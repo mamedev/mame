@@ -505,4 +505,4 @@ ROM_START( europc )
 	ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
 ROM_END
 
-COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
+COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)

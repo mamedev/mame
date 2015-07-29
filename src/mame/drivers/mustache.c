@@ -279,4 +279,4 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 }
 
 
-GAME( 1987, mustache, 0, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)", "Mustache Boy", GAME_SUPPORTS_SAVE )
+GAME( 1987, mustache, 0, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)", "Mustache Boy", MACHINE_SUPPORTS_SAVE )

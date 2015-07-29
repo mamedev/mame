@@ -369,6 +369,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling,   0,        dribling, dribling, driver_device, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, driblingo,  dribling, dribling, dribling, driver_device, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, driblingbr, dribling, dribling, dribling, driver_device, 0, ROT0, "bootleg (Videomac)", "Dribbling (bootleg, Brazil)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, dribling,   0,        dribling, dribling, driver_device, 0, ROT0, "Model Racing", "Dribbling", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingo,  dribling, dribling, dribling, driver_device, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingbr, dribling, dribling, dribling, driver_device, 0, ROT0, "bootleg (Videomac)", "Dribbling (bootleg, Brazil)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

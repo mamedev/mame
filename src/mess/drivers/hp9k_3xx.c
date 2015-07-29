@@ -466,10 +466,10 @@ ROM_START( hp9k382 )
 ROM_END
 
 /*    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT                 INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/310", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/320", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/330", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/340", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/370", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/380", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/382", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

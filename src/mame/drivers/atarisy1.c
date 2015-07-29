@@ -2464,7 +2464,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadb110)
  *
  *************************************/
 
-GAME( 1984, atarisy1, 0,        atarisy1, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Atari System 1 BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1984, atarisy1, 0,        atarisy1, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Atari System 1 BIOS", MACHINE_IS_BIOS_ROOT )
 
 GAME( 1984, marble,   atarisy1, atarisy1, marble, atarisy1_state,   marble,   ROT0, "Atari Games", "Marble Madness (set 1)", 0 )
 GAME( 1984, marble2,  marble,   atarisy1, marble, atarisy1_state,   marble,   ROT0, "Atari Games", "Marble Madness (set 2)", 0 )
@@ -2479,7 +2479,7 @@ GAME( 1985, indytemp2,indytemp, atarisy1, indytemp, atarisy1_state, indytemp, RO
 GAME( 1985, indytemp3,indytemp, atarisy1, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
 GAME( 1985, indytemp4,indytemp, atarisy1, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
 GAME( 1985, indytempd,indytemp, atarisy1, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
-GAME( 1985, indytempc,indytemp, atarisy1, indytemc, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, indytempc,indytemp, atarisy1, indytemc, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1985, roadrunn, atarisy1, atarisy1, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
 GAME( 1985, roadrunn2,roadrunn, atarisy1, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
@@ -2493,6 +2493,6 @@ GAME( 1987, roadblst2,  roadblst, atarisy1, roadblst, atarisy1_state, roadb110, 
 GAME( 1987, roadblstg1, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (upright, German, rev 1)", 0 )
 GAME( 1987, roadblst1,  roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (upright, rev 1)", 0 )
 GAME( 1987, roadblstc,  roadblst, atarisy1, roadblst, atarisy1_state, roadb110, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
-GAME( 1987, roadblstcg, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, roadblstc1, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstcg, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstc1, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1987, roadblstgu, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )

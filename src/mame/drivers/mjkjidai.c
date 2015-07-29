@@ -369,4 +369,4 @@ ROM_START( mjkjidai )
 ROM_END
 
 
-GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, driver_device, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, driver_device, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

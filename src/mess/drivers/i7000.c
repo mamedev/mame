@@ -398,4 +398,4 @@ ROM_START( i7000 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY    FULLNAME    FLAGS */
-COMP( 1982, i7000,  0,      0,       i7000,     i7000,   i7000_state, i7000, "Itautec", "I-7000",   GAME_NOT_WORKING)
+COMP( 1982, i7000,  0,      0,       i7000,     i7000,   i7000_state, i7000, "Itautec", "I-7000",   MACHINE_NOT_WORKING)

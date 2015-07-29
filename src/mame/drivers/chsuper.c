@@ -473,6 +473,6 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 *************************/
 
 /*     YEAR  NAME      PARENT    MACHINE  INPUT    STATE           INIT      ROT    COMPANY         FULLNAME                   FLAGS                 LAYOUT */
-GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state,  chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", GAME_IMPERFECT_SOUND, layout_chsuper ) //24/02/99
-GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state,  chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", GAME_IMPERFECT_SOUND, layout_chsuper ) //26/01/99
-GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state,  chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  GAME_IMPERFECT_SOUND )                 //10/11/99
+GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state,  chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //24/02/99
+GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state,  chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //26/01/99
+GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state,  chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND )                 //10/11/99

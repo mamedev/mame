@@ -166,4 +166,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME       FLAGS */
-COMP( 1982, c8002, 0,      0,       c8002,     c8002, driver_device, 0,     "Onyx", "C8002", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1982, c8002, 0,      0,       c8002,     c8002, driver_device, 0,     "Onyx", "C8002", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

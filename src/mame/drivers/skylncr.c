@@ -1670,7 +1670,7 @@ DRIVER_INIT_MEMBER(skylncr_state,skylncr)
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT     ROT    COMPANY                 FULLNAME                                         FLAGS  */
 GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
 GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   GAME_NOT_WORKING )
+GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
 GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
 GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
 GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )

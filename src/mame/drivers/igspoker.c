@@ -2474,8 +2474,8 @@ GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk, igspoker_state, cpokerpk, 
 GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, green board)", 0, layout_igspoker )
 GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian Cup (bootleg V220IT)",      0, layout_igspoker )
 
-GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igspoker_state,  igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",            GAME_IMPERFECT_GRAPHICS, layout_igspoker )
+GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igspoker_state,  igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",            MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
 
-GAMEL( 1998, stellecu,  0,        number10, number10, driver_device, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                      GAME_NOT_WORKING, layout_igspoker )
+GAMEL( 1998, stellecu,  0,        number10, number10, driver_device, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                      MACHINE_NOT_WORKING, layout_igspoker )
 
 GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                          0, layout_igspoker )

@@ -282,4 +282,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                        FULLNAME            FLAGS */
-COMP( 1987, pes,    0,      0,      pes,        pes, pes_state,    pes, "Pacific Educational Systems", "VPU-01 Speech box", GAME_NOT_WORKING )
+COMP( 1987, pes,    0,      0,      pes,        pes, pes_state,    pes, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

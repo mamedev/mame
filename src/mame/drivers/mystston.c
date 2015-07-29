@@ -318,6 +318,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mystston, 0,        mystston, mystston, driver_device, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure", GAME_SUPPORTS_SAVE )
-GAME( 1984, myststono,mystston, mystston, mystston, driver_device, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure", GAME_SUPPORTS_SAVE )
-GAME( 1984, myststonoi,mystston, mystston, mystston, driver_device, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure (Itisa PCB)", GAME_SUPPORTS_SAVE )
+GAME( 1984, mystston, 0,        mystston, mystston, driver_device, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststono,mystston, mystston, mystston, driver_device, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststonoi,mystston, mystston, mystston, driver_device, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure (Itisa PCB)", MACHINE_SUPPORTS_SAVE )

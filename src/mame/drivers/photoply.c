@@ -153,4 +153,4 @@ DRIVER_INIT_MEMBER(photoply_state,photoply)
 {
 }
 
-GAME( 199?, photoply,  0,   photoply, photoply, photoply_state, photoply, ROT0, "Funworld", "Photo Play 2000 (v2.01)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, photoply,  0,   photoply, photoply, photoply_state, photoply, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

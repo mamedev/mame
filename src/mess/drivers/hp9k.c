@@ -429,4 +429,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, hp9816, 0,      0,      hp9k,   hp9k, hp9k_state,       hp9k,   "Hewlett Packard",  "HP 9816" ,  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, hp9816, 0,      0,      hp9k,   hp9k, hp9k_state,       hp9k,   "Hewlett Packard",  "HP 9816" ,  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

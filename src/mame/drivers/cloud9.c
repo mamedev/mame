@@ -494,5 +494,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloud9,   0, cloud9, cloud9, driver_device,   0, ROT0, "Atari", "Cloud 9 (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1983, firebeas, 0, cloud9, firebeas, driver_device, 0, ROT0, "Atari", "Firebeast (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1983, cloud9,   0, cloud9, cloud9, driver_device,   0, ROT0, "Atari", "Cloud 9 (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, firebeas, 0, cloud9, firebeas, driver_device, 0, ROT0, "Atari", "Firebeast (prototype)", MACHINE_SUPPORTS_SAVE )

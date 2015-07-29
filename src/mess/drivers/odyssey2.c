@@ -828,6 +828,6 @@ ROM_END
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      COMPANY     FULLNAME     FLAGS */
 COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 2", 0 )
 COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac G7000/C52", 0 )
-COMP( 1983, g7400, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac Plus G7400", GAME_IMPERFECT_GRAPHICS )
-COMP( 1983, jopac, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Brandt", "Jopac JO7400", GAME_IMPERFECT_GRAPHICS )
-COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", GAME_IMPERFECT_GRAPHICS )
+COMP( 1983, g7400, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac Plus G7400", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, jopac, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Brandt", "Jopac JO7400", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )

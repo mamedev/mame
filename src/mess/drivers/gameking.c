@@ -191,5 +191,5 @@ ROM_END
 
 
 
-CONS(2003,  gameking,    0,  0,  gameking,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing GM-218", GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS(2003,  gameking,    0,  0,  gameking,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW

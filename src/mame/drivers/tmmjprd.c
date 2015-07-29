@@ -887,5 +887,5 @@ ROM_START( tmpdoki )
 ROM_END
 
 
-GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, driver_device, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, driver_device, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // missing gfx due to wrong roms?
+GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, driver_device, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, driver_device, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?

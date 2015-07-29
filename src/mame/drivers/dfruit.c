@@ -416,4 +416,4 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 1993, dfruit,  0,   dfruit, dfruit, driver_device,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, dfruit,  0,   dfruit, dfruit, driver_device,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )

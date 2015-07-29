@@ -1259,4 +1259,4 @@ COMP( 1990, cpc464p,  0,        0,      cpcplus,       plus, driver_device,     
 COMP( 1990, cpc6128p, 0,        0,      cpcplus,       plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC6128+",                          0 )
 CONS( 1990, gx4000,   0,        0,      gx4000,        gx4000, driver_device,   0,       "Amstrad plc",         "Amstrad GX4000",                            0 )
 COMP( 1989, kccomp,   cpc464,   0,      kccomp,        kccomp, driver_device,   0,       "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,        aleste, driver_device,   0,       "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )
+COMP( 1993, al520ex,  cpc464,   0,      aleste,        aleste, driver_device,   0,       "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

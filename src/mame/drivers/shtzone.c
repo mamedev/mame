@@ -120,4 +120,4 @@ ROM_START( shtzone )
 	ROM_LOAD( "epr10894a.20", 0x00000, 0x04000, CRC(ea8901d9) SHA1(43fd8bfc395e3b2e3fbe9645d692a5eb04783d9c) )
 ROM_END
 
-GAME( 1987, shtzone,  0,    shtzone, shtzone, driver_device,  0, ROT0, "Sega", "Shooting Zone System BIOS", GAME_IS_SKELETON | GAME_NO_SOUND | GAME_NOT_WORKING | GAME_IS_BIOS_ROOT )
+GAME( 1987, shtzone,  0,    shtzone, shtzone, driver_device,  0, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_IS_SKELETON | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )

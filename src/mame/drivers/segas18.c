@@ -2367,7 +2367,7 @@ GAME( 1990, lghostu,   lghost,   lghost,               lghost,   segas18_state, 
 GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (World, FD1094/8751 317-0159)", 0 )
 GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (US, FD1094/8751 317-0158)", 0 )
 GAME( 1990, mwalkj,    mwalk,    system18_fd1094_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (Japan, FD1094/8751 317-0157)", 0 )
-GAME( 1989, pontoon,   0,        system18_fd1094,      shdancer, segas18_state, generic_5874, ROT0,   "Sega",          "Pontoon (FD1094 317-0153)", GAME_NOT_WORKING ) // satellite/networked gambling game?
+GAME( 1989, pontoon,   0,        system18_fd1094,      shdancer, segas18_state, generic_5874, ROT0,   "Sega",          "Pontoon (FD1094 317-0153)", MACHINE_NOT_WORKING ) // satellite/networked gambling game?
 GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (World)", 0 )
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )

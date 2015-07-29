@@ -224,4 +224,4 @@ ROM_START( metamaq2 )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   CLASS        INIT         COMPANY           FULLNAME */
-COMP(2012, metamaq2,      0,        0,   rambo,    0,      rambo_state, rambo,    "Metamaquina", "Metamaquina 2 desktop 3d printer", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(2012, metamaq2,      0,        0,   rambo,    0,      rambo_state, rambo,    "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

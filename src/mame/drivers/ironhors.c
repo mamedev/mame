@@ -527,6 +527,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, ironhors, 0,        ironhors, ironhors, driver_device, 0, ROT0, "Konami", "Iron Horse", GAME_SUPPORTS_SAVE )
-GAME( 1986, dairesya, ironhors, ironhors, dairesya, driver_device, 0, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, farwest,  ironhors, farwest,  ironhors, driver_device, 0, ROT0, "bootleg?", "Far West", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1986, ironhors, 0,        ironhors, ironhors, driver_device, 0, ROT0, "Konami", "Iron Horse", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dairesya, ironhors, ironhors, dairesya, driver_device, 0, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, farwest,  ironhors, farwest,  ironhors, driver_device, 0, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

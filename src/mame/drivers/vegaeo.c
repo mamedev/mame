@@ -331,4 +331,4 @@ DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
 	init_speedup();
 }
 
-GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

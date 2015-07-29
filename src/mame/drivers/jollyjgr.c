@@ -765,5 +765,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider,  fspider, driver_device,  0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", GAME_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
-GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, driver_device, 0, ROT90, "Taito Corporation", "Jolly Jogger", GAME_SUPPORTS_SAVE )
+GAME( 1981, fspiderb, 0, fspider,  fspider, driver_device,  0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
+GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, driver_device, 0, ROT90, "Taito Corporation", "Jolly Jogger", MACHINE_SUPPORTS_SAVE )

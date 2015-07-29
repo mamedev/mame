@@ -635,8 +635,8 @@ ROM_END
 
 
 
-GAME( 1984, pacland,   0,       pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (World)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paclandj,  pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan new)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paclandjo, pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan old)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paclandjo2,pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan older)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paclandm,  pacland, pacland, pacland, driver_device, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", GAME_SUPPORTS_SAVE )
+GAME( 1984, pacland,   0,       pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandj,  pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo, pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo2,pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm,  pacland, pacland, pacland, driver_device, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )

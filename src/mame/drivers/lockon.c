@@ -774,5 +774,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, lockon,  0,      lockon,  lockon, driver_device,  0, ROT0, "Tatsumi", "Lock-On (rev. E)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lockonc, lockon, lockon,  lockone, driver_device, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lockon,  0,      lockon,  lockon, driver_device,  0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockonc, lockon, lockon,  lockone, driver_device, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )

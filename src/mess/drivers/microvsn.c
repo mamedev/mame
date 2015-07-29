@@ -704,4 +704,4 @@ ROM_START( microvsn )
 ROM_END
 
 
-CONS( 1979, microvsn, 0, 0, microvision, microvision, driver_device, 0, "Milton Bradley", "MicroVision", GAME_NOT_WORKING )
+CONS( 1979, microvsn, 0, 0, microvision, microvision, driver_device, 0, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING )

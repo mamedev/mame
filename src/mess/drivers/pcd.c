@@ -569,4 +569,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1984, pcd, 0, 0, pcd, 0, driver_device, 0, "Siemens", "PC-D", GAME_NOT_WORKING )
+COMP( 1984, pcd, 0, 0, pcd, 0, driver_device, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )

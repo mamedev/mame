@@ -301,5 +301,5 @@ ROM_END
 
 
 
-GAME( 1986, solomon,  0,       solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon's Key (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, solomonj, solomon, solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, solomon,  0,       solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon's Key (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomonj, solomon, solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -437,5 +437,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, fgoala, fgoal, fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fgoala, fgoal, fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

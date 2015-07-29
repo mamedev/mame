@@ -241,4 +241,4 @@ ROM_START( eti660 )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                             FULLNAME                FLAGS */
-COMP( 1981, eti660,     0,      0,      eti660,     eti660, driver_device,      0,          "Electronics Today International",  "ETI-660",  GAME_NOT_WORKING )
+COMP( 1981, eti660,     0,      0,      eti660,     eti660, driver_device,      0,          "Electronics Today International",  "ETI-660",  MACHINE_NOT_WORKING )

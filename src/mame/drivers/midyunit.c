@@ -2914,56 +2914,56 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, narc,     0,        zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 7.00)", GAME_SUPPORTS_SAVE )
-GAME( 1988, narc3,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 3.20)", GAME_SUPPORTS_SAVE )
-GAME( 1988, narc2,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 2.00)", GAME_SUPPORTS_SAVE )
+GAME( 1988, narc,     0,        zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 7.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc3,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 3.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc2,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 2.00)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, trog,     0,        yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA5 03/29/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, trog4,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, trog3,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, trogpa6,  trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, trogpa4,  trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, trog,     0,        yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA5 03/29/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog4,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog3,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trogpa6,  trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trogpa4,  trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, smashtv,  0,        yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", GAME_SUPPORTS_SAVE )
-GAME( 1990, smashtv6, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", GAME_SUPPORTS_SAVE )
-GAME( 1990, smashtv5, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", GAME_SUPPORTS_SAVE )
-GAME( 1990, smashtv4, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", GAME_SUPPORTS_SAVE )
-GAME( 1990, smashtv3, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 3.01)", GAME_SUPPORTS_SAVE )
+GAME( 1990, smashtv,  0,        yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv6, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv5, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv4, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv3, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 3.01)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", GAME_SUPPORTS_SAVE ) /* See notes about factory restore above */
+GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", MACHINE_SUPPORTS_SAVE ) /* See notes about factory restore above */
 
-GAME( 1991, strkforc, 0,        yunit_cvsd_4bit_fast,  strkforc, midyunit_state, strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, strkforc, 0,        yunit_cvsd_4bit_fast,  strkforc, midyunit_state, strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, term2,    0,        yunit_adpcm_6bit_faster, term2, midyunit_state,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", GAME_SUPPORTS_SAVE )
-GAME( 1991, term2la3, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", GAME_SUPPORTS_SAVE )
-GAME( 1991, term2la2, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, term2la1, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, term2,    0,        yunit_adpcm_6bit_faster, term2, midyunit_state,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la3, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la2, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la1, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkla3,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkla2,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkla1,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkprot9,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkprot8,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkprot4,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkyturbo, mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkyturboe,mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mknifty,  mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mknifty666, mk,     yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkyawdim, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim3,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim4,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla3,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla2,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla1,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot9,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot8,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot4,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturbo, mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturboe,mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty,  mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty666, mk,     yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyawdim, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim3,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim4,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
 
-GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", GAME_SUPPORTS_SAVE )
-GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", GAME_SUPPORTS_SAVE )
+GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )

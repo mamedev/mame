@@ -1250,7 +1250,7 @@ DRIVER_INIT_MEMBER(maygayv1_state,screenpl)
 	m_p1 = m_p3 = 0xff;
 }
 
-#define GAME_FLAGS GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK
+#define GAME_FLAGS MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK
 
 GAME( 1991, screenpl, 0,        maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 4.0)",               GAME_FLAGS )
 GAME( 1991, screenp1, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 1)",               GAME_FLAGS )

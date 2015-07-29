@@ -461,4 +461,4 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 }
 
 
-GAME( 1993, dblewing, 0,     dblewing, dblewing, dblewing_state,  dblewing,  ROT90, "Mitchell", "Double Wings", GAME_SUPPORTS_SAVE )
+GAME( 1993, dblewing, 0,     dblewing, dblewing, dblewing_state,  dblewing,  ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )

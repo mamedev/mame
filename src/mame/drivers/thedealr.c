@@ -583,4 +583,4 @@ ROM_START( thedealr )
 	ROM_LOAD( "xb0-u68.u68", 0x200, 0x200, CRC(c0c54d43) SHA1(5ce352fb888c8e683014c73e6da00ec95f2ae572) )
 ROM_END
 
-GAME( 1988?, thedealr, 0, thedealr, thedealr, driver_device, 0, ROT0, "Visco Games", "The Dealer (Visco)", GAME_SUPPORTS_SAVE )
+GAME( 1988?, thedealr, 0, thedealr, thedealr, driver_device, 0, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )

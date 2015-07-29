@@ -112,4 +112,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 198?, konin,  0,      0,       konin,     konin, driver_device,   0,    "Mera-Elzab",   "Konin", GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, konin,  0,      0,       konin,     konin, driver_device,   0,    "Mera-Elzab",   "Konin", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

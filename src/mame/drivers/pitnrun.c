@@ -333,5 +333,5 @@ ROM_START( pitnruna )
 	ROM_LOAD( "clr.3",  0x0040, 0x0020, CRC(25e70e5e) SHA1(fdb9c69e9568a725dd0e3ac25835270fb4f49280) )
 ROM_END
 
-GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

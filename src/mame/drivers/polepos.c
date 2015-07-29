@@ -2146,4 +2146,4 @@ GAME( 1982, topracern,  polepos,  topracern,  topracern, polepos_state, topracer
 GAME( 1983, polepos2,   0,        polepos,    polepos2j, polepos_state, polepos2,  ROT0, "Namco", "Pole Position II (Japan)", 0 )
 GAME( 1983, polepos2a,  polepos2, polepos,    polepos2,  polepos_state, polepos2,  ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
 GAME( 1983, polepos2b,  polepos2, polepos,    polepos2,  driver_device, 0,         ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
-GAME( 1984, polepos2bi, polepos2, polepos2bi, topracern, polepos_state, topracern, ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices
+GAME( 1984, polepos2bi, polepos2, polepos2bi, topracern, polepos_state, topracern, ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND ) // should have italian voices

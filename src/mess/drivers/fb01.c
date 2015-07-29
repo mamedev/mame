@@ -225,4 +225,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  INIT                  COMPANY   FULLNAME  FLAGS */
-CONS( 1986, fb01, 0,      0,       fb01,    fb01,  driver_device,   0,   "Yamaha", "FB-01",  GAME_SUPPORTS_SAVE )
+CONS( 1986, fb01, 0,      0,       fb01,    fb01,  driver_device,   0,   "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )

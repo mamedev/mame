@@ -335,4 +335,4 @@ ROM_START( palmz22 )
 	ROM_LOAD( "palmz22.bin", 0, 0x2100000, CRC(6d0320b3) SHA1(99297975fdad44faf69cc6eaf0fa2560d5579a4d) )
 ROM_END
 
-COMP(2005, palmz22, 0, 0, palmz22, palmz22, palmz22_state, palmz22, "Palm", "Palm Z22", GAME_NO_SOUND)
+COMP(2005, palmz22, 0, 0, palmz22, palmz22, palmz22_state, palmz22, "Palm", "Palm Z22", MACHINE_NO_SOUND)

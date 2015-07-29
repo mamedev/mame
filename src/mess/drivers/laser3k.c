@@ -1034,4 +1034,4 @@ ROM_START(las3000)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY          FULLNAME */
-COMP( 1983, las3000,  0,        0,        laser3k,     laser3k, driver_device,  0,        "Video Technology",  "Laser 3000",    GAME_NOT_WORKING )
+COMP( 1983, las3000,  0,        0,        laser3k,     laser3k, driver_device,  0,        "Video Technology",  "Laser 3000",    MACHINE_NOT_WORKING )

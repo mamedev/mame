@@ -2717,11 +2717,11 @@ GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t, driver_device,    0,  
 GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg, driver_device,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", GAME_MECHANICAL )
-GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", GAME_MECHANICAL )
-GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", GAME_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop, itech8_state,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", GAME_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike, itech8_state,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", GAME_MECHANICAL )
+GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop, itech8_state,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike, itech8_state,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
 GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */

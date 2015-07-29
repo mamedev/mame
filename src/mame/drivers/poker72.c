@@ -412,4 +412,4 @@ DRIVER_INIT_MEMBER(poker72_state,poker72)
 	rom[0x4a9] = 0x28;
 }
 
-GAME( 1995, poker72,  0,    poker72, poker72, poker72_state,  poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", GAME_NOT_WORKING ) // actually unknown, was marked 'slot 72 poker'  Manufacturers logo and 'Lucky Boy' gfx in rom..
+GAME( 1995, poker72,  0,    poker72, poker72, poker72_state,  poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", MACHINE_NOT_WORKING ) // actually unknown, was marked 'slot 72 poker'  Manufacturers logo and 'Lucky Boy' gfx in rom..

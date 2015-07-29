@@ -424,6 +424,6 @@ ROM_END
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
 
-CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
-CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
+CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", MACHINE_IMPERFECT_SOUND)
+CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "Nippon Electronic Company", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND)
+CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "Nippon Electronic Company", "SuperGrafx", MACHINE_IMPERFECT_SOUND)

@@ -959,6 +959,6 @@ ROM_END
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY  FULLNAME */
-GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", GAME_NOT_WORKING )
-GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan", "Air Inferno (Japan)", GAME_NOT_WORKING )
+GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", MACHINE_NOT_WORKING )
+GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan", "Air Inferno (Japan)", MACHINE_NOT_WORKING )

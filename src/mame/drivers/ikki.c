@@ -354,5 +354,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, ikki,   0,    ikki, ikki, driver_device, 0, ROT0, "Sun Electronics", "Ikki (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, farmer, ikki, ikki, ikki, driver_device, 0, ROT0, "Sun Electronics", "Farmers Rebellion", GAME_SUPPORTS_SAVE )
+GAME( 1985, ikki,   0,    ikki, ikki, driver_device, 0, ROT0, "Sun Electronics", "Ikki (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, farmer, ikki, ikki, ikki, driver_device, 0, ROT0, "Sun Electronics", "Farmers Rebellion", MACHINE_SUPPORTS_SAVE )

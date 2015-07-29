@@ -1740,49 +1740,49 @@ ROM_END
 
 /***** GAME DRIVERS *****/
 
-GAME( 1996, skns,      0,        skns, skns, driver_device,     0,         ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1996, skns,      0,        skns, skns, driver_device,     0,         ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, galpani4,  skns,     sknsj, cyvern, skns_state,   galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, galpani4k, galpani4, sknsk, cyvern, skns_state,   galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4,  skns,     sknsj, cyvern, skns_state,   galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4k, galpani4, sknsk, cyvern, skns_state,   galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)", MACHINE_IMPERFECT_GRAPHICS )
 // there is a Gals Panic 4 version with 'Gals Panic SU' title as well, seen for sale in Korea (different to the Gals Panic SU clone of galpans2)
 
-GAME( 1996, jjparads,  skns,     sknsj, skns_1p, skns_state,  jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, jjparads,  skns,     sknsj, skns_1p, skns_state,  jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanisj, galpanis, sknsj, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanisk, galpanis, sknsk, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanisj, galpanis, sknsj, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanisk, galpanis, sknsk, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, jjparad2,  skns,     sknsj, skns_1p, skns_state,  jjparad2,  ROT0,  "Electro Design", "Jan Jan Paradise 2", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, jjparad2,  skns,     sknsj, skns_1p, skns_state,  jjparad2,  ROT0,  "Electro Design", "Jan Jan Paradise 2", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, sengekis,  skns,     sknsa, skns, skns_state,     sengekis,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Asia)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sengekisj, sengekis, sknsj, skns, skns_state,     sengekij,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sengekis,  skns,     sknsa, skns, skns_state,     sengekis,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sengekisj, sengekis, sknsj, skns, skns_state,     sengekij,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, vblokbrk,  skns,     sknsa, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sarukani,  vblokbrk, sknsj, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, vblokbrk,  skns,     sknsa, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sarukani,  vblokbrk, sknsj, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, cyvern,    skns,     sknsu, cyvern, skns_state,   cyvern,    ROT90, "Kaneko", "Cyvern (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, cyvernj,   cyvern,   sknsj, cyvern, skns_state,   cyvern,    ROT90, "Kaneko", "Cyvern (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvern,    skns,     sknsu, cyvern, skns_state,   cyvern,    ROT90, "Kaneko", "Cyvern (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvernj,   cyvern,   sknsj, cyvern, skns_state,   cyvern,    ROT90, "Kaneko", "Cyvern (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, puzzloop,  skns,     sknse, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.94)", GAME_IMPERFECT_GRAPHICS ) // Same speed up as US version
-GAME( 1998, puzzloope, puzzloop, sknse, puzzloop, skns_state, puzzloope, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.93)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopj, puzzloop, sknsj, puzzloop, skns_state, puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopa, puzzloop, sknsa, puzzloop, skns_state, puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopk, puzzloop, sknsk, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea)", GAME_IMPERFECT_GRAPHICS ) // Same speed up as US version
-GAME( 1998, puzzloopu, puzzloop, sknsu, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (USA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloop,  skns,     sknse, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.94)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
+GAME( 1998, puzzloope, puzzloop, sknse, puzzloop, skns_state, puzzloope, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.93)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopj, puzzloop, sknsj, puzzloop, skns_state, puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopa, puzzloop, sknsa, puzzloop, skns_state, puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopk, puzzloop, sknsk, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
+GAME( 1998, puzzloopu, puzzloop, sknsu, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (USA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, ryouran ,  skns,     sknsj, skns_1p, skns_state,  ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, ryourano,  ryouran,  sknsj, skns_1p, skns_state,  ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, ryouran ,  skns,     sknsj, skns_1p, skns_state,  ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, ryourano,  ryouran,  sknsj, skns_1p, skns_state,  ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, galpans2,  skns,     sknsj, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, galpans2a, galpans2, sknsa, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, galpansu,  galpans2, sknsk, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", GAME_IMPERFECT_GRAPHICS ) // official or hack?
+GAME( 1999, galpans2,  skns,     sknsj, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpans2a, galpans2, sknsa, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpansu,  galpans2, sknsk, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // official or hack?
 
-GAME( 1999, panicstr,  skns,     sknsj, galpanis, skns_state, panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, panicstr,  skns,     sknsj, galpanis, skns_state, panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, senknow ,  skns,     sknsj, skns, skns_state,     senknow,   ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, senknow ,  skns,     sknsj, skns, skns_state,     senknow,   ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, teljan  ,  skns,     sknsj, skns_1p, skns_state,  teljan,    ROT0,  "Electro Design", "Tel Jan", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, teljan  ,  skns,     sknsj, skns_1p, skns_state,  teljan,    ROT0,  "Electro Design", "Tel Jan", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 2000, gutsn,     skns,     sknsj, skns, skns_state,     gutsn,     ROT0,  "Kaneko / Kouyousha", "Guts'n (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, gutsn,     skns,     sknsj, skns, skns_state,     gutsn,     ROT0,  "Kaneko / Kouyousha", "Guts'n (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 2002, galpans3,  skns,     sknsj, galpanis, skns_state, galpans3,  ROT0,  "Kaneko", "Gals Panic S3 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, galpans3,  skns,     sknsj, galpanis, skns_state, galpans3,  ROT0,  "Kaneko", "Gals Panic S3 (Japan)", MACHINE_IMPERFECT_GRAPHICS )

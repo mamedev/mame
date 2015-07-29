@@ -1359,12 +1359,12 @@ INPUT_PORTS_END
 
 
 
-GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, cubo,     ROT0, "Commodore",  "Cubo BIOS",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_IS_BIOS_ROOT )
-GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
-GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, mgnumber, ROT0, "CD Express", "Magic Number",              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, odeontw2, cubo, cubo, odeontw2, cubo_state, cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", GAME_NOT_WORKING )
+GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
+GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, odeontw2, cubo, cubo, odeontw2, cubo_state, cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING )

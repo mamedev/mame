@@ -418,4 +418,4 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY              FULLNAME ) */
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, driver_device, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", GAME_SUPPORTS_SAVE )
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, driver_device, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )

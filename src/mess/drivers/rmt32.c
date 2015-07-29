@@ -434,5 +434,5 @@ ROM_START( cm32l )
 	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) )
 ROM_END
 
-CONS( 1987, mt32,  0, 0, mt32, mt32, driver_device, 0, "Roland", "MT32",  GAME_NOT_WORKING|GAME_NO_SOUND )
-CONS( 1989, cm32l, 0, 0, mt32, mt32, driver_device, 0, "Roland", "CM32L", GAME_NOT_WORKING|GAME_NO_SOUND )
+CONS( 1987, mt32,  0, 0, mt32, mt32, driver_device, 0, "Roland", "MT32",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1989, cm32l, 0, 0, mt32, mt32, driver_device, 0, "Roland", "CM32L", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

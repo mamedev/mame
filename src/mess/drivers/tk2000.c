@@ -605,4 +605,4 @@ ROM_START(tk2000)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  driver_device,   0,        "Microdigital",    "TK2000", GAME_NOT_WORKING )
+COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  driver_device,   0,        "Microdigital",    "TK2000", MACHINE_NOT_WORKING )

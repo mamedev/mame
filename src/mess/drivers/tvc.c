@@ -871,6 +871,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT     INIT                     COMPANY       FULLNAME       FLAGS */
-COMP( 1985, tvc64,    0,      0,     tvc,       tvc,      driver_device,  0,       "Videoton",   "TVC 64",       GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, tvc64p,   tvc64,  0,     tvc,       tvc,      driver_device,  0,       "Videoton",   "TVC 64+",      GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, tvc64pru, tvc64,  0,     tvc,       tvc64pru, driver_device,  0,       "Videoton",   "TVC 64+ (Russian)",        GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, tvc64,    0,      0,     tvc,       tvc,      driver_device,  0,       "Videoton",   "TVC 64",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, tvc64p,   tvc64,  0,     tvc,       tvc,      driver_device,  0,       "Videoton",   "TVC 64+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, tvc64pru, tvc64,  0,     tvc,       tvc64pru, driver_device,  0,       "Videoton",   "TVC 64+ (Russian)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

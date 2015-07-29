@@ -1118,6 +1118,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY    FULLNAME                        FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3", GAME_NOT_WORKING)
-COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,    driver_device,    0,      "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", GAME_NOT_WORKING)
-COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,    driver_device,    0,      "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", GAME_NOT_WORKING)
+COMP( 1980, bml3,   0,      0,       bml3,      bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3", MACHINE_NOT_WORKING)
+COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,    driver_device,    0,      "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
+COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,    driver_device,    0,      "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)

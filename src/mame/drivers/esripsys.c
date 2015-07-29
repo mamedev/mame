@@ -1071,6 +1071,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_SUPPORTS_SAVE )
-GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", GAME_SUPPORTS_SAVE )
-GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_SUPPORTS_SAVE )
+GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )

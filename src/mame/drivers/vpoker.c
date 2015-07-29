@@ -702,5 +702,5 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  MACHINE  INPUT     STATE          INIT  ROT    COMPANY         FULLNAME             FLAGS... */
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics", "Videotronics Poker", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",    "5-Aces Poker",       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics", "Videotronics Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",    "5-Aces Poker",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

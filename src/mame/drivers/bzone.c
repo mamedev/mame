@@ -875,9 +875,9 @@ DRIVER_INIT_MEMBER(bzone_state,bradley)
  *
  *************************************/
 
-GAMEL(1980, bzone,     0,        bzone,    bzone, driver_device,    0,       ROT0, "Atari", "Battle Zone (rev 2)", GAME_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone, driver_device,    0,       ROT0, "Atari", "Battle Zone (rev 1)", GAME_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone, driver_device,    0,       ROT0, "Atari", "Battle Zone (cocktail)", GAME_SUPPORTS_SAVE|GAME_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley, bzone_state,  bradley, ROT0, "Atari", "Bradley Trainer", GAME_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, driver_device, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", GAME_SUPPORTS_SAVE, layout_redbaron )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, driver_device, 0,       ROT0, "Atari", "Red Baron", GAME_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, bzone,     0,        bzone,    bzone, driver_device,    0,       ROT0, "Atari", "Battle Zone (rev 2)", MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone, driver_device,    0,       ROT0, "Atari", "Battle Zone (rev 1)", MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone, driver_device,    0,       ROT0, "Atari", "Battle Zone (cocktail)", MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,   0,        bzone,    bradley, bzone_state,  bradley, ROT0, "Atari", "Bradley Trainer", MACHINE_SUPPORTS_SAVE )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, driver_device, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, driver_device, 0,       ROT0, "Atari", "Red Baron", MACHINE_SUPPORTS_SAVE, layout_redbaron )

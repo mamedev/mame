@@ -179,4 +179,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, pipbug,  0,       0,     pipbug,    pipbug, driver_device,    0,  "Signetics", "PIPBUG", GAME_NO_SOUND_HW )
+COMP( 1979, pipbug,  0,       0,     pipbug,    pipbug, driver_device,    0,  "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )

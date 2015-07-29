@@ -180,5 +180,5 @@ ROM_START( newsa )
 	ROM_LOAD( "virus.1", 0x00000, 0x40000, CRC(41f5935a) SHA1(1566d243f165019660cd4dd69df9f049e0130f15) )
 ROM_END
 
-GAME( 1993, news,  0,    news, news, driver_device,  0, ROT0, "Poby / Virus", "News (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1993, newsa, news, news, newsa, driver_device, 0, ROT0, "Poby",         "News (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1993, news,  0,    news, news, driver_device,  0, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, newsa, news, news, newsa, driver_device, 0, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )

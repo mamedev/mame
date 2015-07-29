@@ -1980,4 +1980,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT    COMPANY                        FULLNAME */
-COMP( 1961, pdp1,     0,        0,      pdp1,     pdp1, driver_device,  0,  "Digital Equipment Corporation",  "PDP-1" , GAME_NO_SOUND_HW )
+COMP( 1961, pdp1,     0,        0,      pdp1,     pdp1, driver_device,  0,  "Digital Equipment Corporation",  "PDP-1" , MACHINE_NO_SOUND_HW )

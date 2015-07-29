@@ -346,4 +346,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1983, tdv2324,        0,      0,      tdv2324,        tdv2324, driver_device,     0,      "Tandberg",     "TDV 2324",     GAME_NOT_WORKING|GAME_NO_SOUND)
+COMP( 1983, tdv2324,        0,      0,      tdv2324,        tdv2324, driver_device,     0,      "Tandberg",     "TDV 2324",     MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

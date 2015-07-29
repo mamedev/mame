@@ -395,6 +395,6 @@ ROM_START( brod )
 	ROM_LOAD( "brod13.bin", 0xa000, 0x2000, CRC(1177cd17) SHA1(58c5c09a7b857ce6311339c4d0f4d8c1a7e232a3) )
 ROM_END
 
-GAME( 19??,  kok,   0,      photon2, photon2, driver_device, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", GAME_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
-GAME( 19??,  black, 0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')", GAME_SUPPORTS_SAVE ) // original (c)1988 Toposoft
-GAME( 19??,  brod,  0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')", GAME_SUPPORTS_SAVE ) // original (c)1987 BEAM software
+GAME( 19??,  kok,   0,      photon2, photon2, driver_device, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
+GAME( 19??,  black, 0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')", MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
+GAME( 19??,  brod,  0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')", MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software

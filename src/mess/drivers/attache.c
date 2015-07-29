@@ -1024,5 +1024,5 @@ ROM_START( attachef )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev G)",    GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
-COMP( 1982, attachef,attache,0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev F)",    GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
+COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev G)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)
+COMP( 1982, attachef,attache,0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev F)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)

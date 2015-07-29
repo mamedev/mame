@@ -904,10 +904,10 @@ ROM_START( ufo800 )
 ROM_END
 
 
-GAMEL( 1991, newufo,       0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, ufomini,      0,      ufomini, ufomini, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_ufomini )
-GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   driver_device, 0, ROT0, "Sega", "UFO Catcher 21", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_ufo21 )
-GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  driver_device, 0, ROT0, "Sega", "UFO Catcher 800", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_ufo800 )
+GAMEL( 1991, newufo,       0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, ufomini,      0,      ufomini, ufomini, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
+GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   driver_device, 0, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
+GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  driver_device, 0, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )

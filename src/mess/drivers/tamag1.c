@@ -167,4 +167,4 @@ ROM_START( tama )
 ROM_END
 
 
-CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", GAME_SUPPORTS_SAVE )
+CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

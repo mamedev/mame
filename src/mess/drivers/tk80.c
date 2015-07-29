@@ -337,8 +337,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS        INIT     COMPANY                   FULLNAME       FLAGS */
-COMP( 1976, tk80,     0,      0,       tk80,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-80", GAME_NO_SOUND_HW)
-COMP( 1980, nectk85,  tk80,   0,       tk85,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-85", GAME_NO_SOUND_HW)
-COMP( 19??, nd80z,    tk80,   0,       nd80z,     tk80,     driver_device, 0, "Chunichi", "ND-80Z", GAME_NO_SOUND_HW)
-COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, driver_device, 0, "<unknown>", "Mikrolab KR580IK80", GAME_NO_SOUND_HW)
-COMP( 19??, ics8080,  tk80,   0,       ics8080,   ics8080,  driver_device, 0, "<unknown>", "ICS8080", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1976, tk80,     0,      0,       tk80,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-80", MACHINE_NO_SOUND_HW)
+COMP( 1980, nectk85,  tk80,   0,       tk85,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-85", MACHINE_NO_SOUND_HW)
+COMP( 19??, nd80z,    tk80,   0,       nd80z,     tk80,     driver_device, 0, "Chunichi", "ND-80Z", MACHINE_NO_SOUND_HW)
+COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, driver_device, 0, "<unknown>", "Mikrolab KR580IK80", MACHINE_NO_SOUND_HW)
+COMP( 19??, ics8080,  tk80,   0,       ics8080,   ics8080,  driver_device, 0, "<unknown>", "ICS8080", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

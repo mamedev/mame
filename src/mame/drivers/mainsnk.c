@@ -486,5 +486,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, driver_device, 0,   ROT0, "SNK", "Main Event (1984)", GAME_SUPPORTS_SAVE )
-GAME( 1985, canvas,    0,   mainsnk, canvas, driver_device,  0,   ROT0, "SNK", "Canvas Croquis", GAME_SUPPORTS_SAVE )
+GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, driver_device, 0,   ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,    0,   mainsnk, canvas, driver_device,  0,   ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

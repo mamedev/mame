@@ -929,4 +929,4 @@ DRIVER_INIT_MEMBER(bnstars_state,bnstars)
 	configure_banks();
 }
 
-GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

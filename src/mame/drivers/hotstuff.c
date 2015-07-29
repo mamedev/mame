@@ -152,4 +152,4 @@ ROM_START( hotstuff )
 	ROM_LOAD16_WORD_SWAP( "hot stuff symbol u8 (68000).bin", 0x00000, 0x80000, CRC(f154a157) SHA1(92ae0fb977e2dcc0377487d768f95c6e447e990b) )
 ROM_END
 
-GAME( ????, hotstuff,    0,        hotstuff,    hotstuff, driver_device,    0, ROT0,  "Olympic Video Gaming", "Olympic Hot Stuff (TAS 5 Reel System)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( ????, hotstuff,    0,        hotstuff,    hotstuff, driver_device,    0, ROT0,  "Olympic Video Gaming", "Olympic Hot Stuff (TAS 5 Reel System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -918,5 +918,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1982, mz2000,   mz80b,    0,   mz2000,   mz2000, driver_device,  0, "Sharp",   "MZ-2000", GAME_NOT_WORKING )
-COMP( 1982, mz2200,   mz80b,    0,   mz2000,   mz2000, driver_device,  0, "Sharp",   "MZ-2200", GAME_NOT_WORKING )
+COMP( 1982, mz2000,   mz80b,    0,   mz2000,   mz2000, driver_device,  0, "Sharp",   "MZ-2000", MACHINE_NOT_WORKING )
+COMP( 1982, mz2200,   mz80b,    0,   mz2000,   mz2000, driver_device,  0, "Sharp",   "MZ-2200", MACHINE_NOT_WORKING )

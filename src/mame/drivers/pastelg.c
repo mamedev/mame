@@ -565,6 +565,6 @@ ROM_END
 
 
 
-GAME( 1985, pastelg, 0,       pastelg, pastelg, driver_device, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", GAME_SUPPORTS_SAVE )
-GAME( 1985, threeds, 0,       threeds, threeds, driver_device, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", GAME_SUPPORTS_SAVE )
-GAME( 1985, galds,   threeds, threeds, galds,   driver_device, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pastelg, 0,       pastelg, pastelg, driver_device, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, threeds, 0,       threeds, threeds, driver_device, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galds,   threeds, threeds, galds,   driver_device, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

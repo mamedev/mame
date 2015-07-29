@@ -701,5 +701,5 @@ ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
 // pcjr
-COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC Jr", GAME_IMPERFECT_COLORS )
-COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
+COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
+COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

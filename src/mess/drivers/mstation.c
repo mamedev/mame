@@ -557,4 +557,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1999, mstation,  0,       0,  mstation,   mstation, driver_device,  0,   "CIDCO",   "MailStation",        GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1999, mstation,  0,       0,  mstation,   mstation, driver_device,  0,   "CIDCO",   "MailStation",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

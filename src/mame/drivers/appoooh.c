@@ -638,6 +638,6 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh, driver_device,  0,        ROT0, "Sanritsu / Sega", "Appoooh", GAME_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowres, robowres, appoooh_state, robowres, ROT0, "Sanritsu / Sega", "Robo Wres 2001", GAME_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb,ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,  appoooh, driver_device,  0,        ROT0, "Sanritsu / Sega", "Appoooh", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowres, robowres, appoooh_state, robowres, ROT0, "Sanritsu / Sega", "Robo Wres 2001", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb,ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

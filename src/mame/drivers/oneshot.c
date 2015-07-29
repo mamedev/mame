@@ -483,6 +483,6 @@ ROM_END
 
 
 
-GAME( 1995, maddonna, 0,        maddonna, maddonna, driver_device, 0, ROT0, "Tuning",  "Mad Donna (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1995, maddonnb, maddonna, maddonna, maddonna, driver_device, 0, ROT0, "Tuning",  "Mad Donna (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1996, oneshot,  0,        oneshot,  oneshot , driver_device, 0, ROT0, "Promat",  "One Shot One Kill", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, maddonna, 0,        maddonna, maddonna, driver_device, 0, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonnb, maddonna, maddonna, maddonna, driver_device, 0, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, oneshot,  0,        oneshot,  oneshot , driver_device, 0, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

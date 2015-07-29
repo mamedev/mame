@@ -511,5 +511,5 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY    FULLNAME             FLAGS... */
-GAME( 1997, gambl186,  0,        gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V398)",  GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, gambl186a, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V399)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, gambl186,  0,        gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V398)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, gambl186a, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V399)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

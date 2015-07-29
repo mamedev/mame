@@ -141,7 +141,7 @@ public:
 private:
 	UINT8 m_mt_cart_select_reg;
 	UINT32 m_bios_port_ctrl;
-	int m_current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
+	int m_current_MACHINE_IS_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
 	UINT32 m_bios_ctrl_inputs;
 	UINT8 m_bios_ctrl[6];
 	int m_mt_bank_addr;
@@ -430,7 +430,7 @@ void mtech_state::switch_cart(int gameno)
 		if (!m_cart_is_genesis[gameno])
 		{
 			logerror("enabling SMS Z80\n");
-			m_current_game_is_sms = 1;
+			m_current_MACHINE_IS_sms = 1;
 			set_genz80_as_sms();
 			//m_z80snd->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -438,7 +438,7 @@ void mtech_state::switch_cart(int gameno)
 		else
 		{
 			logerror("disabling SMS Z80\n");
-			m_current_game_is_sms = 0;
+			m_current_MACHINE_IS_sms = 0;
 			set_genz80_as_md();
 			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -613,7 +613,7 @@ DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip
-	if (!m_current_game_is_sms)
+	if (!m_current_MACHINE_IS_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
 	{
@@ -635,7 +635,7 @@ UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitm
 
 void mtech_state::screen_eof_main(screen_device &screen, bool state)
 {
-	if (!m_current_game_is_sms)
+	if (!m_current_MACHINE_IS_sms)
 		screen_eof_megadriv(screen, state);
 }
 
@@ -1396,69 +1396,69 @@ ROM_END
 
 
 /* nn */ /* nn is part of the instruction rom name, should there be a game for each number? */
-/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mtech_state, mt_slot, "Sega",                  "Mega-Tech", GAME_IS_BIOS_ROOT )
-/* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
-/* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
-/* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
-/* 04 */ GAME( 1987, mt_ggolf, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Great Golf (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 05 */ GAME( 198?, mt_gsocr, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Great Soccer (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
-/* 06 */ GAME( 1987, mt_orun,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 07 */ GAME( 1987, mt_asyn,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 08 */ GAME( 1987, mt_shnbi, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
-/* 09 */ GAME( 1987, mt_fz,    megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Fantasy Zone (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
-/* 10 */ GAME( 1987, mt_aftrb, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
-/* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Techno Soft / Sega",    "Thunder Force II MD (Mega-Tech)", GAME_NOT_WORKING )
+/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mtech_state, mt_slot, "Sega",                  "Mega-Tech", MACHINE_IS_BIOS_ROOT )
+/* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1987, mt_ggolf, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Great Golf (Mega-Tech, SMS based)", MACHINE_NOT_WORKING ) /* sms! */
+/* 05 */ GAME( 198?, mt_gsocr, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Great Soccer (Mega-Tech, SMS based)", MACHINE_NOT_WORKING ) /* sms! also bad */
+/* 06 */ GAME( 1987, mt_orun,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", MACHINE_NOT_WORKING ) /* sms! */
+/* 07 */ GAME( 1987, mt_asyn,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", MACHINE_NOT_WORKING ) /* sms! */
+/* 08 */ GAME( 1987, mt_shnbi, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", MACHINE_NOT_WORKING) /* sms */
+/* 09 */ GAME( 1987, mt_fz,    megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Fantasy Zone (Mega-Tech, SMS based)", MACHINE_NOT_WORKING) /* sms */
+/* 10 */ GAME( 1987, mt_aftrb, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", MACHINE_NOT_WORKING) /* sms */
+/* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Techno Soft / Sega",    "Thunder Force II MD (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 12 */ // unknown
-/* 13 */ GAME( 1986, mt_astro, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Astro Warrior (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 13 */ GAME( 1986, mt_astro, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Astro Warrior (Mega-Tech, SMS based)", MACHINE_NOT_WORKING ) /* sms! */
 /* 14 */ // unknown
 /* 15 */ // unknown
 /* 16 */ // unknown
 /* 17 */ // unknown
 /* 18 */ // Kung Fu Kid (sms)
-/* 19 */ GAME( 1987, mt_gfoot, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Great Football (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Last Battle (Mega-Tech)", GAME_NOT_WORKING )
-/* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", GAME_NOT_WORKING )
-/* 22 */ GAME( 1989, mt_tetri, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Tetris (Mega-Tech)", GAME_NOT_WORKING )
-/* 23 */ GAME( 1989, mt_gng,   megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Capcom / Sega",         "Ghouls'n Ghosts (Mega-Tech)", GAME_NOT_WORKING )
-/* 24 */ GAME( 1989, mt_shang, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Hang-On (Mega-Tech)", GAME_NOT_WORKING )
-/* 25 */ GAME( 1989, mt_gaxe,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Golden Axe (Mega-Tech)", GAME_NOT_WORKING )
-/* 26 */ GAME( 1989, mt_fwrld, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Forgotten Worlds (Mega-Tech)", GAME_NOT_WORKING )
-/* 27 */ GAME( 1989, mt_mystd, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Mystic Defender (Mega-Tech)", GAME_NOT_WORKING )
-/* 28 */ GAME( 1989, mt_revsh, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "The Revenge of Shinobi (Mega-Tech)", GAME_NOT_WORKING )
-/* 29 */ GAME( 1987, mt_parlg, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Parlour Games (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 19 */ GAME( 1987, mt_gfoot, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Great Football (Mega-Tech, SMS based)", MACHINE_NOT_WORKING ) /* sms! */
+/* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Last Battle (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 22 */ GAME( 1989, mt_tetri, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Tetris (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 23 */ GAME( 1989, mt_gng,   megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Capcom / Sega",         "Ghouls'n Ghosts (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 24 */ GAME( 1989, mt_shang, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Hang-On (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 25 */ GAME( 1989, mt_gaxe,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Golden Axe (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 26 */ GAME( 1989, mt_fwrld, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Forgotten Worlds (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 27 */ GAME( 1989, mt_mystd, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Mystic Defender (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 28 */ GAME( 1989, mt_revsh, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "The Revenge of Shinobi (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 29 */ GAME( 1987, mt_parlg, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Parlour Games (Mega-Tech, SMS based)", MACHINE_NOT_WORKING ) /* sms! */
 /* 30 */ // unknown
-/* 31 */ GAME( 1989, mt_tgolf, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Arnold Palmer Tournament Golf (Mega-Tech)", GAME_NOT_WORKING )
-/* 32 */ GAME( 1989, mt_srbb,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Real Basketball (Mega-Tech)", GAME_NOT_WORKING )
+/* 31 */ GAME( 1989, mt_tgolf, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Arnold Palmer Tournament Golf (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 32 */ GAME( 1989, mt_srbb,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Real Basketball (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 33 */ // unknown
 /* 34 */ // unknown
-/* 35 */ GAME( 1989, mt_tlbba, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Tommy Lasorda Baseball (Mega-Tech)", GAME_NOT_WORKING )
-/* 36 */ GAME( 1990, mt_cols,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Columns (Mega-Tech)", GAME_NOT_WORKING )
+/* 35 */ GAME( 1989, mt_tlbba, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Tommy Lasorda Baseball (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 36 */ GAME( 1990, mt_cols,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Columns (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 37 */ // unknown
-/* 38 */ GAME( 1990, mt_eswat, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Cyber Police ESWAT: Enhanced Special Weapons and Tactics (Mega-Tech)", GAME_NOT_WORKING )
-/* 39 */ GAME( 1990, mt_smgp,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Monaco GP (Mega-Tech)", GAME_NOT_WORKING )
-/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Michael Jackson's Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
-/* 41 */ GAME( 1990, mt_crack, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
+/* 38 */ GAME( 1990, mt_eswat, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Cyber Police ESWAT: Enhanced Special Weapons and Tactics (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 39 */ GAME( 1990, mt_smgp,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Super Monaco GP (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Michael Jackson's Moonwalker (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 41 */ GAME( 1990, mt_crack, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Crack Down (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 42 */ // unknown
-/* 43 */ GAME( 1990, mt_shado, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Shadow Dancer (Mega-Tech)", GAME_NOT_WORKING )
-/* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", GAME_NOT_WORKING )
+/* 43 */ GAME( 1990, mt_shado, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Shadow Dancer (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 45 */ // unknown
 /* 46 */ // unknown
-/* 47 */ GAME( 1990, mt_astrm, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Alien Storm (Mega-Tech)", GAME_NOT_WORKING )
-/* 48 */ GAME( 1991, mt_wwar,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Wrestle War (Mega-Tech)", GAME_NOT_WORKING ) /* Copyright 1989, 1991 Sega */
-/* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
+/* 47 */ GAME( 1990, mt_astrm, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Alien Storm (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 48 */ GAME( 1991, mt_wwar,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Wrestle War (Mega-Tech)", MACHINE_NOT_WORKING ) /* Copyright 1989, 1991 Sega */
+/* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 50 */ // unknown
-/* 51 */ GAME( 1991, mt_srage, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Streets of Rage (Mega-Tech)", GAME_NOT_WORKING )
-/* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
-/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
-/* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
-/* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega / Marvel",         "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
-/* 55 */ GAME( 1991, mt_calga, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "California Games (Mega-Tech)", GAME_NOT_WORKING )
+/* 51 */ GAME( 1991, mt_srage, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Streets of Rage (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", MACHINE_NOT_WORKING )
+/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", MACHINE_NOT_WORKING )
+/* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega / Marvel",         "Spider-Man vs The Kingpin (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 55 */ GAME( 1991, mt_calga, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "California Games (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 56 */ // unknown
-/* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
-/* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )
-/* 59 */ GAME( 1991, mt_mlh,   megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Mario Lemieux Hockey (Mega-Tech)", GAME_NOT_WORKING )
-/* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
-/* 61 */ GAME( 1992, mt_tout,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Turbo Outrun (Mega-Tech)", GAME_NOT_WORKING )
-/* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
+/* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 59 */ GAME( 1991, mt_mlh,   megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Mario Lemieux Hockey (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 61 */ GAME( 1992, mt_tout,  megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Turbo Outrun (Mega-Tech)", MACHINE_NOT_WORKING )
+/* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", MACHINE_NOT_WORKING )
 
 /* more? */

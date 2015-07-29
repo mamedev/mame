@@ -36,7 +36,7 @@ view DIP descriptions. The manual states:
 
 Game does not appear to have cocktail mode. The screen hardware
 is undoubtedly capable of flipscreen and layer priority flipping
-however.(which is why we have GAME_NO_COCKTAIL despite the games
+however.(which is why we have MACHINE_NO_COCKTAIL despite the games
 being upright)
 
 Dumpers Notes
@@ -665,8 +665,8 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 3)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1990, weststry, bloodbro, weststry, weststry, driver_device, 0, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1990, skysmash, 0,        skysmash, skysmash, driver_device, 0, ROT270, "Nihon System",    "Sky Smasher", GAME_SUPPORTS_SAVE )
+GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststry, bloodbro, weststry, weststry, driver_device, 0, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, skysmash, 0,        skysmash, skysmash, driver_device, 0, ROT270, "Nihon System",    "Sky Smasher", MACHINE_SUPPORTS_SAVE )

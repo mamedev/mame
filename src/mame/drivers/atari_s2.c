@@ -535,7 +535,7 @@ ROM_START(fourx4)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
-GAME( 1979, supermap,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Superman (Pinball)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1979, hercules,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Hercules", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1979, roadrunr,  0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "Road Runner", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1982, fourx4,    0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "4x4", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, supermap,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Superman (Pinball)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME( 1979, hercules,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Hercules", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME( 1979, roadrunr,  0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "Road Runner", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME( 1982, fourx4,    0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "4x4", MACHINE_IS_SKELETON_MECHANICAL)

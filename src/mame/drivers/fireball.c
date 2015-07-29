@@ -524,4 +524,4 @@ ROM_END
 *      Game Drivers      *
 *************************/
 /*    YEAR  NAME      PARENT     MACHINE   INPUT     STATE          INIT    ROT     COMPANY     FULLNAME    FLAGS*/
-GAME( 1989, fireball, 0,         fireball, fireball, driver_device, 0,      ROT0,   "Valco",    "Fireball", GAME_MECHANICAL ) //1989 by rom name
+GAME( 1989, fireball, 0,         fireball, fireball, driver_device, 0,      ROT0,   "Valco",    "Fireball", MACHINE_MECHANICAL ) //1989 by rom name

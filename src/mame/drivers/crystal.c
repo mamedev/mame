@@ -1133,9 +1133,9 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 }
 
 
-GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
+GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft", "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga", "Evolution Soccer", 0 )
 GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
-GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", GAME_NOT_WORKING ) // still has some instability issues
-GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi", "Donggul Donggul Haerong", GAME_NOT_WORKING )
+GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
+GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi", "Donggul Donggul Haerong", MACHINE_NOT_WORKING )

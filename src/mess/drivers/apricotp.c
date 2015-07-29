@@ -687,4 +687,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1984, fp,    0,      0,      fp,   fp, driver_device,    0,     "ACT",   "Apricot Portable / FP", GAME_NOT_WORKING )
+COMP( 1984, fp,    0,      0,      fp,   fp, driver_device,    0,     "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )

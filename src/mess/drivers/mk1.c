@@ -206,4 +206,4 @@ ROM_END
 
 // seams to be developed by mostek (MK)
 /*    YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME */
-CONS( 1979,  ccmk1,  0,      0,      mk1,    mk1, driver_device,    0,   "Computer Electronic", "Chess Champion MK I", GAME_NO_SOUND_HW )
+CONS( 1979,  ccmk1,  0,      0,      mk1,    mk1, driver_device,    0,   "Computer Electronic", "Chess Champion MK I", MACHINE_NO_SOUND_HW )

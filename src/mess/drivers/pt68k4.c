@@ -487,5 +487,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1988, pt68k2,  0,       0,     pt68k2,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K2", GAME_SUPPORTS_SAVE )
-COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K4", GAME_SUPPORTS_SAVE )
+COMP( 1988, pt68k2,  0,       0,     pt68k2,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
+COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )

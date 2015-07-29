@@ -307,4 +307,4 @@ ROM_START( uzebox )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY   FULLNAME */
-CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, driver_device,   0,  "Belogic", "Uzebox", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
+CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, driver_device,   0,  "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)

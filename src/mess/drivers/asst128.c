@@ -146,4 +146,4 @@ ROM_START( asst128 )
 ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
-COMP( 198?, asst128,    ibm5150,    0,          asst128,    0,      driver_device, 0,   "Schetmash", "Assistent 128", GAME_NOT_WORKING)
+COMP( 198?, asst128,    ibm5150,    0,          asst128,    0,      driver_device, 0,   "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)

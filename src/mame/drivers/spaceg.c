@@ -481,4 +481,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, spaceg, 0, spaceg, spaceg, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -592,6 +592,6 @@ ROM_START( spbactnp )
 	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 
-GAME( 1991, spbactn, 0,        spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, spbactnj, spbactn, spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
+GAME( 1991, spbactn, 0,        spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, spbactnj, spbactn, spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!

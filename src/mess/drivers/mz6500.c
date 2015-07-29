@@ -177,4 +177,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 198?, mz6500,  0,      0,       mz6500,     mz6500, driver_device,    0,     "Sharp",   "MZ-6500", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, mz6500,  0,      0,       mz6500,     mz6500, driver_device,    0,     "Sharp",   "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

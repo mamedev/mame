@@ -514,6 +514,6 @@ ROM_END
 
 
 // this uses DECO222 style encryption
-GAME( 1981, progolf,  0,       progolf, progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, progolf,  0,       progolf, progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // this uses DECO CPU-6 as custom module CPU (the same as Zoar, are we sure? our Zoar has different encryption, CPU-7 style)
-GAME( 1981, progolfa, progolf, progolfa,progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, progolfa, progolf, progolfa,progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

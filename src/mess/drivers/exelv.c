@@ -620,5 +620,5 @@ ROM_END
 
 
 /*   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
-COMP(1984,  exl100,  0,          0,      exl100,     exelv, driver_device,  0,       "Exelvision",   "EXL 100",  GAME_NOT_WORKING)
-COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, driver_device,  0,       "Exelvision",   "Exeltel",  GAME_NOT_WORKING)
+COMP(1984,  exl100,  0,          0,      exl100,     exelv, driver_device,  0,       "Exelvision",   "EXL 100",  MACHINE_NOT_WORKING)
+COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, driver_device,  0,       "Exelvision",   "Exeltel",  MACHINE_NOT_WORKING)

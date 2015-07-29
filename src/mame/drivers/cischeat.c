@@ -2928,11 +2928,11 @@ ROM_END
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", GAME_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES?)
-GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS, layout_cischeat )
-GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               GAME_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            GAME_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            GAME_IMPERFECT_GRAPHICS )
-GAME ( 1992, wildplt,  0,        f1gpstr2, wildplt, cischeat_state,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS )
-GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS )
+GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES?)
+GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )
+GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, wildplt,  0,        f1gpstr2, wildplt, cischeat_state,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

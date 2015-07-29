@@ -417,4 +417,4 @@ ROM_START( tankbust )
 ROM_END
 
 
-GAME( 1985, tankbust,    0,       tankbust, tankbust, driver_device,  0, ROT90, "Valadon Automation", "Tank Busters", GAME_SUPPORTS_SAVE )
+GAME( 1985, tankbust,    0,       tankbust, tankbust, driver_device,  0, ROT90, "Valadon Automation", "Tank Busters", MACHINE_SUPPORTS_SAVE )

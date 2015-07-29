@@ -858,24 +858,24 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1994, glcolor,   0,       0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1994, glscolor,  glcolor, 0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Super Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1996, glmcolor,  0,       0,  glmcolor,   glmcolor, driver_device,     0,  "VTech",   "Genius Leader Magic Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1999, gwnf,      0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Winner Notebook Fun (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1994, glcolor,   0,       0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1994, glscolor,  glcolor, 0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Super Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1996, glmcolor,  0,       0,  glmcolor,   glmcolor, driver_device,     0,  "VTech",   "Genius Leader Magic Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1999, gwnf,      0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 
 
 // these systems need to be moved into a separate driver
-COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 4000 (Germany)", GAME_IS_SKELETON)
-COMP( 1993, gjmovie,   0,       0,  gjmovie,    prestige, driver_device,     0,  "VTech",   "Genius Junior Movie (Germany)", GAME_IS_SKELETON)
-COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", GAME_IS_SKELETON)
-COMP( 1996, gjrstar2,  gjrstar, 0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 2 (Germany)", GAME_IS_SKELETON)
-COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", GAME_IS_SKELETON)
-COMP( 1998, gj5000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 5000 (Germany)", GAME_IS_SKELETON)
+COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 4000 (Germany)", MACHINE_IS_SKELETON)
+COMP( 1993, gjmovie,   0,       0,  gjmovie,    prestige, driver_device,     0,  "VTech",   "Genius Junior Movie (Germany)", MACHINE_IS_SKELETON)
+COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", MACHINE_IS_SKELETON)
+COMP( 1996, gjrstar2,  gjrstar, 0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON)
+COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON)
+COMP( 1998, gj5000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 5000 (Germany)", MACHINE_IS_SKELETON)
 
 
 // gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
 // http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
-COMP( 1999, gl6600cx,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6600CX (Germany)", GAME_IS_SKELETON)
+COMP( 1999, gl6600cx,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6600CX (Germany)", MACHINE_IS_SKELETON)

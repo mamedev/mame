@@ -237,4 +237,4 @@ DRIVER_INIT_MEMBER(xorworld_state,xorworld)
 }
 
 
-GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )

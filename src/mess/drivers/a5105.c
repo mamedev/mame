@@ -621,4 +621,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME           FLAGS */
-COMP( 1989, a5105,  0,      0,       a5105,     a5105, driver_device,   0,      "VEB Robotron",   "BIC A5105", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, a5105,  0,      0,       a5105,     a5105, driver_device,   0,      "VEB Robotron",   "BIC A5105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

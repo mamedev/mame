@@ -946,8 +946,8 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
-COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
+COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )

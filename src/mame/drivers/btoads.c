@@ -367,4 +367,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, driver_device, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", GAME_SUPPORTS_SAVE )
+GAME( 1994, btoads, 0, btoads, btoads, driver_device, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )

@@ -1504,11 +1504,11 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME        FLAGS
-COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 SD",    GAME_SUPPORTS_SAVE )
-COMP( 1986, pc1512dd,   pc1512,     0,      pc1512dd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 DD",    GAME_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd10, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD10",  GAME_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD20",  GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd30, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD30",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 SD",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512dd,   pc1512,     0,      pc1512dd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 DD",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd10, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD10",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD20",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD30",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

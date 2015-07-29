@@ -584,6 +584,6 @@ DRIVER_INIT_MEMBER(dbz_state,dbz2)
 	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
 }
 
-GAME( 1993, dbz,  0,   dbz, dbz, dbz_state,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
-GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbz,  0,   dbz, dbz, dbz_state,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test

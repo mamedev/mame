@@ -289,4 +289,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, driver_device, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, driver_device, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )

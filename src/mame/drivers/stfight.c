@@ -1043,12 +1043,12 @@ ROM_START( cshooter )
 	ROM_LOAD( "82s123.7a",  0x0800, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
 ROM_END
 
-// Note: Marked GAME_IMPERFECT_SOUND due to YM2203 clock issue
-GAME( 1986, empcity,  0,       stfight, stfight, stfight_state, empcity, ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, empcityu, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // different title logo
-GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+// Note: Marked MACHINE_IMPERFECT_SOUND due to YM2203 clock issue
+GAME( 1986, empcity,  0,       stfight, stfight, stfight_state, empcity, ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityu, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
+GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* Cross Shooter runs on a slightly modified PCB, with a different text tilemap and gfx blobs (see also cshooter.c) */
-GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

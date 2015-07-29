@@ -1272,12 +1272,12 @@ DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 }
 
 /* Type 1 HW */
-GAME( 1984, nightgal, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, ngtbunny, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, driver_device,  0,       ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state,  royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, nightgal, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ngtbunny, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, driver_device,  0,       ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state,  royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
-GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

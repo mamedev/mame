@@ -265,5 +265,5 @@ ROM_END
 
 
 
-GAME( 1980, monacogp,  0,         monacogp, 0, driver_device,  0, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", GAME_IS_SKELETON )
-GAME( 1980, monacogpa, monacogp,  monacogp, 0, driver_device,  0, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", GAME_IS_SKELETON )
+GAME( 1980, monacogp,  0,         monacogp, 0, driver_device,  0, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogpa, monacogp,  monacogp, 0, driver_device,  0, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", MACHINE_IS_SKELETON )

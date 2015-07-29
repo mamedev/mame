@@ -696,6 +696,6 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL )
-GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL )
-GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL )
+GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )

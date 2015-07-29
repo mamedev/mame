@@ -220,4 +220,4 @@ ROM_START( higemaru )
 ROM_END
 
 
-GAME( 1984, higemaru, 0, higemaru, higemaru, driver_device, 0, ROT0, "Capcom", "Pirate Ship Higemaru", GAME_SUPPORTS_SAVE )
+GAME( 1984, higemaru, 0, higemaru, higemaru, driver_device, 0, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )

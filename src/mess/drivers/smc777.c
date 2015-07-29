@@ -1024,4 +1024,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1983, smc777,  0,       0,    smc777,     smc777, driver_device,   0,  "Sony",   "SMC-777",       GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+COMP( 1983, smc777,  0,       0,    smc777,     smc777, driver_device,   0,  "Sony",   "SMC-777",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

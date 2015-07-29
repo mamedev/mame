@@ -969,9 +969,9 @@ DRIVER_INIT_MEMBER(rbisland_state,jumping)
 }
 
 
-GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", GAME_SUPPORTS_SAVE )
-GAME( 1988, rbislande, rbisland, rbisland, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands (Extra)", GAME_SUPPORTS_SAVE )
-GAME( 1989, jumping,   rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg",          "Jumping (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, jumpinga,  rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, jumpingi,  rbisland, jumpingi,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 3, Imnoe PCB)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rbislande, rbisland, rbisland, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands (Extra)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jumping,   rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg",          "Jumping (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpinga,  rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpingi,  rbisland, jumpingi,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 3, Imnoe PCB)", MACHINE_SUPPORTS_SAVE )

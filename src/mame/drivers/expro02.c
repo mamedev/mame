@@ -1831,38 +1831,38 @@ DRIVER_INIT_MEMBER(expro02_state,expro02)
  *
  *************************************/
 
-GAME( 1990, galsnew,   0,        expro02,  expro02,  expro02_state, expro02, ROT90, "Kaneko",                  "Gals Panic (US, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa, expro02_state, expro02, ROT90, "Kaneko",                  "Gals Panic (Export, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Taito license)",  "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Inter license)",  "Gals Panic (Korea, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnew,   0,        expro02,  expro02,  expro02_state, expro02, ROT90, "Kaneko",                  "Gals Panic (US, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL )
+GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa, expro02_state, expro02, ROT90, "Kaneko",                  "Gals Panic (Export, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL )
+GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Taito license)",  "Gals Panic (Japan, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL )
+GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Inter license)",  "Gals Panic (Korea, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL )
 /* the first version of Fantasia clones the EXPRO02 almost exactly, including the encrypted tiles*/
-GAME( 1994, fantasia,  0,        comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, fantasiab, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, fantasiaa, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasia,  0,        comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasiab, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasiaa, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 /* subsequent releases remove the encrypted tile (View2 layer) but leave the unused writes to it in the program code */
-GAME( 1994, fantasian,fantasia, fantasia,  fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", GAME_NO_COCKTAIL )
+GAME( 1994, fantasian,fantasia, fantasia,  fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", MACHINE_NO_COCKTAIL )
 
-GAME( 1994, supmodel, 0,        supmodel, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
+GAME( 1994, supmodel, 0,        supmodel, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",MACHINE_NO_COCKTAIL )
 
-GAME( 1995, newfant,  0,        fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", GAME_NO_COCKTAIL ) // the only difference between the two is the gfx rom containing the copyright
-GAME( 1994, newfanta, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", GAME_NO_COCKTAIL )
-GAME( 1995, fantsy95, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", GAME_NO_COCKTAIL )
+GAME( 1995, newfant,  0,        fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL ) // the only difference between the two is the gfx rom containing the copyright
+GAME( 1994, newfanta, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL )
+GAME( 1995, fantsy95, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL )
 
-GAME( 1996, missw96,  0,        fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 1)", GAME_NO_COCKTAIL )
-GAME( 1996, missw96a, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 2)", GAME_NO_COCKTAIL )
-GAME( 1996, missw96b, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 3)", GAME_NO_COCKTAIL )
-GAME( 1996, missmw96, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
+GAME( 1996, missw96,  0,        fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1996, missw96a, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1996, missw96b, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 3)", MACHINE_NO_COCKTAIL )
+GAME( 1996, missmw96, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL )
 
-GAME( 1996, smissw,   0,        smissw,   missw96,   driver_device, 0, ROT0,  "Comad",                    "Super Miss World", GAME_NO_COCKTAIL ) // 951127 PCB
+GAME( 1996, smissw,   0,        smissw,   missw96,   driver_device, 0, ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL ) // 951127 PCB
 
-GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
-GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
-GAME( 1998, fantsia2n,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (1998)", GAME_NO_COCKTAIL )
+GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL )
+GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL )
+GAME( 1998, fantsia2n,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL )
 
-GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", GAME_NO_COCKTAIL )
+GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL )
 
-GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", GAME_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
 GAME( 1997, pgalvipa, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", 0 )
 GAME( 1997, galhustl, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", 0 ) // hack of the above?
 
-GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )

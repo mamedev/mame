@@ -492,6 +492,6 @@ DRIVER_INIT_MEMBER(rampart_state,rampart)
  *
  *************************************/
 
-GAME( 1990, rampart,  0,       rampart, rampart, rampart_state,  rampart, ROT0, "Atari Games", "Rampart (Trackball)", GAME_SUPPORTS_SAVE )
-GAME( 1990, rampart2p,rampart, rampart, ramprt2p, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Joystick)", GAME_SUPPORTS_SAVE )
-GAME( 1990, rampartj, rampart, rampart, rampartj, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", GAME_SUPPORTS_SAVE )
+GAME( 1990, rampart,  0,       rampart, rampart, rampart_state,  rampart, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2p,rampart, rampart, ramprt2p, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampartj, rampart, rampart, rampartj, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )

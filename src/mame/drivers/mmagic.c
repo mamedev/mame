@@ -314,4 +314,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  MACHINE INPUT   CLASS          INIT  ROT     COMPANY     FULLNAME        FLAGS
-GAME( 1979, mmagic, 0,      mmagic, mmagic, driver_device, 0,    ROT270, "Nintendo", "Monkey Magic", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1979, mmagic, 0,      mmagic, mmagic, driver_device, 0,    ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

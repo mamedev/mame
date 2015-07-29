@@ -724,11 +724,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,  0,        mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mainevto, mainevt,  mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. F)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. Z)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Devastators (ver. X)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. V)", GAME_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Garuka (Japan ver. W)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. F)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. Z)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Devastators (ver. X)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. V)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Garuka (Japan ver. W)", MACHINE_SUPPORTS_SAVE )

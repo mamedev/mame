@@ -472,4 +472,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, gridlee, 0,        gridlee, gridlee, driver_device, 0,     ROT0, "Videa", "Gridlee", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1983, gridlee, 0,        gridlee, gridlee, driver_device, 0,     ROT0, "Videa", "Gridlee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

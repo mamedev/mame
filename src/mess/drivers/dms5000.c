@@ -83,4 +83,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1982, dms5000,  0,      0,       dms5000,   dms5000, driver_device, 0,  "Digital Microsystems", "DMS-5000", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, dms5000,  0,      0,       dms5000,   dms5000, driver_device, 0,  "Digital Microsystems", "DMS-5000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -697,4 +697,4 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", GAME_SUPPORTS_SAVE )
+GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE )

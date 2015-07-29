@@ -502,7 +502,7 @@ ROM_START(alpok_f6)
 ROM_END
 
 
-GAME(1980,algar_l1, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Algar (L-1)", GAME_MECHANICAL )
-GAME(1980,alpok_l6, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6)", GAME_MECHANICAL )
-GAME(1980,alpok_l2, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-2)", GAME_MECHANICAL )
-GAME(1980,alpok_f6, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", GAME_MECHANICAL )
+GAME(1980,algar_l1, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Algar (L-1)", MACHINE_MECHANICAL )
+GAME(1980,alpok_l6, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6)", MACHINE_MECHANICAL )
+GAME(1980,alpok_l2, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-2)", MACHINE_MECHANICAL )
+GAME(1980,alpok_f6, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL )

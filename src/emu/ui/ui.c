@@ -243,7 +243,7 @@ ui_manager::ui_manager(running_machine &machine)
 	// more initialization
 	set_handler(handler_messagebox, 0);
 	m_non_char_keys_down = auto_alloc_array(machine, UINT8, (ARRAY_LENGTH(non_char_keys) + 7) / 8);
-	m_mouse_show = machine.system().flags & GAME_CLICKABLE_ARTWORK ? true : false;
+	m_mouse_show = machine.system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_manager::exit), this));
@@ -343,9 +343,9 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				if (show_warnings && warnings_string(messagebox_text).length() > 0)
 				{
 					set_handler(handler_messagebox_ok, 0);
-					if (machine().system().flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND))
+					if (machine().system().flags & (MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_KEYBOARD | MACHINE_NO_SOUND))
 						messagebox_backcolor = UI_YELLOW_COLOR;
-					if (machine().system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
+					if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
 						messagebox_backcolor = UI_RED_COLOR;
 				}
 				break;
@@ -1008,17 +1008,17 @@ std::string &ui_manager::disclaimer_string(std::string &str)
 
 std::string &ui_manager::warnings_string(std::string &str)
 {
-#define WARNING_FLAGS ( GAME_NOT_WORKING | \
-						GAME_UNEMULATED_PROTECTION | \
-						GAME_MECHANICAL | \
-						GAME_WRONG_COLORS | \
-						GAME_IMPERFECT_COLORS | \
-						GAME_REQUIRES_ARTWORK | \
-						GAME_NO_SOUND |  \
-						GAME_IMPERFECT_SOUND |  \
-						GAME_IMPERFECT_GRAPHICS | \
-						GAME_IMPERFECT_KEYBOARD | \
-						GAME_NO_COCKTAIL)
+#define WARNING_FLAGS ( MACHINE_NOT_WORKING | \
+						MACHINE_UNEMULATED_PROTECTION | \
+						MACHINE_MECHANICAL | \
+						MACHINE_WRONG_COLORS | \
+						MACHINE_IMPERFECT_COLORS | \
+						MACHINE_REQUIRES_ARTWORK | \
+						MACHINE_NO_SOUND |  \
+						MACHINE_IMPERFECT_SOUND |  \
+						MACHINE_IMPERFECT_GRAPHICS | \
+						MACHINE_IMPERFECT_KEYBOARD | \
+						MACHINE_NO_COCKTAIL)
 
 	str.clear();
 
@@ -1057,41 +1057,41 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append(" have not been correctly dumped.\n");
 		}
 		// add one line per warning flag
-		if (machine().system().flags & GAME_IMPERFECT_KEYBOARD)
+		if (machine().system().flags & MACHINE_IMPERFECT_KEYBOARD)
 			str.append("The keyboard emulation may not be 100% accurate.\n");
-		if (machine().system().flags & GAME_IMPERFECT_COLORS)
+		if (machine().system().flags & MACHINE_IMPERFECT_COLORS)
 			str.append("The colors aren't 100% accurate.\n");
-		if (machine().system().flags & GAME_WRONG_COLORS)
+		if (machine().system().flags & MACHINE_WRONG_COLORS)
 			str.append("The colors are completely wrong.\n");
-		if (machine().system().flags & GAME_IMPERFECT_GRAPHICS)
+		if (machine().system().flags & MACHINE_IMPERFECT_GRAPHICS)
 			str.append("The video emulation isn't 100% accurate.\n");
-		if (machine().system().flags & GAME_IMPERFECT_SOUND)
+		if (machine().system().flags & MACHINE_IMPERFECT_SOUND)
 			str.append("The sound emulation isn't 100% accurate.\n");
-		if (machine().system().flags & GAME_NO_SOUND) {
+		if (machine().system().flags & MACHINE_NO_SOUND) {
 			str.append("The ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" lacks sound.\n");
 		}
-		if (machine().system().flags & GAME_NO_COCKTAIL)
+		if (machine().system().flags & MACHINE_NO_COCKTAIL)
 			str.append("Screen flipping in cocktail mode is not supported.\n");
 
 		// check if external artwork is present before displaying this warning?
-		if (machine().system().flags & GAME_REQUIRES_ARTWORK) {
+		if (machine().system().flags & MACHINE_REQUIRES_ARTWORK) {
 			str.append("The ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" requires external artwork files\n");
 		}
 
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
-		if (machine().system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
+		if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
 		{
 			// add the strings for these warnings
-			if (machine().system().flags & GAME_UNEMULATED_PROTECTION) {
+			if (machine().system().flags & MACHINE_UNEMULATED_PROTECTION) {
 				str.append("The ");
 				str.append(emulator_info::get_gamenoun());
 				str.append(" has protection which isn't fully emulated.\n");
 			}
-			if (machine().system().flags & GAME_NOT_WORKING) {
+			if (machine().system().flags & MACHINE_NOT_WORKING) {
 				str.append("\nTHIS ");
 				str.append(emulator_info::get_capgamenoun());
 				str.append(" DOESN'T WORK. The emulation for this ");
@@ -1099,7 +1099,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 				str.append(" is not yet complete. "
 						"There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 			}
-			if (machine().system().flags & GAME_MECHANICAL) {
+			if (machine().system().flags & MACHINE_MECHANICAL) {
 				str.append("\nCertain elements of this ");
 				str.append(emulator_info::get_gamenoun());
 				str.append(" cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
@@ -1119,7 +1119,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 			bool foundworking = false;
 			while (drivlist.next())
 				if (drivlist.current() == maindrv || drivlist.clone() == maindrv)
-					if ((drivlist.driver().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL)) == 0)
+					if ((drivlist.driver().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL)) == 0)
 					{
 						// this one works, add a header and display the name of the clone
 						if (!foundworking) {

@@ -3309,4 +3309,4 @@ GAME( 1990, abcopj,   abcop,    xboard_fd1094,  abcop,    segaxbd_state, generic
 GAME( 1990, gprider,  0,        xboard_fd1094,  gprider,  segaxbd_state, gprider,  ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
 GAME( 1990, gprideru, gprider,  xboard_fd1094,  gprider,  segaxbd_state, gprider,  ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
 GAME( 1990, gpriderj, gprider,  xboard_fd1094,  gprider,  segaxbd_state, gprider,  ROT0,   "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
-GAME( 1991, rascot,   0,        rascot,         rascot,   segaxbd_state, rascot,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1991, rascot,   0,        rascot,         rascot,   segaxbd_state, rascot,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

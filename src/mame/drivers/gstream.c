@@ -1171,6 +1171,6 @@ DRIVER_INIT_MEMBER(gstream_state,x2222)
 }
 
 
-GAME( 2002, gstream, 0, gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_SUPPORTS_SAVE )
-GAME( 2000, x2222,   0,     x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (final debug?)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-GAME( 2000, x2222o,  x2222, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (5-level prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 2002, gstream, 0, gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, x2222,   0,     x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (final debug?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 2000, x2222o,  x2222, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (5-level prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

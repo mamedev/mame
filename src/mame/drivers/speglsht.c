@@ -449,4 +449,4 @@ DRIVER_INIT_MEMBER(speglsht_state,speglsht)
 }
 
 
-GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, speglsht, ROT0, "Seta",  "Super Eagle Shot", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )

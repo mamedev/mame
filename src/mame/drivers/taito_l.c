@@ -2589,9 +2589,9 @@ GAME( 1988, raimaisjo, raimais,  raimais,   raimaisj,  driver_device, 0,        
 GAME( 1988, fhawk,     0,        fhawk,     fhawk,     driver_device, 0,         ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
 GAME( 1988, fhawkj,    fhawk,    fhawk,     fhawkj,    driver_device, 0,         ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
 
-GAME( 1989, champwr,   0,        champwr,   champwr,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", GAME_IMPERFECT_SOUND )
-GAME( 1989, champwru,  champwr,  champwr,   champwru,  driver_device, 0,         ROT0,   "Taito America Corporation", "Champion Wrestler (US)", GAME_IMPERFECT_SOUND )
-GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  driver_device, 0,         ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1989, champwr,   0,        champwr,   champwr,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwru,  champwr,  champwr,   champwru,  driver_device, 0,         ROT0,   "Taito America Corporation", "Champion Wrestler (US)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  driver_device, 0,         ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1988, kurikint,  0,        kurikint,  kurikint,  driver_device, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
 GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, driver_device, 0,         ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
@@ -2623,6 +2623,6 @@ GAME( 1992, plgirls,   0,        cachat,    plgirls,   driver_device, 0,        
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   driver_device, 0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
 GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  driver_device, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
-GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  driver_device, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", GAME_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
+GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  driver_device, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
-GAME( 1990, evilston,  0,        evilston,  evilston,  driver_device, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", GAME_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC
+GAME( 1990, evilston,  0,        evilston,  evilston,  driver_device, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", MACHINE_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC

@@ -536,4 +536,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY  FULLNAME       FLAGS */
-COMP( 198?, pc100,  0,      0,       pc100,     pc100, driver_device,   0,      "NEC",   "PC-100", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, pc100,  0,      0,       pc100,     pc100, driver_device,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

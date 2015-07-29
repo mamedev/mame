@@ -618,4 +618,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY                      FULLNAME        FLAGS */
-COMP( 1982, bigbord2,   bigboard,   0,      bigbord2,   bigbord2, bigbord2_state,   bigbord2, "Digital Research Computers", "Big Board II", GAME_NOT_WORKING )
+COMP( 1982, bigbord2,   bigboard,   0,      bigbord2,   bigbord2, bigbord2_state,   bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )

@@ -732,4 +732,4 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) )    //?? table of increasing values
 ROM_END
 
-GAME( 1981, marinedt, 0, marinedt, marinedt, driver_device, 0, ROT270, "Taito", "Marine Date", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, marinedt, 0, marinedt, marinedt, driver_device, 0, ROT270, "Taito", "Marine Date", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

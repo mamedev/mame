@@ -808,7 +808,7 @@ DRIVER_INIT_MEMBER(namcofl_state,finalapr)
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", GAME_IMPERFECT_SOUND, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", GAME_IMPERFECT_SOUND, layout_namcofl )
+GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_IMPERFECT_SOUND, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_IMPERFECT_SOUND, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_SOUND, layout_namcofl )

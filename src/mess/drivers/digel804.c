@@ -722,5 +722,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1985, digel804,   0,          0,      digel804,   digel804, digel804_state, digel804,      "Digelec, Inc",   "Digelec 804 EPROM Programmer", GAME_NOT_WORKING )
-COMP( 1982, ep804,   digel804,          0,      ep804,   digel804, digel804_state, digel804,      "Wavetek/Digelec, Inc",   "EP804 EPROM Programmer", GAME_NOT_WORKING )
+COMP( 1985, digel804,   0,          0,      digel804,   digel804, digel804_state, digel804,      "Digelec, Inc",   "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,   digel804,          0,      ep804,   digel804, digel804_state, digel804,      "Wavetek/Digelec, Inc",   "EP804 EPROM Programmer", MACHINE_NOT_WORKING )

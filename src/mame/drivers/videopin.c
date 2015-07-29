@@ -460,5 +460,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, videopin, 0, videopin, videopin, driver_device, 0, ROT270, "Atari", "Video Pinball", GAME_SUPPORTS_SAVE, layout_videopin )
-GAMEL( 1979, solarwar, 0, videopin, solarwar, driver_device, 0, ROT270, "Atari", "Solar War", GAME_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopin, 0, videopin, videopin, driver_device, 0, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, solarwar, 0, videopin, solarwar, driver_device, 0, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )

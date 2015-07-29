@@ -293,7 +293,7 @@ void running_machine::start()
 		schedule_load(savegame);
 
 	// if we're in autosave mode, schedule a load
-	else if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) != 0)
+	else if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
 
 	// set up the cheat engine
@@ -501,7 +501,7 @@ void running_machine::schedule_exit()
 #endif
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
+	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
 }
 
@@ -935,7 +935,7 @@ void running_machine::handle_saveload()
 				break;
 
 			case STATERR_NONE:
-				if (!(m_system.flags & GAME_SUPPORTS_SAVE))
+				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
 					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
 				else
 					popmessage("State successfully %s.", opnamed);

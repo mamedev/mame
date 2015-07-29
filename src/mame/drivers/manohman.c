@@ -236,4 +236,4 @@ ROM_END
 *********************************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT    ROT    COMPANY   FULLNAME        FLAGS... */
-GAME( 199?, manohman, 0,      manohman, manohman, driver_device, 0,      ROT0, "Merkur", "Mann, oh-Mann", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 199?, manohman, 0,      manohman, manohman, driver_device, 0,      ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )

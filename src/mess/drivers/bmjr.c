@@ -393,4 +393,4 @@ DRIVER_INIT_MEMBER(bmjr_state,bmjr)
 }
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr, bmjr_state,    bmjr,  "Hitachi", "Basic Master Jr", GAME_NOT_WORKING)
+COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr, bmjr_state,    bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

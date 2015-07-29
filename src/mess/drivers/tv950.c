@@ -67,4 +67,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 198?, tv950,  0,      0,       tv950,     tv950, driver_device,  0,  "Televideo", "TV950", GAME_IS_SKELETON )
+COMP( 198?, tv950,  0,      0,       tv950,     tv950, driver_device,  0,  "Televideo", "TV950", MACHINE_IS_SKELETON )

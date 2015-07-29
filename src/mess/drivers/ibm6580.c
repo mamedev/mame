@@ -101,4 +101,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY            FULLNAME       FLAGS */
-COMP( 1980, ibm6580, 0,      0,       ibm6580,  ibm6580, driver_device,  0,  "IBM", "IBM 6580 DisplayWriter", GAME_IS_SKELETON)
+COMP( 1980, ibm6580, 0,      0,       ibm6580,  ibm6580, driver_device,  0,  "IBM", "IBM 6580 DisplayWriter", MACHINE_IS_SKELETON)

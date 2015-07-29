@@ -265,5 +265,5 @@ ROM_START( icatel )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 1995, icatel,   0,      0,      icatel,     0,        icatel_state, icatel, "Icatel", "TPCI (Brazilian public payphone)",    GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+COMP( 1995, icatel,   0,      0,      icatel,     0,        icatel_state, icatel, "Icatel", "TPCI (Brazilian public payphone)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 /*The hardware was clearly manufactured in 1995. There's no evindence of the actual date of the firmware.*/

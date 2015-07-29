@@ -228,4 +228,4 @@ ROM_START(flicker)
 ROM_END
 
 //   YEAR    GAME     PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION   COMPANY                            DESCRIPTION           FLAGS
-GAME(1974,  flicker,  0,      flicker,  flicker, driver_device,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", GAME_MECHANICAL )
+GAME(1974,  flicker,  0,      flicker,  flicker, driver_device,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL )

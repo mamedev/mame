@@ -2389,25 +2389,25 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", GAME_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", GAME_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

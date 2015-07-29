@@ -283,4 +283,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, chessmst,  0,       0,  chessmst,   chessmst, driver_device,     0,  "VEB Mikroelektronik Erfurt",   "Chess-Master",        GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+COMP( 1984, chessmst,  0,       0,  chessmst,   chessmst, driver_device,     0,  "VEB Mikroelektronik Erfurt",   "Chess-Master",        MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

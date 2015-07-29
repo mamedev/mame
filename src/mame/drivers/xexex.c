@@ -677,6 +677,6 @@ DRIVER_INIT_MEMBER(xexex_state,xexex)
 	}
 }
 
-GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver EAA)", GAME_SUPPORTS_SAVE )
-GAME( 1991, xexexa, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver AAA)", GAME_SUPPORTS_SAVE )
-GAME( 1991, xexexj, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver JAA)", GAME_SUPPORTS_SAVE )
+GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver EAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexexa, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver AAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexexj, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver JAA)", MACHINE_SUPPORTS_SAVE )

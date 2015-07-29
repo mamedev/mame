@@ -307,4 +307,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    MONITOR COMPANY   FULLNAME */
-CONS( 1995, comquest, 0,        0,      comquest, comquest, driver_device, 0,       "Data Concepts",  "ComQuest Plus (German)", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 1995, comquest, 0,        0,      comquest, comquest, driver_device, 0,       "Data Concepts",  "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

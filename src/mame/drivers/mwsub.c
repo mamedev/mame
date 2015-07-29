@@ -224,4 +224,4 @@ ROM_START( submar )
 ROM_END
 
 
-GAMEL( 1979, submar, 0, submar, submar, driver_device, 0, ROT0, "Midway", "Submarine (Midway)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL, layout_submar )
+GAMEL( 1979, submar, 0, submar, submar, driver_device, 0, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )

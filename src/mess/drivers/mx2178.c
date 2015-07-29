@@ -201,4 +201,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, driver_device,  0,  "Memorex", "Memorex 2178", GAME_IS_SKELETON )
+COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, driver_device,  0,  "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )

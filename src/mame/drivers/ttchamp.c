@@ -694,5 +694,5 @@ ROM_END
 
 
 // only the graphics differ between the two sets, code section is the same
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_SUPPORTS_SAVE ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_SUPPORTS_SAVE ) // this only has Palencia Elektronik advertising boards
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart",                               "Table Tennis Champions", MACHINE_SUPPORTS_SAVE ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", MACHINE_SUPPORTS_SAVE ) // this only has Palencia Elektronik advertising boards

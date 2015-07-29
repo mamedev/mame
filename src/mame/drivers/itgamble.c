@@ -702,15 +702,15 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                  FULLNAME                        FLAGS  */
-GAME( 2000, capunc,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      GAME_IS_SKELETON )
-GAME( 2001, capcor,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", GAME_IS_SKELETON )
-GAME( 2002, laperla,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       GAME_IS_SKELETON )
-GAME( 2001, laperlag, 0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  GAME_IS_SKELETON )
-GAME( 2001, euro2k2,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  GAME_IS_SKELETON )
-GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  GAME_IS_SKELETON )
-GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   GAME_IS_SKELETON )
-GAME( 200?, abacus,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "<unknown>",             "Abacus (Ver 1.0)",              GAME_IS_SKELETON )
-GAME( 200?, bookthr,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        GAME_IS_SKELETON )
+GAME( 2000, capunc,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      MACHINE_IS_SKELETON )
+GAME( 2001, capcor,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", MACHINE_IS_SKELETON )
+GAME( 2002, laperla,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       MACHINE_IS_SKELETON )
+GAME( 2001, laperlag, 0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  MACHINE_IS_SKELETON )
+GAME( 2001, euro2k2,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  MACHINE_IS_SKELETON )
+GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  MACHINE_IS_SKELETON )
+GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, driver_device, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
+GAME( 200?, abacus,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "<unknown>",             "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
+GAME( 200?, bookthr,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
 
 /* different hardware */
-GAME( 200?, mnumber,  0,       mnumber,  itgamble, driver_device, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                GAME_IS_SKELETON )
+GAME( 200?, mnumber,  0,       mnumber,  itgamble, driver_device, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                MACHINE_IS_SKELETON )

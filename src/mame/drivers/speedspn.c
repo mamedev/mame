@@ -334,4 +334,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1994, speedspn, 0, speedspn, speedspn, driver_device, 0, ROT180, "TCH", "Speed Spin", GAME_SUPPORTS_SAVE )
+GAME( 1994, speedspn, 0, speedspn, speedspn, driver_device, 0, ROT180, "TCH", "Speed Spin", MACHINE_SUPPORTS_SAVE )

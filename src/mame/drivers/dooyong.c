@@ -2072,34 +2072,34 @@ ROM_END
 
 /* The differences between the two lastday sets are only in the sound program and graphics. The main program is the same. */
 
-GAME( 1990, lastday,  0,        lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, lastdaya, lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddaydoo,  lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lastday,  0,        lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastdaya, lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddaydoo,  lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        GAME_SUPPORTS_SAVE )
-GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        GAME_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        GAME_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 3)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
-GAME( 1991, polluxn,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong (NTC license)",         "Pollux (Japan, NTC license)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
+GAME( 1991, polluxn,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong (NTC license)",         "Pollux (Japan, NTC license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1992, flytigera,flytiger, flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytigera,flytiger, flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong",                       "Blue Hawk",            GAME_SUPPORTS_SAVE )
-GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      GAME_SUPPORTS_SAVE )
+GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sadari,   0,        primella, sadari, driver_device,   0, ROT0,   "Dooyong (NTC license)",         "Sadari",  GAME_SUPPORTS_SAVE )
+GAME( 1993, sadari,   0,        primella, sadari, driver_device,   0, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, gundl94,  0,        primella, primella, driver_device, 0, ROT0,   "Dooyong",                       "Gun Dealer '94",       GAME_SUPPORTS_SAVE )
-GAME( 1994, primella, gundl94,  primella, primella, driver_device, 0, ROT0,   "Dooyong (NTC license)",         "Primella",             GAME_SUPPORTS_SAVE )
+GAME( 1994, gundl94,  0,        primella, primella, driver_device, 0, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, primella, gundl94,  primella, primella, driver_device, 0, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, superx,   0,        superx,   superx, driver_device,   0, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      GAME_SUPPORTS_SAVE )
-GAME( 1994, superxm,  superx,   superx,   superx, driver_device,   0, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", GAME_SUPPORTS_SAVE )
+GAME( 1994, superx,   0,        superx,   superx, driver_device,   0, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superxm,  superx,   superx,   superx, driver_device,   0, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, rshark,   0,        rshark,   rshark, driver_device,   0, ROT270, "Dooyong",                       "R-Shark",              GAME_SUPPORTS_SAVE )
+GAME( 1995, rshark,   0,        rshark,   rshark, driver_device,   0, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, popbingo, 0,        popbingo, popbingo, driver_device, 0, ROT0,   "Dooyong",                       "Pop Bingo",            GAME_SUPPORTS_SAVE )
+GAME( 1996, popbingo, 0,        popbingo, popbingo, driver_device, 0, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )

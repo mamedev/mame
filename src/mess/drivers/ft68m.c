@@ -125,4 +125,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS          INIT COMPANY               FULLNAME  FLAGS */
-COMP( 198?, ft68m, 0,      0,      ft68m,  ft68m,  driver_device, 0,   "Forward Technology", "FT-68M", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 198?, ft68m, 0,      0,      ft68m,  ft68m,  driver_device, 0,   "Forward Technology", "FT-68M", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

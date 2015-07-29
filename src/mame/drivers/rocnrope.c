@@ -370,6 +370,6 @@ DRIVER_INIT_MEMBER(rocnrope_state,rocnropk)
  *
  *************************************/
 
-GAME( 1983, rocnrope, 0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", GAME_SUPPORTS_SAVE )
-GAME( 1983, rocnropek,rocnrope, rocnrope, rocnrope, rocnrope_state, rocnropk, ROT270, "Konami / Kosuka", "Roc'n Rope (Kosuka)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ropeman,  rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", GAME_SUPPORTS_SAVE )
+GAME( 1983, rocnrope, 0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnropek,rocnrope, rocnrope, rocnrope, rocnrope_state, rocnropk, ROT270, "Konami / Kosuka", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ropeman,  rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )

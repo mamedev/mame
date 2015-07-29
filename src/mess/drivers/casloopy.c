@@ -563,4 +563,4 @@ DRIVER_INIT_MEMBER(casloopy_state,casloopy)
 		m_bios_rom[i] = 0x000b0009; // RTS + NOP
 }
 
-CONS( 1995, casloopy,  0,   0,   casloopy,  casloopy, casloopy_state,  casloopy,  "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 1995, casloopy,  0,   0,   casloopy,  casloopy, casloopy_state,  casloopy,  "Casio", "Loopy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

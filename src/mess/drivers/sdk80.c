@@ -202,4 +202,4 @@ ROM_START( sdk80 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS           INIT   COMPANY   FULLNAME  FLAGS */
-COMP( 1975, sdk80,  0,       0,     sdk80,     sdk80,  driver_device,  0,     "Intel",  "SDK-80", GAME_NO_SOUND_HW )
+COMP( 1975, sdk80,  0,       0,     sdk80,     sdk80,  driver_device,  0,     "Intel",  "SDK-80", MACHINE_NO_SOUND_HW )

@@ -601,5 +601,5 @@ ROM_START( ti95 )
 ROM_END
 
 
-COMP( 1985, ti74, 0, 0, ti74, ti74, driver_device, 0, "Texas Instruments", "TI-74 BASICALC", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1986, ti95, 0, 0, ti95, ti95, driver_device, 0, "Texas Instruments", "TI-95 PROCALC", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1985, ti74, 0, 0, ti74, ti74, driver_device, 0, "Texas Instruments", "TI-74 BASICALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1986, ti95, 0, 0, ti95, ti95, driver_device, 0, "Texas Instruments", "TI-95 PROCALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

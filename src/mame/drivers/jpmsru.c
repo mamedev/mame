@@ -165,22 +165,22 @@ ROM_START( j_unk )
 	ROM_LOAD( "sruunk1.p3", 0x0800, 0x000400, CRC(25138e03) SHA1(644fc6144ea74f08dc892f106ad494ba364afe86) )
 ROM_END
 
-GAME(198?, j_ewnud  ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",                       GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ewnda  ,j_ewnud    ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",                       GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ewnd20 ,j_ewnud    ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 3, version 20?)",          GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ews    ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 1, version 16)",                      GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ews8a  ,j_ews      ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 2, version 8a)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnud  ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",                       MACHINE_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnda  ,j_ewnud    ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",                       MACHINE_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnd20 ,j_ewnud    ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 3, version 20?)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ews    ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 1, version 16)",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ews8a  ,j_ews      ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 2, version 8a)",                      MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_luckac ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Aces (Unk)",                     GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_super2 ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Super 2 (JPM)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_luckac ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Aces (Unk)",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME(198?, j_super2 ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Super 2 (JPM)",                      MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_luck2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Twos?",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_luck2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Twos?",                        MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_nuddup ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Nudge Double Up (JPM SRU, set 1)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_nuddup ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Nudge Double Up (JPM SRU, set 1)",                     MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_nuddup2,j_nuddup   ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Nudge Double Up (JPM SRU, set 2)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_nuddup2,j_nuddup   ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Nudge Double Up (JPM SRU, set 2)",                     MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_unk    ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM?","unknown SRU Game (JPM?)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_unk    ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM?","unknown SRU Game (JPM?)",                     MACHINE_IS_SKELETON_MECHANICAL )
 
 // this one is different again?
-GAME(198?, j_plus2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Plus 2 (JPM)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_plus2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Plus 2 (JPM)",                     MACHINE_IS_SKELETON_MECHANICAL )

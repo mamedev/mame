@@ -1570,11 +1570,11 @@ ROM_END
 
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, driver_device, 0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, driver_device, 0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )

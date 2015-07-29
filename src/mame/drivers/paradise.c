@@ -1308,14 +1308,14 @@ DRIVER_INIT_MEMBER(paradise_state,torus)
 
 ***************************************************************************/
 
-GAME( 1994,  paradise, 0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung (Escape license)", "Paradise (Escape)", GAME_SUPPORTS_SAVE )
-GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // year not shown, but should be >=1994
-GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // year not shown, but should be >=1994
-GAME( 1995,  tgtball,  0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
-GAME( 1995,  tgtballa, tgtball,   tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
-GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, tgtball,  ROT0,  "Yun Sung", "Penky", GAME_SUPPORTS_SAVE )
-GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, torus,    ROT90, "Yun Sung", "Torus", GAME_SUPPORTS_SAVE )
-GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", GAME_SUPPORTS_SAVE )
-GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", GAME_SUPPORTS_SAVE )
+GAME( 1994,  paradise, 0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung (Escape license)", "Paradise (Escape)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 1995,  tgtball,  0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  tgtballa, tgtball,   tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, tgtball,  ROT0,  "Yun Sung", "Penky", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, torus,    ROT90, "Yun Sung", "Torus", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", MACHINE_SUPPORTS_SAVE )

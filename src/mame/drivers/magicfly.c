@@ -372,13 +372,13 @@
     - Added new findings to the technical notes.
     - Added version/revision number to magicfly.
     - Marked magicfly PAL as NO_DUMP (read protected).
-    - Added flags GAME_IMPERFECT_GRAPHICS and GAME_WRONG_COLORS.
+    - Added flags MACHINE_IMPERFECT_GRAPHICS and MACHINE_WRONG_COLORS.
 
     [2006-08-06]
     - Figured out how the gfx banks works.
     - Fixed the gfx layers.
     - Fixed the gfx decode.
-    - Removed flag GAME_IMPERFECT_GRAPHICS.
+    - Removed flag MACHINE_IMPERFECT_GRAPHICS.
 
     [2007-05-12]
     - Figured out how the protection works.
@@ -392,7 +392,7 @@
     - Changed CPU clock to 833 kHz.
     - Mapped DIP switches.
     - Found the maximum bet DIP switch in magicfly.
-    - Removed flag GAME_NOT_WORKING for both games.
+    - Removed flag MACHINE_NOT_WORKING for both games.
     - Managed the planes to get the 3bpp GFX colors accurate.
     - Renamed the ROMs acording to pcb pictures and ROM contents.
     - Cleaned up and optimized the driver.
@@ -1050,4 +1050,4 @@ ROM_END
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT   ROT    COMPANY      FULLNAME                         FLAGS... */
 GAME( 198?, magicfly, 0,      magicfly, magicfly, driver_device, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
 GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   driver_device, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
-GAME( 198?, bchance,  0,      bchance,  bchance,  driver_device, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", GAME_IMPERFECT_GRAPHICS )
+GAME( 198?, bchance,  0,      bchance,  bchance,  driver_device, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )

@@ -532,9 +532,9 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE        INPUT   INIT                       COMPANY         FULLNAME                    FLAGS */
-COMP( 1983, svi318,     0,      0,      svi318,        svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (PAL)",   GAME_SUPPORTS_SAVE )
-COMP( 1983, svi318n,    svi318, 0,      svi318n,       svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (NTSC)",  GAME_SUPPORTS_SAVE )
-COMP( 1983, svi328,     svi318, 0,      svi328,        svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (PAL)",   GAME_SUPPORTS_SAVE )
-COMP( 1983, svi328n,    svi318, 0,      svi328n,       svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (NTSC)",  GAME_SUPPORTS_SAVE )
-COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card",  GAME_SUPPORTS_SAVE )
-COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", GAME_SUPPORTS_SAVE )
+COMP( 1983, svi318,     0,      0,      svi318,        svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (PAL)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi318n,    svi318, 0,      svi318n,       svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (NTSC)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328,     svi318, 0,      svi328,        svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (PAL)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328n,    svi318, 0,      svi328n,       svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (NTSC)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", MACHINE_SUPPORTS_SAVE )

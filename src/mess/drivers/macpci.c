@@ -163,4 +163,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1996, pippin,  0,       0,     pippin,    pippin, driver_device,  0,  "Apple / Bandai",   "Pippin @mark", GAME_NOT_WORKING)
+COMP( 1996, pippin,  0,       0,     pippin,    pippin, driver_device,  0,  "Apple / Bandai",   "Pippin @mark", MACHINE_NOT_WORKING)

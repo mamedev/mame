@@ -722,10 +722,10 @@ ROM_END
 /* Driver */
 
 /*  YEAR    NAME    PARENT      COMPAT      MACHINE     INPUT   INIT    COMPANY         FULLNAME            FLAGS */
-COMP(1983,  hec2hrp,    0,      interact,   hec2hrp,    hec2hrp, driver_device,0,       "Micronique",   "Hector 2HR+",      GAME_IMPERFECT_SOUND)
-COMP(1980,  victor,     hec2hrp, 0,         hec2hrp,    hec2hrp, driver_device,0,       "Micronique",   "Victor",           GAME_IMPERFECT_SOUND)
-COMP(1983,  hec2hr,     hec2hrp, 0,         hec2hr,     hec2hrp, driver_device,0,        "Micronique",  "Hector 2HR",       GAME_IMPERFECT_SOUND)
-COMP(1984,  hec2hrx,    hec2hrp, 0,         hec2hrx,    hec2hrp, driver_device,0,        "Micronique",  "Hector HRX + Disc2",       GAME_IMPERFECT_SOUND)
-COMP(1985,  hec2mdhrx,  hec2hrp, 0,         hec2mdhrx,  hec2hrp, driver_device,0,        "Micronique",  "Hector HRX + mini Disc" ,  GAME_IMPERFECT_SOUND)
-COMP(1985,  hec2mx80,   hec2hrp, 0,         hec2mx80,   hec2hrp, driver_device,0,        "Micronique",  "Hector MX 80c + Disc2" ,   GAME_IMPERFECT_SOUND)
-COMP(1985,  hec2mx40,   hec2hrp, 0,         hec2mx40,   hec2hrp, driver_device,0,        "Micronique",  "Hector MX 40c + Disc2" ,   GAME_IMPERFECT_SOUND)
+COMP(1983,  hec2hrp,    0,      interact,   hec2hrp,    hec2hrp, driver_device,0,       "Micronique",   "Hector 2HR+",      MACHINE_IMPERFECT_SOUND)
+COMP(1980,  victor,     hec2hrp, 0,         hec2hrp,    hec2hrp, driver_device,0,       "Micronique",   "Victor",           MACHINE_IMPERFECT_SOUND)
+COMP(1983,  hec2hr,     hec2hrp, 0,         hec2hr,     hec2hrp, driver_device,0,        "Micronique",  "Hector 2HR",       MACHINE_IMPERFECT_SOUND)
+COMP(1984,  hec2hrx,    hec2hrp, 0,         hec2hrx,    hec2hrp, driver_device,0,        "Micronique",  "Hector HRX + Disc2",       MACHINE_IMPERFECT_SOUND)
+COMP(1985,  hec2mdhrx,  hec2hrp, 0,         hec2mdhrx,  hec2hrp, driver_device,0,        "Micronique",  "Hector HRX + mini Disc" ,  MACHINE_IMPERFECT_SOUND)
+COMP(1985,  hec2mx80,   hec2hrp, 0,         hec2mx80,   hec2hrp, driver_device,0,        "Micronique",  "Hector MX 80c + Disc2" ,   MACHINE_IMPERFECT_SOUND)
+COMP(1985,  hec2mx40,   hec2hrp, 0,         hec2mx40,   hec2hrp, driver_device,0,        "Micronique",  "Hector MX 40c + Disc2" ,   MACHINE_IMPERFECT_SOUND)

@@ -547,20 +547,20 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 
 
 /* PGM2 */
-GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", GAME_IS_SKELETON )
-GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", GAME_IS_SKELETON )
-GAME( 2007, orleg2oa,     orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", GAME_IS_SKELETON )
+GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_IS_SKELETON )
+GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_IS_SKELETON )
+GAME( 2007, orleg2oa,     orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_IS_SKELETON )
 // should be earlier verisons too.
 
-GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", GAME_IS_SKELETON )
-GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", GAME_IS_SKELETON )
-GAME( 2008, kov2nloa,     kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Taiwan)", GAME_IS_SKELETON )
+GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_IS_SKELETON )
+GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_IS_SKELETON )
+GAME( 2008, kov2nloa,     kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Taiwan)", MACHINE_IS_SKELETON )
 // should be earlier verisons too.
 
-GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", GAME_IS_SKELETON )
+GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_IS_SKELETON )
 // should be earlier verisons too.
 
-GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3,       ROT0, "IGS", "Knights of Valour 3 (V102, China)", GAME_IS_SKELETON )
+GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3,       ROT0, "IGS", "Knights of Valour 3 (V102, China)", MACHINE_IS_SKELETON )
 // should be earlier verisons too.
 
 // The King of Fighters '98 - Ultimate Match - Hero

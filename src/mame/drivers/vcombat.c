@@ -679,5 +679,5 @@ ROM_START( shadfgtr )
 ROM_END
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      MONITOR COMPANY      FULLNAME           FLAGS */
-GAME( 1993, vcombat,  0,      vcombat,  vcombat, vcombat_state,  vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  GAME_NOT_WORKING )
-GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, vcombat_state, shadfgtr, ROT0,                "Dutech Inc.",  "Shadow Fighters", GAME_NOT_WORKING )
+GAME( 1993, vcombat,  0,      vcombat,  vcombat, vcombat_state,  vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )
+GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, vcombat_state, shadfgtr, ROT0,                "Dutech Inc.",  "Shadow Fighters", MACHINE_NOT_WORKING )

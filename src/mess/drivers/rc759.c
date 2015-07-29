@@ -614,4 +614,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP( 1984, rc759, 0, 0, rc759, rc759, driver_device, 0, "Regnecentralen", "RC759 Piccoline", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1984, rc759, 0, 0, rc759, rc759, driver_device, 0, "Regnecentralen", "RC759 Piccoline", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

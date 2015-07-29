@@ -282,4 +282,4 @@ ROM_START( mbdtower )
 ROM_END
 
 
-CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
+CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

@@ -993,19 +993,19 @@ DRIVER_INIT_MEMBER(bagman_state,bagman)
 }
 
 
-GAME( 1982, bagman,   0,       bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Bagman", GAME_SUPPORTS_SAVE )
-GAME( 1982, bagnard,  bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, bagnarda, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, bagnardi, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", GAME_SUPPORTS_SAVE )
-GAME( 1982, bagmans,  bagman,  bagman,  bagmans, bagman_state, bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, bagmans2, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, bagman,   0,       bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnard,  bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnarda, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnardi, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans,  bagman,  bagman,  bagmans, bagman_state, bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans2, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, sbagman,  0,       bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation", "Super Bagman", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbagmans, sbagman, bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbagman,  0,       bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagmans, sbagman, bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pickin,   0,       pickin,  pickin, driver_device,  0,       ROT270, "Valadon Automation", "Pickin'", GAME_SUPPORTS_SAVE )
+GAME( 1983, pickin,   0,       pickin,  pickin, driver_device,  0,       ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,  0,       botanic, botanici,driver_device, 0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", GAME_SUPPORTS_SAVE )
-GAME( 1984, botanicf, botanic, botanic, botanicf,driver_device, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", GAME_SUPPORTS_SAVE )
+GAME( 1983, botanic,  0,       botanic, botanici,driver_device, 0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, botanicf, botanic, botanic, botanicf,driver_device, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa, 0,       squaitsa,squaitsa, driver_device,0,       ROT0,   "Itisa", "Squash (Itisa)", GAME_SUPPORTS_SAVE )
+GAME( 1984, squaitsa, 0,       squaitsa,squaitsa, driver_device,0,       ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )

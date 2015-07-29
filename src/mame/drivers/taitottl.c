@@ -274,9 +274,9 @@ ROM_START( zzblock )
 ROM_END
 
 
-GAME( 1977, gunman,    0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Gunman [TTL]", GAME_IS_SKELETON )
-GAME( 1977, bazooka,   0,       taitottl, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", GAME_IS_SKELETON ) // clone of Taito Cross Fire - or is Cross Fire a clone of PSE Bazooka?
-GAME( 1977, bazookabr, bazooka, taitottl, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", GAME_IS_SKELETON )
-GAME( 1977, missilex,  0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Missile-X [TTL]", GAME_IS_SKELETON )
-GAME( 1977, ttblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "T.T. Block [TTL]", GAME_IS_SKELETON )
-GAME( 1979, zzblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Zun Zun Block [TTL]", GAME_IS_SKELETON )
+GAME( 1977, gunman,    0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Gunman [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, bazooka,   0,       taitottl, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON ) // clone of Taito Cross Fire - or is Cross Fire a clone of PSE Bazooka?
+GAME( 1977, bazookabr, bazooka, taitottl, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, missilex,  0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Missile-X [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "T.T. Block [TTL]", MACHINE_IS_SKELETON )
+GAME( 1979, zzblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Zun Zun Block [TTL]", MACHINE_IS_SKELETON )

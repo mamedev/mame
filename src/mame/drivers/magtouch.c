@@ -202,4 +202,4 @@ DRIVER_INIT_MEMBER(magtouch_state,magtouch)
 }
 
 
-GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, magtouch, ROT0, "Micro Manufacturing",     "Magical Touch", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, magtouch, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

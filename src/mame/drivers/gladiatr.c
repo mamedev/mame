@@ -1038,8 +1038,8 @@ DRIVER_INIT_MEMBER(gladiatr_state,ppking)
 
 
 
-GAME( 1985, ppking,   0,        ppking,   0,        gladiatr_state, ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", GAME_SUPPORTS_SAVE )
-GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", GAME_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1985, ppking,   0,        ppking,   0,        gladiatr_state, ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump

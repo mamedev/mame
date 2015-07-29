@@ -139,4 +139,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  CLASS         INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 1978, imsai,   0,      0,       imsai,     imsai, driver_device, 0,   "Imsai", "MPU-B", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1978, imsai,   0,      0,       imsai,     imsai, driver_device, 0,   "Imsai", "MPU-B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

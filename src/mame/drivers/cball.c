@@ -303,4 +303,4 @@ ROM_START( cball )
 ROM_END
 
 
-GAME( 1976, cball, 0, cball, cball, driver_device, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1976, cball, 0, cball, cball, driver_device, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

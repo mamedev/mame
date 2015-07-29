@@ -166,4 +166,4 @@ ROM_START( ds348 )
 ROM_END
 
 /*    YEAR  NAME   PARENT COMPAT MACHINE  INPUT   INIT              COMPANY           FULLNAME                                 FLAGS */
-COMP( 1998, ds348, 0,     0,     daruma,  daruma, driver_device, 0, "Sigtron Daruma", "Print Plus DS348 - Dot matrix printer", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, ds348, 0,     0,     daruma,  daruma, driver_device, 0, "Sigtron Daruma", "Print Plus DS348 - Dot matrix printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

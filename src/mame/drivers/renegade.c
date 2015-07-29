@@ -1013,6 +1013,6 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, renegade,  ROT0, "Technos Japan (Taito America license)", "Renegade (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, kuniokun,  ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, kuniokunb, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, renegade,  ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, kuniokun,  ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, kuniokunb, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

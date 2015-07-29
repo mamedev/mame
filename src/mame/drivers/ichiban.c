@@ -167,4 +167,4 @@ ROM_START( ichiban )
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
-GAME( 199?, ichiban,  0,   ichibanjyan,  ichibanjyan, driver_device,  0,       ROT0, "Excel",      "Ichi Ban Jyan", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, ichiban,  0,   ichibanjyan,  ichibanjyan, driver_device,  0,       ROT0, "Excel",      "Ichi Ban Jyan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

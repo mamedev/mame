@@ -161,4 +161,4 @@ ROM_END
 ***************************************************************************/
 
 /*   YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  INIT  COMPANY  FULLNAME  FLAGS */
-CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, driver_device, 0,    "BBC",   "Bridge Companion", GAME_NO_SOUND_HW )
+CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, driver_device, 0,    "BBC",   "Bridge Companion", MACHINE_NO_SOUND_HW )

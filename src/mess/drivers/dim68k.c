@@ -395,4 +395,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, dim68k,  0,       0,     dim68k,   dim68k, driver_device,   0,     "Micro Craft", "Dimension 68000", GAME_NOT_WORKING)
+COMP( 1984, dim68k,  0,       0,     dim68k,   dim68k, driver_device,   0,     "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)

@@ -198,4 +198,4 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 	}
 }
 
-GAME( 1995, tcl,  0,       tcl,  tcl, tcl_state,  tcl, ROT0, "Uniwang", "Taiwan Chess Legend", GAME_NOT_WORKING )
+GAME( 1995, tcl,  0,       tcl,  tcl, tcl_state,  tcl, ROT0, "Uniwang", "Taiwan Chess Legend", MACHINE_NOT_WORKING )
