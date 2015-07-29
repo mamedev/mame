@@ -40,7 +40,7 @@ public:
 	required_device<tms34061_device> m_tms34061;
 	required_device<tlc34076_device> m_tlc34076;
 	required_device<screen_device> m_screen;
-	
+
 	rectangle m_visarea;
 
 	UINT8 m_grom_bank;
@@ -165,7 +165,7 @@ public:
 							UINT16 *sens0, UINT16 *sens1, UINT16 *sens2, UINT16 *sens3);
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

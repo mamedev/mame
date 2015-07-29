@@ -427,13 +427,13 @@ void emu_options::parse_standard_inis(std::string &error_string)
 	else
 		parse_one_ini("horizont", OPTION_PRIORITY_ORIENTATION_INI, &error_string);
 
-	if (cursystem->flags & GAME_TYPE_ARCADE)
+	if (cursystem->flags & MACHINE_TYPE_ARCADE)
 		parse_one_ini("arcade", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	else if (cursystem->flags & GAME_TYPE_CONSOLE)
+	else if (cursystem->flags & MACHINE_TYPE_CONSOLE)
 		parse_one_ini("console", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	else if (cursystem->flags & GAME_TYPE_COMPUTER)
+	else if (cursystem->flags & MACHINE_TYPE_COMPUTER)
 		parse_one_ini("computer", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	else if (cursystem->flags & GAME_TYPE_OTHER)
+	else if (cursystem->flags & MACHINE_TYPE_OTHER)
 		parse_one_ini("othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
 
 	// parse "vector.ini" for vector games

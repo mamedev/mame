@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )
 	AM_RANGE(0x056, 0x057) AM_NOP // in reality, access to sound and rtc is a bit more involved
 	AM_RANGE(0x05a, 0x05b) AM_DEVWRITE8("snd", sn76489a_device, write, 0x00ff)
 	AM_RANGE(0x05c, 0x05d) AM_READWRITE8(rtc_r, rtc_w, 0x00ff)
-//	AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
+//  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
 	AM_RANGE(0x070, 0x077) AM_MIRROR(0x08) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x080, 0x0ff) AM_READWRITE8(nvram_r, nvram_w, 0x00ff)
 //  AM_RANGE(0x100, 0x101) net
@@ -487,12 +487,12 @@ static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )
 //  AM_RANGE(0x28d, 0x28d) external printer control
 	AM_RANGE(0x28e, 0x28f) AM_READWRITE8(floppy_ack_r, floppy_reserve_w, 0x00ff)
 	AM_RANGE(0x290, 0x291) AM_WRITE8(floppy_release_w, 0x00ff)
-//	AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
-//	AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
+//  AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
+//  AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
 	AM_RANGE(0x300, 0x30f) AM_DEVREADWRITE8("isbx", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
 	AM_RANGE(0x310, 0x31f) AM_DEVREADWRITE8("isbx", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
-//	AM_RANGE(0x320, 0x321) isbx dma ack
-//	AM_RANGE(0x330, 0x331) isbx tc
+//  AM_RANGE(0x320, 0x321) isbx dma ack
+//  AM_RANGE(0x330, 0x331) isbx tc
 ADDRESS_MAP_END
 
 
@@ -554,8 +554,8 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 	MCFG_I82730_SINT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir4_w))
 
 	// keyboard
-    MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
-    MCFG_GENERIC_KEYBOARD_CB(WRITE8(rc759_state, keyb_put))
+	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(rc759_state, keyb_put))
 
 	// cassette
 	MCFG_CASSETTE_ADD("cas")
@@ -584,8 +584,8 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 
 	// floppy disk controller
 	MCFG_WD2797_ADD("fdc", 1000000)
-//	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir0_w))
-//	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
+//  MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir0_w))
+//  MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats)
@@ -614,4 +614,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP( 1984, rc759, 0, 0, rc759, rc759, driver_device, 0, "Regnecentralen", "RC759 Piccoline", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1984, rc759, 0, 0, rc759, rc759, driver_device, 0, "Regnecentralen", "RC759 Piccoline", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

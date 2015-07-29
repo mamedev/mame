@@ -71,4 +71,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2007, ___empty, 0, ___empty, 0, driver_device, 0, ROT0, "MAME", "No Driver Loaded", GAME_NO_SOUND )
+GAME( 2007, ___empty, 0, ___empty, 0, driver_device, 0, ROT0, "MAME", "No Driver Loaded", MACHINE_NO_SOUND )

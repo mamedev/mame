@@ -537,4 +537,4 @@ ROM_START( x1twin )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
 
-COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1_state,         x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING )
+COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1_state,         x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    MACHINE_NOT_WORKING )

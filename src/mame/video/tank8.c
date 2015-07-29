@@ -111,7 +111,7 @@ void tank8_state::video_start()
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 
 	m_tilemap->set_scrolly(0, 2 * 24);
-	
+
 	save_item(NAME(m_collision_index));
 }
 

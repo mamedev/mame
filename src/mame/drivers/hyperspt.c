@@ -547,8 +547,8 @@ DRIVER_INIT_MEMBER(hyperspt_state,hyperspt)
 }
 
 
-GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, hyperspt, ROT0,  "Konami (Centuri license)", "Hyper Sports", GAME_SUPPORTS_SAVE )
-GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, hyperspt, ROT0,  "bootleg", "Hyper Sports (bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
-GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, hyperspt, ROT0,  "Konami",  "Hyper Olympic '84", GAME_SUPPORTS_SAVE )
-GAME( 1984, roadf,     0,        roadf,     roadf, hyperspt_state,    hyperspt, ROT90, "Konami",  "Road Fighter (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, roadf2,    roadf,    roadf,     roadf, hyperspt_state,    hyperspt, ROT90, "Konami",  "Road Fighter (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, hyperspt, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, hyperspt, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
+GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, hyperspt, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf,     0,        roadf,     roadf, hyperspt_state,    hyperspt, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf2,    roadf,    roadf,     roadf, hyperspt_state,    hyperspt, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )

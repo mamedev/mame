@@ -312,5 +312,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, driver_device, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", GAME_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam, driver_device,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", GAME_SUPPORTS_SAVE )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, driver_device, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam, driver_device,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", MACHINE_SUPPORTS_SAVE )

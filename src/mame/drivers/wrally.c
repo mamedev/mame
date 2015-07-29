@@ -354,6 +354,6 @@ ROM_START( wrallyb ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,  0,      wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (set 1)", GAME_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (set 2)", GAME_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", GAME_SUPPORTS_SAVE )
+GAME( 1993, wrally,  0,      wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (set 1)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (set 2)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )

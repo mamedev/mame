@@ -26,7 +26,7 @@ INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 
 
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod2 )
 {
@@ -1867,7 +1867,7 @@ GAME(199?, m4spnwina    ,m4spnwin   ,mod2       ,mpu4, mpu4_state, m4default, RO
 
 GAME(199?, m4pick, 0,           mod2    ,mpu4, mpu4_state, m4default, ROT0,   "JPM","Pick A Fruit (JPM) (MPU4)",GAME_FLAGS )
 
-GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4, mpu4_state,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
+GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4, mpu4_state,   connect4,   ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
 
 GAME(199?, m4ttak   ,  0,       mod2    ,mpu4, mpu4_state, m4default, ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4)",GAME_FLAGS )
 

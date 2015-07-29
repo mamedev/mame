@@ -523,6 +523,6 @@ ROM_END
 
 
 
-GAME( 1989, bottom9,  0,       bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version T)", GAME_SUPPORTS_SAVE )
-GAME( 1989, bottom9n, bottom9, bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version N)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mstadium, bottom9, bottom9, mstadium, driver_device, 0, ROT0, "Konami", "Main Stadium (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, bottom9,  0,       bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9n, bottom9, bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mstadium, bottom9, bottom9, mstadium, driver_device, 0, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )

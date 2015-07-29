@@ -40,7 +40,7 @@ protected:
 // ======================> c1526_t
 
 class c1526_t :  public c1526_base_t,
-				 public device_cbm_iec_interface
+					public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
@@ -62,7 +62,7 @@ protected:
 // ======================> c4023_t
 
 class c4023_t :  public c1526_base_t,
-				 public device_ieee488_interface
+					public device_ieee488_interface
 {
 public:
 	// construction/destruction

@@ -1723,4 +1723,4 @@ ROM_START( gp32 )
 #endif
 ROM_END
 
-CONS(2001, gp32, 0, 0, gp32, gp32, driver_device, 0, "Game Park Holdings", "GP32", ROT270|GAME_NOT_WORKING|GAME_NO_SOUND)
+CONS(2001, gp32, 0, 0, gp32, gp32, driver_device, 0, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -1508,7 +1508,6 @@ void slqz3_decrypt(running_machine &machine)
 	int rom_size = 0x200000;
 
 	for(i=0; i<rom_size/2; i++) {
-
 		UINT16 x = src[i];
 
 		// not 100% verified
@@ -1526,4 +1525,3 @@ void slqz3_decrypt(running_machine &machine)
 		src[i] = x;
 	}
 }
-

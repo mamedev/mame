@@ -458,4 +458,4 @@ DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 	main.write_word(8, 000500 - 10);
 }
 
-GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", GAME_NO_SOUND_HW )
+GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", MACHINE_NO_SOUND_HW )

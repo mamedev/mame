@@ -112,4 +112,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                        FULLNAME       FLAGS */
-COMP( 1981, dual68,  0,     0,       dual68,    dual68, driver_device,   0,  "Dual Systems Corporation", "Dual Systems 68000", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, dual68,  0,     0,       dual68,    dual68, driver_device,   0,  "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

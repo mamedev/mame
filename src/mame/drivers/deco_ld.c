@@ -658,9 +658,9 @@ ROM_END
 
 
 
-GAME( 1983, begas,  0,       rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", GAME_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", GAME_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", GAME_NOT_WORKING )
-GAME( 1984, cobraa, cobra,   rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", GAME_NOT_WORKING ) // might be a prototype
+GAME( 1983, begas,  0,       rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
+GAME( 1983, begas1, begas,   rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobra,  0,       rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobraa, cobra,   rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster, driver_device,  0, ROT0, "Data East", "Road Blaster (Data East LD)", GAME_NOT_WORKING )
+GAME( 1985, rblaster,  0,    rblaster,  rblaster, driver_device,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )

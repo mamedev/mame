@@ -330,7 +330,7 @@ void m1comm_device::check_vint_irq()
 #ifdef __M1COMM_SIMULATION__
 void m1comm_device::comm_tick()
 {
-	if (m_linkenable == 0x01)	
+	if (m_linkenable == 0x01)
 	{
 		int frameStart = 0x0010;
 		int frameOffset = 0x0000;

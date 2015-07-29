@@ -120,4 +120,4 @@ ROM_END
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    INIT   COMPANY    FULLNAME       FLAGS */
-COMP(19??, systec, 0,      0,       systec,  systec, driver_device,  0,    "Systec", "Systec Z80", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(19??, systec, 0,      0,       systec,  systec, driver_device,  0,    "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

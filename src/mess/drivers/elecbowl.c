@@ -219,4 +219,4 @@ ROM_START( elecbowl )
 ROM_END
 
 
-CONS( 1978, elecbowl, 0, 0, elecbowl, elecbowl, driver_device, 0, "Marx", "Electronic Bowling (Marx)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_MECHANICAL | GAME_NOT_WORKING )
+CONS( 1978, elecbowl, 0, 0, elecbowl, elecbowl, driver_device, 0, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

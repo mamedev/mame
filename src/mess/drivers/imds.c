@@ -113,4 +113,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT  COMPANY   FULLNAME       FLAGS */
-COMP( 1983, imds,     0,    0,       imds,      imds, driver_device,     0,   "Intel", "Intellec MDS", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, imds,     0,    0,       imds,      imds, driver_device,     0,   "Intel", "Intellec MDS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

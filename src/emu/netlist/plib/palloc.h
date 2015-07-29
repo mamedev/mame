@@ -79,7 +79,7 @@ inline void pfree_array_t(T *p)
 	pfree_raw(s);
 }
 
-#define palloc(T)        	  new(ppool) T
+#define palloc(T)             new(ppool) T
 #define pfree(_ptr)           pfree_t(_ptr)
 
 #if 1
@@ -94,7 +94,7 @@ inline void pfree_array_t(T *p)
 
 #define ATTR_ALIGN
 
-#define palloc(T)        	  global_alloc(T)
+#define palloc(T)             global_alloc(T)
 #define pfree(_ptr)           global_free(_ptr)
 
 #define palloc_array(T, N)    global_alloc_array(T, N)

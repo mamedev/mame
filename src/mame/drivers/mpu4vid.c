@@ -3654,9 +3654,9 @@ ROM_END
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
 The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
-GAME(  199?,v4bios,     0,          mod2,   mpu4, driver_device,        0,          ROT0, "Barcrest","MPU4 Video Firmware",GAME_IS_BIOS_ROOT )
+GAME(  199?,v4bios,     0,          mod2,   mpu4, driver_device,        0,          ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
-#define GAME_FLAGS GAME_NOT_WORKING
+#define GAME_FLAGS MACHINE_NOT_WORKING
 
 GAMEL( 1993,v4cmaze,    v4bios,     crmaze,     crmaze, mpu4vid_state,      crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993,v4cmazedat, v4cmaze,    crmaze,     crmaze, mpu4vid_state,      crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D

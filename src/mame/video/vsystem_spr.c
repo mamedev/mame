@@ -85,7 +85,7 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 	m_pal_mask = 0x3f;
 
 	m_newtilecb =  vsystem_tile_indirection_delegate(FUNC(vsystem_spr_device::tile_callback_noindirect), this);
-	
+
 	memset(&m_curr_sprite, 0, sizeof(m_curr_sprite));
 }
 
@@ -177,9 +177,9 @@ void vsystem_spr_device::device_start()
 {
 	// bind our handler
 	m_newtilecb.bind_relative_to(*owner());
-	
+
 	save_item(NAME(m_pal_base));
-	
+
 	save_item(NAME(m_curr_sprite.ox));
 	save_item(NAME(m_curr_sprite.xsize));
 	save_item(NAME(m_curr_sprite.zoomx));

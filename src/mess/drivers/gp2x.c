@@ -390,4 +390,4 @@ ROM_START(gp2x)
 	ROMX_LOAD( "gp2xyaffs.v4",   0x300000, 0x2dfed0, CRC(e77efc53) SHA1(21477ff77aacb84005bc465a03066d71031a6098), ROM_BIOS(3))
 ROM_END
 
-CONS(2005, gp2x, 0, 0, gp2x, gp2x, driver_device, 0, "Game Park Holdings", "GP2X", GAME_NOT_WORKING|GAME_NO_SOUND)
+CONS(2005, gp2x, 0, 0, gp2x, gp2x, driver_device, 0, "Game Park Holdings", "GP2X", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

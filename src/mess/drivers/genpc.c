@@ -277,4 +277,4 @@ COMP(  1987,    pc,         ibm5150,    0,      pccga,      pcgen, driver_device
 COMP(  1987,    pcega,      ibm5150,    0,      pcega,      pcgen, driver_device,       0,          "<generic>",  "PC (EGA)" , 0)
 COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      pcgen, driver_device,       0,          "<generic>",  "PC (MDA)" , 0)
 COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     pcgen, driver_device,      0,       "<generic>",  "PC (Hercules)" , 0)
-COMP ( 1987,    xtvga,      ibm5150,    0,      xtvga,      pcgen, driver_device,       0,          "<generic>",  "PC (VGA)" , GAME_NOT_WORKING)
+COMP ( 1987,    xtvga,      ibm5150,    0,      xtvga,      pcgen, driver_device,       0,          "<generic>",  "PC (VGA)" , MACHINE_NOT_WORKING)

@@ -41,7 +41,7 @@ DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
 			pSprite += 4;
 		}
 	}
-	
+
 	save_item(NAME(m_da_latch));
 }
 
@@ -257,4 +257,4 @@ ROM_START( poolshrk )
 ROM_END
 
 
-GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", GAME_SUPPORTS_SAVE )
+GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )

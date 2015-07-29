@@ -29,9 +29,9 @@ Please note this rom set boots into BASIC, not monitor.
 #include "bus/rs232/rs232.h"
 //#include "machine/ay31015.h"
 
-#define I8251A_TAG		"usart"
-#define I8251A_BAUD_TAG	"usart_baud"
-#define RS232_TAG		"rs232"
+#define I8251A_TAG      "usart"
+#define I8251A_BAUD_TAG "usart_baud"
+#define RS232_TAG       "rs232"
 
 class sdk80_state : public driver_device
 {
@@ -145,40 +145,40 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 	/* video hardware */
 	// 96364 crt controller
 
-//	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
 	   Each scanline is composed of 65 character times, 40 of which
 	   are visible, and each character time is 7 dot times; a dot time
 	   is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
 	   total blanking time is about 4450 microseconds. */
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
 	/* It would be nice if we could implement some sort of display
 	   overscan here. */
-//	MCFG_SCREEN_SIZE(40 * 7, 24 * 8)
-//	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
-//	MCFG_SCREEN_UPDATE_DRIVER(sdk80_state, screen_update)
-//	MCFG_SCREEN_PALETTE("palette")
+//  MCFG_SCREEN_SIZE(40 * 7, 24 * 8)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
+//  MCFG_SCREEN_UPDATE_DRIVER(sdk80_state, screen_update)
+//  MCFG_SCREEN_PALETTE("palette")
 
-//	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sdk80)
+//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", sdk80)
 
-//	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+//  MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// Video board UART
-//	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
-//	MCFG_AY31015_TX_CLOCK(( XTAL_16MHz / 16 ) / 256)
-//	MCFG_AY31015_RX_CLOCK(( XTAL_16MHz / 16 ) / 256)
-//	MCFG_AY51013_READ_SI_CB(READ8(sdk80_state, nascom1_hd6402_si))
-//	MCFG_AY51013_WRITE_SO_CB(WRITE8(sdk80_state, nascom1_hd6402_so))
+//  MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
+//  MCFG_AY31015_TX_CLOCK(( XTAL_16MHz / 16 ) / 256)
+//  MCFG_AY31015_RX_CLOCK(( XTAL_16MHz / 16 ) / 256)
+//  MCFG_AY51013_READ_SI_CB(READ8(sdk80_state, nascom1_hd6402_si))
+//  MCFG_AY51013_WRITE_SO_CB(WRITE8(sdk80_state, nascom1_hd6402_so))
 
 	/* Devices */
-//	MCFG_DEVICE_ADD("i8279", I8279, 3100000) // based on divider
-//	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-//	MCFG_I8279_OUT_SL_CB(WRITE8(sdk80_state, scanlines_w))          // scan SL lines
-//	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk80_state, digit_w))            // display A&B
-//	MCFG_I8279_IN_RL_CB(READ8(sdk80_state, kbd_r))                  // kbd RL lines
-//	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-//	MCFG_I8279_IN_CTRL_CB(VCC)
+//  MCFG_DEVICE_ADD("i8279", I8279, 3100000) // based on divider
+//  MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
+//  MCFG_I8279_OUT_SL_CB(WRITE8(sdk80_state, scanlines_w))          // scan SL lines
+//  MCFG_I8279_OUT_DISP_CB(WRITE8(sdk80_state, digit_w))            // display A&B
+//  MCFG_I8279_IN_RL_CB(READ8(sdk80_state, kbd_r))                  // kbd RL lines
+//  MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
+//  MCFG_I8279_IN_CTRL_CB(VCC)
 
 	//MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	//MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sdk80_state, kbd_put))
@@ -202,4 +202,4 @@ ROM_START( sdk80 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS           INIT   COMPANY   FULLNAME  FLAGS */
-COMP( 1975, sdk80,  0,       0,     sdk80,     sdk80,  driver_device,  0,     "Intel",  "SDK-80", GAME_NO_SOUND_HW )
+COMP( 1975, sdk80,  0,       0,     sdk80,     sdk80,  driver_device,  0,     "Intel",  "SDK-80", MACHINE_NO_SOUND_HW )

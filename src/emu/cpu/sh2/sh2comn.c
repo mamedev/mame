@@ -899,7 +899,7 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 void sh2a_device::sh7032_dma_exec(int ch)
 {
 	const short dma_word_size[4] = { 0, +1, -1, 0 };
-	UINT8 rs = (m_dma[ch].chcr >> 8) & 0xf;	/**< Resource Select bits */
+	UINT8 rs = (m_dma[ch].chcr >> 8) & 0xf; /**< Resource Select bits */
 	if(rs != 0xc) // Auto-Request
 	{
 		logerror("Warning: SH7032 DMA enables non auto-request transfer\n");
@@ -911,9 +911,9 @@ void sh2a_device::sh7032_dma_exec(int ch)
 		return;
 
 	printf("%08x %08x %04x\n",m_dma[ch].sar,m_dma[ch].dar,m_dma[ch].chcr);
-	UINT8 dm = (m_dma[ch].chcr >> 14) & 3;	/**< Destination Address Mode bits */
-	UINT8 sm = (m_dma[ch].chcr >> 12) & 3;	/**< Source Address Mode bits */
-	bool ts = (m_dma[ch].chcr & 8); 		/**< Transfer Size bit */
+	UINT8 dm = (m_dma[ch].chcr >> 14) & 3;  /**< Destination Address Mode bits */
+	UINT8 sm = (m_dma[ch].chcr >> 12) & 3;  /**< Source Address Mode bits */
+	bool ts = (m_dma[ch].chcr & 8);         /**< Transfer Size bit */
 	int src_word_size = dma_word_size[sm] * ((ts == true) ? 2 : 1);
 	int dst_word_size = dma_word_size[dm] * ((ts == true) ? 2 : 1);
 	UINT32 src_addr = m_dma[ch].sar;
@@ -1025,4 +1025,3 @@ WRITE16_MEMBER(sh2a_device::sh7021_w)
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))
 #pragma GCC diagnostic pop
 #endif
-

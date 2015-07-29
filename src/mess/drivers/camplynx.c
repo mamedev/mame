@@ -127,7 +127,6 @@ public:
 	DECLARE_MACHINE_RESET(lynx128k);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
 	// common
-	DECLARE_PALETTE_INIT(camplynx);
 	required_device<palette_device> m_palette;
 private:
 	UINT8 m_port80;
@@ -464,34 +463,9 @@ WRITE8_MEMBER( camplynx_state::lynx128k_irq )
 	m_maincpu->set_input_line(0, data);
 }
 
-
-static const UINT8 lynx48k_palette[8*3] =
-{
-	0x00, 0x00, 0x00,   /*  0 Black     */
-	0x00, 0x00, 0xff,   /*  1 Blue      */
-	0xff, 0x00, 0x00,   /*  2 Red       */
-	0xff, 0x00, 0xff,   /*  3 Magenta       */
-	0x00, 0xff, 0x00,   /*  4 Green     */
-	0x00, 0xff, 0xff,   /*  5 Cyan      */
-	0xff, 0xff, 0x00,   /*  6 Yellow        */
-	0xff, 0xff, 0xff,   /*  7 White     */
-};
-
-PALETTE_INIT_MEMBER(camplynx_state, camplynx)
-{
-	UINT8 r, b, g, i=0, color_count = 8;
-
-	while (color_count--)
-	{
-		r = lynx48k_palette[i++]; g = lynx48k_palette[i++]; b = lynx48k_palette[i++];
-		palette.set_pen_color(7-color_count, rgb_t(r, g, b));
-	}
-}
-
 MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 {
 	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 r,g,b,x;
 	UINT32 *p = &bitmap.pix32(y);
 	UINT16 mem = ((ma << 2) + (ra << 5)) & 0x3fff;
@@ -502,21 +476,20 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 		g = RAM[0x1c000+mem+x];
 		b = RAM[0x10000+mem+x];
 
-		*p++ = palette[(BIT(r, 7) << 1) | (BIT(g, 7) << 2) | (BIT(b, 7))];
-		*p++ = palette[(BIT(r, 6) << 1) | (BIT(g, 6) << 2) | (BIT(b, 6))];
-		*p++ = palette[(BIT(r, 5) << 1) | (BIT(g, 5) << 2) | (BIT(b, 5))];
-		*p++ = palette[(BIT(r, 4) << 1) | (BIT(g, 4) << 2) | (BIT(b, 4))];
-		*p++ = palette[(BIT(r, 3) << 1) | (BIT(g, 3) << 2) | (BIT(b, 3))];
-		*p++ = palette[(BIT(r, 2) << 1) | (BIT(g, 2) << 2) | (BIT(b, 2))];
-		*p++ = palette[(BIT(r, 1) << 1) | (BIT(g, 1) << 2) | (BIT(b, 1))];
-		*p++ = palette[(BIT(r, 0) << 1) | (BIT(g, 0) << 2) | (BIT(b, 0))];
+		*p++ = m_palette->pen_color((BIT(b, 7) << 2) | (BIT(g, 7) << 1) | (BIT(r, 7)));
+		*p++ = m_palette->pen_color((BIT(b, 6) << 2) | (BIT(g, 6) << 1) | (BIT(r, 6)));
+		*p++ = m_palette->pen_color((BIT(b, 5) << 2) | (BIT(g, 5) << 1) | (BIT(r, 5)));
+		*p++ = m_palette->pen_color((BIT(b, 4) << 2) | (BIT(g, 4) << 1) | (BIT(r, 4)));
+		*p++ = m_palette->pen_color((BIT(b, 3) << 2) | (BIT(g, 3) << 1) | (BIT(r, 3)));
+		*p++ = m_palette->pen_color((BIT(b, 2) << 2) | (BIT(g, 2) << 1) | (BIT(r, 2)));
+		*p++ = m_palette->pen_color((BIT(b, 1) << 2) | (BIT(g, 1) << 1) | (BIT(r, 1)));
+		*p++ = m_palette->pen_color((BIT(b, 0) << 2) | (BIT(g, 0) << 1) | (BIT(r, 0)));
 	}
 }
 
 MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 {
 	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 r,g,b,x;
 	UINT32 green_bank, *p = &bitmap.pix32(y);
 	UINT16 mem = ((ma << 2) + (ra << 6)) & 0x3fff;
@@ -532,14 +505,14 @@ MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 		b = RAM[0x24000+mem+x];
 		g = RAM[green_bank+x];
 
-		*p++ = palette[(BIT(r, 7) << 1) | (BIT(g, 7) << 2) | (BIT(b, 7))];
-		*p++ = palette[(BIT(r, 6) << 1) | (BIT(g, 6) << 2) | (BIT(b, 6))];
-		*p++ = palette[(BIT(r, 5) << 1) | (BIT(g, 5) << 2) | (BIT(b, 5))];
-		*p++ = palette[(BIT(r, 4) << 1) | (BIT(g, 4) << 2) | (BIT(b, 4))];
-		*p++ = palette[(BIT(r, 3) << 1) | (BIT(g, 3) << 2) | (BIT(b, 3))];
-		*p++ = palette[(BIT(r, 2) << 1) | (BIT(g, 2) << 2) | (BIT(b, 2))];
-		*p++ = palette[(BIT(r, 1) << 1) | (BIT(g, 1) << 2) | (BIT(b, 1))];
-		*p++ = palette[(BIT(r, 0) << 1) | (BIT(g, 0) << 2) | (BIT(b, 0))];
+		*p++ = m_palette->pen_color((BIT(b, 7) << 2) | (BIT(g, 7) << 1) | (BIT(r, 7)));
+		*p++ = m_palette->pen_color((BIT(b, 6) << 2) | (BIT(g, 6) << 1) | (BIT(r, 6)));
+		*p++ = m_palette->pen_color((BIT(b, 5) << 2) | (BIT(g, 5) << 1) | (BIT(r, 5)));
+		*p++ = m_palette->pen_color((BIT(b, 4) << 2) | (BIT(g, 4) << 1) | (BIT(r, 4)));
+		*p++ = m_palette->pen_color((BIT(b, 3) << 2) | (BIT(g, 3) << 1) | (BIT(r, 3)));
+		*p++ = m_palette->pen_color((BIT(b, 2) << 2) | (BIT(g, 2) << 1) | (BIT(r, 2)));
+		*p++ = m_palette->pen_color((BIT(b, 1) << 2) | (BIT(g, 1) << 1) | (BIT(r, 1)));
+		*p++ = m_palette->pen_color((BIT(b, 0) << 2) | (BIT(g, 0) << 1) | (BIT(r, 0)));
 	}
 }
 
@@ -557,8 +530,8 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(camplynx_state, camplynx)
+
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -595,8 +568,8 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(camplynx_state, camplynx)
+
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -655,6 +628,6 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT         COMPANY     FULLNAME     FLAGS */
-COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k",   GAME_NOT_WORKING)
-COMP( 1983, lynx96k,   lynx48k,   0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",   GAME_NOT_WORKING)
-COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, driver_device,   0,        "Camputers",  "Lynx 128k",  GAME_NOT_WORKING)
+COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k",   MACHINE_NOT_WORKING)
+COMP( 1983, lynx96k,   lynx48k,   0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",   MACHINE_NOT_WORKING)
+COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, driver_device,   0,        "Camputers",  "Lynx 128k",  MACHINE_NOT_WORKING)

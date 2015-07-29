@@ -454,4 +454,4 @@ ROM_START( tomcat )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
 
-GAME( 1985, tomcat, 0,        tomcat, tomcat, driver_device, 0, ROT0, "Atari", "TomCat (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1985, tomcat, 0,        tomcat, tomcat, driver_device, 0, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -1011,7 +1011,7 @@ void ymf278b_device::device_start()
 	// Register state for saving
 	register_save_state();
 
-	// YMF262 related 
+	// YMF262 related
 
 	/* stream system initialize */
 	int ymf262_clock = clock() / (19/8.0);

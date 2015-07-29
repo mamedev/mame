@@ -191,7 +191,7 @@ void mb_vcu_device::device_start()
 				3,  resistances_gb, m_weights_b,    3600,   0,
 				2,  resistances_r,  m_weights_r,    3600,   0);
 	}
-	
+
 	save_item(NAME(m_status));
 	save_pointer(NAME(m_ram), 0x800);
 	save_pointer(NAME(m_palram), 0x100);

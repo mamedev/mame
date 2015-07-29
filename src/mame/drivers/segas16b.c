@@ -7551,7 +7551,7 @@ ROM_END
 
 
 //             YEAR, NAME,   PARENT, MACHINE,INPUT,  INIT,                       MONITOR, COMPANY,         FULLNAME, FLAGS
-GAME(          2006, isgsm,  0,      isgsm,  isgsm,  isgsm_state,isgsm,  ROT0,   "bootleg (ISG)", "ISG Selection Master Type 2006 BIOS", GAME_IS_BIOS_ROOT )
+GAME(          2006, isgsm,  0,      isgsm,  isgsm,  isgsm_state,isgsm,  ROT0,   "bootleg (ISG)", "ISG Selection Master Type 2006 BIOS", MACHINE_IS_BIOS_ROOT )
 
 /* 01 */ // ?? unknown
 /* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm,  tetrbx, isgsm_state,tetrbx, ROT0,   "bootleg (ISG)", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )

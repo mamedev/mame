@@ -413,7 +413,7 @@ void device_t::start()
 	if (state_registrations == 0 && (interface(exec) || interface(sound)) && type() != SPEAKER)
 	{
 		logerror("Device '%s' did not register any state to save!\n", tag());
-		if ((machine().system().flags & GAME_SUPPORTS_SAVE) != 0)
+		if ((machine().system().flags & MACHINE_SUPPORTS_SAVE) != 0)
 			fatalerror("Device '%s' did not register any state to save!\n", tag());
 	}
 

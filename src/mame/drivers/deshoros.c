@@ -313,4 +313,4 @@ ROM_START( destiny )
 	ROM_LOAD( "ag11.18a",  0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
 ROM_END
 
-GAME( 1983, destiny,  0,       destiny,  destiny, driver_device,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1983, destiny,  0,       destiny,  destiny, driver_device,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

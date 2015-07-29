@@ -371,5 +371,5 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) ) //fg clut
 ROM_END
 
-GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, sprcros2a,sprcros2, sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2a,sprcros2, sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

@@ -416,35 +416,35 @@ ROM_END
 
 
 
-GAME(1975,  antiairc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Anti-Aircraft [TTL]",    GAME_IS_SKELETON)
-GAME(1975,  crashnsc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crash 'n Score/Stock Car [TTL]",   GAME_IS_SKELETON)
-GAME(1976,  indy4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Indy 4 [TTL]",           GAME_IS_SKELETON)
-GAME(1975,  indy800,   0,         atarikee,   0,  driver_device, 0,  ROT90, "Atari/Kee",  "Indy 800 [TTL]",         GAME_IS_SKELETON)
-GAME(1975,  jetfight,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      GAME_IS_SKELETON)
-GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      GAME_IS_SKELETON)
-GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Outlaw [TTL]",           GAME_IS_SKELETON)
-GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",  "Shark JAWS [TTL]",GAME_IS_SKELETON)
-GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Steeplechase [TTL]",     GAME_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Stunt Cycle [TTL]",      GAME_IS_SKELETON)
-GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank/Tank Cocktail/Tank II [TTL]",     GAME_IS_SKELETON)
+GAME(1975,  antiairc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
+GAME(1975,  crashnsc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
+GAME(1976,  indy4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
+GAME(1975,  indy800,   0,         atarikee,   0,  driver_device, 0,  ROT90, "Atari/Kee",  "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
+GAME(1975,  jetfight,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Outlaw [TTL]",           MACHINE_IS_SKELETON)
+GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",  "Shark JAWS [TTL]",MACHINE_IS_SKELETON)
+GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
+GAME(1976,  stuntcyc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
+GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank/Tank Cocktail/Tank II [TTL]",     MACHINE_IS_SKELETON)
 
 // MISSING ROM DUMPS
-//GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Astroturf [TTL]",        GAME_IS_SKELETON)
-//GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 10/Trak 10/Formula K/Race Circuit [TTL]",     GAME_IS_SKELETON) //?
-//GAME(1974,  gtrak20,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 20/Trak 20/Twin Racer [TTL]",     GAME_IS_SKELETON) //?
-//GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "LeMans [TTL]",           GAME_IS_SKELETON)
-//GAME(1974,  quack,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      GAME_IS_SKELETON)
+//GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Astroturf [TTL]",        MACHINE_IS_SKELETON)
+//GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 10/Trak 10/Formula K/Race Circuit [TTL]",     MACHINE_IS_SKELETON) //?
+//GAME(1974,  gtrak20,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 20/Trak 20/Twin Racer [TTL]",     MACHINE_IS_SKELETON) //?
+//GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "LeMans [TTL]",           MACHINE_IS_SKELETON)
+//GAME(1974,  quack,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
 
 // 100% TTL
-//GAME(1974,  coupedem,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Coupe De Monde [TTL]",   GAME_IS_SKELETON)
-//GAME(1975,  crossfir,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crossfire [TTL]",        GAME_IS_SKELETON)
-//GAME(1975,  goal4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Goal 4/World Cup/Coupe De Monde [TTL]",     GAME_IS_SKELETON)
-//GAME(1973,  gotchaat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha [TTL]",           GAME_IS_SKELETON) //?
-//GAME(1973,  gotchaatc, 0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha Color [TTL]",     GAME_IS_SKELETON) //?
-//GAME(1975,  highway,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Highway/Hiway [TTL]",    GAME_IS_SKELETON)
-//GAME(1974,  pinpong,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pin Pong [TTL]",         GAME_IS_SKELETON)
-//GAME(1975,  pursuit,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pursuit [TTL]",          GAME_IS_SKELETON)
-//GAME(1973,  quadpong,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Quadrapong/Elimination [TTL]",     GAME_IS_SKELETON)
-//GAME(1974,  rebound,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Rebound/Spike/Volleyball [TTL]",     GAME_IS_SKELETON)
-//GAME(1974,  spacrace,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Space Race [TTL]",       GAME_IS_SKELETON)
-//GAME(1974,  touchme,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Touch Me [TTL]",         GAME_IS_SKELETON) //?
+//GAME(1974,  coupedem,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Coupe De Monde [TTL]",   MACHINE_IS_SKELETON)
+//GAME(1975,  crossfir,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crossfire [TTL]",        MACHINE_IS_SKELETON)
+//GAME(1975,  goal4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Goal 4/World Cup/Coupe De Monde [TTL]",     MACHINE_IS_SKELETON)
+//GAME(1973,  gotchaat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha [TTL]",           MACHINE_IS_SKELETON) //?
+//GAME(1973,  gotchaatc, 0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha Color [TTL]",     MACHINE_IS_SKELETON) //?
+//GAME(1975,  highway,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Highway/Hiway [TTL]",    MACHINE_IS_SKELETON)
+//GAME(1974,  pinpong,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pin Pong [TTL]",         MACHINE_IS_SKELETON)
+//GAME(1975,  pursuit,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pursuit [TTL]",          MACHINE_IS_SKELETON)
+//GAME(1973,  quadpong,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Quadrapong/Elimination [TTL]",     MACHINE_IS_SKELETON)
+//GAME(1974,  rebound,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Rebound/Spike/Volleyball [TTL]",     MACHINE_IS_SKELETON)
+//GAME(1974,  spacrace,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Space Race [TTL]",       MACHINE_IS_SKELETON)
+//GAME(1974,  touchme,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Touch Me [TTL]",         MACHINE_IS_SKELETON) //?

@@ -398,6 +398,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, battlane,  0,        battlane, battlane, driver_device, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, battlane2, battlane, battlane, battlane, driver_device, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, battlane3, battlane, battlane, battlane, driver_device, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1986, battlane,  0,        battlane, battlane, driver_device, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane2, battlane, battlane, battlane, driver_device, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane3, battlane, battlane, battlane, driver_device, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )

@@ -104,11 +104,10 @@ public:
 	/* mailbox data */
 	UINT8   m_wx318;    /* data of 74ls374 labeled wx318 */
 	UINT8   m_wx319;    /* data of 74sl374 labeled wx319 */
-	DECLARE_PALETTE_INIT(exelv);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
-
 };
 
 
@@ -450,21 +449,6 @@ static INPUT_PORTS_START(exelv)
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(exelv_state, exelv)
-{
-	int i, red, green, blue;
-
-	/* create the 8 color palette */
-	for (i = 0; i < 8; i++)
-	{
-		red = (i & 1) ? 255 : 0;    /* red */
-		green = (i & 2) ? 255 : 0;  /* green */
-		blue = (i & 4) ? 255 : 0;   /* blue */
-		palette.set_pen_color(i, red, green, blue);
-	}
-}
-
-
 /* Machine Initialization */
 
 MACHINE_START_MEMBER( exelv_state, exl100)
@@ -525,8 +509,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(exelv_state, exelv)
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
@@ -575,8 +558,7 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(exelv_state, exelv)
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
@@ -620,5 +602,5 @@ ROM_END
 
 
 /*   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
-COMP(1984,  exl100,  0,          0,      exl100,     exelv, driver_device,  0,       "Exelvision",   "EXL 100",  GAME_NOT_WORKING)
-COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, driver_device,  0,       "Exelvision",   "Exeltel",  GAME_NOT_WORKING)
+COMP(1984,  exl100,  0,          0,      exl100,     exelv, driver_device,  0,       "Exelvision",   "EXL 100",  MACHINE_NOT_WORKING)
+COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, driver_device,  0,       "Exelvision",   "Exeltel",  MACHINE_NOT_WORKING)

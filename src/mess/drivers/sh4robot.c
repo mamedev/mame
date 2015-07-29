@@ -90,4 +90,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 20??, sh4robot,  0,       0,  sh4robot,   sh4robot, driver_device,   0,   "<unknown>", "Robot", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 20??, sh4robot,  0,       0,  sh4robot,   sh4robot, driver_device,   0,   "<unknown>", "Robot", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

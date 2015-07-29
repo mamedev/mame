@@ -151,4 +151,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT                 INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 1988, besta88,  0,      0,     besta,     besta,   driver_device,  0,  "Sapsan", "Besta-88", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, besta88,  0,      0,     besta,     besta,   driver_device,  0,  "Sapsan", "Besta-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

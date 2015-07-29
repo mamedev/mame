@@ -1169,8 +1169,8 @@ ROM_START( dariuse )
 ROM_END
 
 
-GAME( 1986, darius,   0,        darius,   darius,  driver_device, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariusu,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariusj,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariuso,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariuse,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, darius,   0,        darius,   darius,  driver_device, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusu,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusj,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuso,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuse,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )

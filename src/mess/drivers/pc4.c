@@ -247,4 +247,4 @@ ROM_START( pc4 )
 ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                FLAGS */
-COMP( 1990, pc4,       0,          0,      pc4,  pc4, driver_device, 0,      "Laser Computer",   "Laser PC4",                       GAME_NOT_WORKING )
+COMP( 1990, pc4,       0,          0,      pc4,  pc4, driver_device, 0,      "Laser Computer",   "Laser PC4",                       MACHINE_NOT_WORKING )

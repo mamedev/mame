@@ -381,5 +381,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAME( 1997, gotcha,  0,      gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival", GAME_SUPPORTS_SAVE )
-GAME( 1997, ppchamp, gotcha, gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1997, gotcha,  0,      gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ppchamp, gotcha, gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE )

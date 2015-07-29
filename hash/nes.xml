@@ -79879,39 +79879,39 @@ that the real dumps might surface -->
 			</dataarea>
 		</part>
 	</software>
-  
-  <software name="mc_cb280" supported="no">
-    <description>Coolboy RS-18 (280-in-1)</description>
-    <year>19??</year>
-    <publisher>&lt;unknown&gt;</publisher>
-    <part name="cart" interface="nes_cart">
-      <!--<feature name="slot" value="coolboy" />
-      <feature name="pcb" value="UNL-COOLBOY" /> -->
-      <dataarea name="prg" size="4194304">
-        <rom name="w25q32.u5" size="4194304" crc="c9541bdf" sha1="f0ce46f18658ca5dbed881e5a80460e59820bbd0" offset="00000" />
-      </dataarea>
-      <!-- ?? -->
-      <dataarea name="vram" size="131072">
-      </dataarea>
-    </part>
-  </software>
 
-  <software name="mc_samur" supported="no">
-    <!-- a VT03 OneBus based system -->
-    <description>Samurai (60-in-1)</description>
-    <year>2006</year>
-    <publisher>Team Hummer</publisher>
-    <part name="cart" interface="nes_cart">
-      <dataarea name="prg" size="2097152">
-        <rom name="29lv160b.bin" size="2097152" crc="7dac8efe" sha1="ffb27ebb4299d5b9a4b976c418fcc7695200060c" offset="00000" />
-      </dataarea>
-      <!-- ?? -->
-      <dataarea name="vram" size="131072">
-      </dataarea>
-    </part>
-  </software>
+	<software name="mc_cb280" supported="no">
+	<description>Coolboy RS-18 (280-in-1)</description>
+	<year>19??</year>
+	<publisher>&lt;unknown&gt;</publisher>
+	<part name="cart" interface="nes_cart">
+		<!--<feature name="slot" value="coolboy" />
+		<feature name="pcb" value="UNL-COOLBOY" /> -->
+		<dataarea name="prg" size="4194304">
+		<rom name="w25q32.u5" size="4194304" crc="c9541bdf" sha1="f0ce46f18658ca5dbed881e5a80460e59820bbd0" offset="00000" />
+		</dataarea>
+		<!-- ?? -->
+		<dataarea name="vram" size="131072">
+		</dataarea>
+	</part>
+	</software>
 
-  <software name="mc_sg360" supported="no">
+	<software name="mc_samur" supported="no">
+	<!-- a VT03 OneBus based system -->
+	<description>Samurai (60-in-1)</description>
+	<year>2006</year>
+	<publisher>Team Hummer</publisher>
+	<part name="cart" interface="nes_cart">
+		<dataarea name="prg" size="2097152">
+		<rom name="29lv160b.bin" size="2097152" crc="7dac8efe" sha1="ffb27ebb4299d5b9a4b976c418fcc7695200060c" offset="00000" />
+		</dataarea>
+		<!-- ?? -->
+		<dataarea name="vram" size="131072">
+		</dataarea>
+	</part>
+	</software>
+
+	<software name="mc_sg360" supported="no">
 		<description>Super Game 360-in-1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

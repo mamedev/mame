@@ -390,4 +390,4 @@ DRIVER_INIT_MEMBER(miragemi_state,mirage)
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
-GAME( 1994, mirage, 0,     mirage, mirage, miragemi_state, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, mirage, 0,     mirage, mirage, miragemi_state, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )

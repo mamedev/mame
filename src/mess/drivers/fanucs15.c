@@ -420,4 +420,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS          INIT COMPANY  FULLNAME       FLAGS */
-COMP( 1990, fanucs15, 0,      0,     fanucs15,  fanucs15, driver_device, 0,   "Fanuc", "System 15", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, fanucs15, 0,      0,     fanucs15,  fanucs15, driver_device, 0,   "Fanuc", "System 15", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

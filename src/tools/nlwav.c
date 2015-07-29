@@ -90,27 +90,27 @@ public:
 private:
 	struct riff_chunk_t
 	{
-		char		group_id[4];
-		unsigned	filelen;
-		char		rifftype[4];
+		char        group_id[4];
+		unsigned    filelen;
+		char        rifftype[4];
 	};
 
 	struct riff_format_t
 	{
-		char		signature[4];
-		unsigned	fmt_length;
-		short		format_tag;
-		short		channels;
-		unsigned	sample_rate;
-		unsigned	bytes_per_second;
-		short 		block_align;
-		short		bits_sample;
+		char        signature[4];
+		unsigned    fmt_length;
+		short       format_tag;
+		short       channels;
+		unsigned    sample_rate;
+		unsigned    bytes_per_second;
+		short       block_align;
+		short       bits_sample;
 	};
 
 	struct riff_data_t
 	{
-		char		signature[4];
-		unsigned	len;
+		char        signature[4];
+		unsigned    len;
 		// data follows
 	};
 
@@ -144,13 +144,12 @@ private:
 
 void convert(nlwav_options_t &opts)
 {
-	
 	wav_t wo(opts.opt_out(), 48000);
-	
+
 	FILE *FIN = std::fopen(opts.opt_inp(),"r");
 	if (FIN==NULL)
 		throw netlist::fatalerror_e("Error opening input file: %s", opts.opt_inp().cstr());
-	
+
 	double dt = 1.0 / (double) wo.sample_rate();
 	double ct = dt;
 	//double mean = 2.4;
@@ -165,7 +164,7 @@ void convert(nlwav_options_t &opts)
 	int n = 0;
 	//short sample = 0;
 
-	
+
 	while(!std::feof(FIN))
 	{
 #if 1
@@ -212,7 +211,7 @@ void convert(nlwav_options_t &opts)
 			v = 32000.0;
 		else if (v<-32000.0)
 			v = -32000.0;
-		sample = v;	
+		sample = v;
 		//printf("%f %f\n", t, v);
 #endif
 	}
@@ -270,23 +269,23 @@ int main(int argc, char *argv[])
 }
 
 /*
-Der Daten-Abschnitt enthält die Abtastwerte:
-Offset	Länge	Inhalt	Beschreibung
-36 (0x24)	4	'data'	Header-Signatur
-40 (0x28)	4	<length>	Länge des Datenblocks, max. <Dateigröße> − 44
+Der Daten-Abschnitt enth??lt die Abtastwerte:
+Offset  L??nge  Inhalt  Beschreibung
+36 (0x24)   4   'data'  Header-Signatur
+40 (0x28)   4   <length>    L??nge des Datenblocks, max. <Dateigr????e>?????????44
 
-0 (0x00)	char	4	'RIFF'
-4 (0x04)	unsigned	4	<Dateigröße> − 8
-8 (0x08)	char	4	'WAVE'
+0 (0x00)    char    4   'RIFF'
+4 (0x04)    unsigned    4   <Dateigr????e>?????????8
+8 (0x08)    char    4   'WAVE'
 
 Der fmt-Abschnitt (24 Byte) beschreibt das Format der einzelnen Abtastwerte:
-Offset	Länge	Inhalt	Beschreibung
-12 (0x0C)	4	'fmt '	Header-Signatur (folgendes Leerzeichen beachten)
-16 (0x10)	4	<fmt length>	Länge des restlichen fmt-Headers (16 Bytes)
-20 (0x14)	2	<format tag>	Datenformat der Abtastwerte (siehe separate Tabelle weiter unten)
-22 (0x16)	2	<channels>	Anzahl der Kanäle: 1 = mono, 2 = stereo; mittlerweile sind auch mehr als 2 Kanäle (z. B. für Raumklang) möglich.[2]
-24 (0x18)	4	<sample rate>	Samples pro Sekunde je Kanal (z. B. 44100)
-28 (0x1C)	4	<bytes/second>	Abtastrate · Frame-Größe
-32 (0x20)	2	<block align>	Frame-Größe = <Anzahl der Kanäle> · ((<Bits/Sample (eines Kanals)> + 7) / 8)   (Division ohne Rest)
-34 (0x22)	2	<bits/sample>	Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
+Offset  L??nge  Inhalt  Beschreibung
+12 (0x0C)   4   'fmt '  Header-Signatur (folgendes Leerzeichen beachten)
+16 (0x10)   4   <fmt length>    L??nge des restlichen fmt-Headers (16 Bytes)
+20 (0x14)   2   <format tag>    Datenformat der Abtastwerte (siehe separate Tabelle weiter unten)
+22 (0x16)   2   <channels>  Anzahl der Kan??le: 1 = mono, 2 = stereo; mittlerweile sind auch mehr als 2 Kan??le (z. B. f??r Raumklang) m??glich.[2]
+24 (0x18)   4   <sample rate>   Samples pro Sekunde je Kanal (z. B. 44100)
+28 (0x1C)   4   <bytes/second>  Abtastrate????????Frame-Gr????e
+32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
+34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
 */

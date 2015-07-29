@@ -92,7 +92,7 @@ struct mat_cr_t
 		 *
 		 * ==> LUx = r
 		 *
-		 * ==> Ux = L⁻¹r = w
+		 * ==> Ux = L?????r = w
 		 *
 		 * ==> r = Lw
 		 *

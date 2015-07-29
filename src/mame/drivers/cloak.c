@@ -599,11 +599,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloak,   0,     cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (rev 5)", GAME_SUPPORTS_SAVE )
-GAME( 1983, cloaksp, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (Spanish)", GAME_SUPPORTS_SAVE )
-GAME( 1983, cloakfr, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (French)", GAME_SUPPORTS_SAVE )
-GAME( 1983, cloakgr, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (German)", GAME_SUPPORTS_SAVE )
-GAME( 1983, agentx4, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1983, agentx3, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1983, agentx2, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, agentx1, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, cloak,   0,     cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloaksp, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakfr, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakgr, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Cloak & Dagger (German)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx4, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx3, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx2, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx1, cloak, cloak, cloak, driver_device, 0, ROT0, "Atari", "Agent X (prototype, rev 1)", MACHINE_SUPPORTS_SAVE )

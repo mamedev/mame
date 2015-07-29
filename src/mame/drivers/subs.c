@@ -252,4 +252,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, driver_device, 0, ROT0, "Atari", "Subs", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1977, subs, 0, subs, subs, driver_device, 0, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

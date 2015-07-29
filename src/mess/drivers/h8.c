@@ -365,4 +365,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME PARENT  COMPAT MACHINE INPUT    CLASS,         INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1977, h8,  0,       0,    h8,     h8,      driver_device,   0, "Heath, Inc.", "Heathkit H8", GAME_NOT_WORKING )
+COMP( 1977, h8,  0,       0,    h8,     h8,      driver_device,   0, "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )

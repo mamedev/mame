@@ -559,4 +559,4 @@ DRIVER_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY             FULLNAME                         FLAGS */
-GAME( 1997, fruitstb, 0,      mpu12wbk, mpu12wbk, mpu12wbk_state, mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1997, fruitstb, 0,      mpu12wbk, mpu12wbk, mpu12wbk_state, mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

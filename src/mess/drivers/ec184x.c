@@ -381,7 +381,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1987,    ec1840,     ibm5150,    0,      ec1840,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1840", GAME_NOT_WORKING)
+COMP ( 1987,    ec1840,     ibm5150,    0,      ec1840,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1840", MACHINE_NOT_WORKING)
 COMP ( 1987,    ec1841,     ibm5150,    0,      ec1841,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1841", 0)
-COMP ( 1989,    ec1845,     ibm5150,    0,      ec1841,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1845", GAME_NOT_WORKING)
-COMP ( 1990,    ec1847,     ibm5150,    0,      ec1847,     ec1841,   driver_device,    0,          "<unknown>",  "EC-1847", GAME_NOT_WORKING)
+COMP ( 1989,    ec1845,     ibm5150,    0,      ec1841,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1845", MACHINE_NOT_WORKING)
+COMP ( 1990,    ec1847,     ibm5150,    0,      ec1847,     ec1841,   driver_device,    0,          "<unknown>",  "EC-1847", MACHINE_NOT_WORKING)

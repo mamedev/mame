@@ -300,4 +300,4 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 /* Game Drivers */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
-COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", GAME_NO_SOUND )
+COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", MACHINE_NO_SOUND )

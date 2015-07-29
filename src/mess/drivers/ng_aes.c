@@ -1621,7 +1621,7 @@ DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
 
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", GAME_SUPPORTS_SAVE )
+CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
 
 DRIVER_INIT_MEMBER(ng_aes_state,neocdz)
 {
@@ -1638,4 +1638,4 @@ CONS( 1996, neocdz,  0,      0,   neocd, neocd, ng_aes_state,  neocdz,  "SNK", "
 CONS( 1996, neocdzj, neocdz, 0,   neocd, neocd, ng_aes_state,  neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
 
 
-CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, ng_aes_state,  neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, ng_aes_state,  neogeo,  "SNK", "Neo-Geo CD", MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

@@ -162,4 +162,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1977, elekscmp,  0,   0,       elekscmp,  elekscmp, driver_device,  0,  "Elektor Electronics", "Elektor SC/MP", GAME_NO_SOUND_HW)
+COMP( 1977, elekscmp,  0,   0,       elekscmp,  elekscmp, driver_device,  0,  "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)

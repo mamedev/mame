@@ -408,4 +408,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS          INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1983, superslv, 0,      0,      superslave, superslave, driver_device, 0, "Advanced Digital Corporation", "Super Slave",  GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1983, superslv, 0,      0,      superslave, superslave, driver_device, 0, "Advanced Digital Corporation", "Super Slave",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -227,7 +227,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME      FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 06c",  GAME_NOT_WORKING)
-COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 1200", GAME_NOT_WORKING)
-COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "PK-6128c",    GAME_NOT_WORKING)
-COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Krista-2",    GAME_NOT_WORKING)
+COMP( 1987, vector06,    0,        0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 06c",  MACHINE_NOT_WORKING)
+COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
+COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
+COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)

@@ -790,6 +790,6 @@ DRIVER_INIT_MEMBER(hyprduel_state,magerror)
 }
 
 
-GAME( 1993, hyprduel, 0,        hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1993, hyprduel2,hyprduel, hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1994, magerror, 0,        magerror, magerror, hyprduel_state, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", GAME_SUPPORTS_SAVE )
+GAME( 1993, hyprduel, 0,        hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hyprduel2,hyprduel, hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magerror, 0,        magerror, magerror, hyprduel_state, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", MACHINE_SUPPORTS_SAVE )

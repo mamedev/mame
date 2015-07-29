@@ -312,4 +312,4 @@ DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 			gfx2[(i << 3) + j] = (gfx1[i] & (0x80 >> j)) ? (usr1[i] & 7) : (usr1[i] >> 4);
 }
 
-GAME( 19??, dynadice, 0, dynadice, dynadice, dynadice_state, dynadice, ROT90, "<unknown>", "Dynamic Dice", GAME_SUPPORTS_SAVE )
+GAME( 19??, dynadice, 0, dynadice, dynadice, dynadice_state, dynadice, ROT90, "<unknown>", "Dynamic Dice", MACHINE_SUPPORTS_SAVE )

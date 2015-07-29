@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Joakim Larsson Edström
+// copyright-holders:Joakim Larsson Edstr??m
 /**********************************************************************
 
     Motorola MC68230 PI/T Parallell Interface and Timer
@@ -56,7 +56,7 @@ protected:
 	virtual void device_reset();
 
 private:
-        UINT8  m_pgcr;  // Port General Control register
+		UINT8  m_pgcr;  // Port General Control register
 	UINT8  m_psrr;  // Port Service Request register
 	UINT8  m_paddr; // Port A Data Direction register
 	UINT8  m_pbddr; // Port B Data Direction register

@@ -1370,4 +1370,4 @@ COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packa
 COMP ( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48_state, hp48, "Hewlett Packard", "HP48G+", 0 )
 COMP ( 1999, hp49g , 0,      0, hp49g,  hp49g,  hp48_state, hp48, "Hewlett Packard", "HP49G", 0 )
 COMP ( 1995, hp38g , 0,      0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP38G", 0 )
-COMP ( 2000, hp39g , 0,      0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP39G", GAME_NOT_WORKING )
+COMP ( 2000, hp39g , 0,      0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP39G", MACHINE_NOT_WORKING )

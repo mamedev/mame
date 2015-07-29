@@ -926,4 +926,4 @@ ROM_END
 //**************************************************************************
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS */
-COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,      "Atari",    "Portfolio",    GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,      "Atari",    "Portfolio",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

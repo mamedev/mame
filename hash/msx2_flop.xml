@@ -11175,21 +11175,21 @@ The following floppies came with the machines.
 		<description>The Tower? of Cabin - Cabin Panic (Jpn)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
-        <part name="flop1" interface="floppy_3_5">
-            <dataarea name="flop" size="737280">
-                <rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 1 of 3).dsk" size="737280" crc="0471dbee" sha1="0e8d2b0177bd601e84c71735b4b498be2818085f" offset="0" />
-            </dataarea>
-        </part>
-        <part name="flop2" interface="floppy_3_5">
-            <dataarea name="flop" size="737280">
-                <rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 2 of 3).dsk" size="737280" crc="0d3afd17" sha1="d8cb95e558065b19f21f434a97a4a59b1892fc1a" offset="0" />
-            </dataarea>
-        </part>
-        <part name="flop3" interface="floppy_3_5">
-            <dataarea name="flop" size="737280">
-                <rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 3 of 3).dsk" size="737280" crc="9ad7d280" sha1="ed0e55d97817e9d98d563fdeb634cc6443564840" offset="0" />
-            </dataarea>
-        </part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 1 of 3).dsk" size="737280" crc="0471dbee" sha1="0e8d2b0177bd601e84c71735b4b498be2818085f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 2 of 3).dsk" size="737280" crc="0d3afd17" sha1="d8cb95e558065b19f21f434a97a4a59b1892fc1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 3 of 3).dsk" size="737280" crc="9ad7d280" sha1="ed0e55d97817e9d98d563fdeb634cc6443564840" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="towercaba" cloneof="towercab">

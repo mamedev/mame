@@ -168,4 +168,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS           INIT   COMPANY                       FULLNAME       FLAGS */
-COMP( 1974, mod8,   0,       0,      mod8,      mod8,   driver_device,   0, "Microsystems International Ltd", "MOD-8", GAME_NO_SOUND_HW)
+COMP( 1974, mod8,   0,       0,      mod8,      mod8,   driver_device,   0, "Microsystems International Ltd", "MOD-8", MACHINE_NO_SOUND_HW)

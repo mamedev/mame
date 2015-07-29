@@ -176,4 +176,4 @@ ROM_END
 
 /* Driver */
 
-COMP(1978, rm380z, 0,      0,       rm380z,    rm380z, driver_device,  0,    "Research Machines", "RM-380Z", GAME_NO_SOUND_HW)
+COMP(1978, rm380z, 0,      0,       rm380z,    rm380z, driver_device,  0,    "Research Machines", "RM-380Z", MACHINE_NO_SOUND_HW)

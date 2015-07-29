@@ -529,6 +529,6 @@ DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 
 ***************************************************************************/
 
-GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", GAME_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, driver_device,  0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1996, watrball,  0,        watrball, watrball, driver_device,  0,        ROT0, "ABM",         "Water Balls", GAME_SUPPORTS_SAVE )
+GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, driver_device,  0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, watrball,  0,        watrball, watrball, driver_device,  0,        ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )

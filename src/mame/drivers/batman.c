@@ -306,4 +306,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, batman, 0, batman, batman, driver_device, 0, ROT0, "Atari Games", "Batman", GAME_SUPPORTS_SAVE )
+GAME( 1991, batman, 0, batman, batman, driver_device, 0, ROT0, "Atari Games", "Batman", MACHINE_SUPPORTS_SAVE )

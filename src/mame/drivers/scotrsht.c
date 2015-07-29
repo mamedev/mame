@@ -242,4 +242,4 @@ ROM_START( scotrsht )
 	ROM_LOAD( "gx545_6301_8f.bin", 0x0400, 0x0100, CRC(c1c7cf58) SHA1(08452228bf13e43ce4a05806f79e9cd1542416f1) ) /* sprites lookup */
 ROM_END
 
-GAME( 1985, scotrsht, 0, scotrsht, scotrsht, driver_device, 0, ROT90,"Konami", "Scooter Shooter", GAME_SUPPORTS_SAVE )
+GAME( 1985, scotrsht, 0, scotrsht, scotrsht, driver_device, 0, ROT90,"Konami", "Scooter Shooter", MACHINE_SUPPORTS_SAVE )

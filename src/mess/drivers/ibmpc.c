@@ -571,7 +571,7 @@ ROM_END
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
 COMP(  1981,    ibm5150,    0,          0,      ibm5150,    ibm5150, driver_device, 0,    "International Business Machines",  "IBM PC 5150" , 0)
 COMP(  1982,    ibm5155,    ibm5150,    0,      ibm5150,    ibm5150, driver_device, 0,    "International Business Machines",  "IBM PC 5155" , 0)
-COMP(  1985,    ibm5140,    ibm5150,    0,      ibm5140,    ibm5150, driver_device, 0,    "International Business Machines",  "IBM PC 5140 Convertible" , GAME_NOT_WORKING)
+COMP(  1985,    ibm5140,    ibm5150,    0,      ibm5140,    ibm5150, driver_device, 0,    "International Business Machines",  "IBM PC 5140 Convertible" , MACHINE_NOT_WORKING)
 
 // xt class (pc but 8086)
 COMP(  1982,    ibm5160,    ibm5150,    0,      ibm5160,    ibm5150, driver_device, 0,    "International Business Machines",  "IBM XT 5160" , 0)

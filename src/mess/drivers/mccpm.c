@@ -149,4 +149,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                          FULLNAME       FLAGS */
-COMP( 1981, mccpm,  0,      0,       mccpm,     mccpm, driver_device,    0, "GRAF Elektronik Systeme GmbH", "mc-CP/M-Computer", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, mccpm,  0,      0,       mccpm,     mccpm, driver_device,    0, "GRAF Elektronik Systeme GmbH", "mc-CP/M-Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

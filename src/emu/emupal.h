@@ -236,6 +236,22 @@
 	MCFG_PALETTE_ADD(_tag, 8) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_rgb), downcast<palette_device *>(device)));
 
+#define MCFG_PALETTE_ADD_3BIT_RBG(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_rbg), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_BRG(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_brg), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_GRB(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_grb), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_GBR(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_gbr), downcast<palette_device *>(device)));
+
 #define MCFG_PALETTE_ADD_3BIT_BGR(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_bgr), downcast<palette_device *>(device)));
@@ -367,6 +383,9 @@ public:
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
+	void set_pen_red_level(pen_t pen, UINT8 level) { m_palette->entry_set_red_level(pen, level); }
+	void set_pen_green_level(pen_t pen, UINT8 level) { m_palette->entry_set_green_level(pen, level); }
+	void set_pen_blue_level(pen_t pen, UINT8 level) { m_palette->entry_set_blue_level(pen, level); }
 	void set_pen_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
 	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
 	void set_pen_colors(pen_t color_base, const std::vector<rgb_t> &colors) { for(unsigned int i=0; i != colors.size(); i++) set_pen_color(color_base+i, colors[i]); }
@@ -405,6 +424,10 @@ public:
 	void palette_init_monochrome_green_highlight(palette_device &palette);
 	void palette_init_monochrome_yellow(palette_device &palette);
 	void palette_init_3bit_rgb(palette_device &palette);
+	void palette_init_3bit_rbg(palette_device &palette);
+	void palette_init_3bit_brg(palette_device &palette);
+	void palette_init_3bit_grb(palette_device &palette);
+	void palette_init_3bit_gbr(palette_device &palette);
 	void palette_init_3bit_bgr(palette_device &palette);
 	void palette_init_RRRRGGGGBBBB_proms(palette_device &palette);
 	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);

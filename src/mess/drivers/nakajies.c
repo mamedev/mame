@@ -826,10 +826,10 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    COMPANY    FULLNAME            FLAGS */
-COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, driver_device, 0,      "Walther", "ES-210",           GAME_NOT_WORKING | GAME_NO_SOUND ) /* German, 128KB RAM */
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, driver_device, 0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING | GAME_NO_SOUND ) /* Spanish, 128KB RAM */
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, driver_device, 0,      "Nakajima","ES-210 (Spain)",   GAME_NOT_WORKING | GAME_NO_SOUND ) /* Spanish, 128KB RAM */
-COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T100", GAME_NOT_WORKING | GAME_NO_SOUND ) /* English, 128KB RAM */
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING | GAME_NO_SOUND ) /* English, 256KB RAM */
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter 450",  GAME_NOT_WORKING | GAME_NO_SOUND ) /* English, 128KB RAM */
-COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, driver_device, 0,      "NTS",     "DreamWriter T200", GAME_NOT_WORKING | GAME_NO_SOUND ) /* English, 256KB? RAM */
+COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, driver_device, 0,      "Walther", "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* German, 128KB RAM */
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, driver_device, 0,      "Dator",   "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* Spanish, 128KB RAM */
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, driver_device, 0,      "Nakajima","ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* Spanish, 128KB RAM */
+COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 128KB RAM */
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 256KB RAM */
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 128KB RAM */
+COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, driver_device, 0,      "NTS",     "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 256KB? RAM */

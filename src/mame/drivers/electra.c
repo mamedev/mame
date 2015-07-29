@@ -127,4 +127,4 @@ ROM_START( avenger )
 ROM_END
 
 
-GAME( 1975, avenger,  0, electra, 0, driver_device,  0, ROT0, "Electra", "Avenger [TTL]", GAME_IS_SKELETON )
+GAME( 1975, avenger,  0, electra, 0, driver_device,  0, ROT0, "Electra", "Avenger [TTL]", MACHINE_IS_SKELETON )

@@ -164,4 +164,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1983, d6809,  0,      0,       d6809,     d6809, driver_device,   0,     "Dunfield", "6809 Portable", GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1983, d6809,  0,      0,       d6809,     d6809, driver_device,   0,     "Dunfield", "6809 Portable", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

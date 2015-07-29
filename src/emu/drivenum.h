@@ -36,7 +36,7 @@ public:
 	// any item by index
 	static const game_driver &driver(int index) { assert(index >= 0 && index < s_driver_count); return *s_drivers_sorted[index]; }
 	static int clone(int index) { return find(driver(index).parent); }
-	static int non_bios_clone(int index) { int result = find(driver(index).parent); return (result != -1 && (driver(result).flags & GAME_IS_BIOS_ROOT) == 0) ? result : -1; }
+	static int non_bios_clone(int index) { int result = find(driver(index).parent); return (result != -1 && (driver(result).flags & MACHINE_IS_BIOS_ROOT) == 0) ? result : -1; }
 	static int compatible_with(int index) { return find(driver(index).compatible_with); }
 
 	// any item by driver

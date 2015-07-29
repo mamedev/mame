@@ -1247,6 +1247,6 @@ ROM_END
 //**************************************************************************
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
-COMP( 1975, tek4051,    0,          0,      tek4051,    tek4051, driver_device, 0,      "Tektronix",    "Tektronix 4051",   GAME_NOT_WORKING )
-COMP( 1978, tek4052a,   tek4051,    0,      tek4052,    tek4051, driver_device, 0,      "Tektronix",    "Tektronix 4052A",  GAME_NOT_WORKING )
-//COMP( 1979, tek4054,  tek4051,    0,      tek4054,    tek4054, driver_device,    0,      "Tektronix",    "Tektronix 4054",   GAME_NOT_WORKING )
+COMP( 1975, tek4051,    0,          0,      tek4051,    tek4051, driver_device, 0,      "Tektronix",    "Tektronix 4051",   MACHINE_NOT_WORKING )
+COMP( 1978, tek4052a,   tek4051,    0,      tek4052,    tek4051, driver_device, 0,      "Tektronix",    "Tektronix 4052A",  MACHINE_NOT_WORKING )
+//COMP( 1979, tek4054,  tek4051,    0,      tek4054,    tek4054, driver_device,    0,      "Tektronix",    "Tektronix 4054",   MACHINE_NOT_WORKING )

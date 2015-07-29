@@ -918,5 +918,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                     COMPANY   FULLNAME           FLAGS
-COMP( 1983, ehx20,  0,      0,       hx20,      hx20,    driver_device,    0,     "Epson",  "Epson HX-20",           GAME_NOT_WORKING )
-COMP( 1983, ehx20e, ehx20,  0,       hx20,      hx20e,   driver_device,    0,     "Epson",  "Epson HX-20 (Europe)",  GAME_NOT_WORKING )
+COMP( 1983, ehx20,  0,      0,       hx20,      hx20,    driver_device,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e, ehx20,  0,       hx20,      hx20e,   driver_device,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )

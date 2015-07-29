@@ -168,16 +168,16 @@
 		<!--
 		VisiCalc(R)                                                 PET 2001, CBM 2001
 		Program Diskette                                              and CBM 8032 32K
-									  [VisiCorp logo]                for 2040 and 4040
+		                              [VisiCorp logo]                for 2040 and 4040
 		One of the VisiTM programs                                     Diskette Drives
 		from VisiCorp                                           by Software Arts, Inc.
 
-										VisiCorpTM
-									PERSONAL SOFTWARETM
+		                                VisiCorpTM
+		                            PERSONAL SOFTWARETM
 
 		Program Copyright (C) 1979, 1981
 		Software Arts, Inc. All Rights Reserved
-																			20910-5511
+		                                                                    20910-5511
 		-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -201,16 +201,16 @@
 		<!--
 		VisiCalc(R)                                                 PET 2001, CBM 2001
 		Program Diskette                                         CBM 8032 and CBM 8096
-									  [VisiCorp logo]          for 8050 Diskette Drive
+		                              [VisiCorp logo]          for 8050 Diskette Drive
 		One of the VisiTM programs                              by Software Arts, Inc.
 		from VisiCorp
 
-										VisiCorpTM
-									PERSONAL SOFTWARETM
+		                                VisiCorpTM
+		                            PERSONAL SOFTWARETM
 
 		Program Copyright (C) 1979, 1982
 		Software Arts, Inc. All Rights Reserved
-																			20910-5612
+		                                                                    20910-5612
 		-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
@@ -825,7 +825,7 @@
 		<info name="serial" value="CP2-620-580" />
 
 		<!--
-				  C P / M   ( R )       V e r s i o n   2 . 2
+		          C P / M   ( R )       V e r s i o n   2 . 2
 		( C )   1 9 7 6 - 1 9 8 0   D i g i t a l   R e s e a r c h
 		s e r i a l  #  C P 2 - 6 2 0 -   5 8 0   # #
 		8050 format / 4040 on back   (C) 1982 Madison Computer
@@ -849,7 +849,7 @@
 		<year>2012</year>
 		<publisher>Steve Gray</publisher>
 		<!-- These disks contain some programs typed in from the HSG manual,
-			 along with new programs that were written in 2012. -->
+		     along with new programs that were written in 2012. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">

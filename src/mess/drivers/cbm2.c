@@ -2749,19 +2749,19 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT                        COMPANY                         FULLNAME                    FLAGS
-COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,       driver_device,      0,      "Commodore Business Machines",  "P500 (NTSC)",              GAME_SUPPORTS_SAVE )
-COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,       driver_device,      0,      "Commodore Business Machines",  "P500 (PAL)",               GAME_SUPPORTS_SAVE )
-COMP( 1983, b500,       0,      0,      b128,       cbm2,       driver_device,      0,      "Commodore Business Machines",  "B500",                     GAME_SUPPORTS_SAVE )
-COMP( 1983, b128,       b500,   0,      b128,       cbm2,       driver_device,      0,      "Commodore Business Machines",  "B128",                     GAME_SUPPORTS_SAVE )
-COMP( 1983, b256,       b500,   0,      b256,       cbm2,       driver_device,      0,      "Commodore Business Machines",  "B256",                     GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm610,     b500,   0,      cbm610,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 610",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm620,     b500,   0,      cbm620,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 620",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm620_hu,  b500,   0,      cbm620,     cbm2_hu,    driver_device,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        GAME_SUPPORTS_SAVE )
-COMP( 1983, b128hp,     0,      0,      b128hp,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "B128-80HP",                GAME_SUPPORTS_SAVE )
-COMP( 1983, b256hp,     b128hp, 0,      b256hp,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "B256-80HP",                GAME_SUPPORTS_SAVE )
-COMP( 1983, bx256hp,    b128hp, 0,      bx256hp,    cbm2,       driver_device,      0,      "Commodore Business Machines",  "BX256-80HP",               GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
-COMP( 1983, cbm710,     b128hp, 0,      cbm710,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 710",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm720,     b128hp, 0,      cbm720,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 720",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm720_de,  b128hp, 0,      cbm720,     cbm2_de,    driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Germany)",        GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm720_se,  b128hp, 0,      cbm720,     cbm2_se,    driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm730,     b128hp, 0,      cbm730,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 730",                  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,       driver_device,      0,      "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,       driver_device,      0,      "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b500,       0,      0,      b128,       cbm2,       driver_device,      0,      "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128,       b500,   0,      b128,       cbm2,       driver_device,      0,      "Commodore Business Machines",  "B128",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256,       b500,   0,      b256,       cbm2,       driver_device,      0,      "Commodore Business Machines",  "B256",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm610,     b500,   0,      cbm610,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 610",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620,     b500,   0,      cbm620,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 620",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620_hu,  b500,   0,      cbm620,     cbm2_hu,    driver_device,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128hp,     0,      0,      b128hp,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256hp,     b128hp, 0,      b256hp,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, bx256hp,    b128hp, 0,      bx256hp,    cbm2,       driver_device,      0,      "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, cbm710,     b128hp, 0,      cbm710,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720,     b128hp, 0,      cbm720,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_de,  b128hp, 0,      cbm720,     cbm2_de,    driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_se,  b128hp, 0,      cbm720,     cbm2_se,    driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm730,     b128hp, 0,      cbm730,     cbm2,       driver_device,      0,      "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing

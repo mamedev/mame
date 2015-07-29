@@ -199,4 +199,4 @@ DRIVER_INIT_MEMBER(trucocl_state,trucocl)
 /******************************************************************************/
 /*    YEAR   NAME     PARENT  MACHINE  INPUT    INIT     MONITOR  */
 
-GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, trucocl, ROT0, "Miky SRL", "Truco Clemente", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

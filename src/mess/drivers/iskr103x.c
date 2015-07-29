@@ -142,5 +142,5 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1989,    iskr1030m,  ibm5150,    0,      iskr1030m,  iskr1030m, driver_device,   0,          "Schetmash", "Iskra 1030M", GAME_NOT_WORKING)
+COMP ( 1989,    iskr1030m,  ibm5150,    0,      iskr1030m,  iskr1030m, driver_device,   0,          "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING)
 COMP ( 1989,    iskr1031,   ibm5150,    0,      iskr1031,   iskr1031,  driver_device,   0,          "<unknown>", "Iskra 1031", 0)

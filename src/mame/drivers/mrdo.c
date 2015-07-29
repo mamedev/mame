@@ -386,10 +386,10 @@ ROM_END
 
 
 
-GAME( 1982, mrdo,     0,    mrdo, mrdo, driver_device, 0, ROT270, "Universal", "Mr. Do!", GAME_SUPPORTS_SAVE )
-GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, driver_device, 0, ROT270, "Universal", "Mr. Do! (prototype)" , GAME_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
-GAME( 1982, mrdot,    mrdo, mrdo, mrdo, driver_device, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)", GAME_SUPPORTS_SAVE )
-GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, driver_device, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)", GAME_SUPPORTS_SAVE )
-GAME( 1982, mrlo,     mrdo, mrdo, mrdo, driver_device, 0, ROT270, "bootleg", "Mr. Lo!", GAME_SUPPORTS_SAVE )
-GAME( 1982, mrdu,     mrdo, mrdo, mrdo, driver_device, 0, ROT270, "bootleg", "Mr. Du!", GAME_SUPPORTS_SAVE )
-GAME( 1982, yankeedo, mrdo, mrdo, mrdo, driver_device, 0, ROT270, "hack", "Yankee DO!", GAME_SUPPORTS_SAVE )
+GAME( 1982, mrdo,     0,    mrdo, mrdo, driver_device, 0, ROT270, "Universal", "Mr. Do!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, driver_device, 0, ROT270, "Universal", "Mr. Do! (prototype)" , MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
+GAME( 1982, mrdot,    mrdo, mrdo, mrdo, driver_device, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, driver_device, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrlo,     mrdo, mrdo, mrdo, driver_device, 0, ROT270, "bootleg", "Mr. Lo!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdu,     mrdo, mrdo, mrdo, driver_device, 0, ROT270, "bootleg", "Mr. Du!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, yankeedo, mrdo, mrdo, mrdo, driver_device, 0, ROT270, "hack", "Yankee DO!", MACHINE_SUPPORTS_SAVE )

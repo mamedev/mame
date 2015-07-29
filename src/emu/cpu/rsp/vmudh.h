@@ -8,4 +8,3 @@ inline rsp_vec_t rsp_vmudh(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t *acc_md, rsp_ve
 
 	return sclamp_acc_to_mid(*acc_md, *acc_hi);
 }
-

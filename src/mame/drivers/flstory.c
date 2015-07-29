@@ -1576,9 +1576,9 @@ ROM_START( rumba )
 ROM_END
 
 
-GAME( 1985, flstory,   0,        flstory,  flstory, driver_device,  0, ROT180, "Taito", "The FairyLand Story", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, flstoryj,  flstory,  flstory,  flstory, driver_device,  0, ROT180, "Taito", "The FairyLand Story (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, driver_device, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, driver_device, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, victnine,  0,        victnine, victnine, driver_device, 0, ROT0,   "Taito", "Victorious Nine", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, rumba,     0,        rumba,    rumba, driver_device,    0, ROT270, "Taito", "Rumba Lumber", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1985, flstory,   0,        flstory,  flstory, driver_device,  0, ROT180, "Taito", "The FairyLand Story", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstoryj,  flstory,  flstory,  flstory, driver_device,  0, ROT180, "Taito", "The FairyLand Story (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, driver_device, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, driver_device, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, victnine,  0,        victnine, victnine, driver_device, 0, ROT0,   "Taito", "Victorious Nine", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, rumba,     0,        rumba,    rumba, driver_device,    0, ROT270, "Taito", "Rumba Lumber", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

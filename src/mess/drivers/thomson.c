@@ -1477,7 +1477,7 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, driver_device, 0, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
+COMP ( 1985, to9, 0, 0, to9, to9, driver_device, 0, "Thomson", "TO9", MACHINE_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************

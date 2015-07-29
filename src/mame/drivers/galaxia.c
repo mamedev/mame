@@ -467,8 +467,8 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.3d",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
 ROM_END
 
-GAME( 1979, galaxia,  0,       galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1980, astrowar, 0,       astrowar, galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxia,  0,       galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1980, astrowar, 0,       astrowar, galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

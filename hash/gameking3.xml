@@ -5,26 +5,26 @@
 
 <softwarelist name="gameking3" description="TimeTop GameKing 3 cartridges">
 
-  <software name="urgent" supported="no">
-    <description>Urgent Action</description>
-    <year>200?</year>
-    <publisher>TimeTop</publisher>
-    <part name="cart" interface="gameking_cart">
-      <dataarea name="rom" size="524288">
-        <rom name="urgenaction.gk3" size="524288" crc="dcf935f8" sha1="9c1375c622caab9e328ee66434087a18a16ea036" offset="0x00000" />
-      </dataarea>
-    </part>
-  </software>
+	<software name="urgent" supported="no">
+	<description>Urgent Action</description>
+	<year>200?</year>
+	<publisher>TimeTop</publisher>
+	<part name="cart" interface="gameking_cart">
+		<dataarea name="rom" size="524288">
+		<rom name="urgenaction.gk3" size="524288" crc="dcf935f8" sha1="9c1375c622caab9e328ee66434087a18a16ea036" offset="0x00000" />
+		</dataarea>
+	</part>
+	</software>
 
-  <software name="adventr" supported="no">
-    <description>Adventure</description>
-    <year>200?</year>
-    <publisher>TimeTop</publisher>
-    <part name="cart" interface="gameking_cart">
-      <dataarea name="rom" size="524288">
-        <rom name="adventure.gk3" size="524288" crc="70082274" sha1="83b164719b2c2d5c133ca05c9fac0102b0d88e4c" offset="0x00000" />
-      </dataarea>
-    </part>
-  </software>
-  
+	<software name="adventr" supported="no">
+	<description>Adventure</description>
+	<year>200?</year>
+	<publisher>TimeTop</publisher>
+	<part name="cart" interface="gameking_cart">
+		<dataarea name="rom" size="524288">
+		<rom name="adventure.gk3" size="524288" crc="70082274" sha1="83b164719b2c2d5c133ca05c9fac0102b0d88e4c" offset="0x00000" />
+		</dataarea>
+	</part>
+	</software>
+
 </softwarelist>

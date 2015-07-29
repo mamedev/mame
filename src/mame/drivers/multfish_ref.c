@@ -575,54 +575,54 @@ ROM_START( fcockt2_2 ) // 080904
 	ROM_LOAD( "fruitcocktail2_old.008", 0x380000, 0x80000, CRC(a27c49a2) SHA1(7c9ee0e01f76ca3ab6716579f5dde7036050970b) )
 ROM_END
 
-//GAME( 2002, mfish,       mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021120)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_2,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021121)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_4,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021219)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_5,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021227)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_7,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (030511)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_9,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031026)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_10,    mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031117)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish,       mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021120)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_2,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021121)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_4,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021219)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_5,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021227)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_7,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (030511)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_9,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031026)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_10,    mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031117)", MACHINE_SUPPORTS_SAVE ) /* World */
 
-//GAME( 2003, crzmon,     czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030217 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, czmon_2,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030225 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, czmon_3,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030227 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, czmon_4,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030404 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, czmon_6,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (031016 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, czmon_10,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (081027 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-//GAME( 2003, czmon_11,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (081113 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-//GAME( 2003, czmon_12,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, crzmonent,ROT0, "Igrosoft", "Crazy Monkey (090711 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
-//GAME( 2003, czmon_14,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (100311 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, crzmon,     czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030217 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, czmon_2,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030225 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, czmon_3,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030227 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, czmon_4,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030404 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, czmon_6,    czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (031016 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, czmon_10,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (081027 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, czmon_11,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (081113 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, czmon_12,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, crzmonent,ROT0, "Igrosoft", "Crazy Monkey (090711 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+//GAME( 2003, czmon_14,   czmon_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (100311 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
 
-//GAME( 2003, fcockt,      fcockt_parent    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030505 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, fcockt_2,    fcockt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030512 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, fcockt_4,    fcockt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031028 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, fcockt_13,   fcockt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (081124 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, fcockt,      fcockt_parent    igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030505 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, fcockt_2,    fcockt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030512 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, fcockt_4,    fcockt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031028 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, fcockt_13,   fcockt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (081124 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
 
-//GAME( 2003, lhaunt,      lhaunt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (030707 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, lhaunt_3,    lhaunt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (031027 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, lhaunt_9,    lhaunt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (081208 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, lhaunt,      lhaunt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (030707 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, lhaunt_3,    lhaunt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (031027 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, lhaunt_9,    lhaunt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (081208 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
 
-//GAME( 2003, rollfr,      rollfr_parent,   rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (030821)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, rollfr,      rollfr_parent,   rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (030821)", MACHINE_SUPPORTS_SAVE ) /* World */
 
-//GAME( 2004, garage,      garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (040122 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2004, garage_2,    garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (040123 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2004, garage_3,    garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2004, garage_8,    garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (081229 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2004, garage,      garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (040122 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2004, garage_2,    garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (040123 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2004, garage_3,    garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (040216 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2004, garage_8,    garage_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Garage (081229 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
 
-//GAME( 2004, rclimb_2,    rclimb_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (040823 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2004, rclimb_6,    rclimb_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (090217 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2004, rclimb_2,    rclimb_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (040823 World)", MACHINE_SUPPORTS_SAVE ) /* World */
+//GAME( 2004, rclimb_6,    rclimb_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (090217 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
 
-//GAME( 2004, resdnt_4,    resdnt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Resident (090129 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2004, resdnt_4,    resdnt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Resident (090129 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
 //GAME( 2004, resdnt_5,    resdnt_parent,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, resdntent,ROT0, "Igrosoft", "Resident (090722 Entertainment)", GANE_SUPPORTS_SAVE ) /* Entertainment */
-//GAME( 2004, resdnt_7,    resdnt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Resident (100311 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2004, resdnt_7,    resdnt_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Resident (100311 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
 
-//GAME( 2005, pirate,      pirate_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Pirate (051229 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2005, pirate,      pirate_parent,   igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Pirate (051229 World)", MACHINE_SUPPORTS_SAVE ) /* World */
 
-//GAME( 2006, island2_2,   island2_parent,  igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (061214 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2006, island2_2,   island2_parent,  igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (061214 World)", MACHINE_SUPPORTS_SAVE ) /* World */
 
-//GAME( 2007, gnome_6,     gnome_parent,    igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, gnomel,   ROT0, "Igrosoft", "Gnome (090604 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-//GAME( 2007, gnome_8,     gnome_parent,    igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, gnomeent, ROT0, "Igrosoft", "Gnome (090810 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+//GAME( 2007, gnome_6,     gnome_parent,    igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, gnomel,   ROT0, "Igrosoft", "Gnome (090604 Lottery)", MACHINE_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2007, gnome_8,     gnome_parent,    igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, gnomeent, ROT0, "Igrosoft", "Gnome (090810 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 
-//GAME( 2008, fcockt2_2,   fcockt2_parent,  igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+//GAME( 2008, fcockt2_2,   fcockt2_parent,  igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
 
 #endif

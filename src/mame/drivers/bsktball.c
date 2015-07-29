@@ -300,4 +300,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, bsktball, 0, bsktball, bsktball, driver_device, 0, ROT0, "Atari", "Basketball", GAME_SUPPORTS_SAVE )
+GAME( 1979, bsktball, 0, bsktball, bsktball, driver_device, 0, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )

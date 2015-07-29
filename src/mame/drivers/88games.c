@@ -533,6 +533,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, 88games,  0,       88games, 88games, driver_device, 0, ROT0, "Konami", "'88 Games", GAME_SUPPORTS_SAVE )
-GAME( 1988, konami88, 88games, 88games, 88games, driver_device, 0, ROT0, "Konami", "Konami '88", GAME_SUPPORTS_SAVE )
-GAME( 1988, hypsptsp, 88games, 88games, 88games, driver_device, 0, ROT0, "Konami", "Hyper Sports Special (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, 88games,  0,       88games, 88games, driver_device, 0, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, 88games, 88games, driver_device, 0, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, 88games, 88games, driver_device, 0, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -412,5 +412,5 @@ ROM_END
 /* None of these is supported (tape should be easy to emulate) */
 
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        COMPANY                 FULLNAME */
-COMP(   1983,   ti99_224,   0,          0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_24,          "Texas Instruments",    "TI-99/2 BASIC Computer (24kb ROMs)" , GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP(   1983,   ti99_232,   ti99_224,   0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_32,          "Texas Instruments",    "TI-99/2 BASIC Computer (32kb ROMs)" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP(   1983,   ti99_224,   0,          0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_24,          "Texas Instruments",    "TI-99/2 BASIC Computer (24kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(   1983,   ti99_232,   ti99_224,   0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_32,          "Texas Instruments",    "TI-99/2 BASIC Computer (32kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

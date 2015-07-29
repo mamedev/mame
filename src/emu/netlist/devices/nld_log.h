@@ -21,7 +21,7 @@
 #include "../nl_base.h"
 
 #define LOG(_name, _I)                                                       \
-		NET_REGISTER_DEV(ÖPG, _name)                                         \
+		NET_REGISTER_DEV(??PG, _name)                                         \
 		NET_CONNECT(_name, I, _I)
 
 NETLIB_NAMESPACE_DEVICES_START()

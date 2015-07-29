@@ -446,10 +446,10 @@ static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( puzzlovek, puzzlove )
-        MCFG_DEVICE_REMOVE("ymsnd")
-        MCFG_YM2151_ADD("ymsnd", XTAL_15MHz/4) /* Verified */
-        MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-        MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+		MCFG_DEVICE_REMOVE("ymsnd")
+		MCFG_YM2151_ADD("ymsnd", XTAL_15MHz/4) /* Verified */
+		MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -587,6 +587,6 @@ DRIVER_INIT_MEMBER(silvmil_state,silvmil)
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil,	0,		  silvmil,   silvmil,   silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", GAME_SUPPORTS_SAVE )
-GAME( 1994, puzzlove,	0,		  puzzlove,  puzzlove,  silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", GAME_SUPPORTS_SAVE )
-GAME( 1994, puzzlovek,	puzzlove, puzzlovek, puzzlovek, silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )

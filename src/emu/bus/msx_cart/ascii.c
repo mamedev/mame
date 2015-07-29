@@ -533,4 +533,3 @@ WRITE8_MEMBER(msx_cart_msxwrite::write_cart)
 			break;
 	}
 }
-

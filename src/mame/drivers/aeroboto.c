@@ -330,5 +330,5 @@ ROM_END
 
 
 
-GAME( 1984, formatz,  0,       formatz, formatz, driver_device, 0, ROT0, "Jaleco", "Formation Z", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, aeroboto, formatz, formatz, formatz, driver_device, 0, ROT0, "Jaleco (Williams license)", "Aeroboto", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, formatz,  0,       formatz, formatz, driver_device, 0, ROT0, "Jaleco", "Formation Z", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, aeroboto, formatz, formatz, formatz, driver_device, 0, ROT0, "Jaleco (Williams license)", "Aeroboto", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

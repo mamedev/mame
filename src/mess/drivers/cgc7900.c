@@ -445,4 +445,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, driver_device, 0,      "Chromatics",   "CGC 7900", GAME_NOT_WORKING)
+COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, driver_device, 0,      "Chromatics",   "CGC 7900", MACHINE_NOT_WORKING)

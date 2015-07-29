@@ -2098,7 +2098,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 		if(m_system_type != SYSTEM_GX4000)
 		{
 			if(m_fdc)  // if FDC is present (it isn't on a 464)
-			{	
+			{
 				if ((offset & (1<<7)) == 0)
 				{
 					unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);

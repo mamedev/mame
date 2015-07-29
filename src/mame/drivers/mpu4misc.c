@@ -8,7 +8,7 @@
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 
 
@@ -471,16 +471,16 @@ GAME_CUSTOM( 199?, m4looplt__m,    m4looplt,   "70001505.bin",     0x0000, 0x080
 
 /* Global */
 // boot to "Percent Change" then "*initializing*"
-GAME(199?, m4bangin,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bangina, m4bangin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4banginb, m4bangin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4wwc,     0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 1)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4wwca,    m4wwc,    mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 2)" ,   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4wwcb,    m4wwc,    mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 3)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4screw,   0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4screwp,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8) (Protocol)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4screwa,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.7)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4screwb,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.5)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4vfm,     0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4jiggin,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 1)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4jiggina, m4jiggin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 2)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bangin,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bangina, m4bangin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4banginb, m4bangin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4wwc,     0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4wwca,    m4wwc,    mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 2)" ,   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4wwcb,    m4wwc,    mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screw,   0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screwp,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8) (Protocol)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screwa,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.7)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screwb,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.5)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4vfm,     0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4jiggin,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4jiggina, m4jiggin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )

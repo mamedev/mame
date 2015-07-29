@@ -38,7 +38,7 @@
       H counter value 0x0ec (236) -> 0xe0
       H counter value 0x12c (300) -> 0x100
     - Timer 1 seems to count backwards compared to Timer 0 from setting 0x6b onward.
-    - Yabause claims that if VDP2 DISP bit isn't enabled then vblank irqs (hblank too?) 
+    - Yabause claims that if VDP2 DISP bit isn't enabled then vblank irqs (hblank too?)
       doesn't happen.
 
 **************************************************************************************/

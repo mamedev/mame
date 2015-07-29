@@ -147,7 +147,7 @@ ROM_START( fruitpc )
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 
-GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "<unknown>", "Fruit Land", GAME_NO_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "<unknown>", "Fruit Land", MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS )
 
 // this doesn't really belong here, but is some kind of x86 pc-like hardware, exact CPU type etc. unknown
 // hardware ia by Paokai, motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
@@ -159,4 +159,4 @@ ROM_START( gogostrk )
 	DISK_IMAGE( "ggs-5-2-07", 0,SHA1(f214fd39ec8ac02f008823f4b179ea6c6835e1b8) )
 ROM_END
 
-GAME( 2007, gogostrk, 0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "American Alpha / Paokai", "Go Go Strike", GAME_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007
+GAME( 2007, gogostrk, 0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007

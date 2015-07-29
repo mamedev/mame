@@ -531,7 +531,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1980, destryer, 0,        destryer, destryer, driver_device, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, destryera,destryer, destryera,destryer, driver_device, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, altair,   0,        altair,   altair, driver_device,   0, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, draco,    0,        draco,    draco, driver_device,    0, ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, destryer, 0,        destryer, destryer, driver_device, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, destryera,destryer, destryera,destryer, driver_device, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, altair,   0,        altair,   altair, driver_device,   0, ROT90, "Cidelsa", "Altair", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, draco,    0,        draco,    draco, driver_device,    0, ROT90, "Cidelsa", "Draco", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

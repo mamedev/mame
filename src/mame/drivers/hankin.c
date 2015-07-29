@@ -600,8 +600,8 @@ ROM_START(empsback)
 ROM_END
 
 
-GAME(1978,  fjholden,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "FJ Holden", GAME_MECHANICAL )
-GAME(1978,  orbit1,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Orbit 1", GAME_MECHANICAL )
-GAME(1980,  shark,     0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Shark", GAME_MECHANICAL )
-GAME(1980,  howzat,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Howzat!", GAME_MECHANICAL )
-GAME(1981,  empsback,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "The Empire Strike Back", GAME_MECHANICAL )
+GAME(1978,  fjholden,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "FJ Holden", MACHINE_MECHANICAL )
+GAME(1978,  orbit1,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Orbit 1", MACHINE_MECHANICAL )
+GAME(1980,  shark,     0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Shark", MACHINE_MECHANICAL )
+GAME(1980,  howzat,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Howzat!", MACHINE_MECHANICAL )
+GAME(1981,  empsback,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL )

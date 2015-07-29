@@ -582,7 +582,7 @@ DRIVER_INIT_MEMBER(gberet_state,mrgoemon)
  *
  *************************************/
 
-GAME( 1985, gberet,   0,      gberet,   gberet, driver_device,   0,        ROT0, "Konami",  "Green Beret", GAME_SUPPORTS_SAVE )
-GAME( 1985, rushatck, gberet, gberet,   gberet, driver_device,   0,        ROT0, "Konami",  "Rush'n Attack (US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gberetb,  gberet, gberetb,  gberetb, driver_device,  0,        ROT0, "bootleg", "Green Beret (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, gberet_state, mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gberet,   0,      gberet,   gberet, driver_device,   0,        ROT0, "Konami",  "Green Beret", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rushatck, gberet, gberet,   gberet, driver_device,   0,        ROT0, "Konami",  "Rush'n Attack (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gberetb,  gberet, gberetb,  gberetb, driver_device,  0,        ROT0, "bootleg", "Green Beret (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, gberet_state, mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", MACHINE_SUPPORTS_SAVE )

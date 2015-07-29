@@ -35,9 +35,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, UINT16 *data, UINT8 lc,	UINT16 y, int x_count)> i82730_update_row_delegate;
+typedef device_delegate<void (bitmap_rgb32 &bitmap, UINT16 *data, UINT8 lc, UINT16 y, int x_count)> i82730_update_row_delegate;
 
-#define I82730_UPDATE_ROW(name)	\
+#define I82730_UPDATE_ROW(name) \
 	void name(bitmap_rgb32 &bitmap, UINT16 *data, UINT8 lc, UINT16 y, int x_count)
 
 

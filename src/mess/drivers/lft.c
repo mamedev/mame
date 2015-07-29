@@ -113,5 +113,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    CLASS      INIT    COMPANY   FULLNAME     FLAGS */
-COMP( ????, lft1510,   0,       0,    lft,       lft, driver_device,  0,     "LFT",   "LFT 1510", GAME_IS_SKELETON)
-COMP( ????, lft1230, lft1510,   0,    lft,       lft, driver_device,  0,     "LFT",   "LFT 1230", GAME_IS_SKELETON)
+COMP( ????, lft1510,   0,       0,    lft,       lft, driver_device,  0,     "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
+COMP( ????, lft1230, lft1510,   0,    lft,       lft, driver_device,  0,     "LFT",   "LFT 1230", MACHINE_IS_SKELETON)

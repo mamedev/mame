@@ -26,7 +26,7 @@ void starcrus_state::video_start()
 
 	m_proj1_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
 	m_proj2_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
-	
+
 	save_item(NAME(m_s1_x));
 	save_item(NAME(m_s1_y));
 	save_item(NAME(m_s2_x));

@@ -1082,4 +1082,4 @@ ROM_START( hxhdci2k )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-SYST( 2008, hxhdci2k, 0,       0,   cxhumax,    cxhumax, driver_device,  0,   "HUMAX",   "HUMAX HDCI-2000",     GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 2008, hxhdci2k, 0,       0,   cxhumax,    cxhumax, driver_device,  0,   "HUMAX",   "HUMAX HDCI-2000",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

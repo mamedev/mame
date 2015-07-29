@@ -15,9 +15,9 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define VERBOSE	1
-#define VERBOSE_COMMANDS	1
-#define VERBOSE_DATASTREAM	0
+#define VERBOSE 1
+#define VERBOSE_COMMANDS    1
+#define VERBOSE_DATASTREAM  0
 
 
 //**************************************************************************

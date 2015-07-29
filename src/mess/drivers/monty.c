@@ -284,5 +284,5 @@ ROM_END
 
 // Drivers
 //    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT  COMPANY   FULLNAME                 FLAGS
-COMP( 1980, monty,   0,      0,       monty,     monty,  driver_device,  0,    "Ritam",  "Monty Plays Scrabble",  GAME_NOT_WORKING )
-COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  driver_device,  0,    "Ritam",  "Master Monty",          GAME_NOT_WORKING )
+COMP( 1980, monty,   0,      0,       monty,     monty,  driver_device,  0,    "Ritam",  "Monty Plays Scrabble",  MACHINE_NOT_WORKING )
+COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  driver_device,  0,    "Ritam",  "Master Monty",          MACHINE_NOT_WORKING )

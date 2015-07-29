@@ -657,7 +657,7 @@ private:
 #if 0
 	unsigned hash(const pstring &v) const
 	{
-		/* Fowler–Noll–Vo hash - FNV-1 */
+		/* Fowler???Noll???Vo hash - FNV-1 */
 		const char *string = v.cstr();
 		unsigned result = 2166136261;
 		for (UINT8 c = *string++; c != 0; c = *string++)
@@ -671,17 +671,17 @@ private:
 		/* jenkins one at a time algo */
 		unsigned result = 0;
 		const char *string = v.cstr();
-	    while (*string)
-	    {
-	        result += *string;
-	        string++;
-	        result += (result << 10);
-	        result ^= (result >> 6);
-	    }
-	    result += (result << 3);
-	    result ^= (result >> 11);
-	    result += (result << 15);
-	    return result;
+		while (*string)
+		{
+			result += *string;
+			string++;
+			result += (result << 10);
+			result ^= (result >> 6);
+		}
+		result += (result << 3);
+		result ^= (result >> 11);
+		result += (result << 15);
+		return result;
 	}
 #endif
 #endif

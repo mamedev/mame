@@ -250,5 +250,5 @@ ROM_START( mcom4_02 )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS          INIT     COMPANY     FULLNAME         FLAGS */
-COMP( 1997, minicom,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV (1997-08-11)",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND) /* fw release data: 11th Aug 1997 */
-COMP( 2002, mcom4_02,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV (2002-04-19)",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND) /* fw release data: 19th Apr 2002 */
+COMP( 1997, minicom,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV (1997-08-11)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) /* fw release data: 11th Aug 1997 */
+COMP( 2002, mcom4_02,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV (2002-04-19)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) /* fw release data: 19th Apr 2002 */

@@ -125,7 +125,7 @@ WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
 READ8_MEMBER(cpc_ddi1_device::fdc_r)
 {
 	UINT8 data = 0xff;
-	
+
 	switch(offset)
 	{
 	case 0x00:
@@ -137,4 +137,3 @@ READ8_MEMBER(cpc_ddi1_device::fdc_r)
 	}
 	return data;
 }
-

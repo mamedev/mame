@@ -732,6 +732,6 @@ DRIVER_INIT_MEMBER(spoker_state,3super8)
 	}
 }
 
-GAME( 1993?, spk116it, 0,        spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v116IT)", GAME_SUPPORTS_SAVE )
-GAME( 1993?, spk115it, spk116it, spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v115IT)", GAME_SUPPORTS_SAVE )
-GAME( 1993?, 3super8,  spk116it, 3super8,3super8, spoker_state, 3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) //roms are badly dumped
+GAME( 1993?, spk116it, 0,        spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v116IT)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk115it, spk116it, spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v115IT)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, 3super8,  spk116it, 3super8,3super8, spoker_state, 3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped

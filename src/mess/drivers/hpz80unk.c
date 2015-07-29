@@ -156,4 +156,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT      INIT     COMPANY                          FULLNAME       FLAGS */
-COMP( 1977, hpz80unk, 0,      0,       hpz80unk,  hpz80unk, driver_device,  0,   "Hewlett-Packard", "unknown Z80-based mainframe", GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1977, hpz80unk, 0,      0,       hpz80unk,  hpz80unk, driver_device,  0,   "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -407,4 +407,4 @@ ROM_END
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY       FULLNAME */
 COMP ( 1989,    mc1502,     ibm5150,    0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MC-1502", 0)
-COMP ( 1988,    pk88,       ibm5150,    0,      pk88,       mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP ( 1988,    pk88,       ibm5150,    0,      pk88,       mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

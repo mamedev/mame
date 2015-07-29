@@ -2336,8 +2336,8 @@ const device_type M68K = &device_creator<m68000_base_device>;
 
 m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, M68K, "M68K", tag, owner, clock, "m68k", __FILE__),
-	  m_program_config("program", ENDIANNESS_BIG, 16, 24),
-	  m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 16, 24)
+		m_program_config("program", ENDIANNESS_BIG, 16, 24),
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 16, 24)
 {
 	clear_all();
 }
@@ -2348,8 +2348,8 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
 										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
-	  m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map)
+		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map)
 {
 	clear_all();
 }
@@ -2358,8 +2358,8 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
 										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
-	  m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits)
+		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits)
 {
 	clear_all();
 }

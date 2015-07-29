@@ -334,4 +334,4 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
  *
  *************************************/
 
-GAME( 1982, battlex, 0, battlex, battlex, battlex_state, battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, battlex, 0, battlex, battlex, battlex_state, battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

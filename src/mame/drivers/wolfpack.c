@@ -357,4 +357,4 @@ ROM_START( wolfpack )
 ROM_END
 
 
-GAME( 1978, wolfpack, 0, wolfpack, wolfpack, driver_device, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", GAME_IMPERFECT_SOUND )
+GAME( 1978, wolfpack, 0, wolfpack, wolfpack, driver_device, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND )

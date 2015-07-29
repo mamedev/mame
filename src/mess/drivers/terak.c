@@ -117,4 +117,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT  COMPANY   FULLNAME       FLAGS */
-COMP( ????, terak,  0,      0,       terak,     terak, driver_device,   0,    "Terak", "Terak 8510A", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, terak,  0,      0,       terak,     terak, driver_device,   0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

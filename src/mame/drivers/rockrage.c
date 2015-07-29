@@ -380,6 +380,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1986, rockrage,  0,        rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rockragea, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rockragej, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockrage,  0,        rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragej, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )

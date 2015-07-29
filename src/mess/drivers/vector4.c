@@ -117,4 +117,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY      FULLNAME       FLAGS */
-COMP( 19??, vector4, 0,      0,       vector4,   vector4, driver_device, 0,   "Vector Graphics", "Vector 4", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 19??, vector4, 0,      0,       vector4,   vector4, driver_device, 0,   "Vector Graphics", "Vector 4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

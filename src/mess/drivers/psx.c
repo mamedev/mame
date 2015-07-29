@@ -302,7 +302,7 @@ Version 4.3 E
 */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                             FULLNAME                            FLAGS */
-CONS( 1994, psj,    0,      0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,    psj,    0,      pse,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,    psj,    0,      psu,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,    psj,    0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1994, psj,    0,      0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, pse,    psj,    0,      pse,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psu,    psj,    0,      psu,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psa,    psj,    0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

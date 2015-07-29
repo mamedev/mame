@@ -801,9 +801,9 @@ void rsp_device::execute_run()
 			m_rsp_state->icount = MIN(m_rsp_state->icount, 0);
 		}
 		/*m_cop2->dump(op);
-        if (((op >> 26) & 0x3f) == 0x3a)
-        {
-            m_cop2->dump_dmem();
-        }*/
+		if (((op >> 26) & 0x3f) == 0x3a)
+		{
+		    m_cop2->dump_dmem();
+		}*/
 	}
 }

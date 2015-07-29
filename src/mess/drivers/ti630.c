@@ -209,4 +209,4 @@ ROM_START( ti630 )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 1999, ti630,   0,      0,      ti630,     0,   ti630_state, ti630, "Intelbras", "TI630 telephone",    GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+COMP( 1999, ti630,   0,      0,      ti630,     0,   ti630_state, ti630, "Intelbras", "TI630 telephone",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

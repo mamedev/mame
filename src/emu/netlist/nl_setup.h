@@ -58,7 +58,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                    \
 		setup.register_source(palloc(netlist::source_proc_t(# _name, &NETLIST_NAME(_name))));
 
 #define LOCAL_LIB_ENTRY(_name)                                                 \
-		LOCAL_SOURCE(_name)													   \
+		LOCAL_SOURCE(_name)                                                    \
 		setup.register_lib_entry(# _name);
 
 #define INCLUDE(_name)                                                         \

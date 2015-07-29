@@ -6,7 +6,7 @@
 
 /*
  *   MC14584B: Hex Schmitt Trigger
- *   	       ON Semiconductor
+ *             ON Semiconductor
  *
  *          +--------------+
  *       A1 |1     ++    14| VCC
@@ -39,7 +39,7 @@ NETLIST_START(MC14584B_DIP)
 		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
 		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
 		GND.I, /*   GND |7            8| Y4   */ s4.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 

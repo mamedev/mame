@@ -3,7 +3,7 @@
 #ifndef __DEBUG_QT_DEBUGGER_VIEW_H__
 #define __DEBUG_QT_DEBUGGER_VIEW_H__
 
-#include <QtGui/QtGui>
+#include <QtWidgets/QAbstractScrollArea>
 
 #include "debug/debugvw.h"
 

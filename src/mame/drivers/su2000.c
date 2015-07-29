@@ -295,4 +295,4 @@ ROM_START( su2000 )
  *
  *************************************/
 
-GAME( 1993, su2000, 0, su2000, pc_keyboard, driver_device, 0, ROT0, "Virtuality", "SU2000", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1993, su2000, 0, su2000, pc_keyboard, driver_device, 0, ROT0, "Virtuality", "SU2000", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

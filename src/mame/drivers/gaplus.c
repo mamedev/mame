@@ -1004,16 +1004,16 @@ DRIVER_INIT_MEMBER(gaplus_state,galaga3)
 
 
 /* These sets are on revision 2 or 3 PCBs AKA "Namco" PCBs */
-GAME( 1984, gaplus,   0,        gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2 rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, gaplusa,  gaplus,   gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, gaplusd,  gaplus,   gaplusd,  gapluso,  gaplus_state, gaplusd, ROT90, "Namco", "Gaplus (GP2 rev D, alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, galaga3a, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, galaga3b, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, gaplus,   0,        gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2 rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gaplusa,  gaplus,   gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gaplusd,  gaplus,   gaplusd,  gapluso,  gaplus_state, gaplusd, ROT90, "Namco", "Gaplus (GP2 rev D, alternate hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. D)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, galaga3a, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. C)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, galaga3b, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* These sets are on older revision (AKA Midway) 1 PCBs */
-GAME( 1984, galaga3c, gaplus,   gaplus,   galaga3a, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 4)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 5)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, galaga3c, gaplus,   gaplus,   galaga3a, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 4)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* This is an odd mix of Galaga3 and Gaplus, main code seems closest to galaga3m but still has significant changes, copyright is modified to 1992, has Galaga 3 style high scores, PARSEF spelling error on high score table */
-GAME( 1992, gaplust,  gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "bootleg (Tecfri)", "Gaplus (Tecfri PCB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, gaplust,  gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "bootleg (Tecfri)", "Gaplus (Tecfri PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

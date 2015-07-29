@@ -916,16 +916,7 @@ READ8_MEMBER(fm7_state::fm7_palette_r)
 
 WRITE8_MEMBER(fm7_state::fm7_palette_w)
 {
-	UINT8 r = 0,g = 0,b = 0;
-
-	if(data & 0x04)
-		g = 0xff;
-	if(data & 0x02)
-		r = 0xff;
-	if(data & 0x01)
-		b = 0xff;
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset, rgb_t(pal1bit(data >> 1), pal1bit(data >> 2), pal1bit(data >> 0)));
 	m_video.fm7_pal[offset] = data & 0x07;
 }
 
@@ -955,25 +946,13 @@ WRITE8_MEMBER(fm7_state::fm77av_analog_palette_w)
 			m_video.fm77av_pal_selected = val;
 			break;
 		case 2:
-			m_video.fm77av_pal_b[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			m_palette->set_pen_color(m_video.fm77av_pal_selected+8,
-				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
-				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
-				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
+			m_av_palette->set_pen_blue_level(m_video.fm77av_pal_selected, data << 4);
 			break;
 		case 3:
-			m_video.fm77av_pal_r[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			m_palette->set_pen_color(m_video.fm77av_pal_selected+8,
-				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
-				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
-				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
+			m_av_palette->set_pen_red_level(m_video.fm77av_pal_selected, data << 4);
 			break;
 		case 4:
-			m_video.fm77av_pal_g[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			m_palette->set_pen_color(m_video.fm77av_pal_selected+8,
-				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
-				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
-				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
+			m_av_palette->set_pen_green_level(m_video.fm77av_pal_selected, data << 4);
 			break;
 	}
 }
@@ -1437,7 +1416,7 @@ void fm7_state::video_start()
 	m_video.vsync_flag = 0;
 }
 
-UINT32 fm7_state::screen_update_fm7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 code_r = 0,code_g = 0,code_b = 0;
 	UINT8 code_r2 = 0,code_g2 = 0,code_b2 = 0;
@@ -1485,8 +1464,7 @@ UINT32 fm7_state::screen_update_fm7(screen_device &screen, bitmap_ind16 &bitmap,
 					col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0);
 					col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
 					col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0);
-					col += 8;  // use analog palette
-					bitmap.pix16(y, x*8+(7-b)) =  col;
+					bitmap.pix32(y, x*8+(7-b)) = m_av_palette->pen_color(col);
 				}
 			}
 		}
@@ -1506,30 +1484,10 @@ UINT32 fm7_state::screen_update_fm7(screen_device &screen, bitmap_ind16 &bitmap,
 				for (b = 0; b < 8; b++)
 				{
 					col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
-					bitmap.pix16(y, x*8+(7-b)) =  col;
+					bitmap.pix32(y, x*8+(7-b)) = m_palette->pen_color(col);
 				}
 			}
 		}
 	}
 	return 0;
-}
-
-static const rgb_t fm7_initial_palette[8] = {
-	rgb_t(0x00, 0x00, 0x00), // 0
-	rgb_t(0x00, 0x00, 0xff), // 1
-	rgb_t(0xff, 0x00, 0x00), // 2
-	rgb_t(0xff, 0x00, 0xff), // 3
-	rgb_t(0x00, 0xff, 0x00), // 4
-	rgb_t(0x00, 0xff, 0xff), // 5
-	rgb_t(0xff, 0xff, 0x00), // 6
-	rgb_t(0xff, 0xff, 0xff), // 7
-};
-
-PALETTE_INIT_MEMBER(fm7_state, fm7)
-{
-	int x;
-
-	palette.set_pen_colors(0, fm7_initial_palette, ARRAY_LENGTH(fm7_initial_palette));
-	for(x=0;x<8;x++)
-		m_video.fm7_pal[x] = x;
 }
