@@ -5,13 +5,20 @@
 #include "mie.h"
 #include "maple-dc.h"
 
-// MIE aka sega 315-6146, MAPLE-JVS bridge Z80-based MCU
+// MIE aka Sega 315-6146, MAPLE-JVS bridge Z80-based MCU
 //
 // Todos:
-// - In reality, there are two rs422/rs486 ports, one at 10-15 and one
-//   at 20-25.  Perhaps they're a standard design?
+// - ports 00-0f is identical to Sega 315-5338A/315-5649 I/O ICs
+//   (used in Sega H1, Model 2, etc). devicefication needed.
 //
-// - There's also a different port at 0x09-0x0d, supposedly used for cards.
+// - ports 10-15 and 20-25 is standard 8250/16xxx UARTs.
+//
+// - ports a0-af - external I/O 1, in JVS I/Os connected to NEC uPD71053 counter/timer
+//
+// - ports c0-cf - external I/O 2, not used
+//   in JVS I/Os can be connected to (unpopulated) 315-5296 I/O IC, if enabled by DIP switch
+//
+// - both memory and I/O address spaces can be directly accessed by host system (used in Hikaru)
 //
 // - Speed is all wrong
 
