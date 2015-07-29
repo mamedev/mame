@@ -827,6 +827,50 @@ void palette_device::palette_init_3bit_rgb(palette_device &palette)
 
 
 /*-------------------------------------------------
+    3bit_rbg - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_rbg(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1)));
+}
+
+
+/*-------------------------------------------------
+    3bit_brg - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_brg(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0)));
+}
+
+
+/*-------------------------------------------------
+    3bit_grb - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_grb(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 1), pal1bit(i >> 0), pal1bit(i >> 2)));
+}
+
+
+/*-------------------------------------------------
+    3bit_gbr - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_gbr(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1)));
+}
+
+
+/*-------------------------------------------------
     3bit_bgr - 8-color rgb
 -------------------------------------------------*/
 

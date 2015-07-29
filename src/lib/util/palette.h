@@ -166,6 +166,9 @@ public:
 
 	// entry setters
 	void entry_set_color(UINT32 index, rgb_t rgb);
+	void entry_set_red_level(UINT32 index, UINT8 level);
+	void entry_set_green_level(UINT32 index, UINT8 level);
+	void entry_set_blue_level(UINT32 index, UINT8 level);
 	void entry_set_contrast(UINT32 index, float contrast);
 
 	// entry list getters
