@@ -56,14 +56,14 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 	if (clonex)
 	{
 		cx = driver_list::find(x->parent);
-		if (cx == -1 || (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0)))
+		if (cx == -1 || (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0)))
 			clonex = false;
 	}
 
 	if (cloney)
 	{
 		cy = driver_list::find(y->parent);
-		if (cy == -1 || (cy != -1 && ((driver_list::driver(cy).flags & GAME_IS_BIOS_ROOT) != 0)))
+		if (cy == -1 || (cy != -1 && ((driver_list::driver(cy).flags & MACHINE_IS_BIOS_ROOT) != 0)))
 			cloney = false;
 	}
 
@@ -282,7 +282,7 @@ void ui_mewui_select_game::handle()
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
 				if ((FPTR)driver > 2)
 				{
-					if ((driver->flags & GAME_TYPE_ARCADE) != 0)
+					if ((driver->flags & MACHINE_TYPE_ARCADE) != 0)
 						ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_MAMEINFO_LOAD, driver)));
 					else
 						ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_MESSINFO_LOAD, driver)));
@@ -294,7 +294,7 @@ void ui_mewui_select_game::handle()
 
 				if ((FPTR)swinfo > 2 && swinfo->startempty == 1)
 				{
-					if ((swinfo->driver->flags & GAME_TYPE_ARCADE) != 0)
+					if ((swinfo->driver->flags & MACHINE_TYPE_ARCADE) != 0)
 						ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_MAMEINFO_LOAD, swinfo->driver)));
 					else
 						ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_MESSINFO_LOAD, swinfo->driver)));
@@ -537,7 +537,7 @@ void ui_mewui_select_game::populate()
 				if (cloneof)
 				{
 					int cx = driver_list::find(m_displaylist[curitem]->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
@@ -565,7 +565,7 @@ osd_printf_info("fav size = %d\n", (int)machine().favorite().favorite_list.size(
 				if (cloneof)
 				{
 					int cx = driver_list::find(machine().favorite().favorite_list[x].driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
@@ -783,33 +783,33 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 			tempbuf[2].assign("Driver is parent");
 
 		// next line is overall driver status
-		if (driver->flags & GAME_NOT_WORKING)
+		if (driver->flags & MACHINE_NOT_WORKING)
 			tempbuf[3].assign("Overall: NOT WORKING");
-		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
+		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
 			tempbuf[3].assign("Overall: Unemulated Protection");
 		else
 			tempbuf[3].assign("Overall: Working");
 
 		// next line is graphics, sound status
-		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
+		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
 			tempbuf[4].assign("Graphics: Imperfect, ");
 		else
 			tempbuf[4].assign("Graphics: OK, ");
 
-		if (driver->flags & GAME_NO_SOUND)
+		if (driver->flags & MACHINE_NO_SOUND)
 			tempbuf[4].append("Sound: Unimplemented");
-		else if (driver->flags & GAME_IMPERFECT_SOUND)
+		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
 			tempbuf[4].append("Sound: Imperfect");
 		else
 			tempbuf[4].append("Sound: OK");
 
 		color = UI_GREEN_COLOR;
 
-		if ((driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS
-												| GAME_NO_SOUND | GAME_IMPERFECT_SOUND)) != 0)
+		if ((driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS
+												| MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
 			color = UI_YELLOW_COLOR;
 
-		if ((driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
+		if ((driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 			color = UI_RED_COLOR;
 	}
 
@@ -958,7 +958,7 @@ void ui_mewui_select_game::inkey_select(const ui_menu_event *menu_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((driver->flags & GAME_TYPE_ARCADE) == 0)
+			if ((driver->flags & MACHINE_TYPE_ARCADE) == 0)
 				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_software(machine(), container, driver)));
 			else
 			{
@@ -1123,13 +1123,13 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 
 	for (size_t index = 0; index < s_drivers.size(); index++)
 	{
-		if (!bioscheck && filter != FILTER_BIOS && (s_drivers[index]->flags & GAME_IS_BIOS_ROOT) != 0)
+		if (!bioscheck && filter != FILTER_BIOS && (s_drivers[index]->flags & MACHINE_IS_BIOS_ROOT) != 0)
 			continue;
 
-		if ((s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
+		if ((s_drivers[index]->flags & MACHINE_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
 			continue;
 
-		if (!(s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_ARCADES)
+		if (!(s_drivers[index]->flags & MACHINE_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_ARCADES)
 			continue;
 
 		switch (filter)
@@ -1141,17 +1141,17 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 				break;
 
 			case FILTER_WORKING:
-				if (!(s_drivers[index]->flags & GAME_NOT_WORKING))
+				if (!(s_drivers[index]->flags & MACHINE_NOT_WORKING))
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
 			case FILTER_NOT_MECHANICAL:
-				if (!(s_drivers[index]->flags & GAME_MECHANICAL))
+				if (!(s_drivers[index]->flags & MACHINE_MECHANICAL))
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
 			case FILTER_BIOS:
-				if (s_drivers[index]->flags & GAME_IS_BIOS_ROOT)
+				if (s_drivers[index]->flags & MACHINE_IS_BIOS_ROOT)
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
@@ -1161,7 +1161,7 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 				if (cloneof)
 				{
 					cx = driver_list::find(s_drivers[index]->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
@@ -1172,22 +1172,22 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 				break;
 
 			case FILTER_NOT_WORKING:
-				if (s_drivers[index]->flags & GAME_NOT_WORKING)
+				if (s_drivers[index]->flags & MACHINE_NOT_WORKING)
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
 			case FILTER_MECHANICAL:
-				if (s_drivers[index]->flags & GAME_MECHANICAL)
+				if (s_drivers[index]->flags & MACHINE_MECHANICAL)
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
 			case FILTER_SAVE:
-				if (s_drivers[index]->flags & GAME_SUPPORTS_SAVE)
+				if (s_drivers[index]->flags & MACHINE_SUPPORTS_SAVE)
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
 			case FILTER_NOSAVE:
-				if (!(s_drivers[index]->flags & GAME_SUPPORTS_SAVE))
+				if (!(s_drivers[index]->flags & MACHINE_SUPPORTS_SAVE))
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
@@ -1236,10 +1236,10 @@ void ui_mewui_select_game::build_custom()
 
 	for (size_t index = 0; index < s_drivers.size(); ++index)
 	{
-		if ((s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
+		if ((s_drivers[index]->flags & MACHINE_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
 			continue;
 
-		if (!(s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_ARCADES)
+		if (!(s_drivers[index]->flags & MACHINE_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_ARCADES)
 			continue;
 
 		m_displaylist.push_back(s_drivers[index]);
@@ -1314,13 +1314,13 @@ void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_
 
 	for (size_t index = 0; index < s_drivers.size(); ++index)
 	{
-		if (!bioscheck && filter != FILTER_BIOS && (s_drivers[index]->flags & GAME_IS_BIOS_ROOT) != 0)
+		if (!bioscheck && filter != FILTER_BIOS && (s_drivers[index]->flags & MACHINE_IS_BIOS_ROOT) != 0)
 			continue;
 
-		if ((s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
+		if ((s_drivers[index]->flags & MACHINE_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
 			continue;
 
-		if (!(s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_ARCADES)
+		if (!(s_drivers[index]->flags & MACHINE_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_ARCADES)
 			continue;
 
 		int idx = driver_list::find(s_drivers[index]->name);
@@ -1413,7 +1413,7 @@ void ui_mewui_select_game::populate_search()
 		{
 			int cx = driver_list::find(m_searchlist[curitem]->parent);
 
-			if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
 
@@ -1529,15 +1529,15 @@ void ui_mewui_select_game::save_cache_info()
 			if (!strcmp("___empty", driver->name))
 				continue;
 
-			if (driver->flags & GAME_TYPE_ARCADE)
+			if (driver->flags & MACHINE_TYPE_ARCADE)
 			{
-				if (driver->flags & GAME_IS_BIOS_ROOT)
+				if (driver->flags & MACHINE_IS_BIOS_ROOT)
 					m_isabios++;
 				m_isarcades++;
 			}
 			else
 			{
-				if (driver->flags & GAME_IS_BIOS_ROOT)
+				if (driver->flags & MACHINE_IS_BIOS_ROOT)
 					m_issbios++;
 				m_issystems++;
 			}

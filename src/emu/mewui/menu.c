@@ -443,7 +443,7 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
 	{
 		float line_height = machine().ui().get_line_height();
 		if (mewui_globals::default_image)
-			((driver->flags & GAME_TYPE_ARCADE) == 0) ? mewui_globals::curimage_view = CABINETS_VIEW : mewui_globals::curimage_view = SNAPSHOT_VIEW;
+			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? mewui_globals::curimage_view = CABINETS_VIEW : mewui_globals::curimage_view = SNAPSHOT_VIEW;
 
 		std::string searchstr;
 		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
@@ -483,7 +483,7 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
 				if (cloneof)
 				{
 					int cx = driver_list::find(driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
@@ -1783,7 +1783,7 @@ void ui_menu::draw_icon(render_container *container, int linenum, void *selected
 		if (cloneof)
 		{
 			int cx = driver_list::find(driver->parent);
-			if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
 

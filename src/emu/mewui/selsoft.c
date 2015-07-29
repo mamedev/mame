@@ -663,22 +663,22 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 			tempbuf[2].assign("Driver is parent");
 
 		// next line is overall driver status
-		if (driver->flags & GAME_NOT_WORKING)
+		if (driver->flags & MACHINE_NOT_WORKING)
 			tempbuf[3].assign("Overall: NOT WORKING");
-		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
+		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
 			tempbuf[3].assign("Overall: Unemulated Protection");
 		else
 			tempbuf[3].assign("Overall: Working");
 
 		// next line is graphics, sound status
-		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
+		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
 			tempbuf[4].assign("Graphics: Imperfect, ");
 		else
 			tempbuf[4].assign("Graphics: OK, ");
 
-		if (driver->flags & GAME_NO_SOUND)
+		if (driver->flags & MACHINE_NO_SOUND)
 			tempbuf[4].append("Sound: Unimplemented");
-		else if (driver->flags & GAME_IMPERFECT_SOUND)
+		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
 			tempbuf[4].append("Sound: Imperfect");
 		else
 			tempbuf[4].append("Sound: OK");
@@ -686,11 +686,11 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		if (driver != NULL)
 			color = UI_GREEN_COLOR;
 
-		if (driver != NULL && (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS
-												| GAME_NO_SOUND | GAME_IMPERFECT_SOUND)) != 0)
+		if (driver != NULL && (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS
+												| MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
 			color = UI_YELLOW_COLOR;
 
-		if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
+		if (driver != NULL && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 			color = UI_RED_COLOR;
 
 	}

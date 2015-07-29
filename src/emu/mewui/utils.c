@@ -108,36 +108,36 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 	else
 		buffer.append("Driver is Parent\n");
 
-	if (driver->flags & GAME_NOT_WORKING)
+	if (driver->flags & MACHINE_NOT_WORKING)
 		buffer.append("Overall: NOT WORKING\n");
-	else if (driver->flags & GAME_UNEMULATED_PROTECTION)
+	else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
 		buffer.append("Overall: Unemulated Protection\n");
 	else
 		buffer.append("Overall: Working\n");
 
-	if (driver->flags & GAME_IMPERFECT_COLORS)
+	if (driver->flags & MACHINE_IMPERFECT_COLORS)
 		buffer.append("Graphics: Imperfect Colors\n");
-	else if (driver->flags & GAME_WRONG_COLORS)
+	else if (driver->flags & MACHINE_WRONG_COLORS)
 		buffer.append("Graphics: Wrong Colors\n");
-	else if (driver->flags & GAME_IMPERFECT_GRAPHICS)
+	else if (driver->flags & MACHINE_IMPERFECT_GRAPHICS)
 		buffer.append("Graphics: Imperfect\n");
 	else
 		buffer.append("Graphics: OK\n");
 
-	if (driver->flags & GAME_NO_SOUND)
+	if (driver->flags & MACHINE_NO_SOUND)
 		buffer.append("Sound: Unimplemented\n");
-	else if (driver->flags & GAME_IMPERFECT_SOUND)
+	else if (driver->flags & MACHINE_IMPERFECT_SOUND)
 		buffer.append("Sound: Imperfect\n");
 	else
 		buffer.append("Sound: OK\n");
 
-	strcatprintf(buffer, "Driver is Skeleton: %s\n", ((driver->flags & GAME_IS_SKELETON) ? "Yes" : "No"));
-	strcatprintf(buffer, "Game is Mechanical: %s\n", ((driver->flags & GAME_MECHANICAL) ? "Yes" : "No"));
-	strcatprintf(buffer, "Requires Artwork: %s\n", ((driver->flags & GAME_REQUIRES_ARTWORK) ? "Yes" : "No"));
-	strcatprintf(buffer, "Requires Clickable Artwork: %s\n", ((driver->flags & GAME_CLICKABLE_ARTWORK) ? "Yes" : "No"));
-	strcatprintf(buffer, "Support Cocktail: %s\n", ((driver->flags & GAME_NO_COCKTAIL) ? "Yes" : "No"));
-	strcatprintf(buffer, "Driver is Bios: %s\n", ((driver->flags & GAME_IS_BIOS_ROOT) ? "Yes" : "No"));
-	strcatprintf(buffer, "Support Save: %s\n", ((driver->flags & GAME_SUPPORTS_SAVE) ? "Yes" : "No"));
+	strcatprintf(buffer, "Driver is Skeleton: %s\n", ((driver->flags & MACHINE_IS_SKELETON) ? "Yes" : "No"));
+	strcatprintf(buffer, "Game is Mechanical: %s\n", ((driver->flags & MACHINE_MECHANICAL) ? "Yes" : "No"));
+	strcatprintf(buffer, "Requires Artwork: %s\n", ((driver->flags & MACHINE_REQUIRES_ARTWORK) ? "Yes" : "No"));
+	strcatprintf(buffer, "Requires Clickable Artwork: %s\n", ((driver->flags & MACHINE_CLICKABLE_ARTWORK) ? "Yes" : "No"));
+	strcatprintf(buffer, "Support Cocktail: %s\n", ((driver->flags & MACHINE_NO_COCKTAIL) ? "Yes" : "No"));
+	strcatprintf(buffer, "Driver is Bios: %s\n", ((driver->flags & MACHINE_IS_BIOS_ROOT) ? "Yes" : "No"));
+	strcatprintf(buffer, "Support Save: %s\n", ((driver->flags & MACHINE_SUPPORTS_SAVE) ? "Yes" : "No"));
 
 	int idx = driver_list::find(driver->name);
 	strcatprintf(buffer, "Screen Type: %s\n", (mewui_globals::driver_cache[idx].b_vector ? "Vector" : "Raster"));
