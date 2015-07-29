@@ -9,7 +9,7 @@ Set regions are unknown, so all are currently named Galaxia.
 Taken from an untested board.
 
 1K byte files were 2708 or equivalent.
-512 byte file is a 82S130 PROM.
+512 byte file is a 82S130 palette lookup ROM.
 
 This is not a direct pirate of Galaxian as you might think from the name.
 The game uses a Signetics 2650A CPU with three 40-pin 2636 chips, which are
@@ -381,7 +381,7 @@ ROM_START( galaxia )
 	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) )
 	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
+	ROM_REGION( 0x0200, "proms", 0 ) // palette lookup rom
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
 
@@ -402,7 +402,7 @@ ROM_START( galaxiaa )
 	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
+	ROM_REGION( 0x0200, "proms", 0 ) // palette lookup rom
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
 
@@ -423,7 +423,7 @@ ROM_START( galaxiab )
 	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
+	ROM_REGION( 0x0200, "proms", 0 ) // palette lookup rom
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
 
@@ -444,7 +444,7 @@ ROM_START( galaxiac )
 	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
+	ROM_REGION( 0x0200, "proms", 0 ) // palette lookup rom
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
 
