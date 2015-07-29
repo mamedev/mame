@@ -284,7 +284,7 @@ MACHINE_CONFIG_END
   The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
   second release with a gray case instead of black.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 

@@ -953,7 +953,9 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(m62_audio)
+	//MCFG_FRAGMENT_ADD(m62_audio)
+	MCFG_DEVICE_ADD("irem_audio", IREM_M62_AUDIO, 0)
+
 MACHINE_CONFIG_END
 
 
@@ -1150,7 +1152,7 @@ ROM_START( kungfum )
 	ROM_LOAD( "a-4e-c.bin",   0x0000, 0x4000, CRC(b6e2d083) SHA1(17e2cfe2b9d6121239803aba7132918e54ae02bf) )
 	ROM_LOAD( "a-4d-c.bin",   0x4000, 0x4000, CRC(7532918e) SHA1(9d513d5a3b99cc54c4491371cd44af048ef0fb33) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "a-3e-.bin",    0xa000, 0x2000, CRC(58e87ab0) SHA1(3b03c101fec58eac13fc309a78df9a2cd44f7604) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3f-.bin",    0xc000, 0x2000, CRC(c81e31ea) SHA1(f0fc58b929188c8802cd85549bdf9f4566e6a677) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3h-.bin",    0xe000, 0x2000, CRC(d99fb995) SHA1(caa6acdbc3b02d248fd123be95ea6fdcb4f35b59) )
@@ -1191,7 +1193,7 @@ ROM_START( kungfumd )
 	ROM_LOAD( "snx_a-4e-d", 0x0000, 0x4000, CRC(fc330a46) SHA1(50edbd6131310afa17d476e278a7098ab1cfae73) )
 	ROM_LOAD( "snx_a-4d-d", 0x4000, 0x4000, CRC(1b2fd32f) SHA1(34487dacf2ec9fbf55148953a9f248fae9442568) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "snx_a-3d-b", 0x8000, 0x4000, CRC(85ca7956) SHA1(f97f744520770766cf9633c8762013d77b0e7a61) )  /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "snx_a-3f-b", 0xc000, 0x4000, CRC(3ef1100a) SHA1(901c40477b4c6fbc984446fa7171006d67b48652) )  /* samples (ADPCM 4-bit) */
 
@@ -1225,7 +1227,7 @@ ROM_START( spartanx )
 	ROM_LOAD( "a-4e-c-j.bin", 0x0000, 0x4000, CRC(32a0a9a6) SHA1(fbb601a4c98a131013ea49a6877f2cd8139434fa) )
 	ROM_LOAD( "a-4d-c-j.bin", 0x4000, 0x4000, CRC(3173ea78) SHA1(cb6102abf9cf8df531f6e808b59e076831456ff5) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "a-3e-.bin",    0xa000, 0x2000, CRC(58e87ab0) SHA1(3b03c101fec58eac13fc309a78df9a2cd44f7604) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3f-.bin",    0xc000, 0x2000, CRC(c81e31ea) SHA1(f0fc58b929188c8802cd85549bdf9f4566e6a677) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3h-.bin",    0xe000, 0x2000, CRC(d99fb995) SHA1(caa6acdbc3b02d248fd123be95ea6fdcb4f35b59) )
@@ -1266,7 +1268,7 @@ ROM_START( kungfub )
 	ROM_LOAD( "c5.5h",        0x0000, 0x4000, CRC(5d8e791d) SHA1(90cd911f715a50a90427abd89b38272a6df08d69) )
 	ROM_LOAD( "c4.5k",        0x4000, 0x4000, CRC(4000e2b8) SHA1(719b0aa1fd0cbe671178ac728d76d439bd7932d9) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "a-3e-.bin",    0xa000, 0x2000, CRC(58e87ab0) SHA1(3b03c101fec58eac13fc309a78df9a2cd44f7604) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3f-.bin",    0xc000, 0x2000, CRC(c81e31ea) SHA1(f0fc58b929188c8802cd85549bdf9f4566e6a677) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3h-.bin",    0xe000, 0x2000, CRC(d99fb995) SHA1(caa6acdbc3b02d248fd123be95ea6fdcb4f35b59) )
@@ -1324,7 +1326,7 @@ ROM_START( kungfub2 )
 	ROM_LOAD( "kf4",          0x0000, 0x4000, CRC(3f65313f) SHA1(bd584896f558440a0f7bf8e1ca49bf478fe77553) )
 	ROM_LOAD( "kf5",          0x4000, 0x4000, CRC(9ea325f3) SHA1(7c35128a3e70e5994a5e17db656dec1a53c1fe67) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "a-3e-.bin",    0xa000, 0x2000, CRC(58e87ab0) SHA1(3b03c101fec58eac13fc309a78df9a2cd44f7604) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3f-.bin",    0xc000, 0x2000, CRC(c81e31ea) SHA1(f0fc58b929188c8802cd85549bdf9f4566e6a677) )    /* samples (ADPCM 4-bit) */
 	ROM_LOAD( "a-3h-.bin",    0xe000, 0x2000, CRC(d99fb995) SHA1(caa6acdbc3b02d248fd123be95ea6fdcb4f35b59) )
@@ -1373,7 +1375,7 @@ ROM_START( battroad )
 	ROM_LOAD( "br-c-7a",    0x18000, 0x2000, CRC(ec3b0080) SHA1(83dc0d0c4ecf2ff62cfb213c02a3869c6f72f2e9) )
 	ROM_LOAD( "br-c-7k",    0x1c000, 0x2000, CRC(edc75f7f) SHA1(3650521874c85a7cf403ede2588b989ac93fb92e) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "br-a-3e",     0xa000, 0x2000, CRC(a7140871) SHA1(bf993e8ed776974ae59e1995eb5d3055c632eda7) )
 	ROM_LOAD( "br-a-3f",     0xc000, 0x2000, CRC(1bb51b30) SHA1(c8e99d79e2fdb6b02c57cba475be0e5e35359124) )
 	ROM_LOAD( "br-a-3h",     0xe000, 0x2000, CRC(afb3e083) SHA1(b1aaca64bbcce73203e55d2f16be3f3cef46f39b) )
@@ -1415,7 +1417,7 @@ ROM_START( ldrun )
 	ROM_LOAD( "lr-a-4b",      0x4000, 0x2000, CRC(b041c4a9) SHA1(77768b03ea2497e25c3e47b68a0eb2fe3e9aea35) )
 	ROM_LOAD( "lr-a-4a",      0x6000, 0x2000, CRC(645e42aa) SHA1(c806ffce7ece418bad86854c987f78c70c13e492) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "lr-a-3f",      0xc000, 0x2000, CRC(7a96accd) SHA1(e94815dbfaabbb562df8f3298060aa6bd7825904) )
 	ROM_LOAD( "lr-a-3h",      0xe000, 0x2000, CRC(3f7f3939) SHA1(7ee25a21e74995bfb36ac11b45d384b33a6d8515) )
 
@@ -1448,7 +1450,7 @@ ROM_START( ldruna )
 	ROM_LOAD( "roma4b",       0x4000, 0x2000, CRC(3c464bad) SHA1(df34a9ec2f29f8d2a2ef1a2fc065ba7541ea4178) )
 	ROM_LOAD( "roma4a",       0x6000, 0x2000, CRC(899df8e0) SHA1(e80154dccd04e2928124591f16e088de3554995b) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "lr-a-3f",      0xc000, 0x2000, CRC(7a96accd) SHA1(e94815dbfaabbb562df8f3298060aa6bd7825904) )
 	ROM_LOAD( "lr-a-3h",      0xe000, 0x2000, CRC(3f7f3939) SHA1(7ee25a21e74995bfb36ac11b45d384b33a6d8515) )
 
@@ -1483,7 +1485,7 @@ ROM_START( ldrun2 )
 	ROM_LOAD( "lr2-h-1c.a",   0x10000, 0x2000, CRC(7ebcadbc) SHA1(ff8377cb1f349f2957280b6a633e596740a489be) )   /* banked at 8000-9fff */
 	ROM_LOAD( "lr2-h-1d.a",   0x12000, 0x2000, CRC(64cbb7f9) SHA1(897d53c3892e636734f5a380c67c41c0d810955e) )   /* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "lr2-a-3e",     0xa000, 0x2000, CRC(853f3898) SHA1(12ade2f6f10c85c6a2c380dd0727aad64b317d56) )
 	ROM_LOAD( "lr2-a-3f",     0xc000, 0x2000, CRC(7a96accd) SHA1(e94815dbfaabbb562df8f3298060aa6bd7825904) )
 	ROM_LOAD( "lr2-a-3h",     0xe000, 0x2000, CRC(2a0e83ca) SHA1(207bfb3912e7a9caa61b742fc3357154a0189434) )
@@ -1519,7 +1521,7 @@ ROM_START( ldrun3 )
 	ROM_LOAD( "lr3a4db.bin",  0x4000, 0x4000, CRC(23a02178) SHA1(0560b92dfc9b57d01abb62a7b270beb27fa42040) )
 	ROM_LOAD( "lr3a4bb.bin",  0x8000, 0x4000, CRC(3d501a1a) SHA1(a92ff743eb21145154fa717ee9e6ede4da458aa9) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "lr3-a-3d",     0x8000, 0x4000, CRC(28be68cd) SHA1(1e48cdf649bc861066fbef0293466091092045f3) )
 	ROM_LOAD( "lr3-a-3f",     0xc000, 0x4000, CRC(cb7186b7) SHA1(cc99821f3f1523523598e4b7d68b95eee6c84e69) )
 
@@ -1555,7 +1557,7 @@ ROM_START( ldrun3j )
 	ROM_LOAD( "lr3-a-4d.a",   0x4000, 0x4000, CRC(a84bc931) SHA1(0348d238a85a059a6423794910adec4462e14f27) )
 	ROM_LOAD( "lr3-a-4b.a",   0x8000, 0x4000, CRC(be09031d) SHA1(c124163895d295969b66386fee91c89bbd8b8774) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "lr3-a-3d",     0x8000, 0x4000, CRC(28be68cd) SHA1(1e48cdf649bc861066fbef0293466091092045f3) )
 	ROM_LOAD( "lr3-a-3f",     0xc000, 0x4000, CRC(cb7186b7) SHA1(cc99821f3f1523523598e4b7d68b95eee6c84e69) )
 
@@ -1588,7 +1590,7 @@ ROM_START( ldrun4 )
 	ROM_LOAD( "lr4-a-4d.c",   0x04000, 0x4000, CRC(298afa36) SHA1(077b5fa8a246059801232c5287225e3bb7507345) )
 	ROM_LOAD( "lr4-v-4k",     0x10000, 0x8000, CRC(8b248abd) SHA1(3e755c8f8011d6f878a1777a2c22b2156ef926e6) )   /* banked at 8000-bfff */
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "lr4-a-3d",     0x8000, 0x4000, CRC(86c6d445) SHA1(644b86fba745a5be545c4dd9c534157af75492b8) )
 	ROM_LOAD( "lr4-a-3f",     0xc000, 0x4000, CRC(097c6c0a) SHA1(627ccdd1d77ae78db9660b51484d2a9110d035e5) )
 
@@ -1623,7 +1625,7 @@ ROM_START( lotlot )
 	ROM_LOAD( "lot-a-4e",     0x0000, 0x4000, CRC(2913d08f) SHA1(829115333825a9483322a910efee9ee470d85a0e) )
 	ROM_LOAD( "lot-a-4d",     0x4000, 0x4000, CRC(0443095f) SHA1(2c3ca107b54519632513a75b80a1a7d8b971f2b1) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "lot-a-3h",     0xe000, 0x2000, CRC(0781cee7) SHA1(bff8592f96b43af6554f1a04e0c00f45b178cce6) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1666,7 +1668,7 @@ ROM_START( kidniki )
 	ROM_LOAD( "dr12.8l",       0x18000, 0x08000, CRC(c0b255fd) SHA1(bdd74239a3490eb35cb736cac6f5030bec4b2392) )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "dr00.3a",      0x4000, 0x04000, CRC(458309f7) SHA1(7dfd77e0cd76a4b6f913eb434ac20ef5a172e2f0) )
 	ROM_LOAD( "dr01.3cd",     0x8000, 0x04000, CRC(e66897bd) SHA1(04ea4a857a94d4e884fb28623ec6195dae701e25) )
 	ROM_LOAD( "dr02.3f",      0xc000, 0x04000, CRC(f9e31e26) SHA1(712b1bde4b3c18c9ac26d58ade48316af004e733) ) /* 6803 code */
@@ -1716,7 +1718,7 @@ ROM_START( kidnikiu )
 	ROM_LOAD( "dr12.8l",      0x18000, 0x08000, CRC(c0b255fd) SHA1(bdd74239a3490eb35cb736cac6f5030bec4b2392) )
 	ROM_CONTINUE(             0x28000, 0x08000 )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "dr00.3a",      0x4000, 0x04000, CRC(458309f7) SHA1(7dfd77e0cd76a4b6f913eb434ac20ef5a172e2f0) )
 	ROM_LOAD( "dr01.3cd",     0x8000, 0x04000, CRC(e66897bd) SHA1(04ea4a857a94d4e884fb28623ec6195dae701e25) )
 	ROM_LOAD( "dr02.3f",      0xc000, 0x04000, CRC(f9e31e26) SHA1(712b1bde4b3c18c9ac26d58ade48316af004e733) ) /* 6803 code */
@@ -1767,7 +1769,7 @@ ROM_START( yanchamr )
 	ROM_LOAD( "ky_t-8l-.bin", 0x18000, 0x08000, CRC(a929110b) SHA1(87334f946e14c79426bc7a14e8da984bb8ef9cfc) )
 	/*  ROM_CONTINUE(             0x28000, 0x08000 ) */
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "ky_a-3a-.bin", 0x4000, 0x04000, CRC(cb365f3b) SHA1(fefad25459eb00d228ee29931c5714ae895b76c7) )
 	ROM_LOAD( "dr01.3cd",     0x8000, 0x04000, CRC(e66897bd) SHA1(04ea4a857a94d4e884fb28623ec6195dae701e25) )
 	ROM_LOAD( "dr02.3f",      0xc000, 0x04000, CRC(f9e31e26) SHA1(712b1bde4b3c18c9ac26d58ade48316af004e733) ) /* 6803 code */
@@ -1816,7 +1818,7 @@ ROM_START( lithero )
 	ROM_LOAD( "12.bin",       0x18000, 0x08000, CRC(a929110b) SHA1(87334f946e14c79426bc7a14e8da984bb8ef9cfc) )
 	/*  ROM_CONTINUE(             0x28000, 0x08000 ) */
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "ky_a-3a-.bin", 0x4000, 0x04000, CRC(cb365f3b) SHA1(fefad25459eb00d228ee29931c5714ae895b76c7) )
 	ROM_LOAD( "dr01.3cd",     0x8000, 0x04000, CRC(e66897bd) SHA1(04ea4a857a94d4e884fb28623ec6195dae701e25) )
 	ROM_LOAD( "dr02.3f",      0xc000, 0x04000, CRC(f9e31e26) SHA1(712b1bde4b3c18c9ac26d58ade48316af004e733) ) /* 6803 code */
@@ -1859,7 +1861,7 @@ ROM_START( spelunkr )
 	ROM_LOAD( "sprm.7c",      0x10000, 0x4000, CRC(fb6197e2) SHA1(8c3ccc2c14d076a1d6d14c2548a101a87af4211a) )   /* banked at 8000-9fff */
 	ROM_LOAD( "sprm.7b",      0x14000, 0x4000, CRC(26bb25a4) SHA1(d384901042664a4e46d7b6b5d183ce49e360dac8) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "spra.3d",      0x8000, 0x04000, CRC(4110363c) SHA1(8c1f4966291887c17175ab921acd732be6266186) ) /* adpcm data */
 	ROM_LOAD( "spra.3f",      0xc000, 0x04000, CRC(67a9d2e6) SHA1(d859648d7a3f05ae777a3909ddcd866b786c5b26) ) /* 6803 code */
 
@@ -1925,7 +1927,7 @@ ROM_START( spelunkrj )
 	ROM_LOAD( "spr_m7cc.bin", 0x10000, 0x4000, CRC(57598a36) SHA1(7d9c5790eb2a79c7977ca7b590d228685bd3a6b2) )   /* banked at 8000-9fff */
 	ROM_LOAD( "spr_m7bd.bin", 0x14000, 0x4000, CRC(ecf5137f) SHA1(6daa88b40698e2a3a11206cd946465621bb3c059) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "spra.3d",      0x8000, 0x04000, CRC(4110363c) SHA1(8c1f4966291887c17175ab921acd732be6266186) ) /* adpcm data */
 	ROM_LOAD( "spra.3f",      0xc000, 0x04000, CRC(67a9d2e6) SHA1(d859648d7a3f05ae777a3909ddcd866b786c5b26) ) /* 6803 code */
 
@@ -1992,7 +1994,7 @@ ROM_START( spelunk2 )
 	ROM_LOAD( "sp2-r.7c",     0x18000, 0x8000, CRC(4b380162) SHA1(867e441411e8b74d1d6ce0333c47b1aec3d4f5f2) )   /* banked at 9000-9fff */
 	ROM_LOAD( "sp2-r.7b",     0x20000, 0x4000, CRC(7709a1fe) SHA1(4c2b57982b3d3e4524a8e0d24f38d3c3f5a809f3) )   /* banked at 8000-8fff */
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "sp2-a.3d",     0x8000, 0x04000, CRC(839ec7e2) SHA1(a2c45553b149fc16b8af6338627cd2a8a31e08a0) ) /* adpcm data */
 	ROM_LOAD( "sp2-a.3f",     0xc000, 0x04000, CRC(ad3ce898) SHA1(36876b6d51a480a0664413dfcc57ef343e0f9965) ) /* 6803 code */
 
@@ -2058,7 +2060,7 @@ ROM_START( youjyudn )
 	ROM_LOAD( "yju_p4cb.0",   0x10000, 0x4000, CRC(60baf3b1) SHA1(2ab577bdbec7c8695a8f530b3e476aa91447cd60) )   /* banked at 8000-bfff */
 	ROM_LOAD( "yju_p4eb.1",   0x14000, 0x4000, CRC(8d0521f8) SHA1(e03385b94194806e347cd6be4151686e2f38c890) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* sound CPU */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU */
 	ROM_LOAD( "yju_a3fb.bin", 0xc000, 0x04000, CRC(e15c8030) SHA1(bbbf4fa0349d614af86e356a106d5dd24b0b8baa) ) /* 6803 code */
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )
@@ -2104,7 +2106,7 @@ ROM_START( horizon )
 	ROM_LOAD( "hrza-4d",   0x4000, 0x4000, CRC(06b06ac7) SHA1(d9ae9633455733fd14fc4d448b85365bfebef446) )
 	ROM_LOAD( "hrza-4b",   0x8000, 0x4000, CRC(39c0bd02) SHA1(8d3b465ef7db11863cd2d343656e99cfb77c89ef) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )   /* 64k for the audio CPU (6803) */
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* 64k for the audio CPU (6803) */
 	ROM_LOAD( "hrza-3f",    0xc000, 0x4000, CRC(7412c99f) SHA1(33e7cffa08d9644c78e1bada9a2b08ce5d3f97e1) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -2176,25 +2178,25 @@ DRIVER_INIT_MEMBER(m62_state,youjyudn)
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1984, kungfum,  0,        kungfum,  kungfum,  driver_device, 0,        ROT0,   "Irem", "Kung-Fu Master (World)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "Irem (Data East USA license)", "Kung-Fu Master (US)", GAME_SUPPORTS_SAVE )
-GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "Irem", "Spartan X (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, battroad, 0,        battroad, battroad, m62_state,     battroad, ROT90,  "Irem", "The Battle-Road", GAME_SUPPORTS_SAVE )
-GAME( 1984, ldrun,    0,        ldrun,    ldrun,    driver_device, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    driver_device, 0,        ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   m62_state,     ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", GAME_SUPPORTS_SAVE ) /* Japanese version is called Bangeringu Teikoku No Gyakushuu */
-GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3,   driver_device, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", GAME_SUPPORTS_SAVE )
-GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3,   driver_device, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4,   m62_state,     ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, lotlot,   0,        lotlot,   lotlot,   driver_device, 0,        ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", GAME_SUPPORTS_SAVE )
-GAME( 1986, kidniki,  0,        kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "bootleg", "Little Hero", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state,     spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", GAME_SUPPORTS_SAVE )
-GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state,     spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state,     spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state,     youjyudn, ROT270, "Irem", "Youjyuden (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, horizon,  0,        horizon,  horizon,  driver_device, 0,        ROT0,   "Irem", "Horizon (Irem)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfum,  0,        kungfum,  kungfum,  driver_device, 0,        ROT0,   "Irem", "Kung-Fu Master (World)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "Irem (Data East USA license)", "Kung-Fu Master (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "Irem", "Spartan X (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, battroad, 0,        battroad, battroad, m62_state,     battroad, ROT90,  "Irem", "The Battle-Road", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, ldrun,    0,        ldrun,    ldrun,    driver_device, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    driver_device, 0,        ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   m62_state,     ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Japanese version is called Bangeringu Teikoku No Gyakushuu */
+GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3,   driver_device, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3,   driver_device, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4,   m62_state,     ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1985, lotlot,   0,        lotlot,   lotlot,   driver_device, 0,        ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1986, kidniki,  0,        kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  m62_state,     kidniki,  ROT0,   "bootleg", "Little Hero", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state,     spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state,     spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state,     spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state,     youjyudn, ROT270, "Irem", "Youjyuden (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1985, horizon,  0,        horizon,  horizon,  driver_device, 0,        ROT0,   "Irem", "Horizon (Irem)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )

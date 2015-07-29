@@ -224,7 +224,7 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -339,7 +339,7 @@ MACHINE_CONFIG_END
   * Mitsubishi M58846-702P MCU
   * cyan/red/green VFD display Itron CP5143GLR SGA, with light-yellow color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -362,7 +362,7 @@ public:
 void gjungler_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,17,16,15,14,13,12,0,7,1,6,2,5,3,4);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,17,16,15,14,13,12,0,7,1,6,2,5,3,4) | 0x2000;
 	display_matrix(18, 12, plate, grid);
 }
 

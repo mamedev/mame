@@ -2015,6 +2015,40 @@ ROM_START( pspikesb )
 	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
+ROM_START( pspikesba )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "2.ic63",    0x00000, 0x20000, CRC(dd87d28a) SHA1(09ab75bcd62db1a49af123648812852780ac9d60) ) // sldh
+	ROM_LOAD16_BYTE( "3.ic62",    0x00001, 0x20000, CRC(ec505317) SHA1(1e2b9e52654b08169827dbd877de2e724140e50c) ) // sldh
+
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "4.ic122",   0x00000, 0x20000, CRC(ea1c05a7) SHA1(adfdfeac80df287ffa6f469dc38ea94698817cf4) )
+	ROM_LOAD( "5.ic120",   0x20000, 0x20000, CRC(bfdc60f4) SHA1(2b1893fac2651ac82f5a05b8f891b20c928ced7e) )
+	ROM_LOAD( "6.ic118",   0x40000, 0x20000, CRC(96a5c235) SHA1(dad4ef9069d3130f719a402737909bb48225b73c) )
+	ROM_LOAD( "7.ic116",   0x60000, 0x20000, CRC(a7e00b36) SHA1(2b5e85ec02e8893d7d730aad4d690883b1d236cc) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "8.ic121",   0x00000, 0x40000, CRC(fc096cfc) SHA1(75af810c97361b6f08767949b90c394a7a03f60b) )
+	ROM_LOAD( "9.ic119",   0x40000, 0x40000, CRC(a45ec985) SHA1(16357f5df7841e11889ac6fced1e2a9288585a29) )
+	ROM_LOAD( "10.ic117",  0x80000, 0x40000, CRC(3976b372) SHA1(72feec5a6fe7995f39d4b431dbbf25435359b04d) )
+	ROM_LOAD( "11.ic115",  0xc0000, 0x40000, CRC(f9249937) SHA1(5993e5ab7295ca2fa5c8f4c05ce23731741f4e97) )
+
+	ROM_REGION( 0x080000, "user1", 0 ) /* Samples */
+	ROM_LOAD( "1.ic21",    0x000000, 0x80000, CRC(1b78ed0b) SHA1(886bfd78709c295839dd51c7f5a13f5c452c0ab3) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
+ROM_END
+
+
 /*
 
 1991 Spikes (Italian bootleg)
@@ -2692,15 +2726,16 @@ GAME( 1990, spinlbrk, 0,        spinlbrk, spinlbrk, driver_device, 0, ROT0,   "V
 GAME( 1990, spinlbrku,spinlbrk, spinlbrk, spinlbrku, driver_device,0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1990, spinlbrkj,spinlbrk, spinlbrk, spinlbrk, driver_device, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 
-GAME( 1991, pspikes,  0,        pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Power Spikes (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1991, pspikesu, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Power Spikes (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1991, svolly91, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Super Volley '91 (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, driver_device, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1991, spikes91, pspikes,  spikes91, pspikes, driver_device,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg, set 1)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAME( 1991, spikes91b,pspikes,  spikes91, pspikes, driver_device,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg, set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, driver_device, 0, ROT0,   "bootleg",          "Power Spikes (China)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97, driver_device,   0, ROT0,   "Comad",            "Beach Festival World Championship 1997", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL ) // based on power spikes codebase
+GAME( 1991, pspikes,  0,        pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Power Spikes (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Power Spikes (Korea)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesu, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Power Spikes (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, svolly91, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Super Volley '91 (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, driver_device, 0, ROT0,   "bootleg",            "Power Spikes (bootleg)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesba,pspikes,  pspikesb, pspikesb, driver_device, 0, ROT0,   "bootleg (Playmark?)","Power Spikes (Italian bootleg)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, spikes91, pspikes,  spikes91, pspikes, driver_device,  0, ROT0,   "bootleg",            "1991 Spikes (Italian bootleg, set 1)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_NO_COCKTAIL )
+GAME( 1991, spikes91b,pspikes,  spikes91, pspikes, driver_device,  0, ROT0,   "bootleg",            "1991 Spikes (Italian bootleg, set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, driver_device, 0, ROT0,   "bootleg",            "Power Spikes (China)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97, driver_device,   0, ROT0,   "Comad",              "Beach Festival World Championship 1997", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL ) // based on power spikes codebase
 
 GAME( 1991, karatblz, 0,        karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, karatblzu,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

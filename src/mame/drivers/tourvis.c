@@ -16,16 +16,20 @@
 
     Known games:
 
+    1943
     Aero Blaster (label shows "Vol. 33") [dumped]
     After Burner
+    Ankoku Densetu
     Ballistix
-    Bomberman
+    Bomberman (label shows "Vol. 34")
     Columns [dumped]
     Cyber Core
     Daisempuu
     Dead Moon
+    Die Hard
     Dodge Ball
     Doraemon Meikyuu Daisakusen
+    Doramon II
     Down Load
     Dragon Spirit
     Dungeon Explorer [dumped]
@@ -39,10 +43,10 @@
     Kiki Kaikai
     Legend Of Hero Tomna
     Legendary Axe [dumped]
+    Liquid Kids
     Mr. Heli
     Out Run
     Pac-Land
-    Parasol Stars
     PC Denjin Punkic Cyborg
     PC Genjin
     PC Genjin 2 [dumped]
@@ -56,6 +60,8 @@
     Saigo no Nindou
     Salamander
     Shinobi
+    Side Arms
+    Skweek
     Son Son II
     Special Criminal Investigation [dumped]
     Super Star Soldier (label shows "Vol. 30") [dumped]
@@ -64,7 +70,9 @@
     Terra Cresta II
     Thunder Blade [dumped]
     Toy Shop Boys
+    Tricky
     USA Pro Basketball [dumped]
+    Veigues
     Vigilante
     Volfied [dumped]
     W-Ring

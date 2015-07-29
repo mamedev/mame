@@ -3641,6 +3641,25 @@ ROM_START( hanaoji )
 	ROM_LOAD( "hnoj_11.bin", 0x100000, 0x20000, CRC(bfe38671) SHA1(6c81864caab61ea60dfe446b390221bdcfb0895e) )
 ROM_END
 
+ROM_START( hanaojia )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
+	ROM_LOAD( "02.f3.bin", 0x00000, 0x10000, CRC(2f493c0b) SHA1(0c2b2ece744556f8b2d25fde9017680a77afcf6b) )
+
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
+	ROM_LOAD( "hnoj_01.bin", 0x00000, 0x10000, CRC(3f7fcb94) SHA1(7bb0bc3a8c34b1b707b39ba52be40900cca0f015) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "hnoj_03.bin", 0x000000, 0x20000, CRC(fbbe1dce) SHA1(f742bb8e06a1e71e7c586d0a821f96238bdbc6ac) )
+	ROM_LOAD( "hnoj_04.bin", 0x020000, 0x20000, CRC(2074b04f) SHA1(e759e49474bcb1caeea5a60708844ec53aed64c6) )
+	ROM_LOAD( "hnoj_05.bin", 0x040000, 0x20000, CRC(84d20ba6) SHA1(0f270d43cdb390492f349b3680978e2e36a6a5d4) )
+	ROM_LOAD( "hnoj_06.bin", 0x060000, 0x20000, CRC(f85fedd8) SHA1(224a5b05c28b1f84df0bd32b32cb2aa416156460) )
+	ROM_LOAD( "hnoj_07.bin", 0x080000, 0x20000, CRC(c72cdde1) SHA1(877cd52461ecc9cd44d5b328c36ac8878056059d) )
+	ROM_LOAD( "hnoj_08.bin", 0x0a0000, 0x20000, CRC(12e70429) SHA1(4728a5a0f636f793099c5a3a7bc998931921623f) )
+	ROM_LOAD( "hnoj_09.bin", 0x0c0000, 0x20000, CRC(4ec74a59) SHA1(92803e99aa6fb5c8f2227db3b7cc875266249ed1) )
+	ROM_LOAD( "hnoj_10.bin", 0x0e0000, 0x20000, CRC(e9212fc5) SHA1(c09f4a93f01630696acb0e80b1c6adb711377319) )
+	ROM_LOAD( "hnoj_11.bin", 0x100000, 0x20000, CRC(bfe38671) SHA1(6c81864caab61ea60dfe446b390221bdcfb0895e) )
+ROM_END
+
 ROM_START( mjcamerb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "2.3h",        0x00000, 0x10000, CRC(3a0f110b) SHA1(8923136ed25ed91c90f93c3f75f5532ff8f9d420) )
@@ -3857,7 +3876,8 @@ GAME( 1990, hnageman,  0,        hnageman, maiko,    driver_device,         0, R
 GAME( 1990, club90s,   0,        club90s,  club90s,  driver_device,         0, ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", GAME_SUPPORTS_SAVE )
 GAME( 1990, club90sa,  club90s,  club90s,  club90s,  driver_device,         0, ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", GAME_SUPPORTS_SAVE )
 GAME( 1990, lovehous,  club90s,  lovehous, lovehous, driver_device,         0, ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", GAME_SUPPORTS_SAVE )
-GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  driver_device,         0, ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (Japan 911209)", GAME_SUPPORTS_SAVE )
+GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  driver_device,         0, ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.01, 1991/12/09)", GAME_SUPPORTS_SAVE )
+GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  driver_device,         0, ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.00, 1991/08/23)", GAME_SUPPORTS_SAVE )
 GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, driver_device,         0, ROT0,   "Miki Syouji", "Taiwan Mahjong [BET] (Japan 881208)", GAME_SUPPORTS_SAVE )
 GAME( 1989, pairsnb,   0,        pairsnb, pairsnb,  nbmj8891_state,  pairsnb,  ROT0,   "Nichibutsu", "Pairs (Nichibutsu) (Japan 890822)", GAME_SUPPORTS_SAVE )
 GAME( 1989, pairsten,  pairsnb,  pairsten, pairsnb, nbmj8891_state,  pairsten, ROT0,   "System Ten", "Pairs (System Ten) (Japan 890826)", GAME_SUPPORTS_SAVE )

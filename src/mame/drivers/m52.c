@@ -411,7 +411,9 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
+
 MACHINE_CONFIG_END
 
 
@@ -437,7 +439,7 @@ ROM_START( mpatrol )
 	ROM_LOAD( "mpa-3.3k",      0x2000, 0x1000, CRC(2e1a598c) SHA1(112c3c9678db8a8540a8df3708020c87fd10c91b) )
 	ROM_LOAD( "mpa-4.3j",      0x3000, 0x1000, CRC(dd05b587) SHA1(727961b0dafa4a96b580d51013336db2a18aff1e) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "mp-s1.1a",     0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -471,7 +473,7 @@ ROM_START( mpatrolw )
 	ROM_LOAD( "mpa-3w.3k",    0x2000, 0x1000, CRC(9b249fe5) SHA1(c01e0d572c4c163f3cf4b2aa9f4246427811b78d) )
 	ROM_LOAD( "mpa-4w.3j",    0x3000, 0x1000, CRC(fee76972) SHA1(c3166b027f89f61964ead804d3c2da387454c4c2) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "mp-s1.1a",     0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -505,7 +507,7 @@ ROM_START( mranger )
 	ROM_LOAD( "mra-3.3k",      0x2000, 0x1000, CRC(9f0af7b2) SHA1(3daaec15b0d3bc30723ebb14b50f66f288f0d096) )
 	ROM_LOAD( "mra-4.3j",      0x3000, 0x1000, CRC(7fe8e2cd) SHA1(4ffad9c7a9360999b213b790c6c76cc79c8e49d5) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "mp-s1.1a",     0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -543,7 +545,7 @@ ROM_START( alpha1v )
 	ROM_LOAD( "7-f3",      0x5000, 0x1000, CRC(99db9781) SHA1(a56a675cc4cbc9681bfe8052f51f19336eb2a0a6) )
 	ROM_LOAD( "7a e3",     0x6000, 0x1000, CRC(3b0b4b0d) SHA1(0d8eea1e2db269943611289b3490a578ee347f85) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "1-a1",      0x7000, 0x1000, CRC(9e07fdd5) SHA1(ed4f462fcfe91fa8e88bfeaaba0a0c11fa0b4601) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )

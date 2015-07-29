@@ -243,7 +243,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
 	DECLARE_WRITE8_MEMBER(rom_select);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_FLOPPY_FORMATS( aleste_floppy_formats );
 
 	IRQ_CALLBACK_MEMBER(amstrad_cpu_acknowledge_int);
 

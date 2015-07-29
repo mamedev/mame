@@ -5077,6 +5077,32 @@ ROM_START( crush2 )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
 ROM_END
 
+ROM_START( crushrlf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pin1cc_6e.bin",          0x0400, 0x0400, CRC(65e469cf) SHA1(baeb5ba0ca0d78bca07f7830269f9c079f36d425) )
+	ROM_CONTINUE(0x0000,0x0400)
+	ROM_LOAD( "pin2cc_6f.bin",          0x0800, 0x0800, CRC(653f726d) SHA1(3121315cf3e8be86d29687f29fc514e29dc64a02) )
+	ROM_LOAD( "pin3cc_6h.bin",          0x1000, 0x0800, CRC(55e15863) SHA1(bcbf4e5a268739c906e5c400e639e0e055799d47) )
+	ROM_LOAD( "pin4cc_6j.bin",          0x1800, 0x0800, CRC(4fc4b582) SHA1(cb73b5f9171ba493afdfced0baeef9bb6bdb428d) )
+	ROM_LOAD( "pin5cc_6k.bin",          0x2000, 0x0800, CRC(15f0415b) SHA1(90c663387a81ad206874a531d9fe631ac0175975) )
+	ROM_LOAD( "pin6cc_6m.bin",          0x2800, 0x0800, CRC(4536ea5b) SHA1(6e0b22dd05a76644b13f1c71f771d686cd411eea) )
+	ROM_LOAD( "pin7cc_6n.bin",          0x3000, 0x0800, CRC(409111ec) SHA1(ba98cfc1cce8627d11fda4954c3776d0b90cb584) )
+	ROM_LOAD( "pin8cc_6p.bin",          0x3800, 0x0800, CRC(0d97a047) SHA1(d0024a87a7530246bfbef7d1603b599e2f168973) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pin9cc_5e.bin",        0x0000, 0x0800, CRC(b6551507) SHA1(a544e6afda0dd1bea526cb94b9c456d923054698))
+	ROM_LOAD( "pin11cc_5h.bin",       0x0800, 0x0800, CRC(e129d76a) SHA1(c9256795c6d0929ade1f24b372dadc2a2b88d897))
+	ROM_LOAD( "pin10cc_5f.bin",       0x1000, 0x0800, CRC(d106da36) SHA1(a086e4874edf2f1a8bc945bed0e51424d92beaf2))
+	ROM_LOAD( "pin12cc_5j.bin",       0x1800, 0x0800, CRC(d35d1caf) SHA1(65dd7861e05651485626465dc97215fed58db551) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "2s140.4a",     0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+ROM_END
 
 ROM_START( crush3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6879,6 +6905,7 @@ GAME( 1981, crush4,   crush,    crush4,   crush4,   driver_device, 0,        ROT
 GAME( 1981, maketrax, crush,    pacmanp,  maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, maketrxb, crush,    pacmanp,  maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, korosuke, crush,    pacmanp,  korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1981, crushrlf, crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "bootleg", "Crush Roller (Famaresa PCB)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING) // has some encryption or protection
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushbl2, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushbl3, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", GAME_SUPPORTS_SAVE )
