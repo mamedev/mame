@@ -889,6 +889,7 @@ Notes:
 
 837-13741
 837-13844-02 (sticker)
+837-14645
 |-----------------------------|
 |       CN8        CN9        |
 |DB9                       CN1|
@@ -924,6 +925,7 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
       IC6  - Sega 315-6146 custom IC (QFP176)
       IC7  - 27C512 EPROM with label 'EPR-22082' (DIP28)
              On plain 837-13844 (no -02) this is 'EPR-21868' (DIP28)
+             On later 837-14645 it is 'EPR-24354'
       IC8  - Sharp LH52256 32k x8 SRAM (SOP28)
       IC10 - NEC D71054GB programmable counter/timer (QFP44)
       OSC1 - 14.7456MHz
@@ -4643,11 +4645,13 @@ ROM_START( 18wheelr )
 	ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
 	ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
+	// JVS I/O board 837-13844, external Z80 code for Sega 315-6146 "MIE" MCU
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
+	// 837-14645 JVS I/O, uses same PCB as 837-13844
+	ROM_LOAD( "epr-24354.ic7", 0x000000, 0x010000, CRC(0ce43505) SHA1(7700e3acfb756dfbf95f3ff14786d1bcb57e2f7d) )
 
 	// 18 Wheeler motor controller 838-13992, code is for a TMPZ84C015 which is Z80 compatible
 	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
