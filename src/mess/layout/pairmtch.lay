@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<element name="segc" defstate="0">
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="0.2" green="1.0" blue="0.8" /></rect>
+	</element>
+	<element name="segr2" defstate="0">
+		<rect state="0"><color red="0.1" green="0.1" blue="0.01" /></rect>
+		<rect state="1"><color red="1.0" green="0.33" blue="0.2" /></rect>
+	</element>
+
+	<element name="segr" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="1" height="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+			<color red="0.1" green="0.1" blue="0.01" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+			<color red="1.0" green="0.33" blue="0.2" />
+		</rect>
+	</element>
+
+	<element name="c1" defstate="0">
+		<text state="0" string="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="1"><color red="0.2" green="1.0" blue="0.8" /></text>
+	</element>
+	<element name="c2" defstate="0">
+		<text state="0" string="2"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="2"><color red="0.2" green="1.0" blue="0.8" /></text>
+	</element>
+	<element name="c3" defstate="0">
+		<text state="0" string="3"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="3"><color red="0.2" green="1.0" blue="0.8" /></text>
+	</element>
+	<element name="c4" defstate="0">
+		<text state="0" string="4"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="4"><color red="0.2" green="1.0" blue="0.8" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-15" right="600" top="-11" bottom="805" />
+		<bezel element="static_black">
+			<bounds left="-15" right="600" top="-11" bottom="805" />
+		</bezel>
+
+	<!-- 5 -->
+
+		<bezel name="5.10" element="segc"><bounds x="0" y="0" width="75" height="32" /></bezel>
+		<bezel name="5.10" element="segc"><bounds x="102" y="0" width="75" height="32" /></bezel>
+		<bezel name="5.10" element="segc"><bounds x="204" y="0" width="75" height="32" /></bezel>
+		<bezel name="5.10" element="segc"><bounds x="306" y="0" width="75" height="32" /></bezel>
+		<bezel name="5.10" element="segc"><bounds x="408" y="0" width="75" height="32" /></bezel>
+		<bezel name="5.10" element="segc"><bounds x="510" y="0" width="75" height="32" /></bezel>
+
+		<bezel element="static_black"><bounds x="-1" y="8.666" width="587" height="3" /></bezel>
+		<bezel element="static_black"><bounds x="-1" y="20.333" width="587" height="3" /></bezel>
+
+		<bezel name="5.11" element="c1"><bounds x="0" y="42" width="75" height="95" /></bezel>
+
+		<bezel name="5.8" element="segc"><bounds x="102" y="42" width="75" height="95" /></bezel>
+		<bezel name="5.9" element="segr"><bounds x="109.9" y="52" width="59.2" height="75" /></bezel>
+
+		<bezel name="5.6" element="segc"><bounds x="204" y="42" width="75" height="95" /></bezel>
+		<bezel name="5.7" element="segr"><bounds x="211.9" y="52" width="59.2" height="75" /></bezel>
+
+		<bezel name="5.4" element="segc"><bounds x="306" y="42" width="75" height="95" /></bezel>
+		<bezel name="5.5" element="segr"><bounds x="313.9" y="52" width="59.2" height="75" /></bezel>
+
+		<bezel name="5.2" element="segc"><bounds x="408" y="42" width="75" height="95" /></bezel>
+		<bezel name="5.3" element="segr"><bounds x="415.9" y="52" width="59.2" height="75" /></bezel>
+
+		<bezel name="5.1" element="c2"><bounds x="510" y="42" width="75" height="95" /></bezel>
+
+
+	<!-- 4 -->
+
+		<bezel name="4.10" element="segc"><bounds x="0" y="165" width="75" height="95" /></bezel>
+		<bezel name="4.11" element="segr"><bounds x="7.9" y="175" width="59.2" height="75" /></bezel>
+
+		<bezel name="4.8" element="segc"><bounds x="102" y="165" width="75" height="95" /></bezel>
+		<bezel name="4.9" element="segr"><bounds x="109.9" y="175" width="59.2" height="75" /></bezel>
+
+		<bezel name="4.6" element="segc"><bounds x="204" y="165" width="75" height="95" /></bezel>
+		<bezel name="4.7" element="segr"><bounds x="211.9" y="175" width="59.2" height="75" /></bezel>
+
+		<bezel name="4.4" element="segc"><bounds x="306" y="165" width="75" height="95" /></bezel>
+		<bezel name="4.5" element="segr"><bounds x="313.9" y="175" width="59.2" height="75" /></bezel>
+
+		<bezel name="4.2" element="segc"><bounds x="408" y="165" width="75" height="95" /></bezel>
+		<bezel name="4.3" element="segr"><bounds x="415.9" y="175" width="59.2" height="75" /></bezel>
+
+		<bezel name="4.0" element="segc"><bounds x="510" y="165" width="75" height="95" /></bezel>
+		<bezel name="4.1" element="segr"><bounds x="517.9" y="175" width="59.2" height="75" /></bezel>
+
+
+	<!-- 3 -->
+
+		<bezel name="3.10" element="segc"><bounds x="0" y="288" width="75" height="95" /></bezel>
+		<bezel name="3.11" element="segr"><bounds x="7.9" y="298" width="59.2" height="75" /></bezel>
+
+		<bezel name="3.8" element="segc"><bounds x="102" y="288" width="75" height="95" /></bezel>
+		<bezel name="3.9" element="segr"><bounds x="109.9" y="298" width="59.2" height="75" /></bezel>
+
+		<bezel name="3.6" element="segc"><bounds x="204" y="288" width="75" height="95" /></bezel>
+		<bezel name="3.7" element="segr"><bounds x="211.9" y="298" width="59.2" height="75" /></bezel>
+
+		<bezel name="3.4" element="segc"><bounds x="306" y="288" width="75" height="95" /></bezel>
+		<bezel name="3.5" element="segr"><bounds x="313.9" y="298" width="59.2" height="75" /></bezel>
+
+		<bezel name="3.2" element="segc"><bounds x="408" y="288" width="75" height="95" /></bezel>
+		<bezel name="3.3" element="segr"><bounds x="415.9" y="298" width="59.2" height="75" /></bezel>
+
+		<bezel name="3.0" element="segc"><bounds x="510" y="288" width="75" height="95" /></bezel>
+		<bezel name="3.1" element="segr"><bounds x="517.9" y="298" width="59.2" height="75" /></bezel>
+
+
+	<!-- 2 -->
+
+		<bezel name="2.10" element="segc"><bounds x="0" y="411" width="75" height="95" /></bezel>
+		<bezel name="2.11" element="segr"><bounds x="7.9" y="421" width="59.2" height="75" /></bezel>
+
+		<bezel name="2.8" element="segc"><bounds x="102" y="411" width="75" height="95" /></bezel>
+		<bezel name="2.9" element="segr"><bounds x="109.9" y="421" width="59.2" height="75" /></bezel>
+
+		<bezel name="2.6" element="segc"><bounds x="204" y="411" width="75" height="95" /></bezel>
+		<bezel name="2.7" element="segr"><bounds x="211.9" y="421" width="59.2" height="75" /></bezel>
+
+		<bezel name="2.4" element="segc"><bounds x="306" y="411" width="75" height="95" /></bezel>
+		<bezel name="2.5" element="segr"><bounds x="313.9" y="421" width="59.2" height="75" /></bezel>
+
+		<bezel name="2.2" element="segc"><bounds x="408" y="411" width="75" height="95" /></bezel>
+		<bezel name="2.3" element="segr"><bounds x="415.9" y="421" width="59.2" height="75" /></bezel>
+
+		<bezel name="2.0" element="segc"><bounds x="510" y="411" width="75" height="95" /></bezel>
+		<bezel name="2.1" element="segr"><bounds x="517.9" y="421" width="59.2" height="75" /></bezel>
+
+
+	<!-- 1 -->
+
+		<bezel name="1.10" element="segc"><bounds x="0" y="534" width="75" height="95" /></bezel>
+		<bezel name="1.11" element="segr"><bounds x="7.9" y="544" width="59.2" height="75" /></bezel>
+
+		<bezel name="1.8" element="segc"><bounds x="102" y="534" width="75" height="95" /></bezel>
+		<bezel name="1.9" element="segr"><bounds x="109.9" y="544" width="59.2" height="75" /></bezel>
+
+		<bezel name="1.6" element="segc"><bounds x="204" y="534" width="75" height="95" /></bezel>
+		<bezel name="1.7" element="segr"><bounds x="211.9" y="544" width="59.2" height="75" /></bezel>
+
+		<bezel name="1.4" element="segc"><bounds x="306" y="534" width="75" height="95" /></bezel>
+		<bezel name="1.5" element="segr"><bounds x="313.9" y="544" width="59.2" height="75" /></bezel>
+
+		<bezel name="1.2" element="segc"><bounds x="408" y="534" width="75" height="95" /></bezel>
+		<bezel name="1.3" element="segr"><bounds x="415.9" y="544" width="59.2" height="75" /></bezel>
+
+		<bezel name="1.0" element="segc"><bounds x="510" y="534" width="75" height="95" /></bezel>
+		<bezel name="1.1" element="segr"><bounds x="517.9" y="544" width="59.2" height="75" /></bezel>
+
+
+	<!-- 0 -->
+
+		<bezel name="0.11" element="c3"><bounds x="0" y="657" width="75" height="95" /></bezel>
+
+		<bezel name="0.8" element="segc"><bounds x="102" y="657" width="75" height="95" /></bezel>
+		<bezel name="0.9" element="segr"><bounds x="109.9" y="667" width="59.2" height="75" /></bezel>
+
+		<bezel name="0.6" element="segc"><bounds x="204" y="657" width="75" height="95" /></bezel>
+		<bezel name="0.7" element="segr"><bounds x="211.9" y="667" width="59.2" height="75" /></bezel>
+
+		<bezel name="0.4" element="segc"><bounds x="306" y="657" width="75" height="95" /></bezel>
+		<bezel name="0.5" element="segr"><bounds x="313.9" y="667" width="59.2" height="75" /></bezel>
+
+		<bezel name="0.2" element="segc"><bounds x="408" y="657" width="75" height="95" /></bezel>
+		<bezel name="0.3" element="segr"><bounds x="415.9" y="667" width="59.2" height="75" /></bezel>
+
+		<bezel name="0.1" element="c4"><bounds x="510" y="657" width="75" height="95" /></bezel>
+
+		<bezel name="0.10" element="segr2"><bounds x="0" y="762" width="75" height="32" /></bezel>
+		<bezel name="0.10" element="segr2"><bounds x="102" y="762" width="75" height="32" /></bezel>
+		<bezel name="0.10" element="segr2"><bounds x="204" y="762" width="75" height="32" /></bezel>
+		<bezel name="0.10" element="segr2"><bounds x="306" y="762" width="75" height="32" /></bezel>
+		<bezel name="0.10" element="segr2"><bounds x="408" y="762" width="75" height="32" /></bezel>
+		<bezel name="0.10" element="segr2"><bounds x="510" y="762" width="75" height="32" /></bezel>
+
+		<bezel element="static_black"><bounds x="-1" y="770.666" width="587" height="3" /></bezel>
+		<bezel element="static_black"><bounds x="-1" y="782.333" width="587" height="3" /></bezel>
+
+
+	</view>
+</mamelayout>
