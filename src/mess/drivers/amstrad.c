@@ -106,10 +106,9 @@ Some bugs left :
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
+#include "formats/msx_dsk.h"
 
 #include "machine/ram.h"
-
-
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10
@@ -784,8 +783,12 @@ static SLOT_INTERFACE_START( amstrad_floppies )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( aleste_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
+
+FLOPPY_FORMATS_MEMBER( amstrad_state::aleste_floppy_formats )
+	FLOPPY_MSX_FORMAT
+FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gx4000_cart")
@@ -1125,8 +1128,8 @@ static MACHINE_CONFIG_DERIVED( aleste, cpc6128 )
 	MCFG_DEVICE_REMOVE("upd765")
 	MCFG_I8272A_ADD("upd765", true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)
 
 	MCFG_DEVICE_REMOVE("flop_list")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "aleste")

@@ -9,11 +9,17 @@
   also very close to gotcha.c, which was also a Para
   board.
 
-  todo: refresh rate & audio balance
+  todo: refresh rate
         verify dipswitches - difficulty & unknown dips
-        verify clocks for Z80 & OKI6295
 
-OSC on the PCB are 12MHz, 14.31818MHz & 4.096MHz
+OSC on Silver Millennium are 12MHz, 14.31818MHz & 4.096MHz
+The above has been verified on two boards.
+
+OSC on World Puzzlove are 12MHz, 14.31818MHz & 4MHz
+OSC on Korean Puzzlove are 12MHz, 15MHz & 4MHz
+Only one example of each of these is known to exist so far.
+
+Very likely to be 'whatever crystals we had on hand which were close enough for the batch' situations.
 
 */
 
@@ -165,8 +171,6 @@ UINT32 silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
-
-
 
 
 static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
@@ -321,6 +325,23 @@ static INPUT_PORTS_START( puzzlove )
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" ) /* Verified */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( puzzlovek )
+	PORT_INCLUDE(puzzlove)
+
+	PORT_MODIFY("DSW")
+	/* Korean rev has demo sound */
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING( 0x0001, DEF_STR ( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR ( On ) )
+
+	/* Korean rev has slightly different difficulty settings */
+	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0300, DEF_STR( Easy ) )       /* Initial start time 35 secs */
+	PORT_DIPSETTING(      0x0200, DEF_STR( Very_Easy ) )  /* Initial start time 40 secs - Other in game effects?? */
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )       /* Initial start time 30 secs - Other in game effects?? */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )  /* Initial start time 30 secs - Other in game effects?? */
+INPUT_PORTS_END
+
 
 
 static const gfx_layout tlayout =
@@ -368,16 +389,15 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ??
 ADDRESS_MAP_END
 
-/* CLOCKS UNKNOWN! */
 
 static MACHINE_CONFIG_START( silvmil, silvmil_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) // 4.096MHz or 3.579545MHz - Need to verify
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
 
@@ -402,22 +422,36 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, OKIM6295_PIN7_HIGH) // Need to verify
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
+	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
+	MCFG_DEVICE_REMOVE("audiocpu")
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* Verified */
+	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
+
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
+
+	MCFG_DEVICE_REMOVE("oki")
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( puzzlovek, puzzlove )
+        MCFG_DEVICE_REMOVE("ymsnd")
+        MCFG_YM2151_ADD("ymsnd", XTAL_15MHz/4) /* Verified */
+        MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+        MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 
 ROM_START( silvmil )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
@@ -499,6 +533,34 @@ ROM_START( puzzlove )
 	ROM_LOAD16_BYTE( "8.u56", 0x100001, 0x80000, CRC(037dcd3d) SHA1(fcdf604710518982e0b4acc81a56fa703d0c9407) )
 ROM_END
 
+ROM_START( puzzlovek )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "3.u3", 0x00000, 0x40000, CRC(28f403f0) SHA1(5f9fc18f705fe81f0dceaf2d62b6caffb0b0462e) ) // sldh
+	ROM_LOAD16_BYTE( "4.u2", 0x00001, 0x40000, CRC(809371b9) SHA1(6b2dc899a4e2cf4fca777f0ec4a08e636099e0d2) ) // sldh
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80  */
+	ROM_LOAD( "1.uz02", 0x00000, 0x20000, CRC(3077e7f3) SHA1(e2bf634a2166e1851486a801e74a7ec0d4599c28) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
+	ROM_LOAD( "2.uz11", 0x00000, 0x40000, CRC(4c06ec68) SHA1(3cfca1c98e73c65a45b65d43e012c5529572c057) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "10.u41",  0x000000, 0x20000, CRC(3f952c54) SHA1(1f18579ce98305d20ec0f4e216f8170a62b9c68b) ) // sldh
+	ROM_CONTINUE ( 0x080000,0x20000 )
+	ROM_CONTINUE ( 0x040000,0x20000 )
+	ROM_CONTINUE ( 0x0c0000,0x20000 )
+	ROM_LOAD16_BYTE( "9.u42",   0x000001, 0x20000, CRC(4f71ee93) SHA1(db0d00fa0f6c9b7bc638dcb50f041fb32827c7c4) ) // sldh
+	ROM_CONTINUE ( 0x080001,0x20000 )
+	ROM_CONTINUE ( 0x040001,0x20000 )
+	ROM_CONTINUE ( 0x0c0001,0x20000 )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "5.u53", 0x000000, 0x80000, CRC(c5732995) SHA1(e7faecb19f4bdb103b782e38463d32b357ea63bc) ) // sldh
+	ROM_LOAD16_BYTE( "6.u54", 0x000001, 0x80000, CRC(a3b98fd1) SHA1(2b2b7c9df19882a0565e38504b73f56ea27d71ab) ) // sldh
+	ROM_LOAD16_BYTE( "7.u55", 0x100000, 0x80000, CRC(a4c73b48) SHA1(9f26af7b961c96cfd1c45f85f1d6dc4f364e3541) ) // sldh
+	ROM_LOAD16_BYTE( "8.u56", 0x100001, 0x80000, CRC(95b5f049) SHA1(1104dac1fbf6a894b7d8294b3f44a0edbf363157) ) // sldh
+ROM_END
+
 void silvmil_state::tumblepb_gfx1_rearrange()
 {
 	UINT8 *rom = memregion("gfx1")->base();
@@ -525,5 +587,6 @@ DRIVER_INIT_MEMBER(silvmil_state,silvmil)
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil,  0, silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", GAME_SUPPORTS_SAVE )
-GAME( 1994, puzzlove, 0, puzzlove,puzzlove,silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", GAME_SUPPORTS_SAVE )
+GAME( 1995, silvmil,	0,		  silvmil,   silvmil,   silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", GAME_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,	0,		  puzzlove,  puzzlove,  silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", GAME_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,	puzzlove, puzzlovek, puzzlovek, silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", GAME_SUPPORTS_SAVE )

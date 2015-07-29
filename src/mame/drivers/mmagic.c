@@ -69,12 +69,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_vram(*this, "vram"),
 		m_tiles(*this, "tiles"),
 		m_colors(*this, "colors"),
 		m_ball_x(0x00),
 		m_ball_y(0x00),
-		m_color(0)
+		m_color(0x00)
 	{}
 
 	DECLARE_READ8_MEMBER(vblank_r);
@@ -91,16 +92,14 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_vram;
 	required_region_ptr<UINT8> m_tiles;
 	required_region_ptr<UINT8> m_colors;
 
-	static const rgb_t m_palette[];
-
 	UINT8 m_ball_x;
 	UINT8 m_ball_y;
-
-	int m_color;
+	UINT8 m_color;
 };
 
 
@@ -157,10 +156,10 @@ static INPUT_PORTS_START( mmagic )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Debug?")	// debug? checked once at startup
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Debug?") // checked once at startup
 
 	PORT_START("paddle")
-	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
+	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 
@@ -216,15 +215,15 @@ UINT32 mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			{
 				UINT8 gfx = m_tiles[(code << 4) + tx];
 
-				bitmap.pix32(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black : m_palette[color];
-				bitmap.pix32(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black : m_palette[color];
-				bitmap.pix32(y * 12 + tx, x * 8 + 2) = BIT(gfx, 6) ? rgb_t::black : m_palette[color];
-				bitmap.pix32(y * 12 + tx, x * 8 + 3) = BIT(gfx, 7) ? rgb_t::black : m_palette[color];
+				bitmap.pix32(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black : m_palette->pen_color(color);
+				bitmap.pix32(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black : m_palette->pen_color(color);
+				bitmap.pix32(y * 12 + tx, x * 8 + 2) = BIT(gfx, 6) ? rgb_t::black : m_palette->pen_color(color);
+				bitmap.pix32(y * 12 + tx, x * 8 + 3) = BIT(gfx, 7) ? rgb_t::black : m_palette->pen_color(color);
 
-				bitmap.pix32(y * 12 + tx, x * 8 + 4) = BIT(gfx, 0) ? rgb_t::black : m_palette[color];
-				bitmap.pix32(y * 12 + tx, x * 8 + 5) = BIT(gfx, 1) ? rgb_t::black : m_palette[color];
-				bitmap.pix32(y * 12 + tx, x * 8 + 6) = BIT(gfx, 2) ? rgb_t::black : m_palette[color];
-				bitmap.pix32(y * 12 + tx, x * 8 + 7) = BIT(gfx, 3) ? rgb_t::black : m_palette[color];
+				bitmap.pix32(y * 12 + tx, x * 8 + 4) = BIT(gfx, 0) ? rgb_t::black : m_palette->pen_color(color);
+				bitmap.pix32(y * 12 + tx, x * 8 + 5) = BIT(gfx, 1) ? rgb_t::black : m_palette->pen_color(color);
+				bitmap.pix32(y * 12 + tx, x * 8 + 6) = BIT(gfx, 2) ? rgb_t::black : m_palette->pen_color(color);
+				bitmap.pix32(y * 12 + tx, x * 8 + 7) = BIT(gfx, 3) ? rgb_t::black : m_palette->pen_color(color);
 			}
 		}
 	}
@@ -239,23 +238,6 @@ UINT32 mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	return 0;
 }
-
-
-//**************************************************************************
-//  PALETTE
-//**************************************************************************
-
-const rgb_t mmagic_state::m_palette[] =
-{
-	rgb_t(0x00, 0x00, 0x00),
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t(0xff, 0xff, 0xff)
-};
 
 
 //**************************************************************************
@@ -296,6 +278,8 @@ static MACHINE_CONFIG_START( mmagic, mmagic_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_6_144MHz, 384, 0, 256, 264, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(mmagic_state, screen_update)
+
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	// sound hardware
 	// TODO: SN76477 + discrete sound

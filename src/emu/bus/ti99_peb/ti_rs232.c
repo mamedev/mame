@@ -230,13 +230,13 @@ bool ti_pio_attached_device::call_load()
 {
 	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
-	/* tell whether the image is readable */
+	// tell whether the image is readable
 	card->m_pio_readable = !has_been_created();
-	/* tell whether the image is writable */
+	// tell whether the image is writable
 	card->m_pio_writable = !is_readonly();
 
 	if (card->m_pio_write && card->m_pio_writable)
-		card->m_pio_handshakein = false;    /* receiver ready */
+		card->m_pio_handshakein = false;    // receiver ready
 	else
 		card->m_pio_handshakein = true;
 
@@ -1025,6 +1025,9 @@ void ti_rs232_pio_device::device_start()
 	// Prepare the receive buffers
 	m_recvbuf[0] = global_alloc_array(UINT8, 512);
 	m_recvbuf[1] = global_alloc_array(UINT8, 512);
+	m_pio_write = true; // required for call_load of pio_attached_device
+	m_pio_writable = false;
+	m_pio_handshakein = false;
 }
 
 void ti_rs232_pio_device::device_stop()
@@ -1038,14 +1041,12 @@ void ti_rs232_pio_device::device_reset()
 	m_pio_direction_in = false;
 	m_pio_handshakeout = false;
 	m_pio_spareout = false;
-	m_pio_writable = false;
 	m_flag0 = false;
 
 	set_bit(0, CTS, 0);
 	set_bit(1, CTS, 0);
 
 	m_led = false;
-	m_pio_write = true;
 	m_recv_mode[0] = RECV_MODE_NORMAL;
 	m_recv_mode[1] = RECV_MODE_NORMAL;
 

@@ -1,5 +1,5 @@
-#ifndef NLM_OPAMP_H_
-#define NLM_OPAMP_H_
+#ifndef NLM_OTHER_H_
+#define NLM_OTHER_H_
 
 #include "../nl_setup.h"
 
@@ -9,20 +9,18 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
-#define MB3614_DIP(_name)            			                               \
-		NET_REGISTER_DEV(MB3614_DIP, _name)
+#define MC14584B_GATE(_name)                      		                       \
+		NET_REGISTER_DEV(MC14584B_GATE, _name)
 
-#define LM324_DIP(_name)            			                               \
-		NET_REGISTER_DEV(LM324_DIP, _name)
+#define MC14584B_DIP(_name)            	        		                       \
+		NET_REGISTER_DEV(MC14584B_DIP, _name)
 
-#define LM358_DIP(_name)            			                               \
-		NET_REGISTER_DEV(LM358_DIP, _name)
 
 /* ----------------------------------------------------------------------------
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(OPAMP_lib)
+NETLIST_EXTERNAL(otheric_lib)
 
 #endif
 

@@ -95,4 +95,143 @@
 		</part>
 	</software>
 
+  <!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+       If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="kingsq6e">
+		<description>King's Quest VI (Windows 3.1 enhanced)</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kings_quest_6_enhanced" sha1="0d237ee8c2d15be3b47f3676eddce41a00bca094" />
+			</diskarea>
+		</part>
+	</software>
+
+   <!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+       If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="krondor">
+		<description>Betrayal at Krondor (1994 release, CDDA)</description>
+		<year>1994</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
+			</diskarea>
+		</part>
+	</software>
+  
+	<software name="krondora" cloneof="krondor">
+		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
+		<year>1998</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
+			</diskarea>
+		</part>
+	</software>
+
+  <!-- various Windows CDROMs
+       so far the listed discs should all be full english language retail discs, this can be expanded later -->
+      
+	<software name="win95">
+		<description>Windows 95 (en 4.00.950)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="win95_4.00.950_en" sha1="ef1b482b5f6e746b673def87724d9e7ff833ac43" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win95a">
+		<description>Windows 95 OSR1 (en 4.00.950.osr1)</description> <!-- aka Windows 95A -->
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="win95_4.00.950_osr1_en" sha1="bc43d85ea8d0ee65b6102ac7cd425c57398c09ce" />
+			</diskarea>
+		</part>
+	</software>
+  
+	<software name="win95b">
+		<description>Windows 95 OSR2 (en 4.00.1111.osr2)</description> <!-- aka Windows 95B -->
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="win95_4.00.1111_osr2_en" sha1="e15bd9a4e2c930bd4913996a2d9d11d1567635f5" />
+			</diskarea>
+		</part>
+  </software>
+  
+ 	<software name="win95c">
+		<description>Windows 95 OSR2.5 (en 4.03.1216.osr2.5)</description> <!-- aka Windows 95C -->
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="win95_4.03.1216_osr2_5_en" sha1="b000931531cedcbb3f9a00d13d315406cf7c2d52" />
+			</diskarea>
+		</part>
+  </software>
+  
+ 	<software name="win98">
+		<description>Windows 98 (en 4.10.1998) (Retail Full)</description> <!-- aka Windows 98 First Edition -->
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows 98 (en 4.10.1998 retail full)" sha1="1e725b0a7ea471e2b91500d09f242d05330b4f50" />
+			</diskarea>
+		</part>
+	</software>
+
+ 	<software name="win98se">
+		<description>Windows 98 Second Edition (en 4.10.2222) (Retail Full)</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows 98 se (en 4.10.2222 retail full)" sha1="3d9b3e69d03aef2ed5e54c3c73702d1e9b53255c" />
+			</diskarea>
+		</part>
+	</software>
+
+ 	<software name="winme">
+		<description>Windows ME (en 4.90.3000) (Retail Full)</description> <!-- aka Millennium Edition -->
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows me (en 4.90.3000 retail full)" sha1="3bb9b89f2b5918b7dbe393d250a8f1a530a175ef" />
+			</diskarea>
+		</part>
+	</software>
+
+ 	<software name="win2kps4">
+		<description>Windows 2000 Professional (with Service Pack 4) (en 5.00.2195.6717)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en_win2000_pro_sp4" sha1="9344cce041f092f0194944bdc690af7df7185cf6" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

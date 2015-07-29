@@ -55,9 +55,6 @@ TODO:
 #define INT_TRIGGER_COUNT_2 (0x18f)
 
 
-#define NUM_PENS    (8)
-
-
 class enigma2_state : public driver_device
 {
 public:
@@ -66,7 +63,10 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_screen(*this, "screen"){ }
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_colors(*this, "colors"),
+		m_stars(*this, "stars"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -85,6 +85,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+	optional_region_ptr<UINT8> m_colors;
+	optional_region_ptr<UINT8> m_stars;
+
 	DECLARE_READ8_MEMBER(dip_switch_r);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(enigma2_flip_screen_w);
@@ -103,7 +107,6 @@ public:
 	inline int vysnc_chain_counter_to_vpos( UINT16 counter );
 	void create_interrupt_timers(  );
 	void start_interrupt_timers(  );
-	void get_pens(pen_t *pens);
 };
 
 
@@ -202,26 +205,9 @@ void enigma2_state::machine_reset()
  *
  *************************************/
 
-void enigma2_state::get_pens(pen_t *pens)
-{
-	offs_t i;
-
-	for (i = 0; i < NUM_PENS; i++)
-	{
-		/* this color gun arrengement is supported by the flyer screenshot */
-		pens[i] = rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-	}
-}
-
-
 UINT32 enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pen_t pens[NUM_PENS];
-
 	const rectangle &visarea = screen.visible_area();
-	UINT8 *prom = memregion("proms")->base();
-	UINT8 *color_map_base = m_flip_screen ? &prom[0x0400] : &prom[0x0000];
-	UINT8 *star_map_base = (m_blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
 	UINT8 x = 0;
 	UINT16 bitmap_y = visarea.min_y;
@@ -229,8 +215,6 @@ UINT32 enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 
 	UINT8 video_data = 0;
 	UINT8 fore_color = 0;
 	UINT8 star_color = 0;
-
-	get_pens(pens);
 
 	while (1)
 	{
@@ -241,22 +225,29 @@ UINT32 enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 
 		if ((x & 0x07) == 0x00)
 		{
 			offs_t color_map_address = (y >> 3 << 5) | (x >> 3);
+
 			/* the schematics shows it like this, but it doesn't work as this would
 			   produce no stars, due to the contents of the PROM -- maybe there is
 			   a star disabled bit somewhere that's connected here instead of flip_screen() */
 			/* star_map_address = (y >> 4 << 6) | (engima2_flip_screen_get() << 5) | (x >> 3); */
 			offs_t star_map_address = (y >> 4 << 6) | 0x20 | (x >> 3);
+			if (m_blink_count & 0x08)
+				star_map_address |= 0x400;
 
 			offs_t videoram_address = (y << 5) | (x >> 3);
 
 			/* when the screen is flipped, all the video address bits are inverted,
 			   and the adder at 16A is activated */
-			if (m_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+			if (m_flip_screen)
+			{
+				color_map_address |= 0x400;
+				videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+			}
 
 			video_data = m_videoram[videoram_address];
 
-			fore_color = color_map_base[color_map_address] & 0x07;
-			star_color = star_map_base[star_map_address] & 0x07;
+			fore_color = m_colors[color_map_address] & 0x07;
+			star_color = m_stars[star_map_address] & 0x07;
 		}
 
 		/* plot the current pixel */
@@ -277,7 +268,7 @@ UINT32 enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 
 			/* stars only appear at certain positions */
 			color = ((x & y & 0x0f) == 0x0f) ? star_color : 0;
 
-		bitmap.pix32(bitmap_y, x) = pens[color];
+		bitmap.pix32(bitmap_y, x) = m_palette->pen_color(color);
 
 		/* next pixel */
 		x = x + 1;
@@ -612,6 +603,8 @@ static MACHINE_CONFIG_START( enigma2, enigma2_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2)
 
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -662,9 +655,11 @@ ROM_START( enigma2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "enigma2.s",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
 
-	ROM_REGION( 0x1000, "proms", 0 )    /* color map/star map */
+	ROM_REGION( 0x0800, "colors", 0 )
 	ROM_LOAD( "7.11f",        0x0000, 0x0800, CRC(409b5aad) SHA1(1b774a70f725637458ed68df9ed42476291b0e43) )
-	ROM_LOAD( "8.13f",        0x0800, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
+
+	ROM_REGION( 0x0800, "stars", 0 )
+	ROM_LOAD( "8.13f",        0x0000, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
 ROM_END
 
 

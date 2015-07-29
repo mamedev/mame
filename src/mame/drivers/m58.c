@@ -209,7 +209,8 @@ static MACHINE_CONFIG_START( yard, m58_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(m52_large_audio)
+	MCFG_DEVICE_ADD("irem_audio", IREM_M52_LARGE_AUDIO, 0)
+
 MACHINE_CONFIG_END
 
 
@@ -227,7 +228,7 @@ ROM_START( 10yard )
 	ROM_LOAD( "yf-a-3n-b",    0x2000, 0x2000, CRC(82fcd980) SHA1(7846705b29961cb95ee1571ee7e16baceea522d4) )
 	ROM_LOAD( "yf-a-3m-b",    0x4000, 0x2000, CRC(a8d5c311) SHA1(28edb5cfd943a2262d7e37ef9a7245f7017cbc51) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "yf-s.3b",      0x8000, 0x2000, CRC(0392a60c) SHA1(68030504eafc58db250099edd3c3323bdb9eff6b) )
 	ROM_LOAD( "yf-s.1b",      0xa000, 0x2000, CRC(6588f41a) SHA1(209305efc68171886427216b9a0b37333f40daa8) )
 	ROM_LOAD( "yf-s.3a",      0xc000, 0x2000, CRC(bd054e44) SHA1(f10c32c70d60680229fc0891d0e1308015fa69d6) )
@@ -261,7 +262,7 @@ ROM_START( 10yardj )
 	ROM_LOAD( "yf-a.3n",      0x2000, 0x2000, CRC(947fa760) SHA1(bd6c2ee6e6800b063b81dbdd9fc929120019439d) )
 	ROM_LOAD( "yf-a.3m",      0x4000, 0x2000, CRC(d4975633) SHA1(84a506ae680a9dd26ef6f33880400e965ccf8260) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "yf-s.3b",      0x8000, 0x2000, CRC(0392a60c) SHA1(68030504eafc58db250099edd3c3323bdb9eff6b) )
 	ROM_LOAD( "yf-s.1b",      0xa000, 0x2000, CRC(6588f41a) SHA1(209305efc68171886427216b9a0b37333f40daa8) )
 	ROM_LOAD( "yf-s.3a",      0xc000, 0x2000, CRC(bd054e44) SHA1(f10c32c70d60680229fc0891d0e1308015fa69d6) )
@@ -295,7 +296,7 @@ ROM_START( vs10yard )
 	ROM_LOAD( "vyf-a.3m",     0x2000, 0x2000, CRC(3b9330f8) SHA1(b35fe72cf724cfb887906060bbcf40b0c896ccf0) )
 	ROM_LOAD( "a.3m",         0x4000, 0x2000, CRC(cf783dad) SHA1(0b1b875ac65ba90c92ca06d0aa01c477b7427322) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "yf-s.3b",      0x8000, 0x2000, CRC(0392a60c) SHA1(68030504eafc58db250099edd3c3323bdb9eff6b) )
 	ROM_LOAD( "yf-s.1b",      0xa000, 0x2000, CRC(6588f41a) SHA1(209305efc68171886427216b9a0b37333f40daa8) )
 	ROM_LOAD( "yf-s.3a",      0xc000, 0x2000, CRC(bd054e44) SHA1(f10c32c70d60680229fc0891d0e1308015fa69d6) )
@@ -329,7 +330,7 @@ ROM_START( vs10yardj )
 	ROM_LOAD( "vyf-a.3m",     0x2000, 0x2000, CRC(3b9330f8) SHA1(b35fe72cf724cfb887906060bbcf40b0c896ccf0) )
 	ROM_LOAD( "vyf-a.3k",     0x4000, 0x2000, CRC(a0ec15bb) SHA1(a5ce9341e9d05e33c025ac62a27faf738c88326e) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "yf-s.3b",      0x8000, 0x2000, CRC(0392a60c) SHA1(68030504eafc58db250099edd3c3323bdb9eff6b) )
 	ROM_LOAD( "yf-s.1b",      0xa000, 0x2000, CRC(6588f41a) SHA1(209305efc68171886427216b9a0b37333f40daa8) )
 	ROM_LOAD( "yf-s.3a",      0xc000, 0x2000, CRC(bd054e44) SHA1(f10c32c70d60680229fc0891d0e1308015fa69d6) )
@@ -363,7 +364,7 @@ ROM_START( vs10yardu )
 	ROM_LOAD( "yf-a-3n-h-vs.3n",    0x2000, 0x2000, CRC(a14d7a14) SHA1(1b900ed276dd2d918f82613399416cf399362405) )
 	ROM_LOAD( "yf-a-3m-h-vs.3m",    0x4000, 0x2000, CRC(dc4bb0ce) SHA1(9d9c960744720ffeddc7c9f1db4981fb6a0006d7) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "yf-s-3b.3b",      0x8000, 0x2000, CRC(0392a60c) SHA1(68030504eafc58db250099edd3c3323bdb9eff6b) )
 	ROM_LOAD( "yf-s-1b.1b",      0xa000, 0x2000, CRC(6588f41a) SHA1(209305efc68171886427216b9a0b37333f40daa8) )
 	ROM_LOAD( "yf-s-3a.3a",      0xc000, 0x2000, CRC(bd054e44) SHA1(f10c32c70d60680229fc0891d0e1308015fa69d6) )
@@ -397,7 +398,7 @@ ROM_START( 10yard85 )
 	ROM_LOAD( "yf-a-3n-h.3n",       0x2000, 0x2000, CRC(8dc5f32f) SHA1(f550ed326711d1103711b99777f302f0d48e8eaf) )
 	ROM_LOAD( "yf-a-3m-h.3m",       0x4000, 0x2000, CRC(7d5d0c20) SHA1(38ada7a53881f7f812b02514d13fbf0fa013c0f1) )
 
-	ROM_REGION( 0x10000, "iremsound", 0 )
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "yf-s-3b.3b",      0x8000, 0x2000, CRC(0392a60c) SHA1(68030504eafc58db250099edd3c3323bdb9eff6b) )
 	ROM_LOAD( "yf-s-1b.1b",      0xa000, 0x2000, CRC(6588f41a) SHA1(209305efc68171886427216b9a0b37333f40daa8) )
 	ROM_LOAD( "yf-s-3a.3a",      0xc000, 0x2000, CRC(bd054e44) SHA1(f10c32c70d60680229fc0891d0e1308015fa69d6) )

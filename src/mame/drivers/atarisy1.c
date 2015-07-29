@@ -814,7 +814,7 @@ MACHINE_CONFIG_END
 #define MOTHERBOARD_ALPHA                                                                                              \
 	ROM_LOAD_BIOS(0, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
 	ROM_LOAD_BIOS(1, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
-	ROM_LOAD_BIOS(2, "136032.107.b2", 0x00000, 0x02000, CRC(315e4bea) SHA1(a00ea23fbdbf075f8f3f184275be83387e8ac82b) )
+	ROM_LOAD_BIOS(2, "136032.107.b2", 0x00000, 0x02000, CRC(315e4bea) SHA1(a00ea23fbdbf075f8f3f184275be83387e8ac82b) ) /* is this bad? it just seems to be missing upper nibbles and hence some of the planes? */
 
 #define MOTHERBOARD_PROMS                                                                                              \
 	ROM_LOAD_BIOS(0, "136032.101.e3",     0x00000, 0x00100, CRC(7e84972a) SHA1(84d422b53547271e3a07342704a05ef481db3f99) ) \
@@ -1752,6 +1752,86 @@ ROM_START( roadblstg )
 	MOTHERBOARD_PROMS
 ROM_END
 
+/*
+Road Blasters (German upright Rev xx)(Atari 1987)
+Dumped from the original Atari
+(System 1 motherboard Rev. C)
+(System 1 daughterboard). "Road Blasters Cartridge 3 PCB Assy: A043972-01 Rev.A"
+*/
+
+// different IC positions and different GFX rom configuration.
+ROM_START( roadblstgu )
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	// expects bios roms 114/115, does not work properly with others (corrupt insert coin text)
+	ROM_LOAD16_BYTE( "136032-114.j7", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) )
+	ROM_LOAD16_BYTE( "136032-115.j8", 0x00001, 0x04000, CRC(7275b4dc) SHA1(0896ab37ea832a1335046353612c1b4c86d8d040) )
+
+	ROM_LOAD16_BYTE( "136048-1257.c11", 0x010000, 0x008000, CRC(604a5cc0) SHA1(a057a2e47ac7b7c727e9c1bfce28ba955ce75442) )
+	ROM_LOAD16_BYTE( "136048-1258.a11", 0x010001, 0x008000, CRC(3d10929d) SHA1(aa4d568e5d5b62fb8ea11094bad78bb8f713404e) )
+	ROM_LOAD16_BYTE( "136048-1259.c13", 0x020000, 0x008000, CRC(b9c807ac) SHA1(ca955790c98037045aa49425392581f21d33caa9) )
+	ROM_LOAD16_BYTE( "136048-1260.a13", 0x020001, 0x008000, CRC(eaeb1196) SHA1(82bf14244b342c97adde893f19a050baab30ab1e) )
+
+	ROM_LOAD16_BYTE( "136048-1163.c12",  0x050000, 0x008000, CRC(054273b2) SHA1(4c820c00d3b67825c361edc9615c89c2a9a1c6d3) )//
+	ROM_LOAD16_BYTE( "136048-1164.a12",  0x050001, 0x008000, CRC(49181bec) SHA1(79e042e4f079a9806ef12c5c8dfdc2e6e4f90011) )//
+	ROM_LOAD16_BYTE( "136048-1165.c14",  0x060000, 0x008000, CRC(f63dc29a) SHA1(e54637b9d0b271aa9b58e89a442ac03ec812e1eb) )//
+	ROM_LOAD16_BYTE( "136048-1166.a14",  0x060001, 0x008000, CRC(b1fc5955) SHA1(b860213a9b5ae7547c258812045e71795129598f) )//
+	ROM_LOAD16_BYTE( "136048-1167.c16",  0x070000, 0x008000, CRC(c6d30d6f) SHA1(acb552976b2dcfa585097ea246ca88034549c8ab) )//
+	ROM_LOAD16_BYTE( "136048-1168.a16",  0x070001, 0x008000, CRC(16951020) SHA1(5e5a6ad4ae87723060232c7ecb837f5fc2a9be68) )//
+	ROM_LOAD16_BYTE( "136048-2147.c17",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )//
+	ROM_LOAD16_BYTE( "136048-2148.a17",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )//
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_LOAD( "136048-1149.e14",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
+	ROM_LOAD( "136048-1169.e15",   0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )//
+	ROM_LOAD( "136048-1170.e17",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )//
+
+	ROM_REGION( 0x2000, "alpha", 0 )
+	ROM_LOAD( "136032.107.b2", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) )
+
+	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
+	ROM_LOAD( "136048-1101.b4",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 *///
+	ROM_LOAD( "136048-1102.b9",  0x010000, 0x008000, CRC(17c7e780) SHA1(675a2fe5ac55c97d54153eacabf863a525e4b71f) )  /* bank 1, plane 1 *///
+	ROM_LOAD( "136048-1103.f4",  0x020000, 0x008000, CRC(39688e01) SHA1(1b273e26b48a2f69b0895c29c9b3e762c686661d) )  /* bank 1, plane 2 *///
+	ROM_LOAD( "136048-1104.f9",  0x030000, 0x008000, CRC(c8f9bd8e) SHA1(452194efafd5f9562434dafcb14b72f400fc4a49) )  /* bank 1, plane 3 *///
+	ROM_LOAD( "136048-1105.h4",  0x040000, 0x008000, CRC(c69e439e) SHA1(c933637820c04bdbc56990423adfb9067e09fad7) )  /* bank 1, plane 4 *///
+	ROM_LOAD( "136048-1106.h9",  0x050000, 0x008000, CRC(4ee55796) SHA1(045635cd4f80a5f2c378cb4c55996e09c21b5859) )  /* bank 1, plane 5 *///
+
+	ROM_LOAD( "136048-1119.b3",  0x080000, 0x008000, CRC(2533be39) SHA1(4dc5c85fe5388ed62806742c8bb27957b9ffb321) )  /* bank 2/3, plane 0 */
+	ROM_LOAD( "136048-1120.b8",  0x090000, 0x008000, CRC(3de4f4db) SHA1(a3c19ef52f31b924b7eaa7bd864fe942d2e581f9) )  /* bank 2/3, plane 1 */
+	ROM_LOAD( "136048-1121.f3",  0x0a0000, 0x008000, CRC(4a1b6b9f) SHA1(c0c6de17573b314954c02fdd57cf57c9cd59c783) )  /* bank 2/3, plane 2 */
+	ROM_LOAD( "136048-1122.f8",  0x0b0000, 0x008000, CRC(680bdb7d) SHA1(6a66560a8ef983055b250d59022e3d9a2ea25861) )  /* bank 2/3, plane 3 */
+
+	ROM_LOAD( "136048-1123.b2",  0x100000, 0x008000, CRC(a405d8bf) SHA1(c5bb7c54caf04e8f6a6534de7fd1127d9777dded) )  /* bank 2/3, plane 0 */
+	ROM_LOAD( "136048-1124.b7",  0x110000, 0x008000, CRC(b9070c2e) SHA1(4b912cc35d0f4d445a6e619fc52e8c131bbb7899) )  /* bank 2/3, plane 1 */
+	ROM_LOAD( "136048-1125.f2",  0x120000, 0x008000, CRC(5dfac572) SHA1(46eee972944766b7ba3a88937da3b3ac785c5741) )  /* bank 2/3, plane 2 */
+	ROM_LOAD( "136048-1126.f7",  0x130000, 0x008000, CRC(a0416c6d) SHA1(bdaa2d828035206f0662c0c920b654cf4d314ca6) )  /* bank 2/3, plane 3 */
+
+	ROM_LOAD( "136048-1127.b1",  0x180000, 0x008000, CRC(0138b391) SHA1(3d22c93c5ffb1a998f85a27eb9f58061f2ffe19d) )  /* bank 4/5, plane 0 */
+	ROM_LOAD( "136048-1128.b6",  0x190000, 0x008000, CRC(5136fb4b) SHA1(0b2a8d96e573907e11d4fe7288069e9735c1d072) )  /* bank 4/5, plane 1 */
+	ROM_LOAD( "136048-1129.f1",  0x1a0000, 0x008000, CRC(7d75bb12) SHA1(bbaf4c991bb21b32dc1c6fdc23673e27c33f4edf) )  /* bank 4/5, plane 2 */
+	ROM_LOAD( "136048-1130.f6",  0x1b0000, 0x008000, CRC(81bb54d9) SHA1(134a6280183595b5b5989d8cc593b8fbd6a74577) )  /* bank 4/5, plane 3 */
+
+	ROM_LOAD( "136048-1131.d4",  0x200000, 0x008000, CRC(72233889) SHA1(e5596c9f450a00947bd0ab4b7b7b2623d4ce8d89) )  /* bank 4/5, plane 0 */
+	ROM_LOAD( "136048-1132.d9",  0x210000, 0x008000, CRC(6a82b8a7) SHA1(8b9f65617601cb39d37110074e99ab27fd5fa274) )  /* bank 4/5, plane 1 */
+	ROM_LOAD( "136048-1133.d2",  0x220000, 0x008000, CRC(845dd347) SHA1(47ab870a808898c819d48454099b44ccf507c341) )  /* bank 4/5, plane 2 */
+	ROM_LOAD( "136048-1134.d7",  0x230000, 0x008000, CRC(54e4c9e6) SHA1(cfd989b6237c95bac1717025a895eb4b1df28365) )  /* bank 4/5, plane 3 */
+
+	ROM_LOAD( "136048-1115.d3",  0x300000, 0x008000, CRC(a47bc79d) SHA1(367f21c355c0af55629d2c5746cd5cb06272abc0) )  /* bank 7/6, plane 0 *///
+	ROM_CONTINUE(                0x280000, 0x008000 )
+	ROM_LOAD( "136048-1116.d8",  0x310000, 0x008000, CRC(b8a5c215) SHA1(2594f2a865fb73c8a7829e50ff19a6494a35c088) )  /* bank 7/6, plane 0 *///
+	ROM_CONTINUE(                0x290000, 0x008000 )
+	ROM_LOAD( "136048-1117.d1",  0x320000, 0x008000, CRC(2d1c1f64) SHA1(66141b9a7ae8d6dd3f1315d60cf0e99cd802d2e5) )  /* bank 7/6, plane 0 *///
+	ROM_CONTINUE(                0x2a0000, 0x008000 )
+	ROM_LOAD( "136048-1118.d6",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 *///
+	ROM_CONTINUE(                0x2b0000, 0x008000 )
+
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
+	ROM_LOAD( "136048-1174.a7", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )//
+	ROM_LOAD( "136048-1173.a5", 0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )//
+
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
+ROM_END
 
 ROM_START( roadblst3 )
 	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
@@ -2160,10 +2240,19 @@ ROM_START( roadblstc )
 	MOTHERBOARD_PROMS
 ROM_END
 
+/*
+Road Blasters (German Cockpit Rev xx)(Atari 1987)
+Dumped from an original Atari (Dedicated System 1) cocktail board. "Road Blasters Cart. 5 PCB Assy: A044203-01 Rev.A"
+
+Note: The text on the board says "cocktail" but I suppose this is the cockpit version.
+      136048-1150.d7 is a sound rom.
+*/
 
 ROM_START( roadblstcg )
 	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
-	MOTHERBOARD_BIOS
+	ROM_LOAD16_BYTE( "136032-117-l9",  0x000001, 0x004000, CRC(9af9fe29) SHA1(1d5077662e4111ece9f8a5124394dad8b1abdc13) ) // alt bios roms? (to put in bios structure, or are they specific to this set?)
+	ROM_LOAD16_BYTE( "136032-116.m9",  0x000000, 0x004000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) //
+
 	ROM_LOAD16_BYTE( "136048-1235.7p",  0x010000, 0x008000, CRC(58b2998f) SHA1(7e9f4ca2b15cf60c61e0615f214f9fcc518cb194) )
 	ROM_LOAD16_BYTE( "136048-1236.8p",  0x010001, 0x008000, CRC(02e23a40) SHA1(6525351669e95dab869c7adc7d992d12d9313aee) )
 	ROM_LOAD16_BYTE( "136048-1237.7r",  0x020000, 0x008000, CRC(5e0a7c5d) SHA1(fb3688fbadc05f96980c67f5446ccb250d20b1a3) )
@@ -2177,13 +2266,13 @@ ROM_START( roadblstcg )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
-	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
-	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
-	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
-	ROM_REGION( 0x2000, "alpha", 0 )
-	MOTHERBOARD_ALPHA
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_LOAD( "136048-1149.c8",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) ) //
+	ROM_LOAD( "136048-1150.d7",   0x8000, 0x8000, CRC(e89e7fc8) SHA1(d944bc27de2f2f675680c62d999cacf84a08fd4b) )
+
+	ROM_REGION( 0x4000, "alpha", 0 )
+	ROM_LOAD( "136032-120.p1",   0x00000, 0x04000, CRC(90a1950d) SHA1(fba32c255850312175d1e3c03d677ffb57e09e07) ) //
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -2221,6 +2310,13 @@ ROM_START( roadblstcg )
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
 	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
+	// these 2 proms were present on this board, an earlier revision to the other games, however they don't give correct
+	// gfx, so we load the regular ones over, might need different GFX rom loading? investigate further.
+	// (the failure to use these roms properly might be the reason we have the IMPERFECT_GRAPHICS flag on this
+	// set in the first place)
+	ROM_LOAD( "135048-1172.d1", 0x000000, 0x000200, CRC(b79d1903) SHA1(8319fab8b39f708457eb1efe47789b26adc61249) )
+	ROM_LOAD( "135048-1171.d2",  0x000200, 0x000200, CRC(29248a95) SHA1(c9467d495676d323121c92c6757e73b2ed3fb3d7) )
+	
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
@@ -2295,6 +2391,9 @@ ROM_START( roadblstc1 )
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
 	MOTHERBOARD_PROMS
 ROM_END
+
+
+
 
 
 
@@ -2396,3 +2495,4 @@ GAME( 1987, roadblst1,  roadblst, atarisy1, roadblst, atarisy1_state, roadb109, 
 GAME( 1987, roadblstc,  roadblst, atarisy1, roadblst, atarisy1_state, roadb110, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
 GAME( 1987, roadblstcg, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1987, roadblstc1, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstgu, roadblst, atarisy1, roadblst, atarisy1_state, roadb109, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )

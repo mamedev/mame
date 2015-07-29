@@ -141,12 +141,7 @@ UINT32 kangaroo_state::screen_update_kangaroo(screen_device &screen, bitmap_rgb3
 	UINT8 enab = (m_video_control[9] & 0x04);
 	UINT8 pria = (~m_video_control[9] & 0x02);
 	UINT8 prib = (~m_video_control[9] & 0x01);
-	rgb_t pens[8];
 	int x, y;
-
-	/* build up the pens arrays */
-	for (x = 0; x < 8; x++)
-		pens[x] = rgb_t(pal1bit(x >> 2), pal1bit(x >> 1), pal1bit(x >> 0));
 
 	/* iterate over pixels */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -171,7 +166,7 @@ UINT32 kangaroo_state::screen_update_kangaroo(screen_device &screen, bitmap_rgb3
 				finalpens |= pixb;
 
 			/* store the first of two pixels, which is always full brightness */
-			dest[x + 0] = pens[finalpens & 7];
+			dest[x + 0] = m_palette->pen_color(finalpens & 7);
 
 			/* KOS1 alternates at 5MHz, offset from the pixel clock by 1/2 clock */
 			/* when 0, it enables the color mask for pixels with Z = 0 */
@@ -188,7 +183,7 @@ UINT32 kangaroo_state::screen_update_kangaroo(screen_device &screen, bitmap_rgb3
 			}
 
 			/* store the second of two pixels, which is affected by KOS1 and the A/B masks */
-			dest[x + 1] = pens[finalpens & 7];
+			dest[x + 1] = m_palette->pen_color(finalpens & 7);
 		}
 	}
 

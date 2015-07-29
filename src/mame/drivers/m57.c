@@ -249,7 +249,9 @@ static MACHINE_CONFIG_START( m57, m57_state )
 	MCFG_PALETTE_INIT_OWNER(m57_state, m57)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
+
 MACHINE_CONFIG_END
 
 
@@ -267,7 +269,7 @@ ROM_START( troangel )
 	ROM_LOAD( "ta-a-3n", 0x4000, 0x2000, CRC(de3dea44) SHA1(1290755ffc04dc3b3667e063118669a0eab6fb79) )
 	ROM_LOAD( "ta-a-3q", 0x6000, 0x2000, CRC(fff0fc2a) SHA1(82f3f5a8817e956192323eb555daa85b7766676d) )
 
-	ROM_REGION(  0x8000 , "iremsound", 0 )  /* sound CPU */
+	ROM_REGION(  0x8000 , "irem_audio:iremsound", 0 )  /* sound CPU */
 	ROM_LOAD( "ta-s-1a", 0x6000, 0x2000, CRC(15a83210) SHA1(8ada510db689ffa372b2f4dc4bd1b1c69a0c5307) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -297,7 +299,7 @@ ROM_START( newtangl ) /* Offical "upgrade" or hack? */
 	ROM_LOAD( "3n", 0x4000, 0x2000, CRC(17b5a775) SHA1(d85c3371080bea82f19ac96fa0f1b332e1c86e27) )
 	ROM_LOAD( "3q", 0x6000, 0x2000, CRC(2e5fa773) SHA1(9a34fa43bde021fc7b00d8c3762c248e7b96dbf1) )
 
-	ROM_REGION(  0x8000 , "iremsound", 0 )  /* sound CPU */
+	ROM_REGION(  0x8000 , "irem_audio:iremsound", 0 )  /* sound CPU */
 	ROM_LOAD( "ta-s-1a-", 0x6000, 0x2000, CRC(ea8a05cb) SHA1(5683e4dca93066ee788287ab73a766fa303ebe84) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )

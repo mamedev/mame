@@ -10,6 +10,7 @@ extern const device_type MSX_CART_ASCII8;
 extern const device_type MSX_CART_ASCII16;
 extern const device_type MSX_CART_ASCII8_SRAM;
 extern const device_type MSX_CART_ASCII16_SRAM;
+extern const device_type MSX_CART_MSXWRITE;
 
 
 class msx_cart_ascii8 : public device_t
@@ -113,5 +114,28 @@ private:
 	void setup_bank(UINT8 bank);
 };
 
+
+class msx_cart_msxwrite : public device_t
+						, public msx_cart_interface
+{
+public:
+	msx_cart_msxwrite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	virtual void initialize_cartridge();
+
+	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_WRITE8_MEMBER(write_cart);
+
+	void restore_banks();
+
+private:
+	UINT8 m_bank_mask;
+	UINT8 m_selected_bank[2];
+	UINT8 *m_bank_base[2];
+};
 
 #endif

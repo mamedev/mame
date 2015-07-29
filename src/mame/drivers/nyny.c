@@ -84,8 +84,6 @@
 #define AUDIO_CPU_2_CLOCK           AUDIO_2_MASTER_CLOCK
 
 
-#define NUM_PENS       8
-
 class nyny_state : public driver_device
 {
 public:
@@ -100,6 +98,7 @@ public:
 		m_audiocpu2(*this, "audio2"),
 		m_ic48_1(*this, "ic48_1"),
 		m_mc6845(*this, "crtc"),
+		m_palette(*this, "palette"),
 		m_pia1(*this, "pia1"),
 		m_pia2(*this, "pia2") { }
 
@@ -121,10 +120,10 @@ public:
 	required_device<cpu_device> m_audiocpu2;
 	required_device<ttl74123_device> m_ic48_1;
 	required_device<mc6845_device> m_mc6845;
+	required_device<palette_device> m_palette;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 
-	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(audio_1_command_w);
 	DECLARE_WRITE8_MEMBER(audio_1_answer_w);
 	DECLARE_WRITE8_MEMBER(audio_2_command_w);
@@ -143,7 +142,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ic48_1_74123_output_changed);
 	inline void shift_star_generator(  );
 
-	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_END_UPDATE(crtc_end_update);
 };
@@ -248,16 +246,6 @@ WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
 }
 
 
-MC6845_BEGIN_UPDATE( nyny_state::crtc_begin_update )
-{
-	/* create the pens */
-	for (offs_t i = 0; i < NUM_PENS; i++)
-	{
-		m_pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-	}
-}
-
-
 MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 {
 	UINT8 x = 0;
@@ -307,7 +295,7 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 			else
 				color = bit2 ? color2 : 0;
 
-			bitmap.pix32(y, x) = m_pens[color];
+			bitmap.pix32(y, x) = m_palette->pen_color(color);
 
 			x += 1;
 		}
@@ -333,7 +321,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* check if the star status */
-			if (m_star_enable && (bitmap.pix32(y, x) == m_pens[0]) &&
+			if (m_star_enable && (bitmap.pix32(y, x) == m_palette->pen_color(0)) &&
 				((m_star_shift_reg & 0x80ff) == 0x00ff) &&
 				(((y & 0x01) ^ m_flipscreen) ^ (((x & 0x08) >> 3) ^ m_flipscreen)))
 			{
@@ -341,7 +329,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 								((m_star_shift_reg & 0x0400) >>  9) |    /* G */
 								((m_star_shift_reg & 0x1000) >> 10);     /* B */
 
-				bitmap.pix32(y, x) = m_pens[color];
+				bitmap.pix32(y, x) = m_palette->pen_color(color);
 			}
 
 			if (delay_counter == 0)
@@ -609,10 +597,11 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(nyny_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(nyny_state, crtc_update_row)
 	MCFG_MC6845_END_UPDATE_CB(nyny_state, crtc_end_update)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(nyny_state, display_enable_changed))

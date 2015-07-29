@@ -477,7 +477,7 @@ WRITE8_MEMBER( namcos1_state::key_type3_w )
 
 WRITE8_MEMBER(namcos1_state::sound_bankswitch_w)
 {
-	membank("soundbank")->set_entry((data & 0x70) >> 4);
+	m_soundbank->set_entry((data & 0x70) >> 4);
 }
 
 
@@ -510,8 +510,8 @@ WRITE_LINE_MEMBER(namcos1_state::subres_w)
 
 void namcos1_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
-	membank("mcubank")->configure_entries(0, 24, memregion("voice")->base(), 0x8000);
+	m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_mcubank->configure_entries(0, 24, memregion("voice")->base(), 0x8000);
 
 	save_item(NAME(m_dac0_value));
 	save_item(NAME(m_dac1_value));
@@ -568,7 +568,7 @@ WRITE8_MEMBER(namcos1_state::mcu_bankswitch_w)
 	/* bit 0-1 : address line A15-A16 */
 	bank += (data & 3);
 
-	membank("mcubank")->set_entry(bank);
+	m_mcubank->set_entry(bank);
 }
 
 

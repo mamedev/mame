@@ -8,6 +8,7 @@ const device_type MSX_CART_ASCII8 = &device_creator<msx_cart_ascii8>;
 const device_type MSX_CART_ASCII16 = &device_creator<msx_cart_ascii16>;
 const device_type MSX_CART_ASCII8_SRAM = &device_creator<msx_cart_ascii8_sram>;
 const device_type MSX_CART_ASCII16_SRAM = &device_creator<msx_cart_ascii16_sram>;
+const device_type MSX_CART_MSXWRITE = &device_creator<msx_cart_msxwrite>;
 
 
 msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -441,3 +442,95 @@ WRITE8_MEMBER(msx_cart_ascii16_sram::write_cart)
 		}
 	}
 }
+
+
+
+msx_cart_msxwrite::msx_cart_msxwrite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MSX_CART_MSXWRITE, "MSX Cartridge - MSXWRITE", tag, owner, clock, "msx_cart_msxwrite", __FILE__)
+	, msx_cart_interface(mconfig, *this)
+	, m_bank_mask(0)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_selected_bank[i] = 0;
+		m_bank_base[i] = NULL;
+	}
+}
+
+
+void msx_cart_msxwrite::device_start()
+{
+	save_item(NAME(m_selected_bank));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_msxwrite::restore_banks), this));
+}
+
+
+void msx_cart_msxwrite::restore_banks()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_bank_base[i] = get_rom_base() + (m_selected_bank[i] & m_bank_mask) * 0x4000;
+	}
+}
+
+
+void msx_cart_msxwrite::device_reset()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_selected_bank[i] = 0;
+	}
+}
+
+
+void msx_cart_msxwrite::initialize_cartridge()
+{
+	UINT32 size = get_rom_size();
+
+	if ( size > 256 * 0x4000 )
+	{
+		fatalerror("msxwrite: ROM is too big\n");
+	}
+
+	UINT16 banks = size / 0x4000;
+
+	if (size != banks * 0x4000 || (~(banks - 1) % banks))
+	{
+		fatalerror("msxwrite: Invalid ROM size\n");
+	}
+
+	m_bank_mask = banks - 1;
+
+	restore_banks();
+}
+
+
+READ8_MEMBER(msx_cart_msxwrite::read_cart)
+{
+	if ( offset >= 0x4000 && offset < 0xC000 )
+	{
+		return m_bank_base[offset >> 15][offset & 0x3fff];
+	}
+	return 0xff;
+}
+
+
+WRITE8_MEMBER(msx_cart_msxwrite::write_cart)
+{
+	// The rom writes to 6fff and 7fff for banking, unknown whether
+	// other locations also trigger banking.
+	switch (offset)
+	{
+		case 0x6fff:
+			m_selected_bank[0] = data;
+			m_bank_base[0] = get_rom_base() + (m_selected_bank[0] & m_bank_mask) * 0x4000;
+			break;
+
+		case 0x7fff:
+			m_selected_bank[1] = data;
+			m_bank_base[1] = get_rom_base() + (m_selected_bank[1] & m_bank_mask) * 0x4000;
+			break;
+	}
+}
+

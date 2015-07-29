@@ -14,7 +14,8 @@ public:
 	kangaroo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_control(*this, "video_control"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_control;
@@ -37,4 +38,5 @@ public:
 	void videoram_write( UINT16 offset, UINT8 data, UINT8 mask );
 	void blitter_execute(  );
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };

@@ -1935,7 +1935,42 @@ ROM_START( dariusgx )
 	ROM_LOAD16_BYTE("d87-02.bin", 0x400000, 0x200000, CRC(9250abae) SHA1(07cae8edbc3cca0a95022d9b40a5c18a55350b67) )    // CD CE CF D0
 ROM_END
 
+
 ROM_START( bublbob2 )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("d90-21.ic20", 0x000000, 0x40000, CRC(2a2b771a) SHA1(7f9bd768cf34069ca139261ebd8304325598fec6) )
+	ROM_LOAD32_BYTE("d90-20.ic19", 0x000001, 0x40000, CRC(f01f63b6) SHA1(cbdc8c6248a2c0c1bc77fdc28738f67ce9a6aec3) )
+	ROM_LOAD32_BYTE("d90-19.ic18", 0x000002, 0x40000, CRC(86eef19a) SHA1(9a389fefa280662843cafb68b5ae411e9348d34d) )
+	ROM_LOAD32_BYTE("d90-18.ic17", 0x000003, 0x40000, CRC(f5b8cdce) SHA1(cf6ce6638eebd7d2e1defdd48110cc3002109c5c) )
+
+	ROM_REGION(0x400000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("d90-03", 0x000000, 0x100000, CRC(6fa894a1) SHA1(7c33e6d41e8928029b92d66557a3712b51c49c67) )
+	ROM_LOAD16_BYTE("d90-02", 0x000001, 0x100000, CRC(5ab04ca2) SHA1(6d87e7ca3167ff81a041cfedbbed84d51da997de) )
+	ROM_LOAD       ("d90-01", 0x300000, 0x100000, CRC(8aedb9e5) SHA1(fb49330f7985a829c9544ecfd0bc672494f29cf6) )
+	ROM_FILL       (          0x200000, 0x100000, 0 )
+
+	ROM_REGION(0x400000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("d90-08", 0x000000, 0x100000, CRC(25a4fb2c) SHA1(c8bf6fe2291c05386b32cd26bfcb379da756d7b5) )
+	ROM_LOAD16_BYTE("d90-07", 0x000001, 0x100000, CRC(b436b42d) SHA1(559827120273733147b260e0723054d926dbea5e) )
+	ROM_LOAD       ("d90-06", 0x300000, 0x100000, CRC(166a72b8) SHA1(7f70b8c960794322e1dc88e6600a2d13d948d873) )
+	ROM_FILL       (          0x200000, 0x100000, 0 )
+
+	ROM_REGION(0x180000, "audiocpu", 0) /* sound CPU */
+	ROM_LOAD16_BYTE("d90-13.ic32", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
+	ROM_LOAD16_BYTE("d90-14.ic33", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("d90-04", 0x000000, 0x200000, CRC(feee5fda) SHA1(b89354013ec4d34bcd51ecded412effa66dd2f2f) )    // C8 C9 CA CB
+	ROM_LOAD16_BYTE("d90-05", 0x400000, 0x200000, CRC(c192331f) SHA1(ebab05b3681c70b373bc06c1826be1cc397d3af7) )    // CC CD -std-
+
+	ROM_REGION( 0x1200, "plds", 0 )
+	ROM_LOAD("d77-14_palce16v8q-15.ic21.bin", 0x000, 0x117, CRC(2c798a1c) SHA1(e8ac31c3cd53eb61fedfd710c31356e8fa968cbc) )
+	ROM_LOAD("d77-12_palce16v8q-15.ic48.bin", 0x000, 0x117, CRC(b1cc6195) SHA1(629ef8416a2cb51fcbc48e5c306dd04c96902726) )
+	ROM_LOAD("d77-11_palce16v8q-15.ic37.bin", 0x000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
+ROM_END
+
+
+ROM_START( bublbob2o )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("d90-12", 0x000000, 0x40000, CRC(9e523996) SHA1(c49a426f9865f96e8021c8ed9a6ac094c5e586b1) )
 	ROM_LOAD32_BYTE("d90-11", 0x000001, 0x40000, CRC(edfdbb7f) SHA1(698ad631d5b13661645f2c5ccd3e4fbf0248053c) )
@@ -1955,8 +1990,8 @@ ROM_START( bublbob2 )
 	ROM_FILL       (          0x200000, 0x100000, 0 )
 
 	ROM_REGION(0x180000, "audiocpu", 0) /* sound CPU */
-	ROM_LOAD16_BYTE("d90-13", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
-	ROM_LOAD16_BYTE("d90-14", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
+	ROM_LOAD16_BYTE("d90-13.ic32", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
+	ROM_LOAD16_BYTE("d90-14.ic33", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
 
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("d90-04", 0x000000, 0x200000, CRC(feee5fda) SHA1(b89354013ec4d34bcd51ecded412effa66dd2f2f) )    // C8 C9 CA CB
@@ -2030,8 +2065,8 @@ ROM_START( bubsymphe )
 	ROM_FILL       (          0x200000, 0x100000, 0 )
 
 	ROM_REGION(0x180000, "audiocpu", 0) /* sound CPU */
-	ROM_LOAD16_BYTE("d90-13", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
-	ROM_LOAD16_BYTE("d90-14", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
+	ROM_LOAD16_BYTE("d90-13.ic32", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
+	ROM_LOAD16_BYTE("d90-14.ic33", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
 
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("d90-04", 0x000000, 0x200000, CRC(feee5fda) SHA1(b89354013ec4d34bcd51ecded412effa66dd2f2f) )    // C8 C9 CA CB
@@ -2058,8 +2093,8 @@ ROM_START( bubsymphj )
 	ROM_FILL       (          0x200000, 0x100000, 0 )
 
 	ROM_REGION(0x180000, "audiocpu", 0) /* sound CPU */
-	ROM_LOAD16_BYTE("d90-13", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
-	ROM_LOAD16_BYTE("d90-14", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
+	ROM_LOAD16_BYTE("d90-13.ic32", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
+	ROM_LOAD16_BYTE("d90-14.ic33", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
 
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("d90-04", 0x000000, 0x200000, CRC(feee5fda) SHA1(b89354013ec4d34bcd51ecded412effa66dd2f2f) )    // C8 C9 CA CB
@@ -2147,8 +2182,8 @@ ROM_START( bubsymphu )
 	ROM_FILL       (          0x200000, 0x100000, 0 )
 
 	ROM_REGION(0x180000, "audiocpu", 0) /* sound CPU */
-	ROM_LOAD16_BYTE("d90-13", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
-	ROM_LOAD16_BYTE("d90-14", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
+	ROM_LOAD16_BYTE("d90-13.ic32", 0x100000, 0x40000, CRC(6762bd90) SHA1(771db0382bc8dab2caf13d0fc20648366c685829) )
+	ROM_LOAD16_BYTE("d90-14.ic33", 0x100001, 0x40000, CRC(8e33357e) SHA1(68b81693c22e6357e37244f2a416818a81338138) )
 
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("d90-04", 0x000000, 0x200000, CRC(feee5fda) SHA1(b89354013ec4d34bcd51ecded412effa66dd2f2f) )    // C8 C9 CA CB
@@ -4123,7 +4158,8 @@ GAME( 1994, dariusg,  0,        f3,      f3, taito_f3_state, dariusg,  ROT0,   "
 GAME( 1994, dariusgj, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)", 0 )
 GAME( 1994, dariusgu, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito America Corporation", "Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)", 0 )
 GAME( 1994, dariusgx, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
-GAME( 1994, bublbob2, 0,        f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
+GAME( 1994, bublbob2, 0,        f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.6O 1994/12/16)", 0 )
+GAME( 1994, bublbob2o,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
 GAME( 1994, bublbob2p,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)", 0 )
 GAME( 1994, bubsymphe,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
 GAME( 1994, bubsymphu,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )

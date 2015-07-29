@@ -50,7 +50,7 @@
  *128     uPD650C  1981, Roland TR-606
   133     uPD650C  1982, Roland TB-303 -> tb303.c
 
-  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
+  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 ***************************************************************************/
 
@@ -229,7 +229,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy
   - World: UFO Master-Blaster Station
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -341,7 +341,7 @@ MACHINE_CONFIG_END
   Then choose a formation(A,B,C) and either pass the ball, and/or start
   running. For more information, refer to the official manual.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -481,7 +481,7 @@ MACHINE_CONFIG_END
   player 1 presses one of the directional keys. In 2-player mode, player 2
   controls the goalkeeper, defensive players are still controlled by the CPU.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -603,7 +603,7 @@ MACHINE_CONFIG_END
   * NEC uCOM-44 MCU, labeled EMIX D552C 049
   * cyan VFD display Emix-108
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -712,7 +712,7 @@ MACHINE_CONFIG_END
   This is basically a revamp of their earlier Boxing game (ET-06), case and
   buttons are exactly the same.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -865,7 +865,7 @@ MACHINE_CONFIG_END
   - Japan: FL Crazy Climbing
   - USA: Crazy Climber
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -967,7 +967,7 @@ MACHINE_CONFIG_END
   - USA: Invader From Space
   - UK: Invader From Space, published by Grandstand
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1179,7 +1179,7 @@ MACHINE_CONFIG_END
   - Japan: Astro Wars
   - UK: Astro Wars, published by Grandstand
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1281,7 +1281,7 @@ MACHINE_CONFIG_END
   - USA: Astro Command, published by Tandy
   - UK: Scramble, published by Grandstand
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1390,7 +1390,7 @@ MACHINE_CONFIG_END
   - USA: Dracula, red case
   - Other: Dracula, yellow case, published by Hales
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1589,7 +1589,7 @@ MACHINE_CONFIG_END
   - USA: Cosmic Combat
   - Japan: Space Attack
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1688,7 +1688,7 @@ MACHINE_CONFIG_END
   Press the Serve button to start, then hit the ball by pressing one of the
   positional buttons when the ball flies over it.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1850,7 +1850,7 @@ MACHINE_CONFIG_END
   The game will start automatically after turning it on. This Pac Man refuses
   to eat dots with his butt, you can only eat them going right-to-left.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1871,7 +1871,7 @@ public:
 void tmpacman_state::prepare_display()
 {
 	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -1954,7 +1954,7 @@ MACHINE_CONFIG_END
   - UK: Astro Blaster, published by Hales (Epoch Astro Command was named Scramble)
   - Germany: Rambler
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1974,7 +1974,7 @@ public:
 
 void tmscramb_state::prepare_display()
 {
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
 	display_matrix(17, 10, plate, m_grid);
 }
 
@@ -2055,7 +2055,7 @@ MACHINE_CONFIG_END
   - USA: Caveman, published by Tandy
   - UK: Cave Man - Jr. Caveman vs Dinosaur, published by Grandstand
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2076,7 +2076,7 @@ public:
 void tcaveman_state::prepare_display()
 {
 	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -2154,7 +2154,7 @@ MACHINE_CONFIG_END
 
   To start the game, simply press [UP]. Hold a joystick direction to move around.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 

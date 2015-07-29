@@ -15,7 +15,7 @@
  *192     1650    19??, (a phone dialer, have dump)
  *255     1655    19??, (a talking clock, have dump)
 
-  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
+  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
   TODO:

@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- dumps are not yet verified as good, the 3-in-1 internal ROM is not yet dumped -->
+<!-- dumps are not yet verified as good, although most have been confirmed to run on a flash cart
+     the 3-in-1 internal ROM of the system is not yet dumped -->
 
 <softwarelist name="gameking" description="TimeTop GameKing cartridges">
 
@@ -16,7 +17,18 @@
 		</part>
 	</software>
 
-	<software name="2004" supported="no">
+  <software name="4in1a" supported="no">
+    <description>4 in 1 Vol. 8</description>
+    <year>200?</year>
+    <publisher>TimeTop</publisher>
+    <part name="cart" interface="gameking_cart">
+      <dataarea name="rom" size="524288">
+        <rom name="4in1_vol8.bin" size="524288" crc="6741847e" sha1="b561ca1b52e3492f86e7558722c8c8956e845bc5" offset="0x00000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="2004" supported="no">
 		<description>2004</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -225,4 +237,6 @@
 		</part>
 	</software>
 
+
+  
 </softwarelist>

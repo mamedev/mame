@@ -44,6 +44,7 @@ crush4          // Kural TWT
 maketrax        // (c) 1981 Williams, high score table says KRL (fur Kural)
 maketrxb        // (c) 1981 [Kural] (Williams license)
 korosuke        // (c) 1981 Kural Electric
+crushrlf		// bootleg
 mbrush          // 1981 bootleg
 paintrlr        // 1981 bootleg
 crushs          // 1981 bootleg
@@ -593,6 +594,7 @@ club90s         // (c) 1990
 club90sa        // (c) 1990
 lovehous        // (c) 1990
 hanaoji         // (c) 1991
+hanaojia        // (c) 1991
 pstadium        // (c) 1990
 triplew1        // (c) 1989
 triplew2        // (c) 1990
@@ -682,11 +684,14 @@ falcon          // bootleg
 vautour         // bootleg (Jeutel)
 falconz         // bootleg
 vautourz        // bootleg
+vautourza		// bootleg (Jeutal)
 griffon         // bootleg (Videotron)
 nextfase        // bootleg
 phoenixs        // bootleg (Sonic)
+phoenixass		// bootleg (Assa)
 avefenix        // bootleg (Video Game)
 avefenixrf      // bootleg (Recreativos Franco)
+avefenixl		// bootleg (Laguna)
 pleiads         // (c) 1981 Tehkan
 pleiadsb2       // bootleg
 pleiadbl        // bootleg
@@ -2492,6 +2497,7 @@ dariusgj        // 1994.09 D87 (c) 1994 Taito Corporation (Japan)
 dariusgu        // 1994.11 D87 (c) 1994 Taito America Corporation (US)
 dariusgx        // 1994.?? D87 (c) 1994 Taito Corporation
 bublbob2        // 1994.?? D90 (c) 1994 Taito Corporation Japan (World)
+bublbob2o       // 1994.?? D90 (c) 1994 Taito Corporation Japan (World)
 bublbob2p       // prototype
 bubsymphe       // 1994.?? D90 (c) 1994 Taito Corporation Japan (Europe)
 bubsymphu       // 1994.10 D90 (c) 1994 Taito America Corporation (US)
@@ -5730,8 +5736,8 @@ mj2c            // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
 				// 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev D)
 ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev E)
-mj2f            // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
-mj2             // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
+mj2             // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
+mj2g            // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
 				// 2005.03 Sangokushi Taisen
 gundamos        // 2005.03 Gundam Battle Operating Simulator
 				// 2005.04 Quest of D Ver.1.20
@@ -7133,6 +7139,7 @@ roadblst1       // 136048           (c) 1986, 1987
 roadblstc       // 136048           (c) 1986, 1987
 roadblstcg      // 136048           (c) 1986, 1987
 roadblstc1      // 136048           (c) 1986, 1987
+roadblstgu		// 136048			(c) 1986, 1987
 
 // Atari System 2 games
 // Paperboy
@@ -8179,6 +8186,7 @@ mkla4           // (c) 1992 Midway
 mkyawdim        // bootleg
 mkyawdim2       // bootleg
 mkyawdim3       // bootleg
+mkyawdim4       // bootleg
 term2           // (c) 1992 Midway
 term2la3        // (c) 1992 Midway
 term2la2        // (c) 1992 Midway
@@ -8265,6 +8273,7 @@ sfrush          // (c) 1996 Atari Games
 sfrushrk        // (c) 1996 Atari Games
 calspeed        // (c) 1996 Atari Games
 calspeeda       // (c) 1996 Atari Games
+calspeedb       // (c) 1996 Atari Games
 vaportrx        // (c) 1998 Atari Games
 vaportrxp       // (c) 1998 Atari Games
 carnevil        // (c) 1998 Midway Games (v1.0.3)
@@ -8273,6 +8282,7 @@ biofreak        // (c) 1997 Midway Games (prototype)
 blitz           // (c) 1997 Midway Games
 blitz11         // (c) 1997 Midway Games
 blitz99         // (c) 1998 Midway Games
+blitz99a		// (c) 1998 Midway Games
 blitz2k         // (c) 1999 Midway Games
 hyprdriv        // (c) 1998 Midway Games
 
@@ -8287,6 +8297,7 @@ sf2049te        // (c) 1999 Atari Games
 warfa           // (c) 1999 Atari Games
 nbashowt        // (c) 1998 Midway Games
 nbanfl          // (c) 1999 Midway Games
+nbagold		// (c) 2000 Midway Games
 gauntdl         // (c) 1999 Midway Games
 gauntdl24       // (c) 1999 Midway Games
 cartfury        // (c) 2000 Midway Games
@@ -8476,7 +8487,8 @@ panicr          // Seibu / Taito
 panicrg         // Seibu / TV-Tuning (Germany)
 deadang         // (c) 1988 Seibu Kaihatsu
 leadang         // (c) 1988 Seibu Kaihatsu
-ghunter         // (c) 1988 Seibu Kaihatsu + Segasa/Sonic license
+ghunter         // (c) 1988 Seibu Kaihatsu
+ghunters        // (c) 1988 Seibu Kaihatsu + Segasa/Sonic license
 dynduke         // (c) 1989 Seibu Kaihatsu
 dyndukea        // (c) 1989 Seibu Kaihatsu
 dyndukej        // (c) 1989 Seibu Kaihatsu
@@ -8789,6 +8801,7 @@ pspikesk        // (c) 1991 Video System Co. (Korea)
 pspikesu        // (c) 1991 Video System Co. (US)
 svolly91        // (c) 1991 Video System Co. (Japan)
 pspikesb        // bootleg
+pspikesba		// bootleg
 spikes91        // bootleg
 spikes91b       // bootleg
 pspikesc        // bootleg
@@ -10605,6 +10618,7 @@ heuksun         // (c) 1998 Oksan / F2 System
 bestri          // (c) F2 System
 silvmil         // (c) 1995 Para
 puzzlove        // (c) 1994 Para
+puzzlovek       // (c) 1994 Para
 funybubl        // (c) 1999 In Chang Electronic Co
 funybublc       // (c) 1999 Comad Industries
 dcheese         // (c) 1993 HAR

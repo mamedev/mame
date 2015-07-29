@@ -368,6 +368,7 @@ UINT8 ieee488_device::get_data()
 //-------------------------------------------------
 
 // slot devices
+#include "bus/cbmiec/c1526.h"
 #include "c2031.h"
 #include "c2040.h"
 #include "c8050.h"
@@ -391,4 +392,5 @@ SLOT_INTERFACE_START( cbm_ieee488_devices )
 	SLOT_INTERFACE("softbox", SOFTBOX)
 	SLOT_INTERFACE("hardbox", HARDBOX)
 	SLOT_INTERFACE("shark", SHARK)
+	SLOT_INTERFACE("c4023", C4023)
 SLOT_INTERFACE_END

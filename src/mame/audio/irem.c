@@ -12,15 +12,31 @@
 #include "audio/irem.h"
 
 
-const device_type IREM_AUDIO = &device_creator<irem_audio_device>;
+const device_type IREM_M62_AUDIO = &device_creator<m62_audio_device>;
+const device_type IREM_M52_SOUNDC_AUDIO = &device_creator<m52_soundc_audio_device>;
+const device_type IREM_M52_LARGE_AUDIO = &device_creator<m52_large_audio_device>;
 
-irem_audio_device::irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IREM_AUDIO, "Irem Audio", tag, owner, clock, "irem_audio", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_port1(0),
-		m_port2(0)
-		//m_ay_45L(*this, "ay_45l"),
-		//m_ay_45M(*this, "ay_45m")
+irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_port1(0),
+	m_port2(0)
+	//m_ay_45L(*this, "ay_45l"),
+	//m_ay_45M(*this, "ay_45m")
+{
+}
+
+m62_audio_device::m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: irem_audio_device(mconfig, IREM_M62_AUDIO, "Irem M62 Audio", tag, owner, clock, "irem_m62_audio", __FILE__)
+{
+}
+
+m52_soundc_audio_device::m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: irem_audio_device(mconfig, IREM_M52_SOUNDC_AUDIO, "Irem M52 SoundC Audio", tag, owner, clock, "irem_m52_soundc_audio", __FILE__)
+{
+}
+
+m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: irem_audio_device(mconfig, IREM_M52_LARGE_AUDIO, "Irem M52 Large Audio", tag, owner, clock, "irem_m52_large_audio", __FILE__)
 {
 }
 
@@ -40,16 +56,16 @@ void irem_audio_device::device_config_complete()
 
 void irem_audio_device::device_start()
 {
-	m_adpcm1 = machine().device<msm5205_device>("msm1");
-	m_adpcm2 = machine().device<msm5205_device>("msm2");
-	m_ay_45L = machine().device<ay8910_device>("ay_45l");
-	m_ay_45M = machine().device<ay8910_device>("ay_45m");
+	m_adpcm1 = subdevice<msm5205_device>("msm1");
+	m_adpcm2 = subdevice<msm5205_device>("msm2");
+	m_ay_45L = subdevice<ay8910_device>("ay_45l");
+	m_ay_45M = subdevice<ay8910_device>("ay_45m");
 
-	m_audio_BD = machine().device<netlist_mame_logic_input_t>("snd_nl:ibd");
-	m_audio_SD = machine().device<netlist_mame_logic_input_t>("snd_nl:isd");
-	m_audio_OH = machine().device<netlist_mame_logic_input_t>("snd_nl:ioh");
-	m_audio_CH = machine().device<netlist_mame_logic_input_t>("snd_nl:ich");
-	m_audio_SINH = machine().device<netlist_mame_logic_input_t>("snd_nl:sinh");
+	m_audio_BD = subdevice<netlist_mame_logic_input_t>("snd_nl:ibd");
+	m_audio_SD = subdevice<netlist_mame_logic_input_t>("snd_nl:isd");
+	m_audio_OH = subdevice<netlist_mame_logic_input_t>("snd_nl:ioh");
+	m_audio_CH = subdevice<netlist_mame_logic_input_t>("snd_nl:ich");
+	m_audio_SINH = subdevice<netlist_mame_logic_input_t>("snd_nl:sinh");
 
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port2));
@@ -71,7 +87,7 @@ WRITE8_MEMBER( irem_audio_device::cmd_w )
 	if ((data & 0x80) == 0)
 		drvstate->soundlatch_byte_w(space, 0, data & 0x7f);
 	else
-		space.machine().device("iremsound")->execute().set_input_line(0, ASSERT_LINE);
+		subdevice("iremsound")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -139,8 +155,8 @@ READ8_MEMBER( irem_audio_device::m6803_port2_r )
 	 * Pin21, 6803 (Port 21) tied with 4.7k to +5V
 	 *
 	 */
-	printf("port2 read\n");
-	return 0;
+	//printf("port2 read\n"); // used by 10yard
+	return 0x0;
 }
 
 
@@ -193,7 +209,7 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
 
 WRITE8_MEMBER( irem_audio_device::sound_irq_ack_w )
 {
-	space.machine().device("iremsound")->execute().set_input_line(0, CLEAR_LINE);
+	subdevice("iremsound")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -228,7 +244,7 @@ WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
 
 void irem_audio_device::adpcm_int(int st)
 {
-	machine().device("iremsound")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	subdevice("iremsound")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	if (m_adpcm2 != NULL)
@@ -352,31 +368,31 @@ DISCRETE_SOUND_END
 
 /* complete address map verified from Moon Patrol/10 Yard Fight schematics */
 /* large map uses 8k ROMs, small map uses 4k ROMs; this is selected via a jumper */
-static ADDRESS_MAP_START( m52_small_sound_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( m52_small_sound_map, AS_PROGRAM, 8, irem_audio_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVWRITE("irem_audio", irem_audio_device, m52_adpcm_w)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("irem_audio", irem_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(m52_adpcm_w)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m52_large_sound_map, AS_PROGRAM, 8, driver_device )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVWRITE("irem_audio", irem_audio_device, m52_adpcm_w)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("irem_audio", irem_audio_device, sound_irq_ack_w)
+static ADDRESS_MAP_START( m52_large_sound_map, AS_PROGRAM, 8, irem_audio_device )
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(m52_adpcm_w)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /* complete address map verified from Kid Niki schematics */
-static ADDRESS_MAP_START( m62_sound_map, AS_PROGRAM, 8, driver_device )
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_DEVWRITE("irem_audio", irem_audio_device, sound_irq_ack_w)
-	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_DEVWRITE("irem_audio", irem_audio_device, m62_adpcm_w)
+static ADDRESS_MAP_START( m62_sound_map, AS_PROGRAM, 8, irem_audio_device )
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE(sound_irq_ack_w)
+	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_WRITE(m62_adpcm_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( irem_sound_portmap, AS_IO, 8, driver_device )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE("irem_audio", irem_audio_device, m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE("irem_audio", irem_audio_device, m6803_port2_r, m6803_port2_w)
+static ADDRESS_MAP_START( irem_sound_portmap, AS_IO, 8, irem_audio_device )
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 /*
@@ -399,10 +415,10 @@ NETLIST_START(kidniki_interface)
 
 #if (USE_FRONTIERS)
 	SOLVER(Solver, 18000)
-	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.ACCURACY, 1e-8)
 	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.GS_LOOPS, 1)
-	PARAM(Solver.GS_THRESHOLD, 99)
+	PARAM(Solver.GS_THRESHOLD, 6)
 	PARAM(Solver.ITERATIVE, "SOR")
 	PARAM(Solver.PARALLEL, 1)
 	PARAM(Solver.SOR_FACTOR, 1.00)
@@ -496,13 +512,11 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_45M_portb_w))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8(":", driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
@@ -510,13 +524,13 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 	MCFG_SOUND_ADD("ay_45l", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_45L_porta_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(irem_audio_device, ay8910_45L_porta_w))
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 5)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("irem_audio", irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 6)
 
@@ -567,23 +581,21 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_45M_portb_w))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8(":", driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
 	MCFG_SOUND_ADD("ay_45l", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_45L_porta_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(irem_audio_device, ay8910_45L_porta_w))
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("irem_audio", irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
 
@@ -593,11 +605,38 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( m52_large_audio, irem_audio_base )  /* 10 yard fight */
+MACHINE_CONFIG_FRAGMENT( m52_large_audio)  /* 10 yard fight */
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("iremsound")
+	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(m52_large_sound_map)
+	MCFG_CPU_IO_MAP(irem_sound_portmap)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(470, 0, 0)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8(":", driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("ay_45l", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(470, 0, 0)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(irem_audio_device, ay8910_45L_porta_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
 MACHINE_CONFIG_END
 
 
@@ -608,10 +647,17 @@ MACHINE_CONFIG_DERIVED( m62_audio, irem_audio_base )
 	MCFG_CPU_PROGRAM_MAP(m62_sound_map)
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void irem_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+machine_config_constructor m62_audio_device::device_mconfig_additions() const
 {
+	return MACHINE_CONFIG_NAME( m62_audio );
+}
+
+machine_config_constructor m52_soundc_audio_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( m52_sound_c_audio );
+}
+
+machine_config_constructor m52_large_audio_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( m52_large_audio );
 }

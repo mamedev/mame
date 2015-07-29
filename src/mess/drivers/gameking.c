@@ -106,7 +106,7 @@ DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
 
-	if (size > 0x20000)
+	if (size > 0x80000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
@@ -182,6 +182,7 @@ static MACHINE_CONFIG_START( gameking, gameking_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
+	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3") // maybe not compatible with this system (different internal bios?)
 MACHINE_CONFIG_END
 
 ROM_START(gameking)

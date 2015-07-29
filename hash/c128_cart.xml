@@ -156,4 +156,27 @@ Missing dumps:
 		</part>
 	</software>
 
+	<software name="partn128">
+		<description>PARTNER 128</description>
+		<year>1985</year>
+		<publisher>Timeworks</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="partner128" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="romh" size="0x4000">
+				<rom name="partner 128" size="0x4000" crc="686a6881" sha1="53d4bcf7aff40f1642bc143626b63beb3c8478dc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Partner Diagnostic Test &amp; Program Demonstration Disk"/>
+			<dataarea name="flop" size="333744">
+				<rom name="partner 128.g64" size="287512" crc="9b2ac8d5" sha1="8143cafa623bb53b92a37d7ee2cc7d77080d80ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

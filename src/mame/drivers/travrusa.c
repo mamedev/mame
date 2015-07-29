@@ -326,7 +326,9 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	MCFG_PALETTE_INIT_OWNER(travrusa_state, travrusa)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
@@ -357,7 +359,7 @@ ROM_START( travrusa )
 	ROM_LOAD( "zr1-6a.k3",    0x4000, 0x2000, CRC(e1b51383) SHA1(34f4476c1bcc28c53c8ffa7b614f443a329aae13) )
 	ROM_LOAD( "zr1-7.j3",     0x6000, 0x2000, CRC(85cd1a51) SHA1(7eb046514845cb9d2507ee24d1b2f7cc5402ac02) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "mr10.1a",      0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -384,7 +386,7 @@ ROM_START( travrusab )
 	ROM_LOAD( "at6.k3",       0x4000, 0x2000, CRC(baf87d80) SHA1(761d687ef3f3dde80a47f547d3c822704a2ac821) )
 	ROM_LOAD( "at7.h3",       0x6000, 0x2000, CRC(48091ebe) SHA1(6146af6f08053a5955d9b388d25bfbab7ad6b0e5) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "11.a1",        0x7000, 0x1000, CRC(d2c0bc33) SHA1(3a52ae514daf985d297416301dac0ac6cbe671d7) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -410,7 +412,7 @@ ROM_START( motorace )
 	ROM_LOAD( "mr2.3k",       0x4000, 0x2000, CRC(8a2374ec) SHA1(7159731f5ef2485e3c822e3e8e51e9583dd1c6bc) )
 	ROM_LOAD( "mr3.3j",       0x6000, 0x2000, CRC(2f04c341) SHA1(ae990d9d4abdd7d6ef9d21aa62125fe2e0067623) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "mr10.1a",      0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -470,7 +472,7 @@ ROM_START( mototour )
 	ROM_LOAD( "mt1-6.k3",     0x4000, 0x2000, CRC(efd325f2) SHA1(0862c0ec87f601b6c1cba2bd25e3186b6ad0c68e) )
 	ROM_LOAD( "mt1-7.j3",     0x6000, 0x2000, CRC(ab8a3a33) SHA1(e332b6e727083cf508ccec721ce42ccc3aa54e91) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "snd.a1",      0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) ) // == mr10.1a
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -498,7 +500,7 @@ ROM_START( shtrider )
 	ROM_LOAD( "sr03a.bin", 0x4000, 0x2000, CRC(3ade11b9) SHA1(70b9dbd510cf6192194acf6876856d4c19bdf279) )
 	ROM_LOAD( "sr04a.bin", 0x6000, 0x2000, CRC(02b96eaa) SHA1(ba4d61cf57142192684c45dd22720234d3521241) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "sr11a.bin", 0x6000, 0x2000, CRC(a8396b76) SHA1(614151fb1d25930e9fee4ab290a63f8fe97adbe6) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -525,7 +527,7 @@ ROM_START( shtridera )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(78d051cd) SHA1(e1dc2dcfc4af35bdd5245d23977e8640d81a43f1) )
 	ROM_LOAD( "4.bin",   0x6000, 0x2000, CRC(02b96eaa) SHA1(ba4d61cf57142192684c45dd22720234d3521241) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "11.bin",   0x6000, 0x2000, CRC(a8396b76) SHA1(614151fb1d25930e9fee4ab290a63f8fe97adbe6) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -552,7 +554,7 @@ ROM_START( shtriderb )
 	ROM_LOAD( "sr3.22.k3", 0x4000, 0x2000, CRC(44cab4cc) SHA1(9e87d88353c858c25fb4ff9528c3f369505ffd88) )
 	ROM_LOAD( "sr4.23.h3", 0x6000, 0x2000, CRC(02b96eaa) SHA1(ba4d61cf57142192684c45dd22720234d3521241) )
 
-	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
 	ROM_LOAD( "sr11.7.a1", 0x6000, 0x2000, CRC(a8396b76) SHA1(614151fb1d25930e9fee4ab290a63f8fe97adbe6) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )

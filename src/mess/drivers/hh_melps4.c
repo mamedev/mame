@@ -36,6 +36,7 @@ public:
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 
 	UINT8 read_inputs(int columns);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -188,6 +189,8 @@ void hh_melps4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 set
 }
 
 
+// generic input handlers
+
 UINT8 hh_melps4_state::read_inputs(int columns)
 {
 	UINT8 ret = 0;
@@ -200,6 +203,12 @@ UINT8 hh_melps4_state::read_inputs(int columns)
 	return ret;
 }
 
+INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
+{
+	// for when reset button is directly tied to MCU reset pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 
 /***************************************************************************
@@ -210,12 +219,12 @@ UINT8 hh_melps4_state::read_inputs(int columns)
 
 /***************************************************************************
 
-  Coleco Frogger (manufactured in Japan)
+  Coleco Frogger (manufactured in Japan, licensed from Sega)
   * PCB label Coleco Frogger Code No. 01-81543, KS-003282 Japan
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -231,8 +240,6 @@ public:
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ16_MEMBER(input_r);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
 
 // handlers
@@ -246,14 +253,15 @@ void cfrogger_state::prepare_display()
 
 WRITE8_MEMBER(cfrogger_state::plate_w)
 {
+	// F0,F1: input mux
+	if (offset == MELPS4_PORTF)
+		m_inp_mux = data & 3;
+
 	// Sx,Fx,Gx: vfd matrix plate
 	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
 	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
 	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
 	prepare_display();
-
-	// F0,F1: input mux
-	m_inp_mux = m_plate >> 8 & 3;
 }
 
 WRITE16_MEMBER(cfrogger_state::grid_w)
@@ -281,11 +289,11 @@ READ16_MEMBER(cfrogger_state::input_r)
 // config
 
 static INPUT_PORTS_START( cfrogger )
-	PORT_START("IN.0") // F0 port K
+	PORT_START("IN.0") // F0 port K0,K1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
-	PORT_START("IN.1") // F1 port K
+	PORT_START("IN.1") // F1 port K0,K1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
@@ -295,15 +303,8 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.3") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, cfrogger_state, reset_button, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, NULL)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(cfrogger_state::reset_button)
-{
-	// reset button is directly tied to MCU reset pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
 
@@ -333,6 +334,122 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Gakken Jungler (manufactured in Japan, licensed from Konami)
+  * PCB label Konami Gakken GR503
+  * Mitsubishi M58846-702P MCU
+  * cyan/red/green VFD display Itron CP5143GLR SGA, with light-yellow color overlay
+
+  NOTE!: MAME external artwork is recommended
+
+***************************************************************************/
+
+class gjungler_state : public hh_melps4_state
+{
+public:
+	gjungler_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_melps4_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	DECLARE_READ16_MEMBER(input_r);
+};
+
+// handlers
+
+void gjungler_state::prepare_display()
+{
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,17,16,15,14,13,12,0,7,1,6,2,5,3,4) | 0x2000;
+	display_matrix(18, 12, plate, grid);
+}
+
+WRITE8_MEMBER(gjungler_state::plate_w)
+{
+	// G0,G1: input mux
+	if (offset == MELPS4_PORTG)
+		m_inp_mux = data & 3;
+
+	// Sx,Fx,Gx,U: vfd matrix plate
+	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
+	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
+	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(gjungler_state::grid_w)
+{
+	// D0-D11: vfd matrix grid
+	m_grid = data;
+	prepare_display();
+}
+
+WRITE_LINE_MEMBER(gjungler_state::speaker_w)
+{
+	// T: speaker out
+	m_speaker->level_w(state);
+}
+
+READ16_MEMBER(gjungler_state::input_r)
+{
+	// K0,K1: multiplexed inputs
+	// K2,K3: fixed inputs
+	return (m_inp_matrix[2]->read() & 0xc) | (read_inputs(2) & 3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( gjungler )
+	PORT_START("IN.0") // G0 port K0,K1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.1") // G1 port K0,K1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.2") // K2,K3
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_CONFNAME( 0x08, 0x00, "Game Mode" )
+	PORT_CONFSETTING(    0x00, "A" )
+	PORT_CONFSETTING(    0x08, "B" )
+
+	PORT_START("IN.3") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, NULL)
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( gjungler, gjungler_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_MELPS4_READ_K_CB(READ16(gjungler_state, input_r))
+	MCFG_MELPS4_WRITE_S_CB(WRITE8(gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_F_CB(WRITE8(gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_G_CB(WRITE8(gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_U_CB(WRITE8(gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_D_CB(WRITE16(gjungler_state, grid_w))
+	MCFG_MELPS4_WRITE_T_CB(WRITELINE(gjungler_state, speaker_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_melps4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -343,6 +460,14 @@ ROM_START( cfrogger )
 ROM_END
 
 
+ROM_START( gjungler )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m58846-702p", 0x0000, 0x1000, CRC(94ab7060) SHA1(3389bc115d1df8d01a30611fa9e95a900d32b29b) )
+ROM_END
+
+
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1981, cfrogger, 0,        0, cfrogger, cfrogger, driver_device, 0, "Coleco", "Frogger (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+
+CONS( 1982, gjungler, 0,        0, gjungler, gjungler, driver_device, 0, "Gakken / Konami", "Jungler (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
