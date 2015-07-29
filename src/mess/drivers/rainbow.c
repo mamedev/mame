@@ -1122,7 +1122,7 @@ static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
 void rainbow_state::hdc_reset()
 {
-//	printf(">> HARD DISC CONTROLLER RESET <<\n");
+//  printf(">> HARD DISC CONTROLLER RESET <<\n");
 	logerror(">> HARD DISC CONTROLLER RESET <<\n");
 
 	m_hdc->reset(); // NEW HDC
@@ -2025,7 +2025,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 		if (m_unit < 2)
 		{
-			data = data | 8; // MOTOR 0 (for A or B)  
+			data = data | 8; // MOTOR 0 (for A or B)
 		}
 		else
 		{
@@ -2370,7 +2370,7 @@ MACHINE_CONFIG_END
 // - first generation hardware (introduced May '82) with ROM 04.03.11
 // - inability to boot from hard disc (mind the inadequate PSU)
 //----------------------------------------------------------------------------------------
-// AVAILABLE RAM: 64 K on board (versus 128 K on model 'B'). 
+// AVAILABLE RAM: 64 K on board (versus 128 K on model 'B').
 
 // Two compatible memory expansions were sold by DEC:
 // (PCIXX-AA) : 64 K (usable on either Rainbow 100-A or 100-B) *
@@ -2379,7 +2379,7 @@ MACHINE_CONFIG_END
 
 // * DEC changed the way signals are handled on J6 (memory connector) later:
 //  "Whether a PC100-A or PC100-B memory module is installed on the PC100-B system module
-//   affects the functions the signals on 5 pins (29, 30, 32, 43, and 47) of the J6 connector 
+//   affects the functions the signals on 5 pins (29, 30, 32, 43, and 47) of the J6 connector
 //   will perform." (from 'EK-RB100_TM_001 Addendum for PC100-A_PC100-B Dec.84' page 120).
 //----------------------------------------------------------------------------------------
 // KNOWN DIFFERENCES TO 100-B:
@@ -2396,9 +2396,9 @@ ROM_LOAD("23-177e4-00.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90)
 // SOCKETED LANGUAGE ROM (E91) with 1 single localization per ROM -
 ROM_LOAD("23-092e4-00.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - English (?)
 // See also MP-01491-00 - PC100A FIELD MAINTENANCE SET. Appendix A of EK-RB100 Rainbow
-// Technical Manual Addendum f.100A and 100B (Dec.84) lists 15 localizations / part numbers 
+// Technical Manual Addendum f.100A and 100B (Dec.84) lists 15 localizations / part numbers
 
-ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM 
+ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM
 ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 
@@ -2410,25 +2410,25 @@ ROM_END
 ROM_START(rainbow)
 ROM_REGION(0x100000, "maincpu", 0)
 
-// Note that the 'Field Maintenance Print Set 1984' also lists alternate revision 'A1' with 
+// Note that the 'Field Maintenance Print Set 1984' also lists alternate revision 'A1' with
 //              23-063e3-00 (for chargen) and '23-074e5-00' / '23-073e5-00' for E5-01 / E5-02.
 
 // Part numbers 22E5, 20E5 and 37E3 verified to match revision "B" (FCC ID : A0994Q - PC100 - B).
 
-// BOOT ROM 
-ROM_LOAD("23-022e5-00.bin", 0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e)) 
+// BOOT ROM
+ROM_LOAD("23-022e5-00.bin", 0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
 ROM_RELOAD(0xf4000, 0x4000)
 
-// LANGUAGE ROM 
+// LANGUAGE ROM
 ROM_LOAD("23-020e5-00.bin", 0xf8000, 0x4000, CRC(8638712f) SHA1(8269b0d95dc6efbe67d500dac3999df4838625d8)) // German, French, English
 //ROM_LOAD( "23-015e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Dutch, French, English
 //ROM_LOAD( "23-016e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Finish, Swedish, English
-//ROM_LOAD( "23-017e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Danish, Norwegian, English 
-//ROM_LOAD( "23-018e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Spanish, Italian, English 
+//ROM_LOAD( "23-017e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Danish, Norwegian, English
+//ROM_LOAD( "23-018e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Spanish, Italian, English
 ROM_RELOAD(0xfc000, 0x4000)
 
 // CHARACTER GENERATOR (E3-03)
-ROM_REGION(0x1000, "chargen", 0) 
+ROM_REGION(0x1000, "chargen", 0)
 ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 
@@ -2443,7 +2443,7 @@ ROM_END
 // A Readme from January 1985 mentions 'recent ROM changes for MASS 11' (a VAX word processor).
 // It is *likely* that the sole differences between 5.05 and 5.03 affect terminal emulation.
 
-// FIXME: ROM names are * made up *. 
+// FIXME: ROM names are * made up *.
 // Someone who knows the DEC naming conventions should correct them -
 ROM_START(rainbow190)
 ROM_REGION(0x100000, "maincpu", 0)
@@ -2452,7 +2452,7 @@ ROM_RELOAD(0xf4000, 0x4000)
 ROM_LOAD("dec190rom1.bin", 0xf8000, 0x4000, CRC(5ce59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2))
 
 ROM_RELOAD(0xfc000, 0x4000)
-ROM_REGION(0x1000, "chargen", 0) 
+ROM_REGION(0x1000, "chargen", 0)
 ROM_LOAD("chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 //----------------------------------------------------------------------------------------
@@ -2460,6 +2460,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME          PARENT   COMPAT   MACHINE       INPUT      STATE          INIT COMPANY                         FULLNAME       FLAGS */
-COMP(1982, rainbow100a, rainbow, 0, rainbow, rainbow100b_in, driver_device, 0, "Digital Equipment Corporation", "Rainbow 100-A", GAME_IS_SKELETON)
-COMP(1983, rainbow, 0, 0, rainbow, rainbow100b_in, driver_device, 0, "Digital Equipment Corporation", "Rainbow 100-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
-COMP(1985, rainbow190, rainbow, 0, rainbow, rainbow100b_in, driver_device, 0, "Digital Equipment Corporation", "Rainbow 190-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
+COMP(1982, rainbow100a, rainbow, 0, rainbow, rainbow100b_in, driver_device, 0, "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
+COMP(1983, rainbow, 0, 0, rainbow, rainbow100b_in, driver_device, 0, "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)
+COMP(1985, rainbow190, rainbow, 0, rainbow, rainbow100b_in, driver_device, 0, "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)

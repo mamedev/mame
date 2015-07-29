@@ -513,17 +513,17 @@ public:
 	DECLARE_READ16_MEMBER(sh7021_r);
 	DECLARE_WRITE16_MEMBER(sh7021_w);
 	void sh7032_dma_exec(int ch);
-	
+
 private:
 	UINT16 m_sh7021_regs[0x200];
 	struct
 	{
-		UINT32              sar;	/**< Source Address Register */
-		UINT32              dar;	/**< Destination Address Register */
-		UINT16				tcr;	/**< Transfer Count Register */
-		UINT16				chcr;	/**< Channel Control Register */
+		UINT32              sar;    /**< Source Address Register */
+		UINT32              dar;    /**< Destination Address Register */
+		UINT16              tcr;    /**< Transfer Count Register */
+		UINT16              chcr;   /**< Channel Control Register */
 	} m_dma[4];
-	UINT16 m_dmaor;					/**< DMA Operation Register (status flags) */
+	UINT16 m_dmaor;                 /**< DMA Operation Register (status flags) */
 
 };
 

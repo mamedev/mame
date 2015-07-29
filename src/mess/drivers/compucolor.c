@@ -40,6 +40,7 @@ public:
 			m_maincpu(*this, I8080_TAG),
 			m_mioc(*this, TMS5501_TAG),
 			m_vtac(*this, CRT5027_TAG),
+			m_palette(*this, "palette"),
 			m_rs232(*this, RS232_TAG),
 			m_floppy0(*this, "cd0"),
 			m_floppy1(*this, "cd1"),
@@ -67,6 +68,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms5501_device> m_mioc;
 	required_device<crt5027_device> m_vtac;
+	required_device<palette_device> m_palette;
 	required_device<rs232_port_device> m_rs232;
 	required_device<compucolor_floppy_port_device> m_floppy0;
 	required_device<compucolor_floppy_port_device> m_floppy1;
@@ -92,7 +94,6 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_PALETTE_INIT(compucolor2);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -101,8 +102,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( xmt_w );
 
 	IRQ_CALLBACK_MEMBER( int_ack );
-
-	rgb_t m_palette[8];
 
 	UINT8 m_xo;
 };
@@ -305,8 +304,8 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 			UINT8 data = m_char_rom->base()[char_offs];
 
-			rgb_t fg = m_palette[attr & 0x07];
-			rgb_t bg = m_palette[(attr >> 3) & 0x07];
+			rgb_t fg = m_palette->pen_color(attr & 0x07);
+			rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
 
 			for (int x = 0; x < 6; x++)
 			{
@@ -434,23 +433,12 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-PALETTE_INIT_MEMBER(compucolor2_state, compucolor2)
-{
-	for (int i = 0; i < 8; i++)
-	{
-		m_palette[i] = rgb_t(BIT(i, 0) * 0xff, BIT(i, 1) * 0xff, BIT(i, 2) * 0xff);
-	}
-}
-
 static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
 	MCFG_CPU_IO_MAP(compucolor2_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
-
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(compucolor2_state, compucolor2)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -459,6 +447,8 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
+
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/2)
 	MCFG_TMS9927_CHAR_WIDTH(6)
@@ -513,4 +503,4 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
 
-COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, driver_device, 0,      "Intelligent Systems Corporation",  "Compucolor II",  GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, driver_device, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

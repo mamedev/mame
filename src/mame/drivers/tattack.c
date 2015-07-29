@@ -278,4 +278,4 @@ DRIVER_INIT_MEMBER(tattack_state,tattack)
 
 }
 
-GAME( 198?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
+GAME( 198?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

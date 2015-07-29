@@ -3209,7 +3209,7 @@ do                                                                              
 	INT32 smax, tmax;                                                           \
 	UINT32 texbase;                                                             \
 	rgb_union c_local;                                                          \
-	                                                                            \
+																				\
 	/* determine the S/T/LOD values for this texture */                         \
 	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))                                    \
 	{                                                                           \
@@ -4743,10 +4743,10 @@ INLINE void ATTR_FORCE_INLINE multi_reciplog(INT64 valueA, INT64 valueB, INT64 v
 	double recip = double(1ULL<<(47-39))/valueC;
 	double resAD = valueA * recip;
 	double resBD = valueB * recip;
-  log = new_log2(recip);
-  log += 56<<8;
-  resA = resAD;
-  resB = resBD;
+	log = new_log2(recip);
+	log += 56<<8;
+	resA = resAD;
+	resB = resBD;
 }
 
 

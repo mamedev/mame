@@ -143,11 +143,11 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
 
 static ADDRESS_MAP_START( sh7604_map, AS_PROGRAM, 32, sh2_device )
 	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
-/*! 
+/*!
   @todo: cps3boot breaks with this enabled. Needs customization ...
   */
-//	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
-//	AM_RANGE(0xffffff88, 0xffffff8b) AM_READWRITE(dma_dtcr0_r,dma_dtcr0_w)
+//  AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
+//  AM_RANGE(0xffffff88, 0xffffff8b) AM_READWRITE(dma_dtcr0_r,dma_dtcr0_w)
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh7604_r, sh7604_w)
 ADDRESS_MAP_END
 
@@ -159,14 +159,14 @@ static ADDRESS_MAP_START( sh7021_map, AS_PROGRAM, 32, sh2a_device )
 	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dma_tcr0_r, dma_tcr0_w,0x0000ffff)
 	AM_RANGE(0x05ffff4c, 0x05ffff4f) AM_READWRITE16(dma_chcr0_r, dma_chcr0_w, 0x0000ffff)
 //  fall-back
- 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
-//	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-//	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
+//  AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+//  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
 //  fall-back
- 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
+	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
 ADDRESS_MAP_END
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -300,7 +300,7 @@ void sh2_device::WB(offs_t A, UINT8 V)
 		m_program->write_byte(A & AM,V);
 		return;
 	}
-	
+
 	m_program->write_byte(A,V);
 }
 
@@ -311,7 +311,7 @@ void sh2_device::WW(offs_t A, UINT16 V)
 		m_program->write_word(A & AM,V);
 		return;
 	}
-	
+
 	m_program->write_word(A,V);
 }
 
@@ -322,7 +322,7 @@ void sh2_device::WL(offs_t A, UINT32 V)
 		m_program->write_dword(A & AM,V);
 		return;
 	}
-	
+
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
 	m_program->write_dword(A,V);

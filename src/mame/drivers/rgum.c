@@ -292,4 +292,4 @@ ROM_START( rgum )
 ROM_END
 
 
-GAME( 199?, rgum, 0, rgum, rgum, driver_device, 0, ROT0, "<unknown>",         "Royal Gum (Italy)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, rgum, 0, rgum, rgum, driver_device, 0, ROT0, "<unknown>",         "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

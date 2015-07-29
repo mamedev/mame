@@ -266,4 +266,4 @@ ROM_START( sgi_ip6 )
 ROM_END
 
 /*     YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT     COMPANY   FULLNAME */
-COMP( 1988, sgi_ip6,  0,        0,        sgi_ip6,  sgi_ip6, sgi_ip6_state,  sgi_ip6,  "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, sgi_ip6,  0,        0,        sgi_ip6,  sgi_ip6, sgi_ip6_state,  sgi_ip6,  "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

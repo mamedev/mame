@@ -134,11 +134,11 @@ void c140_device::device_start()
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer_left = auto_alloc_array(machine(), INT16, 2 * m_sample_rate);
 	m_mixer_buffer_right = m_mixer_buffer_left + m_sample_rate;
-	
+
 	save_item(NAME(m_REG));
-	
+
 	for (int i = 0; i < C140_MAX_VOICE; i++)
-	{	
+	{
 		save_item(NAME(m_voi[i].ptoffset), i);
 		save_item(NAME(m_voi[i].pos), i);
 		save_item(NAME(m_voi[i].key), i);

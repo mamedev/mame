@@ -522,7 +522,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1984, bcs3,   0,       0,      bcs3,  bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 2.4", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1986, bcs3a,  bcs3,    0,      bcs3a,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.1 29-column", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1986, bcs3b,  bcs3,    0,      bcs3b,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.1 40-column", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, bcs3c,  bcs3,    0,      bcs3c,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.3", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, bcs3,   0,       0,      bcs3,  bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 2.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, bcs3a,  bcs3,    0,      bcs3a,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, bcs3b,  bcs3,    0,      bcs3b,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, bcs3c,  bcs3,    0,      bcs3c,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

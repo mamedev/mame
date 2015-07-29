@@ -48,7 +48,7 @@
 
 
 void sega_decode_2(UINT8 *rom, UINT8 *decrypted,
-				   const UINT8 xor_table[128],const int swap_table[128])
+					const UINT8 xor_table[128],const int swap_table[128])
 {
 	static const UINT8 swaptable[24][4] =
 	{

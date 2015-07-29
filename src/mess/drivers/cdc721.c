@@ -141,4 +141,4 @@ ROM_START( cdc721 )
 	ROM_LOAD( "66315039", 0x0000, 0x1000, CRC(5c9aa968) SHA1(3ec7c5f25562579e6ed3fda7562428ff5e6b9550) ) // chargen
 ROM_END
 
-COMP( 1981, cdc721, 0, 0, cdc721, cdc721, driver_device, 0, "Control Data Corporation",  "CDC721 Terminal", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1981, cdc721, 0, 0, cdc721, cdc721, driver_device, 0, "Control Data Corporation",  "CDC721 Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

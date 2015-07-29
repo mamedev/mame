@@ -309,5 +309,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, blockhl, 0,       blockhl, blockhl, driver_device, 0, ROT0, "Konami", "Block Hole", GAME_SUPPORTS_SAVE )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, driver_device, 0, ROT0, "Konami", "Quarth (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockhl, 0,       blockhl, blockhl, driver_device, 0, ROT0, "Konami", "Block Hole", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, driver_device, 0, ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )

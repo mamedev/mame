@@ -535,9 +535,9 @@ ROM_START( tetgiano )
 ROM_END
 
 
-#define GAME_FLAGS (GAME_NO_SOUND|GAME_NOT_WORKING)
+#define GAME_FLAGS (MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
 
-GAME( 2004, segasp,  0,          segasp,    segasp, driver_device,    0, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | GAME_IS_BIOS_ROOT )
+GAME( 2004, segasp,  0,          segasp,    segasp, driver_device,    0, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 
 // These use ROMs
 GAME( 2009, brickppl,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )

@@ -593,10 +593,10 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR, NAME,     PARENT,   COMPAT, MACHINE,     INPUT,          INIT, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", GAME_SUPPORTS_SAVE)
-CONS(  1984, amsterd,  0,        0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     GAME_SUPPORTS_SAVE)
-CONS(  1984, dallas,   glasgow,  0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas",        GAME_SUPPORTS_SAVE)
-CONS(  1984, roma,     amsterd,  0,      glasgow,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma",          GAME_NOT_WORKING)
-CONS(  1984, dallas32, amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", GAME_SUPPORTS_SAVE)
-CONS(  1984, roma32,   amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   GAME_SUPPORTS_SAVE)
-CONS(  1984, dallas16, amsterd,  0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", GAME_SUPPORTS_SAVE)
+CONS(  1984, glasgow,  0,        0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", MACHINE_SUPPORTS_SAVE)
+CONS(  1984, amsterd,  0,        0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE)
+CONS(  1984, dallas,   glasgow,  0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas",        MACHINE_SUPPORTS_SAVE)
+CONS(  1984, roma,     amsterd,  0,      glasgow,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma",          MACHINE_NOT_WORKING)
+CONS(  1984, dallas32, amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", MACHINE_SUPPORTS_SAVE)
+CONS(  1984, roma32,   amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   MACHINE_SUPPORTS_SAVE)
+CONS(  1984, dallas16, amsterd,  0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", MACHINE_SUPPORTS_SAVE)

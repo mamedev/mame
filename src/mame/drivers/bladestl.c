@@ -439,6 +439,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl, driver_device, 0, ROT90, "Konami", "Blades of Steel (version T)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version L)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version E)", GAME_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl, driver_device, 0, ROT90, "Konami", "Blades of Steel (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version E)", MACHINE_SUPPORTS_SAVE )

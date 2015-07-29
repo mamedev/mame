@@ -285,4 +285,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME                FLAGS */
-COMP( 1983, poly880,    0,      0,      poly880,    poly880, driver_device,    0,   "VEB Polytechnik", "Poly-Computer 880", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW)
+COMP( 1983, poly880,    0,      0,      poly880,    poly880, driver_device,    0,   "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

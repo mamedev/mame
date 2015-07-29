@@ -233,7 +233,7 @@ void info_xml_creator::output_one()
 {
 	// no action if not a game
 	const game_driver &driver = m_drivlist.driver();
-	if (driver.flags & GAME_NO_STANDALONE)
+	if (driver.flags & MACHINE_NO_STANDALONE)
 		return;
 
 	// allocate input ports
@@ -257,16 +257,16 @@ void info_xml_creator::output_one()
 	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(start + 1));
 
 	// append bios and runnable flags
-	if (driver.flags & GAME_IS_BIOS_ROOT)
+	if (driver.flags & MACHINE_IS_BIOS_ROOT)
 		fprintf(m_output, " isbios=\"yes\"");
-	if (driver.flags & GAME_NO_STANDALONE)
+	if (driver.flags & MACHINE_NO_STANDALONE)
 		fprintf(m_output, " runnable=\"no\"");
-	if (driver.flags & GAME_MECHANICAL)
+	if (driver.flags & MACHINE_MECHANICAL)
 		fprintf(m_output, " ismechanical=\"yes\"");
 
 	// display clone information
 	int clone_of = m_drivlist.find(driver.parent);
-	if (clone_of != -1 && !(m_drivlist.driver(clone_of).flags & GAME_IS_BIOS_ROOT))
+	if (clone_of != -1 && !(m_drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
 		fprintf(m_output, " cloneof=\"%s\"", xml_normalize_string(m_drivlist.driver(clone_of).name));
 	if (clone_of != -1)
 		fprintf(m_output, " romof=\"%s\"", xml_normalize_string(m_drivlist.driver(clone_of).name));
@@ -1169,44 +1169,44 @@ void info_xml_creator::output_driver()
 	/* some minor issues, games marked as status=preliminary */
 	/* don't work or have major emulation problems. */
 
-	if (m_drivlist.driver().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_MECHANICAL))
+	if (m_drivlist.driver().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_MECHANICAL))
 		fprintf(m_output, " status=\"preliminary\"");
-	else if (m_drivlist.driver().flags & (GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS))
+	else if (m_drivlist.driver().flags & (MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS))
 		fprintf(m_output, " status=\"imperfect\"");
 	else
 		fprintf(m_output, " status=\"good\"");
 
-	if (m_drivlist.driver().flags & GAME_NOT_WORKING)
+	if (m_drivlist.driver().flags & MACHINE_NOT_WORKING)
 		fprintf(m_output, " emulation=\"preliminary\"");
 	else
 		fprintf(m_output, " emulation=\"good\"");
 
-	if (m_drivlist.driver().flags & GAME_WRONG_COLORS)
+	if (m_drivlist.driver().flags & MACHINE_WRONG_COLORS)
 		fprintf(m_output, " color=\"preliminary\"");
-	else if (m_drivlist.driver().flags & GAME_IMPERFECT_COLORS)
+	else if (m_drivlist.driver().flags & MACHINE_IMPERFECT_COLORS)
 		fprintf(m_output, " color=\"imperfect\"");
 	else
 		fprintf(m_output, " color=\"good\"");
 
-	if (m_drivlist.driver().flags & GAME_NO_SOUND)
+	if (m_drivlist.driver().flags & MACHINE_NO_SOUND)
 		fprintf(m_output, " sound=\"preliminary\"");
-	else if (m_drivlist.driver().flags & GAME_IMPERFECT_SOUND)
+	else if (m_drivlist.driver().flags & MACHINE_IMPERFECT_SOUND)
 		fprintf(m_output, " sound=\"imperfect\"");
 	else
 		fprintf(m_output, " sound=\"good\"");
 
-	if (m_drivlist.driver().flags & GAME_IMPERFECT_GRAPHICS)
+	if (m_drivlist.driver().flags & MACHINE_IMPERFECT_GRAPHICS)
 		fprintf(m_output, " graphic=\"imperfect\"");
 	else
 		fprintf(m_output, " graphic=\"good\"");
 
-	if (m_drivlist.driver().flags & GAME_NO_COCKTAIL)
+	if (m_drivlist.driver().flags & MACHINE_NO_COCKTAIL)
 		fprintf(m_output, " cocktail=\"preliminary\"");
 
-	if (m_drivlist.driver().flags & GAME_UNEMULATED_PROTECTION)
+	if (m_drivlist.driver().flags & MACHINE_UNEMULATED_PROTECTION)
 		fprintf(m_output, " protection=\"preliminary\"");
 
-	if (m_drivlist.driver().flags & GAME_SUPPORTS_SAVE)
+	if (m_drivlist.driver().flags & MACHINE_SUPPORTS_SAVE)
 		fprintf(m_output, " savestate=\"supported\"");
 	else
 		fprintf(m_output, " savestate=\"unsupported\"");

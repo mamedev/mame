@@ -271,4 +271,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, dorachan, 0, dorachan, dorachan, driver_device, 0, ROT270, "Craul Denshi", "Dorachan", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, dorachan, 0, dorachan, dorachan, driver_device, 0, ROT270, "Craul Denshi", "Dorachan", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -164,6 +164,6 @@ ROM_START( tvpoker )
 ROM_END
 
 
-GAME( 197?, tv21,     0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21", GAME_IS_SKELETON )
-GAME( 197?, tv21_3,   0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21 III", GAME_IS_SKELETON )
-GAME( 197?, tvpoker,  0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. Poker", GAME_IS_SKELETON )
+GAME( 197?, tv21,     0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21", MACHINE_IS_SKELETON )
+GAME( 197?, tv21_3,   0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21 III", MACHINE_IS_SKELETON )
+GAME( 197?, tvpoker,  0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. Poker", MACHINE_IS_SKELETON )

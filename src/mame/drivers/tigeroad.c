@@ -1206,15 +1206,15 @@ GAME( 1987, toramich, tigeroad, toramich, toramich, driver_device, 0, ROT0, "Cap
 GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, driver_device, 0, ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */
-GAME( 1988, f1dream,  0,        tigeroad, f1dream, tigeroad_state, f1dream,  ROT0, "Capcom (Romstar license)", "F-1 Dream", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // collisions are wrong
+GAME( 1988, f1dream,  0,        tigeroad, f1dream, tigeroad_state, f1dream,  ROT0, "Capcom (Romstar license)", "F-1 Dream", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // collisions are wrong
 GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream, driver_device,  0,        ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
 GAME( 1988, f1dreamba,f1dream,  tigeroad, f1dream, driver_device,  0,        ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
 
 /* This Comad hardware is based around the F1 Dream design */
-GAME( 1990, pushman,  0,       pushman, pushman, tigeroad_state, pushman, ROT0, "Comad", "Pushman (Korea, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pushmana, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad", "Pushman (Korea, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pushmans, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pushmant, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pushman,  0,       pushman, pushman, tigeroad_state, pushman, ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmana, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad", "Pushman (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmans, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmant, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, bballs,   0,       bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls", GAME_SUPPORTS_SAVE )
-GAME( 1991, bballsa,  bballs,  bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls (Adult)", GAME_SUPPORTS_SAVE )
+GAME( 1991, bballs,   0,       bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballsa,  bballs,  bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )

@@ -24,7 +24,7 @@
 
 #define LOGIC_INPUT(_name, _v, _family)                                        \
 		NET_REGISTER_DEV(LOGIC_INPUT, _name)                                   \
-		PARAM(_name.IN, _v)													   \
+		PARAM(_name.IN, _v)                                                    \
 		PARAM(_name.FAMILY, _family)
 
 #define ANALOG_INPUT(_name, _v)                                                \
@@ -70,9 +70,9 @@
 #define PARAMETERS(_name)                                                      \
 		NET_REGISTER_DEV(PARAMETERS, _name)
 
-#define AFUNC(_name, _N, _F)			                                       \
+#define AFUNC(_name, _N, _F)                                                   \
 		NET_REGISTER_DEV(AFUNC, _name)                                      \
-		PARAM(_name.N, _N)													   \
+		PARAM(_name.N, _N)                                                     \
 		PARAM(_name.FUNC, _F)
 
 NETLIB_NAMESPACE_DEVICES_START()

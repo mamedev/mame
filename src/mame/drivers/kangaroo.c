@@ -565,7 +565,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, driver_device, 0, ROT90, "Sun Electronics",                 "Funky Fish", GAME_SUPPORTS_SAVE )
-GAME( 1982, kangaroo,  0,        mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics",                 "Kangaroo", GAME_SUPPORTS_SAVE )
-GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, driver_device, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, driver_device, 0, ROT90, "Sun Electronics",                 "Funky Fish", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroo,  0,        mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics",                 "Kangaroo", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, driver_device, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -2375,11 +2375,11 @@ ROM_END
 
 
 /* Barcrest */
-GAME( 198?, m4tst2,       0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
-GAME( 198?, m4clr,        0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Meter Clear ROM",GAME_MECHANICAL )
-GAME( 198?, m4rltst,      0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Reel Test (3.0)",GAME_MECHANICAL )
+GAME( 198?, m4tst2,       0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
+GAME( 198?, m4clr,        0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
+GAME( 198?, m4rltst,      0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK)
 
 
 
@@ -2718,19 +2718,19 @@ GAME(199?, m4booze, 0,          mod4oki    ,mpu4, mpu4_state, m4default, ROT0,  
 GAME(199?, m4cbing, 0,          mod4oki    ,mpu4, mpu4_state, m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",GAME_FLAGS ) // custom sound system
 
 
-GAME( 199?, m4nod       , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, m4nod       , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 
 
 // not sure about several of the nova ones
-GAME( 199?, m4aliz      , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Qps",  "AlizBaz (Qps) (German) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4coney     , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Qps",   "Coney Island (Qps) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
+GAME( 199?, m4aliz      , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Qps",  "AlizBaz (Qps) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4coney     , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Qps",   "Coney Island (Qps) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 GAME( 199?, m4crzjk     , 0         ,  mod2         , mpu4      , mpu4_state, m4default     , 0,         "Nova?", "Crazy Jokers (Nova?) (MPU4)",GAME_FLAGS )  // COIN   ALM
-GAME( 199?, m4c2        , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE) // COIN   ALM
+GAME( 199?, m4c2        , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // COIN   ALM
 // regular barcrest structure
-GAME( 199?, m4vivan     , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Viva Las Vegas (Nova) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4spotln    , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Spotlight (Nova) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4mgpn      , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4goldnn    , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Golden Years (Nova) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
+GAME( 199?, m4vivan     , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Viva Las Vegas (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4spotln    , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Spotlight (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4mgpn      , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4goldnn    , 0         ,  mod4oki      , mpu4      , mpu4_state, m4default     , 0,         "Nova",  "Golden Years (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 
 

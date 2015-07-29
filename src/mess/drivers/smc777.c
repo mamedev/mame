@@ -613,33 +613,33 @@ static ADDRESS_MAP_START( smc777_io, AS_IO, 8, smc777_state )
 	AM_RANGE(0x18, 0x19) AM_MIRROR(0xff00) AM_WRITE(mc6845_w)
 	AM_RANGE(0x1a, 0x1b) AM_MIRROR(0xff00) AM_READWRITE(key_r, key_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_READWRITE(system_input_r, system_output_w)
-//	AM_RANGE(0x1d, 0x1d) system and control read, printer strobe write
-//	AM_RANGE(0x1e, 0x1f) rs232 irq control
+//  AM_RANGE(0x1d, 0x1d) system and control read, printer strobe write
+//  AM_RANGE(0x1e, 0x1f) rs232 irq control
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(display_reg_r, display_reg_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_READWRITE(irq_mask_r, irq_mask_w)
-//	AM_RANGE(0x22, 0x22) printer output data
+//  AM_RANGE(0x22, 0x22) printer output data
 	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_WRITE(border_col_w)
-//	AM_RANGE(0x24, 0x24) rtc write address
-//	AM_RANGE(0x25, 0x25) rtc read
-//	AM_RANGE(0x26, 0x26) rs232 #1
-//	AM_RANGE(0x28, 0x2c) fdc #2
-//	AM_RANGE(0x2d, 0x2f) rs232 #2
+//  AM_RANGE(0x24, 0x24) rtc write address
+//  AM_RANGE(0x25, 0x25) rtc read
+//  AM_RANGE(0x26, 0x26) rs232 #1
+//  AM_RANGE(0x28, 0x2c) fdc #2
+//  AM_RANGE(0x2d, 0x2f) rs232 #2
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff00) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(fdc_request_r, floppy_select_w)
-//	AM_RANGE(0x35, 0x37) rs232 #3
-//	AM_RANGE(0x38, 0x3b) cache disk unit
-//	AM_RANGE(0x3c, 0x3d) rgb superimposer
-//	AM_RANGE(0x40, 0x47) ieee-488
-//	AM_RANGE(0x48, 0x4f) hdd (winchester)
+//  AM_RANGE(0x35, 0x37) rs232 #3
+//  AM_RANGE(0x38, 0x3b) cache disk unit
+//  AM_RANGE(0x3c, 0x3d) rgb superimposer
+//  AM_RANGE(0x40, 0x47) ieee-488
+//  AM_RANGE(0x48, 0x4f) hdd (winchester)
 	AM_RANGE(0x51, 0x51) AM_MIRROR(0xff00) AM_READ_PORT("JOY_1P") AM_WRITE(color_mode_w)
 	AM_RANGE(0x52, 0x52) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(ramdac_w)
 	AM_RANGE(0x53, 0x53) AM_MIRROR(0xff00) AM_DEVWRITE("sn1", sn76489a_device, write)
-//	AM_RANGE(0x54, 0x59) vrt controller
-//	AM_RANGE(0x5a, 0x5b) ram banking
-//	AM_RANGE(0x70, 0x70) auto-start rom
-//	AM_RANGE(0x74, 0x74) ieee-488 rom
-//	AM_RANGE(0x75, 0x75) vrt controller rom
-//	AM_RANGE(0x7e, 0x7f) kanji rom
+//  AM_RANGE(0x54, 0x59) vrt controller
+//  AM_RANGE(0x5a, 0x5b) ram banking
+//  AM_RANGE(0x70, 0x70) auto-start rom
+//  AM_RANGE(0x74, 0x74) ieee-488 rom
+//  AM_RANGE(0x75, 0x75) vrt controller rom
+//  AM_RANGE(0x7e, 0x7f) kanji rom
 	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(fbuf_r, fbuf_w)
 ADDRESS_MAP_END
 
@@ -1024,4 +1024,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1983, smc777,  0,       0,    smc777,     smc777, driver_device,   0,  "Sony",   "SMC-777",       GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+COMP( 1983, smc777,  0,       0,    smc777,     smc777, driver_device,   0,  "Sony",   "SMC-777",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

@@ -1432,20 +1432,20 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, sectionz,  0,        lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, sectionza, sectionz, lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, sectionz,  0,        lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionza, sectionz, lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, lwings,    0,        lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwings2,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwingsj,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Ares no Tsubasa (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb,  driver_device, 0, ROT90, "bootleg",                  "Legendary Wings (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lwings,    0,        lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwings2,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsj,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Ares no Tsubasa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb,  driver_device, 0, ROT90, "bootleg",                  "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, trojan,    0,        trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojana,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanr,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanj,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom",                   "Tatakai no Banka (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanb,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "bootleg",                  "Trojan (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, trojan,    0,        trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojana,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanr,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanj,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom",                   "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanb,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "bootleg",                  "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, avengers,  0,        avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, avengers2, avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, buraiken,  avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Hissatsu Buraiken (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, avengers,  0,        avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, avengers2, avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraiken,  avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Hissatsu Buraiken (Japan)", MACHINE_SUPPORTS_SAVE )

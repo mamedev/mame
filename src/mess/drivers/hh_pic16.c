@@ -15,7 +15,7 @@
  *192     1650    19??, (a phone dialer, have dump)
  *255     1655    19??, (a talking clock, have dump)
 
-  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
+  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
   TODO:
@@ -299,4 +299,4 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT   INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, maniac,    0,        0, maniac,  maniac, driver_device, 0, "Ideal", "Maniac", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, maniac,    0,        0, maniac,  maniac, driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

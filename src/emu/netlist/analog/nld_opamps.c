@@ -42,10 +42,10 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 /*
  * Type = 0: Impedance changer
- * 		  1; Ideal opamp
- * 		  2; opamp with first pole
- * 		  3: opamp with first pole + output limit
- * 		  4: opamp with input stage, first pole + output limit
+ *        1; Ideal opamp
+ *        2; opamp with first pole
+ *        3: opamp with first pole + output limit
+ *        4: opamp with input stage, first pole + output limit
  */
 
 NETLIB_START(OPAMP)
@@ -141,17 +141,16 @@ NETLIB_UPDATE_PARAM(OPAMP)
 
 /*
 NETLIB_DEVICE_WITH_PARAMS(OPAMPx,
-	NETLIB_NAME(R) m_RP;
-	NETLIB_NAME(C) m_CP;
-	NETLIB_NAME(VCCS) m_G1;
-	NETLIB_NAME(VCVS) m_EBUF;
+    NETLIB_NAME(R) m_RP;
+    NETLIB_NAME(C) m_CP;
+    NETLIB_NAME(VCCS) m_G1;
+    NETLIB_NAME(VCVS) m_EBUF;
 
-	param_model_t m_model;
-	analog_input_t m_VH;
-	analog_input_t m_VL;
-	analog_input_t m_VREF;
+    param_model_t m_model;
+    analog_input_t m_VH;
+    analog_input_t m_VL;
+    analog_input_t m_VREF;
 );
 */
 
 NETLIB_NAMESPACE_DEVICES_END()
-

@@ -355,7 +355,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 
 /*!
  @brief Configures screen parameters for the given screen.
- 
+
  @param _pixclock Pixel Clock frequency value
  @param _htotal Total number of horizontal pixels, including hblank period.
  @param _hbend Horizontal pixel position for HBlank end event, also first pixel where screen rectangle is visible.
@@ -369,7 +369,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 
 /*!
  @brief Sets the number of Frames Per Second for this screen
- 
+
  @param _rate FPS number
  @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
  */
@@ -378,7 +378,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 
 /*!
  @brief Sets the vblank time of the given screen
- 
+
  @param _time Time parameter, in attotime value\
  @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
  */
@@ -387,7 +387,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 
 /*!
  @brief Sets total screen size, including H/V-Blanks
- 
+
  @param _width Screen horizontal size
  @param _height Screen vertical size
  @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
@@ -397,7 +397,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 
 /*!
  @brief Sets screen visible area
- 
+
  @param _minx Screen left border
  @param _maxx Screen right border, must be in N-1 format
  @param _miny Screen top border

@@ -220,4 +220,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, aztarac, 0, aztarac, aztarac, driver_device, 0, ROT0, "Centuri", "Aztarac", GAME_SUPPORTS_SAVE )
+GAME( 1983, aztarac, 0, aztarac, aztarac, driver_device, 0, ROT0, "Centuri", "Aztarac", MACHINE_SUPPORTS_SAVE )

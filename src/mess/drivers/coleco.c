@@ -354,7 +354,7 @@ ROM_END
     Unreleased Brazilian Colecovision clone by Microdigital.
 
     It was never released and the only known prototypes were uncovered by an ex-employee of Microdigital
-    called Cláudio Cassens who donated it to collectors (Eduardo Luccas) in June 2015.
+    called Cl??udio Cassens who donated it to collectors (Eduardo Luccas) in June 2015.
     -- Felipe Sanches
 */
 ROM_START (onyx)

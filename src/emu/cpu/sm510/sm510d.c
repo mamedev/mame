@@ -103,7 +103,7 @@ static offs_t sm510_common_disasm(const UINT8 *lut_mnemonic, const UINT8 *lut_ex
 		param = oprom[s_next_pc[pc & 0x3f]];
 		len++;
 	}
-	
+
 	// extended opcode
 	bool is_extended = (instr == mEXT);
 	if (is_extended)
@@ -131,12 +131,12 @@ static offs_t sm510_common_disasm(const UINT8 *lut_mnemonic, const UINT8 *lut_ex
 			UINT16 address = (param << 4 & 0xc00) | (mask << 6 & 0x3c0) | (param & 0x03f);
 			dst += sprintf(dst, "$%03X", address);
 		}
-		
+
 		// show param offset
 		if (bits >= 8)
 			dst += sprintf(dst, " [$%03X]", pc + s_next_pc[pc & 0x3f]);
 	}
-	
+
 	return len | s_flags[instr] | DASMFLAG_SUPPORTED;
 }
 
@@ -210,6 +210,6 @@ CPU_DISASSEMBLE(sm511)
 	UINT8 ext[0x100];
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x30, sm511_extended, 0x10);
-	
+
 	return sm510_common_disasm(sm511_mnemonic, ext, buffer, pc, oprom, opram);
 }

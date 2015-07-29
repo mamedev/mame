@@ -275,4 +275,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY           FULLNAME */
-COMP( 1986, babbage,  0,      0,      babbage,    babbage, driver_device, 0,   "Mr Takafumi Aihara",  "Babbage-2nd" , GAME_NO_SOUND_HW )
+COMP( 1986, babbage,  0,      0,      babbage,    babbage, driver_device, 0,   "Mr Takafumi Aihara",  "Babbage-2nd" , MACHINE_NO_SOUND_HW )

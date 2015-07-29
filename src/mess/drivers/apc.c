@@ -1009,4 +1009,4 @@ DRIVER_INIT_MEMBER(apc_state,apc)
 	// ...
 }
 
-COMP( 1982, apc,  0,   0, apc,  apc, apc_state,  apc,      "NEC",      "APC", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, apc,  0,   0, apc,  apc, apc_state,  apc,      "NEC",      "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

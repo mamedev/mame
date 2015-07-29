@@ -538,4 +538,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, boxer, 0, boxer, boxer, driver_device, 0, 0, "Atari", "Boxer (prototype)", GAME_NO_SOUND )
+GAME( 1978, boxer, 0, boxer, boxer, driver_device, 0, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND )

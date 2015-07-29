@@ -136,5 +136,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, ipb,      0,      0,      ipc,      ipc, driver_device,     0,     "Intel",   "iPB", GAME_NO_SOUND)
-COMP( 19??, ipc,      ipb,    0,      ipc,      ipc, driver_device,     0,     "Intel",   "iPC", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, ipb,      0,      0,      ipc,      ipc, driver_device,     0,     "Intel",   "iPB", MACHINE_NO_SOUND)
+COMP( 19??, ipc,      ipb,    0,      ipc,      ipc, driver_device,     0,     "Intel",   "iPC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

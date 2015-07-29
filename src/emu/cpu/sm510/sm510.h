@@ -134,7 +134,7 @@ protected:
 	int m_stack_levels;
 	UINT16 m_stack[2];
 	int m_icount;
-	
+
 	UINT8 m_acc;
 	UINT8 m_bl;
 	UINT8 m_bm;
@@ -177,7 +177,7 @@ protected:
 	bool wake_me_up();
 	void init_divider();
 	TIMER_CALLBACK_MEMBER(div_timer_cb);
-	
+
 	// other i/o handlers
 	devcb_read8 m_read_k;
 	devcb_read_line m_read_ba;
@@ -251,12 +251,12 @@ protected:
 
 	void op_rm();
 	void op_sm();
-	
+
 	void op_pre();
 	void op_sme();
 	void op_rme();
 	void op_tmel();
-	
+
 	void op_skip();
 	void op_cend();
 	void op_idiv();
@@ -274,7 +274,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	virtual void execute_one();
 	virtual void get_opcode_param();
-	
+
 	virtual void update_w_latch() { m_write_s(0, m_w, 0xff); } // W is connected directly to S
 };
 

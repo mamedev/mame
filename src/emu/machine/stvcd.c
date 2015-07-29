@@ -866,7 +866,7 @@ void saturn_state::cd_exec_command( void )
 				if(cr4 == 0)
 					hirqreg |= (CMOK);
 				else
-					hirqreg |= (CMOK|DRDY);					
+					hirqreg |= (CMOK|DRDY);
 				status_type = 1;
 			}
 			break;

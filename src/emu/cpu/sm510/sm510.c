@@ -6,14 +6,14 @@
   - SM510: 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
   - SM511: 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
   - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
-  
+
   Other chips that may be in the same family, investigate more when one of
   them needs to get emulated: SM500, SM530/31, SM4A, SM3903, ..
 
   References:
   - 1990 Sharp Microcomputers Data Book
   - 1996 Sharp Microcomputer Databook
-  
+
   TODO:
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
@@ -146,12 +146,12 @@ void sm510_base_device::device_reset()
 	m_op = m_prev_op = 0;
 	do_branch(3, 7, 0);
 	m_prev_pc = m_pc;
-	
+
 	// lcd is on (Bp on, BC off, bs(y) off)
 	m_bp = true;
 	m_bc = false;
 	m_y = 0;
-	
+
 	m_r = 0;
 	m_write_r(0, 0, 0xff);
 	m_melody_rd &= ~1;
@@ -168,11 +168,11 @@ inline UINT16 sm510_base_device::get_lcd_row(int column, UINT8* ram)
 	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
 	if (ram == NULL || m_bc || !m_bp)
 		return 0;
-	
+
 	UINT16 rowdata = 0;
 	for (int i = 0; i < 0x10; i++)
 		rowdata |= (ram[i] >> column & 1) << i;
-	
+
 	return rowdata;
 }
 
@@ -185,12 +185,12 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 		m_write_sega(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
 		m_write_segb(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
 		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
-		
+
 		// bs output from L/X and Y regs
 		UINT8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
 		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
-	
+
 	// schedule next timeout
 	m_lcd_timer->adjust(attotime::from_ticks(0x200, unscaled_clock()));
 }
@@ -222,10 +222,10 @@ void sm510_base_device::clock_melody()
 		0, 0, 8, 8, 9, 9, 10,10,11,12,12,13,14,15, 8*2, 8*2,
 		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 8*2, 9*2
 	};
-	
+
 	UINT8 cmd = m_melody_rom[m_melody_address] & 0x3f;
 	UINT8 out = 0;
-	
+
 	// clock duty cycle if tone is active
 	if ((cmd & 0xf) > 1)
 	{
@@ -245,7 +245,7 @@ void sm510_base_device::clock_melody()
 		// rest tell signal
 		m_melody_rd |= 2;
 	}
-	
+
 	// clock time base on F8(d7)
 	if ((m_div & 0x7f) == 0)
 	{
@@ -255,7 +255,7 @@ void sm510_base_device::clock_melody()
 		if (m_melody_step_count == 0)
 			m_melody_address++;
 	}
-	
+
 	// output to R pin
 	if (out != m_r)
 	{
@@ -293,7 +293,7 @@ bool sm510_base_device::wake_me_up()
 		// after waking up, but we leave it unchanged
 		m_halt = false;
 		do_branch(1, 0, 0);
-		
+
 		standard_irq_callback(0);
 		return true;
 	}
@@ -305,7 +305,7 @@ void sm510_base_device::execute_set_input(int line, int state)
 {
 	if (line != SM510_INPUT_LINE_K)
 		return;
-	
+
 	// set K input lines active state
 	m_k_active = (state != 0);
 }
@@ -317,7 +317,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 	// 1S signal on overflow(falling edge of f1)
 	if (m_div == 0)
 		m_1s = true;
-	
+
 	clock_melody();
 }
 

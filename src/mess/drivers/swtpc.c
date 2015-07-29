@@ -132,4 +132,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1975, swtpc,  0,       0,      swtpc,     swtpc, driver_device,    0, "Southwest Technical Products Corporation", "SWTPC 6800", GAME_NO_SOUND)
+COMP( 1975, swtpc,  0,       0,      swtpc,     swtpc, driver_device,    0, "Southwest Technical Products Corporation", "SWTPC 6800", MACHINE_NO_SOUND)

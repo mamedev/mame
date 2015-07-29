@@ -209,4 +209,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2012, testcpu, 0, testcpu, 0, driver_device, 0, ROT0, "MAME", "CPU Tester", GAME_NO_SOUND )
+GAME( 2012, testcpu, 0, testcpu, 0, driver_device, 0, ROT0, "MAME", "CPU Tester", MACHINE_NO_SOUND )

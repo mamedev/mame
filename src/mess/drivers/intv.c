@@ -742,11 +742,11 @@ DRIVER_INIT_MEMBER(intv_state,intvkbd)
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-CONS( 1979, intv,       0,      0,      intv,       intv,       intv_state,    intv,       "Mattel", "Intellivision", GAME_SUPPORTS_SAVE )
-CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv_state,    intv,       "Sears",  "Super Video Arcade", GAME_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-CONS( 1982, intv2,      intv,   0,      intv2,      intv,       intv_state,    intv,       "Mattel", "Intellivision II", GAME_SUPPORTS_SAVE )
+CONS( 1979, intv,       0,      0,      intv,       intv,       intv_state,    intv,       "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv_state,    intv,       "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, intv2,      intv,   0,      intv2,      intv,       intv_state,    intv,       "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions
-COMP( 1982, intvoice,   intv,   0,      intvoice,   intv,       intv_state,    intv,       "Mattel", "Intellivision w/IntelliVoice expansion", GAME_SUPPORTS_SAVE )
-COMP( 1983, intvecs,    intv,   0,      intvecs,    intv,       intv_state,    intv,       "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", GAME_SUPPORTS_SAVE )
+COMP( 1982, intvoice,   intv,   0,      intvoice,   intv,       intv_state,    intv,       "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, intvecs,    intv,   0,      intvecs,    intv,       intv_state,    intv,       "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )

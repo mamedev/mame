@@ -267,4 +267,4 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAMEL( 1997, 30test,  0,   30test,  30test, driver_device,  0, ROT0, "Namco", "30 Test (Remake)", GAME_SUPPORTS_SAVE | GAME_CLICKABLE_ARTWORK, layout_30test )
+GAMEL( 1997, 30test,  0,   30test,  30test, driver_device,  0, ROT0, "Namco", "30 Test (Remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )

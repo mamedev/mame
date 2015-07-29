@@ -941,6 +941,6 @@ ROM_END
 GAMEL( 1996, sderby,    0,        sderby,   sderby,   driver_device, 0,     ROT0, "Playmark", "Super Derby (v.07.03)",                0,                                             layout_sderby   )
 GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  driver_device, 0,     ROT0, "Playmark", "Super Derby (v.10.04)",                0,                                             layout_sderby   )
 GAMEL( 1996, spacewin,  0,        spacewin, spacewin, driver_device, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                             layout_spacewin )
-GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, driver_device, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, driver_device, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, driver_device, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, driver_device, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
 GAME ( 1996, luckboom,  0,        luckboom, luckboom, driver_device, 0,     ROT0, "Playmark", "Lucky Boom",                           0 )

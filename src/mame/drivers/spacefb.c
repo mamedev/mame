@@ -604,12 +604,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, spacefb,  0,       spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 04-u)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacefbe, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacefbe2,spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacefba, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 02-a)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacefbg, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacebrd, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacefbb, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg", "Space Firebird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacedem, spacefb, spacefb, spacedem, driver_device, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg? (Potomac Mortgage)", "Star Warrior", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacefb,  0,       spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 04-u)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbe, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbe2,spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefba, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 02-a)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbg, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacebrd, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbb, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg", "Space Firebird (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacedem, spacefb, spacefb, spacedem, driver_device, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg? (Potomac Mortgage)", "Star Warrior", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -1418,9 +1418,9 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, driver_device, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", GAME_NOT_WORKING )
-COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
-COMP( 1979, vbrc,       0,          0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBRC/7002)",  GAME_NOT_WORKING )
-COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
-COMP( 1980, bridgec3,   vbrc,       0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger 3 (model 7014)", GAME_NOT_WORKING )
-COMP( 1980, vsc,        0,          0,      vsc,   vsc, driver_device,      0,      "Fidelity Electronics",   "Voice Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, driver_device, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", MACHINE_NOT_WORKING )
+COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", MACHINE_NOT_WORKING )
+COMP( 1979, vbrc,       0,          0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBRC/7002)",  MACHINE_NOT_WORKING )
+COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", MACHINE_NOT_WORKING )
+COMP( 1980, bridgec3,   vbrc,       0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger 3 (model 7014)", MACHINE_NOT_WORKING )
+COMP( 1980, vsc,        0,          0,      vsc,   vsc, driver_device,      0,      "Fidelity Electronics",   "Voice Sensory Chess Challenger (model VSC)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

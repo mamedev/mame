@@ -63,4 +63,4 @@ ROM_START(kissp)
 ROM_END
 
 
-GAME( 1979,  kissp,  kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 1979,  kissp,  kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -61,4 +61,4 @@ ROM_START( br8641 )
 ROM_END
 
 /* Driver */
-COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, driver_device, 0, "Brandt", "Brandt 8641", GAME_IS_SKELETON)
+COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, driver_device, 0, "Brandt", "Brandt 8641", MACHINE_IS_SKELETON)

@@ -26,7 +26,7 @@ inline rsp_vec_t vec_vrcp_vrsq(UINT32 iw, INT32 dp, UINT32 src, UINT32 e, UINT32
 	}
 	else if (input == -32768)
 	{
-    	result = 0xffff0000;
+		result = 0xffff0000;
 	}
 	else // Main case: compute the reciprocal.
 	{

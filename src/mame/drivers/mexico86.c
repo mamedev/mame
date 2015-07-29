@@ -678,8 +678,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,  kikikai, driver_device,  0, ROT90, "Taito Corporation", "KiKi KaiKai", GAME_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,  kikikai, driver_device,  0, ROT90, "bootleg", "Knight Boy", GAME_SUPPORTS_SAVE )
-GAME( 1986, kicknrun, 0,        mexico86, mexico86, driver_device, 0, ROT0,  "Taito Corporation", "Kick and Run (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, driver_device, 0, ROT0,  "Taito America Corp", "Kick and Run (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, driver_device, 0, ROT0,  "bootleg", "Mexico 86 (bootleg of Kick and Run)", GAME_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai,  kikikai, driver_device,  0, ROT90, "Taito Corporation", "KiKi KaiKai", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,  kikikai, driver_device,  0, ROT90, "bootleg", "Knight Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun, 0,        mexico86, mexico86, driver_device, 0, ROT0,  "Taito Corporation", "Kick and Run (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, driver_device, 0, ROT0,  "Taito America Corp", "Kick and Run (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86, mexico86, driver_device, 0, ROT0,  "bootleg", "Mexico 86 (bootleg of Kick and Run)", MACHINE_SUPPORTS_SAVE )

@@ -412,4 +412,4 @@ DRIVER_INIT_MEMBER( mquake_state, mquake )
  *
  *************************************/
 
-GAME( 1987, mquake, 0, mquake, mquake, mquake_state, mquake, 0, "Sente", "Moonquake", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, mquake, 0, mquake, mquake, mquake_state, mquake, 0, "Sente", "Moonquake", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

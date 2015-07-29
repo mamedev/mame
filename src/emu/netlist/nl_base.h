@@ -241,7 +241,7 @@ typedef UINT8 netlist_sig_t;
 		, _priv)
 
 #define NETLIB_LOGIC_FAMILY(_fam)                                               \
-virtual logic_family_desc_t *default_logic_family()						        \
+virtual logic_family_desc_t *default_logic_family()                             \
 {                                                                               \
 	return netlist_family_ ## _fam;                                             \
 }
@@ -394,8 +394,8 @@ namespace netlist
 			VCCS,       // Voltage controlled current source
 			LVCCS,      // Voltage controlled current source (Current limited)
 			CCCS,       // Current controlled current source
-			VS,			// Voltage Source
-			CS,			// Current Source
+			VS,         // Voltage Source
+			CS,         // Current Source
 			GND         // GND device
 		};
 

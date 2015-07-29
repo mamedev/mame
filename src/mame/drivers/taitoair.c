@@ -186,12 +186,12 @@ perhaps? The two writes seem to take only two values.
 /*!
  @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing.
          My gut feeling is that 3d poly fill operation actually copies to internal buffer then a DMA op actually do the buffer-to-screen copy, including gradiation ROZ too;
-	   - Air Inferno: missing landing monitor camera (blackened);
-	   - Air Inferno: missing 3d HUD graphics;
-	   - Air Inferno: Expert course has wrong 3d geometry;
-	   - Air Inferno: Almost surely crashing during replay has missing smoke effect, looks quite odd atm.
-	   - Top Landing: Night stages might have wrong priority for stars-above-sea;
-	   - Input limiters / analog thresholds for both games;
+       - Air Inferno: missing landing monitor camera (blackened);
+       - Air Inferno: missing 3d HUD graphics;
+       - Air Inferno: Expert course has wrong 3d geometry;
+       - Air Inferno: Almost surely crashing during replay has missing smoke effect, looks quite odd atm.
+       - Top Landing: Night stages might have wrong priority for stars-above-sea;
+       - Input limiters / analog thresholds for both games;
  */
 
 #include "emu.h"
@@ -344,14 +344,14 @@ WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 }
 
 /*!
-	@brief Framebuffer DMA control
-	@regs [0] x--- ---- ---- ---- copy framebuffer to the screen
-	      [0] --x- ---- ---- ---- unknown, used on POST test
-		  [0] 1001 1111 1111 1111 used by Air Inferno after erase op, erase -> copy?
-		  [0] 0001 1111 1111 1111 erase op?
-		  [1] xxxx xxxx xxxx xxxx fill value? 0xffff by Top Landing, 0x0000 Air Inferno
-		  [2] (unused)
-		  [3] both games uses 0xb7, most likely a register setting.
+    @brief Framebuffer DMA control
+    @regs [0] x--- ---- ---- ---- copy framebuffer to the screen
+          [0] --x- ---- ---- ---- unknown, used on POST test
+          [0] 1001 1111 1111 1111 used by Air Inferno after erase op, erase -> copy?
+          [0] 0001 1111 1111 1111 erase op?
+          [1] xxxx xxxx xxxx xxxx fill value? 0xffff by Top Landing, 0x0000 Air Inferno
+          [2] (unused)
+          [3] both games uses 0xb7, most likely a register setting.
 */
 WRITE16_MEMBER(taitoair_state::dma_regs_w)
 {
@@ -959,6 +959,6 @@ ROM_END
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY  FULLNAME */
-GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", GAME_NOT_WORKING )
-GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan", "Air Inferno (Japan)", GAME_NOT_WORKING )
+GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", MACHINE_NOT_WORKING )
+GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan", "Air Inferno (Japan)", MACHINE_NOT_WORKING )

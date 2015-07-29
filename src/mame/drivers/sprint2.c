@@ -24,9 +24,9 @@
 #include "includes/sprint2.h"
 #include "sound/discrete.h"
 
-#define GAME_IS_SPRINT1   (m_game == 1)
-#define GAME_IS_SPRINT2   (m_game == 2)
-#define GAME_IS_DOMINOS   (m_game == 3)
+#define MACHINE_IS_SPRINT1   (m_game == 1)
+#define MACHINE_IS_SPRINT2   (m_game == 2)
+#define MACHINE_IS_DOMINOS   (m_game == 3)
 
 DRIVER_INIT_MEMBER(sprint2_state,sprint1)
 {
@@ -53,15 +53,15 @@ int sprint2_state::service_mode()
 {
 	UINT8 v = ioport("INB")->read();
 
-	if (GAME_IS_SPRINT1)
+	if (MACHINE_IS_SPRINT1)
 	{
 		return (v & 0x10) == 0;
 	}
-	if (GAME_IS_SPRINT2)
+	if (MACHINE_IS_SPRINT2)
 	{
 		return (v & 0x04) == 0;
 	}
-	if (GAME_IS_DOMINOS)
+	if (MACHINE_IS_DOMINOS)
 	{
 		return (v & 0x40) == 0;
 	}
@@ -74,7 +74,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 {
 	/* handle steering wheels */
 
-	if (GAME_IS_SPRINT1 || GAME_IS_SPRINT2)
+	if (MACHINE_IS_SPRINT1 || MACHINE_IS_SPRINT2)
 	{
 		int i;
 
@@ -135,7 +135,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 {
 	UINT8 val = ioport("INA")->read();
 
-	if (m_game == 2)// (GAME_IS_SPRINT2)
+	if (m_game == 2)// (MACHINE_IS_SPRINT2)
 	{
 		if (m_gear[0] == 1) val &= ~0x01;
 		if (m_gear[1] == 1) val &= ~0x02;
@@ -153,7 +153,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 {
 	UINT8 val = ioport("INB")->read();
 
-	if (m_game == 1) // (GAME_IS_SPRINT1)
+	if (m_game == 1) // (MACHINE_IS_SPRINT1)
 	{
 		if (m_gear[0] == 1) val &= ~0x01;
 		if (m_gear[0] == 2) val &= ~0x02;
@@ -715,6 +715,6 @@ ROM_END
 GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint2_state, sprint1, ROT0, "Atari (Kee Games)", "Sprint 1", 0 )
 GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)", 0 )
 GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", 0 )
-GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "hack", "Sprint 2 (color kit, Italy)", GAME_WRONG_COLORS ) // Italian hack, supposedly is color instead of b/w? how?
+GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "hack", "Sprint 2 (color kit, Italy)", MACHINE_WRONG_COLORS ) // Italian hack, supposedly is color instead of b/w? how?
 GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, dominos, ROT0, "Atari", "Dominos", 0 )
 GAME( 1977, dominos4, dominos, dominos, dominos4,sprint2_state, dominos4,ROT0, "Atari", "Dominos 4 (Cocktail)", 0 )

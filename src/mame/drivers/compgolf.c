@@ -352,5 +352,5 @@ DRIVER_INIT_MEMBER(compgolf_state,compgolf)
  *
  *************************************/
 
-GAME( 1986, compgolf, 0,        compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", GAME_SUPPORTS_SAVE )
-GAME( 1985, compgolfo,compgolf, compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (Japan, old version)", GAME_SUPPORTS_SAVE )
+GAME( 1986, compgolf, 0,        compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, compgolfo,compgolf, compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (Japan, old version)", MACHINE_SUPPORTS_SAVE )

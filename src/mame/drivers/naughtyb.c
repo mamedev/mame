@@ -832,7 +832,7 @@ DRIVER_INIT_MEMBER(naughtyb_state,popflame)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9090, 0x9090, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb0ff, write8_delegate(FUNC(naughtyb_state::popflame_protection_w),this));
-	
+
 	save_item(NAME(m_popflame_prot_seed));
 	save_item(NAME(m_r_index));
 	save_item(NAME(m_prot_count));
@@ -864,20 +864,20 @@ DRIVER_INIT_MEMBER(naughtyb_state,trvmstr)
 {
 	/* install questions' handlers  */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xc002, read8_delegate(FUNC(naughtyb_state::trvmstr_questions_r),this), write8_delegate(FUNC(naughtyb_state::trvmstr_questions_w),this));
-	
+
 	save_item(NAME(m_question_offset));
 }
 
 
-GAME( 1982, naughtyb, 0,        naughtyb, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Naughty Boy", GAME_SUPPORTS_SAVE )
-GAME( 1982, naughtyba,naughtyb, naughtyb, naughtyb, driver_device, 0,        ROT90, "bootleg", "Naughty Boy (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, naughtybc,naughtyb, naughtyb, naughtyb, driver_device, 0,        ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, popflame, 0,        popflame, naughtyb, naughtyb_state, popflame, ROT90, "Jaleco", "Pop Flamer (protected)", GAME_SUPPORTS_SAVE )
-GAME( 1982, popflamea,popflame, popflame, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Pop Flamer (not protected)", GAME_SUPPORTS_SAVE )
-GAME( 1982, popflameb,popflame, popflame, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Pop Flamer (hack?)", GAME_SUPPORTS_SAVE )
-GAME( 1982, popflamen,popflame, naughtyb, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", GAME_SUPPORTS_SAVE )
-GAME( 1985, trvmstr,  0,        naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, trvmstrb, trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1985, trvmstrc, trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", GAME_SUPPORTS_SAVE )
-GAME( 1985, trvgns,   trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "bootleg", "Trivia Genius", GAME_SUPPORTS_SAVE )
+GAME( 1982, naughtyb, 0,        naughtyb, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Naughty Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtyba,naughtyb, naughtyb, naughtyb, driver_device, 0,        ROT90, "bootleg", "Naughty Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtybc,naughtyb, naughtyb, naughtyb, driver_device, 0,        ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflame, 0,        popflame, naughtyb, naughtyb_state, popflame, ROT90, "Jaleco", "Pop Flamer (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflamea,popflame, popflame, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Pop Flamer (not protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflameb,popflame, popflame, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Pop Flamer (hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflamen,popflame, naughtyb, naughtyb, driver_device, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstr,  0,        naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstrb, trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstrc, trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvgns,   trvmstr,  naughtyb, trvmstr, naughtyb_state,  trvmstr,  ROT90, "bootleg", "Trivia Genius", MACHINE_SUPPORTS_SAVE )

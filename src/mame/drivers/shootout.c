@@ -392,6 +392,6 @@ DRIVER_INIT_MEMBER(shootout_state,shootout)
 }
 
 
-GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA", "Shoot Out (US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA", "Shoot Out (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )

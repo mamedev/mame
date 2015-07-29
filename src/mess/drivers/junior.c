@@ -256,4 +256,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-COMP( 1980, junior, 0,      0,       junior,    junior, driver_device,   0,     "Elektor Electronics", "Junior Computer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW)
+COMP( 1980, junior, 0,      0,       junior,    junior, driver_device,   0,     "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

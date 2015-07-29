@@ -585,11 +585,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 198?, sun4_300,  0,       0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "Sun 4/3x0", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, sun4_40,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, sun4_50,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, sun4_20,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, sun4_60,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 1 (Sun 4/60)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, sun4_75,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 2 (Sun 4/75)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, sun_s10,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 10 (Sun S10)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, sun_s20,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 20", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, sun4_300,  0,       0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "Sun 4/3x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun4_40,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun4_50,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun4_20,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun4_60,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 1 (Sun 4/60)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun4_75,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 2 (Sun 4/75)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun_s10,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 10 (Sun S10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun_s20,   sun4_300,0,       sun4,      sun4, driver_device,     0,  "Sun Microsystems", "SPARCstation 20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

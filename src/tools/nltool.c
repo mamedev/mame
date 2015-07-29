@@ -273,7 +273,6 @@ struct input_t
 
 	input_t()
 	{
-
 	}
 	input_t(netlist::netlist_t *netlist, const pstring &line)
 	{

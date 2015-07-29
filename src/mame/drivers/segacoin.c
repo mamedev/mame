@@ -139,4 +139,4 @@ ROM_START( westdrm )
 ROM_END
 
 
-GAME (1992, westdrm, 0, westdrm, westdrm, driver_device, 0, ROT0, "Sega", "Western Dream", GAME_IS_SKELETON_MECHANICAL )
+GAME (1992, westdrm, 0, westdrm, westdrm, driver_device, 0, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )

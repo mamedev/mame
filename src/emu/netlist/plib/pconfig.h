@@ -40,7 +40,7 @@
 //============================================================
 
 // prevent implicit copying
-#define P_PREVENT_COPYING(_name)          		\
+#define P_PREVENT_COPYING(_name)                \
 	private:                                    \
 		_name(const _name &);                   \
 		_name &operator=(const _name &);
@@ -234,4 +234,3 @@ private:
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))
 #pragma GCC diagnostic pop
 #endif
-

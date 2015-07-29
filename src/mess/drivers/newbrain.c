@@ -1487,7 +1487,7 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,   0,          0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD",  GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, newbraineim,newbrain,   0,      newbrain_eim,   newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD with Expansion Interface", GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain A",   GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, newbrainmd, newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain MD",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbrain,   0,          0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1981, newbraineim,newbrain,   0,      newbrain_eim,   newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD with Expansion Interface", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain A",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1981, newbrainmd, newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain MD",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

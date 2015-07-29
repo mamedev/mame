@@ -878,7 +878,7 @@ DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800, tmc1800_state,    tmc1800, "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800, driver_device,    0,       "OSCOM Oy",     "OSCOM 1000B",  GAME_NOT_WORKING )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000, driver_device,    0,       "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, nano,       tmc2000,0,      nano,       nano,    driver_device,    0,       "OSCOM Oy",     "OSCOM Nano",   GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800, tmc1800_state,    tmc1800, "Telercas Oy",  "Telmac 1800",  MACHINE_NOT_WORKING )
+COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800, driver_device,    0,       "OSCOM Oy",     "OSCOM 1000B",  MACHINE_NOT_WORKING )
+COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000, driver_device,    0,       "Telercas Oy",  "Telmac 2000",  MACHINE_SUPPORTS_SAVE )
+COMP( 1980, nano,       tmc2000,0,      nano,       nano,    driver_device,    0,       "OSCOM Oy",     "OSCOM Nano",   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -578,4 +578,4 @@ ROM_START( osbexec )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec, osbexec_state,    osbexec,    "Osborne",  "Executive",    GAME_NOT_WORKING )
+COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec, osbexec_state,    osbexec,    "Osborne",  "Executive",    MACHINE_NOT_WORKING )

@@ -7191,937 +7191,937 @@ ROM_END
 
 
 /* Barcrest */
-GAME( 199?, m5clr       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","MPU 5 Ram & Meter Clear (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tst       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","MPU 5 Test Rom (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-
-GAME( 199?, m5addams    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsa   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsb   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsc   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsd   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamse   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsf   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsg   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsh   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.2, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsi   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.2, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsj   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.2, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsk   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsl   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsm   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsn   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamso   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsp   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsq   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamsr   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addamss   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clr       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","MPU 5 Ram & Meter Clear (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tst       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","MPU 5 Test Rom (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5addams    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsa   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsb   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsc   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsd   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamse   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsf   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsg   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.5, set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsh   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.2, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsi   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.2, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsj   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.2, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsk   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsl   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsm   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsn   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamso   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsp   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsq   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamsr   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addamss   ,m5addams,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Addams Family (Barcrest) (MPU5) (v0.3, set 9)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5addlad    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addlada   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladb   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladc   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladd   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addlade   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladf   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladg   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladh   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladi   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladj   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladk   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladl   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladm   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladn   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addlado   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladp   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladq   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.4, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addladr   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.4, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5addlads   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v?.?)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addlad    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addlada   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladb   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladc   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladd   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addlade   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladf   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladg   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladh   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 9)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladi   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.6, set 10)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladj   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladk   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladl   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladm   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladn   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addlado   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladp   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.1, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladq   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.4, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addladr   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v0.4, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5addlads   ,m5addlad,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Adders & Ladders (Barcrest) (MPU5, v?.?)", MACHINE_IS_SKELETON_MECHANICAL )
 
 
-GAME( 199?, m5fire      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","All Fired Up (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fire      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","All Fired Up (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5arab      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Arabian Nights (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5arab03    ,m5arab,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Arabian Nights (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5arab      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Arabian Nights (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5arab03    ,m5arab,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Arabian Nights (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5austin    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Austin Powers (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5austin10  ,m5austin,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Austin Powers (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5austin11  ,m5austin,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Austin Powers (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5austin    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Austin Powers (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5austin10  ,m5austin,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Austin Powers (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5austin11  ,m5austin,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Austin Powers (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bankrl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Bank Roll (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bankrl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Bank Roll (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5barkng    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Barking Mad (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5barkng    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Barking Mad (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5barmy     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Barmy Army (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5barmy     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Barmy Army (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5baxe      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Battle Axe (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5baxe04    ,m5baxe,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Battle Axe (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5baxe      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Battle Axe (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5baxe04    ,m5baxe,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Battle Axe (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bbro      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Big Brother (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bbro02    ,m5bbro,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Big Brother (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bbro      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Big Brother (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bbro02    ,m5bbro,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Big Brother (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bbrocl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Big Brother Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bbrocl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Big Brother Club (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bigchs    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Cheese (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bigchs05  ,m5bigchs,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Cheese (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigchs    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Cheese (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigchs05  ,m5bigchs,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Cheese (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5biggam    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Game (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5biggam11  ,m5biggam,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Game (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5biggam    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Game (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5biggam11  ,m5biggam,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Big Game (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5blkwht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Black & White (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5blkwht11  ,m5blkwht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Black & White (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5blkwht01  ,m5blkwht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Black & White (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5blkwht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Black & White (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5blkwht11  ,m5blkwht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Black & White (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5blkwht01  ,m5blkwht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Black & White (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bwaves    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Brain Waves (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bwaves07  ,m5bwaves,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Brain Waves (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bwaves    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Brain Waves (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bwaves07  ,m5bwaves,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Brain Waves (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bling     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Bling King Crazy (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bling     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Bling King Crazy (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cbw       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ca$h Bang Wallop (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cbwa      ,m5cbw,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ca$h Bang Wallop (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cbw       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ca$h Bang Wallop (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cbwa      ,m5cbw,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ca$h Bang Wallop (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cpcash    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Captain Cash (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cpcash    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Captain Cash (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5carclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Caribbean Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5carclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Caribbean Club (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cashar    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Arena (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cashar04  ,m5cashar,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Arena (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashar    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Arena (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashar04  ,m5cashar,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Arena (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cashat    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Attack (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashat    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Attack (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cashln    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Lines (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashln    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Lines (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cashrn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cashrn01  ,m5cashrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cashrn02  ,m5cashrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cashrn04  ,m5cashrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashrn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashrn01  ,m5cashrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashrn02  ,m5cashrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cashrn04  ,m5cashrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Cash Run (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5codft     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Codfather (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5codft02   ,m5codft,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Codfather (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5codft     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Codfather (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5codft02   ,m5codft,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Codfather (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cos       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Costa Del Cash Casino (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cos       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Costa Del Cash Casino (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cosclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Costa Del Cash Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cosclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Costa Del Cash Club (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5crzkni    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Crazy Crazy Knights (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5crzkni03  ,m5crzkni,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Crazy Crazy Knights (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5crzkni    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Crazy Crazy Knights (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5crzkni03  ,m5crzkni,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Crazy Crazy Knights (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5doshpk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Do$h 'n' Pecks (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5doshpk05  ,m5doshpk,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Do$h 'n' Pecks (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5doshpk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Do$h 'n' Pecks (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5doshpk05  ,m5doshpk,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Do$h 'n' Pecks (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5draclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5draclb07  ,m5draclb,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5draclb01  ,m5draclb,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula Club (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5draclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5draclb07  ,m5draclb,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula Club (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5draclb01  ,m5draclb,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula Club (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ewn       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Each Way Nudge (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ewn08     ,m5ewn,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Each Way Nudge (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ewn       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Each Way Nudge (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ewn08     ,m5ewn,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Each Way Nudge (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5elim      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Eliminator (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5elim03    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Eliminator (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5elim04    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Eliminator (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5elim      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Eliminator (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5elim03    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Eliminator (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5elim04    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Eliminator (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5egr       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Rush (Barcrest) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5egra      ,m5egr,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Rush (Barcrest) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5egr       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Rush (Barcrest) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5egra      ,m5egr,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Rush (Barcrest) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5egss      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Super Streak (Barcrest) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5egssa     ,m5egss,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Super Streak (Barcrest) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5egss      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Super Streak (Barcrest) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5egssa     ,m5egss,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Super Streak (Barcrest) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5evgrhr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Red Hot Roll (Barcrest) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5evgrhra   ,m5evgrhr,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Red Hot Roll (Barcrest) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5evgrhr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Red Hot Roll (Barcrest) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5evgrhra   ,m5evgrhr,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Elvis Gold Red Hot Roll (Barcrest) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5xchn      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Exchanges Unlimited (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xchn      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Exchanges Unlimited (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5firebl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fireball (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5firebl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fireball (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5flipcr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Flippin Crazy (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5flipcr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Flippin Crazy (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fortby    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fort Boyard (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fortby01  ,m5fortby,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fort Boyard (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fortby    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fort Boyard (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fortby01  ,m5fortby,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fort Boyard (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5frnzy     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Frenzy (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5frnzya    ,m5frnzy,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Frenzy (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5frnzy     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Frenzy (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5frnzya    ,m5frnzy,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Frenzy (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5beans     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Full Of Beans (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5beansa    ,m5beans,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Full Of Beans (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5beans     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Full Of Beans (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5beansa    ,m5beans,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Full Of Beans (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5funsun    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fun In The Sun (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5funsun03  ,m5funsun,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fun In The Sun (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5funsun    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fun In The Sun (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5funsun03  ,m5funsun,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Fun In The Sun (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gimmie    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gimmie Gimmie Gimmie (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gimmie    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gimmie Gimmie Gimmie (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5grush     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grush10   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grush04   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grush03   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grush02   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grush01   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush10   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush04   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush03   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush02   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush01   ,m5grush,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush (Barcrest) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5grush5    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Five Liner (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grush504  ,m5grush5,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Five Liner (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush5    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Five Liner (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grush504  ,m5grush5,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Five Liner (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gruss     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Sit Down (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gruss     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Sit Down (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5grusst    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grusst04  ,m5grusst,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5grusst03  ,m5grusst,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grusst    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grusst04  ,m5grusst,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5grusst03  ,m5grusst,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gstrik    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5gstrik11  ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5gstrik02  ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5gstrik01  ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5gstrik01a ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5gstrika   ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gstrik    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gstrik11  ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gstrik02  ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gstrik01  ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gstrik01a ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gstrika   ,m5gstrik,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gsstrk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Super Streak (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5gsstrk07  ,m5gsstrk,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Super Streak (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gsstrk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Super Streak (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gsstrk07  ,m5gsstrk,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Gold Super Streak (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gdrag     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Dragon (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gdrag     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Dragon (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gdrgcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Dragon Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5gdrgcl05  ,m5gdrgcl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Dragon Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gdrgcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Dragon Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gdrgcl05  ,m5gdrgcl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Dragon Club (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gkeys     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Keys (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gkeys     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Golden Keys (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hellrz    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hellraiser (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hellrz    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hellraiser (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hlsumo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hi Lo Sumo (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hlsumo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hi Lo Sumo (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hifly     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","High Flyer (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hifly03   ,m5hifly,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","High Flyer (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hifly04   ,m5hifly,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","High Flyer (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hifly     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","High Flyer (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hifly03   ,m5hifly,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","High Flyer (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hifly04   ,m5hifly,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","High Flyer (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5holy      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Holy Grail (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5holy10    ,m5holy,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Holy Grail (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5holy      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Holy Grail (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5holy10    ,m5holy,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Holy Grail (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hotslt    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hot Slot (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotslt    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hot Slot (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hotstf    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hot Stuff (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotstf    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hot Stuff (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hypvip    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hyper Viper (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hypvip    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hyper Viper (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jackpt    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jackpt07  ,m5jackpt,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jackpt    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jackpt07  ,m5jackpt,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jackp2    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers 2 (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jackp2a   ,m5jackp2,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers 2 (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jackp2    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers 2 (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jackp2a   ,m5jackp2,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jackpoteers 2 (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jlyjwl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Jewels (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jlyjwl01  ,m5jlyjwl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Jewels (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jlyjwl02  ,m5jlyjwl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Jewels (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jlyjwl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Jewels (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jlyjwl01  ,m5jlyjwl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Jewels (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jlyjwl02  ,m5jlyjwl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Jewels (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jlyrog    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Roger (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jlyroga   ,m5jlyrog,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Roger (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jlyrog    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Roger (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jlyroga   ,m5jlyrog,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Jolly Roger (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5kkebab    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kkebab10  ,m5kkebab,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kkebaba   ,m5kkebab,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kkebab    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kkebab10  ,m5kkebab,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kkebaba   ,m5kkebab,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5kingko    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kingko04  ,m5kingko,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kingko05  ,m5kingko,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingko    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingko04  ,m5kingko,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingko05  ,m5kingko,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5lotta     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Lotta Luck (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lotta     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Lotta Luck (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5mega      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Mega Zone (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mega      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Mega Zone (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5martns    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5martns07  ,m5martns,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5martns    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5martns07  ,m5martns,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5mmak      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5mmak06    ,m5mmak,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mmak      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mmak06    ,m5mmak,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5monjok    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5monjoka   ,m5monjok,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5monjok    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5monjoka   ,m5monjok,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5monty     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5monty     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5mprio     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python Rio (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mprio     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python Rio (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5mpfc      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python's Flying Circus (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mpfc      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python's Flying Circus (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5mpfccl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python's Flying Circus Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mpfccl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Monty Python's Flying Circus Club (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5neptun    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Neptunes Treasure (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5neptun    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Neptunes Treasure (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5nnww      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5nnww      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5nnwwgl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Nudge Nudge Wink Wink Gold (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5nnwwgl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Nudge Nudge Wink Wink Gold (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fiddle    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","On The Fiddle (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fiddle03  ,m5fiddle,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","On The Fiddle (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fiddle    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","On The Fiddle (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fiddle03  ,m5fiddle,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","On The Fiddle (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5oohaah    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5oohaah01  ,m5oohaah,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5oohaah    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5oohaah01  ,m5oohaah,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Aah Dracula (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5oohrio    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Ahh Dracula Rio (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5oohrio    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ooh Ahh Dracula Rio (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5openbx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5openbx06  ,m5openbx,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5openbx05  ,m5openbx,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5openbx01  ,m5openbx,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5openbx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5openbx06  ,m5openbx,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5openbx05  ,m5openbx,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5openbx01  ,m5openbx,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5overld    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5overld02  ,m5overld,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5overld10  ,m5overld,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5overld11  ,m5overld,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5overld    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5overld02  ,m5overld,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5overld10  ,m5overld,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5overld11  ,m5overld,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ptyani    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Party Animal (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ptyani01  ,m5ptyani,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Party Animal (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ptyani    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Party Animal (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ptyani01  ,m5ptyani,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Party Animal (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5peepsh    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Peep Show (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5peepsh    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Peep Show (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5psy2      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast 2 (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psy2      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast 2 (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5qshot     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Quack Shot (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qshot04   ,m5qshot,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Quack Shot (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qshot     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Quack Shot (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qshot04   ,m5qshot,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Quack Shot (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5roof      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5roofa     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5roof      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5roofa     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5razdz     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5razdz10   ,m5razdz,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5razdz11   ,m5razdz,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5razdz     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5razdz10   ,m5razdz,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5razdz11   ,m5razdz,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5redrck    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5redrck10  ,m5redrck,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5redrcka   ,m5redrck,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redrck    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redrck10  ,m5redrck,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redrcka   ,m5redrck,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rhkni     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Knights (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhkni     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Knights (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rhrg      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Gold (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rhrga     ,m5rhrg,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Gold (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrg      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Gold (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrga     ,m5rhrg,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Gold (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rhrgt     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rhrgt12   ,m5rhrgt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rhrgt02   ,m5rhrgt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrgt     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrgt12   ,m5rhrgt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrgt02   ,m5rhrgt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5revo      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5revo13    ,m5revo,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5revoa     ,m5revo,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5revo      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5revo13    ,m5revo,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5revoa     ,m5revo,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rgclb     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb11   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb12   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb20   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb21   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb03   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb01   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb01a  ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb11   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb12   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb20   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb21   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb03   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb01   ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb01a  ,m5rgclb,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rcx       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rcxa      ,m5rcx,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rcx       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rcxa      ,m5rcx,     mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rub       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rubies & Diamonds (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rub       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rubies & Diamonds (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ritj      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rumble In The Jungle (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ritj      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Rumble In The Jungle (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rfymc     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rfymc06   ,m5rfymc,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (Set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rfymc     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rfymc06   ,m5rfymc,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (Set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5seven     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Seven Deadly Spins (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5seven     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Seven Deadly Spins (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5sheik     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Sheik Yer Money (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sheik     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Sheik Yer Money (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5showtm    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Showtime (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5showtm    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Showtime (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5silver    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5silver06  ,m5silver,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5silver03  ,m5silver,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5silver    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5silver06  ,m5silver,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5silver03  ,m5silver,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5sondr     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sondr05   ,m5sondr,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sondra    ,m5sondr,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (15GBP Jackpot)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sondr     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sondr05   ,m5sondr,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sondra    ,m5sondr,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (15GBP Jackpot)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5spicer    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5spicer06  ,m5spicer,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spicer    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spicer06  ,m5spicer,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5spiker    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5spiker02  ,m5spiker,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5spikera   ,m5spiker,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spiker    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spiker02  ,m5spiker,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spikera   ,m5spiker,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5spins     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spinsation (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spins     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Spinsation (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5squids    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5squids04a ,m5squids,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5squids05  ,m5squids,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5squids06  ,m5squids,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5squids    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5squids04a ,m5squids,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5squids05  ,m5squids,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5squids06  ,m5squids,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5stax      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Stax Of Cash (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stax      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Stax Of Cash (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5scharg    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5scharg05  ,m5scharg,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5scharg06  ,m5scharg,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5scharga   ,m5scharg,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scharg    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scharg05  ,m5scharg,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scharg06  ,m5scharg,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scharga   ,m5scharg,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5supstr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Star (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5supstra   ,m5supstr,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Star (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5supstr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Star (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5supstra   ,m5supstr,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Star (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5sstrk     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Streak (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sstrk02a  ,m5sstrk,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Streak (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sstrk     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Streak (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sstrk02a  ,m5sstrk,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Super Streak (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5supnov    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Supernova (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5supnova   ,m5supnov,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Supernova (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5supnov    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Supernova (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5supnova   ,m5supnov,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Supernova (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tempt     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tempt05   ,m5tempt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tempta    ,m5tempt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5temptb    ,m5tempt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt05   ,m5tempt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempta    ,m5tempt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5temptb    ,m5tempt,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tempt2    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tempt203  ,m5tempt2,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tempt2a   ,m5tempt2,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt2    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt203  ,m5tempt2,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt2a   ,m5tempt2,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tempcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Temple Of Treasure Club (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tbird     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Thunderbird (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tbird     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Thunderbird (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5topdog    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5topdog04  ,m5topdog,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5topdoga   ,m5topdog,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdog    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdog04  ,m5topdog,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdoga   ,m5topdog,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5trail     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Trailblazer Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5trail     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Trailblazer Club (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ultimo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ultimo03a ,m5ultimo,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ultimo04  ,m5ultimo,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ultimo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ultimo03a ,m5ultimo,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ultimo04  ,m5ultimo,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5upover    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5upover15  ,m5upover,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5upover    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5upover15  ,m5upover,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5vampup    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Vamp It Up (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5vampup    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Vamp It Up (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5wking     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5wking05   ,m5wking,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wking     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wking05   ,m5wking,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5costa     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Costa Del Cash (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5costa     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Costa Del Cash (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ttwo      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Take Two (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ttwo      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Take Two (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5horn      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Whitbread","Horn Of Plenty (Barcrest / Whitbread) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5horn      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Whitbread","Horn Of Plenty (Barcrest / Whitbread) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hotrk     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hot Rocks (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotrk     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Hot Rocks (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
 /* Barcrest / Red Gaming */
 
-GAME( 199?, m5ashock    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Aftershock (Barcrest - Red Gaming) (MPU5, v1.2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ashocka   ,m5ashock,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Aftershock (Barcrest - Red Gaming) (MPU5, v1.3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ashock    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Aftershock (Barcrest - Red Gaming) (MPU5, v1.2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ashocka   ,m5ashock,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Aftershock (Barcrest - Red Gaming) (MPU5, v1.3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bigsht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bigsht04  ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bigsht11  ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bigsht13  ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bigshta   ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigsht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigsht04  ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigsht11  ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigsht13  ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigshta   ,m5bigsht,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bnkrs     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Bonkers (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bnkrs     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Bonkers (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bbank     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Break The Bank (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bbank13   ,m5bbank,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Break The Bank (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bbank     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Break The Bank (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bbank13   ,m5bbank,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Break The Bank (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5casfev    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Casino Fever (Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5casfev12  ,m5casfev,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Casino Fever (Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5casfev    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Casino Fever (Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5casfev12  ,m5casfev,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Casino Fever (Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5dmnstr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dmnstra   ,m5dmnstr,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnstr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnstra   ,m5dmnstr,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5dbubl     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Double Bubble (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dbubl     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Double Bubble (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5dragnd    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dragnda   ,m5dragnd,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dragnd    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dragnda   ,m5dragnd,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fnfair    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fnfaird   ,m5fnfair,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5) (Datapak)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fnfair    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fnfaird   ,m5fnfair,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5) (Datapak)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fusir     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fusir11   ,m5fusir,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fusir12   ,m5fusir,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fusir     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fusir11   ,m5fusir,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fusir12   ,m5fusir,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hypalx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Hypalinx (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hypalx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Hypalinx (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5invad     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Invaders (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5invad     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Invaders (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jcptgn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Jackpot Genie (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jcptgn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Jackpot Genie (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jlstrk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Jewel Strike (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jlstrk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Jewel Strike (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5lock      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lock13    ,m5lock,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lock12    ,m5lock,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lock      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lock13    ,m5lock,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lock12    ,m5lock,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5lockcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lockcl15  ,m5lockcl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lockcl14  ,m5lockcl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lockcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lockcl15  ,m5lockcl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lockcl14  ,m5lockcl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5nitro     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Nitro (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5nitro     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Nitro (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5paint     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Paint The Town Red (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5paint     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Paint The Town Red (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5quake     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Quake (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5quake     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Quake (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rainrn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rainbow Runner (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rainrna   ,m5rainrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rainbow Runner (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rainrn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rainbow Runner (Barcrest - Red Gaming) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rainrna   ,m5rainrn,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rainbow Runner (Barcrest - Red Gaming) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rampg     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rampg11   ,m5rampg,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rampg12   ,m5rampg,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rampg     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rampg11   ,m5rampg,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rampg12   ,m5rampg,   mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rdwarf    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Red Dwarf (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rdwarf    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Red Dwarf (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5redx      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Red X (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5redx12    ,m5redx,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Red X (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redx      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Red X (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redx12    ,m5redx,    mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Red X (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5thtsmg    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","That's Magic (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5thtsmg    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","That's Magic (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5topdol    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5topdola   ,m5topdol,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdol    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdola   ,m5topdol,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5zigzag    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Zig Zag (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5zigzag    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Zig Zag (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cmass     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Critical Mass (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cmass     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Critical Mass (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5sblz      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Snail Blazer (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sblz      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Snail Blazer (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5slide     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Slider (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5slide     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest / Red Gaming","Slider (Barcrest - Red Gaming) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
 /* Vivid */
 
-GAME( 199?, m5sixsht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v1.1, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshta   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v1.1, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtb   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtc   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtd   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshte   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtf   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtg   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshth   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshti   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtj   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtk   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtl   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtm   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sixshtn   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixsht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v1.1, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshta   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v1.1, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtb   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtc   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtd   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshte   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtf   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtg   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshth   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.0, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshti   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtj   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtk   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtl   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtm   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sixshtn   ,m5sixsht,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Six Shooter (Vivid) (MPU5) (v2.1, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5all41     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41a    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41b    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41c    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41d    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41e    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41f    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41g    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41h    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41i    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41j    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41k    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41l    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5all41m    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41a    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41b    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41c    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41d    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41e    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41f    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41g    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41h    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 9)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41i    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 10)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41j    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 11)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41k    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 12)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41l    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 13)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41m    ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","All 4 One (Vivid) (MPU5, set 14)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5atlan     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Atlantic (Vivid) (MPU5, v1.4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5atlana    ,m5atlan,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Atlantic (Vivid) (MPU5, v1.2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5atlan     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Atlantic (Vivid) (MPU5, v1.4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5atlana    ,m5atlan,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Atlantic (Vivid) (MPU5, v1.2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bttf      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Back To The Features (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bttfa     ,m5bttf,    mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Back To The Features (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bttf      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Back To The Features (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bttfa     ,m5bttf,    mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Back To The Features (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5btlbnk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Bottle Bank (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5btlbnk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Bottle Bank (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5caesc     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Caesar's Cash (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5caesc     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Caesar's Cash (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5card      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5card      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cshkcb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cshkcb12  ,m5cshkcb,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cshkcb13  ,m5cshkcb,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cshkcb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cshkcb12  ,m5cshkcb,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cshkcb13  ,m5cshkcb,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5clifhn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Cliffhanger (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clifhn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Cliffhanger (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cnct4     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cnct415   ,m5cnct4,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cnct420   ,m5cnct4,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cnct4     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cnct415   ,m5cnct4,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cnct420   ,m5cnct4,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5devil     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Devil Of A Deal (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5devil     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Devil Of A Deal (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5elband    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","El Bandido Club (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5elband    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","El Bandido Club (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fair      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Fairground Attraction (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fair      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Fairground Attraction (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ggems     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ggems20   ,m5ggems,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ggems     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ggems20   ,m5ggems,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5groll     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Golden Roll (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5groll     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Golden Roll (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hilok     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Hi Lo Karate (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hilok     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Hi Lo Karate (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hiclau    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","High Claudius (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hiclau    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","High Claudius (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5honmon    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Honey Money (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5honmona   ,m5honmon,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Honey Money (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5honmon    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Honey Money (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5honmona   ,m5honmon,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Honey Money (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hopidl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Hop Idol (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hopidl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Hop Idol (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hypno     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Hypnotic (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hypno     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Hypnotic (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jmpjok    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jmpjok11  ,m5jmpjok,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jmpjoka   ,m5jmpjok,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jmpjokb   ,m5jmpjok,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpjok    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpjok11  ,m5jmpjok,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpjoka   ,m5jmpjok,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpjokb   ,m5jmpjok,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5loony     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Loony Juice (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5loony     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Loony Juice (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5loot      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Loot 'n' Khamun (Vivid) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL ) // aka 3-in-1 ?
-GAME( 199?, m5loota     ,m5loot,    mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Loot 'n' Khamun (Vivid) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL ) // aka 3-in-1 ?
+GAME( 199?, m5loot      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Loot 'n' Khamun (Vivid) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // aka 3-in-1 ?
+GAME( 199?, m5loota     ,m5loot,    mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Loot 'n' Khamun (Vivid) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL ) // aka 3-in-1 ?
 
-GAME( 199?, m5mag7s     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5mag7sa    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5mag7sb    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5mag7sc    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5mag7sd    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5mag7se    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mag7s     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mag7sa    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mag7sb    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mag7sc    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mag7sd    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mag7se    ,m5mag7s,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5msf       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Manic Streak Features (Vivid) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5msfa      ,m5msf,     mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Manic Streak Features (Vivid) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5msf       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Manic Streak Features (Vivid) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5msfa      ,m5msf,     mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Manic Streak Features (Vivid) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5piefac    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5piefac23  ,m5piefac,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5piefac12  ,m5piefac,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5piefaca   ,m5piefac,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefac    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefac23  ,m5piefac,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefac12  ,m5piefac,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefaca   ,m5piefac,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5piefc2    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5piefc2a   ,m5piefc2,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5piefc2b   ,m5piefc2,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefc2    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefc2a   ,m5piefc2,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefc2b   ,m5piefc2,  mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5piefcr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory Rio (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefcr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Pie Factory Rio (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5qdraw     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qdraw12   ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qdraw14   ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qdraw15   ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qdrawa    ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qdrawb    ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdraw     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdraw12   ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdraw14   ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdraw15   ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdrawa    ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdrawb    ,m5qdraw,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5redbal    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Random Red Ball (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redbal    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Random Red Ball (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ratpk     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ratpka    ,m5ratpk,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ratpk     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ratpka    ,m5ratpk,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rawin     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid / Whitbread","Reel A Win (Vivid / Whitbread) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rawin     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid / Whitbread","Reel A Win (Vivid / Whitbread) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rollup    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Roll Up Roll Up (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rollup    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Roll Up Roll Up (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5shark     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sharka    ,m5shark,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5shark     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sharka    ,m5shark,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5speccl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Spectrum Club (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5speccl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Spectrum Club (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5spddmn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Speed Demon (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spddmn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Speed Demon (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5stars     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars13a  ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars26   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars25a  ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars25   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars22   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars20   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars10   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars10a  ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars13a  ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars26   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars25a  ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars25   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars22   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars20   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars10   ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars10a  ,m5stars,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 9)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5starcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes Club (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5starcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes Club (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5startr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes Triple (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5startr    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Stars & Stripes Triple (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5supro     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Super Roulette (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5suproa    ,m5supro,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Super Roulette (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5supro     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Super Roulette (Vivid) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5suproa    ,m5supro,   mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Super Roulette (Vivid) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tempp     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Temple Of Pleasure (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempp     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Temple Of Pleasure (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5whdres    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Who Dares Spins (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5whdres    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Who Dares Spins (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5winway    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Winning Ways (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5winway    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Winning Ways (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
 
 
 /* Empire */
 
-GAME( 199?, m5fewmor    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.2, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fewmora   ,m5fewmor,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.2, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fewmorb   ,m5fewmor,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.3, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fewmorc   ,m5fewmor,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.3, set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fewmor    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.2, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fewmora   ,m5fewmor,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.2, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fewmorb   ,m5fewmor,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.3, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fewmorc   ,m5fewmor,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.3, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5wonga     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Fish Called Wonga (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wonga     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","A Fish Called Wonga (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5aceclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5aceclba   ,m5aceclb,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5aceclbb   ,m5aceclb,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5aceclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5aceclba   ,m5aceclb,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5aceclbb   ,m5aceclb,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5barxdx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Bar X Deluxe (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5barxdx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Bar X Deluxe (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bnzclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bnzclb11  ,m5bnzclb,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bnzclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bnzclb11  ,m5bnzclb,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5bukroo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Buckaroo (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bukroo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Buckaroo (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cbrun     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Cannonball Run (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cbrun     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Cannonball Run (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5carou     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Carousel (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5carou     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Carousel (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5casroc    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Casino Royale Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5casroc    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Casino Royale Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5centcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5centcl20  ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5centcl21  ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5centcl21a ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5centcla   ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcl20  ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcl21  ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcl21a ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcla   ,m5centcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cworan    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cworan12  ,m5cworan,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cworan    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cworan12  ,m5cworan,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5clbtro    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clbtro24  ,m5clbtro,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clbtro25  ,m5clbtro,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clbtro    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clbtro24  ,m5clbtro,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clbtro25  ,m5clbtro,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cockdd    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Cock A Doodle Dough! (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cockdd05  ,m5cockdd,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Cock A Doodle Dough! (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cockdd    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Cock A Doodle Dough! (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cockdd05  ,m5cockdd,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Cock A Doodle Dough! (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5coloss    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Colossus Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5coloss    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Colossus Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5crocrk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5crocrk10  ,m5crocrk,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5crocrk    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5crocrk10  ,m5crocrk,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5croclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crocodile Rock Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5croclb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crocodile Rock Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5crsfir    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crossfire (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5crsfir    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Crossfire (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5dmnf      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dmnf10    ,m5dmnf,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnf      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnf10    ,m5dmnf,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5dmnfcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dmnfcl04  ,m5dmnfcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnfcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnfcl04  ,m5dmnfcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5extrm     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrm     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5extrmm    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5extrmm04a ,m5extrmm,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5extrmm04b ,m5extrmm,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5extrmm10  ,m5extrmm,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrmm    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrmm04a ,m5extrmm,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrmm04b ,m5extrmm,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrmm10  ,m5extrmm,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fatcat    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fat Cat (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fatcat    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fat Cat (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fishdl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fishdl10  ,m5fishdl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fishdl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fishdl10  ,m5fishdl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fishcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fish Full Of Dollars Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fishcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Fish Full Of Dollars Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fmonty    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fmonty04a ,m5fmonty,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fmonty04b ,m5fmonty,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fmonty04c ,m5fmonty,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmonty    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmonty04a ,m5fmonty,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmonty04b ,m5fmonty,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmonty04c ,m5fmonty,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5fmount    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Full Mountie (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmount    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Full Mountie (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gophr     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Gopher Gold (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gophr     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Gopher Gold (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gophcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Gopher Gold Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gophcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Gopher Gold Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hisprt    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","High Spirits (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hisprt    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","High Spirits (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hocus     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hocus Pocus (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hocus10   ,m5hocus,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hocus Pocus (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hocus     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hocus Pocus (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hocus10   ,m5hocus,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hocus Pocus (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hocscl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hocus Pocus Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hocscl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hocus Pocus Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hotsht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hotsht07a ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hotsht08  ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hotsht08a ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hotsht10  ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hotsht10a ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht07a ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht08  ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht08a ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht10  ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht10a ,m5hotsht,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hula      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hula Moolah (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hula10    ,m5hula,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hula Moolah (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hula      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hula Moolah (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hula10    ,m5hula,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hula Moolah (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hulacl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hula Moolah Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hulacl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Hula Moolah Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jackbx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jackbx03  ,m5jackbx,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jackbx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jackbx03  ,m5jackbx,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jcy       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Juicy Fruits (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jcy       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Juicy Fruits (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jmpgem    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jmpgem01  ,m5jmpgem,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jmpgem03  ,m5jmpgem,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpgem    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpgem01  ,m5jmpgem,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpgem03  ,m5jmpgem,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jmpgmc    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpgmc    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Jumping Gems Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5kaleid    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kaleidoscope Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kaleid    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kaleidoscope Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5kcclb     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kcclb24   ,m5kcclb,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kcclb     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kcclb24   ,m5kcclb,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5kingqc    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kingqc06  ,m5kingqc,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kingqc07  ,m5kingqc,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kingqc08  ,m5kingqc,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingqc    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingqc06  ,m5kingqc,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingqc07  ,m5kingqc,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingqc08  ,m5kingqc,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5korma     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Korma Chameleon (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5korma12   ,m5korma,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","Korma Chameleon (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5korma     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Korma Chameleon (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5korma12   ,m5korma,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","Korma Chameleon (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5kormcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Korma Chameleon Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kormcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Korma Chameleon Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5monmst    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Money Monster (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5monmsta   ,m5monmst,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Money Monster (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5monmst    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Money Monster (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5monmsta   ,m5monmst,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Money Monster (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ramrd     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ram Raid (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ramrd     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ram Raid (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ramrcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ram Raid Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ramrcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Ram Raid Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ronr      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ronr05    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ronr07    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ronr      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ronr05    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ronr07    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5resfrg    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reservoir Frogs (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5resfrg    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Reservoir Frogs (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rthh      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Return To The Haunted House (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rthh      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Return To The Haunted House (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rollx     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Roll X (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rollx12   ,m5rollx,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","Roll X (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rollx     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Roll X (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rollx12   ,m5rollx,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","Roll X (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5skulcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5skulcl20  ,m5skulcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5skulcl23  ,m5skulcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5skulcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5skulcl20  ,m5skulcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5skulcl23  ,m5skulcl,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tball     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Thunderball (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tball     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Thunderball (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tomb      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Tomb Raiders (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tomb      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Tomb Raiders (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5trclb     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Tomb Raiders Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5trclb     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Tomb Raiders Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ttop      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ttop04    ,m5ttop,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ttop10    ,m5ttop,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ttop      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ttop04    ,m5ttop,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ttop10    ,m5ttop,    mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5ttopcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ttopcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Treble Top Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tsar      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Tsar Wars (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tsar      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Tsar Wars (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5vertgo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Vertigo (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5vertgo    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Vertigo (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5vertcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Vertigo Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5vertcl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Vertigo Club (Empire) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5wthing    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5wthing11  ,m5wthing,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5wthing20  ,m5wthing,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wthing    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wthing11  ,m5wthing,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wthing20  ,m5wthing,  mpu5, mpu5, driver_device, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5xfact     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5xfact02   ,m5xfact,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5xfact04   ,m5xfact,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5xfact11   ,m5xfact,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xfact     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xfact02   ,m5xfact,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xfact04   ,m5xfact,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xfact11   ,m5xfact,   mpu5, mpu5, driver_device, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
 /* Bwb */
-GAME( 199?, m5carwsh    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Car Wash (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5carwsh10  ,m5carwsh,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Car Wash (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5carwsh    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Car Wash (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5carwsh10  ,m5carwsh,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Car Wash (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5cshstx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Cash Stax (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cshstx    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Cash Stax (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5circus    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circus0a  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circus0b  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circus20  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circus21  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circus11  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circus    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circus0a  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circus0b  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circus20  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circus21  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circus11  ,m5circus,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus (Bwb) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5circlb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circlb00  ,m5circlb,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circlb15  ,m5circlb,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5circlb33  ,m5circlb,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circlb    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circlb00  ,m5circlb,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circlb15  ,m5circlb,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5circlb33  ,m5circlb,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Circus Club (Bwb) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5clown     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Clown In Around (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clown11   ,m5clown,   mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Clown In Around (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clown13   ,m5clown,   mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Clown In Around (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clown     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Clown In Around (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clown11   ,m5clown,   mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Clown In Around (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clown13   ,m5clown,   mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Clown In Around (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5clubsn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clubsn11  ,m5clubsn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clubsn14  ,m5clubsn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clubsn16  ,m5clubsn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clubsn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clubsn11  ,m5clubsn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clubsn14  ,m5clubsn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clubsn16  ,m5clubsn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5dick      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Dick Turnip (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dick10    ,m5dick,    mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Dick Turnip (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dick      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Dick Turnip (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dick10    ,m5dick,    mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Dick Turnip (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5donna     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5donnad    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 1, Datapak)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5donnaa    ,m5donna,   mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5donna     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5donnad    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 1, Datapak)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5donnaa    ,m5donna,   mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5dblqts    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dblqtsa   ,m5dblqts,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dblqtsb   ,m5dblqts,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dblqts1b  ,m5dblqts,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dblqts    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dblqtsa   ,m5dblqts,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dblqtsb   ,m5dblqts,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dblqts1b  ,m5dblqts,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5eggold    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Egyptian Gold (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5eggold    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Egyptian Gold (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m55050      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Fifty Fifty (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m55050      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Fifty Fifty (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5gpclub    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Get Plastered Club (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5gpclub    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Get Plastered Club (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5goape     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Going Ape (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5goape     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Going Ape (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5hgl       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Happy Go Lucky (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hgl16     ,m5hgl,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Happy Go Lucky (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hgl14     ,m5hgl,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Happy Go Lucky (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hgl       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Happy Go Lucky (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hgl16     ,m5hgl,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Happy Go Lucky (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hgl14     ,m5hgl,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Happy Go Lucky (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5jokpak    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Joker In The Pack (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jokpak    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Joker In The Pack (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5lvwire    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Live Wire (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lvwirea   ,m5lvwire,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Live Wire (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lvwire    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Live Wire (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lvwirea   ,m5lvwire,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Live Wire (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5carpet    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Magic Carpet (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5carpet12  ,m5carpet,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Magic Carpet (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5carpet    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Magic Carpet (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5carpet12  ,m5carpet,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Magic Carpet (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5minesw    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Minesweeper (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5minesw    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Minesweeper (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5psycho    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5psycho06  ,m5psycho,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5psychoa   ,m5psycho,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5psychoa21 ,m5psycho,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psycho    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psycho06  ,m5psycho,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psychoa   ,m5psycho,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psychoa21 ,m5psycho,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5psyccl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5psyccl01  ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5psyccla   ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast Club (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5psyccla24 ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast Club (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5psyccla02 ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast Club (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psyccl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psyccl01  ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Psycho Cash Beast Club (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psyccla   ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast Club (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psyccla24 ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast Club (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5psyccla02 ,m5psyccl,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Psycho Cash Beast Club (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rwb       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red White & Blue (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rwbbwb    ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rwbbwb24  ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rwbbwb25  ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rwbbwb15  ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rwb       ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Barcrest","Red White & Blue (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rwbbwb    ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rwbbwb24  ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rwbbwb25  ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rwbbwb15  ,m5rwb,     mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Red White & Blue (Bwb) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5reelwn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Reel A Win (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5reelwn24  ,m5reelwn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Reel A Win (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5reelwn    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Reel A Win (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5reelwn24  ,m5reelwn,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Reel A Win (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5reelth    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Reel Thunder (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5reelth    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Reel Thunder (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5rlup      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Roll Up (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rlup      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Roll Up (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5round     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Round & Round (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5round     ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Round & Round (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5sec7      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Secret 7s (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sec7a     ,m5sec7,    mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Secret 7s (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sec7      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Secret 7s (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sec7a     ,m5sec7,    mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Secret 7s (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5sil7      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Silver 7s (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sil7a     ,m5sil7,    mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Silver 7s (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sil7      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Silver 7s (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sil7a     ,m5sil7,    mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Silver 7s (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5smobik    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Smokey Bikin (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5smobik12  ,m5smobik,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Smokey Bikin (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5smobik    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Smokey Bikin (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5smobik12  ,m5smobik,  mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Smokey Bikin (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5tictac    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Tic Tac Tut (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tictacbwb  ,m5tictac, mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Tic Tac Tut (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tictacbwb16,m5tictac, mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Tic Tac Tut (Bwb) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tictac    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Vivid","Tic Tac Tut (Vivid) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tictacbwb  ,m5tictac, mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Tic Tac Tut (Bwb) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tictacbwb16,m5tictac, mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Tic Tac Tut (Bwb) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5xena      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Xena Warrior Princess (Bwb) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xena      ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Bwb","Xena Warrior Princess (Bwb) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
 
 /* Lowen */
-GAME( 199?, m5all41low  ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Lowen","All 4 One (Lowen) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dblfun    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Double Fun (Lowen) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jakjok    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Jackpot Jokers (Lowen) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5roundl    ,m5round,   mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Round & Round (Lowen) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5scfinl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Super Cup Final (Lowen) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5all41low  ,m5all41,   mpu5, mpu5, driver_device, 0, ROT0, "Lowen","All 4 One (Lowen) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dblfun    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Double Fun (Lowen) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jakjok    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Jackpot Jokers (Lowen) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5roundl    ,m5round,   mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Round & Round (Lowen) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scfinl    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Lowen","Super Cup Final (Lowen) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
 /* Others / Uncertain */
 
-GAME( 199?, m5ppussy    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Mdm","Pink Pussy (Mdm) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ppussy    ,0,         mpu5, mpu5, driver_device, 0, ROT0, "Mdm","Pink Pussy (Mdm) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )

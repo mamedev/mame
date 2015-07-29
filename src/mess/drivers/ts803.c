@@ -65,4 +65,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 19??, ts803h,  0,   0,     ts803,     ts803, driver_device,  0,  "Televideo", "TS803H", GAME_IS_SKELETON )
+COMP( 19??, ts803h,  0,   0,     ts803,     ts803, driver_device,  0,  "Televideo", "TS803H", MACHINE_IS_SKELETON )

@@ -98,5 +98,5 @@ ROM_START( m2svlite )
 	ROM_LOAD( "sl1.bin", 0x0000, 0x0800, CRC(afe04b5a) SHA1(3b3385a9b039992279fda5b87926b5089a448581) )
 ROM_END
 
-GAME(198?,  m2hilite,  0, mpu2,  mpu2, driver_device,  0,  ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         GAME_IS_SKELETON_MECHANICAL)
-GAME(198?,  m2svlite,  0, mpu2,  mpu2, driver_device,  0,  ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(198?,  m2hilite,  0, mpu2,  mpu2, driver_device,  0,  ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  m2svlite,  0, mpu2,  mpu2, driver_device,  0,  ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     MACHINE_IS_SKELETON_MECHANICAL)

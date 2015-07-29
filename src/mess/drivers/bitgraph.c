@@ -618,5 +618,5 @@ ROM_END
 
 /* Driver */
 /*       YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1981, bitgrpha, 0, 0, bitgrpha, bitgraph, driver_device, 0, "BBN", "BitGraph rev A", GAME_IMPERFECT_KEYBOARD)
-COMP( 1982, bitgrphb, 0, 0, bitgrphb, bitgraph, driver_device, 0, "BBN", "BitGraph rev B", GAME_NOT_WORKING|GAME_IMPERFECT_KEYBOARD)
+COMP( 1981, bitgrpha, 0, 0, bitgrpha, bitgraph, driver_device, 0, "BBN", "BitGraph rev A", MACHINE_IMPERFECT_KEYBOARD)
+COMP( 1982, bitgrphb, 0, 0, bitgrphb, bitgraph, driver_device, 0, "BBN", "BitGraph rev B", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD)

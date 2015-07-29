@@ -575,9 +575,9 @@ ROM_END
  *
  *************************************/
 
-GAMEL(1976, blockade,  0,        blockade, blockade, driver_device, 0, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
-GAMEL(1976, comotion,  0,        blockade, comotion, driver_device, 0, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
-GAME( 1978, blasto,    0,        blasto,   blasto, driver_device,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // b/w, no overlay
-GAMEL(1977, hustle,    0,        blasto,   hustle, driver_device,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
-GAME( 1977, mineswpr,  0,        blasto,   mineswpr, driver_device, 0, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1977, mineswpr4, mineswpr, blasto,   mineswpr4, driver_device,0, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1976, blockade,  0,        blockade, blockade, driver_device, 0, ROT0, "Gremlin", "Blockade", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotion,  0,        blockade, comotion, driver_device, 0, ROT0, "Gremlin", "Comotion", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAME( 1978, blasto,    0,        blasto,   blasto, driver_device,   0, ROT0, "Gremlin", "Blasto", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
+GAMEL(1977, hustle,    0,        blasto,   hustle, driver_device,   0, ROT0, "Gremlin", "Hustle", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAME( 1977, mineswpr,  0,        blasto,   mineswpr, driver_device, 0, ROT0, "Amutech", "Minesweeper", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, mineswpr4, mineswpr, blasto,   mineswpr4, driver_device,0, ROT0, "Amutech", "Minesweeper (4-Player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

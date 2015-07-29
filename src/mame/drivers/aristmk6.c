@@ -250,20 +250,20 @@ ROM_START( thaiprin )
 	ROM_LOAD32_WORD("30127721.u72", 0x0800002, 0x0100000, BAD_DUMP CRC(613cea6b) SHA1(f04a3ee53074b7cd84879d752df5dbb80437475e) ) // wrong size?!
 ROM_END
 
-GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK6 Base (15011025, Malaysia)",           GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT)
-GAME( 200?, mk6nsw11,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK6 Base (11011901, NSW/ACT)",            GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT)
+GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK6 Base (15011025, Malaysia)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT)
+GAME( 200?, mk6nsw11,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK6 Base (11011901, NSW/ACT)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT)
 
 // Dates listed below are for the combination (reel layout), not release dates
-GAME( 2004, antcleo,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Antony and Cleopatra (10177211, Malaysia)",          GAME_NOT_WORKING | GAME_NO_SOUND ) // 754,    B - 12/07/04
-GAME( 2002, 50lions,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "50 Lions (10120511, NSW/ACT)",                       GAME_NOT_WORKING | GAME_NO_SOUND ) // 717,    A - 11/10/02
-GAME( 2003, 50lionsa,  50lions,    aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "50 Lions (10156111, Malaysia)",                      GAME_NOT_WORKING | GAME_NO_SOUND ) // 717,    D - 20/10/03
-GAME( 2003, choysun,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Choy Sun Doa (20131511, Malaysia)",                  GAME_NOT_WORKING | GAME_NO_SOUND ) // 688,    D - 23/01/03
-GAME( 2003, crystals,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Crystal Springs (10155811, Malaysia)",               GAME_NOT_WORKING | GAME_NO_SOUND ) // 740,    A - 28/05/03
-GAME( 2003, indianmm,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Indian Dreaming - Maximillion$ (10130711, NSW/ACT)", GAME_NOT_WORKING | GAME_NO_SOUND ) // 628/12, A - 17/01/03
-GAME( 2004, wheregld,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Where's the Gold (20177111, Malaysia)",              GAME_NOT_WORKING | GAME_NO_SOUND ) // 756,    C - 17/06/04
-GAME( 2002, whalecsh,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Whales of Cash (20155711, Malaysia)",                GAME_NOT_WORKING | GAME_NO_SOUND ) // 695,    A - 14/06/02
-GAME( 2003, wildways,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wild Ways (10130111, Malaysia)",                     GAME_NOT_WORKING | GAME_NO_SOUND ) // 698/1,  A - 25/02/03
-GAME( 2003, thaiprin,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Thai Princess (30127721, Malaysia)",                 GAME_NOT_WORKING | GAME_NO_SOUND ) // 707,    E - 21/03/03
+GAME( 2004, antcleo,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Antony and Cleopatra (10177211, Malaysia)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 754,    B - 12/07/04
+GAME( 2002, 50lions,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "50 Lions (10120511, NSW/ACT)",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 717,    A - 11/10/02
+GAME( 2003, 50lionsa,  50lions,    aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "50 Lions (10156111, Malaysia)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 717,    D - 20/10/03
+GAME( 2003, choysun,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Choy Sun Doa (20131511, Malaysia)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    D - 23/01/03
+GAME( 2003, crystals,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Crystal Springs (10155811, Malaysia)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 740,    A - 28/05/03
+GAME( 2003, indianmm,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Indian Dreaming - Maximillion$ (10130711, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/12, A - 17/01/03
+GAME( 2004, wheregld,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Where's the Gold (20177111, Malaysia)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 756,    C - 17/06/04
+GAME( 2002, whalecsh,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Whales of Cash (20155711, Malaysia)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 695,    A - 14/06/02
+GAME( 2003, wildways,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wild Ways (10130111, Malaysia)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 698/1,  A - 25/02/03
+GAME( 2003, thaiprin,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Thai Princess (30127721, Malaysia)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 707,    E - 21/03/03
 
 /*
 List of known MK6 games, excluding Hyperlink variations

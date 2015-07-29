@@ -470,6 +470,6 @@ ROM_START( taotaido3 )
 	ROM_LOAD( "u15.bin", 0x000000, 0x200000, CRC(e95823e9) SHA1(362583944ad4fdde4f9e29928cf34376c7ad931f) )
 ROM_END
 
-GAME( 1993, taotaido, 0,        taotaido, taotaido, driver_device, 0, ROT0, "Video System Co.", "Tao Taido (2 button version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, taotaidoa,taotaido, taotaido, taotaido6,driver_device, 0, ROT0, "Video System Co.", "Tao Taido (6 button version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE  ) // maybe a prototype? has various debug features
-GAME( 1993, taotaido3,taotaido, taotaido, taotaido3,driver_device, 0, ROT0, "Video System Co.", "Tao Taido (2/3 button version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE  )
+GAME( 1993, taotaido, 0,        taotaido, taotaido, driver_device, 0, ROT0, "Video System Co.", "Tao Taido (2 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, taotaidoa,taotaido, taotaido, taotaido6,driver_device, 0, ROT0, "Video System Co.", "Tao Taido (6 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE  ) // maybe a prototype? has various debug features
+GAME( 1993, taotaido3,taotaido, taotaido, taotaido3,driver_device, 0, ROT0, "Video System Co.", "Tao Taido (2/3 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE  )

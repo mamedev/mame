@@ -1188,7 +1188,7 @@ ROM_START( kingdrbb2 )
 ROM_END
 
 
-GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, driver_device, 0, ROT0, "Tazmi",                        "King Derby (1981)",           GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, driver_device, 0, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
-GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, driver_device, 0, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 2000, cowrace,   kingdrby, cowrace,  kingdrbb, driver_device, 0, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  GAME_NOT_WORKING | GAME_WRONG_COLORS )
+GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, driver_device, 0, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME ( 1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, driver_device, 0, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
+GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, driver_device, 0, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME ( 2000, cowrace,   kingdrby, cowrace,  kingdrbb, driver_device, 0, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )

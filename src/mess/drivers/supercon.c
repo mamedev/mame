@@ -812,4 +812,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME          PARENT  COMPAT  MACHINE    INPUT       INIT      COMPANY  FULLNAME                     FLAGS */
-CONS( 1983, supercon,     0,      0,      supercon,  supercon, supercon_state,   supercon, "Novag", "SuperConstellation", GAME_SUPPORTS_SAVE)
+CONS( 1983, supercon,     0,      0,      supercon,  supercon, supercon_state,   supercon, "Novag", "SuperConstellation", MACHINE_SUPPORTS_SAVE)

@@ -291,4 +291,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 1979, rotaryf, 0, rotaryf, rotaryf, driver_device, 0, ROT270, "Kasco", "Rotary Fighter", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, driver_device, 0, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

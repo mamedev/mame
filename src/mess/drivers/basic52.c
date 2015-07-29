@@ -154,5 +154,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, basic52,  0,       0,    basic52,   basic52, driver_device,  0,    "Intel", "MCS BASIC 52", GAME_NO_SOUND_HW)
-COMP( 1985, basic31,  basic52, 0,    basic31,   basic52, driver_device,  0,    "Intel", "MCS BASIC 31", GAME_NO_SOUND_HW)
+COMP( 1985, basic52,  0,       0,    basic52,   basic52, driver_device,  0,    "Intel", "MCS BASIC 52", MACHINE_NO_SOUND_HW)
+COMP( 1985, basic31,  basic52, 0,    basic31,   basic52, driver_device,  0,    "Intel", "MCS BASIC 31", MACHINE_NO_SOUND_HW)

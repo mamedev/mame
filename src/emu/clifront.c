@@ -310,7 +310,7 @@ void cli_frontend::listfull(const char *gamename)
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
-		if ((drivlist.driver().flags & GAME_NO_STANDALONE) == 0)
+		if ((drivlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
 			osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().description);
 }
 
@@ -350,7 +350,7 @@ void cli_frontend::listclones(const char *gamename)
 	{
 		// if we have a non-bios clone and it matches, keep it
 		int clone_of = drivlist.clone();
-		if (clone_of != -1 && (drivlist.driver(clone_of).flags & GAME_IS_BIOS_ROOT) == 0)
+		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
 			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
 				drivlist.include();
 	}
@@ -374,7 +374,7 @@ void cli_frontend::listclones(const char *gamename)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		if (clone_of != -1 && (drivlist.driver(clone_of).flags & GAME_IS_BIOS_ROOT) == 0)
+		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
 			osd_printf_info("%-16s %-8s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 	}
 }

@@ -9,7 +9,7 @@
     Fixes and additions by Krzysztof Strzecha:
     07.06.2004 Tape loading added. Some cleanups of debug code.
            Fixed stupid bug in timings (vblank duration).
-           GAME_NOT_WORKING flag removed.
+           MACHINE_NOT_WORKING flag removed.
         29.05.2004 CPU clock, number of scanlines, vblank duration corrected.
            Some cleanups. Two non-working TESTDRIVERS added.
         14.05.2004 Finally fixed and readded.
@@ -541,4 +541,4 @@ COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81, zx_state,       zx,   
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300, zx_state,     zx,     "Your Computer",            "PC8300",              0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Creon Enterprises",        "Power 3000",          0 )
 COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81, zx_state,       zx,     "Wilf Rigter",              "ZX97", GAME_NOT_WORKING | GAME_UNOFFICIAL )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81, zx_state,       zx,     "Wilf Rigter",              "ZX97", MACHINE_NOT_WORKING | MACHINE_UNOFFICIAL )

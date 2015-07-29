@@ -28,7 +28,7 @@ public:
 	{ }
 
 	required_device<timer_device> m_t3_off_timer;
-	
+
 	UINT8 m_ram[0xc00];
 	UINT16 m_ram_address;
 	bool m_ram_ce;
@@ -97,7 +97,7 @@ void tb303_state::refresh_ram()
 		case 2: hi = 1; break;
 		case 3: hi = 2; break;
 	}
-	
+
 	if (m_ram_ce)
 	{
 		// _WE must be high(read mode) for address transitions
@@ -114,7 +114,7 @@ WRITE8_MEMBER(tb303_state::ram_w)
 	// MCU D,F,E: RAM address
 	m_port[offset] = data;
 	refresh_ram();
-	
+
 	// MCU D,F01: pitch data
 	//..
 }
@@ -133,7 +133,7 @@ WRITE8_MEMBER(tb303_state::strobe_w)
 	// MCU I0: RAM _WE
 	m_ram_we = (data & 1) ? false : true;
 	refresh_ram();
-	
+
 	// MCU I1: pitch data latch strobe
 	// MCU I2: gate signal
 
@@ -147,13 +147,13 @@ void tb303_state::update_leds()
 {
 	// 4*4 LED matrix from port G/H:
 	/*
-		0.0 D204    1.0 D211    2.0 D217    3.0 D205
-		0.1 D206    1.1 D213    2.1 D218    3.1 D207
-		0.2 D208    1.2 D215    2.2 D220    3.2 D210
-		0.3 D209    1.3 D216    2.3 D221    3.3 D212
+	    0.0 D204    1.0 D211    2.0 D217    3.0 D205
+	    0.1 D206    1.1 D213    2.1 D218    3.1 D207
+	    0.2 D208    1.2 D215    2.2 D220    3.2 D210
+	    0.3 D209    1.3 D216    2.3 D221    3.3 D212
 	*/
 	display_matrix(4, 4, m_port[NEC_UCOM4_PORTG], m_port[NEC_UCOM4_PORTH]);
-	
+
 	// todo: battery led
 	// todo: 4 more leds(see top-left part)
 }
@@ -164,7 +164,7 @@ WRITE8_MEMBER(tb303_state::switch_w)
 	// MCU H: input/led mux
 	if (offset == NEC_UCOM4_PORTH)
 		m_inp_mux = data = data ^ 0xf;
-	
+
 	m_port[offset] = data;
 	update_leds();
 }
@@ -253,13 +253,13 @@ INPUT_PORTS_END
 void tb303_state::machine_start()
 {
 	hh_ucom4_state::machine_start();
-	
+
 	// zerofill
 	memset(m_ram, 0, sizeof(m_ram));
 	m_ram_address = 0;
 	m_ram_ce = false;
 	m_ram_we = false;
-	
+
 	// register for savestates
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ram_address));
@@ -309,4 +309,4 @@ ROM_START( tb303 )
 ROM_END
 
 
-CONS( 1982, tb303, 0, 0, tb303, tb303, driver_device, 0, "Roland", "TB-303", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+CONS( 1982, tb303, 0, 0, tb303, tb303, driver_device, 0, "Roland", "TB-303", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -206,9 +206,9 @@ const rsp_cop2::vec_helpers_t rsp_cop2::m_vec_helpers = {
 		{ 0xffff, 0xffff, 0x0000, 0x0000 }, // L
 		{ 0xffff, 0xffff, 0xffff, 0xffff }  // D
 	},
-    { // word_reverse
-        0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d
-    }
+	{ // word_reverse
+		0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d
+	}
 };
 
 #if !(defined(__SSSE3__) || defined(_MSC_VER))
@@ -322,7 +322,7 @@ void rsp_cop2::vec_load_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 	dqm = _mm_shuffle_epi8(dqm, ekey);
 #endif
 
-  // Align the data to the DQM so we can mask it in.
+	// Align the data to the DQM so we can mask it in.
 #if !(defined(__SSSE3__) || defined(_MSC_VER))
 	data = sse2_pshufb(data, m_vec_helpers.ror_b2l_keys[ror & 0xF]);
 #else
@@ -330,7 +330,7 @@ void rsp_cop2::vec_load_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 	data = _mm_shuffle_epi8(data, ekey);
 #endif
 
-  // Mask and mux in the data.
+	// Mask and mux in the data.
 #if (defined(__SSE4_1__) || defined(_MSC_VER))
 	reg = _mm_blendv_epi8(reg, data, dqm);
 #else
@@ -377,7 +377,7 @@ void rsp_cop2::vec_load_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 	}
 
 	// "Unpack" the data.
-    rsp_vec_t zero = _mm_setzero_si128();
+	rsp_vec_t zero = _mm_setzero_si128();
 	data = _mm_unpacklo_epi8(zero, data);
 
 	if (request_type != RSP_MEM_REQUEST_PACK)
@@ -385,10 +385,10 @@ void rsp_cop2::vec_load_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 		data = _mm_srli_epi16(data, 1);
 	}
 
-    data = _mm_shufflehi_epi16(data, _MM_SHUFFLE(0, 1, 2, 3));
-    data = _mm_shufflelo_epi16(data, _MM_SHUFFLE(0, 1, 2, 3));
+	data = _mm_shufflehi_epi16(data, _MM_SHUFFLE(0, 1, 2, 3));
+	data = _mm_shufflelo_epi16(data, _MM_SHUFFLE(0, 1, 2, 3));
 
-    _mm_store_si128((rsp_vec_t *) regp, data);
+	_mm_store_si128((rsp_vec_t *) regp, data);
 }
 
 //
@@ -403,7 +403,7 @@ void rsp_cop2::vec_load_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 {
 	UINT32 aligned_addr = addr & 0xFF0;
 	UINT32 offset = addr & 0xF;
-    static UINT32 call_count = 0;
+	static UINT32 call_count = 0;
 
 	rsp_vec_t data = _mm_load_si128((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr));
 
@@ -439,7 +439,7 @@ void rsp_cop2::vec_load_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 
 	_mm_store_si128((rsp_vec_t *) regp, data);
 
-    call_count++;
+	call_count++;
 }
 
 //
@@ -542,7 +542,7 @@ void rsp_cop2::vec_store_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 	reg = _mm_shuffle_epi8(reg, dkey);
 #endif
 
-    // TODO: Always store in 8-byte chunks to emulate wraparound.
+	// TODO: Always store in 8-byte chunks to emulate wraparound.
 	_mm_storel_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr), reg);
 }
 
@@ -574,7 +574,7 @@ void rsp_cop2::vec_store_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 	reg = _mm_shuffle_epi8(reg, ekey);
 #endif
 
-  // Mask and mux out the data, write.
+	// Mask and mux out the data, write.
 #if (defined(__SSE4_1__) || defined(_MSC_VER))
 	data = _mm_blendv_epi8(data, reg, dqm);
 #else
@@ -702,10 +702,10 @@ rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
 	memset(m_vflag, 0, sizeof(m_vflag));
 	memset(m_accum, 0, sizeof(m_accum));
 #if USE_SIMD
-    memset(&m_acc, 0, sizeof(m_acc));
-    memset(&m_flags, 0, sizeof(aligned_rsp_2vect_t) * 3);
-    m_div_out = 0;
-    m_div_in = 0;
+	memset(&m_acc, 0, sizeof(m_acc));
+	memset(&m_flags, 0, sizeof(aligned_rsp_2vect_t) * 3);
+	m_div_out = 0;
+	m_div_in = 0;
 #endif
 	m_rspcop2_state = (internal_rspcop2_state *)rsp.m_cache.alloc_near(sizeof(internal_rspcop2_state));
 }
@@ -877,7 +877,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Load 1 byte to vector byte index
 
-            //printf("LBV ");
+			//printf("LBV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -896,7 +896,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 2 bytes starting from vector byte index
 
-            //printf("LSV ");
+			//printf("LSV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -922,7 +922,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 4 bytes starting from vector byte index
 
-            //printf("LLV ");
+			//printf("LLV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -948,7 +948,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 8 bytes starting from vector byte index
 
-            //printf("LDV ");
+			//printf("LDV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -974,7 +974,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads up to 16 bytes starting from vector byte index
 
-            //printf("LQV ");
+			//printf("LQV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1001,7 +1001,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
-            //printf("LRV ");
+			//printf("LRV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1029,7 +1029,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the upper 8 bits of each element
 
-            //printf("LPV ");
+			//printf("LPV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1052,7 +1052,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element
 
-            //printf("LUV ");
+			//printf("LUV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1075,7 +1075,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element, with 2-byte stride
 
-            //printf("LHV ");
+			//printf("LHV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1098,7 +1098,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
 
-            //printf("LFV ");
+			//printf("LFV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1127,7 +1127,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
-            //printf("LWV ");
+			//printf("LWV ");
 #if USE_SIMD
 #else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
@@ -1154,15 +1154,15 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 
 			// FIXME: has a small problem with odd indices
 
-            //printf("LTV ");
+			//printf("LTV ");
 #if 0
 #else
-	        INT32 index = (op >> 7) & 0xf;
-	        INT32 offset = (op & 0x7f);
-	        if (offset & 0x40)
-		        offset |= 0xffffffc0;
+			INT32 index = (op >> 7) & 0xf;
+			INT32 offset = (op & 0x7f);
+			if (offset & 0x40)
+				offset |= 0xffffffc0;
 
-            INT32 vs = (op >> 16) & 0x1f;
+			INT32 vs = (op >> 16) & 0x1f;
 			INT32 ve = vs + 8;
 			if (ve > 32)
 				ve = 32;
@@ -1225,7 +1225,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 1 byte from vector byte index
 
-            //printf("SBV ");
+			//printf("SBV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1244,7 +1244,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 2 bytes starting from vector byte index
 
-            //printf("SSV ");
+			//printf("SSV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1270,7 +1270,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 4 bytes starting from vector byte index
 
-            //printf("SLV ");
+			//printf("SLV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1296,7 +1296,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 8 bytes starting from vector byte index
 
-            //printf("SDV ");
+			//printf("SDV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1322,7 +1322,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from vector byte index until 16-byte boundary
 
-            //printf("SQV ");
+			//printf("SQV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1348,7 +1348,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
-            //printf("SRV ");
+			//printf("SRV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1377,7 +1377,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores upper 8 bits of each element
 
-            //printf("SPV ");
+			//printf("SPV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1409,7 +1409,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores bits 14-7 of each element
 
-            //printf("SUV ");
+			//printf("SUV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1441,7 +1441,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores bits 14-7 of each element, with 2-byte stride
 
-            //printf("SHV ");
+			//printf("SHV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1470,7 +1470,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 
 			// FIXME: only works for index 0 and index 8
 
-            //printf("SFV ");
+			//printf("SFV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1500,7 +1500,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			// Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
-            //printf("SWV ");
+			//printf("SWV ");
 #if USE_SIMD
 #else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
@@ -1528,13 +1528,13 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores one element from maximum of 8 vectors, while incrementing element index
 
-            //printf("STV ");
+			//printf("STV ");
 #if 0
 #else
-	        INT32 index = (op >> 7) & 0xf;
-	        INT32 offset = (op & 0x7f);
-	        if (offset & 0x40)
-		        offset |= 0xffffffc0;
+			INT32 index = (op >> 7) & 0xf;
+			INT32 offset = (op & 0x7f);
+			if (offset & 0x40)
+				offset |= 0xffffffc0;
 
 			INT32 vs = (op >> 16) & 0x1f;
 			INT32 ve = vs + 8;
@@ -1548,7 +1548,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			INT32 eaoffset = (ea & 0xf) + (element * 2);
 			ea &= ~0xf;
 
-            for (INT32 i = vs; i < ve; i++)
+			for (INT32 i = vs; i < ve; i++)
 			{
 				m_rsp.WRITE16(ea + (eaoffset & 0xf), VREG_S(i, element & 0x7));
 				eaoffset += 2;
@@ -1654,7 +1654,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Multiplies signed integer by signed integer * 2
 
-            //printf("MULF ");
+			//printf("MULF ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1706,7 +1706,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// ------------------------------------------------------
 			//
 
-            //printf("MULU ");
+			//printf("MULU ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1762,7 +1762,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Stores the higher 16 bits of the 32-bit result to accumulator
 			// The low slice of accumulator is stored into destination element
 
-            //printf("MUDL ");
+			//printf("MUDL ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1809,7 +1809,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into accumulator
 			// The middle slice of accumulator is stored into destination element
 
-            //printf("MUDM ");
+			//printf("MUDM ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1857,7 +1857,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into accumulator
 			// The low slice of accumulator is stored into destination element
 
-            //printf("MUDN ");
+			//printf("MUDN ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo = read_acc_lo(acc);
@@ -1902,7 +1902,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into highest 32 bits of accumulator, the low slice is zero
 			// The highest 32 bits of accumulator is saturated into destination element
 
-            //printf("MUDH ");
+			//printf("MUDH ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1950,7 +1950,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Multiplies signed integer by signed integer * 2
 			// The result is added to accumulator
 
-            //printf("MACF ");
+			//printf("MACF ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2001,7 +2001,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// ------------------------------------------------------
 			//
 
-            //printf("MACU ");
+			//printf("MACU ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2071,7 +2071,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Adds the higher 16 bits of the 32-bit result to accumulator
 			// The low slice of accumulator is stored into destination element
 
-            //printf("MADL ");
+			//printf("MADL ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2120,7 +2120,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into accumulator
 			// The middle slice of accumulator is stored into destination element
 
-            //printf("MADM ");
+			//printf("MADM ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2171,7 +2171,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into accumulator
 			// The low slice of accumulator is stored into destination element
 
-            //printf("MADN ");
+			//printf("MADN ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2225,7 +2225,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into highest 32 bits of accumulator, the low slice is zero
 			// The highest 32 bits of accumulator is saturated into destination element
 
-            //printf("MADH ");
+			//printf("MADH ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2275,7 +2275,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG == VDREG
 
-            //printf("ADD ");
+			//printf("ADD ");
 #if USE_SIMD
 			rsp_vec_t acc_lo;
 			UINT16 *acc = m_acc.s;
@@ -2321,7 +2321,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG == VDREG
 
-            //printf("SUB ");
+			//printf("SUB ");
 #if USE_SIMD
 			rsp_vec_t acc_lo;
 			UINT16 *acc = m_acc.s;
@@ -2367,7 +2367,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Changes the sign of source register 2 if source register 1 is negative and stores
 			// the result to destination register
 
-            //printf("ABS ");
+			//printf("ABS ");
 #if USE_SIMD
 			rsp_vec_t acc_lo;
 			UINT16 *acc = m_acc.s;
@@ -2423,7 +2423,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG = VDREG
 
-            //printf("ADDC ");
+			//printf("ADDC ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t sn;
@@ -2471,7 +2471,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG = VDREG
 
-            //printf("SUBC ");
+			//printf("SUBC ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t eq, sn;
@@ -2521,7 +2521,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Stores high, middle or low slice of accumulator to destination vector
 
-            //printf("SAW ");
+			//printf("SAW ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			switch (EL)
@@ -2586,7 +2586,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are less than VS2
 			// Moves the element in VS2 to destination vector
 
-            //printf("LT ");
+			//printf("LT ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2655,7 +2655,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are equal with VS2
 			// Moves the element in VS2 to destination vector
 
-            //printf("EQ ");
+			//printf("EQ ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2712,7 +2712,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are not equal with VS2
 			// Moves the element in VS2 to destination vector
 
-            //printf("NE ");
+			//printf("NE ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2770,7 +2770,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are greater or equal with VS2
 			// Moves the element in VS2 to destination vector
 
-            //printf("GE ");
+			//printf("GE ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2827,7 +2827,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip low
 
-            //printf("CL ");
+			//printf("CL ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -2944,7 +2944,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip high
 
-            //printf("CH ");
+			//printf("CH ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t ge, le, sign, eq, vce;
@@ -3047,7 +3047,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip reverse
 
-            //printf("CR ");
+			//printf("CR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t ge, le;
@@ -3125,7 +3125,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Merges two vectors according to compare flags
 
-            //printf("MRG ");
+			//printf("MRG ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le = read_vcc_lo(m_flags[RSP_VCC].s);
@@ -3166,7 +3166,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise AND of two vector registers
 
-            //printf("AND ");
+			//printf("AND ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3196,7 +3196,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT AND of two vector registers
 
-            //printf("NAND ");
+			//printf("NAND ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3226,7 +3226,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise OR of two vector registers
 
-            //printf("OR ");
+			//printf("OR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3256,7 +3256,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT OR of two vector registers
 
-            //printf("NOR ");
+			//printf("NOR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3286,7 +3286,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise XOR of two vector registers
 
-            //printf("XOR ");
+			//printf("XOR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3316,7 +3316,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT XOR of two vector registers
 
-            //printf("NXOR ");
+			//printf("NXOR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3347,7 +3347,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal
 
-            //printf("RCP ");
+			//printf("RCP ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3418,7 +3418,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal low part
 
-            //printf("RCPL ");
+			//printf("RCPL ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3505,7 +3505,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal high part
 
-            //printf("RCPH ");
+			//printf("RCPH ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3537,7 +3537,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Moves element from vector to destination vector
 
-            //printf("MOV ");
+			//printf("MOV ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 			m_v[VDREG].v = vec_vmov(VS2REG, EL, VDREG, VS1REG);
@@ -3561,7 +3561,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root
 
-            //printf("RSQ ");
+			//printf("RSQ ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3633,7 +3633,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root low part
 
-            //printf("RSQL ");
+			//printf("RSQL ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3723,7 +3723,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root high part
 
-            //printf("RSQH ");
+			//printf("RSQH ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3754,7 +3754,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector null instruction
 
-            //printf("NOP ");
+			//printf("NOP ");
 			break;
 		}
 
@@ -3777,7 +3777,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00000 | TTTTT | DDDDD | IIII | 0000000 |
 			// ---------------------------------------------------
 			//
-            //printf("MFC2 ");
+			//printf("MFC2 ");
 			int el = (op >> 7) & 0xf;
 			UINT16 b1 = VREG_B(RDREG, (el+0) & 0xf);
 			UINT16 b2 = VREG_B(RDREG, (el+1) & 0xf);
@@ -3792,15 +3792,15 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00010 | TTTTT | DDDDD | 00000000000 |
 			// ------------------------------------------------
 			//
-            //printf("CFC2 ");
+			//printf("CFC2 ");
 			if (RTREG)
 			{
 #if USE_SIMD
-                INT32 src = RDREG & 3;
-                if (src == 3) {
-                    src = 2;
-                }
-                RTVAL = get_flags(m_flags[src].s);
+				INT32 src = RDREG & 3;
+				if (src == 3) {
+					src = 2;
+				}
+				RTVAL = get_flags(m_flags[src].s);
 #else
 				switch(RDREG)
 				{
@@ -3865,7 +3865,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00100 | TTTTT | DDDDD | IIII | 0000000 |
 			// ---------------------------------------------------
 			//
-            //printf("MTC2 ");
+			//printf("MTC2 ");
 			int el = (op >> 7) & 0xf;
 			W_VREG_B(RDREG, (el+0) & 0xf, (RTVAL >> 8) & 0xff);
 			W_VREG_B(RDREG, (el+1) & 0xf, (RTVAL >> 0) & 0xff);
@@ -3966,7 +3966,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 		{
-            //printf("V");
+			//printf("V");
 			handle_vector_ops(op);
 			break;
 		}
@@ -4185,38 +4185,38 @@ void rsp_cop2::dump(UINT32 op)
 	}
 
 #if USE_SIMD
-    printf("acc_h: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[0], m_acc.s[1], m_acc.s[2], m_acc.s[3], m_acc.s[4], m_acc.s[5], m_acc.s[6], m_acc.s[7]);
-    printf("acc_m: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[8], m_acc.s[9], m_acc.s[10], m_acc.s[11], m_acc.s[12], m_acc.s[13], m_acc.s[14], m_acc.s[15]);
-    printf("acc_l: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[16], m_acc.s[17], m_acc.s[18], m_acc.s[19], m_acc.s[20], m_acc.s[21], m_acc.s[22], m_acc.s[23]);
-    printf("vcc_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCC].s[0], m_flags[RSP_VCC].s[1], m_flags[RSP_VCC].s[2], m_flags[RSP_VCC].s[3], m_flags[RSP_VCC].s[4], m_flags[RSP_VCC].s[5], m_flags[RSP_VCC].s[6], m_flags[RSP_VCC].s[7]);
-    printf("vcc_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCC].s[8], m_flags[RSP_VCC].s[9], m_flags[RSP_VCC].s[10], m_flags[RSP_VCC].s[11], m_flags[RSP_VCC].s[12], m_flags[RSP_VCC].s[13], m_flags[RSP_VCC].s[14], m_flags[RSP_VCC].s[15]);
-    printf("vco_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCO].s[0], m_flags[RSP_VCO].s[1], m_flags[RSP_VCO].s[2], m_flags[RSP_VCO].s[3], m_flags[RSP_VCO].s[4], m_flags[RSP_VCO].s[5], m_flags[RSP_VCO].s[6], m_flags[RSP_VCO].s[7]);
-    printf("vco_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCO].s[8], m_flags[RSP_VCO].s[9], m_flags[RSP_VCO].s[10], m_flags[RSP_VCO].s[11], m_flags[RSP_VCO].s[12], m_flags[RSP_VCO].s[13], m_flags[RSP_VCO].s[14], m_flags[RSP_VCO].s[15]);
-    printf("vce:    %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCE].s[0], m_flags[RSP_VCE].s[1], m_flags[RSP_VCE].s[2], m_flags[RSP_VCE].s[3], m_flags[RSP_VCE].s[4], m_flags[RSP_VCE].s[5], m_flags[RSP_VCE].s[6], m_flags[RSP_VCE].s[7]);
+	printf("acc_h: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[0], m_acc.s[1], m_acc.s[2], m_acc.s[3], m_acc.s[4], m_acc.s[5], m_acc.s[6], m_acc.s[7]);
+	printf("acc_m: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[8], m_acc.s[9], m_acc.s[10], m_acc.s[11], m_acc.s[12], m_acc.s[13], m_acc.s[14], m_acc.s[15]);
+	printf("acc_l: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[16], m_acc.s[17], m_acc.s[18], m_acc.s[19], m_acc.s[20], m_acc.s[21], m_acc.s[22], m_acc.s[23]);
+	printf("vcc_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCC].s[0], m_flags[RSP_VCC].s[1], m_flags[RSP_VCC].s[2], m_flags[RSP_VCC].s[3], m_flags[RSP_VCC].s[4], m_flags[RSP_VCC].s[5], m_flags[RSP_VCC].s[6], m_flags[RSP_VCC].s[7]);
+	printf("vcc_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCC].s[8], m_flags[RSP_VCC].s[9], m_flags[RSP_VCC].s[10], m_flags[RSP_VCC].s[11], m_flags[RSP_VCC].s[12], m_flags[RSP_VCC].s[13], m_flags[RSP_VCC].s[14], m_flags[RSP_VCC].s[15]);
+	printf("vco_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCO].s[0], m_flags[RSP_VCO].s[1], m_flags[RSP_VCO].s[2], m_flags[RSP_VCO].s[3], m_flags[RSP_VCO].s[4], m_flags[RSP_VCO].s[5], m_flags[RSP_VCO].s[6], m_flags[RSP_VCO].s[7]);
+	printf("vco_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCO].s[8], m_flags[RSP_VCO].s[9], m_flags[RSP_VCO].s[10], m_flags[RSP_VCO].s[11], m_flags[RSP_VCO].s[12], m_flags[RSP_VCO].s[13], m_flags[RSP_VCO].s[14], m_flags[RSP_VCO].s[15]);
+	printf("vce:    %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCE].s[0], m_flags[RSP_VCE].s[1], m_flags[RSP_VCE].s[2], m_flags[RSP_VCE].s[3], m_flags[RSP_VCE].s[4], m_flags[RSP_VCE].s[5], m_flags[RSP_VCE].s[6], m_flags[RSP_VCE].s[7]);
 #else
-    printf("acc_h: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
-    printf("acc_m: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
-    printf("acc_l: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_L(0), ACCUM_L(1), ACCUM_L(2), ACCUM_L(3), ACCUM_L(4), ACCUM_L(5), ACCUM_L(6), ACCUM_L(7));
-    printf("vcc_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[4][0], m_vflag[4][1], m_vflag[4][2], m_vflag[4][3], m_vflag[4][4], m_vflag[4][5], m_vflag[4][6], m_vflag[4][7]);
-    printf("vcc_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[1][0], m_vflag[1][1], m_vflag[1][2], m_vflag[1][3], m_vflag[1][4], m_vflag[1][5], m_vflag[1][6], m_vflag[1][7]);
-    printf("vco_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[3][0], m_vflag[3][1], m_vflag[3][2], m_vflag[3][3], m_vflag[3][4], m_vflag[3][5], m_vflag[3][6], m_vflag[3][7]);
-    printf("vco_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[0][0], m_vflag[0][1], m_vflag[0][2], m_vflag[0][3], m_vflag[0][4], m_vflag[0][5], m_vflag[0][6], m_vflag[0][7]);
-    printf("vce:    %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[2][0], m_vflag[2][1], m_vflag[2][2], m_vflag[2][3], m_vflag[2][4], m_vflag[2][5], m_vflag[2][6], m_vflag[2][7]);
+	printf("acc_h: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
+	printf("acc_m: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
+	printf("acc_l: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_L(0), ACCUM_L(1), ACCUM_L(2), ACCUM_L(3), ACCUM_L(4), ACCUM_L(5), ACCUM_L(6), ACCUM_L(7));
+	printf("vcc_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[4][0], m_vflag[4][1], m_vflag[4][2], m_vflag[4][3], m_vflag[4][4], m_vflag[4][5], m_vflag[4][6], m_vflag[4][7]);
+	printf("vcc_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[1][0], m_vflag[1][1], m_vflag[1][2], m_vflag[1][3], m_vflag[1][4], m_vflag[1][5], m_vflag[1][6], m_vflag[1][7]);
+	printf("vco_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[3][0], m_vflag[3][1], m_vflag[3][2], m_vflag[3][3], m_vflag[3][4], m_vflag[3][5], m_vflag[3][6], m_vflag[3][7]);
+	printf("vco_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[0][0], m_vflag[0][1], m_vflag[0][2], m_vflag[0][3], m_vflag[0][4], m_vflag[0][5], m_vflag[0][6], m_vflag[0][7]);
+	printf("vce:    %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[2][0], m_vflag[2][1], m_vflag[2][2], m_vflag[2][3], m_vflag[2][4], m_vflag[2][5], m_vflag[2][6], m_vflag[2][7]);
 #endif
 }
 
 void rsp_cop2::dump_dmem()
 {
-    UINT8* dmem = m_rsp.get_dmem();
-    printf("\n");
-    for (int i = 0; i < 0x1000; i += 32)
-    {
-        printf("%04x: ", i);
-        for (int j = 0; j < 32; j++)
-        {
-            printf("%02x ", dmem[i + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
+	UINT8* dmem = m_rsp.get_dmem();
+	printf("\n");
+	for (int i = 0; i < 0x1000; i += 32)
+	{
+		printf("%04x: ", i);
+		for (int j = 0; j < 32; j++)
+		{
+			printf("%02x ", dmem[i + j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
 }

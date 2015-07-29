@@ -106,6 +106,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE   INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-//COMP( 1993, vt510,  0,      0,       vt520,    vt520, driver_device,   0,  "Digital Equipment Corporation", "VT510", GAME_NOT_WORKING)
-COMP( 1994, vt520,  0,      0,       vt520,    vt520, driver_device,   0,  "Digital Equipment Corporation", "VT520", GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1994, vt525,  0,      0,       vt520,    vt520, driver_device,   0,  "Digital Equipment Corporation", "VT525", GAME_NOT_WORKING)
+//COMP( 1993, vt510,  0,      0,       vt520,    vt520, driver_device,   0,  "Digital Equipment Corporation", "VT510", MACHINE_NOT_WORKING)
+COMP( 1994, vt520,  0,      0,       vt520,    vt520, driver_device,   0,  "Digital Equipment Corporation", "VT520", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP( 1994, vt525,  0,      0,       vt520,    vt520, driver_device,   0,  "Digital Equipment Corporation", "VT525", MACHINE_NOT_WORKING)

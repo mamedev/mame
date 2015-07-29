@@ -768,5 +768,5 @@ DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 }
 
 
-GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

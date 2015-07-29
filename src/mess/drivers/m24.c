@@ -308,5 +308,5 @@ ROM_START( m240 )
 	ROM_LOAD("pdbd.tms2516.keyboardmcureplacementdaughterboard_10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
-COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M24", GAME_NOT_WORKING)
-COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M240", GAME_NOT_WORKING)
+COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M24", MACHINE_NOT_WORKING)
+COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M240", MACHINE_NOT_WORKING)

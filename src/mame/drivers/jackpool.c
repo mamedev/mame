@@ -315,4 +315,4 @@ DRIVER_INIT_MEMBER(jackpool_state,jackpool)
 	rom[0x9040/2] = 0x6602;
 }
 
-GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",GAME_NOT_WORKING )
+GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",MACHINE_NOT_WORKING )

@@ -405,5 +405,5 @@ DRIVER_INIT_MEMBER(dcon_state,sdgndmps)
 }
 
 
-GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, dcon,     0, dcon,     dcon, driver_device,     0,        ROT0, "Success",            "D-Con", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dcon,     0, dcon,     dcon, driver_device,     0,        ROT0, "Success",            "D-Con", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

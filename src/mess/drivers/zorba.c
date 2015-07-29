@@ -428,4 +428,4 @@ ROM_START( zorba )
 	ROM_LOAD( "74ls288.u77", 0x0040, 0x0020, CRC(946e03b0) SHA1(24240bdd7bdf507a5b51628fb36ad1266fc53a28) ) // suspected bad dump
 ROM_END
 
-COMP( 1982, zorba, 0, 0, zorba, zorba, zorba_state, zorba, "Telcon Industries", "Zorba", GAME_NOT_WORKING )
+COMP( 1982, zorba, 0, 0, zorba, zorba, zorba_state, zorba, "Telcon Industries", "Zorba", MACHINE_NOT_WORKING )

@@ -579,6 +579,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid, driver_device,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, driver_device,  0, ROT0, "Sanritsu / Esco", "Yachtsman", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1982, rougien,  0,        rougien,  rougien, driver_device,  0, ROT0, "Sanritsu", "Rougien", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid, driver_device,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, driver_device,  0, ROT0, "Sanritsu / Esco", "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, rougien,  0,        rougien,  rougien, driver_device,  0, ROT0, "Sanritsu", "Rougien", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

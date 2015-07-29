@@ -176,4 +176,4 @@ ROM_START( taitons1 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
 ROM_END
 
-CONS( 2006, taitons1,  0,   0,  xavix,  xavix, driver_device,  0,   "Bandai / SSD Company LTD / Taito",      "Let's! TV Play Classic - Taito Nostalgia 1", GAME_IS_SKELETON )
+CONS( 2006, taitons1,  0,   0,  xavix,  xavix, driver_device,  0,   "Bandai / SSD Company LTD / Taito",      "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )

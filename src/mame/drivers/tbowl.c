@@ -704,6 +704,6 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206a.2",    0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
-GAME( 1987, tbowl,    0,        tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World)", GAME_SUPPORTS_SAVE )
-GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", GAME_SUPPORTS_SAVE ) // or early version, handwritten labels
-GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, driver_device,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, tbowl,    0,        tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
+GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, driver_device,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)", MACHINE_SUPPORTS_SAVE )

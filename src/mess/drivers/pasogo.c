@@ -573,4 +573,4 @@ ROM_START( pasogo )
 ROM_END
 
 //    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS
-CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, driver_device,    0,   "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
+CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, driver_device,    0,   "KOEI", "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)

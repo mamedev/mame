@@ -135,4 +135,4 @@ ROM_START( crzyddz )
 ROM_END
 
 
-GAME( 2004?, crzyddz,  0, sealy, sealy, driver_device, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", GAME_IS_SKELETON )
+GAME( 2004?, crzyddz,  0, sealy, sealy, driver_device, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )

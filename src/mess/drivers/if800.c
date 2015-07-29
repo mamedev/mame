@@ -114,4 +114,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1985, if800,  0,      0,       if800,     if800, driver_device,    0,     "Oki Electric",   "if800 model 60", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, if800,  0,      0,       if800,     if800, driver_device,    0,     "Oki Electric",   "if800 model 60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -103,7 +103,6 @@ public:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(vpoker);
 	UINT32 screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -606,20 +605,6 @@ static GFXDECODE_START( vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(vpoker_state, vpoker)
-{
-	int i;
-
-	for (i = 0; i < 7; i++)
-	{
-		rgb_t color;
-
-		color = rgb_t(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
-
-		palette.set_pen_color(i, color);
-	}
-}
-
 WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -643,8 +628,8 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vpoker)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(vpoker_state, vpoker)
+
+	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
@@ -702,5 +687,5 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  MACHINE  INPUT     STATE          INIT  ROT    COMPANY         FULLNAME             FLAGS... */
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics", "Videotronics Poker", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",    "5-Aces Poker",       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics", "Videotronics Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",    "5-Aces Poker",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

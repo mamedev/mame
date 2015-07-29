@@ -688,4 +688,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1983, multi8, 0,      0,       multi8,    multi8, driver_device,  0,     "Mitsubishi", "Multi 8", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, multi8, 0,      0,       multi8,    multi8, driver_device,  0,     "Mitsubishi", "Multi 8", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

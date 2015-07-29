@@ -524,8 +524,8 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio4)
 
 
 
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )

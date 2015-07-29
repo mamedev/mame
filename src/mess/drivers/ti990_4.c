@@ -363,5 +363,5 @@ ROM_START(ti990_4v)
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1976, ti990_4,  0,      0,      ti990_4,    0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System with Video Display Terminal" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4,  0,      0,      ti990_4,    0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System with Video Display Terminal" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

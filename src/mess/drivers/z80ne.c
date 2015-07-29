@@ -595,7 +595,7 @@ ROM_START( z80netf )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY               FULLNAME                      FLAGS */
-COMP( 1980, z80ne,    0,        0,      z80ne,    z80ne, z80ne_state,    z80ne,   "Nuova Elettronica",  "Z80NE",                      GAME_NO_SOUND_HW)
-COMP( 1980, z80net,   z80ne,    0,      z80net,   z80net, z80ne_state,   z80net,  "Nuova Elettronica",  "Z80NE + LX.388",             GAME_NO_SOUND_HW)
-COMP( 1980, z80netb,  z80ne,    0,      z80netb,  z80net, z80ne_state,   z80netb, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", GAME_NO_SOUND_HW)
-COMP( 1980, z80netf,  z80ne,    0,      z80netf,  z80netf, z80ne_state,  z80netf, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    GAME_NO_SOUND_HW)
+COMP( 1980, z80ne,    0,        0,      z80ne,    z80ne, z80ne_state,    z80ne,   "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW)
+COMP( 1980, z80net,   z80ne,    0,      z80net,   z80net, z80ne_state,   z80net,  "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW)
+COMP( 1980, z80netb,  z80ne,    0,      z80netb,  z80net, z80ne_state,   z80netb, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW)
+COMP( 1980, z80netf,  z80ne,    0,      z80netf,  z80netf, z80ne_state,  z80netf, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW)

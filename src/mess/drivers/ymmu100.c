@@ -495,5 +495,5 @@ ROM_START( mu100r )
 	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100,  mu100, driver_device, 0, "Yamaha", "MU100",                  GAME_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100r, mu100, driver_device, 0, "Yamaha", "MU100 Rackable version", GAME_NOT_WORKING )
+CONS( 1997, mu100,  0,     0, mu100,  mu100, driver_device, 0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+CONS( 1997, mu100r, mu100, 0, mu100r, mu100, driver_device, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )

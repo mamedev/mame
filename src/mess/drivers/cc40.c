@@ -638,4 +638,4 @@ ROM_START( cc40 )
 ROM_END
 
 
-COMP( 1983, cc40, 0, 0, cc40, cc40, driver_device, 0, "Texas Instruments", "Compact Computer 40", GAME_SUPPORTS_SAVE )
+COMP( 1983, cc40, 0, 0, cc40, cc40, driver_device, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )

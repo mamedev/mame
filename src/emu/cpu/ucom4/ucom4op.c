@@ -59,7 +59,7 @@ UINT8 upd650_cpu_device::input_r(int index)
 	// bidirectional ports are 'push-pull', meaning it will output 0 when it's read
 	if ((index & 0xf) == NEC_UCOM4_PORTC || (index & 0xf) == NEC_UCOM4_PORTD)
 		output_w(index, 0);
-	
+
 	return ucom4_cpu_device::input_r(index);
 }
 

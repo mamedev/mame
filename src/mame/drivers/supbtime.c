@@ -505,7 +505,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1990, supbtime, 0,        supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, supbtimea,supbtime, supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, supbtimej,supbtime, supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, driver_device, 0, ROT0, "Data East Corporation", "China Town (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, supbtime, 0,        supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimea,supbtime, supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimej,supbtime, supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, driver_device, 0, ROT0, "Data East Corporation", "China Town (Japan)", MACHINE_SUPPORTS_SAVE )

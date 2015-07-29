@@ -726,10 +726,10 @@ DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
 GAME( 1994, renju,      0,      renju,    renju,    st0016_state, renju,    ROT0, "Visco",            "Renju Kizoku", 0)
 GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, nratechu, ROT0, "Seta",             "Neratte Chu", 0)
 GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, mayjisn2, ROT0, "Seta",             "Mayjinsen 2", 0)
-GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, renju,    ROT0, "Visco",            "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
+GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, renju,    ROT0, "Visco",            "Koi Koi Shimasho", MACHINE_IMPERFECT_GRAPHICS)
 GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop", 0)
 
 /* Not working */
-GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, mayjinsn, ROT0, "Seta",             "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
-GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", GAME_NOT_WORKING) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
-GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", GAME_NOT_WORKING) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, mayjinsn, ROT0, "Seta",             "Mayjinsen",MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)
+GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", MACHINE_NOT_WORKING) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", MACHINE_NOT_WORKING) // the Insert Coin text has been translated to English and no (c) is uploaded

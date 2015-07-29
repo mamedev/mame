@@ -242,11 +242,11 @@ ROM_END
 // ??/87 Skill Flight
 
 
-GAME(1979,  antar,     0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Antar (set 1)",      GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  antar2,    antar,  play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Antar (set 2)",      GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  evlfight,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Evil Fight",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  attack,    0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Attack",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  blkfever,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Black Fever",        GAME_IS_SKELETON_MECHANICAL)
-GAME(1982,  cerberup,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Cerberus (Pinball)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  madrace,   0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Mad Race",           GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  zira,      0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Zira",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  antar,     0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Antar (set 1)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  antar2,    antar,  play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Antar (set 2)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  evlfight,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Evil Fight",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  attack,    0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Attack",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  blkfever,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Black Fever",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  cerberup,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Cerberus (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  madrace,   0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Mad Race",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  zira,      0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Zira",           MACHINE_IS_SKELETON_MECHANICAL)

@@ -855,10 +855,10 @@ DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 }
 
 
-GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", GAME_SUPPORTS_SAVE )
-GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", GAME_SUPPORTS_SAVE ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, driver_device,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1988, cabalbl2,cabal, cabalbl2,cabalj, cabal_state,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", MACHINE_SUPPORTS_SAVE ) // korea?
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, driver_device,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2,cabal, cabalbl2,cabalj, cabal_state,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", GAME_SUPPORTS_SAVE )
-GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 2, Trackball version)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 2, Trackball version)", MACHINE_SUPPORTS_SAVE )

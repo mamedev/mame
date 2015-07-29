@@ -1580,7 +1580,7 @@ fsa1gt
 fsa1st
 
 // Microsoft
-xbox	
+xbox
 
 // NASCOM Microcomputers
 nascom1   // 1978 Nascom 1
@@ -2155,6 +2155,8 @@ packmon     // Bandai
 msthawk     // Bandai/Mattel
 bzaxxon     // Bandai
 zackman     // Bandai
+bpengo      // Bandai
+bbtime      // Bandai
 bdoramon    // Bandai
 bultrman    // Bandai
 machiman    // Bandai

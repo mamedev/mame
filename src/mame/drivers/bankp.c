@@ -394,5 +394,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bankp, 0, bankp, bankp, driver_device, 0, ROT0,   "Sanritsu / Sega", "Bank Panic",  GAME_SUPPORTS_SAVE )
-GAME( 1987, combh, 0, bankp, combh, driver_device, 0, ROT270, "Sanritsu / Sega", "Combat Hawk", GAME_SUPPORTS_SAVE )
+GAME( 1984, bankp, 0, bankp, bankp, driver_device, 0, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, combh, 0, bankp, combh, driver_device, 0, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )

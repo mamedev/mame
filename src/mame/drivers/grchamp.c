@@ -760,4 +760,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp, 0, grchamp, grchamp, driver_device, 0, ROT270, "Taito", "Grand Champion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchamp, 0, grchamp, grchamp, driver_device, 0, ROT270, "Taito", "Grand Champion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

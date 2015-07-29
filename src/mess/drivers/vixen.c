@@ -874,4 +874,4 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1984, vixen,  0,       0,     vixen,  vixen, vixen_state,  vixen,  "Osborne",   "Vixen",      GAME_NOT_WORKING )
+COMP( 1984, vixen,  0,       0,     vixen,  vixen, vixen_state,  vixen,  "Osborne",   "Vixen",      MACHINE_NOT_WORKING )

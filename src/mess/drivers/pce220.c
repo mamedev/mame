@@ -1045,5 +1045,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1991, pce220,  0,       0,    pce220,     pce220, driver_device,  0,   "Sharp",   "PC-E220",      GAME_NOT_WORKING )
-COMP( 2001, pcg850v, 0,       0,    pcg850v,    pcg850v, driver_device, 0,   "Sharp",   "PC-G850V", GAME_NOT_WORKING )
+COMP( 1991, pce220,  0,       0,    pce220,     pce220, driver_device,  0,   "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,       0,    pcg850v,    pcg850v, driver_device, 0,   "Sharp",   "PC-G850V", MACHINE_NOT_WORKING )

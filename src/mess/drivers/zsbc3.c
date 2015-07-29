@@ -124,4 +124,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY               FULLNAME       FLAGS */
-COMP( 1980, zsbc3,  0,      0,       zsbc3,     zsbc3, driver_device,   0,   "Digital Microsystems",   "ZSBC-3", GAME_NO_SOUND_HW)
+COMP( 1980, zsbc3,  0,      0,       zsbc3,     zsbc3, driver_device,   0,   "Digital Microsystems",   "ZSBC-3", MACHINE_NO_SOUND_HW)

@@ -776,7 +776,7 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia, driver_device,   0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, warriorb,  0,       warriorb, warriorb, driver_device, 0,   ROT0,   "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, sagaia,    darius2, darius2d, sagaia, driver_device,   0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, driver_device, 0,   ROT0,   "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )

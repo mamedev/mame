@@ -79,7 +79,7 @@ Done:
     - moved address remapping proms to "user1" (hunchbkd & co)
     - Service now adds credit
     - Hooked up coin_counters
-    - remove GAME_NOT_WORKING GAME_WRONG_COLORS from hunchbkd
+    - remove MACHINE_NOT_WORKING MACHINE_WRONG_COLORS from hunchbkd
     - fixed shootgal0121u4red
     - dkongjr: mapped more interface lines between sound board and cpu board
     - tagged all inputs, all reads use tag names
@@ -3282,48 +3282,48 @@ DRIVER_INIT_MEMBER(dkong_state,dkingjr)
  *
  *************************************/
 
-GAME( 1980, radarscp,  0,        radarscp,  radarscp, driver_device, 0,        ROT90,  "Nintendo", "Radar Scope", GAME_SUPPORTS_SAVE )
-GAME( 1980, radarscp1, radarscp, radarscp1, radarscp, driver_device, 0,        ROT90,  "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
+GAME( 1980, radarscp,  0,        radarscp,  radarscp, driver_device, 0,        ROT90,  "Nintendo", "Radar Scope", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, radarscp1, radarscp, radarscp1, radarscp, driver_device, 0,        ROT90,  "Nintendo", "Radar Scope (TRS01)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, dkong,     0,        dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkonghrd,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong (hard kit)", GAME_SUPPORTS_SAVE ) // not sure if original or bootleg (see notes on top of driver file)
-GAME( 1981, dkongo,    dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongj,    dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongjo,   dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongjo1,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1981, dkong,     0,        dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkonghrd,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong (hard kit)", MACHINE_SUPPORTS_SAVE ) // not sure if original or bootleg (see notes on top of driver file)
+GAME( 1981, dkongo,    dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkongj,    dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkongjo,   dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkongjo1,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, dkongf,    dkong,    dkong2b,   dkongf,   driver_device, 0,        ROT90,  "hack (Jeff Kulczycki)", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
-GAME( 2006, dkongx,    dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II: Jumpman Returns (hack, V1.2)", GAME_SUPPORTS_SAVE )
-GAME( 2006, dkongx11,  dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II: Jumpman Returns (hack, V1.1)", GAME_SUPPORTS_SAVE )
+GAME( 2004, dkongf,    dkong,    dkong2b,   dkongf,   driver_device, 0,        ROT90,  "hack (Jeff Kulczycki)", "Donkey Kong Foundry (hack)", MACHINE_SUPPORTS_SAVE ) /* from Jeff's Romhack */
+GAME( 2006, dkongx,    dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II: Jumpman Returns (hack, V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, dkongx11,  dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II: Jumpman Returns (hack, V1.1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (US set F-2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjrb,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjre,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (E kit)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjrpb, dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Junior (P kit, bootleg)", GAME_SUPPORTS_SAVE ) // definitely not issued by Nintendo
-GAME( 1982, jrking,    dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Junior King (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkingjr,   dkongjr,  dkongjr,   dkongjr,  dkong_state,   dkingjr,  ROT90,  "bootleg", "Donkey King Jr. (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (US set F-2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong Jr. (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong Junior (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrb,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjre,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (E kit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrpb, dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Junior (P kit, bootleg)", MACHINE_SUPPORTS_SAVE ) // definitely not issued by Nintendo
+GAME( 1982, jrking,    dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Junior King (bootleg of Donkey Kong Jr.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkingjr,   dkongjr,  dkongjr,   dkongjr,  dkong_state,   dkingjr,  ROT90,  "bootleg", "Donkey King Jr. (bootleg of Donkey Kong Jr.)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, dkong3,    0,        dkong3,    dkong3,   driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE )
-GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1983, dkong3,    0,        dkong3,    dkong3,   driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong 3 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pestplce,  mario,    pestplce,  pestplce, driver_device, 0,        ROT180, "bootleg", "Pest Place", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, pestplce,  mario,    pestplce,  pestplce, driver_device, 0,        ROT180, "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 2650 based */
-GAME( 1984, herbiedk,  huncholy, s2650,     herbiedk, driver_device, 0,        ROT90,  "Century Electronics / Seatongrove Ltd", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1983, hunchbkd,  hunchbak, s2650,     hunchbkd, driver_device, 0,        ROT90,  "Century Electronics", "Hunchback (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbdk,      superbik, s2650,     sbdk,     driver_device, 0,        ROT90,  "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state,   herodk,   ROT90,  "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, herodku,   hero,     s2650,     herodk,   driver_device, 0,        ROT90,  "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, 8ballact,  0,        s2650,     8ballact, driver_device, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, 8ballact2, 8ballact, s2650,     8ballact, driver_device, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (DKJr conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, shootgal,  0,        s2650,     shootgal, driver_device, 0,        ROT180, "Seatongrove Ltd (Zaccaria license)", "Shooting Gallery", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, spclforc,  0,        spclforc,  spclforc, driver_device, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, driver_device, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces II", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, herbiedk,  huncholy, s2650,     herbiedk, driver_device, 0,        ROT90,  "Century Electronics / Seatongrove Ltd", "Herbie at the Olympics (DK conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbkd,  hunchbak, s2650,     hunchbkd, driver_device, 0,        ROT90,  "Century Electronics", "Hunchback (DK conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbdk,      superbik, s2650,     sbdk,     driver_device, 0,        ROT90,  "Century Electronics", "Super Bike (DK conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state,   herodk,   ROT90,  "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herodku,   hero,     s2650,     herodk,   driver_device, 0,        ROT90,  "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact,  0,        s2650,     8ballact, driver_device, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (DK conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact2, 8ballact, s2650,     8ballact, driver_device, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (DKJr conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, shootgal,  0,        s2650,     shootgal, driver_device, 0,        ROT180, "Seatongrove Ltd (Zaccaria license)", "Shooting Gallery", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spclforc,  0,        spclforc,  spclforc, driver_device, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, driver_device, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces II", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* EPOS */
-GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state,   drakton,  ROT90,  "Epos Corporation", "Drakton (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, drktnjr,   drakton,  drktnjr,   drakton,  dkong_state,   drakton,  ROT90,  "Epos Corporation", "Drakton (DKJr conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state,   strtheat, ROT90,  "Epos Corporation", "Street Heat", GAME_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
+GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state,   drakton,  ROT90,  "Epos Corporation", "Drakton (DK conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, drktnjr,   drakton,  drktnjr,   drakton,  dkong_state,   drakton,  ROT90,  "Epos Corporation", "Drakton (DKJr conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state,   strtheat, ROT90,  "Epos Corporation", "Street Heat", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)

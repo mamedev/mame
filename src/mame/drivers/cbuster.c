@@ -617,8 +617,8 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 
 /******************************************************************************/
 
-GAME( 1990, cbuster,  0,       twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", GAME_SUPPORTS_SAVE )
-GAME( 1990, cbusterw, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", GAME_SUPPORTS_SAVE )
-GAME( 1990, cbusterj, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan FR revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, twocrude, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US FT revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, twocrudea,cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US FT version)", GAME_SUPPORTS_SAVE )
+GAME( 1990, cbuster,  0,       twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cbusterw, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cbusterj, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan FR revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, twocrude, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US FT revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, twocrudea,cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US FT version)", MACHINE_SUPPORTS_SAVE )

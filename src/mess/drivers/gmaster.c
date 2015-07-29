@@ -312,4 +312,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT    CLASS          INIT      COMPANY    FULLNAME */
-CONS( 1990, gmaster,  0,      0,        gmaster,  gmaster, gmaster_state, gmaster, "Hartung", "Game Master", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+CONS( 1990, gmaster,  0,      0,        gmaster,  gmaster, gmaster_state, gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

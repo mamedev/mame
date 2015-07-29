@@ -372,8 +372,8 @@ ROM_END
 
 
 
-GAME( 1988, hcastle,   0,       hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version M)", GAME_SUPPORTS_SAVE )
-GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version K)", GAME_SUPPORTS_SAVE )
-GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version E)", GAME_SUPPORTS_SAVE )
-GAME( 1988, akumajou,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", GAME_SUPPORTS_SAVE )
-GAME( 1988, akumajoun, hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", GAME_SUPPORTS_SAVE )
+GAME( 1988, hcastle,   0,       hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajou,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajoun, hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", MACHINE_SUPPORTS_SAVE )

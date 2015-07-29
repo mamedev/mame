@@ -631,7 +631,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (US)", GAME_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1992, riot,      0,        riot,     riot, driver_device,     0, ROT0,  "NMK",   "Riot", GAME_SUPPORTS_SAVE )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun, driver_device,   0, ROT0,  "Tecmo", "Ganbare Ginkun", GAME_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, riot,      0,        riot,     riot, driver_device,     0, ROT0,  "NMK",   "Riot", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun, driver_device,   0, ROT0,  "Tecmo", "Ganbare Ginkun", MACHINE_SUPPORTS_SAVE )

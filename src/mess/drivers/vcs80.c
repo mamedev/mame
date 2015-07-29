@@ -254,4 +254,4 @@ DRIVER_INIT_MEMBER(vcs80_state,vcs80)
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME    FLAGS */
-COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80, vcs80_state,  vcs80, "Eckhard Schiller", "VCS-80", GAME_SUPPORTS_SAVE | GAME_NO_SOUND)
+COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80, vcs80_state,  vcs80, "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

@@ -391,4 +391,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, xtheball, 0, xtheball, xtheball, driver_device, 0,  ROT0, "Rare", "X the Ball", GAME_SUPPORTS_SAVE )
+GAME( 1991, xtheball, 0, xtheball, xtheball, driver_device, 0,  ROT0, "Rare", "X the Ball", MACHINE_SUPPORTS_SAVE )

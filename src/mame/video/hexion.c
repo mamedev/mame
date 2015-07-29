@@ -51,7 +51,7 @@ void hexion_state::video_start()
 	m_vram[0] = memregion("maincpu")->base() + 0x30000;
 	m_vram[1] = m_vram[0] + 0x2000;
 	m_unkram = m_vram[1] + 0x2000;
-	
+
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 

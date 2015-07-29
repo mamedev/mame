@@ -719,5 +719,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1983, comx35p,    0,      0,      pal,        comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (PAL)",    GAME_IMPERFECT_SOUND )
-COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (NTSC)",   GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35p,    0,      0,      pal,        comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (PAL)",    MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (NTSC)",   MACHINE_IMPERFECT_SOUND )

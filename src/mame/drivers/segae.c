@@ -1111,10 +1111,10 @@ DRIVER_INIT_MEMBER(systeme_state, fantzn2)
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        systeme,  hangonjr, systeme_state, hangonjr, ROT0,   "Sega", "Hang-On Jr.", GAME_SUPPORTS_SAVE )
-GAME( 1986, transfrm, 0,        systeme,  transfrm, driver_device, 0,        ROT0,   "Sega", "Transformer", GAME_SUPPORTS_SAVE )
-GAME( 1986, astrofl,  transfrm, systemex, transfrm, systeme_state, astrofl,  ROT0,   "Sega", "Astro Flash (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ridleofp, 0,        systeme,  ridleofp, systeme_state, ridleofp, ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, opaopa,   0,        systemeb, opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", GAME_SUPPORTS_SAVE )
-GAME( 1988, fantzn2,  0,        systemex, fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetrisse, 0,        systeme,  tetrisse, driver_device, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", GAME_SUPPORTS_SAVE )
+GAME( 1985, hangonjr, 0,        systeme,  hangonjr, systeme_state, hangonjr, ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, transfrm, 0,        systeme,  transfrm, driver_device, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, astrofl,  transfrm, systemex, transfrm, systeme_state, astrofl,  ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ridleofp, 0,        systeme,  ridleofp, systeme_state, ridleofp, ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opaopa,   0,        systemeb, opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, fantzn2,  0,        systemex, fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrisse, 0,        systeme,  tetrisse, driver_device, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )

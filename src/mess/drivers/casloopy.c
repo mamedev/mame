@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x04051000, 0x040511ff) AM_READWRITE16(pal_r, pal_w, 0xffffffff)
 	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(vregs_r, vregs_w, 0xffffffff)
 	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
-//	AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
+//  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	AM_RANGE(0x06000000, 0x061fffff) AM_READ(cart_r)
 	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
@@ -563,4 +563,4 @@ DRIVER_INIT_MEMBER(casloopy_state,casloopy)
 		m_bios_rom[i] = 0x000b0009; // RTS + NOP
 }
 
-CONS( 1995, casloopy,  0,   0,   casloopy,  casloopy, casloopy_state,  casloopy,  "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 1995, casloopy,  0,   0,   casloopy,  casloopy, casloopy_state,  casloopy,  "Casio", "Loopy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -816,4 +816,4 @@ ROM_START( itt3030 )
 	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
 
-COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  driver_device, 0,  "ITT RFA",      "ITT3030", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  driver_device, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

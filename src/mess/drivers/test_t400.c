@@ -49,5 +49,5 @@ ROM_START( test420 )
 	ROM_LOAD( "rom_42x.bin", 0x000, 0x400, BAD_DUMP CRC(e4e80001) SHA1(8fdca9d08de1cc83387a7d141f6b254117902442) )
 ROM_END
 
-COMP( 2008, test410,   0,        0,      test_t410,   0, driver_device, 0,      "T400 uController project",   "T410 test suite", GAME_NO_SOUND_HW )
-COMP( 2008, test420,   test410,  0,      test_t420,   0, driver_device, 0,      "T400 uController project",   "T420 test suite", GAME_NO_SOUND_HW )
+COMP( 2008, test410,   0,        0,      test_t410,   0, driver_device, 0,      "T400 uController project",   "T410 test suite", MACHINE_NO_SOUND_HW )
+COMP( 2008, test420,   test410,  0,      test_t420,   0, driver_device, 0,      "T400 uController project",   "T420 test suite", MACHINE_NO_SOUND_HW )

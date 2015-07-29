@@ -298,6 +298,6 @@ ROM_START(tsclass)
 ROM_END
 
 
-GAME(1997, hrclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME(1997, ccclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME(1997, tsclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME(1997, hrclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, ccclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, tsclass, 0, cesclassic, cesclassic, driver_device, 0, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

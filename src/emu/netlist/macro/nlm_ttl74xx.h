@@ -9,10 +9,10 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
-#define TTL_7416_GATE(_name)                    		                       \
+#define TTL_7416_GATE(_name)                                                   \
 		NET_REGISTER_DEV(TTL_7416_GATE, _name)
 
-#define TTL_7416_DIP(_name)            	        		                       \
+#define TTL_7416_DIP(_name)                                                    \
 		NET_REGISTER_DEV(TTL7416_DIP, _name)
 
 /* ----------------------------------------------------------------------------

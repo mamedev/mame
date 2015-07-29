@@ -500,4 +500,4 @@ ROM_START( flipjack )
 ROM_END
 
 
-GAME( 1983?, flipjack,   0,      flipjack, flipjack, driver_device, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983
+GAME( 1983?, flipjack,   0,      flipjack, flipjack, driver_device, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983

@@ -73,9 +73,6 @@ struct fm7_video_t
 	UINT16 vram_offset2;
 	UINT8 fm7_pal[8];
 	UINT16 fm77av_pal_selected;
-	UINT8 fm77av_pal_r[4096];
-	UINT8 fm77av_pal_g[4096];
-	UINT8 fm77av_pal_b[4096];
 	UINT8 subrom;  // currently active sub CPU ROM (AV only)
 	UINT8 cgrom;  // currently active CGROM (AV only)
 	UINT8 modestatus;
@@ -148,6 +145,7 @@ public:
 		m_joy2(*this, "joy2"),
 		m_dsw(*this, "DSW"),
 		m_palette(*this, "palette"),
+		m_av_palette(*this, "av_palette"),
 		m_avbank1(*this, "av_bank1"),
 		m_avbank2(*this, "av_bank2"),
 		m_avbank3(*this, "av_bank3"),
@@ -293,12 +291,11 @@ public:
 	DECLARE_DRIVER_INIT(fm7);
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(fm7);
 	DECLARE_MACHINE_START(fm7);
 	DECLARE_MACHINE_START(fm77av);
 	DECLARE_MACHINE_START(fm11);
 	DECLARE_MACHINE_START(fm16);
-	UINT32 screen_update_fm7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(fm7_beeper_off);
 	TIMER_CALLBACK_MEMBER(fm77av_encoder_ack);
 	TIMER_CALLBACK_MEMBER(fm7_timer_irq);
@@ -367,6 +364,7 @@ public:
 	required_ioport m_joy2;
 	required_ioport m_dsw;
 	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_av_palette;
 
 	optional_device<address_map_bank_device> m_avbank1;
 	optional_device<address_map_bank_device> m_avbank2;

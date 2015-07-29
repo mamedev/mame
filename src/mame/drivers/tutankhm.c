@@ -316,5 +316,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, driver_device, 0, ROT90, "Konami", "Tutankham", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, driver_device, 0, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, driver_device, 0, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, driver_device, 0, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)

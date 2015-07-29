@@ -15,7 +15,7 @@
 		<bounds left="0" right="100" top="0" bottom="100" />
 
 	<!-- 21 LEDs: D201-D221 -->
-		
+
 		<bezel name="x.0" element="led"><bounds x="1" y="10" width="1" height="1" /></bezel> <!-- d201 -->
 
 		<bezel name="x.0" element="led"><bounds x="10" y="2" width="1" height="1" /></bezel> <!-- d202 -->

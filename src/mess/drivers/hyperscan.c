@@ -644,4 +644,4 @@ ROM_END
 /* Driver */
 
 /*  YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME     FLAGS */
-COMP( 2006, hs,   0,  0,  hyperscan ,  hyperscan , driver_device,   0, "Mattel",   "HyperScan",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2006, hs,   0,  0,  hyperscan ,  hyperscan , driver_device,   0, "Mattel",   "HyperScan",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

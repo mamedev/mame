@@ -1820,4 +1820,4 @@ GAME( 1985, sharrier1, sharrier, sharrier, sharrier,  segahang_state,sharrier,RO
 GAME( 1986, enduror,   0,        enduror,  enduror,   segahang_state,enduror, ROT0,   "Sega", "Enduro Racer (YM2151, FD1089B 317-0013A)", 0 )
 GAME( 1986, enduror1,  enduror,  enduror1, enduror,   segahang_state,enduror, ROT0,   "Sega", "Enduro Racer (YM2203, FD1089B 317-0013A)", 0 )
 GAME( 1986, endurobl,  enduror,  endurobl, enduror,   segahang_state,endurobl,ROT0,   "bootleg", "Enduro Racer (bootleg set 1)", 0 )
-GAME( 1986, endurob2,  enduror,  endurob2, enduror,   segahang_state,endurob2,ROT0,   "bootleg", "Enduro Racer (bootleg set 2)", GAME_NOT_WORKING )
+GAME( 1986, endurob2,  enduror,  endurob2, enduror,   segahang_state,endurob2,ROT0,   "bootleg", "Enduro Racer (bootleg set 2)", MACHINE_NOT_WORKING )

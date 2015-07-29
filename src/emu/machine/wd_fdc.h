@@ -179,7 +179,7 @@ public:
 	void hlt_w(bool state);
 
 	bool enp_r();
-        
+
 	void index_callback(floppy_image_device *floppy, int state);
 
 protected:

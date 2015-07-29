@@ -956,8 +956,8 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,  sfus, sfus, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", GAME_SUPPORTS_SAVE ) // Shows Capcom copyright
-GAME( 1987, sfua, sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", GAME_SUPPORTS_SAVE ) // Shows Capcom USA copyright
-GAME( 1987, sfj,  sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sfan, sf, sfan, sfan, driver_device, 0, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sfp,  sf, sfp,  sfan, driver_device, 0, ROT0, "Capcom", "Street Fighter (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sf,   0,  sfus, sfus, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
+GAME( 1987, sfua, sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
+GAME( 1987, sfj,  sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfan, sf, sfan, sfan, driver_device, 0, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfp,  sf, sfp,  sfan, driver_device, 0, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )

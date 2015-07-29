@@ -9,7 +9,7 @@
   to create the illusion of a moving ball, and even the flippers are leds.
   A drawing of a pinball table is added as overlay.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 
   TODO:
@@ -90,7 +90,7 @@ inline bool wildfire_state::index_is_7segled(int index)
 	return (index < 3);
 }
 
-// lamp translation table: Lzz from patent US4334679 FIG.4 = MESS lampxxy,
+// lamp translation table: Lzz from patent US4334679 FIG.4 = MAME lampxxy,
 // where xx is led column and y is led row, eg. lamp103 is output A10 D3
 // (note: 2 mistakes in the patent: the L19 between L12 and L14 should be L13, and L84 should of course be L48)
 /*
@@ -340,4 +340,4 @@ ROM_START( wildfire )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (patent)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release
+CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release

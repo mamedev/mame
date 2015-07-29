@@ -185,10 +185,10 @@ void namcona1_state::video_start()
 	m_shaperam.resize(0x8000);
 
 	m_gfxdecode->gfx(2)->set_source(&m_shaperam[0]);
-	
+
 	save_item(NAME(m_shaperam));
 	save_item(NAME(m_palette_is_dirty));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(namcona1_state::postload), this));
 } /* video_start */
 

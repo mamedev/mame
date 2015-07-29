@@ -38,4 +38,4 @@ ROM_START( dps1 )
 	ROM_LOAD( "boot 1280", 0x000, 0x400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
 ROM_END
 
-COMP( 1979, dps1, 0, 0, dps1, dps1, driver_device, 0, "Ithaca InterSystems", "DPS-1", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1979, dps1, 0, 0, dps1, dps1, driver_device, 0, "Ithaca InterSystems", "DPS-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -348,4 +348,4 @@ ROM_START(scrzy_l1)
 	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
 
-GAME(1984,scrzy_l1, 0, s8a, s8a, s8a_state, s8a, ROT0, "Williams", "Still Crazy", GAME_MECHANICAL )
+GAME(1984,scrzy_l1, 0, s8a, s8a, s8a_state, s8a, ROT0, "Williams", "Still Crazy", MACHINE_MECHANICAL )

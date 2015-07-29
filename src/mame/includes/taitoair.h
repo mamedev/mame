@@ -75,7 +75,7 @@ public:
 	INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
 	bool m_gradbank;
-	
+
 	DECLARE_READ16_MEMBER(dsp_m_r);
 	DECLARE_WRITE16_MEMBER(dsp_m_w);
 
@@ -130,7 +130,7 @@ public:
 	void fb_copy_op(void);
 	void fb_fill_op(void);
 	void fb_erase_op(void);
-	
+
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
 	int projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type);

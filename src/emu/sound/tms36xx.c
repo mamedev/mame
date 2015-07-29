@@ -375,7 +375,7 @@ void tms36xx_device::device_start()
 		m_decay[0], m_decay[1], m_decay[2],
 		m_decay[3], m_decay[4], m_decay[5]));
 	LOG(("TMS36xx speed         %d\n", m_speed));
-	
+
 	save_item(NAME(m_octave));
 	save_item(NAME(m_tune_counter));
 	save_item(NAME(m_note_counter));

@@ -223,4 +223,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT COMPANY             FULLNAME       FLAGS */
-COMP( 1984, bob85,  0,       0,     bob85,   bob85, driver_device,    0, "Josef Kratochvil", "BOB-85", GAME_NO_SOUND_HW)
+COMP( 1984, bob85,  0,       0,     bob85,   bob85, driver_device,    0, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)

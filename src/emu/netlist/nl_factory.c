@@ -34,7 +34,7 @@ ATTR_COLD const pstring_list_t base_factory_t::def_params()
 }
 
 
-factory_list_t::factory_list_t(	setup_t &setup)
+factory_list_t::factory_list_t( setup_t &setup)
 : m_setup(setup)
 {
 }

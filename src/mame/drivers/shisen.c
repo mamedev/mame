@@ -423,7 +423,7 @@ ROM_START( matchit )
 	/* no samples on this board */
 ROM_END
 
-GAME( 1989, matchit,  0,         shisen,   matchit, driver_device,  0, ROT0, "Tamtex",  "Match It", GAME_SUPPORTS_SAVE )
-GAME( 1989, shisen,   matchit,   shisen,   shisen, driver_device,   0, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, sichuan2, matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, sichuan2a,matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, matchit,  0,         shisen,   matchit, driver_device,  0, ROT0, "Tamtex",  "Match It", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shisen,   matchit,   shisen,   shisen, driver_device,   0, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sichuan2, matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sichuan2a,matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 2)", MACHINE_SUPPORTS_SAVE )

@@ -543,4 +543,4 @@ ROM_START( changela )
 	ROM_LOAD( "cl88",   0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
 ROM_END
 
-GAMEL( 1983, changela, 0, changela, changela, driver_device, 0,   ROT180, "Taito Corporation", "Change Lanes", GAME_SUPPORTS_SAVE, layout_changela )
+GAMEL( 1983, changela, 0, changela, changela, driver_device, 0,   ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )

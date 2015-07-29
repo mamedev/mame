@@ -906,10 +906,10 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT    COMPANY             FULLNAME                                    FLAGS */
-CONS( 1983, sg1000,     0,          0,          sg1000,     sg1000, driver_device,     0,      "Sega",             "SG-1000",                                  GAME_SUPPORTS_SAVE )
-CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SG-1000 II",                               GAME_SUPPORTS_SAVE )
-COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000",                                  GAME_SUPPORTS_SAVE )
-COMP( 1983, sc3000h,    sc3000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000H",                                 GAME_SUPPORTS_SAVE )
-COMP( 1983, sf7000,     sc3000,     0,          sf7000,     sf7000, driver_device,     0,      "Sega",             "SC-3000/Super Control Station SF-7000",    GAME_SUPPORTS_SAVE )
-CONS( 1984, omv1000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-1000",              GAME_SUPPORTS_SAVE )
-CONS( 1984, omv2000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-2000",              GAME_SUPPORTS_SAVE )
+CONS( 1983, sg1000,     0,          0,          sg1000,     sg1000, driver_device,     0,      "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
+CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000h,    sc3000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000H",                                 MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sf7000,     sc3000,     0,          sf7000,     sf7000, driver_device,     0,      "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv1000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv2000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )

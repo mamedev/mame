@@ -702,7 +702,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   driver_device, 0, ROT270, "Atari", "Super Breakout (rev 04)", GAME_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   driver_device, 0, ROT270, "Atari", "Super Breakout (rev 03)", GAME_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  driver_device, 0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", GAME_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, driver_device, 0, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   driver_device, 0, ROT270, "Atari", "Super Breakout (rev 04)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   driver_device, 0, ROT270, "Atari", "Super Breakout (rev 03)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  driver_device, 0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, driver_device, 0, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
