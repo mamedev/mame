@@ -46,7 +46,7 @@ inline rsp_vec_t vec_vcl(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 	*ge = _mm_or_si128(ge_eq, *ge);
 #endif
 
-  // Mux the result based on the value of sign.
+	// Mux the result based on the value of sign.
 #if (defined(__SSE4_1__) || defined(_MSC_VER))
 	rsp_vec_t mux_mask = _mm_blendv_epi8(*ge, *le, sign);
 #else

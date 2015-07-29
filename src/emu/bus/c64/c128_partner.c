@@ -11,15 +11,15 @@
     PCB Layout
     ----------
 
-	|---------------|
-	|LS74  SW     CN|
-	|LS09      LS273|
-	|LS139   RAM    |
-	|LS133          |
-	|     LS240     |
-	|LS33    ROM    |
-	|LS09           |
-	 |||||||||||||||
+    |---------------|
+    |LS74  SW     CN|
+    |LS09      LS273|
+    |LS139   RAM    |
+    |LS133          |
+    |     LS240     |
+    |LS33    ROM    |
+    |LS09           |
+     |||||||||||||||
 
     ROM     - Toshiba TMM24128AP 16Kx8 EPROM (blank label)
     RAM     - Sony CXK5864PN-15L 8Kx8 SRAM

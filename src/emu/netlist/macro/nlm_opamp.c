@@ -17,7 +17,7 @@ NETLIST_START(opamp_layout_4_4_11)
 		B.PLUS,   /*   |5           10|   */ C.PLUS,
 		B.MINUS,  /*   |6            9|   */ C.MINUS,
 		B.OUT,    /*   |7            8|   */ C.OUT
-				  /*   +--------------+   */
+					/*   +--------------+   */
 	)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
@@ -33,7 +33,7 @@ NETLIST_START(opamp_layout_2_8_4)
 		A.MINUS,  /*   |2            7|   */ B.OUT,
 		A.PLUS,   /*   |3            6|   */ B.MINUS,
 		A.GND,    /*   |4            5|   */ B.PLUS
-				  /*   +--------------+   */
+					/*   +--------------+   */
 	)
 	NET_C(A.GND, B.GND)
 	NET_C(A.VCC, B.VCC)

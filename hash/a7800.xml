@@ -2370,112 +2370,112 @@ almost nothing like the prototype.
 	</software>
 
 	<!-- XM board enhanced -->
-    <!-- from http://atariage.com/forums/topic/204250-donkey-kong-xm-pre-order-and-demo/ -->
+	<!-- from http://atariage.com/forums/topic/204250-donkey-kong-xm-pre-order-and-demo/ -->
 
-    <!-- these ones are listed as 'working in MESS' but are apparently the only images that work on real hardware too -->
-    <software name="dkongxm">
-      <description>Donkey Kong (PAL, Demo, XM enhanced, V1.2)</description>
-      <year>2012</year>
-      <publisher>&lt;homebrew&gt;</publisher>
-      <info name="programmer" value="TEP392" />
-      <sharedfeat name="compatibility" value="PAL"/>
-      <part name="cart" interface="a7800_cart">
-        <feature name="slot" value="a78_sg9" />
-        <dataarea name="rom" size="147456">
-          <rom name="dkxm_demo_v12_pal.bin" size="147456" crc="9f6c0600" sha1="18409eace880dda3646792f9ec050a87a3b1b382" offset="0" />
-        </dataarea>
-      </part>
-    </software>
+	<!-- these ones are listed as 'working in MESS' but are apparently the only images that work on real hardware too -->
+	<software name="dkongxm">
+		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+		<feature name="slot" value="a78_sg9" />
+		<dataarea name="rom" size="147456">
+			<rom name="dkxm_demo_v12_pal.bin" size="147456" crc="9f6c0600" sha1="18409eace880dda3646792f9ec050a87a3b1b382" offset="0" />
+		</dataarea>
+		</part>
+	</software>
 
-    <software name="dkongxmu" cloneof="dkongxm">
-      <description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2)</description>
-      <year>2012</year>
-      <publisher>&lt;homebrew&gt;</publisher>
-      <info name="programmer" value="TEP392" />
-      <sharedfeat name="compatibility" value="NTSC"/>
-      <part name="cart" interface="a7800_cart">
-        <feature name="slot" value="a78_sg9" />
-        <dataarea name="rom" size="147456">
-          <rom name="dkxm_demo_v12_ntsc.bin" size="147456" crc="8b06bb4b" sha1="3129cbc91dc8f223f00db5c3273a4a330320be99" offset="0" />
-        </dataarea>
-      </part>
-    </software>
+	<software name="dkongxmu" cloneof="dkongxm">
+		<description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+		<feature name="slot" value="a78_sg9" />
+		<dataarea name="rom" size="147456">
+			<rom name="dkxm_demo_v12_ntsc.bin" size="147456" crc="8b06bb4b" sha1="3129cbc91dc8f223f00db5c3273a4a330320be99" offset="0" />
+		</dataarea>
+		</part>
+	</software>
 
-    <!-- these are listed as 'with HSC emulation' and are designed for the prosystem emulator, they simulate some of the HSC features -->
-    <!-- remove them? -->
-    
-    <software name="dkongxmps"  cloneof="dkongxm" supported="no">
-      <description>Donkey Kong (PAL, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
-      <year>2012</year>
-      <publisher>&lt;homebrew&gt;</publisher>
-      <info name="programmer" value="TEP392" />
-      <sharedfeat name="compatibility" value="PAL"/>
-      <part name="cart" interface="a7800_cart">
-        <feature name="slot" value="a78_sg9" />
-        <dataarea name="rom" size="147456">
-          <rom name="dkxm_final_demo_pal_hsc.bin" size="147456" crc="6510b674" sha1="65b723b470d287af51e9888813149c43fb11ac26" offset="0" />
-        </dataarea>
-      </part>
-    </software>
+	<!-- these are listed as 'with HSC emulation' and are designed for the prosystem emulator, they simulate some of the HSC features -->
+	<!-- remove them? -->
 
-    <software name="dkongxmups" cloneof="dkongxm" supported="no">
-      <description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
-      <year>2012</year>
-      <publisher>&lt;homebrew&gt;</publisher>
-      <info name="programmer" value="TEP392" />
-      <sharedfeat name="compatibility" value="NTSC"/>
-      <part name="cart" interface="a7800_cart">
-        <feature name="slot" value="a78_sg9" />
-        <dataarea name="rom" size="147456">
-          <rom name="dkxm_final_demo_ntsc_hsc.bin" size="147456" crc="2c67fea7" sha1="7825c1946e3c7492fa9bbfae33029cd68c0d1135" offset="0" />
-        </dataarea>
-      </part>
-    </software>
-    
+	<software name="dkongxmps"  cloneof="dkongxm" supported="no">
+		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+		<feature name="slot" value="a78_sg9" />
+		<dataarea name="rom" size="147456">
+			<rom name="dkxm_final_demo_pal_hsc.bin" size="147456" crc="6510b674" sha1="65b723b470d287af51e9888813149c43fb11ac26" offset="0" />
+		</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongxmups" cloneof="dkongxm" supported="no">
+		<description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+		<feature name="slot" value="a78_sg9" />
+		<dataarea name="rom" size="147456">
+			<rom name="dkxm_final_demo_ntsc_hsc.bin" size="147456" crc="2c67fea7" sha1="7825c1946e3c7492fa9bbfae33029cd68c0d1135" offset="0" />
+		</dataarea>
+		</part>
+	</software>
 
 
-    <!-- an older version? sound is broken, did it work on the real hardware? -->
-    <software name="dkongxmo" cloneof="dkongxm" supported="no">
-		  <description>Donkey Kong (PAL, Demo, XM enhanced, older)</description>
-		  <year>2012</year>
-		  <publisher>&lt;homebrew&gt;</publisher>
-		  <info name="programmer" value="TEP392" />
-		  <sharedfeat name="compatibility" value="PAL"/>
-		  <part name="cart" interface="a7800_cart">
-			  <feature name="slot" value="a78_sg9" />
-			  <dataarea name="rom" size="147456">
-				  <rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00" offset="0" />
-			  </dataarea>
-		  </part>
-	  </software>
 
-	  <software name="dkongxmou" cloneof="dkongxm" supported="no" >
-		  <description>Donkey Kong (NTSC, Demo, XM enhanced, older)</description>
-		  <year>2012</year>
-		  <publisher>&lt;homebrew&gt;</publisher>
-		  <info name="programmer" value="TEP392" />
-		  <sharedfeat name="compatibility" value="NTSC"/>
-		  <part name="cart" interface="a7800_cart">
-			  <feature name="slot" value="a78_sg9" />
-			  <dataarea name="rom" size="147456">
-				  <rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455" offset="0" />
-			  </dataarea>
-		  </part>
-	  </software>
-    
-    <!-- this one is meant to detect PAL / NTSC and runs on an A7800 CC2 development board, without sound? based off older code? -->
-    <software name="dkongxmcc" cloneof="dkongxm" supported="no">
-      <description>Donkey Kong (PAL/NTSC, Demo, XM enhanced, older, for CC2 board)</description>
-      <year>2012</year>
-      <publisher>&lt;homebrew&gt;</publisher>
-      <info name="programmer" value="TEP392" />
-      <part name="cart" interface="a7800_cart">
-        <feature name="slot" value="a78_sg9" />
-        <dataarea name="rom" size="147456">
-          <rom name="dkxm_final_demo.bin" size="0x20000" crc="fd503bd4" sha1="454d754a0c4603323e476d9418f343a6a1a0d017" offset="0x4000" />
-          <rom size="0x4000" offset="0x0000" loadflag="continue" />
-        </dataarea>
-      </part>
-    </software>
-  
+	<!-- an older version? sound is broken, did it work on the real hardware? -->
+	<software name="dkongxmo" cloneof="dkongxm" supported="no">
+			<description>Donkey Kong (PAL, Demo, XM enhanced, older)</description>
+			<year>2012</year>
+			<publisher>&lt;homebrew&gt;</publisher>
+			<info name="programmer" value="TEP392" />
+			<sharedfeat name="compatibility" value="PAL"/>
+			<part name="cart" interface="a7800_cart">
+				<feature name="slot" value="a78_sg9" />
+				<dataarea name="rom" size="147456">
+					<rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00" offset="0" />
+				</dataarea>
+			</part>
+		</software>
+
+		<software name="dkongxmou" cloneof="dkongxm" supported="no" >
+			<description>Donkey Kong (NTSC, Demo, XM enhanced, older)</description>
+			<year>2012</year>
+			<publisher>&lt;homebrew&gt;</publisher>
+			<info name="programmer" value="TEP392" />
+			<sharedfeat name="compatibility" value="NTSC"/>
+			<part name="cart" interface="a7800_cart">
+				<feature name="slot" value="a78_sg9" />
+				<dataarea name="rom" size="147456">
+					<rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455" offset="0" />
+				</dataarea>
+			</part>
+		</software>
+
+	<!-- this one is meant to detect PAL / NTSC and runs on an A7800 CC2 development board, without sound? based off older code? -->
+	<software name="dkongxmcc" cloneof="dkongxm" supported="no">
+		<description>Donkey Kong (PAL/NTSC, Demo, XM enhanced, older, for CC2 board)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<part name="cart" interface="a7800_cart">
+		<feature name="slot" value="a78_sg9" />
+		<dataarea name="rom" size="147456">
+			<rom name="dkxm_final_demo.bin" size="0x20000" crc="fd503bd4" sha1="454d754a0c4603323e476d9418f343a6a1a0d017" offset="0x4000" />
+			<rom size="0x4000" offset="0x0000" loadflag="continue" />
+		</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

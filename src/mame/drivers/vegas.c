@@ -2537,7 +2537,7 @@ ROM_START( nbashowt )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	// various strings from this image
-	// SHOWTIME REV 2.0 
+	// SHOWTIME REV 2.0
 	// BUILD DATE: Apr 25 1999 (diag.exe?)
 	// BUILD DATE: Apr 21 1999 (game?)
 	DISK_IMAGE( "nbashowt", 0, SHA1(f7c56bc3dcbebc434de58034986179ae01127f87) )
@@ -2555,7 +2555,7 @@ ROM_START( nbanfl )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	// various strings from this image
-	//NBA SHOWTIME 2.1 
+	//NBA SHOWTIME 2.1
 	//BUILD DATE: Sep 22 1999 (diag.exe?)
 	//BUILD DATE: Sep 21 1999 (game?)
 	DISK_IMAGE( "nbanfl", 0, SHA1(f60c627f85f1bf58f2ea674063736a1e516e7e9e) )
@@ -2568,7 +2568,7 @@ ROM_END
 // it's possible the boot rom and CHD are mismatched here
 ROM_START( nbagold )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
-	ROM_LOAD( "nbagold_jan10_2000.u27", 0x000000, 0x80000, CRC(6768e802) SHA1(d994e3efe14f57e261841134ddd1489fa67d418b) ) // 11:29:11 Jan 10 2000. BIOS FOR NBAGOLD USING BANSHEE / 11:23:58 Jan 10 2000. POST FOR NBAGOLD USING BANSHEE 
+	ROM_LOAD( "nbagold_jan10_2000.u27", 0x000000, 0x80000, CRC(6768e802) SHA1(d994e3efe14f57e261841134ddd1489fa67d418b) ) // 11:29:11 Jan 10 2000. BIOS FOR NBAGOLD USING BANSHEE / 11:23:58 Jan 10 2000. POST FOR NBAGOLD USING BANSHEE
 
 	DISK_REGION( "ide:0:hdd:image" )
 	// various strings from this image
@@ -2578,9 +2578,9 @@ ROM_START( nbagold )
 	//BUILD DATE:Feb 10 2000 (something else?)
 	DISK_IMAGE( "nbanfl3", 0,  SHA1(19a51346ce5ae4e06e8dff3eb4bed59ec1ee855f))
 	// these both contain the same strings / build dates, same thing with different user data / drive sizes?
-//	DISK_IMAGE( "nbanfl27", 0, SHA1(da371d27e2fbceec493e2203055e0c1399eaf3b9) )
-//	DISK_IMAGE( "sportstn", 0, SHA1(9442feefaeb5ae4a090422e937615f8a2d8e8f31) )
-	
+//  DISK_IMAGE( "nbanfl27", 0, SHA1(da371d27e2fbceec493e2203055e0c1399eaf3b9) )
+//  DISK_IMAGE( "sportstn", 0, SHA1(9442feefaeb5ae4a090422e937615f8a2d8e8f31) )
+
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )

@@ -1051,7 +1051,7 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 			*/
 			logerror("SCSP: Reading from EXTS register %08x\n",addr);
 			if(addr == 0xee0)
-				v =	space.machine().device<cdda_device>("cdda")->get_channel_volume(0);
+				v = space.machine().device<cdda_device>("cdda")->get_channel_volume(0);
 			if(addr == 0xee2)
 				v = space.machine().device<cdda_device>("cdda")->get_channel_volume(1);
 		}

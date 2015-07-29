@@ -102,7 +102,7 @@ void sm511_device::execute_one()
 			switch (m_op)
 			{
 		case 0x00: op_rot(); break;
-//		case 0x01: op_xxx(); break; // ?
+//      case 0x01: op_xxx(); break; // ?
 		case 0x02: op_sbm(); break;
 		case 0x03: op_atpl(); break;
 		case 0x08: op_add(); break;
@@ -119,7 +119,7 @@ void sm511_device::execute_one()
 		case 0x5a: op_ta0(); break;
 		case 0x5b: op_tabl(); break;
 		case 0x5c: op_atx(); break;
-//		case 0x5d: op_cend(); break;
+//      case 0x5d: op_cend(); break;
 		case 0x5e: op_tal(); break;
 		case 0x5f: op_lbl(); break;
 
@@ -127,14 +127,14 @@ void sm511_device::execute_one()
 		case 0x62: op_wr(); break;
 		case 0x63: op_ws(); break;
 		case 0x64: op_incb(); break;
-//		case 0x65: op_idiv(); break;
+//      case 0x65: op_idiv(); break;
 		case 0x66: op_rc(); break;
 		case 0x67: op_sc(); break;
 		case 0x6c: op_decb(); break;
 		case 0x6d: op_ptw(); break;
 		case 0x6e: op_rtn0(); break;
 		case 0x6f: op_rtn1(); break;
-		
+
 		// extended opcodes
 		case 0x60:
 			m_op = m_op << 8 | m_param;

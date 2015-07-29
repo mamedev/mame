@@ -96,16 +96,16 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	for (offs = start_offset; offs >= 0; offs -= 0x008 / 2)
 	{
 		/*!
-		 Starting at a particular sequence, sprite DMA seems to stop there and resume via "something", 
+		 Starting at a particular sequence, sprite DMA seems to stop there and resume via "something",
 		 effectively drawing any other sprite with better priority in the framebuffer scheme of things.
-		 
-		 @todo reported sequence for DMA pause flag is 0x0c** 0x0000 0x0000 0x0000. 
-		       Verify how exactly via HW test. Continuing may be determined by a DMA bit write. 
+
+		 @todo reported sequence for DMA pause flag is 0x0c** 0x0000 0x0000 0x0000.
+		       Verify how exactly via HW test. Continuing may be determined by a DMA bit write.
 		 */
 		if(m_tc0080vco->sprram_r(space, offs + 0, 0xffff) == 0xc00 ||
-		   m_tc0080vco->sprram_r(space, offs + 0, 0xffff) == 0xcff) // Air Inferno
+			m_tc0080vco->sprram_r(space, offs + 0, 0xffff) == 0xcff) // Air Inferno
 			return offs - 8/2;
-		
+
 		x0        =  m_tc0080vco->sprram_r(space, offs + 1, 0xffff) & 0x3ff;
 		y0        =  m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x3ff;
 		zoomx     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x7f00) >> 8;
@@ -113,7 +113,7 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		tile_offs = (m_tc0080vco->sprram_r(space, offs + 3, 0xffff) & 0x1fff) << 2;
 		ysize     = size[(m_tc0080vco->sprram_r(space, offs, 0xffff) & 0x0c00) >> 10];
 
-		
+
 		if (tile_offs)
 		{
 			/* Convert zoomy value to real value as zoomx */
@@ -198,7 +198,7 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -401,7 +401,7 @@ void taitoair_state::fb_copy_op()
 	cliprect.min_y = 3*16;
 	cliprect.max_x = m_screen->width() - 1;
 	cliprect.max_y = m_screen->height() - 1;
-	
+
 	/* clear screen fb */
 	m_framebuffer[1]->fill(0, cliprect);
 	/* copy buffer fb into screen fb (at this stage we are ready to draw) */
@@ -421,7 +421,7 @@ void taitoair_state::fb_erase_op()
 	cliprect.min_y = 3*16;
 	cliprect.max_x = m_screen->width() - 1;
 	cliprect.max_y = m_screen->height() - 1;
-	
+
 	m_framebuffer[0]->fill(0, cliprect);
 	//m_framebuffer[1]->fill(0, cliprect);
 }
@@ -437,7 +437,7 @@ void taitoair_state::fb_fill_op()
 	cliprect.min_y = 3*16;
 	cliprect.max_x = m_screen->width() - 1;
 	cliprect.max_y = m_screen->height() - 1;
-	
+
 	if (m_line_ram[0x3fff])
 	{
 		int adr = 0x3fff;
@@ -542,16 +542,16 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 			}
 			if(m_gradbank == true)
 				base|= 0x1000;
-			
+
 			*dest++ = base | (cntr >= 0x83f000 ? 0x3f : (cntr >> 12) & 0x3f);
-				
+
 			c1b += inc1x;
 			c2b += inc2x;
 		}
 		counter1 += inc1y;
 		counter2 += inc2y;
 	}
-		
+
 
 
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
@@ -560,8 +560,8 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 
 	sprite_ptr = draw_sprites(bitmap, cliprect);
 
-	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);	
-	
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 
 	draw_sprites(bitmap, cliprect, sprite_ptr);

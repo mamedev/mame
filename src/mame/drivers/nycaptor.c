@@ -743,7 +743,7 @@ void nycaptor_state::machine_start()
 		membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	else
 		membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
-	
+
 	save_item(NAME(m_generic_control_reg));
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));

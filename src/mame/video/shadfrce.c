@@ -103,8 +103,6 @@ WRITE16_MEMBER(shadfrce_state::bg1scrolly_w)
 
 void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offset )
 {
-
-
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
 	   | ---- ---- -pCc cccX | ---- ---- xxxx xxxx | ---- ---- ---- ---- | ---- ---- ---- ---- | */
 
@@ -125,7 +123,6 @@ void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	int hcount;
 	while (source >= finish)
 	{
-
 		int enable = ((source[0] & 0x0004));
 
 		if (enable)

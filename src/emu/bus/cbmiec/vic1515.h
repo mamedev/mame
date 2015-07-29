@@ -24,7 +24,7 @@
 // ======================> vic1515_t
 
 class vic1515_t :  public device_t,
-				   public device_cbm_iec_interface
+					public device_cbm_iec_interface
 {
 public:
 	// construction/destruction

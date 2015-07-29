@@ -212,7 +212,7 @@ void pcktgal_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
 	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x6000, 0xc000);
 	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
-	
+
 	save_item(NAME(m_msm5205next));
 	save_item(NAME(m_toggle));
 }

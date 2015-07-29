@@ -149,7 +149,7 @@ void itech8_state::video_start()
 	/* fetch the GROM base */
 	m_grom_base = memregion("grom")->base();
 	m_grom_size = memregion("grom")->bytes();
-	
+
 	save_item(NAME(m_blitter_data));
 	save_item(NAME(m_blit_in_progress));
 	save_item(NAME(m_page_select));

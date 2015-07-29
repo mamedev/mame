@@ -10,4 +10,3 @@
 // an arbitrary amount of banks at 8000-BFFF.
 
 void mc8123_decode(UINT8 *rom, UINT8 *opcodes, const UINT8 *key, int length);
-

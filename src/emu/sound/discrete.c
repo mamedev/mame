@@ -1146,4 +1146,3 @@ WRITE8_MEMBER( discrete_device::write )
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))
 #pragma GCC diagnostic pop
 #endif
-

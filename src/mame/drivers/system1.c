@@ -129,7 +129,7 @@ This game runs on Sega System 1 hardware.
 
 834-5583-12 SPATTER (sticker)
 834-5542 daughter board with 4 eproms (EPR6306, EPR6307, EPR6308, EPR6309)
-834-5540 daughter board with logic ICs 
+834-5540 daughter board with logic ICs
 315-5099 custom Z80 CPU w/security
 
 *******************************************************************************
@@ -380,7 +380,7 @@ void system1_state::machine_start()
 	m_bank1->set_entry(0);
 
 	if (m_banked_decrypted_opcodes)
-	{		
+	{
 		m_bank0d->set_base(m_banked_decrypted_opcodes);
 		m_bank1d->configure_entries(0, numbanks, m_banked_decrypted_opcodes + 0x10000, 0x4000);
 		m_bank1d->set_entry(0);
@@ -2821,7 +2821,7 @@ ROM_END
 
 ROM_START( spattera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-6597.116",   0x0000, 0x4000, CRC(fb928b9d) SHA1(0a9bede7a147009b9ebb8a0b73681359da665982) ) /* encrypted */ 
+	ROM_LOAD( "epr-6597.116",   0x0000, 0x4000, CRC(fb928b9d) SHA1(0a9bede7a147009b9ebb8a0b73681359da665982) ) /* encrypted */
 	ROM_LOAD( "epr-6598.109",   0x4000, 0x4000, CRC(5dff037a) SHA1(8e6f6b75a89609ab0498d317c11e6d653343ffbe) ) /* encrypted */
 	ROM_LOAD( "epr-6599.96",    0x8000, 0x4000, CRC(7ba9de5b) SHA1(f18542c95e8241433ed995c213924ad1ce03cd5b) )
 

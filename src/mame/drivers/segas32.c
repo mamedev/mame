@@ -2486,7 +2486,7 @@ static MACHINE_CONFIG_FRAGMENT( system32 )
 	MCFG_RF5C68_ADD("rfsnd", RFC_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
-	
+
 	MCFG_S32COMM_ADD("s32comm")
 MACHINE_CONFIG_END
 
@@ -2572,7 +2572,7 @@ static MACHINE_CONFIG_FRAGMENT( multi32 )
 	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	
+
 	MCFG_S32COMM_ADD("s32comm")
 MACHINE_CONFIG_END
 
@@ -5237,7 +5237,7 @@ void segas32_state::init_f1lap(void)
 	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
 
 	m_sw1_output = &segas32_state::f1lap_sw1_output;
-		
+
 	m_s32comm->set_linktype(15612); // EPR-15612
 }
 
@@ -5303,7 +5303,7 @@ void segas32_state::init_radr(void)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 	m_sw1_output = &segas32_state::radm_sw1_output;
 	m_sw2_output = &segas32_state::radr_sw2_output;
-		
+
 	m_s32comm->set_linktype(14084); // EPR-14084
 }
 

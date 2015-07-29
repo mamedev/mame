@@ -1569,8 +1569,8 @@ COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, driver_device,  
 COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Polymax",  "Maxxi", GAME_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", GAME_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
-COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletrônica", "Unitron AP II (in English)", GAME_SUPPORTS_SAVE )
-COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletrônica", "Unitron AP II (in Brazilian Portuguese)", GAME_SUPPORTS_SAVE )
+COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletr??nica", "Unitron AP II (in English)", GAME_SUPPORTS_SAVE )
+COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletr??nica", "Unitron AP II (in Brazilian Portuguese)", GAME_SUPPORTS_SAVE )
 COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
 // reverse font direction -\/
 COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", GAME_SUPPORTS_SAVE )

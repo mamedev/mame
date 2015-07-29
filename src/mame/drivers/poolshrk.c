@@ -41,7 +41,7 @@ DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
 			pSprite += 4;
 		}
 	}
-	
+
 	save_item(NAME(m_da_latch));
 }
 

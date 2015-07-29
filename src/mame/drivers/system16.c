@@ -137,9 +137,9 @@ static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-//	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_irq_w)
+//  AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xC42006, 0xC42007) AM_WRITE(sound_command_irq_w)
-	
+
 	AM_RANGE(0xC44000, 0xC44001) AM_READNOP
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -2133,7 +2133,7 @@ static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
 
 	// 2x YM2203C, one at U57, one at U56
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
-//	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
+//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -2141,7 +2141,7 @@ static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
 
 	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-//	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
+//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)

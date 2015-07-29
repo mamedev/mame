@@ -159,7 +159,7 @@ void deco32_state::video_start()
 VIDEO_START_MEMBER(deco32_state,captaven)
 {
 	m_has_ace_ram=0;
-	
+
 	deco32_state::video_start();
 }
 
@@ -168,7 +168,7 @@ VIDEO_START_MEMBER(deco32_state,fghthist)
 	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
 	m_sprgen->alloc_sprite_bitmap();
 	m_has_ace_ram=0;
-	
+
 	save_pointer(NAME(m_dirty_palette), 4096);
 	deco32_state::video_start();
 }
@@ -184,12 +184,12 @@ VIDEO_START_MEMBER(deco32_state,nslasher)
 	m_sprgen2->alloc_sprite_bitmap();
 	memset(m_dirty_palette,0,4096);
 	m_has_ace_ram=1;
-	
+
 	save_pointer(NAME(m_dirty_palette), 4096);
 	save_item(NAME(m_ace_ram_dirty));
 	save_item(NAME(m_spriteram16_2));
 	save_item(NAME(m_spriteram16_2_buffered));
-	
+
 	deco32_state::video_start();
 }
 
@@ -207,7 +207,7 @@ VIDEO_START_MEMBER(dragngun_state,dragngun)
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 
 	memset(m_dirty_palette,0,4096);
-	
+
 	m_has_ace_ram=0;
 
 	save_item(NAME(m_sprite_ctrl));

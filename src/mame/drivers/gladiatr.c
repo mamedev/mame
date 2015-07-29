@@ -994,7 +994,7 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x6000);
 	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0xc000);
-	
+
 	/* make sure bank is valid in cpu-reset */
 	membank("bank2")->set_entry(0);
 }

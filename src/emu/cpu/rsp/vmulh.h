@@ -28,4 +28,3 @@ inline rsp_vec_t vec_vmadh_vmudh(UINT32 iw, rsp_vec_t vs, rsp_vec_t vt, rsp_vec_
 
 	return sclamp_acc_to_mid(*acc_md, *acc_hi);
 }
-

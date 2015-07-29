@@ -179,4 +179,3 @@ void nvram_device::determine_final_base()
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))
 #pragma GCC diagnostic pop
 #endif
-

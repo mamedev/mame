@@ -597,7 +597,7 @@ MACHINE_START_MEMBER(itech8_state,sstrike)
 	/* we need to update behind the beam as well */
 	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);
 	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(0), 32);
-	
+
 	itech8_state::machine_start();
 }
 
@@ -605,7 +605,7 @@ void itech8_state::machine_start()
 {
 	if (membank("bank1"))
 		membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
-	
+
 	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 	m_delayed_sound_data_timer = timer_alloc(TIMER_DELAYED_SOUND_DATA);
 	m_blitter_done_timer = timer_alloc(TIMER_BLITTER_DONE);
@@ -2611,7 +2611,7 @@ DRIVER_INIT_MEMBER(itech8_state,grmatch)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x01e0, 0x01ff);
-	
+
 	save_item(NAME(m_grmatch_palcontrol));
 	save_item(NAME(m_grmatch_xscroll));
 	save_item(NAME(m_grmatch_palette));
@@ -2623,9 +2623,9 @@ DRIVER_INIT_MEMBER(itech8_state,slikshot)
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01cf, 0x01cf, write8_delegate(FUNC(itech8_state::slikshot_z80_control_w),this));
-	
+
 	m_delayed_z80_control_timer = timer_alloc(TIMER_DELAYED_Z80_CONTROL);
-	
+
 	save_item(NAME(m_z80_ctrl));
 	save_item(NAME(m_z80_port_val));
 	save_item(NAME(m_z80_clear_to_send));

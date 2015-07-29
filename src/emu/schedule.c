@@ -993,4 +993,3 @@ void device_scheduler::dump_timers() const
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))
 #pragma GCC diagnostic pop
 #endif
-

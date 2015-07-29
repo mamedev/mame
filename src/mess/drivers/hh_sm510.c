@@ -57,7 +57,7 @@ void hh_sm510_state::machine_start()
 {
 	// zerofill
 	m_inp_mux = 0;
-//	m_inp_lines = 0;
+//  m_inp_lines = 0;
 	memset(m_lcd_output_cache, ~0, sizeof(m_lcd_output_cache));
 
 	// register for savestates
@@ -149,7 +149,7 @@ READ8_MEMBER(hh_sm510_state::input_r)
   Konami Top Gun
   * PCB label BH003
   * Sharp SM510 under epoxy (die label CMS54C, KMS598)
-  
+
   The ROM listing "BH003 Top Gun" from patent US5137277 is identical to the
   released version, except for 2 probable bit errors and filler bytes. Unused
   pages list data too, of what looks like assembler leftover garbage.

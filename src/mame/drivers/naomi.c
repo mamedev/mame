@@ -1422,7 +1422,7 @@ Notes:
       XC9536 - Xilinx XC9536XL in-system programmable CPLD (PLCC44), stamped JULIE_DEV
       XC2S30 - Xilinx XC2S30 Spartan-II FPGA (TQFP144), Rumble Fish 2 have printed sticker A08
       17S30  - Xilinx 17S30APC OTP Configuration PROM, stamped SXFLS
-   IC12-IC27 - Fujitsu MBM29DL640E 64M TSOP48 flash ROMs 
+   IC12-IC27 - Fujitsu MBM29DL640E 64M TSOP48 flash ROMs
 
 
 Network Board
@@ -9388,4 +9388,3 @@ GAME( 2009, basschal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))
 #pragma GCC diagnostic pop
 #endif
-

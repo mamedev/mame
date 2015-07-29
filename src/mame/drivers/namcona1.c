@@ -694,7 +694,7 @@ void namcona1_state::machine_start()
 	m_maskrom = (UINT16 *)memregion("maskrom")->base();
 	m_mEnableInterrupts = 0;
 	m_c140->set_base(m_workram);
-	
+
 	save_item(NAME(m_mEnableInterrupts));
 	save_item(NAME(m_count));
 	save_item(NAME(m_mcu_mailbox));

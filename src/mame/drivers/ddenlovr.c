@@ -3921,10 +3921,10 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 {
 	m_prot_val = data;
 
-	set_led_status(machine(), 0, data & 0x01);	// led? 1 in-game, 0 in service mode / while booting
+	set_led_status(machine(), 0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
 
-	coin_counter_w(machine(), 0, data & 0x04);	// coin-out
-	coin_counter_w(machine(), 1, data & 0x08);	// coin-in
+	coin_counter_w(machine(), 0, data & 0x04);  // coin-out
+	coin_counter_w(machine(), 1, data & 0x08);  // coin-in
 
 	if (data & 0xf2)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);

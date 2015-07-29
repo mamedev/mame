@@ -38,7 +38,7 @@ NETLIST_START(CD4001_DIP)
 		s2.A,  /*    A3 |5           10| Y5   */ s3.Q,
 		s2.B,  /*    Y3 |6            9| A4   */ s3.B,
 		VDD.I, /*   GND |7            8| Y4   */ s3.A
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 
 NETLIST_END()
@@ -74,10 +74,10 @@ NETLIST_START(CD4020_DIP)
 		s1.Q7,   /*    Q7 |6           11| RESET */ s1.RESET,
 		s1.Q4,   /*    Q4 |7           10| IP    */ s1.IP,
 		s1.VSS,  /*   VSS |8            9| Q1    */ s1.Q1
-	  		     /*       +--------------+       */
+					/*       +--------------+       */
 	)
 		/*
-		 * IP =	(Input pulses)
+		 * IP = (Input pulses)
 		 */
 
 NETLIST_END()
@@ -117,12 +117,12 @@ NETLIST_START(CD4066_DIP)
 	DIPPINS(      /*          +--------------+          */
 		A.R.1,    /*   INOUTA |1     ++    14| VDD      */ A.PS.VDD,
 		A.R.2,    /*   OUTINA |2           13| CONTROLA */ A.CTL,
-	    B.R.1,    /*   OUTINB |3           12| CONTROLD */ D.CTL,
+		B.R.1,    /*   OUTINB |3           12| CONTROLD */ D.CTL,
 		B.R.2,    /*   INOUTB |4    4066   11| INOUTD   */ D.R.1,
 		B.CTL,    /* CONTROLB |5           10| OUTIND   */ D.R.2,
 		C.CTL,    /* CONTROLC |6            9| OUTINC   */ C.R.1,
 		A.PS.VSS, /*      VSS |7            8| INOUTC   */ C.R.2
-			      /*          +--------------+          */
+					/*          +--------------+          */
 	)
 NETLIST_END()
 
@@ -143,12 +143,12 @@ NETLIST_START(CD4016_DIP)
 	DIPPINS(      /*          +--------------+          */
 		A.R.1,    /*   INOUTA |1     ++    14| VDD      */ A.PS.VDD,
 		A.R.2,    /*   OUTINA |2           13| CONTROLA */ A.CTL,
-	    B.R.1,    /*   OUTINB |3           12| CONTROLD */ D.CTL,
+		B.R.1,    /*   OUTINB |3           12| CONTROLD */ D.CTL,
 		B.R.2,    /*   INOUTB |4    4016   11| INOUTD   */ D.R.1,
 		B.CTL,    /* CONTROLB |5           10| OUTIND   */ D.R.2,
 		C.CTL,    /* CONTROLC |6            9| OUTINC   */ C.R.1,
 		A.PS.VSS, /*      VSS |7            8| INOUTC   */ C.R.2
-			      /*          +--------------+          */
+					/*          +--------------+          */
 	)
 NETLIST_END()
 

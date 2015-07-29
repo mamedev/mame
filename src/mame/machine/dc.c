@@ -732,4 +732,3 @@ TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))
 #pragma GCC diagnostic pop
 #endif
-

@@ -75,4 +75,3 @@ template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, 
 	m_save.add(p);
 	state.register_state(*this, stname);
 }
-

@@ -393,7 +393,7 @@ GFXDECODE_END
 void appoooh_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);
-	
+
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_address));
 }

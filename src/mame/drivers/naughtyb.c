@@ -832,7 +832,7 @@ DRIVER_INIT_MEMBER(naughtyb_state,popflame)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9090, 0x9090, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb0ff, write8_delegate(FUNC(naughtyb_state::popflame_protection_w),this));
-	
+
 	save_item(NAME(m_popflame_prot_seed));
 	save_item(NAME(m_r_index));
 	save_item(NAME(m_prot_count));
@@ -864,7 +864,7 @@ DRIVER_INIT_MEMBER(naughtyb_state,trvmstr)
 {
 	/* install questions' handlers  */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xc002, read8_delegate(FUNC(naughtyb_state::trvmstr_questions_r),this), write8_delegate(FUNC(naughtyb_state::trvmstr_questions_w),this));
-	
+
 	save_item(NAME(m_question_offset));
 }
 

@@ -476,7 +476,7 @@ void destroyr_state::machine_start()
 {
 	m_dial_timer = timer_alloc(TIMER_DESTROYR_DIAL);
 	m_frame_timer = timer_alloc(TIMER_DESTROYR_FRAME);
-	
+
 	save_item(NAME(m_cursor));
 	save_item(NAME(m_wavemod));
 	save_item(NAME(m_attract));

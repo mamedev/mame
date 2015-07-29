@@ -372,7 +372,7 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
-	
+
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
@@ -381,7 +381,7 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 0;
-	
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_scrollx_raster));
@@ -424,7 +424,7 @@ void nbmj9195_state::video_start()
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
-	
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_scrollx_raster));

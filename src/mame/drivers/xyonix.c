@@ -262,7 +262,7 @@ ROM_START( xyonix )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "mc68705p3s.e7", 0x00000, 0x780, BAD_DUMP CRC(f60cdd86) SHA1(e18cc598153b3e108942328ee9c5b9f83b034c41) ) // FIXED BITS (xxxxxx0x)
-	
+
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "xyonix1.bin", 0x00000, 0x08000, CRC(3dfa9596) SHA1(52cdbbe18f83cea7248c29588ea3a18c4bb7984f) )
 	ROM_LOAD( "xyonix2.bin", 0x08000, 0x08000, CRC(db87343e) SHA1(62bc30cd65b2f8976cd73a0b349a9ccdb3faaad2) )

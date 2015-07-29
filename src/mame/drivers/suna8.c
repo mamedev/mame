@@ -1918,7 +1918,7 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(rranger_map)
 	MCFG_CPU_IO_MAP(rranger_io_map)
-//	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+//  MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */

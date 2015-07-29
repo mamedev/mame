@@ -350,7 +350,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_vbank_w)
 WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)
 {
 	m_gfx_rom_bank = data;
-	
+
 	membank("bank1")->set_entry(m_gfx_rom_bank);
 }
 
@@ -1381,7 +1381,7 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 void mazerbla_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
-	
+
 	save_item(NAME(m_vcu_video_reg));
 	save_item(NAME(m_vcu_gfx_addr));
 	save_item(NAME(m_vcu_gfx_param_addr));

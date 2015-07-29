@@ -4811,7 +4811,7 @@ static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjembase, hnoridur )
-	MCFG_CPU_MODIFY("maincpu")	// TMPZ84015
+	MCFG_CPU_MODIFY("maincpu")  // TMPZ84015
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(mjembase_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  mjelctrn_vblank_interrupt)   /* IM 2 needs a vector on the data bus */
@@ -5456,7 +5456,7 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 
 	}
 }
-	
+
 
 DRIVER_INIT_MEMBER(dynax_state, maya_common)
 {

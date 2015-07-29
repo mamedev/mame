@@ -6523,7 +6523,6 @@ DRIVER_INIT_MEMBER(galaxian_state,scobra)
 
 DRIVER_INIT_MEMBER(galaxian_state,scobrae)
 {
-
 	UINT8 *rom = memregion("maincpu")->base();
 	int offs;
 

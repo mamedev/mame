@@ -100,7 +100,7 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 		y = 255-y;
 		x = 247-x;
 	}
-	
+
 	tmpbitmap->pix16(y, x) = col;
 }
 

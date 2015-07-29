@@ -229,17 +229,17 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-//	union
-//	{
-//		struct
-//		{
-//			UINT8 m_vcf;
-//			UINT8 m_vcq;
-//			UINT8 m_vca;
-//			UINT8 m_pan;
-//		};
+//  union
+//  {
+//      struct
+//      {
+//          UINT8 m_vcf;
+//          UINT8 m_vcq;
+//          UINT8 m_vca;
+//          UINT8 m_pan;
+//      };
 		UINT8 m_dac[4];
-//	};
+//  };
 
 	float               m_gain;
 	UINT32              m_noise_shift;

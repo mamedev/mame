@@ -1543,7 +1543,7 @@ TIMER_CALLBACK_MEMBER(chihiro_state::usb_ohci_timer)
 							usb_ohci_read_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
 							// only if it is not halted and not to be skipped
 							if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
-								// compare the Endpoint Descriptor’s TailPointer and NextTransferDescriptor fields.
+								// compare the Endpoint Descriptor?s TailPointer and NextTransferDescriptor fields.
 								if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
 									UINT32 a, b;
 									// service transfer descriptor

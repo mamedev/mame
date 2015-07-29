@@ -32,7 +32,7 @@ Notes:
 void nbmj9195_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x8000, 0x8000);
-	
+
 	save_item(NAME(m_inputport));
 	save_item(NAME(m_dipswbitsel));
 	save_item(NAME(m_outcoin_flag));

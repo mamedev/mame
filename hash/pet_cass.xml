@@ -2635,7 +2635,7 @@
 	<software name="ppdm2">
 		<description>The Pet Professor Whole Numbers Fractions Decimals D-M-2</description>
 		<year>1979</year>
-  
+
 		<!-- pet2001n16 Side A: DEC.MULT.2-PP -->
 		<publisher>Cow Bay Computing</publisher>
 		<part name="cass" interface="cbm_cass">
@@ -2700,7 +2700,7 @@
 	<software name="ppds2">
 		<description>The Pet Professor Whole Numbers Fractions Decimals D-S-2</description>
 		<year>1979</year>
-  
+
 		<!-- pet2001n16 Side A: DEC.SUB.2-PP -->
 		<publisher>Cow Bay Computing</publisher>
 		<part name="cass" interface="cbm_cass">

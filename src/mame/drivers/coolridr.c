@@ -345,7 +345,7 @@ public:
 	// store the blit params here
 	UINT32 m_spriteblit[12];
 	UINT32 m_vregs_address;
-	
+
 	UINT32 m_clipvals[2][3];
 	UINT8  m_clipblitterMode[2]; // hack
 
@@ -2732,7 +2732,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 
 	do{
 		cmd = (m_framebuffer_vram[(0+dma_index)/4] & 0xfc000000) >> 24;
-		
+
 		switch(cmd)
 		{
 			case 0x00: /* end of list marker */
@@ -3026,7 +3026,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-//	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
+//  AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
 	AM_RANGE(0x06000000, 0x060001ff) AM_RAM AM_SHARE("nvram") // backup RAM
 	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITE8(lamps_w,0x000000ff)
 	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
@@ -3123,32 +3123,31 @@ GFXDECODE_END
 	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) ) \
 	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED ) \
-
+	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
 static INPUT_PORTS_START( aquastge )
 	DUMMY_INPUT_PORT("IN0")
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN1" ) 
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) ) 
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) 
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) ) 
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) ) 
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) 
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) ) 
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) ) 
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) 
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) ) 
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) ) 
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) 
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) 
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) 
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) ) 
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) ) 
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) 
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) ) 
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) ) 
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) 
+	PORT_DIPNAME( 0x00000001, 0x00000001, "IN1" )
+	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin")
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin")
 	PORT_SERVICE_NO_TOGGLE( 0x00040000, IP_ACTIVE_LOW )
@@ -3157,8 +3156,8 @@ static INPUT_PORTS_START( aquastge )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start")
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	
+	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	DUMMY_INPUT_PORT("IN2")
 
 	DUMMY_INPUT_PORT("IN3")
@@ -3906,7 +3905,7 @@ READ32_MEMBER(coolridr_state::aquastge_hack_r)
 		return 0;
 	else
 	{
-//		printf("pc %08x\n", pc);
+//      printf("pc %08x\n", pc);
 	}
 
 	return m_sysh1_workram_h[0xc3fd8/4];
@@ -3933,7 +3932,7 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
 
-	
+
 
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -3944,4 +3943,3 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
 GAME( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",GAME_NOT_WORKING)
-

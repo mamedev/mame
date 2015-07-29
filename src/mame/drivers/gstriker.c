@@ -181,7 +181,7 @@ Frequencies: 68k is XTAL_32MHZ/2
 void gstriker_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x8000);
-	
+
 	save_item(NAME(m_dmmy_8f_ret));
 	save_item(NAME(m_pending_command));
 }
@@ -1012,7 +1012,7 @@ void gstriker_state::mcu_init()
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20008e, 0x20008f, write16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20008e, 0x20008f, read16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_r),this));
-	
+
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_prot_reg));
 }

@@ -1521,8 +1521,8 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(karatblzbl_sound_map)
 
-//	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-//	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+//  MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+//  MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1554,7 +1554,7 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	// NEC D7759c + YM???? 
+	// NEC D7759c + YM????
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
@@ -2480,7 +2480,7 @@ ROM_START( karatblzbl )
 	ROM_LOAD16_BYTE( "gfx21.u71",        0x2c0000, 0x020000, CRC(ffd66ea0) SHA1(fc1b2fa27d28a61b381e3d4f15809c740082d07f) )
 	ROM_LOAD16_BYTE( "gfx26.u76",        0x2c0001, 0x020000, CRC(7ae76103) SHA1(5c42fbe133cbf600d2150295a70a1541b79706b5) )
 	ROM_LOAD16_BYTE( "gfx25.u67",        0x300000, 0x020000, CRC(1195b559) SHA1(2fd00b3360df5f0a762569ab49c445b68568cf2e) )
-	ROM_LOAD16_BYTE( "gfx30.u72",        0x300001, 0x020000, CRC(7593679f) SHA1(3a6199d1dc60d2c05084fe41c639228613831d99) ) 
+	ROM_LOAD16_BYTE( "gfx30.u72",        0x300001, 0x020000, CRC(7593679f) SHA1(3a6199d1dc60d2c05084fe41c639228613831d99) )
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
 	ROM_LOAD16_BYTE( "5.u62",        0x000000, 0x040000, CRC(1ed12174) SHA1(1e4fc511ad644aaf90505f7930957b4adf9f6c2a) )

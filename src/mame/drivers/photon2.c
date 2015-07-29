@@ -105,7 +105,7 @@ void photon2_state::video_start()
 {
 	m_spectrum_frame_number = 0;
 	m_spectrum_flash_invert = 0;
-	
+
 	save_item(NAME(m_spectrum_frame_number));
 	save_item(NAME(m_spectrum_flash_invert));
 	save_item(NAME(m_spectrum_port_fe));
@@ -329,7 +329,7 @@ void photon2_state::machine_start()
 {
 	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base(), 0x4000);
 	membank("mainbank")->set_entry(0);
-	
+
 	save_item(NAME(m_nmi_enable));
 }
 

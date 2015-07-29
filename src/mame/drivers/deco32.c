@@ -3643,7 +3643,7 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
-	
+
 	save_item(NAME(m_raster_enable));
 	save_item(NAME(m_nslasher_sound_irq));
 	save_item(NAME(m_irq_source));
@@ -3725,7 +3725,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 
 	memcpy(RAM+0x300000,RAM+0x100000,0x100000);
 	memset(RAM+0x100000,0,0x100000);
-	
+
 	save_item(NAME(m_raster_enable));
 	save_item(NAME(m_nslasher_sound_irq));
 	save_item(NAME(m_irq_source));
@@ -3752,7 +3752,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
-	
+
 	save_item(NAME(m_tattass_eprom_bit));
 	save_item(NAME(m_lastClock));
 	save_item(NAME(m_buffer));
@@ -3783,7 +3783,7 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 	deco156_decrypt(machine());
 
 	soundlatch_setclearedvalue(0xff);
-	
+
 	save_item(NAME(m_nslasher_sound_irq));
 
 	/* The board for Night Slashers is very close to the Fighter's History and

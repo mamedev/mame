@@ -201,11 +201,11 @@ WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
 					/* read bit at address */
 					/* if (m_variant == TMS6110_IS_M58819)
 					{
-						m_data = (m_rom[m_address >> 3] >> (7-(m_address & 0x07))) & 1;
+					    m_data = (m_rom[m_address >> 3] >> (7-(m_address & 0x07))) & 1;
 					}
 					else // m_variant == (TMS6110_IS_TMS6100 || TMS6110_IS_TMS6125)
 					{
-						*/
+					    */
 					m_data = (m_rom[m_address >> 3] >> (m_address & 0x07)) & 1;
 					/* } */
 					m_address++;

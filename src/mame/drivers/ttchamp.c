@@ -82,7 +82,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	
+
 	UINT16 m_paloff;
 	UINT16 m_port10;
 	UINT8 m_rombank;
@@ -155,7 +155,7 @@ void ttchamp_state::machine_start()
 
 	m_bakram = auto_alloc_array(machine(), UINT8, 0x100);
 	machine().device<nvram_device>("backram")->set_base(m_bakram, 0x100);
-	
+
 	save_item(NAME(m_paloff));
 	save_item(NAME(m_port10));
 	save_item(NAME(m_rombank));

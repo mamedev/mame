@@ -107,7 +107,7 @@ void naughtyb_state::video_start()
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
 	m_tmpbitmap.allocate(68*8,28*8,m_screen->format());
-	
+
 	save_item(NAME(m_cocktail));
 	save_item(NAME(m_palreg));
 	save_item(NAME(m_bankreg));

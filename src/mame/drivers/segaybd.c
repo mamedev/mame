@@ -836,8 +836,8 @@ ADDRESS_MAP_END
 
 /*
 static ADDRESS_MAP_START( motor_portmap, AS_IO, 8, segaybd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+    ADDRESS_MAP_UNMAP_HIGH
+    ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 */
 
@@ -1440,7 +1440,7 @@ static MACHINE_CONFIG_DERIVED( yboard_deluxe, yboard )
 	// basic machine hardware
 	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2 ) // 8 Mhz(guessed)
 	MCFG_CPU_PROGRAM_MAP(motor_map)
-//	MCFG_CPU_IO_MAP(motor_portmap)
+//  MCFG_CPU_IO_MAP(motor_portmap)
 
 MACHINE_CONFIG_END
 

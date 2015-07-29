@@ -2495,7 +2495,7 @@ ROM_START( tnzsj )
 	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x00000, 0x01000, NO_DUMP) // on sub pcb
 ROM_END
 
-/* tnzs - old style PCB sets 
+/* tnzs - old style PCB sets
 The New Zealand Story
 Taito, 1988
 
