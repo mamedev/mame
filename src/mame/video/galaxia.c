@@ -16,21 +16,24 @@
 #define BULLET_PEN          (0x19)
 
 
-// Colors are 3bpp, but how they are generated is a mystery
-// there's no color prom on the pcb, nor palette ram
+// Colors are 3bpp, palette is generated weirdly though
+// instead of palettes in the PROM theres a lookup scheme
+// tile address bits go in, rgbi goes out into a RAM chip
+// and the video HW grabs the palettes from there
+// todo: the above!!!
 
 PALETTE_INIT_MEMBER(galaxia_state,galaxia)
 {
-	// estimated with video/photo references
+	// taken from actual PCB shots, matches schematics
 	const int lut_clr[0x18] = {
 		// background
 		0, 1, 4, 5,
-		0, 3, 6, 2,
-		0, 1, 4, 5, // unused?
-		0, 3, 1, 7,
+		0, 3, 4, 7,
+		0, 0, 0, 0, // from tests, nothing uses this line, ever
+		0, 3, 1, 3,
 
 		// sprites
-		0, 4, 3, 6, 1, 5, 2, 7
+		0, 4, 3, 6, 1, 5, 3, 7
 	};
 
 	for (int i = 0; i < 0x18; i++)
@@ -43,8 +46,8 @@ PALETTE_INIT_MEMBER(galaxia_state,galaxia)
 
 PALETTE_INIT_MEMBER(galaxia_state,astrowar)
 {
-	// no reference material available(?), except for Data East astrof
-	const int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
+	// part of this was other references while some where taken from actual PCB shots
+	const int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 4, 7 };
 
 	for (int i = 0; i < 8; i++)
 	{
