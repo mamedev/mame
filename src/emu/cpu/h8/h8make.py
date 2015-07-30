@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 USAGE = """
 Usage:
 %s h8.lst <type> h8.inc (type = o/h/s20/s26)
@@ -45,45 +47,45 @@ def has_eat(ins):
     return False
 
 def save_full_one(f, t, name, source):
-    print >>f, "void %s::%s_full()" % (t, name)
-    print >>f, "{"
+    print("void %s::%s_full()" % (t, name), file=f)
+    print("{", file=f)
     substate = 1
     for line in source:
         if has_memory(line):
-            print >>f, "\tif(icount <= bcount) { inst_substate = %d; return; }" % substate
-            print >>f, line
+            print("\tif(icount <= bcount) { inst_substate = %d; return; }" % substate, file=f)
+            print(line, file=f)
             substate += 1
         elif has_eat(line):
-            print >>f, "\tif(icount) icount = bcount; inst_substate = %d; return;" % substate
+            print("\tif(icount) icount = bcount; inst_substate = %d; return;" % substate, file=f)
             substate += 1
         else:
-            print >>f, line
-    print >>f, "}"
-    print >>f
+            print(line, file=f)
+    print("}", file=f)
+    print("", file=f)
 
 def save_partial_one(f, t, name, source):
-    print >>f, "void %s::%s_partial()" % (t, name)
-    print >>f, "{"
-    print >>f, "switch(inst_substate) {"
-    print >>f, "case 0:"
+    print("void %s::%s_partial()" % (t, name), file=f)
+    print("{", file=f)
+    print("switch(inst_substate) {", file=f)
+    print("case 0:", file=f)
     substate = 1
     for line in source:
         if has_memory(line):
-            print >>f, "\tif(icount <= bcount) { inst_substate = %d; return; }" % substate
-            print >>f, "case %d:;" % substate
-            print >>f, line
+            print("\tif(icount <= bcount) { inst_substate = %d; return; }" % substate, file=f)
+            print("case %d:;" % substate, file=f)
+            print(line, file=f)
             substate += 1
         elif has_eat(line):
-            print >>f, "\tif(icount) icount = bcount; inst_substate = %d; return;" % substate
-            print >>f, "case %d:;" % substate
+            print("\tif(icount) icount = bcount; inst_substate = %d; return;" % substate, file=f)
+            print("case %d:;" % substate, file=f)
             substate += 1
         else:
-            print >>f, line
-    print >>f, "\tbreak;"
-    print >>f, "}"
-    print >>f, "\tinst_substate = 0;"
-    print >>f, "}"
-    print >>f
+            print(line, file=f)
+    print("\tbreak;", file=f)
+    print("}", file=f)
+    print("\tinst_substate = 0;", file=f)
+    print("}", file=f)
+    print("", file=f)
 
 class Hash:
     def __init__(self, premask):
@@ -185,7 +187,7 @@ class Opcode:
         else:
             flags = "%d" % size
         
-        print >>f, "\t{ %d, 0x%08x, 0x%08x, 0x%04x, 0x%04x, \"%s\", DASM_%s, DASM_%s, %s }, // %s" % ( slot, val, mask, val2, mask2, self.name, self.am1 if self.am1 != "-" else "none", self.am2 if self.am2 != "-" else "none", flags, "needed" if self.needed else "inherited")
+        print("\t{ %d, 0x%08x, 0x%08x, 0x%04x, 0x%04x, \"%s\", DASM_%s, DASM_%s, %s }, // %s" % ( slot, val, mask, val2, mask2, self.name, self.am1 if self.am1 != "-" else "none", self.am2 if self.am2 != "-" else "none", flags, "needed" if self.needed else "inherited"), file=f)
 
 class Special:
     def __init__(self, val, name, otype, dtype):
@@ -244,7 +246,7 @@ class DispatchStep:
         return True
 
     def source(self):
-        start = self.pos / 2
+        start = self.pos // 2
         end = start + self.skip
         s = []
         for i in range(start, end+1):
@@ -345,13 +347,13 @@ class OpcodeList:
                         h = self.get(d.id)
     
     def save_dasm(self, f, dname):
-        print >>f, "const %s::disasm_entry %s::disasm_entries[] = {" % (dname, dname)
+        print("const %s::disasm_entry %s::disasm_entries[] = {" % (dname, dname), file=f)
         for opc in self.opcode_info:
             if opc.enabled:
                 opc.save_dasm(f)
-        print >>f, "\t{ 0, 0, 0, 0, 0, \"illegal\", 0, 0, 2 },"
-        print >>f, "};"
-        print >>f
+        print("\t{ 0, 0, 0, 0, 0, \"illegal\", 0, 0, 2 },", file=f)
+        print("};", file=f)
+        print("", file=f)
     
     def save_opcodes(self, f, t):
         for opc in self.opcode_info:
@@ -370,24 +372,24 @@ class OpcodeList:
             save_partial_one(f, t, "dispatch_" + dsp.name, dsp.source())
     
     def save_exec(self, f, t, dtype, v):
-        print >>f, "void %s::do_exec_%s()" % (t, v)
-        print >>f, "{"
-        print >>f, "\tswitch(inst_state >> 16) {"
+        print("void %s::do_exec_%s()" % (t, v), file=f)
+        print("{", file=f)
+        print("\tswitch(inst_state >> 16) {", file=f)
         for i in range(0, len(self.dispatch_info)+2):
             if i == 1:
-                print >>f, "\tcase 0x01: {"
-                print >>f, "\t\tswitch(inst_state & 0xffff) {"
+                print("\tcase 0x01: {", file=f)
+                print("\t\tswitch(inst_state & 0xffff) {", file=f)
                 for sta in self.states_info:
                     if sta.enabled:
-                        print >>f, "\t\tcase 0x%02x: state_%s_%s(); break;" % (sta.val & 0xffff, sta.name, v)
-                print >>f, "\t\t}"
-                print >>f, "\t\tbreak;"
-                print >>f, "\t}"
+                        print("\t\tcase 0x%02x: state_%s_%s(); break;" % (sta.val & 0xffff, sta.name, v), file=f)
+                print("\t\t}", file=f)
+                print("\t\tbreak;", file=f)
+                print("\t}", file=f)
             else:
                 if i == 0 or self.dispatch_info[i-2].enabled:
-                    print >>f, "\tcase 0x%02x: {" % i
+                    print("\tcase 0x%02x: {" % i, file=f)
                     h = self.get(i)
-                    print >>f, "\t\tswitch((inst_state >> 8) & 0x%02x) {" % h.mask
+                    print("\t\tswitch((inst_state >> 8) & 0x%02x) {" % h.mask, file=f)
                     for val, h2 in sorted(h.d.items()):
                         if h2.enabled:
                             fmask = h2.premask | (h.mask ^ 0xff)
@@ -398,16 +400,16 @@ class OpcodeList:
                                 s += 1
                                 while s & fmask:
                                     s += s & fmask
-                            print >>f, "\t\t%s{" % c
+                            print("\t\t%s{" % c, file=f)
                             if h2.mask == 0x00:
                                 n = h2.d[0]
                                 if n.is_dispatch():
-                                    print >>f, "\t\t\tdispatch_%s_%s();" % (n.name, v)
+                                    print("\t\t\tdispatch_%s_%s();" % (n.name, v), file=f)
                                 else:
-                                    print >>f, "\t\t\t%s_%s();" % (n.function_name(), v)
-                                print >>f, "\t\t\tbreak;"
+                                    print("\t\t\t%s_%s();" % (n.function_name(), v), file=f)
+                                print("\t\t\tbreak;", file=f)
                             else:
-                                print >>f, "\t\t\tswitch(inst_state & 0x%02x) {" % h2.mask
+                                print("\t\t\tswitch(inst_state & 0x%02x) {" % h2.mask, file=f)
                                 if i == 0:
                                     mpos = 1
                                 else:
@@ -427,23 +429,23 @@ class OpcodeList:
                                             while s & fmask:
                                                 s += s & fmask
                                         if n.is_dispatch():
-                                            print >>f, "\t\t\t%sdispatch_%s_%s(); break;" % (c, n.name, v)
+                                            print("\t\t\t%sdispatch_%s_%s(); break;" % (c, n.name, v), file=f)
                                         else:
-                                            print >>f, "\t\t\t%s%s_%s(); break;" % (c, n.function_name(), v)
-                                print >>f, "\t\t\tdefault: illegal(); break;"
-                                print >>f, "\t\t\t}"
-                                print >>f, "\t\t\tbreak;"
-                            print >>f, "\t\t}"
-                    print >>f, "\t\tdefault: illegal(); break;"
-                    print >>f, "\t\t}"
-                    print >>f, "\t\tbreak;"
-                    print >>f, "\t}"
-        print >>f, "\t}"
-        print >>f, "}"
+                                            print("\t\t\t%s%s_%s(); break;" % (c, n.function_name(), v), file=f)
+                                print("\t\t\tdefault: illegal(); break;", file=f)
+                                print("\t\t\t}", file=f)
+                                print("\t\t\tbreak;", file=f)
+                            print("\t\t}", file=f)
+                    print("\t\tdefault: illegal(); break;", file=f)
+                    print("\t\t}", file=f)
+                    print("\t\tbreak;", file=f)
+                    print("\t}", file=f)
+        print("\t}", file=f)
+        print("}", file=f)
 
 def main(argv):
     if len(argv) != 4:
-        print USAGE % argv[0]
+        print(USAGE % argv[0])
         return 1
 
     dtype = name_to_type(argv[2])

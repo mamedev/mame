@@ -2113,6 +2113,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/megadriv.c",  
 	MAME_DIR .. "src/mess/drivers/saturn.c",    
 	MAME_DIR .. "src/mess/drivers/segapico.c",  
+	MAME_DIR .. "src/mess/drivers/segapm.c",  
 	MAME_DIR .. "src/mess/drivers/sg1000.c",    
 	MAME_DIR .. "src/mess/drivers/sms.c",
 	MAME_DIR .. "src/mess/machine/sms.c", 
@@ -2332,7 +2333,6 @@ files {
 	MAME_DIR .. "src/mess/video/ondra.c", 
 	MAME_DIR .. "src/mess/drivers/pmd85.c",
 	MAME_DIR .. "src/mess/machine/pmd85.c",
-	MAME_DIR .. "src/mess/video/pmd85.c", 
 	MAME_DIR .. "src/mess/drivers/pmi80.c",     
 	MAME_DIR .. "src/mess/drivers/sapi1.c",     
 }

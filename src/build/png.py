@@ -143,15 +143,16 @@ And now, my famous members
 """
 
 # http://www.python.org/doc/2.2.3/whatsnew/node5.html
-from __future__ import generators
+from __future__ import generators,print_function
 
 __version__ = "0.0.17"
 
 from array import array
-try: # See :pyver:old
-    import itertools
+try:
+    from itertools import imap
 except ImportError:
-    pass
+    imap = map
+from itertools import starmap
 import math
 # http://www.python.org/doc/2.4.4/lib/module-operator.html
 import operator
@@ -1650,11 +1651,10 @@ class Reader:
             spb = 8//self.bitdepth
             out = array('B')
             mask = 2**self.bitdepth - 1
-            shifts = map(self.bitdepth.__mul__, reversed(range(spb)))
+            shifts = list(map(self.bitdepth.__mul__, reversed(range(spb))))
             for o in raw:
-                out.extend(map(lambda i: mask&(o>>i), shifts))
+                out.extend(list(map(lambda i: mask&(o>>i), shifts)))
             return out[:width]
-
         return itertools.imap(asvalues, rows)
 
     def serialtoflat(self, bytes, width=None):
@@ -1915,8 +1915,8 @@ class Reader:
             while True:
                 try:
                     type, data = self.chunk(lenient=lenient)
-                except ValueError, e:
-                    raise ChunkError(e.args[0])
+                except ValueError:
+                    raise ChunkError(sys.exc_info()[1].args[0])
                 if type == 'IEND':
                     # http://www.w3.org/TR/PNG/#11IEND
                     break
@@ -1947,7 +1947,6 @@ class Reader:
 
         self.preamble(lenient=lenient)
         raw = iterdecomp(iteridat())
-
         if self.interlace:
             raw = array('B', itertools.chain(*raw))
             arraycode = 'BH'[self.bitdepth>8]
@@ -2062,10 +2061,10 @@ class Reader:
             meta['alpha'] = bool(self.trns)
             meta['bitdepth'] = 8
             meta['planes'] = 3 + bool(self.trns)
-            plte = self.palette()
+            plte = list(self.palette())
             def iterpal(pixels):
                 for row in pixels:
-                    row = map(plte.__getitem__, row)
+                    row = list(map(plte.__getitem__, row))
                     yield array('B', itertools.chain(*row))
             pixels = iterpal(pixels)
         elif self.trns:
@@ -2779,5 +2778,5 @@ def _main(argv):
 if __name__ == '__main__':
     try:
         _main(sys.argv)
-    except Error, e:
-        print >>sys.stderr, e
+    except Error:
+        print (sys.exc_info()[1], file=e)

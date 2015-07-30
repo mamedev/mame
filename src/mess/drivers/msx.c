@@ -22,8 +22,8 @@
 **
 **
 ** Todo/known issues:
-** - piopx7/piopx7uk/piopxv60: Laserdisc integration doesn't exist
-** - piopx7: Is this a pal or an ntsc machine?
+** - piopx7/piopx7uk/piopxv60: Pioneer System Remote (home entertainment/Laserdisc control) not implemented
+** - piopx7: Dump is from a PAL (EU/AU) machine, we have no known good dumps from JP or US NTSC machines
 ** - spc800: Haven't been able to test operation of the han rom yet
 ** - svi728: Expansion slot not emulated
 ** - svi738: v9938 not emulated
@@ -1500,7 +1500,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V9938_ADD("v9938", "screen", 0x20000, XTAL_21_4772MHz)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1565,7 +1565,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2942,10 +2942,29 @@ ROM_START (piopx7)
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( piopx7, msx_pal )
-	// AY8910/YM2149?
+	// TMS9129NL VDP with sync/overlay interface
+	// AY-3-8910 PSG
+	// Pioneer System Remote (SR) system control interface
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-	// TMS9928 is this were an ntsc machine
+
+	// Line-level stereo audio input can be mixed with sound output, balance controlled with slider on front panel
+	// Front-panel switch allows audio input to be passed through bypassing the mixing circuit
+	// Line input can be muted under software control, e.g. when loading data from Laserdisc
+	// Right channel of line input is additionally routed via some signal processing to the cassette input for loading data from Laserdisc
+
+	// PSG port B bits 0-5 can be used to drive controller pins 1-6, 1-7, 2-6, 2-7, 1-8 and 2-8 low if 0 is written
+
+	// Slot #2 7FFE is the SR control register LCON
+	// Bit 7 R = /ACK (significant with acknowledge 1->0 with respect to remote control signal transmission)
+	// Bit 0 R = RMCLK (clock produced by dividing CLK1/CLK2 frequency by 128)
+	// Bit 0 W = /REM (high output with bit serial data output generated in synchronisation with RMCLK)
+
+	// Slot #2 7FFF is the video overlay control register VCON
+	// Bit 7 R = /EXTV (low when external video input available; high when not available)
+	// Bit 7 W = Mute (line input signal muting)
+	// Bit 0 R = INTEXV (interrupt available when external video signal OFF, reset on read)
+	// Bit 0 W = /OVERLAY (0 = superimpose, 1 = non-superimpose)
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 2, 2)   /* 32KB RAM */

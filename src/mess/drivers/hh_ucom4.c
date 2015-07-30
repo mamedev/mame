@@ -1067,6 +1067,8 @@ MACHINE_CONFIG_END
   known releases:
   - USA: Electronic Football (aka Pro-Bowl Football)
   - Japan: American Football
+  
+  note: MAME external artwork is not needed for this game
 
 ***************************************************************************/
 
@@ -1479,6 +1481,8 @@ MACHINE_CONFIG_END
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, labeled D553C 049
   * cyan VFD display Futaba DM-4.5 91
+
+  note: MAME external artwork is not needed for this game
 
 ***************************************************************************/
 

@@ -98,7 +98,6 @@ public:
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(mz3500);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -786,16 +785,6 @@ void mz3500_state::machine_reset()
 }
 
 
-
-PALETTE_INIT_MEMBER(mz3500_state, mz3500)
-{
-	int i;
-
-	for(i=0;i<8;i++)
-		palette.set_pen_color(i,pal1bit((i >> 1) & 1),pal1bit(i >> 2),pal1bit((i >> 0) & 1));
-
-}
-
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
@@ -854,8 +843,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz3500)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(mz3500_state, mz3500)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

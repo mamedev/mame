@@ -625,14 +625,6 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			for (const rom_entry *data = part->romdata(); data->_name != NULL; data++)
 				if (data->_hashdata != NULL)
 				{
-					// make sure it's all lowercase
-					for (const char *str = data->_name; *str; str++)
-						if (tolower((UINT8)*str) != *str)
-						{
-							osd_printf_error("%s: %s has upper case ROM name %s\n", filename(), swinfo->shortname(), data->_name);
-							break;
-						}
-
 					// make sure the hash is valid
 					hash_collection hashes;
 					if (!hashes.from_internal_string(data->_hashdata))

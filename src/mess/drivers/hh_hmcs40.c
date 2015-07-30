@@ -55,21 +55,20 @@
  @69      HD38820A  1983, Gakken Dig Dug
  @70      HD38820A  1983, Parker Brothers Q*Bert
  @85      HD38820A  1984, Bandai Machine Man (PT-438)
- *88      HD38820A  1984, Bandai Pair Match (1/2)
- *89      HD38820A  1984, Bandai Pair Match (2/2)
+ @88      HD38820A  1984, Bandai Pair Match (PT-460) (1/2)
+ @89      HD38820A  1984, Bandai Pair Match (PT-460) (2/2)
 
  *75      HD44801A  1982, Alpha 8201 protection MCU (have dump)
 
  *35      HD44801B  1983, Alpha 8302 protection MCU (have dump)
  *42      HD44801B  1984, Alpha 8303 protection MCU (have dump)
 
-  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
+  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
   TODO:
   - cdkong discrete sound (simple volume decay, simulated for now)
   - cgalaxn discrete sound (alien attacking sound effect)
-  - vinvader locks up at boot
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
     Or it could be a race condition: irq happening too late/early.
@@ -85,6 +84,9 @@
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/speaker.h"
+
+// internal artwork
+#include "pairmtch.lh"
 
 #include "hh_hmcs40_test.lh" // common test-layout - use external artwork
 
@@ -332,7 +334,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   * Hitachi HD38750A08 MCU
   * green VFD display Emix-106, with bezel overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -444,7 +446,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38750A07 MCU
   * cyan VFD display Emix-103, with blue or green color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -580,7 +582,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800A77 MCU
   * cyan/red/green VFD display Futaba DM-43ZK 2E
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -710,7 +712,7 @@ MACHINE_CONFIG_END
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -821,7 +823,7 @@ MACHINE_CONFIG_END
   - Japan: ?
   - USA: Star Hawk, published by Mattel
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -949,7 +951,7 @@ MACHINE_CONFIG_END
   * cyan/red/blue VFD display NEC FIP11BM24T no. 4-8, half of it reflected
     with a one-way mirror to give the illusion of a 3D display
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1069,7 +1071,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A49 MCU
   * cyan/red/yellow VFD display Futaba DM-53Z 3E, with color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1188,7 +1190,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A63 MCU
   * cyan/red/blue VFD display Futaba DM-68ZK 3D DM-63
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1316,7 +1318,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A65 MCU
   * cyan/red/green VFD display NEC FIP6AM25T no. 21-21
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1440,7 +1442,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B43 MCU
   * cyan/red/blue VFD display Futaba DM-71
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1538,7 +1540,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B52 MCU
   * cyan/red/blue VFD display NEC FIP8BM25T no. 21-8 2
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1587,9 +1589,9 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // port D
-	PORT_CONFNAME( 0x10, 0x00, "Factory Test" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x10, DEF_STR( On ) )
+	PORT_CONFNAME( 0x0010, 0x0000, "Factory Test" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0010, DEF_STR( On ) )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1628,7 +1630,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A85 MCU
   * cyan/red/green VFD display NEC FIP5CM33T no. 4 21
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1712,6 +1714,161 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Bandai Pair Match (manufactured in Japan)
+  * PCB label Kaken Corp. PT-460
+  * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio)
+  * cyan/red VFD display
+  
+  This is a memory game, the difference is instead of pictures, the player
+  needs to match sound effects. It has an extra MCU for sound. The case is
+  shaped like a glossy black pyramid. Star Trek fans will recognize it as
+  a prop used in TNG Ten Forward.
+
+  note: MAME external artwork is not needed for this game
+
+***************************************************************************/
+
+class pairmtch_state : public hh_hmcs40_state
+{
+public:
+	pairmtch_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_READ8_MEMBER(input_r);
+
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(sound2_w);
+	DECLARE_WRITE16_MEMBER(speaker_w);
+};
+
+// handlers: maincpu side
+
+WRITE8_MEMBER(pairmtch_state::plate_w)
+{
+	// R2x,R3x,R6x: vfd matrix plate
+	int shift = (offset == HMCS40_PORT_R6X) ? 8 : (offset-2) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	display_matrix(12, 6, m_plate, m_grid);
+}
+
+WRITE16_MEMBER(pairmtch_state::grid_w)
+{
+	// D7: sound reset (to audiocpu reset line)
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	
+	// D9: sound start (to audiocpu INT0)
+	m_audiocpu->set_input_line(0, (data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
+	
+	// D10,D15: input mux
+	m_inp_mux = (data >> 10 & 1) | (data >> 14 & 2);
+	
+	// D0-D5: vfd matrix grid
+	m_grid = data & 0x3f;
+	display_matrix(12, 6, m_plate, m_grid);
+}
+
+READ8_MEMBER(pairmtch_state::input_r)
+{
+	// R4x: multiplexed inputs
+	return read_inputs(2);
+}
+
+WRITE8_MEMBER(pairmtch_state::sound_w)
+{
+	// R5x: soundlatch (to audiocpu R2x)
+	soundlatch_byte_w(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+}
+
+
+// handlers: audiocpu side
+
+WRITE8_MEMBER(pairmtch_state::sound2_w)
+{
+	// R2x: soundlatch (to maincpu R5x)
+	soundlatch2_byte_w(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+}
+
+WRITE16_MEMBER(pairmtch_state::speaker_w)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+	
+	// D1: sound ack (to maincpu INT0)
+	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+// config
+
+static INPUT_PORTS_START( pairmtch )
+	PORT_START("IN.0") // D10 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.1") // D15 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+
+	PORT_START("IN.2") // port D
+	PORT_CONFNAME( 0x0040, 0x0000, "Factory Test" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0040, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_CONFNAME( 0x0800, 0x0800, "Players" )
+	PORT_CONFSETTING(      0x0800, "1" )
+	PORT_CONFSETTING(      0x0000, "2" )
+	PORT_CONFNAME( 0x3000, 0x2000, "Skill Level" )
+	PORT_CONFSETTING(      0x2000, "1" )
+	PORT_CONFSETTING(      0x1000, "2" )
+	PORT_CONFSETTING(      0x0000, "3" )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( pairmtch, pairmtch_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(pairmtch_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(4, READ8(pairmtch_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(pairmtch_state, sound_w))
+	MCFG_HMCS40_READ_R_CB(5, READ8(driver_device, soundlatch2_byte_r))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
+
+	MCFG_CPU_ADD("audiocpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, sound2_w))
+	MCFG_HMCS40_READ_R_CB(2, READ8(driver_device, soundlatch_byte_r))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, speaker_w))
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_pairmtch)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Coleco Alien Attack (manufactured in Taiwan)
   * Hitachi HD38800A25 MCU
   * cyan/red VFD display Futaba DM-19Z 1J
@@ -1719,7 +1876,7 @@ MACHINE_CONFIG_END
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
   action-oriented game.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1830,7 +1987,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A45 MCU
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1964,7 +2121,7 @@ MACHINE_CONFIG_END
   - P2 Left:  Head-to-Head Galaxian (2-player mode, short)
   - P2 Right: Head-to-Head Galaxian (2-player mode, long)
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2097,7 +2254,7 @@ MACHINE_CONFIG_END
 
   BTANB note: 1st version doesn't show the whole maze on power-on
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2213,7 +2370,7 @@ MACHINE_CONFIG_END
 
   BTANB note: in demo-mode, she hardly ever walks to the upper two rows
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2322,7 +2479,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2446,7 +2603,7 @@ MACHINE_CONFIG_END
 
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 #if 0
@@ -2504,7 +2661,7 @@ INPUT_PORTS_END
   * COP411L sub MCU, labeled COP411L-KED/N
   * cyan/red/green VFD display NEC FIP15BM32T
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2533,7 +2690,7 @@ protected:
 	virtual void machine_start();
 };
 
-// handlers (maincpu side first)
+// handlers: maincpu side
 
 void eturtles_state::prepare_display()
 {
@@ -2578,7 +2735,7 @@ void eturtles_state::update_int()
 }
 
 
-// COP side
+// handlers: COP side
 
 WRITE_LINE_MEMBER(eturtles_state::speaker_w)
 {
@@ -2697,7 +2854,7 @@ MACHINE_CONFIG_END
   * COP411L sub MCU, labeled ~/B8236 COP411L-KEC/N
   * cyan/red/green VFD display NEC FIP15AM32T (EL628-003) no. 2-421, with partial color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2712,7 +2869,7 @@ public:
 	DECLARE_READ8_MEMBER(cop_data_r);
 };
 
-// handlers (most of it is handled in eturtles_state above)
+// handlers (most of it is in eturtles_state above)
 
 void estargte_state::prepare_display()
 {
@@ -2807,7 +2964,7 @@ MACHINE_CONFIG_END
   - Japan: Heiankyo Alien
   - USA: Earth Invaders, published by CGL
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -2923,7 +3080,7 @@ MACHINE_CONFIG_END
   - Japan: Crazy Kong
   - USA: Super Kong, published by CGL
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3046,7 +3203,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A69 MCU
   * cyan/red/green VFD display Futaba DM-69Z 3F, with color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3171,7 +3328,7 @@ MACHINE_CONFIG_END
   turn the game on while holding the 1-key and use the visitor's side keypad
   to play offsense.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3329,7 +3486,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A70 MCU
   * cyan/red/green/darkgreen VFD display Itron CP5137
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3417,7 +3574,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3538,7 +3695,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD display NEC FIP10AM24T no. 2-8 1
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3663,7 +3820,7 @@ MACHINE_CONFIG_END
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3836,6 +3993,17 @@ ROM_START( machiman )
 ROM_END
 
 
+ROM_START( pairmtch )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a88", 0x0000, 0x1000, CRC(ffa35730) SHA1(5a80b9025aaad2ac0ab0b1436a1355ae8cd3f868) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a89", 0x0000, 0x1000, CRC(3533ec56) SHA1(556d69e78a0ee1bf766fce16ed58992d7272d57f) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( alnattck )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38800a25", 0x0000, 0x1000, CRC(18b50869) SHA1(11e9d5f7b4ae818b077b0ee14a3b43190e20bff3) )
@@ -3962,7 +4130,7 @@ ROM_END
 
 ROM_START( vinvader )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hd38750a45", 0x0000, 0x0800, CRC(e02d94d9) SHA1(d4679abbb9c6778e5e853aa6c2b90dee1d21c9dd) )
+	ROM_LOAD( "hd38750a45", 0x0000, 0x0800, CRC(32de6056) SHA1(70238c6c40c3d513f8eced1cb81bdd4dbe12f16c) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 ROM_END
 
@@ -3982,6 +4150,7 @@ CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Banda
 CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultra Man (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
@@ -4006,4 +4175,4 @@ CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parke
 CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1981, vinvader,  0,        0, vinvader, vinvader, driver_device, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1981, vinvader,  0,        0, vinvader, vinvader, driver_device, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

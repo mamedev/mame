@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(big10_state, big10_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)

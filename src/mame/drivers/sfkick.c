@@ -470,7 +470,7 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_CPU_PROGRAM_MAP(sfkick_sound_map)
 	MCFG_CPU_IO_MAP(sfkick_sound_io_map)
 
-	MCFG_V9938_ADD("v9938", "screen", 0x80000)
+	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sfkick_state,sfkick_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)

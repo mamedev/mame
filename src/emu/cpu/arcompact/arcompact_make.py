@@ -1,351 +1,352 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import sys
 
 def EmitGroup04_Handle_NZ_Flags(f, funcname, opname):
-        print >>f, "		if (result & 0x80000000) { STATUS32_SET_N; }"
-        print >>f, "		else { STATUS32_CLEAR_N; }"
-        print >>f, "		if (result == 0x00000000) { STATUS32_SET_Z; }"
-        print >>f, "		else { STATUS32_CLEAR_Z; }"
+        print("		if (result & 0x80000000) { STATUS32_SET_N; }", file=f)
+        print("		else { STATUS32_CLEAR_N; }", file=f)
+        print("		if (result == 0x00000000) { STATUS32_SET_Z; }", file=f)
+        print("		else { STATUS32_CLEAR_Z; }", file=f)
 
 def EmitGroup04_Handle_NZC_LSR1_Flags(f, funcname, opname):
-        print >>f, "		if (result & 0x80000000) { STATUS32_SET_N; }"
-        print >>f, "		else { STATUS32_CLEAR_N; }"
-        print >>f, "		if (result == 0x00000000) { STATUS32_SET_Z; }"
-        print >>f, "		else { STATUS32_CLEAR_Z; }"
-        print >>f, "		if (c == 0x00000001) { STATUS32_SET_C; }"
-        print >>f, "		else { STATUS32_CLEAR_C; }"
+        print("		if (result & 0x80000000) { STATUS32_SET_N; }", file=f)
+        print("		else { STATUS32_CLEAR_N; }", file=f)
+        print("		if (result == 0x00000000) { STATUS32_SET_Z; }", file=f)
+        print("		else { STATUS32_CLEAR_Z; }", file=f)
+        print("		if (c == 0x00000001) { STATUS32_SET_C; }", file=f)
+        print("		else { STATUS32_CLEAR_C; }", file=f)
 
 def EmitGroup04_Handle_NZCV_ADD_Flags(f, funcname, opname):
-        print >>f, "		if (result & 0x80000000) { STATUS32_SET_N; }"
-        print >>f, "		else { STATUS32_CLEAR_N; }"
-        print >>f, "		if (result == 0x00000000) { STATUS32_SET_Z; }"
-        print >>f, "		else { STATUS32_CLEAR_Z; }"
-        print >>f, "		if ((b & 0x80000000) == (c & 0x80000000))"
-        print >>f, "		{"
-        print >>f, "			if ((result & 0x80000000) != (b & 0x80000000))"
-        print >>f, "			{"
-        print >>f, "				STATUS32_SET_V;"
-        print >>f, "			}"
-        print >>f, "			else"
-        print >>f, "			{"
-        print >>f, "				STATUS32_CLEAR_V;"
-        print >>f, "			}"
-        print >>f, "		}"
-        print >>f, "		if (b < c)"
-        print >>f, "		{"
-        print >>f, "			STATUS32_SET_C;"
-        print >>f, "		}"
-        print >>f, "		else"
-        print >>f, "		{"
-        print >>f, "			STATUS32_CLEAR_C;"
-        print >>f, "		}"
+        print("		if (result & 0x80000000) { STATUS32_SET_N; }", file=f)
+        print("		else { STATUS32_CLEAR_N; }", file=f)
+        print("		if (result == 0x00000000) { STATUS32_SET_Z; }", file=f)
+        print("		else { STATUS32_CLEAR_Z; }", file=f)
+        print("		if ((b & 0x80000000) == (c & 0x80000000))", file=f)
+        print("		{", file=f)
+        print("			if ((result & 0x80000000) != (b & 0x80000000))", file=f)
+        print("			{", file=f)
+        print("				STATUS32_SET_V;", file=f)
+        print("			}", file=f)
+        print("			else", file=f)
+        print("			{", file=f)
+        print("				STATUS32_CLEAR_V;", file=f)
+        print("			}", file=f)
+        print("		}", file=f)
+        print("		if (b < c)", file=f)
+        print("		{", file=f)
+        print("			STATUS32_SET_C;", file=f)
+        print("		}", file=f)
+        print("		else", file=f)
+        print("		{", file=f)
+        print("			STATUS32_CLEAR_C;", file=f)
+        print("		}", file=f)
 
 
 def EmitGroup04_no_Flags(f, funcname, opname):
-       print >>f, "		// no flag changes"
+       print("		// no flag changes", file=f)
 
 def EmitGroup04_unsupported_Flags(f, funcname, opname):
-        print >>f, "		arcompact_fatal(\"arcompact_handle%s (%s) (F set)\\n\"); // not yet supported" % (funcname, opname)
+        print("		arcompact_fatal(\"arcompact_handle%s (%s) (F set)\\n\"); // not yet supported" % (funcname, opname), file=f)
 
 def EmitGroup04_Flaghandler(f,funcname, opname, flagcondition, flaghandler):
     if flagcondition == -1:
-        print >>f, "	if (F)"
-        print >>f, "	{"
+        print("	if (F)", file=f)
+        print("	{", file=f)
         flaghandler(f, funcname, opname)
-        print >>f, "	}"
+        print("	}", file=f)
     elif flagcondition == 0:
-        print >>f, "	if (0)"
-        print >>f, "	{"
+        print("	if (0)", file=f)
+        print("	{", file=f)
         flaghandler(f, funcname, opname)
-        print >>f, "	}"
+        print("	}", file=f)
     elif flagcondition == 1:
-        print >>f, "	if (1)"
-        print >>f, "	{"
+        print("	if (1)", file=f)
+        print("	{", file=f)
         flaghandler(f, funcname, opname)
-        print >>f, "	}"
+        print("	}", file=f)
 
 def EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler):
-    print >>f, "	int size = 4;"
+    print("	int size = 4;", file=f)
     
     if breg_is_dst_only == 0:	
-        print >>f, "	UINT32 limm = 0;"
+        print("	UINT32 limm = 0;", file=f)
     
-    print >>f, "/*	int got_limm = 0; */"
-    print >>f, "	"
-    print >>f, "	COMMON32_GET_breg;"
+    print("/*	int got_limm = 0; */", file=f)
+    print("	", file=f)
+    print("	COMMON32_GET_breg;", file=f)
     
     if flagcondition == -1:
-        print >>f, "	COMMON32_GET_F;"
+        print("	COMMON32_GET_F;", file=f)
     
-    print >>f, "	COMMON32_GET_u6;"
+    print("	COMMON32_GET_u6;", file=f)
     
     if ignore_a == 0:
-        print >>f, "	COMMON32_GET_areg;"
+        print("	COMMON32_GET_areg;", file=f)
     elif ignore_a == 1:
-        print >>f, "     //COMMON32_GET_areg; // areg is reserved / not used"
+        print("     //COMMON32_GET_areg; // areg is reserved / not used", file=f)
     elif ignore_a == 2:
-        print >>f, "     //COMMON32_GET_areg; // areg bits already used as opcode select"
+        print("     //COMMON32_GET_areg; // areg bits already used as opcode select", file=f)
     elif ignore_a == 3:
-        print >>f, "     //COMMON32_GET_areg; // areg bits already used as condition code select"
-    print >>f, "	"
+        print("     //COMMON32_GET_areg; // areg bits already used as condition code select", file=f)
+    print("	", file=f)
     
-    print >>f, "	UINT32 c;"
+    print("	UINT32 c;", file=f)
     if breg_is_dst_only == 0:
-        print >>f, "	UINT32 b;"
-        print >>f, "	"
-        print >>f, "	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */"
-        print >>f, "	if (breg == LIMM_REG)"
-        print >>f, "	{"
-        print >>f, "		GET_LIMM_32;"
-        print >>f, "		size = 8;"
-        print >>f, "/*		got_limm = 1; */"
-        print >>f, "		b = limm;"
-        print >>f, "	}"
-        print >>f, "	else"
-        print >>f, "	{"
-        print >>f, "		b = m_regs[breg];"
-        print >>f, "	}"
+        print("	UINT32 b;", file=f)
+        print("	", file=f)
+        print("	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */", file=f)
+        print("	if (breg == LIMM_REG)", file=f)
+        print("	{", file=f)
+        print("		GET_LIMM_32;", file=f)
+        print("		size = 8;", file=f)
+        print("/*		got_limm = 1; */", file=f)
+        print("		b = limm;", file=f)
+        print("	}", file=f)
+        print("	else", file=f)
+        print("	{", file=f)
+        print("		b = m_regs[breg];", file=f)
+        print("	}", file=f)
     
-    print >>f, "    "
-    print >>f, " 	c = u;"
-    print >>f, "	"
-    print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
+    print("    ", file=f)
+    print(" 	c = u;", file=f)
+    print("	", file=f)
+    print("	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */", file=f)
 
 def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler):
     # the mode 0x00 handler  
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p00(OPS_32)" % funcname
-    print >>f, "{"
-    print >>f, "	int size = 4;"
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p00(OPS_32)" % funcname, file=f)
+    print("{", file=f)
+    print("	int size = 4;", file=f)
     
-    print >>f, "	UINT32 limm = 0;"
+    print("	UINT32 limm = 0;", file=f)
     
-    print >>f, "	int got_limm = 0;"
-    print >>f, "	"
-    print >>f, "	COMMON32_GET_breg;"
+    print("	int got_limm = 0;", file=f)
+    print("	", file=f)
+    print("	COMMON32_GET_breg;", file=f)
 
     if flagcondition == -1:
-        print >>f, "	COMMON32_GET_F;"
+        print("	COMMON32_GET_F;", file=f)
         
-    print >>f, "	COMMON32_GET_creg;"
+    print("	COMMON32_GET_creg;", file=f)
 
     if ignore_a == 0:
-        print >>f, "	COMMON32_GET_areg;"
+        print("	COMMON32_GET_areg;", file=f)
     elif ignore_a == 1:
-        print >>f, "     //COMMON32_GET_areg; // areg is reserved / not used"
+        print("     //COMMON32_GET_areg; // areg is reserved / not used", file=f)
     elif ignore_a == 2:
-        print >>f, "     //COMMON32_GET_areg; // areg bits already used as opcode select"
+        print("     //COMMON32_GET_areg; // areg bits already used as opcode select", file=f)
   
-    print >>f, "	"
+    print("	", file=f)
     
-    print >>f, "	UINT32 c;"
+    print("	UINT32 c;", file=f)
     if breg_is_dst_only == 0:
-        print >>f, "	UINT32 b;"
-        print >>f, "	"
-        print >>f, "	if (breg == LIMM_REG)"
-        print >>f, "	{"
-        print >>f, "		GET_LIMM_32;"
-        print >>f, "		size = 8;"
-        print >>f, "		got_limm = 1;"
-        print >>f, "		b = limm;"
-        print >>f, "	}"
-        print >>f, "	else"
-        print >>f, "	{"
-        print >>f, "		b = m_regs[breg];"
-        print >>f, "	}"
+        print("	UINT32 b;", file=f)
+        print("	", file=f)
+        print("	if (breg == LIMM_REG)", file=f)
+        print("	{", file=f)
+        print("		GET_LIMM_32;", file=f)
+        print("		size = 8;", file=f)
+        print("		got_limm = 1;", file=f)
+        print("		b = limm;", file=f)
+        print("	}", file=f)
+        print("	else", file=f)
+        print("	{", file=f)
+        print("		b = m_regs[breg];", file=f)
+        print("	}", file=f)
     
-    print >>f, "	"
-    print >>f, "	if (creg == LIMM_REG)"
-    print >>f, "	{"
-    print >>f, "		if (!got_limm)"
-    print >>f, "		{"
-    print >>f, "			GET_LIMM_32;"
-    print >>f, "			size = 8;"
-    print >>f, "		}"
-    print >>f, "		c = limm;"
-    print >>f, "	}"
-    print >>f, "	else"
-    print >>f, "	{"
-    print >>f, "		c = m_regs[creg];"
-    print >>f, "	}"
-    print >>f, "	/* todo: is the limm, limm syntax valid? (it's pointless.) */"
-    print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
-    print >>f, "	%s" % opexecute
-    print >>f, "	%s" % opwrite
-    print >>f, "	"
+    print("	", file=f)
+    print("	if (creg == LIMM_REG)", file=f)
+    print("	{", file=f)
+    print("		if (!got_limm)", file=f)
+    print("		{", file=f)
+    print("			GET_LIMM_32;", file=f)
+    print("			size = 8;", file=f)
+    print("		}", file=f)
+    print("		c = limm;", file=f)
+    print("	}", file=f)
+    print("	else", file=f)
+    print("	{", file=f)
+    print("		c = m_regs[creg];", file=f)
+    print("	}", file=f)
+    print("	/* todo: is the limm, limm syntax valid? (it's pointless.) */", file=f)
+    print("	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */", file=f)
+    print("	%s" % opexecute, file=f)
+    print("	%s" % opwrite, file=f)
+    print("	", file=f)
     EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
-    print >>f, "	return m_pc + (size >> 0);"
-    print >>f, "}"
-    print >>f, ""
-    print >>f, ""
+    print("	return m_pc + (size >> 0);", file=f)
+    print("}", file=f)
+    print("", file=f)
+    print("", file=f)
     # the mode 0x01 handler    
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p01(OPS_32)" % funcname
-    print >>f, "{"
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p01(OPS_32)" % funcname, file=f)
+    print("{", file=f)
     EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler)
-    print >>f, "	%s" % opexecute
-    print >>f, "	%s" % opwrite
-    print >>f, "	"
+    print("	%s" % opexecute, file=f)
+    print("	%s" % opwrite, file=f)
+    print("	", file=f)
     EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
-    print >>f, "	return m_pc + (size >> 0);"
-    print >>f, "}"
-    print >>f, ""
-    print >>f, ""
+    print("	return m_pc + (size >> 0);", file=f)
+    print("}", file=f)
+    print("", file=f)
+    print("", file=f)
     # the mode 0x10 handler 
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p10(OPS_32)" % funcname
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p10(OPS_32)" % funcname, file=f)
     if ignore_a == 2:
-        print >>f, "{"
-        print >>f, "	int size = 4;"
-        print >>f, "	arcompact_fatal(\"illegal arcompact_handle%s_p10 (ares bits already used as opcode select, can't be used as s12) (%s)\\n\");"  % (funcname, opname)
-        print >>f, "	return m_pc + (size >> 0);"
-        print >>f, "}"
+        print("{", file=f)
+        print("	int size = 4;", file=f)
+        print("	arcompact_fatal(\"illegal arcompact_handle%s_p10 (ares bits already used as opcode select, can't be used as s12) (%s)\\n\");"  % (funcname, opname), file=f)
+        print("	return m_pc + (size >> 0);", file=f)
+        print("}", file=f)
     else:
-        print >>f, "{"
-        print >>f, "	int size = 4;"
+        print("{", file=f)
+        print("	int size = 4;", file=f)
         if breg_is_dst_only == 0:
-            print >>f, "	UINT32 limm = 0;"
+            print("	UINT32 limm = 0;", file=f)
         
-        print >>f, "/*	int got_limm = 0; */"
-        print >>f, "	"
-        print >>f, "	COMMON32_GET_breg;"
+        print("/*	int got_limm = 0; */", file=f)
+        print("	", file=f)
+        print("	COMMON32_GET_breg;", file=f)
     
         if flagcondition == -1:	
-            print >>f, "	COMMON32_GET_F;"
+            print("	COMMON32_GET_F;", file=f)
         
-        print >>f, "	COMMON32_GET_s12;"
+        print("	COMMON32_GET_s12;", file=f)
         
         # areg can't be used here, it's used for s12 bits
         
-        print >>f, "	"
-        print >>f, "	UINT32 c;"
+        print("	", file=f)
+        print("	UINT32 c;", file=f)
         if breg_is_dst_only == 0:
-            print >>f, "	UINT32 b;"
-            print >>f, "	"
-            print >>f, "	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */"
-            print >>f, "	if (breg == LIMM_REG)"
-            print >>f, "	{"
-            print >>f, "		GET_LIMM_32;"
-            print >>f, "		size = 8;"
-            print >>f, "/*		got_limm = 1; */"
-            print >>f, "		b = limm;"
-            print >>f, "	}"
-            print >>f, "	else"
-            print >>f, "	{"
-            print >>f, "		b = m_regs[breg];"
-            print >>f, "	}"
+            print("	UINT32 b;", file=f)
+            print("	", file=f)
+            print("	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */", file=f)
+            print("	if (breg == LIMM_REG)", file=f)
+            print("	{", file=f)
+            print("		GET_LIMM_32;", file=f)
+            print("		size = 8;", file=f)
+            print("/*		got_limm = 1; */", file=f)
+            print("		b = limm;", file=f)
+            print("	}", file=f)
+            print("	else", file=f)
+            print("	{", file=f)
+            print("		b = m_regs[breg];", file=f)
+            print("	}", file=f)
         
-        print >>f, "    "
-        print >>f, " 	c = (UINT32)S;"
-        print >>f, "	"
-        print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
-        print >>f, "	%s" % opexecute
-        print >>f, "	%s" % opwrite_alt
-        print >>f, "	"
+        print("    ", file=f)
+        print(" 	c = (UINT32)S;", file=f)
+        print("	", file=f)
+        print("	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */", file=f)
+        print("	%s" % opexecute, file=f)
+        print("	%s" % opwrite_alt, file=f)
+        print("	", file=f)
         EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
-        print >>f, "	return m_pc + (size >> 0);"
-        print >>f, "}"
-    print >>f, ""
-    print >>f, ""
+        print("	return m_pc + (size >> 0);", file=f)
+        print("}", file=f)
+    print("", file=f)
+    print("", file=f)
     # the mode 0x11 m0 handler    
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m0(OPS_32)" % funcname
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m0(OPS_32)" % funcname, file=f)
     if ignore_a == 2:
-        print >>f, "{"
-        print >>f, "	int size = 4;"
-        print >>f, "	arcompact_fatal(\"illegal arcompact_handle%s_p11_m0 (ares bits already used as opcode select, can't be used as Q condition) (%s)\\n\");"  % (funcname, opname)
-        print >>f, "	return m_pc + (size >> 0);"
-        print >>f, "}"
+        print("{", file=f)
+        print("	int size = 4;", file=f)
+        print("	arcompact_fatal(\"illegal arcompact_handle%s_p11_m0 (ares bits already used as opcode select, can't be used as Q condition) (%s)\\n\");"  % (funcname, opname), file=f)
+        print("	return m_pc + (size >> 0);", file=f)
+        print("}", file=f)
     else:
-        print >>f, "{"
-        print >>f, "	int size = 4;"
-        print >>f, "	arcompact_fatal(\"arcompact_handle%s_p11_m0 (%s)\\n\");"  % (funcname, opname)
-        print >>f, "	return m_pc + (size >> 0);"
-        print >>f, "}"
-        print >>f, ""
-        print >>f, ""	
+        print("{", file=f)
+        print("	int size = 4;", file=f)
+        print("	arcompact_fatal(\"arcompact_handle%s_p11_m0 (%s)\\n\");"  % (funcname, opname), file=f)
+        print("	return m_pc + (size >> 0);", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print("", file=f)
     # the mode 0x11 m1 handler    
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m1(OPS_32)" % funcname
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m1(OPS_32)" % funcname, file=f)
     if ignore_a == 2:
-        print >>f, "{"
-        print >>f, "	int size = 4;"
-        print >>f, "	arcompact_fatal(\"illegal arcompact_handle%s_p11_m1 (ares bits already used as opcode select, can't be used as Q condition) (%s)\\n\");"  % (funcname, opname)
-        print >>f, "	return m_pc + (size >> 0);"
-        print >>f, "}"
+        print("{", file=f)
+        print("	int size = 4;", file=f)
+        print("	arcompact_fatal(\"illegal arcompact_handle%s_p11_m1 (ares bits already used as opcode select, can't be used as Q condition) (%s)\\n\");"  % (funcname, opname), file=f)
+        print("	return m_pc + (size >> 0);", file=f)
+        print("}", file=f)
     else:
-        print >>f, "{"
+        print("{", file=f)
         EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, 3, breg_is_dst_only, flagcondition, flaghandler)
-        print >>f, "	COMMON32_GET_CONDITION;"
-        print >>f, "	if (!check_condition(condition))"
-        print >>f, "		return m_pc + (size>>0);"
-        print >>f, ""		
-        print >>f, "	%s" % opexecute
-        print >>f, "	%s" % opwrite_alt
-        print >>f, "	"
+        print("	COMMON32_GET_CONDITION;", file=f)
+        print("	if (!check_condition(condition))", file=f)
+        print("		return m_pc + (size>>0);", file=f)
+        print("", file=f)
+        print("	%s" % opexecute, file=f)
+        print("	%s" % opwrite_alt, file=f)
+        print("	", file=f)
         EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
-        print >>f, "	return m_pc + (size >> 0);"
-        print >>f, "}"
-    print >>f, ""
-    print >>f, ""
+        print("	return m_pc + (size >> 0);", file=f)
+        print("}", file=f)
+    print("", file=f)
+    print("", file=f)
 
 
 # xxx_S  c, b, u3  format opcodes (note c is destination)
 def EmitGroup0d(f,funcname, opname, opexecute, opwrite):
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"  % funcname
-    print >>f, "{"
-    print >>f, "	int u, breg, creg;"
-    print >>f, ""
-    print >>f, "	COMMON16_GET_u3;"
-    print >>f, "	COMMON16_GET_breg;"
-    print >>f, "	COMMON16_GET_creg;"
-    print >>f, ""
-    print >>f, "	REG_16BIT_RANGE(breg);"
-    print >>f, "	REG_16BIT_RANGE(creg);"
-    print >>f, ""
-    print >>f, "	%s" % opexecute
-    print >>f, "	%s" % opwrite
-    print >>f, ""
-    print >>f, "	return m_pc + (2 >> 0);"
-    print >>f, "}"
-    print >>f, ""
-    print >>f, ""
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"  % funcname, file=f)
+    print("{", file=f)
+    print("	int u, breg, creg;", file=f)
+    print("", file=f)
+    print("	COMMON16_GET_u3;", file=f)
+    print("	COMMON16_GET_breg;", file=f)
+    print("	COMMON16_GET_creg;", file=f)
+    print("", file=f)
+    print("	REG_16BIT_RANGE(breg);", file=f)
+    print("	REG_16BIT_RANGE(creg);", file=f)
+    print("", file=f)
+    print("	%s" % opexecute, file=f)
+    print("	%s" % opwrite, file=f)
+    print("", file=f)
+    print("	return m_pc + (2 >> 0);", file=f)
+    print("}", file=f)
+    print("", file=f)
+    print("", file=f)
 
 
 # xxx_S b <- b,c format opcodes
 def EmitGroup0f(f,funcname, opname, opexecute, opwrite):
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"% funcname
-    print >>f, "{"
-    print >>f, "	int breg, creg;"
-    print >>f, ""
-    print >>f, "	COMMON16_GET_breg;"
-    print >>f, "	COMMON16_GET_creg;"
-    print >>f, ""
-    print >>f, "	REG_16BIT_RANGE(breg);"
-    print >>f, "	REG_16BIT_RANGE(creg);"
-    print >>f, ""
-    print >>f, "	%s" % opexecute
-    print >>f, "	%s" % opwrite
-    print >>f, ""
-    print >>f, "	return m_pc + (2 >> 0);"
-    print >>f, "}"
-    print >>f, ""
-    print >>f, ""
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"% funcname, file=f)
+    print("{", file=f)
+    print("	int breg, creg;", file=f)
+    print("", file=f)
+    print("	COMMON16_GET_breg;", file=f)
+    print("	COMMON16_GET_creg;", file=f)
+    print("", file=f)
+    print("	REG_16BIT_RANGE(breg);", file=f)
+    print("	REG_16BIT_RANGE(creg);", file=f)
+    print("", file=f)
+    print("	%s" % opexecute, file=f)
+    print("	%s" % opwrite, file=f)
+    print("", file=f)
+    print("	return m_pc + (2 >> 0);", file=f)
+    print("}", file=f)
+    print("", file=f)
+    print("", file=f)
 
 
 #  xxx_S b, b, u5 format opcodes
 def EmitGroup17(f,funcname, opname, opexecute):
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)" % funcname
-    print >>f, "{"
-    print >>f, "	int breg, u;"
-    print >>f, "	"
-    print >>f, "	COMMON16_GET_breg;"
-    print >>f, "	COMMON16_GET_u5;"
-    print >>f, "	"
-    print >>f, "	REG_16BIT_RANGE(breg);"
-    print >>f, "	"
-    print >>f, "	%s" % opexecute
-    print >>f, "	"
-    print >>f, "	return m_pc + (2 >> 0);"
-    print >>f, "}"
-    print >>f, ""
-    print >>f, ""
+    print("ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)" % funcname, file=f)
+    print("{", file=f)
+    print("	int breg, u;", file=f)
+    print("	", file=f)
+    print("	COMMON16_GET_breg;", file=f)
+    print("	COMMON16_GET_u5;", file=f)
+    print("	", file=f)
+    print("	REG_16BIT_RANGE(breg);", file=f)
+    print("	", file=f)
+    print("	%s" % opexecute, file=f)
+    print("	", file=f)
+    print("	return m_pc + (2 >> 0);", file=f)
+    print("}", file=f)
+    print("", file=f)
+    print("", file=f)
 
 
 

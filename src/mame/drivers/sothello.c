@@ -92,6 +92,7 @@ public:
 
 #define VDP_MEM             0x40000
 
+#define MAIN_CLOCK          (XTAL_21_4772MHz)
 #define MAINCPU_CLOCK       (XTAL_21_4772MHz/6)
 #define SOUNDCPU_CLOCK      (XTAL_21_4772MHz/6)
 #define YM_CLOCK            (XTAL_21_4772MHz/12)
@@ -369,7 +370,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sothello_state,sothello_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -42,7 +42,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 /*
  * Type = 0: Impedance changer
- *        1; Ideal opamp
+ *        1; Idealized opamp
  *        2; opamp with first pole
  *        3: opamp with first pole + output limit
  *        4: opamp with input stage, first pole + output limit
@@ -50,12 +50,9 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(OPAMP)
 {
-	register_sub("RP1", m_RP);
-	register_sub("CP1", m_CP);
-	register_sub("G1", m_G1);
-	register_sub("EBUF", m_EBUF);
-	register_sub("DN", m_DN);
-	register_sub("DP", m_DP);
+	register_param("MODEL", m_model, "");
+
+	m_type = m_model.model_value("TYPE");
 
 	register_input("VCC", m_VCC);
 	register_input("GND", m_GND);
@@ -64,12 +61,27 @@ NETLIB_START(OPAMP)
 	register_output("VH", m_VH);
 	register_output("VREF", m_VREF);
 
-	register_param("MODEL", m_model, "");
+	register_sub("G1", m_G1);
+	register_sub("RP1", m_RP);
 
-	m_type = m_model.model_value("TYPE");
-
-	if (m_type == 3)
+	if (m_type == 1)
 	{
+		register_subalias("PLUS", "G1.IP");
+		register_subalias("MINUS", "G1.IN");
+		register_subalias("OUT", "G1.OP");
+
+		connect_late("G1.ON", "VREF");
+		connect_late("RP1.2", "VREF");
+		connect_late("RP1.1", "G1.OP");
+
+	}
+	else if (m_type == 3)
+	{
+		register_sub("CP1", m_CP);
+		register_sub("EBUF", m_EBUF);
+		register_sub("DN", m_DN);
+		register_sub("DP", m_DP);
+
 		register_subalias("PLUS", "G1.IP");
 		register_subalias("MINUS", "G1.IN");
 		register_subalias("OUT", "EBUF.OP");
@@ -111,27 +123,40 @@ NETLIB_UPDATE(OPAMP)
 
 NETLIB_RESET(OPAMP)
 {
-	m_EBUF.do_reset();
 	m_G1.do_reset();
-	m_DP.do_reset();
-	m_DN.do_reset();
-	m_CP.do_reset();
-	m_RP.do_reset();
-
-	m_EBUF.m_G.setTo(1.0);
 	m_G1.m_RI.setTo(m_model.model_value("RI"));
-	m_EBUF.m_RO.setTo(m_model.model_value("RO"));
-	m_DP.m_model.setTo("D(IS=1e-15 N=1)");
-	m_DN.m_model.setTo("D(IS=1e-15 N=1)");
 
-	double CP = m_model.model_value("DAB") / m_model.model_value("SLEW");
-	double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
-	double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
+	if (m_type == 1)
+	{
+		double RO = m_model.model_value("RO");
+		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RO;
+		m_RP.set_R(RO);
+		m_G1.m_G.setTo(G);
+	}
+	else if (m_type == 3)
+	{
+		m_EBUF.do_reset();
+		m_DP.do_reset();
+		m_DN.do_reset();
+		m_CP.do_reset();
+		m_RP.do_reset();
 
-	//printf("CP=%e RP=%f G=%f\n", CP, RP, G);
-	m_CP.m_C.setTo(CP);
-	m_RP.set_R(RP);
-	m_G1.m_G.setTo(G);
+		m_EBUF.m_G.setTo(1.0);
+		m_EBUF.m_RO.setTo(m_model.model_value("RO"));
+		m_DP.m_model.setTo("D(IS=1e-15 N=1)");
+		m_DN.m_model.setTo("D(IS=1e-15 N=1)");
+
+		double CP = m_model.model_value("DAB") / m_model.model_value("SLEW");
+		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
+		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
+
+		//printf("CP=%e RP=%f G=%f\n", CP, RP, G);
+		m_CP.m_C.setTo(CP);
+		m_RP.set_R(RP);
+		m_G1.m_G.setTo(G);
+
+	}
+
 
 }
 
