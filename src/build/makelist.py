@@ -11,7 +11,7 @@ drivlist = []
 
 def parse_file(srcfile):
     try:
-        fp = open(srcfile, 'rb')
+        fp = open(srcfile, 'rt')
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1

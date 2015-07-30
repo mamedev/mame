@@ -59,6 +59,13 @@ import os
 import png
 import sys
 
+if sys.version_info >= (3,):
+    def b2p(v):
+        return bytes([v])
+else:
+    def b2p(v):
+        return chr(v)
+
 
 ########################################
 ## Helper classes
@@ -117,27 +124,27 @@ def renderFontSaveCached(font, filename, hash32):
     CACHED_HEADER_SIZE = 16
     
     try:
-        fp.write('f')
-        fp.write('o')
-        fp.write('n')
-        fp.write('t')
-        fp.write(chr(hash32 >> 24 & 0xff))
-        fp.write(chr(hash32 >> 16 & 0xff))
-        fp.write(chr(hash32 >> 8 & 0xff))
-        fp.write(chr(hash32 >> 0 & 0xff))
-        fp.write(chr(font.height >> 8 & 0xff))
-        fp.write(chr(font.height >> 0 & 0xff))
-        fp.write(chr(font.yOffs >> 8 & 0xff))
-        fp.write(chr(font.yOffs >> 0 & 0xff))
-        fp.write(chr(numChars >> 24 & 0xff))
-        fp.write(chr(numChars >> 16 & 0xff))
-        fp.write(chr(numChars >> 8 & 0xff))
-        fp.write(chr(numChars >> 0 & 0xff))
+        fp.write(b'f')
+        fp.write(b'o')
+        fp.write(b'n')
+        fp.write(b't')
+        fp.write(b2p(hash32 >> 24 & 0xff))
+        fp.write(b2p(hash32 >> 16 & 0xff))
+        fp.write(b2p(hash32 >> 8 & 0xff))
+        fp.write(b2p(hash32 >> 0 & 0xff))
+        fp.write(b2p(font.height >> 8 & 0xff))
+        fp.write(b2p(font.height >> 0 & 0xff))
+        fp.write(b2p(font.yOffs >> 8 & 0xff))
+        fp.write(b2p(font.yOffs >> 0 & 0xff))
+        fp.write(b2p(numChars >> 24 & 0xff))
+        fp.write(b2p(numChars >> 16 & 0xff))
+        fp.write(b2p(numChars >> 8 & 0xff))
+        fp.write(b2p(numChars >> 0 & 0xff))
         
         # Write a blank table at first (?)
         charTable = [0]*(numChars * CACHED_CHAR_SIZE)
         for i in range(numChars * CACHED_CHAR_SIZE):
-            fp.write(chr(charTable[i]))
+            fp.write(b2p(charTable[i]))
         
         # Loop over all characters
         tableIndex = 0
@@ -173,7 +180,7 @@ def renderFontSaveCached(font, filename, hash32):
                 
                 # Write the data
                 for j in range(len(dBuffer)):
-                    fp.write(chr(dBuffer[j]))
+                    fp.write(b2p(dBuffer[j]))
             
             destIndex = tableIndex * CACHED_CHAR_SIZE
             charTable[destIndex +  0] = i >> 8 & 0xff
@@ -193,12 +200,13 @@ def renderFontSaveCached(font, filename, hash32):
         # Seek back to the beginning and rewrite the table
         fp.seek(CACHED_HEADER_SIZE, 0)
         for i in range(numChars * CACHED_CHAR_SIZE):
-            fp.write(chr(charTable[i]))
+            fp.write(b2p(charTable[i]))
     
         fp.close()
         return 0
 
     except:
+        print(sys.exc_info[1])
         return 1
     
 
@@ -347,7 +355,7 @@ def main():
     except:
         sys.stderr.write("Error reading PNG file.\n")
         return 1
-            
+
     error = bitmapToChars(pngObject, font)
     if error:
         return 1
