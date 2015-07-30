@@ -2332,7 +2332,6 @@ files {
 	MAME_DIR .. "src/mess/video/ondra.c", 
 	MAME_DIR .. "src/mess/drivers/pmd85.c",
 	MAME_DIR .. "src/mess/machine/pmd85.c",
-	MAME_DIR .. "src/mess/video/pmd85.c", 
 	MAME_DIR .. "src/mess/drivers/pmi80.c",     
 	MAME_DIR .. "src/mess/drivers/sapi1.c",     
 }
