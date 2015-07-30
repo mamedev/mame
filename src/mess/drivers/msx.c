@@ -1500,7 +1500,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V9938_ADD("v9938", "screen", 0x20000, XTAL_21_4772MHz)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1565,7 +1565,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)

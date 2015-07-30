@@ -1122,10 +1122,10 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 
 	MCFG_DS1204_ADD("ds1204")
 
-	MCFG_V9938_ADD("v9938_0", "screen", 0x20000)
+	MCFG_V9938_ADD("v9938_0", "screen", 0x20000, SYSTEM_CLK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp0_interrupt))
 
-	MCFG_V9938_ADD("v9938_1", "screen", 0x20000)
+	MCFG_V9938_ADD("v9938_1", "screen", 0x20000, SYSTEM_CLK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp1_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)
