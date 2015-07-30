@@ -10,6 +10,7 @@
 #include "disk.h"
 #include "dooly.h"
 #include "fmpac.h"
+#include "fs_sr022.h"
 #include "halnote.h"
 #include "hfox.h"
 #include "holy_quran.h"
@@ -39,6 +40,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("rtype", MSX_CART_RTYPE)
 	SLOT_INTERFACE_INTERNAL("majutsushi", MSX_CART_MAJUTSUSHI)
 	SLOT_INTERFACE_INTERNAL("fmpac", MSX_CART_FMPAC)
+	SLOT_INTERFACE_INTERNAL("fs_sr022", MSX_CART_FS_SR022)
 	SLOT_INTERFACE_INTERNAL("superloderunner", MSX_CART_SUPERLODERUNNER)
 	SLOT_INTERFACE_INTERNAL("synthesizer", MSX_CART_SYNTHESIZER)
 	SLOT_INTERFACE_INTERNAL("cross_blaim", MSX_CART_CROSSBLAIM)

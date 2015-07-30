@@ -886,6 +886,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/emu/bus/msx_cart/dooly.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/fmpac.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/fmpac.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/fs_sr022.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/fs_sr022.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/halnote.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/halnote.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/hfox.c",
