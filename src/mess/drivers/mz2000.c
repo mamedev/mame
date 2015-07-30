@@ -586,20 +586,6 @@ void mz2000_state::machine_reset()
 	m_color_mode = m_io_config->read() & 1;
 	m_has_fdc = (m_io_config->read() & 2) >> 1;
 	m_hi_mode = (m_io_config->read() & 4) >> 2;
-
-	{
-		int i;
-		int r,g,b;
-
-		for(i=0;i<8;i++)
-		{
-			r = (m_color_mode) ? (i & 2)>>1 : 0;
-			g = (m_color_mode) ? (i & 4)>>2 : ((i) ? 1 : 0);
-			b = (m_color_mode) ? (i & 1)>>0 : 0;
-
-			m_palette->set_pen_color(i,pal1bit(r),pal1bit(g),pal1bit(b));
-		}
-	}
 }
 
 
@@ -859,7 +845,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2000)
-	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -17,12 +17,12 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_V9938_ADD(_tag, _screen, _vramsize) \
-	MCFG_DEVICE_ADD(_tag, V9938, 0) \
+#define MCFG_V9938_ADD(_tag, _screen, _vramsize, _clock) \
+	MCFG_DEVICE_ADD(_tag, V9938, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
 	v9938_device::static_set_vram_size(*device, _vramsize);
-#define MCFG_V9958_ADD(_tag, _screen, _vramsize) \
-	MCFG_DEVICE_ADD(_tag, V9958, 0) \
+#define MCFG_V9958_ADD(_tag, _screen, _vramsize, _clock) \
+	MCFG_DEVICE_ADD(_tag, V9958, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
 	v9938_device::static_set_vram_size(*device, _vramsize);
 

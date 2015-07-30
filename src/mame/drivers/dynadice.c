@@ -68,7 +68,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(dynadice);
 	UINT32 screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -227,13 +226,6 @@ UINT32 dynadice_state::screen_update_dynadice(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(dynadice_state, dynadice)
-{
-	int i;
-	for(i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-}
-
 void dynadice_state::machine_start()
 {
 	save_item(NAME(m_ay_data));
@@ -268,8 +260,7 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynadice)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(dynadice_state, dynadice)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

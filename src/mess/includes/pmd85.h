@@ -76,8 +76,6 @@ public:
 	DECLARE_DRIVER_INIT(alfa);
 	DECLARE_DRIVER_INIT(c2717);
 	virtual void machine_reset();
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(pmd85);
 	UINT32 screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
@@ -148,15 +146,10 @@ protected:
 	void mato_update_memory();
 	void c2717_update_memory();
 	void pmd85_common_driver_init();
-	void pmd85_draw_scanline(bitmap_ind16 &bitmap, int pmd85_scanline);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	int m_cas_tx;
 };
-
-/*----------- defined in video/pmd85.c -----------*/
-
-extern const unsigned char pmd85_palette[3*3];
 
 
 #endif /* PMD85_H_ */

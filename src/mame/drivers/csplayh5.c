@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)

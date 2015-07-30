@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 USAGE = """
 Usage:
 %s device_name {opc.lst|-} disp.lst device.inc
@@ -52,7 +54,7 @@ def load_disp(fname):
 
 def emit(f, text):
     """write string to file"""
-    print >>f, text,
+    print(text, file=f)
 
 FULL_PROLOG="""\
 void %(device)s::%(opcode)s_full()
@@ -252,7 +254,7 @@ def main(argv):
 
 
     if len(argv) != 5:
-        print USAGE % argv[0]
+        print(USAGE % argv[0])
         return 1
 
     device_name = argv[1]

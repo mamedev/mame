@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)

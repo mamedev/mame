@@ -13823,29 +13823,27 @@ legacy FM implementations cannot find it.
     </software>
 -->
 
-<!-- Dictionary ROMs? -->
-	<software name="natjis" supported="no">
-		<description>National FS-SR022 MSX-Jisho (Jpn)</description>
+<!-- Dictionary ROMs -->
+	<software name="natjis" supported="partial">
+		<description>National FS-SR022 Bunsetsu Henkan Jisho (Jpn)</description>
 		<year>1985</year>
 		<publisher>Matsushita</publisher>
+		<info name="alt_title" value="文節変換熟語ユニット" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="jisyo data (japan) (program).rom" size="131072" crc="46e90b77" sha1="765413bb6b03bc3bb888ee8fe00b99ef69c1317a" offset="0" />
+			<feature name="slot" value="fs_sr022" />
+			<feature name="pcb" value="DFUP0058ZAJ" />
+			<dataarea name="rom" size="262144">
+				<rom name="PRO ROM V1.0 DASR022A1.ic16" size="32768" crc="381b3431" sha1="8c7ae1a1720b1dae9af9904e638b868f56d905c2" offset="0" />
+				<!-- The dictionary is in 4 32KB EEPROMs instead of one 128KB rom:
+				     - DIC1 ROM V1.0 DASR022B1.ic15
+				     - DIC2 ROM V1.0 DASR022C1.ic14
+				     - DIC3 ROM V1.0 DASR022D1.ic13
+				     - DIC4 ROM V1.0 DASR022E1.ic12
+				-->
+				<rom name="jisyo data (japan) (program).rom" size="131072" crc="46e90b77" sha1="765413bb6b03bc3bb888ee8fe00b99ef69c1317a" status="baddump" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="natbhjis" supported="no">
-		<description>National FS-SR022 MSX Bunsetsu Henkan Jisho (Jpn)</description>
-		<year>1985</year>
-		<publisher>Matsushita</publisher>
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="msx bunsetsu henkan jisyo (japan) (program).rom" size="32768" crc="381b3431" sha1="8c7ae1a1720b1dae9af9904e638b868f56d905c2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 
 
 

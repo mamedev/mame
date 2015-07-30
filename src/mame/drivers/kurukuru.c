@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kurukuru_state,kurukuru_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)
