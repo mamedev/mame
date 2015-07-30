@@ -208,7 +208,6 @@ private:
 	bool is_joystick_hires(int joystick_index);
 
 	soundmux_status_t soundmux_status(void);
-	UINT8 sound_value(void);
 	void update_sound(void);
 	bool joyin(void);
 	void poll_joystick(bool *joyin, UINT8 *buttons);
