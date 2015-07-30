@@ -13833,7 +13833,7 @@ legacy FM implementations cannot find it.
 			<feature name="slot" value="fs_sr022" />
 			<feature name="pcb" value="DFUP0058ZAJ" />
 			<dataarea name="rom" size="262144">
-				<rom name="pro rom v1.0 dasr022a1.ic16" size="32768" crc="381b3431" sha1="8c7ae1a1720b1dae9af9904e638b868f56d905c2" offset="0" />
+				<rom name="PRO ROM V1.0 DASR022A1.ic16" size="32768" crc="381b3431" sha1="8c7ae1a1720b1dae9af9904e638b868f56d905c2" offset="0" />
 				<!-- The dictionary is in 4 32KB EEPROMs instead of one 128KB rom:
 				     - DIC1 ROM V1.0 DASR022B1.ic15
 				     - DIC2 ROM V1.0 DASR022C1.ic14
