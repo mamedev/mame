@@ -39,6 +39,15 @@
 #define FORMAT_IA               3
 #define FORMAT_I                4
 
+#define ZMODE_OPAQUE			0
+#define ZMODE_INTERPENETRATING	1
+#define ZMODE_TRANSLUCENT		2
+#define ZMODE_DECAL				3
+
+#define SPAN_UNINITIALIZED		0
+#define SPAN_VALID				1
+#define SPAN_INVALID			2
+
 #ifdef LSB_FIRST
 #define BYTE_XOR_DWORD_SWAP 7
 #define WORD_XOR_DWORD_SWAP 3
@@ -98,13 +107,13 @@
 #define HWRITEADDR8(in, val)    /*{if ((in) <= MEM8_LIMIT) */m_hidden_bits[(in) ^ BYTE_ADDR_XOR] = val;/*}*/
 
 //sign-extension macros
-#define SIGN22(x)   (((x & 0x00200000) * 0x7ff) | (x & 0x1fffff))
-#define SIGN17(x)   (((x & 0x00010000) * 0xffff) | (x & 0xffff))
-#define SIGN16(x)   (((x & 0x00008000) * 0x1ffff) | (x & 0x7fff))
-#define SIGN13(x)   (((x & 0x00001000) * 0xfffff) | (x & 0xfff))
-#define SIGN11(x)   (((x & 0x00000400) * 0x3fffff) | (x & 0x3ff))
-#define SIGN9(x)    (((x & 0x00000100) * 0xffffff) | (x & 0xff))
-#define SIGN8(x)    (((x & 0x00000080) * 0x1ffffff) | (x & 0x7f))
+#define SIGN22(x)   ((((x) & 0x00200000) * 0x7ff) | ((x) & 0x1fffff))
+#define SIGN17(x)   ((((x) & 0x00010000) * 0xffff) | ((x) & 0xffff))
+#define SIGN16(x)   ((((x) & 0x00008000) * 0x1ffff) | ((x) & 0x7fff))
+#define SIGN13(x)   ((((x) & 0x00001000) * 0xfffff) | ((x) & 0xfff))
+#define SIGN11(x)   ((((x) & 0x00000400) * 0x3fffff) | ((x) & 0x3ff))
+#define SIGN9(x)    ((((x) & 0x00000100) * 0xffffff) | ((x) & 0xff))
+#define SIGN8(x)    ((((x) & 0x00000080) * 0x1ffffff) | ((x) & 0x7f))
 
 #define KURT_AKELEY_SIGN9(x)    ((((x) & 0x180) == 0x180) ? ((x) | ~0x1ff) : ((x) & 0x1ff))
 
@@ -117,7 +126,7 @@
 #define SPAN_W      (6)
 #define SPAN_Z      (7)
 
-#define EXTENT_AUX_COUNT            (sizeof(rdp_span_aux)*(480*192)) // Screen coverage *192, more or less
+#define EXTENT_AUX_COUNT            (sizeof(rdp_span_aux)*(480*4096)) // Screen coverage *192, more or less
 
 /*****************************************************************************/
 
@@ -160,6 +169,19 @@ public:
 			m_tiles[i].invmm = rgbaint_t(~0, ~0, ~0, ~0);
 			m_tiles[i].invmask = rgbaint_t(~0, ~0, ~0, ~0);
 		}
+
+		m_dz_compare_lut[0] = 0;
+		for (INT32 i = 1; i < 0x10000; i++)
+		{
+			for (INT32 k = 15; k >= 0; k--)
+			{
+				if (i & (1 << k))
+				{
+					m_dz_compare_lut[i] = 1 << k;
+					break;
+				}
+			}
+		}
 	}
 
 	void        process_command_list();
@@ -199,9 +221,9 @@ public:
 	UINT8       get_random() { return m_misc_state.m_random_seed += 0x13; }
 
 	// YUV Factors
-	void        set_yuv_factors(color_t k023, color_t k1, color_t k4, color_t k5) { m_k023 = k023; m_k1 = k1; m_k4 = k4; m_k5 = k5; }
-	color_t&    get_k023() { return m_k023; }
-	color_t&    get_k1() { return m_k1; }
+	void        set_yuv_factors(color_t k02, color_t k13, color_t k4, color_t k5) { m_k02 = k02; m_k13 = k13; m_k4 = k4; m_k5 = k5; }
+	color_t&    get_k02() { return m_k02; }
+	color_t&    get_k13() { return m_k13; }
 
 	// Blender-related (move into RDP::Blender)
 	void        set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, color_t** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
@@ -219,9 +241,8 @@ public:
 	void            render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object);
 	INT32           get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object);
 
-	void            z_store(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc);
+	void            z_store(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc);
 	UINT32          z_decompress(UINT32 zcurpixel);
-	UINT32          dz_decompress(UINT32 zcurpixel, UINT32 dzcurpixel);
 	UINT32          dz_compress(UINT32 value);
 	INT32           normalize_dzpix(INT32 sum);
 	bool            z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix, rdp_span_aux* userdata, const rdp_poly_state &object);
@@ -268,8 +289,7 @@ public:
 	void        cmd_set_mask_image(UINT32 w1, UINT32 w2);
 	void        cmd_set_color_image(UINT32 w1, UINT32 w2);
 
-	void        rgbaz_clip(INT32 sr, INT32 sg, INT32 sb, INT32 sa, INT32* sz, rdp_span_aux* userdata);
-	void        rgbaz_correct_triangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void        rgbaz_correct_clip(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z, rdp_span_aux* userdata, const rdp_poly_state &object);
 
 	void        triangle(bool shade, bool texture, bool zbuffer);
 
@@ -324,8 +344,10 @@ public:
 	n64_tile_t      m_tiles[8];
 
 private:
-	void    compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
-	void    compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+	void	deduce_derivatives(rdp_span_aux *userdata);
+	void	get_span_userdata(void** userdata);
+	void    compute_cvg_noflip(rdp_span_aux* data, UINT32 lx, UINT32 rx);
+	void    compute_cvg_flip(rdp_span_aux* data, UINT32 lx, UINT32 rx);
 
 	void    write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
 	void    read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
@@ -338,12 +360,13 @@ private:
 	void    video_update16(n64_periphs* n64, bitmap_rgb32 &bitmap);
 	void    video_update32(n64_periphs* n64, bitmap_rgb32 &bitmap);
 
-	typedef void (n64_rdp::*compute_cvg_t) (extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+	typedef void (n64_rdp::*compute_cvg_t) (rdp_span_aux* data, UINT32 lx, UINT32 rx);
 	compute_cvg_t   m_compute_cvg[2];
 
 	running_machine* m_machine;
 
 	combine_modes_t m_combine;
+	mode_derivs_t	m_mode_derivs;
 	bool            m_pending_mode_block;
 	bool            m_pipe_clean;
 
@@ -367,8 +390,8 @@ private:
 	UINT8*  m_tmem;
 
 	// YUV factors
-	color_t m_k023;
-	color_t m_k1;
+	color_t m_k02;
+	color_t m_k13;
 	color_t m_k4;
 	color_t m_k5;
 
@@ -378,6 +401,7 @@ private:
 
 	INT32 m_gamma_table[256];
 	INT32 m_gamma_dither_table[0x4000];
+	UINT32 m_dz_compare_lut[0x10000];
 
 	static UINT32 s_special_9bit_clamptable[512];
 	static const z_decompress_entry_t m_z_dec_table[8];

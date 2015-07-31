@@ -143,13 +143,20 @@ struct span_base_t
 	INT32 m_span_dt;
 	INT32 m_span_dw;
 	INT32 m_span_dz;
-	INT32 m_span_dymax;
-	INT32 m_span_dzpix;
 	INT32 m_span_drdy;
 	INT32 m_span_dgdy;
 	INT32 m_span_dbdy;
 	INT32 m_span_dady;
+	INT32 m_span_dsdy;
+	INT32 m_span_dtdy;
+	INT32 m_span_dwdy;
 	INT32 m_span_dzdy;
+	INT32 m_span_dzpix;
+	INT32 m_span_cdr;
+	INT32 m_span_cdg;
+	INT32 m_span_cdb;
+	INT32 m_span_cda;
+	INT32 m_span_cdz;
 };
 
 struct combine_modes_t
@@ -242,6 +249,20 @@ struct rectangle_t
 	UINT16 m_yl;    // 10.2 fixed-point
 	UINT16 m_xh;    // 10.2 fixed-point
 	UINT16 m_yh;    // 10.2 fixed-point
+
+	bool m_field;
+	bool m_keep_odd;
+};
+
+struct mode_derivs_t
+{
+	bool	m_stale_derivs;
+	bool	m_do_lod;
+	bool	m_partial_reject_1cycle;
+	bool	m_partial_reject_2cycle;
+	bool	m_special_bsel0;
+	bool	m_special_bsel1;
+	INT32	m_rgb_alpha_dither;
 };
 
 struct rdp_poly_state
@@ -252,6 +273,7 @@ struct rdp_poly_state
 	other_modes_t       m_other_modes;          /* miscellaneous rasterizer bits (2) */
 	span_base_t         m_span_base;            /* span initial values for triangle rasterization */
 	rectangle_t         m_scissor;              /* screen-space scissor bounds */
+	mode_derivs_t		m_mode_derivs;
 	UINT32              m_fill_color;           /* poly fill color */
 	n64_tile_t          m_tiles[8];             /* texture tile state */
 	UINT8               m_tmem[0x1000];         /* texture cache */
@@ -266,7 +288,7 @@ struct rdp_poly_state
 struct rdp_span_aux
 {
 	UINT32              m_unscissored_rx;
-	UINT16              m_cvg[RDP_CVG_SPAN_MAX];
+	UINT8				m_cvg[RDP_CVG_SPAN_MAX];
 	color_t             m_memory_color;
 	color_t             m_pixel_color;
 	color_t             m_inv_pixel_color;
@@ -278,8 +300,10 @@ struct rdp_span_aux
 	color_t             m_texel0_alpha;
 	color_t             m_texel1_color;
 	color_t             m_texel1_alpha;
-	color_t             m_next_texel_color;
-	color_t             m_next_texel_alpha;
+	color_t             m_next_texel0_color;
+	color_t             m_next_texel0_alpha;
+	color_t             m_next_texel1_color;
+	color_t             m_next_texel1_alpha;
 	color_t             m_blend_color;          /* constant blend color */
 	color_t             m_prim_color;           /* flat primitive color */
 	color_t             m_prim_alpha;           /* flat primitive alpha */
@@ -300,6 +324,9 @@ struct rdp_span_aux
 	UINT32              m_current_cvg_bit;
 	INT32               m_shift_a;
 	INT32               m_shift_b;
+	INT32				m_prev_shift_a;
+	INT32				m_prev_shift_b;
+	INT32				m_prev_raw_dzmem;
 	INT32               m_precomp_s;
 	INT32               m_precomp_t;
 	INT32               m_blend_enable;
@@ -308,6 +335,21 @@ struct rdp_span_aux
 	UINT8*              m_tmem;                /* pointer to texture cache for this polygon */
 	bool                m_start_span;
 	rgbaint_t           m_clamp_diff[8];
+	bool				m_noise_used;
+	INT32				m_majorx[4];
+	INT32				m_minorx[4];
+	bool				m_valid_line;
+	bool				m_next_valid;
+	INT32				m_next_s;
+	INT32				m_next_t;
+	INT32				m_next_w;
+	bool				m_invalid_y[4];
+	bool				m_long_span;
+	bool				m_mid_span;
+	bool				m_almost_mid_span;
+	bool				m_end_span;
+	bool				m_pre_end_span;
+	bool				m_next_span;
 };
 
 struct z_decompress_entry_t

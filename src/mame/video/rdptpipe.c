@@ -59,8 +59,565 @@ void n64_texture_pipe_t::set_machine(running_machine &machine)
 		}
 	}
 
+	m_log2_table[0] = m_log2_table[1] = 0;
+	for (INT32 i = 2; i < 256; i++)
+	{
+		for (INT32 k = 7; k > 0; k--)
+		{
+			if ((i >> k) & 1)
+			{
+				m_log2_table[i] = k;
+				break;
+			}
+		}
+	}
+
 	m_st2_add.set(1, 0, 1, 0);
 	m_v1.set(1, 1, 1, 1);
+	m_yuv1.set(1, 0, 0, 0);
+}
+
+void n64_texture_pipe_t::tclod_tcclamp(INT32* sss, INT32* sst)
+{
+	INT32 temps = *sss;
+	INT32 tempt = *sst;
+
+	if (!(temps & 0x40000))
+	{
+		if (!(temps & 0x20000))
+		{
+			const INT32 tempanded = temps & 0x18000;
+			if (tempanded != 0x8000)
+			{
+				if (tempanded != 0x10000)
+				{
+					*sss &= 0xffff;
+				}
+				else
+				{
+					*sss = 0x8000;
+				}
+			}
+			else
+			{
+				*sss = 0x7fff;
+			}
+		}
+		else
+		{
+			*sss = 0x8000;
+		}
+	}
+	else
+	{
+		*sss = 0x7fff;
+	}
+
+	if (!(tempt & 0x40000))
+	{
+		if (!(tempt & 0x20000))
+		{
+			const INT32 tempanded = tempt & 0x18000;
+			if (tempanded != 0x8000)
+			{
+				if (tempanded != 0x10000)
+				{
+					*sst &= 0xffff;
+				}
+				else
+				{
+					*sst = 0x8000;
+				}
+			}
+			else
+			{
+				*sst = 0x7fff;
+			}
+		}
+		else
+		{
+			*sst = 0x8000;
+		}
+	}
+	else
+	{
+		*sst = 0x7fff;
+	}
+}
+
+void n64_texture_pipe_t::tclod_1cycle_current(INT32* sss, INT32* sst, INT32 nexts, INT32 nextt, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, rdp_span_aux* userdata, const rdp_poly_state& object)
+{
+	tclod_tcclamp(sss, sst);
+
+	if (object.m_mode_derivs.m_do_lod)
+	{
+		INT32 fars, fart, farw;
+		if (userdata->m_next_valid)
+		{
+			if (!userdata->m_end_span || !userdata->m_long_span)
+			{
+				if (!(userdata->m_pre_end_span && userdata->m_long_span) && !(userdata->m_end_span && userdata->m_mid_span))
+				{
+					fars = (s + (dsinc << 1)) >> 16;
+					fart = (t + (dtinc << 1)) >> 16;
+					farw = (w + (dwinc << 1)) >> 16;
+				}
+				else
+				{
+					fars = (s - dsinc) >> 16;
+					fart = (t - dtinc) >> 16;
+					farw = (w - dwinc) >> 16;
+				}
+			}
+			else
+			{
+				fars = (userdata->m_next_s + dsinc) >> 16;
+				fart = (userdata->m_next_t + dtinc) >> 16;
+				farw = (userdata->m_next_w + dwinc) >> 16;
+			}
+		}
+		else
+		{
+			fars = (s + (dsinc << 1)) >> 16;
+			fart = (t + (dtinc << 1)) >> 16;
+			farw = (w + (dwinc << 1)) >> 16;
+		}
+
+		if (object.m_other_modes.persp_tex_en)
+		{
+			m_rdp->tc_div(fars, fart, farw, &fars, &fart);
+		}
+		else
+		{
+			m_rdp->tc_div_no_perspective(fars, fart, farw, &fars, &fart);
+		}
+
+		const bool lodclamp = ((fars | nexts | fart | nextt) & 0x60000) ? true : false;
+
+		INT32 lod;
+		tclod_4x17_to_15(nexts, fars, nextt, fart, 0, &lod);
+
+		bool magnify, distant;
+		UINT32 l_tile;
+		lodfrac_lodtile_signals(lodclamp, lod, &l_tile, &magnify, &distant, userdata, object);
+
+		if (object.m_other_modes.tex_lod_en)
+		{
+			if (distant)
+			{
+				l_tile = object.m_misc_state.m_max_level;
+			}
+
+			if (object.m_other_modes.detail_tex_en || magnify)
+			{
+				*t1 = (prim_tile + l_tile) & 7;
+			}
+			else
+			{
+				*t1 = (prim_tile + l_tile + 1) & 7;
+			}
+		}
+	}
+}
+
+void n64_texture_pipe_t::tclod_2cycle_current(INT32* sss, INT32* sst, INT32 nexts, INT32 nextt, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object)
+{
+	tclod_tcclamp(sss, sst);
+
+	if (object.m_mode_derivs.m_do_lod)
+	{
+		INT32 nextys = (s + object.m_span_base.m_span_dsdy) >> 16;
+		INT32 nextyt = (t + object.m_span_base.m_span_dtdy) >> 16;
+		INT32 nextyw = (w + object.m_span_base.m_span_dwdy) >> 16;
+
+		if (object.m_other_modes.persp_tex_en)
+		{
+			m_rdp->tc_div(nextys, nextyt, nextyw, &nextys, &nextyt);
+		}
+		else
+		{
+			m_rdp->tc_div_no_perspective(nextys, nextyt, nextyw, &nextys, &nextyt);
+		}
+
+		INT32 inits = *sss;
+		INT32 initt = *sst;
+		const bool lodclamp = ((inits | nexts | nextys | initt | nextt | nextyt) & 0x60000) ? true : false;
+
+		INT32 lod;
+		tclod_4x17_to_15(inits, nexts, initt, nextt, 0, &lod);
+		tclod_4x17_to_15(inits, nextys, initt, nextyt, lod, &lod);
+
+		bool magnify, distant;
+		UINT32 l_tile;
+		lodfrac_lodtile_signals(lodclamp, lod, &l_tile, &magnify, &distant, userdata, object);
+
+		if (object.m_other_modes.tex_lod_en)
+		{
+			if (distant)
+			{
+				l_tile = object.m_misc_state.m_max_level;
+			}
+
+			if (!object.m_other_modes.detail_tex_en)
+			{
+				*t1 = (prim_tile + l_tile) & 7;
+				if (!(distant || (!object.m_other_modes.sharpen_tex_en && magnify)))
+				{
+					*t2 = (*t1 + 1) & 7;
+				}
+				else
+				{
+					*t2 = *t1;
+				}
+			}
+			else
+			{
+				if (!magnify)
+				{
+					*t1 = prim_tile + l_tile + 1;
+				}
+				else
+				{
+					*t1 = prim_tile + l_tile;
+				}
+				*t1 &= 7;
+
+				if (!distant && !magnify)
+				{
+					*t2 = prim_tile + l_tile + 2;
+				}
+				else
+				{
+					*t2 = prim_tile + l_tile + 1;
+				}
+				*t2 &= 7;
+			}
+		}
+	}
+}
+
+void n64_texture_pipe_t::tclod_1cycle_next(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* pre_lod_frac, rdp_span_aux* userdata, const rdp_poly_state& object)
+{
+	tclod_tcclamp(sss, sst);
+
+	if (object.m_mode_derivs.m_do_lod)
+	{
+		INT32 nexts, nextt, nextw, fars, fart, farw;
+		if (userdata->m_next_valid)
+		{
+			if (userdata->m_next_span)
+			{
+				if (!userdata->m_end_span || !userdata->m_long_span)
+				{
+					nexts = (s + dsinc)>> 16;
+					nextt = (t + dtinc)>> 16;
+					nextw = (w + dwinc)>> 16;
+
+					if (!(userdata->m_pre_end_span && userdata->m_long_span) && !(userdata->m_end_span && userdata->m_mid_span))
+					{
+						fars = (s + (dsinc << 1)) >> 16;
+						fart = (t + (dtinc << 1)) >> 16;
+						farw = (w + (dwinc << 1)) >> 16;
+					}
+					else
+					{
+						fars = (s - dsinc) >> 16;
+						fart = (t - dtinc) >> 16;
+						farw = (w - dwinc) >> 16;
+					}
+				}
+				else
+				{
+					nexts = userdata->m_next_s;
+					nextt = userdata->m_next_t;
+					nextw = userdata->m_next_w;
+
+					fars = (nexts + dsinc) >> 16;
+					fart = (nextt + dtinc) >> 16;
+					farw = (nextw + dwinc) >> 16;
+
+					nexts >>= 16;
+					nextt >>= 16;
+					nextw >>= 16;
+				}
+			}
+			else
+			{
+				if (!userdata->m_almost_mid_span)
+				{
+					nexts = userdata->m_next_s + dsinc;
+					nextt = userdata->m_next_t + dtinc;
+					nextw = userdata->m_next_w + dwinc;
+
+					fars = (nexts + dsinc) >> 16;
+					fart = (nextt + dtinc) >> 16;
+					farw = (nextw + dwinc) >> 16;
+
+					nexts >>= 16;
+					nextt >>= 16;
+					nextw >>= 16;
+				}
+				else
+				{
+					nexts = (s + dsinc) >> 16;
+					nextt = (t + dtinc) >> 16;
+					nextw = (w + dwinc) >> 16;
+
+					fars = (s - dsinc) >> 16;
+					fart = (t - dtinc) >> 16;
+					farw = (w - dwinc) >> 16;
+				}
+			}
+		}
+		else
+		{
+			nexts = (s + dsinc) >> 16;
+			nextt = (t + dtinc) >> 16;
+			nextw = (w + dwinc) >> 16;
+
+			fars = (s + (dsinc << 1)) >> 16;
+			fart = (t + (dtinc << 1)) >> 16;
+			farw = (w + (dwinc << 1)) >> 16;
+		}
+
+		if (object.m_other_modes.persp_tex_en)
+		{
+			m_rdp->tc_div(fars, fart, farw, &fars, &fart);
+			m_rdp->tc_div(nexts, nextt, nextw, &nexts, &nextt);
+		}
+		else
+		{
+			m_rdp->tc_div_no_perspective(fars, fart, farw, &fars, &fart);
+			m_rdp->tc_div_no_perspective(nexts, nextt, nextw, &nexts, &nextt);
+		}
+
+		const bool lodclamp = ((fars | nexts | fart | nextt) & 0x60000) ? true : false;
+
+		INT32 lod;
+		tclod_4x17_to_15(nexts, fars, nextt, fart, 0, &lod);
+
+		if ((lod & 0x4000) || lodclamp)
+		{
+			lod = 0x7fff;
+		}
+		else if (lod < object.m_misc_state.m_min_level)
+		{
+			lod = object.m_misc_state.m_min_level;
+		}
+
+		const bool magnify = (lod < 32);
+		UINT32 l_tile = m_log2_table[(lod >> 5) & 0xff];
+		const bool distant = (lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level);
+
+		*pre_lod_frac = ((lod << 3) >> l_tile) & 0xff;
+
+		if (!object.m_other_modes.sharpen_tex_en && !object.m_other_modes.detail_tex_en)
+		{
+			if (distant)
+			{
+				*pre_lod_frac = 0xff;
+			}
+			else
+			{
+				*pre_lod_frac = 0;
+			}
+		}
+
+		if (object.m_other_modes.sharpen_tex_en && magnify)
+		{
+			*pre_lod_frac |= 0x100;
+		}
+
+		if (object.m_other_modes.tex_lod_en)
+		{
+			if (distant)
+			{
+				l_tile = object.m_misc_state.m_max_level;
+			}
+
+			if (!object.m_other_modes.detail_tex_en || magnify)
+			{
+				*t1 = (prim_tile + l_tile) & 7;
+			}
+			else
+			{
+				*t1 = (prim_tile + l_tile + 1) & 7;
+			}
+		}
+	}
+}
+
+void n64_texture_pipe_t::tclod_2cycle_next(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* t2, INT32* pre_lod_frac, rdp_span_aux* userdata, const rdp_poly_state& object)
+{
+	tclod_tcclamp(sss, sst);
+
+	if (object.m_mode_derivs.m_do_lod)
+	{
+		INT32 inits = *sss;
+		INT32 initt = *sst;
+
+		INT32 nexts = (s + dsinc) >> 16;
+		INT32 nextt = (t + dtinc) >> 16;
+		INT32 nextw = (w + dwinc) >> 16;
+
+		INT32 nextys = (s + object.m_span_base.m_span_dsdy) >> 16;
+		INT32 nextyt = (t + object.m_span_base.m_span_dtdy) >> 16;
+		INT32 nextyw = (w + object.m_span_base.m_span_dwdy) >> 16;
+
+		if (object.m_other_modes.persp_tex_en)
+		{
+			m_rdp->tc_div(nexts, nextt, nextw, &nexts, &nextt);
+			m_rdp->tc_div(nextys, nextyt, nextyw, &nextys, &nextyt);
+		}
+		else
+		{
+			m_rdp->tc_div_no_perspective(nexts, nextt, nextw, &nexts, &nextt);
+			m_rdp->tc_div_no_perspective(nextys, nextyt, nextyw, &nextys, &nextyt);
+		}
+
+		const bool lodclamp = ((inits | nexts | nextys | initt | nextt | nextyt) & 0x60000) ? true : false;
+
+		INT32 lod;
+		tclod_4x17_to_15(inits, nexts, initt, nextt, 0, &lod);
+		tclod_4x17_to_15(inits, nextys, initt, nextyt, lod, &lod);
+
+		if ((lod & 0x4000) || lodclamp)
+		{
+			lod = 0x7fff;
+		}
+		else if (lod < object.m_misc_state.m_min_level)
+		{
+			lod = object.m_misc_state.m_min_level;
+		}
+
+		const bool magnify = (lod < 32);
+		UINT32 l_tile = m_log2_table[(lod >> 5) & 0xff];
+		const bool distant = (lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level);
+
+		*pre_lod_frac = ((lod << 3) >> l_tile) & 0xff;
+
+		if (!object.m_other_modes.sharpen_tex_en && !object.m_other_modes.detail_tex_en)
+		{
+			if (distant)
+			{
+				*pre_lod_frac = 0xff;
+			}
+			else
+			{
+				*pre_lod_frac = 0;
+			}
+		}
+
+		if (object.m_other_modes.sharpen_tex_en && magnify)
+		{
+			*pre_lod_frac |= 0x100;
+		}
+
+		if (object.m_other_modes.tex_lod_en)
+		{
+			if (distant)
+			{
+				l_tile = object.m_misc_state.m_max_level;
+			}
+
+			if (!object.m_other_modes.detail_tex_en)
+			{
+				*t1 = (prim_tile + l_tile) & 7;
+				if (!(distant || (!object.m_other_modes.sharpen_tex_en && magnify)))
+				{
+					*t2 = (*t1 + 1) & 7;
+				}
+				else
+				{
+					*t2 = *t1;
+				}
+			}
+			else
+			{
+				if (!magnify)
+				{
+					*t1 = prim_tile + l_tile + 1;
+				}
+				else
+				{
+					*t1 = prim_tile + l_tile;
+				}
+				*t1 &= 7;
+
+				if (!distant && !magnify)
+				{
+					*t2 = prim_tile + l_tile + 2;
+				}
+				else
+				{
+					*t2 = prim_tile + l_tile + 1;
+				}
+				*t2 &= 7;
+			}
+		}
+	}
+}
+
+void n64_texture_pipe_t::lodfrac_lodtile_signals(bool lodclamp, INT32 lod, UINT32* l_tile, bool* magnify, bool* distant, rdp_span_aux* userdata, const rdp_poly_state& object)
+{
+	if ((lod & 0x4000) || lodclamp)
+	{
+		lod = 0x7fff;
+	}
+	else if (lod < object.m_misc_state.m_min_level)
+	{
+		lod = object.m_misc_state.m_min_level;
+	}
+
+	const bool mag = (lod < 32);
+	UINT32 ltil = m_log2_table[(lod >> 5) & 0xff];
+	const bool dis = (lod & 0x6000) || (ltil >= object.m_misc_state.m_max_level);
+
+	INT32 lf = ((lod << 3) >> ltil) & 0xff;
+
+	if (object.m_other_modes.sharpen_tex_en && !object.m_other_modes.detail_tex_en)
+	{
+		if (dis)
+		{
+			lf = 0xff;
+		}
+		else
+		{
+			lf = 0;
+		}
+	}
+
+	if (object.m_other_modes.sharpen_tex_en && mag)
+	{
+		lf |= 0x100;
+	}
+
+	*distant = dis;
+	*l_tile = ltil;
+	*magnify = mag;
+	userdata->m_lod_fraction.set(lf, lf, lf, lf);
+}
+
+void n64_texture_pipe_t::tclod_4x17_to_15(INT32 scurr, INT32 snext, INT32 tcurr, INT32 tnext, INT32 previous, INT32* lod)
+{
+	INT32 dels = SIGN17(snext) - SIGN17(scurr);
+	INT32 delt = SIGN17(tnext) - SIGN17(tcurr);
+	if (dels & 0x20000)
+	{
+		dels = ~dels & 0x1ffff;
+	}
+	if (delt & 0x20000)
+	{
+		delt = ~delt & 0x1ffff;
+	}
+
+	dels = (dels > delt) ? dels : delt;
+	dels = (previous > dels) ? previous : dels;
+	*lod = dels & 0x7fff;
+	if (dels & 0x1c000)
+	{
+		*lod |= 0x4000;
+	}
 }
 
 void n64_texture_pipe_t::mask(rgbaint_t& sstt, const n64_tile_t& tile)
@@ -197,14 +754,17 @@ void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, INT32 SSS, I
 		t0.set(*prev);
 	}
 
-	t0.sign_extend(0x00000100, 0xffffff00);
+	if (tile.format == FORMAT_YUV)
+	{
+		t0.sign_extend(0x00000100, 0xffffff00);
+	}
 
-	rgbaint_t k1r(m_rdp->get_k1());
-	k1r.mul_imm(t0.get_r32());
+	rgbaint_t k13r(m_rdp->get_k13());
+	k13r.mul_imm(t0.get_r32());
 
-	TEX->set(m_rdp->get_k023());
+	TEX->set(m_rdp->get_k02());
 	TEX->mul_imm(t0.get_g32());
-	TEX->add(k1r);
+	TEX->add(k13r);
 	TEX->add_imm(0x80);
 	TEX->shr_imm(8);
 	TEX->add_imm(t0.get_b32());
@@ -224,6 +784,12 @@ void n64_texture_pipe_t::cycle_nearest_lerp(color_t* TEX, color_t* prev, INT32 S
 	UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
 
 	((this)->*(m_texel_fetch[index]))(*TEX, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
+
+	if (object.m_other_modes.convert_one && cycle)
+	{
+		const UINT32 prev_b = prev->get_b32();
+		TEX->set(prev_b, prev_b, prev_b, prev_b);
+	}
 }
 
 void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
@@ -242,22 +808,6 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 
 	const UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
 
-	bool upper = ((stfrac.get_r32() + stfrac.get_b32()) >= 0x20);
-
-	rgbaint_t invstf;
-	if (upper)
-	{
-		invstf.set(stfrac);
-		invstf.subr_imm(0x20);
-		invstf.shl_imm(3);
-	}
-	else
-	{
-		invstf.set(0, 0, 0, 0);
-	}
-
-	stfrac.shl_imm(3);
-
 	rgbaint_t t0;
 	((this)->*(m_texel_fetch[index]))(t0, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
 	if (object.m_other_modes.convert_one && cycle)
@@ -267,12 +817,12 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 
 	t0.sign_extend(0x00000100, 0xffffff00);
 
-	rgbaint_t k1r(m_rdp->get_k1());
-	k1r.mul_imm(t0.get_r32());
+	rgbaint_t k13r(m_rdp->get_k13());
+	k13r.mul_imm(t0.get_r32());
 
-	TEX->set(m_rdp->get_k023());
+	TEX->set(m_rdp->get_k02());
 	TEX->mul_imm(t0.get_g32());
-	TEX->add(k1r);
+	TEX->add(k13r);
 	TEX->add_imm(0x80);
 	TEX->shr_imm(8);
 	TEX->add_imm(t0.get_b32());
@@ -300,28 +850,22 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 	const UINT32 tbase1 = tile.tmem + ((tile.line * sstt.get_b32()) & 0x1ff);
 	const UINT32 tbase2 = tile.tmem + ((tile.line * sstt.get_g32()) & 0x1ff);
 
-	bool upper = ((stfrac.get_r32() + stfrac.get_b32()) >= 0x20);
-
-	rgbaint_t invstf;
-	if (upper)
-	{
-		invstf.set(stfrac);
-		invstf.subr_imm(0x20);
-		invstf.shl_imm(3);
-	}
-
-	stfrac.shl_imm(3);
-
-	bool center = (stfrac.get_r32() == 0x10) && (stfrac.get_b32() == 0x10) && object.m_other_modes.mid_texel;
+	const UINT32 sfrac = stfrac.get_r32();
+	const UINT32 tfrac = stfrac.get_b32();
 
 	rgbaint_t t2;
 	((this)->*(m_texel_fetch[index]))(*TEX, sstt.get_a32(), sstt.get_b32(), tbase1, tpal, userdata);
 	((this)->*(m_texel_fetch[index]))(t2, sstt.get_r32(), sstt.get_g32(), tbase2, tpal, userdata);
 
-	if (!center)
+	if ((sfrac != 0x10) || (tfrac != 0x10) || !object.m_other_modes.mid_texel)
 	{
-		if (upper)
+		if ((sfrac + tfrac) >= 0x20)
 		{
+			rgbaint_t invstf(stfrac);
+			invstf.set(stfrac);
+			invstf.subr_imm(0x20);
+			invstf.shl_imm(3);
+
 			rgbaint_t t3;
 			((this)->*(m_texel_fetch[index]))(t3, sstt.get_a32(), sstt.get_g32(), tbase2, tpal, userdata);
 
@@ -338,6 +882,8 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 		}
 		else
 		{
+			stfrac.shl_imm(3);
+
 			rgbaint_t t0;
 			((this)->*(m_texel_fetch[index]))(t0, sstt.get_r32(), sstt.get_b32(), tbase1, tpal, userdata);
 
@@ -647,6 +1193,10 @@ void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 
 
 void n64_texture_pipe_t::calculate_clamp_diffs(UINT32 prim_tile, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
+	if (userdata == NULL)
+	{
+		printf("Whoa, userdata is NULL!\n"); fflush(stdout);
+	}
 	const n64_tile_t* tiles = object.m_tiles;
 	if (object.m_other_modes.cycle_type == CYCLE_TYPE_2)
 	{

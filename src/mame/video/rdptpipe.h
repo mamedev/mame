@@ -99,6 +99,12 @@ class n64_texture_pipe_t
 
 		void                copy(color_t* TEX, INT32 SSS, INT32 SST, UINT32 tilenum, const rdp_poly_state& object, rdp_span_aux* userdata);
 		void                calculate_clamp_diffs(UINT32 prim_tile, rdp_span_aux* userdata, const rdp_poly_state& object);
+		void				tclod_tcclamp(INT32* sss, INT32* sst);
+		void				tclod_1cycle_current(INT32* sss, INT32* sst, INT32 nexts, INT32 nextt, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		void				tclod_1cycle_next(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* pre_lod_frac, rdp_span_aux* userdata, const rdp_poly_state& object);
+		void				tclod_2cycle_current(INT32* sss, INT32* sst, INT32 nexts, INT32 nextt, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object);
+		void				tclod_2cycle_next(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* t2, INT32* pre_lod_frac, rdp_span_aux* userdata, const rdp_poly_state& object);
+		void				lodfrac_lodtile_signals(bool lodclamp, INT32 lod, UINT32* l_tile, bool* magnify, bool* distant, rdp_span_aux* userdata, const rdp_poly_state& object);
 		void                lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, rdp_span_aux* userdata, const rdp_poly_state& object);
 		void                lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object);
 		void                lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 s, const INT32 t, INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, const rdp_poly_state& object);
@@ -108,6 +114,7 @@ class n64_texture_pipe_t
 		bool                m_start_span;
 
 	private:
+		void				tclod_4x17_to_15(INT32 scurr, INT32 snext, INT32 tcurr, INT32 tnext, INT32 previous, INT32* lod);
 		void                mask(rgbaint_t& sstt, const n64_tile_t& tile);
 
 		rgbaint_t           shift_cycle(rgbaint_t& st, const n64_tile_t& tile);
@@ -158,9 +165,11 @@ class n64_texture_pipe_t
 		INT32               m_maskbits_table[16];
 		color_t             m_expand_16to32_table[0x10000];
 		UINT16              m_lod_lookup[0x80000];
+		INT32				m_log2_table[0x100];
 
 		rgbaint_t           m_st2_add;
 		rgbaint_t           m_v1;
+		rgbaint_t			m_yuv1;
 };
 
 #endif // _VIDEO_RDPTEXPIPE_H_
