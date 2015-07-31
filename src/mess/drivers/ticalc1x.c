@@ -11,7 +11,6 @@
 
   TODO:
   - MCU clocks are unknown where noted
-  - lilprof78 equals-sign is always on
 
 ***************************************************************************/
 
@@ -686,7 +685,7 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 		m_display_state[y] = (r >> y & 1) ? o : 0;
 
 	// 3rd digit A/G(equals sign) is from O7
-	m_display_state[3] = (m_o & 0x80) ? 0x41 : 0;
+	m_display_state[3] = (r && m_o & 0x80) ? 0x41 : 0;
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
 	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
