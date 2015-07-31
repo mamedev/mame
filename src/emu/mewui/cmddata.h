@@ -1,11 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Dankan1890
 /*********************************************************************
 
     mewui/cmddata.h
-
-    Defined Game Command Font Color Array / Convert.
-
-    This is an unofficial version based on MAME.
-    Please do not send any reports from this build to the MAME team.
 
 *********************************************************************/
 #pragma once
