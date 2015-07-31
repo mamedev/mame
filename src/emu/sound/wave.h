@@ -5,6 +5,8 @@
 #ifndef __WAVE_H__
 #define __WAVE_H__
 
+#include "imagedev/cassette.h"
+
 
 /*****************************************************************************
  *  CassetteWave interface
@@ -28,6 +30,7 @@ protected:
 
 private:
 	const char *m_cassette_tag;
+	cassette_image_device *m_cass;
 };
 
 extern const device_type WAVE;
