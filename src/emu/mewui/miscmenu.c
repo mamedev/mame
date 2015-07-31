@@ -4,7 +4,7 @@
 
     mewui/miscmenu.c
 
-    Internal MEWUI user interface.
+    MEWUI miscellaneous options menu.
 
 ***************************************************************************/
 

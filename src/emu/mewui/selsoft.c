@@ -4,7 +4,7 @@
 
     mewui/selsoft.c
 
-    Internal MEWUI user interface.
+    MEWUI softwares menu.
 
 ***************************************************************************/
 
@@ -22,9 +22,9 @@
 #include "mewui/swcustmenu.h"
 
 static const char *region_lists[] = { "arab", "arg", "asia", "aus", "aut", "bel", "blr", "bra", "can", "chi", "chn", "cze", "den",
-									"ecu", "esp", "euro", "fin", "fra", "gbr", "ger", "gre", "hkg", "hun", "irl", "isr",
-									"isv", "ita", "jpn", "kaz", "kor", "lat", "lux", "mex", "ned", "nld", "nor", "nzl",
-									"pol", "rus", "slo", "spa", "sui", "swe", "tha", "tpe", "tw", "uk", "ukr", "usa" };
+                                      "ecu", "esp", "euro", "fin", "fra", "gbr", "ger", "gre", "hkg", "hun", "irl", "isr",
+                                      "isv", "ita", "jpn", "kaz", "kor", "lat", "lux", "mex", "ned", "nld", "nor", "nzl",
+                                      "pol", "rus", "slo", "spa", "sui", "swe", "tha", "tpe", "tw", "uk", "ukr", "usa" };
 
 //-------------------------------------------------
 //  compares two items in the software list and
@@ -315,13 +315,11 @@ void ui_menu_select_software::populate()
 	image_interface_iterator iter(config.root_device());
 
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
-	{
 		if (image->filename() == NULL && image->must_be_loaded())
 		{
-				has_empty_start = false;
-				break;
+			has_empty_start = false;
+			break;
 		}
-	}
 
 	// no active search
 	if (m_search[0] == 0)
@@ -367,11 +365,11 @@ void ui_menu_select_software::populate()
 				old_software = 0;
 
 			else if (!reselect_last::software.empty() && m_displaylist[curitem]->shortname.compare(reselect_last::software) == 0
-							&& m_displaylist[curitem]->listname.compare(reselect_last::swlist) == 0)
-					old_software = has_empty_start ? curitem + 1 : curitem;
+			         && m_displaylist[curitem]->listname.compare(reselect_last::swlist) == 0)
+				old_software = has_empty_start ? curitem + 1 : curitem;
 
 			item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
-						m_displaylist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui), (void *)m_displaylist[curitem]);
+			            m_displaylist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui), (void *)m_displaylist[curitem]);
 		}
 	}
 
@@ -381,8 +379,8 @@ void ui_menu_select_software::populate()
 
 		for (int curitem = 0; searchlist[curitem]; curitem++)
 			item_append(searchlist[curitem]->longname.c_str(), searchlist[curitem]->devicetype.c_str(),
-						searchlist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
-						(void *)searchlist[curitem]);
+			            searchlist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
+			            (void *)searchlist[curitem]);
 	}
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, flags_mewui, NULL);
@@ -557,13 +555,11 @@ void ui_menu_select_software::build_software_list()
 
 				strmakelower(name);
 				for (size_t y = 0; y < m_swlist.size(); ++y)
-				{
 					if (m_swlist[y].shortname == name && m_swlist[y].listname == vlist[x])
 					{
 						m_swlist[y].available = true;
 						break;
 					}
-				}
 			}
 		}
 	}
@@ -1136,6 +1132,9 @@ void ui_menu_select_software::build_custom()
 	}
 }
 
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
 
 ui_mewui_software_parts::ui_mewui_software_parts(running_machine &machine, render_container *container, std::vector<std::string> partname, std::vector<std::string> partdesc, ui_software_info *ui_info) : ui_menu(machine, container)
 {
@@ -1144,9 +1143,17 @@ ui_mewui_software_parts::ui_mewui_software_parts(running_machine &machine, rende
 	m_uiinfo = ui_info;
 }
 
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
 ui_mewui_software_parts::~ui_mewui_software_parts()
 {
 }
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
 
 void ui_mewui_software_parts::populate()
 {
@@ -1154,12 +1161,15 @@ void ui_mewui_software_parts::populate()
 		item_append(m_nameparts[index].c_str(), m_descpart[index].c_str(), 0, (void *)&m_nameparts[index]);
 }
 
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
 void ui_mewui_software_parts::handle()
 {
 	// process the menu
 	const ui_menu_event *event = process(0);
 	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
-	{
 		for (size_t idx = 0; idx < m_nameparts.size(); idx++)
 			if ((void*)&m_nameparts[idx] == event->itemref)
 			{
@@ -1179,7 +1189,6 @@ void ui_mewui_software_parts::handle()
 				machine().schedule_hard_reset();
 				ui_menu::stack_reset(machine());
 			}
-	}
 }
 
 

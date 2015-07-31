@@ -4,7 +4,7 @@
 
     mewui/palsel.c
 
-    Internal MEWUI user interface.
+    MEWUI colors palette menu.
 
 *********************************************************************/
 

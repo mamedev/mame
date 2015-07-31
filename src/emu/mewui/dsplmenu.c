@@ -4,7 +4,7 @@
 
     mewui/dsplmenu.c
 
-    Internal MEWUI user interface.
+    MEWUI video options menu.
 
 *********************************************************************/
 
@@ -49,6 +49,7 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 	m_options[WAITSYNC_ENABLED] = options.wait_vsync();
 	m_options[FILTER_ENABLED] = options.filter();
 	m_options[PRESCALE_ENABLED] = (options.prescale() == 1);
+	m_options[GLSL_ENABLED] = options.gl_glsl();
 
 #ifdef MEWUI_WINDOWS
 	// windows
@@ -81,6 +82,7 @@ ui_menu_display_options::~ui_menu_display_options()
 	machine().options().set_value(WINOPTION_TRIPLEBUFFER, m_options[TBUFFER_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
 #endif
 
+	machine().options().set_value(OSDOPTION_GL_GLSL, m_options[GLSL_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_VIDEO, video_modes[cur_video], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_FILTER, m_options[FILTER_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_PRESCALE, m_options[PRESCALE_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
@@ -155,17 +157,24 @@ void ui_menu_display_options::populate()
 
 #ifdef MEWUI_WINDOWS
 	// add hardware stretch option
-	item_append("Hardware Stretch", m_options[HWSTRETCH_ENABLED] ? "On" : "Off",
-	            m_options[HWSTRETCH_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HWSTRETCH_ENABLED);
+	if (!strcmp(video_modes[cur_video], "ddraw"))
+		item_append("Hardware Stretch", m_options[HWSTRETCH_ENABLED] ? "On" : "Off",
+	                 m_options[HWSTRETCH_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HWSTRETCH_ENABLED);
 
 	// add Triple Buffer option
 	item_append("Triple Buffering", m_options[TBUFFER_ENABLED] ? "On" : "Off",
 	            m_options[TBUFFER_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)TBUFFER_ENABLED);
 
 	// add HLSL option
-	item_append("HLSL", m_options[HLSL_ENABLED] ? "On" : "Off",
-	            m_options[HLSL_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HLSL_ENABLED);
+	if (!strcmp(video_modes[cur_video], "auto") || !strcmp(video_modes[cur_video], "d3d"))
+		item_append("HLSL", m_options[HLSL_ENABLED] ? "On" : "Off",
+					m_options[HLSL_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HLSL_ENABLED);
 #endif
+
+	// add GLSL option
+	if (!strcmp(video_modes[cur_video], "opengl"))
+		item_append("GLSL", m_options[GLSL_ENABLED] ? "On" : "Off",
+					m_options[GLSL_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)GLSL_ENABLED);
 
 	// add bilinear option
 	item_append("Bilinear Filtering", m_options[FILTER_ENABLED] ? "On" : "Off",

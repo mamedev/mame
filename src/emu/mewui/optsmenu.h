@@ -4,7 +4,7 @@
 
     mewui/optsmenu.h
 
-    Internal MEWUI user interface.
+    MEWUI main options menu manager.
 
 ***************************************************************************/
 

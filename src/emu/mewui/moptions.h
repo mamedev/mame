@@ -4,7 +4,7 @@
 
     mewui/options.h
 
-    MEWUI Options management.
+    MEWUI main options manager.
 
 ***************************************************************************/
 

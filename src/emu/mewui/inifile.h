@@ -4,7 +4,7 @@
 
     mewui/inifile.h
 
-    MEWUI inifile system.
+    MEWUI INIs file manager.
 
 ***************************************************************************/
 

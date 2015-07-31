@@ -4,7 +4,7 @@
 
     mewui/miscmenu.h
 
-    Internal MEWUI user interface.
+    MEWUI miscellaneous options menu.
 
 ***************************************************************************/
 #pragma once

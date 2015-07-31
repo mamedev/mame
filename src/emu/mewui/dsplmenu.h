@@ -4,7 +4,7 @@
 
     mewui/dsplmenu.h
 
-    Internal MEWUI user interface.
+    MEWUI video options menu.
 
 ***************************************************************************/
 
@@ -33,6 +33,7 @@ private:
 		FILTER_ENABLED,
 		PRESCALE_ENABLED,
 		HLSL_ENABLED,
+		GLSL_ENABLED,
 		MT_ENABLED,
 		WINDOW_ENABLED,
 		KAR_ENABLED,

@@ -4,7 +4,7 @@
 
     mewui/selsoft.h
 
-    Internal MEWUI user interface.
+    MEWUI softwares menu.
 
 ***************************************************************************/
 #pragma once

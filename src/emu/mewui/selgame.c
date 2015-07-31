@@ -4,7 +4,7 @@
 
     mewui/selgame.c
 
-    Internal MEWUI user interface.
+    Main MEWUI menu.
 
 *********************************************************************/
 
