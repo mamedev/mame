@@ -275,6 +275,8 @@ void running_machine::start()
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debugger_init(*this);
 
+	m_render->resolve_tags();
+
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important

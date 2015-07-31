@@ -208,10 +208,13 @@ public:
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const;
 		bool has_input() const { return !m_input_tag.empty(); }
-		const char *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_tag.c_str(); }
+		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
 
 		// fetch state based on configured source
 		int state() const;
+
+		// resolve tags, if any
+		void resolve_tags();
 
 	private:
 		// internal state
@@ -219,6 +222,7 @@ public:
 		layout_element *    m_element;          // pointer to the associated element (non-screens only)
 		std::string         m_output_name;      // name of this item
 		std::string         m_input_tag;        // input tag of this item
+		ioport_port *       m_input_port;       // input port of this item
 		ioport_value        m_input_mask;       // input mask of this item
 		screen_device *     m_screen;           // pointer to screen
 		int                 m_orientation;      // orientation of this item
@@ -244,6 +248,9 @@ public:
 
 	// operations
 	void recompute(render_layer_config layerconfig);
+
+	// resolve tags, if any
+	void resolve_tags();
 
 private:
 	// internal state

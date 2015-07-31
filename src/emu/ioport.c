@@ -1917,13 +1917,12 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 
 	// coin impulse option
 	int effective_impulse = m_impulse;
-	int impulse_option_val = machine().options().coin_impulse();
-	if (impulse_option_val != 0)
+	if (m_impulse_option_val != 0)
 	{
-		if (impulse_option_val < 0)
+		if (m_impulse_option_val < 0)
 			effective_impulse = 0;
 		else if ((m_type >= IPT_COIN1 && m_type <= IPT_COIN12) || m_impulse != 0)
-			effective_impulse = impulse_option_val;
+			effective_impulse = m_impulse_option_val;
 	}
 
 	// if this is a switch-down event, handle impulse and toggle
@@ -2137,6 +2136,8 @@ void ioport_field::init_live_state(analog_field *analog)
 
 	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
 		setting->condition().initialize(setting->device());
+
+	m_impulse_option_val = machine().options().coin_impulse();
 }
 
 
@@ -2902,12 +2903,11 @@ g_profiler.start(PROFILER_INPUT);
 	ioport_field *mouse_field = NULL;
 	if (mouse_button && mouse_target != NULL)
 	{
-		const char *tag = NULL;
+		ioport_port *port = NULL;
 		ioport_value mask;
 		float x, y;
-		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, tag, mask, x, y))
+		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, port, mask, x, y))
 		{
-			ioport_port *port = machine().root_device().ioport(tag);
 			if (port != NULL)
 				mouse_field = port->field(mask);
 		}
