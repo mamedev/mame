@@ -1917,12 +1917,13 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 
 	// coin impulse option
 	int effective_impulse = m_impulse;
-	if (m_impulse_option_val != 0)
+	int impulse_option_val = machine().options().coin_impulse();
+	if (impulse_option_val != 0)
 	{
-		if (m_impulse_option_val < 0)
+		if (impulse_option_val < 0)
 			effective_impulse = 0;
 		else if ((m_type >= IPT_COIN1 && m_type <= IPT_COIN12) || m_impulse != 0)
-			effective_impulse = m_impulse_option_val;
+			effective_impulse = impulse_option_val;
 	}
 
 	// if this is a switch-down event, handle impulse and toggle
@@ -2136,8 +2137,6 @@ void ioport_field::init_live_state(analog_field *analog)
 
 	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
 		setting->condition().initialize(setting->device());
-
-	m_impulse_option_val = machine().options().coin_impulse();
 }
 
 

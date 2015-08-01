@@ -266,7 +266,7 @@ public:
 	int frameskip() const { return int_value(OPTION_FRAMESKIP); }
 	int seconds_to_run() const { return int_value(OPTION_SECONDS_TO_RUN); }
 	bool throttle() const { return bool_value(OPTION_THROTTLE); }
-	bool sleep() const { return bool_value(OPTION_SLEEP); }
+	bool sleep() const { return m_sleep; }
 	float speed() const { return float_value(OPTION_SPEED); }
 	bool refresh_speed() const { return bool_value(OPTION_REFRESHSPEED); }
 
@@ -328,7 +328,7 @@ public:
 	bool offscreen_reload() const { return bool_value(OPTION_OFFSCREEN_RELOAD); }
 	bool natural_keyboard() const { return bool_value(OPTION_NATURAL_KEYBOARD); }
 	bool joystick_contradictory() const { return bool_value(OPTION_JOYSTICK_CONTRADICTORY); }
-	int coin_impulse() const { return int_value(OPTION_COIN_IMPULSE); }
+	int coin_impulse() const { return m_coin_impulse; }
 
 	// core debugging options
 	bool log() const { return bool_value(OPTION_LOG); }
@@ -382,7 +382,14 @@ private:
 	// INI parsing helper
 	bool parse_one_ini(const char *basename, int priority, std::string *error_string = NULL);
 
+	// cache frequently used options in members
+	void update_cached_options();
+
 	static const options_entry s_option_entries[];
+
+	// cached options
+	int m_coin_impulse;
+	bool m_sleep;
 };
 
 

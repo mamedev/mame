@@ -1117,7 +1117,6 @@ private:
 	void *                      m_read_param;       // parameter for read callback routine
 	ioport_field_write_delegate m_write;            // write callback routine
 	void *                      m_write_param;      // parameter for write callback routine
-	int                         m_impulse_option_val; // impulse setting from options
 
 	// data relevant to digital control types
 	bool                        m_digital_value;    // externally set value

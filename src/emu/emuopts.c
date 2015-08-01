@@ -202,6 +202,8 @@ const options_entry emu_options::s_option_entries[] =
 
 emu_options::emu_options()
 : core_options()
+, m_coin_impulse(0)
+, m_sleep(true)
 {
 	add_entries(emu_options::s_option_entries);
 }
@@ -380,6 +382,8 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options_count());
 
+	update_cached_options();
+
 	return result;
 }
 
@@ -393,7 +397,9 @@ bool emu_options::parse_command_line(int argc, char *argv[], std::string &error_
 {
 	// parse as normal
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	return parse_slot_devices(argc, argv, error_string, NULL, NULL);
+	bool result = parse_slot_devices(argc, argv, error_string, NULL, NULL);
+	update_cached_options();
+	return result;
 }
 
 
@@ -468,6 +474,8 @@ void emu_options::parse_standard_inis(std::string &error_string)
 
 	// Re-evaluate slot options after loading ini files
 	update_slot_options();
+
+	update_cached_options();
 }
 
 
@@ -570,3 +578,18 @@ const char *emu_options::sub_value(std::string &buffer, const char *name, const 
 		buffer.clear();
 	return buffer.c_str();
 }
+
+
+//-------------------------------------------------
+//  update_cached_options - to prevent tagmap
+//    lookups keep copies of frequently requested
+//    options in member variables.
+//-------------------------------------------------
+
+void emu_options::update_cached_options()
+{
+	m_coin_impulse = int_value(OPTION_COIN_IMPULSE);
+	m_sleep = bool_value(OPTION_SLEEP);
+
+}
+
