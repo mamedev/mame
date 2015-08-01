@@ -268,7 +268,7 @@ public:
 	bool throttle() const { return bool_value(OPTION_THROTTLE); }
 	bool sleep() const { return m_sleep; }
 	float speed() const { return float_value(OPTION_SPEED); }
-	bool refresh_speed() const { return bool_value(OPTION_REFRESHSPEED); }
+	bool refresh_speed() const { return m_refresh_speed; }
 
 	// core rotation options
 	bool rotate() const { return bool_value(OPTION_ROTATE); }
@@ -390,6 +390,7 @@ private:
 	// cached options
 	int m_coin_impulse;
 	bool m_sleep;
+	bool m_refresh_speed;
 };
 
 

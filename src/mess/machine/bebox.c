@@ -97,16 +97,9 @@
 #include "video/pc_vga.h"
 #include "bus/lpci/cirrus.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ins8250.h"
-#include "machine/upd765.h"
 #include "machine/mc146818.h"
-#include "machine/pic8259.h"
-#include "machine/am9517a.h"
 #include "machine/ataintf.h"
 #include "bus/lpci/pci.h"
-#include "machine/intelfsh.h"
-#include "machine/53c810.h"
-#include "machine/ram.h"
 
 #define LOG_CPUIMASK    1
 #define LOG_UART        1
@@ -215,7 +208,7 @@ WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
 	};
 	int i, line;
 	UINT32 old_crossproc_interrupts = m_crossproc_interrupts;
-	static const char *const cputags[] = { "ppc1", "ppc2" };
+	cpu_device *cpus[] = { m_ppc1, m_ppc2 };
 
 	bebox_mbreg32_w(&m_crossproc_interrupts, data, mem_mask);
 
@@ -237,7 +230,7 @@ WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
                     */
 			}
 
-			space.machine().device(cputags[crossproc_map[i].cpunum])->execute().set_input_line(crossproc_map[i].inputline, line);
+			cpus[crossproc_map[i].cpunum]->set_input_line(crossproc_map[i].inputline, line);
 		}
 	}
 }
@@ -256,7 +249,7 @@ WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 void bebox_state::bebox_update_interrupts()
 {
 	UINT32 interrupt;
-	static const char *const cputags[] = { "ppc1", "ppc2" };
+	cpu_device *cpus[] = { m_ppc1, m_ppc2 };
 
 	for (int cpunum = 0; cpunum < 2; cpunum++)
 	{
@@ -268,7 +261,7 @@ void bebox_state::bebox_update_interrupts()
 				m_interrupts, m_cpu_imask[cpunum], interrupt ? "on" : "off");
 		}
 
-		machine().device(cputags[cpunum])->execute().set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		cpus[cpunum]->set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -318,8 +311,8 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) machine().device("ppc1")->safe_pc(),
-			(unsigned) machine().device("ppc2")->safe_pc(),
+			(unsigned) m_ppc1->pc(),
+			(unsigned) m_ppc2->pc(),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
@@ -546,7 +539,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 
 READ8_MEMBER(bebox_state::bebox_dma_read_byte )
 {
-	address_space& prog_space = machine().device<cpu_device>("ppc1")->space(AS_PROGRAM); // get the right address space
+	address_space& prog_space = m_ppc1->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	return prog_space.read_byte(page_offset + offset);
@@ -555,7 +548,7 @@ READ8_MEMBER(bebox_state::bebox_dma_read_byte )
 
 WRITE8_MEMBER(bebox_state::bebox_dma_write_byte )
 {
-	address_space& prog_space = machine().device<cpu_device>("ppc1")->space(AS_PROGRAM); // get the right address space
+	address_space& prog_space = m_ppc1->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	prog_space.write_byte(page_offset + offset, data);
@@ -563,17 +556,17 @@ WRITE8_MEMBER(bebox_state::bebox_dma_write_byte )
 
 
 READ8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_r){
-	return machine().device<smc37c78_device>("smc37c78")->dma_r();
+	return m_smc37c78->dma_r();
 }
 
 
 WRITE8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_w){
-	machine().device<smc37c78_device>("smc37c78")->dma_w(data);
+	m_smc37c78->dma_w(data);
 }
 
 
 WRITE_LINE_MEMBER(bebox_state::bebox_dma8237_out_eop){
-	machine().device<smc37c78_device>("smc37c78")->tc_w(state);
+	m_smc37c78->tc_w(state);
 }
 
 static void set_dma_channel(running_machine &machine, int channel, int state)
@@ -607,17 +600,15 @@ WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
 
 READ8_MEMBER(bebox_state::bebox_flash_r )
 {
-	fujitsu_29f016a_device *flash = space.machine().device<fujitsu_29f016a_device>("flash");
 	offset = (offset & ~7) | (7 - (offset & 7));
-	return flash->read(offset);
+	return m_flash->read(offset);
 }
 
 
 WRITE8_MEMBER(bebox_state::bebox_flash_w )
 {
-	fujitsu_29f016a_device *flash = space.machine().device<fujitsu_29f016a_device>("flash");
 	offset = (offset & ~7) | (7 - (offset & 7));
-	flash->write(offset, data);
+	m_flash->write(offset, data);
 }
 
 /*************************************
@@ -779,7 +770,7 @@ void bebox_state::machine_reset()
 	m_ppc1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_ppc2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	memcpy(machine().device<fujitsu_29f016a_device>("flash")->space().get_read_ptr(0),memregion("user1")->base(),0x200000);
+	memcpy(m_flash->space().get_read_ptr(0),memregion("user1")->base(),0x200000);
 }
 
 void bebox_state::machine_start()

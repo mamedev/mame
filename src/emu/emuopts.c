@@ -204,6 +204,7 @@ emu_options::emu_options()
 : core_options()
 , m_coin_impulse(0)
 , m_sleep(true)
+, m_refresh_speed(false)
 {
 	add_entries(emu_options::s_option_entries);
 }
@@ -590,6 +591,6 @@ void emu_options::update_cached_options()
 {
 	m_coin_impulse = int_value(OPTION_COIN_IMPULSE);
 	m_sleep = bool_value(OPTION_SLEEP);
-
+	m_refresh_speed = bool_value(OPTION_REFRESHSPEED);
 }
 

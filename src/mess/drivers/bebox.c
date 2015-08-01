@@ -17,23 +17,15 @@
 #include "bus/lpci/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/3812intf.h"
-#include "machine/ins8250.h"
-#include "machine/pic8259.h"
 #include "machine/mc146818.h"
-#include "bus/lpci/pci.h"
-#include "machine/am9517a.h"
 #include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
 #include "bus/lpci/mpc105.h"
-#include "machine/intelfsh.h"
 #include "bus/scsi/scsi.h"
-#include "machine/53c810.h"
 
 /* Devices */
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
 #include "formats/pc_dsk.h"
-#include "machine/ram.h"
 #include "machine/8042kbdc.h"
 
 READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237_2->read(space, offset / 2); }
@@ -80,15 +72,13 @@ ADDRESS_MAP_END
 
 READ64_MEMBER(bebox_state::bb_slave_64be_r)
 {
-	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
-
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
 	if ((space.device().safe_pc() == 0xfff02e94) || (space.device().safe_pc() == 0xfff02e84))
 	{
 		return 0x108000ff;  // indicate slave CPU
 	}
 
-	return device->read_64be(space, offset, mem_mask);
+	return m_pcibus->read_64be(space, offset, mem_mask);
 }
 
 static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )
