@@ -52,8 +52,9 @@ void ui_menu_game_options::handle()
 	bool changed = false;
 
 	// process the menu
-	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
-	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT | UI_MENU_PROCESS_NOIMAGE);
+//	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
+//	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT | UI_MENU_PROCESS_NOIMAGE);
+	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	if (menu_event != NULL && menu_event->itemref != NULL)
 		switch ((FPTR)menu_event->itemref)
