@@ -716,9 +716,10 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 {
 	UINT16 execute_address, start_addr, end_addr;
 	int autorun;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, file_type, &execute_address, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
+	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
 		return IMAGE_INIT_FAIL;
 
 	/* is this file executable? */
@@ -726,8 +727,6 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 	{
 		/* check to see if autorun is on */
 		autorun = m_io_config->read_safe(0xFF) & 1;
-
-		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
 

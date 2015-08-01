@@ -13,6 +13,6 @@
 #ifndef __Z80_BIN__
 #define __Z80_BIN__
 
-int z80bin_load_file(device_image_interface *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr );
+int z80bin_load_file(device_image_interface *image, address_space &space, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr );
 
 #endif
