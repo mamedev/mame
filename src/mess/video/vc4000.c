@@ -321,7 +321,7 @@ WRITE8_MEMBER( vc4000_state::vc4000_video_w )
 
 	case 0xc7:                      // Soundregister
 		m_video.reg.data[offset] = data;
-		machine().device<vc4000_sound_device>("custom")->soundport_w(0, data);
+		m_custom->soundport_w(0, data);
 		break;
 
 	case 0xc8:                      // Digits 1 and 2

@@ -82,6 +82,7 @@ public:
 		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
+		m_custom(*this, "custom"),
 		m_keypad1_1(*this, "KEYPAD1_1"),
 		m_keypad1_2(*this, "KEYPAD1_2"),
 		m_keypad1_3(*this, "KEYPAD1_3"),
@@ -93,11 +94,12 @@ public:
 		m_io_joy1_x(*this, "JOY1_X"),
 		m_io_joy1_y(*this, "JOY1_Y"),
 		m_io_joy2_x(*this, "JOY2_X"),
-		m_io_joy2_y(*this, "JOY2_Y") { }
+		m_io_joy2_y(*this, "JOY2_Y")
 #else
 		m_joys(*this, "JOYS"),
-		m_config(*this, "CONFIG") { }
+		m_config(*this, "CONFIG")
 #endif
+	{ }
 
 	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
 	DECLARE_READ8_MEMBER(vc4000_key_r);
@@ -128,6 +130,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<vc4000_cart_slot_device> m_cart;
+	required_device<vc4000_sound_device> m_custom;
 	required_ioport m_keypad1_1;
 	required_ioport m_keypad1_2;
 	required_ioport m_keypad1_3;
