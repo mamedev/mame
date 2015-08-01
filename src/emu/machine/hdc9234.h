@@ -202,6 +202,7 @@ private:
 	line_state m_line_level;
 	int m_event_line;
 	int m_state_after_line;
+	bool m_timed_wait;
 
 	// ==============================================
 	//   Live state machine

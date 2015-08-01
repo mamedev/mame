@@ -3,7 +3,7 @@
 /****************************************************************************
 
     Hard disk support
-    See ti99_hd.c for documentation
+    See mfm_hd.c for documentation
 
     Michael Zapf
 
@@ -16,6 +16,11 @@
 
 #include "emu.h"
 #include "imagedev/harddriv.h"
+
+const chd_metadata_tag MFM_HARD_DISK_METADATA_TAG = CHD_MAKE_TAG('G','D','D','I');
+
+extern const char *MFMHD_REC_METADATA_FORMAT;
+extern const char *MFMHD_GAP_METADATA_FORMAT;
 
 /*
     Determine how data are passed from the hard disk to the controller. We
@@ -30,6 +35,7 @@ enum mfmhd_enc_t
 };
 
 class mfmhd_image_format_t;
+class mfm_harddisk_device;
 
 // Pointer to its alloc function
 typedef mfmhd_image_format_t *(*mfmhd_format_type)();
@@ -39,6 +45,86 @@ mfmhd_image_format_t *mfmhd_image_format_creator()
 {
 	return new _FormatClass();
 }
+
+/*
+    Parameters for the track layout
+*/
+class mfmhd_layout_params
+{
+public:
+	// Geometry params. These are fixed for the device. However, sector sizes
+	// could be changed, but we do not support this (yet). These are defined
+	// in the CHD and must match those of the device. They are stored by the GDDD tag.
+	// The encoding is not stored in the CHD but is also supposed to be immutable.
+	int     cylinders;
+	int     heads;
+	int     sectors_per_track;
+	int     sector_size;
+	mfmhd_enc_t     encoding;
+
+	// Parameters like interleave, precompensation, write current can be changed
+	// on every write operation. They are stored by the GDDI tag (first record).
+	int     interleave;
+	int     cylskew;
+	int     headskew;
+	int     write_precomp_cylinder;     // if -1, no wpcom on the disks
+	int     reduced_wcurr_cylinder;     // if -1, no rwc on the disks
+
+	// Parameters for the track layout that are supposed to be the same for
+	// all tracks and that do not change (until the next reformat).
+	// Also, they do not have any influence on the CHD file.
+	// They are stored by the GDDI tag (second record).
+	int     gap1;
+	int     gap2;
+	int     gap3;
+	int     sync;
+	int     headerlen;
+	int     ecctype;        // -1 is CRC
+
+	bool sane_rec()
+	{
+		return ((interleave >= 0 && interleave < 32) && (cylskew >= 0 && cylskew < 32) && (headskew >= 0 && headskew < 32)
+			&& (write_precomp_cylinder >= -1 && write_precomp_cylinder < 100000)
+			&& (reduced_wcurr_cylinder >= -1 && reduced_wcurr_cylinder < 100000));
+	}
+
+	void reset_rec()
+	{
+		interleave = cylskew = headskew = 0;
+		write_precomp_cylinder = reduced_wcurr_cylinder = -1;
+	}
+
+	bool sane_gap()
+	{
+		return ((gap1 >= 1 && gap1 < 1000) && (gap2 >= 1 && gap2 < 20) && (gap3 >= 1 && gap3 < 1000)
+			&& (sync >= 10 && sync < 20)
+			&& (headerlen >= 4 && headerlen<=5) && (ecctype>=-1 && ecctype < 10));
+	}
+
+	void reset_gap()
+	{
+		gap1 = gap2 = gap3 = sync = headerlen = ecctype = 0;
+	}
+
+	bool equals_rec(mfmhd_layout_params* other)
+	{
+		return ((interleave == other->interleave) &&
+				(cylskew == other->cylskew) &&
+				(headskew == other->headskew) &&
+				(write_precomp_cylinder == other->write_precomp_cylinder) &&
+				(reduced_wcurr_cylinder == other->reduced_wcurr_cylinder));
+	}
+
+	bool equals_gap(mfmhd_layout_params* other)
+	{
+		return ((gap1 == other->gap1) &&
+				(gap2 == other->gap2) &&
+				(gap3 == other->gap3) &&
+				(sync == other->sync) &&
+				(headerlen == other->headerlen) &&
+				(ecctype == other->ecctype));
+	}
+};
 
 class mfmhd_trackimage
 {
@@ -55,31 +141,16 @@ class mfmhd_trackimage_cache
 public:
 	mfmhd_trackimage_cache();
 	~mfmhd_trackimage_cache();
-	void        init(chd_file* chdfile, const char* tag, int tracksize, int imagecyls, int imageheads, int imagesecpt, int trackslots, mfmhd_enc_t encoding, mfmhd_image_format_t* format);
+	void        init(mfm_harddisk_device* mfmhd, int tracksize, int trackslots);
 	UINT16*     get_trackimage(int cylinder, int head);
 	void        mark_current_as_dirty();
 	void        cleanup();
 	void        write_back_one();
-	int         get_cylinders() { return m_cylinders; }
 
 private:
-	chd_file*   m_chd;
-
-	const char*             m_tagdev;
-	mfmhd_trackimage*       m_tracks;
-	mfmhd_enc_t             m_encoding;
-	mfmhd_image_format_t*   m_format;
-
-	bool        m_lastbit;
-	int         m_current_crc;
-	int         m_cylinders;
-	int         m_heads;
-	int         m_sectors_per_track;
-	int         m_sectorsize;
-	int         m_tracksize;
-
+	mfm_harddisk_device*        m_mfmhd;
+	mfmhd_trackimage*           m_tracks;
 	void        showtrack(UINT16* enctrack, int length);
-	const char* tag() { return m_tagdev; }
 };
 
 class mfm_harddisk_device : public harddisk_image_device,
@@ -117,7 +188,7 @@ public:
 	bool            read(attotime &from_when, const attotime &limit, UINT16 &data);
 
 	// Data input from controller
-	bool            write(attotime &from_when, const attotime &limit, UINT16 data);
+	bool            write(attotime &from_when, const attotime &limit, UINT16 cdata, bool wpcom=false, bool reduced_wc=false);
 
 	// Step
 	void            step_w(line_state line);
@@ -131,6 +202,13 @@ public:
 
 	// Tells us the time when the track ends (next index pulse)
 	attotime        track_end_time();
+
+	// Access the tracks on the image. Used as a callback from the cache.
+	chd_error       load_track(UINT16* data, int cylinder, int head);
+	void            write_track(UINT16* data, int cylinder, int head);
+
+	// Delivers the number of heads according to the loaded image
+	int             get_actual_heads();
 
 protected:
 	void                device_start();
@@ -149,7 +227,10 @@ protected:
 	int         m_phys_cylinders;
 	int         m_actual_cylinders;  // after reading the CHD
 	int         m_max_heads;
-	int         m_park_pos;
+	int         m_landing_zone;
+	int         m_precomp_cyl;
+	int         m_redwc_cyl;
+
 	int         m_maxseek_time;
 	int         m_seeknext_time;
 
@@ -261,7 +342,7 @@ extern const device_type MFM_HD_CONNECTOR;
     _tag = Tag of the connector
     _slot_intf = Selection of hard drives
     _def_slot = Default hard drive
-    _enc = Encoding (see comments in ti99_hd.c)
+    _enc = Encoding (see comments in mfm_hd.c)
     _spinupms = Spinup time in milliseconds (some configurations assume that the
     user has turned on the hard disk before turning on the system. We cannot
     emulate this, so we allow for shorter times)
@@ -273,53 +354,81 @@ extern const device_type MFM_HD_CONNECTOR;
 	static_cast<mfm_harddisk_connector *>(device)->configure(_enc, _spinupms, _cache, _format);
 
 
+enum mfmhd_param_t
+{
+	MFMHD_IL,
+	MFMHD_HSKEW,
+	MFMHD_CSKEW,
+	MFMHD_WPCOM,
+	MFMHD_RWC,
+	MFMHD_GAP1,
+	MFMHD_GAP2,
+	MFMHD_GAP3,
+	MFMHD_SYNC,
+	MFMHD_HLEN,
+	MFMHD_ECC
+};
+
 /*
     Hard disk format
 */
 class mfmhd_image_format_t
 {
 public:
-	mfmhd_image_format_t();
-	virtual ~mfmhd_image_format_t();
+	mfmhd_image_format_t() {};
+	virtual ~mfmhd_image_format_t() {};
 
 	// Load the image.
-	virtual chd_error load(const char* tagdev, chd_file* chdfile, UINT16* trackimage, mfmhd_enc_t encoding, int tracksize, int cylinder, int head, int cylcnt, int headcnt, int sect_per_track) = 0;
+	virtual chd_error load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) = 0;
 
 	// Save the image.
-	virtual chd_error save(const char* tagdev, chd_file* chdfile, UINT16* trackimage, mfmhd_enc_t encoding, int tracksize, int cylinder, int head, int cylcnt, int headcnt, int sect_per_track) = 0;
+	virtual chd_error save(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) = 0;
 
-	// Return the recent interleave of the image
-	int get_interleave() { return m_interleave; }
+	// Return the original parameters of the image
+	mfmhd_layout_params* get_initial_params() { return &m_param_old; }
+
+	// Return the recent parameters of the image
+	mfmhd_layout_params* get_current_params() { return &m_param; }
+
+	// Set the track layout parameters (and reset the skew detection values)
+	void set_layout_params(mfmhd_layout_params param);
+
+	// Concrete format shall decide whether we want to save the retrieved parameters or not.
+	virtual bool save_param(mfmhd_param_t type) =0;
 
 protected:
-	bool        m_lastbit;
-	int         m_current_crc;
-	mfmhd_enc_t m_encoding;
-	const char* m_tagdev;
-	int         m_cylinders;
-	int         m_heads;
-	int         m_sectors_per_track;
-	int         m_interleave;
+	bool    m_lastbit;
+	int     m_current_crc;
+	int     m_secnumber[4];     // used to determine the skew values
+
+	mfmhd_layout_params m_param, m_param_old;
 
 	void    mfm_encode(UINT16* trackimage, int& position, UINT8 byte, int count=1);
 	void    mfm_encode_a1(UINT16* trackimage, int& position);
 	void    mfm_encode_mask(UINT16* trackimage, int& position, UINT8 byte, int count, int mask);
 	UINT8   mfm_decode(UINT16 raw);
-	const char* tag() { return m_tagdev; }
 	void    showtrack(UINT16* enctrack, int length);
+
+	// Deliver defaults.
+	virtual int get_default(mfmhd_param_t type) =0;
 };
 
-class ti99_mfmhd_format : public mfmhd_image_format_t
+class gen_mfmhd_format : public mfmhd_image_format_t
 {
 public:
-	ti99_mfmhd_format() {};
-	chd_error load(const char* tagdev, chd_file* chdfile, UINT16* trackimage, mfmhd_enc_t encoding, int tracksize, int cylinder, int head, int cylcnt, int headcnt, int sect_per_track);
-	chd_error save(const char* tagdev, chd_file* chdfile, UINT16* trackimage, mfmhd_enc_t encoding, int tracksize, int cylinder, int head, int cylcnt, int headcnt, int sect_per_track);
+	gen_mfmhd_format() {};
+	chd_error load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head);
+	chd_error save(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head);
+
+	// Yes, we want to save all parameters
+	virtual bool save_param(mfmhd_param_t type) { return true; }
+	virtual int get_default(mfmhd_param_t type);
+
 private:
 	UINT8   cylinder_to_ident(int cylinder);
 	int     chs_to_lba(int cylinder, int head, int sector);
 };
 
-extern const mfmhd_format_type MFMHD_TI99_FORMAT;
+extern const mfmhd_format_type MFMHD_GEN_FORMAT;
 
 #endif
