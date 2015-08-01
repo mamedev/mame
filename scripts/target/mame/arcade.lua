@@ -2085,6 +2085,7 @@ files {
 	MAME_DIR .. "src/mame/machine/namcos1.c",
 	MAME_DIR .. "src/mame/video/namcos1.c",
 	MAME_DIR .. "src/mame/drivers/namcos10.c",
+	MAME_DIR .. "src/mame/machine/ns10crypt.c",
 	MAME_DIR .. "src/mame/drivers/namcos11.c",
 	MAME_DIR .. "src/mame/machine/ns11prot.c",
 	MAME_DIR .. "src/mame/drivers/namcos12.c",
