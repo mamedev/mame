@@ -38,7 +38,6 @@ backup of playfield rom and picture/description of its board
 #include "emu.h"
 
 #include "includes/ssystem3.h"
-#include "machine/6522via.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 
@@ -60,7 +59,7 @@ void ssystem3_state::ssystem3_playfield_reset()
 {
 	memset(&m_playfield, 0, sizeof(m_playfield));
 	m_playfield.signal=FALSE;
-	//  m_playfield.on=TRUE; //ioport("Configuration")->read()&1;
+	//  m_playfield.on=TRUE; //m_configuration->read()&1;
 }
 
 void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
@@ -91,7 +90,7 @@ void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
 		if (d) m_playfield.data|=1<<(m_playfield.bit^7);
 		m_playfield.bit++;
 		if (m_playfield.bit==8) {
-	logerror("%.4x playfield wrote %d %02x\n", (int)machine().device("maincpu")->safe_pc(), m_playfield.count, m_playfield.data);
+	logerror("%.4x playfield wrote %d %02x\n", (int)m_maincpu->pc(), m_playfield.count, m_playfield.data);
 	m_playfield.u.data[m_playfield.count]=m_playfield.data;
 	m_playfield.bit=0;
 	m_playfield.count=(m_playfield.count+1)%ARRAY_LENGTH(m_playfield.u.data);
@@ -110,7 +109,7 @@ void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
 
 void ssystem3_state::ssystem3_playfield_read(int *on, int *ready)
 {
-	*on=!(ioport("Configuration")->read()&1);
+	*on = !(m_configuration->read() & 1);
 	//  *on=!m_playfield.on;
 	*ready=FALSE;
 }
@@ -197,22 +196,21 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_b)
 
 WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 {
-	ssystem3_playfield_write(data&1, data&8);
-	ssystem3_lcd_write(data&4, data&2);
+	ssystem3_playfield_write(data & 1, data & 8);
+	ssystem3_lcd_write(data & 4, data & 2);
 
 	// TODO: figure out what this is trying to achieve
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	UINT8 d=ssystem3_via_read_b(space, 0, mem_mask)&~0x40;
-	if (data&0x80) d|=0x40;
+	UINT8 d = ssystem3_via_read_b(space, 0, mem_mask) & ~0x40;
+	if (data & 0x80) d |= 0x40;
 	//  d&=~0x8f;
-	via_0->write_pb0((d>>0)&1);
-	via_0->write_pb1((d>>1)&1);
-	via_0->write_pb2((d>>2)&1);
-	via_0->write_pb3((d>>3)&1);
-	via_0->write_pb4((d>>4)&1);
-	via_0->write_pb5((d>>5)&1);
-	via_0->write_pb6((d>>6)&1);
-	via_0->write_pb7((d>>7)&1);
+	m_via6522_0->write_pb0((d >> 0) & 1);
+	m_via6522_0->write_pb1((d >> 1) & 1);
+	m_via6522_0->write_pb2((d >> 2) & 1);
+	m_via6522_0->write_pb3((d >> 3) & 1);
+	m_via6522_0->write_pb4((d >> 4) & 1);
+	m_via6522_0->write_pb5((d >> 5) & 1);
+	m_via6522_0->write_pb6((d >> 6) & 1);
+	m_via6522_0->write_pb7((d >> 7) & 1);
 }
 
 DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
