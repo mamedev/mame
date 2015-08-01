@@ -31,16 +31,11 @@
 #
 /* components */
 #include "cpu/z80/z80.h"
-#include "machine/wd_fdc.h"
-#include "machine/msm6242.h"
 #include "sound/saa1099.h"
-#include "sound/speaker.h"
 
 /* devices */
-#include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
 #include "formats/coupedsk.h"
-#include "machine/ram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -78,23 +73,21 @@ void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 {
-	wd1772_t *fdc = machine().device<wd1772_t>("wd1772");
-
 	/* drive and side is encoded into bit 5 and 3 */
-	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "wd1772:1" : "wd1772:0");
+	floppy_connector *con = (BIT(offset, 4) ? m_wd1772_1 : m_wd1772_0);
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 
 	if(floppy)
 		floppy->ss_w(BIT(offset, 2));
-	fdc->set_floppy(floppy);
+	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: return fdc->status_r();
-	case 1: return fdc->track_r();
-	case 2: return fdc->sector_r();
-	case 3: return fdc->data_r();
+	case 0: return m_fdc->status_r();
+	case 1: return m_fdc->track_r();
+	case 2: return m_fdc->sector_r();
+	case 3: return m_fdc->data_r();
 	}
 
 	return 0xff;
@@ -102,23 +95,21 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 {
-	wd1772_t *fdc = machine().device<wd1772_t>("wd1772");
-
 	/* drive and side is encoded into bit 5 and 3 */
-	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "wd1772:1" : "wd1772:0");
+	floppy_connector *con = (BIT(offset, 4) ? m_wd1772_1 : m_wd1772_0);
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 
 	if(floppy)
 		floppy->ss_w(BIT(offset, 2));
-	fdc->set_floppy(floppy);
+	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: fdc->cmd_w(data);     break;
-	case 1: fdc->track_w(data);   break;
-	case 2: fdc->sector_w(data);  break;
-	case 3: fdc->data_w(data);    break;
+	case 0: m_fdc->cmd_w(data);     break;
+	case 1: m_fdc->track_w(data);   break;
+	case 2: m_fdc->sector_w(data);  break;
+	case 3: m_fdc->data_w(data);    break;
 	}
 }
 
@@ -156,14 +147,14 @@ READ8_MEMBER(samcoupe_state::samcoupe_status_r)
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
-	if (!BIT(offset,  8)) data &= ioport("keyboard_row_fe")->read() & 0xe0;
-	if (!BIT(offset,  9)) data &= ioport("keyboard_row_fd")->read() & 0xe0;
-	if (!BIT(offset, 10)) data &= ioport("keyboard_row_fb")->read() & 0xe0;
-	if (!BIT(offset, 11)) data &= ioport("keyboard_row_f7")->read() & 0xe0;
-	if (!BIT(offset, 12)) data &= ioport("keyboard_row_ef")->read() & 0xe0;
-	if (!BIT(offset, 13)) data &= ioport("keyboard_row_df")->read() & 0xe0;
-	if (!BIT(offset, 14)) data &= ioport("keyboard_row_bf")->read() & 0xe0;
-	if (!BIT(offset, 15)) data &= ioport("keyboard_row_7f")->read() & 0xe0;
+	if (!BIT(offset,  8)) data &= m_keyboard_row_fe->read() & 0xe0;
+	if (!BIT(offset,  9)) data &= m_keyboard_row_fd->read() & 0xe0;
+	if (!BIT(offset, 10)) data &= m_keyboard_row_fb->read() & 0xe0;
+	if (!BIT(offset, 11)) data &= m_keyboard_row_f7->read() & 0xe0;
+	if (!BIT(offset, 12)) data &= m_keyboard_row_ef->read() & 0xe0;
+	if (!BIT(offset, 13)) data &= m_keyboard_row_df->read() & 0xe0;
+	if (!BIT(offset, 14)) data &= m_keyboard_row_bf->read() & 0xe0;
+	if (!BIT(offset, 15)) data &= m_keyboard_row_7f->read() & 0xe0;
 
 	/* bit 0-4, interrupt source */
 	data |= m_status;
@@ -231,18 +222,18 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
-	if (!BIT(offset,  8)) data &= ioport("keyboard_row_fe")->read() & 0x1f;
-	if (!BIT(offset,  9)) data &= ioport("keyboard_row_fd")->read() & 0x1f;
-	if (!BIT(offset, 10)) data &= ioport("keyboard_row_fb")->read() & 0x1f;
-	if (!BIT(offset, 11)) data &= ioport("keyboard_row_f7")->read() & 0x1f;
-	if (!BIT(offset, 12)) data &= ioport("keyboard_row_ef")->read() & 0x1f;
-	if (!BIT(offset, 13)) data &= ioport("keyboard_row_df")->read() & 0x1f;
-	if (!BIT(offset, 14)) data &= ioport("keyboard_row_bf")->read() & 0x1f;
-	if (!BIT(offset, 15)) data &= ioport("keyboard_row_7f")->read() & 0x1f;
+	if (!BIT(offset,  8)) data &= m_keyboard_row_fe->read() & 0x1f;
+	if (!BIT(offset,  9)) data &= m_keyboard_row_fd->read() & 0x1f;
+	if (!BIT(offset, 10)) data &= m_keyboard_row_fb->read() & 0x1f;
+	if (!BIT(offset, 11)) data &= m_keyboard_row_f7->read() & 0x1f;
+	if (!BIT(offset, 12)) data &= m_keyboard_row_ef->read() & 0x1f;
+	if (!BIT(offset, 13)) data &= m_keyboard_row_df->read() & 0x1f;
+	if (!BIT(offset, 14)) data &= m_keyboard_row_bf->read() & 0x1f;
+	if (!BIT(offset, 15)) data &= m_keyboard_row_7f->read() & 0x1f;
 
 	if (offset == 0xff00)
 	{
-		data &= ioport("keyboard_row_ff")->read() & 0x1f;
+		data &= m_keyboard_row_ff->read() & 0x1f;
 
 		/* if no key has been pressed, return the mouse state */
 		if (data == 0x1f)

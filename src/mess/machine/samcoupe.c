@@ -8,8 +8,6 @@
 
 #include "emu.h"
 #include "includes/samcoupe.h"
-#include "machine/msm6242.h"
-#include "machine/ram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -136,7 +134,7 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 void samcoupe_state::samcoupe_update_memory(address_space &space)
 {
 	const int PAGE_MASK = ((m_ram->size() & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = memregion("maincpu")->base();
+	UINT8 *rom = m_region_maincpu->base();
 	UINT8 *memory;
 	int is_readonly;
 
@@ -228,16 +226,14 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
 READ8_MEMBER(samcoupe_state::samcoupe_rtc_r)
 {
 	address_space &spaceio = m_maincpu->space(AS_IO);
-	msm6242_device *rtc = dynamic_cast<msm6242_device*>(machine().device("sambus_clock"));
-	return rtc->read(spaceio,offset >> 12);
+	return m_rtc->read(spaceio, offset >> 12);
 }
 
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_rtc_w)
 {
 	address_space &spaceio = m_maincpu->space(AS_IO);
-	msm6242_device *rtc = dynamic_cast<msm6242_device*>(machine().device("sambus_clock"));
-	rtc->write(spaceio,offset >> 12, data);
+	m_rtc->write(spaceio, offset >> 12, data);
 }
 
 
@@ -261,8 +257,8 @@ UINT8 samcoupe_state::samcoupe_mouse_r()
 	if (m_mouse_index == 2)
 	{
 		/* update values */
-		int mouse_x = ioport("mouse_x")->read();
-		int mouse_y = ioport("mouse_y")->read();
+		int mouse_x = m_io_mouse_x->read();
+		int mouse_y = m_io_mouse_y->read();
 
 		int mouse_dx = m_mouse_x - mouse_x;
 		int mouse_dy = m_mouse_y - mouse_y;
@@ -271,7 +267,7 @@ UINT8 samcoupe_state::samcoupe_mouse_r()
 		m_mouse_y = mouse_y;
 
 		/* button state */
-		m_mouse_data[2] = ioport("mouse_buttons")->read();
+		m_mouse_data[2] = m_mouse_buttons->read();
 
 		/* y-axis */
 		m_mouse_data[3] = (mouse_dy & 0xf00) >> 8;
@@ -324,7 +320,7 @@ void samcoupe_state::machine_reset()
 	m_mouse_data[0] = 0xff;
 	m_mouse_data[1] = 0xff;
 
-	if (ioport("config")->read() & 0x01)
+	if (m_config->read() & 0x01)
 	{
 		/* install RTC */
 		spaceio.install_readwrite_handler(0xef, 0xef, 0xffff, 0xff00, read8_delegate(FUNC(samcoupe_state::samcoupe_rtc_r),this), write8_delegate(FUNC(samcoupe_state::samcoupe_rtc_w),this));
