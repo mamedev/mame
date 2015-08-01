@@ -239,9 +239,21 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_crt(*this, "crt"),
+		m_spacewar(*this, "SPACEWAR"),
+		m_csw(*this, "CSW"),
+		m_sense(*this, "SENSE"),
+		m_tstadd(*this, "TSTADD"),
+		m_twdmsb(*this, "TWDMSB"),
+		m_twdlsb(*this, "TWDLSB"),
+		m_twr(*this, "TWR"),
+		m_cfg(*this, "CFG"),
+		m_io_lightpen(*this, "LIGHTPEN"),
+		m_lightx(*this, "LIGHTX"),
+		m_lighty(*this, "LIGHTY")
+	{ }
 
-	pdp1_reset_param_t m_reset_param;
 	int m_io_status;
 	tape_reader_t m_tape_reader;
 	tape_puncher_t m_tape_puncher;
@@ -249,19 +261,8 @@ public:
 	emu_timer *m_dpy_timer;
 	lightpen_t m_lightpen;
 	parallel_drum_t m_parallel_drum;
-	int m_old_typewriter_keys[4];
-	int m_old_lightpen;
-	int m_old_control_keys;
-	int m_old_tw_keys;
-	int m_old_ta_keys;
-	int m_typewriter_color;
-	bitmap_ind16 m_panel_bitmap;
-	bitmap_ind16 m_typewriter_bitmap;
-	lightpen_t m_lightpen_state;
-	lightpen_t m_previous_lightpen_state;
-	int m_pos;
-	int m_case_shift;
-	crt_device *m_crt;
+	required_device<pdp1_device> m_maincpu;
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -275,7 +276,6 @@ public:
 	TIMER_CALLBACK_MEMBER(dpy_callback);
 	TIMER_CALLBACK_MEMBER(il_timer_callback);
 	void pdp1_machine_stop();
-	required_device<pdp1_device> m_maincpu;
 	inline void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void pdp1_plot(int x, int y);
 	void pdp1_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
@@ -302,7 +302,35 @@ public:
 	void drum_write(int field, int position, UINT32 data);
 	void pdp1_keyboard();
 	void pdp1_lightpen();
+	int read_spacewar() { return m_spacewar->read(); }
+
+private:
+	pdp1_reset_param_t m_reset_param;
+	int m_old_typewriter_keys[4];
+	int m_old_lightpen;
+	int m_old_control_keys;
+	int m_old_tw_keys;
+	int m_old_ta_keys;
+	int m_typewriter_color;
+	bitmap_ind16 m_panel_bitmap;
+	bitmap_ind16 m_typewriter_bitmap;
+	lightpen_t m_lightpen_state;
+	lightpen_t m_previous_lightpen_state;
+	int m_pos;
+	int m_case_shift;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<crt_device> m_crt;
+	required_ioport m_spacewar;
+	required_ioport m_csw;
+	required_ioport m_sense;
+	required_ioport m_tstadd;
+	required_ioport m_twdmsb;
+	required_ioport m_twdlsb;
+	required_ioport_array<4> m_twr;
+	required_ioport m_cfg;
+	required_ioport m_io_lightpen;
+	required_ioport m_lightx;
+	required_ioport m_lighty;
 };
 #endif /* PDP1_H_ */
