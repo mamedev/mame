@@ -8,7 +8,9 @@
 //
 //============================================================
 
+#if (!defined(NO_MEM_TRACKING))
 #define NO_MEM_TRACKING
+#endif
 
 #include "debug_module.h"
 #include "modules/osdmodule.h"
@@ -17,7 +19,8 @@
 
 #include <vector>
 
-#include <QtWidgets/QApplication>
+#include <QtGui/QtGui>
+#include <QtGui/QApplication>
 
 #include "emu.h"
 #include "config.h"
