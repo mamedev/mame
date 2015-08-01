@@ -5,7 +5,7 @@
 *****************************************/
 public:
 	int  visible_items;
-	bool    ui_error;
+	bool ui_error;
 
 	// draw UME box
 	void draw_ume_box(float x1, float y1, float x2, float y2);
@@ -23,9 +23,7 @@ public:
 	template <typename _T1, typename _T2, typename _T3>
 	UINT32 get_arrow_flags(_T1 min, _T2 max, _T3 actual)
 	{
-		if (actual < min) actual = min;
-		if (actual > max) actual = max;
-		return ((actual == min) ? MENU_FLAG_RIGHT_ARROW : (actual == max ? MENU_FLAG_LEFT_ARROW : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)));
+		return ((actual <= min) ? MENU_FLAG_RIGHT_ARROW : (actual >= max ? MENU_FLAG_LEFT_ARROW : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)));
 	}
 
 protected:
@@ -62,7 +60,7 @@ private:
 	int totallines;
 
 	// draw game list
-	void draw_select_game();
+	void draw_select_game(bool noinput);
 
 	// draw game list
 	void draw_palette_menu();

@@ -28,6 +28,8 @@
 #define CR                       0x0d   //  '\n' and '\r' meanings are swapped in some
 #define LF                       0x0a   //  compilers (e.g., Mac compilers)
 #define UI_MENU_PROCESS_ONLYCHAR 8
+#define UI_MENU_PROCESS_NOINPUT  16
+#define UI_MENU_PROCESS_NOIMAGE  32
 #define MAX_CUST_FILTER          8
 #define MAX_ICONS_RENDER         40
 #define MEWUI_TOOLBAR_BUTTONS    7

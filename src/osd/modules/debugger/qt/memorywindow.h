@@ -3,8 +3,7 @@
 #ifndef __DEBUG_QT_MEMORY_WINDOW_H__
 #define __DEBUG_QT_MEMORY_WINDOW_H__
 
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QComboBox>
+#include <QtGui/QtGui>
 
 #include "debuggerview.h"
 #include "windowqt.h"

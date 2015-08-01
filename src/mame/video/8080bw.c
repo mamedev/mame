@@ -379,9 +379,9 @@ UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32
 		for (int i = 0; i < 8; i++)
 		{
 			if (m_flip_screen)
-				bitmap.pix32(191-y, 255-(x|i)) = BIT(data, 7) ? rgb_t::white : rgb_t::black;
+				bitmap.pix32(191-y, 255-(x|i)) = m_palette->pen_color(BIT(data, 7));
 			else
-				bitmap.pix32(y, x|i) = BIT(data, 7) ? rgb_t::white : rgb_t::black;
+				bitmap.pix32(y, x|i) = m_palette->pen_color(BIT(data, 7));
 			data <<= 1;
 		}
 	}
@@ -402,7 +402,7 @@ UINT32 _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb32
 
 		for (int i = 0; i < 8; i++)
 		{
-			bitmap.pix32(y, x | (i^flipx)) = BIT(data, 0) ? rgb_t::white : rgb_t::black;
+			bitmap.pix32(y, x | (i^flipx)) = m_palette->pen_color(BIT(data, 0));
 			data >>= 1;
 		}
 	}

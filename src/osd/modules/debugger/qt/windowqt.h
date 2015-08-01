@@ -3,7 +3,7 @@
 #ifndef __DEBUG_QT_WINDOW_QT_H__
 #define __DEBUG_QT_WINDOW_QT_H__
 
-#include <QtWidgets/QMainWindow>
+#include <QtGui/QtGui>
 
 #include "emu.h"
 #include "config.h"

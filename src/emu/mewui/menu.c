@@ -164,7 +164,7 @@ void ui_menu::init_mewui(running_machine &machine)
 //  draw main menu
 //-------------------------------------------------
 
-void ui_menu::draw_select_game()
+void ui_menu::draw_select_game(bool noinput)
 {
 	float line_height = machine().ui().get_line_height();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
@@ -189,10 +189,13 @@ void ui_menu::draw_select_game()
 	// locate mouse
 	mouse_hit = FALSE;
 	mouse_button = FALSE;
-	mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
-	if (mouse_target != NULL)
-		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
-			mouse_hit = TRUE;
+	if (!noinput)
+	{
+		mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+		if (mouse_target != NULL)
+			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+				mouse_hit = TRUE;
+	}
 
 	// account for extra space at the top and bottom
 	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;

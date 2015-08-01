@@ -11,6 +11,9 @@ function maintargetosdoptions(_target,_subtarget)
 		linkoptions {
 			"-municode",
 		}
+		links {
+			"mingw32",
+		}
 
 	configuration { }
 
@@ -34,7 +37,6 @@ function maintargetosdoptions(_target,_subtarget)
 	links {
 		"comctl32",
 		"comdlg32",
-		"mingw32",
 	}
 end
 

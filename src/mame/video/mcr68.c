@@ -133,33 +133,6 @@ VIDEO_START_MEMBER(mcr68_state,zwackery)
 
 /*************************************
  *
- *  Palette RAM writes
- *
- *************************************/
-
-WRITE16_MEMBER(mcr68_state::mcr68_paletteram_w)
-{
-	int newword;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	newword = m_generic_paletteram_16[offset];
-	m_palette->set_pen_color(offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
-}
-
-
-WRITE16_MEMBER(mcr68_state::zwackery_paletteram_w)
-{
-	int newword;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	newword = m_generic_paletteram_16[offset];
-	m_palette->set_pen_color(offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
-}
-
-
-
-/*************************************
- *
  *  Video RAM writes
  *
  *************************************/
