@@ -423,6 +423,9 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_MACHINE_START_OVERRIDE(junofrst_state,junofrst)
 	MCFG_MACHINE_RESET_OVERRIDE(junofrst_state,junofrst)
 
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
