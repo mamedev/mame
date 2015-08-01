@@ -99,6 +99,7 @@ void centronics_printer_device::device_reset()
 	output_busy(m_busy);
 	output_fault(1);
 	output_ack(1);
+	output_select(1);
 }
 
 /*-------------------------------------------------
