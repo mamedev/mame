@@ -23,7 +23,6 @@ public:
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_sharedram;
-//  UINT8 *    m_paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
 	bitmap_ind16 m_pixbitmap;

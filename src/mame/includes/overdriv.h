@@ -28,9 +28,6 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	/* memory pointers */
-//  UINT16 *   m_paletteram;    // currently this uses generic palette handling
-
 	/* video-related */
 	int       m_zoom_colorbase[2];
 	int       m_road_colorbase[2];

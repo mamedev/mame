@@ -38,7 +38,6 @@ public:
 	required_shared_ptr<UINT16> m_head_layersize;
 	required_shared_ptr<UINT16> m_headpanic_platform_x;
 	required_shared_ptr<UINT16> m_headpanic_platform_y;
-//  UINT16 *       m_paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t       *m_tilemap_0_16x16;

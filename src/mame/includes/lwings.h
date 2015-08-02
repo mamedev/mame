@@ -22,8 +22,6 @@ public:
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_bg1videoram;
 	required_shared_ptr<UINT8> m_soundlatch2;
-//      UINT8 *  m_paletteram;    // currently this uses generic palette handling
-//      UINT8 *  m_paletteram2;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;

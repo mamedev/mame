@@ -24,8 +24,6 @@ public:
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<UINT8> m_txvideoram;
-//  UINT8 * m_paletteram; // currently this uses generic palette handling
-//  UINT8 * m_paletteram2;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t *m_tx_tilemap;
