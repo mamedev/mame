@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "includes/macrossp.h"
 
-//#define DEBUG_KEYS 1
+#define DEBUG_KEYS 0
 
 /*
 Sprite list is drawn backwards, and priorities with backgrounds are not transitive
@@ -31,6 +31,9 @@ Interesting test cases:
 2) Second level, as zoom into end of canyon
 3) Second level, as doors open to revels tracks/blue background for boss
 4) Boss should go under bridge on level 4 when he first appears
+
+Not bugs:
+* It looks like the level 2 boss has wrong priorities versus the background (tiles weaving in and out), but that's just because of the scrolling problems on zoomed tilemaps
 
 */
 
@@ -332,13 +335,10 @@ void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, co
 
 	if ((vr[2] & 0xf0000000) == 0xe0000000) /* zoom enable (guess, surely wrong) */
 	{
-		int startx, starty, incy, incx;
+		int startx=0, starty=0, incy, incx;
 
-//		The global scroll registers play a part here - since they must be used to part the doors on level 2
-//		startx = ((vr[0] & 0x000003ff) << 16 );
-//		starty = ((vr[0] & 0x03ff0000) >> 0);
-		startx = (vr[1] & 0x0000ffff) << 16;
-		starty = (vr[1] & 0xffff0000) >> 0;
+		startx += (vr[1] & 0x0000ffff) << 16;
+		starty += (vr[1] & 0xffff0000) >> 0;
 		incy = (vr[2] & 0x00ff0000) >> 6;
 
 		if (line&1)
@@ -347,14 +347,17 @@ void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, co
 			incx = (lr[line/2] & 0xffff0000)>>16;
 
 		incx <<= 10;
-		
+
 		/* WRONG! */
 		/* scroll register contain position relative to the center of the screen, so adjust */
-		/* Zoom Scroll registers set to this when at 1:1 with non-zoom on homescreen */
-		startx -= 0x120 * incx;
-		starty -= 0x80 * incy;	
-/*		startx -= (368/2) * incx;
-		starty -= (240/2) * incy;*/
+		startx -= (368/2) * incx;
+		starty -= (240/2) * incy;
+
+		/* The global scroll registers play a part here - since they must be used to part the doors on level 2 */
+#if 0
+		startx += ((vr[0] & 0x000003ff) << 16 );
+		starty += ((vr[0] & 0x03ff0000) >> 0);
+#endif
 
 		tm->draw_roz(screen, bitmap, cliprect,
 				startx,starty,incx,0,0,incy,
