@@ -53,7 +53,6 @@ public:
 	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(colorram2_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(colbank_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
