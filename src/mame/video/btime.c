@@ -123,7 +123,6 @@ VIDEO_START_MEMBER(btime_state,disco)
 	m_gfxdecode->gfx(1)->set_source(m_deco_charram);
 }
 
-
 VIDEO_START_MEMBER(btime_state,bnj)
 {
 	/* the background area is twice as wide as the screen */
@@ -132,14 +131,6 @@ VIDEO_START_MEMBER(btime_state,bnj)
 	m_background_bitmap = auto_bitmap_ind16_alloc(machine(), 2 * width, height);
 
 	save_item(NAME(*m_background_bitmap));
-}
-
-
-WRITE8_MEMBER(btime_state::btime_paletteram_w)
-{
-	m_paletteram[offset] = data;
-	/* RGB output is inverted */
-	m_palette->write(space, offset, UINT8(~data));
 }
 
 WRITE8_MEMBER(btime_state::lnc_videoram_w)
