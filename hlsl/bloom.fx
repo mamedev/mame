@@ -186,27 +186,27 @@ uniform float4 Level67Size;
 uniform float4 Level89Size;
 uniform float2 LevelASize;
 
-uniform bool PrepareVector = false;
-
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
 	Output.Color = Input.Color;
 
 	float2 TexCoord = Input.Position.xy / ScreenDims;
-	Output.TexCoord01 = TexCoord.xyxy + Prescale.xyxy / Level01Size;
+
+	Output.TexCoord01.xy = TexCoord.xy;
+	Output.TexCoord01.zw = TexCoord.xy + Prescale.xy / Level01Size.zw;
 	Output.TexCoord23 = TexCoord.xyxy + Prescale.xyxy / Level23Size;
 	Output.TexCoord45 = TexCoord.xyxy + Prescale.xyxy / Level45Size;
 	Output.TexCoord67 = TexCoord.xyxy + Prescale.xyxy / Level67Size;
 	Output.TexCoord89 = TexCoord.xyxy + Prescale.xyxy / Level89Size;
-	Output.TexCoordA  = TexCoord.xy   + Prescale.xy / LevelASize;
+	Output.TexCoordA = TexCoord.xy + Prescale.xy / LevelASize;
 	
 	return Output;
 }

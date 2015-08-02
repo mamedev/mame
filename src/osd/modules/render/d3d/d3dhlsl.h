@@ -44,6 +44,7 @@ public:
 		CU_SCREEN_DIMS = 0,
 		CU_SOURCE_DIMS,
 		CU_SOURCE_RECT,
+		CU_TARGET_DIMS,
 
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
@@ -411,7 +412,7 @@ private:
 	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
 
 	texture_info *          curr_texture;
-	bool                    phosphor_passthrough;
+	render_target *         curr_render_target;
 
 public:
 	render_target *         targethead;

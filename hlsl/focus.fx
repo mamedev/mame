@@ -40,7 +40,6 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 Unused : TEXCOORD1;
 };
 
 struct PS_INPUT
@@ -61,12 +60,10 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
+uniform float2 TargetDims;
 
 uniform float2 Defocus = float2(0.0f, 0.0f);
 
-uniform float2 Prescale = float2(8.0f, 8.0f);
-
-float2 Coord0Offset = float2( 0.0f,  0.0f);
 float2 Coord1Offset = float2(-0.2f, -0.6f);
 float2 Coord2Offset = float2( 0.4f, -0.4f);
 float2 Coord3Offset = float2( 0.6f,  0.2f);
@@ -79,28 +76,24 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 ScreenTexelDims = 1.0f / ScreenDims;
+	float2 TargetTexelDims = 1.0f / TargetDims;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
-
-	// todo: there is an offset which can be noticed at lower prescale in high-resolution
-	float2 FocusPrescaleOffset = ScreenTexelDims / Prescale;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 	
-	float2 TexCoord = Input.TexCoord;
-	TexCoord += FocusPrescaleOffset;
+	float2 TexCoord = Input.TexCoord + 0.5f / TargetDims;
 
-	Output.TexCoord0 = TexCoord + Coord0Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord1 = TexCoord + Coord1Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord2 = TexCoord + Coord2Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord3 = TexCoord + Coord3Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord4 = TexCoord + Coord4Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord5 = TexCoord + Coord5Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord6 = TexCoord + Coord6Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord7 = TexCoord + Coord7Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord0 = TexCoord;
+	Output.TexCoord1 = TexCoord + Coord1Offset * TargetTexelDims * Defocus;
+	Output.TexCoord2 = TexCoord + Coord2Offset * TargetTexelDims * Defocus;
+	Output.TexCoord3 = TexCoord + Coord3Offset * TargetTexelDims * Defocus;
+	Output.TexCoord4 = TexCoord + Coord4Offset * TargetTexelDims * Defocus;
+	Output.TexCoord5 = TexCoord + Coord5Offset * TargetTexelDims * Defocus;
+	Output.TexCoord6 = TexCoord + Coord6Offset * TargetTexelDims * Defocus;
+	Output.TexCoord7 = TexCoord + Coord7Offset * TargetTexelDims * Defocus;
 
 	Output.Color = Input.Color;
 
@@ -123,13 +116,9 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 d7 = tex2D(DiffuseSampler, Input.TexCoord7).rgb;
 
 	float3 blurred = (d0.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7) / 8.0f;
-
 	blurred = lerp(d0.rgb, blurred, 1.0f);
+	
 	return float4(blurred, d0.a);
-
-	// float4 texel = tex2D(DiffuseSampler, Input.TexCoord0);
-
-	// return float4(texel.rgb, 1.0f);
 }
 
 //-----------------------------------------------------------------------------

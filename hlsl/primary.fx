@@ -33,7 +33,6 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 Unused : TEXCOORD1;
 };
 
 struct PS_INPUT
@@ -47,6 +46,7 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
+
 uniform bool PostPass;
 uniform float Brighten;
 
@@ -56,11 +56,13 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = PostPass ? (Input.Position.xy / ScreenDims) : Input.TexCoord;
+	Output.TexCoord = PostPass 
+		? Input.Position.xy / ScreenDims
+		: Input.TexCoord;
 
 	Output.Color = Input.Color;
 
@@ -86,6 +88,8 @@ technique TestTechnique
 	pass Pass0
 	{
 		Lighting = FALSE;
+
+		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
 		PixelShader  = compile ps_2_0 ps_main();

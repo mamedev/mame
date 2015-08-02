@@ -60,13 +60,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
 	Output.Color = Input.Color;
 
 	float2 TexCoord = Input.Position.xy / ScreenDims;
+
 	Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelSize * Prescale;
 	Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelSize * Prescale;
 	Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelSize * Prescale;

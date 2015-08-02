@@ -88,10 +88,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float4 Position = Input.Position;
-	Position.xy *= (ScreenDims + 1.0f) / ScreenDims;
-	Position.xy -= 0.5f / ScreenDims;
-
 	float2 shadowUVOffset = ShadowUVOffset;
 	shadowUVOffset = xor(OrientationSwapXY, RotationSwapXY)
 		? shadowUVOffset.yx
@@ -101,16 +97,18 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 ScreenCoordPrescaleOffset = 0.0f;
 	ScreenCoordPrescaleOffset += shadowUVOffset;
 
-	Output.ScreenCoord = Position.xy;
+	Output.ScreenCoord = Input.Position.xy;
 	Output.ScreenCoord += ScreenCoordPrescaleOffset;
 
-	Output.Position = float4(Position.xyz, 1.0f);
+	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y; // flip y
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = PrepareVector ? (Input.Position.xy / ScreenDims) : Input.TexCoord;
+	Output.TexCoord = PrepareVector
+		? Input.Position.xy / ScreenDims
+		: Input.TexCoord; // + 0.5f / TargetDims;
 
 	Output.Color = Input.Color;
 

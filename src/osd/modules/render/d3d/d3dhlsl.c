@@ -1066,11 +1066,12 @@ int shaders::create_resources(bool reset)
 	deconverge_effect->add_uniform("RadialConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_Y);
 
 	focus_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	focus_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
 
 	phosphor_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	phosphor_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
-	phosphor_effect->add_uniform("Passthrough", uniform::UT_FLOAT, uniform::CU_PHOSPHOR_IGNORE);
 
 	downsample_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
@@ -1386,22 +1387,12 @@ int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, 
 		return next_index;
 	}
 
-	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
-
-	// Defocus pass 1
 	curr_effect = focus_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
-	curr_effect->set_vector("Prescale", 2, prescale);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
-
-	// Defocus pass 2
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
-
-	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1410,25 +1401,20 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 {
 	int next_index = source_index;
 
-	phosphor_passthrough = false;
-
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
-
-	float rtsize[2] = { rt->target_width, rt->target_height };
-	curr_effect->set_vector("TargetDims", 2, rtsize);
 	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
 	curr_effect->set_texture("LastPass", ct->last_texture);
+	curr_effect->set_bool("Passthrough", false);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 	
-	phosphor_passthrough = true;
-
 	// Pass along our phosphor'd screen
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
 	curr_effect->set_texture("LastPass", rt->prescale_texture[next_index]);
+	curr_effect->set_bool("Passthrough", true);
 
 	// Avoid changing targets due to page flipping
 	blit(ct->last_target, true, D3DPT_TRIANGLELIST, 0, 2);
@@ -1442,7 +1428,8 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 
 	texture_info *texture = poly->get_texture();
 
-	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
+	bool prepare_vector = 
+		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
 	float prescale[2] = {
 		prepare_vector ? 1.0f : (float)hlsl_prescale_x,
 		prepare_vector ? 1.0f : (float)hlsl_prescale_y };
@@ -1496,8 +1483,15 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
+	bool prepare_vector = 
+		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
+	float prescale[2] = {
+		prepare_vector ? 1.0f : (float)hlsl_prescale_x,   // no prescale for vector
+		prepare_vector ? 1.0f : (float)hlsl_prescale_y }; // full prescale for raster
+
 	curr_effect = downsample_effect;
 	curr_effect->update_uniforms();
+	curr_effect->set_vector("Prescale", 2, prescale);
 
 	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	int bloom_index = 0;
@@ -1529,8 +1523,8 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 
 	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
 	float prescale[2] = {
-		prepare_vector ? 1.0f : (float)hlsl_prescale_x / 2.0f,
-		prepare_vector ? 1.0f : (float)hlsl_prescale_y / 2.0f }; // no prescale for vector, half prescale for raster
+		prepare_vector ? 1.0f : (float)hlsl_prescale_x / 2.0f,   // no prescale for vector
+		prepare_vector ? 1.0f : (float)hlsl_prescale_y / 2.0f }; // half prescale for raster
 	float bloom_rescale = prepare_vector
 		? options->vector_bloom_scale 
 		: options->raster_bloom_scale;
@@ -1599,7 +1593,8 @@ int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, i
 	curr_effect->set_bool("PostPass", true);
 	curr_effect->set_float("Brighten", prepare_vector ? 1.0f : 0.0f);
 
-	blit(backbuffer, true, poly->get_type(), vertnum, poly->get_count());
+	// we do not clear the backbuffe here because multiple screens might rendered into
+	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
 
 	if (avi_output_file != NULL)
 	{
@@ -1632,7 +1627,9 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
 	{
-		render_target *rt = find_render_target(curr_texture);
+		curr_render_target = find_render_target(curr_texture);
+
+		render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1646,7 +1643,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = color_convolution_pass(rt, next_index, poly, vertnum);
 		next_index = prescale_pass(rt, next_index, poly, vertnum);
 		next_index = deconverge_pass(rt, next_index, poly, vertnum);
-		next_index = defocus_pass(rt, next_index, poly, vertnum);
+		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
+		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
 
 		// create bloom textures
@@ -1669,7 +1667,9 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	}
 	else if (PRIMFLAG_GET_VECTOR(poly->get_flags()) && vector_enable)
 	{
-		render_target *rt = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+
+		render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1697,7 +1697,9 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable)
 	{
-		render_target *rt = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+
+		render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1750,6 +1752,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		blit(NULL, false, poly->get_type(), vertnum, poly->get_count());
 	}
 
+	curr_render_target = NULL;
 	curr_texture = NULL;
 }
 
@@ -2811,6 +2814,12 @@ void uniform::update()
 			m_shader->set_vector("SourceRect", 2, &delta.c.x);
 			break;
 		}
+		case CU_TARGET_DIMS:
+		{
+			float rtsize[2] = { shadersys->curr_render_target->target_width, shadersys->curr_render_target->target_height };
+			m_shader->set_vector("TargetDims", 2, rtsize);
+			break;
+		}
 
 		case CU_NTSC_CCFREQ:
 			m_shader->set_float("CCValue", options->yiq_cc);
@@ -2884,9 +2893,6 @@ void uniform::update()
 
 		case CU_PHOSPHOR_LIFE:
 			m_shader->set_vector("Phosphor", 3, options->phosphor);
-			break;
-		case CU_PHOSPHOR_IGNORE:
-			m_shader->set_float("Passthrough", shadersys->phosphor_passthrough ? 1.0f : 0.0f);
 			break;
 
 		case CU_POST_REFLECTION:

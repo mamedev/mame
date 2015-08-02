@@ -2837,9 +2837,7 @@ render_target::~render_target()
 //============================================================
 
 bool render_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
-{
-	D3DFORMAT format = D3DFMT_A8R8G8B8;
-	
+{	
 	HRESULT result;
 	
 	for (int index = 0; index < 2; index++)
