@@ -44,12 +44,13 @@ void ui_menu_command::populate()
 	{
 		for (size_t menu_items = 0; menu_items < text.size(); menu_items++)
 			item_append(text[menu_items].c_str(), NULL, 0, (void *)(FPTR)menu_items);
-
-		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-		customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
 	else
-		item_append("No available command info for this game.", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+		item_append("No available command info for this game.", NULL, MENU_FLAG_DISABLE, NULL);
+
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+
 }
 
 //-------------------------------------------------
@@ -318,16 +319,15 @@ void ui_menu_history_sw::populate()
 			std::string tempbuf = std::string(buffer.substr(xstart[r], xend[r] - xstart[r]));
 			item_append(tempbuf.c_str(), NULL, MENU_FLAG_MEWUI_HISTORY, NULL);
 		}
-
-		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	}
 	else
-		item_append("No available history for this software.", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+		item_append("No available history info for this software.", NULL, MENU_FLAG_DISABLE, NULL);
 
 	// Resume MESS / UME machine if necessary
 	if (!game_paused)
 		machine().resume();
 
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -484,41 +484,29 @@ void ui_menu_dats::populate()
 								item_append(tempstr.c_str(), NULL, MENU_FLAG_MEWUI_HISTORY, NULL);
 							}
 				}
-
-				item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 			}
 			else
-				item_append("No available history info for this game / system.", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
-
+				item_append("No available history info for this machine.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 
 		case MEWUI_MAMEINFO_LOAD:
+			if (!get_data(ui_driver, flags))
+				item_append("No available MameInfo for this game.", NULL, MENU_FLAG_DISABLE, NULL);
+			break;
+
 		case MEWUI_MESSINFO_LOAD:
-			if (get_data(ui_driver, flags))
-				item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-			else
-			{
-				if (flags == MEWUI_MAMEINFO_LOAD)
-					item_append("No available MameInfo for this game.", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
-				else
-					item_append("No available MessInfo for this system.", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
-			}
+			if (!get_data(ui_driver, flags))
+				item_append("No available MessInfo for this system.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 
 		case MEWUI_STORY_LOAD:
-			if (get_data(ui_driver, MEWUI_STORY_LOAD))
-				item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-			else
-				item_append("No available mamescore for this game.", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
-
+			if (!get_data(ui_driver, MEWUI_STORY_LOAD))
+				item_append("No available mamescore for this game.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 
 		case MEWUI_SYSINFO_LOAD:
-			if (get_data(ui_driver, MEWUI_SYSINFO_LOAD))
-				item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-			else
-				item_append("No available sysinfo for this system.", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
-
+			if (!get_data(ui_driver, MEWUI_SYSINFO_LOAD))
+				item_append("No available sysinfo for this system.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 	}
 
@@ -526,6 +514,7 @@ void ui_menu_dats::populate()
 	if (!game_paused)
 		machine().resume();
 
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
