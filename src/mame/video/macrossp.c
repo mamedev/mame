@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "includes/macrossp.h"
 
-#define DEBUG_KEYS 0
+//#define DEBUG_KEYS 1
 
 /*
 Sprite list is drawn backwards, and priorities with backgrounds are not transitive
@@ -18,22 +18,19 @@ Sprite list is drawn backwards, and priorities with backgrounds are not transiti
 0x03ff0000 - global scrolly
 0x90000000 - enable? Always 0x9
 
-[1] - zoom params
-0xffff0000 - starty
-0x0000ffff - startx
+[1] - ???
+0xffff0000 - another scrolly register, mainly used when zooming. unused by emulation
+0x0000ffff - another scrollx register, mainly used when zooming. unused by emulation
 
 [2] - zoom params
 0xf0000000 - zoom enable (== 0xe, not == 0x2). Presumably one bit for x and y enable
-0x00ff0000 - inxy
+0x00ff0000 - incy (0x40 is 1:1, incx is in lineram)
 
-Interesting test cases:
+Interesting test cases (macrossp, quizmoon doens't use tilemap zoom):
 1) Title screen logo zoom
 2) Second level, as zoom into end of canyon
 3) Second level, as doors open to revels tracks/blue background for boss
 4) Boss should go under bridge on level 4 when he first appears
-
-Not bugs:
-* It looks like the level 2 boss has wrong priorities versus the background (tiles weaving in and out), but that's just because of the scrolling problems on zoomed tilemaps
 
 */
 
@@ -337,8 +334,8 @@ void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, co
 	{
 		int startx=0, starty=0, incy, incx;
 
-		startx += (vr[1] & 0x0000ffff) << 16;
-		starty += (vr[1] & 0xffff0000) >> 0;
+		startx = ((vr[0] & 0x000003ff) << 16 );
+		starty = ((vr[0] & 0x03ff0000) >> 0);
 		incy = (vr[2] & 0x00ff0000) >> 6;
 
 		if (line&1)
@@ -348,16 +345,15 @@ void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, co
 
 		incx <<= 10;
 
-		/* WRONG! */
 		/* scroll register contain position relative to the center of the screen, so adjust */
-		startx -= (368/2) * incx;
-		starty -= (240/2) * incy;
+		startx -= (368/2) * (incx - 0x10000);
+		starty -= (240/2) * (incy - 0x10000);
 
-		/* The global scroll registers play a part here - since they must be used to part the doors on level 2 */
-#if 0
-		startx += ((vr[0] & 0x000003ff) << 16 );
-		starty += ((vr[0] & 0x03ff0000) >> 0);
-#endif
+// previous logic, which gives mostly comparable results, vr[1] is now unused
+//		startx = (vr[1] & 0x0000ffff) << 16;
+//		starty = (vr[1] & 0xffff0000) >> 0;
+//		startx -= (368/2) * incx;
+//		starty -= (240/2) * incy;
 
 		tm->draw_roz(screen, bitmap, cliprect,
 				startx,starty,incx,0,0,incy,
@@ -435,6 +431,7 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 
 	if(sprites) draw_sprites(screen, bitmap, cliprect);
 
+	
 #if 0
 popmessage  ("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",
 m_scra_videoregs[0]&0xffffffff, // yyyyxxxx
