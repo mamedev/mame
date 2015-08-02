@@ -356,11 +356,11 @@ void nl_convert_spice_t::process_line(const pstring &line)
 	}
 }
 
-
+//FIXME: should accept a stream as well
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
-	eagle_tokenizer tok(*this);
-	tok.reset(contents.cstr());
+	pistringstream istrm(contents);
+	eagle_tokenizer tok(*this, istrm);
 
 	out("NETLIST_START(dummy)\n");
 	add_term("GND", "GND");

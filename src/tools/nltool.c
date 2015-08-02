@@ -192,11 +192,11 @@ public:
 		m_setup->init();
 	}
 
-	void read_netlist(const char *buffer, pstring name)
+	void read_netlist(const pstring &filename, const pstring &name)
 	{
 		// read the netlist ...
 
-		m_setup->register_source(palloc(netlist::netlist_source_mem_t(buffer)));
+		m_setup->register_source(palloc(netlist::source_file_t(filename)));
 		m_setup->include(name);
 		log_setup();
 
@@ -278,7 +278,7 @@ struct input_t
 	{
 		char buf[400];
 		double t;
-		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
+		int e = line.scanf("%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
 			throw netlist::fatalerror_e("error %d scanning line %s\n", e, line.cstr());
 		m_time = netlist::netlist_time::from_double(t);
@@ -310,16 +310,15 @@ plist_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 	plist_t<input_t> *ret = palloc(plist_t<input_t>());
 	if (fname != "")
 	{
-		pstring_list_t lines(filetobuf(fname) , "\n");
-		for (unsigned i=0; i<lines.size(); i++)
-		{
-			pstring l = lines[i].trim();
+		pifilestream f(fname);
+		do {
+			pstring l = f.readline();
 			if (l != "")
 			{
 				input_t inp(netlist, l);
 				ret->add(inp);
 			}
-		}
+		} while (!f.eof());
 	}
 	return ret;
 }
@@ -331,7 +330,7 @@ static void run(tool_options_t &opts)
 
 	nt.m_opts = &opts;
 	nt.init();
-	nt.read_netlist(filetobuf(opts.opt_file()), opts.opt_name());
+	nt.read_netlist(opts.opt_file(), opts.opt_name());
 
 	plist_t<input_t> *inps = read_input(&nt, opts.opt_inp());
 

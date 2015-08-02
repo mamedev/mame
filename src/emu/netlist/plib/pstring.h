@@ -123,6 +123,8 @@ public:
 
 	const pstring vprintf(va_list args) const;
 
+	int scanf(const char *format, ...) const;
+
 	// static
 	static const pstring sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 	static void resetmem();

@@ -26,13 +26,7 @@
 
 pstring ptokenizer::currentline_str()
 {
-	char buf[300];
-	int bufp = 0;
-	const char *p = m_line_ptr;
-	while (*p && *p != 10)
-		buf[bufp++] = *p++;
-	buf[bufp] = 0;
-	return pstring(buf);
+	return m_cur_line;
 }
 
 
@@ -55,15 +49,17 @@ void ptokenizer::skipeol()
 
 unsigned char ptokenizer::getc()
 {
-	if (*m_px == 10)
+	if (m_px >= m_cur_line.len())
 	{
-		m_line++;
-		m_line_ptr = m_px + 1;
+		if (!m_strm.eof())
+		{
+			m_cur_line = m_strm.readline() + "\n";
+			m_px = 0;
+		}
+		else
+			return 0;
 	}
-	if (*m_px)
-		return *(m_px++);
-	else
-		return *m_px;
+	return m_cur_line[m_px++];
 }
 
 void ptokenizer::ungetc()
@@ -273,6 +269,7 @@ ATTR_COLD void ptokenizer::error(const char *format, ...)
 // ----------------------------------------------------------------------------------------
 
 ppreprocessor::ppreprocessor()
+: m_ifflag(0), m_level(0), m_lineno(0)
 {
 	m_expr_sep.add("!");
 	m_expr_sep.add("(");
@@ -285,7 +282,7 @@ ppreprocessor::ppreprocessor()
 	m_expr_sep.add(" ");
 	m_expr_sep.add("\t");
 
-	m_defines.add(define_t("__PLIB_PREPROCESSOR__", "1"));
+	m_defines.add("__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1"));
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -367,12 +364,11 @@ double ppreprocessor::expr(const pstring_list_t &sexpr, std::size_t &start, int 
 
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
-	for (std::size_t i = 0; i<m_defines.size(); i++)
-	{
-		if (m_defines[i].m_name == name)
-			return &m_defines[i];
-	}
-	return NULL;
+	int idx = m_defines.index_of(name);
+	if (idx >= 0)
+		return &m_defines.value_at(idx);
+	else
+		return NULL;
 }
 
 pstring ppreprocessor::replace_macros(const pstring &line)
@@ -401,91 +397,93 @@ static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstr
 	return pstring(ret.cstr());
 }
 
-pstring ppreprocessor::process(const pstring &contents)
+pstring  ppreprocessor::process_line(const pstring &line)
 {
-	pstringbuffer ret = "";
-	pstring_list_t lines(contents,"\n", false);
-	UINT32 ifflag = 0; // 31 if levels
-	int level = 0;
-
-	std::size_t i=0;
-	while (i<lines.size())
+	pstring lt = line.replace("\t"," ").trim();
+	pstringbuffer ret;
+	m_lineno++;
+	// FIXME ... revise and extend macro handling
+	if (lt.startsWith("#"))
 	{
-		pstring line = lines[i];
-		pstring lt = line.replace("\t"," ").trim();
-		// FIXME ... revise and extend macro handling
-		if (lt.startsWith("#"))
+		pstring_list_t lti(lt, " ", true);
+		if (lti[0].equals("#if"))
 		{
-			pstring_list_t lti(lt, " ", true);
-			if (lti[0].equals("#if"))
+			m_level++;
+			std::size_t start = 0;
+			lt = replace_macros(lt);
+			pstring_list_t t = pstring_list_t::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
+			int val = expr(t, start, 0);
+			if (val == 0)
+				m_ifflag |= (1 << m_level);
+		}
+		else if (lti[0].equals("#ifdef"))
+		{
+			m_level++;
+			if (get_define(lti[1]) == NULL)
+				m_ifflag |= (1 << m_level);
+		}
+		else if (lti[0].equals("#ifndef"))
+		{
+			m_level++;
+			if (get_define(lti[1]) != NULL)
+				m_ifflag |= (1 << m_level);
+		}
+		else if (lti[0].equals("#else"))
+		{
+			m_ifflag ^= (1 << m_level);
+		}
+		else if (lti[0].equals("#endif"))
+		{
+			m_ifflag &= ~(1 << m_level);
+			m_level--;
+		}
+		else if (lti[0].equals("#include"))
+		{
+			// ignore
+		}
+		else if (lti[0].equals("#pragma"))
+		{
+			if (m_ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
 			{
-				level++;
-				std::size_t start = 0;
-				lt = replace_macros(lt);
-				pstring_list_t t = pstring_list_t::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
-				int val = expr(t, start, 0);
-				if (val == 0)
-					ifflag |= (1 << level);
+				if (lti[2].equals("warning"))
+					error("NETLIST: " + catremainder(lti, 3, " "));
 			}
-			else if (lti[0].equals("#ifdef"))
+		}
+		else if (lti[0].equals("#define"))
+		{
+			if (m_ifflag == 0)
 			{
-				level++;
-				if (get_define(lti[1]) == NULL)
-					ifflag |= (1 << level);
+				if (lti.size() != 3)
+					error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
+				m_defines.add(lti[1], define_t(lti[1], lti[2]));
 			}
-			else if (lti[0].equals("#ifndef"))
-			{
-				level++;
-				if (get_define(lti[1]) != NULL)
-					ifflag |= (1 << level);
-			}
-			else if (lti[0].equals("#else"))
-			{
-				ifflag ^= (1 << level);
-			}
-			else if (lti[0].equals("#endif"))
-			{
-				ifflag &= ~(1 << level);
-				level--;
-			}
-			else if (lti[0].equals("#include"))
-			{
-				// ignore
-			}
-			else if (lti[0].equals("#pragma"))
-			{
-				if (ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
-				{
-					if (lti[2].equals("warning"))
-						error("NETLIST: " + catremainder(lti, 3, " "));
-				}
-			}
-			else if (lti[0].equals("#define"))
-			{
-				if (ifflag == 0)
-				{
-					if (lti.size() != 3)
-						error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
-					m_defines.add(define_t(lti[1], lti[2]));
-				}
-			}
-			else
-				error(pstring::sprintf("unknown directive on line %" SIZETFMT ": %s\n", SIZET_PRINTF(i), line.cstr()));
 		}
 		else
-		{
-			//if (ifflag == 0 && level > 0)
-			//  fprintf(stderr, "conditional: %s\n", line.cstr());
-			lt = replace_macros(lt);
-			if (ifflag == 0)
-			{
-				ret.cat(lt);
-				ret.cat("\n");
-			}
-		}
-		i++;
+			error(pstring::sprintf("unknown directive on line %d: %s\n", m_lineno, line.cstr()));
 	}
-	return pstring(ret.cstr());
+	else
+	{
+		//if (ifflag == 0 && level > 0)
+		//  fprintf(stderr, "conditional: %s\n", line.cstr());
+		lt = replace_macros(lt);
+		if (m_ifflag == 0)
+		{
+			ret.cat(lt);
+			ret.cat("\n");
+		}
+	}
+	return ret;
+}
+
+
+postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
+{
+	while (!istrm.eof())
+	{
+		pstring line = process_line(istrm.readline());
+		ostrm.writeline(line);
+	}
+	return ostrm;
 }
 
 

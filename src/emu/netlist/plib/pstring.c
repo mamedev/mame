@@ -259,6 +259,15 @@ void pstring::resetmem()
 // pstring ...
 // ----------------------------------------------------------------------------------------
 
+int pstring::scanf(const char *format, ...) const
+{
+	va_list ap;
+	va_start(ap, format);
+	int ret = vsscanf(cstr(), format, ap);
+	va_end(ap);
+	return ret;
+}
+
 const pstring pstring::sprintf(const char *format, ...)
 {
 	va_list ap;
@@ -267,7 +276,6 @@ const pstring pstring::sprintf(const char *format, ...)
 	va_end(ap);
 	return ret;
 }
-
 
 int pstring::find(const char *search, int start) const
 {
@@ -314,6 +322,7 @@ void pstringbuffer::resize(const std::size_t size)
 		while (m_size <= size)
 			m_size *= 2;
 		m_ptr = palloc_array(char, m_size);
+		*m_ptr = 0;
 		m_len = 0;
 	}
 	else if (m_size < size)
