@@ -36,26 +36,26 @@ READ8_MEMBER(orao_state::orao_io_r)
 
 		switch(offset) {
 		/* Keyboard*/
-		case 0x07FC : return ioport("LINE0")->read();
-		case 0x07FD : return ioport("LINE1")->read();
-		case 0x07FA : return ioport("LINE2")->read();
-		case 0x07FB : return ioport("LINE3")->read();
-		case 0x07F6 : return ioport("LINE4")->read();
-		case 0x07F7 : return ioport("LINE5")->read();
-		case 0x07EE : return ioport("LINE6")->read();
-		case 0x07EF : return ioport("LINE7")->read();
-		case 0x07DE : return ioport("LINE8")->read();
-		case 0x07DF : return ioport("LINE9")->read();
-		case 0x07BE : return ioport("LINE10")->read();
-		case 0x07BF : return ioport("LINE11")->read();
-		case 0x077E : return ioport("LINE12")->read();
-		case 0x077F : return ioport("LINE13")->read();
-		case 0x06FE : return ioport("LINE14")->read();
-		case 0x06FF : return ioport("LINE15")->read();
-		case 0x05FE : return ioport("LINE16")->read();
-		case 0x05FF : return ioport("LINE17")->read();
-		case 0x03FE : return ioport("LINE18")->read();
-		case 0x03FF : return ioport("LINE19")->read();
+		case 0x07FC : return m_line[0]->read();
+		case 0x07FD : return m_line[1]->read();
+		case 0x07FA : return m_line[2]->read();
+		case 0x07FB : return m_line[3]->read();
+		case 0x07F6 : return m_line[4]->read();
+		case 0x07F7 : return m_line[5]->read();
+		case 0x07EE : return m_line[6]->read();
+		case 0x07EF : return m_line[7]->read();
+		case 0x07DE : return m_line[8]->read();
+		case 0x07DF : return m_line[9]->read();
+		case 0x07BE : return m_line[10]->read();
+		case 0x07BF : return m_line[11]->read();
+		case 0x077E : return m_line[12]->read();
+		case 0x077F : return m_line[13]->read();
+		case 0x06FE : return m_line[14]->read();
+		case 0x06FF : return m_line[15]->read();
+		case 0x05FE : return m_line[16]->read();
+		case 0x05FF : return m_line[17]->read();
+		case 0x03FE : return m_line[18]->read();
+		case 0x03FF : return m_line[19]->read();
 		/* Tape */
 		case 0x07FF :
 					level = m_cassette->input();
