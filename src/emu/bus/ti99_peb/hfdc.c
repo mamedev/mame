@@ -57,7 +57,7 @@
 #include "emu.h"
 #include "peribox.h"
 #include "hfdc.h"
-#include "machine/ti99_hd.h"
+#include "formats/mfm_hd.h"
 #include "formats/ti99_dsk.h"       // Format
 
 #define BUFFER "ram"
@@ -1011,7 +1011,7 @@ static SLOT_INTERFACE_START( hfdc_floppies )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( hfdc_harddisks )
-	SLOT_INTERFACE( "generic", MFMHD_GENERIC )     // Generic high-level emulation
+	SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
 	SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
 	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
 	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
@@ -1032,9 +1032,9 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
 
 	// NB: Hard disks don't go without image (other than floppy drives)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_TI99_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20, MFMHD_TI99_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20, MFMHD_TI99_FORMAT)
+	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
+	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
+	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour

@@ -22,7 +22,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int     m_gfx_bank;

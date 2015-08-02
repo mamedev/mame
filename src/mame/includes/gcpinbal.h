@@ -37,7 +37,6 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-//  UINT16 *    m_paletteram; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t     *m_tilemap[3];

@@ -2599,6 +2599,8 @@ files {
 	MAME_DIR .. "src/mess/drivers/amust.c",     
 	MAME_DIR .. "src/mess/drivers/applix.c",    
 	MAME_DIR .. "src/mess/drivers/attache.c",   
+	MAME_DIR .. "src/mess/drivers/aussiebyte.c",
+	MAME_DIR .. "src/mess/video/aussiebyte.c",
 	MAME_DIR .. "src/mess/drivers/ax20.c",      
 	MAME_DIR .. "src/mess/drivers/beehive.c",   
 	MAME_DIR .. "src/mess/drivers/binbug.c",    

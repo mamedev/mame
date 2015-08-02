@@ -9,8 +9,8 @@ Driver by David Haywood
 
 TODO:
  - what is the 'bios' rom for? it appears to be data tables and is very different between games but we don't map it anywhere
- - priorities
- - zooming is wrong
+ - sprite zooming for chained tiles is inaccurate
+ - zoomed tilemap zoom scrolling is incorrect
  - is alpha REALLY alpha or sprite flicker?
  - convert tilemaps to devices?
 

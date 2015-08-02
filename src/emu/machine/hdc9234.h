@@ -9,8 +9,8 @@
 
 #include "emu.h"
 #include "imagedev/floppy.h"
+#include "imagedev/mfmhd.h"
 #include "fdc_pll.h"
-#include "ti99_hd.h"
 
 extern const device_type HDC9234;
 
@@ -202,6 +202,7 @@ private:
 	line_state m_line_level;
 	int m_event_line;
 	int m_state_after_line;
+	bool m_timed_wait;
 
 	// ==============================================
 	//   Live state machine

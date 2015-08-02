@@ -298,6 +298,8 @@ files {
 	MAME_DIR .. "src/emu/imagedev/floppy.h",
 	MAME_DIR .. "src/emu/imagedev/harddriv.c",
 	MAME_DIR .. "src/emu/imagedev/harddriv.h",
+	MAME_DIR .. "src/emu/imagedev/mfmhd.c",
+	MAME_DIR .. "src/emu/imagedev/mfmhd.h",
 	MAME_DIR .. "src/emu/imagedev/midiin.c",
 	MAME_DIR .. "src/emu/imagedev/midiin.h",
 	MAME_DIR .. "src/emu/imagedev/midiout.c",
@@ -408,11 +410,12 @@ function emuProject(_target, _subtarget)
 
 	dofile(path.join("src", "sound.lua"))
 
+
 	dofile(path.join("src", "video.lua"))
 
 	dofile(path.join("src", "machine.lua"))
 
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["DRIVERS"] == nil) then
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind (LIBTYPE)
@@ -453,8 +456,8 @@ if (_OPTIONS["DRIVERS"] == nil) then
 else
 	dofile(path.join("src", "bus.lua"))
 end
-	
-	--	netlist now defines a project
+
+	--  netlist now defines a project
 	dofile(path.join("src", "netlist.lua"))
 
 

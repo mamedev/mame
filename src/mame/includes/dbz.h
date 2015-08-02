@@ -33,7 +33,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1_videoram;
 	required_shared_ptr<UINT16> m_bg2_videoram;
-//  UINT16 *      m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t    *m_bg1_tilemap;

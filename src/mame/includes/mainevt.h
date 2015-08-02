@@ -24,9 +24,6 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960") { }
 
-	/* memory pointers */
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
-
 	/* video-related */
 	int        m_layer_colorbase[3];
 	int        m_sprite_colorbase;

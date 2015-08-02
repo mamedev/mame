@@ -72,7 +72,7 @@ public:
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	optional_device<decospr_device> m_sprgen;
-//  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
+
 	DECLARE_WRITE16_MEMBER(mirage_mux_w);
 	DECLARE_READ16_MEMBER(mirage_input_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
