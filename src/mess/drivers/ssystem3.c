@@ -124,39 +124,39 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
 {
 	UINT8 data=0xff;
 #if 1 // time switch
-	if (!(m_porta&0x10)) data&=ioport("matrix1")->read()|0xf1;
-	if (!(m_porta&0x20)) data&=ioport("matrix2")->read()|0xf1;
-	if (!(m_porta&0x40)) data&=ioport("matrix3")->read()|0xf1;
-	if (!(m_porta&0x80)) data&=ioport("matrix4")->read()|0xf1;
+	if (!(m_porta&0x10)) data&=m_matrix[1]->read()|0xf1;
+	if (!(m_porta&0x20)) data&=m_matrix[2]->read()|0xf1;
+	if (!(m_porta&0x40)) data&=m_matrix[3]->read()|0xf1;
+	if (!(m_porta&0x80)) data&=m_matrix[4]->read()|0xf1;
 #else
-	if (!(m_porta&0x10)) data&=ioport("matrix1")->read()|0xf0;
-	if (!(m_porta&0x20)) data&=ioport("matrix2")->read()|0xf0;
-	if (!(m_porta&0x40)) data&=ioport("matrix3")->read()|0xf0;
-	if (!(m_porta&0x80)) data&=ioport("matrix4")->read()|0xf0;
+	if (!(m_porta&0x10)) data&=m_matrix[1]->read()|0xf0;
+	if (!(m_porta&0x20)) data&=m_matrix[2]->read()|0xf0;
+	if (!(m_porta&0x40)) data&=m_matrix[3]->read()|0xf0;
+	if (!(m_porta&0x80)) data&=m_matrix[4]->read()|0xf0;
 #endif
 	if (!(m_porta&1)) {
-	if (!(ioport("matrix1")->read()&1)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&1)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&1)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&1)) data&=~0x80;
+	if (!(m_matrix[1]->read()&1)) data&=~0x10;
+	if (!(m_matrix[2]->read()&1)) data&=~0x20;
+	if (!(m_matrix[3]->read()&1)) data&=~0x40;
+	if (!(m_matrix[4]->read()&1)) data&=~0x80;
 	}
 	if (!(m_porta&2)) {
-	if (!(ioport("matrix1")->read()&2)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&2)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&2)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&2)) data&=~0x80;
+	if (!(m_matrix[1]->read()&2)) data&=~0x10;
+	if (!(m_matrix[2]->read()&2)) data&=~0x20;
+	if (!(m_matrix[3]->read()&2)) data&=~0x40;
+	if (!(m_matrix[4]->read()&2)) data&=~0x80;
 	}
 	if (!(m_porta&4)) {
-	if (!(ioport("matrix1")->read()&4)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&4)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&4)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&4)) data&=~0x80;
+	if (!(m_matrix[1]->read()&4)) data&=~0x10;
+	if (!(m_matrix[2]->read()&4)) data&=~0x20;
+	if (!(m_matrix[3]->read()&4)) data&=~0x40;
+	if (!(m_matrix[4]->read()&4)) data&=~0x80;
 	}
 	if (!(m_porta&8)) {
-	if (!(ioport("matrix1")->read()&8)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&8)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&8)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&8)) data&=~0x80;
+	if (!(m_matrix[1]->read()&8)) data&=~0x10;
+	if (!(m_matrix[2]->read()&8)) data&=~0x20;
+	if (!(m_matrix[3]->read()&8)) data&=~0x40;
+	if (!(m_matrix[4]->read()&8)) data&=~0x80;
 	}
 	//  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
 	return data;
@@ -250,22 +250,22 @@ static INPUT_PORTS_START( ssystem3 )
 //PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seems to be direct wired to reset
 //  PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?CLEAR") PORT_CODE(KEYCODE_F1)
 //  PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?ENTER") PORT_CODE(KEYCODE_ENTER)
-	PORT_START( "matrix1" )
+	PORT_START( "matrix.1" )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?1") PORT_CODE(KEYCODE_1_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   C SQ     EP") PORT_CODE(KEYCODE_9)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER?") PORT_CODE(KEYCODE_ENTER)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   C BOARD  MD") PORT_CODE(KEYCODE_0)
-	PORT_START( "matrix2" )
+	PORT_START( "matrix.2" )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?2") PORT_CODE(KEYCODE_2_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 F springer zeitvorgabe") PORT_CODE(KEYCODE_6)  PORT_CODE(KEYCODE_F)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 E laeufer ruecknahme") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CE  interrupt") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_START( "matrix3" )
+	PORT_START( "matrix.3" )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?3") PORT_CODE(KEYCODE_3_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 G bauer zugvorschlaege") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_G)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 D turm #") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 A white") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
-	PORT_START( "matrix4" )
+	PORT_START( "matrix.4" )
 		PORT_DIPNAME( 0x01, 0, "Time") PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_DIPSETTING( 0, DEF_STR(Off) ) PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 H black") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 C dame #50") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)

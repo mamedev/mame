@@ -47,6 +47,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_via6522_0(*this, "via6522_0")
 		, m_configuration(*this, "Configuration")
+		, m_mtrix(*this, "matrix")
 	{ }
 
 	DECLARE_DRIVER_INIT(ssystem3);
@@ -76,6 +77,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<via6522_device> m_via6522_0;
 	required_ioport m_configuration;
+	required_ioport_array<4> m_matrix;
 };
 
 
