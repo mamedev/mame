@@ -7,7 +7,7 @@
 
 #include <solver/nld_solver.h>
 #include "nld_ne555.h"
-#include "../nl_setup.h"
+#include "nl_setup.h"
 
 #define R_OFF (1E20)
 #define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2

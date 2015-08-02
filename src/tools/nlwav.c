@@ -3,6 +3,7 @@
 #include "plib/poptions.h"
 #include "plib/pstring.h"
 #include "plib/plists.h"
+#include "plib/pstream.h"
 #include "nl_setup.h"
 
 class nlwav_options_t : public poptions
@@ -146,8 +147,8 @@ void convert(nlwav_options_t &opts)
 {
 	wav_t wo(opts.opt_out(), 48000);
 
-	FILE *FIN = std::fopen(opts.opt_inp(),"r");
-	if (FIN==NULL)
+	pifilestream fin(opts.opt_inp());
+	if (fin.bad())
 		throw netlist::fatalerror_e("Error opening input file: %s", opts.opt_inp().cstr());
 
 	double dt = 1.0 / (double) wo.sample_rate();
@@ -165,11 +166,12 @@ void convert(nlwav_options_t &opts)
 	//short sample = 0;
 
 
-	while(!std::feof(FIN))
+	while(!fin.eof())
 	{
 #if 1
 		float t = 0.0; float v = 0.0;
-		fscanf(FIN, "%f %f", &t, &v);
+		pstring line = fin.readline();
+		line.scanf("%f %f", &t, &v);
 		while (t >= ct)
 		{
 			outsam += (ct - lt) * cursam;
@@ -220,7 +222,7 @@ void convert(nlwav_options_t &opts)
 	printf("Amp + %f\n", 32000.0 / (maxsam- mean));
 	printf("Amp - %f\n", -32000.0 / (minsam- mean));
 	wo.close();
-	fclose(FIN);
+	fin.close();
 
 }
 

@@ -7,18 +7,18 @@
     by Ted Green & R. Belmont
 
     Known games on this hardware and their security chip IDs:
+        * ITVP-1     (c) 1998     Virtual Pool
         * E2-LED0    (c) 2000     Golden Tee Fore!
         * E2-BBH0    (c) 2000     Big Buck Hunter
         * G42-US-U   (c) 2001     Golden Tee Fore! 2002
         * BB15-US    (c) 2002     Big Buck Hunter: Shooter's Challenge (AKA Big Buck Hunter v1.5)
         * BBH2-US    (c) 2002     Big Buck Hunter II: Sportsman's Paradise
-        * CK1-US     (C) 2002     Carnival King
+        * CK1-US     (c) 2002     Carnival King
         * G43-US-U   (c) 2002     Golden Tee Fore! 2003
         * G44-US-U   (c) 2003     Golden Tee Fore! 2004
         * G45-US-U   (c) 2004     Golden Tee Fore! 2005
         * CW-US-U    (c) 2005     Big Buck Hunter: Call of the Wild
         * G4C-US-U   (c) 2006     Golden Tee Complete
-        * ????????   (c) ????     Virtual Pool (not on IT's website master list but known to exist)
 
     Valid regions: US = USA, CAN = Canada, ENG = England, EUR = Euro, SWD = Sweden, AUS = Australia, NZ  = New Zealand, SA  = South Africa
 

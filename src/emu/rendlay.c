@@ -2304,6 +2304,22 @@ void layout_view::recompute(render_layer_config layerconfig)
 }
 
 
+//-----------------------------
+//  resolve_tags - resolve tags
+//-----------------------------
+
+void layout_view::resolve_tags()
+{
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
+	{
+		for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
+		{
+			curitem->resolve_tags();
+		}
+	}
+}
+
+
 
 //**************************************************************************
 //  LAYOUT VIEW ITEM
@@ -2316,6 +2332,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist)
 	: m_next(NULL),
 		m_element(NULL),
+		m_input_port(NULL),
 		m_input_mask(0),
 		m_screen(NULL),
 		m_orientation(ROT0)
@@ -2365,6 +2382,11 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 		if (m_element == NULL)
 			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.name);
 	}
+
+	if (has_input())
+	{
+		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
+	}
 }
 
 
@@ -2387,6 +2409,7 @@ render_container *layout_view::item::screen_container(running_machine &machine) 
 	return (m_screen != NULL) ? &m_screen->container() : NULL;
 }
 
+
 //-------------------------------------------------
 //  state - fetch state based on configured source
 //-------------------------------------------------
@@ -2404,15 +2427,28 @@ int layout_view::item::state() const
 	// if configured to an input, fetch the input value
 	else if (m_input_tag[0] != 0)
 	{
-		ioport_port *port = m_element->machine().root_device().ioport(m_input_tag.c_str());
-		if (port != NULL)
+		if (m_input_port != NULL)
 		{
-			ioport_field *field = port->field(m_input_mask);
+			ioport_field *field = m_input_port->field(m_input_mask);
 			if (field != NULL)
-				state = ((port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
+				state = ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 		}
 	}
 	return state;
+}
+
+
+//---------------------------------------------
+//  resolve_tags - resolve tags, if any are set
+//---------------------------------------------
+
+
+void layout_view::item::resolve_tags()
+{
+	if (has_input())
+	{
+		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
+	}
 }
 
 

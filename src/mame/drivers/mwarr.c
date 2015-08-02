@@ -78,7 +78,6 @@ public:
 	required_shared_ptr<UINT16> m_mhigh_scrollram;
 	required_shared_ptr<UINT16> m_vidattrram;
 	required_shared_ptr<UINT16> m_spriteram;
-//  UINT16 *m_paletteram;    // currently this uses generic palette handling
 	required_shared_ptr<UINT16> m_mwarr_ram;
 
 	/* video-related */

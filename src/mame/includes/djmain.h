@@ -16,8 +16,7 @@ public:
 		m_k055555(*this, "k055555"),
 		m_ata(*this, "ata"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -32,7 +31,6 @@ public:
 	const UINT8 *m_ata_user_password;
 	const UINT8 *m_ata_master_password;
 	required_shared_ptr<UINT32> m_obj_ram;
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_WRITE32_MEMBER(sndram_bank_w);
 	DECLARE_READ32_MEMBER(sndram_r);
 	DECLARE_WRITE32_MEMBER(sndram_w);
@@ -76,6 +74,5 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
 	K056832_CB_MEMBER(tile_callback);
 };

@@ -269,6 +269,7 @@ Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 #include "emu.h"
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
+#include "machine/ns10crypt.h"
 
 class namcos10_state : public driver_device
 {
@@ -283,7 +284,8 @@ public:
 	DECLARE_WRITE16_MEMBER(bank_w);
 
 	// memn variant interface
-	DECLARE_READ16_MEMBER (nand_status_r);
+	DECLARE_WRITE16_MEMBER(crypto_switch_w);
+	DECLARE_READ16_MEMBER(nand_status_r);
 	DECLARE_WRITE8_MEMBER(nand_address1_w);
 	DECLARE_WRITE8_MEMBER(nand_address2_w);
 	DECLARE_WRITE8_MEMBER(nand_address3_w);
@@ -301,6 +303,7 @@ private:
 	UINT32 bank_base;
 	UINT32 nand_address;
 	UINT16 block[0x1ff];
+	ns10_decrypter_device* decrypter;
 
 	UINT16 nand_read( UINT32 address );
 	UINT16 nand_read2( UINT32 address );
@@ -401,6 +404,14 @@ ADDRESS_MAP_END
 // Block access to the nand.  Something strange is going on with the
 // status port.  Interaction with the decryption is unclear at best.
 
+WRITE16_MEMBER(namcos10_state::crypto_switch_w)
+{
+	if (BIT(data, 15) != 0)
+		decrypter->activate();
+	else
+		decrypter->deactivate();
+}
+
 READ16_MEMBER(namcos10_state::nand_status_r )
 {
 	return 0;
@@ -451,7 +462,10 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
 
-	return data;
+	if (decrypter->is_active())
+		return decrypter->decrypt(data);
+	else
+		return data;
 }
 
 void namcos10_state::nand_copy( UINT32 *dst, UINT32 address, int len )
@@ -475,8 +489,7 @@ READ16_MEMBER(namcos10_state::nand_block_r)
 }
 
 static ADDRESS_MAP_START( namcos10_memn_map, AS_PROGRAM, 32, namcos10_state )
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(key_w, 0x0000ffff)
-
+	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ16(nand_status_r, 0x0000ffff)
 	AM_RANGE(0x1f410000, 0x1f410003) AM_WRITE8(nand_address1_w, 0x000000ff)
 	AM_RANGE(0x1f420000, 0x1f420003) AM_WRITE8(nand_address2_w, 0x000000ff)
@@ -492,17 +505,18 @@ void namcos10_state::memn_driver_init(  )
 {
 	UINT8 *BIOS = (UINT8 *)memregion( "maincpu:rom" )->base();
 	nand_base = (UINT8 *)memregion( "user2" )->base();
+	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 
 	nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
 	nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
 }
 
-static void decrypt_bios( running_machine &machine, const char *regionName, int start, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
+static void decrypt_bios( running_machine &machine, const char *regionName, int start, int end, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
 	int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0 )
 {
 	memory_region *region = machine.root_device().memregion( regionName );
 	UINT16 *BIOS = (UINT16 *)( region->base() + start );
-	int len = (region->bytes()-start)/2;
+	int len = (end - start) / 2;
 
 	for( int i = 0; i < len; i++ )
 	{
@@ -513,66 +527,81 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
-	decrypt_bios( machine(), "maincpu:rom", 0, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3 );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "maincpu:rom", 0, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,gjspace)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilrg)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,startrgn)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9 );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x008400, 0x028000, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
+	decrypt_bios(machine(), "user2", 0x0b4000, 0xfdc000, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
+	decrypt_bios(machine(), "user2", 0x1000000, regSize, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,gamshara)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,gunbalna)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xa, 0xb );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xa, 0xb);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9 );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,panikuru)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9 );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
 	memn_driver_init();
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,konotako)
 {
-	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa );
+	int regSize = machine().root_device().memregion("user2")->bytes();
+	decrypt_bios(machine(), "user2", 0x008400, 0x028000, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
+	decrypt_bios(machine(), "user2", 0x0b4000, 0xfdc000, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
+	decrypt_bios(machine(), "user2", 0x1000000, regSize, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
 	memn_driver_init();
 }
 
@@ -613,6 +642,16 @@ static MACHINE_CONFIG_START( namcos10_memn, namcos10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(ns10_konotako, namcos10_memn)
+/* decrypter device (CPLD in hardware?) */
+MCFG_DEVICE_ADD("decrypter", KONOTAKO_DECRYPTER, 0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(ns10_startrgn, namcos10_memn)
+/* decrypter device (CPLD in hardware?) */
+MCFG_DEVICE_ADD("decrypter", STARTRGN_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos10 )
@@ -750,8 +789,9 @@ ROM_START( ptblank3 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "gnn2a.8e",         0x0000000, 0x1080000, CRC(31b39221) SHA1(7fcb14aaa26c531928a6cd704e746d0e3ae3e031) )
-	ROM_LOAD( "gnn2a.8d",         0x1080000, 0x1080000, CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) )
+	// protection issues preventing the last NAND block to be dumped
+	ROM_LOAD("gnn2a.8e", 0x0000000, 0x1080000, BAD_DUMP CRC(31b39221) SHA1(7fcb14aaa26c531928a6cd704e746d0e3ae3e031))
+	ROM_LOAD( "gnn2a.8d",         0x1080000, 0x1080000, BAD_DUMP CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) )
 ROM_END
 
 ROM_START( gunbalina )
@@ -759,8 +799,9 @@ ROM_START( gunbalina )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "gnn1a.8e",         0x0000000, 0x1080000, CRC(981b03d4) SHA1(1c55458f1b2964afe2cf4e9d84548c0699808e9f) )
-	ROM_LOAD( "gnn1a.8d",         0x1080000, 0x1080000, CRC(6cd343e0) SHA1(dcec44abae1504025895f42fe574549e5010f7d5) )
+	// protection issues preventing the last NAND block to be dumped
+	ROM_LOAD( "gnn1a.8e",         0x0000000, 0x1080000, BAD_DUMP CRC(981b03d4) SHA1(1c55458f1b2964afe2cf4e9d84548c0699808e9f) )
+	ROM_LOAD( "gnn1a.8d",         0x1080000, 0x1080000, BAD_DUMP CRC(6cd343e0) SHA1(dcec44abae1504025895f42fe574549e5010f7d5) )
 ROM_END
 
 ROM_START( chocovdr )
@@ -806,17 +847,17 @@ ROM_START( konotako )
 ROM_END
 
 
-GAME( 2000, mrdrilr2,  0,        namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, gjspace,   0,        namcos10_memn, namcos10, namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2001, knpuzzle,  0,        namcos10_memn, namcos10, namcos10_state, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, chocovdr,  0,        namcos10_memn, namcos10, namcos10_state, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, startrgn,  0,        namcos10_memn, namcos10, namcos10_state, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, nflclsfb,  0,        namcos10_memn, namcos10, namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gamshara,  0,        namcos10_memn, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, konotako,  0,        namcos10_memn, namcos10, namcos10_state, konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, mrdrilr2,  0,        namcos10_memm, namcos10,     namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10_memm, namcos10,     namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10,     namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10,     namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, gjspace,   0,        namcos10_memn, namcos10,     namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10,     namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10,     namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2001, knpuzzle,  0,        namcos10_memn, namcos10,     namcos10_state, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, chocovdr,  0,        namcos10_memn, namcos10,     namcos10_state, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, startrgn,  0,        ns10_startrgn, namcos10,     namcos10_state, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2002, panikuru,  0,        namcos10_memn, namcos10,     namcos10_state, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, nflclsfb,  0,        namcos10_memn, namcos10,     namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gamshara,  0,        namcos10_memn, namcos10,     namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, konotako,  0,        ns10_konotako, namcos10,     namcos10_state, konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

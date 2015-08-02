@@ -44,7 +44,7 @@
 #include "nld_ms_sor_mat.h"
 #include "nld_ms_gmres.h"
 //#include "nld_twoterm.h"
-#include "../nl_lists.h"
+#include "nl_lists.h"
 
 #if HAS_OPENMP
 #include "omp.h"

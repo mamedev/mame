@@ -226,6 +226,7 @@
 		</part>
 	</software>
 
+<!-- Same hashes as trojanl, why is there a new entry?
 	<software name="trojanla" cloneof="trojanl" supported="no">
 		<description>Trojan Legend (Alt Revision)</description>
 		<year>200?</year>
@@ -236,6 +237,7 @@
 			</dataarea>
 		</part>
 	</software>
+-->
 
 
 

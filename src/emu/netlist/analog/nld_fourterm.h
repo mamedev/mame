@@ -9,7 +9,7 @@
 #define NLD_FOURTERM_H_
 
 
-#include "../nl_base.h"
+#include "nl_base.h"
 #include "nld_twoterm.h"
 
 // ----------------------------------------------------------------------------------------

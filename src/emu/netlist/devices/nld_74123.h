@@ -49,9 +49,9 @@
 #ifndef NLD_74123_H_
 #define NLD_74123_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 #include "nld_system.h"
-#include "../analog/nld_twoterm.h"
+#include "analog/nld_twoterm.h"
 
 #define TTL_74123(_name)                                                        \
 		NET_REGISTER_DEV(TTL_74123, _name)

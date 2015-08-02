@@ -1,7 +1,7 @@
 #ifndef NLM_OTHER_H_
 #define NLM_OTHER_H_
 
-#include "../nl_setup.h"
+#include "nl_setup.h"
 
 #ifndef __PLIB_PREPROCESSOR__
 

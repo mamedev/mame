@@ -1683,7 +1683,7 @@ READ8_MEMBER( thomson_state::to7_network_r )
 	if ( offset == 8 )
 	{
 		/* network ID of the computer */
-		UINT8 id = ioport("fconfig")->read() >> 3;
+		UINT8 id = m_io_fconfig->read() >> 3;
 		VLOG(( "%f $%04x to7_network_r: read id $%02X\n", machine().time().as_double(), m_maincpu->pc(), id ));
 		return id;
 	}
@@ -1727,7 +1727,7 @@ UINT8 to7_floppy_bank;
 
 void thomson_state::to7_floppy_init( void* base )
 {
-	membank( THOM_FLOP_BANK )->configure_entries( 0, TO7_NB_FLOP_BANK, base, 0x800 );
+	m_flopbank->configure_entries( 0, TO7_NB_FLOP_BANK, base, 0x800 );
 	save_item(NAME(to7_controller_type));
 	save_item(NAME(to7_floppy_bank));
 	to7_5p14sd_init();
@@ -1741,7 +1741,7 @@ void thomson_state::to7_floppy_init( void* base )
 
 void thomson_state::to7_floppy_reset()
 {
-	to7_controller_type = (ioport("fconfig")->read() ) & 7;
+	to7_controller_type = (m_io_fconfig->read() ) & 7;
 
 	switch ( to7_controller_type )
 	{
@@ -1775,7 +1775,7 @@ void thomson_state::to7_floppy_reset()
 		break;
 	}
 
-	membank( THOM_FLOP_BANK )->set_entry( to7_floppy_bank );
+	m_flopbank->set_entry( to7_floppy_bank );
 }
 
 
@@ -1821,7 +1821,7 @@ WRITE8_MEMBER( thomson_state::to7_floppy_w )
 		if ( offset == 8 )
 		{
 			to7_floppy_bank = 3 + (data & 3);
-			membank( THOM_FLOP_BANK )->set_entry( to7_floppy_bank );
+			m_flopbank->set_entry( to7_floppy_bank );
 			VLOG (( "to7_floppy_w: set CD 90-351 ROM bank to %i\n", data & 3 ));
 		}
 		else
@@ -1851,7 +1851,7 @@ WRITE8_MEMBER( thomson_state::to7_floppy_w )
 void thomson_state::to9_floppy_init( void* int_base, void* ext_base )
 {
 	to7_floppy_init( ext_base );
-	membank( THOM_FLOP_BANK )->configure_entry( TO7_NB_FLOP_BANK, int_base);
+	m_flopbank->configure_entry( TO7_NB_FLOP_BANK, int_base);
 }
 
 
@@ -1867,7 +1867,7 @@ void thomson_state::to9_floppy_reset()
 	{
 		LOG(( "to9_floppy_reset: internal controller\n" ));
 		to7_5p14_reset();
-		membank( THOM_FLOP_BANK )->set_entry( TO7_NB_FLOP_BANK );
+		m_flopbank->set_entry( TO7_NB_FLOP_BANK );
 	}
 }
 

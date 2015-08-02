@@ -144,7 +144,7 @@ files {
 	MAME_DIR .. "src/emu/output.c",
 	MAME_DIR .. "src/emu/output.h",
 	MAME_DIR .. "src/emu/render.c",
-	MAME_DIR .. "src/emu/render.h",	
+	MAME_DIR .. "src/emu/render.h",
 	MAME_DIR .. "src/emu/rendfont.c",
 	MAME_DIR .. "src/emu/rendfont.h",
 	MAME_DIR .. "src/emu/rendlay.c",
@@ -216,7 +216,7 @@ files {
 	MAME_DIR .. "src/emu/validity.h",
 	MAME_DIR .. "src/emu/video.c",
 	MAME_DIR .. "src/emu/video.h",
-	MAME_DIR .. "src/emu/rendersw.inc",	
+	MAME_DIR .. "src/emu/rendersw.inc",
 	MAME_DIR .. "src/emu/debug/debugcmd.c",
 	MAME_DIR .. "src/emu/debug/debugcmd.h",
 	MAME_DIR .. "src/emu/debug/debugcon.c",
@@ -296,6 +296,8 @@ files {
 	MAME_DIR .. "src/emu/imagedev/floppy.h",
 	MAME_DIR .. "src/emu/imagedev/harddriv.c",
 	MAME_DIR .. "src/emu/imagedev/harddriv.h",
+	MAME_DIR .. "src/emu/imagedev/mfmhd.c",
+	MAME_DIR .. "src/emu/imagedev/mfmhd.h",
 	MAME_DIR .. "src/emu/imagedev/midiin.c",
 	MAME_DIR .. "src/emu/imagedev/midiin.h",
 	MAME_DIR .. "src/emu/imagedev/midiout.c",
@@ -340,12 +342,12 @@ dependency {
 	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/noscreens.lh" },
 
 	{ MAME_DIR .. "src/emu/video.c",   GEN_DIR .. "emu/layout/snap.lh" },
-	
+
 }
 
 custombuildtask {
 	{ MAME_DIR .. "src/emu/uismall.png"         , GEN_DIR .. "emu/uismall.fh",  {  MAME_DIR.. "src/build/png2bdc.py",  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting uismall.png...", PYTHON .. " $(1) $(<) temp.bdc", PYTHON .. " $(2) temp.bdc $(@) font_uismall UINT8" }},
-                                                
+
 	layoutbuildtask("emu/layout", "dualhovu"),
 	layoutbuildtask("emu/layout", "dualhsxs"),
 	layoutbuildtask("emu/layout", "dualhuov"),
@@ -377,6 +379,7 @@ function emuProject(_target, _subtarget)
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
+    MAME_DIR .. "src/emu/netlist",
 		MAME_DIR .. "src/mame", -- used for sound amiga
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -400,17 +403,17 @@ function emuProject(_target, _subtarget)
 			MAME_DIR .. "3rdparty/lua/src",
 		}
 	end
-	
+
 	dofile(path.join("src", "cpu.lua"))
 
 	dofile(path.join("src", "sound.lua"))
-	
-	
+
+
 	dofile(path.join("src", "video.lua"))
 
 	dofile(path.join("src", "machine.lua"))
 
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["DRIVERS"] == nil) then
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind (LIBTYPE)
@@ -423,6 +426,7 @@ if (_OPTIONS["DRIVERS"] == nil) then
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
+    MAME_DIR .. "src/emu/netlist",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
@@ -451,11 +455,11 @@ if (_OPTIONS["DRIVERS"] == nil) then
 else
 	dofile(path.join("src", "bus.lua"))
 end
-	
-	--	netlist now defines a project
+
+	--  netlist now defines a project
 	dofile(path.join("src", "netlist.lua"))
 
-	
+
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
 	kind (LIBTYPE)
@@ -487,10 +491,10 @@ end
 			MAME_DIR .. "3rdparty/lua/src",
 		}
 	end
-	
+
 	files {
 		disasm_files
-	}	
+	}
 
 	if #disasm_dependency > 0 then
 		dependency {

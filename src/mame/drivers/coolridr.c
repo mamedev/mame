@@ -280,6 +280,9 @@ to the same bank as defined through A20.
 
 */
 
+// http://www.nicozon.net/watch/sm7834644  (first part is Aqua Stage video?)
+// http://www.system16.com/hardware.php?id=841 has a picture of Aqua Stage showing the wide aspect
+
 
 #include "emu.h"
 #include "cpu/sh2/sh2.h"
@@ -287,6 +290,7 @@ to the same bank as defined through A20.
 #include "sound/scsp.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
+#include "aquastge.lh"
 
 #define CLIPMAXX_FULL (496-1)
 #define CLIPMAXY_FULL (384-1)
@@ -3942,4 +3946,4 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
-GAME( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",MACHINE_NOT_WORKING)
+GAMEL( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",MACHINE_NOT_WORKING, layout_aquastge)

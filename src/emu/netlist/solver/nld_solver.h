@@ -8,8 +8,8 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include "../nl_setup.h"
-#include "../nl_base.h"
+#include "nl_setup.h"
+#include "nl_base.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN

@@ -29,7 +29,6 @@ public:
 	/* memory pointers (used by pipedrm) */
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
-//  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
 	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
 

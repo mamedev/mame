@@ -57,7 +57,7 @@
 #ifndef NLD_7493_H_
 #define NLD_7493_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_7493(_name, _CLKA, _CLKB, _R1, _R2)                                     \
 		NET_REGISTER_DEV(TTL_7493, _name)                                               \

@@ -6,7 +6,7 @@
  */
 
 #include "nld_7493.h"
-#include "../nl_setup.h"
+#include "nl_setup.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

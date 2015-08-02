@@ -34,14 +34,8 @@ ATTR_COLD void parser_t::verror(pstring msg, int line_num, pstring line)
 }
 
 
-bool parser_t::parse(const char *buf, const pstring nlname)
+bool parser_t::parse(const pstring nlname)
 {
-	ppreprocessor prepro;
-
-	pstring processed = prepro.process(buf);
-	m_buf = processed.cstr();
-
-	reset(m_buf);
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
 	char ws[5];

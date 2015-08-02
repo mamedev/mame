@@ -20,9 +20,6 @@ public:
 		m_pc080sn(*this, "pc080sn"),
 		m_pc090oj(*this, "pc090oj") { }
 
-	/* memory pointers */
-//  UINT16 *    paletteram; // this currently uses generic palette handlers
-
 	/* video-related */
 	UINT16      m_sprite_ctrl;
 	UINT16      m_sprites_flipscreen;

@@ -29,7 +29,6 @@ public:
 	required_shared_ptr<UINT16> m_pf2_data;
 	optional_shared_ptr<UINT16> m_control;
 	optional_device<decospr_device> m_sprgen;
-//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* misc */
 	int         m_music_command;

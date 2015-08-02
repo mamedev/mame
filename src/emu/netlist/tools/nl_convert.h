@@ -165,8 +165,8 @@ public:
 	class eagle_tokenizer : public ptokenizer
 	{
 	public:
-		eagle_tokenizer(nl_convert_eagle_t &convert)
-		: ptokenizer(), m_convert(convert)
+		eagle_tokenizer(nl_convert_eagle_t &convert, pistream &strm)
+		: ptokenizer(strm), m_convert(convert)
 		{
 			set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 			set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers

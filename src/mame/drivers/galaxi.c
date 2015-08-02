@@ -68,7 +68,6 @@ public:
 	required_shared_ptr<UINT16> m_bg3_ram;
 	required_shared_ptr<UINT16> m_bg4_ram;
 	required_shared_ptr<UINT16> m_fg_ram;
-//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 //  UINT16 *  m_nvram;        // currently this uses generic nvram handling
 
 	/* video-related */

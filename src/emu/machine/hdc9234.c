@@ -605,9 +605,7 @@ int hdc9234_device::calc_sector_size()
 
 void hdc9234_device::wait_time(emu_timer *tm, int microsec, int next_substate)
 {
-	if (TRACE_DELAY) logerror("%s: Delay by %d microsec\n", tag(), microsec);
-	tm->adjust(attotime::from_usec(microsec));
-	m_substate = next_substate;
+	wait_time(tm, attotime::from_usec(microsec), next_substate);
 }
 
 void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
@@ -615,6 +613,8 @@ void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 	if (TRACE_DELAY) logerror("%s: [%s] Delaying by %4.2f microsecs\n", tag(), ttsn().c_str(), delay.as_double()*1000000);
 	tm->adjust(delay);
 	m_substate = param;
+	m_state_after_line = UNDEF;
+	m_timed_wait = true;
 }
 
 /*
@@ -623,6 +623,7 @@ void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 void hdc9234_device::wait_line(int line, line_state level, int substate, bool stopwrite)
 {
 	bool line_at_level = true;
+	m_timed_wait = false;
 
 	if (line == SEEKCOMP_LINE && (seek_complete() == (level==ASSERT_LINE)))
 	{
@@ -1181,7 +1182,7 @@ void hdc9234_device::restore_drive()
 			break;
 
 		case STEP_ON:
-			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: substate STEP_ON\n", tag());
+			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: [%s] substate STEP_ON\n", tag(), ttsn().c_str());
 
 			// Increase step count
 			m_seek_count++;
@@ -1196,7 +1197,7 @@ void hdc9234_device::restore_drive()
 			break;
 
 		case STEP_OFF:
-			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: substate STEP_OFF\n", tag());
+			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: [%s] substate STEP_OFF\n", tag(), ttsn().c_str());
 			set_bits(m_output2, OUT2_STEPPULSE, false);
 			wait_time(m_timer, step_time(), RESTORE_CHECK);
 			cont = WAIT;
@@ -1698,7 +1699,7 @@ void hdc9234_device::read_track()
 
        7     6     5     4      3     2     1      0
     +-----+-----+-----+------+-----+-----+-----+------+
-    |  0  |  1  |  1  |Normal|RedWC|  Precompensation |
+    |  0  |  1  |  1  |DelMrk|RedWC|  Precompensation |
     +-----+-----+-----+------+-----+-----+-----+------+
 */
 void hdc9234_device::format_track()
@@ -1707,7 +1708,7 @@ void hdc9234_device::format_track()
 	{
 		if (TRACE_FORMAT) logerror("%s: FORMAT TRACK command %02x, head = %d\n", tag(), current_command(), desired_head());
 		m_substate = WAITINDEX0;
-		m_deleted = (current_command() & 0x10)==0;
+		m_deleted = (current_command() & 0x10)!=0;
 		m_reduced_write_current = (current_command() & 0x08)!=0;
 		m_precompensation = (current_command() & 0x07);
 		m_write = true;
@@ -1793,11 +1794,8 @@ void hdc9234_device::format_track()
 
        7      6      5      4      3     2     1      0
     +-----+------+-------+------+-----+-----+-----+------+
-    |  1  |NoSeek|Logical|Normal|RedWC|  Precompensation |
+    |  1  |NoSeek|Logical|DelMrk|RedWC|  Precompensation |
     +-----+------+-------+------+-----+-----+-----+------+
-
-    Write physical: typical value 11000000
-    Write logical : typical value 10110000
 */
 void hdc9234_device::write_sectors()
 {
@@ -1809,7 +1807,7 @@ void hdc9234_device::write_sectors()
 		m_multi_sector = (m_register_w[SECTOR_COUNT] != 1);
 		m_substate = READ_ID;
 
-		m_deleted = (current_command() & 0x10)==0;
+		m_deleted = (current_command() & 0x10)!=0;
 		m_reduced_write_current = (current_command() & 0x08)!=0;
 		m_precompensation = (current_command() & 0x07);
 		// Important for DATA TRANSFER
@@ -2504,9 +2502,9 @@ void hdc9234_device::live_run_until(attotime limit)
 				write_on_track(encode((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
 			}
 			else
-				// Write a filler byte so that the last CRC bit is saved correctly (why actually?)
-				// write_on_track(encode(0xff), 1, WRITE_DONE);
-				m_live_state.state = WRITE_DONE;
+				// Write a filler byte so that the last CRC bit is saved correctly
+				// Without, the last bit of the CRC value may be flipped
+				write_on_track(encode(0xff), 1, WRITE_DONE);
 
 			break;
 
@@ -3785,7 +3783,7 @@ bool hdc9234_device::write_to_mfmhd(const attotime &limit)
 		data = m_live_state.shift_reg;
 		count = 16;
 	}
-	offlimit = m_harddisk->write(m_live_state.time, limit, data);
+	offlimit = m_harddisk->write(m_live_state.time, limit, data, m_precompensation != 0, m_reduced_write_current);
 	if (offlimit) return true;
 
 	m_live_state.bit_counter -= count;
@@ -4176,7 +4174,7 @@ void hdc9234_device::index_handler()
 	{
 		// Live processing waits for INDEX
 		// For harddisk we will continue processing on the falling edge
-		if (!waiting_for_other_line(INDEX_LINE) && (using_floppy() || level == CLEAR_LINE))
+		if (!m_timed_wait && !waiting_for_other_line(INDEX_LINE) && (using_floppy() || level == CLEAR_LINE))
 			reenter_command_processing();
 	}
 }
@@ -4353,6 +4351,7 @@ void hdc9234_device::set_clock_divider(int line, int value)
 void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	live_sync();
+	m_timed_wait = false;
 
 	switch (id)
 	{
@@ -4362,9 +4361,6 @@ void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case COM_TIMER:
 		process_command();
 		break;
-	/* case LIVE_TIMER:
-	    live_run();
-	    break; */
 	}
 }
 
@@ -4425,6 +4421,7 @@ void hdc9234_device::device_reset()
 	m_state_after_line = UNDEF;
 	m_stop_after_index = false;
 	m_substate = UNDEF;
+	m_timed_wait = false;
 	m_track_delta = 0;
 	m_transfer_enabled = true;
 	m_wait_for_index = false;

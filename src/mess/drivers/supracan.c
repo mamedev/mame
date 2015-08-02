@@ -149,7 +149,6 @@ public:
 	DECLARE_READ16_MEMBER(video_r);
 	DECLARE_WRITE16_MEMBER(video_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
 	acan_dma_regs_t m_acan_dma_regs;
 	acan_sprdma_regs_t m_acan_sprdma_regs;
 

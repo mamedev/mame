@@ -63,8 +63,13 @@
 
 ROM_START( dmv_k220 )
 	ROM_REGION(0x4000, "rom", 0)
-	ROM_LOAD( "ncr_32563_diagnostics_rom.bin", 0x0000, 0x2000, CRC(57445768) SHA1(59b615437444789bf10ba6768cd3c43a69c7ed7b))
-	ROM_LOAD( "ncr_32564_diagnostics_rom.bin", 0x2000, 0x2000, CRC(172e0c60) SHA1(eedae538636009a5b86fc78e50a03c72eeb0e73b))
+	ROM_SYSTEM_BIOS(0, "v4", "V 04.00")
+	ROMX_LOAD("34014.u17", 0x0000, 0x2000, CRC(552c2247) SHA1(7babd264ead2e04afe624c3035f211279c203f41), ROM_BIOS(1))
+	ROMX_LOAD("34015.u18", 0x2000, 0x2000, CRC(d714f2d8) SHA1(1a7095401d63951ba9189bc3e384c26996113815), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "v2", "V 02.00")
+	ROMX_LOAD("32563.u17", 0x0000, 0x2000, CRC(57445768) SHA1(59b615437444789bf10ba6768cd3c43a69c7ed7b), ROM_BIOS(2))
+	ROMX_LOAD("32564.u18", 0x2000, 0x2000, CRC(172e0c60) SHA1(eedae538636009a5b86fc78e50a03c72eeb0e73b), ROM_BIOS(2))
 
 	ROM_REGION(0x0080, "prom", 0)
 	ROM_LOAD( "u11.bin", 0x0000, 0x0080, NO_DUMP)   // used for address decoding
@@ -199,7 +204,7 @@ bool dmv_k220_device::read(offs_t offset, UINT8 &data)
 	}
 	else if ((m_portc & 0x02) && offset >= 0xf000 && offset < 0xf800)
 	{
-		data = m_ram->base()[offset];
+		data = m_ram->base()[offset & 0x7ff];
 		return true;
 	}
 
@@ -219,7 +224,7 @@ bool dmv_k220_device::write(offs_t offset, UINT8 data)
 	}
 	else if ((m_portc & 0x02) && offset >= 0xf000 && offset < 0xf800)
 	{
-		m_ram->base()[offset] = data;
+		m_ram->base()[offset & 0x7ff] = data;
 		return true;
 	}
 

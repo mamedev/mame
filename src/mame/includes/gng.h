@@ -24,8 +24,6 @@ public:
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_bgvideoram;
-//  UINT8 *    m_paletteram;  // currently this uses generic palette handling
-//  UINT8 *    m_paletteram2; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;

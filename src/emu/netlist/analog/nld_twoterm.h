@@ -33,7 +33,7 @@
 #ifndef NLD_TWOTERM_H_
 #define NLD_TWOTERM_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 // -----------------------------------------------------------------------------
 // Macros

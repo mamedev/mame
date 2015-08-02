@@ -11,7 +11,7 @@
 #define MAT_CR_H_
 
 #include <algorithm>
-#include "../plib/pconfig.h"
+#include "plib/pconfig.h"
 
 template<int _storage_N>
 struct mat_cr_t

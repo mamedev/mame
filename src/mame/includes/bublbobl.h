@@ -26,7 +26,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_objectram;
 	optional_shared_ptr<UINT8> m_mcu_sharedram;
-//  UINT8 *  paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int      m_video_enable;

@@ -18,6 +18,11 @@ if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS[
 	}
 end
 
+if _OPTIONS["SDL_INI_PATH"]~=nil then
+    defines {
+        "'INI_PATH=\"" .. _OPTIONS["SDL_INI_PATH"] .. "\"'",
+    }
+end
 
 if _OPTIONS["NO_X11"]=="1" then
 	defines {
@@ -125,7 +130,7 @@ elseif _OPTIONS["targetos"]=="linux" then
 		}
 	else
 		buildoptions {
-			backtick("pkg-config --cflags Qt5Widgets"),
+			backtick("pkg-config --cflags QtGui"),
 		}
 	end
 elseif _OPTIONS["targetos"]=="macosx" then

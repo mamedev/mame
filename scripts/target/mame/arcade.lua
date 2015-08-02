@@ -775,6 +775,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
+    MAME_DIR .. "src/emu/netlist",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
 	}
@@ -2085,6 +2086,7 @@ files {
 	MAME_DIR .. "src/mame/machine/namcos1.c",
 	MAME_DIR .. "src/mame/video/namcos1.c",
 	MAME_DIR .. "src/mame/drivers/namcos10.c",
+	MAME_DIR .. "src/mame/machine/ns10crypt.c",
 	MAME_DIR .. "src/mame/drivers/namcos11.c",
 	MAME_DIR .. "src/mame/machine/ns11prot.c",
 	MAME_DIR .. "src/mame/drivers/namcos12.c",

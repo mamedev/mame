@@ -10,8 +10,8 @@
 #ifndef NLD_TRUTHTABLE_H_
 #define NLD_TRUTHTABLE_H_
 
-#include "../nl_base.h"
-#include "../nl_factory.h"
+#include "nl_base.h"
+#include "nl_factory.h"
 
 #define NETLIB_TRUTHTABLE(_name, _nIN, _nOUT, _state)                               \
 	class NETLIB_NAME(_name) : public nld_truthtable_t<_nIN, _nOUT, _state>         \

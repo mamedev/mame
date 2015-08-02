@@ -3,11 +3,8 @@
 #ifndef __DEBUG_QT_MAIN_WINDOW_H__
 #define __DEBUG_QT_MAIN_WINDOW_H__
 
+#include <QtGui/QtGui>
 #include <vector>
-
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QComboBox>
 
 #include "debug/dvdisasm.h"
 
@@ -46,7 +43,7 @@ private slots:
 	void runToCursor(bool changedTo);
 	void rightBarChanged(QAction* changedTo);
 
-	void executeCommandSlot();
+	void executeCommand(bool withClear=true);
 
 	void mountImage(bool changedTo);
 	void unmountImage(bool changedTo);
@@ -75,7 +72,6 @@ private:
 	int m_historyIndex;
 	std::vector<QString> m_inputHistory;
 	void addToHistory(const QString& command);
-	void executeCommand(bool withClear);
 };
 
 

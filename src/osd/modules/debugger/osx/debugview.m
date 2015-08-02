@@ -260,6 +260,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	if (view != NULL) machine->debug_view().free_view(*view);
 	if (font != nil) [font release];
 	if (text != nil) [text release];
 	[super dealloc];

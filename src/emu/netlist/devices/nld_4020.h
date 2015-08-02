@@ -27,7 +27,7 @@
 #ifndef NLD_4020_H_
 #define NLD_4020_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 #include "nld_cmos.h"
 
 /* FIXME: only used in mario.c */

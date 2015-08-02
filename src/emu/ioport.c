@@ -2902,12 +2902,11 @@ g_profiler.start(PROFILER_INPUT);
 	ioport_field *mouse_field = NULL;
 	if (mouse_button && mouse_target != NULL)
 	{
-		const char *tag = NULL;
+		ioport_port *port = NULL;
 		ioport_value mask;
 		float x, y;
-		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, tag, mask, x, y))
+		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, port, mask, x, y))
 		{
-			ioport_port *port = machine().root_device().ioport(tag);
 			if (port != NULL)
 				mouse_field = port->field(mask);
 		}

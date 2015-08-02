@@ -2,17 +2,6 @@
 // copyright-holders:Andrew Gardner
 #define NO_MEM_TRACKING
 
-#include <QtGui/QClipboard>
-#include <QtGui/QMouseEvent>
-#include <QtWidgets/QActionGroup>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QScrollBar>
-#include <QtWidgets/QToolTip>
-#include <QtWidgets/QVBoxLayout>
-
 #include "memorywindow.h"
 
 #include "debug/dvmemory.h"
@@ -41,13 +30,13 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 
 	// The input edit
 	m_inputEdit = new QLineEdit(topSubFrame);
-	connect(m_inputEdit, &QLineEdit::returnPressed, this, &MemoryWindow::expressionSubmitted);
+	connect(m_inputEdit, SIGNAL(returnPressed()), this, SLOT(expressionSubmitted()));
 
 	// The memory space combo box
 	m_memoryComboBox = new QComboBox(topSubFrame);
 	m_memoryComboBox->setObjectName("memoryregion");
 	m_memoryComboBox->setMinimumWidth(300);
-	connect(m_memoryComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MemoryWindow::memoryRegionChanged);
+	connect(m_memoryComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(memoryRegionChanged(int)));
 
 	// The main memory window
 	m_memTable = new DebuggerMemView(DVT_MEMORY, m_machine, this);
@@ -89,7 +78,7 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	chunkActTwo->setShortcut(QKeySequence("Ctrl+2"));
 	chunkActFour->setShortcut(QKeySequence("Ctrl+4"));
 	chunkActOne->setChecked(true);
-	connect(chunkGroup, &QActionGroup::triggered, this, &MemoryWindow::chunkChanged);
+	connect(chunkGroup, SIGNAL(triggered(QAction*)), this, SLOT(chunkChanged(QAction*)));
 
 	// Create a address display group
 	QActionGroup* addressGroup = new QActionGroup(this);
@@ -103,22 +92,22 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	addressActLogical->setShortcut(QKeySequence("Ctrl+G"));
 	addressActPhysical->setShortcut(QKeySequence("Ctrl+Y"));
 	addressActLogical->setChecked(true);
-	connect(addressGroup, &QActionGroup::triggered, this, &MemoryWindow::addressChanged);
+	connect(addressGroup, SIGNAL(triggered(QAction*)), this, SLOT(addressChanged(QAction*)));
 
 	// Create a reverse view radio
 	QAction* reverseAct = new QAction("Reverse View", this);
 	reverseAct->setObjectName("reverse");
 	reverseAct->setCheckable(true);
 	reverseAct->setShortcut(QKeySequence("Ctrl+R"));
-	connect(reverseAct, &QAction::toggled, this, &MemoryWindow::reverseChanged);
+	connect(reverseAct, SIGNAL(toggled(bool)), this, SLOT(reverseChanged(bool)));
 
 	// Create increase and decrease bytes-per-line actions
 	QAction* increaseBplAct = new QAction("Increase Bytes Per Line", this);
 	QAction* decreaseBplAct = new QAction("Decrease Bytes Per Line", this);
 	increaseBplAct->setShortcut(QKeySequence("Ctrl+P"));
 	decreaseBplAct->setShortcut(QKeySequence("Ctrl+O"));
-	connect(increaseBplAct, &QAction::triggered, this, &MemoryWindow::increaseBytesPerLine);
-	connect(decreaseBplAct, &QAction::triggered, this, &MemoryWindow::decreaseBytesPerLine);
+	connect(increaseBplAct, SIGNAL(triggered(bool)), this, SLOT(increaseBytesPerLine(bool)));
+	connect(decreaseBplAct, SIGNAL(triggered(bool)), this, SLOT(decreaseBytesPerLine(bool)));
 
 	// Assemble the options menu
 	QMenu* optionsMenu = menuBar()->addMenu("&Options");

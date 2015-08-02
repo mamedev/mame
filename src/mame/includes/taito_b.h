@@ -42,7 +42,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_pixelram;
-//  UINT16 *      m_paletteram;   // this currently uses generic palette handlers
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
