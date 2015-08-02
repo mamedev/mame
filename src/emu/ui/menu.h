@@ -174,7 +174,7 @@ private:
 	bool m_special_main_menu;
 	running_machine &m_machine;  // machine we are attached to
 
-	void draw(bool customonly, bool noinput);
+	void draw(bool customonly, bool noimage, bool noinput);
 	void draw_text_box();
 	void handle_events();
 	void handle_keys(UINT32 flags);
