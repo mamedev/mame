@@ -183,6 +183,7 @@ void coco_state::device_reset()
 
 	/* reset state */
 	m_dac_output = 0;
+	m_analog_audio_level = 0;
 	m_hiresjoy_ca = false;
 	m_dclg_previous_bit = false;
 	m_dclg_output_h = 0;
@@ -364,7 +365,7 @@ WRITE8_MEMBER( coco_state::pia0_pb_w )
 
 WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
 {
-	update_sound();
+	update_sound();     // analog mux SEL1 is tied to PIA0 CA2
 	poll_keyboard();
 }
 
@@ -376,7 +377,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
 
 WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
 {
-	update_sound();
+	update_sound();     // analog mux SEL2 is tied to PIA0 CB2
 	poll_keyboard();
 }
 
@@ -532,11 +533,8 @@ WRITE_LINE_MEMBER( coco_state::pia1_ca2_w )
 
 WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
 {
+	update_sound();     // SOUND_ENABLE is connected to PIA1 CB2
 	poll_keyboard();
-
-	// Theoretically, I should be calling update_sound() here; however this seems to create
-	// a buzzing in some CoCo software (e.g. - Popcorn).  This is likely because this line
-	// drives the MC14529B MUX, and when disabled the output probably goes hi-Z.
 }
 
 
@@ -689,10 +687,25 @@ void coco_state::update_sound(void)
 	UINT8 cassette_sound = (bCassSoundEnable ? 0x40 : 0);
 	UINT8 cart_sound = (bCartSoundEnable ? 0x40 : 0);
 
-	/* determine the value to send to the DAC */
+	/* determine the value to send to the DAC (this is used by the Joystick read as well as audio out) */
 	m_dac_output = (m_pia_1->a_output() & 0xFC) >> 2;
 	UINT8 dac_sound =  (status == SOUNDMUX_ENABLE ? m_dac_output << 1 : 0);
-	m_dac->write_unsigned8(single_bit_sound + dac_sound + cassette_sound + cart_sound);
+
+	/* The CoCo uses a single DAC for both audio output and joystick axis position measurement.
+	 * To avoid introducing artifacts while reading the axis positions, some software will disable
+	 * the audio output while using the DAC to read the joystick.  On a real CoCo, there is a low-pass
+	 * filter (C57 on the CoCo 3) which will hold the audio level for very short periods of time,
+	 * preventing the introduction of artifacts while the joystick value is being read.  We are not going
+	 * to simulate the exponential decay of a capacitor here.  Instead, we will store and hold the last
+	 * used analog audio output value while the audio is disabled, to avoid introducing artifacts in
+	 * software such as Tandy's Popcorn and Sock Master's Donkey Kong.
+	 */
+	if ((status & SOUNDMUX_ENABLE) != 0)
+	{
+	    m_analog_audio_level = dac_sound + cassette_sound + cart_sound;
+	}
+
+	m_dac->write_unsigned8(single_bit_sound + m_analog_audio_level);
 
 	/* determine the cassette sound status */
 	cassette_state cas_sound = bCassSoundEnable ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED;
@@ -983,7 +996,7 @@ void coco_state::update_prinout(bool prinout)
 
 void coco_state::pia1_pa_changed(void)
 {
-	update_sound();
+	update_sound();     // DAC is connected to PIA1 PA2-PA7
 	poll_keyboard();
 	update_cassout(dac_output());
 	update_prinout(m_pia_1->a_output() & 0x02 ? true : false);
@@ -997,7 +1010,7 @@ void coco_state::pia1_pa_changed(void)
 
 void coco_state::pia1_pb_changed(void)
 {
-	update_sound();
+	update_sound();     // singe_bit_sound is connected to PIA1 PB1
 }
 
 

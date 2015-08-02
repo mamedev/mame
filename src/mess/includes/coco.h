@@ -243,6 +243,10 @@ private:
 	// DAC output
 	UINT8 m_dac_output;
 
+	// remember the last audio sample level from the analog sources (DAC, cart, cassette) so that we don't
+	// introduce step changes when the audio output is enabled/disabled via PIA1 CB2
+	UINT8 m_analog_audio_level;
+
 	// hires interface
 	emu_timer *m_hiresjoy_transition_timer[2];
 	bool m_hiresjoy_ca;
