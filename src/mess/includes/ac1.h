@@ -20,9 +20,10 @@ public:
 		m_cassette(*this, "cassette"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_io_line(*this, "LINE")
+	{ }
 
-	required_device<cassette_image_device> m_cassette;
 	DECLARE_DRIVER_INIT(ac1);
 	virtual void machine_reset();
 	virtual void video_start();
@@ -32,9 +33,13 @@ public:
 	DECLARE_READ8_MEMBER(ac1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ac1_port_a_w);
 	DECLARE_WRITE8_MEMBER(ac1_port_b_w);
+
+private:
+	required_device<cassette_image_device> m_cassette;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_ioport_array<7> m_io_line;
 };
 
 /*----------- defined in video/ac1.c -----------*/
