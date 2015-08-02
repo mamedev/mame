@@ -7,13 +7,6 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dynduke_state::paletteram_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	int color=m_generic_paletteram_16[offset];
-	m_palette->set_pen_color(offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
-}
-
 WRITE16_MEMBER(dynduke_state::background_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);

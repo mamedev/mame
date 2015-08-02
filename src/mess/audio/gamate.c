@@ -193,7 +193,7 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 			size = reg[chan*2] | ((reg[chan*2+1] & 0xf) << 8);
 			if (size)
 			{
-				m_channels[chan].size= (int) (machine().sample_rate() * size*ClockDelay / machine().device("maincpu")->unscaled_clock());
+				m_channels[chan].size= (int) (machine().sample_rate() * size*ClockDelay / m_clock);
 			}
 			else
 			{
@@ -205,7 +205,7 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 			size=data&0x1f;
 			if (size==0)
 				size=1;
-			noise.step= machine().device("maincpu")->unscaled_clock() / (1.0*ClockDelay*machine().sample_rate()*size);
+			noise.step= m_clock / (1.0*ClockDelay*machine().sample_rate()*size);
 			break;
 		case 7:
 			m_channels[Right].full_cycle=data&1;
@@ -229,7 +229,7 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 			size = reg[0xb] | ((reg[0xc]) << 8);
 			if (size==0)
 				size=1;
-			envelope.step= machine().device("maincpu")->unscaled_clock() / (1.0*ClockDelay*machine().sample_rate()*size);
+			envelope.step= m_clock / (1.0*ClockDelay*machine().sample_rate()*size);
 			break;
 		case 0xd:
 			envelope.control=data&0xf;

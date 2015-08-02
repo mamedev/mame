@@ -27,13 +27,13 @@ READ8_MEMBER(ac1_state::ac1_port_b_r)
 
 READ8_MEMBER(ac1_state::ac1_port_a_r)
 {
-	UINT8 line0 = ioport("LINE0")->read();
-	UINT8 line1 = ioport("LINE1")->read();
-	UINT8 line2 = ioport("LINE2")->read();
-	UINT8 line3 = ioport("LINE3")->read();
-	UINT8 line4 = ioport("LINE4")->read();
-	UINT8 line5 = ioport("LINE5")->read();
-	UINT8 line6 = ioport("LINE6")->read();
+	UINT8 line0 = m_io_line[0]->read();
+	UINT8 line1 = m_io_line[1]->read();
+	UINT8 line2 = m_io_line[2]->read();
+	UINT8 line3 = m_io_line[3]->read();
+	UINT8 line4 = m_io_line[4]->read();
+	UINT8 line5 = m_io_line[5]->read();
+	UINT8 line6 = m_io_line[6]->read();
 
 	UINT8 SH    = BNOT(BIT(line6,0));
 	UINT8 CTRL  = BNOT(BIT(line6,1));

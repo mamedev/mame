@@ -8,8 +8,8 @@
 #ifndef NLD_CMOS_H_
 #define NLD_CMOS_H_
 
-#include "../nl_base.h"
-#include "../analog/nld_twoterm.h"
+#include "nl_base.h"
+#include "analog/nld_twoterm.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

@@ -45,7 +45,7 @@
 #ifndef NLD_9310_H_
 #define NLD_9310_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_9310(_name, _CLK, _ENP, _ENT, _CLRQ, _LOADQ, _A, _B, _C, _D)            \
 		NET_REGISTER_DEV(TTL_9310, _name)                                               \

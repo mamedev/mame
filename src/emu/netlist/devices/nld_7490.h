@@ -55,7 +55,7 @@
 #ifndef NLD_7490_H_
 #define NLD_7490_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_7490(_name, _A, _B, _R1, _R2, _R91, _R92)                               \
 		NET_REGISTER_DEV(TTL_7490, _name)                                               \

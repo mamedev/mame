@@ -14,8 +14,8 @@
 
 #include <algorithm>
 
-#include "../solver/nld_ms_direct.h"
-#include "../solver/nld_solver.h"
+#include "solver/nld_ms_direct.h"
+#include "solver/nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

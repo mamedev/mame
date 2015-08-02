@@ -20,6 +20,9 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
+#include "machine/intelfsh.h"
+#include "bus/lpci/pci.h"
+
 
 class bebox_state : public driver_device
 {
@@ -39,7 +42,10 @@ public:
 			m_pic8259_1(*this, "pic8259_1"),
 			m_pic8259_2(*this, "pic8259_2"),
 			m_pit8254(*this, "pit8254"),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_smc37c78(*this, "smc37c78"),
+			m_flash(*this, "flash"),
+			m_pcibus(*this, "pcibus")
 	{
 	}
 
@@ -52,6 +58,9 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
 	required_device<ram_device> m_ram;
+	required_device<smc37c78_device> m_smc37c78;
+	required_device<fujitsu_29f016a_device> m_flash;
+	required_device<pci_bus_device> m_pcibus;
 	UINT32 m_cpu_imask[2];
 	UINT32 m_interrupts;
 	UINT32 m_crossproc_interrupts;

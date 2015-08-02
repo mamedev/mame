@@ -48,6 +48,8 @@ project "netlist"
 		MAME_DIR .. "src/emu/netlist/plib/pstring.h",
 		MAME_DIR .. "src/emu/netlist/plib/pstring.c",
 		MAME_DIR .. "src/emu/netlist/plib/pstring.h",
+    MAME_DIR .. "src/emu/netlist/plib/pstream.c",
+    MAME_DIR .. "src/emu/netlist/plib/pstream.h",
 		MAME_DIR .. "src/emu/netlist/tools/nl_convert.c",
 		MAME_DIR .. "src/emu/netlist/tools/nl_convert.h",
 		MAME_DIR .. "src/emu/netlist/analog/nld_bjt.c",

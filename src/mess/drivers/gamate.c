@@ -25,6 +25,8 @@ public:
 		, m_io_joy(*this, "JOY")
 		, m_palette(*this, "palette")
 		, m_bios(*this, "bios")
+		, m_bank(*this, "bank")
+		, m_bankmulti(*this, "bankmulti")
 	{ }
 
 	DECLARE_PALETTE_INIT(gamate);
@@ -77,6 +79,8 @@ private:
 	required_ioport m_io_joy;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_bios;
+	required_memory_bank m_bank;
+	required_memory_bank m_bankmulti;
 	emu_timer *timer1;
 	emu_timer *timer2;
 	UINT8 bank_multi;
@@ -186,12 +190,12 @@ WRITE8_MEMBER( gamate_state::gamate_video_w )
 WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
 {
 	bank_multi=data;
-	membank("bankmulti")->set_base(m_cart_ptr+0x4000*data+1);
+	m_bankmulti->set_base(m_cart_ptr+0x4000*data+1);
 }
 
 WRITE8_MEMBER( gamate_state::cart_bankswitch_w )
 {
-	membank("bank")->set_base(m_cart_ptr+0x4000*data);
+	m_bank->set_base(m_cart_ptr+0x4000*data);
 }
 
 READ8_MEMBER( gamate_state::gamate_video_r )
@@ -322,8 +326,8 @@ void gamate_state::machine_start()
 	{
 //      m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
 		m_cart_ptr = m_cart->get_rom_base();
-		membank("bankmulti")->set_base(m_cart->get_rom_base()+1);
-		membank("bank")->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset
+		m_bankmulti->set_base(m_cart->get_rom_base()+1);
+		m_bank->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset
 	}
 //  m_bios[0xdf1]=0xea; m_bios[0xdf2]=0xea; // default bios: $47 protection readback
 	card_protection.set=false;
@@ -382,7 +386,7 @@ static MACHINE_CONFIG_START( gamate, gamate_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", GAMATE_SND, 0)
+	MCFG_SOUND_ADD("custom", GAMATE_SND, 4433000/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

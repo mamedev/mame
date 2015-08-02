@@ -1,7 +1,7 @@
 #ifndef NLD_CD4XXX_H_
 #define NLD_CD4XXX_H_
 
-#include "../nl_setup.h"
+#include "nl_setup.h"
 
 /*
  * Devices:

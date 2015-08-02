@@ -22,7 +22,6 @@
 #include "emu.h"
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
-#include "video/crt.h"
 
 
 
@@ -48,8 +47,6 @@ void pdp1_state::video_start()
 
 	const rectangle typewriter_bitmap_bounds(0, typewriter_window_width-1, 0, typewriter_window_height-1);
 	m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_bitmap_bounds);
-
-	m_crt = machine().device<crt_device>("crt");
 }
 
 

@@ -638,9 +638,13 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-bool netlist_source_memregion_t::parse(netlist::setup_t *setup, const pstring name)
+bool netlist_source_memregion_t::parse(netlist::setup_t &setup, const pstring &name)
 {
-	const char *mem = (const char *)downcast<netlist_mame_t &>(setup->netlist()).machine().root_device().memregion(m_name.cstr())->base();
-	netlist::parser_t p(*setup);
-	return p.parse(mem, name);
+	// FIXME: preprocessor should be a stream!
+	memory_region *mem = downcast<netlist_mame_t &>(setup.netlist()).machine().root_device().memregion(m_name.cstr());
+	pimemstream istrm(mem->base(),mem->bytes() );
+	pomemstream ostrm;
+
+	pimemstream istrm2(ppreprocessor().process(istrm, ostrm));
+	return netlist::parser_t(istrm2, setup).parse(name);
 }

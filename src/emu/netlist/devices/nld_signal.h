@@ -8,7 +8,7 @@
 #ifndef NLD_SIGNAL_H_
 #define NLD_SIGNAL_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 // ----------------------------------------------------------------------------------------
 // MACROS

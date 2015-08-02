@@ -435,8 +435,10 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 {
 	UINT16 execute_address, start_address, end_address;
 	int autorun;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, file_type, &execute_address, &start_address, &end_address) == IMAGE_INIT_FAIL)
+	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) == IMAGE_INIT_FAIL)
 		return IMAGE_INIT_FAIL;
 
 	/* is this file executable? */
@@ -444,8 +446,6 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 	{
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
-
-		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
 			return IMAGE_INIT_FAIL;     /* can't run a program if the cartridge isn't in */

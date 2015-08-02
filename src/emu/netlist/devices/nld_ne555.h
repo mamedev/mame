@@ -19,8 +19,8 @@
 #ifndef NLD_NE555_H_
 #define NLD_NE555_H_
 
-#include "../nl_base.h"
-#include "../analog/nld_twoterm.h"
+#include "nl_base.h"
+#include "analog/nld_twoterm.h"
 
 #define NE555(_name)                                                        \
 		NET_REGISTER_DEV(NE555, _name)

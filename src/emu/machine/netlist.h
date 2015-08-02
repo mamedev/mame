@@ -68,7 +68,7 @@ public:
 	{
 	}
 
-	bool parse(netlist::setup_t *setup, const pstring name);
+	bool parse(netlist::setup_t &setup, const pstring &name);
 private:
 	pstring m_name;
 };

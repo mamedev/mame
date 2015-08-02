@@ -26,7 +26,7 @@
 #ifndef NLD_74193_H_
 #define NLD_74193_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_74193(_name)                                              \
 		NET_REGISTER_DEV(TTL_74193, _name)

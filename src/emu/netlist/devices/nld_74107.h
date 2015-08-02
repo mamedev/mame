@@ -59,7 +59,7 @@
 #ifndef NLD_74107_H_
 #define NLD_74107_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
 		NET_REGISTER_DEV(TTL_74107A, _name)                                             \

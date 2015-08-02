@@ -8,7 +8,6 @@
 #include <solver/nld_solver.h>
 #include <cstring>
 #include <algorithm>
-#include <cstdio>
 
 #include "plib/palloc.h"
 

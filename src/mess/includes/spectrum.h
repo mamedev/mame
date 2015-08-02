@@ -203,9 +203,9 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( spectrum );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( spectrum );
 
+	required_device<cpu_device> m_maincpu;
 
 protected:
-	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;

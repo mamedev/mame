@@ -6,7 +6,7 @@
  */
 
 #include "nld_opamps.h"
-#include "../devices/net_lib.h"
+#include "devices/net_lib.h"
 
 NETLIST_START(opamp_lm3900)
 

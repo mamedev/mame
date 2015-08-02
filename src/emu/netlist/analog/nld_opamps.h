@@ -10,8 +10,8 @@
 #ifndef NLD_OPAMPS_H_
 #define NLD_OPAMPS_H_
 
-#include "../nl_base.h"
-#include "../nl_setup.h"
+#include "nl_base.h"
+#include "nl_setup.h"
 #include "nld_twoterm.h"
 #include "nld_fourterm.h"
 
