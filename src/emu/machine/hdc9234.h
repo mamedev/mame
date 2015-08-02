@@ -9,8 +9,8 @@
 
 #include "emu.h"
 #include "imagedev/floppy.h"
+#include "imagedev/mfmhd.h"
 #include "fdc_pll.h"
-#include "ti99_hd.h"
 
 extern const device_type HDC9234;
 

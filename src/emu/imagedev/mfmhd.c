@@ -2,40 +2,288 @@
 // copyright-holders:Michael Zapf
 /*************************************************************************
 
-    Hard disk emulation
+    MFM Hard disk emulation
+    -----------------------
+
+    This is a low-level emulation of a hard disk drive. Unlike high-level
+    emulations which just deliver the data bytes, this implementation
+    considers all bytes on a track, including gaps, CRC, interleave, and more.
+
+    The actual data are stored on a CHD file, however, only as a sequence
+    of sector contents. The other metadata (like gap information, interleave)
+    are stored as metadata information in the CHD.
+
+    To provide the desired low-level emulation grade, the tracks must be
+    reconstructed from the sector contents in the CHD. This is done in
+    the call_load method.
+
+    Usually, more than one sector of a track is read, so when a track is
+    reconstructed, the track image is retained for later accesses.
+
+    This implementation also features a LRU cache for the track images,
+    implemented by the class mfmhd_trackimage_cache, also contained in this
+    source file. The LRU cache stores the most recently accessed track images.
+    When lines must be evicted, they are stored back into the CHD file. This
+    is done in the call_unload method. Beside the sector contents, call_unload
+    also saves track layout metadata which have been detected during usage.
+
+    The architecture can be imagined like this:
+
+    [host system] ---- [controller] --- [harddisk] --- [track cache]
+                                             |
+                                         [format] ---- [CHD]
+
+    Encodings
+    ---------
+    The goal of this implementation is to provide an emulation that is very
+    close to the original, similar to the grade achieved for the floppy
+    emulation. This means that the track image does not contain a byte
+    sequence but a sequence of MFM cell values. Unlike the floppy emulation,
+    we do not define the cells by time intervals but simply by a sequence of
+    bits which represent the MFM cell contents; this is also due to the fact
+    that the cell rate is more than 10 times higher than with floppy media.
+
+    There are four options for encodings which differ by overhead and
+    emulation precision.
+
+    - MFM_BITS: MFM cells are transferred bit by bit for reading and writing
+    - MFM_BYTE: MFM cells are transferred in clusters of 16 cells, thus
+                encoding a full data byte (with 8 clock bits interleaved)
+    - SEPARATED: 16 bits are transferred in one go, with the 8 clock bits in the
+                first byte, and the 8 data bits in the second byte
+    - SEPARATED_SIMPLE: Similar to SEPARATED, but instead of the clock bits,
+                0x00 is used for normal data, and 0xff is used for marks.
+
+    Following the specification of MFM, the data byte 0x67 is encoded as follows:
+
+    MFM_BITS / MFM_BYTE: 1001010010010101 = 0x9495
+    SEPARATED:           10001000 01100111 = 0x8867
+    SEPARATED_SIMPLE:    00000000 01100111 = 0x0067
+
+    The ID Address Mark (0xA1) is encoded this way:
+
+    MFM_BITS / MFM_BYTE: 0100010010001001 = 0x4489
+    SEPARATED:           00001010 10100001 = 0x0AA1
+    SEPARATED_SIMPLE:    11111111 10100001 = 0xFFA1
+
+    If the CPU load by the emulation is already very high, the
+    SEPARATED(_SIMPLE) options are recommended. The MFM_BITS option is closest
+    to the real processing, but causes a high load. MFM_BYTE is a good
+    compromise between speed and precision.
+
+
+    Drive definition
+    ----------------
+    Hard disk drives are defined by subclassing mfm_harddisk_device, as can
+    be seen for the offered Seagate drive implementations.
+
+    The following parameters must be set in the constructor of the subclass:
+
+    - Number of physical cylinders. These can be more than the number of
+      cylinders that are used for data. Some drives have cylinders near the
+      spindle that are used as park positions.
+
+    - Number of cylinders used for data. This is the number of the highest
+      cylinder plus 1 (counting from 0).
+
+    - Landing zone: Cylinder number where the head is parked. Should be higher
+      than the number of usable cylinders.
+
+    - Heads: Number of heads.
+
+    - Time for one cylinder seek step in milliseconds: This is the time the
+      drive heads need to step one cylinder inwards or outwards. This time
+      includes the settling time.
+
+    - Maximum seek time in milliseconds: This is the time the drive needs to
+      seek from cylinder 0 to the maximum cylinder. This time includes the
+      settling time and is typically far less than the one cylinder time
+      multiplied by the number of cylinders, because the settling time only
+      occurs once. These delay values are calculated in call_load.
+
+    If the number of physical cylinders is set to 0, the cylinder and head
+    count in taken from the metadata of the mounted CHD file. This allows for
+    using all kinds of CHD images that can be handled by the controller,
+    without having to define a proper drive for them.
+
+    The predefined drives are
+
+    ST-213: Seagate hard disk drive, 10 MB capacity
+    ST-225: Seagate hard disk drive, 20 MB capacity
+    ST-251: Seagate hard disk drive, 40 MB capacity
+
+    generic: Hard disk with 0 physical cylinders, which can be used for
+             all CHDs that can be handled by the controller.
+
+    The ST-xxx drives require to mount a CHD that exactly matches their
+    geometry.
+
+
+    Track image cache
+    -----------------
+    Since the reconstruction of the track takes some time, and we don't want
+    to create unnecessary effort, track images (sector contents plus all
+    preambles and gaps encoded as selected) are kept in a cache. Whenever a
+    track shall be read, the cache is consulted first to retrieve a copy.
+    If no recent copy is available, the track is loaded from the CHD, set up
+    by the format implementation (see lib/formats/mfm_hd.c). The least
+    recently used track is evicted from the cache and written back to the CHD
+    (also by means of the format implementation).
+
+    When the emulation is stopped, all cache lines are evicted and written back.
+    If the emulation is killed before, cache contents may possibly not be
+    written back, so changes may be lost. To alleviate this issue, the cache
+    writes back one line every 5 seconds so that changes are automatically
+    committed after some time.
+
+    This cache is not related to caches on real hard drives. It is a pure
+    emulation artifact, intended to keep conversion efforts as low as possible.
+
+
+    Interface
+    ---------
+    There are three outgoing lines, used as callbacks to the controller:
+    - READY: asserted when the drive has completed its spinup.
+    - INDEX: asserted when the index hole passes by. Unlike the floppy
+             implementation, this hard disk implementation produces a
+             zero-length pulse (assert/clear). This must be considered for
+             the controller emulation.
+    - SEEK COMPLETE: asserted when the read/write heads have settled over the
+             target cylinder. This line is important for controller that want
+             to employ buffered steps.
+
+    There are two data transfer methods:
+
+    - read(attotime &from_when, const attotime &limit, UINT16 &data)
+
+      Delivers the MFM cells at the given point in time. The cells are returned
+      in the data parameter. The behavior depends on the chosen encoding:
+
+      MFM_BITS: data contains 0x0000 or 0x0001
+      MFM_BYTE: data contains a set of 16 consecutive cells at the given time
+      SEPARATED: data contains the clock bits in the MSB, the data bits in the LSB
+      SEPARATED_SIMPLE: data contains 0x00 or 0xFF in the MSB (normal or mark)
+                        and the data bits in the LSB.
+
+      When the limit is exceeded, the method returns true, otherwise false.
+
+    - write(attotime &from_when, const attotime &limit, UINT16 cdata, bool wpcom=false, bool reduced_wc=false)
+
+      Writes the MFM cells at the given point in time. cdata contains the
+      cells according to the encoding (see above). The controller also has
+      to set wpcom to true to indicate write precompensation, and reduced_wc
+      to true to indicate a reduced write current; otherwise, these settings
+      are assumed to be false. The wpcom and rwc settings do not affect the
+      recording of the data bytes in this emulation, but the drive will store
+      the cylinder with the lowest number where wpcom (or rwc) occured and
+      store this in the CHD.
+
+    These methods are used to move and select the heads:
+
+    - step_w(line_state line)
+    - direction_in_w(line_state line)
+    - headsel_w(int head)
+
+    Some status lines:
+
+    - ready_r
+    - seek_complete_r
+    - trk00_r
+
+    These reflect the values that are also passed by the callback routines
+    listed above and can be used for a polling scheme. Track00 is not available
+    as a callback. It indicates whether track 0 has been reached.
+
+
+    Configuration
+    -------------
+    For a working example please refer to emu/bus/ti99_peb/hfdc.c.
+
+    According to the MAME/MESS concept of slot devices, the settings are
+    passed over the slot to the slot device, in this case, the hard disk drive.
+
+    This means that when we add a slot (the connector), we also have to
+    pass the desired parameters for the drive.
+
+    MCFG_MFM_HARDDISK_CONN_ADD(_tag, _slot_intf, _def_slot, _enc, _spinupms, _cache, _format)
+
+    Specific parameters:
+
+    _enc: Select an encoding from the values as listed above.
+    _spinupms: Number of milliseconds until the drive announces READY. Many
+          drives like the included Seagate drives require a pretty long
+          powerup time (10-20 seconds). In some computer systems, the
+          user is therefore asked to turn on the drive first so that
+          on first access by the system, the drive may have completed
+          its powerup. In MAME/MESS we cannot turn on components earlier,
+          thus we do not define the spinup time inside the drive
+          implementation but at this point.
+    _cache: Number of tracks to be stored in the LRU track cache
+    _format: Format to be used for the drive. Must be a subclass of
+          mfmhd_image_format_t, for example, mfmhd_generic_format. The format
+          is specified by its format creator identifier (e.g. MFMHD_GEN_FORMAT).
+
+    Metadata
+    --------
+    We have three sets of metadata information. The first one is the
+    declaration of cylinders, heads, sectors, and sector size. It is stored
+    by the tag GDDD in the CHD.
+    The second is the declaration of interleave, skew, write precompensation,
+    and reduced write current.
+
+       Write precompensation is a modification of the timing used for the inner
+       cylinders. Although write precompensation (wpcom for short) can be applied
+       at every write operation, it is usually only used starting from some
+       cylinder, going towards the spindle, applied to the whole tracks.
+       The value defined here is the first cylinder where wpcom is applied.
+       Reduced write current (rwc) is a modification of the electrical current
+       used for writing data. The value defined here is the first cylinder where
+       rwc is applied.
+
+       Both wpcom and rwc have an effect on the physical device, but this is not
+       emulated. For that reason we store the information as additional metadata
+       inside the CHD. It is not relevant for the functionality of the emulated
+       hard disk. The write operations
+
+       When wpcom or rwc are not used, their value is defined to be -1.
+
+    Interleave affects the order how sectors are arranged on the track; skew
+    is the number of sectors that the sector sequence is shifted on the
+    next cylinder (cylinder skew) or head (head skew). These values are used
+    to compensate for the delay that occurs when the read/write heads are moved
+    from one cylinder to the next, or switched from one head to the next.
+
+    These parameters are stored by the tag GDDI on the CHD.
+
+    The third set refers to the specification of gaps and sync fields on the
+    track. These values may change only on first use (when undefined) or when
+    the hard disk is reformatted with a different controller or driver. These
+    parameters are also stored by the GDDI tag as a second record.
+
 
     Michael Zapf
-    April 2010
-    February 2012: Rewritten as class
-    April 2015: Rewritten with deeper emulation detail
+    August 2015
 
     References:
     [1] ST225 OEM Manual, Seagate
 
 **************************************************************************/
 
-// TODO: Define format by a file
-
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "harddisk.h"
-
-#include "ti99_hd.h"
+#include "mfmhd.h"
 
 #define TRACE_STEPS 0
 #define TRACE_SIGNALS 0
 #define TRACE_READ 0
 #define TRACE_WRITE 0
 #define TRACE_CACHE 0
-#define TRACE_RWTRACK 0
 #define TRACE_BITS 0
 #define TRACE_DETAIL 0
 #define TRACE_TIMING 0
-#define TRACE_IMAGE 0
 #define TRACE_STATE 1
 #define TRACE_CONFIG 1
-#define TRACE_LAYOUT 0
-#define TRACE_FORMAT 1
 
 enum
 {
@@ -52,10 +300,6 @@ enum
 	STEP_SETTLE
 };
 
-#define TRACKSLOTS 5
-
-#define OFFLIMIT -1
-
 std::string mfm_harddisk_device::tts(const attotime &t)
 {
 	char buf[256];
@@ -69,7 +313,7 @@ mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_t
 		device_slot_card_interface(mconfig, *this)
 {
 	m_spinupms = 10000;
-	m_cachelines = TRACKSLOTS;
+	m_cachelines = 5;
 	m_max_cylinders = 0;
 	m_phys_cylinders = 0;   // We will get this value for generic drives from the image
 	m_max_heads = 0;
@@ -132,6 +376,12 @@ void mfm_harddisk_device::device_stop()
 bool mfm_harddisk_device::call_load()
 {
 	bool loaded = harddisk_image_device::call_load();
+
+	std::string devtag(tag());
+	devtag += ":format";
+
+	m_format->set_tag(devtag.c_str());
+
 	if (loaded==IMAGE_INIT_PASS)
 	{
 		std::string metadata;
@@ -924,620 +1174,3 @@ void mfm_harddisk_connector::device_config_complete()
 }
 
 const device_type MFM_HD_CONNECTOR = &device_creator<mfm_harddisk_connector>;
-
-// ================================================================
-
-void mfmhd_image_format_t::set_layout_params(mfmhd_layout_params param)
-{
-	m_param = m_param_old = param;
-	m_secnumber[0] = m_secnumber[1] = m_secnumber[2] = -1;
-}
-
-void mfmhd_image_format_t::mfm_encode(UINT16* trackimage, int& position, UINT8 byte, int count)
-{
-	mfm_encode_mask(trackimage, position, byte, count, 0x00);
-}
-
-void mfmhd_image_format_t::mfm_encode_a1(UINT16* trackimage, int& position)
-{
-	m_current_crc = 0xffff;
-	mfm_encode_mask(trackimage, position, 0xa1, 1, 0x04);
-	// 0x443b; CRC for A1
-}
-
-void mfmhd_image_format_t::mfm_encode_mask(UINT16* trackimage, int& position, UINT8 byte, int count, int mask)
-{
-	UINT16 encclock = 0;
-	UINT16 encdata = 0;
-	UINT8 thisbyte = byte;
-	bool mark = (mask != 0x00);
-
-	m_current_crc = ccitt_crc16_one(m_current_crc, byte);
-
-	for (int i=0; i < 8; i++)
-	{
-		encdata <<= 1;
-		encclock <<= 1;
-
-		if (m_param.encoding == MFM_BITS || m_param.encoding == MFM_BYTE)
-		{
-			// skip one position for later interleaving
-			encdata <<= 1;
-			encclock <<= 1;
-		}
-
-		if (thisbyte & 0x80)
-		{
-			// Encoding 1 => 01
-			encdata |= 1;
-			m_lastbit = true;
-		}
-		else
-		{
-			// Encoding 0 => x0
-			// If the bit in the mask is set, suppress the clock bit
-			// Also, if we use the simplified encoding, don't set the clock bits
-			if (m_lastbit == false && m_param.encoding != SEPARATED_SIMPLE && (mask & 0x80) == 0) encclock |= 1;
-			m_lastbit = false;
-		}
-		mask <<= 1;
-		// For simplified encoding, set all clock bits to indicate a mark
-		if (m_param.encoding == SEPARATED_SIMPLE && mark) encclock |= 1;
-		thisbyte <<= 1;
-	}
-
-	if (m_param.encoding == MFM_BITS || m_param.encoding == MFM_BYTE)
-		encclock <<= 1;
-	else
-		encclock <<= 8;
-
-	trackimage[position++] = (encclock | encdata);
-
-	// When we write the byte multiple times, check whether the next encoding
-	// differs from the previous because of the last bit
-
-	if (m_param.encoding == MFM_BITS || m_param.encoding == MFM_BYTE)
-	{
-		encclock &= 0x7fff;
-		if ((byte & 0x80)==0 && m_lastbit==false) encclock |= 0x8000;
-	}
-
-	for (int j=1; j < count; j++)
-	{
-		trackimage[position++] = (encclock | encdata);
-		m_current_crc = ccitt_crc16_one(m_current_crc, byte);
-	}
-}
-
-UINT8 mfmhd_image_format_t::mfm_decode(UINT16 raw)
-{
-	unsigned int value = 0;
-
-	for (int i=0; i < 8; i++)
-	{
-		value <<= 1;
-
-		value |= (raw & 0x4000);
-		raw <<= 2;
-	}
-	return (value >> 14) & 0xff;
-}
-
-/*
-    For debugging. Outputs the byte array in a xxd-like way.
-*/
-void mfmhd_image_format_t::showtrack(UINT16* enctrack, int length)
-{
-	for (int i=0; i < length; i+=16)
-	{
-		logerror("%07x: ", i);
-		for (int j=0; j < 16; j++)
-		{
-			logerror("%04x ", enctrack[i+j]);
-		}
-		logerror(" ");
-		logerror("\n");
-	}
-}
-
-// ======================================================================
-//    General MFM HD format
-// ======================================================================
-
-	// According to MDM5 formatting:
-	// gap0=16 gap1=16 gap2=3 gap3=22 sync=13 count=32 size=2
-
-	// HFDC manual: When using the hard disk format, the values for GAP0 and GAP1 must
-	// both be set to the same number and loaded in the appropriate registers.
-
-
-/*
-    Concerning pre-comp and reduced wc:
-    The MDM5 formatter allows for specifying the cylinders for precompensation and reduced write current
-    Default: red_wc = precomp_cyl = bottom(cylinders / 21) * 16
-
-    Cylinder = 0 ... precomp_cyl-1: Format command = 0x62, Write command = 0xc0
-    Cylinder = precomp_cyl ... end: Format command = 0x62, Write command = 0xca
-
-    (format command unaffected; could be a bug)
-
-    C0: no current reduction, disable EARLY/LATE
-    CA: reduced write current, enable EARLY/LATE
-*/
-
-const mfmhd_format_type MFMHD_GEN_FORMAT = &mfmhd_image_format_creator<gen_mfmhd_format>;
-
-enum
-{
-	SEARCH_A1=0,
-	FOUND_A1,
-	DAM_FOUND,
-	CHECK_CRC
-};
-
-/*
-    Calculate the ident byte from the cylinder. The specification does not
-    define idents beyond cylinder 1023, but formatting programs seem to
-    continue with 0xfd for cylinders between 1024 and 2047.
-*/
-UINT8 gen_mfmhd_format::cylinder_to_ident(int cylinder)
-{
-	if (cylinder < 256) return 0xfe;
-	if (cylinder < 512) return 0xff;
-	if (cylinder < 768) return 0xfc;
-	return 0xfd;
-}
-
-/*
-    Returns the linear sector number, given the CHS data.
-
-      C,H,S
-    | 0,0,0 | 0,0,1 | 0,0,2 | ...
-    | 0,1,0 | 0,1,1 | 0,1,2 | ...
-    ...
-    | 1,0,0 | ...
-    ...
-*/
-int gen_mfmhd_format::chs_to_lba(int cylinder, int head, int sector)
-{
-	if ((cylinder < m_param.cylinders) && (head < m_param.heads) && (sector < m_param.sectors_per_track))
-	{
-		return (cylinder * m_param.heads + head) * m_param.sectors_per_track + sector;
-	}
-	else return -1;
-}
-
-chd_error gen_mfmhd_format::load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head)
-{
-	chd_error state = CHDERR_NONE;
-	UINT8 sector_content[1024];     // TODO: should be prepared for max 16K
-
-	int sectorcount = m_param.sectors_per_track;
-	int size = m_param.sector_size;
-	int position = 0; // will be incremented by each encode call
-	int sec_number = 0;
-	int identfield = 0;
-	int cylfield = 0;
-	int headfield = 0;
-	int sizefield = (size >> 7)-1;
-
-	// If we don't have interleave data in the CHD, take a default
-	if (m_param.interleave==0)
-	{
-		m_param.interleave = get_default(MFMHD_IL);
-		m_param.cylskew = get_default(MFMHD_CSKEW);
-		m_param.headskew = get_default(MFMHD_HSKEW);
-	}
-
-	int sec_il_start = (m_param.cylskew * cylinder + m_param.headskew * head) % sectorcount;
-	int delta = (sectorcount + m_param.interleave-1) / m_param.interleave;
-
-	if (TRACE_RWTRACK) logerror("gen_mfmhd_format: MFM HD cache: load track (c=%d,h=%d) from CHD, interleave=%d, cylskew=%d, headskew=%d\n", cylinder, head, m_param.interleave, m_param.cylskew, m_param.headskew);
-
-	m_lastbit = false;
-
-	if (m_param.sync==0)
-	{
-		m_param.gap1 = get_default(MFMHD_GAP1);
-		m_param.gap2 = get_default(MFMHD_GAP2);
-		m_param.gap3 = get_default(MFMHD_GAP3);
-		m_param.sync = get_default(MFMHD_SYNC);
-		m_param.headerlen = get_default(MFMHD_HLEN);
-		m_param.ecctype = get_default(MFMHD_ECC);
-	}
-
-	// Gap 1
-	mfm_encode(trackimage, position, 0x4e, m_param.gap1);
-
-	if (TRACE_LAYOUT) logerror("gen_mfmhd_format: cyl=%d head=%d: sector sequence = ", cylinder, head);
-
-	sec_number = sec_il_start;
-	for (int sector = 0; sector < sectorcount; sector++)
-	{
-		if (TRACE_LAYOUT) logerror("%02d ", sec_number);
-
-		// Sync gap
-		mfm_encode(trackimage, position, 0x00, m_param.sync);
-
-		// Write IDAM
-		mfm_encode_a1(trackimage, position);
-
-		// Write header
-		identfield = cylinder_to_ident(cylinder);
-		cylfield = cylinder & 0xff;
-		headfield = head & 0x0f;
-		if (m_param.headerlen==5)
-			headfield |= ((cylinder & 0x700)>>4);
-
-		mfm_encode(trackimage, position, identfield);
-		mfm_encode(trackimage, position, cylfield);
-		mfm_encode(trackimage, position, headfield);
-		mfm_encode(trackimage, position, sec_number);
-		if (m_param.headerlen==5)
-			mfm_encode(trackimage, position, sizefield);
-
-		// Write CRC for header.
-		int crc = m_current_crc;
-		mfm_encode(trackimage, position, (crc >> 8) & 0xff);
-		mfm_encode(trackimage, position, crc & 0xff);
-
-		// Gap 2
-		mfm_encode(trackimage, position, 0x4e, m_param.gap2);
-
-		// Sync
-		mfm_encode(trackimage, position, 0x00, m_param.sync);
-
-		// Write DAM
-		mfm_encode_a1(trackimage, position);
-		mfm_encode(trackimage, position, 0xfb);
-
-		// Get sector content from CHD
-		int lbaposition = chs_to_lba(cylinder, head, sec_number);
-		if (lbaposition>=0)
-		{
-			chd_error state = chdfile->read_units(lbaposition, sector_content);
-			if (state != CHDERR_NONE) break;
-		}
-		else
-		{
-			logerror("gen_mfmhd_format: Invalid CHS data (%d,%d,%d); not loading from CHD\n", cylinder, head, sector);
-		}
-
-		for (int i=0; i < size; i++)
-			mfm_encode(trackimage, position, sector_content[i]);
-
-		// Write CRC for content.
-		crc = m_current_crc;
-		mfm_encode(trackimage, position, (crc >> 8) & 0xff);
-		mfm_encode(trackimage, position, crc & 0xff);
-
-		// Gap 3
-		mfm_encode(trackimage, position, 0x00, 3);
-		mfm_encode(trackimage, position, 0x4e, m_param.gap3-3);
-
-		// Calculate next sector number
-		sec_number += delta;
-		if (sec_number >= sectorcount)
-		{
-			sec_il_start = (sec_il_start+1) % delta;
-			sec_number = sec_il_start;
-		}
-	}
-	if (TRACE_LAYOUT) logerror("\n");
-
-	// Gap 4
-	if (state == CHDERR_NONE)
-	{
-		// Fill the rest with 0x4e
-		mfm_encode(trackimage, position, 0x4e, tracksize-position);
-		if (TRACE_IMAGE) showtrack(trackimage, tracksize);
-	}
-	return state;
-}
-
-chd_error gen_mfmhd_format::save(chd_file* chdfile, UINT16* trackimage, int tracksize, int current_cylinder, int current_head)
-{
-	if (TRACE_CACHE) logerror("gen_mfmhd_format: write back (c=%d,h=%d) to CHD\n", current_cylinder, current_head);
-
-	UINT8 buffer[1024]; // for header or sector content
-
-	int bytepos = 0;
-	int state = SEARCH_A1;
-	int count = 0;
-	int pos = 0;
-	UINT16 crc = 0;
-	UINT8 byte;
-	bool search_header = true;
-
-	int ident = 0;
-	int cylinder = 0;
-	int head = 0;
-	int sector = 0;
-	int size = 0;
-
-	int headerpos = 0;
-
-	int interleave = 0;
-	int interleave_prec = -1;
-	bool check_interleave = true;
-	bool check_skew = true;
-
-	int gap1 = 0;
-	int ecctype = 0;
-
-	// if (current_cylinder==0 && current_head==0) showtrack(trackimage, tracksize);
-
-	// If we want to detect gaps, we only do it on cylinder 0, head 0
-	// This makes it safer to detect the header length
-	// (There is indeed some chance that we falsely assume a header length of 4
-	// because the two bytes behind happen to be a valid CRC value)
-	if (save_param(MFMHD_GAP1) && current_cylinder==0 && current_head==0)
-	{
-		m_param.gap1 = 0;
-		m_param.gap2 = 0;
-		m_param.gap3 = 0;
-		m_param.sync = 0;
-		// 4-byte headers are used for the IBM-AT format
-		// 5-byte headers are used in other formats
-		m_param.headerlen = 4;
-		m_param.ecctype = 0;
-	}
-
-	// AT format implies 512 bytes per sector
-	int sector_length = 512;
-
-	// Only check once
-	bool countgap1 = (m_param.gap1==0);
-	bool countgap2 = false;
-	bool countgap3 = false;
-	bool countsync = false;
-
-	chd_error chdstate = CHDERR_NONE;
-
-	if (TRACE_IMAGE)
-	{
-		for (int i=0; i < tracksize; i++)
-		{
-			if ((i % 16)==0) logerror("\n%04x: ", i);
-			logerror("%02x ", (m_param.encoding==MFM_BITS || m_param.encoding==MFM_BYTE)? mfm_decode(trackimage[i]) : (trackimage[i]&0xff));
-		}
-		logerror("\n");
-	}
-
-	// We have to go through the bytes of the track and save a sector as soon as one shows up
-
-	while (bytepos < tracksize)
-	{
-		// Decode the next 16 bits
-		if (m_param.encoding==MFM_BITS || m_param.encoding==MFM_BYTE)
-		{
-			byte = mfm_decode(trackimage[bytepos]);
-		}
-		else byte = (trackimage[bytepos] & 0xff);
-
-		switch (state)
-		{
-		case SEARCH_A1:
-			// Counting gaps and sync
-			if (countgap2)
-			{
-				if (byte == 0x4e) m_param.gap2++;
-				else if (byte == 0) { countsync = true; countgap2 = false; }
-			}
-
-			if (countsync)
-			{
-				if (byte == 0) m_param.sync++;
-				else countsync = false;
-			}
-
-			if (countgap3)
-			{
-				if (byte != 0x00 || m_param.gap3 < 4) m_param.gap3++;
-				else countgap3 = false;
-			}
-
-			if (((m_param.encoding==MFM_BITS || m_param.encoding==MFM_BYTE) && trackimage[bytepos]==0x4489)
-				|| (m_param.encoding==SEPARATED && trackimage[bytepos]==0x0aa1)
-				|| (m_param.encoding==SEPARATED_SIMPLE && trackimage[bytepos]==0xffa1))
-			{
-				state = FOUND_A1;
-				count = (search_header? m_param.headerlen : (sector_length+1)) + 2;
-				crc = 0x443b; // init value with a1
-				pos = 0;
-			}
-			bytepos++;
-			break;
-
-		case FOUND_A1:
-			crc = ccitt_crc16_one(crc, byte);
-			// logerror("%s: MFM HD: Byte = %02x, CRC=%04x\n", tag(), byte, crc);
-
-			// Put byte into buffer
-			// but not the data mark and the CRC
-			if (search_header || (count > 2 &&  count < sector_length+3)) buffer[pos++] = byte;
-
-			// Stop counting gap1
-			if (search_header && countgap1)
-			{
-				gap1 = bytepos-1;
-				countgap1 = false;
-			}
-
-			if (--count == 0)
-			{
-				if (crc==0)
-				{
-					if (search_header)
-					{
-						// Found a header
-						ident = buffer[0];
-						cylinder = buffer[1];
-						// For non-PC-AT formats, highest three bits are in the head field
-						if (m_param.headerlen == 5) cylinder |= ((buffer[2]&0x70)<<4);
-						else
-						{
-							logerror("gen_mfmhd_format: Unexpected header size: %d, cylinder=%d, position=%04x\n", m_param.headerlen, cylinder, bytepos);
-							showtrack(trackimage, tracksize);
-						}
-
-						head = buffer[2] & 0x0f;
-						sector = buffer[3];
-						int identexp = cylinder_to_ident(cylinder);
-
-						if (identexp != ident)
-						{
-							logerror("gen_mfmhd_format: Field error; ident = %02x (expected %02x) for sector chs=(%d,%d,%d)\n", ident, identexp, cylinder, head, sector);
-						}
-
-						if (cylinder != current_cylinder)
-						{
-							logerror("gen_mfmhd_format: Sector header of sector %d defines cylinder = %02x (should be %02x)\n", sector, cylinder, current_cylinder);
-						}
-
-						if (head != current_head)
-						{
-							logerror("gen_mfmhd_format: Sector header of sector %d defines head = %02x (should be %02x)\n", sector, head, current_head);
-						}
-
-						// Check skew
-						// We compare the beginning of this track with the track on the next head and the track on the next cylinder
-						if (check_skew && cylinder < 2 && head < 2)
-						{
-							m_secnumber[cylinder*2 + head] = sector;
-							check_skew=false;
-						}
-
-						// Count the sectors for the interleave
-						if (check_interleave)
-						{
-							if (interleave_prec == -1) interleave_prec = sector;
-							else
-							{
-								if (sector == interleave_prec+1) check_interleave = false;
-								interleave++;
-							}
-						}
-
-						if (interleave == 0) interleave = sector - buffer[3];
-
-						// When we have 4-byte headers, the sector length is 512 bytes
-						if (m_param.headerlen == 5)
-						{
-							size = buffer[4];
-							sector_length = 128 << (size&0x07);
-							ecctype = (size&0xf0)>>4;
-						}
-
-						search_header = false;
-						if (TRACE_DETAIL) logerror("gen_mfmhd_format: Found sector chs=(%d,%d,%d)\n", cylinder, head, sector);
-						headerpos = pos;
-						// Start the GAP2 counter (if not already determined)
-						if (m_param.gap2==0) countgap2 = true;
-					}
-					else
-					{
-						// Sector contents
-						// Write the sectors to the CHD
-						int lbaposition = chs_to_lba(cylinder, head, sector);
-						if (lbaposition>=0)
-						{
-							if (TRACE_DETAIL) logerror("gen_mfmhd_format: Writing sector chs=(%d,%d,%d) to CHD\n", current_cylinder, current_head, sector);
-							chdstate = chdfile->write_units(chs_to_lba(current_cylinder, current_head, sector), buffer);
-
-							if (chdstate != CHDERR_NONE)
-							{
-								logerror("gen_mfmhd_format: Write error while writing sector chs=(%d,%d,%d)\n", cylinder, head, sector);
-							}
-						}
-						else
-						{
-							logerror("gen_mfmhd_format: Invalid CHS data in track image: (%d,%d,%d); not saving to CHD\n", cylinder, head, sector);
-						}
-						if (m_param.gap3==0) countgap3 = true;
-						search_header = true;
-					}
-				}
-				else
-				{
-					// Let's test for a 5-byte header
-					if (search_header && m_param.headerlen==4 && current_cylinder==0 && current_head==0)
-					{
-						if (TRACE_DETAIL) logerror("gen_mfmhd_format: CRC error for 4-byte header; trying 5 bytes\n");
-						m_param.headerlen=5;
-						count = 1;
-						bytepos++;
-						break;
-					}
-					else
-					{
-						logerror("gen_mfmhd_format: CRC error in %s of (%d,%d,%d)\n", search_header? "header" : "data", cylinder, head, sector);
-						search_header = true;
-					}
-				}
-				// search next A1
-				state = SEARCH_A1;
-
-				if (!search_header && (pos - headerpos) > 30)
-				{
-					logerror("gen_mfmhd_format: Error; missing DAM; searching next header\n");
-					search_header = true;
-				}
-			}
-			bytepos++;
-			break;
-		}
-	}
-
-	if (check_interleave == false && save_param(MFMHD_IL))
-	{
-		// Successfully determined the interleave
-		m_param.interleave = interleave;
-	}
-
-	if (check_skew == false)
-	{
-		if (m_secnumber[0] != -1)
-		{
-			if (m_secnumber[1] != -1)
-			{
-				if (save_param(MFMHD_HSKEW)) m_param.headskew = m_secnumber[1]-m_secnumber[0];
-				if (TRACE_FORMAT) logerror("gen_mfmhd_format: Determined head skew = %d\n", m_param.headskew);
-			}
-			if (m_secnumber[2] != -1)
-			{
-				if (save_param(MFMHD_CSKEW)) m_param.cylskew = m_secnumber[2]-m_secnumber[0];
-				if (TRACE_FORMAT) logerror("gen_mfmhd_format: Determined cylinder skew = %d\n", m_param.cylskew);
-			}
-		}
-	}
-
-	gap1 -= m_param.sync;
-	ecctype = -1;   // lock to CRC until we have a support for ECC
-
-	if (current_cylinder==0 && current_head==0)
-	{
-		if (save_param(MFMHD_GAP1)) m_param.gap1 = gap1;
-		if (save_param(MFMHD_ECC)) m_param.ecctype = ecctype;
-	}
-	return chdstate;
-}
-
-int gen_mfmhd_format::get_default(mfmhd_param_t type)
-{
-	switch (type)
-	{
-	case MFMHD_IL: return 4;
-	case MFMHD_HSKEW:
-	case MFMHD_CSKEW: return 0;
-	case MFMHD_WPCOM:
-	case MFMHD_RWC: return -1;
-	case MFMHD_GAP1: return 16;
-	case MFMHD_GAP2: return 3;
-	case MFMHD_GAP3: return 18;
-	case MFMHD_SYNC: return 13;
-	case MFMHD_HLEN: return 5;
-	case MFMHD_ECC: return -1;
-	}
-	return -1;
-}

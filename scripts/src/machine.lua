@@ -2562,18 +2562,6 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/ti99_hd.h,MACHINES["TI99_HD"] = true
----------------------------------------------------
-
-if (MACHINES["TI99_HD"]~=null) then
-	files {
-		MAME_DIR .. "src/emu/machine/ti99_hd.c",
-		MAME_DIR .. "src/emu/machine/ti99_hd.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/emu/machine/strata.h,MACHINES["STRATA"] = true
 ---------------------------------------------------
 

@@ -17,9 +17,10 @@
 #define __HFDC__
 
 #include "imagedev/floppy.h"
+#include "imagedev/mfmhd.h"
+
 #include "machine/mm58274c.h"
 #include "machine/hdc9234.h"
-#include "machine/ti99_hd.h"
 
 extern const device_type TI99_HFDC;
 

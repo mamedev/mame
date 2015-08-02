@@ -296,6 +296,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/msx_dsk.h",
 		MAME_DIR .. "src/lib/formats/mfi_dsk.c",
 		MAME_DIR .. "src/lib/formats/mfi_dsk.h",
+		MAME_DIR .. "src/lib/formats/mfm_hd.c",
+		MAME_DIR .. "src/lib/formats/mfm_hd.h",
 		MAME_DIR .. "src/lib/formats/mz_cas.c",
 		MAME_DIR .. "src/lib/formats/mz_cas.h",
 		MAME_DIR .. "src/lib/formats/nanos_dsk.c",
