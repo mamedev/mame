@@ -380,7 +380,7 @@ bool mfm_harddisk_device::call_load()
 	std::string devtag(tag());
 	devtag += ":format";
 
-	m_format->set_tag(devtag.c_str());
+	m_format->set_tag(devtag);
 
 	if (loaded==IMAGE_INIT_PASS)
 	{

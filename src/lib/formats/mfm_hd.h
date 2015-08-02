@@ -146,7 +146,7 @@ enum mfmhd_param_t
 class mfmhd_image_format_t
 {
 public:
-	mfmhd_image_format_t() { m_devtag = "mfmhd_image_format_t"; };
+	mfmhd_image_format_t() { m_devtag = std::string("mfmhd_image_format_t"); };
 	virtual ~mfmhd_image_format_t() {};
 
 	// Load the image.
@@ -168,13 +168,13 @@ public:
 	virtual bool save_param(mfmhd_param_t type) =0;
 
 	// Accept a tag for log output, since this is not a device instance
-	void set_tag(const char* tag) { m_devtag = tag; }
+	void set_tag(std::string tag) { m_devtag = tag; }
 
 protected:
 	bool    m_lastbit;
 	int     m_current_crc;
 	int     m_secnumber[4];     // used to determine the skew values
-	const char* m_devtag;
+	std::string m_devtag;
 
 	mfmhd_layout_params m_param, m_param_old;
 
@@ -188,13 +188,13 @@ protected:
 
 	// Debugging
 	void    showtrack(UINT16* enctrack, int length);
-	const char* tag() { return m_devtag; }
+	virtual const char* tag() { return m_devtag.c_str(); }
 };
 
 class mfmhd_generic_format : public mfmhd_image_format_t
 {
 public:
-	mfmhd_generic_format() { m_devtag = "mfmhd_generic_format"; };
+	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); };
 	chd_error load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head);
 	chd_error save(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head);
 

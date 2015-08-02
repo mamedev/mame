@@ -124,7 +124,7 @@
 #define TRACE_LAYOUT 0
 #define TRACE_IMAGE 0
 #define TRACE_DETAIL 0
-#define TRACE_FORMAT 1
+#define TRACE_FORMAT 0
 
 /*
     Accept the new layout parameters and reset the sector number fields
@@ -692,7 +692,8 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 	{
 		// Successfully determined the interleave
 		m_param.interleave = interleave;
-		if (TRACE_FORMAT) logerror("%s: Determined interleave = %d\n", tag(), m_param.interleave);
+		if (TRACE_FORMAT)
+			if (current_cylinder==0 && current_head==0) logerror("%s: Determined interleave = %d\n", tag(), m_param.interleave);
 	}
 
 	if (check_skew == false)
