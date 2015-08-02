@@ -11,7 +11,7 @@
 #define VECTOR_BASE_H_
 
 #include <algorithm>
-#include "../plib/pconfig.h"
+#include "plib/pconfig.h"
 
 #if 0
 template <unsigned _storage_N>

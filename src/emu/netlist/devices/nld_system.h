@@ -9,10 +9,10 @@
 #ifndef NLD_SYSTEM_H_
 #define NLD_SYSTEM_H_
 
-#include "../nl_setup.h"
-#include "../nl_base.h"
-#include "../nl_factory.h"
-#include "../analog/nld_twoterm.h"
+#include "nl_setup.h"
+#include "nl_base.h"
+#include "nl_factory.h"
+#include "analog/nld_twoterm.h"
 
 // -----------------------------------------------------------------------------
 // Macros

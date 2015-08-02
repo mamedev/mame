@@ -24,7 +24,7 @@
 #ifndef NLD_4066_H_
 #define NLD_4066_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 #include "nld_cmos.h"
 
 #define CD4066_GATE(_name)                                                     \

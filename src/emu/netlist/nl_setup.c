@@ -5,8 +5,7 @@
  *
  */
 
-#include <solver/nld_solver.h>
-#include <cstdio>
+#include "solver/nld_solver.h"
 
 #include "plib/palloc.h"
 #include "nl_base.h"

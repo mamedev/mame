@@ -24,7 +24,7 @@
 #ifndef NLD_7448_H_
 #define NLD_7448_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)                      \
 		NET_REGISTER_DEV(TTL_7448, _name)                                               \

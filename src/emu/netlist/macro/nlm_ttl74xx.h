@@ -1,7 +1,7 @@
 #ifndef NLD_TTL74XX_H_
 #define NLD_TTL74XX_H_
 
-#include "../nl_setup.h"
+#include "nl_setup.h"
 
 #ifndef __PLIB_PREPROCESSOR__
 

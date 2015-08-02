@@ -7,7 +7,7 @@
 
 #include <solver/nld_solver.h>
 #include "nld_mm5837.h"
-#include "../nl_setup.h"
+#include "nl_setup.h"
 
 #define R_LOW (1000)
 #define R_HIGH (1000)

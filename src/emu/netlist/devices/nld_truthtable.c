@@ -6,7 +6,7 @@
  */
 
 #include "nld_truthtable.h"
-#include "../plib/plists.h"
+#include "plib/plists.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

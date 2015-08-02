@@ -28,8 +28,8 @@
 #ifndef NLD_74LS629_H_
 #define NLD_74LS629_H_
 
-#include "../nl_base.h"
-#include "../analog/nld_twoterm.h"
+#include "nl_base.h"
+#include "analog/nld_twoterm.h"
 
 #define SN74LS629(_name, _cap)                                                      \
 		NET_REGISTER_DEV(SN74LS629, _name)                                          \

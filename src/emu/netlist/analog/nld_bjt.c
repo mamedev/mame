@@ -5,9 +5,9 @@
  *
  */
 
-#include <solver/nld_solver.h>
-#include "nld_bjt.h"
-#include "../nl_setup.h"
+#include "solver/nld_solver.h"
+#include "analog/nld_bjt.h"
+#include "nl_setup.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

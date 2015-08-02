@@ -14,10 +14,10 @@
 
 #include <algorithm>
 
-#include "../solver/mat_cr.h"
-#include "../solver/nld_ms_direct.h"
-#include "../solver/nld_solver.h"
-#include "../solver/vector_base.h"
+#include "solver/mat_cr.h"
+#include "solver/nld_ms_direct.h"
+#include "solver/nld_solver.h"
+#include "solver/vector_base.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

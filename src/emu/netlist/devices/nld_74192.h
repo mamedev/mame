@@ -29,7 +29,7 @@
 #ifndef NLD_74192_H_
 #define NLD_74192_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 #include "nld_9316.h"
 
 #define TTL_74192(_name)                                              \
