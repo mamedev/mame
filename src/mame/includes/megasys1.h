@@ -135,6 +135,7 @@ public:
 	DECLARE_DRIVER_INIT(rodland);
 	DECLARE_DRIVER_INIT(edfbl);
 	DECLARE_DRIVER_INIT(stdragona);
+	DECLARE_DRIVER_INIT(stdragonb);
 	TILEMAP_MAPPER_MEMBER(megasys1_scan_8x8);
 	TILEMAP_MAPPER_MEMBER(megasys1_scan_16x16);
 	TILE_GET_INFO_MEMBER(megasys1_get_scroll_tile_info_8x8);
