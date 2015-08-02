@@ -44,7 +44,7 @@ private:
 		LAST_DISPLAY
 	};
 
-	UINT16            cur_video;
+	UINT16            cur_video, cur_prescale;
 	static const char *video_modes[], *video_modes_label[];
 	bool              m_options[LAST_DISPLAY];
 };

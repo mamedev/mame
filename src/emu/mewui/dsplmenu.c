@@ -48,7 +48,6 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 	m_options[SYNCREF_ENABLED] = options.sync_refresh();
 	m_options[WAITSYNC_ENABLED] = options.wait_vsync();
 	m_options[FILTER_ENABLED] = options.filter();
-	m_options[PRESCALE_ENABLED] = (options.prescale() == 1);
 	m_options[GLSL_ENABLED] = options.gl_glsl();
 
 #ifdef MEWUI_WINDOWS
@@ -59,6 +58,8 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 #endif
 
 	int total = ARRAY_LENGTH(video_modes);
+
+	cur_prescale = options.prescale();
 
 	for (cur_video = 0; cur_video < total; cur_video++)
 		if (!core_stricmp(options.video(), video_modes[cur_video]))
@@ -85,7 +86,7 @@ ui_menu_display_options::~ui_menu_display_options()
 	machine().options().set_value(OSDOPTION_GL_GLSL, m_options[GLSL_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_VIDEO, video_modes[cur_video], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_FILTER, m_options[FILTER_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OSDOPTION_PRESCALE, m_options[PRESCALE_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OSDOPTION_PRESCALE, cur_prescale, OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_MULTITHREADING, m_options[MT_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_WINDOW, m_options[WINDOW_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OSDOPTION_KEEPASPECT, m_options[KAR_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
@@ -128,6 +129,14 @@ void ui_menu_display_options::handle()
 				}
 				break;
 			}
+
+			case PRESCALE_ENABLED:
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				{
+					changed = true;
+					(menu_event->iptkey == IPT_UI_LEFT) ? cur_prescale-- : cur_prescale++;
+				}
+				break;
 
 			default:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
@@ -181,8 +190,9 @@ void ui_menu_display_options::populate()
 	            m_options[FILTER_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)FILTER_ENABLED);
 
 	// add Bitmap Prescale option
-	item_append("Bitmap Prescaling", m_options[PRESCALE_ENABLED] ? "On" : "Off",
-	            m_options[PRESCALE_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)PRESCALE_ENABLED);
+	strprintf(v_text, "%d", cur_prescale);
+	arrow_flags = get_arrow_flags(1, 3, cur_prescale);
+	item_append("Bitmap Prescaling", v_text.c_str(), arrow_flags, (void *)PRESCALE_ENABLED);
 
 	// add multithreaded rendering option
 	item_append("Multi-Threaded Rendering", m_options[MT_ENABLED] ? "On" : "Off",
