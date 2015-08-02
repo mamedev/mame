@@ -2358,12 +2358,54 @@ ROM_START( edf )
 	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
+
+ROM_START( edfa )
+	ROM_REGION( 0xc0000, "maincpu", 0 )     /* Main CPU Code: 00000-3ffff & 80000-bffff */
+	ROM_LOAD16_BYTE( "5.b5", 0x00000, 0x20000, CRC(6edd3c53) SHA1(53fd42f417be7ca57bd941abe343e2730a7b3ba9) )
+	ROM_CONTINUE (           0x80000, 0x20000 )
+	ROM_LOAD16_BYTE( "6.b3", 0x00001, 0x20000, CRC(4d8bfa8f) SHA1(9d61f035e7c73a26b5de5380030c511eebeb7ece) )
+	ROM_CONTINUE (           0x80001, 0x20000 )
+
+	// rest from edf:
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
+	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, 64 pin DIP surface scratched, m50747? */
+	ROM_LOAD( "edf.mcu", 0x000000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
+	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+	ROM_LOAD( "edf_m05.rom",  0x000000, 0x080000, CRC(6f47e456) SHA1(823baa9dc4cb2425c64e9332c6ed4678e49d0c7b) )
+
+	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
+	ROM_LOAD( "edf_09.rom",   0x000000, 0x020000, CRC(96e38983) SHA1(a4fb94f15d9a9f7df1645be66fe3e179d0ebf765) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD( "edf_m03.rom",  0x000000, 0x080000, CRC(ef469449) SHA1(bc591e56c5478383eb4bd29f16133c6ba407c22f) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "edf_m02.rom",  0x000000, 0x040000, CRC(fc4281d2) SHA1(67ea324ff359a5d9e7538c08865b5eeebd16704b) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "edf_m01.rom",  0x000000, 0x040000, CRC(9149286b) SHA1(f6c66c5cd50b72c4d401a263c65a8d4ef8cf9221) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type PROM) */
+	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
+
 ROM_START( edfu )
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* Main CPU Code: 00000-3ffff & 80000-bffff */
 	ROM_LOAD16_BYTE( "edf5.b5",  0x000000, 0x020000, CRC(105094d1) SHA1(e962164836756bc20c2b5dc0032042a0219e82d8) )
 	ROM_CONTINUE (               0x080000, 0x020000 )
 	ROM_LOAD16_BYTE( "edf6.b3",  0x000001, 0x020000, CRC(4797de97) SHA1(dcfcc376a49853c938d772808efe421ba4ba24da) )
 	ROM_CONTINUE (               0x080001, 0x020000 )
+
+	// rest from edf:
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
@@ -2429,6 +2471,7 @@ ROM_START( edfbl )
 	ROM_REGION( 0x0200, "proms", 0 ) /* the bootleg has an 82s131 prom like the original, but it isn't confirmed to be the same yet */
 	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
+
 
 /***************************************************************************
 
@@ -4287,7 +4330,8 @@ GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state,  ro
 GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", 0 )
-GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force", 0 )
+GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", 0 )
+GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", 0 )
 GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
 GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      megasys1_state, edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND )
 GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
