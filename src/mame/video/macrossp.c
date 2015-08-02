@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood,Paul Priest
 /* video/macrossp.c */
 
 #include "emu.h"
@@ -24,9 +24,9 @@ Sprite list is drawn backwards, and priorities with backgrounds are not transiti
 
 [2] - zoom params
 0xf0000000 - zoom enable (== 0xe, not == 0x2). Presumably one bit for x and y enable
-0x00ff0000 - incy (0x40 is 1:1, incx is in lineram)
+0x01ff0000 - incy (0x40 is 1:1, incx is in lineram. might be more bits)
 
-Interesting test cases (macrossp, quizmoon doens't use tilemap zoom):
+Interesting test cases (macrossp, quizmoon doesn't use tilemap zoom):
 1) Title screen logo zoom
 2) Second level, as zoom into end of canyon
 3) Second level, as doors open to revels tracks/blue background for boss
@@ -261,9 +261,9 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 		int ymin = 0;
 		int ymax = high+1;
 		int yinc = 1;
-		int yoffst = 0; /* I'm doing this so rounding errors are cumulative, still looks a touch crappy when multiple sprites used together */
+		int yoffst = 0;
 		if(flipy) {
-			yoffst = ((high * yzoom * 16) >> 8);
+			yoffst = (high * yzoom * 16);
 			ymin = high;
 			ymax = -1;	
 			yinc = -1;
@@ -274,7 +274,7 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 		int xinc = 1;
 		int xoffst = 0;
 		if(flipx) {
-			xoffst = ((wide * xzoom * 16) >> 8);
+			xoffst = (wide * xzoom * 16);
 			xmin = wide;
 			xmax = -1;
 			xinc = -1;
@@ -286,15 +286,22 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 			xoffset = xoffst;
 			for (xcnt = xmin; xcnt != xmax; xcnt += xinc)
 			{
+				int fudged_xzoom = xzoom<<8;
+				int fudged_yzoom = yzoom<<8;
+				
+				/* cover seams as don't know exactly how many pixels on target will cover, and can't specify fractional offsets to start */
+				if(xzoom < 0x100) fudged_xzoom += 0x600;
+				if(yzoom < 0x100) fudged_yzoom += 0x600;
+					
 				gfx->prio_zoom_alpha(bitmap,cliprect,tileno+loopno,col,
-									 flipx,flipy,xpos+xoffset,ypos+yoffset,
-									 xzoom*0x100,yzoom*0x100,
+									 flipx,flipy,xpos+(xoffset>>8),ypos+(yoffset>>8),
+									 fudged_xzoom,fudged_yzoom,
 									 screen.priority(),primask,0,alpha);
 
-				xoffset += (((xzoom*16 + (1<<7)) >> 8) * xinc);
+				xoffset += ((xzoom*16) * xinc);
 				loopno++;
 			}
-			yoffset += (((yzoom*16 + (1<<7)) >> 8) * yinc);
+			yoffset += ((yzoom*16) * yinc);
 		}
 
 		source -= 3;
@@ -336,7 +343,7 @@ void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, co
 
 		startx = ((vr[0] & 0x000003ff) << 16 );
 		starty = ((vr[0] & 0x03ff0000) >> 0);
-		incy = (vr[2] & 0x00ff0000) >> 6;
+		incy   = (vr[2] & 0x01ff0000) >> 6;
 
 		if (line&1)
 			incx = (lr[line/2] & 0x0000ffff)>>0;
