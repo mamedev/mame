@@ -329,6 +329,14 @@ MCFG_CPU_PROGRAM_MAP (force68k_mem)
 
 /* P3/Host Port config */
 MCFG_DEVICE_ADD ("aciahost", ACIA6850, 0)
+
+MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE ("rs232host", rs232_port_device, write_txd))
+MCFG_ACIA6850_RTS_HANDLER (DEVWRITELINE ("rs232host", rs232_port_device, write_rts))
+
+MCFG_RS232_PORT_ADD ("rs232host", default_rs232_devices, "null_modem")
+MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("aciahost", acia6850_device, write_rxd))
+MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("aciahost", acia6850_device, write_cts))
+
 MCFG_DEVICE_ADD ("aciahost_clock", CLOCK, ACIA_CLOCK)
 MCFG_CLOCK_SIGNAL_HANDLER (WRITELINE (force68k_state, write_aciahost_clock))
 
@@ -419,13 +427,13 @@ ROM_LOAD16_BYTE ("fccpu1V1.0L.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90
  * DC <expression> <CR>                        Data Conversion
  * DF <CR>                                     Display Formatted registers
  * DU [n] <address1> <address2>[<string>] <CR> Dump memory to object file
- * GO [<address] <CR>                          Execute program
+ * GO or G [<address] <CR>                     Execute program. 
  * GD [<address] <CR>                          Go Direct
  * GT <address> <CR>                           Exec prog: temporary breakpoint
  * HE<CR>                                      Help; display monitor commands
  * LO [n] [;<options] <CR>                     Load Object file
- * MD <address> [<count» <CR>                  Memory Display
- * MM <address> [<data» [;<options» <CR>       Memory Modify
+ * MD <address> [<count>] <CR>                 Memory Display
+ * MM or M <address> [<data<][;<options>] <CR> Memory Modify
  * MS <address> <data1 > <data2> < ... <CR>    Memory Set - starting at addr with data 1. data 2 ...
  * NOBR [<address> ... ] <CR>                  Remove Breakpoint
  * NOPA <CR>                                   Printer Detach (Centronics on PIT/P2)
@@ -433,22 +441,24 @@ ROM_LOAD16_BYTE ("fccpu1V1.0L.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90
  * PA <CR>                                     Printer Attach (Centronics on PIT/P2)
  * PF[n] <CR>                                  Set/display Port Format
  * RM <CR>                                     Register Modify
- * TM [<exit character» <CR>                   Transparent Mode
- * TR [<count] <CR>                            Trace
+ * TM [<exit character>] <CR>                  Transparent Mode
+ * TR OR T [<count] <CR>                       Trace
  * TT <address> <CR>                           Trace: temporary breakpoint
  * VE [n] [<string] <CR>                       Verify memory/object file
  * ----------------------------------------------------------------------------
- * .AO - .A7 [<expression] <CR>                 Display/set address register
- * .00 - .07 [<expression] <CR>                 Display/set data register
- * .RO - .R6 [<expression] <CR>                 Display/set offset register
- * .PC [<expression] <CR>                       Display/set program counter
- * .SR [<expression] <CR>                       Display/set status register
- * .SS [<expression] <CR>                       Display/set supervisor stack
- * .US [<expression] <CR>                       Display/set user stack
+ * .AO - .A7 [<expression] <CR>                Display/set address register
+ * .00 - .07 [<expression] <CR>                Display/set data register
+ * .RO - .R6 [<expression] <CR>                Display/set offset register
+ * .PC [<expression] <CR>                      Display/set program counter
+ * .SR [<expression] <CR>                      Display/set status register
+ * .SS [<expression] <CR>                      Display/set supervisor stack
+ * .US [<expression] <CR>                      Display/set user stack
  * ----------------------------------------------------------------------------
- * MD <address> [<count>]; D1 <CR>             Disassemble memory location
+ * MD <address> [<count>]; DI <CR>             Disassemble memory location
  * MM <address>; DI <CR>                       Disassemble/Assemble memory location
  * ----------------------------------------------------------------------------
+ * Undocumented commands found in ROM table at address 0x80308
+ * .*                                          No WHAT message displayed, no action seen.
  */
 ROM_END
 
