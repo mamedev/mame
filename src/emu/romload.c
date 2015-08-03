@@ -371,8 +371,8 @@ static void determine_bios_rom(romload_private *romdata, device_t *device, const
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
 		{
-			strcatprintf(romdata->errorstring, "%s: invalid bios\n", specbios);
-			romdata->errors++;
+			strcatprintf(romdata->errorstring, "%s: invalid bios, reverting to '1'\n", specbios);
+			romdata->warnings++;
 		}
 
 		/* set to default */
