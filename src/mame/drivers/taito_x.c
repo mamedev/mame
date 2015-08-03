@@ -965,7 +965,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state, kyustrkr_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
