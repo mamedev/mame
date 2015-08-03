@@ -422,7 +422,8 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 		for (int y=0; y<240; y++) {
 			clip.min_y = clip.max_y = y;
 			
-			for(int layer = 0; layer < 3; layer++) {
+			/* quizmoon map requires that layer 2 be drawn over layer 3 when same pri */
+			for(int layer = 2; layer >= 0; layer--) {
 				if(layerpri[layer] == pri) {
 					draw_layer(screen, bitmap, clip, layer, y, pri);
 				}
