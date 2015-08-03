@@ -322,9 +322,6 @@ class upd650_cpu_device : public ucom4_cpu_device
 {
 public:
 	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual UINT8 input_r(int index);
 };
 
 
