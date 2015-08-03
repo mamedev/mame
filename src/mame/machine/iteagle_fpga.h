@@ -73,6 +73,7 @@ private:
 	UINT32 m_seq;
 	UINT32 m_seq_rem1, m_seq_rem2;
 	void update_sequence(UINT32 data);
+	void update_sequence_eg1(UINT32 data);
 
 	DECLARE_ADDRESS_MAP(rtc_map, 32);
 	DECLARE_ADDRESS_MAP(fpga_map, 32);
@@ -132,6 +133,7 @@ private:
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
+	int m_irq_status;
 
 	UINT32 m_ctrl_regs[0xd0/4];
 	UINT8 m_rtc_regs[0x100];
