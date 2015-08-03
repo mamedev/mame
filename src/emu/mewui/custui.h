@@ -158,4 +158,27 @@ private:
 	void inkey_special(const ui_menu_event *menu_event);
 };
 
+/***************************************************************************
+    PALETTE UI CLASS
+***************************************************************************/
+
+struct palcolor
+{
+	const char *m_name;
+	const char *m_argb;
+};
+
+class ui_menu_palette_sel : public ui_menu
+{
+public:
+	ui_menu_palette_sel(running_machine &machine, render_container *container, rgb_t &_color);
+	virtual ~ui_menu_palette_sel();
+	virtual void populate();
+	virtual void handle();
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+
+private:
+	rgb_t &m_original;
+};
+
 #endif /* __MEWUI_CUSTUI_H__ */

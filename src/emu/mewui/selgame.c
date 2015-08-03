@@ -555,12 +555,11 @@ void ui_mewui_select_game::populate()
 		// reset search string
 		m_search[0] = '\0';
 
-		flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_MEWUI_FAVORITE | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
+		flags_mewui |= MENU_FLAG_MEWUI_FAVORITE;
 
 		// iterate over entries
 		for (size_t x = 0; x < machine().favorite().favorite_list.size(); x++)
 		{
-osd_printf_info("fav size = %d\n", (int)machine().favorite().favorite_list.size());
 			if (machine().favorite().favorite_list[x].startempty == 1)
 			{
 				bool cloneof = strcmp(machine().favorite().favorite_list[x].driver->parent, "0");
@@ -1030,8 +1029,26 @@ void ui_mewui_select_game::inkey_select_favorite(const ui_menu_event *menu_event
 		software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
+		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
+			if (swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
+			{
+				std::vector<std::string> partname, partdesc;
+				for (const software_part *swpart = swinfo->first_part(); swpart != NULL; swpart = swpart->next())
+				{
+					if (swpart->matches_interface(ui_swinfo->interface.c_str()))
+					{
+						partname.push_back(swpart->name());
+						std::string menu_part_name(swpart->name());
+						if (swpart->feature("part_id") != NULL)
+							menu_part_name.assign("(").append(swpart->feature("part_id")).append(")");
+						partdesc.push_back(menu_part_name);
+					}
+				}
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_software_parts(machine(), container, partname, partdesc, ui_swinfo)));
+				return;
+			}
+
 			std::string error_string;
 			std::string string_list = std::string(ui_swinfo->listname.c_str()).append(":").append(ui_swinfo->shortname.c_str()).append(":");
 			string_list.append(ui_swinfo->part.c_str()).append(":").append(ui_swinfo->instance.c_str());
