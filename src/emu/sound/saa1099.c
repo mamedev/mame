@@ -65,9 +65,9 @@
 
     Version History:
     ================
-    ??-??-200? - First version of the driver submitted for MESS (GPL/MESS license)
-    ??-??-200? - Submitted to DOSBOX for Creative Music System/Game Blaster emulation
-    ??-??-201? - Driver relicensed to BSD 3 Clause (GPL+ compatible)
+    ??-??-200? - First version of the driver submitted for MAME
+    10-15-2003 - Submitted to DOSBOX for Creative Music System/Game Blaster emulation
+    05-07-2015 - Driver relicensed to BSD-3-Clause
     06-27-2015 - Applied clock divisor fix from DOSBOX SVN, http://www.vogons.org/viewtopic.php?p=344227#p344227
 
 ***************************************************************************/
@@ -212,6 +212,8 @@ void saa1099_device::device_start()
 void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int j, ch;
+	int clk2div512;
+
 	/* if the channels are disabled we're done */
 	if (!m_all_ch_enable)
 	{
@@ -232,6 +234,8 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 	}
 
+	clk2div512 = (m_master_clock + 128) / 256;
+
 	/* fill all data needed */
 	for( j = 0; j < samples; j++ )
 	{
@@ -241,7 +245,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		for (ch = 0; ch < 6; ch++)
 		{
 			if (m_channels[ch].freq == 0.0)
-				m_channels[ch].freq = (double)((2 * m_master_clock / 512) << m_channels[ch].octave) /
+				m_channels[ch].freq = (double)(clk2div512 << m_channels[ch].octave) /
 					(511.0 - (double)m_channels[ch].frequency);
 
 			/* check the actual position in the square wave */
@@ -249,7 +253,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			while (m_channels[ch].counter < 0)
 			{
 				/* calculate new frequency now after the half wave is updated */
-				m_channels[ch].freq = (double)((2 * m_master_clock / 512) << m_channels[ch].octave) /
+				m_channels[ch].freq = (double)(clk2div512 << m_channels[ch].octave) /
 					(511.0 - (double)m_channels[ch].frequency);
 
 				m_channels[ch].counter += m_sample_rate;
