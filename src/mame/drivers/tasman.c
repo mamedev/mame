@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x4b001c, 0x4b001f) AM_WRITENOP
 
@@ -590,7 +590,8 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 

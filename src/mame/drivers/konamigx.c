@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP // LAN board
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
@@ -1002,7 +1002,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
@@ -1587,6 +1587,7 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx)
 
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(XRGB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
@@ -1754,8 +1755,8 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -132, -23)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16384)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
@@ -1796,8 +1797,8 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8192)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 

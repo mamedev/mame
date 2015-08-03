@@ -503,20 +503,6 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 	return m_com_shared[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_pal_w)
-{
-	UINT32 *paletteram = m_generic_paletteram_32;
-	int r, g, b/*, a*/;
-
-	COMBINE_DATA(&paletteram[offset]);
-
-	b = ((paletteram[offset] & 0x000000ff) >>0);
-	g = ((paletteram[offset] & 0x0000ff00) >>8);
-	r = ((paletteram[offset] & 0x00ff0000) >>16);
-	//a = ((paletteram[offset] & 0xff000000) >>24);
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
-
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
 {
 	UINT16 rtc_addr;
@@ -983,7 +969,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
 	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
@@ -1581,6 +1567,7 @@ static MACHINE_CONFIG_START(hng64, hng64_state)
 	MCFG_SCREEN_VBLANK_DRIVER(hng64_state, screen_eof_hng64)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_FRAGMENT_ADD( hng64_audio )
 	MCFG_FRAGMENT_ADD( hng64_network )
