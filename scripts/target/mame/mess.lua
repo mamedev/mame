@@ -486,6 +486,7 @@ MACHINES["PC_LPT"] = true
 MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCKEYBRD"] = true
+MACHINES["PDC"] = true
 MACHINES["PIC8259"] = true
 MACHINES["PIT68230"] = true
 MACHINES["PIT8253"] = true
@@ -3120,6 +3121,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pulsar.cpp",
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
+	MAME_DIR .. "src/mess/drivers/r9751.c",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",

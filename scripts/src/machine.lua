@@ -2701,3 +2701,14 @@ if (MACHINES["VT82C496"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/emu/machine/pdc.h,MACHINES["PDC"] = true
+---------------------------------------------------
+
+if (MACHINES["PDC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pdc.c",
+		MAME_DIR .. "src/emu/machine/pdc.h",
+	}
+end
