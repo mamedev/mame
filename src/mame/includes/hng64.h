@@ -125,10 +125,7 @@ public:
 		m_com_ram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
-
-	{ }
+		m_palette(*this, "palette")	{ }
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
@@ -159,8 +156,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
-
 
 	int m_mcu_type;
 
@@ -224,7 +219,6 @@ public:
 	DECLARE_READ8_MEMBER(hng64_com_share_r);
 	DECLARE_WRITE8_MEMBER(hng64_com_share_mips_w);
 	DECLARE_READ8_MEMBER(hng64_com_share_mips_r);
-	DECLARE_WRITE32_MEMBER(hng64_pal_w);
 	DECLARE_READ32_MEMBER(hng64_sysregs_r);
 	DECLARE_WRITE32_MEMBER(hng64_sysregs_w);
 	DECLARE_READ32_MEMBER(fight_io_r);
