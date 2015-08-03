@@ -4600,7 +4600,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
   % Range: 95.5-97.5%  Optimum: 99.5%  Hit Frequency: 45.5%
      Programs Available: PP0132, PP0447, PP0555, X000447P
 
-Internally the program reports a 95.40% return.
+Internally the program reports a 99.40% return.
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
