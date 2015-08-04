@@ -457,6 +457,8 @@ WRITE8_MEMBER( coco_state::ff20_write )
 
 READ8_MEMBER( coco_state::pia1_pa_r )
 {
+	// Port A: we need to specify the values of all the lines, regardless of whether
+	// they are in input or output mode in the DDR
 	return (m_cassette->input() >= 0 ? 0x01 : 0x00)
 		| (dac_output() << 2);
 }
@@ -471,6 +473,8 @@ READ8_MEMBER( coco_state::pia1_pa_r )
 
 READ8_MEMBER( coco_state::pia1_pb_r )
 {
+	// Port B: lines in output mode are handled automatically by the PIA object.
+	// We only need to specify the input lines here
 	UINT32 ram_size = m_ram->size();
 
 	//  For the CoCo 1, the logic has been changed to only select 64K rams
@@ -480,7 +484,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 	//  to access 32K of ram, and also allows the cocoe driver to access
 	//  the full 64K, as this uses Color Basic 1.2, which can configure 64K rams
 	bool memory_sense = (ram_size >= 0x4000 && ram_size <= 0x7FFF)
-		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x80));
+		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x40));
 
 	// serial in (PB0)
 	bool serial_in = (m_rs232 != NULL) && (m_rs232->rxd_r() ? true : false);
