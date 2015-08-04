@@ -1000,8 +1000,9 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
 |LED    CN4     IC4  |
 |--------------------|
 Notes:
-      This is the I/O board used for Dynamic Golf and Out Trigger for the trackball 
-      and is located under the panel. 
+      This is the I/O board used in Dynamic Golf, Out Trigger, Shootout Pool,
+      Shootout Pool Prize, Kick'4'Cash, Crackin' DJ 1&2 
+      for the trackballs and other rotary type game controls.
       It must be daisy-chained to the normal I/O board with a USB cable.
 
       CN1 - 24 pin connector (not used on Dynamic Golf, other use unknown)
@@ -7509,39 +7510,11 @@ ROM_START( monkeyba )
 	ROM_LOAD("317-0307-com.pic", 0x00, 0x4000, CRC(4046de19) SHA1(8adda9f223e926148b36744bbbaa89557544a229) )
 ROM_END
 
-/*
-This is the I/O board used for Dynamic Golf which is
-located under the panel.
-It must be connected to the normal I/O board with a USB cable.
-
-PCB Layout
-----------
-
-837-13938
-|--------------------|
-|CN2      CN1        |
-|                    |
-|      |-----|       |
-|      | IC2 |       |
-| CN3  |     |       |
-|      |-----|    IC3|
-|LED    CN4     IC4  |
-|--------------------|
-Notes:
-      CN1 - 24 pin connector. not used
-      CN2 - 4 pin connector used for 5 volt power input
-      CN3 - USB connector type B
-      CN4 - 16 pin connector used for buttons and trackball
-      IC1 - HC240 logic IC (SOIC20)
-      IC2 - Sega 315-6146 custom IC (QFP176)
-      IC3 - 27C512 EPROM with label 'EPR-22084' (DIP28)
-      IC4 - HC4020 logic IC (SOIC16)
-*/
-
 ROM_START( dygolf )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
+	// 837-13938 JVS I/O
 	ROM_REGION( 0x10000, "io_board", 0)
 	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
