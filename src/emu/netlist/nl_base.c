@@ -19,24 +19,6 @@ const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time:
 
 namespace netlist
 {
-//============================================================
-//  Exceptions
-//============================================================
-
-// emu_fatalerror is a generic fatal exception that provides an error string
-fatalerror_e::fatalerror_e(const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	m_text = pstring(format).vprintf(ap);
-	fprintf(stderr, "%s\n", m_text.cstr());
-	va_end(ap);
-}
-
-fatalerror_e::fatalerror_e(const char *format, va_list ap)
-{
-	m_text = pstring(format).vprintf(ap);
-}
 
 // ----------------------------------------------------------------------------------------
 // logic_family_ttl_t

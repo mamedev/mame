@@ -280,7 +280,7 @@ struct input_t
 		double t;
 		int e = line.scanf("%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
-			throw netlist::fatalerror_e("error %d scanning line %s\n", e, line.cstr());
+			throw netlist::fatalerror_e(pstring::sprintf("error %d scanning line %s\n", e, line.cstr()));
 		m_time = netlist::netlist_time::from_double(t);
 		m_param = netlist->setup().find_param(buf, true);
 	}
@@ -291,7 +291,7 @@ struct input_t
 		{
 			case netlist::param_t::MODEL:
 			case netlist::param_t::STRING:
-				throw netlist::fatalerror_e("param %s is not numeric\n", m_param->name().cstr());
+				throw netlist::fatalerror_e(pstring::sprintf("param %s is not numeric\n", m_param->name().cstr()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
 				break;

@@ -13,6 +13,7 @@
 
 #include "pconfig.h"
 #include "pstring.h"
+#include "palloc.h"
 
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
@@ -71,13 +72,13 @@ protected:
 	void check_not_eof() const
 	{
 		if (m_flags & FLAG_EOF)
-			throw std::runtime_error("unexpected eof");
+			throw pexception("unexpected eof");
 	}
 
 	void check_seekable() const
 	{
-		if (m_flags & FLAG_SEEKABLE)
-			throw std::runtime_error("stream is not seekable");
+		if (!(m_flags & FLAG_SEEKABLE))
+			throw pexception("stream is not seekable");
 	}
 
 	unsigned flags() const { return m_flags; }
@@ -153,7 +154,7 @@ public:
 	void writeline(const pstring &line)
 	{
 		write(line.cstr(), line.len());
-		putc(10);
+		write(10);
 	}
 
 	void write(const pstring &text)
@@ -161,7 +162,7 @@ public:
 		write(text.cstr(), text.len());
 	}
 
-	void putc(const char c)
+	void write(const char c)
 	{
 		write(&c, 1);
 	}

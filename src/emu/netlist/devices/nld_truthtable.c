@@ -135,8 +135,8 @@ void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
 		{
 			// cutoff previous inputs and outputs for ignore
 			if (m_outs[nstate] != ~0U &&  m_outs[nstate] != val)
-				fatalerror_e("Error in truthtable: State %04x already set, %d != %d\n",
-						(UINT32) nstate, m_outs[nstate], val);
+				fatalerror_e(pstring::sprintf("Error in truthtable: State %04x already set, %d != %d\n",
+						(UINT32) nstate, m_outs[nstate], val));
 			m_outs[nstate] = val;
 			for (unsigned j=0; j<m_NO; j++)
 				m_timing[nstate * m_NO + j] = timing_index[j];
@@ -231,7 +231,7 @@ void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32 disabled_
 	for (UINT32 i=0; i<m_size; i++)
 	{
 		if (m_outs[i] == ~0U)
-			fatalerror_e("truthtable: found element not set %04x\n", i);
+			throw fatalerror_e(pstring::sprintf("truthtable: found element not set %04x\n", i));
 		m_outs[i] |= ((ign[i] & ~disabled_ignore)  << m_NO);
 	}
 	*m_initialized = true;

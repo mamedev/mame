@@ -5,7 +5,6 @@
  *
  */
 
-#include <cstdio>
 #include <cstdarg>
 
 #include "pparser.h"
@@ -287,7 +286,7 @@ ppreprocessor::ppreprocessor()
 
 void ppreprocessor::error(const pstring &err)
 {
-	fprintf(stderr, "PREPRO ERROR: %s\n", err.cstr());
+	throw pexception("PREPRO ERROR: " + err);
 }
 
 

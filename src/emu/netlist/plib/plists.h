@@ -499,8 +499,7 @@ public:
 				}
 				p = p->m_next;
 			}
-			//FXIME: throw a standard exception
-			//nl_assert_always(false, "element not found");
+			throw pexception("element not found");
 		}
 	}
 

@@ -8,9 +8,26 @@
 #ifndef PALLOC_H_
 #define PALLOC_H_
 
-#include <cstdio>
+#include <exception>
 
 #include "pconfig.h"
+#include "pstring.h"
+
+//============================================================
+//  exception base
+//============================================================
+
+class pexception : public std::exception
+{
+public:
+	pexception(const pstring &text);
+	virtual ~pexception() throw() {}
+
+	const pstring &text() { return m_text; }
+
+private:
+	pstring m_text;
+};
 
 //============================================================
 //  Memory allocation

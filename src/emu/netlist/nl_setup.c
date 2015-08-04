@@ -243,7 +243,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
+							if (val.scanf("%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<param_double_t &>(param).initial(vald);
 						}
@@ -253,7 +253,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
+							if (val.scanf("%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<param_int_t &>(param).initial((int) vald);
 						}
@@ -997,7 +997,7 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 		case 'a': factor = 1e-18; break;
 		default:
 			if (numfac < '0' || numfac > '9')
-				fatalerror_e("Unknown number factor <%c> in: %s", numfac, entity.cstr());
+				fatalerror_e(pstring::sprintf("Unknown number factor <%c> in: %s", numfac, entity.cstr()));
 	}
 	if (factor != NL_FCONST(1.0))
 		tmp = tmp.left(tmp.len() - 1);

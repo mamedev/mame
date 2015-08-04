@@ -5,11 +5,11 @@
  *
  */
 
-#include <cstdio>
 #include <cstring>
 //FIXME:: pstring should be locale free
 #include <cctype>
 #include <cstdlib>
+#include <cstdio>
 #include <algorithm>
 
 #include "pstring.h"
