@@ -58,7 +58,6 @@ public:
 		m_vgb(*this, "vgb"),
 		m_palette(*this, "palette"),
 		m_duart68681(*this, "duart68681"),
-		m_generic_paletteram_16(*this, "paletteram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
 		m_sprite_vram(*this, "sprite_vram") { }
@@ -70,7 +69,6 @@ public:
 	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
 	required_device<mc68681_device> m_duart68681;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	required_shared_ptr<UINT16> m_shared_ram;
 	UINT8               m_m68681_tx0;
@@ -145,7 +143,6 @@ public:
 	DECLARE_READ32_MEMBER(micro3d_shared_r);
 	DECLARE_WRITE32_MEMBER(drmath_int_w);
 	DECLARE_WRITE32_MEMBER(drmath_intr2_ack);
-	DECLARE_WRITE16_MEMBER(micro3d_clut_w);
 	DECLARE_WRITE16_MEMBER(micro3d_creg_w);
 	DECLARE_WRITE16_MEMBER(micro3d_xfer3dk_w);
 	DECLARE_WRITE32_MEMBER(micro3d_fifo_w);
