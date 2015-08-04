@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midtunit_state )
 	AM_RANGE(0x01600010, 0x0160001f) AM_READ_PORT("IN1")
 	AM_RANGE(0x01600020, 0x0160002f) AM_READ_PORT("IN2")
 	AM_RANGE(0x01600030, 0x0160003f) AM_READ_PORT("DSW")
-	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_WRITE(midtunit_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x01a80000, 0x01a800ff) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
 	AM_RANGE(0x01b00000, 0x01b0001f) AM_WRITE(midtunit_control_w)
 /*  AM_RANGE(0x01c00060, 0x01c0007f) AM_WRITE(midtunit_cmos_enable_w) */
@@ -602,6 +602,7 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	// from TMS340 registers

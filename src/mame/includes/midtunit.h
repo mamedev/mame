@@ -24,7 +24,6 @@ public:
 		m_dcs(*this, "dcs"),
 		m_cvsd_sound(*this, "cvsd"),
 		m_adpcm_sound(*this, "adpcm") ,
-		m_generic_paletteram_16(*this, "paletteram"),
 		m_nvram(*this, "nvram"),
 		m_gfxrom(*this, "gfxrom") { }
 
@@ -34,7 +33,6 @@ public:
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_shared_ptr<UINT16> m_nvram;
 
 	required_memory_region m_gfxrom;
@@ -69,7 +67,6 @@ public:
 	DECLARE_WRITE16_MEMBER(midtunit_control_w);
 	DECLARE_WRITE16_MEMBER(midwunit_control_w);
 	DECLARE_READ16_MEMBER(midwunit_control_r);
-	DECLARE_WRITE16_MEMBER(midtunit_paletteram_w);
 	DECLARE_WRITE16_MEMBER(midxunit_paletteram_w);
 	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
 	DECLARE_READ16_MEMBER(midtunit_dma_r);

@@ -556,6 +556,15 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 }
 
+VIDEO_START_MEMBER(seta_state,kyustrkr_no_layers)
+{
+	VIDEO_START_CALL_MEMBER(seta_no_layers);
+
+	// position kludges
+	m_seta001->set_fg_yoffsets( -0x0a, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
+}
+
 
 
 /***************************************************************************

@@ -1000,9 +1000,8 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
 |LED    CN4     IC4  |
 |--------------------|
 Notes:
-      This is the I/O board used for Dynamic Golf which is
-      located under the panel. It's also used for spinner
-      controls such as those used on Outtrigger.
+      This is the I/O board used for Dynamic Golf and Out Trigger for the trackball 
+      and is located under the panel. 
       It must be daisy-chained to the normal I/O board with a USB cable.
 
       CN1 - 24 pin connector (not used on Dynamic Golf, other use unknown)
@@ -1027,7 +1026,7 @@ Sega's I/O board has:
 - analog input
 - USB input (connect to NAOMI motherboard)
 - USB output (not used)
-- shrinked D-sub 15pin connector (connect JVS video output, the signal is routed to JAMMA connector, signal is amplified to 3Vp-p and H/V sync signal is mixed (composite))
+- D-sub 15pin VGA-compatible connector (connect JVS video output, the signal is routed to JAMMA connector, signal is amplified to 3Vp-p and H/V sync signal is mixed (composite))
 - external I/O connector (JST 12pin)
 - switch to select function of external I/O connector (extra button input or 7-seg LED(x2) output of total wins for 'Versus City' cabinet)
 - spare audio input (the signal goes to JAMMA speaker output)
@@ -1397,8 +1396,8 @@ Notes:
 
 Development ROM board:
 
-few unreleased and many prototype game versions known to exist on this ROM board,
-currently only Rumble Fish 2 prototype dumped
+There are a few unreleased and many prototype game versions known to exist on this ROM board.
+Currently only Rumble Fish 2 prototype is dumped.
 
 PC BD SYSTEMX 3MODE FLASH Rev.B
 1111-00001402
@@ -5090,6 +5089,9 @@ Serial (from 2 carts): BAZE-01A0288
 ROM_START( otrigger )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
+
+        ROM_REGION( 0x10000, "io_board", 0)
+	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
 	ROM_REGION( 0xa000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD("epr-22163.ic22", 0x0000000, 0x0400000, CRC(3bdafb6a) SHA1(c4c5a4ba94d85c4353df22d70bb08be67e9c22c3) )
