@@ -17,7 +17,7 @@ public:
 		UINT16(*nonlinear_calculation)(UINT64, UINT64);  // preliminary encoding; need research
 	};
 
-	void activate();
+	void activate(int iv);
 	void deactivate();
 	bool is_active()const;
 
@@ -35,13 +35,20 @@ private:
 	bool _active;
 	const ns10_crypto_logic& _logic;
 	int _gf2Reduction[0x10000];
+	static const int initSbox[16];
 
 	void device_start();
-	void init();
+	void init(int iv);
 	int gf2_reduce(UINT64 num);
 };
 
 // game-specific devices
+
+class gamshara_decrypter_device : public ns10_decrypter_device
+{
+public:
+	gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 class konotako_decrypter_device : public ns10_decrypter_device
 {
@@ -56,6 +63,7 @@ public:
 };
 
 
+extern const device_type GAMSHARA_DECRYPTER;
 extern const device_type KONOTAKO_DECRYPTER;
 extern const device_type STARTRGN_DECRYPTER;
 
