@@ -102,7 +102,7 @@ void queue_t::on_pre_save()
 		pstring p = this->listptr()[i].object()->name();
 		int n = p.len();
 		n = std::min(63, n);
-		std::strncpy(m_names[i].m_buf, p, n);
+		std::strncpy(m_names[i].m_buf, p.cstr(), n);
 		m_names[i].m_buf[n] = 0;
 	}
 }

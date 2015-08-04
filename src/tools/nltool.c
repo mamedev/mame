@@ -155,7 +155,7 @@ pstring filetobuf(pstring fname)
 	else
 	{
 		FILE *f;
-		f = fopen(fname, "rb");
+		f = fopen(fname.cstr(), "rb");
 		fseek(f, 0, SEEK_END);
 		long fsize = ftell(f);
 		fseek(f, 0, SEEK_SET);
@@ -267,11 +267,8 @@ void usage(tool_options_t &opts)
 
 struct input_t
 {
-	netlist::netlist_time m_time;
-	netlist::param_t *m_param;
-	double m_value;
-
 	input_t()
+	: m_param(NULL), m_value(0.0)
 	{
 	}
 	input_t(netlist::netlist_t *netlist, const pstring &line)
@@ -303,6 +300,11 @@ struct input_t
 				break;
 		}
 	}
+
+	netlist::netlist_time m_time;
+	netlist::param_t *m_param;
+	double m_value;
+
 };
 
 plist_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
@@ -311,14 +313,15 @@ plist_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 	if (fname != "")
 	{
 		pifilestream f(fname);
-		do {
-			pstring l = f.readline();
+		pstring l;
+		while (f.readline(l))
+		{
 			if (l != "")
 			{
 				input_t inp(netlist, l);
 				ret->add(inp);
 			}
-		} while (!f.eof());
+		}
 	}
 	return ret;
 }

@@ -160,13 +160,12 @@ void convert(nlwav_options_t &opts)
 	double minsam = 1e9;
 	int n = 0;
 	//short sample = 0;
+	pstring line;
 
-
-	while(!fin.eof())
+	while(fin.readline(line))
 	{
 #if 1
 		float t = 0.0; float v = 0.0;
-		pstring line = fin.readline();
 		line.scanf("%f %f", &t, &v);
 		while (t >= ct)
 		{

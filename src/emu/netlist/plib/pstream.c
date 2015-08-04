@@ -19,7 +19,7 @@
 
 pifilestream::pifilestream(const pstring &fname) : pistream(0), m_pos(0)
 {
-	m_file = fopen(fname, "rb");
+	m_file = fopen(fname.cstr(), "rb");
 	if (m_file == NULL)
 	{
 		set_flag(FLAG_ERROR);
@@ -94,7 +94,7 @@ pifilestream::pos_type pifilestream::vtell()
 
 pofilestream::pofilestream(const pstring &fname) : postream(0), m_pos(0)
 {
-	m_file = fopen(fname, "wb");
+	m_file = fopen(fname.cstr(), "wb");
 	if (m_file == NULL)
 	{
 		set_flag(FLAG_ERROR);

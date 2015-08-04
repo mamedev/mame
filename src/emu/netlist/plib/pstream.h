@@ -103,24 +103,29 @@ public:
 
 	/* this digests linux & dos/windows text files */
 
-	pstring readline()
+	bool readline(pstring &line)
 	{
+		UINT8 c = 0;
 		pstringbuffer buf;
-		while (!eof())
+		if (!this->read(c))
 		{
-			char c = 0;
-			if (this->getc(c))
-			{
-				if (c == 10)
-					return buf;
-				else if (c != 13) /* ignore CR */
-					buf += c;
-			}
+			line = "";
+			return false;
 		}
-		return buf;
+		while (true)
+		{
+			if (c == 10)
+				break;
+			else if (c != 13) /* ignore CR */
+				buf += c;
+			if (!this->read(c))
+				break;
+		}
+		line = buf;
+		return true;
 	}
 
-	bool getc(char &c)
+	bool read(UINT8 &c)
 	{
 		return (read(&c, 1) == 1);
 	}
@@ -153,13 +158,13 @@ public:
 
 	void writeline(const pstring &line)
 	{
-		write(line.cstr(), line.len());
+		write(line.cstr(), line.blen());
 		write(10);
 	}
 
 	void write(const pstring &text)
 	{
-		write(text.cstr(), text.len());
+		write(text.cstr(), text.blen());
 	}
 
 	void write(const char c)

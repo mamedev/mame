@@ -140,7 +140,7 @@ device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 
 void setup_t::register_model(const pstring &model_in)
 {
-	int pos = model_in.find(' ');
+	int pos = model_in.find(" ");
 	if (pos < 0)
 		netlist().error("Unable to parse model: %s", model_in.cstr());
 	pstring model = model_in.left(pos).trim().ucase();
@@ -955,10 +955,11 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	if (!remainder.endsWith(")"))
 		netlist().error("Model error %s\n", model.cstr());
 	remainder = remainder.left(remainder.len() - 1);
+
 	pstring_list_t pairs(remainder," ", true);
 	for (unsigned i=0; i<pairs.size(); i++)
 	{
-		int pose = pairs[i].find('=');
+		int pose = pairs[i].find("=");
 		if (pose < 0)
 			netlist().error("Model error on pair %s\n", model.cstr());
 		map[pairs[i].left(pose).ucase()] = pairs[i].substr(pose+1);

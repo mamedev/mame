@@ -235,7 +235,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 	{
 		pstring_list_t tt(line, " ", true);
 		double val = 0.0;
-		switch (tt[0].cstr()[0])
+		switch (tt[0].code_at(0))
 		{
 			case ';':
 				out("// %s\n", line.substr(1).cstr());
@@ -280,9 +280,9 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					pins = m[1].left(3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
-				add_term(tt[1], tt[0] + "." + pins[0]);
-				add_term(tt[2], tt[0] + "." + pins[1]);
-				add_term(tt[3], tt[0] + "." + pins[2]);
+				add_term(tt[1], tt[0] + "." + pins.code_at(0));
+				add_term(tt[2], tt[0] + "." + pins.code_at(1));
+				add_term(tt[3], tt[0] + "." + pins.code_at(2));
 			}
 				break;
 			case 'R':
@@ -397,7 +397,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 				tok.require_token(tok.m_tok_SEMICOLON);
 				token = tok.get_token();
 			}
-			switch (name.cstr()[0])
+			switch (name.code_at(0))
 			{
 				case 'Q':
 				{

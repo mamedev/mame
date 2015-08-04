@@ -580,12 +580,12 @@ public:
 		pstring col = "";
 
 		int i = 0;
-		while (i<str.len())
+		while (i<str.blen())
 		{
 			int p = -1;
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
-				if (std::strncmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].len())==0)
+				if (std::memcmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].blen())==0)
 				{
 					p = j;
 					break;
@@ -595,14 +595,16 @@ public:
 			{
 				if (col != "")
 					temp.add(col);
+
 				col = "";
 				temp.add(onstrl[p]);
-				i += onstrl[p].len();
+				i += onstrl[p].blen();
 			}
 			else
 			{
-				col += str.cstr()[i];
-				i++;
+				pstring::traits::code_t c = pstring::traits::code(str.cstr() + i);
+				col += c;
+				i+=pstring::traits::codelen(c);
 			}
 		}
 		if (col != "")
@@ -639,9 +641,9 @@ struct phash_functor<pstring>
 	phash_functor(const pstring &v)
 	{
 		/* modified djb2 */
-		const char *string = v.cstr();
+		const pstring::mem_t *string = v.cstr();
 		unsigned result = 5381;
-		for (UINT8 c = *string; c != 0; c = *string++)
+		for (pstring::mem_t c = *string; c != 0; c = *string++)
 			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ c;
 			//result = (result*33) ^ c;
 		m_hash = result;
