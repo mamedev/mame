@@ -503,7 +503,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_rgb3
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	bitmap.fill(32, cliprect);
+	bitmap.fill(m_bm_palette->pen_color(0), cliprect);
 
 	if(m_pri) //used in Frog & Spiders level 3
 	{
