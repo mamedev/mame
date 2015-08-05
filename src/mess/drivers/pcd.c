@@ -43,6 +43,7 @@ public:
 	m_scsi(*this, "scsi"),
 	m_scsi_data_out(*this, "scsi_data_out"),
 	m_scsi_data_in(*this, "scsi_data_in"),
+	m_ram(*this, "ram"),
 	m_vram(*this, "vram"),
 	m_charram(8*1024)
 	{ }
@@ -71,6 +72,8 @@ public:
 	DECLARE_WRITE16_MEMBER( vram_w );
 	DECLARE_READ16_MEMBER( mmu_r );
 	DECLARE_WRITE16_MEMBER( mmu_w );
+	DECLARE_READ16_MEMBER( mem_r );
+	DECLARE_WRITE16_MEMBER( mem_w );
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
@@ -98,12 +101,18 @@ private:
 	required_device<SCSI_PORT_DEVICE> m_scsi;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
+	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT16> m_vram;
 	dynamic_buffer m_charram;
 	UINT8 m_stat, m_led, m_vram_sw;
 	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
 	emu_timer *m_req_hack;
 	UINT16 m_dskctl;
+	struct {
+		UINT16 ctl;
+		UINT16 regs[1024];
+		bool sc;
+	} m_mmu;
 };
 
 
@@ -135,6 +144,8 @@ void pcd_state::machine_start()
 {
 	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), pcd_charlayout, &m_charram[0], 0, 1, 0)));
 	m_req_hack = timer_alloc();
+	save_item(NAME(m_mmu.ctl));
+	save_item(NAME(m_mmu.regs));
 }
 
 void pcd_state::machine_reset()
@@ -144,6 +155,8 @@ void pcd_state::machine_reset()
 	m_dskctl = 0;
 	m_vram_sw = 1;
 	m_rst = 0;
+	m_mmu.ctl = 0;
+	m_mmu.sc = false;
 }
 
 READ8_MEMBER( pcd_state::irq_callback )
@@ -286,13 +299,32 @@ WRITE8_MEMBER( pcd_state::led_w )
 
 READ16_MEMBER( pcd_state::mmu_r )
 {
-	logerror("%s: mmu read %04x\n", machine().describe_context(), offset + 0x8000);
+	UINT16 data = m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)];
+	logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
+	if(!offset)
+		return m_mmu.ctl;
+	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
+		return (data << 4) | (data >> 12) | (m_mmu.sc && (offset == 0x200) ? 0xc0 : 0);
+	else if(offset == 0x400)
+	{
+		m_mmu.sc = false;
+		m_pic1->ir0_w(CLEAR_LINE);
+	}
 	return 0;
 }
 
 WRITE16_MEMBER( pcd_state::mmu_w )
 {
-	logerror("%s: mmu write %04x %04x\n", machine().describe_context(), offset + 0x8000, data);
+	logerror("%s: mmu write %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
+	if(!offset)
+		m_mmu.ctl = data;
+	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
+		m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)] = (data >> 4) | (data << 12);
+	else if(offset == 0x400)
+	{
+		m_mmu.sc = true;
+		m_pic1->ir0_w(ASSERT_LINE);
+	}
 }
 
 SCN2674_DRAW_CHARACTER_MEMBER(pcd_state::display_pixels)
@@ -409,12 +441,47 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 	else
 		m_scsi->write_ack(0);
 }
+
+WRITE16_MEMBER(pcd_state::mem_w)
+{
+	UINT16 *ram = (UINT16 *)m_ram->pointer();
+	if(m_mmu.ctl & 0x20)
+	{
+		UINT16 reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
+		if(!reg && !space.debugger_access())
+		{
+			offset <<= 1;
+			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
+			nmi_io_w(space, offset, data, mem_mask);
+			return;
+		}
+		offset = ((reg << 3) & 0x7fc00) | (offset & 0x3ff);
+	}
+	COMBINE_DATA(&ram[offset]);
+}
+
+READ16_MEMBER(pcd_state::mem_r)
+{
+	UINT16 *ram = (UINT16 *)m_ram->pointer();
+	if(m_mmu.ctl & 0x20)
+	{
+		UINT16 reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
+		if(!reg && !space.debugger_access())
+		{
+			offset <<= 1;
+			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
+			return nmi_io_r(space, offset, mem_mask);
+		}
+		offset = ((reg << 3) & 0x7fc00) | (offset & 0x3ff);
+	}
+	return ram[offset];
+}
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( pcd_map, AS_PROGRAM, 16, pcd_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM // fixed 512k for now
+	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(mem_r, mem_w)
 	AM_RANGE(0xf0000, 0xf7fff) AM_READONLY AM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
@@ -474,11 +541,8 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_PIC8259_ADD("pic1", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NULL)
 	MCFG_PIC8259_ADD("pic2", DEVWRITELINE("maincpu", i80186_cpu_device, int1_w), VCC, NULL)
 
-#if 0
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
-#endif
+	MCFG_RAM_DEFAULT_SIZE("1M")
 
 	// nvram
 	MCFG_NVRAM_ADD_1FILL("nvram")

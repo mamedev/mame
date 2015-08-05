@@ -3436,7 +3436,6 @@ ROM_END
 
 */
 
-/*
 ROM_START( pkii_dm )
     ROM_REGION( 0x10000, "maincpu", 0 ) // no stack, call's RET go to PC=0
     ROM_LOAD( "12.u12", 0x0000, 0x1000, CRC(048e70d8) SHA1(f0eb16ba68455638de2ce68f51f305a13d0df287) )
@@ -3449,7 +3448,6 @@ ROM_START( pkii_dm )
     ROM_REGION( 0x0200,  "proms", 0 )
     ROM_LOAD( "63s141n.u51",  0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
 ROM_END
-*/
 
 
 /**************************
@@ -3644,5 +3642,4 @@ GAME(  1993, tpoker2,  0,       dphltest, norautp, driver_device,  0,   ROT0, "M
 GAME(  198?, fastdrwp, 0,       dphl,     norautp, driver_device,  0,   ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunka, 0,       dphl,     norautp, driver_device,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunkb, 0,       dphl,     norautp, driver_device,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
-
-//GAME(  198?, pkii_dm,  0,       nortest1, norautp, driver_device,  0,   ROT0, "<unknown>",                "Unknown Poker PKII/DM",               MACHINE_NOT_WORKING )
+GAME(  198?, pkii_dm,  0,       nortest1, norautp, driver_device,  0,   ROT0, "<unknown>",                "Unknown Poker PKII/DM",               MACHINE_NOT_WORKING )

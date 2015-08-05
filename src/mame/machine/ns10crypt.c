@@ -25,9 +25,11 @@ some bootup code has been executed, will copy the encrypted content from
 the ROM to RAM, moment at which the decryption is triggered.
 
 Most games do a single decryption run, so the process is only initialized once;
-however, at least one game (gamshara) does write to the triggering registers
+however, at least one game (gamshara) does write to the triggering register
 more than once, effectively resetting the internal state of the decrypter
-several times. (gamshara do it every 5 NAND blocks).
+several times. (gamshara do it every 5 NAND blocks; the lowest nibble written to
+the register seem to control the initial value of the state; see details in the
+implementation).
 
 The calculation of the XOR masks seem to operate this way: most bits are
 calculated by using linear equations over GF(2) taking as input data the bits from
@@ -53,6 +55,13 @@ panikuru  -> #2
 ptblank3  -> #11
 startrgn  -> #4
 
+Overall, the values used as linear masks, those from the initSbox and
+the values and bit order used at initialization time are not expected to
+be exactly the ones used by the hardware; given the many degrees of freedom
+caused by the nature of the scheme, the whole set of values should
+be considered as a representative of a class of equivalence of functionally
+equivalent datasets, nothing else.
+
 
 TO-DO:
 * Research the nonlinear calculations in most of the games.
@@ -75,9 +84,13 @@ really exist.
 #include "emu.h"
 #include "ns10crypt.h"
 
+const device_type GAMSHARA_DECRYPTER = &device_creator<gamshara_decrypter_device>;
 const device_type KONOTAKO_DECRYPTER = &device_creator<konotako_decrypter_device>;
 const device_type STARTRGN_DECRYPTER = &device_creator<startrgn_decrypter_device>;
 
+// this could perfectly be part of the per-game logic; by now, only gamshara seems to use it, so we keep it global
+const int ns10_decrypter_device::initSbox[16] = {0,12,13,6,2,4,9,8,11,1,7,15,10,5,14,3};
+ 
 ns10_decrypter_device::ns10_decrypter_device(device_type type, const ns10_crypto_logic &logic, const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, "Namco System 10 Decrypter", tag, owner, clock, "ns10_crypto", __FILE__)
 	, _active(false)
@@ -85,9 +98,9 @@ ns10_decrypter_device::ns10_decrypter_device(device_type type, const ns10_crypto
 {
 }
 
-void ns10_decrypter_device::activate()
+void ns10_decrypter_device::activate(int iv)
 {
-	init();
+	init(iv);
 	_active = true;
 }
 
@@ -109,7 +122,7 @@ UINT16 ns10_decrypter_device::decrypt(UINT16 cipherword)
 	_previous_cipherwords  ^= cipherword;
 	_previous_plainwords  <<= 16;
 	_previous_plainwords   ^= plainword;
-
+	
 	_mask = 0;
 	for (int j = 15; j >= 0; --j)
 	{
@@ -138,9 +151,11 @@ void ns10_decrypter_device::device_start()
 	}
 }
 
-void ns10_decrypter_device::init()
+void ns10_decrypter_device::init(int iv)
 {
-	_previous_cipherwords = 0;
+	// by now, only gamshara requires non-trivial initialization code; data
+	// should be moved to the per-game logic in case any other game do it differently
+	_previous_cipherwords = BITSWAP16(initSbox[iv],3,16,16,2,1,16,16,0,16,16,16,16,16,16,16,16);
 	_previous_plainwords  = 0;
 	_mask                 = 0;
 }
@@ -156,6 +171,28 @@ int ns10_decrypter_device::gf2_reduce(UINT64 num)
 
 
 // game-specific logic
+
+static UINT16 gamshara_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords)
+{
+	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
+	return ((previous_masks >> 7) & (previous_masks >> 13) & 1) << 2;
+}
+
+static const ns10_decrypter_device::ns10_crypto_logic gamshara_crypto_logic = {
+	{
+		0x0000000000000028ull, 0x0000cae83f389fd9ull, 0x0000000000001000ull, 0x0000000042823402ull,
+		0x0000cae8736a0592ull, 0x0000cae8736a8596ull, 0x000000008b4095b9ull, 0x0000000000002100ull,
+		0x0000000004018228ull, 0x0000000000000042ull, 0x0000000000000818ull, 0x0000000000004010ull,
+		0x000000008b4099f1ull, 0x00000000044bce08ull, 0x00000000000000c1ull, 0x0000000042823002ull,
+	}, {
+		0x0000000000000028ull, 0x00000904c2048dd9ull, 0x0000000000008000ull, 0x0000000054021002ull,
+		0x00000904e0078592ull, 0x00000904e00785b2ull, 0x00000000440097f9ull, 0x0000000000002104ull,
+		0x0000000029018308ull, 0x0000000000000042ull, 0x0000000000000850ull, 0x0000000000004012ull,
+		0x000000004400d1f1ull, 0x000000006001ce08ull, 0x00000000000000c8ull, 0x0000000054023002ull,
+	},
+	0x25ab,
+	gamshara_nonlinear_calc
+};
 
 static UINT16 konotako_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords)
 {
@@ -201,7 +238,13 @@ static const ns10_decrypter_device::ns10_crypto_logic startrgn_crypto_logic = {
 	startrgn_nonlinear_calc
 };
 
+
 // game-specific devices
+
+gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ns10_decrypter_device(GAMSHARA_DECRYPTER, gamshara_crypto_logic, mconfig, tag, owner, clock)
+{
+}
 
 konotako_decrypter_device::konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ns10_decrypter_device(KONOTAKO_DECRYPTER, konotako_crypto_logic, mconfig, tag, owner, clock)

@@ -2552,7 +2552,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-	ROM_START( x1 )
+ROM_START( x1 )
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d) )
 
