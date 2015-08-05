@@ -186,10 +186,12 @@ public:
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
 	palette_device *palette() { return m_palette; }
+
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
 	void reset_origin(int beamy = 0, int beamx = 0);
 	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
+	void set_brightness(UINT8 brightness) { m_brightness = brightness; }
 
 	// beam positioning and state
 	int vpos() const;
@@ -239,6 +241,7 @@ private:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_stop();
 	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -284,6 +287,8 @@ private:
 	INT32               m_last_partial_scan;        // scanline of last partial update
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
 	UINT32              m_unique_id;                // unique id for this screen_device
+	rgb_t				m_color;					// render color
+	UINT8				m_brightness;				// global brightness
 
 	// screen timing
 	attoseconds_t       m_frame_period;             // attoseconds per frame

@@ -84,8 +84,10 @@ really exist.
 #include "emu.h"
 #include "ns10crypt.h"
 
+const device_type CHOCOVDR_DECRYPTER = &device_creator<chocovdr_decrypter_device>;
 const device_type GAMSHARA_DECRYPTER = &device_creator<gamshara_decrypter_device>;
 const device_type KONOTAKO_DECRYPTER = &device_creator<konotako_decrypter_device>;
+const device_type NFLCLSFB_DECRYPTER = &device_creator<nflclsfb_decrypter_device>;
 const device_type STARTRGN_DECRYPTER = &device_creator<startrgn_decrypter_device>;
 
 // this could perfectly be part of the per-game logic; by now, only gamshara seems to use it, so we keep it global
@@ -127,16 +129,30 @@ UINT16 ns10_decrypter_device::decrypt(UINT16 cipherword)
 	for (int j = 15; j >= 0; --j)
 	{
 		_mask <<= 1;
-		_mask ^= gf2_reduce(_logic.eMask[j] & _previous_cipherwords);
-		_mask ^= gf2_reduce(_logic.dMask[j] & _previous_plainwords);
+		_mask ^= _reducer.gf2_reduce(_logic.eMask[j] & _previous_cipherwords);
+		_mask ^= _reducer.gf2_reduce(_logic.dMask[j] & _previous_plainwords);
 	}
 	_mask ^= _logic.xMask;
-	_mask ^= _logic.nonlinear_calculation(_previous_cipherwords, _previous_plainwords);
+	_mask ^= _logic.nonlinear_calculation(_previous_cipherwords, _previous_plainwords, _reducer);
 
 	return plainword;
 }
 
 void ns10_decrypter_device::device_start()
+{
+	_active = false;
+}
+
+void ns10_decrypter_device::init(int iv)
+{
+	// by now, only gamshara requires non-trivial initialization code; data
+	// should be moved to the per-game logic in case any other game do it differently
+	_previous_cipherwords = BITSWAP16(initSbox[iv],3,16,16,2,1,16,16,0,16,16,16,16,16,16,16,16);
+	_previous_plainwords  = 0;
+	_mask                 = 0;
+}
+
+gf2_reducer::gf2_reducer()
 {
 	int reduction;
 
@@ -151,16 +167,7 @@ void ns10_decrypter_device::device_start()
 	}
 }
 
-void ns10_decrypter_device::init(int iv)
-{
-	// by now, only gamshara requires non-trivial initialization code; data
-	// should be moved to the per-game logic in case any other game do it differently
-	_previous_cipherwords = BITSWAP16(initSbox[iv],3,16,16,2,1,16,16,0,16,16,16,16,16,16,16,16);
-	_previous_plainwords  = 0;
-	_mask                 = 0;
-}
-
-int ns10_decrypter_device::gf2_reduce(UINT64 num)
+int gf2_reducer::gf2_reduce(UINT64 num)const
 {
 	return
 		_gf2Reduction[num & 0xffff]         ^
@@ -172,7 +179,29 @@ int ns10_decrypter_device::gf2_reduce(UINT64 num)
 
 // game-specific logic
 
-static UINT16 gamshara_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords)
+static UINT16 chocovdr_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
+{
+	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
+	return ((previous_masks >> 9) & (reducer.gf2_reduce(0x0000000010065810ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000021005810ull & previous_plainwords)) & 1) << 10;
+}
+
+static const ns10_decrypter_device::ns10_crypto_logic chocovdr_crypto_logic = {
+	{
+		0x00005239351ec1daull, 0x0000000000008090ull, 0x0000000048264808ull, 0x0000000000004820ull,
+		0x0000000000000500ull, 0x0000000058ff5a54ull, 0x00000000d8220208ull, 0x00005239351e91d3ull,
+		0x000000009a1dfaffull, 0x0000000090040001ull, 0x0000000000000100ull, 0x0000000000001408ull,
+		0x0000000032efd3f1ull, 0x00000000000000d0ull, 0x0000000032efd2d7ull, 0x0000000000000840ull,
+	}, {
+		0x00002000410485daull, 0x0000000000008081ull, 0x0000000008044088ull, 0x0000000000004802ull,
+		0x0000000000000500ull, 0x00000000430cda54ull, 0x0000000010000028ull, 0x00002000410491dbull,
+		0x000000001100fafeull, 0x0000000018040001ull, 0x0000000000000010ull, 0x0000000000000508ull,
+		0x000000006800d3f5ull, 0x0000000000000058ull, 0x000000006800d2d5ull, 0x0000000000001840ull,
+	},
+	0x5b22,
+	chocovdr_nonlinear_calc
+};
+
+static UINT16 gamshara_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer&)
 {
 	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 7) & (previous_masks >> 13) & 1) << 2;
@@ -194,7 +223,7 @@ static const ns10_decrypter_device::ns10_crypto_logic gamshara_crypto_logic = {
 	gamshara_nonlinear_calc
 };
 
-static UINT16 konotako_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords)
+static UINT16 konotako_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer&)
 {
 	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 7) & (previous_masks >> 15) & 1) << 15;
@@ -216,7 +245,29 @@ static const ns10_decrypter_device::ns10_crypto_logic konotako_crypto_logic = {
 	konotako_nonlinear_calc
 };
 
-static UINT16 startrgn_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords)
+static UINT16 nflclsfb_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
+{
+	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
+	return ((previous_masks >> 1) & (reducer.gf2_reduce(0x0000000040de8fb3ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000088008fb3ull & previous_plainwords)) & 1) << 2;
+}
+
+static const ns10_decrypter_device::ns10_crypto_logic nflclsfb_crypto_logic = {
+	{
+		0x000034886e281880ull, 0x0000000012c5e7baull, 0x0000000000000200ull, 0x000000002900002aull,
+		0x00000000000004c0ull, 0x0000000012c5e6baull, 0x00000000e0df8bbbull, 0x000000002011532aull,
+		0x0000000000009040ull, 0x0000000000006004ull, 0x000000000000a001ull, 0x000034886e2818e1ull,
+		0x0000000000004404ull, 0x0000000000004200ull, 0x0000000000009100ull, 0x0000000020115712ull,
+	}, {
+		0x00000e00060819c0ull, 0x000000000e08e7baull, 0x0000000000000800ull, 0x000000000100002aull,
+		0x00000000000010c0ull, 0x000000000e08cebaull, 0x0000000088018bbbull, 0x000000008c005302ull,
+		0x000000000000c040ull, 0x0000000000006010ull, 0x0000000000000001ull, 0x00000e00060818e3ull,
+		0x0000000000000404ull, 0x0000000000004201ull, 0x0000000000001100ull, 0x000000008c0057b2ull,
+	},
+	0xbe32,
+	nflclsfb_nonlinear_calc
+};
+
+static UINT16 startrgn_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer&)
 {
 	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 12) & (previous_masks >> 14) & 1) << 4;
@@ -241,6 +292,11 @@ static const ns10_decrypter_device::ns10_crypto_logic startrgn_crypto_logic = {
 
 // game-specific devices
 
+chocovdr_decrypter_device::chocovdr_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ns10_decrypter_device(CHOCOVDR_DECRYPTER, chocovdr_crypto_logic, mconfig, tag, owner, clock)
+{
+}
+
 gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ns10_decrypter_device(GAMSHARA_DECRYPTER, gamshara_crypto_logic, mconfig, tag, owner, clock)
 {
@@ -248,6 +304,11 @@ gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconf
 
 konotako_decrypter_device::konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ns10_decrypter_device(KONOTAKO_DECRYPTER, konotako_crypto_logic, mconfig, tag, owner, clock)
+{
+}
+
+nflclsfb_decrypter_device::nflclsfb_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ns10_decrypter_device(NFLCLSFB_DECRYPTER, nflclsfb_crypto_logic, mconfig, tag, owner, clock)
 {
 }
 

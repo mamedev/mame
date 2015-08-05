@@ -773,6 +773,11 @@ MACHINE_CONFIG_END
   * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
   * 9-digit 7seg LED display
 
+  Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
+  a docking station to the TI-30, with an additional display made of magnetic
+  refreshable Braille cells. The TI-30 itself is slightly modified to wire
+  the original LED display to a 25-pin D-Sub connector.
+
 ***************************************************************************/
 
 class majestic_state : public ticalc1x_state

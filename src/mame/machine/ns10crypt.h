@@ -4,6 +4,15 @@
 #ifndef _NS10CRYPT_H_
 #define _NS10CRYPT_H_
 
+class gf2_reducer  // helper class
+{
+public:
+	gf2_reducer();
+	int gf2_reduce(UINT64 num)const;
+private:
+	int _gf2Reduction[0x10000];
+};
+
 class ns10_decrypter_device : public device_t
 {
 public:
@@ -14,7 +23,7 @@ public:
 		UINT64 eMask[16];
 		UINT64 dMask[16];
 		UINT16 xMask;
-		UINT16(*nonlinear_calculation)(UINT64, UINT64);  // preliminary encoding; need research
+		UINT16(*nonlinear_calculation)(UINT64, UINT64, const gf2_reducer&);  // preliminary encoding; need research
 	};
 
 	void activate(int iv);
@@ -34,15 +43,22 @@ private:
 	UINT64 _previous_plainwords;
 	bool _active;
 	const ns10_crypto_logic& _logic;
-	int _gf2Reduction[0x10000];
 	static const int initSbox[16];
+	const gf2_reducer _reducer;
 
 	void device_start();
 	void init(int iv);
-	int gf2_reduce(UINT64 num);
 };
 
+
+
 // game-specific devices
+
+class chocovdr_decrypter_device : public ns10_decrypter_device
+{
+public:
+	chocovdr_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 class gamshara_decrypter_device : public ns10_decrypter_device
 {
@@ -56,6 +72,12 @@ public:
 	konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class nflclsfb_decrypter_device : public ns10_decrypter_device
+{
+public:
+	nflclsfb_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class startrgn_decrypter_device : public ns10_decrypter_device
 {
 public:
@@ -63,8 +85,10 @@ public:
 };
 
 
+extern const device_type CHOCOVDR_DECRYPTER;
 extern const device_type GAMSHARA_DECRYPTER;
 extern const device_type KONOTAKO_DECRYPTER;
+extern const device_type NFLCLSFB_DECRYPTER;
 extern const device_type STARTRGN_DECRYPTER;
 
 #endif

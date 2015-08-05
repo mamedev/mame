@@ -34,57 +34,15 @@ void ucom4_cpu_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
-UINT8 ucom4_cpu_device::input_r(int index)
-{
-	index &= 0xf;
-	UINT8 inp = 0xf;
 
-	switch (index)
-	{
-		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff); break;
-		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff); break;
-		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff) | m_port_out[index]; break;
-		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
 
-		default:
-			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
-			break;
-	}
-
-	return inp & 0xf;
-}
-
-void ucom4_cpu_device::output_w(int index, UINT8 data)
-{
-	index &= 0xf;
-	data &= 0xf;
-
-	switch (index)
-	{
-		case NEC_UCOM4_PORTC: m_write_c(index, data, 0xff); break;
-		case NEC_UCOM4_PORTD: m_write_d(index, data, 0xff); break;
-		case NEC_UCOM4_PORTE: m_write_e(index, data, 0xff); break;
-		case NEC_UCOM4_PORTF: m_write_f(index, data, 0xff); break;
-		case NEC_UCOM4_PORTG: m_write_g(index, data, 0xff); break;
-		case NEC_UCOM4_PORTH: m_write_h(index, data, 0xff); break;
-		case NEC_UCOM4_PORTI: m_write_i(index, data & 7, 0xff); break;
-
-		default:
-			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data & 0xf, m_prev_pc);
-			break;
-	}
-
-	m_port_out[index] = data;
-}
+// basic instruction set
 
 void ucom4_cpu_device::op_illegal()
 {
 	logerror("%s unknown opcode $%02X at $%03X\n", tag(), m_op, m_prev_pc);
 }
 
-
-
-// basic instruction set
 
 // Load
 
