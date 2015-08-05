@@ -262,7 +262,7 @@ void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
 void floppy_image_device::commit_image()
 {
 	image_dirty = false;
-	if(!output_format)
+	if(!output_format || !output_format->supports_save())
 		return;
 	io_generic io;
 	// Do _not_ remove this cast otherwise the pointer will be incorrect when used by the ioprocs.

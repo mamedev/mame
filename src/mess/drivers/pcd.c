@@ -111,6 +111,7 @@ private:
 	struct {
 		UINT16 ctl;
 		UINT16 regs[1024];
+		int type;
 		bool sc;
 	} m_mmu;
 };
@@ -157,6 +158,7 @@ void pcd_state::machine_reset()
 	m_rst = 0;
 	m_mmu.ctl = 0;
 	m_mmu.sc = false;
+	m_mmu.type = ioport("mmu")->read();
 }
 
 READ8_MEMBER( pcd_state::irq_callback )
@@ -445,9 +447,13 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 WRITE16_MEMBER(pcd_state::mem_w)
 {
 	UINT16 *ram = (UINT16 *)m_ram->pointer();
-	if(m_mmu.ctl & 0x20)
+	if((m_mmu.ctl & 0x20) && m_mmu.type)
 	{
-		UINT16 reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
+		UINT16 reg;
+		if(m_mmu.type == 2)
+			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
+		else
+			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
 		if(!reg && !space.debugger_access())
 		{
 			offset <<= 1;
@@ -463,9 +469,13 @@ WRITE16_MEMBER(pcd_state::mem_w)
 READ16_MEMBER(pcd_state::mem_r)
 {
 	UINT16 *ram = (UINT16 *)m_ram->pointer();
-	if(m_mmu.ctl & 0x20)
+	if((m_mmu.ctl & 0x20) && m_mmu.type)
 	{
-		UINT16 reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
+		UINT16 reg;
+		if(m_mmu.type == 2)
+			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
+		else
+			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
 		if(!reg && !space.debugger_access())
 		{
 			offset <<= 1;
@@ -525,6 +535,14 @@ SLOT_INTERFACE_END
 FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
+
+static INPUT_PORTS_START(pcd)
+	PORT_START("mmu")
+	PORT_CONFNAME(0x03, 0x00, "MMU Type")
+	PORT_CONFSETTING(0x00, "None")
+	PORT_CONFSETTING(0x01, "SINIX 1.0")
+	PORT_CONFSETTING(0x02, "SINIX 1.2")
+INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
@@ -633,4 +651,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1984, pcd, 0, 0, pcd, 0, driver_device, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
+COMP( 1984, pcd, 0, 0, pcd, pcd, driver_device, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
