@@ -10340,6 +10340,8 @@ ringking2       // (c) 1985 Data East USA
 ringking3       // (c) 1985 Data East USA
 ringkingw       // (c) 1985 Wood Place Inc.
 dlair           // (c) 1983 Cinematronics
+dlair_1         // (c) 1983 Cinematronics
+dlair_2         // (c) 1983 Cinematronics
 dlairf          // (c) 1983 Cinematronics
 dlaire          // (c) 1983 Cinematronics
 dlaird          // (c) 1983 Cinematronics
@@ -12253,7 +12255,7 @@ ssjkrpkr        // (c) 1982 Southern Systems & Assembly, Ltd.
 fastdrwp        // Stern?
 dphlunka        // SMS Manufacturing Corp?
 dphlunkb        // SMS Manufacturing Corp?
-//pkii_dm         // Unknown Poker PKII/DM (misplaced roms)
+pkii_dm         // Unknown Poker PKII/DM
 
 // Sanki Denshi Kogyo
 pachifev        // (c) 1983?
