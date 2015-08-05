@@ -538,7 +538,6 @@ WRITE_LINE_MEMBER( coco_state::pia1_ca2_w )
 WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
 {
 	update_sound();     // SOUND_ENABLE is connected to PIA1 CB2
-	poll_keyboard();
 }
 
 
