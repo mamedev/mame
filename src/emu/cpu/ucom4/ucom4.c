@@ -26,6 +26,7 @@
 
 // uCOM-43 products: 2000x8 ROM, RAM size custom, supports full instruction set
 const device_type NEC_D553 = &device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output, 96x4 RAM
+const device_type NEC_D557L = &device_creator<upd557l_cpu_device>; // 28-pin PMOS, 21 pins for I/O, Open Drain output, 96x4 RAM
 const device_type NEC_D650 = &device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O, push-pull output, 96x4 RAM
 
 // uCOM-44 products: 1000x8 ROM, 64x4 RAM, does not support external interrupt
@@ -59,6 +60,10 @@ ADDRESS_MAP_END
 // device definitions
 upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
+{ }
+
+upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ucom4_cpu_device(mconfig, NEC_D557L, "uPD557L", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd557l", __FILE__)
 { }
 
 upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -203,6 +208,90 @@ void ucom4_cpu_device::device_reset()
 	// clear i/o
 	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
 		output_w(i, 0xf);
+}
+
+
+
+//-------------------------------------------------
+//  i/o handling
+//-------------------------------------------------
+
+// default:
+// A,B are inputs, C,D are input/output, E,F,G,H,I are output
+
+UINT8 ucom4_cpu_device::input_r(int index)
+{
+	index &= 0xf;
+	UINT8 inp = 0;
+
+	switch (index)
+	{
+		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff); break;
+		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff); break;
+		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff) | m_port_out[index]; break;
+		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
+
+		default:
+			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+			break;
+	}
+
+	return inp & 0xf;
+}
+
+void ucom4_cpu_device::output_w(int index, UINT8 data)
+{
+	index &= 0xf;
+	data &= 0xf;
+
+	switch (index)
+	{
+		case NEC_UCOM4_PORTC: m_write_c(index, data, 0xff); break;
+		case NEC_UCOM4_PORTD: m_write_d(index, data, 0xff); break;
+		case NEC_UCOM4_PORTE: m_write_e(index, data, 0xff); break;
+		case NEC_UCOM4_PORTF: m_write_f(index, data, 0xff); break;
+		case NEC_UCOM4_PORTG: m_write_g(index, data, 0xff); break;
+		case NEC_UCOM4_PORTH: m_write_h(index, data, 0xff); break;
+		case NEC_UCOM4_PORTI: m_write_i(index, data & 7, 0xff); break;
+
+		default:
+			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+			break;
+	}
+
+	m_port_out[index] = data;
+}
+
+// uPD557L:
+// ports B,H,I are stripped, port G is reduced to 1 pin
+
+UINT8 upd557l_cpu_device::input_r(int index)
+{
+	index &= 0xf;
+	
+	if (index == NEC_UCOM4_PORTB)
+		logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+	else
+		return ucom4_cpu_device::input_r(index);
+	
+	return 0;
+}
+
+void upd557l_cpu_device::output_w(int index, UINT8 data)
+{
+	index &= 0xf;
+	data &= 0xf;
+
+	if (index == NEC_UCOM4_PORTH || index == NEC_UCOM4_PORTI)
+		logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+	else
+	{
+		// only G0 for port G
+		if (index == NEC_UCOM4_PORTG)
+			data &= 1;
+
+		ucom4_cpu_device::output_w(index, data);
+	}
 }
 
 

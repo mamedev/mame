@@ -44,6 +44,8 @@
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
+ @512     uPD557LC 1980, Castle Toy Tactix
+
  *060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
@@ -52,6 +54,11 @@
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
+
+TODO:
+  - games that rely on the fact that faster/longer strobed elements appear brighter:
+    tactix(player 2)
+
 ***************************************************************************/
 
 #include "includes/hh_ucom4.h"
@@ -59,6 +66,7 @@
 // internal artwork
 #include "efball.lh"
 #include "mvbfree.lh"
+#include "tactix.lh" // clickable
 
 #include "hh_ucom4_test.lh" // common test-layout - use external artwork
 
@@ -943,6 +951,125 @@ static MACHINE_CONFIG_START( bcclimbr, bcclimbr_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Castle Toy Tactix
+  * NEC uCOM-43 MCU, labeled D557LC 512
+  * 16 LEDs behind buttons
+  
+  Tactix is similar to Merlin, for 1 or 2 players. In 2-player mode, simply
+  don't press the Comp Turn button. The four included minigames are:
+  1: Capture (reversi)
+  2: Jump-Off (peg solitaire)
+  3: Triple Play (3 in a row)
+  4: Concentration (memory)
+
+  note: MAME external artwork is not needed for this game
+
+***************************************************************************/
+
+class tactix_state : public hh_ucom4_state
+{
+public:
+	tactix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(leds_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+// handlers
+
+WRITE8_MEMBER(tactix_state::leds_w)
+{
+	// D,F: 4*4 led matrix
+	m_port[offset] = data;
+	display_matrix(4, 4, m_port[NEC_UCOM4_PORTD], m_port[NEC_UCOM4_PORTF]);
+}
+
+WRITE8_MEMBER(tactix_state::speaker_w)
+{
+	// G0: speaker out
+	m_speaker->level_w(data & 1);
+}
+
+WRITE8_MEMBER(tactix_state::input_w)
+{
+	// C,E0: input mux
+	m_port[offset] = data;
+	m_inp_mux = (m_port[NEC_UCOM4_PORTE] << 4 & 0x10) | m_port[NEC_UCOM4_PORTC];
+}
+
+READ8_MEMBER(tactix_state::input_r)
+{
+	// A: multiplexed inputs
+	return read_inputs(5);
+}
+
+
+// config
+
+static INPUT_PORTS_START( tactix )
+	PORT_START("IN.0") // C0 port A
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 5")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Button 9")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 13")
+
+	PORT_START("IN.1") // C1 port A
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Button 6")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Button 10")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Button 14")
+
+	PORT_START("IN.2") // C2 port A
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Button 7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Button 11")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Button 15")
+
+	PORT_START("IN.3") // C3 port A
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Button 8")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Button 12")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Button 16")
+
+	PORT_START("IN.4") // E0 port A
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) //todo..
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( tactix, tactix_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D557L, 400000) // approximation
+	MCFG_UCOM4_READ_A_CB(READ8(tactix_state, input_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(tactix_state, input_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(tactix_state, leds_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(tactix_state, input_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(tactix_state, leds_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(tactix_state, speaker_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tactix)
 
 	/* no video! */
 
@@ -2319,6 +2446,12 @@ ROM_START( bcclimbr )
 ROM_END
 
 
+ROM_START( tactix )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d557lc-512", 0x0000, 0x0800, CRC(1df738cb) SHA1(15a5de28a3c03e6894d29c56b5b424983569ccf2) )
+ROM_END
+
+
 ROM_START( invspace )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
@@ -2400,6 +2533,8 @@ CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambin
 CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
