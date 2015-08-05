@@ -171,7 +171,7 @@ UINT32 astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb3
 		{
 			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
 			UINT8 data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
-			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color);
+			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color & 0x07);
 		}
 
 	return 0;
