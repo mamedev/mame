@@ -528,16 +528,12 @@ void macrossp_state::machine_start()
 {
 	save_item(NAME(m_sndpending));
 	save_item(NAME(m_snd_toggle));
-	save_item(NAME(m_fade_effect));
-	save_item(NAME(m_old_fade));
 }
 
 void macrossp_state::machine_reset()
 {
 	m_sndpending = 0;
 	m_snd_toggle = 0;
-	m_fade_effect = 0;
-	m_old_fade = 0;
 }
 
 static MACHINE_CONFIG_START( macrossp, macrossp_state )

@@ -64,8 +64,6 @@ public:
 	/* misc */
 	int              m_sndpending;
 	int              m_snd_toggle;
-	INT32            m_fade_effect;
-	INT32            m_old_fade;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -97,6 +95,5 @@ public:
 	void screen_eof_macrossp(screen_device &screen, bool state);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int linem, int pri);
-	void update_colors(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
