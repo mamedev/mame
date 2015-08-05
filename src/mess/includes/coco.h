@@ -153,8 +153,8 @@ protected:
 	void recalculate_firq(void);
 
 	// changed handlers
-	virtual void pia1_pa_changed(void);
-	virtual void pia1_pb_changed(void);
+	virtual void pia1_pa_changed(UINT8 data);
+	virtual void pia1_pb_changed(UINT8 data);
 
 	// miscellaneous
 	virtual void update_keyboard_input(UINT8 value, UINT8 z);

@@ -502,7 +502,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 
 WRITE8_MEMBER( coco_state::pia1_pa_w )
 {
-	pia1_pa_changed();
+	pia1_pa_changed(data);
 }
 
 
@@ -513,7 +513,7 @@ WRITE8_MEMBER( coco_state::pia1_pa_w )
 
 WRITE8_MEMBER( coco_state::pia1_pb_w )
 {
-	pia1_pb_changed();
+	pia1_pb_changed(data);
 }
 
 
@@ -998,12 +998,12 @@ void coco_state::update_prinout(bool prinout)
 //  pia1_pa_changed - called when PIA1 PA changes
 //-------------------------------------------------
 
-void coco_state::pia1_pa_changed(void)
+void coco_state::pia1_pa_changed(UINT8 data)
 {
 	update_sound();     // DAC is connected to PIA1 PA2-PA7
 	poll_keyboard();
 	update_cassout(dac_output());
-	update_prinout(m_pia_1->a_output() & 0x02 ? true : false);
+	update_prinout(data & 0x02 ? true : false);
 }
 
 
@@ -1012,7 +1012,7 @@ void coco_state::pia1_pa_changed(void)
 //  pia1_pb_changed - called when PIA1 PB changes
 //-------------------------------------------------
 
-void coco_state::pia1_pb_changed(void)
+void coco_state::pia1_pb_changed(UINT8 data)
 {
 	update_sound();     // singe_bit_sound is connected to PIA1 PB1
 }

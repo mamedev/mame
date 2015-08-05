@@ -45,7 +45,7 @@ public:
 	required_device<printer_image_device> m_printer;
 
 protected:
-	virtual void pia1_pa_changed(void);
+	virtual void pia1_pa_changed(UINT8 data);
 };
 
 
@@ -65,7 +65,7 @@ protected:
 	virtual DECLARE_READ8_MEMBER( ff00_read );
 	virtual DECLARE_WRITE8_MEMBER( ff00_write );
 
-	virtual void pia1_pb_changed(void);
+	virtual void pia1_pb_changed(UINT8 data);
 	void page_rom(bool romswitch);
 };
 
