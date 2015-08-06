@@ -2243,6 +2243,8 @@ snmath
 snmathp
 snread
 lantutor
+tntell
+vocaid
 
 // hh_tms1k ticalc1x.c
 tisr16
