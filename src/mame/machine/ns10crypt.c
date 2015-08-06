@@ -22,7 +22,27 @@ reverse order (first the one nearest the end, then the second nearest, etc);
 the second part goes inmediately after it from a logic perspective, but it's
 physically located at the area starting at 0x28000 in the ROM. Games, after
 some bootup code has been executed, will copy the encrypted content from
-the ROM to RAM, moment at which the decryption is triggered.
+the NANDs to RAM, moment at which the decryption is triggered. Physical locations
+of the encrypted programs in the first NAND, together with the RAM region where 
+they are loaded, are summarized in the following table:
+
+game        head region         tail region        RAM address
+--------    ----------------    --------------     -----------
+chocovdr    [fdc000,1000000)    [28000,1dc000)     80010000
+gamshara    [fdc000,1000000)    [28000,144000)     80010000
+knpuzzle    [fc8000,fcc000)     [28000,40c000)     80030000
+konotako    [fdc000,1000000)    [28000,b4000)      80010000
+nflclsfb    [fdc000,1000000)    [28000,204000)     80010000
+startrgn    [fdc000,1000000)    [28000,b4000)      80010000
+
+knpuzzle constitutes an interesting case, as it seem to be playing some tricks
+in order to obfuscate the location of the main program; first, both regions
+are padded by encrypted blank regions (at [fc4000,fc8000) & [40c000,458000)),
+maybe in an attempt to hinder the recognition of the extremes of the
+encrypted data; second, some kind of protection trap seem to simulate a loading
+of the encrypted region as if it were using the same head region and RAM address
+than most sets ([fdc000,1000000) & 80010000), while those aren't the correct
+values for it.  
 
 Most games do a single decryption run, so the process is only initialized once;
 however, at least one game (gamshara) does write to the triggering register
@@ -86,6 +106,7 @@ really exist.
 
 const device_type CHOCOVDR_DECRYPTER = &device_creator<chocovdr_decrypter_device>;
 const device_type GAMSHARA_DECRYPTER = &device_creator<gamshara_decrypter_device>;
+const device_type KNPUZZLE_DECRYPTER = &device_creator<knpuzzle_decrypter_device>;
 const device_type KONOTAKO_DECRYPTER = &device_creator<konotako_decrypter_device>;
 const device_type NFLCLSFB_DECRYPTER = &device_creator<nflclsfb_decrypter_device>;
 const device_type STARTRGN_DECRYPTER = &device_creator<startrgn_decrypter_device>;
@@ -223,6 +244,28 @@ static const ns10_decrypter_device::ns10_crypto_logic gamshara_crypto_logic = {
 	gamshara_nonlinear_calc
 };
 
+static UINT16 knpuzzle_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
+{
+	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
+	return ((previous_masks >> 0x13) & (reducer.gf2_reduce(0x0000000014001290ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000000021290ull & previous_plainwords)) & 1) << 1;
+}
+
+static const ns10_decrypter_device::ns10_crypto_logic knpuzzle_crypto_logic = {
+	{
+		0x00000000c0a4208cull, 0x00000000204100a8ull, 0x000000000c0306a0ull, 0x000000000819e944ull,
+		0x0000000000001400ull, 0x0000000000000061ull, 0x000000000141401cull, 0x0000000000000020ull,
+		0x0000000001418010ull, 0x00008d6a1eb690cfull, 0x00008d6a4d3b90ceull, 0x0000000000004201ull,
+		0x00000000012c00a2ull, 0x000000000c0304a4ull, 0x0000000000000500ull, 0x0000000000000980ull,
+	}, {
+		0x000000002a22608cull, 0x00000000002300a8ull, 0x0000000000390ea0ull, 0x000000000100a9c4ull,
+		0x0000000000001400ull, 0x0000000000000041ull, 0x0000000003014014ull, 0x0000000000000022ull,
+		0x0000000003010110ull, 0x00000800031a80cfull, 0x00000800003398deull, 0x0000000000004200ull,
+		0x00000000012a04a2ull, 0x00000000003984a4ull, 0x0000000000000700ull, 0x0000000000000882ull,
+	},
+	0x01e2,
+	knpuzzle_nonlinear_calc
+};
+
 static UINT16 konotako_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer&)
 {
 	UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
@@ -299,6 +342,11 @@ chocovdr_decrypter_device::chocovdr_decrypter_device(const machine_config &mconf
 
 gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ns10_decrypter_device(GAMSHARA_DECRYPTER, gamshara_crypto_logic, mconfig, tag, owner, clock)
+{
+}
+
+knpuzzle_decrypter_device::knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ns10_decrypter_device(KNPUZZLE_DECRYPTER, konotako_crypto_logic, mconfig, tag, owner, clock)
 {
 }
 
