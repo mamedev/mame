@@ -346,7 +346,7 @@ gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconf
 }
 
 knpuzzle_decrypter_device::knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ns10_decrypter_device(KNPUZZLE_DECRYPTER, konotako_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_decrypter_device(KNPUZZLE_DECRYPTER, knpuzzle_crypto_logic, mconfig, tag, owner, clock)
 {
 }
 
