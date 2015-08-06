@@ -462,6 +462,8 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 	UINT16 data = nand_read2( nand_address * 2 );
 
 	//  logerror("read %08x = %04x\n", nand_address*2, data);
+	printf("read %08x = %04x\n", nand_address*2, data);
+	  
 
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
@@ -556,7 +558,9 @@ DRIVER_INIT_MEMBER(namcos10_state,mrdrilrg)
 DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
-	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
+	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
+	decrypt_bios(machine(), "user2", 0x047ac00, 0x1042200, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
+	decrypt_bios(machine(), "user2", 0x104a600, regSize  , 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
 	memn_driver_init();
 }
 
@@ -666,6 +670,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED(ns10_gamshara, namcos10_memn)
 /* decrypter device (CPLD in hardware?) */
 MCFG_DEVICE_ADD("decrypter", GAMSHARA_DECRYPTER, 0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(ns10_knpuzzle, namcos10_memn)
+/* decrypter device (CPLD in hardware?) */
+MCFG_DEVICE_ADD("decrypter", KNPUZZLE_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(ns10_konotako, namcos10_memn)
@@ -883,7 +892,7 @@ GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbal
 GAME( 2001, gjspace,   0,        namcos10_memn, namcos10, namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2001, knpuzzle,  0,        namcos10_memn, namcos10, namcos10_state, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle, namcos10, namcos10_state, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr, namcos10, namcos10_state, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, startrgn,  0,        ns10_startrgn, namcos10, namcos10_state, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

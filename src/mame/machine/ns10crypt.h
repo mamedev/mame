@@ -66,6 +66,12 @@ public:
 	gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class knpuzzle_decrypter_device : public ns10_decrypter_device
+{
+public:
+	knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class konotako_decrypter_device : public ns10_decrypter_device
 {
 public:
@@ -87,6 +93,7 @@ public:
 
 extern const device_type CHOCOVDR_DECRYPTER;
 extern const device_type GAMSHARA_DECRYPTER;
+extern const device_type KNPUZZLE_DECRYPTER;
 extern const device_type KONOTAKO_DECRYPTER;
 extern const device_type NFLCLSFB_DECRYPTER;
 extern const device_type STARTRGN_DECRYPTER;
