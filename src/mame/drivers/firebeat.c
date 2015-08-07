@@ -960,6 +960,7 @@ public:
 	DECLARE_READ16_MEMBER(spu_unk_r);
 	DECLARE_WRITE16_MEMBER(spu_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(spu_220000_w);
+	DECLARE_WRITE16_MEMBER(spu_sdram_bank_w);
 	DECLARE_READ16_MEMBER(m68k_spu_share_r);
 	DECLARE_WRITE16_MEMBER(m68k_spu_share_w);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
@@ -1624,6 +1625,14 @@ WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 		if (offset == 0xff)     // address 0x3fe triggers M68K interrupt
 		{
 			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
+
+			printf("SPU command %02X%02X\n", m_spu_shared_ram[0], m_spu_shared_ram[1]);
+
+			UINT16 cmd = ((UINT16)(m_spu_shared_ram[0]) << 8) | m_spu_shared_ram[1];
+			if (cmd == 0x1110)
+			{
+				printf("   [%02X %02X %02X %02X %02X]\n", m_spu_shared_ram[0x10], m_spu_shared_ram[0x11], m_spu_shared_ram[0x12], m_spu_shared_ram[0x13], m_spu_shared_ram[0x14]);
+			}
 		}
 	}
 	if (ACCESSING_BITS_0_7)
@@ -1685,6 +1694,7 @@ READ16_MEMBER(firebeat_state::spu_unk_r)
 
 	UINT16 r = 0;
 	r |= 0x80;      // if set, uses ATA PIO mode, otherwise DMA
+	r |= 0x01;      // enable SDRAM test
 
 	return r;
 }
@@ -1705,6 +1715,10 @@ WRITE16_MEMBER(firebeat_state::spu_irq_ack_w)
 WRITE16_MEMBER(firebeat_state::spu_220000_w)
 {
 	// IRQ2 handler 5 sets all bits
+}
+
+WRITE16_MEMBER(firebeat_state::spu_sdram_bank_w)
+{
 }
 
 WRITE_LINE_MEMBER(firebeat_state::spu_ata_interrupt)
@@ -1757,10 +1771,13 @@ static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
 	AM_RANGE(0x200000, 0x200001) AM_READ(spu_unk_r)
 	AM_RANGE(0x220000, 0x220001) AM_WRITE(spu_220000_w)
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(spu_irq_ack_w)
+	AM_RANGE(0x260000, 0x260001) AM_WRITE(spu_sdram_bank_w)
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(m68k_spu_share_r, m68k_spu_share_w)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs0, write_cs0)
 	AM_RANGE(0x340000, 0x34000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs1, write_cs1)
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf5c400", rf5c400_device, rf5c400_r, rf5c400_w)
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM			// SDRAM
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAM			// SDRAM
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -2091,6 +2108,17 @@ MACHINE_CONFIG_END
 /*****************************************************************************/
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
 
+/* popn7 supports 8 different dongles:
+   - Manufacture
+   - Service
+   - Event
+   - Oversea
+   - No Hardware
+   - Rental
+   - Debug
+   - Normal
+*/
+
 enum
 {
 	DS1991_STATE_NORMAL,
@@ -2420,7 +2448,7 @@ ROM_START( popn7 )
 	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
 
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
-	ROM_LOAD("gcb00-ja", 0x00, 0xc0, CRC(cc28625a) SHA1(e7de79ae72fdbd22328c9de74dfa17b5e6ae43b6))
+	ROM_LOAD("gcb00-ja", 0x00, 0xc0, CRC(d0a58c74) SHA1(fc1d8ad2f9d16743dc10b6e61a5a88ffa9c9dd2f))
 
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))

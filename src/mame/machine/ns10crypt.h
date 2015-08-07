@@ -44,7 +44,7 @@ private:
 	bool _active;
 	const ns10_crypto_logic& _logic;
 	static const int initSbox[16];
-	const gf2_reducer _reducer;
+	const gf2_reducer *_reducer;
 
 	void device_start();
 	void init(int iv);
