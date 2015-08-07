@@ -527,7 +527,8 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			}
 
 			// else if the mouse is over this item, draw with a different background
-			else if (itemnum == hover && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0)
+			else if (itemnum == hover && (((pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0) || (linenum == 0 && top_line != 0)
+			         || (linenum == visible_lines - 1 && itemnum != item.size() - 1)))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
