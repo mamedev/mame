@@ -59,23 +59,6 @@
  * Slot 1 Controller Board      ASCU    7    31     0xb02000
  * ----------------------------------------------------------
  *
- * 10. The VMEbus
- * ---------------
- * The implemented VMEbus Interface includes 24 address, 16 data,
- * 6 address modifier and the asynchronous control signals.
- * A single level bus arbiter is provided to build multi master
- * systems. In addition to the bus arbiter, a separate slave bus
- * arbitration allows selection of the arbitration level (0-3).
- *
- * The address modifier range .,Short 110 Access« can be selected
- * via a jumper for variable system generation. The 7 interrupt
- * request levels of the VMEbus are fully supported from the
- * SYS68K1CPU-1 B/D. For multi-processing, each IRQ signal can be
- * enabled/disabled via a jumper field.
- *
- * Additionally, the SYS68K1CPU-1 B/D supports the ACFAIL, SYSRESET,
- * SYSFAIL and SYSCLK signal (16 MHz).
- *
  *  TODO:
  *  - Finish 3 x ACIA6850, host and remote interface left, terminal works
  *  - Finish 1 x 68230 Motorola, Parallel Interface / Timer as required by ROM
@@ -100,8 +83,10 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
-#define LOG(x) /* x */
+#define LOG(x) x
 
 #define BAUDGEN_CLOCK XTAL_1_8432MHz
 /*
@@ -152,10 +137,15 @@ force68k_state(const machine_config &mconfig, device_type type, const char *tag)
         , m_centronics_busy (0)
         , m_centronics_perror (0)
         , m_centronics_select (0)
+	,m_cart(*this, "exp_rom1")
 {
 }
 
 DECLARE_READ16_MEMBER (bootvect_r);
+DECLARE_READ16_MEMBER (vme_a24_r);
+DECLARE_WRITE16_MEMBER (vme_a24_w);
+DECLARE_READ16_MEMBER (vme_a16_r);
+DECLARE_WRITE16_MEMBER (vme_a16_w);
 virtual void machine_start ();
 // clocks
 DECLARE_WRITE_LINE_MEMBER (write_aciahost_clock);
@@ -166,6 +156,9 @@ DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
 DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
 DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
 DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
+// User EPROM/SRAM slot(s)
+//int force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
+//DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 
 protected:
 
@@ -185,14 +178,17 @@ INT32 m_centronics_select;
 
 // Pointer to System ROMs needed by bootvect_r
 UINT16  *m_sysrom;
+
+required_device<generic_slot_device> m_cart;
+
 };
 
 static ADDRESS_MAP_START (force68k_mem, AS_PROGRAM, 16, force68k_state)
 ADDRESS_MAP_UNMAP_HIGH
 AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
-AM_RANGE (0x000008, 0x01ffff) AM_RAM        /* DRAM */
-AM_RANGE (0x080000, 0x09ffff) AM_ROM        /* System EPROM Area */
-//	AM_RANGE(0x0a0000, 0x0bffff) AM_ROM /* User EPROM Area   */
+AM_RANGE (0x000008, 0x01ffff) AM_RAM /* DRAM */
+AM_RANGE (0x080000, 0x09ffff) AM_ROM /* System EPROM Area      */
+//AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, mapped by a cartslot  */
 AM_RANGE (0x0c0040, 0x0c0041) AM_DEVREADWRITE8 ("aciahost", acia6850_device, status_r, control_w, 0x00ff)
 AM_RANGE (0x0c0042, 0x0c0043) AM_DEVREADWRITE8 ("aciahost", acia6850_device, data_r, data_w, 0x00ff)
 AM_RANGE (0x0c0080, 0x0c0081) AM_DEVREADWRITE8 ("aciaterm", acia6850_device, status_r, control_w, 0xff00)
@@ -202,8 +198,8 @@ AM_RANGE (0x0c0102, 0x0c0103) AM_DEVREADWRITE8 ("aciaremt", acia6850_device, dat
 AM_RANGE (0x0c0400, 0x0c042f) AM_DEVREADWRITE8 ("rtc", mm58167_device, read, write, 0x00ff)
 AM_RANGE (0x0e0000, 0x0e0035) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
 //      AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
-//      AM_RANGE(0x100000, 0xfeffff) /* VMEbus Rev B addresses (24 bits) */
-//      AM_RANGE(0xff0000, 0xffffff) /* VMEbus Rev B addresses (16 bits) */
+AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) */
+AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -294,11 +290,57 @@ void force68k_state::machine_start ()
 
         /* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
         m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x080000);
+
+        /* Map user ROM/RAM socket(s) */
+	if (m_cart->exists())
+        {
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 
+                                                                  0xaffff, 
+                                                                  read16_delegate(FUNC(generic_slot_device::read16_rom),
+                                                                                     (generic_slot_device*)m_cart));
+        }
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
 READ16_MEMBER (force68k_state::bootvect_r){
         return m_sysrom [offset];
+}
+
+/* 10. The VMEbus (text from board documentation)
+ * ---------------
+ * The implemented VMEbus Interface includes 24 address, 16 data,
+ * 6 address modifier and the asynchronous control signals.
+ * A single level bus arbiter is provided to build multi master
+ * systems. In addition to the bus arbiter, a separate slave bus
+ * arbitration allows selection of the arbitration level (0-3).
+ *
+ * The address modifier range .,Short 110 Access« can be selected
+ * via a jumper for variable system generation. The 7 interrupt
+ * request levels of the VMEbus are fully supported from the
+ * SYS68K1CPU-1 B/D. For multi-processing, each IRQ signal can be
+ * enabled/disabled via a jumper field.
+ *
+ * Additionally, the SYS68K1CPU-1 B/D supports the ACFAIL, SYSRESET,
+ * SYSFAIL and SYSCLK signal (16 MHz).
+ */
+
+/* Dummy VME access methods until the VME bus device is ready for use */
+READ16_MEMBER (force68k_state::vme_a24_r){
+        LOG (logerror ("vme_a24_r\n"));
+        return (UINT16) 0;
+}
+
+WRITE16_MEMBER (force68k_state::vme_a24_w){
+        LOG (logerror ("vme_a24_w\n"));
+}
+
+READ16_MEMBER (force68k_state::vme_a16_r){
+        LOG (logerror ("vme_16_r\n"));
+        return (UINT16) 0;
+}
+
+WRITE16_MEMBER (force68k_state::vme_a16_w){
+        LOG (logerror ("vme_a16_w\n"));
 }
 
 /*
@@ -320,6 +362,54 @@ WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
 }
 
 /*
+ * 4. The USER Area (Text from the board manual)
+  The USER area contains two 28 pin sockets with JEDEC compatible pin out. 
+   To allow the usage of static RAM's, the access to the USER area is byte
+   oriented. Table 3. lists the usable device types.
+
+   Bits   Bytes    EPROM SRAM
+   --------------------------
+   2Kx16   4 Kbyte 2716  6116
+   4Kx16   8 Kbyte 2732
+   8Kx16  16 Kbyte 2764  6264
+   16Kx16 32 Kbyte 27128
+   32Kx16 64 Kbyte 27256
+   --------------------------
+*/
+// Implementation of static 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier 
+// software handling. TODO: make configurable according to table above.
+static MACHINE_CONFIG_FRAGMENT( fccpu1_eprom_sockets )
+	MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_linear_slot, "fccpu1_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+        MCFG_GENERIC_ENDIAN(ENDIANNESS_LITTLE) // In generic call_load() len 12152, width 2 endianess 0
+//       MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG) // In generic call_load() len 12152, width 2 endianess 1
+//	MCFG_GENERIC_LOAD(force68k_state, exp1_load)
+//	MCFG_SOFTWARE_LIST_ADD("cart_list", "fccpu1_cart")
+MACHINE_CONFIG_END
+
+/***************************
+   Rom loading functions
+****************************/
+int force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
+{
+	UINT32 size = slot->common_get_size("rom");
+
+        printf("force68k_load_cart() loading rom at slot %s for image \n", (char *) image.device_typename);
+	if (size > 0x10000) // Max 64Kb
+	{
+	  LOG( printf("Cartridge size exceeding max size (64Kb): %d\n", size) );
+	  image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge size exceeding max size (64Kb)");
+		return IMAGE_INIT_FAIL;
+	}
+
+        slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+	return IMAGE_INIT_PASS;
+}
+
+/*
  * Machine configuration
  */
 static MACHINE_CONFIG_START (fccpu1, force68k_state)
@@ -327,7 +417,12 @@ static MACHINE_CONFIG_START (fccpu1, force68k_state)
 MCFG_CPU_ADD ("maincpu", M68000, XTAL_16MHz / 2)
 MCFG_CPU_PROGRAM_MAP (force68k_mem)
 
-/* P3/Host Port config */
+/* P3/Host Port config  
+ * LO command causes ROM monitor to expect S-records on HOST port by default
+ * Implementation through nullmodem currently does not support handshakes so
+ * the ROM momitor is over-run while checking for checksums etc if used with
+ * UI mount <file> feature.
+ */
 MCFG_DEVICE_ADD ("aciahost", ACIA6850, 0)
 
 MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE ("rs232host", rs232_port_device, write_txd))
@@ -374,6 +469,9 @@ MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (force68k_state, centronics_busy_w))
 MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (force68k_state, centronics_perror_w))
 MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (force68k_state, centronics_select_w))
 MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
+
+// EPROM sockets
+MCFG_FRAGMENT_ADD(fccpu1_eprom_sockets)
 MACHINE_CONFIG_END
 
 #if 0 /*
