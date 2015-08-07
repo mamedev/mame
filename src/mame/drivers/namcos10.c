@@ -462,7 +462,7 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 	UINT16 data = nand_read2( nand_address * 2 );
 
 	//  logerror("read %08x = %04x\n", nand_address*2, data);
-	printf("read %08x = %04x\n", nand_address*2, data);
+	//printf("read %08x = %04x\n", nand_address*2, data);
 	  
 
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */

@@ -150,11 +150,11 @@ UINT16 ns10_decrypter_device::decrypt(UINT16 cipherword)
 	for (int j = 15; j >= 0; --j)
 	{
 		_mask <<= 1;
-		_mask ^= _reducer.gf2_reduce(_logic.eMask[j] & _previous_cipherwords);
-		_mask ^= _reducer.gf2_reduce(_logic.dMask[j] & _previous_plainwords);
+		_mask ^= _reducer->gf2_reduce(_logic.eMask[j] & _previous_cipherwords);
+		_mask ^= _reducer->gf2_reduce(_logic.dMask[j] & _previous_plainwords);
 	}
 	_mask ^= _logic.xMask;
-	_mask ^= _logic.nonlinear_calculation(_previous_cipherwords, _previous_plainwords, _reducer);
+	_mask ^= _logic.nonlinear_calculation(_previous_cipherwords, _previous_plainwords, *_reducer);
 
 	return plainword;
 }
@@ -162,6 +162,7 @@ UINT16 ns10_decrypter_device::decrypt(UINT16 cipherword)
 void ns10_decrypter_device::device_start()
 {
 	_active = false;
+	_reducer = auto_alloc(machine(), gf2_reducer());
 }
 
 void ns10_decrypter_device::init(int iv)
