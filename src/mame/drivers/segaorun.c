@@ -1937,10 +1937,10 @@ ROM_END
 //
 ROM_START( shangon1 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
-	ROM_LOAD16_BYTE( "ic133", 0x000000, 0x10000, CRC(e52721fe) SHA1(21f0aa14d0cbda3d762bca86efe089646031aef5) ) // All EPR numbers for this main CPU version are unknown
-	ROM_LOAD16_BYTE( "ic118", 0x000001, 0x10000, BAD_DUMP CRC(5fee09f6) SHA1(b97a08ba75d8c617aceff2b03c1f2bfcb16181ef) )
-	ROM_LOAD16_BYTE( "ic132", 0x020000, 0x10000, CRC(5d55d65f) SHA1(d02d76b98d74746b078b0f49f0320b8be48e4c47) )
-	ROM_LOAD16_BYTE( "ic117", 0x020001, 0x10000, CRC(b967e8c3) SHA1(00224b337b162daff03bbfabdcf8541025220d46) )
+	ROM_LOAD16_BYTE( "epr-10636.133", 0x000000, 0x10000, CRC(e52721fe) SHA1(21f0aa14d0cbda3d762bca86efe089646031aef5) )
+	ROM_LOAD16_BYTE( "epr-10634.118", 0x000001, 0x10000, CRC(08feca97) SHA1(011aa59155d77150ed3a5c3a3b031c699736d262) )
+	ROM_LOAD16_BYTE( "epr-10637.132", 0x020000, 0x10000, CRC(5d55d65f) SHA1(d02d76b98d74746b078b0f49f0320b8be48e4c47) )
+	ROM_LOAD16_BYTE( "epr-10635.117", 0x020001, 0x10000, CRC(b967e8c3) SHA1(00224b337b162daff03bbfabdcf8541025220d46) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
 	ROM_LOAD16_BYTE( "epr-10640.76", 0x00000, 0x10000, CRC(02be68db) SHA1(8c9f98ee49db54ee53b721ecf53f91737ae6cd73) )
@@ -2532,7 +2532,7 @@ GAMEL(1986, outrunb,   outrun,  outrun,          outrun,   segaorun_state,outrun
 GAME( 1987, shangon,   0,       shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright, unprotected)", 0 )
 GAME( 1987, shangon3,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon2,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
-GAME( 1987, shangon1,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on?, FD1089B 317-0034)", MACHINE_NOT_WORKING ) // bad program rom
+GAME( 1987, shangon1,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on?, FD1089B 317-0034)", 0 )
 GAME( 1991, shangonle, shangon, shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Limited Edition Hang-On", 0 )
 GAMEL(1989, toutrun,   0,       outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
 GAMEL(1989, toutrunj,  toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, Out Run upgrade, FD1094 317-0117)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
