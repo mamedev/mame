@@ -14,6 +14,7 @@
 #define __UI_MENU_H__
 
 #include "render.h"
+#include "mewui/toolbar.h"
 
 
 /***************************************************************************
@@ -27,6 +28,11 @@
 #define MENU_FLAG_MULTILINE         (1 << 3)
 #define MENU_FLAG_REDTEXT           (1 << 4)
 #define MENU_FLAG_DISABLE           (1 << 5)
+#define MENU_FLAG_MEWUI             (1 << 6)
+#define MENU_FLAG_MEWUI_HISTORY     (1 << 7)
+#define MENU_FLAG_MEWUI_SWLIST      (1 << 8)
+#define MENU_FLAG_MEWUI_FAVORITE    (1 << 9)
+#define MENU_FLAG_MEWUI_PALETTE     (1 << 10)
 
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"
@@ -35,6 +41,9 @@
 #define UI_MENU_PROCESS_NOKEYS      1
 #define UI_MENU_PROCESS_LR_REPEAT   2
 #define UI_MENU_PROCESS_CUSTOM_ONLY 4
+#define UI_MENU_PROCESS_ONLYCHAR    8
+#define UI_MENU_PROCESS_NOINPUT     16
+#define UI_MENU_PROCESS_NOIMAGE     32
 
 // options for ui_menu_reset
 enum ui_menu_reset_options
@@ -176,7 +185,7 @@ private:
 
 	void draw(bool customonly, bool noimage, bool noinput);
 	void draw_text_box();
-	void handle_events();
+	void handle_events(UINT32 flags);
 	void handle_keys(UINT32 flags);
 	void clear_free_list();
 

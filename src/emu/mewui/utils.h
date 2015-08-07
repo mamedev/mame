@@ -19,20 +19,10 @@
 #include <algorithm>
 #include "drivenum.h"
 
-#define MENU_FLAG_MEWUI          (1 << 6)
-#define MENU_FLAG_MEWUI_HISTORY  (1 << 7)
-#define MENU_FLAG_MEWUI_SWLIST   (1 << 8)
-#define MENU_FLAG_MEWUI_FAVORITE (1 << 9)
-#define MENU_FLAG_MEWUI_PALETTE  (1 << 10)
 #define MAX_CHAR_INFO            256
 #define CR                       0x0d   //  '\n' and '\r' meanings are swapped in some
 #define LF                       0x0a   //  compilers (e.g., Mac compilers)
-#define UI_MENU_PROCESS_ONLYCHAR 8
-#define UI_MENU_PROCESS_NOINPUT  16
-#define UI_MENU_PROCESS_NOIMAGE  32
 #define MAX_CUST_FILTER          8
-#define MAX_ICONS_RENDER         40
-#define MEWUI_TOOLBAR_BUTTONS    7
 
 #define MEWUI_VERSION_TAG        "# MEWUI INFO "
 

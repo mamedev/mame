@@ -15,7 +15,8 @@
 #include "rendfont.h"
 #include "mewui/custmenu.h"
 #include "mewui/icorender.h"
-#include "mewui/toolbar.h"
+
+#define MAX_ICONS_RENDER         40
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -877,7 +878,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 					menu_event.iptkey = IPT_OTHER;
 					stop = true;
 				}
-				else if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+				else
 				{
 					if (hover >= 0 && hover < item.size())
 						selected = hover;
@@ -967,46 +968,39 @@ void ui_menu::handle_main_events(UINT32 flags)
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
 			case UI_EVENT_MOUSE_DOUBLE_CLICK:
-				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+				if (hover >= 0 && hover < item.size())
 				{
-					if (hover >= 0 && hover < item.size())
-					{
-						selected = hover;
-						menu_event.iptkey = IPT_UI_SELECT;
-					}
-
-					if (selected == item.size() - 1)
-					{
-						menu_event.iptkey = IPT_UI_CANCEL;
-						ui_menu::stack_pop(machine());
-					}
-					stop = true;
+					selected = hover;
+					menu_event.iptkey = IPT_UI_SELECT;
 				}
 
+				if (selected == item.size() - 1)
+				{
+					menu_event.iptkey = IPT_UI_CANCEL;
+					ui_menu::stack_pop(machine());
+				}
+				stop = true;
 				break;
 
 			// caught scroll event
 			case UI_EVENT_MOUSE_SCROLL:
-				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+				if (local_menu_event.zdelta > 0)
 				{
-					if (local_menu_event.zdelta > 0)
-					{
-						if (selected >= visible_items || selected == 0 || ui_error)
-							break;
-						selected -= local_menu_event.num_lines;
-						if (selected < top_line + (top_line != 0))
-							top_line -= local_menu_event.num_lines;
-					}
-					else
-					{
-						if (selected >= visible_items - 1 || ui_error)
-							break;
-						selected += local_menu_event.num_lines;
-						if (selected > visible_items - 1)
-							selected = visible_items - 1;
-						if (selected >= top_line + visitems + (top_line != 0))
-							top_line += local_menu_event.num_lines;
-					}
+					if (selected >= visible_items || selected == 0 || ui_error)
+						break;
+					selected -= local_menu_event.num_lines;
+					if (selected < top_line + (top_line != 0))
+						top_line -= local_menu_event.num_lines;
+				}
+				else
+				{
+					if (selected >= visible_items - 1 || ui_error)
+						break;
+					selected += local_menu_event.num_lines;
+					if (selected > visible_items - 1)
+						selected = visible_items - 1;
+					if (selected >= top_line + visitems + (top_line != 0))
+						top_line += local_menu_event.num_lines;
 				}
 				break;
 

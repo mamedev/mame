@@ -40,10 +40,10 @@ private:
 	static bitmap_argb32 *icons_bitmap[40];
 
 	// toolbar
-	static render_texture *toolbar_texture[7];
-	static bitmap_argb32 *toolbar_bitmap[7];
-	static render_texture *sw_toolbar_texture[7];
-	static bitmap_argb32 *sw_toolbar_bitmap[7];
+	static render_texture *toolbar_texture[MEWUI_TOOLBAR_BUTTONS];
+	static bitmap_argb32 *toolbar_bitmap[MEWUI_TOOLBAR_BUTTONS];
+	static render_texture *sw_toolbar_texture[MEWUI_TOOLBAR_BUTTONS];
+	static bitmap_argb32 *sw_toolbar_bitmap[MEWUI_TOOLBAR_BUTTONS];
 
 	// mouse handling
 	bool mouse_hit, mouse_button;

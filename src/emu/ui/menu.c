@@ -298,7 +298,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 		if ((item[0].flags & MENU_FLAG_MEWUI ) != 0 || (item[0].flags & MENU_FLAG_MEWUI_SWLIST ) != 0)
 			handle_main_events(flags);
 		else
-			handle_events();
+			handle_events(flags);
 
 		// handle the keys if we don't already have an menu_event
 		if (menu_event.iptkey == IPT_INVALID)
@@ -755,7 +755,7 @@ void ui_menu::draw_text_box()
 //  input events for a menu
 //-------------------------------------------------
 
-void ui_menu::handle_events()
+void ui_menu::handle_events(UINT32 flags)
 {
 	int stop = FALSE;
 	ui_event local_menu_event;
@@ -767,35 +767,66 @@ void ui_menu::handle_events()
 		{
 			// if we are hovering over a valid item, select it with a single click
 			case UI_EVENT_MOUSE_DOWN:
-				if (hover >= 0 && hover < item.size())
-					selected = hover;
-				else if (hover == HOVER_ARROW_UP)
+				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
 				{
-					selected -= visitems - 1;
-					validate_selection(1);
-				}
-				else if (hover == HOVER_ARROW_DOWN)
-				{
-					selected += visitems - 1;
-					validate_selection(1);
+					if (hover >= 0 && hover < item.size())
+						selected = hover;
+					else if (hover == HOVER_ARROW_UP)
+					{
+						selected -= visitems - 1;
+						validate_selection(1);
+					}
+					else if (hover == HOVER_ARROW_DOWN)
+					{
+						selected += visitems - 1;
+						validate_selection(1);
+					}
 				}
 				break;
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
 			case UI_EVENT_MOUSE_DOUBLE_CLICK:
-				if (hover >= 0 && hover < item.size())
+				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
 				{
-					selected = hover;
-					if (local_menu_event.event_type == UI_EVENT_MOUSE_DOUBLE_CLICK)
+					if (hover >= 0 && hover < item.size())
 					{
-						menu_event.iptkey = IPT_UI_SELECT;
-						if (selected == item.size() - 1)
+						selected = hover;
+						if (local_menu_event.event_type == UI_EVENT_MOUSE_DOUBLE_CLICK)
 						{
-							menu_event.iptkey = IPT_UI_CANCEL;
-							ui_menu::stack_pop(machine());
+							menu_event.iptkey = IPT_UI_SELECT;
+							if (selected == item.size() - 1)
+							{
+								menu_event.iptkey = IPT_UI_CANCEL;
+								ui_menu::stack_pop(machine());
+							}
 						}
+						stop = TRUE;
 					}
-					stop = TRUE;
+				}
+				break;
+
+			// caught scroll event
+			case UI_EVENT_MOUSE_SCROLL:
+				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+				{
+					if (local_menu_event.zdelta > 0)
+					{
+						if (selected >= visible_items || selected == 0 || ui_error)
+							break;
+						selected -= local_menu_event.num_lines;
+						if (selected < top_line + (top_line != 0))
+							top_line -= local_menu_event.num_lines;
+					}
+					else
+					{
+						if (selected >= visible_items - 1 || ui_error)
+							break;
+						selected += local_menu_event.num_lines;
+						if (selected > visible_items - 1)
+							selected = visible_items - 1;
+						if (selected >= top_line + visitems + (top_line != 0))
+							top_line += local_menu_event.num_lines;
+					}
 				}
 				break;
 
