@@ -36,7 +36,7 @@ Year + Game                    PCB         Notes
 94  Great 1000 Miles Rally     Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
     Bonk's Adventure           Z09AF-003   TBSOP01 MCU protection (EEPROM handling, 68k code snippet, data)
     Blood Warrior              Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
-	Pack'n Bang Banng                      (prototype)
+	Pack'n Bang Bang           BW-002      (prototype)
 95  Great 1000 Miles Rally 2   M201F00138  TBSOP02 MCU protection (EEPROM handling etc.)
 ----------------------------------------------------------------------------------------
 
@@ -87,7 +87,7 @@ Dip locations verified from manual for:
 
 Non-Bugs (happen on real PCB)
 
-[pbb]
+[packbang]
  - Game crashes or gives you a corrupt stage if you attempt to continue on a bonus stage (due to buggy prototype code)
  - Background fading appears inverted, fading to a black screen during levels, this is correct
  - Some screens shown on the flyer (enemy select etc.) are never shown, the flyer probably shows a different version
@@ -1440,7 +1440,7 @@ INPUT_PORTS_END
                                 Pack'n Bang Bang
 ***************************************************************************/
 
-static INPUT_PORTS_START( pbb )
+static INPUT_PORTS_START( packbang )
 	PORT_START("P1")        /* 680000.w */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -2693,14 +2693,14 @@ ROM_START( berlwallk )
 	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
 ROM_END
 
-ROM_START( pbb )
+ROM_START( packbang ) /* same PCB as Berlin Wall - BW-002 */
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
-	ROM_LOAD16_BYTE( "bbp0x3.u23", 0x000000, 0x020000, CRC(105e978a) SHA1(d2aa72a25b70726ebe4b16bfe16da149bb37cd85) )
-	ROM_LOAD16_BYTE( "bbp1x3.u39", 0x000001, 0x020000, CRC(465d36f5) SHA1(d3bc9e5d444e086652d2bc562d9adfb8a1fd0d2d) )
+	ROM_LOAD16_BYTE( "bbp0x3.u23", 0x000000, 0x020000, CRC(105e978a) SHA1(d2aa72a25b70726ebe4b16bfe16da149bb37cd85) ) /* hand written checksum on label - 527B */
+	ROM_LOAD16_BYTE( "bbp1x3.u39", 0x000001, 0x020000, CRC(465d36f5) SHA1(d3bc9e5d444e086652d2bc562d9adfb8a1fd0d2d) ) /* hand written checksum on label - C5C8 */
 
 	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "bb.u84",  0x000000, 0x080000, CRC(97837aaa) SHA1(303780621afea01f9e4d1386229c7421307562ec) )
-	ROM_LOAD( "pb_spr_ext_9_20_ver.u83",  0x080000, 0x040000, CRC(666a1217) SHA1(0d7b08d63b229d70b7e9e77a36516a695533c4cb) )
+	ROM_LOAD( "pb_spr_ext_9_20_ver.u83",  0x080000, 0x040000, CRC(666a1217) SHA1(0d7b08d63b229d70b7e9e77a36516a695533c4cb) ) /* hand written label plus checksum BA63 */
 
 	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "bbbox1.u77",  0x000000, 0x080000, CRC(b2ffd081) SHA1(e4b8b60ed0c5f2e0709477cc840864e1c0a351ea) ) // 1ST AND 2ND HALF IDENTICAL
@@ -4086,9 +4086,7 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1994, pbb,      0,        berlwall, pbb,      kaneko16_berlwall_state, berlwall, ROT90,  "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
-
+GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall, ROT90, "Kaneko",                 "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
 GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
