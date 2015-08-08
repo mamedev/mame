@@ -27,6 +27,10 @@
 #define WAVERAM1_WIDTH      512
 #define WAVERAM1_HEIGHT     512
 
+#define BLEND_OPAQUE		0x00000000
+#define BLEND_OPAQUE2		0x4b23cb00
+#define BLEND_ADD			0x40b68800
+#define BLEND_SUB			0x4093c800
 
 
 /*************************************
@@ -46,6 +50,8 @@ struct mz_poly_extra_data
 	UINT16          texwidth;
 	UINT16          color;
 	UINT32          alpha;
+	bool			blend_enable;
+	UINT32			blend;
 	UINT8           (*get_texel)(const void *, int, int, int);
 };
 
@@ -75,7 +81,6 @@ static UINT32 *waveram[2];
 static int yoffs;
 static int texel_width;
 static int is_mk4b;
-
 
 
 /*************************************
@@ -1253,6 +1258,8 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 	extra->solidcolor = m_zeusbase[0x00] & 0x7fff;
 	extra->zoffset = m_zeusbase[0x7e] >> 16;
 	extra->alpha = m_zeusbase[0x4e];
+	extra->blend = m_zeusbase[0x5c];
+	extra->blend_enable = m_zeusbase[0x5c] == BLEND_ADD || m_zeusbase[0x5c] == BLEND_SUB;
 	extra->transcolor = ((ctrl_word >> 16) & 1) ? 0 : 0x100;
 	extra->palbase = waveram0_ptr_from_block_addr(zeus_palbase);
 
@@ -1310,7 +1317,42 @@ static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *e
 				color2 = ((color2 & 0x7fe0) << 6) | (color2 & 0x1f);
 				color3 = ((color3 & 0x7fe0) << 6) | (color3 & 0x1f);
 				rgb_t filtered = rgbaint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
-				WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, ((filtered >> 6) & 0x7fe0) | (filtered & 0x1f));
+
+				if (extra->blend_enable)
+				{
+					UINT16 dst = WAVERAM_READPIX(zeus_renderbase, scanline, x);
+					INT32 dst_r = (dst >> 10) & 0x1f;
+					INT32 dst_g = (dst >> 5) & 0x1f;
+					INT32 dst_b = dst & 0x1f;
+
+					INT32 src_r = filtered.r();
+					INT32 src_g = filtered.g() >> 3;
+					INT32 src_b = filtered.b();
+
+					if (extra->blend == BLEND_ADD)
+					{
+						dst_r += src_r;
+						dst_g += src_g;
+						dst_b += src_b;
+						dst_r = ((dst_r > 0x1f) ? 0x1f : dst_r);
+						dst_g = ((dst_g > 0x1f) ? 0x1f : dst_g);
+						dst_b = ((dst_b > 0x1f) ? 0x1f : dst_b);
+					}
+					else if (extra->blend == BLEND_SUB)
+					{
+						dst_r -= src_r;
+						dst_g -= src_g;
+						dst_b -= src_b;
+						dst_r = ((dst_r < 0) ? 0 : dst_r);
+						dst_g = ((dst_g < 0) ? 0 : dst_g);
+						dst_b = ((dst_b < 0) ? 0 : dst_b);
+					}
+					WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, (dst_r << 10) | (dst_g << 5) | dst_b);
+				}
+				else
+				{
+					WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, ((filtered >> 6) & 0x7fe0) | (filtered & 0x1f));
+				}
 				*depthptr = depth;
 			}
 		}
