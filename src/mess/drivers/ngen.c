@@ -91,8 +91,6 @@ public:
 		m_pic(*this,"pic"),
 		m_pit(*this,"pit"),
 		m_disk_rom(*this,"disk"),
-		m_vram(*this,"vram"),
-		m_fontram(*this,"fontram"),
 		m_fdc(*this,"fdc"),
 		m_fd0(*this,"fdc:0"),
 		m_fdc_timer(*this,"fdc_timer"),
@@ -159,8 +157,8 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
 	optional_memory_region m_disk_rom;
-	required_memory_region m_vram;
-	required_memory_region m_fontram;
+	memory_array m_vram;
+	memory_array m_fontram;
 	optional_device<wd2797_t> m_fdc;
 	optional_device<floppy_connector> m_fd0;
 	optional_device<pit8253_device> m_fdc_timer;
@@ -749,10 +747,10 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 	
 	for(int x=0;x<bitmap.width();x+=9)
 	{
-		UINT8 ch = m_vram->u16(addr++) & 0xff;
+		UINT8 ch = m_vram.read16(addr++) & 0xff;
 		for(int z=0;z<9;z++)
 		{
-			if(BIT(m_fontram->u16(ch*16+ra),8-z))
+			if(BIT(m_fontram.read16(ch*16+ra),8-z))
 				bitmap.pix32(y,x+z) = rgb_t(0,0xff,0);
 			else
 				bitmap.pix32(y,x+z) = rgb_t(0,0,0);
@@ -832,7 +830,13 @@ WRITE16_MEMBER( ngen_state::b38_crtc_w )
 
 void ngen_state::machine_start()
 {
+	memory_share* vidshare = memshare("vram");
+	memory_share* fontshare = memshare("fontram");
 	m_hd_buffer.allocate(1024*8);  // 8kB buffer RAM for HD controller
+	if(vidshare == NULL || fontshare == NULL)
+		fatalerror("Error: VRAM not found");
+	m_vram.set(*vidshare,2);
+	m_fontram.set(*fontshare,2);
 }
 
 void ngen_state::machine_reset()
@@ -848,8 +852,8 @@ void ngen_state::machine_reset()
 // boot ROMs from modules are not mapped anywhere, instead, they have to send the code from the boot ROM via DMA
 static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_REGION("vram",0)
-	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_REGION("fontram",0)
+	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
 	AM_RANGE(0xfc000, 0xfcfff) AM_RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
@@ -870,8 +874,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
 	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
-	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_REGION("vram",0)
-	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_REGION("fontram",0)
+	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
 	AM_RANGE(0x000fc000, 0x000fcfff) AM_RAM
 	AM_RANGE(0x000fe000, 0x000fffff) AM_ROM AM_REGION("bios",0)
 	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM  // some extra RAM
@@ -880,8 +884,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386i_mem, AS_PROGRAM, 32, ngen_state )
 	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
-	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_REGION("vram",0)
-	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_REGION("fontram",0)
+	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
 	AM_RANGE(0x000fc000, 0x000fffff) AM_ROM AM_REGION("bios",0)
 	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM  // some extra RAM
 	AM_RANGE(0xffffc000, 0xffffffff) AM_ROM AM_REGION("bios",0)
