@@ -1417,7 +1417,7 @@ void psxcpu_device::update_rom_config()
 		}
 	}
 
-	if( window_size < max_window_size )
+	if( window_size < max_window_size && !m_disable_rom_berr)
 	{
 		m_program->install_readwrite_handler( 0x1fc00000 + window_size, 0x1fffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
 		m_program->install_readwrite_handler( 0x9fc00000 + window_size, 0x9fffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
@@ -1756,6 +1756,7 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 	m_cd_write_handler( *this ),
 	m_ram( *this, "ram" )
 {
+	m_disable_rom_berr = false;
 }
 
 cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
@@ -3372,6 +3373,11 @@ READ8_MEMBER( psxcpu_device::cd_r )
 WRITE8_MEMBER( psxcpu_device::cd_w )
 {
 	m_cd_write_handler( space, offset, data, mem_mask );
+}
+
+void psxcpu_device::set_disable_rom_berr(bool mode)
+{
+	m_disable_rom_berr = mode;
 }
 
 static MACHINE_CONFIG_FRAGMENT( psx )
