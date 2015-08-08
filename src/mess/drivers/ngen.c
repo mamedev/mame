@@ -141,6 +141,10 @@ public:
 	DECLARE_READ8_MEMBER(hd_buffer_r);
 	DECLARE_WRITE8_MEMBER(hd_buffer_w);
 
+	DECLARE_READ16_MEMBER(b38_keyboard_r);
+	DECLARE_WRITE16_MEMBER(b38_keyboard_w);
+	DECLARE_READ16_MEMBER(b38_crtc_r);
+	DECLARE_WRITE16_MEMBER(b38_crtc_w);
 protected:
 	virtual void machine_reset();
 	virtual void machine_start();
@@ -155,8 +159,8 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
 	optional_memory_region m_disk_rom;
-	optional_shared_ptr<UINT16> m_vram;
-	optional_shared_ptr<UINT16> m_fontram;
+	required_memory_region m_vram;
+	required_memory_region m_fontram;
 	optional_device<wd2797_t> m_fdc;
 	optional_device<floppy_connector> m_fd0;
 	optional_device<pit8253_device> m_fdc_timer;
@@ -742,13 +746,13 @@ WRITE8_MEMBER(ngen_state::dma_write_word)
 MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 {
 	UINT16 addr = ma;
-
+	
 	for(int x=0;x<bitmap.width();x+=9)
 	{
-		UINT8 ch = m_vram[addr++];
+		UINT8 ch = m_vram->u16(addr++) & 0xff;
 		for(int z=0;z<9;z++)
 		{
-			if(BIT(m_fontram[ch*16+ra],8-z))
+			if(BIT(m_fontram->u16(ch*16+ra),8-z))
 				bitmap.pix32(y,x+z) = rgb_t(0,0xff,0);
 			else
 				bitmap.pix32(y,x+z) = rgb_t(0,0,0);
@@ -759,6 +763,71 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 READ8_MEMBER( ngen_state::irq_cb )
 {
 	return m_pic->acknowledge();
+}
+
+READ16_MEMBER( ngen_state::b38_keyboard_r )
+{
+	UINT8 ret = 0;
+	switch(offset)
+	{
+	case 0:
+		if(mem_mask & 0x00ff)
+			ret = m_viduart->data_r(space,0);
+		break;
+	case 1:  // keyboard UART
+		// expects bit 0 to be set (UART transmit ready)
+		if(mem_mask & 0x00ff)
+			ret = m_viduart->status_r(space,0);
+		break;
+	}
+	return ret;
+}
+
+WRITE16_MEMBER( ngen_state::b38_keyboard_w )
+{
+	switch(offset)
+	{
+	case 0:
+		if(mem_mask & 0x00ff)
+			m_viduart->data_w(space,0,data & 0xff);
+		break;
+	case 1:
+		if(mem_mask & 0x00ff)
+			m_viduart->control_w(space,0,data & 0xff);
+		break;
+	}
+}
+
+READ16_MEMBER( ngen_state::b38_crtc_r )
+{
+	UINT8 ret = 0;
+	switch(offset)
+	{
+	case 0:
+		if(mem_mask & 0x00ff)
+			ret = m_crtc->register_r(space,0);
+		break;
+	case 1:
+		if(mem_mask & 0x00ff)
+			ret = m_viduart->data_r(space,0);
+		break;
+	}
+	return ret;
+}
+
+WRITE16_MEMBER( ngen_state::b38_crtc_w )
+{
+	switch(offset)
+	{
+	case 0:
+		if(mem_mask & 0x00ff)
+			m_crtc->address_w(space,0,data & 0xff);
+		break;
+	case 1:
+		if(mem_mask & 0x00ff)
+			m_crtc->register_w(space,0,data & 0xff);
+		break;
+	}
 }
 
 void ngen_state::machine_start()
@@ -779,8 +848,8 @@ void ngen_state::machine_reset()
 // boot ROMs from modules are not mapped anywhere, instead, they have to send the code from the boot ROM via DMA
 static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
+	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_REGION("vram",0)
+	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_REGION("fontram",0)
 	AM_RANGE(0xfc000, 0xfcfff) AM_RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
@@ -800,25 +869,29 @@ static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
-	AM_RANGE(0x00000000, 0x000fdfff) AM_RAM
-	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
+	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
+	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_REGION("vram",0)
+	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_REGION("fontram",0)
 	AM_RANGE(0x000fc000, 0x000fcfff) AM_RAM
 	AM_RANGE(0x000fe000, 0x000fffff) AM_ROM AM_REGION("bios",0)
+	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM  // some extra RAM
 	AM_RANGE(0xffffe000, 0xffffffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386i_mem, AS_PROGRAM, 32, ngen_state )
-	AM_RANGE(0x00000000, 0x000fbfff) AM_RAM
-	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
+	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
+	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_REGION("vram",0)
+	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_REGION("fontram",0)
 	AM_RANGE(0x000fc000, 0x000fffff) AM_ROM AM_REGION("bios",0)
+	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM  // some extra RAM
 	AM_RANGE(0xffffc000, 0xffffffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_io, AS_IO, 32, ngen_state )
 	AM_RANGE(0x0000, 0x0003) AM_READWRITE16(xbus_r, xbus_w, 0x0000ffff)
-	AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
+//	AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
+	AM_RANGE(0xfd08, 0xfd0b) AM_READWRITE16(b38_crtc_r, b38_crtc_w,0xffffffff)
+	AM_RANGE(0xfd0c, 0xfd0f) AM_READWRITE16(b38_keyboard_r, b38_keyboard_w,0xffffffff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ngen )
@@ -1064,6 +1137,9 @@ ROM_START( ngen )
 	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
 
+	ROM_REGION16_LE( 0x2000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "fontram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x1000, "disk", 0)
 	ROM_LOAD( "72-00422_10mb_disk.bin", 0x000000, 0x001000,  CRC(f5b046b6) SHA1(b303c6f6aa40504016de9826879bc316e44389aa) )
 
@@ -1076,12 +1152,18 @@ ROM_START( ngenb38 )
 	ROM_REGION( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-168_fpc_386_cpu.bin",  0x000000, 0x001000, CRC(250a3b68) SHA1(49c070514bac264fa4892f284f7d2c852ae6605d) )
 	ROM_LOAD16_BYTE( "72-167_fpc_386_cpu.bin",  0x000001, 0x001000, CRC(4010cc4e) SHA1(74a3024d605569056484d08b63f19fbf8eaf31c6) )
+
+	ROM_REGION16_LE( 0x2000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "fontram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( 386i )
 	ROM_REGION( 0x4000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-1561o_386i_cpu.bin",  0x000000, 0x002000, CRC(b5efd768) SHA1(8b250d47d9c6eb82e1afaeb2244d8c4134ecbc47) )
 	ROM_LOAD16_BYTE( "72-1562e_386i_cpu.bin",  0x000001, 0x002000, CRC(002d0d3a) SHA1(31de8592999377db9251acbeff348390a2d2602a) )
+
+	ROM_REGION16_LE( 0x2000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "fontram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x2000, "video", 0)
 	ROM_LOAD( "72-1630_gc-104_vga.bin",  0x000000, 0x002000, CRC(4e4d8ebe) SHA1(50c96ccb4d0bd1beb2d1aee0d18b2c462d25fc8f) )
