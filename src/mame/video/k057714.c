@@ -218,12 +218,9 @@ WRITE32_MEMBER(k057714_device::write)
 
 		case 0x64:      // VRAM Port 1 Write Address
 			m_vram_fifo1_addr = (data & 0xffffff) / 2;
-			printf("GCU FIFO1 addr = %08X\n", data);
 			break;
 
 		case 0x74:      // VRAM Port 1 Write FIFO
-			printf("GCU FIFO1 write = %08X\n", data);
-
 			if (m_vram_fifo1_mode & 0x100)
 			{
 				// write to command fifo
@@ -614,6 +611,7 @@ void k057714_device::execute_display_list(UINT32 addr)
 				draw_object(cmd);
 				break;
 
+			case 6:
 			case 7:     // Draw 8x8 character (2 bits per pixel)
 				draw_character(cmd);
 				break;
@@ -658,6 +656,7 @@ void k057714_device::execute_command(UINT32* cmd)
 			draw_object(cmd);
 			break;
 
+		case 6:
 		case 7:     // Draw 8x8 character (2 bits per pixel)
 			draw_character(cmd);
 			break;

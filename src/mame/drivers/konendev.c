@@ -61,7 +61,7 @@ public:
 
 UINT32 konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return 0;
+	return m_gcu->draw(screen, bitmap, cliprect);
 }
 
 static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
