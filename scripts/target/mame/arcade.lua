@@ -1921,6 +1921,7 @@ files {
 	MAME_DIR .. "src/mame/video/k001006.c",
 	MAME_DIR .. "src/mame/video/k001005.c",
 	MAME_DIR .. "src/mame/video/k001604.c",
+	MAME_DIR .. "src/mame/video/k057714.c",
 }
 
 createMAMEProjects(_target, _subtarget, "matic")
