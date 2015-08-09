@@ -836,7 +836,7 @@ UINT32 aerofgt_state::screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &
 		m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	return 0;
 }
