@@ -1248,6 +1248,7 @@ configuration { "vs2015" }
 			"/wd4091", -- warning C4091: 'typedef ': ignored on left of '' when no variable is declared
 			"/wd4463", -- warning C4463: overflow; assigning 1 to bit-field that can only hold values from -1 to 0
 			"/wd4297", -- warning C4297: 'xxx::~xxx': function assumed not to throw an exception but does
+			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
 		}
 configuration { "vs2010" }
 		buildoptions {
