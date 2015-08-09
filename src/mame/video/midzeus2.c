@@ -749,6 +749,18 @@ if (subregdata_count[which] < 256)
 			zeus_unknown_40 = value & 0xffffff;
 			zeus_quad_size = (zeus_unknown_40 == 0) ? 10 : 14;
 			break;
+
+#if 0
+		case 0x0c:
+		case 0x0d:
+			// These seem to have something to do with blending.
+			// There are fairly unique 0x0C,0x0D pairs for various things:
+			// Car reflection on initial screen: 0x40, 0x00
+			// Additively-blended "flares": 0xFA, 0xFF
+			// Car windshields (and drivers, apparently): 0x82, 0x7D
+			// Other minor things: 0xA4, 0x100
+			break;
+#endif
 	}
 }
 
