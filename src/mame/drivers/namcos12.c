@@ -1042,6 +1042,7 @@ Notes:
 #include "emu.h"
 #include "cpu/psx/psx.h"
 #include "cpu/h8/h83002.h"
+#include "cpu/h8/h83337.h"
 #include "video/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
@@ -1082,6 +1083,14 @@ public:
 	UINT8 m_sub_porta;
 	UINT8 m_sub_portb;
 
+	UINT8 m_jvssense;
+	UINT8 m_tssio_port_4;
+
+	DECLARE_READ16_MEMBER(s12_mcu_p6_r);
+	DECLARE_READ16_MEMBER(iob_p4_r);
+	DECLARE_READ16_MEMBER(iob_p6_r);
+	DECLARE_WRITE16_MEMBER(iob_p4_w);
+
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(bankoffset_w);
@@ -1111,6 +1120,7 @@ public:
 protected:
 	virtual void machine_reset();
 };
+
 
 inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char *s_fmt, ... )
 {
@@ -1417,6 +1427,9 @@ void namcos12_state::machine_reset()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	bankoffset_w(space,0,0,0xffff);
 
+	m_jvssense = 1;
+	m_tssio_port_4 = 0;
+
 	m_has_tektagt_dma = 0;
 
 	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
@@ -1441,6 +1454,7 @@ void namcos12_state::machine_reset()
 		strcmp( machine().system().name, "sws2000" ) == 0 ||
 		strcmp( machine().system().name, "sws2001" ) == 0 ||
 		strcmp( machine().system().name, "truckk" ) == 0 ||
+		strcmp( machine().system().name, "technodr" ) == 0 ||
 		strcmp( machine().system().name, "kartduel" ) == 0 ||
 		strcmp( machine().system().name, "ohbakyuun" ) == 0 ||
 		strcmp( machine().system().name, "ghlpanic" ) == 0 )
@@ -1460,6 +1474,17 @@ static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")
+	AM_RANGE(0x300010, 0x300011) AM_NOP // golgo13 writes here a lot, possibly also a wait state generator?
+	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
+ADDRESS_MAP_END
+
+// map for JVS games w/o controls connected directly
+static ADDRESS_MAP_START( s12h8rwjvsmap, AS_PROGRAM, 16, namcos12_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
+	AM_RANGE(0x300000, 0x300001) AM_NOP
+	AM_RANGE(0x300002, 0x300003) AM_NOP
 	AM_RANGE(0x300010, 0x300011) AM_NOP // golgo13 writes here a lot, possibly also a wait state generator?
 	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 ADDRESS_MAP_END
@@ -1498,7 +1523,14 @@ WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
 	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
+READ16_MEMBER(namcos12_state::s12_mcu_p6_r)
+{
+	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
+	return (m_jvssense << 1) | 0xfd;
+}
+
 static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
+	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r) AM_WRITENOP
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w)
@@ -1508,7 +1540,6 @@ static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
 	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
 ADDRESS_MAP_END
-
 
 // Golgo 13 lightgun inputs
 
@@ -1617,6 +1648,92 @@ static MACHINE_CONFIG_DERIVED( golgo13, coh700 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_IO_MAP(golgo13_h8iomap)
+MACHINE_CONFIG_END
+
+#define JVSCLOCK    (XTAL_14_7456MHz)
+static ADDRESS_MAP_START( jvsmap, AS_PROGRAM, 16, namcos12_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
+	AM_RANGE(0xc000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_END
+
+
+static MACHINE_CONFIG_DERIVED( truckk, coh700 )
+	// Timer at 115200*16 for the jvs serial clock
+	MCFG_DEVICE_MODIFY(":sub:sci0")
+	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+
+	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_CPU_PROGRAM_MAP( jvsmap )
+	MCFG_CPU_IO_MAP( jvsiomap )
+
+	MCFG_DEVICE_MODIFY("iocpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":sub:sci0", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("sub:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
+MACHINE_CONFIG_END
+
+READ16_MEMBER(namcos12_state::iob_p4_r)
+{
+	return m_tssio_port_4;
+}
+
+WRITE16_MEMBER(namcos12_state::iob_p4_w)
+{
+	m_tssio_port_4 = data;
+
+	// bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
+	m_jvssense = (data & 0x04) ? 0 : 1;
+}
+
+READ16_MEMBER(namcos12_state::iob_p6_r)
+{
+	// d4 is service button
+	UINT8 sb = (ioport("SERVICE")->read() & 1) << 4;
+	// other bits: unknown
+
+	return sb | 0;
+}
+
+static ADDRESS_MAP_START( tdjvsmap, AS_PROGRAM, 16, namcos12_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("iocpu", 0)
+	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
+	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
+	AM_RANGE(0xc000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tdjvsiomap, AS_IO, 16, namcos12_state )
+	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READWRITE(iob_p4_r, iob_p4_w)
+	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(iob_p6_r)
+	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_READ_PORT("STEER")
+	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ_PORT("BRAKE")
+	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ_PORT("GAS")
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_DERIVED( technodr, coh700 )
+	// Timer at 115200*16 for the jvs serial clock
+	MCFG_DEVICE_MODIFY(":sub:sci0")
+	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+
+	// modify H8/3002 map to omit direct-connected controls
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_PROGRAM_MAP(s12h8rwjvsmap)
+	MCFG_CPU_IO_MAP(s12h8iomap)
+
+	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_CPU_PROGRAM_MAP( tdjvsmap )
+	MCFG_CPU_IO_MAP( tdjvsiomap )
+
+	MCFG_DEVICE_MODIFY("iocpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":sub:sci0", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("sub:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
 
 
@@ -1743,6 +1860,38 @@ static INPUT_PORTS_START( golgo13 )
 
 	PORT_START("LIGHT0_Y")
 	PORT_BIT( 0xffff, 0x00fe, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x1f,0x1de) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( technodr )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR(Service_Mode) ) PORT_DIPLOCATION( "DIP SW2:1" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Freeze" ) PORT_DIPLOCATION( "DIP SW2:2" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN01")
+	PORT_SERVICE( 0x100, IP_ACTIVE_LOW ) // service switch
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) // select switch
+	PORT_BIT( 0x7eff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN23")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1 )	// coin switch
+	PORT_BIT(0xf7ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )  // service coin
+
+	PORT_START("GAS")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+
+	PORT_START("STEER")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END
 
 ROM_START( aquarush )
@@ -2798,11 +2947,35 @@ ROM_START( truckk )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "tkk1wave0.ic1", 0x000000, 0x800000, CRC(037d3095) SHA1(cc343bdd45d023c133964321e2df5cb1c91525ef) )
 
-	ROM_REGION( 0x20000, "ioboard", 0)  /* Truck K. I/O board */
+	ROM_REGION( 0x20000, "iocpu", 0)  /* Truck K. I/O board */
 	ROM_LOAD( "tkk1prg0.ic7", 0x000000, 0x020000, CRC(11fd9c31) SHA1(068b8364ec0eb1e88f9f85f40b8b322876f6f3e2) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "tkk2-a", 0, SHA1(6b7c3686b22a508c44f67295b188504b757dd482) )
+ROM_END
+
+ROM_START( technodr )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "th1verb.2l",   0x000000, 0x200000, CRC(736fae08) SHA1(099e648784f617cc3b5a57a5838b8fbb54cacca1) )
+	ROM_LOAD16_BYTE( "th1verb.2p",   0x000001, 0x200000, CRC(1fafb2d2) SHA1(ea0617714dcd7636e21a10fa2665a6f9c0f0a93b) )
+
+	ROM_REGION32_LE( 0x3400000, "user2", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "th1rom0l.6",   0x0000000, 0x400000, CRC(f8274106) SHA1(5c0b60c7440cfa01572b10ed564446d7f1a81a3a) )
+	ROM_LOAD16_BYTE( "th1rom0u.9",   0x0000001, 0x400000, CRC(260ae0c5) SHA1(2ecb82e069fa64b9d3f63d6193befae02f3140e4) )
+	ROM_LOAD16_BYTE( "th1rom1l.7",   0x0800000, 0x400000, CRC(56d9b477) SHA1(101b5acfbe5d292418f7fd8db642187f2b571d0b) )
+	ROM_LOAD16_BYTE( "th1rom1u.10",  0x0800001, 0x400000, CRC(a45d337e) SHA1(10e230b61ab4c6aa386c68463badef0c4ba58f0e) )
+	ROM_LOAD16_BYTE( "th1fl3l.12",   0x1000000, 0x200000, CRC(cd4422c0) SHA1(97a9788cf0c589477f77c5403cc715ce4980a7bd) )
+	ROM_LOAD16_BYTE( "th1fl3u.13",   0x1000001, 0x200000, CRC(c330116f) SHA1(b12de5a82d6ebb5f893882b578e02af732231512) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "th1verb.11s",  0x000000, 0x080000, CRC(85806e2e) SHA1(9e0a7e6924b72e7b5b1d0e72eeec10045984dd4b) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "th1wave0.5",   0x000000, 0x400000, CRC(6cdd06fb) SHA1(31bd0b359e3b93bd40c3416a4805d0523e7f54c3) )
+	ROM_LOAD( "th1wave1.4",   0x400000, 0x400000, CRC(40fd413b) SHA1(b7edf89b5fa196a0787646c73b9aa07fc062fc8b) )
+
+	ROM_REGION( 0x40000, "iocpu", 0)  /* Truck K. I/O board */
+	ROM_LOAD( "th1io-a.4f",   0x000000, 0x040000, CRC(1cbbce27) SHA1(71d61d9218543e1b0b2a6c550a8ff2b7c6267257) )
 ROM_END
 
 GAME( 1996, tekken3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC006 */
@@ -2827,6 +3000,7 @@ GAME( 1998, ehrgeizaa, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC035 */
 GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC0?? */
+GAME( 1998, technodr,  0,        technodr, technodr, namcos12_state, namcos12, ROT0, "Namco",   		"Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Asia, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC037 */
@@ -2852,6 +3026,6 @@ GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1999, golgo13,   0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC054 */
 GAME( 1999, g13knd,    0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC055 */
-GAME( 2000, truckk,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
+GAME( 2000, truckk,    0,        truckk,   namcos12, namcos12_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
 GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC057 */
 GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC061 */
