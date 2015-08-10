@@ -4,6 +4,34 @@
 <softwarelist name="lantutor" description="Language Tutor modules">
 
 
+	<software name="ingles">
+		<description>Ingles Britanico</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="lantutor">
+			<dataarea name="rom" size="0x10000">
+				<rom name="cd2311.vsm" size="0x4000" crc="7bab7f7c" sha1="e89cfa7ae9d5ce09ff19b9474ecd70fb5982ccb9" offset="0x0000" />
+				<rom name="cd2312.vsm" size="0x4000" crc="6acb9c72" sha1="09817f1e0b1683d90edada38ac70ce738af6417f" offset="0x4000" />
+				<rom name="cd2313.vsm" size="0x4000" crc="ed979cc9" sha1="414457c6359e64c48cd1b80f47098dc2438f0b93" offset="0x8000" />
+				<rom name="cd2314.vsm" size="0x4000" crc="0454d5fb" sha1="347d0d5f39e2e31f93773bad9e62d121f1d40d3c" offset="0xc000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spanish">
+		<description>Spanish</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="lantutor">
+			<dataarea name="rom" size="0x10000">
+				<rom name="cd2315.vsm" size="0x4000" crc="cd44490f" sha1="7b62e9fb0cc30fa81c23ef3361bb579c8794f178" offset="0x0000" />
+				<rom name="cd2316.vsm" size="0x4000" crc="c5464edf" sha1="0f028cb5e8445216dd45fa641e5751b08a637f5c" offset="0x4000" />
+				<rom name="cd2317.vsm" size="0x4000" crc="53231c0b" sha1="472117c3d0e28437fa8faa054f98088e06efc2a1" offset="0x8000" />
+				<rom name="cd2318.vsm" size="0x4000" crc="6c0727bc" sha1="132e39755b122f2cbec6f3e767f5d256a9c1e7ae" offset="0xc000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="french">
 		<description>French</description>
 		<year>1979</year>
@@ -32,16 +60,16 @@
 		</part>
 	</software>
 
-	<software name="spanish">
-		<description>Spanish</description>
-		<year>1979</year>
+	<software name="english">
+		<description>English</description>
+		<year>1980</year>
 		<publisher>Texas Instruments</publisher>
 		<part name="cart" interface="lantutor">
 			<dataarea name="rom" size="0x10000">
-<!--            <rom name="cd2315.vsm" size="0x4000" crc="" sha1="" offset="0x0000" /> -->
-<!--            <rom name="cd2316.vsm" size="0x4000" crc="" sha1="" offset="0x4000" /> -->
-				<rom name="cd2317.vsm" size="0x4000" crc="53231c0b" sha1="472117c3d0e28437fa8faa054f98088e06efc2a1" offset="0x8000" />
-				<rom name="cd2318.vsm" size="0x4000" crc="6c0727bc" sha1="132e39755b122f2cbec6f3e767f5d256a9c1e7ae" offset="0xc000" />
+				<rom name="cd3526.vsm" size="0x4000" crc="58fae847" sha1="ee9c0f4dbd7101a1f8f276e60e77403d01a9b36f" offset="0x0000" />
+				<rom name="cd3527.vsm" size="0x4000" crc="aa9f5334" sha1="a363aaf4fb9194995431a9dc1d78446ef510e7be" offset="0x4000" />
+				<rom name="cd3528.vsm" size="0x4000" crc="e21919ea" sha1="b0edd35d5de29ac2f61a1dc7dc0a7fab20914fbe" offset="0x8000" />
+				<rom name="cd3529.vsm" size="0x4000" crc="dc06f09d" sha1="946868b4748d93c918bbe33c9b1a40a723dbf410" offset="0xc000" />
 			</dataarea>
 		</part>
 	</software>
