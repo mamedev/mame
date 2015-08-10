@@ -336,11 +336,11 @@ void pstring_t<F>::resetmem()
 // pstring ...
 // ----------------------------------------------------------------------------------------
 
-int pstring::scanf(const type_t &format, ...) const
+int pstring::scanf(const mem_t *format, ...) const
 {
 	va_list ap;
 	va_start(ap, format);
-	int ret = vsscanf(cstr(), format.cstr(), ap);
+	int ret = vsscanf(cstr(), format, ap);
 	va_end(ap);
 	return ret;
 }
@@ -522,8 +522,8 @@ pformat::pformat(const pstring &fmt)
 pformat::pformat(const char *fmt)
 : m_arg(0)
 {
-	strncpy(m_str, fmt, sizeof(m_str));
-	m_str[sizeof(m_str)] = 0;
+	strncpy(m_str, fmt, sizeof(m_str) - 1);
+	m_str[sizeof(m_str) - 1] = 0;
 }
 
 pformat &pformat::update(const char *f, const char *l, ...)

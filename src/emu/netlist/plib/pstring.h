@@ -308,7 +308,7 @@ public:
 	pstring(const type_t &string) : type_t(string) { }
 
 	const type_t vprintf(va_list args) const;
-	int scanf(const type_t &format, ...) const;
+	int scanf(const mem_t *format, ...) const;
 
 	static const type_t sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 
