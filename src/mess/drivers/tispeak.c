@@ -1028,7 +1028,7 @@ ROM_START( snspelljp )
 	ROM_LOAD( "cd2322.vsm", 0x4000, 0x4000, CRC(b6f4bba4) SHA1(65d686a9385b5ef3f080a5f47c6b2418bb9455b0) )
 ROM_END
 
-ROM_START( ladictee )
+ROM_START( snspellfr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
 
@@ -1043,7 +1043,7 @@ ROM_START( ladictee )
 	ROM_LOAD( "cd2352.vsm", 0x0000, 0x4000, CRC(181a239e) SHA1(e16043766c385e152b7005c1c010be4c5fccdd9b) )
 ROM_END
 
-ROM_START( grillo )
+ROM_START( snspellit )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
 
@@ -1155,7 +1155,7 @@ ROM_START( tntelluk )
 	ROM_LOAD( "cd62170.vsm", 0x0000, 0x4000, CRC(6dc9d072) SHA1(9d2c9ff57c4f8fe69768666ffa41fcac649279ef) )
 ROM_END
 
-ROM_START( lelivre )
+ROM_START( tntellfr )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
 
@@ -1204,8 +1204,8 @@ COMP( 1980, snspellb,   snspell,  0, sns_tmc0281d,snspell,  tispeak_state, snspe
 COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 COMP( 1981, snspelluka, snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
-COMP( 1980, ladictee,   snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
-COMP( 1982, grillo,     snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
+COMP( 1982, snspellit,  snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 
 COMP( 1986, snmath,     0,        0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snmathp,    snmath,   0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
@@ -1216,7 +1216,7 @@ COMP( 1979, lantutor,   0,        0, lantutor,    lantutor, tispeak_state, lantu
 
 COMP( 1981, tntell,     0,        0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // assume there is an older version too, with CD8010 MCU
 COMP( 1981, tntelluk,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-COMP( 1981, lelivre,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1981, tntellfr,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 COMP( 1980, tntellp,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 COMP( 1982, vocaid,     0,        0, vocaid,      tntell,   driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
