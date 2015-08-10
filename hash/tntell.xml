@@ -76,5 +76,17 @@
 		</part>
 	</software>
 
+	<software name="et">
+		<description>E.T. the Extra-Terrestial</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2363"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2363.vsm" size="0x4000" crc="f8363d2a" sha1="0450b185b121a51307637c42c0719af90c22206f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
