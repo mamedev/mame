@@ -140,7 +140,7 @@ device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 
 void setup_t::register_model(const pstring &model_in)
 {
-	int pos = model_in.find(' ');
+	int pos = model_in.find(" ");
 	if (pos < 0)
 		netlist().error("Unable to parse model: %s", model_in.cstr());
 	pstring model = model_in.left(pos).trim().ucase();
@@ -170,8 +170,8 @@ void setup_t::register_dippins_arr(const pstring &terms)
 	unsigned n = list.size();
 	for (unsigned i = 0; i < n / 2; i++)
 	{
-		register_alias(pstring::sprintf("%d", i+1), list[i * 2]);
-		register_alias(pstring::sprintf("%d", n-i), list[i * 2 + 1]);
+		register_alias(pformat("%1")(i+1), list[i * 2]);
+		register_alias(pformat("%1")(n-i), list[i * 2 + 1]);
 	}
 }
 
@@ -243,7 +243,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
+							if (val.scanf("%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<param_double_t &>(param).initial(vald);
 						}
@@ -253,7 +253,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
+							if (val.scanf("%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<param_int_t &>(param).initial((int) vald);
 						}
@@ -332,7 +332,7 @@ void setup_t::remove_connections(const pstring pin)
 void setup_t::register_frontier(const pstring attach, const double r_IN, const double r_OUT)
 {
 	static int frontier_cnt = 0;
-	pstring frontier_name = pstring::sprintf("frontier_%d", frontier_cnt);
+	pstring frontier_name = pformat("frontier_%1")(frontier_cnt);
 	frontier_cnt++;
 	device_t *front = register_dev("FRONTIER_DEV", frontier_name);
 	register_param(frontier_name + ".RIN", r_IN);
@@ -362,7 +362,7 @@ void setup_t::register_frontier(const pstring attach, const double r_IN, const d
 void setup_t::register_param(const pstring &param, const double value)
 {
 	// FIXME: there should be a better way
-	register_param(param, pstring::sprintf("%.9e", value));
+	register_param(param, pformat("%1").e(value,".9"));
 }
 
 void setup_t::register_param(const pstring &param, const pstring &value)
@@ -478,7 +478,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 	{
 		// create a new one ...
 		devices::nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(&out_cast);
-		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
+		pstring x = pformat("proxy_da_%1_%2")(out.name())(m_proxy_cnt);
 		m_proxy_cnt++;
 
 		register_dev(new_proxy, x);
@@ -510,7 +510,7 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
 		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(&incast));
 		incast.set_proxy(proxy);
-		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
+		pstring x = pformat("proxy_ad_%1_%2")(in.name())( m_proxy_cnt);
 		m_proxy_cnt++;
 
 		register_dev(proxy, x);
@@ -549,7 +549,7 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
 		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(&incast));
 		incast.set_proxy(proxy);
-		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
+		pstring x = pformat("proxy_ad_%1_%2")(inp.name())(m_proxy_cnt);
 		m_proxy_cnt++;
 
 		register_dev(proxy, x);
@@ -799,8 +799,7 @@ void setup_t::resolve_inputs()
 	{
 		core_terminal_t *term = m_terminals.value_at(i);
 		if (!term->has_net())
-			errstr += pstring::sprintf("Found terminal %s without a net\n",
-					term->name().cstr());
+			errstr += pformat("Found terminal %1 without a net\n")(term->name());
 		else if (term->net().num_cons() == 0)
 			netlist().warning("Found terminal %s without connections",
 					term->name().cstr());
@@ -955,10 +954,11 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	if (!remainder.endsWith(")"))
 		netlist().error("Model error %s\n", model.cstr());
 	remainder = remainder.left(remainder.len() - 1);
+
 	pstring_list_t pairs(remainder," ", true);
 	for (unsigned i=0; i<pairs.size(); i++)
 	{
-		int pose = pairs[i].find('=');
+		int pose = pairs[i].find("=");
 		if (pose < 0)
 			netlist().error("Model error on pair %s\n", model.cstr());
 		map[pairs[i].left(pose).ucase()] = pairs[i].substr(pose+1);
@@ -984,8 +984,8 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 	pstring tmp = model_value_str(map, entity);
 
 	nl_double factor = NL_FCONST(1.0);
-	char numfac = *(tmp.right(1).cstr());
-	switch (numfac)
+	pstring numfac = tmp.right(1);
+	switch (numfac.code_at(0))
 	{
 		case 'M': factor = 1e6; break;
 		case 'k': factor = 1e3; break;
@@ -996,8 +996,8 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 		case 'f': factor = 1e-15; break;
 		case 'a': factor = 1e-18; break;
 		default:
-			if (numfac < '0' || numfac > '9')
-				fatalerror_e("Unknown number factor <%c> in: %s", numfac, entity.cstr());
+			if (numfac < "0" || numfac > "9")
+				fatalerror_e(pformat("Unknown number factor <%1> in: %2")(numfac)(entity));
 	}
 	if (factor != NL_FCONST(1.0))
 		tmp = tmp.left(tmp.len() - 1);

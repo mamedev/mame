@@ -175,11 +175,11 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &set
 	if (snd_in == NULL)
 		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT"));
 
-	pstring sparam = pstring::sprintf("STREAM_INPUT.CHAN%d", m_channel);
+	pstring sparam = pformat("STREAM_INPUT.CHAN%1")(m_channel);
 	setup.register_param(sparam, m_param_name);
-	sparam = pstring::sprintf("STREAM_INPUT.MULT%d", m_channel);
+	sparam = pformat("STREAM_INPUT.MULT%1")(m_channel);
 	setup.register_param(sparam, m_mult);
-	sparam = pstring::sprintf("STREAM_INPUT.OFFSET%d", m_channel);
+	sparam = pformat("STREAM_INPUT.OFFSET%1")(m_channel);
 	setup.register_param(sparam, m_offset);
 }
 
@@ -210,7 +210,7 @@ void netlist_mame_stream_output_t::device_start()
 void netlist_mame_stream_output_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	//NETLIB_NAME(sound_out) *snd_out;
-	pstring sname = pstring::sprintf("STREAM_OUT_%d", m_channel);
+	pstring sname = pformat("STREAM_OUT_%1")(m_channel);
 
 	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
 	setup.register_dev("NETDEV_SOUND_OUT", sname);
@@ -405,29 +405,29 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 			case DT_DOUBLE:
 				{
 					double *td = s->resolved<double>();
-					if (td != NULL) save_pointer(td, s->m_name, s->m_count);
+					if (td != NULL) save_pointer(td, s->m_name.cstr(), s->m_count);
 				}
 				break;
 			case DT_FLOAT:
 				{
 					float *td = s->resolved<float>();
-					if (td != NULL) save_pointer(td, s->m_name, s->m_count);
+					if (td != NULL) save_pointer(td, s->m_name.cstr(), s->m_count);
 				}
 				break;
 			case DT_INT64:
-				save_pointer((INT64 *) s->m_ptr, s->m_name, s->m_count);
+				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count);
 				break;
 			case DT_INT16:
-				save_pointer((INT16 *) s->m_ptr, s->m_name, s->m_count);
+				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
 				break;
 			case DT_INT8:
-				save_pointer((INT8 *) s->m_ptr, s->m_name, s->m_count);
+				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
 				break;
 			case DT_INT:
-				save_pointer((int *) s->m_ptr, s->m_name, s->m_count);
+				save_pointer((int *) s->m_ptr, s->m_name.cstr(), s->m_count);
 				break;
 			case DT_BOOLEAN:
-				save_pointer((bool *) s->m_ptr, s->m_name, s->m_count);
+				save_pointer((bool *) s->m_ptr, s->m_name.cstr(), s->m_count);
 				break;
 			case DT_CUSTOM:
 				break;
@@ -470,11 +470,11 @@ void netlist_mame_cpu_device_t::device_start()
 		netlist::net_t *n = netlist().m_nets[i];
 		if (n->isFamily(netlist::object_t::LOGIC))
 		{
-			state_add(i*2, n->name(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
+			state_add(i*2, n->name().cstr(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
 		}
 		else
 		{
-			state_add(i*2+1, n->name(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
+			state_add(i*2+1, n->name().cstr(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
 		}
 	}
 

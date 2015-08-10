@@ -1,3 +1,6 @@
+
+/* € */ // ABC
+
 #include "netlist/devices/net_lib.h"
 #include "netlist/devices/nld_system.h"
 #include "netlist/analog/nld_bjt.h"
@@ -33,7 +36,7 @@ NETLIST_START(dummy)
 // IGNORED O_AUDIO0: O_AUDIO0  64 0
 // .END
 
-	SOLVER(Solver, 24000)
+	/* €€ */ SOLVER(Solver, 24000)
 	PARAM(Solver.ACCURACY, 1e-8)
 	PARAM(Solver.NR_LOOPS, 150)
 	PARAM(Solver.SOR_FACTOR, 0.001)

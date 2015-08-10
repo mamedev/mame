@@ -478,7 +478,7 @@ public:
 
 	ATTR_COLD factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: base_factory_t(name, classname, def_param), m_setup(setup) { }
+	: base_factory_t(name, classname, def_param), m_setup(setup) {  printf("devname %s\n", classname.cstr()); }
 
 	class dummy : public device_t
 	{

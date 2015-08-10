@@ -73,13 +73,13 @@ namespace netlist
 				const pstring &def_param)
 		{
 			if (!add(name, palloc(factory_t< _C >(name, classname, def_param))))
-				error(pstring::sprintf("factory already contains %s", name.cstr()));
+				error("factory already contains " + name);
 		}
 
 		ATTR_COLD void register_device(base_factory_t *factory)
 		{
 			if (!add(factory->name(), factory))
-				error(pstring::sprintf("factory already contains %s", factory->name().cstr()));
+				error("factory already contains " + factory->name());
 		}
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;

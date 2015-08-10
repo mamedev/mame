@@ -13,6 +13,7 @@
 
 #include "pconfig.h"
 #include "pstring.h"
+#include "palloc.h"
 
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
@@ -71,13 +72,13 @@ protected:
 	void check_not_eof() const
 	{
 		if (m_flags & FLAG_EOF)
-			throw std::runtime_error("unexpected eof");
+			throw pexception("unexpected eof");
 	}
 
 	void check_seekable() const
 	{
-		if (m_flags & FLAG_SEEKABLE)
-			throw std::runtime_error("stream is not seekable");
+		if (!(m_flags & FLAG_SEEKABLE))
+			throw pexception("stream is not seekable");
 	}
 
 	unsigned flags() const { return m_flags; }
@@ -102,24 +103,29 @@ public:
 
 	/* this digests linux & dos/windows text files */
 
-	pstring readline()
+	bool readline(pstring &line)
 	{
+		UINT8 c = 0;
 		pstringbuffer buf;
-		while (!eof())
+		if (!this->read(c))
 		{
-			char c = 0;
-			if (this->getc(c))
-			{
-				if (c == 10)
-					return buf;
-				else if (c != 13) /* ignore CR */
-					buf += c;
-			}
+			line = "";
+			return false;
 		}
-		return buf;
+		while (true)
+		{
+			if (c == 10)
+				break;
+			else if (c != 13) /* ignore CR */
+				buf += c;
+			if (!this->read(c))
+				break;
+		}
+		line = buf;
+		return true;
 	}
 
-	bool getc(char &c)
+	bool read(UINT8 &c)
 	{
 		return (read(&c, 1) == 1);
 	}
@@ -152,16 +158,16 @@ public:
 
 	void writeline(const pstring &line)
 	{
-		write(line.cstr(), line.len());
-		putc(10);
+		write(line.cstr(), line.blen());
+		write(10);
 	}
 
 	void write(const pstring &text)
 	{
-		write(text.cstr(), text.len());
+		write(text.cstr(), text.blen());
 	}
 
-	void putc(const char c)
+	void write(const char c)
 	{
 		write(&c, 1);
 	}

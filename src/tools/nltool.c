@@ -155,7 +155,7 @@ pstring filetobuf(pstring fname)
 	else
 	{
 		FILE *f;
-		f = fopen(fname, "rb");
+		f = fopen(fname.cstr(), "rb");
 		fseek(f, 0, SEEK_END);
 		long fsize = ftell(f);
 		fseek(f, 0, SEEK_SET);
@@ -267,11 +267,8 @@ void usage(tool_options_t &opts)
 
 struct input_t
 {
-	netlist::netlist_time m_time;
-	netlist::param_t *m_param;
-	double m_value;
-
 	input_t()
+	: m_param(NULL), m_value(0.0)
 	{
 	}
 	input_t(netlist::netlist_t *netlist, const pstring &line)
@@ -280,7 +277,7 @@ struct input_t
 		double t;
 		int e = line.scanf("%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
-			throw netlist::fatalerror_e("error %d scanning line %s\n", e, line.cstr());
+			throw netlist::fatalerror_e(pformat("error %1 scanning line %2\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
 		m_param = netlist->setup().find_param(buf, true);
 	}
@@ -291,7 +288,7 @@ struct input_t
 		{
 			case netlist::param_t::MODEL:
 			case netlist::param_t::STRING:
-				throw netlist::fatalerror_e("param %s is not numeric\n", m_param->name().cstr());
+				throw netlist::fatalerror_e(pformat("param %1 is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
 				break;
@@ -303,6 +300,11 @@ struct input_t
 				break;
 		}
 	}
+
+	netlist::netlist_time m_time;
+	netlist::param_t *m_param;
+	double m_value;
+
 };
 
 plist_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
@@ -311,14 +313,15 @@ plist_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 	if (fname != "")
 	{
 		pifilestream f(fname);
-		do {
-			pstring l = f.readline();
+		pstring l;
+		while (f.readline(l))
+		{
 			if (l != "")
 			{
 				input_t inp(netlist, l);
 				ret->add(inp);
 			}
-		} while (!f.eof());
+		}
 	}
 	return ret;
 }
@@ -377,12 +380,11 @@ static void listdevices()
 	for (int i=0; i < list.size(); i++)
 	{
 		netlist::base_factory_t *f = list.value_at(i);
-		pstring out = pstring::sprintf("%-20s %s(<id>", f->classname().cstr(),
-				f->name().cstr() );
+		pstring out = pformat("%1 %2(<id>")(f->classname(),"-20")(f->name());
 		pstring terms("");
 
 		netlist::device_t *d = f->Create();
-		d->init(nt, pstring::sprintf("dummy%d", i));
+		d->init(nt, pformat("dummy%1")(i));
 		d->start_dev();
 
 		// get the list of terminals ...

@@ -37,57 +37,31 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/ymz280b.h"
+#include "video/k057714.h"
 
 class konendev_state : public driver_device
 {
 public:
 	konendev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_gcu(*this, "gcu")
 	{ }
 
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<k057714_device> m_gcu;
 
 public:
 	DECLARE_DRIVER_INIT(konendev);
-
-	DECLARE_READ32_MEMBER(gcu_r);
-	DECLARE_WRITE32_MEMBER(gcu_w);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 UINT32 konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return 0;
-}
-
-// VERY similar to the Firebeat GCU, probably the same
-READ32_MEMBER(konendev_state::gcu_r)
-{
-	int reg = offset << 2;
-
-	switch (reg)
-	{
-		// Status register
-		case 0x78:
-			return rand();
-	}
-
-	return 0;
-}
-
-WRITE32_MEMBER(konendev_state::gcu_w)
-{
-	int reg = offset << 2;
-
-	switch (reg)
-	{
-		default:
-			osd_printf_debug("[%x] %.4x\n", reg, data);
-	}
+	return m_gcu->draw(screen, bitmap, cliprect);
 }
 
 static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
@@ -95,7 +69,7 @@ static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
 	AM_RANGE(0x78000000, 0x78000003) AM_READNOP
 	AM_RANGE(0x78100000, 0x7810001b) AM_RAM
 	AM_RANGE(0x78a00014, 0x78a00017) AM_WRITENOP
-	AM_RANGE(0x79800000, 0x798000ff) AM_READWRITE(gcu_r, gcu_w)
+	AM_RANGE(0x79800000, 0x798000ff) AM_DEVREADWRITE("gcu", k057714_device, read, write)
 	AM_RANGE(0x7ff00000, 0x7fffffff) AM_ROM AM_REGION("program", 0)
 ADDRESS_MAP_END
 
@@ -120,6 +94,9 @@ static MACHINE_CONFIG_START( konendev, konendev_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(konendev_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gcu", K057714, 0)
+	MCFG_K057714_CPU_TAG("maincpu")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

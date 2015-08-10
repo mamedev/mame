@@ -277,7 +277,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		pstring num = pstring::sprintf("%d", k);
+		pstring num = pformat("%1")(k);
 
 		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
 		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());

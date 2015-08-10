@@ -47,15 +47,13 @@ public:
 class wav_t
 {
 public:
-	wav_t(const pstring &fn, unsigned sr)
+	wav_t(postream &strm, unsigned sr) : m_f(strm)
 	{
-		m_f = std::fopen(fn.cstr(),"w");
-		if (m_f==NULL)
-			throw netlist::fatalerror_e("Error opening output file: %s", fn.cstr());
+//		m_f = strm;
 		initialize(sr);
-		std::fwrite(&m_fh, sizeof(m_fh), 1, m_f);
-		std::fwrite(&m_fmt, sizeof(m_fmt), 1, m_f);
-		std::fwrite(&m_data, sizeof(m_data), 1, m_f);
+		m_f.write(&m_fh, sizeof(m_fh));
+		m_f.write(&m_fmt, sizeof(m_fmt));
+		m_f.write(&m_data, sizeof(m_data));
 	}
 	~wav_t()
 	{
@@ -69,24 +67,17 @@ public:
 	{
 		m_data.len += m_fmt.block_align;
 		short ps = sample; /* 16 bit sample, FIXME: powerpc? */
-		std::fwrite(&ps, sizeof(ps), 1, m_f);
+		m_f.write(&ps, sizeof(ps));
 	}
 
 	void close()
 	{
-		if (m_f != NULL)
-		{
-			std::fseek(m_f, 0, SEEK_SET);
-			std::fwrite(&m_fh, sizeof(m_fh), 1, m_f);
-			std::fwrite(&m_fmt, sizeof(m_fmt), 1, m_f);
+		m_f.seek(0);
+		m_f.write(&m_fh, sizeof(m_fh));
+		m_f.write(&m_fmt, sizeof(m_fmt));
 
-			//data.len = fmt.block_align * n;
-			std::fwrite(&m_data, sizeof(m_data), 1, m_f);
-
-
-			std::fclose(m_f);
-			m_f = NULL;
-		}
+		//data.len = fmt.block_align * n;
+		m_f.write(&m_data, sizeof(m_data));
 	}
 private:
 	struct riff_chunk_t
@@ -139,17 +130,22 @@ private:
 	riff_format_t m_fmt;
 	riff_data_t m_data;
 
-	FILE *m_f;
+	postream &m_f;
 
 };
 
 void convert(nlwav_options_t &opts)
 {
-	wav_t wo(opts.opt_out(), 48000);
+	pofilestream fo(opts.opt_out());
+	if (fo.bad())
+	{
+		throw netlist::fatalerror_e("Error opening output file: " + opts.opt_out());
+	}
+	wav_t wo(fo, 48000);
 
 	pifilestream fin(opts.opt_inp());
 	if (fin.bad())
-		throw netlist::fatalerror_e("Error opening input file: %s", opts.opt_inp().cstr());
+		throw netlist::fatalerror_e("Error opening input file: " + opts.opt_inp());
 
 	double dt = 1.0 / (double) wo.sample_rate();
 	double ct = dt;
@@ -164,13 +160,12 @@ void convert(nlwav_options_t &opts)
 	double minsam = 1e9;
 	int n = 0;
 	//short sample = 0;
+	pstring line;
 
-
-	while(!fin.eof())
+	while(fin.readline(line))
 	{
 #if 1
 		float t = 0.0; float v = 0.0;
-		pstring line = fin.readline();
 		line.scanf("%f %f", &t, &v);
 		while (t >= ct)
 		{
@@ -222,6 +217,7 @@ void convert(nlwav_options_t &opts)
 	printf("Amp + %f\n", 32000.0 / (maxsam- mean));
 	printf("Amp - %f\n", -32000.0 / (minsam- mean));
 	wo.close();
+	fo.close();
 	fin.close();
 
 }

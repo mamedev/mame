@@ -19,122 +19,10 @@
 // It uses reference counts and only uses new memory when a string changes.
 // ----------------------------------------------------------------------------------------
 
-struct pstring
-{
-public:
-	// simple construction/destruction
-	pstring()
-	{
-		init();
-	}
-	~pstring();
-
-	// construction with copy
-	pstring(const char *string) {init(); if (string != NULL && *string != 0) pcopy(string); }
-	pstring(const pstring &string) {init(); pcopy(string); }
-
-	// assignment operators
-	pstring &operator=(const char *string) { pcopy(string); return *this; }
-	pstring &operator=(const pstring &string) { pcopy(string); return *this; }
-
-	// C string conversion operators and helpers
-	operator const char *() const { return m_ptr->str(); }
-	const char *cstr() const { return m_ptr->str(); }
-
-	// concatenation operators
-	pstring& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
-	pstring& operator+=(const pstring &string) { pcat(string.cstr()); return *this; }
-	pstring& operator+=(const char *string) { pcat(string); return *this; }
-	friend pstring operator+(const pstring &lhs, const pstring &rhs) { return pstring(lhs) += rhs; }
-	friend pstring operator+(const pstring &lhs, const char *rhs) { return pstring(lhs) += rhs; }
-	friend pstring operator+(const pstring &lhs, const char rhs) { return pstring(lhs) += rhs; }
-	friend pstring operator+(const char *lhs, const pstring &rhs) { return pstring(lhs) += rhs; }
-
-	// comparison operators
-	bool operator==(const char *string) const { return (pcmp(string) == 0); }
-	bool operator==(const pstring &string) const { return (pcmp(string.cstr()) == 0); }
-	bool operator!=(const char *string) const { return (pcmp(string) != 0); }
-	bool operator!=(const pstring &string) const { return (pcmp(string.cstr()) != 0); }
-	bool operator<(const char *string) const { return (pcmp(string) < 0); }
-	bool operator<(const pstring &string) const { return (pcmp(string.cstr()) < 0); }
-	bool operator<=(const char *string) const { return (pcmp(string) <= 0); }
-	bool operator<=(const pstring &string) const { return (pcmp(string.cstr()) <= 0); }
-	bool operator>(const char *string) const { return (pcmp(string) > 0); }
-	bool operator>(const pstring &string) const { return (pcmp(string.cstr()) > 0); }
-	bool operator>=(const char *string) const { return (pcmp(string) >= 0); }
-	bool operator>=(const pstring &string) const { return (pcmp(string.cstr()) >= 0); }
-
-	int len() const { return m_ptr->len(); }
-
-	bool equals(const pstring &string) const { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
-	bool iequals(const pstring &string) const { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
-
-	int cmp(const pstring &string) const { return pcmp(string.cstr()); }
-	int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
-
-	int find(const char *search, int start = 0) const;
-
-	int find(const char search, int start = 0) const;
-
-	// various
-
-	bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
-	bool startsWith(const char *arg) const;
-
-	bool endsWith(const pstring &arg) const { return (this->right(arg.len()) == arg); }
-	bool endsWith(const char *arg) const { return endsWith(pstring(arg)); }
-
-	pstring replace(const pstring &search, const pstring &replace) const;
-
-	// these return nstring ...
-	const pstring cat(const pstring &s) const { return *this + s; }
-	const pstring cat(const char *s) const { return *this + s; }
-
-	const pstring substr(unsigned int start, int count = -1) const ;
-
-	const pstring left(unsigned int count) const { return substr(0, count); }
-	const pstring right(unsigned int count) const  { return substr(len() - count, count); }
-
-	int find_first_not_of(const pstring &no) const;
-	int find_last_not_of(const pstring &no) const;
-
-	const pstring ltrim(const pstring &ws = " \t\n\r") const;
-	const pstring rtrim(const pstring &ws = " \t\n\r") const;
-	const pstring trim(const pstring &ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
-
-	const pstring rpad(const pstring &ws, const int cnt) const
-	{
-		// FIXME: slow!
-		pstring ret = *this;
-		while (ret.len() < cnt)
-			ret += ws;
-		return ret.substr(0, cnt);
-	}
-
-	const pstring ucase() const;
-
-	// conversions
-
-	double as_double(bool *error = NULL) const;
-
-	long as_long(bool *error = NULL) const;
-
-	// printf using string as format ...
-
-	const pstring vprintf(va_list args) const;
-
-	int scanf(const char *format, ...) const;
-
-	// static
-	static const pstring sprintf(const char *format, ...) ATTR_PRINTF(1,2);
-	static void resetmem();
-
-protected:
-
-	struct str_t
+	struct pstr_t
 	{
 		//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
-		str_t(const int alen)
+		pstr_t(const int alen)
 		{
 			init(alen);
 		}
@@ -145,14 +33,127 @@ protected:
 				m_str[0] = 0;
 		}
 		char *str() { return &m_str[0]; }
-		int len() { return m_len; }
+		int len() const  { return m_len; }
 		int m_ref_count;
 	private:
 		int m_len;
 		char m_str[1];
 	};
 
-	str_t *m_ptr;
+
+template <typename F>
+struct pstring_t
+{
+public:
+	typedef F traits;
+
+	typedef typename traits::mem_t mem_t;
+	typedef typename traits::code_t code_t;
+
+	// simple construction/destruction
+	pstring_t()
+	{
+		init();
+	}
+	~pstring_t();
+
+	// construction with copy
+	pstring_t(const mem_t *string) {init(); if (string != NULL && *string != 0) pcopy(string); }
+	pstring_t(const pstring_t &string) {init(); pcopy(string); }
+
+	// assignment operators
+	pstring_t &operator=(const mem_t *string) { pcopy(string); return *this; }
+	pstring_t &operator=(const pstring_t &string) { pcopy(string); return *this; }
+
+	// C string conversion helpers
+	const mem_t *cstr() const { return m_ptr->str(); }
+
+	// concatenation operators
+	pstring_t& operator+=(const pstring_t &string) { pcat(string); return *this; }
+	pstring_t& operator+=(const mem_t *string) { pcat(string); return *this; }
+	friend pstring_t operator+(const pstring_t &lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
+	friend pstring_t operator+(const pstring_t &lhs, const mem_t *rhs) { return pstring_t(lhs) += rhs; }
+	friend pstring_t operator+(const mem_t *lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
+
+	// comparison operators
+	bool operator==(const mem_t *string) const { return (pcmp(string) == 0); }
+	bool operator==(const pstring_t &string) const { return (pcmp(string) == 0); }
+	bool operator!=(const mem_t *string) const { return (pcmp(string) != 0); }
+	bool operator!=(const pstring_t &string) const { return (pcmp(string) != 0); }
+
+	bool operator<(const mem_t *string) const { return (pcmp(string) < 0); }
+	bool operator<(const pstring_t &string) const { return (pcmp(string) < 0); }
+	bool operator<=(const mem_t *string) const { return (pcmp(string) <= 0); }
+	bool operator<=(const pstring_t &string) const { return (pcmp(string) <= 0); }
+	bool operator>(const mem_t *string) const { return (pcmp(string) > 0); }
+	bool operator>(const pstring_t &string) const { return (pcmp(string) > 0); }
+	bool operator>=(const mem_t *string) const { return (pcmp(string) >= 0); }
+	bool operator>=(const pstring_t &string) const { return (pcmp(string) >= 0); }
+
+	bool equals(const pstring_t &string) const { return (pcmp(string) == 0); }
+
+	int cmp(const pstring_t &string) const { return pcmp(string); }
+	int cmp(const mem_t *string) const { return pcmp(string); }
+
+	bool startsWith(const pstring_t &arg) const;
+	bool startsWith(const mem_t *arg) const;
+
+	bool endsWith(const pstring_t &arg) const;
+	bool endsWith(const mem_t *arg) const { return endsWith(pstring_t(arg)); }
+
+	pstring_t replace(const pstring_t &search, const pstring_t &replace) const;
+
+	const pstring_t cat(const pstring_t &s) const { return *this + s; }
+	const pstring_t cat(const mem_t *s) const { return *this + s; }
+
+	unsigned blen() const { return m_ptr->len(); }
+
+	// conversions
+
+	double as_double(bool *error = NULL) const;
+	long as_long(bool *error = NULL) const;
+
+	/*
+	 * everything below MAY not work for utf8.
+	 * Example a=s.find(EUROSIGN); b=s.substr(a,1); will deliver invalid utf8
+	 */
+
+	unsigned len() const
+	{
+		return F::len(m_ptr);
+	}
+
+	pstring_t& operator+=(const code_t c) { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(c, buf); pcat(buf); return *this; }
+	friend pstring_t operator+(const pstring_t &lhs, const mem_t rhs) { return pstring_t(lhs) += rhs; }
+
+	int find(const pstring_t &search, unsigned start = 0) const;
+	int find(const mem_t *search, unsigned start = 0) const;
+	int find(const code_t search, unsigned start = 0) const { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(search, buf); return find(buf, start); };
+
+	const pstring_t substr(int start, int count = -1) const ;
+
+	const pstring_t left(unsigned count) const { return substr(0, count); }
+	const pstring_t right(unsigned count) const  { return substr((int) len() - (int) count, count); }
+
+	int find_first_not_of(const pstring_t &no) const;
+	int find_last_not_of(const pstring_t &no) const;
+
+	// FIXME:
+	code_t code_at(const unsigned pos) const { return F::code(F::nthcode(m_ptr->str(),pos)); }
+
+	const pstring_t ltrim(const pstring_t &ws = " \t\n\r") const;
+	const pstring_t rtrim(const pstring_t &ws = " \t\n\r") const;
+	const pstring_t trim(const pstring_t &ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
+
+	const pstring_t rpad(const pstring_t &ws, const int cnt) const;
+
+	const pstring_t ucase() const;
+
+	static void resetmem();
+
+protected:
+
+	pstr_t *m_ptr;
 
 private:
 	void init()
@@ -161,32 +162,156 @@ private:
 		m_ptr->m_ref_count++;
 	}
 
-	int pcmp(const char *right) const
-	{
-		return pcmp(m_ptr->str(), right);
-	}
+	int pcmp(const pstring_t &right) const;
 
-	int pcmp(const char *left, const char *right, int count = -1) const;
+	int pcmp(const mem_t *right) const;
 
-	int pcmpi(const char *lhs, const char *rhs, int count = -1) const;
+	void pcopy(const mem_t *from, int size);
 
-	void pcopy(const char *from, int size);
+	void pcopy(const mem_t *from);
 
-	void pcopy(const char *from);
-
-	void pcopy(const pstring &from)
+	void pcopy(const pstring_t &from)
 	{
 		sfree(m_ptr);
 		m_ptr = from.m_ptr;
 		m_ptr->m_ref_count++;
 	}
 
-	void pcat(const char *s);
+	void pcat(const mem_t *s);
+	void pcat(const pstring_t &s);
 
-	static str_t *salloc(int n);
-	static void sfree(str_t *s);
+	static pstr_t *salloc(int n);
+	static void sfree(pstr_t *s);
 
-	static str_t m_zero;
+	static pstr_t m_zero;
+};
+
+struct pu8_traits
+{
+	static const unsigned MAXCODELEN = 1; /* in memory units */
+	typedef char mem_t;
+	typedef char code_t;
+	static unsigned len(const pstr_t *p) { return p->len(); }
+	static unsigned codelen(const mem_t *p) { return 1; }
+	static unsigned codelen(const code_t c) { return 1; }
+	static code_t code(const mem_t *p) { return *p; }
+	static void encode(const code_t c, mem_t *p) { *p = c; }
+	static const mem_t *nthcode(const mem_t *p, const unsigned n) { return &(p[n]); }
+};
+
+/* No checking, this may deliver invalid codes */
+struct putf8_traits
+{
+	static const unsigned MAXCODELEN = 4; /* in memory units,  RFC 3629 */
+	typedef char mem_t;
+	typedef unsigned code_t;
+	static unsigned len(pstr_t *p)
+	{
+		unsigned ret = 0;
+		unsigned char *c = (unsigned char *) p->str();
+		while (*c)
+		{
+			if (!((*c & 0xC0) == 0x80))
+				ret++;
+			c++;
+		}
+		return ret;
+	}
+	static unsigned codelen(const mem_t *p)
+	{
+		unsigned char *p1 = (unsigned char *) p;
+		if ((*p1 & 0x80) == 0x00)
+			return 1;
+		else if ((*p1 & 0xE0) == 0xC0)
+			return 2;
+		else if ((*p1 & 0xF0) == 0xE0)
+			return 3;
+		else if ((*p1 & 0xF8) == 0xF0)
+			return 4;
+		else
+		{
+			return 1; // not correct
+		}
+	}
+	static unsigned codelen(const code_t c)
+	{
+		if (c < 0x0080)
+			return 1;
+		else if (c < 0x800)
+			return 2;
+		else if (c < 0x10000)
+			return 3;
+		else /* U+10000	U+1FFFFF */
+			return 4; /* no checks */
+	}
+	static code_t code(const mem_t *p)
+	{
+		unsigned char *p1 = (unsigned char *)p;
+		if ((*p1 & 0x80) == 0x00)
+			return (code_t) *p1;
+		else if ((*p1 & 0xE0) == 0xC0)
+			return ((p1[0] & 0x3f) << 6) | ((p1[1] & 0x3f));
+		else if ((*p1 & 0xF0) == 0xE0)
+			return ((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0);
+		else if ((*p1 & 0xF8) == 0xF0)
+			return ((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0);
+		else
+			return *p1; // not correct
+	}
+	static void encode(const code_t c, mem_t *p)
+	{
+		unsigned char *m = (unsigned char*)p;
+		if (c < 0x0080)
+		{
+			m[0] = c;
+		}
+		else if (c < 0x800)
+		{
+			m[0] = 0xC0 | (c >> 6);
+			m[1] = 0x80 | (c & 0x3f);
+		}
+		else if (c < 0x10000)
+		{
+			m[0] = 0xE0 | (c >> 12);
+			m[1] = 0x80 | ((c>>6) & 0x3f);
+			m[2] = 0x80 | (c & 0x3f);
+		}
+		else /* U+10000	U+1FFFFF */
+		{
+			m[0] = 0xF0 | (c >> 18);
+			m[1] = 0x80 | ((c>>12) & 0x3f);
+			m[2] = 0x80 | ((c>>6) & 0x3f);
+			m[3] = 0x80 | (c & 0x3f);
+		}
+	}
+	static const mem_t *nthcode(const mem_t *p, const unsigned n)
+	{
+		const mem_t *p1 = p;
+		int i = n;
+		while (i-- > 0)
+			p1 += codelen(p1);
+		return p1;
+	}
+};
+
+struct pstring : public pstring_t<putf8_traits>
+{
+public:
+
+	typedef pstring_t<putf8_traits> type_t;
+
+	// simple construction/destruction
+	pstring() : type_t() { }
+
+	// construction with copy
+	pstring(const mem_t *string) : type_t(string) { }
+	pstring(const type_t &string) : type_t(string) { }
+
+	const type_t vprintf(va_list args) const;
+	int scanf(const type_t &format, ...) const;
+
+	static const type_t sprintf(const char *format, ...) ATTR_PRINTF(1,2);
+
 };
 
 // ----------------------------------------------------------------------------------------
@@ -199,6 +324,7 @@ private:
 struct pstringbuffer
 {
 public:
+
 	static const int DEFAULT_SIZE = 2048;
 	// simple construction/destruction
 	pstringbuffer()
@@ -216,27 +342,22 @@ public:
 	// assignment operators
 	pstringbuffer &operator=(const char *string) { pcopy(string); return *this; }
 	pstringbuffer &operator=(const pstring &string) { pcopy(string); return *this; }
-	pstringbuffer &operator=(const pstringbuffer &string) { pcopy(string.cstr()); return *this; }
+	pstringbuffer &operator=(const pstringbuffer &string) { pcopy(string); return *this; }
 
-	// C string conversion operators and helpers
-	operator const char *() const { return m_ptr; }
+	// C string conversion helpers
 	const char *cstr() const { return m_ptr; }
 
 	operator pstring() const { return pstring(m_ptr); }
 
 	// concatenation operators
-	pstringbuffer& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
-	pstringbuffer& operator+=(const pstring &string) { pcat(string.cstr()); return *this; }
+	pstringbuffer& operator+=(const UINT8 c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
+	pstringbuffer& operator+=(const pstring &string) { pcat(string); return *this; }
+	pstringbuffer& operator+=(const char *string) { pcat(string); return *this; }
 
 	std::size_t len() const { return m_len; }
 
 	void cat(const pstring &s) { pcat(s); }
 	void cat(const char *s) { pcat(s); }
-
-	pstring substr(unsigned int start, int count = -1)
-	{
-		return pstring(m_ptr).substr(start, count);
-	}
 
 private:
 
@@ -259,6 +380,51 @@ private:
 	std::size_t m_len;
 
 };
+
+class pformat
+{
+public:
+	pformat(const pstring &fmt);
+	pformat(const char *fmt);
+
+	operator pstring() const { return m_str; }
+
+	const char *cstr() { return m_str; }
+
+	pformat &operator ()(const INT64 x, const char *f = "") { return update(f, I64FMT "d", x);  }
+	pformat &operator ()(const UINT64 x, const char *f = "") { return update(f, I64FMT "u", x);  }
+
+	pformat &x 		    (const INT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
+	pformat &x          (const UINT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
+
+	pformat &operator ()(const INT32 x, const char *f = "") { return update(f, "d", x);  }
+	pformat &operator ()(const UINT32 x, const char *f = "") { return update(f, "u", x);  }
+
+	pformat &x 		    (const INT32 x, const char *f = "") { return update(f, "x", x);  }
+	pformat &x          (const UINT32 x, const char *f = "") { return update(f, "x", x);  }
+
+	pformat &operator ()(const INT16 x, const char *f = "") { return update(f, "hd", x);  }
+	pformat &operator ()(const UINT16 x, const char *f = "") { return update(f, "hu", x);  }
+
+	pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
+
+	pformat &operator ()(const double x, const char *f = "") { return update(f, "f", x);  }
+	pformat &          e(const double x, const char *f = "") { return update(f, "e", x);  }
+	pformat &          g(const double x, const char *f = "") { return update(f, "g", x);  }
+
+	pformat &operator ()(const char *x, const char *f = "") { return update(f, "s", x);  }
+	pformat &operator ()(const void *x, const char *f = "") { return update(f, "p", x);  }
+	pformat &operator ()(const pstring &x, const char *f = "") { return update(f, "s", x.cstr() );  }
+
+private:
+
+	pformat &update(const char *f, const char *l, ...);
+
+	char m_str[2048];
+	unsigned m_arg;
+};
+//const type_t vprintf(va_list args) const;
+//static const type_t sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 
 
 #endif /* _PSTRING_H_ */

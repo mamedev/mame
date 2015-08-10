@@ -252,11 +252,11 @@ virtual logic_family_desc_t *default_logic_family()                             
 //============================================================
 
 #if defined(MAME_DEBUG)
-#define nl_assert(x)               do { if (!(x)) throw fatalerror_e("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#define nl_assert(x)               do { if (1) if (!(x)) throw fatalerror_e(pformat("assert: %1:%2: %3")(__FILE__)(__LINE__)(#x) ); } while (0)
 #else
-#define nl_assert(x)               do { if (0) if (!(x)) throw fatalerror_e("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#define nl_assert(x)               do { if (0) if (!(x)) throw fatalerror_e(pformat("assert: %1:%2: %3")(__FILE__)(__LINE__)(#x) ); } while (0)
 #endif
-#define nl_assert_always(x, msg)    do { if (!(x)) throw fatalerror_e("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) throw fatalerror_e(pformat("Fatal error: %1\nCaused by assert: %2:%3: %4")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
 
 
 // -----------------------------------------------------------------------------
@@ -284,16 +284,11 @@ namespace netlist
 	//  Exceptions
 	//============================================================
 
-	class fatalerror_e : public std::exception
+	class fatalerror_e : public pexception
 	{
 	public:
-		fatalerror_e(const char *format, ...) ATTR_PRINTF(2,3);
-		fatalerror_e(const char *format, va_list ap);
+		fatalerror_e(const pstring &text) : pexception(text) { }
 		virtual ~fatalerror_e() throw() {}
-
-			const pstring &text() { return m_text; }
-	private:
-		pstring m_text;
 	};
 
 	class logic_output_t;

@@ -20,7 +20,7 @@
 #include "imagedev/mfmhd.h"
 
 #include "machine/mm58274c.h"
-#include "machine/hdc9234.h"
+#include "machine/hdc92x4.h"
 
 extern const device_type TI99_HFDC;
 

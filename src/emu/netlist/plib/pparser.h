@@ -120,7 +120,7 @@ protected:
 private:
 	void skipeol();
 
-	unsigned char getc();
+	pstring::code_t getc();
 	void ungetc();
 
 	bool eof() { return m_strm.eof(); }

@@ -5,7 +5,6 @@
  *
  */
 
-#include <cstdio>
 #include <cstdarg>
 
 #include "pparser.h"
@@ -32,7 +31,7 @@ pstring ptokenizer::currentline_str()
 
 void ptokenizer::skipeol()
 {
-	char c = getc();
+	pstring::code_t c = getc();
 	while (c)
 	{
 		if (c == 10)
@@ -47,19 +46,19 @@ void ptokenizer::skipeol()
 }
 
 
-unsigned char ptokenizer::getc()
+pstring::code_t ptokenizer::getc()
 {
 	if (m_px >= m_cur_line.len())
 	{
-		if (!m_strm.eof())
+		if (m_strm.readline(m_cur_line))
 		{
-			m_cur_line = m_strm.readline() + "\n";
+			m_cur_line += "\n";
 			m_px = 0;
 		}
 		else
 			return 0;
 	}
-	return m_cur_line[m_px++];
+	return m_cur_line.code_at(m_px++);
 }
 
 void ptokenizer::ungetc()
@@ -161,14 +160,16 @@ ptokenizer::token_t ptokenizer::get_token()
 			skipeol();
 		}
 		else
+		{
 			return ret;
+		}
 	}
 }
 
 ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
-	char c = getc();
+	pstring::code_t c = getc();
 	while (m_whitespace.find(c)>=0)
 	{
 		c = getc();
@@ -287,7 +288,7 @@ ppreprocessor::ppreprocessor()
 
 void ppreprocessor::error(const pstring &err)
 {
-	fprintf(stderr, "PREPRO ERROR: %s\n", err.cstr());
+	throw pexception("PREPRO ERROR: " + err);
 }
 
 
@@ -383,7 +384,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 		else
 			ret.cat(elems[i]);
 	}
-	return pstring(ret.cstr());
+	return ret;
 }
 
 static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstring sep)
@@ -454,17 +455,15 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			if (m_ifflag == 0)
 			{
 				if (lti.size() != 3)
-					error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
+					error("PREPRO: only simple defines allowed: %s" + line);
 				m_defines.add(lti[1], define_t(lti[1], lti[2]));
 			}
 		}
 		else
-			error(pstring::sprintf("unknown directive on line %d: %s\n", m_lineno, line.cstr()));
+			error(pformat("unknown directive on line %1: %2\n")(m_lineno)(line));
 	}
 	else
 	{
-		//if (ifflag == 0 && level > 0)
-		//  fprintf(stderr, "conditional: %s\n", line.cstr());
 		lt = replace_macros(lt);
 		if (m_ifflag == 0)
 		{
@@ -478,9 +477,10 @@ pstring  ppreprocessor::process_line(const pstring &line)
 
 postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
 {
-	while (!istrm.eof())
+	pstring line;
+	while (istrm.readline(line))
 	{
-		pstring line = process_line(istrm.readline());
+		line = process_line(line);
 		ostrm.writeline(line);
 	}
 	return ostrm;

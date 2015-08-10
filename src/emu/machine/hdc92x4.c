@@ -2,26 +2,24 @@
 // copyright-holders:Michael Zapf
 /**************************************************************************
 
-    HDC9234 Hard and Floppy Disk Controller
+    HDC 9224 and HDC 9234 Hard and Floppy Disk Controller
     Standard Microsystems Corporation (SMC)
 
     This controller handles MFM and FM encoded floppy disks and hard disks.
-    A variant, the HDC9224, is used in some DEC systems.
-
-    The HDC9234 is used in the Myarc HFDC card for the TI99/4A.
 
     References:
     [1] SMC HDC9234 preliminary data book (1988)
+    [2] SMC HDC9224 data book
 
-    The HDC9234 controller is also referred to as the "Universal Disk Controller" (UDC)
+    The HDC 9224 / 9234 controller is also referred to as the "Universal Disk Controller" (UDC)
     by the data book
 
-    Michael Zapf, July 2015
+    Michael Zapf, August 2015
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "hdc9234.h"
+#include "hdc92x4.h"
 #include "formats/imageutl.h"
 
 // Per-command debugging
@@ -410,30 +408,30 @@ enum
 	SUCCESS
 };
 
-const hdc9234_device::cmddef hdc9234_device::s_command[] =
+const hdc92x4_device::cmddef hdc92x4_device::s_command[] =
 {
-	{ 0x00, 0xff, &hdc9234_device::reset_controller },
-	{ 0x01, 0xff, &hdc9234_device::drive_deselect },
-	{ 0x02, 0xfe, &hdc9234_device::restore_drive },
-	{ 0x04, 0xfc, &hdc9234_device::step_drive },
-	{ 0x08, 0xf8, &hdc9234_device::tape_backup },
-	{ 0x10, 0xf0, &hdc9234_device::poll_drives },
-	{ 0x20, 0xe0, &hdc9234_device::drive_select },
-	{ 0x40, 0xf0, &hdc9234_device::set_register_pointer },
-	{ 0x50, 0xf8, &hdc9234_device::seek_read_id },
-	{ 0x58, 0xfe, &hdc9234_device::read_sectors },
-	{ 0x5a, 0xfe, &hdc9234_device::read_track },
-	{ 0x5c, 0xfc, &hdc9234_device::read_sectors },
-	{ 0x60, 0xe0, &hdc9234_device::format_track },
-	{ 0x80, 0x80, &hdc9234_device::write_sectors },
+	{ 0x00, 0xff, &hdc92x4_device::reset_controller },
+	{ 0x01, 0xff, &hdc92x4_device::drive_deselect },
+	{ 0x02, 0xfe, &hdc92x4_device::restore_drive },
+	{ 0x04, 0xfc, &hdc92x4_device::step_drive },
+	{ 0x08, 0xf8, &hdc92x4_device::tape_backup },
+	{ 0x10, 0xf0, &hdc92x4_device::poll_drives },
+	{ 0x20, 0xe0, &hdc92x4_device::drive_select },
+	{ 0x40, 0xf0, &hdc92x4_device::set_register_pointer },
+	{ 0x50, 0xf8, &hdc92x4_device::seek_read_id },
+	{ 0x58, 0xfe, &hdc92x4_device::read_sectors },
+	{ 0x5a, 0xfe, &hdc92x4_device::read_track },
+	{ 0x5c, 0xfc, &hdc92x4_device::read_sectors },
+	{ 0x60, 0xe0, &hdc92x4_device::format_track },
+	{ 0x80, 0x80, &hdc92x4_device::write_sectors },
 	{ 0, 0, 0 }
 };
 
 /*
-    Standard constructor.
+    Standard constructor for the base class and the two variants
 */
-hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HDC9234, "SMC HDC9234 Universal Disk Controller", tag, owner, clock, "hdc9234", __FILE__),
+hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_out_intrq(*this),
 	m_out_dmarq(*this),
 	m_out_dip(*this),
@@ -444,10 +442,23 @@ hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+hdc9224_device::hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: hdc92x4_device(mconfig, HDC9224, "SMC HDC9224 Universal Disk Controller", tag, owner, clock, "hdc9224", __FILE__)
+{
+	m_is_hdc9234 = false;
+}
+
+hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: hdc92x4_device(mconfig, HDC9234, "SMC HDC9234 Universal Disk Controller", tag, owner, clock, "hdc9234", __FILE__)
+{
+	m_is_hdc9234 = true;
+}
+
+
 /*
     Set or reset some bits.
 */
-void hdc9234_device::set_bits(UINT8& byte, int mask, bool set)
+void hdc92x4_device::set_bits(UINT8& byte, int mask, bool set)
 {
 	if (set) byte |= mask;
 	else byte &= ~mask;
@@ -456,7 +467,7 @@ void hdc9234_device::set_bits(UINT8& byte, int mask, bool set)
 /*
     Tell whether the controller is in FM mode.
 */
-bool hdc9234_device::fm_mode()
+bool hdc92x4_device::fm_mode()
 {
 	return ((m_register_w[MODE]&MO_DENSITY)!=0);
 }
@@ -464,7 +475,7 @@ bool hdc9234_device::fm_mode()
 /*
     Are we back on track 0?
 */
-bool hdc9234_device::on_track00()
+bool hdc92x4_device::on_track00()
 {
 	return (m_register_r[DRIVE_STATUS] & HDC_DS_TRK00)!=0;
 }
@@ -472,7 +483,7 @@ bool hdc9234_device::on_track00()
 /*
     Seek completed?
 */
-bool hdc9234_device::seek_complete()
+bool hdc92x4_device::seek_complete()
 {
 	return (m_register_r[DRIVE_STATUS] & HDC_DS_SKCOM)!=0;
 }
@@ -480,7 +491,7 @@ bool hdc9234_device::seek_complete()
 /*
     Index hole?
 */
-bool hdc9234_device::index_hole()
+bool hdc92x4_device::index_hole()
 {
 	return (m_register_r[DRIVE_STATUS] & HDC_DS_INDEX)!=0;
 }
@@ -488,7 +499,7 @@ bool hdc9234_device::index_hole()
 /*
     Drive ready?
 */
-bool hdc9234_device::drive_ready()
+bool hdc92x4_device::drive_ready()
 {
 	return (m_register_r[DRIVE_STATUS] & HDC_DS_READY)!=0;
 }
@@ -496,7 +507,7 @@ bool hdc9234_device::drive_ready()
 /*
     Doing a track read?
 */
-bool hdc9234_device::reading_track()
+bool hdc92x4_device::reading_track()
 {
 	return (current_command() & 0xfe) == 0x5a;
 }
@@ -511,42 +522,42 @@ bool hdc9234_device::reading_track()
     This is true for the desired cyl/head, current cyl/head, and the header
     fields on the track.
 */
-int hdc9234_device::desired_head()
+int hdc92x4_device::desired_head()
 {
 	return m_register_w[DESIRED_HEAD] & 0x0f;
 }
 
-int hdc9234_device::desired_cylinder()
+int hdc92x4_device::desired_cylinder()
 {
 	return (m_register_w[DESIRED_CYLINDER] & 0xff) | ((m_register_w[DESIRED_HEAD] & 0x70) << 4);
 }
 
-int hdc9234_device::desired_sector()
+int hdc92x4_device::desired_sector()
 {
 	return m_register_w[DESIRED_SECTOR] & 0xff;
 }
 
-int hdc9234_device::current_head()
+int hdc92x4_device::current_head()
 {
 	return m_register_r[CURRENT_HEAD] & 0x0f;
 }
 
-int hdc9234_device::current_cylinder()
+int hdc92x4_device::current_cylinder()
 {
 	return (m_register_r[CURRENT_CYLINDER] & 0xff) | ((m_register_r[CURRENT_HEAD] & 0x70) << 4);
 }
 
-int hdc9234_device::current_sector()
+int hdc92x4_device::current_sector()
 {
 	return m_register_r[CURRENT_SECTOR] & 0xff;
 }
 
-UINT8 hdc9234_device::current_command()
+UINT8 hdc92x4_device::current_command()
 {
 	return m_register_w[COMMAND];
 }
 
-bool hdc9234_device::using_floppy()
+bool hdc92x4_device::using_floppy()
 {
 	return (m_selected_drive_type == TYPE_FLOPPY5 || m_selected_drive_type == TYPE_FLOPPY8);
 }
@@ -554,7 +565,7 @@ bool hdc9234_device::using_floppy()
 /*
     Delivers the step time (in microseconds) minus the pulse width
 */
-int hdc9234_device::step_time()
+int hdc92x4_device::step_time()
 {
 	int time = 0;
 	int index = m_register_w[MODE] & MO_STEPRATE;
@@ -574,7 +585,7 @@ int hdc9234_device::step_time()
 /*
     Delivers the pulse width time (in microseconds)
 */
-int hdc9234_device::pulse_width()
+int hdc92x4_device::pulse_width()
 {
 	int time = 0;
 	// Get seek time.
@@ -593,7 +604,7 @@ int hdc9234_device::pulse_width()
 /*
     Delivers the sector size
 */
-int hdc9234_device::calc_sector_size()
+int hdc92x4_device::calc_sector_size()
 {
 	return 128 << (m_register_r[CURRENT_SIZE] & 3);
 }
@@ -603,12 +614,12 @@ int hdc9234_device::calc_sector_size()
 //    We can wait for a given time period or for a line to be set or cleared
 // ===========================================================================
 
-void hdc9234_device::wait_time(emu_timer *tm, int microsec, int next_substate)
+void hdc92x4_device::wait_time(emu_timer *tm, int microsec, int next_substate)
 {
 	wait_time(tm, attotime::from_usec(microsec), next_substate);
 }
 
-void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
+void hdc92x4_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 {
 	if (TRACE_DELAY) logerror("%s: [%s] Delaying by %4.2f microsecs\n", tag(), ttsn().c_str(), delay.as_double()*1000000);
 	tm->adjust(delay);
@@ -620,7 +631,7 @@ void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 /*
     Set the hook for line level handling
 */
-void hdc9234_device::wait_line(int line, line_state level, int substate, bool stopwrite)
+void hdc92x4_device::wait_line(int line, line_state level, int substate, bool stopwrite)
 {
 	bool line_at_level = true;
 	m_timed_wait = false;
@@ -676,7 +687,7 @@ void hdc9234_device::wait_line(int line, line_state level, int substate, bool st
     (must have saved that value before!)
     - steps to that location during OUTPUT2 times
 */
-void hdc9234_device::read_id(int& cont, bool implied_seek, bool wait_seek_complete)
+void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_complete)
 {
 	cont = CONTINUE;
 
@@ -796,7 +807,7 @@ void hdc9234_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
     contents of the DESIRED_HEAD/CYLINDER/SECTOR registers
     - checks the CRC
 */
-void hdc9234_device::verify(int& cont)
+void hdc92x4_device::verify(int& cont)
 {
 	cont = CONTINUE;
 
@@ -910,7 +921,7 @@ void hdc9234_device::verify(int& cont)
     - transfers the contents of the current sector into memory via DMA (read) or
       via DMA to the sector (write)
 */
-void hdc9234_device::data_transfer(int& cont)
+void hdc92x4_device::data_transfer(int& cont)
 {
 	cont = CONTINUE;
 
@@ -1091,7 +1102,7 @@ void hdc9234_device::data_transfer(int& cont)
     +-----+-----+-----+-----+-----+-----+-----+-----+
 
 */
-void hdc9234_device::reset_controller()
+void hdc92x4_device::reset_controller()
 {
 	logerror("%s: RESET command\n", tag());
 	device_reset();
@@ -1108,7 +1119,7 @@ void hdc9234_device::reset_controller()
     |  0  |  0  |  0  |  0  |  0  |  0  |  0  |  1  |
     +-----+-----+-----+-----+-----+-----+-----+-----+
 */
-void hdc9234_device::drive_deselect()
+void hdc92x4_device::drive_deselect()
 {
 	if (TRACE_SELECT) logerror("%s: DESELECT command\n", tag());
 	m_selected_drive_number = NODRIVE;
@@ -1128,7 +1139,7 @@ void hdc9234_device::drive_deselect()
     |  0  |  0  |  0  |  0  |  0  |  0  |  1  |skcom|
     +-----+-----+-----+-----+-----+-----+-----+-----+
 */
-void hdc9234_device::restore_drive()
+void hdc92x4_device::restore_drive()
 {
 	int cont = CONTINUE;
 	bool buffered_step = current_command() & 1;
@@ -1232,7 +1243,7 @@ void hdc9234_device::restore_drive()
       +-----+-----+-----+-----+-----+-----+-----+-----+
 
 */
-void hdc9234_device::step_drive()
+void hdc92x4_device::step_drive()
 {
 	int cont = CONTINUE;
 
@@ -1282,7 +1293,7 @@ void hdc9234_device::step_drive()
     TAPE BACKUP
     Not implemented
 */
-void hdc9234_device::tape_backup()
+void hdc92x4_device::tape_backup()
 {
 	logerror("%s: TAPE BACKUP command %02x not implemented\n", tag(), current_command());
 	set_command_done(TC_SUCCESS);
@@ -1305,7 +1316,7 @@ void hdc9234_device::tape_backup()
     This command only sets the select lines but does not process parameters
     like head load times or drive types.
 */
-void hdc9234_device::poll_drives()
+void hdc92x4_device::poll_drives()
 {
 	UINT8 drivebit = 0;
 	if (m_substate == UNDEF)
@@ -1388,7 +1399,7 @@ void hdc9234_device::poll_drives()
          +-----+-----+-----+-----+-----+-----+-----+-----+
 */
 
-void hdc9234_device::drive_select()
+void hdc92x4_device::drive_select()
 {
 	int cont = CONTINUE;
 	int head_load_delay = 0;
@@ -1449,7 +1460,7 @@ void hdc9234_device::drive_select()
     Sets the pointer to the read and write registers. On read or write accesses,
     the pointer is increased until it reaches the DATA register.
 */
-void hdc9234_device::set_register_pointer()
+void hdc92x4_device::set_register_pointer()
 {
 	m_register_pointer = current_command() & 0xf;
 	if (TRACE_SETPTR) logerror("%s: SET REGISTER POINTER command; start reg=%d\n", tag(), m_register_pointer);
@@ -1478,7 +1489,7 @@ void hdc9234_device::set_register_pointer()
 
     All combinations of flags are legal ([1], p.12).
 */
-void hdc9234_device::seek_read_id()
+void hdc92x4_device::seek_read_id()
 {
 	if (m_substate == UNDEF)
 	{
@@ -1540,7 +1551,7 @@ void hdc9234_device::seek_read_id()
     +-----+-----+-----+-----+-----+--------+------+------+
 
 */
-void hdc9234_device::read_sectors()
+void hdc92x4_device::read_sectors()
 {
 	m_logical = (current_command() & 0x04)!=0;
 
@@ -1594,7 +1605,7 @@ void hdc9234_device::read_sectors()
     +-----+-----+-----+-----+-----+-----+-----+------+
 
 */
-void hdc9234_device::read_track()
+void hdc92x4_device::read_track()
 {
 	if (m_substate == UNDEF)
 	{
@@ -1702,7 +1713,7 @@ void hdc9234_device::read_track()
     |  0  |  1  |  1  |DelMrk|RedWC|  Precompensation |
     +-----+-----+-----+------+-----+-----+-----+------+
 */
-void hdc9234_device::format_track()
+void hdc92x4_device::format_track()
 {
 	if (m_substate == UNDEF)
 	{
@@ -1797,7 +1808,7 @@ void hdc9234_device::format_track()
     |  1  |NoSeek|Logical|DelMrk|RedWC|  Precompensation |
     +-----+------+-------+------+-----+-----+-----+------+
 */
-void hdc9234_device::write_sectors()
+void hdc92x4_device::write_sectors()
 {
 	m_logical = (current_command() & 0x20)!=0;
 
@@ -1878,7 +1889,7 @@ void hdc9234_device::write_sectors()
 ===========================================================================
 */
 
-std::string hdc9234_device::tts(const attotime &t)
+std::string hdc92x4_device::tts(const attotime &t)
 {
 	char buf[256];
 	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
@@ -1886,12 +1897,12 @@ std::string hdc9234_device::tts(const attotime &t)
 	return buf;
 }
 
-std::string hdc9234_device::ttsn()
+std::string hdc92x4_device::ttsn()
 {
 	return tts(machine().time());
 }
 
-bool hdc9234_device::found_mark(int state)
+bool hdc92x4_device::found_mark(int state)
 {
 	bool ismark = false;
 	if (using_floppy())
@@ -1928,7 +1939,7 @@ bool hdc9234_device::found_mark(int state)
     The controller starts to read bits from the disk. This method takes an
     argument for the state machine called at the end.
 */
-void hdc9234_device::live_start(int state)
+void hdc92x4_device::live_start(int state)
 {
 	if (TRACE_LIVE) logerror("%s: [%s] Live start substate=%02x\n", tag(), ttsn().c_str(), state);
 	m_live_state.time = machine().time();
@@ -1954,7 +1965,7 @@ void hdc9234_device::live_start(int state)
 	if (TRACE_LIVE) logerror("%s: [%s] Live start end\n", tag(), ttsn().c_str());  // delete
 }
 
-void hdc9234_device::live_run()
+void hdc92x4_device::live_run()
 {
 	if (using_floppy()) live_run_until(attotime::never);
 	else live_run_hd_until(attotime::never);
@@ -1968,7 +1979,7 @@ void hdc9234_device::live_run()
 
     THIS IS THE FLOPPY-ONLY LIVE_RUN
 */
-void hdc9234_device::live_run_until(attotime limit)
+void hdc92x4_device::live_run_until(attotime limit)
 {
 	int slot = 0;
 
@@ -2799,7 +2810,7 @@ void hdc9234_device::live_run_until(attotime limit)
     [1], section "Drive select", table
     This is currently unsupported; hard disks are forced to MFM
 */
-void hdc9234_device::live_run_hd_until(attotime limit)
+void hdc92x4_device::live_run_hd_until(attotime limit)
 {
 	int slot = 0;
 	if (TRACE_LIVE) logerror("%s: live_run_hd\n", tag());
@@ -3400,7 +3411,7 @@ void hdc9234_device::live_run_hd_until(attotime limit)
     Results in a new checkpoint and a live position at machine time or behind.
     As a side effect, portions of the track may be re-read
 */
-void hdc9234_device::live_sync()
+void hdc92x4_device::live_sync()
 {
 	// Do we have some time set?
 	if (!m_live_state.time.is_never())
@@ -3452,7 +3463,7 @@ void hdc9234_device::live_sync()
 	}
 }
 
-void hdc9234_device::live_abort()
+void hdc92x4_device::live_abort()
 {
 	if (!m_live_state.time.is_never() && m_live_state.time > machine().time())
 	{
@@ -3473,7 +3484,7 @@ void hdc9234_device::live_abort()
     comprised by WRITE_TRACK_(NEXT_)BYTE
     Arguments: byte to be written, number, state on return
 */
-void hdc9234_device::write_on_track(UINT16 encoded, int repeat, int next_state)
+void hdc92x4_device::write_on_track(UINT16 encoded, int repeat, int next_state)
 {
 	m_live_state.repeat = repeat;
 	m_live_state.state = WRITE_TRACK_BYTE;
@@ -3486,7 +3497,7 @@ void hdc9234_device::write_on_track(UINT16 encoded, int repeat, int next_state)
     only intended for skipping bytes.
     Arguments: number, state on return
 */
-void hdc9234_device::skip_on_track(int repeat, int next_state)
+void hdc92x4_device::skip_on_track(int repeat, int next_state)
 {
 	m_live_state.bit_counter = 0;
 	m_live_state.repeat = repeat;
@@ -3494,7 +3505,7 @@ void hdc9234_device::skip_on_track(int repeat, int next_state)
 	m_live_state.return_state = next_state;
 }
 
-UINT8 hdc9234_device::get_data_from_encoding(UINT16 raw)
+UINT8 hdc92x4_device::get_data_from_encoding(UINT16 raw)
 {
 	unsigned int value = 0;
 
@@ -3509,7 +3520,7 @@ UINT8 hdc9234_device::get_data_from_encoding(UINT16 raw)
 	return (value >> 14) & 0xff;
 }
 
-void hdc9234_device::rollback()
+void hdc92x4_device::rollback()
 {
 	m_live_state = m_checkpoint_state;
 	m_pll = m_checkpoint_pll;
@@ -3519,7 +3530,7 @@ void hdc9234_device::rollback()
     Wait for real time to catch up. This way we pretend that the last
     operation actually needed the real time.
 */
-void hdc9234_device::wait_for_realtime(int state)
+void hdc92x4_device::wait_for_realtime(int state)
 {
 	m_live_state.next_state = state;
 	m_timer->adjust(m_live_state.time - machine().time());
@@ -3533,7 +3544,7 @@ void hdc9234_device::wait_for_realtime(int state)
     rightmost bit; the shift register is a member of m_live_state. Also,
     the CRC is updated.
 */
-bool hdc9234_device::read_one_bit(const attotime &limit)
+bool hdc92x4_device::read_one_bit(const attotime &limit)
 {
 	// Get the next bit from the phase-locked loop.
 	int bit = m_pll.get_next_bit(m_live_state.time, m_floppy, limit);
@@ -3572,7 +3583,7 @@ bool hdc9234_device::read_one_bit(const attotime &limit)
 	return false;
 }
 
-bool hdc9234_device::write_one_bit(const attotime &limit)
+bool hdc92x4_device::write_one_bit(const attotime &limit)
 {
 	bool bit = (m_live_state.shift_reg & 0x8000)!=0;
 
@@ -3592,7 +3603,7 @@ bool hdc9234_device::write_one_bit(const attotime &limit)
 	return false;
 }
 
-UINT16 hdc9234_device::encode(UINT8 byte)
+UINT16 hdc92x4_device::encode(UINT8 byte)
 {
 	UINT16 raw;
 	UINT8 check_pos;
@@ -3638,12 +3649,12 @@ UINT16 hdc9234_device::encode(UINT8 byte)
 	return raw;
 }
 
-void hdc9234_device::encode_again()
+void hdc92x4_device::encode_again()
 {
 	encode_raw(m_live_state.shift_reg_save);
 }
 
-void hdc9234_device::encode_raw(UINT16 raw)
+void hdc92x4_device::encode_raw(UINT16 raw)
 {
 	m_live_state.bit_counter = 16;
 	m_live_state.shift_reg = m_live_state.shift_reg_save = raw;
@@ -3660,7 +3671,7 @@ void hdc9234_device::encode_raw(UINT16 raw)
     When writing, the controller generates the proper output bitstream, so we
     have to set it from its own state (fm/mfm and device type).
 */
-void hdc9234_device::pll_reset(const attotime &when, bool output)
+void hdc92x4_device::pll_reset(const attotime &when, bool output)
 {
 	m_pll.reset(when);
 
@@ -3675,7 +3686,7 @@ void hdc9234_device::pll_reset(const attotime &when, bool output)
 		m_pll.set_clock(attotime::from_nsec(8000 >> (~m_clock_divider & 0x03)));
 }
 
-void hdc9234_device::checkpoint()
+void hdc92x4_device::checkpoint()
 {
 	// Commit bits from pll buffer to disk until live time (if there is something to write)
 	// For HD we do not use a PLL in this implementation
@@ -3698,7 +3709,7 @@ void hdc9234_device::checkpoint()
 
     Updates the CRC and the shift register. Also, the time is updated.
 */
-bool hdc9234_device::read_from_mfmhd(const attotime &limit)
+bool hdc92x4_device::read_from_mfmhd(const attotime &limit)
 {
 	UINT16 data = 0;
 	bool offlimit = m_harddisk->read(m_live_state.time, limit, data);
@@ -3766,7 +3777,7 @@ bool hdc9234_device::read_from_mfmhd(const attotime &limit)
     Return false: valid return
     Updates the CRC and the shift register. Also, the time is updated.
 */
-bool hdc9234_device::write_to_mfmhd(const attotime &limit)
+bool hdc92x4_device::write_to_mfmhd(const attotime &limit)
 {
 	UINT16 data = 0;
 	int count;
@@ -3809,7 +3820,7 @@ bool hdc9234_device::write_to_mfmhd(const attotime &limit)
 	return false;
 }
 
-UINT16 hdc9234_device::encode_hd(UINT8 byte)
+UINT16 hdc92x4_device::encode_hd(UINT8 byte)
 {
 	UINT16 cells;
 	UINT8 check_pos;
@@ -3853,7 +3864,7 @@ UINT16 hdc9234_device::encode_hd(UINT8 byte)
 	return cells;
 }
 
-UINT16 hdc9234_device::encode_a1_hd()
+UINT16 hdc92x4_device::encode_a1_hd()
 {
 	UINT16 cells = 0;
 
@@ -3884,7 +3895,7 @@ UINT16 hdc9234_device::encode_a1_hd()
     Read a byte of data from the controller
     The address (offset) encodes the C/D* line (command and /data)
 */
-READ8_MEMBER( hdc9234_device::read )
+READ8_MEMBER( hdc92x4_device::read )
 {
 	UINT8 reply = 0;
 
@@ -3920,7 +3931,7 @@ READ8_MEMBER( hdc9234_device::read )
     The operation terminates immediately, and the controller picks up the
     values stored in this phase at a later time.
 */
-WRITE8_MEMBER( hdc9234_device::write )
+WRITE8_MEMBER( hdc92x4_device::write )
 {
 	if ((offset & 1) == 0)
 	{
@@ -3944,7 +3955,7 @@ WRITE8_MEMBER( hdc9234_device::write )
 /*
     When the commit period has passed, process the command or register access
 */
-void hdc9234_device::process_command()
+void hdc92x4_device::process_command()
 {
 	if (m_substate == REGISTER_ACCESS)
 	{
@@ -4004,7 +4015,7 @@ void hdc9234_device::process_command()
 	auxbus_out();
 }
 
-void hdc9234_device::reenter_command_processing()
+void hdc92x4_device::reenter_command_processing()
 {
 	if (TRACE_DELAY) logerror("%s: Re-enter command processing; live state = %02x\n", tag(), m_live_state.state);
 	// Do we have a live run on the track?
@@ -4026,7 +4037,7 @@ void hdc9234_device::reenter_command_processing()
 /*
     Assert Command Done status bit, triggering interrupts as needed
 */
-void hdc9234_device::set_command_done(int flags)
+void hdc92x4_device::set_command_done(int flags)
 {
 	// Do another output, then set the flag
 	auxbus_out();
@@ -4055,7 +4066,7 @@ void hdc9234_device::set_command_done(int flags)
 /*
     Preserve previously set termination code
 */
-void hdc9234_device::set_command_done()
+void hdc92x4_device::set_command_done()
 {
 	set_command_done(-1);
 }
@@ -4063,7 +4074,7 @@ void hdc9234_device::set_command_done()
 /*
     Auxiliary bus operation.
 
-    The auxbus of the HDC9234 is used to poll the drive status of the cur-
+    The auxbus of the HDC92x4 is used to poll the drive status of the cur-
     rently selected drive, to transmit DMA address bytes, to output the
     OUTPUT1 register, and to output the OUTPUT2 register.
 
@@ -4106,7 +4117,7 @@ void hdc9234_device::set_command_done()
     Read the drive status over the auxbus
     (as said, let the controller board push the values into the controller)
 */
-void hdc9234_device::auxbus_in(UINT8 data)
+void hdc92x4_device::auxbus_in(UINT8 data)
 {
 	// Kill unwanted input via auxbus until we are initialized.
 	if (!m_initialized)
@@ -4131,12 +4142,12 @@ void hdc9234_device::auxbus_in(UINT8 data)
 	if (prevskcom != seek_complete()) seek_complete_handler();
 }
 
-bool hdc9234_device::waiting_for_line(int line, int level)
+bool hdc92x4_device::waiting_for_line(int line, int level)
 {
 	return (m_event_line == line && m_state_after_line != UNDEF && m_line_level == level);
 }
 
-bool hdc9234_device::waiting_for_other_line(int line)
+bool hdc92x4_device::waiting_for_other_line(int line)
 {
 	return (m_state_after_line != UNDEF && m_event_line != line);
 }
@@ -4144,7 +4155,7 @@ bool hdc9234_device::waiting_for_other_line(int line)
 /*
     Handlers for incoming signal lines.
 */
-void hdc9234_device::index_handler()
+void hdc92x4_device::index_handler()
 {
 	int level = index_hole()? ASSERT_LINE : CLEAR_LINE;
 	if (TRACE_LINES) logerror("%s: [%s] Index handler; level=%d\n", tag(), ttsn().c_str(), level);
@@ -4179,7 +4190,7 @@ void hdc9234_device::index_handler()
 	}
 }
 
-void hdc9234_device::ready_handler()
+void hdc92x4_device::ready_handler()
 {
 	int level = drive_ready()? ASSERT_LINE : CLEAR_LINE;
 	if (TRACE_LINES) logerror("%s: [%s] Ready handler; level=%d\n", tag(), ttsn().c_str(), level);
@@ -4206,7 +4217,7 @@ void hdc9234_device::ready_handler()
 	}
 }
 
-void hdc9234_device::seek_complete_handler()
+void hdc92x4_device::seek_complete_handler()
 {
 	int level = seek_complete()? ASSERT_LINE : CLEAR_LINE;
 	if (TRACE_LINES) logerror("%s: [%s] Seek complete handler; level=%d\n", tag(), ttsn().c_str(), level);
@@ -4248,7 +4259,7 @@ void hdc9234_device::seek_complete_handler()
     Step = Step pulse
     Head = desired head
 */
-void hdc9234_device::auxbus_out()
+void hdc92x4_device::auxbus_out()
 {
 	// prepare output2
 	set_bits(m_output2, OUT2_DRVSEL3I, (m_output1 & OUT1_DRVSEL3)==0);
@@ -4268,7 +4279,7 @@ void hdc9234_device::auxbus_out()
 	}
 }
 
-void hdc9234_device::dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb)
+void hdc92x4_device::dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb)
 {
 	if (TRACE_DMA) logerror("%s: Setting DMA address %06x\n", tag(), (addrub<<16 | addrhb<<8 | addrlb)&0xffffff);
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrub);
@@ -4284,7 +4295,7 @@ void hdc9234_device::dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb)
     - when the READY_CHANGE bit is set to 1 in the ISR and ST_RDYCHNG is set to 1
     (ready change: 1->0 or 0->1)
 */
-void hdc9234_device::set_interrupt(line_state intr)
+void hdc92x4_device::set_interrupt(line_state intr)
 {
 	if (intr == ASSERT_LINE)
 	{
@@ -4306,7 +4317,7 @@ void hdc9234_device::set_interrupt(line_state intr)
 /*
     DMA acknowledge line.
 */
-WRITE_LINE_MEMBER( hdc9234_device::dmaack )
+WRITE_LINE_MEMBER( hdc92x4_device::dmaack )
 {
 	if (state==ASSERT_LINE)
 	{
@@ -4319,7 +4330,7 @@ WRITE_LINE_MEMBER( hdc9234_device::dmaack )
     This is pretty simple here, compared to wd17xx, because index and ready
     callbacks have to be tied to the controller board outside the chip.
 */
-void hdc9234_device::connect_floppy_drive(floppy_image_device* floppy)
+void hdc92x4_device::connect_floppy_drive(floppy_image_device* floppy)
 {
 	m_floppy = floppy;
 }
@@ -4327,7 +4338,7 @@ void hdc9234_device::connect_floppy_drive(floppy_image_device* floppy)
 /*
     Connect the current hard drive.
 */
-void hdc9234_device::connect_hard_drive(mfm_harddisk_device* harddisk)
+void hdc92x4_device::connect_hard_drive(mfm_harddisk_device* harddisk)
 {
 	m_harddisk = harddisk;
 	m_hd_encoding = m_harddisk->get_encoding();
@@ -4340,7 +4351,7 @@ void hdc9234_device::connect_hard_drive(mfm_harddisk_device* harddisk)
     at some time and make it a device of its own.
     line: CD0 (0) and CD1(1), value 0 or 1
 */
-void hdc9234_device::set_clock_divider(int line, int value)
+void hdc92x4_device::set_clock_divider(int line, int value)
 {
 	set_bits(m_clock_divider, (line==0)? 1 : 2, value&1);
 }
@@ -4348,7 +4359,7 @@ void hdc9234_device::set_clock_divider(int line, int value)
 /*
     This is reached when a timer has expired
 */
-void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hdc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	live_sync();
 	m_timed_wait = false;
@@ -4367,7 +4378,7 @@ void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int para
 /*
     Reset the controller. Negative logic, but we use ASSERT_LINE.
 */
-WRITE_LINE_MEMBER( hdc9234_device::reset )
+WRITE_LINE_MEMBER( hdc92x4_device::reset )
 {
 	if (state == ASSERT_LINE)
 	{
@@ -4376,7 +4387,7 @@ WRITE_LINE_MEMBER( hdc9234_device::reset )
 	}
 }
 
-void hdc9234_device::device_start()
+void hdc92x4_device::device_start()
 {
 	m_out_intrq.resolve_safe();
 	m_out_dip.resolve_safe();
@@ -4393,7 +4404,7 @@ void hdc9234_device::device_start()
 	m_live_state.state = IDLE;
 }
 
-void hdc9234_device::device_reset()
+void hdc92x4_device::device_reset()
 {
 	m_clock_divider = 0;
 	m_deleted = false;
@@ -4435,4 +4446,5 @@ void hdc9234_device::device_reset()
 	m_out_dmarq(CLEAR_LINE);
 }
 
+const device_type HDC9224 = &device_creator<hdc9224_device>;
 const device_type HDC9234 = &device_creator<hdc9234_device>;

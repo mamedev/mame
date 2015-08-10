@@ -324,8 +324,8 @@ void parser_t::dippins()
 	unsigned n = pins.size();
 	for (unsigned i = 0; i < n / 2; i++)
 	{
-		m_setup.register_alias(pstring::sprintf("%d", i+1), pins[i*2]);
-		m_setup.register_alias(pstring::sprintf("%d", n-i), pins[i*2 + 1]);
+		m_setup.register_alias(pformat("%1")(i+1), pins[i*2]);
+		m_setup.register_alias(pformat("%1")(n-i), pins[i*2 + 1]);
 	}
 }
 

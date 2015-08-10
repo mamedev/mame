@@ -2550,13 +2550,13 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/hdc9234.h,MACHINES["HDC9234"] = true
+--@src/emu/machine/hdc92x4.h,MACHINES["HDC9234"] = true
 ---------------------------------------------------
 
 if (MACHINES["HDC9234"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/hdc9234.c",
-		MAME_DIR .. "src/emu/machine/hdc9234.h",
+		MAME_DIR .. "src/emu/machine/hdc92x4.c",
+		MAME_DIR .. "src/emu/machine/hdc92x4.h",
 	}
 end
 

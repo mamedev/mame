@@ -1,17 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Michael Zapf
 /*
-    HDC9234 Hard and Floppy Disk Controller
-    For details see hdc9234.c
+    HDC9224 / HDC9234 Hard and Floppy Disk Controller
+    For details see hdc92x4.c
 */
-#ifndef __HDC9234_H__
-#define __HDC9234_H__
+#ifndef __HDC92X4_H__
+#define __HDC92X4_H__
 
 #include "emu.h"
 #include "imagedev/floppy.h"
 #include "imagedev/mfmhd.h"
 #include "fdc_pll.h"
 
+extern const device_type HDC9224;
 extern const device_type HDC9234;
 
 /*
@@ -44,41 +45,41 @@ enum
 //===================================================================
 
 /* Interrupt line. To be connected with the controller PCB. */
-#define MCFG_HDC9234_INTRQ_CALLBACK(_write) \
-	devcb = &hdc9234_device::set_intrq_wr_callback(*device, DEVCB_##_write);
+#define MCFG_HDC92X4_INTRQ_CALLBACK(_write) \
+	devcb = &hdc92x4_device::set_intrq_wr_callback(*device, DEVCB_##_write);
 
 /* DMA request line. To be connected with the controller PCB. */
-#define MCFG_HDC9234_DMARQ_CALLBACK(_write) \
-	devcb = &hdc9234_device::set_dmarq_wr_callback(*device, DEVCB_##_write);
+#define MCFG_HDC92X4_DMARQ_CALLBACK(_write) \
+	devcb = &hdc92x4_device::set_dmarq_wr_callback(*device, DEVCB_##_write);
 
 /* DMA in progress line. To be connected with the controller PCB. */
-#define MCFG_HDC9234_DIP_CALLBACK(_write) \
-	devcb = &hdc9234_device::set_dip_wr_callback(*device, DEVCB_##_write);
+#define MCFG_HDC92X4_DIP_CALLBACK(_write) \
+	devcb = &hdc92x4_device::set_dip_wr_callback(*device, DEVCB_##_write);
 
 /* Auxiliary Bus. These 8 lines need to be connected to external latches
    and to a counter circuitry which works together with the external RAM.
    We use the S0/S1 lines as address lines. */
-#define MCFG_HDC9234_AUXBUS_OUT_CALLBACK(_write) \
-	devcb = &hdc9234_device::set_auxbus_wr_callback(*device, DEVCB_##_write);
+#define MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(_write) \
+	devcb = &hdc92x4_device::set_auxbus_wr_callback(*device, DEVCB_##_write);
 
 /* Callback to read the contents of the external RAM via the data bus.
    Note that the address must be set and automatically increased
    by external circuitry. */
-#define MCFG_HDC9234_DMA_IN_CALLBACK(_read) \
-	devcb = &hdc9234_device::set_dma_rd_callback(*device, DEVCB_##_read);
+#define MCFG_HDC92X4_DMA_IN_CALLBACK(_read) \
+	devcb = &hdc92x4_device::set_dma_rd_callback(*device, DEVCB_##_read);
 
 /* Callback to write the contents of the external RAM via the data bus.
    Note that the address must be set and automatically increased
    by external circuitry. */
-#define MCFG_HDC9234_DMA_OUT_CALLBACK(_write) \
-	devcb = &hdc9234_device::set_dma_wr_callback(*device, DEVCB_##_write);
+#define MCFG_HDC92X4_DMA_OUT_CALLBACK(_write) \
+	devcb = &hdc92x4_device::set_dma_wr_callback(*device, DEVCB_##_write);
 
 //===================================================================
 
-class hdc9234_device : public device_t
+class hdc92x4_device : public device_t
 {
 public:
-	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// Accesors from the CPU side
 	DECLARE_READ8_MEMBER( read );
@@ -87,12 +88,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dmaack );
 
 	// Callbacks
-	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_intrq.set_callback(object); }
-	template<class _Object> static devcb_base &set_dmarq_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dmarq.set_callback(object); }
-	template<class _Object> static devcb_base &set_dip_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dip.set_callback(object); }
-	template<class _Object> static devcb_base &set_auxbus_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_auxbus.set_callback(object); }
-	template<class _Object> static devcb_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_in_dma.set_callback(object); }
-	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dma.set_callback(object); }
+	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<hdc92x4_device &>(device).m_out_intrq.set_callback(object); }
+	template<class _Object> static devcb_base &set_dmarq_wr_callback(device_t &device, _Object object) { return downcast<hdc92x4_device &>(device).m_out_dmarq.set_callback(object); }
+	template<class _Object> static devcb_base &set_dip_wr_callback(device_t &device, _Object object) { return downcast<hdc92x4_device &>(device).m_out_dip.set_callback(object); }
+	template<class _Object> static devcb_base &set_auxbus_wr_callback(device_t &device, _Object object) { return downcast<hdc92x4_device &>(device).m_out_auxbus.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<hdc92x4_device &>(device).m_in_dma.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<hdc92x4_device &>(device).m_out_dma.set_callback(object); }
 
 	// auxbus_in is intended to read events from the drives
 	// In the real chip the status is polled; to avoid unnecessary load
@@ -117,7 +118,8 @@ protected:
 	void device_start();
 	void device_reset();
 
-private:
+	bool m_is_hdc9234;
+
 	devcb_write_line   m_out_intrq;    // INT line
 	devcb_write_line   m_out_dmarq;    // DMA request line
 	devcb_write_line   m_out_dip;      // DMA in progress line
@@ -309,7 +311,7 @@ private:
 
 	int m_substate;
 
-	typedef void (hdc9234_device::*cmdfunc)(void);
+	typedef void (hdc92x4_device::*cmdfunc)(void);
 
 	typedef struct
 	{
@@ -464,6 +466,22 @@ private:
 	void read_track();
 	void format_track();
 	void write_sectors();
+};
+
+// =====================================================
+//   Subclasses: the two variants
+// =====================================================
+
+class hdc9224_device : public hdc92x4_device
+{
+public:
+	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hdc9234_device : public hdc92x4_device
+{
+public:
+	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 #endif
