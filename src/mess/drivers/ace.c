@@ -55,7 +55,95 @@ Ports:
 #include "sound/sp0256.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "includes/ace.h"
+
+
+#define Z80_TAG         "z0"
+#define AY8910_TAG      "ay8910"
+#define I8255_TAG       "i8255"
+#define SP0256AL2_TAG   "ic1"
+#define Z80PIO_TAG      "z80pio"
+#define CENTRONICS_TAG  "centronics"
+#define SCREEN_TAG      "screen"
+
+class ace_state : public driver_device
+{
+public:
+	ace_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, Z80_TAG),
+			m_ppi(*this, I8255_TAG),
+			m_z80pio(*this, Z80PIO_TAG),
+			m_speaker(*this, "speaker"),
+			m_cassette(*this, "cassette"),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ram(*this, RAM_TAG),
+			m_sp0256(*this, SP0256AL2_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_char_ram(*this, "char_ram"),
+			m_a8(*this, "A8"),
+			m_a9(*this, "A9"),
+			m_a10(*this, "A10"),
+			m_a11(*this, "A11"),
+			m_a12(*this, "A12"),
+			m_a13(*this, "A13"),
+			m_a14(*this, "A14"),
+			m_a15(*this, "A15"),
+			m_joy(*this, "JOY")
+	{ }
+
+	virtual void machine_start();
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi_pa_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pb_w );
+	DECLARE_READ8_MEMBER( ppi_pc_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_READ8_MEMBER( ppi_control_r );
+	DECLARE_WRITE8_MEMBER( ppi_control_w );
+	DECLARE_READ8_MEMBER( pio_pa_r );
+	DECLARE_WRITE8_MEMBER( pio_pa_w );
+
+	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(set_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(clear_irq);
+	DECLARE_READ8_MEMBER(pio_ad_r);
+	DECLARE_READ8_MEMBER(pio_bd_r);
+	DECLARE_READ8_MEMBER(pio_ac_r);
+	DECLARE_READ8_MEMBER(pio_bc_r);
+	DECLARE_WRITE8_MEMBER(pio_ad_w);
+	DECLARE_WRITE8_MEMBER(pio_bd_w);
+	DECLARE_WRITE8_MEMBER(pio_ac_w);
+	DECLARE_WRITE8_MEMBER(pio_bc_w);
+	DECLARE_READ8_MEMBER(sby_r);
+	DECLARE_WRITE8_MEMBER(ald_w);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
+	required_device<z80pio_device> m_z80pio;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
+	required_device<ram_device> m_ram;
+	required_device<sp0256_device> m_sp0256;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_char_ram;
+	required_ioport m_a8;
+	required_ioport m_a9;
+	required_ioport m_a10;
+	required_ioport m_a11;
+	required_ioport m_a12;
+	required_ioport m_a13;
+	required_ioport m_a14;
+	required_ioport m_a15;
+	required_ioport m_joy;
+};
 
 
 /* Load in .ace files. These are memory images of 0x2000 to 0x7fff
@@ -172,17 +260,17 @@ READ8_MEMBER( ace_state::io_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(offset, 8)) data &= ioport("A8")->read();
-	if (!BIT(offset, 9)) data &= ioport("A9")->read();
-	if (!BIT(offset, 10)) data &= ioport("A10")->read();
-	if (!BIT(offset, 11)) data &= ioport("A11")->read();
-	if (!BIT(offset, 12)) data &= ioport("A12")->read();
-	if (!BIT(offset, 13)) data &= ioport("A13")->read();
-	if (!BIT(offset, 14)) data &= ioport("A14")->read();
+	if (!BIT(offset, 8)) data &= m_a8->read();
+	if (!BIT(offset, 9)) data &= m_a9->read();
+	if (!BIT(offset, 10)) data &= m_a10->read();
+	if (!BIT(offset, 11)) data &= m_a11->read();
+	if (!BIT(offset, 12)) data &= m_a12->read();
+	if (!BIT(offset, 13)) data &= m_a13->read();
+	if (!BIT(offset, 14)) data &= m_a14->read();
 
 	if (!BIT(offset, 15))
 	{
-		data &= ioport("A15")->read();
+		data &= m_a15->read();
 
 		m_cassette->output(-1);
 		m_speaker->level_w(0);
@@ -264,26 +352,22 @@ WRITE8_MEMBER( ace_state::ppi_control_w )
 
 READ8_MEMBER(ace_state::pio_ad_r)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	return dynamic_cast<z80pio_device*>(device)->data_read(0);
+	return m_z80pio->data_read(0);
 }
 
 READ8_MEMBER(ace_state::pio_bd_r)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	return dynamic_cast<z80pio_device*>(device)->data_read(1);
+	return m_z80pio->data_read(1);
 }
 
 READ8_MEMBER(ace_state::pio_ac_r)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	return dynamic_cast<z80pio_device*>(device)->control_read();
+	return m_z80pio->control_read();
 }
 
 READ8_MEMBER(ace_state::pio_bc_r)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	return dynamic_cast<z80pio_device*>(device)->control_read();
+	return m_z80pio->control_read();
 }
 
 
@@ -293,26 +377,22 @@ READ8_MEMBER(ace_state::pio_bc_r)
 
 WRITE8_MEMBER(ace_state::pio_ad_w)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	dynamic_cast<z80pio_device*>(device)->data_write(0, data);
+	m_z80pio->data_write(0, data);
 }
 
 WRITE8_MEMBER(ace_state::pio_bd_w)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	dynamic_cast<z80pio_device*>(device)->data_write(1, data);
+	m_z80pio->data_write(1, data);
 }
 
 WRITE8_MEMBER(ace_state::pio_ac_w)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	dynamic_cast<z80pio_device*>(device)->control_write(0, data);
+	m_z80pio->control_write(0, data);
 }
 
 WRITE8_MEMBER(ace_state::pio_bc_w)
 {
-	device_t *device = machine().device(Z80PIO_TAG);
-	dynamic_cast<z80pio_device*>(device)->control_write(1, data);
+	m_z80pio->control_write(1, data);
 }
 
 
