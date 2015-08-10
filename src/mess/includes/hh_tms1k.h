@@ -38,6 +38,7 @@ public:
 	UINT16 m_o;                         // MCU O-pins data
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 	bool m_power_on;
+	bool m_power_led;
 
 	UINT8 read_inputs(int columns);
 	DECLARE_INPUT_CHANGED_MEMBER(power_button);

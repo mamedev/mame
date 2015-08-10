@@ -144,6 +144,7 @@ void hh_tms1k_state::machine_start()
 	m_o = 0;
 	m_r = 0;
 	m_inp_mux = 0;
+	m_power_led = false;
 	m_power_on = false;
 
 	// register for savestates
@@ -153,6 +154,7 @@ void hh_tms1k_state::machine_start()
 
 	save_item(NAME(m_display_state));
 	/* save_item(NAME(m_display_cache)); */ // don't save!
+	/* save_item(NAME(m_power_led)); */ // don't save!
 	save_item(NAME(m_display_decay));
 	save_item(NAME(m_display_segmask));
 
@@ -229,6 +231,13 @@ void hh_tms1k_state::display_update()
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
+	
+	// output optional power led
+	if (m_power_led != m_power_on)
+	{
+		m_power_led = m_power_on;
+		output_set_value("power_led", m_power_led ? 1 : 0);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
