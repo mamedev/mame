@@ -192,8 +192,6 @@ Touch & Tell:
     - MCU & TMS51xx: same as US version
     - VSM: 16KB CD62170
 
-https://dl.dropboxusercontent.com/u/79094972/vsms/CD2526.VSM
-
     Touch & Tell (France) "Le Livre Magique", 1981
     - MCU & TMS51xx: same as US version
     - VSM: 16KB CD62171
