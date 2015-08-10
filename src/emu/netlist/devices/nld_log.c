@@ -16,7 +16,7 @@ NETLIB_START(log)
 {
 	register_input("I", m_I);
 
-	pstring filename = pstring::sprintf("%s.log", name().cstr());
+	pstring filename = pformat("%1.log")(name());
 	m_strm = palloc(pofilestream(filename));
 }
 
@@ -26,7 +26,9 @@ NETLIB_RESET(log)
 
 NETLIB_UPDATE(log)
 {
-	m_strm->writeline(pstring::sprintf("%20.9e %e", netlist().time().as_double(), (nl_double) INPANALOG(m_I)).cstr());
+	/* use pstring::sprintf, it is a LOT faster */
+//	m_strm->writeline(pstring::sprintf("%20.9e %e", netlist().time().as_double(), (nl_double) INPANALOG(m_I)).cstr());
+	m_strm->writeline(pformat("%1 %2").e(netlist().time().as_double(),".9").e((nl_double) INPANALOG(m_I)).cstr());
 }
 
 NETLIB_NAME(log)::~NETLIB_NAME(log)()

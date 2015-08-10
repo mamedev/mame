@@ -175,11 +175,11 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &set
 	if (snd_in == NULL)
 		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT"));
 
-	pstring sparam = pstring::sprintf("STREAM_INPUT.CHAN%d", m_channel);
+	pstring sparam = pformat("STREAM_INPUT.CHAN%1")(m_channel);
 	setup.register_param(sparam, m_param_name);
-	sparam = pstring::sprintf("STREAM_INPUT.MULT%d", m_channel);
+	sparam = pformat("STREAM_INPUT.MULT%1")(m_channel);
 	setup.register_param(sparam, m_mult);
-	sparam = pstring::sprintf("STREAM_INPUT.OFFSET%d", m_channel);
+	sparam = pformat("STREAM_INPUT.OFFSET%1")(m_channel);
 	setup.register_param(sparam, m_offset);
 }
 
@@ -210,7 +210,7 @@ void netlist_mame_stream_output_t::device_start()
 void netlist_mame_stream_output_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	//NETLIB_NAME(sound_out) *snd_out;
-	pstring sname = pstring::sprintf("STREAM_OUT_%d", m_channel);
+	pstring sname = pformat("STREAM_OUT_%1")(m_channel);
 
 	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
 	setup.register_dev("NETDEV_SOUND_OUT", sname);

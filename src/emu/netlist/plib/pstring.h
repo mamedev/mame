@@ -381,5 +381,50 @@ private:
 
 };
 
+class pformat
+{
+public:
+	pformat(const pstring &fmt);
+	pformat(const char *fmt);
+
+	operator pstring() const { return m_str; }
+
+	const char *cstr() { return m_str; }
+
+	pformat &operator ()(const INT64 x, const char *f = "") { return update(f, I64FMT "d", x);  }
+	pformat &operator ()(const UINT64 x, const char *f = "") { return update(f, I64FMT "u", x);  }
+
+	pformat &x 		    (const INT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
+	pformat &x          (const UINT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
+
+	pformat &operator ()(const INT32 x, const char *f = "") { return update(f, "d", x);  }
+	pformat &operator ()(const UINT32 x, const char *f = "") { return update(f, "u", x);  }
+
+	pformat &x 		    (const INT32 x, const char *f = "") { return update(f, "x", x);  }
+	pformat &x          (const UINT32 x, const char *f = "") { return update(f, "x", x);  }
+
+	pformat &operator ()(const INT16 x, const char *f = "") { return update(f, "hd", x);  }
+	pformat &operator ()(const UINT16 x, const char *f = "") { return update(f, "hu", x);  }
+
+	pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
+
+	pformat &operator ()(const double x, const char *f = "") { return update(f, "f", x);  }
+	pformat &          e(const double x, const char *f = "") { return update(f, "e", x);  }
+	pformat &          g(const double x, const char *f = "") { return update(f, "g", x);  }
+
+	pformat &operator ()(const char *x, const char *f = "") { return update(f, "s", x);  }
+	pformat &operator ()(const void *x, const char *f = "") { return update(f, "p", x);  }
+	pformat &operator ()(const pstring &x, const char *f = "") { return update(f, "s", x.cstr() );  }
+
+private:
+
+	pformat &update(const char *f, const char *l, ...);
+
+	char m_str[2048];
+	unsigned m_arg;
+};
+//const type_t vprintf(va_list args) const;
+//static const type_t sprintf(const char *format, ...) ATTR_PRINTF(1,2);
+
 
 #endif /* _PSTRING_H_ */

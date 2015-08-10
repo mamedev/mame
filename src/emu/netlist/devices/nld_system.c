@@ -299,7 +299,7 @@ NETLIB_START(function)
 	register_output("Q", m_Q);
 
 	for (int i=0; i < m_N; i++)
-		register_input(pstring::sprintf("A%d", i), m_I[i]);
+		register_input(pformat("A%1")(i), m_I[i]);
 
 	pstring_list_t cmds(m_func.Value(), " ");
 	m_precompiled.clear();

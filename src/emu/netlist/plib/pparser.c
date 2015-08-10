@@ -455,12 +455,12 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			if (m_ifflag == 0)
 			{
 				if (lti.size() != 3)
-					error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
+					error("PREPRO: only simple defines allowed: %s" + line);
 				m_defines.add(lti[1], define_t(lti[1], lti[2]));
 			}
 		}
 		else
-			error(pstring::sprintf("unknown directive on line %d: %s\n", m_lineno, line.cstr()));
+			error(pformat("unknown directive on line %1: %2\n")(m_lineno)(line));
 	}
 	else
 	{

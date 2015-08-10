@@ -149,7 +149,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 				break;
 			i++;
 		}
-		return pstring::sprintf(m_units[i].m_func.cstr(), val / m_units[i].m_mult);
+		return pformat(m_units[i].m_func.cstr()).g(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
@@ -181,21 +181,21 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"T",   "",      1.0e12 },
 		{"G",   "",      1.0e9  },
-		{"MEG", "RES_M(%g)", 1.0e6  },
-		{"k",   "RES_K(%g)", 1.0e3  }, /* eagle */
-		{"K",   "RES_K(%g)", 1.0e3  },
-		{"",    "%g",        1.0e0  },
-		{"M",   "CAP_M(%g)", 1.0e-3 },
-		{"u",   "CAP_U(%g)", 1.0e-6 }, /* eagle */
-		{"U",   "CAP_U(%g)", 1.0e-6 },
-		{"??",   "CAP_U(%g)", 1.0e-6    },
-		{"N",   "CAP_N(%g)", 1.0e-9 },
-		{"P",   "CAP_P(%g)", 1.0e-12},
-		{"F",   "%ge-15",    1.0e-15},
+		{"MEG", "RES_M(%1)", 1.0e6  },
+		{"k",   "RES_K(%1)", 1.0e3  }, /* eagle */
+		{"K",   "RES_K(%1)", 1.0e3  },
+		{"",    "%1",        1.0e0  },
+		{"M",   "CAP_M(%1)", 1.0e-3 },
+		{"u",   "CAP_U(%1)", 1.0e-6 }, /* eagle */
+		{"U",   "CAP_U(%1)", 1.0e-6 },
+		{"??",   "CAP_U(%1)", 1.0e-6    },
+		{"N",   "CAP_N(%1)", 1.0e-9 },
+		{"P",   "CAP_P(%1)", 1.0e-12},
+		{"F",   "%1e-15",    1.0e-15},
 
-		{"MIL", "%e",  25.4e-6},
+		{"MIL", "%1",  25.4e-6},
 
-		{"-",   "%g",  1.0  }
+		{"-",   "%1",  1.0  }
 };
 
 
@@ -345,7 +345,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = pstring::sprintf("%s.%" SIZETFMT, xname.cstr(), SIZET_PRINTF(i));
+					pstring term = pformat("%1.%2")(xname)(i);
 					add_term(tt[i], term);
 				}
 				break;

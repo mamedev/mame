@@ -226,6 +226,7 @@ pstring_t<F> pstring_t<F>::replace(const pstring_t &search, const pstring_t &rep
 			i++;
 		}
 	}
+	ret = ret.cat(cstr() + i);
 	return ret;
 }
 
@@ -511,6 +512,43 @@ void pstringbuffer::pcat(const pstring &s)
 	m_len += slen;
 	m_ptr[m_len] = 0;
 }
+
+pformat::pformat(const pstring &fmt)
+: m_arg(0)
+{
+	memcpy(m_str, fmt.cstr(), fmt.blen() + 1);
+}
+
+pformat::pformat(const char *fmt)
+: m_arg(0)
+{
+	strncpy(m_str, fmt, sizeof(m_str));
+	m_str[sizeof(m_str)] = 0;
+}
+
+pformat &pformat::update(const char *f, const char *l, ...)
+{
+	va_list ap;
+	va_start(ap, l);
+	char fmt[30] = "%";
+	char search[10] = "";
+	char buf[1024];
+	strcat(fmt, f);
+	strcat(fmt, l);
+	int nl = vsprintf(buf, fmt, ap);
+	m_arg++;
+	int sl = sprintf(search, "%%%d", m_arg);
+	char *p = strstr(m_str, search);
+	if (p != NULL)
+	{
+		// Make room
+		memmove(p+nl, p+sl, strlen(p) + 1 - sl);
+		memcpy(p, buf, nl);
+	}
+	va_end(ap);
+	return *this;
+}
+
 
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;
