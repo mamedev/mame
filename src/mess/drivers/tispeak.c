@@ -87,7 +87,7 @@ above expectations. TI continued to manufacture many products for this line.
 
     Speak & Spell (Italy) "Grillo Parlante", 1982
     - MCU & TMS51xx: same as French 1980 version
-    - VSM: 16KB? CD62190**
+    - VSM: 16KB CD62190
 
     Speak & Spell Compact (US), 1981
     - MCU: CD8011**
@@ -124,7 +124,7 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
     French:
     - No.1: Les Mots de Base: VSM: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
     - No.2: Les Mots Difficilies: VSM: 16KB? CD62177*
-    - No.3: Les Animaux Familiers: VSM: 16KB? CD62047
+    - No.3: Les Animaux Familiers: VSM: 16KB? CD62047*
     - No.4: Les Magasins De La Rue: VSM: 16KB CD62048
     - No.5: Les Extra-Terrestres: VSM: 16KB? CD62178*
 
@@ -182,7 +182,7 @@ Speak & Read modules:
 Touch & Tell:
 
     Touch & Tell (US), 1981
-    - MCU: CD8012**
+    - MCU: CD8012
     - TMS51xx: CD2802
     - VSM: 4KB CD2610, overlay codes a:04, b:01, c:05, d:09
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
@@ -190,11 +190,13 @@ Touch & Tell:
 
     Touch & Tell (UK), 1981
     - MCU & TMS51xx: same as US version
-    - VSM: ?KB CD62170*
+    - VSM: 16KB CD62170
+
+https://dl.dropboxusercontent.com/u/79094972/vsms/CD2526.VSM
 
     Touch & Tell (France) "Le Livre Magique", 1981
     - MCU & TMS51xx: same as US version
-    - VSM: ?KB CD62171*
+    - VSM: 16KB CD62171
 
     Touch & Tell (Germany) "Tipp & Sprich", 1981
     - MCU & TMS51xx: same as US version
@@ -221,7 +223,7 @@ Touch & Tell modules:
     - All About Me: VSM: 4KB CD2613, " 4a:0E, 4b:0B, 4c:0D, 4d:0C
     - World of Transportation: VSM: 16KB CD2361, " 5a:0A, 5b:0B, 5c:0C, 5d:0D, 5e:10, 5f:11, 5g:12, 5h:13
     - Little Creatures: VSM: 16KB CD2362 " 6a:14, 6b:15, 6c:16, 6d:17, 6e:18, 6f:1A, 6g:19, 6h:1B
-    - E.T.: VSM: 16KB CD2363** " 7a:0F, 7b:10, 7c:11, 7d:12, 7e:13, 7f:14, 7g:15, 7h:16
+    - E.T.: VSM: 16KB CD2363 " 7a:0F, 7b:10, 7c:11, 7d:12, 7e:13, 7f:14, 7g:15, 7h:16
 
 
 Language Tutor/Translator:
@@ -235,13 +237,13 @@ A later device, called Language Teacher, was released without speech hardware.
 
 Language Tutor modules:
 
-    - Ingles(1/4): VSM: 16KB CD2311*
-    - Ingles(2/4): VSM: 16KB CD2312*
-    - Ingles(3/4): VSM: 16KB CD2313*
-    - Ingles(4/4): VSM: 16KB CD2314*
+    - Ingles(1/4): VSM: 16KB CD2311
+    - Ingles(2/4): VSM: 16KB CD2312
+    - Ingles(3/4): VSM: 16KB CD2313
+    - Ingles(4/4): VSM: 16KB CD2314
 
-    - Spanish(1/4): VSM: 16KB CD2315*
-    - Spanish(2/4): VSM: 16KB CD2316*
+    - Spanish(1/4): VSM: 16KB CD2315
+    - Spanish(2/4): VSM: 16KB CD2316
     - Spanish(3/4): VSM: 16KB CD2317
     - Spanish(4/4): VSM: 16KB CD2318
 
@@ -255,10 +257,10 @@ Language Tutor modules:
     - German(3/4): VSM: 16KB CD2333
     - German(4/4): VSM: 16KB CD2334
 
-    - English(1/4): VSM: 16KB CD3526**
-    - English(2/4): VSM: 16KB CD3527**
-    - English(3/4): VSM: 16KB CD3528**
-    - English(4/4): VSM: 16KB CD3529**
+    - English(1/4): VSM: 16KB CD3526
+    - English(2/4): VSM: 16KB CD3527
+    - English(3/4): VSM: 16KB CD3528
+    - English(4/4): VSM: 16KB CD3529
 
 
 ----------------------------------------------------------------------------
@@ -1043,6 +1045,21 @@ ROM_START( ladictee )
 	ROM_LOAD( "cd2352.vsm", 0x0000, 0x4000, CRC(181a239e) SHA1(e16043766c385e152b7005c1c010be4c5fccdd9b) )
 ROM_END
 
+ROM_START( grillo )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common1_micro.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // placeholder, use the one we have
+
+	ROM_REGION( 0xc000, "tms6100", ROMREGION_ERASEFF ) // uses only 1 rom, 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "cd62190.vsm", 0x0000, 0x4000, CRC(63832002) SHA1(ea8124b2bf0f5908c5f1a56d60063f2468a10143) )
+ROM_END
+
 
 ROM_START( snmath )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -1116,20 +1133,60 @@ ROM_END
 
 ROM_START( tntell )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "us4403965_cd1100", 0x0000, 0x0800, BAD_DUMP CRC(863a1c9e) SHA1(f2f9eb0ae17eedd4ef2b887b34601e75b4f6c720) ) // typed in from patent US4403965/EP0048835A2, may have errors
+	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
+	
+	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
+	ROM_LOAD( "cd2610.vsm", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
+ROM_END
+
+ROM_START( tntelluk )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
+	
+	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
+	ROM_LOAD( "cd62170.vsm", 0x0000, 0x4000, CRC(6dc9d072) SHA1(9d2c9ff57c4f8fe69768666ffa41fcac649279ef) )
+ROM_END
+
+ROM_START( lelivre )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
+	
+	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
+	ROM_LOAD( "cd62171.vsm", 0x0000, 0x4000, CRC(cc26f7d1) SHA1(2b03e37b3bf3cbeca36980acfc45246dac706b83) )
+ROM_END
+
+ROM_START( tntellp )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "us4403965_cd1100", 0x0000, 0x0800, BAD_DUMP CRC(863a1c9e) SHA1(f2f9eb0ae17eedd4ef2b887b34601e75b4f6c720) ) // typed in from patent US4403965/EP0048835A2, may have errors
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) ) // from cd8012, matches patent source code
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_us4403965_output.pla", 0, 365, CRC(66cfb3c3) SHA1(80a05e5d729518e1f35d8f26438f56e80ffbd003) )
 
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
 	ROM_LOAD( "cd2610.vsm", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
 ROM_END
 
+
 ROM_START( vocaid )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012", 0x0000, 0x0800, BAD_DUMP CRC(863a1c9e) SHA1(f2f9eb0ae17eedd4ef2b887b34601e75b4f6c720) ) // placeholder, use the one we have
+	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
@@ -1145,11 +1202,12 @@ ROM_END
 /*    YEAR  NAME        PARENT COMPAT MACHINE     INPUT     INIT                     COMPANY, FULLNAME, FLAGS */
 COMP( 1978, snspell,    0,        0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1979, snspella,   snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
-COMP( 1980, snspellb,   snspell,  0, sns_tmc0281d,snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
-COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
-COMP( 1981, snspelluka, snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
-COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1980, snspellb,   snspell,  0, sns_tmc0281d,snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1981, snspelluka, snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 COMP( 1980, ladictee,   snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
+COMP( 1982, grillo,     snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 
 COMP( 1986, snmath,     0,        0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snmathp,    snmath,   0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
@@ -1158,5 +1216,9 @@ COMP( 1980, snread,     0,        0, snread,      snread,   tispeak_state, snspe
 
 COMP( 1979, lantutor,   0,        0, lantutor,    lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-COMP( 1981, tntell,     0,        0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1981, tntell,     0,        0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // assume there is an older version too, with CD8010 MCU
+COMP( 1981, tntelluk,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1981, lelivre,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1980, tntellp,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
 COMP( 1982, vocaid,     0,        0, vocaid,      tntell,   driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
