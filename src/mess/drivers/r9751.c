@@ -19,6 +19,8 @@
 * * Stephen Stair (sgstair)   - for help with reverse engineering,
 *				programming, and emulation
 * * Felipe Sanches (FSanches) - for help with MESS and emulation
+* * Michael Zapf (mizapf)     - for building the HDC9234/HDC9224
+				driver that makes this driver possible
 *
 * Memory map:
 * * 0x00000000 - 0x00ffffff : RAM? 16MB, up to 128MB?
@@ -31,6 +33,9 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
+#include "bus/scsi/scsi.h"
+#include "machine/wd33c93.h"
+
 #include "machine/pdc.h"
 
 #define TERMINAL_TAG "terminal"
@@ -42,6 +47,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pdc(*this, "pdc"),
+		m_wd33c93(*this, "wd33c93"),
 		m_terminal(*this, TERMINAL_TAG),
 		m_main_ram(*this, "main_ram")
 	{
@@ -66,6 +72,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
+	required_device<wd33c93_device> m_wd33c93;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT32> m_main_ram;
 
@@ -360,6 +367,11 @@ static MACHINE_CONFIG_START( r9751, r9751_state )
 
 	/* disk hardware */
 	MCFG_DEVICE_ADD("pdc", PDC, 0)
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	//MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
+	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	//MCFG_WD33C93_IRQ_CB(WRITELINE(r9751_state,scsi_irq))
 MACHINE_CONFIG_END
 
 

@@ -14,7 +14,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
+#include "machine/am9517a.h"
 #include "formats/pc_dsk.h"
+#include "machine/hdc9234.h"
+#include "imagedev/mfmhd.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -49,6 +52,8 @@ public:
 //        DECLARE_WRITE8_MEMBER( via1_pb_w );
 //        DECLARE_WRITE_LINE_MEMBER( atn_w );
 //        DECLARE_WRITE_LINE_MEMBER( byte_w );
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
         DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -78,8 +83,11 @@ protected:
 //        required_device<via6522_device> m_via1;
 //        required_device<c64h156_device> m_ga;
 //        required_device<floppy_image_device> m_fdc;
+	required_device<am9517a_device> m_dma8237;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
+	optional_device<hdc9234_device> m_hdc9234;
+	mfm_harddisk_device*    m_harddisk;
 //        required_ioport m_address;
 	required_shared_ptr<UINT8> m_pdc_ram;
         // IEC bus

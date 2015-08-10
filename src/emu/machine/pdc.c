@@ -17,9 +17,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG       "u19"
-
+#define Z80_TAG		"pdc_z80" // U19
 #define FDC_TAG         "fdc"
+#define HDC_TAG		"hdc"
+#define FDCDMA_TAG	"8237dma"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -56,6 +57,7 @@ static ADDRESS_MAP_START( pdc_mem, AS_PROGRAM, 8, pdc_device )
 //        AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION(M6502_TAG, 0)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("rom", 0)
 	AM_RANGE(0x8000, 0x9FFF) AM_RAM AM_SHARE("pdc_ram") // HM6264ALP-12 SRAM 8KB
+	AM_RANGE(0xC000, 0xC7FF) AM_RAM // HM6116P-2 SRAM 2KB
 //	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("pdc_ram")
 ADDRESS_MAP_END
 
@@ -64,7 +66,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
-	//AM_RANGE(0x10, 0x11) AM_DEVICE(FDC_TAG, upd765a_device, map)
+	//AM_RANGE(0x40, 0x41) AM_DEVICE(HDC_TAG, hdc9234_device, map) AM_MIRROR(0xFF00)
+	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -73,6 +76,17 @@ ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START( pdc_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+SLOT_INTERFACE_END
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( pdc_harddisks )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( pdc_harddisks )
+        SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
+        SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
+        SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
+        SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
@@ -118,6 +132,13 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 	MCFG_UPD765A_ADD(FDC_TAG, true, false)
 //	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG, pdc_floppies, "35hd", pdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats)
+
+	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL_14_31818MHz/2) // Verify XTAL
+	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pdc_device, memory_write_byte))
+
+	MCFG_DEVICE_ADD(HDC_TAG, HDC9234, 0)
+	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -150,8 +171,11 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
         //m_ga(*this, C64H156_TAG),
         //m_floppy(*this, C64H156_TAG":0:525ssqd"),
 //	m_fdc(*this, FDC_TAG ":35hd")
+	m_dma8237(*this, "8237dma"),
 	m_fdc(*this, FDC_TAG),
 	m_floppy(*this, FDC_TAG ":0"),
+	m_hdc9234(*this, HDC_TAG),
+//	m_harddisk(*this, "h1"),
         //m_address(*this, "ADDRESS"),
         //m_data_out(1),
         //m_via0_irq(CLEAR_LINE),
@@ -200,5 +224,17 @@ void pdc_device::device_reset()
         // initialize gate array
 //        m_ga->accl_w(0);
 //        m_ga->ted_w(1);
+}
+
+READ8_MEMBER(pdc_device::memory_read_byte)
+{
+        address_space& prog_space = m_pdccpu->space(AS_PROGRAM);
+        return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(pdc_device::memory_write_byte)
+{
+        address_space& prog_space = m_pdccpu->space(AS_PROGRAM);
+        return prog_space.write_byte(offset, data);
 }
 
