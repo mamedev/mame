@@ -327,7 +327,7 @@ public:
 	bool ui_active() const { return bool_value(OPTION_UI_ACTIVE); }
 	bool offscreen_reload() const { return bool_value(OPTION_OFFSCREEN_RELOAD); }
 	bool natural_keyboard() const { return bool_value(OPTION_NATURAL_KEYBOARD); }
-	bool joystick_contradictory() const { return bool_value(OPTION_JOYSTICK_CONTRADICTORY); }
+	bool joystick_contradictory() const { return m_joystick_contradictory; }
 	int coin_impulse() const { return m_coin_impulse; }
 
 	// core debugging options
@@ -389,6 +389,7 @@ private:
 
 	// cached options
 	int m_coin_impulse;
+	bool m_joystick_contradictory;
 	bool m_sleep;
 	bool m_refresh_speed;
 };

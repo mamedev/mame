@@ -504,6 +504,8 @@ if (BUSES["COLECO"]~=null) then
 		MAME_DIR .. "src/emu/bus/coleco/exp.h",
 		MAME_DIR .. "src/emu/bus/coleco/std.c",
 		MAME_DIR .. "src/emu/bus/coleco/std.h",
+		MAME_DIR .. "src/emu/bus/coleco/xin1.h",
+		MAME_DIR .. "src/emu/bus/coleco/xin1.c",
 	}
 end
 

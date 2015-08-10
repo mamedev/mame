@@ -203,6 +203,7 @@ const options_entry emu_options::s_option_entries[] =
 emu_options::emu_options()
 : core_options()
 , m_coin_impulse(0)
+, m_joystick_contradictory(false)
 , m_sleep(true)
 , m_refresh_speed(false)
 {
@@ -590,6 +591,7 @@ const char *emu_options::sub_value(std::string &buffer, const char *name, const 
 void emu_options::update_cached_options()
 {
 	m_coin_impulse = int_value(OPTION_COIN_IMPULSE);
+	m_joystick_contradictory = bool_value(OPTION_JOYSTICK_CONTRADICTORY);
 	m_sleep = bool_value(OPTION_SLEEP);
 	m_refresh_speed = bool_value(OPTION_REFRESHSPEED);
 }

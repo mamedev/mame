@@ -114,6 +114,15 @@ bool colecovision_cartridge_slot_device::call_softlist_load(software_list_device
 
 void colecovision_cartridge_slot_device::get_default_card_software(std::string &result)
 {
+	if (open_image_file(mconfig().options()))
+	{
+		UINT32 length = core_fsize(m_file);
+		if (length == 0x100000 || length == 0x200000)
+		{
+			software_get_default_slot(result, "xin1");
+			return;
+		}
+	}
 	software_get_default_slot(result, "standard");
 }
 
@@ -138,8 +147,10 @@ UINT8 colecovision_cartridge_slot_device::bd_r(address_space &space, offs_t offs
 //-------------------------------------------------
 
 #include "std.h"
+#include "xin1.h"
 
 SLOT_INTERFACE_START( colecovision_cartridges )
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", COLECOVISION_STANDARD)
+	SLOT_INTERFACE_INTERNAL("xin1", COLECOVISION_XIN1)
 SLOT_INTERFACE_END
