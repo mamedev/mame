@@ -230,7 +230,8 @@ WRITE32_MEMBER(k057714_device::write)
 				// execute when filled
 				if (m_command_fifo1_ptr >= 4)
 				{
-					printf("GCU FIFO1 exec: %08X %08X %08X %08X\n", m_command_fifo1[0], m_command_fifo1[1], m_command_fifo1[2], m_command_fifo1[3]);
+					//printf("GCU FIFO1 exec: %08X %08X %08X %08X\n", m_command_fifo1[0], m_command_fifo1[1], m_command_fifo1[2], m_command_fifo1[3]);
+					execute_command(m_command_fifo1);
 					m_command_fifo1_ptr = 0;
 				}
 			}
@@ -504,6 +505,7 @@ void k057714_device::draw_character(UINT32 *cmd)
 
 	// 0x01: -------- -------- ------xx xxxxxxxx   character x
 	// 0x01: -------- ----xxxx xxxxxx-- --------   character y
+	// 0x01: -------x -------- -------- --------   double height
 
 	// 0x02: xxxxxxxx xxxxxxxx -------- --------   color 0
 	// 0x02: -------- -------- xxxxxxxx xxxxxxxx   color 1
@@ -516,6 +518,7 @@ void k057714_device::draw_character(UINT32 *cmd)
 	UINT32 address = cmd[0] & 0xffffff;
 	UINT16 color[4];
 	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
+	bool double_height = (cmd[1] & 0x01000000) ? true : false;
 
 	if (relative_coords)
 	{
@@ -534,8 +537,9 @@ void k057714_device::draw_character(UINT32 *cmd)
 
 	UINT16 *vram16 = (UINT16*)m_vram;
 	int fb_pitch = 1024;
+	int height = double_height ? 16 : 8;
 
-	for (int j=0; j < 8; j++)
+	for (int j=0; j < height; j++)
 	{
 		UINT32 fbaddr = (y+j) * fb_pitch;
 		UINT16 line = vram16[address ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
