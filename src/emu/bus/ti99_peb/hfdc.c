@@ -1019,12 +1019,12 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
-	MCFG_HDC9234_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
-	MCFG_HDC9234_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
-	MCFG_HDC9234_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
-	MCFG_HDC9234_DMARQ_CALLBACK(WRITELINE(myarc_hfdc_device, dmarq_w))
-	MCFG_HDC9234_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
-	MCFG_HDC9234_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
+	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
+	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
+	MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
+	MCFG_HDC92X4_DMARQ_CALLBACK(WRITELINE(myarc_hfdc_device, dmarq_w))
+	MCFG_HDC92X4_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
+	MCFG_HDC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
 
 	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
