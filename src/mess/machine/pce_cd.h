@@ -93,6 +93,8 @@ private:
 	TIMER_CALLBACK_MEMBER(clear_ack);
 	TIMER_CALLBACK_MEMBER(adpcm_dma_timer_callback);
 
+	required_device<cpu_device> m_maincpu;
+
 	UINT8   m_regs[16];
 	UINT8   *m_bram;
 	UINT8   *m_adpcm_ram;

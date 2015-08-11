@@ -115,7 +115,7 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
 	   We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
-	m_acard = ioport("A_CARD")->read() & 1;
+	m_acard = m_a_card->read() & 1;
 
 	if (m_cartslot->get_type() == PCE_CDSYS3J)
 	{
@@ -134,7 +134,7 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 {
 	int joy_i;
-	UINT8 joy_type = ioport("JOY_TYPE")->read();
+	UINT8 joy_type = m_joy_type->read();
 
 	m_maincpu->io_set_buffer(data);
 
@@ -162,13 +162,7 @@ WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 
 READ8_MEMBER(pce_state::mess_pce_joystick_r)
 {
-	static const char *const joyname[4][5] = {
-		{ "JOY_P1", "JOY_P2", "JOY_P3", "JOY_P4", "JOY_P5" },
-		{ },
-		{ "JOY6B_P1", "JOY6B_P2", "JOY6B_P3", "JOY6B_P4", "JOY6B_P5" },
-		{ }
-	};
-	UINT8 joy_type = ioport("JOY_TYPE")->read();
+	UINT8 joy_type = m_joy_type->read();
 	UINT8 ret, data;
 
 	if (m_joystick_port_select <= 4)
@@ -176,7 +170,7 @@ READ8_MEMBER(pce_state::mess_pce_joystick_r)
 		switch ((joy_type >> (m_joystick_port_select*2)) & 3)
 		{
 			case 0: //2-buttons pad
-				data = ioport(joyname[0][m_joystick_port_select])->read();
+				data = m_joy[m_joystick_port_select]->read();
 				break;
 			case 2: //6-buttons pad
 				/*
@@ -186,7 +180,7 @@ READ8_MEMBER(pce_state::mess_pce_joystick_r)
 				Note that six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this
 				on real HW.
 				*/
-				data = ioport(joyname[2][m_joystick_port_select])->read() >> (m_joy_6b_packet[m_joystick_port_select]*8);
+				data = m_joy6b[m_joystick_port_select]->read() >> (m_joy_6b_packet[m_joystick_port_select]*8);
 				break;
 			default:
 				data = 0xff;

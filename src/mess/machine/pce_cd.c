@@ -80,6 +80,7 @@ const device_type PCE_CD = &device_creator<pce_cd_device>;
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, PCE_CD, "PCE CD Add-on", tag, owner, clock, "pcecd", __FILE__),
+						m_maincpu(*this, ":maincpu"),
 						m_msm(*this, "msm5205"),
 						m_cdda(*this, "cdda"),
 						m_nvram(*this, "bram"),
@@ -930,11 +931,11 @@ void pce_cd_device::set_irq_line(int num, int state)
 	if (m_regs[0x02] & m_regs[0x03] & 0x7c)
 	{
 		//printf("IRQ PEND = %02x MASK = %02x IRQ ENABLE %02X\n",m_regs[0x02] & m_regs[0x03] & 0x7c,m_regs[0x02] & 0x7c,m_regs[0x03] & 0x7c);
-		machine().device<cpu_device>("maincpu")->set_input_line(1, ASSERT_LINE);
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
 	else
 	{
-		machine().device<cpu_device>("maincpu")->set_input_line(1, CLEAR_LINE);
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 	}
 }
 
@@ -1267,7 +1268,7 @@ UINT8 pce_cd_device::get_cd_data_byte()
 		if (m_scsi_IO)
 		{
 			m_scsi_ACK = 1;
-			machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(15), timer_expired_delegate(FUNC(pce_cd_device::clear_ack),this));
+			machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(15), timer_expired_delegate(FUNC(pce_cd_device::clear_ack),this));
 		}
 	}
 	return data;
