@@ -427,7 +427,7 @@ MACHINES["LDV1000"] = true
 MACHINES["LDVP931"] = true
 MACHINES["LH5810"] = true
 MACHINES["LINFLASH"] = true
---MACHINES["LPCI"] = true
+MACHINES["LPCI"] = true
 MACHINES["LSI53C810"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
@@ -984,6 +984,7 @@ files {
 	MAME_DIR .. "src/mame/video/vectrex.c",     
 	MAME_DIR .. "src/mame/drivers/cps1.c",      
 	MAME_DIR .. "src/mame/video/cps1.c",        
+	MAME_DIR .. "src/mame/video/chihiro.c",        
 	MAME_DIR .. "src/mame/machine/xbox.c",
 }
 end
