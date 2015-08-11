@@ -65,7 +65,15 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_lcdc(*this, "hd44780"),
 			m_cassette(*this, "cassette"),
-		m_maincpu(*this, "maincpu") { }
+			m_maincpu(*this, "maincpu"),
+			m_col1(*this, "COL1"),
+			m_col2(*this, "COL2"),
+			m_col3(*this, "COL3"),
+			m_col4(*this, "COL4"),
+			m_col5(*this, "COL5"),
+			m_col6(*this, "COL6"),
+			m_select(*this, "SELECT")
+	{ }
 
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;
@@ -92,6 +100,13 @@ private:
 	UINT8       m_leds;
 	UINT8       m_lcd_digits[5];
 	required_device<cpu_device> m_maincpu;
+	required_ioport m_col1;
+	required_ioport m_col2;
+	required_ioport m_col3;
+	required_ioport m_col4;
+	required_ioport m_col5;
+	required_ioport m_col6;
+	optional_ioport m_select;
 };
 
 // device type definition
