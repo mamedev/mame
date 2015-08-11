@@ -318,7 +318,6 @@ void mboard_state::check_board_buttons()
 	int i;
 	UINT8 port_input=0;
 	UINT8 data = 0xff;
-	static const char *const keynames[] = { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	static UINT8 board_row = 0;
 	static UINT16 mouse_down = 0;
 	UINT8 pos2num_res = 0;
@@ -329,14 +328,14 @@ void mboard_state::check_board_buttons()
 
 /* check click on border pieces */
 	i=0;
-	port_input=ioport("B_BLACK")->read();
+	port_input = m_b_black->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input)+6;
 		click_on_border_piece=TRUE;
 	}
 
-	port_input=ioport("B_WHITE")->read();
+	port_input = m_b_white->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
@@ -373,7 +372,7 @@ void mboard_state::check_board_buttons()
 
 
 /* check click on board */
-	data = ioport(keynames[board_row])->read_safe(0xff);
+	data = m_line[board_row]->read();
 
 	if ((data != 0xff) && (!mouse_down) )
 	{
@@ -419,7 +418,7 @@ void mboard_state::check_board_buttons()
 		mouse_down = 0;
 
 /* check click on border - remove selected piece*/
-	if (ioport("LINE10")->read_safe(0x01))
+	if (m_line10->read())
 	{
 		if (mouse_hold_piece)
 		{
@@ -439,7 +438,7 @@ void mboard_state::check_board_buttons()
 /* check additional buttons */
 	if (data == 0xff)
 	{
-		port_input=ioport("B_BUTTONS")->read();
+		port_input = m_b_buttons->read();
 		if (port_input==0x01)
 		{
 			clear_board();
@@ -457,7 +456,7 @@ void mboard_state::check_board_buttons()
 
 extern INPUT_PORTS_START( chessboard )
 
-	PORT_START("LINE2")
+	PORT_START("LINE.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -466,7 +465,7 @@ extern INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE3")
+	PORT_START("LINE.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -475,7 +474,7 @@ extern INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE4")
+	PORT_START("LINE.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -484,7 +483,7 @@ extern INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE5")
+	PORT_START("LINE.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -493,7 +492,7 @@ extern INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE6")
+	PORT_START("LINE.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -502,7 +501,7 @@ extern INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE7")
+	PORT_START("LINE.5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -511,7 +510,7 @@ extern INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE8")
+	PORT_START("LINE.6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -520,7 +519,7 @@ extern INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE9")
+	PORT_START("LINE.7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
