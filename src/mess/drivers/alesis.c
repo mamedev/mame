@@ -27,17 +27,17 @@ READ8_MEMBER( alesis_state::kb_r )
 	UINT8 data = 0xff;
 
 	if (!(m_kb_matrix & 0x01))
-		data &= ioport("COL1")->read();
+		data &= m_col1->read();
 	if (!(m_kb_matrix & 0x02))
-		data &= ioport("COL2")->read();
+		data &= m_col2->read();
 	if (!(m_kb_matrix & 0x04))
-		data &= ioport("COL3")->read();
+		data &= m_col3->read();
 	if (!(m_kb_matrix & 0x08))
-		data &= ioport("COL4")->read();
+		data &= m_col4->read();
 	if (!(m_kb_matrix & 0x10))
-		data &= ioport("COL5")->read();
+		data &= m_col5->read();
 	if (!(m_kb_matrix & 0x20))
-		data &= ioport("COL6")->read();
+		data &= m_col6->read();
 
 	return data;
 }

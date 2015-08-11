@@ -64,6 +64,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_vs(*this, "VS")
+		, m_iop_x(*this, "X")
 	{ }
 
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);
@@ -103,6 +104,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
+	required_ioport_array<16> m_iop_x;
 };
 
 #endif /* SORCERER_H_ */

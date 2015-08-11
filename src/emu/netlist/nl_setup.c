@@ -243,7 +243,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (val.scanf("%lf", &vald) != 1)
+							if (sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<param_double_t &>(param).initial(vald);
 						}
@@ -253,7 +253,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (val.scanf("%lf", &vald) != 1)
+							if (sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<param_int_t &>(param).initial((int) vald);
 						}

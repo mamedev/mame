@@ -54,14 +54,14 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 			{
 				/* here we read B, C & the additional buttons */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((m_io_pad6b[0][portnum]->read_safe(0) & 0x30) |
-								(m_io_pad6b[1][portnum]->read_safe(0) & 0x0f)) & ~helper_6b);
+							((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x30) |
+								((m_io_pad6b[1][portnum] ? m_io_pad6b[1][portnum]->read() : 0) & 0x0f)) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read B, C & the directional buttons */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((m_io_pad6b[0][portnum]->read_safe(0) & 0x3f) & ~helper_6b);
+							(((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x3f) & ~helper_6b);
 			}
 		}
 		else
@@ -70,20 +70,20 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) & ~helper_6b);
+							((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) & ~helper_6b);
 			}
 			else if (m_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
+							(((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read ((Start & A) >> 2) | Up and Down */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) |
-								(m_io_pad6b[0][portnum]->read_safe(0) & 0x03)) & ~helper_6b);
+							(((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) |
+								((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x03)) & ~helper_6b);
 			}
 		}
 
@@ -107,14 +107,14 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						(((m_io_pad3b[portnum]->read_safe(0) & 0x3f) | 0x40) & ~helper_3b);
+						((((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0x3f) | 0x40) & ~helper_3b);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						((((m_io_pad3b[portnum]->read_safe(0) & 0xc0) >> 2) |
-							(m_io_pad3b[portnum]->read_safe(0) & 0x03) | 0x40) & ~helper_3b);
+						(((((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0xc0) >> 2) |
+							((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0x03) | 0x40) & ~helper_3b);
 		}
 	}
 
@@ -311,7 +311,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
 void md_cons_state::screen_eof_console(screen_device &screen, bool state)
 {
-	if (m_io_reset->read_safe(0x00) & 0x01)
+	if (m_io_reset && (m_io_reset->read() & 0x01))
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge

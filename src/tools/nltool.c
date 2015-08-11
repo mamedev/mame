@@ -275,7 +275,7 @@ struct input_t
 	{
 		char buf[400];
 		double t;
-		int e = line.scanf("%lf,%[^,],%lf", &t, buf, &m_value);
+		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
 			throw netlist::fatalerror_e(pformat("error %1 scanning line %2\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);

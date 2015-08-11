@@ -202,7 +202,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 	if (offset == 2)
 	{
 //        printf("Sonora: read monitor ID at PC=%x\n", m_maincpu->pc());
-		return (m_montype->read_safe(6)<<4);
+		return ((m_montype ? m_montype->read() : 6)<<4);
 	}
 
 	return m_sonora_vctl[offset];

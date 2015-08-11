@@ -40,7 +40,11 @@ public:
 		m_user_ram(*this, "user_ram"),
 		m_huc6260(*this, "huc6260"),
 		m_cartslot(*this, "cartslot"),
-		m_cd(*this, "pce_cd")
+		m_cd(*this, "pce_cd"),
+		m_joy(*this, "JOY_P"),
+		m_joy6b(*this, "JOY6B_P"),
+		m_joy_type(*this, "JOY_TYPE"),
+		m_a_card(*this, "A_CARD")
 	{ }
 
 	required_device<h6280_device> m_maincpu;
@@ -49,6 +53,10 @@ public:
 	optional_device<huc6260_device> m_huc6260;
 	required_device<pce_cart_slot_device> m_cartslot;
 	optional_device<pce_cd_device> m_cd;
+	required_ioport_array<5> m_joy;
+	required_ioport_array<5> m_joy6b;
+	required_ioport m_joy_type;
+	required_ioport m_a_card;
 
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;

@@ -205,14 +205,13 @@ Known Issues (MZ, 2010-11-07)
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
-#include "machine/ti99/videowrp.h"
-#include "machine/ti99/speech8.h"
+#include "bus/ti99x/998board.h"
+#include "bus/ti99x/videowrp.h"
+#include "bus/ti99x/grom.h"
+#include "bus/ti99x/gromport.h"
+#include "bus/ti99x/joyport.h"
 
 #include "bus/ti99_peb/peribox.h"
-#include "machine/ti99/mapper8.h"
-#include "machine/ti99/grom.h"
-#include "machine/ti99/gromport.h"
-#include "machine/ti99/joyport.h"
 
 // Debugging
 #define TRACE_READY 0
@@ -1027,7 +1026,7 @@ static MACHINE_CONFIG_START( ti99_8, ti99_8_state )
 	MCFG_GROM_LIBRARY_ADD3(pascal3_grom, pascal3)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(SPEECH_TAG, TI99_SPEECH8, 0)
+	MCFG_DEVICE_ADD(SPEECH_TAG, SPEECH8, 0)
 	MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
 
 	// Joystick port

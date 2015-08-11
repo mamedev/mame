@@ -73,8 +73,8 @@ TODO :
 
 #include "cpu/tms9900/ti990_10.h"
 #include "sound/beep.h"
-#include "machine/ti99/990_hd.h"
-#include "machine/ti99/990_tap.h"
+#include "bus/ti99x/990_hd.h"
+#include "bus/ti99x/990_tap.h"
 #include "video/911_vdt.h"
 
 
