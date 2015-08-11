@@ -219,6 +219,11 @@ public:
 		DECLARE_WRITE16_MEMBER(hp64k_usart_w);
                 DECLARE_WRITE_LINE_MEMBER(hp64k_rxrdy_w);
                 DECLARE_WRITE_LINE_MEMBER(hp64k_txrdy_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_txd_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_dtr_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rts_w);
+		DECLARE_WRITE16_MEMBER(hp64k_loopback_w);
+                void hp64k_update_loopback(void);
 
 		DECLARE_WRITE16_MEMBER(hp64k_beep_w);
 		TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
@@ -298,6 +303,10 @@ private:
                 bool m_16x_clk;
                 bool m_baud_clk;
                 UINT8 m_16x_div;
+                bool m_loopback;
+                bool m_txd_state;
+                bool m_dtr_state;
+                bool m_rts_state;
 };
 
 static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 16 , hp64k_state)
@@ -324,8 +333,8 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
 		// Read from USART
 		AM_RANGE(HP_MAKE_IOADDR(6 , 0) , HP_MAKE_IOADDR(6 , 3))   AM_READ(hp64k_usart_r)
 		// PA = 7, IC = 2
-		// Rear-panel switches
-		AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))   AM_READ(hp64k_rear_sw_r)
+		// Rear-panel switches and loopback relay control
+		AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))	  AM_READWRITE(hp64k_rear_sw_r , hp64k_loopback_w)
 		// PA = 9, IC = [0..3]
 		// Beeper control & interrupt status read
 		AM_RANGE(HP_MAKE_IOADDR(9 , 0) , HP_MAKE_IOADDR(9 , 3))   AM_WRITE(hp64k_beep_w)
@@ -417,6 +426,11 @@ void hp64k_state::machine_reset()
 		m_beeper->set_state(0);
                 m_baud_rate->set_unscaled_clock(BAUD_RATE_GEN_CLOCK / baud_rate_divisors[ (m_s5_sw->read() >> 1) & 0xf ]);
                 m_16x_clk = (m_rs232_sw->read() & 0x02) != 0;
+                m_loopback = false;
+                m_txd_state = true;
+                m_dtr_state = true;
+                m_rts_state = true;
+                
 }
 
 UINT8 hp64k_state::hp64k_crtc_filter(UINT8 data)
@@ -990,6 +1004,49 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_txrdy_w)
                 hp64k_update_irl();
 }
 
+WRITE_LINE_MEMBER(hp64k_state::hp64k_txd_w)
+{
+                m_txd_state = state;
+                if (m_loopback) {
+                                m_uart->write_rxd(state);
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_dtr_w)
+{
+                m_dtr_state = state;
+                if (m_loopback) {
+                                m_uart->write_dsr(state);
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rts_w)
+{
+                m_rts_state = state;
+                if (m_loopback) {
+                                m_uart->write_cts(state);
+                }
+}
+
+WRITE16_MEMBER(hp64k_state::hp64k_loopback_w)
+{
+                m_loopback = BIT(data , 11);
+                hp64k_update_loopback();
+}
+
+void hp64k_state::hp64k_update_loopback(void)
+{
+                if (m_loopback) {
+                                m_uart->write_rxd(m_txd_state);
+                                m_uart->write_dsr(m_dtr_state);
+                                m_uart->write_cts(m_rts_state);
+                } else {
+                                m_uart->write_rxd(1);
+                                m_uart->write_dsr(1);
+                                m_uart->write_cts(1);
+                }
+}
+
 WRITE16_MEMBER(hp64k_state::hp64k_beep_w)
 {
 		if (!BIT(offset , 0)) {
@@ -1325,7 +1382,9 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
                                 MCFG_DEVICE_ADD("uart" , I8251 , 0)
                                 MCFG_I8251_RXRDY_HANDLER(WRITELINE(hp64k_state , hp64k_rxrdy_w));
                                 MCFG_I8251_TXRDY_HANDLER(WRITELINE(hp64k_state , hp64k_txrdy_w));
-
+                                MCFG_I8251_TXD_HANDLER(WRITELINE(hp64k_state , hp64k_txd_w));
+                                MCFG_I8251_DTR_HANDLER(WRITELINE(hp64k_state , hp64k_dtr_w));
+                                MCFG_I8251_RTS_HANDLER(WRITELINE(hp64k_state , hp64k_rts_w));
 MACHINE_CONFIG_END
 
 ROM_START(hp64k)
