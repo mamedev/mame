@@ -1163,7 +1163,7 @@ WRITE8_MEMBER( coco_state::ff60_write )
 
 READ8_MEMBER( coco_state::ff40_read )
 {
-	if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+	if (offset >= 1 && offset <= 2 && m_beckerportconfig && m_beckerportconfig->read() == 1)
 	{
 		return m_beckerport->read(space, offset-1, mem_mask);
 	}
@@ -1179,7 +1179,7 @@ READ8_MEMBER( coco_state::ff40_read )
 
 WRITE8_MEMBER( coco_state::ff40_write )
 {
-	if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+	if (offset >= 1 && offset <= 2 && m_beckerportconfig && m_beckerportconfig->read() == 1)
 	{
 		return m_beckerport->write(space, offset-1, data, mem_mask);
 	}

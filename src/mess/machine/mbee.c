@@ -726,7 +726,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 	if (execute_address != 0xffff)
 	{
 		/* check to see if autorun is on */
-		autorun = m_io_config->read_safe(0xFF) & 1;
+		autorun = m_io_config->read() & 1;
 
 		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
 
