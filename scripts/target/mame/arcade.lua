@@ -2533,6 +2533,7 @@ files {
 	MAME_DIR .. "src/mame/video/sega16sp.c",
 	MAME_DIR .. "src/mame/video/segaic24.c",
 	MAME_DIR .. "src/mame/machine/gdrom.c",
+	MAME_DIR .. "src/mame/machine/xbox.c",
 }
 
 createMAMEProjects(_target, _subtarget, "seibu")
