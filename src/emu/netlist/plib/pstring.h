@@ -392,7 +392,7 @@ public:
 	const char *cstr() { return m_str; }
 
 	pformat &operator ()(const INT64 x, const char *f = "") { return update(f, I64FMT "d", x);  }
-//	pformat &operator ()(const UINT64 x, const char *f = "") { return update(f, I64FMT "u", x);  }
+	pformat &operator ()(const UINT64 x, const char *f = "") { return update(f, I64FMT "u", x);  }
 
 	pformat &x 		    (const INT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
 	pformat &x          (const UINT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
@@ -406,8 +406,9 @@ public:
 	pformat &operator ()(const INT16 x, const char *f = "") { return update(f, "hd", x);  }
 	pformat &operator ()(const UINT16 x, const char *f = "") { return update(f, "hu", x);  }
 
+#if !defined(__MINGW32__) && !defined(__MINGW64__)
 	pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
-
+#endif
 	pformat &operator ()(const double x, const char *f = "") { return update(f, "f", x);  }
 	pformat &          e(const double x, const char *f = "") { return update(f, "e", x);  }
 	pformat &          g(const double x, const char *f = "") { return update(f, "g", x);  }
