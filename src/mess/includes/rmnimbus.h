@@ -66,7 +66,12 @@ public:
 		m_scsi_ctrl_out(*this, "scsi_ctrl_out"),
 		m_fdc(*this, FDC_TAG),
 		m_z80sio(*this, Z80SIO_TAG),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_io_config(*this, "config"),
+		m_io_joystick0(*this, JOYSTICK0_TAG),
+		m_io_mouse_button(*this, MOUSE_BUTTON_TAG),
+		m_io_mousex(*this, MOUSEX_TAG),
+		m_io_mousey(*this, MOUSEY_TAG)
 	{
 	}
 
@@ -84,6 +89,11 @@ public:
 	required_device<wd2793_t> m_fdc;
 	required_device<z80sio2_device> m_z80sio;
 	required_device<screen_device> m_screen;
+	required_ioport m_io_config;
+	required_ioport m_io_joystick0;
+	required_ioport m_io_mouse_button;
+	required_ioport m_io_mousex;
+	required_ioport m_io_mousey;
 
 	bitmap_ind16 m_video_mem;
 

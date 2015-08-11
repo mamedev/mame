@@ -1546,9 +1546,9 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	int     xint;
 	int     yint;
 
-	m_nimbus_mouse.m_reg0a4 = ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
-	x = ioport(MOUSEX_TAG)->read();
-	y = ioport(MOUSEY_TAG)->read();
+	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read() | 0xC0;
+	x = m_io_mousex->read();
+	y = m_io_mousey->read();
 
 	UINT8   mxa;
 	UINT8   mxb;
@@ -1683,14 +1683,14 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 	UINT8 result;
 	//int pc=m_maincpu->_pc();
 
-	if (ioport("config")->read() & 0x01)
+	if (m_io_config->read() & 0x01)
 	{
 		result=m_nimbus_mouse.m_reg0a4;
 		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
 	}
 	else
 	{
-		result=ioport(JOYSTICK0_TAG)->read_safe(0xff);
+		result = m_io_joystick0->read();
 	}
 
 	return result;
