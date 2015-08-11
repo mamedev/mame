@@ -392,7 +392,7 @@ public:
 	const char *cstr() { return m_str; }
 
 	pformat &operator ()(const INT64 x, const char *f = "") { return update(f, I64FMT "d", x);  }
-	pformat &operator ()(const UINT64 x, const char *f = "") { return update(f, I64FMT "u", x);  }
+//	pformat &operator ()(const UINT64 x, const char *f = "") { return update(f, I64FMT "u", x);  }
 
 	pformat &x 		    (const INT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
 	pformat &x          (const UINT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
