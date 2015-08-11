@@ -79,9 +79,9 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
   - DS1232 Reset and Watchdog
   - MAX232 (for MegaLink)
 
-    One of the following Dallas Nonvolatile SRAM chips:
-    - DS1225Y 64K Non-volitile SRAM (Mega Touch 4)
-    - DS1230Y 256K Non-volitile SRAM (Mega Touch 6)
+    One of the following Dallas Non-volatile SRAM chips:
+    - DS1225Y 64K Non-volatile SRAM (Mega Touch 4)
+    - DS1230Y 256K Non-volatile SRAM (Mega Touch 6)
     - DS1644 32K NVRAM + RTC (Tournament sets)
 
   Known Games:
@@ -105,7 +105,7 @@ PROGRAM#    Program Version      Program Differences
 923x-00-01  Standard Version     Includes all Options, no Restrictions
 923x-00-02  Minnesota Version    Excludes Casino Games
 923x-00-03  Louisiana Version    Excludes all Poker Games
-923x-00-04  Wisconsin Version    Game Connot End if Player Busts; 1,000 Points are Added to End of Each Hand
+923x-00-04  Wisconsin Version    Game Cannot End if Player Busts; 1,000 Points are Added to End of Each Hand
 923x-00-05  Montana Version      Excludes Blackjack, Dice and Photo Finish
 923x-00-06  California Version   Excludes Poker Double-up feature
 9234-00-07  New Jersey Version   Excludes Sex Trivia and includes 2-Coin Limit with Lockout Coil (Only for Supertouch 30 & Megastar)
@@ -130,21 +130,21 @@ Custom Program Versions (from different Megatouch manuals):
 
 PROGRAM#    Program Version      Program Differences
 ---------------------------------------------------------------------------------------------
-9255-xx-01  Standard Version     Includes all Options, no Restrictions
-9255-xx-02  Minnesota Version    Excludes Casino Games
-9255-xx-03  Louisiana Version    Excludes all Poker Games
-9255-xx-04  Wisconsin Version    Game Connot End if Player Busts; 1,000 Points are Added to End of Each Hand
-9255-xx-06  California Version   Excludes Poker Double-up feature & No Free Game in Solitaire
-9255-xx-07  New Jersey Version   Includes 2-Coin Limit with Lockout Coil
-9255-xx-50  Bi-Lingual ENG/GER   Same as Standard Version, Without Word/Casino Games
-9255-xx-54  Bi-Lingual ENG/SPA   Same as Standard Version, Without Word Games
-9255-xx-56  No Free Credits      Same as Standard Version, Without Word Games and No Free Credits
-9255-xx-57  Internation Version  Same as Standard Version, Without Word Games
-9255-xx-60  Bi-Lingual ENG/FRE   Same as Standard Version, Without Word/Casino Games
-9255-xx-62  No Free Credit       Same as Standard Version, With No Free Credit (see regional notes below)
-9255-xx-62  Croatia              Same as Standard Version, With No Free Credit (see regional notes below)
-9255-xx-70  Australia Version    Same as Standard Version with Special Question Set
-9255-xx-71  South Africa Ver.    Same as Standard Version with Special Question Set
+9255-xx-01  Standard Version       Includes all Options, no Restrictions
+9255-xx-02  Minnesota Version      Excludes Casino Games
+9255-xx-03  Louisiana Version      Excludes all Poker Games
+9255-xx-04  Wisconsin Version      Game Cannot End if Player Busts; 1,000 Points are Added to End of Each Hand
+9255-xx-06  California Version     Excludes Poker Double-up feature & No Free Game in Solitaire
+9255-xx-07  New Jersey Version     Includes 2-Coin Limit with Lockout Coil
+9255-xx-50  Bi-Lingual ENG/GER     Same as Standard Version, Without Word/Casino Games
+9255-xx-54  Bi-Lingual ENG/SPA     Same as Standard Version, Without Word Games
+9255-xx-56  No Free Credits        Same as Standard Version, Without Word Games and No Free Credits
+9255-xx-57  International Version  Same as Standard Version, Without Word Games
+9255-xx-60  Bi-Lingual ENG/FRE     Same as Standard Version, Without Word/Casino Games
+9255-xx-62  No Free Credit         Same as Standard Version, With No Free Credit (see regional notes below)
+9255-xx-62  Croatia                Same as Standard Version, With No Free Credit (see regional notes below)
+9255-xx-70  Australia Version      Same as Standard Version with Special Question Set
+9255-xx-71  South Africa Ver.      Same as Standard Version with Special Question Set
 
 xx = game/version code:
 
@@ -163,12 +163,12 @@ Not all regional versions are available for each Megatouch series
  For Megatouch Super 4, set 9255-41-62 is No Free Credit
 
   Notes/ToDo:
-  - offset for top V9938 layer is hardcoded, probably should be taken from V9938 setup
+  - offset for top V9938 layer is hard coded, probably should be taken from V9938 setup
   - blinking on Megatouch title screen is probably incorrect
   - clean up V9938 interrupt implementation
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
-  - megat5a: has jmp $0000 in the initialization code causing infinite loop - Dump verfied on 4 different sets. (watchdog issue???)
+  - megat5a: has jmp $0000 in the initialization code causing infinite loop - Dump verified on 4 different sets. (watchdog issue???)
  */
 
 #include "emu.h"
@@ -1221,6 +1221,22 @@ ROM_START( americna ) /* Uses a small daughter card CRT-251 & Dallas DS1225Y NV 
 	ROM_LOAD( "9131-00_u11-0.u11", 0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) )
 ROM_END
 
+/*
+
+This set seems odd, it doesn't really have a title sequence.
+
+Same keys as Americana & same Stand / Hi-Score issue
+
+C1988 MII on the labels
+
+*/
+ROM_START( meritjp ) /* Uses a small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9131-01_u9-00.u9",   0x00000, 0x10000, CRC(dadaac6a) SHA1(798068f3cef6f5d41dd8ee4315e220932f31a3f7) ) /* 9131-01 U9-00 */
+	ROM_LOAD( "9131-01_u10-r0.u10", 0x10000, 0x10000, CRC(ebee75e2) SHA1(1ba1c92684d0f5251bb5b57a29b39467b57a1170) )
+	ROM_LOAD( "9131-01_u11-r0.u11", 0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) )
+ROM_END
+
 ROM_START( dodgecty ) /* Uses a small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9131-02_u9-2t.u9",  0x00000, 0x10000, CRC(22e73039) SHA1(368f03b31f7c3cb81a95b20d1cb954e8557d2017) ) /* 9131-02 U9-2T  880111 */
@@ -1331,7 +1347,7 @@ ROM_START( megat ) /* Dallas DS1204V security key attached to CRT-254 connected 
 	ROM_LOAD( "9234-20_u1-r0_c1994_mii", 0x000000, 0x000022, BAD_DUMP CRC(6cbdbde1) SHA1(b076ee21fc792a5e85cdaed427bc41554568811e) )
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
-	ROM_LOAD( "qs9234-20_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9234-20_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 satellite PCB */
 	ROM_LOAD( "qs9234-20_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) ) /* Same data as Pit Boss Supertouch 30 sets, different label - verified */
 	ROM_LOAD( "qs9234-20_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
 ROM_END
@@ -1350,7 +1366,7 @@ ROM_START( pbst30 ) /* Dallas DS1204V security key attached to CRT-254 connected
 	ROM_LOAD( "9234-10_u1-r01_c1994_mii", 0x000000, 0x000022, BAD_DUMP CRC(1c782f78) SHA1(8255afcffbe21a43f53cfb41867552681403ea47) )
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
-	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 satellite PCB */
 	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
 ROM_END
@@ -1369,7 +1385,7 @@ ROM_START( pbst30a ) /* Dallas DS1204V security key attached to CRT-254 connecte
 	ROM_LOAD( "9234-01_u1-r01_c1993_mii", 0x000000, 0x000022, BAD_DUMP CRC(74bf0546) SHA1(eb44a057cf797279ee3456a74e166fa711547ea4) )
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
-	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 satellite PCB */
 	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
 ROM_END
@@ -1386,7 +1402,7 @@ ROM_START( pitbossma ) /* Unprotected or patched??  The manual shows a DS1204 ke
 	ROM_RELOAD(     0x70000, 0x10000)
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
-	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 satellite PCB */
 	ROM_LOAD( "qs9243-00-01_u6-r0",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
 ROM_END
@@ -1443,7 +1459,7 @@ ROM_START( pitbossm ) /* Dallas DS1204V security key attached to CRT-254 connect
 	ROM_LOAD( "9244-00_u1-ro1_c1994_mii", 0x000000, 0x000022, BAD_DUMP CRC(0455e18b) SHA1(919b48c25888af0af34b2d0cf34370476a97b79e) )
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
-	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 satellite PCB */
 	ROM_LOAD( "qs9243-00-01_u6-r0",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
 ROM_END
@@ -2278,6 +2294,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat3te)
 
 /* CRT-250 */
 GAME( 1987, americna,  0,        meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Americana (9131-00)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, meritjp,  0,         meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Merit Joker Poker (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty,  driver_device, 0,        ROT0, "Merit", "Dodge City (9131-02)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, pitboss2,  0,        meritm_crt250, pitboss2,  driver_device, 0,        ROT0, "Merit", "Pit Boss II (9221-01C)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, spitboss,  0,        meritm_crt250, spitboss,  driver_device, 0,        ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )

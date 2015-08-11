@@ -984,6 +984,7 @@ files {
 	MAME_DIR .. "src/mame/video/vectrex.c",     
 	MAME_DIR .. "src/mame/drivers/cps1.c",      
 	MAME_DIR .. "src/mame/video/cps1.c",        
+	MAME_DIR .. "src/mame/machine/xbox.c",
 }
 end
 --------------------------------------------------

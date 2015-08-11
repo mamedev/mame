@@ -184,7 +184,7 @@ Touch & Tell:
     Touch & Tell (US), 1981
     - MCU: CD8012
     - TMS51xx: CD2802
-    - VSM: 4KB CD2610, overlay codes a:04, b:01, c:05, d:09
+    - VSM: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
       too, maybe an earlier version?
 
@@ -211,17 +211,82 @@ Touch & Tell:
       you get a serious medical aid device for the voice-impaired. The PCB is
       identical, it includes the edge connector for modules but no external slot.
 
-
 Touch & Tell modules:
 
     English:
-    - Alphabet Fun: VSM: 4KB CD2611, overlay codes 1a:0E, 1b:0D, 1c:0C, 1d:0B
-    - Animal Friends: VSM: 16KB CD2355, " 2a:0A, 2b:0F, 2c:0E, 2d:0D
-    - Number Fun: VSM: 4KB CD2612*, " 3a:02, 3b:03, 3c:07, 3d:06, CD2612(rev.A), " 3a:0A, 3b:0F, 3c:0D, 3d:0E
-    - All About Me: VSM: 4KB CD2613, " 4a:0E, 4b:0B, 4c:0D, 4d:0C
-    - World of Transportation: VSM: 16KB CD2361, " 5a:0A, 5b:0B, 5c:0C, 5d:0D, 5e:10, 5f:11, 5g:12, 5h:13
-    - Little Creatures: VSM: 16KB CD2362 " 6a:14, 6b:15, 6c:16, 6d:17, 6e:18, 6f:1A, 6g:19, 6h:1B
-    - E.T.: VSM: 16KB CD2363 " 7a:0F, 7b:10, 7c:11, 7d:12, 7e:13, 7f:14, 7g:15, 7h:16
+    - Alphabet Fun: VSM: 4KB CD2611
+    - Animal Friends: VSM: 16KB CD2355
+    - Number Fun: VSM: 4KB CD2612*, CD2612(rev.A)
+    - All About Me: VSM: 4KB CD2613
+    - World of Transportation: VSM: 16KB CD2361
+    - Little Creatures: VSM: 16KB CD2362
+    - E.T.: VSM: 16KB CD2363
+
+Touch & Tell/Vocaid overlay reference:
+
+    tntell CD2610:
+    - 04: a - Colors
+    - 01: b - Objects
+    - 05: c - Shapes
+    - 09: d - Home Scene
+    tntelluk CD62170, tntellfr CD62171:
+    - see tntell
+    - see numfun(not A)
+    - see animalfr
+    - 08: ? - Clown Face
+    - 0B: ? - Body Parts
+    vocaid CD2357:
+    - 1C: 1 - Leisure
+    - 1E: 2 - Telephone
+    - 1B: 3 - Bedside
+    - 1D: 4 - Alphabet
+    alphabet CD2611:
+    - 0E: 1a - Alphabet A-M
+    - 0D: 1b - Alphabet N-Z
+    - 0C: 1c - Letter Jumble A-M
+    - 0B: 1d - Letter Jumble N-Z
+    animalfr CD2355:
+    - 0A: 2a - Farm Animals
+    - 0F: 2b - At The Farm
+    - 0E: 2c - Animal Babies
+    - 0D: 2d - In The Jungle
+    numfun CD2612:
+    - 02/0A(rev.A): 3a - Numbers 1-10
+    - 03/0F(rev.A): 3b - Numbers 11-30
+    - 07/0D(rev.A): 3c - How Many?
+    - 06/0E(rev.A): 3d - Hidden Numbers
+    aboutme CD2613:
+    - 0E: 4a - Clown Face
+    - 0B: 4b - Body Parts
+    - 0D: 4c - Things to Wear
+    - 0C: 4d - Just For Me
+    wot CD2361:
+    - 0A: 5a - On Land
+    - 0B: 5b - In The Air
+    - 0C: 5c - On The Water
+    - 0D: 5d - In Space
+    - 10: 5e - What Belongs Here?
+    - 11: 5f - How It Used To Be
+    - 12: 5g - Word Fun
+    - 13: 5h - In the Surprise Garage
+    lilcreat CD2362:
+    - 14: 6a - In The Park
+    - 15: 6b - In The Sea
+    - 16: 6c - In The Woods
+    - 17: 6d - Whose House?
+    - 18: 6e - Hide & Seek
+    - 1A: 6f - Who Is It?
+    - 19: 6g - But It's Not
+    - 1B: 6h - Word Fun
+    et CD2363:
+    - 0F: 7a - The Adventure On Earth I
+    - 10: 7b - The Adventure On Earth II
+    - 11: 7c - Fun And Friendship I
+    - 12: 7d - Fun And Friendship II
+    - 13: 7e - E.T. The Star I
+    - 14: 7f - E.T. The Star II
+    - 15: 7g - Do You Remember? I
+    - 16: 7h - Do You Remember? II
 
 
 Language Tutor/Translator:
@@ -265,6 +330,7 @@ Language Tutor modules:
 
   TODO:
   - why doesn't lantutor work?
+  - tntell/vocaid: able to get overlay code from external artwork file
   - emulate other known devices
 
 
@@ -279,6 +345,7 @@ Language Tutor modules:
 // internal artwork
 #include "lantutor.lh"
 #include "snspell.lh"
+#include "tntell.lh" // keyboard overlay
 
 // The master clock is a single stage RC oscillator into TMS5100 RCOSC:
 // In an early 1979 Speak & Spell, C is 68pf, R is a 50kohm trimpot which is set to around 33.6kohm
@@ -327,6 +394,9 @@ public:
 	DECLARE_DRIVER_INIT(tntell);
 	DECLARE_DRIVER_INIT(lantutor);
 
+	UINT8 m_overlay;
+	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
+
 protected:
 	virtual void machine_start();
 };
@@ -350,6 +420,8 @@ void tispeak_state::machine_start()
 
 void tispeak_state::init_cartridge()
 {
+	m_overlay = 0;
+	
 	if (m_cart != NULL && m_cart->exists())
 	{
 		std::string region_tag;
@@ -500,10 +572,22 @@ READ8_MEMBER(tispeak_state::tntell_read_k)
 		k |= 4;
 
 	// K8: overlay code from R5,O4-O7
-	if (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_inp_matrix[10]->read())
+	if (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay)
 		k |= 8;
 	
 	return k;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
+{
+	// Each keyboard overlay insert has 5 holes, used by the game to determine
+	// which one is active(if any). If it matches with the internal ROM or
+	// external module, the game continues.
+	// 00 for none, 1F for diagnostics, see comment section above for a list
+	m_overlay = m_inp_matrix[10]->read();
+	
+	for (int i = 0; i < 5; i++)
+		output_set_indexed_value("ol", i+1, m_overlay >> i & 1);
 }
 
 
@@ -695,62 +779,62 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tntell )
 	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Grid 1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Grid 1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Grid 1-4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Grid 1-3")
 
 	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Grid 2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Grid 2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Grid 2-4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Grid 2-3")
 
 	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Grid 3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Grid 3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Grid 3-4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Grid 3-3")
 
 	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Grid 4-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Grid 4-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Grid 4-4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Grid 4-3")
 
 	PORT_START("IN.4") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Grid 5-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Grid 5-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Grid 5-4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Grid 5-3")
 
 	PORT_START("IN.5") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Grid 5-6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Grid 6-5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Grid 5-5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // overlay code
 
 	PORT_START("IN.6") // R6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Grid 3-5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Grid 2-5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Grid 4-5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Grid 1-5")
 
 	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Grid 3-6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Grid 2-6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Grid 4-6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Grid 1-6")
 
 	PORT_START("IN.8") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Grid 6-1 (Off)") // -> auto_power_off
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Grid 6-1 (Off)") // -> auto_power_off
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("Grid 6-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Grid 6-4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Grid 6-3")
 
 	PORT_START("IN.9") // Vss!
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
 
 	PORT_START("IN.10")
 	PORT_CONFNAME( 0x1f, 0x01, "Overlay Code" )
@@ -904,7 +988,9 @@ static MACHINE_CONFIG_START( vocaid, tispeak_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, tntell_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, tntell_write_r))
 
-//	MCFG_DEFAULT_LAYOUT(layout_tntell)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
+	MCFG_DEFAULT_LAYOUT(layout_tntell)
 
 	/* no video! */
 
@@ -1214,9 +1300,9 @@ COMP( 1980, snread,     0,        0, snread,      snread,   tispeak_state, snspe
 
 COMP( 1979, lantutor,   0,        0, lantutor,    lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-COMP( 1981, tntell,     0,        0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // assume there is an older version too, with CD8010 MCU
-COMP( 1981, tntelluk,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-COMP( 1981, tntellfr,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-COMP( 1980, tntellp,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1981, tntell,     0,        0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK ) // assume there is an older version too, with CD8010 MCU
+COMP( 1981, tntelluk,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+COMP( 1981, tntellfr,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+COMP( 1980, tntellp,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 
-COMP( 1982, vocaid,     0,        0, vocaid,      tntell,   driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1982, vocaid,     0,        0, vocaid,      tntell,   driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )

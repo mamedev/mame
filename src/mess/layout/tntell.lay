@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
+	<element name="static_white"><rect><color red="0.98" green="0.98" blue="1.0" /></rect></element>
+
+	<element name="text_on">
+		<rect><color red="0.98" green="0.98" blue="1.0" /></rect>
+		<text string="ON"><color red="0.9" green="0.7" blue="0.6" /></text>
+	</element>
+	<element name="text_off">
+		<rect><color red="0.98" green="0.98" blue="1.0" /></rect>
+		<text string="OFF"><color red="0.44" green="0.55" blue="0.9" /></text>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.4" green="0.1" blue="0.11" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.22" /></disk>
+	</element>
+
+	<element name="hole" defstate="1">
+		<text state="0" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="1" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<disk state="0"><color red="0.0" green="0.0" blue="0.0" /></disk>
+	</element>
+
+	<element name="button" defstate="0">
+		<rect state="0"><color red="0.98" green="0.98" blue="1.0" /></rect>
+		<rect state="1"><color red="0.98" green="0.98" blue="1.0" /></rect>
+		<disk state="1">
+			<bounds x="0.16" y="0.16" width="0.68" height="0.68"/>
+			<color red="0.88" green="0.88" blue="0.86" />
+		</disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="3" right="71.8" top="9.7" bottom="71.8" />
+		<bezel element="static_black">
+			<bounds left="3" right="71.8" top="9.7" bottom="71.8" />
+		</bezel>
+
+		<bezel element="static_white"><bounds x="3.3" y="10.0" width="6.3" height="61.5" /></bezel>
+		<bezel name="ol1" element="hole"><bounds x="5.6" y="56.0" width="1.7" height="1.7" /></bezel>
+		<bezel name="ol2" element="hole"><bounds x="5.6" y="53.5" width="1.7" height="1.7" /></bezel>
+		<bezel name="ol3" element="hole"><bounds x="5.6" y="51.0" width="1.7" height="1.7" /></bezel>
+		<bezel name="ol4" element="hole"><bounds x="5.6" y="48.5" width="1.7" height="1.7" /></bezel>
+		<bezel name="ol5" element="hole"><bounds x="5.6" y="46.0" width="1.7" height="1.7" /></bezel>
+
+		<bezel element="button" inputtag="IN.0" inputmask="0x01"><bounds x="10.0" y="10.0" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x02"><bounds x="20.3" y="10.0" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x08"><bounds x="30.6" y="10.0" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x04"><bounds x="40.9" y="10.0" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x08"><bounds x="51.2" y="10.0" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.7" inputmask="0x08"><bounds x="61.5" y="10.0" width="10" height="10" /></bezel>
+
+		<bezel element="button" inputtag="IN.1" inputmask="0x01"><bounds x="10.0" y="20.3" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x02"><bounds x="20.3" y="20.3" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x08"><bounds x="30.6" y="20.3" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x04"><bounds x="40.9" y="20.3" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x02"><bounds x="51.2" y="20.3" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.7" inputmask="0x02"><bounds x="61.5" y="20.3" width="10" height="10" /></bezel>
+
+		<bezel element="button" inputtag="IN.2" inputmask="0x01"><bounds x="10.0" y="30.6" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x02"><bounds x="20.3" y="30.6" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x08"><bounds x="30.6" y="30.6" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x04"><bounds x="40.9" y="30.6" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x01"><bounds x="51.2" y="30.6" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.7" inputmask="0x01"><bounds x="61.5" y="30.6" width="10" height="10" /></bezel>
+
+		<bezel element="button" inputtag="IN.3" inputmask="0x01"><bounds x="10.0" y="40.9" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x02"><bounds x="20.3" y="40.9" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x08"><bounds x="30.6" y="40.9" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x04"><bounds x="40.9" y="40.9" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x04"><bounds x="51.2" y="40.9" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.7" inputmask="0x04"><bounds x="61.5" y="40.9" width="10" height="10" /></bezel>
+
+		<bezel element="button" inputtag="IN.4" inputmask="0x01"><bounds x="10.0" y="51.2" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x02"><bounds x="20.3" y="51.2" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x08"><bounds x="30.6" y="51.2" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x04"><bounds x="40.9" y="51.2" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.5" inputmask="0x04"><bounds x="51.2" y="51.2" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.5" inputmask="0x01"><bounds x="61.5" y="51.2" width="10" height="10" /></bezel>
+
+		<bezel element="button" inputtag="IN.8" inputmask="0x01"><bounds x="10.0" y="61.5" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.8" inputmask="0x02"><bounds x="20.3" y="61.5" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.8" inputmask="0x08"><bounds x="30.6" y="61.5" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.8" inputmask="0x04"><bounds x="40.9" y="61.5" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.5" inputmask="0x02"><bounds x="51.2" y="61.5" width="10" height="10" /></bezel>
+		<bezel element="button" inputtag="IN.9" inputmask="0x02"><bounds x="61.5" y="61.5" width="10" height="10" /></bezel>
+
+		<bezel element="text_off"><bounds x="10.6" y="69.8" width="3" height="1.6" /></bezel>
+		<bezel element="text_on"><bounds x="67.9" y="69.8" width="2.3" height="1.6" /></bezel>
+		<bezel name="power_led" element="led"><bounds x="70.1" y="70.1" width="1" height="1" /></bezel> <!-- fake -->
+
+	</view>
+</mamelayout>
