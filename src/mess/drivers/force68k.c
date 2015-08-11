@@ -137,7 +137,7 @@ force68k_state(const machine_config &mconfig, device_type type, const char *tag)
         , m_centronics_busy (0)
         , m_centronics_perror (0)
         , m_centronics_select (0)
-	,m_cart(*this, "exp_rom1")
+        ,m_cart(*this, "exp_rom1")
 {
 }
 
@@ -157,8 +157,9 @@ DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
 DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
 DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
 // User EPROM/SRAM slot(s)
-//int force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
-//DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
+int force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
+DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
+DECLARE_READ16_MEMBER (read16_rom);
 
 protected:
 
@@ -178,6 +179,7 @@ INT32 m_centronics_select;
 
 // Pointer to System ROMs needed by bootvect_r
 UINT16  *m_sysrom;
+UINT16  *m_usrrom;
 
 required_device<generic_slot_device> m_cart;
 
@@ -186,9 +188,11 @@ required_device<generic_slot_device> m_cart;
 static ADDRESS_MAP_START (force68k_mem, AS_PROGRAM, 16, force68k_state)
 ADDRESS_MAP_UNMAP_HIGH
 AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
-AM_RANGE (0x000008, 0x01ffff) AM_RAM /* DRAM */
-AM_RANGE (0x080000, 0x09ffff) AM_ROM /* System EPROM Area      */
-//AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, mapped by a cartslot  */
+AM_RANGE (0x000008, 0x01ffff) AM_RAM /* DRAM CPU-1B */
+//AM_RANGE (0x020000, 0x07ffff) AM_RAM /* Additional DRAM CPU-1D */
+AM_RANGE (0x080000, 0x083fff) AM_ROM /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
+AM_RANGE (0x084000, 0x09ffff) AM_ROM /* System EPROM Area 112Kb additional space for System ROM     */
+//AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
 AM_RANGE (0x0c0040, 0x0c0041) AM_DEVREADWRITE8 ("aciahost", acia6850_device, status_r, control_w, 0x00ff)
 AM_RANGE (0x0c0042, 0x0c0043) AM_DEVREADWRITE8 ("aciahost", acia6850_device, data_r, data_w, 0x00ff)
 AM_RANGE (0x0c0080, 0x0c0081) AM_DEVREADWRITE8 ("aciaterm", acia6850_device, status_r, control_w, 0xff00)
@@ -292,13 +296,21 @@ void force68k_state::machine_start ()
         m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x080000);
 
         /* Map user ROM/RAM socket(s) */
-	if (m_cart->exists())
+        if (m_cart->exists())
         {
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 
-                                                                  0xaffff, 
-                                                                  read16_delegate(FUNC(generic_slot_device::read16_rom),
-                                                                                     (generic_slot_device*)m_cart));
+                m_usrrom = (UINT16*)m_cart->get_rom_base();
+#if 0 // This should be the correct way but produces odd and even bytes swapped
+                m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
+#else // So we installs a custom very ineffecient handler for now until we understand hwp to solve the problem better
+                m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(force68k_state::read16_rom), this));
+#endif
         }
+}
+
+/* A very ineffecient User cart emulation of two 8 bit sockets (odd and even) */
+READ16_MEMBER (force68k_state::read16_rom){
+  offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
+  return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
@@ -376,16 +388,15 @@ WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
    32Kx16 64 Kbyte 27256
    --------------------------
 */
-// Implementation of static 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier 
+// Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier 
 // software handling. TODO: make configurable according to table above.
 static MACHINE_CONFIG_FRAGMENT( fccpu1_eprom_sockets )
-	MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_linear_slot, "fccpu1_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-        MCFG_GENERIC_ENDIAN(ENDIANNESS_LITTLE) // In generic call_load() len 12152, width 2 endianess 0
-//       MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG) // In generic call_load() len 12152, width 2 endianess 1
-//	MCFG_GENERIC_LOAD(force68k_state, exp1_load)
-//	MCFG_SOFTWARE_LIST_ADD("cart_list", "fccpu1_cart")
+        MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "fccpu1_cart")
+        MCFG_GENERIC_EXTENSIONS("bin,rom")
+        MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+        MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG) 
+        MCFG_GENERIC_LOAD(force68k_state, exp1_load)
+//      MCFG_SOFTWARE_LIST_ADD("cart_list", "fccpu1_cart")
 MACHINE_CONFIG_END
 
 /***************************
@@ -393,20 +404,19 @@ MACHINE_CONFIG_END
 ****************************/
 int force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+        UINT32 size = slot->common_get_size("rom");
 
-        printf("force68k_load_cart() loading rom at slot %s for image \n", (char *) image.device_typename);
-	if (size > 0x10000) // Max 64Kb
-	{
-	  LOG( printf("Cartridge size exceeding max size (64Kb): %d\n", size) );
-	  image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge size exceeding max size (64Kb)");
-		return IMAGE_INIT_FAIL;
-	}
+        if (size > 0x20000) // Max 128Kb
+        {
+                LOG( printf("Cartridge size exceeding max size (128Kb): %d\n", size) );
+                image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge size exceeding max size (128Kb)");
+                return IMAGE_INIT_FAIL;
+        }
 
         slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
-	slot->common_load_rom(slot->get_rom_base(), size, "rom");
-
-	return IMAGE_INIT_PASS;
+        slot->common_load_rom(slot->get_rom_base(), size, "rom");
+        
+        return IMAGE_INIT_PASS;
 }
 
 /*
