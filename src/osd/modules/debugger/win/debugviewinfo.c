@@ -68,9 +68,6 @@ debugview_info::debugview_info(debugger_windows_interface &debugger, debugwin_in
 	return;
 
 cleanup:
-	if (m_view != NULL)
-		machine().debug_view().free_view(*m_view);
-	m_view = NULL;
 	if (m_hscroll != NULL)
 		DestroyWindow(m_hscroll);
 	m_hscroll = NULL;
@@ -80,15 +77,18 @@ cleanup:
 	if (m_wnd != NULL)
 		DestroyWindow(m_wnd);
 	m_wnd = NULL;
+	if (m_view != NULL)
+		machine().debug_view().free_view(*m_view);
+	m_view = NULL;
 }
 
 
 debugview_info::~debugview_info()
 {
-	if (m_view)
-		machine().debug_view().free_view(*m_view);
 	if (m_wnd != NULL)
 		DestroyWindow(m_wnd);
+	if (m_view)
+		machine().debug_view().free_view(*m_view);
 }
 
 
