@@ -271,6 +271,10 @@ void upd7759_device::device_start()
 	save_item(NAME(m_start));
 	save_item(NAME(m_drq));
 
+	save_item(NAME(m_fifo_data), 0x40);
+	save_item(NAME(m_fifo_read));
+	save_item(NAME(m_fifo_write));
+
 	save_item(NAME(m_state));
 	save_item(NAME(m_clocks_left));
 	save_item(NAME(m_nibbles_left));
@@ -344,6 +348,10 @@ void upd7756_device::device_start()
 	save_item(NAME(m_start));
 	save_item(NAME(m_drq));
 
+	save_item(NAME(m_fifo_data), 0x40);
+	save_item(NAME(m_fifo_read));
+	save_item(NAME(m_fifo_write));
+
 	save_item(NAME(m_state));
 	save_item(NAME(m_clocks_left));
 	save_item(NAME(m_nibbles_left));
@@ -396,6 +404,9 @@ void upd7759_device::device_reset()
 	m_adpcm_data         = 0;
 	m_sample             = 0;
 
+	m_fifo_read          = 0x3F;
+	m_fifo_write         = 0x00;
+
 	/* turn off any timer */
 	if (m_timer)
 		m_timer->adjust(attotime::never);
@@ -422,6 +433,9 @@ void upd7756_device::device_reset()
 	m_adpcm_state        = 0;
 	m_adpcm_data         = 0;
 	m_sample             = 0;
+
+	m_fifo_read          = 0x3F;
+	m_fifo_write         = 0x00;
 }
 
 
@@ -494,6 +508,16 @@ void upd775x_device::advance_state()
 		case STATE_DROP_DRQ:
 			m_drq = 0;
 
+			if (m_rombase == NULL)
+			{
+				// Slave Mode: get data from FIFO buffer
+				UINT8 fiforead = (m_fifo_read + 1) & 0x3F;
+				if (fiforead != m_fifo_write)
+				{
+					m_fifo_in = m_fifo_data[fiforead];
+					m_fifo_read = fiforead;
+				}
+			}
 			m_clocks_left = m_post_drq_clocks;
 			m_state = m_post_drq_state;
 			break;
@@ -795,8 +819,16 @@ WRITE_LINE_MEMBER( upd7756_device::start_w )
 
 WRITE8_MEMBER( upd775x_device::port_w )
 {
-	/* update the FIFO value */
-	m_fifo_in = data;
+	if (m_rombase != NULL)
+	{
+		/* update the FIFO value */
+		m_fifo_in = data;
+	}
+	else
+	{
+		m_fifo_data[m_fifo_write++] = data;
+		m_fifo_write &= 0x3F;
+	}
 }
 
 
@@ -812,6 +844,11 @@ void upd775x_device::set_bank_base(UINT32 base)
 	assert(m_rombase != NULL);
 	m_rom = m_rombase + base;
 	m_romoffset = base;
+}
+
+UINT8 upd775x_device::get_fifo_space()
+{
+	return (m_fifo_read - m_fifo_write) & 0x3F;
 }
 
 //-------------------------------------------------

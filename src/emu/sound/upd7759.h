@@ -26,6 +26,7 @@ public:
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<upd775x_device &>(device).m_drqcallback.set_callback(object); }
 
 	void set_bank_base(offs_t base);
+	UINT8 get_fifo_space();
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
@@ -56,6 +57,10 @@ protected:
 	UINT8       m_reset;                      /* current state of the RESET line */
 	UINT8       m_start;                      /* current state of the START line */
 	UINT8       m_drq;                        /* current state of the DRQ line */
+	
+	UINT8       m_fifo_data[0x40];
+	UINT8       m_fifo_read;	// last read offset (will read in m_fifo_read+1)
+	UINT8       m_fifo_write;	// write offset
 
 	/* internal state machine */
 	INT8        m_state;                      /* current overall chip state */
