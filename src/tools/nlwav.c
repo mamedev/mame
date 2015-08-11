@@ -166,7 +166,7 @@ void convert(nlwav_options_t &opts)
 	{
 #if 1
 		float t = 0.0; float v = 0.0;
-		line.scanf("%f %f", &t, &v);
+		sscanf(line.cstr(), "%f %f", &t, &v);
 		while (t >= ct)
 		{
 			outsam += (ct - lt) * cursam;

@@ -308,8 +308,6 @@ public:
 	pstring(const type_t &string) : type_t(string) { }
 
 	const type_t vprintf(va_list args) const;
-	int scanf(const mem_t *format, ...) const;
-
 	static const type_t sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 
 };
@@ -409,9 +407,9 @@ public:
 #if !defined(__MINGW32__) && !defined(__MINGW64__)
 	pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
 #endif
-	pformat &operator ()(const double x, const char *f = "") { return update(f, "f", x);  }
+	pformat &operator ()(const double x, const char *f = "") { return update(f, "g", x);  }
 	pformat &          e(const double x, const char *f = "") { return update(f, "e", x);  }
-	pformat &          g(const double x, const char *f = "") { return update(f, "g", x);  }
+	pformat &          f(const double x, const char *f = "") { return update(f, "f", x);  }
 
 	pformat &operator ()(const char *x, const char *f = "") { return update(f, "s", x);  }
 	pformat &operator ()(const void *x, const char *f = "") { return update(f, "p", x);  }

@@ -149,7 +149,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 				break;
 			i++;
 		}
-		return pformat(m_units[i].m_func.cstr()).g(val / m_units[i].m_mult);
+		return pformat(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)

@@ -336,15 +336,6 @@ void pstring_t<F>::resetmem()
 // pstring ...
 // ----------------------------------------------------------------------------------------
 
-int pstring::scanf(const mem_t *format, ...) const
-{
-	va_list ap;
-	va_start(ap, format);
-	int ret = vsscanf(cstr(), format, ap);
-	va_end(ap);
-	return ret;
-}
-
 const pstring::type_t pstring::vprintf(va_list args) const
 {
 	// sprintf into the temporary buffer
