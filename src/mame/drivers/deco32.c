@@ -2883,8 +2883,8 @@ ROM_END
 
 ROM_START( fghthist ) /* DE-0380-2 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_WORD( "kx00-unknown.bin", 0x000000, 0x80000, CRC(fe5eaba1) SHA1(c8a3784af487a1bbd2150abf4b1c8f3ad33da8a4) ) /* Version 43-07, Overseas */
-	ROM_LOAD32_WORD( "kx01-unknown.bin", 0x000002, 0x80000, CRC(3fb8d738) SHA1(2fca7a3ea483f01c97fb28a0adfa6d7980d8236c) )
+	ROM_LOAD32_WORD( "kx00-unknown.1f", 0x000000, 0x80000, CRC(fe5eaba1) SHA1(c8a3784af487a1bbd2150abf4b1c8f3ad33da8a4) ) /* Version 43-07, Overseas */
+	ROM_LOAD32_WORD( "kx01-unknown.2f", 0x000002, 0x80000, CRC(3fb8d738) SHA1(2fca7a3ea483f01c97fb28a0adfa6d7980d8236c) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "kx02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
@@ -2915,11 +2915,10 @@ ROM_START( fghthist ) /* DE-0380-2 PCB */
 	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
 ROM_END
 
-
-ROM_START( fghthista ) /* ? PCB */
+ROM_START( fghthista ) /* DE-0380-2 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_WORD( "Kx-00-2", 0x000000, 0x80000, CRC(a7c36bbd) SHA1(590937818343da53a6bccbd3ea1d7102abd4f27e))
-	ROM_LOAD32_WORD( "Kx-01-2", 0x000002, 0x80000, CRC(bdc60bb1) SHA1(e621c5cf357f49aa62deef4da1e2227021f552ce) )
+	ROM_LOAD32_WORD( "kx00-2.1f", 0x000000, 0x80000, CRC(a7c36bbd) SHA1(590937818343da53a6bccbd3ea1d7102abd4f27e) ) /* Version 43-05, Overseas */
+	ROM_LOAD32_WORD( "kx01-2.2f", 0x000002, 0x80000, CRC(bdc60bb1) SHA1(e621c5cf357f49aa62deef4da1e2227021f552ce) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "kx02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
@@ -2949,9 +2948,6 @@ ROM_START( fghthista ) /* ? PCB */
 	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
 	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
 ROM_END
-
-
-
 
 ROM_START( fghthistu ) /* DE-0395-1 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
@@ -3839,7 +3835,7 @@ GAME( 1991, captavenua, captaven, captaven, captaven, deco32_state,   captaven, 
 GAME( 1991, captavenj,  captaven, captaven, captaven, deco32_state,   captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, fghthist,   0,        fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-07, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthista,  fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthista,  fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthistu,  fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-06, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthistua, fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthistub, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
