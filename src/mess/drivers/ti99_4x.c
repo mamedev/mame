@@ -46,11 +46,12 @@
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
-#include "machine/ti99/videowrp.h"
-#include "machine/ti99/datamux.h"
-#include "machine/ti99/grom.h"
-#include "machine/ti99/gromport.h"
-#include "machine/ti99/joyport.h"
+#include "bus/ti99x/videowrp.h"
+#include "bus/ti99x/datamux.h"
+#include "bus/ti99x/grom.h"
+#include "bus/ti99x/gromport.h"
+#include "bus/ti99x/joyport.h"
+
 #include "bus/ti99_peb/peribox.h"
 
 // Debugging

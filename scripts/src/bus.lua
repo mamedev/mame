@@ -1994,6 +1994,41 @@ end
 
 ---------------------------------------------------
 --
+--@src/emu/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
+---------------------------------------------------
+
+if (BUSES["TI99X"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/bus/ti99x/990_dk.c",
+		MAME_DIR .. "src/emu/bus/ti99x/990_dk.h",
+		MAME_DIR .. "src/emu/bus/ti99x/990_hd.c",
+		MAME_DIR .. "src/emu/bus/ti99x/990_hd.h",
+		MAME_DIR .. "src/emu/bus/ti99x/990_tap.c",
+		MAME_DIR .. "src/emu/bus/ti99x/990_tap.h",
+		MAME_DIR .. "src/emu/bus/ti99x/998board.c",
+		MAME_DIR .. "src/emu/bus/ti99x/998board.h",
+		MAME_DIR .. "src/emu/bus/ti99x/datamux.c",
+		MAME_DIR .. "src/emu/bus/ti99x/datamux.h",
+		MAME_DIR .. "src/emu/bus/ti99x/genboard.c",
+		MAME_DIR .. "src/emu/bus/ti99x/genboard.h",
+		MAME_DIR .. "src/emu/bus/ti99x/grom.c",
+		MAME_DIR .. "src/emu/bus/ti99x/grom.h",
+		MAME_DIR .. "src/emu/bus/ti99x/gromport.c",
+		MAME_DIR .. "src/emu/bus/ti99x/gromport.h",
+		MAME_DIR .. "src/emu/bus/ti99x/handset.c",
+		MAME_DIR .. "src/emu/bus/ti99x/handset.h",
+		MAME_DIR .. "src/emu/bus/ti99x/joyport.c",
+		MAME_DIR .. "src/emu/bus/ti99x/joyport.h",
+		MAME_DIR .. "src/emu/bus/ti99x/mecmouse.c",
+		MAME_DIR .. "src/emu/bus/ti99x/mecmouse.h",
+		MAME_DIR .. "src/emu/bus/ti99x/ti99defs.h",
+		MAME_DIR .. "src/emu/bus/ti99x/videowrp.c",
+		MAME_DIR .. "src/emu/bus/ti99x/videowrp.h",		
+	}
+end
+		
+---------------------------------------------------
+--
 --@src/emu/bus/ti99_peb/peribox.h,BUSES["TI99PEB"] = true
 ---------------------------------------------------
 

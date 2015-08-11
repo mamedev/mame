@@ -44,7 +44,7 @@ TODO:
 #include "sound/beep.h"
 #include "video/733_asr.h"
 
-#include "machine/ti99/990_dk.h"
+#include "bus/ti99x/990_dk.h"
 
 
 class ti990_4_state : public driver_device

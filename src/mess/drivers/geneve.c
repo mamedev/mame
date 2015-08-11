@@ -209,11 +209,12 @@
 #include "machine/mm58274c.h"
 #include "sound/sn76496.h"
 
-#include "machine/ti99/genboard.h"
-#include "bus/ti99_peb/peribox.h"
-#include "machine/ti99/videowrp.h"
+#include "bus/ti99x/genboard.h"
+#include "bus/ti99x/videowrp.h"
+#include "bus/ti99x/joyport.h"
 
-#include "machine/ti99/joyport.h"
+#include "bus/ti99_peb/peribox.h"
+
 
 #define VERBOSE 1
 #define LOG logerror
