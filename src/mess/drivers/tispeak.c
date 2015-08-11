@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Jonathan Gevaryahu
+// copyright-holders:hap, Jonathan Gevaryahu, Sean Riddle
 /***************************************************************************
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
 
-  Texas Instruments 1st-gen. handheld speech devices,
+  Texas Instruments 1st-gen. handheld speech devices.
 
   These devices, mostly edu-toys, are based around an MCU(TMS0270/TMS1100),
   TMS51xx speech, and VSM ROM(s). Newer devices, such as Speak & Music,
@@ -36,6 +36,7 @@ above expectations. TI continued to manufacture many products for this line.
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351NL
     - VSM(2/2): 16KB TMC0352NL
+    - VFD: NEC FIP8A5AR no. 3A
     - notes: keyboard has buttons instead of cheap membrane
 
     Speak & Spell (US), 1979
