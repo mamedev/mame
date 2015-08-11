@@ -16,7 +16,7 @@
 #include "machine/upd765.h"
 #include "machine/am9517a.h"
 #include "formats/pc_dsk.h"
-#include "machine/hdc9234.h"
+#include "machine/hdc92x4.h"
 #include "imagedev/mfmhd.h"
 
 //**************************************************************************
@@ -52,8 +52,16 @@ public:
 //        DECLARE_WRITE8_MEMBER( via1_pb_w );
 //        DECLARE_WRITE_LINE_MEMBER( atn_w );
 //        DECLARE_WRITE_LINE_MEMBER( byte_w );
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+
+//	DECLARE_READ8_MEMBER(memory_read_byte);
+//	DECLARE_WRITE8_MEMBER(memory_write_byte);
+
+	DECLARE_WRITE_LINE_MEMBER(i8237_hreq_w);
+	DECLARE_WRITE_LINE_MEMBER(i8237_eop_w);
+	DECLARE_READ8_MEMBER(i8237_dma_mem_r);
+	DECLARE_WRITE8_MEMBER(i8237_dma_mem_w);
+	DECLARE_READ8_MEMBER(i8237_fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(i8237_fdc_dma_w);
 
         DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -86,7 +94,7 @@ protected:
 	required_device<am9517a_device> m_dma8237;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
-	optional_device<hdc9234_device> m_hdc9234;
+	optional_device<hdc9224_device> m_hdc9224;
 	mfm_harddisk_device*    m_harddisk;
 //        required_ioport m_address;
 	required_shared_ptr<UINT8> m_pdc_ram;

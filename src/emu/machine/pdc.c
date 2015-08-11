@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
-	//AM_RANGE(0x40, 0x41) AM_DEVICE(HDC_TAG, hdc9234_device, map) AM_MIRROR(0xFF00)
+	//AM_RANGE(0x40, 0x41) AM_DEVICE(HDC_TAG, hdc9224_device, map) AM_MIRROR(0xFF00)
 	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
 ADDRESS_MAP_END
 
@@ -128,16 +128,28 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 //        MCFG_64H156_ATN_CALLBACK(WRITELINE(c1541_base_t, atn_w))
 //        MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1541_base_t, byte_w))
 //        MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_base_t::floppy_formats)
+
+	// upD765a FDC
 //	MCFG_UPD765A_ADD("upd765a", true, false)
 	MCFG_UPD765A_ADD(FDC_TAG, true, false)
 //	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG, pdc_floppies, "35hd", pdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats)
+//	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("8237dma", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
 
+	// uPD765A DMA Controller
 	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL_14_31818MHz/2) // Verify XTAL
-	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(pdc_device, memory_write_byte))
+//	MCFG_Ii8237_IN_MEMR_CB(READ8(pdc_device, memory_read_byte))
+//	MCFG_Ii8237_OUT_MEMW_CB(WRITE8(pdc_device, memory_write_byte))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pdc_device, i8237_hreq_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(pdc_device, i8237_eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, i8237_dma_mem_r))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pdc_device, i8237_dma_mem_w))
+	MCFG_I8237_IN_IOR_0_CB(READ8(pdc_device, i8237_fdc_dma_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pdc_device, i8237_fdc_dma_w))
+        // MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(pdc_device, fdc_dack_w))
 
-	MCFG_DEVICE_ADD(HDC_TAG, HDC9234, 0)
+	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)
 	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
 MACHINE_CONFIG_END
 
@@ -174,7 +186,7 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 	m_dma8237(*this, "8237dma"),
 	m_fdc(*this, FDC_TAG),
 	m_floppy(*this, FDC_TAG ":0"),
-	m_hdc9234(*this, HDC_TAG),
+	m_hdc9224(*this, HDC_TAG),
 //	m_harddisk(*this, "h1"),
         //m_address(*this, "ADDRESS"),
         //m_data_out(1),
@@ -226,15 +238,51 @@ void pdc_device::device_reset()
 //        m_ga->ted_w(1);
 }
 
-READ8_MEMBER(pdc_device::memory_read_byte)
+//-------------------------------------------------
+//  I8237 DMA
+//-------------------------------------------------
+
+//READ8_MEMBER(pdc_device::memory_read_byte)
+//{
+//        address_space& prog_space = m_pdccpu->space(AS_PROGRAM);
+//        return prog_space.read_byte(offset);
+//}
+
+//WRITE8_MEMBER(pdc_device::memory_write_byte)
+//{
+//        address_space& prog_space = m_pdccpu->space(AS_PROGRAM);
+//        return prog_space.write_byte(offset, data);
+//}
+
+WRITE_LINE_MEMBER(pdc_device::i8237_hreq_w)
 {
-        address_space& prog_space = m_pdccpu->space(AS_PROGRAM);
-        return prog_space.read_byte(offset);
+	m_pdccpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dma8237->hack_w(state);
 }
 
-WRITE8_MEMBER(pdc_device::memory_write_byte)
+WRITE_LINE_MEMBER(pdc_device::i8237_eop_w)
 {
-        address_space& prog_space = m_pdccpu->space(AS_PROGRAM);
-        return prog_space.write_byte(offset, data);
+	m_fdc->tc_w(state);
+}
+
+READ8_MEMBER(pdc_device::i8237_dma_mem_r)
+{
+	return m_pdccpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+WRITE8_MEMBER(pdc_device::i8237_dma_mem_w)
+{
+	m_pdccpu->space(AS_PROGRAM).write_byte(offset,data);
+}
+
+READ8_MEMBER(pdc_device::i8237_fdc_dma_r)
+{
+	UINT8 ret = m_fdc->dma_r();
+	return ret;
+}
+
+WRITE8_MEMBER(pdc_device::i8237_fdc_dma_w)
+{
+	m_fdc->dma_w(data);
 }
 
