@@ -164,6 +164,12 @@ static INPUT_PORTS_START( cchance )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// These ports are required in tnzs_state
+	PORT_START("IN1")
+	PORT_START("IN2")
+	PORT_START("DSWA")
+	PORT_START("DSWB")
 INPUT_PORTS_END
 
 static const gfx_layout cchance_layout =

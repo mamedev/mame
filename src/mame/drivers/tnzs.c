@@ -675,8 +675,8 @@ READ8_MEMBER(tnzs_state::kageki_csport_r)
 {
 	int dsw, dsw1, dsw2;
 
-	dsw1 = ioport("DSWA")->read();
-	dsw2 = ioport("DSWB")->read();
+	dsw1 = m_dswa->read();
+	dsw2 = m_dswb->read();
 
 	switch (m_kageki_csport_sel)
 	{
@@ -731,7 +731,7 @@ WRITE8_MEMBER(tnzs_state::kabukiz_sound_bank_w)
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		membank("audiobank")->set_entry(data & 0x07);
+		m_audiobank->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(tnzs_state::kabukiz_sample_w)
@@ -877,7 +877,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(tnzs_state::jpopnics_subbankswitch_w)
 {
 	/* bits 0-1 select ROM bank */
-	membank("subbank")->set_entry(data & 0x03);
+	m_subbank->set_entry(data & 0x03);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, tnzs_state )
