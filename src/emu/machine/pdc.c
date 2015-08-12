@@ -34,7 +34,7 @@ const device_type PDC = &device_creator<pdc_device>;
 
 ROM_START( pdc )
         ROM_REGION( 0x4000, "rom", 0 )
-        ROM_LOAD( "pdc-97d9988.u17", 0x0000, 0x4000, CRC(d96ccaa6) SHA1(e1a465c2274a63e81dba7a71fc8b30f10c03baf0) )
+        ROM_LOAD( "97d9988.27128.pdc.u17", 0x0000, 0x4000, CRC(d96ccaa6) SHA1(e1a465c2274a63e81dba7a71fc8b30f10c03baf0) ) // Label: "97D9988" 27128 @U17
 ROM_END
 
 //-------------------------------------------------
@@ -66,8 +66,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
-	//AM_RANGE(0x40, 0x41) AM_DEVICE(HDC_TAG, hdc9224_device, map) AM_MIRROR(0xFF00)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE(HDC_TAG, hdc9224_device,read,write) AM_MIRROR(0xFF00)
 	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
+	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE(FDCDMA_TAG,am9517a_device,read,write) AM_MIRROR(0xFF00)
 ADDRESS_MAP_END
 
 //-------------------------------------------------
