@@ -50,6 +50,16 @@ PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 	}
 }
 
+PALETTE_DECODER_MEMBER( nova2001_state, BBGGRRII )
+{
+	UINT8 i = raw & 3;
+	UINT8 r = (raw >> 0) & 0x0c;
+	UINT8 g = (raw >> 2) & 0x0c;
+	UINT8 b = (raw >> 4) & 0x0c;
+
+	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
+}
+
 WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
 {
 	int i;

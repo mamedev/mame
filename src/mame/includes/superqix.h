@@ -89,6 +89,7 @@ public:
 	DECLARE_VIDEO_START(pbillian);
 	DECLARE_MACHINE_START(superqix);
 	DECLARE_VIDEO_START(superqix);
+	DECLARE_PALETTE_DECODER(BBGGRRII);
 	UINT32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);

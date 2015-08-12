@@ -270,7 +270,6 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -282,8 +281,7 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxmissio)
 	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
-
+	MCFG_PALETTE_FORMAT_CLASS(1, xxmissio_state, BBGGRRII)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

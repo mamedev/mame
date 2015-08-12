@@ -647,8 +647,8 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nova2001)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
@@ -692,8 +692,8 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakun)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
@@ -728,8 +728,8 @@ static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkunwar)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
@@ -771,8 +771,8 @@ static MACHINE_CONFIG_START( raiders5, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiders5)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 

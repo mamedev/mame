@@ -1217,7 +1217,6 @@ public:
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
-	ioport_value active_safe(ioport_value defval) const { return (this == NULL) ? defval : active(); }
 	ioport_port_live &live() const { assert(m_live != NULL); return *m_live; }
 
 	// read/write to the port

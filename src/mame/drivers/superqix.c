@@ -941,7 +941,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -980,7 +980,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
@@ -1071,7 +1071,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 

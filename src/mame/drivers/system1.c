@@ -747,7 +747,7 @@ static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
 	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(system1_mixer_collision_reset_w)
@@ -760,7 +760,7 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, system
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, system1_state )
@@ -768,7 +768,7 @@ static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8,
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
@@ -780,7 +780,7 @@ static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(system1_sprite_collision_reset_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -2173,6 +2173,7 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", system1)
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

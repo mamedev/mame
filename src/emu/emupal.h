@@ -123,9 +123,6 @@
 #define PALETTE_FORMAT_BBGGGRRR_inverted raw_to_rgb_converter(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 0,3,6>)
 #define PALETTE_FORMAT_RRRGGGBB_inverted raw_to_rgb_converter(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 5,2,0>)
 
-// standard 2-2-2-2 formats
-#define PALETTE_FORMAT_BBGGRRII raw_to_rgb_converter(1, &raw_to_rgb_converter::BBGGRRII_decoder)
-
 // standard 3-3-3 formats
 #define PALETTE_FORMAT_xxxxxxxBBBGGGRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 0,3,6>)
 #define PALETTE_FORMAT_xxxxxxxRRRBBBGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 6,0,3>)
@@ -353,7 +350,6 @@ public:
 	}
 
 	// other standard decoders
-	static rgb_t BBGGRRII_decoder(UINT32 raw);
 	static rgb_t IRRRRRGGGGGBBBBB_decoder(UINT32 raw);
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);  // bits 3/2/1 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(UINT32 raw);  // bits 14/13/12 are LSb
