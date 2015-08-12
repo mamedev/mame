@@ -19,9 +19,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu_region(*this, "maincpu"),
+		m_color_prom(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d") { }
@@ -142,9 +142,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
+	optional_region_ptr<UINT8> m_color_prom;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;

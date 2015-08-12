@@ -292,9 +292,6 @@ WRITE8_MEMBER(system1_state::system1_videoram_bank_w)
 
 WRITE8_MEMBER(system1_state::system1_paletteram_w)
 {
-	const UINT8 *color_prom = memregion("palette")->base();
-	int val,r,g,b;
-
 	/*
 	  There are two kind of color handling: in the System 1 games, values in the
 	  palette RAM are directly mapped to colors with the usual BBGGGRRR format;
@@ -316,41 +313,25 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 	  accurate to +/- .003K ohms.
 	*/
 
-	m_generic_paletteram_8[offset] = data;
-
-	if (color_prom != NULL)
+	if (m_color_prom != NULL)
 	{
-		int bit0,bit1,bit2,bit3;
+		UINT8 val;
 
-		val = color_prom[data+0*256];
-		bit0 = (val >> 0) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 2) & 0x01;
-		bit3 = (val >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		val = m_color_prom[data + 0 * 256];
+		UINT8 r = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
 
-		val = color_prom[data+1*256];
-		bit0 = (val >> 0) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 2) & 0x01;
-		bit3 = (val >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		val = m_color_prom[data + 1 * 256];
+		UINT8 g = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
 
-		val = color_prom[data+2*256];
-		bit0 = (val >> 0) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 2) & 0x01;
-		bit3 = (val >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		val = m_color_prom[data + 2 * 256];
+		UINT8 b = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
+
+		m_palette->set_pen_color(offset, rgb_t(r, g, b));
 	}
 	else
 	{
-		r = pal3bit(data >> 0);
-		g = pal3bit(data >> 3);
-		b = pal2bit(data >> 6);
+		m_palette->write(space, offset, data);
 	}
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 
