@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", senjyo)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
-	MCFG_PALETTE_FORMAT(IIBBGGRR)
+	MCFG_PALETTE_FORMAT_CLASS(1, senjyo_state, IIBBGGRR)
 
 	MCFG_PALETTE_ADD("radar_palette", 2)
 	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)

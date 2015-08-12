@@ -108,6 +108,16 @@ void senjyo_state::video_start()
 	m_fg_tilemap->set_scroll_cols(32);
 }
 
+PALETTE_DECODER_MEMBER( senjyo_state, IIBBGGRR )
+{
+	UINT8 i = (raw >> 6) & 3;
+	UINT8 r = (raw << 2) & 0x0c;
+	UINT8 g = (raw     ) & 0x0c;
+	UINT8 b = (raw >> 2) & 0x0c;
+
+	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
+}
+
 PALETTE_INIT_MEMBER( senjyo_state, radar )
 {
 	// two colors for the radar dots (verified on the real board)

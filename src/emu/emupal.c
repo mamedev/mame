@@ -966,24 +966,6 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
 }
 
-rgb_t raw_to_rgb_converter::BBGGRRII_decoder(UINT32 raw)
-{
-	UINT8 i = raw & 3;
-	UINT8 r = (raw >> 0) & 0x0c;
-	UINT8 g = (raw >> 2) & 0x0c;
-	UINT8 b = (raw >> 4) & 0x0c;
-	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
-}
-
-rgb_t raw_to_rgb_converter::IIBBGGRR_decoder(UINT32 raw)
-{
-	UINT8 i = (raw >> 6) & 3;
-	UINT8 r = (raw << 2) & 0x0c;
-	UINT8 g = (raw     ) & 0x0c;
-	UINT8 b = (raw >> 2) & 0x0c;
-	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
-}
-
 rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(UINT32 raw)
 {
 	UINT8 i = (raw >> 15) & 1;

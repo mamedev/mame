@@ -69,6 +69,15 @@ VIDEO_START_MEMBER(superqix_state,superqix)
 	save_item(NAME(*m_fg_bitmap[1]));
 }
 
+PALETTE_DECODER_MEMBER( superqix_state, BBGGRRII )
+{
+	UINT8 i = raw & 3;
+	UINT8 r = (raw >> 0) & 0x0c;
+	UINT8 g = (raw >> 2) & 0x0c;
+	UINT8 b = (raw >> 4) & 0x0c;
+
+	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
+}
 
 
 /***************************************************************************
