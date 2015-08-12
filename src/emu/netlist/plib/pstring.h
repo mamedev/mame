@@ -404,7 +404,7 @@ public:
 	pformat &operator ()(const INT16 x, const char *f = "") { return update(f, "hd", x);  }
 	pformat &operator ()(const UINT16 x, const char *f = "") { return update(f, "hu", x);  }
 
-#if !defined(__MINGW32__) && !defined(__MINGW64__)
+#if !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(EMSCRIPTEN)
 	pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
 #endif
 	pformat &operator ()(const double x, const char *f = "") { return update(f, "g", x);  }
