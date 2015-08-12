@@ -2488,7 +2488,7 @@ ROM_START( gauntleg12 )
 
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.4 10/22/1998 Main 10/23/1998 */
-	DISK_IMAGE( "gauntl12", 0, SHA1(c8208e3ce3b02a271dc6b089efa98dd996b66ce0) )
+	DISK_IMAGE( "gauntl12", 0, SHA1(62917fbd692d004bc391287349041ebe669385cf) ) // compressed with -chs 4969,16,63 (which is apparently correct for a Quantum FIREBALL 2.5 GB and allows the update program to work)
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
