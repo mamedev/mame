@@ -146,15 +146,15 @@ VIDEO_START_MEMBER( amiga_state, amiga )
  *
  *************************************/
 
-UINT32 amiga_gethvpos(screen_device &screen)
+UINT32 amiga_state::amiga_gethvpos()
 {
-	amiga_state *state = screen.machine().driver_data<amiga_state>();
-	UINT32 hvpos = (state->m_last_scanline << 8) | (screen.hpos() >> 2);
-	UINT32 latchedpos = state->ioport("HVPOS")->read_safe(0);
+	amiga_state *state = this;
+	UINT32 hvpos = (m_last_scanline << 8) | (m_screen->hpos() >> 2);
+	UINT32 latchedpos = m_hvpos ? m_hvpos->read() : 0;
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */
-	if ((CUSTOM_REG(REG_BPLCON0) & 0x0008) == 0 || latchedpos == 0 || (state->m_last_scanline >= 20 && hvpos < latchedpos))
+	if ((CUSTOM_REG(REG_BPLCON0) & 0x0008) == 0 || latchedpos == 0 || (m_last_scanline >= 20 && hvpos < latchedpos))
 		return hvpos;
 
 	/* otherwise, return the latched position */
