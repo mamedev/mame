@@ -22,40 +22,111 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "machine/bankdev.h"
+#include "video/k052109.h"
+#include "video/k051960.h"
+#include "video/konami_helper.h"
 #include "sound/2151intf.h"
 #include "includes/konamipt.h"
-#include "includes/blockhl.h"
 
+
+class blockhl_state : public driver_device
+{
+public:
+	blockhl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_bankedram(*this, "bankedram"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960"),
+		m_bankedrom(*this, "bankedrom") { }
+
+	DECLARE_WRITE8_MEMBER(blockhl_sh_irqtrigger_w);
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	UINT32 screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(blockhl_interrupt);
+	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
+	DECLARE_WRITE8_MEMBER(banking_callback);
+
+protected:
+	virtual void machine_start();
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_bankedram;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+	required_memory_bank m_bankedrom;
+
+	// video-related
+	static const int LAYER_COLORBASE[3];
+	static const int SPRITE_COLORBASE;
+};
+
+
+const int blockhl_state::LAYER_COLORBASE[] = { 0, 16, 32 };
+const int blockhl_state::SPRITE_COLORBASE = 48;
+
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(blockhl_state::tile_callback)
+{
+	*code |= ((*color & 0x0f) << 8);
+	*color = LAYER_COLORBASE[layer] + ((*color & 0xe0) >> 5);
+}
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(blockhl_state::sprite_callback)
+{
+	if(*color & 0x10)
+		*priority = 0xfe; // under K052109_tilemap[0]
+	else
+		*priority = 0xfc; // under K052109_tilemap[1]
+
+	*color = SPRITE_COLORBASE + (*color & 0x0f);
+}
+
+
+UINT32 blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+
+	m_k052109->tilemap_update();
+
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);   // tile 2
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 1); // tile 1
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 2); // tile 0
+
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, -1);
+	return 0;
+}
 
 INTERRUPT_GEN_MEMBER(blockhl_state::blockhl_interrupt)
 {
-	if (m_k052109->is_irq_enabled() && m_rombank == 0)    /* kludge to prevent crashes */
+	if (m_k052109->is_irq_enabled() && m_bankedrom->entry() == 0)    /* kludge to prevent crashes */
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-}
-
-READ8_MEMBER(blockhl_state::bankedram_r)
-{
-	if (m_palette_selected)
-		return m_paletteram[offset];
-	else
-		return m_ram[offset];
-}
-
-WRITE8_MEMBER(blockhl_state::bankedram_w)
-{
-	if (m_palette_selected)
-		m_palette->write(space, offset, data);
-	else
-		m_ram[offset] = data;
 }
 
 WRITE8_MEMBER(blockhl_state::blockhl_sh_irqtrigger_w)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
-
 
 /* special handlers to combine 052109 & 051960 */
 READ8_MEMBER(blockhl_state::k052109_051960_r)
@@ -95,9 +166,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bankedram", address_map_bank_device, amap8)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bankedrom")
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bankedram_map, AS_PROGRAM, 8, blockhl_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockhl_state )
@@ -165,36 +241,21 @@ INPUT_PORTS_END
 
 void blockhl_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
-
-	m_paletteram.resize(m_palette->entries() * 2);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-
-	save_item(NAME(m_paletteram));
-	save_item(NAME(m_palette_selected));
-	save_item(NAME(m_rombank));
-}
-
-void blockhl_state::machine_reset()
-{
-	m_palette_selected = 0;
-	m_rombank = 0;
+	// the first 0x8000 are banked, the remaining 0x8000 are directly accessible
+	m_bankedrom->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 }
 
 WRITE8_MEMBER( blockhl_state::banking_callback )
 {
 	/* bits 0-1 = ROM bank */
-	m_rombank = data & 0x03;
-	membank("bank1")->set_entry(m_rombank);
+	m_bankedrom->set_entry(data & 0x03);
 
 	/* bits 3/4 = coin counters */
 	coin_counter_w(machine(), 0, data & 0x08);
 	coin_counter_w(machine(), 1, data & 0x10);
 
 	/* bit 5 = select palette RAM or work RAM at 5800-5fff */
-	m_palette_selected = ~data & 0x20;
+	m_bankedram->set_bank(BIT(data, 5));
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -214,6 +275,13 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blockhl_state,  blockhl_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(blockhl_state, banking_callback))
+
+	MCFG_DEVICE_ADD("bankedram", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bankedram_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -255,12 +323,11 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( blockhl )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
-	ROM_LOAD( "973l02.e21", 0x10000, 0x08000, CRC(e14f849a) SHA1(d44cf178cc98998b72ed32c6e20b6ebdf1f97579) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "973l02.e21", 0x00000, 0x10000, CRC(e14f849a) SHA1(d44cf178cc98998b72ed32c6e20b6ebdf1f97579) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
-	ROM_LOAD( "973d01.g6",  0x0000, 0x8000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
+	ROM_REGION( 0x08000, "audiocpu", 0 ) /* 32k for the sound CPU */
+	ROM_LOAD( "973d01.g6",  0x00000, 0x08000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
 	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
 	ROM_LOAD32_BYTE( "973f07.k15", 0x00000, 0x08000, CRC(1a8cd9b4) SHA1(7cb7944d24ac51fa6b610542d9dec68697cacf0f) )
@@ -279,12 +346,11 @@ ROM_START( blockhl )
 ROM_END
 
 ROM_START( quarth )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
-	ROM_LOAD( "973j02.e21", 0x10000, 0x08000, CRC(27a90118) SHA1(51309385b93db29b9277d14252166c4ea1746303) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "973j02.e21", 0x00000, 0x10000, CRC(27a90118) SHA1(51309385b93db29b9277d14252166c4ea1746303) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
-	ROM_LOAD( "973d01.g6",  0x0000, 0x8000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
+	ROM_REGION( 0x08000, "audiocpu", 0 ) /* 32k for the sound CPU */
+	ROM_LOAD( "973d01.g6",  0x00000, 0x08000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
 	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
 	ROM_LOAD32_BYTE( "973e07.k15", 0x00000, 0x08000, CRC(0bd6b0f8) SHA1(6c59cf637354fe2df424eaa89feb9c1bc1f66a92) )

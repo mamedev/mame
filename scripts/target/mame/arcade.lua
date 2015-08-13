@@ -1737,7 +1737,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/bladestl.c",
 	MAME_DIR .. "src/mame/video/bladestl.c",
 	MAME_DIR .. "src/mame/drivers/blockhl.c",
-	MAME_DIR .. "src/mame/video/blockhl.c",
 	MAME_DIR .. "src/mame/drivers/bottom9.c",
 	MAME_DIR .. "src/mame/video/bottom9.c",
 	MAME_DIR .. "src/mame/drivers/chqflag.c",
