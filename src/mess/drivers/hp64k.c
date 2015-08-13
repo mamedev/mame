@@ -160,6 +160,7 @@
 #include "sound/beep.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "bus/rs232/rs232.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -224,7 +225,10 @@ public:
                 DECLARE_WRITE_LINE_MEMBER(hp64k_rts_w);
 		DECLARE_WRITE16_MEMBER(hp64k_loopback_w);
                 void hp64k_update_loopback(void);
-
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_rxd_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_dcd_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_cts_w);
+                
 		DECLARE_WRITE16_MEMBER(hp64k_beep_w);
 		TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
@@ -249,6 +253,7 @@ private:
                 required_device<clock_device> m_baud_rate;
                 required_ioport m_s5_sw;
                 required_device<i8251_device> m_uart;
+                required_device<rs232_port_device> m_rs232;
 
 		// Character generator
 		const UINT8 *m_chargen;
@@ -366,7 +371,8 @@ hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const 
                 m_beep_timer(*this , "beep_timer"),
                 m_baud_rate(*this , "baud_rate"),
                 m_s5_sw(*this , "s5_sw"),
-                m_uart(*this , "uart")
+                m_uart(*this , "uart"),
+                m_rs232(*this , "rs232")
 {
 }
 
@@ -1010,6 +1016,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_txd_w)
                 if (m_loopback) {
                                 m_uart->write_rxd(state);
                 }
+                m_rs232->write_txd(state);
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_dtr_w)
@@ -1018,14 +1025,20 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_dtr_w)
                 if (m_loopback) {
                                 m_uart->write_dsr(state);
                 }
+                m_rs232->write_dtr(state);
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_rts_w)
 {
+                if (BIT(m_s5_sw->read() , 0)) {
+                                // Full duplex, RTS/ = 0
+                                state = 0;
+                }
                 m_rts_state = state;
                 if (m_loopback) {
                                 m_uart->write_cts(state);
                 }
+                m_rs232->write_rts(state);
 }
 
 WRITE16_MEMBER(hp64k_state::hp64k_loopback_w)
@@ -1041,9 +1054,30 @@ void hp64k_state::hp64k_update_loopback(void)
                                 m_uart->write_dsr(m_dtr_state);
                                 m_uart->write_cts(m_rts_state);
                 } else {
-                                m_uart->write_rxd(1);
-                                m_uart->write_dsr(1);
-                                m_uart->write_cts(1);
+                                m_uart->write_rxd(m_rs232->rxd_r());
+                                m_uart->write_dsr(m_rs232->dcd_r());
+                                m_uart->write_cts(m_rs232->cts_r());
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_rxd_w)
+{
+                if (!m_loopback) {
+                                m_uart->write_rxd(state);
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_dcd_w)
+{
+                if (!m_loopback) {
+                                m_uart->write_dsr(state);
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_cts_w)
+{
+                if (!m_loopback) {
+                                m_uart->write_cts(state);
                 }
 }
 
@@ -1385,6 +1419,12 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
                                 MCFG_I8251_TXD_HANDLER(WRITELINE(hp64k_state , hp64k_txd_w));
                                 MCFG_I8251_DTR_HANDLER(WRITELINE(hp64k_state , hp64k_dtr_w));
                                 MCFG_I8251_RTS_HANDLER(WRITELINE(hp64k_state , hp64k_rts_w));
+
+                                MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , NULL)
+                                MCFG_RS232_RXD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_rxd_w))
+                                MCFG_RS232_DCD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_dcd_w))
+                                MCFG_RS232_CTS_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_cts_w))
+                                
 MACHINE_CONFIG_END
 
 ROM_START(hp64k)
