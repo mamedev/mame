@@ -38,11 +38,11 @@ public:
 	blockhl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_bankedram(*this, "bankedram"),
+		m_bank5800(*this, "bank5800"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
-		m_bankedrom(*this, "bankedrom") { }
+		m_rombank(*this, "rombank") { }
 
 	DECLARE_WRITE8_MEMBER(blockhl_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
@@ -58,20 +58,12 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_bankedram;
+	required_device<address_map_bank_device> m_bank5800;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
-	required_memory_bank m_bankedrom;
-
-	// video-related
-	static const int LAYER_COLORBASE[3];
-	static const int SPRITE_COLORBASE;
+	required_memory_bank m_rombank;
 };
-
-
-const int blockhl_state::LAYER_COLORBASE[] = { 0, 16, 32 };
-const int blockhl_state::SPRITE_COLORBASE = 48;
 
 
 /***************************************************************************
@@ -82,8 +74,10 @@ const int blockhl_state::SPRITE_COLORBASE = 48;
 
 K052109_CB_MEMBER(blockhl_state::tile_callback)
 {
+	static const int layer_colorbase[] = { 0 / 16, 256 / 16, 512 / 16 };
+
 	*code |= ((*color & 0x0f) << 8);
-	*color = LAYER_COLORBASE[layer] + ((*color & 0xe0) >> 5);
+	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 /***************************************************************************
@@ -94,12 +88,10 @@ K052109_CB_MEMBER(blockhl_state::tile_callback)
 
 K051960_CB_MEMBER(blockhl_state::sprite_callback)
 {
-	if(*color & 0x10)
-		*priority = 0xfe; // under K052109_tilemap[0]
-	else
-		*priority = 0xfc; // under K052109_tilemap[1]
+	enum { sprite_colorbase = 768 / 16 };
 
-	*color = SPRITE_COLORBASE + (*color & 0x0f);
+	*priority = (*color & 0x10) ? GFX_PMASK_1 : 0;
+	*color = sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -111,15 +103,14 @@ UINT32 blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 
 
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);   // tile 2
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 1); // tile 1
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 2); // tile 0
-
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0); // tile 0
 	return 0;
 }
 
 INTERRUPT_GEN_MEMBER(blockhl_state::blockhl_interrupt)
 {
-	if (m_k052109->is_irq_enabled() && m_bankedrom->entry() == 0)    /* kludge to prevent crashes */
+	if (m_k052109->is_irq_enabled() && m_rombank->entry() == 0)    /* kludge to prevent crashes */
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
@@ -166,12 +157,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bankedram", address_map_bank_device, amap8)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bankedrom")
+	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bank5800", address_map_bank_device, amap8)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bankedram_map, AS_PROGRAM, 8, blockhl_state )
+static ADDRESS_MAP_START( bank5800_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
@@ -242,20 +233,20 @@ INPUT_PORTS_END
 void blockhl_state::machine_start()
 {
 	// the first 0x8000 are banked, the remaining 0x8000 are directly accessible
-	m_bankedrom->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 }
 
 WRITE8_MEMBER( blockhl_state::banking_callback )
 {
 	/* bits 0-1 = ROM bank */
-	m_bankedrom->set_entry(data & 0x03);
+	m_rombank->set_entry(data & 0x03);
 
 	/* bits 3/4 = coin counters */
 	coin_counter_w(machine(), 0, data & 0x08);
 	coin_counter_w(machine(), 1, data & 0x10);
 
 	/* bit 5 = select palette RAM or work RAM at 5800-5fff */
-	m_bankedram->set_bank(BIT(data, 5));
+	m_bank5800->set_bank(BIT(data, 5));
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -265,7 +256,7 @@ WRITE8_MEMBER( blockhl_state::banking_callback )
 	/* other bits unknown */
 
 	if ((data & 0x84) != 0x80)
-		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+		logerror("%04x: setlines %02x\n", m_maincpu->pc(), data);
 }
 
 static MACHINE_CONFIG_START( blockhl, blockhl_state )
@@ -276,8 +267,8 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blockhl_state,  blockhl_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(blockhl_state, banking_callback))
 
-	MCFG_DEVICE_ADD("bankedram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bankedram_map)
+	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank5800_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)

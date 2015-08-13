@@ -12,8 +12,10 @@
 
 K052109_CB_MEMBER(_88games_state::tile_callback)
 {
+	static const int layer_colorbase[] = { 1024 / 16, 0 / 16, 256 / 16 };
+
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
-	*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
 }
 
 
@@ -25,8 +27,10 @@ K052109_CB_MEMBER(_88games_state::tile_callback)
 
 K051960_CB_MEMBER(_88games_state::sprite_callback)
 {
+	enum { sprite_colorbase = 512 / 16 };
+
 	*priority = (*color & 0x20) >> 5;   /* ??? */
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	*color = sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -38,9 +42,11 @@ K051960_CB_MEMBER(_88games_state::sprite_callback)
 
 K051316_CB_MEMBER(_88games_state::zoom_callback)
 {
+	enum { zoom_colorbase = 768 / 16 };
+
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x07) << 8);
-	*color = m_zoom_colorbase + ((*color & 0x38) >> 3) + ((*color & 0x80) >> 4);
+	*color = zoom_colorbase + ((*color & 0x38) >> 3) + ((*color & 0x80) >> 4);
 }
 
 /***************************************************************************
