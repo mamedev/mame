@@ -262,7 +262,7 @@ READ8_MEMBER( k051960_device::k051937_r )
 		/* some games need bit 0 to pulse */
 		return (m_k051937_counter++) & 1;
 
-	//logerror("%04x: read unknown 051937 address %x\n", device->cpu->safe_pc(), offset);
+	//logerror("%04x: read unknown 051937 address %x\n", space.device().safe_pc(), offset);
 	return 0;
 }
 
@@ -287,12 +287,12 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 
 		/* bit 5 = enable gfx ROM reading */
 		m_readroms = data & 0x20;
-		//logerror("%04x: write %02x to 051937 address %x\n", machine().cpu->safe_pc(), data, offset);
+		//logerror("%04x: write %02x to 051937 address %x\n", space.device().safe_pc(), data, offset);
 	}
 	else if (offset == 1)
 	{
-//  popmessage("%04x: write %02x to 051937 address %x", machine().cpu->safe_pc(), data, offset);
-//logerror("%04x: write %02x to unknown 051937 address %x\n", machine().cpu->safe_pc(), data, offset);
+//  popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
+//logerror("%04x: write %02x to unknown 051937 address %x\n", space.device().safe_pc(), data, offset);
 	}
 	else if (offset >= 2 && offset < 5)
 	{
@@ -300,8 +300,8 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	}
 	else
 	{
-	//  popmessage("%04x: write %02x to 051937 address %x", machine().cpu->safe_pc(), data, offset);
-	//logerror("%04x: write %02x to unknown 051937 address %x\n", machine().cpu->safe_pc(), data, offset);
+	//  popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
+	//logerror("%04x: write %02x to unknown 051937 address %x\n", space.device().safe_pc(), data, offset);
 	}
 }
 

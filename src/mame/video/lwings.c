@@ -95,13 +95,23 @@ VIDEO_START_MEMBER(lwings_state,trojan)
 	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); /* split type 1 has pens 7-11 opaque in front half */
 
 	m_bg2_avenger_hw = 0;
+	m_spr_avenger_hw = 0;
 }
 
 VIDEO_START_MEMBER(lwings_state,avengers)
 {
 	VIDEO_START_CALL_MEMBER(trojan);
 	m_bg2_avenger_hw = 1;
+	m_spr_avenger_hw = 1;
 }
+
+VIDEO_START_MEMBER(lwings_state,avengersb)
+{
+	VIDEO_START_CALL_MEMBER(trojan);
+	m_bg2_avenger_hw = 0;
+	m_spr_avenger_hw = 1;
+}
+
 
 /***************************************************************************
 
@@ -222,7 +232,7 @@ void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 					((buffered_spriteram[offs + 1] & 0x80) << 3);
 			color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
 
-			if (m_bg2_avenger_hw)
+			if (m_spr_avenger_hw)
 			{
 				flipx = 0;                                      /* Avengers */
 				flipy = ~buffered_spriteram[offs + 1] & 0x10;

@@ -11,8 +11,10 @@
 
 K051960_CB_MEMBER(ultraman_state::sprite_callback)
 {
-	*priority = (*color & 0x80) >> 7;
-	*color = m_sprite_colorbase + ((*color & 0x7e) >> 1);
+	enum { sprite_colorbase = 3072 / 16 };
+
+	*priority = (*color & 0x80) ? 0 : GFX_PMASK_1;
+	*color = sprite_colorbase + ((*color & 0x7e) >> 1);
 	*shadow = 0;
 }
 
@@ -25,36 +27,25 @@ K051960_CB_MEMBER(ultraman_state::sprite_callback)
 
 K051316_CB_MEMBER(ultraman_state::zoom_callback_1)
 {
+	enum { zoom_colorbase_1 = 0 / 16 };
+
 	*code |= ((*color & 0x07) << 8) | (m_bank0 << 11);
-	*color = m_zoom_colorbase[0] + ((*color & 0xf8) >> 3);
+	*color = zoom_colorbase_1 + ((*color & 0xf8) >> 3);
 }
 
 K051316_CB_MEMBER(ultraman_state::zoom_callback_2)
 {
+	enum { zoom_colorbase_2 = 1024 / 16 };
+
 	*code |= ((*color & 0x07) << 8) | (m_bank1 << 11);
-	*color = m_zoom_colorbase[1] + ((*color & 0xf8) >> 3);
+	*color = zoom_colorbase_2 + ((*color & 0xf8) >> 3);
 }
 
 K051316_CB_MEMBER(ultraman_state::zoom_callback_3)
 {
+	enum { zoom_colorbase_3 = 2048 / 16 };
 	*code |= ((*color & 0x07) << 8) | (m_bank2 << 11);
-	*color = m_zoom_colorbase[2] + ((*color & 0xf8) >> 3);
-}
-
-
-
-/***************************************************************************
-
-    Start the video hardware emulation.
-
-***************************************************************************/
-
-void ultraman_state::video_start()
-{
-	m_sprite_colorbase = 192;
-	m_zoom_colorbase[0] = 0;
-	m_zoom_colorbase[1] = 64;
-	m_zoom_colorbase[2] = 128;
+	*color = zoom_colorbase_3 + ((*color & 0xf8) >> 3);
 }
 
 
@@ -117,10 +108,11 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 
 UINT32 ultraman_state::screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
+
 	m_k051316_3->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
-	m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
+	m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 	return 0;
 }

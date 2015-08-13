@@ -172,6 +172,15 @@ private:
 	UINT8 m_data_register;                /* data register, used by read command */
 	UINT8 m_RDB_flag;                 /* whether we should read data register or status register */
 
+	/* The TMS52xx has two different ways of providing output data: the
+	   analog speaker pin (which was usually used) and the Digital I/O pin.
+	   The internal DAC used to feed the analog pin is only 8 bits, and has the
+	   funny clipping/clamping logic, while the digital pin gives full 10 bit
+	   resolution of the output data.
+	   TODO: add a way to set/reset this other than the FORCE_DIGITAL define
+	 */
+	UINT8 m_digital_select;
+
 	/* io_ready: page 3 of the datasheet specifies that READY will be asserted until
 	 * data is available or processed by the system.
 	 */
@@ -184,15 +193,6 @@ private:
 	UINT8 m_rs_ws;
 	UINT8 m_read_latch;
 	UINT8 m_write_latch;
-
-	/* The TMS52xx has two different ways of providing output data: the
-	   analog speaker pin (which was usually used) and the Digital I/O pin.
-	   The internal DAC used to feed the analog pin is only 8 bits, and has the
-	   funny clipping/clamping logic, while the digital pin gives full 10 bit
-	   resolution of the output data.
-	   TODO: add a way to set/reset this other than the FORCE_DIGITAL define
-	 */
-	UINT8 m_digital_select;
 
 	sound_stream *m_stream;
 	int m_clock;

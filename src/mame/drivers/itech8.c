@@ -504,7 +504,6 @@
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
-#include "machine/ticket.h"
 #include "includes/itech8.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
@@ -518,6 +517,8 @@
 #define CLOCK_12MHz     (12000000)
 
 
+
+IOPORT_ARRAY_MEMBER(itech8_state::analog_inputs) { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 /*************************************
  *
@@ -747,7 +748,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	m_pia_portb_data = data;
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x10) << 3);
+	m_ticket->write(space, 0, (data & 0x10) << 3);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -761,7 +762,7 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	m_pia_portb_data = data;
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, data & 0x80);
+	m_ticket->write(machine().driver_data()->generic_space(), 0, data & 0x80);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 

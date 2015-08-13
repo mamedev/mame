@@ -282,7 +282,6 @@ void bladestl_state::machine_start()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_spritebank));
-	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_last_track));
 }
 
@@ -290,8 +289,6 @@ void bladestl_state::machine_reset()
 {
 	int i;
 
-	m_layer_colorbase[0] = 0;
-	m_layer_colorbase[1] = 1;
 	m_spritebank = 0;
 
 	for (i = 0; i < 4 ; i++)

@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bionicc_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(bionicc_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bionicc_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(bionicc_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xfffff7) AM_RAM /* working RAM */
 	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
 	AM_RANGE(0xfffffa, 0xffffff) AM_READWRITE(hacked_controls_r, hacked_controls_w) /* hack */
@@ -372,6 +372,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT_CLASS(2, bionicc_state, RRRRGGGGBBBBIIII)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 

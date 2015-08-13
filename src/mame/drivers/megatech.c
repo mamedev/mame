@@ -97,7 +97,8 @@ public:
 		m_cart6(*this, "mt_slot6"),
 		m_cart7(*this, "mt_slot7"),
 		m_cart8(*this, "mt_slot8"),
-		m_bioscpu(*this, "mtbios")
+		m_bioscpu(*this, "mtbios"),
+		m_region_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( snd_int_callback );
@@ -167,6 +168,7 @@ private:
 	optional_device<generic_slot_device> m_cart7;
 	optional_device<generic_slot_device> m_cart8;
 	required_device<cpu_device>          m_bioscpu;
+	required_memory_region               m_region_maincpu;
 
 	memory_region *m_cart_reg[8];
 };
@@ -345,13 +347,13 @@ WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, m_region_maincpu->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, m_region_maincpu->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, m_region_maincpu->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -359,9 +361,8 @@ WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
 
 void mtech_state::set_genz80_as_sms()
 {
-	address_space &prg = machine().device("genesis_snd_z80")->memory().space(AS_PROGRAM);
-	address_space &io = machine().device("genesis_snd_z80")->memory().space(AS_IO);
-	sn76496_base_device *sn = machine().device<sn76496_base_device>("snsnd");
+	address_space &prg = m_z80snd->space(AS_PROGRAM);
+	address_space &io = m_z80snd->space(AS_IO);
 
 	// main ram area
 	sms_mainram = (UINT8 *)prg.install_ram(0xc000, 0xdfff, 0, 0x2000);
@@ -370,13 +371,13 @@ void mtech_state::set_genz80_as_sms()
 	// fixed rom bank area
 	sms_rom = (UINT8 *)prg.install_rom(0x0000, 0xbfff, NULL);
 
-	memcpy(sms_rom, machine().root_device().memregion("maincpu")->base(), 0xc000);
+	memcpy(sms_rom, m_region_maincpu->base(), 0xc000);
 
 	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(mtech_state::mt_sms_standard_rom_bank_w),this));
 
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0xff, 0x3e, read8_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0xff, 0x3e, write8_delegate(FUNC(sn76496_device::write),sn));
+	io.install_write_handler     (0x40, 0x41, 0xff, 0x3e, write8_delegate(FUNC(sn76496_device::write),(sn76496_base_device *)m_snsnd));
 	io.install_readwrite_handler (0x80, 0x80, 0xff, 0x3e, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
 	io.install_readwrite_handler (0x81, 0x81, 0xff, 0x3e, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
 
@@ -392,15 +393,14 @@ void mtech_state::set_genz80_as_sms()
 /* sets the megadrive z80 to it's normal ports / map */
 void mtech_state::set_genz80_as_md()
 {
-	address_space &prg = machine().device("genesis_snd_z80")->memory().space(AS_PROGRAM);
-	ym2612_device *ym2612 = machine().device<ym2612_device>("ymsnd");
+	address_space &prg = m_z80snd->space(AS_PROGRAM);
 
 	prg.install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram);
 
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
 
-	prg.install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read),ym2612), write8_delegate(FUNC(ym2612_device::write),ym2612));
+	prg.install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read), (ym2612_device *)m_ymsnd), write8_delegate(FUNC(ym2612_device::write), (ym2612_device *)m_ymsnd));
 	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	prg.install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	prg.install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
@@ -417,7 +417,7 @@ void mtech_state::switch_cart(int gameno)
 	m_z80snd->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	//m_z80snd->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	machine().device("ymsnd")->reset();
+	m_ymsnd->reset();
 
 	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
 	m_vdp->reset();
@@ -425,7 +425,7 @@ void mtech_state::switch_cart(int gameno)
 	/* if the regions exist we're fine */
 	if (m_cart_reg[gameno])
 	{
-		memcpy(memregion("maincpu")->base(), m_cart_reg[gameno]->base(), 0x400000);
+		memcpy(m_region_maincpu->base(), m_cart_reg[gameno]->base(), 0x400000);
 
 		if (!m_cart_is_genesis[gameno])
 		{
@@ -447,7 +447,7 @@ void mtech_state::switch_cart(int gameno)
 	else    /* else, no cart.. */
 	{
 		memset(memregion("mtbios")->base() + 0x8000, 0x00, 0x8000);
-		memset(memregion("maincpu")->base(), 0x00, 0x400000);
+		memset(m_region_maincpu->base(), 0x00, 0x400000);
 	}
 }
 

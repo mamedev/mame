@@ -26,10 +26,6 @@ public:
 	/* memory pointers */
 	std::vector<UINT8> m_paletteram;
 
-	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

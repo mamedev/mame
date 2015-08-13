@@ -381,23 +381,23 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 UINT16 amiga_state::joy0dat_r()
 {
 	if (m_input_device == NULL)
-		return m_joy0dat_port->read_safe(0xffff);
+		return m_joy0dat_port ? m_joy0dat_port->read() : 0xffff;
 
-	if (m_input_device->read_safe(0xff) & 0x10)
-		return m_joy0dat_port->read_safe(0xffff);
+	if (m_input_device->read() & 0x10)
+		return m_joy0dat_port ? m_joy0dat_port->read() : 0xffff;
 	else
-		return (m_p1_mouse_y->read_safe(0xff) << 8) | m_p1_mouse_x->read_safe(0xff);
+		return ((m_p1_mouse_y ? m_p1_mouse_y->read() : 0xff) << 8) | (m_p1_mouse_x? m_p1_mouse_x->read() : 0xff);
 }
 
 UINT16 amiga_state::joy1dat_r()
 {
 	if (m_input_device == NULL)
-		return m_joy1dat_port->read_safe(0xffff);
+		return m_joy1dat_port ? m_joy1dat_port->read() : 0xffff;
 
-	if (m_input_device->read_safe(0xff) & 0x20)
-		return m_joy1dat_port->read_safe(0xffff);
+	if (m_input_device->read() & 0x20)
+		return m_joy1dat_port ? m_joy1dat_port->read() : 0xffff;
 	else
-		return (m_p2_mouse_y->read_safe(0xff) << 8) | m_p2_mouse_x->read_safe(0xff);
+		return ((m_p2_mouse_y ? m_p2_mouse_y->read() : 0xff) << 8) | (m_p2_mouse_x ? m_p2_mouse_x->read() : 0xff);
 }
 
 CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
@@ -1172,12 +1172,12 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 
 		case REG_VPOSR:
 			CUSTOM_REG(REG_VPOSR) &= 0xff00;
-			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(*m_screen) >> 16;
+			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos() >> 16;
 
 			return CUSTOM_REG(REG_VPOSR);
 
 		case REG_VHPOSR:
-			return amiga_gethvpos(*m_screen) & 0xffff;
+			return amiga_gethvpos() & 0xffff;
 
 		case REG_SERDATR:
 			if (LOG_SERIAL)
@@ -1186,23 +1186,23 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			return CUSTOM_REG(REG_SERDATR);
 
 		case REG_JOY0DAT:
-			if (state->m_joy0dat_port)
+			if (m_joy0dat_port)
 				return joy0dat_r();
 
 		case REG_JOY1DAT:
-			if (state->m_joy1dat_port)
+			if (m_joy1dat_port)
 				return joy1dat_r();
 
 		case REG_POTGOR:
-			if (state->m_potgo_port)
-				return state->m_potgo_port->read();
+			if (m_potgo_port)
+				return m_potgo_port->read();
 			else
 				return 0x5500;
 
 		case REG_POT0DAT:
-			if (state->m_pot0dat_port)
+			if (m_pot0dat_port)
 			{
-				return state->m_pot0dat_port->read();
+				return m_pot0dat_port->read();
 			}
 			else
 			{
@@ -1215,9 +1215,9 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			}
 
 		case REG_POT1DAT:
-			if (state->m_pot1dat_port)
+			if (m_pot1dat_port)
 			{
-				return state->m_pot1dat_port->read();
+				return m_pot1dat_port->read();
 			}
 			else
 			{
@@ -1230,7 +1230,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			}
 
 		case REG_DSKBYTR:
-			return state->m_fdc->dskbytr_r();
+			return m_fdc->dskbytr_r();
 
 		case REG_INTENAR:
 			return CUSTOM_REG(REG_INTENA);
@@ -1255,13 +1255,13 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			return CUSTOM_REG(REG_DENISEID);
 
 		case REG_DSKPTH:
-			return state->m_fdc->dskpth_r();
+			return m_fdc->dskpth_r();
 
 		case REG_DSKPTL:
-			return state->m_fdc->dskptl_r();
+			return m_fdc->dskptl_r();
 
 		case REG_ADKCONR:
-			return state->m_fdc->adkcon_r();
+			return m_fdc->adkcon_r();
 
 		case REG_DSKDATR:
 			popmessage("DSKDAT R, contact MESSdev");
@@ -1294,19 +1294,19 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			break;
 
 		case REG_DSKSYNC:
-			state->m_fdc->dsksync_w(data);
+			m_fdc->dsksync_w(data);
 			break;
 
 		case REG_DSKPTH:
-			state->m_fdc->dskpth_w(data);
+			m_fdc->dskpth_w(data);
 			break;
 
 		case REG_DSKPTL:
-			state->m_fdc->dskptl_w(data);
+			m_fdc->dskptl_w(data);
 			break;
 
 		case REG_DSKLEN:
-			state->m_fdc->dsklen_w(data);
+			m_fdc->dsklen_w(data);
 			break;
 
 		case REG_POTGO:
@@ -1392,7 +1392,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 
 		case REG_SPR0PTH:   case REG_SPR1PTH:   case REG_SPR2PTH:   case REG_SPR3PTH:
 		case REG_SPR4PTH:   case REG_SPR5PTH:   case REG_SPR6PTH:   case REG_SPR7PTH:
-			data &= ( state->m_chip_ram_mask >> 16 );
+			data &= ( m_chip_ram_mask >> 16 );
 			break;
 
 		case REG_SPR0PTL:   case REG_SPR1PTL:   case REG_SPR2PTL:   case REG_SPR3PTL:
@@ -1414,7 +1414,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 
 		case REG_COP1LCH:
 		case REG_COP2LCH:
-			data &= ( state->m_chip_ram_mask >> 16 );
+			data &= ( m_chip_ram_mask >> 16 );
 			break;
 
 		case REG_COPJMP1:
@@ -1445,7 +1445,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			/* bits BBUSY (14) and BZERO (13) are read-only */
 			data &= 0x9fff;
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-			state->m_fdc->dmacon_set(data);
+			m_fdc->dmacon_set(data);
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
@@ -1495,7 +1495,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		case REG_ADKCON:
 			m_sound->update();
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-			state->m_fdc->adkcon_set(data);
+			m_fdc->adkcon_set(data);
 			break;
 
 		case REG_AUD0LCL:   case REG_AUD0LCH:   case REG_AUD0LEN:   case REG_AUD0PER:   case REG_AUD0VOL:
@@ -1511,7 +1511,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 
 		case REG_BPL1PTH:   case REG_BPL2PTH:   case REG_BPL3PTH:   case REG_BPL4PTH:
 		case REG_BPL5PTH:   case REG_BPL6PTH:
-			data &= ( state->m_chip_ram_mask >> 16 );
+			data &= ( m_chip_ram_mask >> 16 );
 			break;
 
 		case REG_BPLCON0:

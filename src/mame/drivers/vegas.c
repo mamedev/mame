@@ -1708,6 +1708,9 @@ static ADDRESS_MAP_START( vegas_map_8mb, AS_PROGRAM, 32, vegas_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE(nile_r, nile_w) AM_SHARE("nile_regs")
+
+	AM_RANGE(0x01700000, 0x017fffff) AM_ROM AM_REGION("update", 0)
+
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
@@ -1716,6 +1719,10 @@ static ADDRESS_MAP_START( vegas_map_32mb, AS_PROGRAM, 32, vegas_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE(nile_r, nile_w) AM_SHARE("nile_regs")
+
+
+	AM_RANGE(0x01700000, 0x017fffff) AM_ROM AM_REGION("update", 0)
+
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
@@ -2446,12 +2453,14 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-
+ // there is a socket next to the main bios roms for updates, this is what the update region is.
 
 
 ROM_START( gauntleg )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "legend15.bin", 0x000000, 0x80000, CRC(a8372d70) SHA1(d8cd4fd4d7007ee38bb58b5a818d0f83043d5a48) ) // EPROM Boot code. Version: Nov 17 1998 19:18:28 / 1.5 Nov 17 1998 19:21:49
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.5 1/14/1999 Game 1/14/1999 */
 	DISK_IMAGE( "gauntleg", 0, SHA1(66eb70e2fba574a7abe54be8bd45310654b24b08) )
@@ -2465,9 +2474,21 @@ ROM_START( gauntleg12 )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "legend13.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) ) //  EPROM Boot code. Version: Sep 25 1998 18:34:43 / 1.3 Sep 25 1998 18:33:45
 	ROM_LOAD( "legend14.bin", 0x000000, 0x80000, CRC(66869402) SHA1(bf470e0b9198b80f8baf8b9432a7e1df8c7d18ca) ) //  EPROM Boot code. Version: Oct 30 1998 17:48:21 / 1.4 Oct 30 1998 17:44:29
+	
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
+
+	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.2 to 1.6 Step 1 of 3" )
+	ROMX_LOAD("12to16.1.bin", 0x000000, 0x100000, CRC(253c6bf2) SHA1(5e129576afe2bc4c638242e010735655d269a747), ROM_BIOS(2))	
+	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.2 to 1.6 Step 2 of 3" )
+	ROMX_LOAD("12to16.2.bin", 0x000000, 0x100000, CRC(15b1fe78) SHA1(532c4937b55befcc3a8cb25b0282d63e206fba47), ROM_BIOS(3))	
+	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.2 to 1.6 Step 3 of 3" )
+	ROMX_LOAD("12to16.3.bin", 0x000000, 0x100000, CRC(1027e54f) SHA1(a841f5cc5b022ddfaf70c97a64d1582f0a2ca70e), ROM_BIOS(4))	
+
+
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.4 10/22/1998 Main 10/23/1998 */
-	DISK_IMAGE( "gauntl12", 0, SHA1(c8208e3ce3b02a271dc6b089efa98dd996b66ce0) )
+	DISK_IMAGE( "gauntl12", 0, SHA1(62917fbd692d004bc391287349041ebe669385cf) ) // compressed with -chs 4969,16,63 (which is apparently correct for a Quantum FIREBALL 2.5 GB and allows the update program to work)
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
@@ -2477,6 +2498,9 @@ ROM_END
 ROM_START( gauntdl )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.7 12/14/1999 */
 	ROM_LOAD( "gauntdl.bin", 0x000000, 0x80000, CRC(3d631518) SHA1(d7f5a3bc109a19c9c7a711d607ff87e11868b536) )
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts: 1.9 3/17/2000 Game 5/9/2000 */
 	DISK_IMAGE( "gauntdl", 0, SHA1(ba3af48171e727c2f7232c06dcf8411cbcf14de8) )
@@ -2490,6 +2514,9 @@ ROM_START( gauntdl24 )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.7 12/14/1999 */
 	ROM_LOAD( "gauntdl.bin", 0x000000, 0x80000, CRC(3d631518) SHA1(d7f5a3bc109a19c9c7a711d607ff87e11868b536) )
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts: 1.9 3/17/2000 Game 3/19/2000 */
 	DISK_IMAGE( "gauntd24", 0, SHA1(3e055794d23d62680732e906cfaf9154765de698) )
 
@@ -2502,6 +2529,9 @@ ROM_START( warfa )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.9 3/25/1999 */
 	ROM_LOAD( "warboot.v19", 0x000000, 0x80000, CRC(b0c095cd) SHA1(d3b8cccdca83f0ecb49aa7993864cfdaa4e5c6f0) )
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.3 4/20/1999 Game 4/20/1999 */
 	DISK_IMAGE( "warfa", 0, SHA1(87f8a8878cd6be716dbd6c68fb1bc7f564ede484) )
 
@@ -2512,6 +2542,9 @@ ROM_END
 ROM_START( warfaa )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.6 Jan 14 1999 */
 	ROM_LOAD( "warboot.v16", 0x000000, 0x80000, CRC(1c44b3a3) SHA1(e81c15d7c9bc19078787d39c7f5e48eab003c5f4) )
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
 
 	DISK_REGION( "ide:0:hdd:image" )    /* GUTS 1.1 Mar 16 1999, GAME Mar 16 1999 */
 	DISK_IMAGE( "warfaa", 0, SHA1(b443ba68003f8492e5c20156e0d3091fe51e9224) )
@@ -2525,6 +2558,9 @@ ROM_START( tenthdeg )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "tenthdeg.bio", 0x000000, 0x80000, CRC(1cd2191b) SHA1(a40c48f3d6a9e2760cec809a79a35abe762da9ce) )
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 5/26/1998 Main 8/25/1998 */
 	DISK_IMAGE( "tenthdeg", 0, SHA1(41a1a045a2d118cf6235be2cc40bf16dbb8be5d1) )
 
@@ -2537,6 +2573,9 @@ ROM_START( roadburn )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 2.6 4/22/1999 */
 	ROM_LOAD( "rbmain.bin", 0x000000, 0x80000, CRC(060e1aa8) SHA1(2a1027d209f87249fe143500e721dfde7fb5f3bc) )
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 4/22/1999 Game 4/22/1999 */
 	DISK_IMAGE( "roadburn", 0, SHA1(a62870cceafa6357d7d3505aca250c3f16087566) )
 ROM_END
@@ -2545,6 +2584,9 @@ ROM_END
 ROM_START( nbashowt )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "showtime_mar15_1999.u27", 0x000000, 0x80000, CRC(ff5d620d) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) ) // 16:09:14 Mar 15 1999 BIOS FOR SHOWTIME USING BANSHEE / 16:09:01 Mar 15 1999. POST FOR SHOWTIME USING BANSHEE
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
 
 	DISK_REGION( "ide:0:hdd:image" )
 	// various strings from this image
@@ -2564,6 +2606,9 @@ ROM_START( nbanfl )
 //  ROM_LOAD( "bootnflnba.bin", 0x000000, 0x80000, CRC(3def7053) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) ) // 1 byte different to above (0x51b95 is 0x1b instead of 0x18)
 	ROM_LOAD( "blitz00_nov30_1999.u27", 0x000000, 0x80000, CRC(4242bf14) SHA1(c1fcec67d7463df5f41afc89f22c3b4484279534) ) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )
 	// various strings from this image
 	//NBA SHOWTIME 2.1
@@ -2580,6 +2625,9 @@ ROM_END
 ROM_START( nbagold )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "nbagold_jan10_2000.u27", 0x000000, 0x80000, CRC(6768e802) SHA1(d994e3efe14f57e261841134ddd1489fa67d418b) ) // 11:29:11 Jan 10 2000. BIOS FOR NBAGOLD USING BANSHEE / 11:23:58 Jan 10 2000. POST FOR NBAGOLD USING BANSHEE
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
 
 	DISK_REGION( "ide:0:hdd:image" )
 	// various strings from this image
@@ -2604,6 +2652,9 @@ ROM_START( cartfury )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "cart_mar8_2000.u27", 0x000000, 0x80000, CRC(c44550a2) SHA1(ad30f1c3382ff2f5902a4cbacbb1f0c4e37f42f9) ) // 10:40:17 Mar  8 2000 BIOS FOR CART USING VOODOO3 / 10:39:55 Mar  8 2000 POST FOR CART USING VOODOO3
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "cartfury", 0, SHA1(4c5bc2803297ea9a191bbd8b002d0e46b4ae1563) )
 
@@ -2616,6 +2667,9 @@ ROM_START( sf2049 )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.02 7/9/1999 */
 	ROM_LOAD( "sf2049.u27", 0x000000, 0x80000, CRC(174ba8fe) SHA1(baba83b811eca659f00514a008a86ef0ac9680ee) )
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.03 9/3/1999 Game 9/8/1999 */
 	DISK_IMAGE( "sf2049", 0, SHA1(9e0661b8566a6c78d18c59c11cd3a6628d025405) )
 ROM_END
@@ -2625,6 +2679,9 @@ ROM_START( sf2049se )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "sf2049se.u27", 0x000000, 0x80000, CRC(da4ecd9c) SHA1(2574ff3d608ebcc59a63cf6dea13ee7650ae8921) )
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "sf2049se", 0, SHA1(7b27a8ce2a953050ce267548bb7160b41f3e8054) )
 ROM_END
@@ -2633,6 +2690,9 @@ ROM_END
 ROM_START( sf2049te )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "sf2049te.u27", 0x000000, 0x80000, CRC(cc7c8601) SHA1(3f37dbd1b32b3ac5caa300725468e8e426f0fb83) )
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "sf2049te", 0, SHA1(625aa36436587b7bec3e7db1d19793b760e2ea51) )

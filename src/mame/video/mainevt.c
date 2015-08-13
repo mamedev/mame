@@ -19,19 +19,23 @@
 
 K052109_CB_MEMBER(mainevt_state::mainevt_tile_callback)
 {
+	static const int layer_colorbase[] = { 0 / 16, 128 / 16, 64 / 16 };
+
 	*flags = (*color & 0x02) ? TILE_FLIPX : 0;
 
 	/* priority relative to HALF priority sprites */
 	*priority = (layer == 2) ? (*color & 0x20) >> 5 : 0;
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
-	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 K052109_CB_MEMBER(mainevt_state::dv_tile_callback)
 {
+	static const int layer_colorbase[] = { 0 / 16, 0 / 16, 64 / 16 };
+
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x3c) << 7);
-	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 
@@ -43,6 +47,8 @@ K052109_CB_MEMBER(mainevt_state::dv_tile_callback)
 
 K051960_CB_MEMBER(mainevt_state::mainevt_sprite_callback)
 {
+	enum { sprite_colorbase = 192 / 16 };
+
 	/* bit 5 = priority over layer B (has precedence) */
 	/* bit 6 = HALF priority over layer B (used for crowd when you get out of the ring) */
 	if (*color & 0x20)
@@ -53,33 +59,17 @@ K051960_CB_MEMBER(mainevt_state::mainevt_sprite_callback)
 		*priority = 0xff00 | 0xf0f0 | 0xcccc;
 	/* bit 7 is shadow, not used */
 
-	*color = m_sprite_colorbase + (*color & 0x03);
+	*color = sprite_colorbase + (*color & 0x03);
 }
 
 K051960_CB_MEMBER(mainevt_state::dv_sprite_callback)
 {
+	enum { sprite_colorbase = 128 / 16 };
+
 	/* TODO: the priority/shadow handling (bits 5-7) seems to be quite complex (see PROM) */
-	*color = m_sprite_colorbase + (*color & 0x07);
+	*color = sprite_colorbase + (*color & 0x07);
 }
 
-
-/*****************************************************************************/
-
-VIDEO_START_MEMBER(mainevt_state,mainevt)
-{
-	m_layer_colorbase[0] = 0;
-	m_layer_colorbase[1] = 8;
-	m_layer_colorbase[2] = 4;
-	m_sprite_colorbase = 12;
-}
-
-VIDEO_START_MEMBER(mainevt_state,dv)
-{
-	m_layer_colorbase[0] = 0;
-	m_layer_colorbase[1] = 0;
-	m_layer_colorbase[2] = 4;
-	m_sprite_colorbase = 8;
-}
 
 /*****************************************************************************/
 

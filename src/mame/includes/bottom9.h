@@ -25,11 +25,6 @@ public:
 		m_k051316(*this, "k051316"),
 		m_palette(*this, "palette") { }
 
-	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-	int        m_zoom_colorbase;
-
 	/* misc */
 	int        m_video_enable;
 	int        m_zoomreadroms;
@@ -58,7 +53,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	UINT32 screen_update_bottom9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bottom9_interrupt);
 	INTERRUPT_GEN_MEMBER(bottom9_sound_interrupt);
