@@ -343,7 +343,7 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 	{
 		case 0x01:
 		{
-			micro3d_sound_device *noise = machine().device<micro3d_sound_device>(data & 4 ? "noise_2" : "noise_1");
+			micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
 			noise->noise_sh_w(data);
 			break;
 		}
@@ -360,7 +360,7 @@ READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 {
 	switch (offset)
 	{
-		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | ioport("SOUND_SW")->read();
+		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | m_sound_sw->read();
 		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 		default:    return 0;
 	}
