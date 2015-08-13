@@ -1213,10 +1213,21 @@ Entering the Setup menu "S":
 
 Is the "Stand" & "Hi-Score" keys the same? Without a separate Stand key, you cannot set up the "TWIN" bonus feature
 
+REPLAYS - You start with 1 star per coin up to a maximum 15 stars. One star is deducted for each losing hand including
+          busting on Double-ups while stars are added for winning hands. Running out of stars forces the player to add
+          at least 1 more coin to continue to play EVEN if the player still has points available to use.
+
 */
 ROM_START( americna ) /* Uses a small daughter card CRT-251 & Dallas DS1225Y NV SRAM */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "9131-00_u9-2.u9",   0x00000, 0x10000, CRC(8a741fb6) SHA1(2d77c67e5a0bdaf6199c31c4055df214672db3e1) ) /* 9131-00 U9-2  888020 */
+	ROM_LOAD( "9131-01_u9-2.u9",   0x00000, 0x10000, CRC(0410a1bf) SHA1(1218cf4b3d1067777841673620c84406cce418fb) ) /* 9131-01 U9-2  888020 - Has REPLAYS feature */
+	ROM_LOAD( "9131-00_u10-0.u10", 0x10000, 0x10000, CRC(d6f72934) SHA1(4f3d6a5227a3b0fc298533a03cc0a32f8e2f3840) )
+	ROM_LOAD( "9131-00_u11-0.u11", 0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) )
+ROM_END
+
+ROM_START( americnaa ) /* Uses a small daughter card CRT-251 & Dallas DS1225Y NV SRAM */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9131-00_u9-2.u9",   0x00000, 0x10000, CRC(8a741fb6) SHA1(2d77c67e5a0bdaf6199c31c4055df214672db3e1) ) /* 9131-00 U9-2  888020 - Doesn't have REPLAYS feature */
 	ROM_LOAD( "9131-00_u10-0.u10", 0x10000, 0x10000, CRC(d6f72934) SHA1(4f3d6a5227a3b0fc298533a03cc0a32f8e2f3840) )
 	ROM_LOAD( "9131-00_u11-0.u11", 0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) )
 ROM_END
@@ -1227,12 +1238,12 @@ This set seems odd, it doesn't really have a title sequence.
 
 Same keys as Americana & same Stand / Hi-Score issue
 
-C1988 MII on the labels
+This set also has additional bonuses for certain winning hands, but requires a minimum 10 point bet to qualify for any bonus.
 
 */
 ROM_START( meritjp ) /* Uses a small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "9131-01_u9-00.u9",   0x00000, 0x10000, CRC(dadaac6a) SHA1(798068f3cef6f5d41dd8ee4315e220932f31a3f7) ) /* 9131-01 U9-00 */
+	ROM_LOAD( "9131-01_u9-00.u9",   0x00000, 0x10000, CRC(dadaac6a) SHA1(798068f3cef6f5d41dd8ee4315e220932f31a3f7) ) /* 9131-01 U9-00 - Has REPLAYS feature */
 	ROM_LOAD( "9131-01_u10-r0.u10", 0x10000, 0x10000, CRC(ebee75e2) SHA1(1ba1c92684d0f5251bb5b57a29b39467b57a1170) )
 	ROM_LOAD( "9131-01_u11-r0.u11", 0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) )
 ROM_END
@@ -2293,8 +2304,9 @@ DRIVER_INIT_MEMBER(meritm_state,megat3te)
 }
 
 /* CRT-250 */
-GAME( 1987, americna,  0,        meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Americana (9131-00)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, meritjp,  0,         meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Merit Joker Poker (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, americna,  0,        meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Americana (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, americnaa, americna, meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Americana (9131-00)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, meritjp,   0,        meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Merit Joker Poker (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty,  driver_device, 0,        ROT0, "Merit", "Dodge City (9131-02)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, pitboss2,  0,        meritm_crt250, pitboss2,  driver_device, 0,        ROT0, "Merit", "Pit Boss II (9221-01C)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, spitboss,  0,        meritm_crt250, spitboss,  driver_device, 0,        ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )
