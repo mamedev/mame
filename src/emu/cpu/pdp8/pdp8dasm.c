@@ -9,16 +9,7 @@
 #include "emu.h"
 
 static char *output;
-/*
-static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
-{
-	va_list vl;
 
-	va_start(vl, fmt);
-	output += vsprintf(output, fmt, vl);
-	va_end(vl);
-}
-*/
 offs_t pdp8_dasm_one(char *buffer, offs_t pc, UINT16 op)
 {
 	UINT8 opcode = (op >> 011) & 07;
