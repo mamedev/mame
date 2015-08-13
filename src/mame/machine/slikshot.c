@@ -546,8 +546,8 @@ UINT32 itech8_state::screen_update_slikshot(screen_device &screen, bitmap_rgb32 
 	screen_update_2page(screen, bitmap, cliprect);
 
 	/* add the current X,Y positions to the list */
-	m_xbuffer[m_ybuffer_next % YBUFFER_COUNT] = ioport("FAKEX")->read_safe(0);
-	m_ybuffer[m_ybuffer_next % YBUFFER_COUNT] = ioport("FAKEY")->read_safe(0);
+	m_xbuffer[m_ybuffer_next % YBUFFER_COUNT] = m_fakex->read();
+	m_ybuffer[m_ybuffer_next % YBUFFER_COUNT] = m_fakey->read();
 	m_ybuffer_next++;
 
 	/* determine where to draw the starting point */
