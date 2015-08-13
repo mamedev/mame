@@ -12,7 +12,7 @@
 K007342_CALLBACK_MEMBER(battlnts_state::battlnts_tile_callback)
 {
 	*code |= ((*color & 0x0f) << 9) | ((*color & 0x40) << 2);
-	*color = m_layer_colorbase[layer];
+	*color = 0;
 }
 
 /***************************************************************************

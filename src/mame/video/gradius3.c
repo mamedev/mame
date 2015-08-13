@@ -4,9 +4,6 @@
 #include "includes/gradius3.h"
 
 
-#define TOTAL_CHARS    0x1000
-#define TOTAL_SPRITES  0x4000
-
 /***************************************************************************
 
   Callbacks for the K052109
@@ -15,9 +12,11 @@
 
 K052109_CB_MEMBER(gradius3_state::tile_callback)
 {
+	static const int layer_colorbase[] = { 0 / 16, 512 / 16, 768 / 16 };
+
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 /***************************************************************************
@@ -28,14 +27,19 @@ K052109_CB_MEMBER(gradius3_state::tile_callback)
 
 K051960_CB_MEMBER(gradius3_state::sprite_callback)
 {
-	#define L0 0xaa
-	#define L1 0xcc
-	#define L2 0xf0
+	enum { sprite_colorbase = 256 / 16 };
+
+	#define L0 GFX_PMASK_1
+	#define L1 GFX_PMASK_2
+	#define L2 GFX_PMASK_4
 	static const int primask[2][4] =
 	{
 		{ L0|L2, L0, L0|L2, L0|L1|L2 },
 		{ L1|L2, L2, 0,     L0|L1|L2 }
 	};
+	#undef L0
+	#undef L1
+	#undef L2
 
 	int pri = ((*color & 0x60) >> 5);
 
@@ -45,7 +49,7 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 		*priority = primask[1][pri];
 
 	*code |= (*color & 0x01) << 13;
-	*color = m_sprite_colorbase + ((*color & 0x1e) >> 1);
+	*color = sprite_colorbase + ((*color & 0x1e) >> 1);
 }
 
 /***************************************************************************
@@ -61,11 +65,6 @@ void gradius3_state::gradius3_postload()
 
 void gradius3_state::video_start()
 {
-	m_layer_colorbase[0] = 0;
-	m_layer_colorbase[1] = 32;
-	m_layer_colorbase[2] = 48;
-	m_sprite_colorbase = 16;
-
 	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_state::gradius3_postload), this));
 }
 
@@ -77,9 +76,7 @@ void gradius3_state::video_start()
 
 READ16_MEMBER(gradius3_state::gradius3_gfxrom_r)
 {
-	UINT8 *gfxdata = memregion("k051960")->base();
-
-	return (gfxdata[2 * offset + 1] << 8) | gfxdata[2 * offset];
+	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
 }
 
 WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)

@@ -32,7 +32,7 @@ PALETTE_INIT_MEMBER(bladestl_state, bladestl)
 K007342_CALLBACK_MEMBER(bladestl_state::bladestl_tile_callback)
 {
 	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
-	*color = m_layer_colorbase[layer];
+	*color = layer;
 }
 
 /***************************************************************************

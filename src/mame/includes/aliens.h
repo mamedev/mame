@@ -24,10 +24,6 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960") { }
 
-	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -42,7 +38,6 @@ public:
 	DECLARE_WRITE8_MEMBER(aliens_snd_bankswitch_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	UINT32 screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(aliens_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);

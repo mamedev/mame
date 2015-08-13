@@ -10,10 +10,10 @@
 
 ***************************************************************************/
 
-static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
-
 K052109_CB_MEMBER(spy_state::tile_callback)
 {
+	static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
+
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
 	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
@@ -53,7 +53,7 @@ UINT32 spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap,
 	screen.priority().fill(0, cliprect);
 
 	if (!m_video_enable)
-		bitmap.fill(16 * layer_colorbase[0], cliprect);
+		bitmap.fill(768, cliprect); // ?
 	else
 	{
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
