@@ -353,6 +353,8 @@ void tms5220_device::set_variant(int variant)
 
 void tms5220_device::register_for_save_states()
 {
+	save_item(NAME(m_variant));
+
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_head));
 	save_item(NAME(m_fifo_tail));
@@ -796,6 +798,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 #endif
 
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
+			/** TODO: investigate this later! **/
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
 					m_talk_status = m_speak_external = 0;
@@ -1264,7 +1267,7 @@ void tms5220_device::process_command(unsigned char cmd)
 
 void tms5220_device::parse_frame()
 {
-	int indx, i, rep_flag;
+	int i, rep_flag;
 
 	// We actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
 
@@ -1272,12 +1275,12 @@ void tms5220_device::parse_frame()
 	has a 2 bit rate preceding it, grab two bits here and store them as the rate; */
 	if ((TMS5220_HAS_RATE_CONTROL) && (m_c_variant_rate & 0x04))
 	{
-		indx = extract_bits(2);
+		i = extract_bits(2);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-		printbits(indx,2);
+		printbits(i,2);
 		fprintf(stderr," ");
 #endif
-		m_IP = reload_table[indx];
+		m_IP = reload_table[i];
 	}
 	else // non-5220C and 5220C in fixed rate mode
 	m_IP = reload_table[m_c_variant_rate&0x3];
