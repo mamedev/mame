@@ -14,8 +14,6 @@
 		- How is the sound irq cleared (currently using HOLD_LINE)?
 		- Do bit 2 and 7 of the bankswitch port have any meaning?
 		- Use raw screen parameters
-		- When entering a highscore, some letters will appear partially behind
-		  the blocks. Driver problem or original game bug?
 		- Verify exact XTAL values
 
 *******************************************************************************/
