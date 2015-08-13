@@ -461,6 +461,22 @@ if (CPUS["T11"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- DEC PDP-8
+--@src/emu/cpu/pdp8/pdp8.h,CPUS["PDP8"] = true
+--------------------------------------------------
+
+if (CPUS["PDP8"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/pdp8/pdp8.c",
+		MAME_DIR .. "src/emu/cpu/pdp8/pdp8.h",
+	}
+end
+
+if (CPUS["PDP8"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/pdp8/pdp8dasm.c")
+end
+
+--------------------------------------------------
 -- F8
 --@src/emu/cpu/f8/f8.h,CPUS["F8"] = true
 --------------------------------------------------
