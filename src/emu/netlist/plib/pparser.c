@@ -75,7 +75,7 @@ void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
-		error("Error: expected token <%s> got <%s>\n", m_tokens[token_num.id()].cstr(), tok.str().cstr());
+		error(pformat("Expected token <%1> got <%2>")(m_tokens[token_num.id()])(tok.str()) );
 	}
 }
 
@@ -84,7 +84,7 @@ pstring ptokenizer::get_string()
 	token_t tok = get_token();
 	if (!tok.is_type(STRING))
 	{
-		error("Error: expected a string, got <%s>\n", tok.str().cstr());
+		error(pformat("Expected a string, got <%1>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -94,7 +94,7 @@ pstring ptokenizer::get_identifier()
 	token_t tok = get_token();
 	if (!tok.is_type(IDENTIFIER))
 	{
-		error("Error: expected an identifier, got <%s>\n", tok.str().cstr());
+		error(pformat("Expected an identifier, got <%1>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -104,7 +104,7 @@ pstring ptokenizer::get_identifier_or_number()
 	token_t tok = get_token();
 	if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
 	{
-		error("Error: expected an identifier, got <%s>\n", tok.str().cstr());
+		error(pformat("Expected an identifier, got <%1>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -114,12 +114,12 @@ double ptokenizer::get_number_double()
 	token_t tok = get_token();
 	if (!tok.is_type(NUMBER))
 	{
-		error("Error: expected a number, got <%s>\n", tok.str().cstr());
+		error(pformat("Expected a number, got <%1>")(tok.str()) );
 	}
 	bool err = false;
 	double ret = tok.str().as_double(&err);
 	if (err)
-		error("Error: expected a number, got <%s>\n", tok.str().cstr());
+		error(pformat("Expected a number, got <%1>")(tok.str()) );
 	return ret;
 }
 
@@ -128,12 +128,12 @@ long ptokenizer::get_number_long()
 	token_t tok = get_token();
 	if (!tok.is_type(NUMBER))
 	{
-		error("Error: expected a long int, got <%s>\n", tok.str().cstr());
+		error(pformat("Expected a long int, got <%1>")(tok.str()) );
 	}
 	bool err = false;
 	long ret = tok.str().as_long(&err);
 	if (err)
-		error("Error: expected a long int, got <%s>\n", tok.str().cstr());
+		error(pformat("Expected a long int, got <%1>")(tok.str()) );
 	return ret;
 }
 
@@ -252,16 +252,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 
 }
 
-ATTR_COLD void ptokenizer::error(const char *format, ...)
+ATTR_COLD void ptokenizer::error(const pstring &errs)
 {
-	va_list ap;
-	va_start(ap, format);
-
-	pstring errmsg1 = pstring(format).vprintf(ap);
-	va_end(ap);
-
-	verror(errmsg1, currentline_no(), currentline_str());
-
+	verror("Error: " + errs, currentline_no(), currentline_str());
 	//throw error;
 }
 
@@ -460,7 +453,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			}
 		}
 		else
-			error(pformat("unknown directive on line %1: %2\n")(m_lineno)(line));
+			error(pformat("unknown directive on line %1: %2")(m_lineno)(line));
 	}
 	else
 	{

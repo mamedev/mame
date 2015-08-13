@@ -395,6 +395,10 @@ public:
 	pformat &x 		    (const INT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
 	pformat &x          (const UINT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
 
+	pformat &operator ()(const long x, const char *f = "") { return update(f, "ld", x);  }
+	pformat &operator ()(const unsigned long x, const char *f = "") { return update(f, "lu", x);  }
+
+
 	pformat &operator ()(const INT32 x, const char *f = "") { return update(f, "d", x);  }
 	pformat &operator ()(const UINT32 x, const char *f = "") { return update(f, "u", x);  }
 
@@ -405,7 +409,7 @@ public:
 	pformat &operator ()(const UINT16 x, const char *f = "") { return update(f, "hu", x);  }
 
 #if !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(EMSCRIPTEN)
-	pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
+	//pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
 #endif
 	pformat &operator ()(const double x, const char *f = "") { return update(f, "g", x);  }
 	pformat &          e(const double x, const char *f = "") { return update(f, "e", x);  }
@@ -422,8 +426,6 @@ private:
 	char m_str[2048];
 	unsigned m_arg;
 };
-//const type_t vprintf(va_list args) const;
-//static const type_t sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 
 
 #endif /* _PSTRING_H_ */

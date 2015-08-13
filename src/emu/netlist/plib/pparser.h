@@ -112,10 +112,10 @@ public:
 	}
 
 	token_t get_token_internal();
-	void error(const char *format, ...) ATTR_PRINTF(2,3);
+	void error(const pstring &errs);
 
 protected:
-	virtual void verror(pstring msg, int line_num, pstring line) = 0;
+	virtual void verror(const pstring &msg, int line_num, const pstring &line) = 0;
 
 private:
 	void skipeol();

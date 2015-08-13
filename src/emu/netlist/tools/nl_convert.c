@@ -439,7 +439,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					break;
 				}
 				default:
-					tok.error("// IGNORED %s\n", name.cstr());
+					tok.error("// IGNORED " + name);
 			}
 
 		}
