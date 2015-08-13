@@ -70,7 +70,6 @@
 #define MAX_K                   10
 #define MAX_SCALE_BITS          6
 #define MAX_SCALE               (1<<MAX_SCALE_BITS)
-#define COEFF_ENERGY_SENTINEL   (511)
 #define MAX_CHIRP_SIZE          52
 
 struct tms5100_coeffs
@@ -92,20 +91,12 @@ struct tms5100_coeffs
 #define TI_0280_PATENT_ENERGY \
 		/* E  */\
 		{   0,  0,  1,  1,  2,  3,  5,  7, \
-			10, 15, 21, 30, 43, 61, 86, COEFF_ENERGY_SENTINEL }, // last rom value is actually really 0, but the tms5110.c code still requires the sentinel value to function correctly, until it is properly updated or merged with tms5220.c
+			10, 15, 21, 30, 43, 61, 86, 0 },
 
-#define TI_0280_LATER_ENERGY \
-		/* E  */\
-		{   0,  1,  2,  3,  4,  6,  8, 11, \
-			16, 23, 33, 47, 63, 85,114, COEFF_ENERGY_SENTINEL }, // last rom value is actually really 0, but the tms5110.c code still requires the sentinel value to function correctly, until it is properly updated or merged with tms5220.c
-
-//technically this is the same as above, but tms5220.c expects the 0 rather than needing a sentinel value
-//TODO: when tms5110.c no longer needs sentinel, get rid of this and merge with above.
-#define TI_0285_LATER_ENERGY \
+#define TI_028X_LATER_ENERGY \
 		/* E  */\
 		{   0,  1,  2,  3,  4,  6,  8, 11, \
 			16, 23, 33, 47, 63, 85,114, 0 },
-
 
 /* pitch */
 #define TI_0280_2801_PATENT_PITCH \
@@ -375,7 +366,7 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
 	TI_0280_PATENT_LPC
@@ -411,7 +402,7 @@ static const struct tms5100_coeffs T0280F_2801A_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
 	TI_2801_2501E_LPC
@@ -435,7 +426,7 @@ static const struct tms5100_coeffs M58817_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
 	TI_2801_2501E_LPC
@@ -460,7 +451,7 @@ static const struct tms5100_coeffs T0280F_2802_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_2802_PITCH
 	{
 	TI_2802_LPC
@@ -492,7 +483,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_5110_PITCH
 	{
 	TI_5110_5220_LPC
@@ -518,7 +509,7 @@ static const struct tms5100_coeffs pat4335277_coeff =
 	4,
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0285_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_2501E_PITCH
 	{
 		/* K1dc  */
@@ -591,7 +582,7 @@ static const struct tms5100_coeffs T0285_2501E_coeff =
 	4,
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0285_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_2501E_PITCH
 	{
 	TI_2801_2501E_LPC
@@ -620,7 +611,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 	4,
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0285_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_5220_PITCH
 	{
 	TI_5110_5220_LPC
