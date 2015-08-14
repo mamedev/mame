@@ -477,7 +477,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	m_params.m_accuracy = m_accuracy.Value();
 	m_params.m_gs_loops = m_gs_loops.Value();
 	m_params.m_nr_loops = m_nr_loops.Value();
-	m_params.m_nt_sync_delay = m_sync_delay.Value();
+	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
 	m_params.m_lte = m_lte.Value();
 	m_params.m_sor = m_sor.Value();
 

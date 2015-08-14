@@ -25,6 +25,9 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 			"NOT_SUPPORTED",
 			"DT_CUSTOM",
 			"DT_DOUBLE",
+#if (PHAS_INT128)
+			"DT_INT128",
+#endif
 			"DT_INT64",
 			"DT_INT16",
 			"DT_INT8",
