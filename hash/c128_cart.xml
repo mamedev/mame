@@ -167,7 +167,7 @@ Missing dumps:
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
 
-			<dataarea name="romh" size="0x4000">
+			<dataarea name="roml" size="0x4000">
 				<rom name="partner 128" size="0x4000" crc="686a6881" sha1="53d4bcf7aff40f1642bc143626b63beb3c8478dc" offset="0" />
 			</dataarea>
 		</part>

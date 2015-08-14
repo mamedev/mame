@@ -34,42 +34,42 @@
 class c64_state : public driver_device
 {
 public:
-	c64_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, M6510_TAG),
-			m_pla(*this, PLA_TAG),
-			m_vic(*this, MOS6569_TAG),
-			m_sid(*this, MOS6581_TAG),
-			m_cia1(*this, MOS6526_1_TAG),
-			m_cia2(*this, MOS6526_2_TAG),
-			m_iec(*this, CBM_IEC_TAG),
-			m_joy1(*this, CONTROL1_TAG),
-			m_joy2(*this, CONTROL2_TAG),
-			m_exp(*this, C64_EXPANSION_SLOT_TAG),
-			m_user(*this, PET_USER_PORT_TAG),
-			m_ram(*this, RAM_TAG),
-			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-			m_color_ram(*this, "color_ram"),
-			m_row0(*this, "ROW0"),
-			m_row1(*this, "ROW1"),
-			m_row2(*this, "ROW2"),
-			m_row3(*this, "ROW3"),
-			m_row4(*this, "ROW4"),
-			m_row5(*this, "ROW5"),
-			m_row6(*this, "ROW6"),
-			m_row7(*this, "ROW7"),
-			m_lock(*this, "LOCK"),
-			m_loram(1),
-			m_hiram(1),
-			m_charen(1),
-			m_va14(1),
-			m_va15(1),
-			m_restore(1),
-			m_cia1_irq(CLEAR_LINE),
-			m_cia2_irq(CLEAR_LINE),
-			m_vic_irq(CLEAR_LINE),
-			m_exp_irq(CLEAR_LINE),
-			m_exp_nmi(CLEAR_LINE)
+	c64_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, M6510_TAG),
+		m_pla(*this, PLA_TAG),
+		m_vic(*this, MOS6569_TAG),
+		m_sid(*this, MOS6581_TAG),
+		m_cia1(*this, MOS6526_1_TAG),
+		m_cia2(*this, MOS6526_2_TAG),
+		m_iec(*this, CBM_IEC_TAG),
+		m_joy1(*this, CONTROL1_TAG),
+		m_joy2(*this, CONTROL2_TAG),
+		m_exp(*this, C64_EXPANSION_SLOT_TAG),
+		m_user(*this, PET_USER_PORT_TAG),
+		m_ram(*this, RAM_TAG),
+		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		m_color_ram(*this, "color_ram"),
+		m_row0(*this, "ROW0"),
+		m_row1(*this, "ROW1"),
+		m_row2(*this, "ROW2"),
+		m_row3(*this, "ROW3"),
+		m_row4(*this, "ROW4"),
+		m_row5(*this, "ROW5"),
+		m_row6(*this, "ROW6"),
+		m_row7(*this, "ROW7"),
+		m_lock(*this, "LOCK"),
+		m_loram(1),
+		m_hiram(1),
+		m_charen(1),
+		m_va14(1),
+		m_va15(1),
+		m_restore(1),
+		m_cia1_irq(CLEAR_LINE),
+		m_cia2_irq(CLEAR_LINE),
+		m_vic_irq(CLEAR_LINE),
+		m_exp_irq(CLEAR_LINE),
+		m_exp_nmi(CLEAR_LINE)
 	{ }
 
 	// ROM
@@ -121,6 +121,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( cia1_irq_w );
 	DECLARE_READ8_MEMBER( cia1_pa_r );
+	DECLARE_WRITE8_MEMBER( cia1_pa_w );
 	DECLARE_READ8_MEMBER( cia1_pb_r );
 	DECLARE_WRITE8_MEMBER( cia1_pb_w );
 

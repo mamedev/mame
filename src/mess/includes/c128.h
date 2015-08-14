@@ -171,6 +171,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cia1_cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( cia1_sp_w );
 	DECLARE_READ8_MEMBER( cia1_pa_r );
+	DECLARE_WRITE8_MEMBER( cia1_pa_w );
 	DECLARE_READ8_MEMBER( cia1_pb_r );
 	DECLARE_WRITE8_MEMBER( cia1_pb_w );
 

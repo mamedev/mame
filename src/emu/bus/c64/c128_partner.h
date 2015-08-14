@@ -24,8 +24,8 @@
 // ======================> partner128_t
 
 class partner128_t : public device_t,
-						public device_c64_expansion_card_interface,
-						public device_vcs_control_port_interface
+					 public device_c64_expansion_card_interface
+					 //public device_vcs_control_port_interface
 {
 public:
 	// construction/destruction
@@ -47,9 +47,17 @@ protected:
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw);
 
 	// device_vcs_control_port_interface overrides
+	virtual void vcs_joy_w(UINT8 data);
 
 private:
 	optional_shared_ptr<UINT8> m_ram;
+
+	int m_ram_a12_a7;
+	int m_ls74_cd;
+	int m_ls74_d1;
+	int m_ls74_q1;
+	int m_ls74_q2;
+	int m_joyb2;
 };
 
 
