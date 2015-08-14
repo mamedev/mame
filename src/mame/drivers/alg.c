@@ -36,7 +36,13 @@ class alg_state : public amiga_state
 public:
 	alg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") { }
+		m_laserdisc(*this, "laserdisc"),
+		m_gun1x(*this, "GUN1X"),
+		m_gun1y(*this, "GUN1Y"),
+		m_gun2x(*this, "GUN2X"),
+		m_gun2y(*this, "GUN2Y"),
+		m_triggers(*this, "TRIGGERS")
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
@@ -55,9 +61,15 @@ public:
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(UINT16 data);
+	int get_lightgun_pos(int player, int *x, int *y);
 
 private:
 	required_device<sony_ldp1450_device> m_laserdisc;
+	required_ioport m_gun1x;
+	required_ioport m_gun1y;
+	optional_ioport m_gun2x;
+	optional_ioport m_gun2y;
+	optional_ioport m_triggers;
 
 	UINT16 m_input_select;
 };
@@ -72,12 +84,12 @@ private:
  *
  *************************************/
 
-static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
+int alg_state::get_lightgun_pos(int player, int *x, int *y)
 {
-	const rectangle &visarea = screen.visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
-	int xpos = screen.ioport((player == 0) ? "GUN1X" : "GUN2X")->read_safe(0xffffffff);
-	int ypos = screen.ioport((player == 0) ? "GUN1Y" : "GUN2Y")->read_safe(0xffffffff);
+	int xpos = (player == 0) ? m_gun1x->read() : (m_gun2x ? m_gun2x->read() : 0xffffffff);
+	int ypos = (player == 0) ? m_gun1y->read() : (m_gun2y ? m_gun2y->read() : 0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
@@ -128,7 +140,7 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(*m_screen, m_input_select, &x, &y);
+	get_lightgun_pos(m_input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
@@ -136,14 +148,14 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 CUSTOM_INPUT_MEMBER(alg_state::lightgun_trigger_r)
 {
 	/* read the trigger control based on the input select */
-	return (ioport("TRIGGERS")->read() >> m_input_select) & 1;
+	return (m_triggers->read() >> m_input_select) & 1;
 }
 
 
 CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
 {
 	/* read the holster control based on the input select */
-	return (ioport("TRIGGERS")->read() >> (2 + m_input_select)) & 1;
+	return (m_triggers->read() >> (2 + m_input_select)) & 1;
 }
 
 
