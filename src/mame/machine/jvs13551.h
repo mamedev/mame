@@ -56,6 +56,7 @@ protected:
 
 private:
 	const char *port_tag[12];
+	ioport_port *port[12];
 	UINT16 coin_counter[2];
 };
 
