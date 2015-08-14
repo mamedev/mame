@@ -33,23 +33,6 @@ WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
 	coin_counter_w(machine(), 1, data & 2);
 }
 
-WRITE8_MEMBER(crimfght_state::crimfght_sh_irqtrigger_w)
-{
-	soundlatch_byte_w(space, offset, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-WRITE8_MEMBER(crimfght_state::crimfght_snd_bankswitch_w)
-{
-	/* b1: bank for channel A */
-	/* b0: bank for channel B */
-
-	int bank_A = BIT(data, 1);
-	int bank_B = BIT(data, 0);
-
-	m_k007232->set_bank(bank_A, bank_B );
-}
-
 READ8_MEMBER(crimfght_state::k052109_051960_r)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
@@ -75,11 +58,35 @@ WRITE8_MEMBER(crimfght_state::k052109_051960_w)
 		m_k051960->k051960_w(space, offset - 0x3c00, data);
 }
 
-/********************************************/
+WRITE8_MEMBER(crimfght_state::sound_w)
+{
+	// writing the latch asserts the irq line
+	soundlatch_write(0, data);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+}
+
+READ8_MEMBER( crimfght_state::datain_r )
+{
+	// reading the latch clears the irq
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return soundlatch_read(0);
+}
+
+WRITE8_MEMBER(crimfght_state::ym2151_ct_w)
+{
+	// ne output from the 007232 is connected to a ls399 which
+	// has inputs connected to the ct1 and ct2 outputs from
+	// the ym2151 used to select the bank
+
+	int bank_a = BIT(data, 1);
+	int bank_b = BIT(data, 0);
+
+	m_k007232->set_bank(bank_a, bank_b);
+}
 
 static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1")                        /* banked RAM */
-	AM_RANGE(0x0400, 0x1fff) AM_RAM                             /* RAM */
+	AM_RANGE(0x0400, 0x1fff) AM_RAM
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P1")
 	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P2")
@@ -88,19 +95,20 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x3f85, 0x3f85) AM_READ_PORT("P3")
 	AM_RANGE(0x3f86, 0x3f86) AM_READ_PORT("P4")
 	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f88, 0x3f88) AM_READ(watchdog_reset_r) AM_WRITE(crimfght_coin_w)    /* watchdog reset */
-	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)             /* cause interrupt on audio CPU? */
+	AM_RANGE(0x3f88, 0x3f88) AM_MIRROR(0x03) AM_READ(watchdog_reset_r) AM_WRITE(crimfght_coin_w) // 051550
+	AM_RANGE(0x3f8c, 0x3f8c) AM_MIRROR(0x03) AM_WRITE(sound_w)
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)   /* video RAM + sprite RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")                        /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+// full memory map derived from schematics
 static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8, crimfght_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                 /* ROM 821l01.h4 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                                 /* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)       /* YM2151 */
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)                     /* soundlatch_byte_r */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)    /* 007232 registers */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
+	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(datain_r)
+	AM_RANGE(0xe000, 0xe00f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -111,48 +119,64 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( crimfght )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/99 Credits" )
-	PORT_DIPUNUSED_DIPLOC( 0xf0, 0xf0, "SW1:5,6,7,8" ) /* Manual says these are unused */
+	PORT_DIPNAME(0x0f, 0x0f, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(   0x02, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x05, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x08, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x04, DEF_STR( 3C_2C ))
+	PORT_DIPSETTING(   0x01, DEF_STR( 4C_3C ))
+	PORT_DIPSETTING(   0x0f, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x03, DEF_STR( 3C_4C ))
+	PORT_DIPSETTING(   0x07, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(   0x0e, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x06, DEF_STR( 2C_5C ))
+	PORT_DIPSETTING(   0x0d, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(   0x0b, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(   0x0a, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(   0x09, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(   0x00, "Void")
+	PORT_DIPNAME(0xf0, 0x00, "Coin B (unused)") PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(   0x20, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x50, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x40, DEF_STR( 3C_2C ))
+	PORT_DIPSETTING(   0x10, DEF_STR( 4C_3C ))
+	PORT_DIPSETTING(   0xf0, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x30, DEF_STR( 3C_4C ))
+	PORT_DIPSETTING(   0x70, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(   0xe0, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x60, DEF_STR( 2C_5C ))
+	PORT_DIPSETTING(   0xd0, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0xc0, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(   0xb0, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(   0xa0, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(   0x90, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(   0x00, "Void")
 
 	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Manual says these are unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" ) /* Manual says these are unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" ) /* Manual says these are unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" ) /* Manual says these are unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" ) /* Manual says these are unused */
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPNAME(0x60, 0x40, DEF_STR( Difficulty ))  PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(   0x60, DEF_STR( Easy ))
+	PORT_DIPSETTING(   0x40, DEF_STR( Normal ))
+	PORT_DIPSETTING(   0x20, DEF_STR( Difficult ))
+	PORT_DIPSETTING(   0x00, DEF_STR( Very_Difficult ))
+	PORT_DIPNAME(0x80, 0x00, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(   0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" ) /* Manual says these are unused */
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" ) /* Manual says these are unused */
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME(0x01, 0x01, DEF_STR( Flip_Screen )) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_DIPUNUSED_DIPLOC(0x02, IP_ACTIVE_LOW, "SW3:2")
+	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, IP_ACTIVE_LOW, "SW3:4")
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, 0)
 
 	PORT_START("P1")
 	KONAMI8_B12_UNK(1)
@@ -167,14 +191,14 @@ static INPUT_PORTS_START( crimfght )
 	KONAMI8_B12_UNK(4)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crimfghtj )
@@ -234,8 +258,11 @@ void crimfght_state::machine_start()
 
 WRITE8_MEMBER( crimfght_state::banking_callback )
 {
+	membank("bank2")->set_entry(data & 0x0f);
+
 	/* bit 5 = select work RAM or palette */
-	if (data & 0x20)
+	m_woco = BIT(data, 5);
+	if (m_woco)
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), m_palette.target()));
@@ -245,9 +272,22 @@ WRITE8_MEMBER( crimfght_state::banking_callback )
 		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");                             /* RAM */
 
 	/* bit 6 = enable char ROM reading through the video RAM */
-	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_rmrd = BIT(data, 6);
+	m_k052109->set_rmrd_line(m_rmrd ? ASSERT_LINE : CLEAR_LINE);
 
-	membank("bank2")->set_entry(data & 0x0f);
+	m_init = BIT(data, 7);
+}
+
+CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
+{
+	UINT8 data = 0;
+
+	data |= 1 << 4; // VCC
+	data |= m_woco << 5;
+	data |= m_rmrd << 6;
+	data |= m_init << 7;
+
+	return data >> 4;
 }
 
 static MACHINE_CONFIG_START( crimfght, crimfght_state )
@@ -286,7 +326,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified on pcb */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(crimfght_state,crimfght_snd_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(crimfght_state, ym2151_ct_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
