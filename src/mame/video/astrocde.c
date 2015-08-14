@@ -24,7 +24,6 @@ void astrocde_state::machine_start()
 	save_item(NAME(m_port_2_last));
 	save_item(NAME(m_ram_write_enable));
 	save_item(NAME(m_input_select));
-	save_item(NAME(m_profpac_bank));
 
 	m_port_1_last = m_port_2_last = 0xff;
 }

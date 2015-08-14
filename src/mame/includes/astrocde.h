@@ -5,6 +5,7 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
+#include "machine/bankdev.h"
 #include "sound/astrocde.h"
 #include "sound/samples.h"
 #include "sound/votrax.h"
@@ -38,10 +39,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
 		m_screen(*this, "screen"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_user1(*this, "user1"),
-		m_user2(*this, "user2"),
+		m_bank4000(*this, "bank4000"),
+		m_bank8000(*this, "bank8000"),
 		m_p1handle(*this, "P1HANDLE"),
 		m_p2handle(*this, "P2HANDLE"),
 		m_p3handle(*this, "P3HANDLE"),
@@ -66,10 +65,8 @@ public:
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_protected_ram;
 	required_device<screen_device> m_screen;
-	optional_memory_bank m_bank1;
-	optional_memory_bank m_bank2;
-	optional_memory_region m_user1;
-	optional_memory_region m_user2;
+	optional_device<address_map_bank_device> m_bank4000;
+	optional_memory_bank m_bank8000;
 	optional_ioport m_p1handle;
 	optional_ioport m_p2handle;
 	optional_ioport m_p3handle;
@@ -97,7 +94,6 @@ public:
 	UINT8 m_port_2_last;
 	UINT8 m_ram_write_enable;
 	UINT8 m_input_select;
-	UINT8 m_profpac_bank;
 	UINT8 *m_sparklestar;
 	UINT8 m_interrupt_enabl;
 	UINT8 m_interrupt_vector;
@@ -151,6 +147,7 @@ public:
 	DECLARE_READ8_MEMBER(profpac_io_1_r);
 	DECLARE_READ8_MEMBER(profpac_io_2_r);
 	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
+	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
 	DECLARE_READ8_MEMBER(demndrgn_io_r);
 	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
 	DECLARE_WRITE8_MEMBER(tenpindx_sound_w);
@@ -186,7 +183,6 @@ public:
 	UINT32 screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
-	void profbank_banksw_restore();
 	inline int mame_vpos_to_astrocade_vpos(int scanline);
 	void init_savestate();
 	void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback);
