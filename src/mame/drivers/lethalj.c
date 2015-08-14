@@ -142,7 +142,6 @@ Pin #11(+) | | R               |
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "includes/lethalj.h"
-#include "machine/ticket.h"
 #include "sound/okim6295.h"
 
 
@@ -162,7 +161,7 @@ Pin #11(+) | | R               |
 
 CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 {
-	int value = ioport("PADDLE")->read();
+	int value = m_paddle->read();
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 
@@ -177,14 +176,14 @@ CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
 	coin_counter_w(machine(), 0, data & 1);
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 1) & 1) << 7);
+	m_ticket->write(space, 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 0) & 1) << 7);
+	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
@@ -194,7 +193,7 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 0) & 1) << 7);
+	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);
