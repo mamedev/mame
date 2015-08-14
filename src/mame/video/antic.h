@@ -389,6 +389,9 @@ private:
 
 	const char *m_gtia_tag;
 	gtia_device  *m_gtia;
+	required_device<cpu_device> m_maincpu;
+	optional_ioport m_djoy_b;
+	optional_ioport m_artifacts;
 
 	UINT32 m_tv_artifacts;
 	int m_render1, m_render2, m_render3;
