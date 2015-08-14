@@ -65,11 +65,11 @@ WRITE8_MEMBER(crimfght_state::sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-READ8_MEMBER( crimfght_state::datain_r )
+IRQ_CALLBACK_MEMBER( crimfght_state::audiocpu_irq_ack )
 {
-	// reading the latch clears the irq
+	// irq ack cycle clears irq via flip-flop u86
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	return soundlatch_read(0);
+	return 0xff;
 }
 
 WRITE8_MEMBER(crimfght_state::ym2151_ct_w)
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(datain_r)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xe00f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 ADDRESS_MAP_END
 
@@ -296,6 +296,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, crimfght_state, audiocpu_irq_ack)
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)

@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
-	DECLARE_READ8_MEMBER(datain_r);
+	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
 	DECLARE_WRITE8_MEMBER(ym2151_ct_w);
 	virtual void machine_start();
 	UINT32 screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
