@@ -150,18 +150,18 @@ INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
+IOPORT_ARRAY_MEMBER(warpwarp_state::portnames) { "SW0", "SW1", "DSW2", "PLACEHOLDER" }; // "IN1" & "IN2" are read separately when offset==3
 
 /* B&W Games I/O */
 READ8_MEMBER(warpwarp_state::geebee_in_r)
 {
 	int res;
-	static const char *const portnames[] = { "SW0", "SW1", "DSW2", "PLACEHOLDER" }; // "IN1" & "IN2" are read separately when offset==3
 
 	offset &= 3;
-	res = ioport(portnames[offset])->read_safe(0);
+	res = m_ports[offset] ? m_ports[offset]->read() : 0;
 	if (offset == 3)
 	{
-		res = ioport((flip_screen() & 1) ? "IN2" : "IN1")->read();  // read player 2 input in cocktail mode
+		res = (flip_screen() & 1) ? m_in2->read() : m_in1->read();  // read player 2 input in cocktail mode
 		if (m_handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -234,13 +234,13 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 /* Read Switch Inputs */
 READ8_MEMBER(warpwarp_state::warpwarp_sw_r)
 {
-	return (ioport("IN0")->read() >> (offset & 7)) & 1;
+	return (m_in0->read() >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
 READ8_MEMBER(warpwarp_state::warpwarp_dsw1_r)
 {
-	return (ioport("DSW1")->read() >> (offset & 7)) & 1;
+	return (m_dsw1->read() >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
@@ -248,7 +248,7 @@ READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
 {
 	int res;
 
-	res = ioport((flip_screen() & 1) ? "VOLIN2" : "VOLIN1")->read();
+	res = (flip_screen() & 1) ?  m_volin2->read() : m_volin1->read();
 	if (m_handle_joystick)
 	{
 		if (res & 1) return 0x0f;
