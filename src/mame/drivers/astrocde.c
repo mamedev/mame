@@ -231,10 +231,11 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
  *
  *************************************/
 
+IOPORT_ARRAY_MEMBER(astrocde_state::trackball_inputs) { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
+
 CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
 {
-	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-	return ioport(names[m_input_select])->read();
+	return m_trackball[m_input_select]->read();
 }
 
 
@@ -261,7 +262,7 @@ READ8_MEMBER(astrocde_state::spacezap_io_r)
 {
 	coin_counter_w(machine(), 0, (offset >> 8) & 1);
 	coin_counter_w(machine(), 1, (offset >> 9) & 1);
-	return ioport("P3HANDLE")->read_safe(0xff);
+	return m_p3handle ? m_p3handle->read() : 0xff;
 }
 
 
@@ -405,15 +406,15 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 	m_profpac_bank = data;
 
 	/* set the main banking */
-	prog_space.install_read_bank(0x4000, 0xbfff, "bank1");
-	membank("bank1")->set_base(memregion("user1")->base() + 0x8000 * bank);
+	prog_space.install_read_bank(0x4000, 0xbfff, m_bank1);
+	m_bank1->set_base(m_user1->base() + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
 		prog_space.install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(astrocde_state::profpac_videoram_r), this));
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && memregion("user2")->base() != NULL)
+	if ((data & 0x80) && m_user2->base() != NULL)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
 		bank = data - 0x80;
@@ -421,8 +422,16 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			prog_space.install_read_bank(0x4000, 0x7fff, "bank2");
-			membank("bank2")->set_base(memregion("user2")->base() + 0x4000 * bank);
+			if (m_bank2)
+			{
+				prog_space.install_read_bank(0x4000, 0x7fff, m_bank2);
+			}
+			else
+			{
+				prog_space.install_read_bank(0x4000, 0x7fff, "bank2");
+				m_bank2.findit();
+			}
+			m_bank2->set_base(m_user2->base() + 0x4000 * bank);
 		}
 		else
 			prog_space.unmap_read(0x4000, 0x7fff);
@@ -456,10 +465,12 @@ READ8_MEMBER(astrocde_state::demndrgn_io_r)
 }
 
 
+IOPORT_ARRAY_MEMBER(astrocde_state::joystick_inputs) { "MOVEX", "MOVEY" };
+
+
 CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)
 {
-	static const char *const names[] = { "MOVEX", "MOVEY" };
-	return ioport(names[m_input_select])->read();
+	return m_joystick[m_input_select]->read();
 }
 
 

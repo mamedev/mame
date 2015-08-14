@@ -37,7 +37,26 @@ public:
 		m_astrocade_sound1(*this, "astrocade1"),
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_user1(*this, "user1"),
+		m_user2(*this, "user2"),
+		m_p1handle(*this, "P1HANDLE"),
+		m_p2handle(*this, "P2HANDLE"),
+		m_p3handle(*this, "P3HANDLE"),
+		m_p4handle(*this, "P4HANDLE"),
+		m_keypad0(*this, "KEYPAD0"),
+		m_keypad1(*this, "KEYPAD1"),
+		m_keypad2(*this, "KEYPAD2"),
+		m_keypad3(*this, "KEYPAD3"),
+		m_p1_knob(*this, "P1_KNOB"),
+		m_p2_knob(*this, "P2_KNOB"),
+		m_p3_knob(*this, "P3_KNOB"),
+		m_p4_knob(*this, "P4_KNOB"),
+		m_trackball(*this, trackball_inputs),
+		m_joystick(*this, joystick_inputs)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -47,6 +66,26 @@ public:
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_protected_ram;
 	required_device<screen_device> m_screen;
+	optional_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+	optional_memory_region m_user1;
+	optional_memory_region m_user2;
+	optional_ioport m_p1handle;
+	optional_ioport m_p2handle;
+	optional_ioport m_p3handle;
+	optional_ioport m_p4handle;
+	optional_ioport m_keypad0;
+	optional_ioport m_keypad1;
+	optional_ioport m_keypad2;
+	optional_ioport m_keypad3;
+	optional_ioport m_p1_knob;
+	optional_ioport m_p2_knob;
+	optional_ioport m_p3_knob;
+	optional_ioport m_p4_knob;
+	DECLARE_IOPORT_ARRAY(trackball_inputs);
+	optional_ioport_array<4> m_trackball;
+	DECLARE_IOPORT_ARRAY(joystick_inputs);
+	optional_ioport_array<2> m_joystick;
 
 	UINT8 m_video_config;
 	UINT8 m_sparkle[4];
