@@ -85,7 +85,7 @@ WRITE8_MEMBER(crimfght_state::ym2151_ct_w)
 }
 
 static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1")                        /* banked RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P1")
@@ -98,8 +98,13 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x3f88, 0x3f88) AM_MIRROR(0x03) AM_READ(watchdog_reset_r) AM_WRITE(crimfght_coin_w) // 051550
 	AM_RANGE(0x3f8c, 0x3f8c) AM_MIRROR(0x03) AM_WRITE(sound_w)
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)   /* video RAM + sprite RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")                        /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")                        /* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x18000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, crimfght_state )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 // full memory map derived from schematics
@@ -250,26 +255,17 @@ WRITE8_MEMBER(crimfght_state::volume_callback)
 
 void crimfght_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank2")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
-	membank("bank2")->set_entry(0);
+	m_rombank->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
+	m_rombank->set_entry(0);
 }
 
 WRITE8_MEMBER( crimfght_state::banking_callback )
 {
-	membank("bank2")->set_entry(data & 0x0f);
+	m_rombank->set_entry(data & 0x0f);
 
 	/* bit 5 = select work RAM or palette */
 	m_woco = BIT(data, 5);
-	if (m_woco)
-	{
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), m_palette.target()));
-		membank("bank3")->set_base(&m_paletteram[0]);
-	}
-	else
-		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");                             /* RAM */
+	m_bank0000->set_bank(m_woco);
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	m_rmrd = BIT(data, 6);
@@ -300,6 +296,13 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
+
+	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(11)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -345,9 +348,8 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( crimfght )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "821l02.f24", 0x10000, 0x18000, CRC(588e7da6) SHA1(285febb3bcca31f82b34af3695a59eafae01cd30) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "821l02.f24", 0x00000, 0x20000, CRC(588e7da6) SHA1(285febb3bcca31f82b34af3695a59eafae01cd30) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
@@ -368,9 +370,8 @@ ROM_START( crimfght )
 ROM_END
 
 ROM_START( crimfghtj )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "821p02.f24", 0x10000, 0x18000, CRC(f33fa2e1) SHA1(00fc9e8250fa51386f3af2fca0f137bec9e1c220) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "821p02.f24", 0x00000, 0x20000, CRC(f33fa2e1) SHA1(00fc9e8250fa51386f3af2fca0f137bec9e1c220) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
@@ -391,9 +392,8 @@ ROM_START( crimfghtj )
 ROM_END
 
 ROM_START( crimfght2 )
-ROM_REGION( 0x28000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "821r02.f24", 0x10000, 0x18000, CRC(4ecdd923) SHA1(78e5260c4bb9b18d7818fb6300d7e1d3a577fb63) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "821r02.f24", 0x00000, 0x20000, CRC(4ecdd923) SHA1(78e5260c4bb9b18d7818fb6300d7e1d3a577fb63) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
