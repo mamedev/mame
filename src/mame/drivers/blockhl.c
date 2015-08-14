@@ -168,7 +168,7 @@ WRITE8_MEMBER( blockhl_state::k052109_051960_w )
 
 WRITE8_MEMBER( blockhl_state::sound_irq_w )
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 
