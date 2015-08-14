@@ -838,7 +838,7 @@ static INPUT_PORTS_START( tntell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
 
 	PORT_START("IN.10")
-	PORT_CONFNAME( 0x1f, 0x01, "Overlay Code" )
+	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" )
 	PORT_CONFSETTING(    0x00, "00 (None)" )
 	PORT_CONFSETTING(    0x01, "01" )
 	PORT_CONFSETTING(    0x02, "02" )
