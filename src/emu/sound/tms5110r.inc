@@ -47,7 +47,7 @@
 	T0280B 0281A = 1979 speak & spell, also == TMS5100, uses old chirp
 	?????? ????? (no decap; likely 'T0280D 0281D') = 1980 speak & spell, 1981 speak & spell compact, changed energy table, otherwise same as above, uses old chirp
 	T0280F 2801A = 1980 speak & math, 1980 speak and read, uses old chirp
-	?????? ????? (no decap; likely 'T0280F 2802') = touch and tell, language translator; uses a unique chirp rom.
+	T0280F 2802  = touch and tell, language translator; uses a unique chirp rom.
 	?????? ????? = TMS5110
 	T0280F 5110A = TMS5110AN2L
 
@@ -318,6 +318,11 @@ struct tms5100_coeffs
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
 		0x00, 0x00, 0x00, 0x00 },
 
+/* Interpolation Table */
+#define TI_INTERP \
+	/* interpolation shift coefficients */\
+	{ 0, 3, 3, 3, 2, 2, 1, 1 }
+
 /* TMS5100/TMC0281:
    (Die revs A, B; 1977?-1981?)
    The TMS5100NL was decapped and imaged by digshadow in April, 2013.
@@ -347,8 +352,7 @@ static const struct tms5100_coeffs T0280B_0281A_coeff =
 	TI_0280_PATENT_LPC
 	},
 	TI_0280_PATENT_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMS5110A/TMC0281D:
@@ -372,8 +376,7 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
 	TI_0280_PATENT_LPC
 	},
 	TI_0280_PATENT_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMC0280/CD2801:
@@ -408,8 +411,7 @@ static const struct tms5100_coeffs T0280F_2801A_coeff =
 	TI_2801_2501E_LPC
 	},
 	TI_2801_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* Mitsubishi M58817
@@ -432,8 +434,7 @@ static const struct tms5100_coeffs M58817_coeff =
 	TI_2801_2501E_LPC
 	},
 	TI_2801_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* CD2802:
@@ -457,8 +458,7 @@ static const struct tms5100_coeffs T0280F_2802_coeff =
 	TI_2802_LPC
 	},
 	TI_2802_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMS5110A:
@@ -489,8 +489,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	TI_5110_5220_LPC
 	},
 	TI_LATER_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* The following coefficients come from US Patent 4,335,277 and 4,581,757.
@@ -545,8 +544,7 @@ static const struct tms5100_coeffs pat4335277_coeff =
 		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
 	},
 	TI_0280_PATENT_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMS5200/CD2501E
@@ -588,8 +586,7 @@ static const struct tms5100_coeffs T0285_2501E_coeff =
 	TI_2801_2501E_LPC
 	},
 	TI_LATER_CHIRP
-	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 1, 1 }
+	TI_INTERP
 };
 
 /* TMS5220/5220C:
@@ -617,8 +614,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 	TI_5110_5220_LPC
 	},
 	TI_LATER_CHIRP
-	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 1, 1 }
+	TI_INTERP
 };
 
 /* The following Sanyo VLM5030 coefficients are derived from decaps of the chip

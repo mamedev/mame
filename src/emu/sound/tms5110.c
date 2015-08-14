@@ -92,8 +92,6 @@ static INT16 clip_analog(INT16 cliptemp);
 /* *****debugging defines***** */
 #undef VERBOSE
 // above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
-#undef DEBUG_DUMP_INPUT_DATA
-// above dumps the data input to the tms51xx to stdout, useful for making logged data dumps for real hardware tests
 #undef DEBUG_PARSE_FRAME_DUMP
 // above dumps each frame to stderr: be sure to select one of the options below if you define it!
 #undef DEBUG_PARSE_FRAME_DUMP_BIN
@@ -886,7 +884,7 @@ void tms5110_device::PDC_set(int data)
 
 				case TMS5110_CMD_SPKSLOW:
 #ifdef DEBUG_COMMAND_DUMP
-					fprintf(stderr,"SPKSLOW (todo: this isn't implemented right yet)\n");
+					fprintf(stderr,"SPKSLOW\n");
 #endif
 					perform_dummy_read();
 					m_speaking_now = 1;
