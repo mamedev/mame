@@ -103,6 +103,7 @@ private:
 	z80_device *cpu;
 	emu_timer *timer;
 	mie_jvs_device *jvs;
+	ioport_port *gpio_port[8];
 
 	UINT32 tbuf[TBUF_SIZE];
 	UINT32 control, lreg, jvs_rpos;

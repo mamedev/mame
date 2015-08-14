@@ -79,6 +79,10 @@ UINT8 sega_837_13551::comm_method_version()
 void sega_837_13551::device_start()
 {
 	jvs_device::device_start();
+	for (int i = 0; i < ARRAY_LENGTH(port_tag); i++)
+	{
+		port[i] = ioport(port_tag[i]);
+	}
 	save_item(NAME(coin_counter));
 }
 
@@ -140,9 +144,9 @@ bool sega_837_13551::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_
 	if(count_players > 2 || bytes_per_switch > 2)
 		return false;
 
-	*buf++ = ioport(port_tag[0])->read_safe(0);
+	*buf++ = port[0] ? port[0]->read() : 0;
 	for(int i=0; i<count_players; i++) {
-		UINT32 val = ioport(port_tag[1+i])->read_safe(0);
+		UINT32 val = port[1+i] ? port[1+i]->read() : 0;
 		for(int j=0; j<bytes_per_switch; j++)
 			*buf++ = val >> ((1-j) << 3);
 	}
@@ -155,7 +159,7 @@ bool sega_837_13551::analogs(UINT8 *&buf, UINT8 count)
 	if(count > 8)
 		return false;
 	for(int i=0; i<count; i++) {
-		UINT16 val = ioport(port_tag[3+i])->read_safe(0x8000);
+		UINT16 val = port[3+i] ? port[3+i]->read() : 0x8000;
 		*buf++ = val >> 8;
 		*buf++ = val;
 	}
@@ -170,7 +174,10 @@ bool sega_837_13551::swoutputs(UINT8 count, const UINT8 *vals)
 		return false;
 	jvs_outputs = vals[0] & 0xfc;
 	logerror("837-13551: output %02x\n", jvs_outputs);
-	ioport(port_tag[11])->write_safe(jvs_outputs, 0xfc);
+	if (port[11])
+	{
+		port[11]->write(jvs_outputs, 0xfc);
+	}
 	return true;
 }
 
@@ -178,7 +185,7 @@ bool sega_837_13551::swoutputs(UINT8 id, UINT8 val)
 {
 	if(id > 6)
 		return false;
-	handle_output(port_tag[11], id, val);
+	handle_output(port[11], id, val);
 	logerror("837-13551: output %d, %d\n", id, val);
 	return true;
 }

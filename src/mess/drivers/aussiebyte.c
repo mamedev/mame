@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio2", z80sio0_device, rxa_w))
 
 	MCFG_WD2797_ADD("fdc", XTAL_16MHz / 16)

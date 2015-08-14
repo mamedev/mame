@@ -94,6 +94,7 @@ private:
 	int extract_bits(int count);
 	void request_bits(int no);
 	void perform_dummy_read();
+	INT32 lattice_filter();
 	void process(INT16 *buffer, unsigned int size);
 	void PDC_set(int data);
 	void parse_frame();
@@ -108,8 +109,7 @@ private:
 	UINT8 m_PDC;
 	UINT8 m_CTL_pins;
 	UINT8 m_speaking_now;
-
-
+	// UINT8 m_talk_status is a protected member, see above
 	UINT8 m_state;
 
 	/* Rom interface */
@@ -131,31 +131,66 @@ private:
 	devcb_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
 
 	/* these contain data describing the current and previous voice frames */
-	UINT16 m_old_energy;
-	UINT16 m_old_pitch;
-	INT32 m_old_k[10];
+#define OLD_FRAME_SILENCE_FLAG m_OLDE // 1 if E=0, 0 otherwise.
+#define OLD_FRAME_UNVOICED_FLAG m_OLDP // 1 if P=0 (unvoiced), 0 if voiced
+	UINT8 m_OLDE;
+	UINT8 m_OLDP;
 
-	UINT16 m_new_energy;
-	UINT16 m_new_pitch;
-	INT32 m_new_k[10];
+#define NEW_FRAME_STOP_FLAG (m_new_frame_energy_idx == 0xF) // 1 if this is a stop (Energy = 0xF) frame
+#define NEW_FRAME_SILENCE_FLAG (m_new_frame_energy_idx == 0) // ditto as above
+#define NEW_FRAME_UNVOICED_FLAG (m_new_frame_pitch_idx == 0) // ditto as above
+	UINT8 m_new_frame_energy_idx;
+	UINT8 m_new_frame_pitch_idx;
+	UINT8 m_new_frame_k_idx[10];
 
 
 	/* these are all used to contain the current state of the sound generation */
-	UINT16 m_current_energy;
-	UINT16 m_current_pitch;
+#ifndef PERFECT_INTERPOLATION_HACK
+	INT16 m_current_energy;
+	INT16 m_current_pitch;
+	INT16 m_current_k[10];
+
+	INT16 m_target_energy;
+	INT16 m_target_pitch;
+	INT16 m_target_k[10];
+#else
+	UINT8 m_old_frame_energy_idx;
+	UINT8 m_old_frame_pitch_idx;
+	UINT8 m_old_frame_k_idx[10];
+
+	INT32 m_current_energy;
+	INT32 m_current_pitch;
 	INT32 m_current_k[10];
 
-	UINT16 m_target_energy;
-	UINT16 m_target_pitch;
+	INT32 m_target_energy;
+	INT32 m_target_pitch;
 	INT32 m_target_k[10];
+#endif
 
-	UINT8 m_interp_count;       /* number of interp periods (0-7) */
-	UINT8 m_sample_count;       /* sample number within interp (0-24) */
-	INT32 m_pitch_count;
+	UINT16 m_previous_energy; /* needed for lattice filter to match patent */
 
-	INT32 m_x[11];
+	UINT8 m_subcycle;         /* contains the current subcycle for a given PC: 0 is A' (only used on SPKSLOW mode on 51xx), 1 is A, 2 is B */
+	UINT8 m_subc_reload;      /* contains 1 for normal speech, 0 when SPKSLOW is active */
+	UINT8 m_PC;               /* current parameter counter (what param is being interpolated), ranges from 0 to 12 */
+	/* TODO/NOTE: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
+	UINT8 m_IP;               /* the current interpolation period */
+	UINT8 m_inhibit;          /* If 1, interpolation is inhibited until the DIV1 period */
+	UINT16 m_pitch_count;     /* pitch counter; provides chirp rom address */
+
+	INT32 m_u[11];
+	INT32 m_x[10];
 
 	INT32 m_RNG;  /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+	INT16 m_excitation_data;
+
+	/* The TMS51xx has two different ways of providing output data: the
+	   analog speaker pins (which were usually used) and the Digital I/O pin.
+	   The internal DAC used to feed the analog pins is only 8 bits, and has the
+	   funny clipping/clamping logic, while the digital pin gives full 10 bit
+	   resolution of the output data.
+	   TODO: add a way to set/reset this other than the FORCE_DIGITAL define
+	 */
+	UINT8 m_digital_select;
 
 	INT32 m_speech_rom_bitnum;
 

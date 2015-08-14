@@ -19,6 +19,18 @@
 	#define PSTANDALONE (0)
 #endif
 
+#define PHAS_INT128 (0)
+
+#ifndef PHAS_INT128
+#define PHAS_INT128 (0)
+#endif
+
+#if (PHAS_INT128)
+typedef __uint128_t UINT128;
+typedef __int128_t INT128;
+#endif
+
+
 #if !(PSTANDALONE)
 #include "osdcore.h"
 #include "eminline.h"

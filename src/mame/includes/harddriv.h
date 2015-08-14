@@ -59,6 +59,8 @@ public:
 	optional_device<dac_device> m_ds3dac2;
 	optional_device<harddriv_sound_board_device> m_harddriv_sound;
 	optional_device<atari_jsa_base_device> m_jsa;
+	optional_device<screen_device> m_screen;
+	optional_device<mc68681_device> m_duartn68681;
 
 	UINT8                   m_hd34010_host_access;
 	UINT8                   m_dsk_pio_access;
@@ -105,6 +107,12 @@ public:
 	optional_shared_ptr<UINT16> m_gsp_control_hi;
 	optional_shared_ptr<UINT16> m_gsp_paletteram_lo;
 	optional_shared_ptr<UINT16> m_gsp_paletteram_hi;
+
+	required_ioport m_in0;
+	optional_ioport m_sw1;
+	required_ioport m_a80000;
+	optional_ioport_array<8> m_8badc;
+	optional_ioport_array<4> m_12badc;
 
 	/* machine state */
 	UINT8                   m_irq_state;
@@ -525,7 +533,6 @@ class racedriv_board_device_state :  public harddriv_state
 {
 public:
 	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_WRITE_LINE_MEMBER(tx_a);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;

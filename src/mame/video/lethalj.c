@@ -24,13 +24,20 @@
 
 inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
 {
-	static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 	const rectangle &visarea = m_screen->visible_area();
 	int width = visarea.width();
 	int height = visarea.height();
 
-	*x = ((ioport(gunnames[player * 2])->read_safe(0x00) & 0xff) * width) / 255;
-	*y = ((ioport(gunnames[1 + player * 2])->read_safe(0x00) & 0xff) * height) / 255;
+	if (player)
+	{
+		*x = (((m_light1_x ? m_light1_x->read() : 0) & 0xff) * width) / 255;
+		*y = (((m_light1_y ? m_light1_y->read() : 0) & 0xff) * height) / 255;
+	}
+	else
+	{
+		*x = (((m_light0_x ? m_light0_x->read() : 0) & 0xff) * width) / 255;
+		*y = (((m_light0_y ? m_light0_y->read() : 0) & 0xff) * height) / 255;
+	}
 }
 
 

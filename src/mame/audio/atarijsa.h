@@ -200,6 +200,7 @@ protected:
 	// devices
 	optional_device<pokey_device> m_pokey;
 	optional_device<tms5220_device> m_tms5220;
+	required_ioport m_jsai;
 
 	// internal state
 	double              m_pokey_volume;
@@ -222,6 +223,8 @@ protected:
 	// device level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
+
+	required_ioport m_jsaii;
 };
 
 
@@ -245,6 +248,8 @@ protected:
 	// device level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
+
+	required_ioport m_jsaiii;
 };
 
 

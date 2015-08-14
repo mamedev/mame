@@ -39,6 +39,7 @@ enum dac_registers {
 	PAN
 };
 
+class micro3d_sound_device;
 
 class micro3d_state : public driver_device
 {
@@ -58,6 +59,14 @@ public:
 		m_vgb(*this, "vgb"),
 		m_palette(*this, "palette"),
 		m_duart68681(*this, "duart68681"),
+		m_noise_1(*this, "noise_1"),
+		m_noise_2(*this, "noise_2"),
+		m_vertex(*this, "vertex"),
+		m_sound_sw(*this, "SOUND_SW"),
+		m_volume(*this, "VOLUME"),
+		m_joystick_x(*this, "JOYSTICK_X"),
+		m_joystick_y(*this, "JOYSTICK_Y"),
+		m_throttle(*this, "THROTTLE"),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
 		m_sprite_vram(*this, "sprite_vram") { }
@@ -69,6 +78,15 @@ public:
 	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
 	required_device<mc68681_device> m_duart68681;
+	required_device<micro3d_sound_device> m_noise_1;
+	required_device<micro3d_sound_device> m_noise_2;
+	required_memory_region m_vertex;
+
+	required_ioport m_sound_sw;
+	required_ioport m_volume;
+	optional_ioport m_joystick_x;
+	optional_ioport m_joystick_y;
+	optional_ioport m_throttle;
 
 	required_shared_ptr<UINT16> m_shared_ram;
 	UINT8               m_m68681_tx0;

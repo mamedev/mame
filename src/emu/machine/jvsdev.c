@@ -244,7 +244,7 @@ bool jvs_device::swoutputs(UINT8 id, UINT8 val)
 	return false;
 }
 
-void jvs_device::handle_output(const char *tag, UINT8 id, UINT8 val)
+void jvs_device::handle_output(ioport_port *port, UINT8 id, UINT8 val)
 {
 	UINT32 m = 1 << id;
 	switch(val) {
@@ -253,5 +253,8 @@ void jvs_device::handle_output(const char *tag, UINT8 id, UINT8 val)
 	case 2: jvs_outputs ^=  m;  break;
 	}
 
-	machine().root_device().ioport(tag)->write_safe(jvs_outputs, m);
+	if (port)
+	{
+		port->write(jvs_outputs, m);
+	}
 }

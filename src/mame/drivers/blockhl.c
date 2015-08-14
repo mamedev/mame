@@ -14,9 +14,6 @@
 		- How is the sound irq cleared (currently using HOLD_LINE)?
 		- Do bit 2 and 7 of the bankswitch port have any meaning?
 		- Use raw screen parameters
-		- When entering a highscore, some letters will appear partially behind
-		  the blocks. Driver problem or original game bug?
-		- Verify exact XTAL values
 
 *******************************************************************************/
 
@@ -170,7 +167,7 @@ WRITE8_MEMBER( blockhl_state::k052109_051960_w )
 
 WRITE8_MEMBER( blockhl_state::sound_irq_w )
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 
@@ -277,7 +274,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)     // Konami custom 052526
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)     // Konami 052526
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blockhl_state,  blockhl_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(blockhl_state, banking_callback))
@@ -289,7 +286,7 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	// video hardware
@@ -316,7 +313,7 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END

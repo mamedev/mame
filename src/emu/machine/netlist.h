@@ -143,13 +143,13 @@ protected:
 	//virtual void device_debug_setup();
 	virtual void device_clock_changed();
 
-	UINT32              m_div;
+	netlist::netlist_time m_div;
 
 private:
 	void save_state();
 
 	/* timing support here - so sound can hijack it ... */
-	UINT32              m_rem;
+	netlist::netlist_time        m_rem;
 	netlist::netlist_time        m_old;
 
 	netlist_mame_t *    m_netlist;

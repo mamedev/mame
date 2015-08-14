@@ -196,7 +196,7 @@ public:
 
 	protected:
 
-		void verror(pstring msg, int line_num, pstring line)
+		void verror(const pstring &msg, int line_num, const pstring &line)
 		{
 			m_convert.out("%s (line %d): %s\n", msg.cstr(), line_num, line.cstr());
 		}

@@ -963,11 +963,11 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 
 	    bit     description
 
-	    PA0     COL0, JOY B0
-	    PA1     COL1, JOY B1
-	    PA2     COL2, JOY B2
-	    PA3     COL3, JOY B3
-	    PA4     COL4, BTNB
+	    PA0     COL0, JOYB0
+	    PA1     COL1, JOYB1
+	    PA2     COL2, JOYB2
+	    PA3     COL3, JOYB3
+	    PA4     COL4, FBTNB
 	    PA5     COL5
 	    PA6     COL6
 	    PA7     COL7
@@ -1005,20 +1005,40 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 	return data;
 }
 
+WRITE8_MEMBER( c128_state::cia1_pa_w )
+{
+	/*
+
+	    bit     description
+
+	    PA0     COL0, JOYB0
+	    PA1     COL1, JOYB1
+	    PA2     COL2, JOYB2
+	    PA3     COL3, JOYB3
+	    PA4     COL4, FBTNB
+	    PA5     COL5
+	    PA6     COL6
+	    PA7     COL7
+
+	*/
+
+	m_joy2->joy_w(data & 0x1f);
+}
+
 READ8_MEMBER( c128_state::cia1_pb_r )
 {
 	/*
 
 	    bit     description
 
-	    PB0     JOY A0
-	    PB1     JOY A1
-	    PB2     JOY A2
-	    PB3     JOY A3
-	    PB4     BTNA/_LP
-	    PB5
-	    PB6
-	    PB7
+	    PB0     ROW0, JOYA0
+	    PB1     ROW1, JOYA1
+	    PB2     ROW2, JOYA2
+	    PB3     ROW3, JOYA3
+	    PB4     ROW4, FBTNA, _LP
+	    PB5     ROW5
+	    PB6     ROW6
+	    PB7     ROW7
 
 	*/
 
@@ -1055,16 +1075,18 @@ WRITE8_MEMBER( c128_state::cia1_pb_w )
 
 	    bit     description
 
-	    PB0     ROW0
-	    PB1     ROW1
-	    PB2     ROW2
-	    PB3     ROW3
-	    PB4     ROW4
+	    PB0     ROW0, JOYA0
+	    PB1     ROW1, JOYA1
+	    PB2     ROW2, JOYA2
+	    PB3     ROW3, JOYA3
+	    PB4     ROW4, FBTNA, _LP
 	    PB5     ROW5
 	    PB6     ROW6
 	    PB7     ROW7
 
 	*/
+
+	m_joy1->joy_w(data & 0x1f);
 
 	m_vic->lp_w(BIT(data, 4));
 }
@@ -1487,6 +1509,7 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(c128_state, cia1_cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(c128_state, cia1_sp_w))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c128_state, cia1_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pa_w))
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c128_state, cia1_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pb_w))
 	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL_14_31818MHz*2/3.5/8)
@@ -1659,6 +1682,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(c128_state, cia1_cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(c128_state, cia1_sp_w))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c128_state, cia1_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pa_w))
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c128_state, cia1_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pb_w))
 	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL_17_734472MHz*2/4.5/8)

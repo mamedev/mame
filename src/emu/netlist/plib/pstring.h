@@ -379,7 +379,137 @@ private:
 
 };
 
-class pformat
+template <typename T>
+struct ptype_treats
+{
+};
+
+template<>
+struct ptype_treats<char>
+{
+	typedef short cast_type;
+	static const bool is_signed = true;
+	static const char *size_specifier() { return "h"; }
+};
+
+template<>
+struct ptype_treats<short>
+{
+	typedef short cast_type;
+	static const bool is_signed = true;
+	static const char *size_specifier() { return "h"; }
+};
+
+template<>
+struct ptype_treats<int>
+{
+	typedef int cast_type;
+	static const bool is_signed = true;
+	static const char *size_specifier() { return ""; }
+};
+
+template<>
+struct ptype_treats<long>
+{
+	typedef long cast_type;
+	static const bool is_signed = true;
+	static const char *size_specifier() { return "l"; }
+};
+
+template<>
+struct ptype_treats<long long>
+{
+	typedef long long cast_type;
+	static const bool is_signed = true;
+	static const char *size_specifier() { return "ll"; }
+};
+
+template<>
+struct ptype_treats<unsigned char>
+{
+	typedef unsigned short cast_type;
+	static const bool is_signed = false;
+	static const char *size_specifier() { return "h"; }
+};
+
+template<>
+struct ptype_treats<unsigned short>
+{
+	typedef unsigned short cast_type;
+	static const bool is_signed = false;
+	static const char *size_specifier() { return "h"; }
+};
+
+template<>
+struct ptype_treats<unsigned int>
+{
+	typedef unsigned int cast_type;
+	static const bool is_signed = false;
+	static const char *size_specifier() { return ""; }
+};
+
+template<>
+struct ptype_treats<unsigned long>
+{
+	typedef unsigned long cast_type;
+	static const bool is_signed = false;
+	static const char *size_specifier() { return "l"; }
+};
+
+template<>
+struct ptype_treats<unsigned long long>
+{
+	typedef unsigned long long cast_type;
+	static const bool is_signed = false;
+	static const char *size_specifier() { return "ll"; }
+};
+
+template <typename P>
+class pformat_base
+{
+public:
+
+	virtual ~pformat_base() { }
+
+	P &operator ()(const double x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this); }
+	P &          e(const double x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
+	P &          f(const double x, const char *f = "") { format_element(f, "", "f", x); return static_cast<P &>(*this);  }
+
+	P &operator ()(const char *x, const char *f = "") { format_element(f, "", "s", x); return static_cast<P &>(*this);  }
+	P &operator ()(const void *x, const char *f = "") { format_element(f, "", "p", x); return static_cast<P &>(*this);  }
+	P &operator ()(const pstring &x, const char *f = "") { format_element(f, "", "s", x.cstr() ); return static_cast<P &>(*this);  }
+
+	template<typename T>
+	P &operator ()(const T x, const char *f = "")
+	{
+		if (ptype_treats<T>::is_signed)
+			format_element(f, ptype_treats<T>::size_specifier(), "d", (typename ptype_treats<T>::cast_type) x);
+		else
+			format_element(f, ptype_treats<T>::size_specifier(), "u", (typename ptype_treats<T>::cast_type) x);
+		return static_cast<P &>(*this);
+	}
+
+	template<typename T>
+	P &x(const T x, const char *f = "")
+	{
+		format_element(f, ptype_treats<T>::size_specifier(), "x", x);
+		return static_cast<P &>(*this);
+	}
+
+	template<typename T>
+	P &o(const T x, const char *f = "")
+	{
+		format_element(f, ptype_treats<T>::size_specifier(), "o", x);
+		return static_cast<P &>(*this);
+	}
+
+protected:
+
+	virtual void format_element(const char *f, const char *l, const char *fmt_spec, ...) = 0;
+
+};
+
+class pformat : public pformat_base<pformat>
 {
 public:
 	pformat(const pstring &fmt);
@@ -389,41 +519,15 @@ public:
 
 	const char *cstr() { return m_str; }
 
-	pformat &operator ()(const INT64 x, const char *f = "") { return update(f, I64FMT "d", x);  }
-	pformat &operator ()(const UINT64 x, const char *f = "") { return update(f, I64FMT "u", x);  }
 
-	pformat &x 		    (const INT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
-	pformat &x          (const UINT64 x, const char *f = "") { return update(f, I64FMT "x", x);  }
-
-	pformat &operator ()(const INT32 x, const char *f = "") { return update(f, "d", x);  }
-	pformat &operator ()(const UINT32 x, const char *f = "") { return update(f, "u", x);  }
-
-	pformat &x 		    (const INT32 x, const char *f = "") { return update(f, "x", x);  }
-	pformat &x          (const UINT32 x, const char *f = "") { return update(f, "x", x);  }
-
-	pformat &operator ()(const INT16 x, const char *f = "") { return update(f, "hd", x);  }
-	pformat &operator ()(const UINT16 x, const char *f = "") { return update(f, "hu", x);  }
-
-#if !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(EMSCRIPTEN)
-	pformat &operator ()(const std::size_t x, const char *f = "") { return update(f, SIZETFMT, x);  }
-#endif
-	pformat &operator ()(const double x, const char *f = "") { return update(f, "g", x);  }
-	pformat &          e(const double x, const char *f = "") { return update(f, "e", x);  }
-	pformat &          f(const double x, const char *f = "") { return update(f, "f", x);  }
-
-	pformat &operator ()(const char *x, const char *f = "") { return update(f, "s", x);  }
-	pformat &operator ()(const void *x, const char *f = "") { return update(f, "p", x);  }
-	pformat &operator ()(const pstring &x, const char *f = "") { return update(f, "s", x.cstr() );  }
+protected:
+	void format_element(const char *f, const char *l, const char *fmt_spec, ...);
 
 private:
-
-	pformat &update(const char *f, const char *l, ...);
 
 	char m_str[2048];
 	unsigned m_arg;
 };
-//const type_t vprintf(va_list args) const;
-//static const type_t sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 
 
 #endif /* _PSTRING_H_ */

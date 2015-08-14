@@ -629,6 +629,7 @@ atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char
 	: atari_jsa_base_device(mconfig, ATARI_JSA_I, "Atari JSA I Sound Board", tag, owner, clock, "atjsa1", 2),
 		m_pokey(*this, "pokey"),
 		m_tms5220(*this, "tms"),
+		m_jsai(*this, "JSAI"),
 		m_pokey_volume(1.0),
 		m_tms5220_volume(1.0)
 {
@@ -653,7 +654,7 @@ READ8_MEMBER( atari_jsa_i_device::rdio_r )
 	//  0x01 = coin 1
 	//
 
-	UINT8 result = ioport("JSAI")->read();
+	UINT8 result = m_jsai->read();
 	if (!m_test_read_cb())
 		result ^= 0x80;
 	if (m_tms5220 != NULL && m_tms5220->readyq_r() == 0)
@@ -841,6 +842,7 @@ void atari_jsa_i_device::update_all_volumes()
 
 atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_II, "Atari JSA II Sound Board", tag, owner, clock, "atjsa2", 1)
+	, m_jsaii(*this, "JSAII")
 {
 }
 
@@ -863,7 +865,7 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 	//  0x01 = coin 1
 	//
 
-	UINT8 result = ioport("JSAII")->read();
+	UINT8 result = m_jsaii->read();
 	if (!m_test_read_cb())
 		result ^= 0x80;
 
@@ -904,11 +906,13 @@ ioport_constructor atari_jsa_ii_device::device_input_ports() const
 
 atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_III, "Atari JSA III Sound Board", tag, owner, clock, "atjsa3", 1)
+	, m_jsaiii(*this, "JSAIII")
 {
 }
 
 atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels)
 	: atari_jsa_oki_base_device(mconfig, devtype, name, tag, owner, clock, shortname, channels)
+	, m_jsaiii(*this, "JSAIII")
 {
 }
 
@@ -931,7 +935,7 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 	//  0x01 = coin R (active high)
 	//
 
-	UINT8 result = ioport("JSAIII")->read();
+	UINT8 result = m_jsaiii->read();
 	if (!m_test_read_cb())
 		result ^= 0x90;
 	return result;

@@ -47,22 +47,6 @@ K051960_CB_MEMBER(crimfght_state::sprite_callback)
 
 /***************************************************************************
 
-    Start the video hardware emulation.
-
-***************************************************************************/
-
-void crimfght_state::video_start()
-{
-	m_paletteram.resize(0x400);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-
-	save_item(NAME(m_paletteram));
-}
-
-
-
-/***************************************************************************
-
   Display refresh
 
 ***************************************************************************/
