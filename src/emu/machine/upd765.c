@@ -2187,12 +2187,12 @@ std::string upd765_family_device::tts(attotime t)
 {
 	char buf[256];
 	const char *sign = "";
-	if(t.seconds < 0) {
+	if(t.seconds() < 0) {
 		t = attotime::zero-t;
 		sign = "-";
 	}
-	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 	return buf;
 }
 

@@ -850,7 +850,7 @@ void running_machine::base_datetime(system_time &systime)
 
 void running_machine::current_datetime(system_time &systime)
 {
-	systime.set(m_base_time + this->time().seconds);
+	systime.set(m_base_time + this->time().seconds());
 }
 
 

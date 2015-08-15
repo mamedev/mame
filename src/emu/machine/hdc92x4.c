@@ -1892,8 +1892,8 @@ void hdc92x4_device::write_sectors()
 std::string hdc92x4_device::tts(const attotime &t)
 {
 	char buf[256];
-	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 	return buf;
 }
 
@@ -3558,7 +3558,7 @@ bool hdc92x4_device::read_one_bit(const attotime &limit)
 	// value < 100: big trouble for controller, will fail
 	if (UNRELIABLE_MEDIA)
 	{
-		if ((machine().time().attoseconds % 1009)==0) bit = 0;
+		if ((machine().time().attoseconds() % 1009)==0) bit = 0;
 	}
 
 	// Push into shift register

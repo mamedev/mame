@@ -1597,7 +1597,7 @@ static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	(*io) = (state->m_parallel_drum.rotation_timer->elapsed() *
-		(ATTOSECONDS_PER_SECOND / (PARALLEL_DRUM_WORD_TIME.as_attoseconds()))).seconds & 0007777;
+		(ATTOSECONDS_PER_SECOND / (PARALLEL_DRUM_WORD_TIME.as_attoseconds()))).seconds() & 0007777;
 
 	/* set parity error and timing error... */
 }

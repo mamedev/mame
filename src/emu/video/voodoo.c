@@ -2095,8 +2095,8 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 			v->pci.op_end_time = v->device->machine().time() + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				v->device->machine().time().seconds, (UINT32)(v->device->machine().time().attoseconds >> 32), (UINT32)v->device->machine().time().attoseconds,
-				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
+				v->device->machine().time().seconds(), (UINT32)(v->device->machine().time().attoseconds() >> 32), (UINT32)v->device->machine().time().attoseconds(),
+				v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 		}
 	}
 }
@@ -2585,7 +2585,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 				if (v->reg[hSync].u != 0 && v->reg[vSync].u != 0 && v->reg[videoDimensions].u != 0)
 				{
 					int hvis, vvis, htotal, vtotal, hbp, vbp;
-					attoseconds_t refresh = v->screen->frame_period().attoseconds;
+					attoseconds_t refresh = v->screen->frame_period().attoseconds();
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
@@ -3569,8 +3569,8 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 	if (!v->pci.op_pending) fatalerror("flush_fifos called with no pending operation\n");
 
 	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos start -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
-		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
-		current_time.seconds, (UINT32)(current_time.attoseconds >> 32), (UINT32)current_time.attoseconds);
+		v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds(),
+		current_time.seconds(), (UINT32)(current_time.attoseconds() >> 32), (UINT32)current_time.attoseconds());
 
 	/* loop while we still have cycles to burn */
 	while (v->pci.op_end_time <= current_time)
@@ -3667,12 +3667,12 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 		v->pci.op_end_time += attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:update -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
-			v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
-			current_time.seconds, (UINT32)(current_time.attoseconds >> 32), (UINT32)current_time.attoseconds);
+			v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds(),
+			current_time.seconds(), (UINT32)(current_time.attoseconds() >> 32), (UINT32)current_time.attoseconds());
 	}
 
 	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos end -- pending command complete at %d.%08X%08X\n", v->index,
-		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
+		v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 
 	in_flush = FALSE;
 }
@@ -3782,8 +3782,8 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 			v->pci.op_end_time = machine().time() + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				machine().time().seconds, (UINT32)(machine().time().attoseconds >> 32), (UINT32)machine().time().attoseconds,
-				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
+				machine().time().seconds(), (UINT32)(machine().time().attoseconds() >> 32), (UINT32)machine().time().attoseconds(),
+				v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 		}
 		g_profiler.stop();
 		return;

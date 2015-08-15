@@ -1251,7 +1251,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 				strcatprintf(str, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 						visarea.width(), visarea.height(),
 						(machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds));
+						ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
 			}
 		}
 	}
@@ -2084,8 +2084,8 @@ static INT32 slider_refresh(running_machine &machine, void *arg, std::string *st
 		screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3ffps", ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds));
-	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds);
+		strprintf(*str,"%.3ffps", ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds()));
+	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds());
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }
 

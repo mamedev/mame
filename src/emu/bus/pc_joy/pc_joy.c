@@ -21,7 +21,7 @@ pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, dev
 
 READ8_MEMBER ( pc_joy_device::joy_port_r )
 {
-	int delta = ((machine().time() - m_stime) * 256 * 1000).seconds;
+	int delta = ((machine().time() - m_stime) * 256 * 1000).seconds();
 
 	if(!m_dev)
 		return 0xf0;

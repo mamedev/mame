@@ -244,7 +244,7 @@ void ef9345_device::set_video_mode(void)
 		rectangle visarea = m_screen->visible_area();
 		visarea.max_x = new_width - 1;
 
-		m_screen->configure(new_width, m_screen->height(), visarea, m_screen->frame_period().attoseconds);
+		m_screen->configure(new_width, m_screen->height(), visarea, m_screen->frame_period().attoseconds());
 	}
 
 	//border color

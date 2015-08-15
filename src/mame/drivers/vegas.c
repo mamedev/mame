@@ -1172,7 +1172,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (scale != 0)
 					m_timer[which]->adjust(TIMER_PERIOD * scale, which);
-				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ((TIMER_PERIOD * (m_nile_regs[offset + 1] + 1)).attoseconds));
+				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ((TIMER_PERIOD * (m_nile_regs[offset + 1] + 1)).attoseconds()));
 			}
 
 			/* timer disabled? */

@@ -266,7 +266,7 @@ READ8_MEMBER(cinemat_state::qb3_frame_r)
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
-	int percent = next_update.attoseconds / (frame_period.attoseconds / 100);
+	int percent = next_update.attoseconds() / (frame_period.attoseconds() / 100);
 
 	/* note this is just an approximation... */
 	return (percent >= 10);

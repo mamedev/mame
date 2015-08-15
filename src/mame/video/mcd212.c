@@ -518,7 +518,7 @@ void mcd212_device::update_visible_area()
 {
 	const rectangle &visarea = m_screen->visible_area();
 	rectangle visarea1;
-	attoseconds_t period = m_screen->frame_period().attoseconds;
+	attoseconds_t period = m_screen->frame_period().attoseconds();
 	int width = 0;
 
 	if((m_channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (m_channel[0].csrw & MCD212_CSR1W_ST))

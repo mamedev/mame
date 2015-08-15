@@ -1064,7 +1064,7 @@ void snes_state::snes_init_ram()
 	SNES_CPU_REG(WRIO) = 0xff;
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59)
+	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59)
 		m_ppu->m_beam.current_vert = SNES_VTOTAL_NTSC;
 	else
 		m_ppu->m_beam.current_vert = SNES_VTOTAL_PAL;
@@ -1137,7 +1137,7 @@ void snes_state::machine_reset()
 	}
 
 	/* Set STAT78 to NTSC or PAL */
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59.0)
+	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59.0)
 		m_ppu->m_stat78 = SNES_NTSC;
 	else /* if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) == 50.0f) */
 		m_ppu->m_stat78 = SNES_PAL;

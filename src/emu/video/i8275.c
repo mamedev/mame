@@ -666,7 +666,7 @@ void i8275_device::recompute_parameters()
 
 	int horiz_pix_total = (CHARACTERS_PER_ROW + HRTC_COUNT) * m_hpixels_per_column;
 	int vert_pix_total = (CHARACTER_ROWS_PER_FRAME + VRTC_ROW_COUNT) * SCANLINES_PER_ROW;
-	attoseconds_t refresh = m_screen->frame_period().attoseconds;
+	attoseconds_t refresh = m_screen->frame_period().attoseconds();
 	int max_visible_x = (CHARACTERS_PER_ROW * m_hpixels_per_column) - 1;
 	int max_visible_y = (CHARACTER_ROWS_PER_FRAME * SCANLINES_PER_ROW) - 1;
 
