@@ -20,7 +20,7 @@ const device_type MSX_CART_MOONSOUND = &device_creator<msx_cart_moonsound>;
 
 
 msx_cart_moonsound::msx_cart_moonsound(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSX_CART_MOONSOUND, "MSX Cartridge - MoonSound", tag, owner, clock, "msx_cart_moonsound", __FILE__)
+	: device_t(mconfig, MSX_CART_MOONSOUND, "MSX Cartridge - MoonSound", tag, owner, clock, "msx_moonsound", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_ymf278b(*this, "ymf278b")
 {
