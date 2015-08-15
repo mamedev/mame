@@ -67,4 +67,18 @@ private:
 	ui_software_info *m_uiinfo;
 };
 
+class ui_mewui_bios_selection : public ui_menu
+{
+public:
+	ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<std::string> partname, std::vector<std::string> partdesc, ui_software_info *ui_info);
+	virtual ~ui_mewui_bios_selection();
+	virtual void populate();
+	virtual void handle();
+
+private:
+
+	std::vector<std::string> m_bios;
+	ui_software_info *m_uiinfo;
+};
+
 #endif /* __MEWUI_SELSOFT_H__ */
