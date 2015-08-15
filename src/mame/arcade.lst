@@ -6144,10 +6144,11 @@ ragtimea        // MBD (c) 1992 (Japan, v1.3)
 dblewing        // MBE (c) 1993 Mitchell
 fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
 fghthista       // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
-fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
+fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0396-0 PCB
 fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
+fghthistub      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
+fghthistuc      // MBF (c) 1993 Data East Corporation (US)    DE-0380-2 PCB
 fghthistj       // MBF (c) 1993 Data East Corporation (Japan) DE-0395-1 PCB
-fghthistub      // MBF (c) 1993 Data East Corporation (US)    DE-0380-2 PCB
 fghthistja      // MBF (c) 1993 Data East Corporation (Japan) DE-0380-2 PCB
 fghthistjb      // MBF (c) 1993 Data East Corporation (Japan) DE-0380-1 PCB
 hvysmsh         // MBG (c) 1993 Data East Corporation (World)
