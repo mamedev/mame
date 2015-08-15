@@ -16,16 +16,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
-
 #include "sound/2151intf.h"
 #include "includes/konamipt.h"
 #include "includes/crimfght.h"
 
-INTERRUPT_GEN_MEMBER(crimfght_state::crimfght_interrupt)
-{
-	if (m_k051960->k051960_is_irq_enabled())
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-}
 
 WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
 {
@@ -291,7 +285,6 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(crimfght_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crimfght_state,  crimfght_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(crimfght_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
@@ -307,10 +300,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17)             /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8-2, (64-12)*8-3, 2*8, 30*8-1 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 416, 256, 16, 240) // measured 59.17
 	MCFG_SCREEN_UPDATE_DRIVER(crimfght_state, screen_update_crimfght)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -324,7 +314,9 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(crimfght_state, sprite_callback)
+	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
