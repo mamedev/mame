@@ -128,12 +128,17 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(NULL),
+	m_screen_tag(NULL),
+	m_irq_handler(*this),
+	m_firq_handler(*this),
+	m_nmi_handler(*this),
 	m_romoffset(0),
 	m_spriteflip(0),
 	m_readroms(0),
 	m_irq_enabled(0),
 	m_nmi_enabled(0),
-	m_k051937_counter(0)
+	m_k051937_counter(0),
+	m_vblank(0)
 {
 }
 
@@ -161,11 +166,32 @@ void k051960_device::set_plane_order(device_t &device, int order)
 }
 
 //-------------------------------------------------
+//  set_screen_tag - set screen we are attached to
+//-------------------------------------------------
+
+void k051960_device::set_screen_tag(device_t &device, device_t *owner, const char *tag)
+{
+	k051960_device &dev = dynamic_cast<k051960_device &>(device);
+	dev.m_screen_tag = tag;
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void k051960_device::device_start()
 {
+	if (m_screen_tag != NULL)
+	{
+		// make sure our screen is started
+		screen_device *screen = m_owner->subdevice<screen_device>(m_screen_tag);
+		if (!screen->started())
+			throw device_missing_dependencies();
+
+		// and register a callback for vblank state
+		screen->register_vblank_callback(vblank_state_delegate(FUNC(k051960_device::vblank_callback), this));
+	}
+
 	m_sprite_rom = region()->base();
 	m_sprite_size = region()->bytes();
 
@@ -180,6 +206,12 @@ void k051960_device::device_start()
 	// bind callbacks
 	m_k051960_cb.bind_relative_to(*owner());
 
+	// resolve callbacks
+	m_irq_handler.resolve_safe();
+	m_firq_handler.resolve_safe();
+	m_nmi_handler.resolve_safe();
+
+	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_spriteflip));
 	save_item(NAME(m_readroms));
@@ -187,8 +219,8 @@ void k051960_device::device_start()
 	save_pointer(NAME(m_ram), 0x400);
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_nmi_enabled));
-
 	save_item(NAME(m_k051937_counter));
+	save_item(NAME(m_vblank));
 }
 
 //-------------------------------------------------
@@ -214,6 +246,17 @@ void k051960_device::device_reset()
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
+
+void k051960_device::update_irq()
+{
+	m_irq_handler(m_irq_enabled && m_vblank ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void k051960_device::vblank_callback(screen_device &screen, bool state)
+{
+	m_vblank = state;
+	update_irq();
+}
 
 int k051960_device::k051960_fetchromdata( int byte )
 {
@@ -274,6 +317,7 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 
 		/* bit 0 is IRQ enable */
 		m_irq_enabled = data & 0x01;
+		update_irq();
 
 		/* bit 1: probably FIRQ enable */
 
