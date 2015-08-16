@@ -71,7 +71,7 @@ private:
 class ui_mewui_bios_selection : public ui_menu
 {
 public:
-	ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<std::string> biosname, void *driver, bool software);
+	ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<std::string> biosname, void *driver, bool software, bool inlist);
 	virtual ~ui_mewui_bios_selection();
 	virtual void populate();
 	virtual void handle();
@@ -81,7 +81,7 @@ private:
 
 	std::vector<std::string> m_bios;
 	void *driver;
-	bool software;
+	bool software, inlist;
 };
 
 #endif /* __MEWUI_SELSOFT_H__ */

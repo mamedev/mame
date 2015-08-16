@@ -490,35 +490,6 @@ void ui_menu_select_software::build_software_list()
 			}
 		}
 	}
-
-	// no software found? start directly the driver
-	if (m_swlist.size() == 1)
-	{
-		std::vector<std::string> biosname;
-		const game_driver *driver = m_swlist[0].driver;
-		int bios_count = 0;
-		for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-			if (ROMENTRY_ISSYSTEM_BIOS(rom))
-			{
-				std::string name(ROM_GETHASHDATA(rom));
-				biosname.push_back(name);
-				bios_count++;
-			}
-
-		if (bios_count > 1)
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false)));
-		else
-		{
-			reselect_last::driver.assign(m_swlist[0].driver->name);
-			reselect_last::software.clear();
-			reselect_last::swlist.clear();
-			mewui_globals::force_reselect_software = true;
-			machine().manager().schedule_new_driver(*m_swlist[0].driver);
-			machine().schedule_hard_reset();
-			ui_menu::stack_reset(machine());
-		}
-	}
-
 	m_displaylist.resize(m_swlist.size() + 1);
 
 	// retrieve and set the long name of software for parents
@@ -826,7 +797,7 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 			}
 
 		if (bios_count > 1)
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false, true)));
 		else
 		{
 			reselect_last::driver.assign(ui_swinfo->driver->name);
@@ -1260,11 +1231,12 @@ void ui_mewui_software_parts::custom_render(void *selectedref, float top, float 
 //  ctor
 //-------------------------------------------------
 
-ui_mewui_bios_selection::ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<std::string> biosname, void *_driver, bool _software) : ui_menu(machine, container)
+ui_mewui_bios_selection::ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<std::string> biosname, void *_driver, bool _software, bool _inlist) : ui_menu(machine, container)
 {
 	m_bios = biosname;
 	driver = _driver;
 	software = _software;
+	inlist = _inlist;
 }
 
 //-------------------------------------------------
@@ -1302,9 +1274,13 @@ void ui_mewui_bios_selection::handle()
 			{
 				const game_driver *s_driver = (const game_driver *)driver;
 				reselect_last::driver.assign(s_driver->name);
-				reselect_last::software.clear();
+				if (inlist)
+					reselect_last::software.assign("[Start empty]");
+				else
+					reselect_last::software.clear();
 				reselect_last::swlist.clear();
 				std::string error;
+				mewui_globals::force_reselect_software = true;
 				machine().options().set_value("bios", (int)idx, OPTION_PRIORITY_CMDLINE, error);
 				machine().manager().schedule_new_driver(*s_driver);
 				machine().schedule_hard_reset();
