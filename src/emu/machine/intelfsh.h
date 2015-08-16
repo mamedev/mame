@@ -90,6 +90,9 @@
 #define MCFG_SST_39VF400A_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SST_39VF400A, 0)
 
+#define MCFG_TMS_29F040_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, TMS_29F040, 0)
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -126,6 +129,7 @@ public:
 		FLASH_SANYO_LE26FV10N1TS,
 		FLASH_SST_28SF040,
 		FLASH_SST_39VF020,
+		FLASH_TMS_29F040,
 
 		// 16-bit variants
 		FLASH_SHARP_LH28F400 = 0x1000,
@@ -163,6 +167,7 @@ protected:
 	UINT32                  m_type;
 	INT32                   m_size;
 	UINT8                   m_bits;
+	UINT32                  m_addrmask;
 	UINT16                  m_device_id;
 	UINT8                   m_maker_id;
 	bool                    m_sector_is_4k;
@@ -338,6 +343,12 @@ public:
 	sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class tms_29f040_device : public intelfsh8_device
+{
+public:
+	tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 // 16-bit variants
 class sharp_lh28f400_device : public intelfsh16_device
 {
@@ -398,6 +409,7 @@ extern const device_type FUJITSU_29DL16X;
 extern const device_type INTEL_E28F400B;
 extern const device_type MACRONIX_29L001MC;
 extern const device_type MACRONIX_29LV160TMC;
+extern const device_type TMS_29F040;
 
 extern const device_type PANASONIC_MN63F805MNP;
 extern const device_type SANYO_LE26FV10N1TS;

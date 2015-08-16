@@ -3429,6 +3429,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jankenmn.c",
 	MAME_DIR .. "src/mame/drivers/jokrwild.c",
 	MAME_DIR .. "src/mame/drivers/jongkyo.c",
+	MAME_DIR .. "src/mame/drivers/joystand.c",
 	MAME_DIR .. "src/mame/drivers/jubilee.c",
 	MAME_DIR .. "src/mame/drivers/kas89.c",
 	MAME_DIR .. "src/mame/drivers/kingpin.c",

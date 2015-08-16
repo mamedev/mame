@@ -38,6 +38,8 @@
 #include "cpu/powerpc/ppc.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
+#include "machine/nvram.h"
+#include "machine/eepromser.h"
 
 class konendev_state : public driver_device
 {
@@ -45,19 +47,26 @@ public:
 	konendev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_gcu(*this, "gcu")
+			m_gcu(*this, "gcu"),
+			m_eeprom(*this, "eeprom")
 	{ }
 
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<k057714_device> m_gcu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 public:
 	DECLARE_DRIVER_INIT(konendev);
+	DECLARE_DRIVER_INIT(enchlamp);
 
 	DECLARE_READ32_MEMBER(mcu2_r);
 	DECLARE_READ32_MEMBER(ifu2_r);
+	DECLARE_READ32_MEMBER(unk_78800004_r);
+	DECLARE_READ32_MEMBER(unk_78a00000_r);
+	DECLARE_READ32_MEMBER(unk_78e00000_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -71,15 +80,23 @@ READ32_MEMBER(konendev_state::mcu2_r)
 {
 	UINT32 r = 0;
 
+	if (ACCESSING_BITS_24_31)
+	{
+		r |= 0x11000000;		// MCU2 version
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		r |= (m_eeprom->do_read() ? 0x2 : 0) << 16;
+	}
 	if (ACCESSING_BITS_8_15)
 	{
 		r &= ~0x4000;		// MCU2 presence
 		r &= ~0x2000;		// IFU2 presence
-		r &= ~0x1000;		// FMU2 presence
+		r &= ~0x1000;		// FMU2 presence	
 	}
-	if (ACCESSING_BITS_24_31)
+	if (ACCESSING_BITS_0_7)
 	{
-		r |= 0x11000000;		// MCU2 version
+		r |= 0x40;			// logic door
 	}
 
 	return r;
@@ -97,14 +114,45 @@ READ32_MEMBER(konendev_state::ifu2_r)
 	return r;
 }
 
+READ32_MEMBER(konendev_state::unk_78800004_r)
+{
+	return 0xffffffff;
+}
+
+READ32_MEMBER(konendev_state::unk_78a00000_r)
+{
+	return 0xffffffff;
+}
+
+READ32_MEMBER(konendev_state::unk_78e00000_r)
+{
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(konendev_state::eeprom_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_eeprom->di_write((data & 0x04) ? 1 : 0);
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
 static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x78000000, 0x78000003) AM_READ(mcu2_r)
+	AM_RANGE(0x78100000, 0x78100003) AM_WRITE(eeprom_w)
 	AM_RANGE(0x78800000, 0x78800003) AM_READ(ifu2_r)
+	AM_RANGE(0x78800004, 0x78800007) AM_READ(unk_78800004_r)
+	AM_RANGE(0x78a00000, 0x78a0001f) AM_READ(unk_78a00000_r)
+	AM_RANGE(0x78e00000, 0x78e00003) AM_READ(unk_78e00000_r)
 //	AM_RANGE(0x78000000, 0x78000003) AM_READNOP
 //	AM_RANGE(0x78100000, 0x7810001b) AM_RAM
 //	AM_RANGE(0x78a00014, 0x78a00017) AM_WRITENOP
 	AM_RANGE(0x79800000, 0x798000ff) AM_DEVREADWRITE("gcu", k057714_device, read, write)
+	AM_RANGE(0x7a000000, 0x7a01ffff) AM_RAM AM_SHARE("nvram0")
+	AM_RANGE(0x7a100000, 0x7a11ffff) AM_RAM AM_SHARE("nvram1")
 	AM_RANGE(0x7e000000, 0x7f7fffff) AM_ROM AM_REGION("flash", 0)
 	AM_RANGE(0x7ff00000, 0x7fffffff) AM_ROM AM_REGION("program", 0)
 ADDRESS_MAP_END
@@ -134,6 +182,11 @@ static MACHINE_CONFIG_START( konendev, konendev_state )
 	MCFG_DEVICE_ADD("gcu", K057714, 0)
 	MCFG_K057714_CPU_TAG("maincpu")
 
+	MCFG_NVRAM_ADD_0FILL("nvram0")
+	MCFG_NVRAM_ADD_0FILL("nvram1")
+
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -152,6 +205,9 @@ ROM_START( enchlamp )
 
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
 	ROM_LOAD( "enl5r211.fmu.bin", 0x0000, 0x1800000, CRC(592c3c7f) SHA1(119b3c6223d656981c399c399d7edccfdbb50dc7) )
+
+	ROM_REGION32_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )			// empty eeprom with Konami header
 ROM_END
 
 
@@ -279,14 +335,25 @@ ROM_START( konzero )
 	ROM_LOAD32_WORD_SWAP( "rmclr_l.bin", 0x00002, 0x080000, CRC(2806299c) SHA1(a069f4477b310f99ff1ff48f622dc30862589127) )
 
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
+
+	ROM_REGION32_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )			// empty eeprom with Konami header
 ROM_END
 
 DRIVER_INIT_MEMBER(konendev_state,konendev)
 {
 }
 
+DRIVER_INIT_MEMBER(konendev_state,enchlamp)
+{
+	UINT32 *rom = (UINT32*)memregion("program")->base();
+	rom[0x24/4] = 0x00002743;		// patch flash checksum for now
+
+	rom[0] = 0xd43eb930;				// new checksum for program rom
+}
+
 // has a flash dump?
-GAME( 200?, enchlamp,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Enchanted Lamp (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, enchlamp,   0,        konendev,    konendev, konendev_state,    enchlamp, ROT0,  "Konami", "Enchanted Lamp (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // missing flash but has other interesting files
 GAME( 200?, whiterus,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "White Russia (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

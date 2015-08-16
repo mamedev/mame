@@ -519,6 +519,7 @@ static MACHINE_CONFIG_START( spy, spy_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(spy_state, sprite_callback)
 
 	/* sound hardware */
