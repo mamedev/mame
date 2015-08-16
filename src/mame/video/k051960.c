@@ -137,8 +137,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	m_readroms(0),
 	m_irq_enabled(0),
 	m_nmi_enabled(0),
-	m_k051937_counter(0),
-	m_vblank(0)
+	m_k051937_counter(0)
 {
 }
 
@@ -220,7 +219,6 @@ void k051960_device::device_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_k051937_counter));
-	save_item(NAME(m_vblank));
 }
 
 //-------------------------------------------------
@@ -247,15 +245,10 @@ void k051960_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k051960_device::update_irq()
-{
-	m_irq_handler(m_irq_enabled && m_vblank ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void k051960_device::vblank_callback(screen_device &screen, bool state)
 {
-	m_vblank = state;
-	update_irq();
+	if (state)
+		m_irq_handler(ASSERT_LINE);
 }
 
 int k051960_device::k051960_fetchromdata( int byte )
@@ -317,7 +310,8 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 
 		/* bit 0 is IRQ enable */
 		m_irq_enabled = data & 0x01;
-		update_irq();
+		if (m_irq_enabled)
+			m_irq_handler(CLEAR_LINE);
 
 		/* bit 1: probably FIRQ enable */
 

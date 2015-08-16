@@ -103,9 +103,6 @@ private:
 
 	int      m_k051937_counter;
 
-	int m_vblank;
-	void update_irq();
-
 	int k051960_fetchromdata( int byte );
 };
 
