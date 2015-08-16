@@ -78,6 +78,7 @@ private:
 	UINT16 m_iisr;
 	UINT16 m_scr;
 	UINT16 m_pdir;
+	UINT16 m_pdr;
 
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);
