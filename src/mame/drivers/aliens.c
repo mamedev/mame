@@ -16,11 +16,6 @@ Preliminary driver by:
 #include "includes/konamipt.h"
 #include "includes/aliens.h"
 
-INTERRUPT_GEN_MEMBER(aliens_state::aliens_interrupt)
-{
-	if (m_k051960->k051960_is_irq_enabled())
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-}
 
 WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 {
@@ -196,9 +191,8 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(aliens_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aliens_state, aliens_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(aliens_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
@@ -213,10 +207,9 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17)             /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240) // measured 59.17
+//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
+//	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(aliens_state, screen_update_aliens)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -230,7 +223,9 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(aliens_state, sprite_callback)
+	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
