@@ -223,6 +223,60 @@ Notes:
 
                    PROM.9J     Fujitsu MB7124 compatible with 82S147  Labelled 'LN-00'
 
+
+
+Fighter's History
+Data East, 1993
+
+PCB Layout
+----------
+
+DE-0396-0   DEC-22VO
+|-----------------------------------------------------|
+| TA8205AH  Z80                       MBF-05    2M-8M*|
+|           6164  YM2151              MBF-04       8M*|
+|           LJ02              52*     MBF-03   4M-16M*|
+|     YM3012      32.220MHz           MBF-02      16M*|
+|  JP1   MBF-07   93C45                        4M-16M*|
+|CN2     MBF-06                                   16M*|
+|  M6295(1)                   52*                     |
+|     M6295(2)                                        |
+|      |-----|                       |-----|          |
+|J     | 75  |   153*                | 52  |          |
+|A     |     |             |-----|   |     |          |
+|M     |-----|             | 153 |   |-----|          |
+|M                         |     |            28MHz   |
+|A                         |-----|                    |
+|            PAL*                                     |
+|      99*   KT-00             |-----| 6164    MBF-01 |
+|                              | 74  | 6164           |
+|                              |     |         MBF-00 |
+|      |-----|  |-----|        |-----|                |
+|      | 153 |  | 200 |        |-----| 6164           |
+|      |     |  |     |        | 141 | 6164           |
+|      |-----|  |-----|        |     |  VE-01A        |
+|TEST_SW                       |-----|  VE-00 |-----| |
+|                                             | 101 | |
+|  CN4      LH52250  LH52250   LJ01-3         |     | |
+|  CN3*     LH52250  LH52250   LJ00-3         |-----| |
+|-----------------------------------------------------|
+
+This PCB is very close to the DE-397-0 listed above
+
+       Custom ICs-
+                   DE #            Package Type      Additional #'s (for reference of scratched-off chips on other PCB's)
+                   ------------------------------------------------------------------------------------------------------
+                   101 (CPU)       100 Pin PQFP      9321EV 301811
+                   141             160 Pin PQFP      24220F008
+                   74              160 Pin PQFP      24220F009
+                   52              128 Pin PQFP      9313EV 211771 VC5259-0001
+                   153 (x2)        144 Pin PQFP      L7A0888 9312
+                   75              100 Pin PQFP      L7A0680 9143
+                   200             100 Pin PQFP      JAPAN 9315PP002  (chip is darker black)
+
+NOTE: There are several unpopulated locations (denoted by *) for additional rom chips
+      or more custom ICs.
+
 ***************************************************************************/
 
 #include "emu.h"
