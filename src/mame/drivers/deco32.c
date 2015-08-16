@@ -309,8 +309,6 @@ WRITE32_MEMBER(deco32_state::sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-
-
 void deco32_state::deco32_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
 {
 	soundlatch_byte_w(space,0,data & 0xff);
@@ -357,7 +355,9 @@ WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 	}
 }
 
+
 /**********************************************************************************/
+
 
 READ32_MEMBER(dragngun_state::service_r)
 {
@@ -373,7 +373,6 @@ READ32_MEMBER(dragngun_state::lockload_gun_mirror_r)
 		return ioport("IN4")->read() | ((machine().rand()%0xff)<<16);
 	return ioport("IN3")->read() | ioport("LIGHT0_X")->read() | (ioport("LIGHT0_X")->read()<<16) | (ioport("LIGHT0_X")->read()<<24); //((machine().rand()%0xff)<<16);
 }
-
 
 READ32_MEMBER(dragngun_state::lightgun_r)
 {
@@ -411,8 +410,8 @@ WRITE32_MEMBER(dragngun_state::eeprom_w)
 	logerror("%s:Write control 1 %08x %08x\n",machine().describe_context(),offset,data);
 }
 
-/**********************************************************************************/
 
+/**********************************************************************************/
 
 
 WRITE32_MEMBER(deco32_state::tattass_control_w)
@@ -545,13 +544,14 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 	//logerror("%08x: %08x data\n",data,mem_mask);
 }
 
+
 /**********************************************************************************/
+
 
 UINT16 deco32_state::port_b_nslasher(int unused)
 {
 	return (m_eeprom->do_read());
 }
-
 
 void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
 {
@@ -574,9 +574,6 @@ void deco32_state::tattass_sound_cb( address_space &space, UINT16 data, UINT16 m
 	m_decobsmt->bsmt_comms_w(space, 0, soundcommand);
 }
 
-
-
-
 WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -590,9 +587,8 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 }
 
 
-
-
 /**********************************************************************************/
+
 
 READ32_MEMBER(deco32_state::spriteram_r)
 {
@@ -769,7 +765,6 @@ static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(fghthist_protection_region_0_146_r, fghthist_protection_region_0_146_w) AM_SHARE("prot32ram") // only maps on 16-bits
-
 ADDRESS_MAP_END
 
 
@@ -1016,7 +1011,6 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
 
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(nslasher_protection_region_0_104_r, nslasher_protection_region_0_104_w, 0xffff0000)
 	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff) // seems to be debug switches / code activated by this?
-
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -2351,7 +2345,6 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, nslasher_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2383,13 +2376,7 @@ static MACHINE_CONFIG_DERIVED( nslasheru, nslasher )
 	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_nslasher )
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
-
 MACHINE_CONFIG_END
-
-
-
-
-
 
 
 /**********************************************************************************/
@@ -2916,8 +2903,8 @@ ROM_END
 
 ROM_START( fghthist ) /* DE-0380-2 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_WORD( "kx00-unknown.1f", 0x000000, 0x80000, CRC(fe5eaba1) SHA1(c8a3784af487a1bbd2150abf4b1c8f3ad33da8a4) ) /* Version 43-07, Overseas */
-	ROM_LOAD32_WORD( "kx01-unknown.2f", 0x000002, 0x80000, CRC(3fb8d738) SHA1(2fca7a3ea483f01c97fb28a0adfa6d7980d8236c) )
+	ROM_LOAD32_WORD( "kx00-3.1f", 0x000000, 0x80000, CRC(fe5eaba1) SHA1(c8a3784af487a1bbd2150abf4b1c8f3ad33da8a4) ) /* Version 43-07, Overseas */
+	ROM_LOAD32_WORD( "kx01-3.2f", 0x000002, 0x80000, CRC(3fb8d738) SHA1(2fca7a3ea483f01c97fb28a0adfa6d7980d8236c) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "kx02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
@@ -2955,6 +2942,40 @@ ROM_START( fghthista ) /* DE-0380-2 PCB */
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "kx02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "mbf01-8.9a",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "mbf02-16.16d",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
+	ROM_LOAD16_BYTE( "mbf04-16.18d",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
+	ROM_LOAD16_BYTE( "mbf03-16.17d",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
+	ROM_LOAD16_BYTE( "mbf05-16.19d",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
+
+	ROM_REGION(0x80000, "oki1", 0 )
+	ROM_LOAD( "mbf06.15k",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
+
+	ROM_REGION(0x80000, "oki2", 0 )
+	ROM_LOAD( "mbf07.16k",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
+
+	ROM_REGION(512, "proms", 0 )
+	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+ROM_END
+
+ROM_START( fghthistu ) /* DE-0396-0 PCB */
+	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_WORD( "lj00-3.1f", 0x000000, 0x80000, CRC(17543d60) SHA1(ff206e8552587b41d075b3c99f9ad733f1c2b5e0) ) /* Version 42-09, US */
+	ROM_LOAD32_WORD( "lj01-3.2f", 0x000002, 0x80000, CRC(e255d48f) SHA1(30444832cfed7eeb6082010eb219362adbafb826) )
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "lj02-.17k",  0x00000,  0x10000,  CRC(146a1063) SHA1(d16734c2443bf38add54040b9dd2628ba523638d) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
@@ -3159,40 +3180,6 @@ ROM_START( fghthistjb ) /* DE-0380-1 PCB */
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "kw02-.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mbf01-8.9a",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
-
-	ROM_REGION( 0x800000, "gfx3", 0 ) /* Sprites */
-	ROM_LOAD16_BYTE( "mbf02-16.16d",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
-	ROM_LOAD16_BYTE( "mbf04-16.18d",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
-	ROM_LOAD16_BYTE( "mbf03-16.17d",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
-	ROM_LOAD16_BYTE( "mbf05-16.19d",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
-
-	ROM_REGION(0x80000, "oki1", 0 )
-	ROM_LOAD( "mbf06.15k",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
-
-	ROM_REGION(0x80000, "oki2", 0 )
-	ROM_LOAD( "mbf07.16k",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
-
-	ROM_REGION(512, "proms", 0 )
-	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
-
-	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-ROM_END
-
-ROM_START( fghthistu ) /* DE-0396-0 PCB */
-	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_WORD( "lj00-3.1f", 0x000000, 0x80000, CRC(17543d60) SHA1(ff206e8552587b41d075b3c99f9ad733f1c2b5e0) )
-	ROM_LOAD32_WORD( "lj01-3.2f", 0x000002, 0x80000, CRC(e255d48f) SHA1(30444832cfed7eeb6082010eb219362adbafb826) )
-
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
-	ROM_LOAD( "lj02-.k17",  0x00000,  0x10000,  CRC(146a1063) SHA1(d16734c2443bf38add54040b9dd2628ba523638d) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
@@ -3808,15 +3795,11 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-
 DRIVER_INIT_MEMBER(deco32_state,fghthist)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
-
-
-
 
 DRIVER_INIT_MEMBER(dragngun_state,lockload)
 {
