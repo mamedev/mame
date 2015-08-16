@@ -190,4 +190,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-GAME( 198?, xxx,  0,   xxx,  xxx, driver_device,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", GAME_IS_SKELETON )
+GAME( 198?, xxx,  0,   xxx,  xxx, driver_device,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", MACHINE_IS_SKELETON )
