@@ -464,7 +464,9 @@ public:
 		m_nile_regs(*this, "nile_regs"),
 		m_rombase(*this, "rombase"),
 		m_dcs(*this, "dcs"),
-		m_ioasic(*this, "ioasic") { }
+		m_ioasic(*this, "ioasic"),
+		m_io_analog(*this, "AN")
+	{ }
 
 	required_device<mips3_device> m_maincpu;
 	required_device<m48t37_device> m_timekeeper;
@@ -475,6 +477,7 @@ public:
 	required_shared_ptr<UINT32> m_rombase;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
+	optional_ioport_array<8> m_io_analog;
 
 	UINT16 m_nile_irq_state;
 	UINT16 m_ide_irq_state;
@@ -1442,11 +1445,9 @@ READ32_MEMBER( vegas_state::analog_port_r )
 
 WRITE32_MEMBER( vegas_state::analog_port_w )
 {
-	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", safe_pc(), data);
-	m_pending_analog_read = ioport(portnames[data & 7])->read_safe(0);
+	m_pending_analog_read = m_io_analog[data & 7] ? m_io_analog[data & 7]->read() : 0;
 }
 
 
@@ -1947,28 +1948,28 @@ static INPUT_PORTS_START( warfa )
 	PORT_DIPSETTING(      0x4000, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" )
 
-	PORT_START("AN0")
+	PORT_START("AN.0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")
+	PORT_START("AN.1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")
+	PORT_START("AN.2")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN3")
+	PORT_START("AN.3")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN4")
+	PORT_START("AN.4")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN5")
+	PORT_START("AN.5")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN6")
+	PORT_START("AN.6")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN7")
+	PORT_START("AN.7")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
@@ -1991,28 +1992,28 @@ static INPUT_PORTS_START( roadburn )
 	PORT_DIPSETTING(      0x0200, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" )
 
-	PORT_START("AN0")   /* Steer */
+	PORT_START("AN.0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")   /* Accel */
+	PORT_START("AN.1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")   /* Brake */
+	PORT_START("AN.2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
-	PORT_START("AN3")
+	PORT_START("AN.3")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN4")
+	PORT_START("AN.4")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN5")
+	PORT_START("AN.5")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN6")
+	PORT_START("AN.6")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN7")
+	PORT_START("AN.7")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
@@ -2087,28 +2088,28 @@ static INPUT_PORTS_START( sf2049 )
 	PORT_DIPSETTING(      0x0200, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0300, "VGA Res 640x480" )
 
-	PORT_START("AN0")   /* Steer */
+	PORT_START("AN.0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")   /* Accel */
+	PORT_START("AN.1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")   /* Brake */
+	PORT_START("AN.2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
-	PORT_START("AN3")
+	PORT_START("AN.3")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN4")
+	PORT_START("AN.4")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN5")
+	PORT_START("AN.5")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN6")
+	PORT_START("AN.6")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN7")
+	PORT_START("AN.7")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
@@ -2118,28 +2119,28 @@ static INPUT_PORTS_START( sf2049se )
 
 	PORT_MODIFY("DIPS")
 
-	PORT_START("AN0")   /* Steer */
+	PORT_START("AN.0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")   /* Accel */
+	PORT_START("AN.1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")   /* Brake */
+	PORT_START("AN.2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
-	PORT_START("AN3")
+	PORT_START("AN.3")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN4")
+	PORT_START("AN.4")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN5")
+	PORT_START("AN.5")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN6")
+	PORT_START("AN.6")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN7")
+	PORT_START("AN.7")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
@@ -2149,28 +2150,28 @@ static INPUT_PORTS_START( sf2049te )
 
 	PORT_MODIFY("DIPS")
 
-	PORT_START("AN0")   /* Steer */
+	PORT_START("AN.0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")   /* Accel */
+	PORT_START("AN.1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")   /* Brake */
+	PORT_START("AN.2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
-	PORT_START("AN3")
+	PORT_START("AN.3")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN4")
+	PORT_START("AN.4")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN5")
+	PORT_START("AN.5")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN6")
+	PORT_START("AN.6")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN7")
+	PORT_START("AN.7")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
@@ -2180,28 +2181,28 @@ static INPUT_PORTS_START( cartfury )
 
 	PORT_MODIFY("DIPS")
 
-	PORT_START("AN0")   /* Steer */
+	PORT_START("AN.0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")   /* Accel */
+	PORT_START("AN.1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")   /* Brake */
+	PORT_START("AN.2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
-	PORT_START("AN3")
+	PORT_START("AN.3")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN4")
+	PORT_START("AN.4")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN5")
+	PORT_START("AN.5")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN6")
+	PORT_START("AN.6")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN7")
+	PORT_START("AN.7")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 INPUT_PORTS_END
 
