@@ -963,12 +963,27 @@ void ui_mewui_select_game::inkey_select(const ui_menu_event *menu_event)
 				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_software(machine(), container, driver)));
 			else
 			{
-				reselect_last::driver.assign(driver->name);
-				reselect_last::software.clear();
-				reselect_last::swlist.clear();
-				machine().manager().schedule_new_driver(*driver);
-				machine().schedule_hard_reset();
-				ui_menu::stack_reset(machine());
+				std::vector<std::string> biosname;
+				int bios_count = 0;
+				for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+					if (ROMENTRY_ISSYSTEM_BIOS(rom))
+					{
+						std::string name(ROM_GETHASHDATA(rom));
+						biosname.push_back(name);
+						bios_count++;
+					}
+
+				if (bios_count > 1)
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, menu_event->itemref, false)));
+				else
+				{
+					reselect_last::driver.assign(driver->name);
+					reselect_last::software.clear();
+					reselect_last::swlist.clear();
+					machine().manager().schedule_new_driver(*driver);
+					machine().schedule_hard_reset();
+					ui_menu::stack_reset(machine());
+				}
 			}
 		}
 		// otherwise, display an error

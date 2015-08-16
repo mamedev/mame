@@ -977,3 +977,254 @@ kf2k3upl        // bootleg
 samsh5sp        // 0272 (c) 2004 Playmore
 samsh5sph       // 0272 (c) 2004 Playmore
 samsh5spho      // 0272 (c) 2004 Playmore
+
+// IGS PGM System Games
+pgm             // Base Unit
+orlegend        // (c) 1997 Oriental Legend
+orlegende       //
+orlegendc       //
+orlegendca      //
+orlegend111c    //
+orlegend111t    //
+orlegend105k    //
+drgw2           // (c) 1997 Dragon World 2
+dw2v100x        //
+drgw2c          //
+drgw2j          //
+drgw2hk         //
+drgw3           // (c) 1998 Dragon World 3
+drgw3105        //
+drgw3103        //
+drgw3100        //
+dwex            // (c) 1998 Dragon World 3 EX
+killbld         // (c) 1998 The Killing Blade
+killbld104      //
+kov             // (c) 1999 Knights of Valor
+kov115          //
+kov100          //
+kovplus         // (c) 1999 Knights of Valor Plus (aka 10 Character version)
+kovplusa        //
+kovsgqyz        // bootleg
+kovsgqyza       // bootleg
+kovsgqyzb       // bootleg
+kovsh           // (c) 1999 Knights of Valor Superheroes
+kovsh103        //
+kovsh102        //
+kovsh101        //
+kovsh100        //
+kovqhsgs        // bootleg
+photoy2k        // (c) 1999 Photo Y2k
+photoy2k102     //
+photoy2k104     //
+puzlstar        // (c) 1999 Puzzle Star
+olds            // (c) 1999 Oriental Legend Super / Special
+olds100         //
+olds100a        //
+olds103t        //
+kov2            // (c) 2000 Knights of Valor 2
+kov2106         //
+kov2103         //
+kov2102         //
+kov2101         //
+kov2100         //
+kov2p           // (c) 2000 Knights of Valor 2 Nine Dragons
+kov2p204        //
+kov2p202        //
+ddp2            // (c) 2001 DoDonPachi 2 - Bee Storm
+ddp2101         //
+ddp2100         //
+ddp2hk          //
+ddp2101hk       //
+ddp2100hk       //
+ddp2k           //
+ddp2101k        //
+ddp2100k        //
+ddp2j           //
+ddp2101j        //
+ddp2100j        //
+ddp2t           //
+ddp2101t        //
+ddp2100t        //
+ddp2c           //
+ddp2101c        //
+ddp2100c        //
+puzzli2         // (c) 1999 Puzzli 2
+puzzli2s        // (c) 2001 Puzzli 2 Super
+martmast        // (c) 2001 Martial Masters
+martmastc       //
+martmastc102        //
+theglad         // (c) 2003 The Gladiator
+theglad100      //
+theglad101      //
+thegladpcb      //
+dw2001          // (c) 2001 Dragon World 2001
+dwpc            // (c) 2001 Dragon World Pretty Chance
+py2k2           // (c) 2001 Photo Y2K2
+pgm3in1         // (c) 2004 Photo Y2K2 3-in-1
+dmnfrnt         // (c) 2002 Demon Front
+dmnfrnta        //
+dmnfrntb        //
+dmnfrntpcb      //
+kovshp          // (c) 2004 Knights of Valor Superheroes PLUS
+kovshpa         //
+kovytzy         // (c) 1999 Knights of Valour: Yi Tong Zhong Yuan
+kovshxas        // bootleg
+kovlsqh         // bootleg
+kovlsqh2        // bootleg
+kovlsjb         // bootleg
+kovlsjba        // bootleg
+oldsplus        // (c) 2004 Oriental Legend Super Plus
+killbldp        // (c) 2004 Killing Blade Plus
+happy6          // (c) 2004 Happy 6
+happy6101       //
+svg             // (c) 2003 Spectral vs Generation
+svgtw
+svgpcb          //
+ket             // (c) 2002 Ketsui
+keta            //
+ketb            //
+ddpdoj          // (c) 2002 DoDonPachi Dai-Ou-Jou
+ddpdoja         //
+ddpdojb         //
+ddpdojblk       //
+ddpdojblka      //
+espgal          // (c) 2003 Espgaluda
+
+// Commodore
+kim1      // Commodore (MOS) KIM-1 1975
+sym1      // Synertek SYM-1
+aim65    // Rockwell AIM65
+aim65_40  // Rockwell AIM65/40
+
+pet2001
+pet20018
+pet2001n
+pet2001n16
+pet2001n32
+cbm3008
+cbm3016
+cbm3032
+pet2001b
+pet2001b16
+pet2001b32
+cbm3032b
+pet4016
+pet4032
+pet4032f
+cbm4016
+cbm4032
+cbm4032f
+pet4032b
+cbm4032b
+pet8032
+cbm8032
+cbm8032_de
+cbm8032_se
+superpet
+mmf9000
+mmf9000_se
+cbm8096
+cbm8296
+cbm8296ed
+cbm8296d
+cbm8296d_de
+cbm8296gd
+cbm8296dgv_de
+
+vic1001   // Commodore VIC-1001 (Japan)
+vic20    // Commodore VIC 20 (NTSC)
+vic20p  // Commodore VIC 20 (PAL)
+vic20_se    // Commodore VIC 20 (Swedish Expanson Kit)
+
+vic10      // Commodore Max Machine (Japan)
+c64
+c64p    // Commodore 64 (PAL)
+c64_jp  // Commodore 64 (Japan)
+c64_se  // Commodore 64 (Sweden)
+pet64    // Commodore PET 64
+edu64    // Commodore Educator 64
+//clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer - roms needed - not in driver
+sx64
+sx64p
+vip64    // Commodore VIP64 (SX64, PAL, Swedish)
+dx64    // Commodore DX-64 - Prototype
+tesa6240
+c64c
+c64cp   // Commodore 64C (PAL)
+c64c_es
+c64c_se
+c64g      // Commodore 64G (PAL)
+c64gs    // Commodore 64 Games System
+c64dtv   // Commodore 64 Direct-to-TV
+clcd      // Commodore LCD
+
+b500      // Commodore B500
+b128      // Commodore B128
+b256      // Commodore B256
+cbm610  // Commodore CBM 610
+cbm620  // Commodore CBM 620
+cbm620_hu  // Commodore CBM 620 (Hungary)
+b128hp  // Commodore B128HP
+b256hp  // Commodore B256HP
+bx256hp   // Commodore BX256HP
+cbm710  // Commodore CBM 710
+cbm720  // Commodore CBM 720
+cbm720_de
+cbm720_se  // Commodore CBM 720 (Sweden / Finland)
+cbm730
+p500      // Commodore P500 (proto, a.k.a. C128-40, PET-II)
+p500p
+
+c264
+plus4
+plus4p
+c16
+c16p
+c16_hu
+c116
+c232
+v364
+
+c128
+c128p
+c128_de
+//c128_fr
+//c128_no
+c128_se
+c128d
+c128dp
+c128cr
+c128dcr
+c128dcrp
+c128dcr_de
+//c128dcr_it
+c128dcr_se
+c128d81
+
+a1000       // Commodore Amiga 1000
+a1000n
+a2000       // Commodore Amiga 2000
+a2000n
+a500        // Commodore Amiga 500
+a500n
+cdtv        // Commodore CDTV
+cdtvn
+a3000       // Commodore Amiga 3000
+a3000n
+a500p       // Commodore Amiga 500 Plus
+a500pn
+a600        // Commodore Amiga 600
+a600n
+a1200       // Commodore Amiga 1200
+a1200n
+a4000       // Commodore Amiga 4000/040
+a4000n
+a400030     // Commodore Amiga 4000/030
+a400030n
+cd32        // Commodore Amiga CD32
+cd32n
+a4000t      // Commodore Amiga 4000T
+a4000tn
+
+c65    // 1991 C65 / C64DX (Prototype, NTSC)
+c64dx    // 1991 C65 / C64DX (Prototype, German PAL)

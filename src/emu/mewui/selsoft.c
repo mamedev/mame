@@ -494,14 +494,29 @@ void ui_menu_select_software::build_software_list()
 	// no software found? start directly the driver
 	if (m_swlist.size() == 1)
 	{
-		reselect_last::driver.assign(m_swlist[0].driver->name);
-		reselect_last::software.clear();
-		reselect_last::swlist.clear();
-		mewui_globals::force_reselect_software = true;
-		machine().manager().schedule_new_driver(*m_swlist[0].driver);
-		machine().schedule_hard_reset();
-		ui_menu::stack_reset(machine());
-		return;
+		std::vector<std::string> biosname;
+		const game_driver *driver = m_swlist[0].driver;
+		int bios_count = 0;
+		for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
+			{
+				std::string name(ROM_GETHASHDATA(rom));
+				biosname.push_back(name);
+				bios_count++;
+			}
+
+		if (bios_count > 1)
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false)));
+		else
+		{
+			reselect_last::driver.assign(m_swlist[0].driver->name);
+			reselect_last::software.clear();
+			reselect_last::swlist.clear();
+			mewui_globals::force_reselect_software = true;
+			machine().manager().schedule_new_driver(*m_swlist[0].driver);
+			machine().schedule_hard_reset();
+			ui_menu::stack_reset(machine());
+		}
 	}
 
 	m_displaylist.resize(m_swlist.size() + 1);
@@ -799,13 +814,29 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 
 	if (ui_swinfo->startempty == 1)
 	{
-		reselect_last::driver.assign(ui_swinfo->driver->name);
-		reselect_last::software.assign("[Start empty]");
-		reselect_last::swlist.clear();
-		mewui_globals::force_reselect_software = true;
-		machine().manager().schedule_new_driver(*ui_swinfo->driver);
-		machine().schedule_hard_reset();
-		ui_menu::stack_reset(machine());
+		std::vector<std::string> biosname;
+		const game_driver *driver = ui_swinfo->driver;
+		int bios_count = 0;
+		for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
+			{
+				std::string name(ROM_GETHASHDATA(rom));
+				biosname.push_back(name);
+				bios_count++;
+			}
+
+		if (bios_count > 1)
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false)));
+		else
+		{
+			reselect_last::driver.assign(ui_swinfo->driver->name);
+			reselect_last::software.assign("[Start empty]");
+			reselect_last::swlist.clear();
+			mewui_globals::force_reselect_software = true;
+			machine().manager().schedule_new_driver(*ui_swinfo->driver);
+			machine().schedule_hard_reset();
+			ui_menu::stack_reset(machine());
+		}
 	}
 
 	else
@@ -1159,6 +1190,9 @@ void ui_mewui_software_parts::populate()
 {
 	for (size_t index = 0; index < m_nameparts.size(); index++)
 		item_append(m_nameparts[index].c_str(), m_descpart[index].c_str(), 0, (void *)&m_nameparts[index]);
+
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
 //-------------------------------------------------
@@ -1191,4 +1225,121 @@ void ui_mewui_software_parts::handle()
 			}
 }
 
+//-------------------------------------------------
+//  perform our special rendering
+//-------------------------------------------------
+
+void ui_mewui_software_parts::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+{
+	float width;
+	machine().ui().draw_text_full(container, "Software part selection:", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+	width += 2 * UI_BOX_LR_BORDER;
+	float maxwidth = MAX(origx2 - origx1, width);
+
+	// compute our bounds
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
+
+	// draw a box
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+
+	// take off the borders
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+
+	// draw the text within it
+	machine().ui().draw_text_full(container, "Software part selection:", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+}
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+ui_mewui_bios_selection::ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<std::string> biosname, void *_driver, bool _software) : ui_menu(machine, container)
+{
+	m_bios = biosname;
+	driver = _driver;
+	software = _software;
+}
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+ui_mewui_bios_selection::~ui_mewui_bios_selection()
+{
+}
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void ui_mewui_bios_selection::populate()
+{
+	for (size_t index = 0; index < m_bios.size(); index++)
+		item_append(m_bios[index].c_str(), NULL, 0, (void *)&m_bios[index]);
+
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+}
+
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
+void ui_mewui_bios_selection::handle()
+{
+	// process the menu
+	const ui_menu_event *event = process(0);
+	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
+		for (size_t idx = 0; idx < m_bios.size(); idx++)
+			if ((void*)&m_bios[idx] == event->itemref)
+			{
+				const game_driver *s_driver = (const game_driver *)driver;
+				reselect_last::driver.assign(s_driver->name);
+				reselect_last::software.clear();
+				reselect_last::swlist.clear();
+				std::string error;
+				machine().options().set_value("bios", (int)idx, OPTION_PRIORITY_CMDLINE, error);
+				machine().manager().schedule_new_driver(*s_driver);
+				machine().schedule_hard_reset();
+				ui_menu::stack_reset(machine());
+			}
+}
+
+//-------------------------------------------------
+//  perform our special rendering
+//-------------------------------------------------
+
+void ui_mewui_bios_selection::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+{
+	float width;
+	machine().ui().draw_text_full(container, "Bios selection:", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+	width += 2 * UI_BOX_LR_BORDER;
+	float maxwidth = MAX(origx2 - origx1, width);
+
+	// compute our bounds
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
+
+	// draw a box
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+
+	// take off the borders
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+
+	// draw the text within it
+	machine().ui().draw_text_full(container, "Bios selection:", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+}
 
