@@ -974,17 +974,8 @@ void ui_mewui_select_game::inkey_select(const ui_menu_event *menu_event)
 			if ((driver->flags & MACHINE_TYPE_ARCADE) != 0 || !has_swlist)
 			{
 				std::vector<std::string> biosname;
-				int bios_count = 0;
-				for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-					if (ROMENTRY_ISSYSTEM_BIOS(rom))
-					{
-						std::string name(ROM_GETHASHDATA(rom));
-						biosname.push_back(name);
-						bios_count++;
-					}
-
-				if (bios_count > 1)
-					ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, menu_event->itemref, false, false)));
+				if (get_bios_count(driver, biosname) > 1)
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false, false)));
 				else
 				{
 					reselect_last::driver.assign(driver->name);
@@ -1033,18 +1024,8 @@ void ui_mewui_select_game::inkey_select_favorite(const ui_menu_event *menu_event
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
 			std::vector<std::string> biosname;
-			int bios_count = 0;
-			const game_driver *driver = ui_swinfo->driver;
-			for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-				if (ROMENTRY_ISSYSTEM_BIOS(rom))
-				{
-					std::string name(ROM_GETHASHDATA(rom));
-					biosname.push_back(name);
-					bios_count++;
-				}
-
-			if (bios_count > 1)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false, false)));
+			if (get_bios_count(ui_swinfo->driver, biosname) > 1)
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)ui_swinfo->driver, false, false)));
 			else
 			{
 				reselect_last::driver.assign(ui_swinfo->driver->name);
@@ -1076,7 +1057,13 @@ void ui_mewui_select_game::inkey_select_favorite(const ui_menu_event *menu_event
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if (swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
+			std::vector<std::string> biosname;
+			if (get_bios_count(ui_swinfo->driver, biosname) > 1)
+			{
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)ui_swinfo, true, false)));
+				return;
+			}
+			else if (swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
 				std::vector<std::string> partname, partdesc;
 				for (const software_part *swpart = swinfo->first_part(); swpart != NULL; swpart = swpart->next())
@@ -1095,10 +1082,9 @@ void ui_mewui_select_game::inkey_select_favorite(const ui_menu_event *menu_event
 			}
 
 			std::string error_string;
-			std::string string_list = std::string(ui_swinfo->listname.c_str()).append(":").append(ui_swinfo->shortname.c_str()).append(":");
-			string_list.append(ui_swinfo->part.c_str()).append(":").append(ui_swinfo->instance.c_str());
+			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
 			machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-			std::string snap_list = std::string(ui_swinfo->listname.c_str()).append(PATH_SEPARATOR).append(ui_swinfo->shortname.c_str());
+			std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
 			machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 			reselect_last::driver.assign(drv.driver().name);
 			reselect_last::software.assign(ui_swinfo->shortname);

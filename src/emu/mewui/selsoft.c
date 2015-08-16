@@ -786,18 +786,8 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 	if (ui_swinfo->startempty == 1)
 	{
 		std::vector<std::string> biosname;
-		const game_driver *driver = ui_swinfo->driver;
-		int bios_count = 0;
-		for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-			if (ROMENTRY_ISSYSTEM_BIOS(rom))
-			{
-				std::string name(ROM_GETHASHDATA(rom));
-				biosname.push_back(name);
-				bios_count++;
-			}
-
-		if (bios_count > 1)
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)driver, false, true)));
+		if (get_bios_count(ui_swinfo->driver, biosname) > 1)
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)ui_swinfo->driver, false, true)));
 		else
 		{
 			reselect_last::driver.assign(ui_swinfo->driver->name);
@@ -823,7 +813,13 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if (swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
+			std::vector<std::string> biosname;
+			if (get_bios_count(ui_swinfo->driver, biosname) > 1)
+			{
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_bios_selection(machine(), container, biosname, (void *)ui_swinfo, true, false)));
+				return;
+			}
+			else if (swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
 				std::vector<std::string> partname, partdesc;
 				for (const software_part *swpart = swinfo->first_part(); swpart != NULL; swpart = swpart->next())
@@ -841,18 +837,15 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 				return;
 			}
 
+			mewui_globals::force_reselect_software = true;
 			std::string error_string;
 			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
 			machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-
+			std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
+			machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 			reselect_last::driver.assign(drivlist.driver().name);
 			reselect_last::software.assign(ui_swinfo->shortname);
 			reselect_last::swlist.assign(ui_swinfo->listname);
-			mewui_globals::force_reselect_software = true;
-
-			std::string snap_list = std::string(ui_swinfo->listname).append("/").append(ui_swinfo->shortname);
-			machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-
 			machine().manager().schedule_new_driver(drivlist.driver());
 			machine().schedule_hard_reset();
 			ui_menu::stack_reset(machine());
@@ -1272,19 +1265,65 @@ void ui_mewui_bios_selection::handle()
 		for (size_t idx = 0; idx < m_bios.size(); idx++)
 			if ((void*)&m_bios[idx] == event->itemref)
 			{
-				const game_driver *s_driver = (const game_driver *)driver;
-				reselect_last::driver.assign(s_driver->name);
-				if (inlist)
-					reselect_last::software.assign("[Start empty]");
+				if (!software)
+				{
+					const game_driver *s_driver = (const game_driver *)driver;
+					reselect_last::driver.assign(s_driver->name);
+					if (inlist)
+						reselect_last::software.assign("[Start empty]");
+					else
+						reselect_last::software.clear();
+					reselect_last::swlist.clear();
+					mewui_globals::force_reselect_software = true;
+					std::string error;
+					machine().options().set_value("bios", (int)idx, OPTION_PRIORITY_CMDLINE, error);
+					machine().manager().schedule_new_driver(*s_driver);
+					machine().schedule_hard_reset();
+					ui_menu::stack_reset(machine());
+				}
 				else
-					reselect_last::software.clear();
-				reselect_last::swlist.clear();
-				std::string error;
-				mewui_globals::force_reselect_software = true;
-				machine().options().set_value("bios", (int)idx, OPTION_PRIORITY_CMDLINE, error);
-				machine().manager().schedule_new_driver(*s_driver);
-				machine().schedule_hard_reset();
-				ui_menu::stack_reset(machine());
+				{
+					ui_software_info *ui_swinfo = (ui_software_info *)driver;
+					std::string error;
+					machine().options().set_value("bios", (int)idx, OPTION_PRIORITY_CMDLINE, error);
+					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
+					drivlist.next();
+					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
+					software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+					if (swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
+					{
+						std::vector<std::string> partname, partdesc;
+						for (const software_part *swpart = swinfo->first_part(); swpart != NULL; swpart = swpart->next())
+						{
+							if (swpart->matches_interface(ui_swinfo->interface.c_str()))
+							{
+								partname.push_back(swpart->name());
+								std::string menu_part_name(swpart->name());
+								if (swpart->feature("part_id") != NULL)
+									menu_part_name.assign("(").append(swpart->feature("part_id")).append(")");
+								partdesc.push_back(menu_part_name);
+							}
+						}
+						ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_software_parts(machine(), container, partname, partdesc, ui_swinfo)));
+						return;
+					}
+
+					mewui_globals::force_reselect_software = true;
+					std::string error_string;
+					std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
+					machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
+					machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					reselect_last::driver.assign(drivlist.driver().name);
+					reselect_last::software.assign(ui_swinfo->shortname);
+					reselect_last::swlist.assign(ui_swinfo->listname);
+					machine().manager().schedule_new_driver(drivlist.driver());
+					machine().schedule_hard_reset();
+					ui_menu::stack_reset(machine());
+
+
+
+				}
 			}
 }
 

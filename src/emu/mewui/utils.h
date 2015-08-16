@@ -276,6 +276,7 @@ struct sw_custfltr
 };
 
 // GLOBAL FUNCTIONS
+int get_bios_count(const game_driver *driver, std::vector<std::string> &biosname);
 
 // save options to file
 void save_game_options(running_machine &machine);

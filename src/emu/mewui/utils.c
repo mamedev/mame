@@ -75,6 +75,24 @@ size_t mewui_globals::s_filter_text = ARRAY_LENGTH(mewui_globals::filter_text);
 size_t mewui_globals::sw_filter_len = ARRAY_LENGTH(mewui_globals::sw_filter_text);
 size_t mewui_globals::s_ume_text = ARRAY_LENGTH(mewui_globals::ume_text);
 
+
+//-------------------------------------------------
+//  get bios count
+//-------------------------------------------------
+
+int get_bios_count(const game_driver *driver, std::vector<std::string> &biosname)
+{
+	int bios_count = 0;
+	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		{
+			std::string name(ROM_GETHASHDATA(rom));
+			biosname.push_back(name);
+			bios_count++;
+		}
+	return bios_count;
+}
+
 //-------------------------------------------------
 //  save game options
 //-------------------------------------------------
