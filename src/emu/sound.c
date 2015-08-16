@@ -270,14 +270,14 @@ void sound_stream::update()
 	attotime last_update = m_device.machine().sound().last_update();
 	if (time.seconds() > last_update.seconds())
 	{
-		assert(time.seconds == last_update.seconds + 1);
+		assert(time.seconds() == last_update.seconds() + 1);
 		update_sampindex += m_sample_rate;
 	}
 
 	// if we're behind the last update, then adjust downwards
 	if (time.seconds() < last_update.seconds())
 	{
-		assert(time.seconds == last_update.seconds - 1);
+		assert(time.seconds() == last_update.seconds() - 1);
 		update_sampindex -= m_sample_rate;
 	}
 
@@ -1085,7 +1085,7 @@ void sound_manager::update(void *ptr, int param)
 	bool second_tick = false;
 	if (curtime.seconds() != m_last_update.seconds())
 	{
-		assert(curtime.seconds == m_last_update.seconds + 1);
+		assert(curtime.seconds() == m_last_update.seconds() + 1);
 		second_tick = true;
 	}
 

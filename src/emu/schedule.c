@@ -941,7 +941,7 @@ inline void device_scheduler::execute_timers()
 
 void device_scheduler::add_scheduling_quantum(const attotime &quantum, const attotime &duration)
 {
-	assert(quantum.seconds == 0);
+	assert(quantum.seconds() == 0);
 
 	attotime curtime = time();
 	attotime expire = curtime + duration;
