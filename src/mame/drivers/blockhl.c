@@ -301,6 +301,7 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(blockhl_state, sprite_callback)
 
 	// sound hardware

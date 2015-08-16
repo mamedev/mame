@@ -200,6 +200,7 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(ultraman_state, sprite_callback)
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)

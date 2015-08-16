@@ -27,6 +27,9 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 #define MCFG_K051960_IRQ_HANDLER(_devcb) \
 	devcb = &k051960_device::set_irq_handler(*device, DEVCB_##_devcb);
 
+#define MCFG_K051960_NMI_HANDLER(_devcb) \
+	devcb = &k051960_device::set_nmi_handler(*device, DEVCB_##_devcb);
+
 
 class k051960_device : public device_t,
 							public device_gfx_interface
@@ -44,6 +47,9 @@ public:
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
 		{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
+		{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(object); }
 
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
@@ -71,10 +77,8 @@ public:
 	DECLARE_WRITE8_MEMBER( k051937_w );
 
 	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority);
-	int k051960_is_irq_enabled();
-	int k051960_is_nmi_enabled();
 
-	void vblank_callback(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(scanline_callback);
 
 protected:
 	// device-level overrides
@@ -89,6 +93,8 @@ private:
 	UINT32 m_sprite_size;
 
 	const char *m_screen_tag;
+	screen_device *m_screen;
+	emu_timer *m_scanline_timer;
 
 	k051960_cb_delegate m_k051960_cb;
 
@@ -99,9 +105,7 @@ private:
 	UINT8    m_spriterombank[3];
 	int      m_romoffset;
 	int      m_spriteflip, m_readroms;
-	int      m_irq_enabled, m_nmi_enabled;
-
-	int      m_k051937_counter;
+	int m_nmi_enabled;
 
 	int k051960_fetchromdata( int byte );
 };

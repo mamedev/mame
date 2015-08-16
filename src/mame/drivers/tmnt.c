@@ -1992,6 +1992,7 @@ static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(tmnt_state, mia_sprite_callback)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
@@ -2041,6 +2042,7 @@ static MACHINE_CONFIG_START( mia, tmnt_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(tmnt_state, mia_sprite_callback)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
@@ -2103,6 +2105,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(tmnt_state, tmnt_sprite_callback)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
@@ -2163,6 +2166,7 @@ static MACHINE_CONFIG_START( punkshot, tmnt_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(tmnt_state, punkshot_sprite_callback)
 
 	MCFG_K053251_ADD("k053251")
@@ -2632,6 +2636,7 @@ static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(tmnt_state, thndrx2_sprite_callback)
 
 	MCFG_K053251_ADD("k053251")

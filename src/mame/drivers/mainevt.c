@@ -432,6 +432,7 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
 
 	/* sound hardware */
@@ -477,6 +478,7 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(mainevt_state, dv_sprite_callback)
 
 	MCFG_K051733_ADD("k051733")
