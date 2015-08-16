@@ -31,7 +31,9 @@ Lower board (MGP_01):
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/nvram.h"
 
+#include "monzagp.lh"
 
 class monzagp_state : public driver_device
 {
@@ -41,6 +43,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_nvram(*this, "nvram"),
 		m_gfx1(*this, "gfx1"),
 		m_tile_attr(*this, "unk1"),
 		m_proms(*this, "proms"),
@@ -49,26 +52,20 @@ public:
 		m_dsw(*this, "DSW")
 		{ }
 
-	UINT8 m_p1;
-	UINT8 m_p2;
-	UINT8 *m_vram;
-	int m_screenw;
-	int m_bank;
-
-	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port3_w);
 	virtual void video_start();
+	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
 	DECLARE_PALETTE_INIT(monzagp);
 	UINT32 screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<nvram_device> m_nvram;
 	required_memory_region m_gfx1;
 	required_memory_region m_tile_attr;
 	required_memory_region m_proms;
@@ -76,10 +73,23 @@ public:
 	required_ioport m_in1;
 	required_ioport m_dsw;
 
+private:
+	UINT8 m_p1;
+	UINT8 m_p2;
 	UINT8 m_video_ctrl[2][8];
+	bool  m_time_tick;
+	bool  m_cp_ruote;
+	UINT8 m_mycar_pos;
+	UINT8 *m_vram;
+	UINT8 *m_score_ram;
 };
 
 
+
+TIMER_DEVICE_CALLBACK_MEMBER(monzagp_state::time_tick_timer)
+{
+	m_time_tick = !m_time_tick;
+}
 
 PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 {
@@ -87,39 +97,19 @@ PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 
 void monzagp_state::video_start()
 {
-	m_screenw = 80;
-	m_vram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_score_ram = auto_alloc_array(machine(), UINT8, 0x100);
+	m_time_tick = 0;
+	m_cp_ruote = 0;
+	m_mycar_pos = 7*16;
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_score_ram), 0x100);
+
+	m_nvram->set_base(m_score_ram, 0x100);
 }
 
 UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
-	if(machine().input().code_pressed_once(KEYCODE_Z))
-		m_bank--;
-
-	if(machine().input().code_pressed_once(KEYCODE_X))
-		m_bank++;
-
-	if(machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		m_screenw--;
-		printf("%x\n",m_screenw);
-	}
-
-	if(machine().input().code_pressed_once(KEYCODE_W))
-	{
-		m_screenw++;
-		printf("%x\n",m_screenw);
-	}
-
-	if(machine().input().code_pressed_once(KEYCODE_A))
-	{
-		FILE * p=fopen("vram.bin","wb");
-		fwrite(&m_vram[0],1,0x10000,p);
-		fclose(p);
-	}
-
 /*
     for(int i=0;i<8;i++)
         printf("%02x ", m_video_ctrl[0][i]);
@@ -135,17 +125,18 @@ UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 
 	UINT8 *tile_table = m_proms->base() + 0x100;
 	UINT8 start_tile = m_video_ctrl[0][0] >> 5;
 
-	for(y=0; y<8; y++)
+	for(int y=0; y<8; y++)
 	{
 		UINT16 start_x = ((m_video_ctrl[0][3] << 8) | m_video_ctrl[0][2]) ^ 0xffff;
 		bool inv = y > 3;
 
-		for(x=0;x<64;x++)
+		for(int x=0;x<64;x++)
 		{
 			UINT8 tile_attr = m_tile_attr->base()[((start_x >> 5) & 0x07) | (((start_x >> 8) & 0x3f) << 3) | ((start_x >> 6) & 0x200)];
 
 			//if (tile_attr & 0x10)         printf("dark on\n");
 			//if (tile_attr & 0x20)         printf("light on\n");
+			//if (tile_attr & 0x40)         printf("bridge\n");
 
 			int tile_idx = tile_table[((tile_attr & 0x0f) << 4) | (inv ? 0x08 : 0) | (start_tile & 0x07)];
 			int tile = (tile_idx << 3) | (((start_x) >> 2) & 0x07);
@@ -165,10 +156,32 @@ UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 
 			start_tile--;
 	}
 
-	// characters
-	for(y=0;y<256;y++)
+	// my car sprite
+	if (m_video_ctrl[1][3] & 0x18)
 	{
-		for(x=0;x<256;x++)
+		int start_sprite = (((m_video_ctrl[1][3] & 0x18)) << 3) | (m_video_ctrl[1][3] & 0x06);
+
+		if (m_cp_ruote && (m_video_ctrl[1][3] & 0x0e) == 0)
+			start_sprite |= 0x02;
+
+		for(int y=0; y<2; y++)
+			for(int x=0; x<4*8; x+=4)
+			{
+				int sprite = start_sprite | ((x << 1) & 0x38);
+
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					(sprite ^ 0x06) + y,
+					0,
+					0, 0,
+					m_video_ctrl[1][2] + x, m_mycar_pos + (1 - y) * 16,
+					3);
+			}
+	}
+
+	// characters
+	for(int y=0;y<26;y++)
+	{
+		for(int x=0;x<40;x++)
 		{
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				m_vram[y*40+x],
@@ -186,10 +199,6 @@ static ADDRESS_MAP_START( monzagp_map, AS_PROGRAM, 8, monzagp_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER(monzagp_state::rng_r)
-{
-	return machine().rand();
-}
 
 READ8_MEMBER(monzagp_state::port_r)
 {
@@ -226,12 +235,20 @@ READ8_MEMBER(monzagp_state::port_r)
 	}
 	if (!(m_p1 & 0x40))             // digits
 	{
+		data = m_score_ram[BITSWAP8(offset, 3,2,1,0,7,6,5,4)];
 		//printf("ext 6 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 	}
 	if (!(m_p1 & 0x80))
 	{
 		//printf("ext 7 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 		data = 0;
+		if(machine().input().code_pressed(KEYCODE_1_PAD))      data |= 0x01;
+		if(machine().input().code_pressed(KEYCODE_2_PAD))      data |= 0x02;
+		if(machine().input().code_pressed(KEYCODE_3_PAD))      data |= 0x04;
+		if(machine().input().code_pressed(KEYCODE_4_PAD))      data |= 0x08;
+
+		if (m_time_tick)
+			data |= 0x10;
 	}
 
 	return data;
@@ -253,6 +270,13 @@ WRITE8_MEMBER(monzagp_state::port_w)
 	if (!(m_p1 & 0x04))    // GFX
 	{
 		//printf("ext 2 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		int addr = ((m_p2 & 0x7f) << 5) | (offset & 0x1f);
+		if (addr < 0x400)
+		{
+			static int pt[] = { 0x0e, 0x0c, 0x0d, 0x08, 0x09, 0x0a, 0x0b, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x0f };
+			m_gfx1->base()[addr] = (pt[(data >> 4) & 0x0f] << 4) | pt[data & 0x0f];
+			m_gfxdecode->gfx(0)->mark_dirty(addr >> 4);
+		}
 	}
 	if (!(m_p1 & 0x08))
 	{
@@ -269,6 +293,15 @@ WRITE8_MEMBER(monzagp_state::port_w)
 	if (!(m_p1 & 0x40))    // digits
 	{
 		//printf("ext 6 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		offs_t ram_offset = BITSWAP8(offset, 3,2,1,0,7,6,5,4);
+		m_score_ram[ram_offset] = data & 0x0f;
+
+		if ((ram_offset & 0x07) == 0)
+		{
+			// 74LS47 BCD-to-Seven-Segment Decoder
+			static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x49, 0x78, 0x00 };
+			output_set_digit_value(ram_offset >> 3, bcd2hex[data & 0x0f]);
+		}
 	}
 	if (!(m_p1 & 0x80))
 	{
@@ -276,11 +309,6 @@ WRITE8_MEMBER(monzagp_state::port_w)
 		m_video_ctrl[0][(offset>>0) & 0x07] = data;
 		m_video_ctrl[1][(offset>>3) & 0x07] = data;
 	}
-}
-
-WRITE8_MEMBER(monzagp_state::port0_w)
-{
-//  printf("P0 %x = %x\n",space.device().safe_pc(),data);
 }
 
 WRITE8_MEMBER(monzagp_state::port1_w)
@@ -303,10 +331,8 @@ WRITE8_MEMBER(monzagp_state::port2_w)
 
 static ADDRESS_MAP_START( monzagp_io, AS_IO, 8, monzagp_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(port_r, port_w)
-	AM_RANGE(MCS48_PORT_P0, MCS48_PORT_P0) AM_WRITE(port0_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(port1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(port2_r, port2_w)
-	AM_RANGE(0x104, 0x104) AM_READ(rng_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( monzagp )
@@ -402,6 +428,10 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", monzagp)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("time_tick_timer", monzagp_state, time_tick_timer, attotime::from_hz(4))
+
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 MACHINE_CONFIG_END
 
 ROM_START( monzagp )
@@ -416,10 +446,10 @@ ROM_START( monzagp )
 	ROM_LOAD( "11.8d",       0x0800, 0x0400, CRC(47607a83) SHA1(91ce272c4af3e1994db71d2239b68879dd279347) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "7.3f",        0x0000, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
-	ROM_LOAD( "8.1f",        0x0400, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
-	ROM_LOAD( "6.4f",        0x0800, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
-	ROM_LOAD( "9.10j",       0x0c00, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
+	ROM_LOAD( "9.10j",       0x0000, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
+	ROM_LOAD( "6.4f",        0x0400, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
+	ROM_LOAD( "7.3f",        0x0800, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
+	ROM_LOAD( "8.1f",        0x0c00, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
 
 	ROM_REGION( 0x1000, "gfx3", 0 )
 	ROM_LOAD( "5.9f",        0x0000, 0x0400, CRC(5abd1ef6) SHA1(1bc79225c1be2821930fdb8e821a70c7ac8683ab) )
@@ -453,10 +483,10 @@ ROM_START( monzagpb )
 	ROM_LOAD( "m11.8d",      0x0800, 0x0400, CRC(5b4a7ffa) SHA1(50fa073437febe516065cd83fbaf85b596c4f3c8) ) /* differs from above */
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "m7.3f",       0x0000, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
-	ROM_LOAD( "m8.1f",       0x0400, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
-	ROM_LOAD( "m6.4f",       0x0800, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
-	ROM_LOAD( "m9.10j",      0x0c00, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
+	ROM_LOAD( "m9.10j",      0x0000, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
+	ROM_LOAD( "m6.4f",       0x0400, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
+	ROM_LOAD( "m7.3f",       0x0800, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
+	ROM_LOAD( "m8.1f",       0x0c00, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
 
 	ROM_REGION( 0x1000, "gfx3", 0 )
 	ROM_LOAD( "m5.9f",       0x0000, 0x0400, CRC(5abd1ef6) SHA1(1bc79225c1be2821930fdb8e821a70c7ac8683ab) )
@@ -478,5 +508,5 @@ ROM_START( monzagpb )
 ROM_END
 
 
-GAME( 1981, monzagp,  0,       monzagp, monzagp, driver_device, 0, ROT270, "Olympia", "Monza GP", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 1981, monzagpb, monzagp, monzagp, monzagp, driver_device, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAMEL( 1981, monzagp,  0,       monzagp, monzagp, driver_device, 0, ROT270, "Olympia", "Monza GP", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, driver_device, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
