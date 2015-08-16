@@ -677,7 +677,7 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period *= 16 * SOUND_CHANNELS;
 
-			dmadac_set_frequency(&m_dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
+			dmadac_set_frequency(&m_dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
 			dmadac_enable(&m_dmadac[0], SOUND_CHANNELS, 1);
 
 			/* fire off a timer wich will hit every half-buffer */

@@ -118,7 +118,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 
 attotime sound_stream::sample_time() const
 {
-	return attotime(m_device.machine().sound().last_update().seconds, 0) + attotime(0, m_output_sampindex * m_attoseconds_per_sample);
+	return attotime(m_device.machine().sound().last_update().seconds(), 0) + attotime(0, m_output_sampindex * m_attoseconds_per_sample);
 }
 
 
@@ -264,20 +264,20 @@ void sound_stream::update()
 {
 	// determine the number of samples since the start of this second
 	attotime time = m_device.machine().time();
-	INT32 update_sampindex = INT32(time.attoseconds / m_attoseconds_per_sample);
+	INT32 update_sampindex = INT32(time.attoseconds() / m_attoseconds_per_sample);
 
 	// if we're ahead of the last update, then adjust upwards
 	attotime last_update = m_device.machine().sound().last_update();
-	if (time.seconds > last_update.seconds)
+	if (time.seconds() > last_update.seconds())
 	{
-		assert(time.seconds == last_update.seconds + 1);
+		assert(time.seconds() == last_update.seconds() + 1);
 		update_sampindex += m_sample_rate;
 	}
 
 	// if we're behind the last update, then adjust downwards
-	if (time.seconds < last_update.seconds)
+	if (time.seconds() < last_update.seconds())
 	{
-		assert(time.seconds == last_update.seconds - 1);
+		assert(time.seconds() == last_update.seconds() - 1);
 		update_sampindex -= m_sample_rate;
 	}
 
@@ -297,7 +297,7 @@ void sound_stream::sync_update(void *, INT32)
 {
 	update();
 	attotime time = m_device.machine().time();
-	attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds % m_attoseconds_per_sample);
+	attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds() % m_attoseconds_per_sample);
 	m_sync_timer->adjust(attotime(0, next_edge));
 }
 
@@ -514,7 +514,7 @@ void sound_stream::recompute_sample_rate_data()
 	if (m_synchronous)
 	{
 		attotime time = m_device.machine().time();
-		attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds % m_attoseconds_per_sample);
+		attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds() % m_attoseconds_per_sample);
 		m_sync_timer->adjust(attotime(0, next_edge));
 	}
 }
@@ -584,7 +584,7 @@ void sound_stream::postload()
 		memset(&m_output[outputnum].m_buffer[0], 0, m_output_bufalloc * sizeof(m_output[outputnum].m_buffer[0]));
 
 	// recompute the sample indexes to make sense
-	m_output_sampindex = m_device.machine().sound().last_update().attoseconds / m_attoseconds_per_sample;
+	m_output_sampindex = m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample;
 	m_output_update_sampindex = m_output_sampindex;
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 }
@@ -817,7 +817,7 @@ sound_manager::sound_manager(running_machine &machine)
 		m_attenuation(0),
 		m_nosound_mode(machine.osd().no_sound()),
 		m_wavfile(NULL),
-		m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds),
+		m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds()),
 		m_last_update(attotime::zero)
 {
 	// get filename for WAV file or AVI file if specified
@@ -1083,9 +1083,9 @@ void sound_manager::update(void *ptr, int param)
 	// see if we ticked over to the next second
 	attotime curtime = machine().time();
 	bool second_tick = false;
-	if (curtime.seconds != m_last_update.seconds)
+	if (curtime.seconds() != m_last_update.seconds())
 	{
-		assert(curtime.seconds == m_last_update.seconds + 1);
+		assert(curtime.seconds() == m_last_update.seconds() + 1);
 		second_tick = true;
 	}
 

@@ -194,7 +194,7 @@ void emu_timer::adjust(attotime start_delay, INT32 param, const attotime &period
 	m_enabled = true;
 
 	// clamp negative times to 0
-	if (start_delay.seconds < 0)
+	if (start_delay.seconds() < 0)
 		start_delay = attotime::zero;
 
 	// set the start and expire times
@@ -452,11 +452,11 @@ void device_scheduler::timeslice()
 		{
 			// only process if this CPU is executing or truly halted (not yielding)
 			// and if our target is later than the CPU's current time (coarse check)
-			if (EXPECTED((exec->m_suspend == 0 || exec->m_eatcycles) && target.seconds >= exec->m_localtime.seconds))
+			if (EXPECTED((exec->m_suspend == 0 || exec->m_eatcycles) && target.seconds() >= exec->m_localtime.seconds()))
 			{
 				// compute how many attoseconds to execute this CPU
-				attoseconds_t delta = target.attoseconds - exec->m_localtime.attoseconds;
-				if (delta < 0 && target.seconds > exec->m_localtime.seconds)
+				attoseconds_t delta = target.attoseconds() - exec->m_localtime.attoseconds();
+				if (delta < 0 && target.seconds() > exec->m_localtime.seconds())
 					delta += ATTOSECONDS_PER_SECOND;
 				assert(delta == (target - exec->m_localtime).as_attoseconds());
 
@@ -564,7 +564,7 @@ void device_scheduler::trigger(int trigid, const attotime &after)
 void device_scheduler::boost_interleave(const attotime &timeslice_time, const attotime &boost_duration)
 {
 	// ignore timeslices > 1 second
-	if (timeslice_time.seconds > 0)
+	if (timeslice_time.seconds() > 0)
 		return;
 	add_scheduling_quantum(timeslice_time, boost_duration);
 }
@@ -941,10 +941,11 @@ inline void device_scheduler::execute_timers()
 
 void device_scheduler::add_scheduling_quantum(const attotime &quantum, const attotime &duration)
 {
-	assert(quantum.seconds == 0);
+	assert(quantum.seconds() == 0);
 
 	attotime curtime = time();
 	attotime expire = curtime + duration;
+	const attoseconds_t quantum_attos = quantum.attoseconds();
 
 	// figure out where to insert ourselves, expiring any quanta that are out-of-date
 	quantum_slot *insert_after = NULL;
@@ -957,20 +958,20 @@ void device_scheduler::add_scheduling_quantum(const attotime &quantum, const att
 			m_quantum_allocator.reclaim(m_quantum_list.detach(*quant));
 
 		// if this quantum is shorter than us, we need to be inserted afterwards
-		else if (quant->m_requested <= quantum.attoseconds)
+		else if (quant->m_requested <= quantum_attos)
 			insert_after = quant;
 	}
 
 	// if we found an exact match, just take the maximum expiry time
-	if (insert_after != NULL && insert_after->m_requested == quantum.attoseconds)
+	if (insert_after != NULL && insert_after->m_requested == quantum_attos)
 		insert_after->m_expire = max(insert_after->m_expire, expire);
 
 	// otherwise, allocate a new quantum and insert it after the one we picked
 	else
 	{
 		quantum_slot &quant = *m_quantum_allocator.alloc();
-		quant.m_requested = quantum.attoseconds;
-		quant.m_actual = MAX(quantum.attoseconds, m_quantum_minimum);
+		quant.m_requested = quantum_attos;
+		quant.m_actual = MAX(quantum_attos, m_quantum_minimum);
 		quant.m_expire = expire;
 		m_quantum_list.insert_after(quant, insert_after);
 	}

@@ -1343,7 +1343,7 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_vram_bank_w)
 
 			visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
-			machine().first_screen()->configure(320, 240, visarea, machine().first_screen()->frame_period().attoseconds);
+			machine().first_screen()->configure(320, 240, visarea, machine().first_screen()->frame_period().attoseconds());
 		}
 	}
 

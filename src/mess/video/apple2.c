@@ -615,7 +615,7 @@ UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &b
 	UINT32 new_a2;
 
 	/* calculate the m_flash value */
-	m_flash = ((machine().time() * 4).seconds & 1) ? 1 : 0;
+	m_flash = ((machine().time() * 4).seconds() & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
 	new_a2 = effective_a2();

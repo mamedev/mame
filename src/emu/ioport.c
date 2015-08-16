@@ -3442,9 +3442,11 @@ void ioport_manager::playback_frame(const attotime &curtime)
 	if (m_playback_file.is_open())
 	{
 		// first the absolute time
-		attotime readtime;
-		playback_read(readtime.seconds);
-		playback_read(readtime.attoseconds);
+		seconds_t seconds_temp;
+		attoseconds_t attoseconds_temp;
+		playback_read(seconds_temp);
+		playback_read(attoseconds_temp);
+		attotime readtime(seconds_temp, attoseconds_temp);
 		if (readtime != curtime)
 			playback_end("Out of sync");
 
@@ -3581,8 +3583,8 @@ void ioport_manager::record_frame(const attotime &curtime)
 	if (m_record_file.is_open())
 	{
 		// first the absolute time
-		record_write(curtime.seconds);
-		record_write(curtime.attoseconds);
+		record_write(curtime.seconds());
+		record_write(curtime.attoseconds());
 
 		// then the current speed
 		record_write(UINT32(machine().video().speed_percent() * double(1 << 20)));

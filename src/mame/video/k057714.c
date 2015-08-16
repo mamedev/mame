@@ -265,7 +265,7 @@ int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		{
 			visarea.max_x = width-1;
 			visarea.max_y = height-1;
-			screen.configure(width, height, visarea, screen.frame_period().attoseconds);
+			screen.configure(width, height, visarea, screen.frame_period().attoseconds());
 		}
 	}
 

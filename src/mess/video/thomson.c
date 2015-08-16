@@ -70,7 +70,7 @@ unsigned thomson_state::thom_video_elapsed()
 {
 	unsigned u;
 	attotime elapsed = m_thom_video_timer->elapsed();
-	u = (elapsed * 1000000 ).seconds;
+	u = (elapsed * 1000000 ).seconds();
 	if ( u >= 19968 )
 		u = 19968;
 	return u;

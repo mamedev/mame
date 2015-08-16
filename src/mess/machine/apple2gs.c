@@ -143,7 +143,7 @@ void apple2gs_state::process_clock()
 	seconds_t current_interval;
 
 	/* update clock_curtime */
-	current_interval = machine().time().seconds;
+	current_interval = machine().time().seconds();
 	m_clock_curtime += current_interval - m_clock_curtime_interval;
 	m_clock_curtime_interval = current_interval;
 

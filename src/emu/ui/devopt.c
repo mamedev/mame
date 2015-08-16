@@ -110,7 +110,7 @@ void ui_menu_device_config::populate()
 				strcatprintf(str,"%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 									visarea.width(), visarea.height(),
 									(machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-									ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds));
+									ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
 			}
 		}
 	}

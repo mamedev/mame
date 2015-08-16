@@ -568,7 +568,7 @@ void scn2674_device::recompute_parameters()
 	m_hpixels_per_column = m_gfx_enabled ? m_gfx_hpixels_per_column : m_text_hpixels_per_column;
 	int horiz_pix_total = ((m_IR1_equalizing_constant + (m_IR2_horz_sync_width << 1)) << 1) * m_hpixels_per_column;
 	int vert_pix_total = m_IR4_rows_per_screen * m_IR0_scanline_per_char_row + m_IR3_vert_front_porch + m_IR3_vert_back_porch + m_IR7_vsync_width;
-	attoseconds_t refresh = m_screen->frame_period().attoseconds;
+	attoseconds_t refresh = m_screen->frame_period().attoseconds();
 	int max_visible_x = (m_IR5_character_per_row * m_hpixels_per_column) - 1;
 	int max_visible_y = (m_IR4_rows_per_screen * m_IR0_scanline_per_char_row) - 1;
 

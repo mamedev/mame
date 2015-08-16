@@ -1438,7 +1438,7 @@ READ8_MEMBER(isa16_gus_device::joy_r)
 			data = ioport("gus_joy")->read() | 0x0f;
 
 			{
-				delta = ((new_time - m_joy_time) * 256 * 1000).seconds;
+				delta = ((new_time - m_joy_time) * 256 * 1000).seconds();
 
 				if (ioport("gus_joy_1")->read() < delta) data &= ~0x01;
 				if (ioport("gus_joy_2")->read() < delta) data &= ~0x02;
