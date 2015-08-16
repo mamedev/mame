@@ -67,6 +67,7 @@ public:
 	DECLARE_DRIVER_INIT(klxyj);
 	DECLARE_DRIVER_INIT(fearless);
 	DECLARE_DRIVER_INIT(slqz3);
+	DECLARE_DRIVER_INIT(fruitpar);
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
 	virtual void video_start();
@@ -454,7 +455,7 @@ IGS PCB-0239-11-EE
 |                                            |
 |                                            |
 |          62256                  IGS027A    |
-|                                            |
+|                                 55857G     |
 |                U29                         |
 |    8255                                    |
 |                                            |
@@ -471,7 +472,7 @@ IGS PCB-0239-11-EE
 
 ROM_START( slqz3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
+	/* Internal rom of IGS027A type G ARM based MCU */
 	ROM_LOAD( "slqz3_igs027a", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -483,6 +484,56 @@ ROM_START( slqz3 )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "u26", 0x000000, 0x200000, CRC(84bc2f3e) SHA1(49dcf5eaa39accd5c6bf01782fd4221298cb43ed) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+
+
+
+/***************************************************************************
+
+Fruit Paradise
+IGS
+
+PCB Layout
+----------
+
+IGS PCB-0331-02-FG
+|--------------------------------------------|
+|PC817                   7805       W4102.U28|
+|ULN2004 ULN2004   TDA1020  VOL        M6295 |
+|ULN2004       PAL    62257          3.6VBATT|
+|ULN2004  82C55   22MHz                      |
+|ULN2004                                     |
+|8                 V214.U23                  |
+|L                                |--------| |
+|I  PC817(x20)                    |IGS027A | |
+|N                   |--------|   |55857G  | |
+|E      M4101.U13    |        |   |--------| |
+|R                   | IGS031 |              |
+|                    |        |              |
+|       TEXT.U12     |--------|              |
+|DSW1                                        |
+|DSW2 ULN2004                       61256    |
+|DSW3              PC817(x13)   PC817 PC817  |
+|       |--|         JAMMA             |--|  |
+|-------|  |---------------------------|  |--|
+
+***************************************************************************/
+
+ROM_START( fruitpar )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A type G ARM based MCU */
+	ROM_LOAD( "fruitpar_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "fruit_paradise_v214.u23", 0x00000, 0x80000, CRC(e37bc4e0) SHA1(f5580e6007dc60f32efd3b3e7e64c5ee446ede8a) )
+
+	ROM_REGION( 0x480000, "gfx1", 0 )
+	ROM_LOAD( "igs_m4101.u13",     0x000000, 0x400000, CRC(84899398) SHA1(badac65af6e03c490798f4368eb2b15db8c590d0) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "paradise_text.u12", 0x400000, 0x080000, CRC(bdaa4407) SHA1(845eead0902c81290c2b5d7543ac9dfda375fdd1) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_w4102.u28", 0x00000, 0x80000, CRC(558cab25) SHA1(0280b37a14589329f0385c048e5742b9e89bd587) )
 ROM_END
 
 
@@ -1006,6 +1057,13 @@ DRIVER_INIT_MEMBER(igs_m027_state,slqz3)
 	pgm_create_dummy_internal_arm_region();
 }
 
+DRIVER_INIT_MEMBER(igs_m027_state,fruitpar)
+{
+	fruitpar_decrypt(machine());
+	//sdwx_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 /***************************************************************************
 
     Game Drivers
@@ -1013,6 +1071,7 @@ DRIVER_INIT_MEMBER(igs_m027_state,slqz3)
 ***************************************************************************/
 
 GAME( 1999,  slqz3,     0, igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
+GAME( 200?,  fruitpar,  0, igs_majhong, sdwx, igs_m027_state, fruitpar,    ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
 GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line?
 GAME( 200?,  sddz,      0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
 GAME( 2000,  zhongguo,  0, igs_majhong, sdwx, igs_m027_state, zhongguo,    ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
