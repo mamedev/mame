@@ -342,7 +342,7 @@ const pstring::type_t pstring::vprintf(va_list args) const
 	char tempbuf[4096];
 	std::vsprintf(tempbuf, cstr(), args);
 
-	return pstring_t(tempbuf);
+	return type_t(tempbuf);
 }
 
 
@@ -350,7 +350,7 @@ const pstring::type_t pstring::sprintf(const char *format, ...)
 {
 	va_list ap;
 	va_start(ap, format);
-	pstring_t ret = pstring(format).vprintf(ap);
+	type_t ret = pstring(format).vprintf(ap);
 	va_end(ap);
 	return ret;
 }
