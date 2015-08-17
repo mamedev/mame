@@ -17,7 +17,6 @@
 #endif
 
 
-//#pragma GCC optimize "-ffast-math"
 #if 0
 #pragma GCC optimize "-ffast-math"
 //#pragma GCC optimize "-ftree-parallelize-loops=4"
@@ -37,7 +36,11 @@
 #include <iostream>
 #include <algorithm>
 #include "nld_solver.h"
+#if 1
 #include "nld_ms_direct.h"
+#else
+#include "nld_ms_direct_lu.h"
+#endif
 #include "nld_ms_direct1.h"
 #include "nld_ms_direct2.h"
 #include "nld_ms_sor.h"
@@ -302,17 +305,31 @@ ATTR_HOT nl_double matrix_solver_t::solve()
 	return next_time_step;
 }
 
-
-// ----------------------------------------------------------------------------------------
-// matrix_solver - Direct base
-// ----------------------------------------------------------------------------------------
-
 ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
 {
 	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
 			return k;
 	return -1;
+}
+
+void matrix_solver_t::log_stats()
+{
+	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
+	{
+		this->netlist().log("==============================================");
+		this->netlist().log("Solver %s", this->name().cstr());
+		this->netlist().log("       ==> %d nets", (unsigned) this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
+		this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
+		this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
+				this->m_stat_calculations,
+				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
+				this->m_iterative_fail,
+				100.0 * (double) this->m_iterative_fail / (double) this->m_stat_calculations,
+				(double) this->m_iterative_total / (double) this->m_stat_calculations);
+	}
 }
 
 
@@ -335,15 +352,21 @@ NETLIB_START(solver)
 
 	register_param("FREQ", m_freq, 48000.0);
 
-	register_param("ITERATIVE", m_iterative_solver, "SOR");
 
+	/* iteration parameters */
+	register_param("SOR_FACTOR", m_sor, 1.059);
+	register_param("ITERATIVE", m_iterative_solver, "SOR");
 	register_param("ACCURACY", m_accuracy, 1e-7);
-	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
 	register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
+	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
+
+	/* general parameters */
+	register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
+	register_param("PIVOT", m_pivot, 0);                    // use pivoting - on supported solvers
 	register_param("NR_LOOPS", m_nr_loops, 250);            // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
-	register_param("SOR_FACTOR", m_sor, 1.059);
-	register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
+
+	/* automatic time step */
 	register_param("DYNAMIC_TS", m_dynamic, 0);
 	register_param("LTE", m_lte, 5e-5);                     // diff/timestep
 	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
@@ -474,6 +497,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	int cur_group = -1;
 	const bool use_specific = true;
 
+	m_params.m_pivot = m_pivot.Value();
 	m_params.m_accuracy = m_accuracy.Value();
 	m_params.m_gs_loops = m_gs_loops.Value();
 	m_params.m_nr_loops = m_nr_loops.Value();
@@ -551,13 +575,31 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 			case 8:
 				ms = create_solver<8,8>(8, use_specific);
 				break;
+			case 10:
+				ms = create_solver<10,10>(10, use_specific);
+				break;
+			case 11:
+				ms = create_solver<11,11>(11, use_specific);
+				break;
 			case 12:
 				ms = create_solver<12,12>(12, use_specific);
 				break;
+			case 15:
+				ms = create_solver<15,15>(15, use_specific);
+				break;
+			case 31:
+				ms = create_solver<31,31>(31, use_specific);
+				break;
+			case 49:
+				ms = create_solver<49,49>(49, use_specific);
+				break;
+#if 0
 			case 87:
 				ms = create_solver<87,87>(87, use_specific);
 				break;
+#endif
 			default:
+				netlist().warning("No specific solver found for netlist of size %d", (unsigned) net_count);
 				if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, use_specific);
