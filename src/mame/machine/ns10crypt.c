@@ -19,7 +19,7 @@ game (8E), and it's always stored spanning an integer number of NAND blocks
 0x200 bytes). The first part of the encrypted data is stored at about the end
 of the ROM, and apparently all the blocks in that area are processed in
 reverse order (first the one nearest the end, then the second nearest, etc);
-the second part goes inmediately after it from a logic perspective, but it's
+the second part goes immediately after it from a logic perspective, but it's
 physically located at the area starting at 0x28000 in the ROM. Games, after
 some bootup code has been executed, will copy the encrypted content from
 the NANDs to RAM, moment at which the decryption is triggered. Physical locations
@@ -32,6 +32,7 @@ chocovdr    [fdc000,1000000)    [28000,1dc000)     80010000
 gamshara    [fdc000,1000000)    [28000,144000)     80010000
 knpuzzle    [fc8000,fcc000)     [28000,40c000)     80030000
 konotako    [fdc000,1000000)    [28000,b4000)      80010000
+mrdrilrg    [fd4000,fd8000)     [28000,3dc000)     80030000
 nflclsfb    [fdc000,1000000)    [28000,204000)     80010000
 startrgn    [fdc000,1000000)    [28000,b4000)      80010000
 
@@ -90,8 +91,8 @@ the implementation accordingly.
 
 Observing the linear equations, there is a keen difference between bits using
 just a bunch of previous bits, and others using much more bits from more words;
-simplyfing the latter ones could be handy, and probably closer to what the
-hardware is doing. Two possible simplyfications could be:
+simplifying the latter ones could be handy, and probably closer to what the
+hardware is doing. Two possible simplifications could be:
 A) The linear relations are creating lots of identities involving the bits
 from the sequence; they could be exploited to simplify the equations (but
 only when the implementation be stable, to avoid duplicating work).
@@ -200,6 +201,13 @@ int gf2_reducer::gf2_reduce(UINT64 num)const
 
 
 // game-specific logic
+
+// static UINT16 mrdrilrg_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
+// {
+	// UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
+	// return (reducer.gf2_reduce(0x00000a00a305c826ull & previousMasks) & reducer.gf2_reduce(0x0000011800020000ull & previousMasks)) * 0x0011;
+// }
+
 
 static UINT16 chocovdr_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
 {
