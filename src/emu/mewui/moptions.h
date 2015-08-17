@@ -41,6 +41,8 @@
 #define OPTION_ENLARGE_SNAPS          "enlarge_snaps"
 #define OPTION_FORCED4X3              "forced4x3"
 #define OPTION_USE_BACKGROUND         "use_background"
+#define OPTION_SKIP_BIOS_MENU         "skip_biosmenu"
+#define OPTION_SKIP_PARTS_MENU        "skip_partsmenu"
 #define OPTION_START_FILTER           "start_filter"
 
 // core UI options
@@ -96,6 +98,8 @@ public:
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }
 	bool forced_4x3_snapshot() const { return bool_value(OPTION_FORCED4X3); }
 	bool use_background_image() const { return bool_value(OPTION_USE_BACKGROUND); }
+	bool skip_bios_menu() const { return bool_value(OPTION_SKIP_BIOS_MENU); }
+	bool skip_parts_menu() const { return bool_value(OPTION_SKIP_PARTS_MENU); }
 	int start_filter() const { return int_value(OPTION_START_FILTER); }
 
 	// UI options

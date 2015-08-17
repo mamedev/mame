@@ -46,6 +46,8 @@ const options_entry mewui_options::s_option_entries[] =
 	{ OPTION_ENLARGE_SNAPS,                  "1",  OPTION_BOOLEAN, "enlarge arts (snapshot, title, etc...) in right panel (keeping aspect ratio)" },
 	{ OPTION_FORCED4X3,                      "1",  OPTION_BOOLEAN, "force the appearance of the snapshot in the list software to 4:3" },
 	{ OPTION_USE_BACKGROUND,                 "0",  OPTION_BOOLEAN, "enable background image in main view" },
+	{ OPTION_SKIP_BIOS_MENU,                 "0",  OPTION_BOOLEAN, "skip bios submenu, start with configured or default" },
+	{ OPTION_SKIP_PARTS_MENU,                "0",  OPTION_BOOLEAN, "skip parts submenu, start with first part" },
 	{ OPTION_START_FILTER,                   "0",  OPTION_INTEGER, "startup filter (0 = ALL, 1 = ARCADES, 2 = SYSTEMS)" },
 
 	// UI options

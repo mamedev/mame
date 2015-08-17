@@ -31,6 +31,8 @@ ui_menu_misc_options::ui_menu_misc_options(running_machine &machine, render_cont
 	m_options[SKIP_GAMEINFO_ENABLED] = machine.options().skip_gameinfo();
 	m_options[FORCED_4X3] = machine.options().forced_4x3_snapshot();
 	m_options[USE_BGRND] = machine.options().use_background_image();
+	m_options[SKIP_BIOS] = machine.options().skip_bios_menu();
+	m_options[SKIP_PARTS] = machine.options().skip_parts_menu();
 }
 
 ui_menu_misc_options::~ui_menu_misc_options()
@@ -45,6 +47,8 @@ ui_menu_misc_options::~ui_menu_misc_options()
 	machine().options().set_value(OPTION_SKIP_GAMEINFO, m_options[SKIP_GAMEINFO_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OPTION_FORCED4X3, m_options[FORCED_4X3], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OPTION_USE_BACKGROUND, m_options[USE_BGRND], OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OPTION_SKIP_BIOS_MENU, m_options[SKIP_BIOS], OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OPTION_SKIP_PARTS_MENU, m_options[SKIP_PARTS], OPTION_PRIORITY_CMDLINE, error_string);
 	mewui_globals::force_reset_main = true;
 }
 
@@ -87,7 +91,7 @@ void ui_menu_misc_options::populate()
 	item_append("Enlarge images in the right panel", m_options[ENLARGE_ARTS] ? "On" : "Off",
 				m_options[ENLARGE_ARTS] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)ENLARGE_ARTS);
 
-	item_append("Loading DATs info", m_options[DATS_ENABLED] ? "On" : "Off",
+	item_append("DATs info", m_options[DATS_ENABLED] ? "On" : "Off",
 				m_options[DATS_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)DATS_ENABLED);
 
 	item_append("Cheats", m_options[CHEAT_ENABLED] ? "On" : "Off",
@@ -96,17 +100,23 @@ void ui_menu_misc_options::populate()
 	item_append("Show mouse pointer", m_options[MOUSE_ENABLED] ? "On" : "Off",
 				m_options[MOUSE_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MOUSE_ENABLED);
 
-	item_append("Confirm quit from game / system", m_options[CONFIRM_QUIT_ENABLED] ? "On" : "Off",
+	item_append("Confirm quit from machines", m_options[CONFIRM_QUIT_ENABLED] ? "On" : "Off",
 				m_options[CONFIRM_QUIT_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)CONFIRM_QUIT_ENABLED);
 
 	item_append("Skip displaying information's screen at startup", m_options[SKIP_GAMEINFO_ENABLED] ? "On" : "Off",
 				m_options[SKIP_GAMEINFO_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)SKIP_GAMEINFO_ENABLED);
 
-	item_append("Force Min 4:3 appearance for snapshot", m_options[FORCED_4X3] ? "On" : "Off",
+	item_append("Force 4:3 appearance for software snapshot", m_options[FORCED_4X3] ? "On" : "Off",
 				m_options[FORCED_4X3] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)FORCED_4X3);
 
 	item_append("Use image as background", m_options[USE_BGRND] ? "On" : "Off",
 				m_options[USE_BGRND] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)USE_BGRND);
+
+	item_append("Skip bios selection menu", m_options[SKIP_BIOS] ? "On" : "Off",
+				m_options[SKIP_BIOS] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)SKIP_BIOS);
+
+	item_append("Skip software parts selection menu", m_options[SKIP_PARTS] ? "On" : "Off",
+				m_options[SKIP_PARTS] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)SKIP_PARTS);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
