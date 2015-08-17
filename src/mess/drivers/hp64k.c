@@ -60,7 +60,7 @@
 // simple rectangular envelope.
 //
 //*U20      HP "PHI"    Custom HP-IB interface microcontroller
-//*U28      i8251       RS232 UART
+// U28      i8251       RS232 UART
 //
 // **********
 // Display card (64100-66530)
@@ -148,8 +148,6 @@
 //
 // ICs that are not emulated yet are marked with "*"
 //
-// TODO:
-// - RS232 I/F
 
 #include "emu.h"
 #include "cpu/hphybrid/hphybrid.h"
@@ -158,12 +156,17 @@
 #include "machine/74123.h"
 #include "machine/rescap.h"
 #include "sound/beep.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "bus/rs232/rs232.h"
 
 #define BIT_MASK(n) (1U << (n))
 
 // Macros to clear/set single bits
 #define BIT_CLR(w , n)  ((w) &= ~BIT_MASK(n))
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
+
+#define BAUD_RATE_GEN_CLOCK     5068800
 
 class hp64k_state : public driver_device
 {
@@ -212,9 +215,22 @@ public:
 		void hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state);
 
 		DECLARE_READ16_MEMBER(hp64k_usart_r);
-
+		DECLARE_WRITE16_MEMBER(hp64k_usart_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rxrdy_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_txrdy_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_txd_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_dtr_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rts_w);
+		DECLARE_WRITE16_MEMBER(hp64k_loopback_w);
+                void hp64k_update_loopback(void);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_rxd_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_dcd_w);
+                DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_cts_w);
+                
 		DECLARE_WRITE16_MEMBER(hp64k_beep_w);
 		TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
+
+                DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
 private:
 		required_device<hp_5061_3011_cpu_device> m_cpu;
 		required_device<i8275_device> m_crtc;
@@ -232,6 +248,10 @@ private:
 		required_ioport m_rs232_sw;
 		required_device<beep_device> m_beeper;
 		required_device<timer_device> m_beep_timer;
+                required_device<clock_device> m_baud_rate;
+                required_ioport m_s5_sw;
+                required_device<i8251_device> m_uart;
+                required_device<rs232_port_device> m_rs232;
 
 		// Character generator
 		const UINT8 *m_chargen;
@@ -281,6 +301,15 @@ private:
 
 		floppy_state_t m_floppy_if_state;
 		floppy_image_device *m_current_floppy;
+
+                // RS232 I/F
+                bool m_16x_clk;
+                bool m_baud_clk;
+                UINT8 m_16x_div;
+                bool m_loopback;
+                bool m_txd_state;
+                bool m_dtr_state;
+                bool m_rts_state;
 };
 
 static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 16 , hp64k_state)
@@ -300,12 +329,15 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
 		// PA = 4, IC = [0..3]
 		// Floppy I/F
 		AM_RANGE(HP_MAKE_IOADDR(4 , 0) , HP_MAKE_IOADDR(4 , 3))   AM_READWRITE(hp64k_flp_r , hp64k_flp_w)
+                // PA = 5, IC = [0..3]
+                // Write to USART
+                AM_RANGE(HP_MAKE_IOADDR(5 , 0) , HP_MAKE_IOADDR(5 , 3))   AM_WRITE(hp64k_usart_w)
 		// PA = 6, IC = [0..3]
 		// Read from USART
 		AM_RANGE(HP_MAKE_IOADDR(6 , 0) , HP_MAKE_IOADDR(6 , 3))   AM_READ(hp64k_usart_r)
 		// PA = 7, IC = 2
-		// Rear-panel switches
-		AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))   AM_READ(hp64k_rear_sw_r)
+		// Rear-panel switches and loopback relay control
+		AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))	  AM_READWRITE(hp64k_rear_sw_r , hp64k_loopback_w)
 		// PA = 9, IC = [0..3]
 		// Beeper control & interrupt status read
 		AM_RANGE(HP_MAKE_IOADDR(9 , 0) , HP_MAKE_IOADDR(9 , 3))   AM_WRITE(hp64k_beep_w)
@@ -334,7 +366,11 @@ hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const 
 		m_rear_panel_sw(*this , "rear_sw"),
 		m_rs232_sw(*this , "rs232_sw"),
 		m_beeper(*this , "beeper"),
-		m_beep_timer(*this , "beep_timer")
+                m_beep_timer(*this , "beep_timer"),
+                m_baud_rate(*this , "baud_rate"),
+                m_s5_sw(*this , "s5_sw"),
+                m_uart(*this , "uart"),
+                m_rs232(*this , "rs232")
 {
 }
 
@@ -348,6 +384,26 @@ void hp64k_state::video_start()
 {
 		m_chargen = memregion("chargen")->base();
 }
+
+// Divisors of K1135 baud rate generator
+static unsigned baud_rate_divisors[] = {
+        	6336,
+        	4224,
+        	2880,
+        	2355,
+        	2112,
+        	1056,
+        	528,
+        	264,
+        	176,
+        	158,
+        	132,
+        	88,
+        	66,
+        	44,
+        	33,
+        	16
+};
 
 void hp64k_state::machine_reset()
 {
@@ -372,6 +428,13 @@ void hp64k_state::machine_reset()
 		m_floppy0_wpt = false;
 		m_floppy1_wpt = false;
 		m_beeper->set_state(0);
+                m_baud_rate->set_unscaled_clock(BAUD_RATE_GEN_CLOCK / baud_rate_divisors[ (m_s5_sw->read() >> 1) & 0xf ]);
+                m_16x_clk = (m_rs232_sw->read() & 0x02) != 0;
+                m_loopback = false;
+                m_txd_state = true;
+                m_dtr_state = true;
+                m_rts_state = true;
+                
 }
 
 UINT8 hp64k_state::hp64k_crtc_filter(UINT8 data)
@@ -895,9 +958,125 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 
 READ16_MEMBER(hp64k_state::hp64k_usart_r)
 {
-		// todo
+                UINT16 tmp;
+
+                if ((offset & 1) == 0) {
+                                tmp = m_uart->status_r(space , 0);
+                } else {
+                                tmp = m_uart->data_r(space , 0);
+                }
+                
 		// bit 8 == bit 7 rear panel switches (modem/terminal) ???
-		return m_rs232_sw->read() << 8;
+
+                tmp |= (m_rs232_sw->read() << 8);
+
+                if (BIT(m_rear_panel_sw->read() , 7)) {
+                                BIT_SET(tmp , 8);
+                }
+                
+		return tmp;
+}
+
+WRITE16_MEMBER(hp64k_state::hp64k_usart_w)
+{
+                if ((offset & 1) == 0) {
+                                m_uart->control_w(space , 0 , (UINT8)(data & 0xff));
+                } else {
+                                m_uart->data_w(space , 0 , (UINT8)(data & 0xff));
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rxrdy_w)
+{
+                if (state) {
+                                BIT_SET(m_irl_pending , 6);
+                } else {
+                                BIT_CLR(m_irl_pending , 6);
+                }
+
+                hp64k_update_irl();
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_txrdy_w)
+{
+                if (state) {
+                                BIT_SET(m_irl_pending , 5);
+                } else {
+                                BIT_CLR(m_irl_pending , 5);
+                }
+
+                hp64k_update_irl();
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_txd_w)
+{
+                m_txd_state = state;
+                if (m_loopback) {
+                                m_uart->write_rxd(state);
+                }
+                m_rs232->write_txd(state);
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_dtr_w)
+{
+                m_dtr_state = state;
+                if (m_loopback) {
+                                m_uart->write_dsr(state);
+                }
+                m_rs232->write_dtr(state);
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rts_w)
+{
+                if (BIT(m_s5_sw->read() , 0)) {
+                                // Full duplex, RTS/ = 0
+                                state = 0;
+                }
+                m_rts_state = state;
+                if (m_loopback) {
+                                m_uart->write_cts(state);
+                }
+                m_rs232->write_rts(state);
+}
+
+WRITE16_MEMBER(hp64k_state::hp64k_loopback_w)
+{
+                m_loopback = BIT(data , 11);
+                hp64k_update_loopback();
+}
+
+void hp64k_state::hp64k_update_loopback(void)
+{
+                if (m_loopback) {
+                                m_uart->write_rxd(m_txd_state);
+                                m_uart->write_dsr(m_dtr_state);
+                                m_uart->write_cts(m_rts_state);
+                } else {
+                                m_uart->write_rxd(m_rs232->rxd_r());
+                                m_uart->write_dsr(m_rs232->dcd_r());
+                                m_uart->write_cts(m_rs232->cts_r());
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_rxd_w)
+{
+                if (!m_loopback) {
+                                m_uart->write_rxd(state);
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_dcd_w)
+{
+                if (!m_loopback) {
+                                m_uart->write_dsr(state);
+                }
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_cts_w)
+{
+                if (!m_loopback) {
+                                m_uart->write_cts(state);
+                }
 }
 
 WRITE16_MEMBER(hp64k_state::hp64k_beep_w)
@@ -912,6 +1091,19 @@ WRITE16_MEMBER(hp64k_state::hp64k_beep_w)
 TIMER_DEVICE_CALLBACK_MEMBER(hp64k_state::hp64k_beeper_off)
 {
 		m_beeper->set_state(0);
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_baud_clk_w)
+{
+                if (!m_16x_clk) {
+                		if (state && !m_baud_clk) {
+                		                m_16x_div++;
+                		}
+                		m_baud_clk = !!state;
+                                state = BIT(m_16x_div , 3);
+                }
+                m_uart->write_txc(state);
+                m_uart->write_rxc(state);
 }
 
 static INPUT_PORTS_START(hp64k)
@@ -1129,6 +1321,30 @@ static INPUT_PORTS_START(hp64k)
 						PORT_DIPSETTING(0x00 , "1x")
 						PORT_DIPSETTING(0x02 , "16x")
 
+                                PORT_START("s5_sw")
+                                PORT_DIPNAME(0x01 , 0x00 , "Duplex")
+                                PORT_DIPLOCATION("S5 IO:!1")
+                                PORT_DIPSETTING(0x00 , "Half duplex")
+                                PORT_DIPSETTING(0x01 , "Full duplex")
+                                PORT_DIPNAME(0x1e , 0x00 , "Baud rate")
+                                PORT_DIPLOCATION("S5 IO:!5,!4,!3,!2")
+                                PORT_DIPSETTING(0x00 , "50")
+                                PORT_DIPSETTING(0x02 , "75")
+                                PORT_DIPSETTING(0x04 , "110")
+                                PORT_DIPSETTING(0x06 , "134.5")
+                                PORT_DIPSETTING(0x08 , "150")
+                                PORT_DIPSETTING(0x0a , "300")
+                                PORT_DIPSETTING(0x0c , "600")
+                                PORT_DIPSETTING(0x0e , "1200")
+                                PORT_DIPSETTING(0x10 , "1800")
+                                PORT_DIPSETTING(0x12 , "2000")
+                                PORT_DIPSETTING(0x14 , "2400")
+                                PORT_DIPSETTING(0x16 , "3600")
+                                PORT_DIPSETTING(0x18 , "4800")
+                                PORT_DIPSETTING(0x1a , "7200")
+                                PORT_DIPSETTING(0x1c , "9600")
+                                PORT_DIPSETTING(0x1e , "19200")
+
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(hp64k_floppies)
@@ -1150,6 +1366,7 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 
 				// Clock = 25 MHz / 9 * (112/114)
 				MCFG_DEVICE_ADD("crtc" , I8275 , 2729045)
+                                MCFG_VIDEO_SET_SCREEN("screen")
 				MCFG_I8275_CHARACTER_WIDTH(9)
 				MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(hp64k_state , crtc_display_pixels)
 				MCFG_I8275_DRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_crtc_drq_w))
@@ -1158,9 +1375,10 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 				MCFG_SCREEN_ADD("screen" , RASTER)
 				MCFG_SCREEN_UPDATE_DEVICE("crtc" , i8275_device , screen_update)
 				MCFG_SCREEN_REFRESH_RATE(60)
+                                MCFG_SCREEN_SIZE(720 , 390)
 				MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-						MCFG_FD1791_ADD("fdc" , XTAL_4MHz / 4)
+		                MCFG_FD1791_ADD("fdc" , XTAL_4MHz / 4)
 						MCFG_WD_FDC_FORCE_READY
 						MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_intrq_w))
 						MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_drq_w))
@@ -1191,6 +1409,22 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 						MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 
 						MCFG_TIMER_DRIVER_ADD("beep_timer" , hp64k_state , hp64k_beeper_off);
+
+                                MCFG_DEVICE_ADD("baud_rate" , CLOCK , 0)
+                                MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(hp64k_state , hp64k_baud_clk_w));
+
+                                MCFG_DEVICE_ADD("uart" , I8251 , 0)
+                                MCFG_I8251_RXRDY_HANDLER(WRITELINE(hp64k_state , hp64k_rxrdy_w));
+                                MCFG_I8251_TXRDY_HANDLER(WRITELINE(hp64k_state , hp64k_txrdy_w));
+                                MCFG_I8251_TXD_HANDLER(WRITELINE(hp64k_state , hp64k_txd_w));
+                                MCFG_I8251_DTR_HANDLER(WRITELINE(hp64k_state , hp64k_dtr_w));
+                                MCFG_I8251_RTS_HANDLER(WRITELINE(hp64k_state , hp64k_rts_w));
+
+                                MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , NULL)
+                                MCFG_RS232_RXD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_rxd_w))
+                                MCFG_RS232_DCD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_dcd_w))
+                                MCFG_RS232_CTS_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_cts_w))
+                                
 MACHINE_CONFIG_END
 
 ROM_START(hp64k)
