@@ -60,7 +60,7 @@
 // simple rectangular envelope.
 //
 //*U20      HP "PHI"    Custom HP-IB interface microcontroller
-//*U28      i8251       RS232 UART
+// U28      i8251       RS232 UART
 //
 // **********
 // Display card (64100-66530)
@@ -148,8 +148,6 @@
 //
 // ICs that are not emulated yet are marked with "*"
 //
-// TODO:
-// - RS232 I/F
 
 #include "emu.h"
 #include "cpu/hphybrid/hphybrid.h"
