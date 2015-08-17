@@ -56,7 +56,7 @@ protected:
 	virtual void update_cart_base(UINT8 *cart_base);
 
 	/* PIA1 */
-	virtual void pia1_pb_changed(void);
+	virtual void pia1_pb_changed(UINT8 data);
 
 private:
 

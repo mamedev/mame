@@ -153,8 +153,8 @@ protected:
 	void recalculate_firq(void);
 
 	// changed handlers
-	virtual void pia1_pa_changed(void);
-	virtual void pia1_pb_changed(void);
+	virtual void pia1_pa_changed(UINT8 data);
+	virtual void pia1_pb_changed(UINT8 data);
 
 	// miscellaneous
 	virtual void update_keyboard_input(UINT8 value, UINT8 z);
@@ -208,7 +208,6 @@ private:
 	bool is_joystick_hires(int joystick_index);
 
 	soundmux_status_t soundmux_status(void);
-	UINT8 sound_value(void);
 	void update_sound(void);
 	bool joyin(void);
 	void poll_joystick(bool *joyin, UINT8 *buttons);
@@ -243,6 +242,10 @@ private:
 
 	// DAC output
 	UINT8 m_dac_output;
+
+	// remember the last audio sample level from the analog sources (DAC, cart, cassette) so that we don't
+	// introduce step changes when the audio output is enabled/disabled via PIA1 CB2
+	UINT8 m_analog_audio_level;
 
 	// hires interface
 	emu_timer *m_hiresjoy_transition_timer[2];

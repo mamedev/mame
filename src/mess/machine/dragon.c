@@ -48,13 +48,13 @@ easier to manage.
 //  pia1_pa_changed - called when PIA1 PA changes
 //-------------------------------------------------
 
-void dragon_state::pia1_pa_changed(void)
+void dragon_state::pia1_pa_changed(UINT8 data)
 {
 	/* call inherited function */
-	coco12_state::pia1_pa_changed();
+	coco12_state::pia1_pa_changed(data);
 
 	/* if strobe bit is high send data from pia0 port b to dragon parallel printer */
-	if (m_pia_1->a_output() & 0x02)
+	if (data & 0x02)
 	{
 		UINT8 output = m_pia_1->b_output();
 		m_printer->output(output);
@@ -113,9 +113,9 @@ WRITE8_MEMBER( dragon64_state::ff00_write )
 //  pia1_pb_changed
 //-------------------------------------------------
 
-void dragon64_state::pia1_pb_changed(void)
+void dragon64_state::pia1_pb_changed(UINT8 data)
 {
-	dragon_state::pia1_pb_changed();
+	dragon_state::pia1_pb_changed(data);
 
 	UINT8 ddr = ~m_pia_1->port_b_z_mask();
 
@@ -125,7 +125,7 @@ void dragon64_state::pia1_pb_changed(void)
 	/* always be high (enabling 32k basic rom) */
 	if (ddr & 0x04)
 	{
-		page_rom(m_pia_1->b_output() & 0x04 ? true : false);
+		page_rom(data & 0x04 ? true : false);
 		logerror("pia1_pb_changed\n");
 	}
 }
