@@ -94,12 +94,11 @@ READ8_MEMBER( coco12_state::sam_read )
 //  pia1_pb_changed
 //-------------------------------------------------
 
-void coco12_state::pia1_pb_changed(void)
+void coco12_state::pia1_pb_changed(UINT8 data)
 {
 	/* call inherited function */
-	coco_state::pia1_pb_changed();
+	coco_state::pia1_pb_changed(data);
 
-	UINT8 data = m_pia_1->b_output();
 	m_vdg->css_w(data & 0x08);
 	m_vdg->intext_w(data & 0x10);
 	m_vdg->gm0_w(data & 0x10);
