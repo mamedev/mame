@@ -1525,3 +1525,8 @@ void slqz3_decrypt(running_machine &machine)
 		src[i] = x;
 	}
 }
+
+void fruitpar_decrypt(running_machine &machine)
+{
+// TODO
+}

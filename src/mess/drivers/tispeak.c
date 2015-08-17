@@ -331,7 +331,6 @@ Language Tutor modules:
 
   TODO:
   - why doesn't lantutor work?
-  - tntell/vocaid: able to get overlay code from external artwork file
   - emulate other known devices
 
 
@@ -585,7 +584,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// which one is active(if any). If it matches with the internal ROM or
 	// external module, the game continues.
 	// 00 for none, 1F for diagnostics, see comment section above for a list
-	m_overlay = m_inp_matrix[10]->read();
+	
+	// try to get overlay code from artwork file(in decimal), otherwise pick the
+	// one that was selected in machine configuration
+	m_overlay = output_get_value("overlay_code") & 0x1f;
+	if (m_overlay == 0)
+		m_overlay = m_inp_matrix[10]->read();
 	
 	for (int i = 0; i < 5; i++)
 		output_set_indexed_value("ol", i+1, m_overlay >> i & 1);
@@ -838,7 +842,7 @@ static INPUT_PORTS_START( tntell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
 
 	PORT_START("IN.10")
-	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" )
+	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" ) // only if not provided by external artwork
 	PORT_CONFSETTING(    0x00, "00 (None)" )
 	PORT_CONFSETTING(    0x01, "01" )
 	PORT_CONFSETTING(    0x02, "02" )
