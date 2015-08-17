@@ -54,6 +54,7 @@ UINT16 sw_custfltr::mnfct[MAX_CUST_FILTER];
 UINT16 sw_custfltr::year[MAX_CUST_FILTER];
 UINT16 sw_custfltr::region[MAX_CUST_FILTER];
 UINT16 sw_custfltr::type[MAX_CUST_FILTER];
+UINT16 sw_custfltr::list[MAX_CUST_FILTER];
 
 std::string reselect_last::driver;
 std::string reselect_last::software;
@@ -370,7 +371,7 @@ void c_year::set(const char *str)
 //  save custom filters info to file
 //-------------------------------------------------
 
-void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year, c_sw_type &m_type)
+void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year, c_sw_type &m_type, c_sw_list &m_list)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -387,6 +388,8 @@ void save_sw_custom_filters(running_machine &machine, const game_driver *driver,
 			if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS)
 				cinfo.append("  Manufacturer filter = ").append(m_publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
+				cinfo.append("  Software List filter = ").append(m_list.name[sw_custfltr::list[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
 				cinfo.append("  Year filter = ").append(m_year.ui[sw_custfltr::year[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_TYPE)
 				cinfo.append("  Type filter = ").append(m_type.ui[sw_custfltr::type[x]]).append("\n");
@@ -402,7 +405,7 @@ void save_sw_custom_filters(running_machine &machine, const game_driver *driver,
 //  load custom filters info from file
 //-------------------------------------------------
 
-void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year, c_sw_type &m_type)
+void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year, c_sw_type &m_type, c_sw_list &m_list)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_READ);
@@ -449,6 +452,14 @@ void load_sw_custom_filters(running_machine &machine, const game_driver *driver,
 						for (size_t z = 0; z < m_year.ui.size(); z++)
 							if (!strncmp(db, m_year.ui[z].c_str(), m_year.ui[z].length()))
 								sw_custfltr::year[x] = z;
+					}
+					else if (y == MEWUI_SW_LIST)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *gb = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < m_list.name.size(); z++)
+							if (!strncmp(gb, m_list.name[z].c_str(), m_list.name[z].length()))
+								sw_custfltr::list[x] = z;
 					}
 					else if (y == MEWUI_SW_TYPE)
 					{

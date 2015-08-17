@@ -91,7 +91,7 @@ ui_menu_select_software::ui_menu_select_software(running_machine &machine, rende
 
 	ui_driver = driver;
 	build_software_list();
-	load_sw_custom_filters(machine, driver, m_region, m_publisher, m_year, m_type);
+	load_sw_custom_filters(machine, driver, m_region, m_publisher, m_year, m_type, m_swlist);
 
 	mewui_globals::curimage_view = SNAPSHOT_VIEW;
 	mewui_globals::switch_image = true;
@@ -283,8 +283,8 @@ void ui_menu_select_software::handle()
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_year.ui,
 			                                     &m_year.actual, SELECTOR_SOFTWARE, l_sw_hover)));
 		else if (l_sw_hover == MEWUI_SW_LIST)
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_swlist_description,
-			                                     &actual_swlist, SELECTOR_SOFTWARE, l_sw_hover)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_swlist.description,
+			                                     &m_swlist.actual, SELECTOR_SOFTWARE, l_sw_hover)));
 		else if (l_sw_hover == MEWUI_SW_TYPE)
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_type.ui,
 			                                     &m_type.actual, SELECTOR_SOFTWARE, l_sw_hover)));
@@ -294,7 +294,7 @@ void ui_menu_select_software::handle()
 		else if (l_sw_hover == MEWUI_SW_CUSTOM)
 		{
 			mewui_globals::actual_sw_filter = l_sw_hover;
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_swcustom_filter(machine(), container, ui_driver, m_region, m_publisher, m_year, m_type)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_swcustom_filter(machine(), container, ui_driver, m_region, m_publisher, m_year, m_type, m_swlist)));
 		}
 		else
 		{
@@ -341,7 +341,7 @@ void ui_menu_select_software::populate()
 				break;
 
 			case MEWUI_SW_LIST:
-				build_list(m_tmp, m_swlist[actual_swlist].c_str());
+				build_list(m_tmp, m_swlist.name[m_swlist.actual].c_str());
 				break;
 
 			case MEWUI_SW_YEARS:
@@ -440,8 +440,8 @@ void ui_menu_select_software::build_software_list()
 	// iterate thru all software lists
 	for (software_list_device *swlist = deviter.first(); swlist != NULL; swlist = deviter.next())
 	{
-		m_swlist.push_back(swlist->list_name());
-		m_swlist_description.push_back(swlist->description());
+		m_swlist.name.push_back(swlist->list_name());
+		m_swlist.description.push_back(swlist->description());
 		for (software_info *swinfo = swlist->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
 		{
 			software_part *part = swinfo->first_part();
@@ -527,12 +527,12 @@ void ui_menu_select_software::build_software_list()
 
 	std::string searchstr, curpath;
 	const osd_directory_entry *dir;
-	for (size_t x = 0; x < m_swlist.size(); ++x)
+	for (size_t x = 0; x < m_swlist.name.size(); ++x)
 	{
 		path_iterator path(machine().options().media_path());
 		while (path.next(curpath))
 		{
-			searchstr.assign(curpath).append(PATH_SEPARATOR).append(m_swlist[x]).append(";");
+			searchstr.assign(curpath).append(PATH_SEPARATOR).append(m_swlist.name[x]).append(";");
 			file_enumerator fpath(searchstr.c_str());
 
 			// iterate while we get new objects
@@ -548,7 +548,7 @@ void ui_menu_select_software::build_software_list()
 
 				strmakelower(name);
 				for (size_t y = 0; y < m_swinfo.size(); ++y)
-					if (m_swinfo[y].shortname == name && m_swinfo[y].listname == m_swlist[x])
+					if (m_swinfo[y].shortname == name && m_swinfo[y].listname == m_swlist.name[x])
 					{
 						m_swinfo[y].available = true;
 						break;
@@ -594,7 +594,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	else if (mewui_globals::actual_sw_filter == MEWUI_SW_YEARS)
 		filtered.assign("Year: ").append(m_year.ui[m_year.actual]).append(" - ");
 	else if (mewui_globals::actual_sw_filter == MEWUI_SW_LIST)
-		filtered.assign("Software List: ").append(m_swlist_description[actual_swlist]).append(" - ");
+		filtered.assign("Software List: ").append(m_swlist.description[m_swlist.actual]).append(" - ");
 	else if (mewui_globals::actual_sw_filter == MEWUI_SW_TYPE)
 		filtered.assign("Device type: ").append(m_type.ui[m_type.actual]).append(" - ");
 
@@ -1124,6 +1124,9 @@ void ui_menu_select_software::build_custom()
 		{
 			case MEWUI_SW_YEARS:
 				build_list(s_drivers, m_year.ui[sw_custfltr::year[count]].c_str(), filter);
+				break;
+			case MEWUI_SW_LIST:
+				build_list(s_drivers, m_swlist.name[sw_custfltr::list[count]].c_str(), filter);
 				break;
 			case MEWUI_SW_TYPE:
 				build_list(s_drivers, m_type.ui[sw_custfltr::type[count]].c_str(), filter);
