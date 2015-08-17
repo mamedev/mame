@@ -9,7 +9,7 @@ class k057714_device : public device_t
 {
 public:
 	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<k057714_device &>(device).m_cputag = tag; }
+	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<k057714_device &>(device).m_irq.set_callback(object); }
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -47,17 +47,17 @@ private:
 	UINT32 m_command_fifo1[4];
 	UINT32 m_command_fifo1_ptr;
 
-	const char* m_cputag;
-	device_t* m_cpu;
-
 	framebuffer m_frame[4];
 	UINT32 m_fb_origin_x;
 	UINT32 m_fb_origin_y;
+
+	devcb_write_line m_irq;
 };
 
 extern const device_type K057714;
 
-#define MCFG_K057714_CPU_TAG(_tag) \
-	k057714_device::static_set_cpu_tag(*device, _tag);
+#define MCFG_K057714_IRQ_CALLBACK(_devcb) \
+	devcb = &k057714_device::static_set_irq_callback(*device, DEVCB_##_devcb);
+
 
 #endif

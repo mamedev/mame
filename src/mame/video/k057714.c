@@ -14,13 +14,14 @@
 const device_type K057714 = &device_creator<k057714_device>;
 
 k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K057714, "K057714 GCU", tag, owner, clock, "k057714", __FILE__)
+	: device_t(mconfig, K057714, "K057714 GCU", tag, owner, clock, "k057714", __FILE__),
+	m_irq(*this)
 {
 }
 
 void k057714_device::device_start()
 {
-	m_cpu = machine().device(m_cputag);
+	m_irq.resolve_safe();
 
 	m_vram = auto_alloc_array(machine(), UINT32, 0x2000000/4);
 	memset(m_vram, 0, 0x2000000);
@@ -97,7 +98,12 @@ WRITE32_MEMBER(k057714_device::write)
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x00010000) == 0)
-				m_cpu->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			{
+				if (!m_irq.isnull())
+				{
+					m_irq(CLEAR_LINE);
+				}
+			}
 			if (ACCESSING_BITS_0_15)
 #if PRINT_GCU
 				printf("%s_w: %02X, %08X, %08X\n", basetag(), reg, data, mem_mask);

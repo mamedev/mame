@@ -68,6 +68,8 @@ public:
 	DECLARE_READ32_MEMBER(unk_78e00000_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 
+	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -162,6 +164,12 @@ static INPUT_PORTS_START( konendev )
 INPUT_PORTS_END
 
 
+WRITE_LINE_MEMBER(konendev_state::gcu_interrupt)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
+}
+
+
 
 static MACHINE_CONFIG_START( konendev, konendev_state )
 	/* basic machine hardware */
@@ -180,7 +188,7 @@ static MACHINE_CONFIG_START( konendev, konendev_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gcu", K057714, 0)
-	MCFG_K057714_CPU_TAG("maincpu")
+	MCFG_K057714_IRQ_CALLBACK(WRITELINE(konendev_state, gcu_interrupt))
 
 	MCFG_NVRAM_ADD_0FILL("nvram0")
 	MCFG_NVRAM_ADD_0FILL("nvram1")
