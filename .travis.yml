@@ -3,7 +3,7 @@ compiler:
   - gcc
   - clang
 env:
-  - SUBTARGET=arcade MAME=mamearcade64
+  - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
   - SUBTARGET=mess   MAME=mess64
 script:
   - if [ $CC == 'clang' ];
