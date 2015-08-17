@@ -1423,13 +1423,12 @@ void ui_mewui_select_game::populate_search()
 {
 	// allocate memory to track the penalty value
 	std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
-
 	int index = 0;
 	for (; index < m_displaylist.size(); ++index)
 	{
 		// pick the best match between driver name and description
-		int curpenalty = driver_list::penalty_compare(m_search, m_displaylist[index]->description);
-		int tmp = driver_list::penalty_compare(m_search, m_displaylist[index]->name);
+		int curpenalty = fuzzy_substring(m_search, m_displaylist[index]->description);
+		int tmp = fuzzy_substring(m_search, m_displaylist[index]->name);
 		curpenalty = MIN(curpenalty, tmp);
 
 		// insert into the sorted table of matches
@@ -1452,21 +1451,16 @@ void ui_mewui_select_game::populate_search()
 	}
 
 	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = NULL : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
-
 	UINT32 flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
-
 	for (int curitem = 0; m_searchlist[curitem]; curitem++)
 	{
 		bool cloneof = strcmp(m_searchlist[curitem]->parent, "0");
-
 		if (cloneof)
 		{
 			int cx = driver_list::find(m_searchlist[curitem]->parent);
-
 			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
-
 		item_append(m_searchlist[curitem]->description, NULL, (!cloneof) ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
 					(void *)m_searchlist[curitem]);
 	}

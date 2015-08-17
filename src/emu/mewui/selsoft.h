@@ -36,12 +36,14 @@ private:
 	c_sw_year           m_year;
 	c_sw_type           m_type;
 
-	ui_software_info *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
-	std::vector<ui_software_info *> m_displaylist;
-	std::vector<ui_software_info> m_swlist;
-	std::vector<ui_software_info *> m_tmp;
-	std::vector<ui_software_info *> m_sortedlist;
-	software_info    *swinfo;
+	ui_software_info                  *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	std::vector<ui_software_info *>   m_displaylist;
+	std::vector<ui_software_info>     m_swinfo;
+	std::vector<ui_software_info *>   m_tmp;
+	std::vector<ui_software_info *>   m_sortedlist;
+	std::vector<std::string>          m_swlist, m_swlist_description;
+	software_info                     *swinfo;
+	UINT16                            actual_swlist;
 
 	void build_software_list();
 	void build_list(std::vector<ui_software_info *> &vec, const char *filter_text = NULL, int filter = -1);

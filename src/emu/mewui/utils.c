@@ -67,7 +67,7 @@ const char *mewui_globals::filter_text[] = { "All", "Available", "Unavailable", 
                                              "Horizontal", "Raster", "Vectors", "Custom" };
 
 const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable", "Originals", "Clones", "Years", "Publishers", "Supported",
-                                                "Partial Supported", "Unsupported", "Region", "Device Type", "Custom" };
+                                                "Partial Supported", "Unsupported", "Region", "Device Type", "Software List", "Custom" };
 
 const char *mewui_globals::ume_text[] = { "ALL", "ARCADES", "SYSTEMS" };
 
