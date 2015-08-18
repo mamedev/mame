@@ -1491,6 +1491,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/glass.c",
 	MAME_DIR .. "src/mame/video/glass.c",
 	MAME_DIR .. "src/mame/drivers/mastboy.c",
+	MAME_DIR .. "src/mame/drivers/rollext.c",
 	MAME_DIR .. "src/mame/drivers/splash.c",
 	MAME_DIR .. "src/mame/video/splash.c",
 	MAME_DIR .. "src/mame/drivers/targeth.c",

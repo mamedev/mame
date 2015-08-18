@@ -55,7 +55,9 @@ public:
 		MP_IN1P,
 		MP_OUTP,
 		MP_IE,
-		MP_INTPEN
+		MP_INTPEN,
+		MP_TCOUNT,
+		MP_TSCALE
 	};
 
 	enum
@@ -126,6 +128,9 @@ protected:
 	UINT32 m_intpen;
 	UINT32 m_epc;
 	UINT32 m_eip;
+
+	UINT32 m_tcount;
+	UINT32 m_tscale;
 
 	UINT32 m_param_ram[0x800];
 
