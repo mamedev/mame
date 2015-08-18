@@ -296,6 +296,7 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 
 // advanced search function
 int fuzzy_substring(const char *needle, const char *haystack);
+int fuzzy_substring2(const char *needle, const char *haystack);
 
 // custom filter load and save
 void load_custom_filters(running_machine &machine);

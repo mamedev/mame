@@ -1427,8 +1427,8 @@ void ui_mewui_select_game::populate_search()
 	for (; index < m_displaylist.size(); ++index)
 	{
 		// pick the best match between driver name and description
-		int curpenalty = fuzzy_substring(m_search, m_displaylist[index]->description);
-		int tmp = fuzzy_substring(m_search, m_displaylist[index]->name);
+		int curpenalty = fuzzy_substring2(m_search, m_displaylist[index]->description);
+		int tmp = fuzzy_substring2(m_search, m_displaylist[index]->name);
 		curpenalty = MIN(curpenalty, tmp);
 
 		// insert into the sorted table of matches
