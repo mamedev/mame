@@ -34,7 +34,12 @@ public:
 		m_tc0140syt(*this, "tc0140syt"),
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_z80bank(*this, "z80bank"),
+		m_steer(*this, "STEER"),
+		m_unknown(*this, "UNKNOWN"),
+		m_fake(*this, "FAKE")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spritemap;
@@ -66,6 +71,10 @@ public:
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_memory_bank m_z80bank;
+	optional_ioport m_steer;
+	optional_ioport m_unknown;
+	optional_ioport m_fake;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(lan_status_r);

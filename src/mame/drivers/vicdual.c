@@ -186,7 +186,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::get_timer_value)
 
 int vicdual_state::is_cabinet_color()
 {
-	return (ioport(COLOR_BW_PORT_TAG)->read_safe(0) & 1) ? 0 : 1;
+	return ((m_color_bw ? m_color_bw->read() : 0) & 1) ? 0 : 1;
 }
 
 
@@ -266,8 +266,8 @@ READ8_MEMBER(vicdual_state::depthch_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x08)  ret = ioport("IN1")->read();
+	if (offset & 0x01)  ret = m_in0->read();
+	if (offset & 0x08)  ret = m_in1->read();
 
 	return ret;
 }
@@ -347,8 +347,8 @@ READ8_MEMBER(vicdual_state::safari_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x08)  ret = ioport("IN1")->read();
+	if (offset & 0x01)  ret = m_in0->read();
+	if (offset & 0x08)  ret = m_in1->read();
 
 	return ret;
 }
@@ -430,8 +430,8 @@ READ8_MEMBER(vicdual_state::frogs_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x08)  ret = ioport("IN1")->read();
+	if (offset & 0x01)  ret = m_in0->read();
+	if (offset & 0x08)  ret = m_in1->read();
 
 	return ret;
 }
@@ -541,8 +541,8 @@ READ8_MEMBER(vicdual_state::headon_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x08)  ret = ioport("IN1")->read();
+	if (offset & 0x01)  ret = m_in0->read();
+	if (offset & 0x08)  ret = m_in1->read();
 
 	return ret;
 }
@@ -552,9 +552,9 @@ READ8_MEMBER(vicdual_state::sspaceat_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x04)  ret = ioport("IN1")->read();
-	if (offset & 0x08)  ret = ioport("IN2")->read();
+	if (offset & 0x01)  ret = m_in0->read();
+	if (offset & 0x04)  ret = m_in1->read();
+	if (offset & 0x08)  ret = m_in2->read();
 
 	return ret;
 }
@@ -800,10 +800,10 @@ READ8_MEMBER(vicdual_state::headon2_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x02) { /* schematics show this as in input port, but never read from */ }
-	if (offset & 0x04)  ret = ioport("IN1")->read();
-	if (offset & 0x08)  ret = ioport("IN2")->read();
+	if (offset & 0x04)  ret = m_in1->read();
+	if (offset & 0x08)  ret = m_in2->read();
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
 
 	return ret;
@@ -1289,14 +1289,12 @@ ADDRESS_MAP_END
 /* several of the games' lives DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(vicdual_state::fake_lives_r)
 {
-	static const char *const portnames[] = { "FAKE_LIVES1", "FAKE_LIVES2" };
-
 	/* use the low byte for the bitmask */
 	UINT8 bit_mask = ((FPTR)param) & 0xff;
 
 	/* and use d8 for the port */
 	int port = ((FPTR)param) >> 8 & 1;
-	return (ioport(portnames[port])->read_safe(0) & bit_mask) ? 0 : 1;
+	return ((m_fake_lives[port] ? m_fake_lives[port]->read() : 0) & bit_mask) ? 0 : 1;
 }
 
 
@@ -1341,7 +1339,7 @@ static INPUT_PORTS_START( invho2 )
 
 	PORT_COIN_DEFAULT
 
-	PORT_START("FAKE_LIVES1")
+	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x01, "Head On 2 Lives" )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -1353,7 +1351,7 @@ static INPUT_PORTS_START( invho2 )
 	   reads IN3 bit 3 instead of bit 2.
 	   Note that the manual only lists setting it to 3 or 4.
 	*/
-	PORT_START("FAKE_LIVES2")
+	PORT_START("FAKE_LIVES.1")
 	PORT_DIPNAME( 0x03, 0x03, "Invinco Lives" )     PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -1404,14 +1402,14 @@ static INPUT_PORTS_START( carhntds )
 
 	PORT_COIN_DEFAULT
 
-	PORT_START("FAKE_LIVES1")
+	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x01, "Car Hunt Lives" )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 
-	PORT_START("FAKE_LIVES2")
+	PORT_START("FAKE_LIVES.1")
 	PORT_DIPNAME( 0x03, 0x03, "Deep Scan Lives" )     PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -1462,14 +1460,14 @@ static INPUT_PORTS_START( invds )
 	PORT_COIN_DEFAULT
 
 	// SW1 @ C1, 6-pos (where are 5 & 6?)
-	PORT_START("FAKE_LIVES1")
+	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x03, "Invinco Lives" )     PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 
-	PORT_START("FAKE_LIVES2")
+	PORT_START("FAKE_LIVES.1")
 	PORT_DIPNAME( 0x03, 0x01, "Deep Scan Lives" )   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -1523,7 +1521,7 @@ static INPUT_PORTS_START( sspacaho )
 
 	PORT_COIN_DEFAULT
 
-	PORT_START("FAKE_LIVES1")
+	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x03, "Space Attack Lives" )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -1763,7 +1761,7 @@ static INPUT_PORTS_START( brdrline )
 
 	PORT_COIN_DEFAULT
 
-	PORT_START("FAKE_LIVES1")
+	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -1838,7 +1836,7 @@ static INPUT_PORTS_START( pulsar )
 
 	PORT_COIN_DEFAULT
 
-	PORT_START("FAKE_LIVES1")
+	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
@@ -1943,7 +1941,7 @@ static INPUT_PORTS_START( alphaho )
 
 	PORT_COIN_DEFAULT
 
-	PORT_START("FAKE_LIVES1")
+	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x03, "Alpha Fighter Lives" )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -2230,8 +2228,8 @@ READ8_MEMBER(vicdual_state::nsub_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x08)  ret = ioport("IN1")->read();
+	if (offset & 0x01)  ret = m_in0->read();
+	if (offset & 0x08)  ret = m_in1->read();
 
 	return ret;
 }
@@ -2279,7 +2277,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
 	if (newval)
 	{
 		int which = (int)(FPTR)param;
-		int coinage = ioport("COINAGE")->read();
+		int coinage = m_coinage->read();
 
 		switch (which)
 		{
@@ -2377,7 +2375,7 @@ MACHINE_START_MEMBER(vicdual_state,nsub)
 
 MACHINE_RESET_MEMBER(vicdual_state,nsub)
 {
-	m_nsub_coin_counter = ioport("COINAGE")->read() & 7;
+	m_nsub_coin_counter = m_coinage->read() & 7;
 
 	machine_reset();
 }
@@ -2411,9 +2409,9 @@ READ8_MEMBER(vicdual_state::invinco_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x02)  ret = ioport("IN1")->read();
-	if (offset & 0x08)  ret = ioport("IN2")->read();
+	if (offset & 0x01)  ret = m_in0->read();
+	if (offset & 0x02)  ret = m_in1->read();
+	if (offset & 0x08)  ret = m_in2->read();
 
 	return ret;
 }

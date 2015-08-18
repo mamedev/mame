@@ -233,30 +233,12 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 
 	rgbaint_t st(0, SSS, 0, SST);
 	rgbaint_t maxst = shift_cycle(st, tile);
-	rgbaint_t stfrac(st);
-	stfrac.and_imm(0x1f);
 
-	clamp_cycle(st, stfrac, maxst, tilenum, tile, userdata);
+	clamp_cycle_light(st, maxst, tilenum, tile, userdata);
 
 	mask(st, tile);
 
 	const UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
-
-	bool upper = ((stfrac.get_r32() + stfrac.get_b32()) >= 0x20);
-
-	rgbaint_t invstf;
-	if (upper)
-	{
-		invstf.set(stfrac);
-		invstf.subr_imm(0x20);
-		invstf.shl_imm(3);
-	}
-	else
-	{
-		invstf.set(0, 0, 0, 0);
-	}
-
-	stfrac.shl_imm(3);
 
 	rgbaint_t t0;
 	((this)->*(m_texel_fetch[index]))(t0, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
@@ -302,10 +284,9 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 
 	bool upper = ((stfrac.get_r32() + stfrac.get_b32()) >= 0x20);
 
-	rgbaint_t invstf;
+	rgbaint_t invstf(stfrac);
 	if (upper)
 	{
-		invstf.set(stfrac);
 		invstf.subr_imm(0x20);
 		invstf.shl_imm(3);
 	}

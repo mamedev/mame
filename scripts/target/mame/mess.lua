@@ -1623,7 +1623,8 @@ files {
 	MAME_DIR .. "src/mess/drivers/hp9845.c",    
 	MAME_DIR .. "src/mess/drivers/hp9k.c",      
 	MAME_DIR .. "src/mess/drivers/hp9k_3xx.c",  
-        MAME_DIR .. "src/mess/drivers/hp64k.c",
+	MAME_DIR .. "src/mess/drivers/hp64k.c",
+	MAME_DIR .. "src/mess/drivers/hp_ipc.c",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")
