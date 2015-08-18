@@ -50,8 +50,8 @@ HP Part# 00095-60953
 |--------------------|     |5  |         |          68000          |                                   |
 |                          |0  |         |                         |                                   |
 | MB81256   MB81256        |0  |         |-------------------------|                                   |
-|                          |A--|                                                                       |
-| MB81256   MB81256                                                                                    |
+|                          |A  |                                                                       |
+| MB81256   MB81256        |---|                                                                       |
 |                      |----------------J3-----------------|                                           |
 | MB81256   MB81256    |                                   |                                           |
 |                      |                                   |                                           |
@@ -123,15 +123,15 @@ HP Part# 00095-60952
 Notes:
          GPU - GPU (Graphics Processor) at U1. Clock input 3MHz [24/8]. VSync on pin 45, HSync on pin 46 (DIP48)
        16Kx4 - 16Kx4 DRAM, organised as 32Kx8bit/16Kx16bit at U3, U4, U5 & U6. Chip type unknown, likely Fujitsu MB81416 (DIP18)
-      WD2797 - WD2797 Floppy Disk Controller at U18. Clock input 2MHz [24/2/3/2] (DIP40)
+      WD2797 - Western Digital WD2797 Floppy Disk Controller at U18. Clock input 2MHz [24/2/3/2] (DIP40)
     HP-IL(1) - HP-IL 1LJ7-0015 'Saturn' Thinkjet Printer Controller IC at U28. Clock input 3MHz on pin 9 [24/8] (DIP48)
     HP-IL(2) - HP-IL Interface IC at U31. Clock input 2MHz on pin 22 [24/2/3/2] (DIP28)
          1Kb - 1Kb RAM at U27 for printer buffer (DIP28, type unknown, very old, with only DATA0,1,2,3, C/D and DIN,DOUT)
-         ROM - 16Kb (2Kx8) Some kind of very early DIP28 PROM/ROM? Same pinout as 1Kb RAM above. Holds the character font table for the printer
+         ROM - 16Kb (2Kx8?) Some kind of very early DIP28 PROM/ROM? Same pinout as 1Kb RAM above. Holds the character font table for the printer
                Four versions of this ROM exist, one each for Japan/Arabic/Hebrew and one for all other regions
     NS58167A - National Semiconductor NS58167A Clock Controller RTC at U44. Clock input 32.768kHz (DIP24)
        LM358 - National Semiconductor LM358 Operational Amplifier at U40 (DIP8)
-       LM393 - Texas Instruments LM393 Dual Comparator (DIP8)
+       LM393 - Texas Instruments LM393 Dual Comparator at U34 (DIP8)
          BT1 - 3v lithium battery
       COP452 - National Semiconductor COP452 Speaker Controller at U39. Clock input 2MHz [24/2/3/2]. This IC provides programmable square wave output from 100Hz to 5000Hz (DIP14)
      TMS9914 - Texas Instruments TMS9914 General Purpose Interface Bus Adapter at U41. Clock input 4MHz [24/2/3] (DIP40)
@@ -186,7 +186,7 @@ Note this PCB plugs in upside-down on top of the Operating System ROM PCB
 |                                   |
 |----------------J3-----------------|
 Notes:
-      J1/J2 - 20 pin connector joining to 'Option ROM PCA'
+      J1/J2 - 20 pin connector joining to 'Operating System ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
       U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
@@ -355,5 +355,5 @@ ROM_START(hp_ipc)
 ROM_END
 
 
-COMP(198?, hp_ipc, 0, 0, hp_ipc, hp_ipc, driver_device, 0, "HP", "Integral Personal Computer", MACHINE_IS_SKELETON)
+COMP(1985, hp_ipc, 0, 0, hp_ipc, hp_ipc, driver_device, 0, "HP", "Integral Personal Computer", MACHINE_IS_SKELETON)
 
