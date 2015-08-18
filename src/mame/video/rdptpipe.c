@@ -302,7 +302,7 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 
 	bool upper = ((stfrac.get_r32() + stfrac.get_b32()) >= 0x20);
 
-	rgbaint_t invstf;
+	rgbaint_t invstf(0);
 	if (upper)
 	{
 		invstf.set(stfrac);
