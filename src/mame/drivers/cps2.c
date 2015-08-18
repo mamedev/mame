@@ -6761,6 +6761,7 @@ ROM_START( sfa3u )
 	SFA3_USA_KEY
 ROM_END
 
+
 ROM_START( sfa3ur1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sz3u.03", 0x000000, 0x80000, CRC(b5984a19) SHA1(e225dd1d3a5d1b94adcfc5f720775e9ba321996e) )
@@ -6786,6 +6787,39 @@ ROM_START( sfa3ur1 )
 	ROM_LOAD( "sz3.01",   0x00000, 0x08000, CRC(de810084) SHA1(fd0b969b732921ed8b40c16fbfa30ee09c7a7cbd) )
 	ROM_CONTINUE(         0x10000, 0x18000 )
 	ROM_LOAD( "sz3.02",   0x28000, 0x20000, CRC(72445dc4) SHA1(14fca7596ac45ba655016eef5b6120f9f9671c23) )
+
+	ROM_REGION( 0x800000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "sz3.11m",   0x000000, 0x400000, CRC(1c89eed1) SHA1(649a0b0a3eb72e2e69e9fb1ac51a58b70daa39f3) )
+	ROM_LOAD16_WORD_SWAP( "sz3.12m",   0x400000, 0x400000, CRC(f392b13a) SHA1(fa04ce0370144a49bd1d5acd873eef87b0dc9d15) )
+
+	SFA3_USA_KEY
+ROM_END
+
+ROM_START( sfa3us )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_03.6a", 0x000000, 0x80000, CRC(14319e29) SHA1(6de0c08f887d334d720d4c8ba7d5745f5282adfb) )
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_04.7a", 0x080000, 0x80000, CRC(65fbc272) SHA1(d320a3c0dae03ea7c32cd521b99afb0e2d62dfaf) )
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_05.8a",  0x100000, 0x80000, CRC(e93c47d1) SHA1(18c388e55b852ad46b784e0cf3fd4c72e8bb6850) )
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_06.9a",  0x180000, 0x80000, CRC(1bf09de3) SHA1(8bd7f5ae7dbaccc65af835f166134f1bb44e6aae) )
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_07.6d",  0x200000, 0x80000, CRC(f6296d96) SHA1(ff9376544968c6783fd98b9a714f0c25174f027a) )
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_08.7d",  0x280000, 0x80000, CRC(1f4008ff) SHA1(f3fe9d6560bf97e7a3a15c1c43f74ac9ef3d5fbb) )
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_09.8d",  0x300000, 0x80000, CRC(822fc451) SHA1(49ec9e3f33d6023b59b350a79fe2299f6ac90251) )
+	ROM_LOAD16_WORD_SWAP( "sz3-usam_10.9d",  0x380000, 0x80000, CRC(92713468) SHA1(9855bb1dd54190e29c5935be4a6529ac0936a628))
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROMX_LOAD( "sz3.13m",   0x0000000, 0x400000, CRC(0f7a60d9) SHA1(c69e0ee22537312909dacc86d2e4be319d54e426) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sz3.15m",   0x0000002, 0x400000, CRC(8e933741) SHA1(f4ac4bfe830dc7df9fe4f680e4e0c053e7cbd8fe) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sz3.17m",   0x0000004, 0x400000, CRC(d6e98147) SHA1(37f331fbb1284db446faecade6f484f58c0e1b2a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sz3.19m",   0x0000006, 0x400000, CRC(f31a728a) SHA1(f14136564648f006c1b74afda78349f260524b5f) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sz3.14m",   0x1000000, 0x400000, CRC(5ff98297) SHA1(9e0ce43380b776c7a03872bafd4856f6fa60bda7) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sz3.16m",   0x1000002, 0x400000, CRC(52b5bdee) SHA1(7918204dc457f7a146d8fb8cf7242dfed3109fd8) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sz3.18m",   0x1000004, 0x400000, CRC(40631ed5) SHA1(c18c56822b90a71ca5fbdf3440eb2671011f3d8f) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sz3.20m",   0x1000006, 0x400000, CRC(763409b4) SHA1(af60a5116c1ca9050366a35ea29128921867f3cc) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sz3-usam_01.1a",   0x00000, 0x08000, CRC(c180947d) SHA1(829c8cf45029676acde369b890ac1b941981f750) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "sz3-usam_02.2a",   0x28000, 0x20000, CRC(9ebc280f) SHA1(33fa0934c046eaae3c841d5be0bbdf7b190ef5e7) )
 
 	ROM_REGION( 0x800000, "qsound", 0 ) /* QSound samples */
 	ROM_LOAD16_WORD_SWAP( "sz3.11m",   0x000000, 0x400000, CRC(1c89eed1) SHA1(649a0b0a3eb72e2e69e9fb1ac51a58b70daa39f3) )
@@ -9442,6 +9476,7 @@ GAME( 1998, mvscb,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   
 GAME( 1998, sfa3,       0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Euro 980904)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3u,      sfa3,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980904)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3ur1,    sfa3,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980629)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sfa3us,     sfa3,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980616, SAMPLE Version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3h,      sfa3,     cps2, cps2_2p6bt, cps_state,cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Hispanic 980904)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3hr1,    sfa3,     cps2, cps2_2p6bt, cps_state,cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Hispanic 980629)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3b,      sfa3,     cps2, cps2_2p6bt, cps_state,cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Brazil 980629)", MACHINE_SUPPORTS_SAVE )
