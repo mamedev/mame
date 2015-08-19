@@ -6006,7 +6006,7 @@ static INPUT_PORTS_START( crazybon )
 	PORT_INCLUDE( cmv4_service )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( "Hold Pair" ) )      PORT_DIPLOCATION("DSW1:1")      /* OK */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:2")      /* not checked */
