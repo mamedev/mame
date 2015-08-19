@@ -14,19 +14,26 @@
 
 const char *ui_menu_controller_mapping::device_status[] = { "none", "keyboard", "mouse", "lightgun", "joystick" };
 
+static ctrl_option m_options[] = {
+	{ 0, NULL, NULL },
+	{ 0, "Lightgun Device Assignment", OPTION_LIGHTGUN_DEVICE },
+	{ 0, "Trackball Device Assignment", OPTION_TRACKBALL_DEVICE },
+	{ 0, "Pedal Device Assignment", OPTION_PEDAL_DEVICE },
+	{ 0, "Adstick Device Assignment", OPTION_ADSTICK_DEVICE },
+	{ 0, "Paddle Device Assignment", OPTION_PADDLE_DEVICE },
+	{ 0, "Dial Device Assignment", OPTION_DIAL_DEVICE },
+	{ 0, "Positional Device Assignment", OPTION_POSITIONAL_DEVICE },
+	{ 0, "Mouse Device Assignment", OPTION_MOUSE_DEVICE }
+};
+
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
 ui_menu_controller_mapping::ui_menu_controller_mapping(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-	m_options[ADSTICK_DEVICE_ASSIGN] = check_status(machine.options().adstick_device());
-	m_options[PADDLE_DEVICE_ASSIGN] = check_status(machine.options().paddle_device());
-	m_options[LIGHTGUN_DEVICE_ASSIGN] = check_status(machine.options().lightgun_device());
-	m_options[TRACKBALL_DEVICE_ASSIGN] = check_status(machine.options().trackball_device());
-	m_options[DIAL_DEVICE_ASSIGN] = check_status(machine.options().dial_device());
-	m_options[POSITIONAL_DEVICE_ASSIGN] = check_status(machine.options().positional_device());
-	m_options[MOUSE_DEVICE_ASSIGN] = check_status(machine.options().mouse_device());
+	for (int d = 1; d < LAST_DEVICE_ASSIGN; ++d)
+		m_options[d].status = check_status(machine.options().value(m_options[d].option), m_options[d].option);
 }
 
 //-------------------------------------------------
@@ -36,13 +43,8 @@ ui_menu_controller_mapping::ui_menu_controller_mapping(running_machine &machine,
 ui_menu_controller_mapping::~ui_menu_controller_mapping()
 {
 	std::string error_string;
-	machine().options().set_value(OPTION_LIGHTGUN_DEVICE, device_status[m_options[LIGHTGUN_DEVICE_ASSIGN]], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_ADSTICK_DEVICE, device_status[m_options[ADSTICK_DEVICE_ASSIGN]], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_PADDLE_DEVICE, device_status[m_options[PADDLE_DEVICE_ASSIGN]], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_DIAL_DEVICE, device_status[m_options[DIAL_DEVICE_ASSIGN]], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_POSITIONAL_DEVICE, device_status[m_options[POSITIONAL_DEVICE_ASSIGN]], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_TRACKBALL_DEVICE, device_status[m_options[TRACKBALL_DEVICE_ASSIGN]], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_MOUSE_DEVICE, device_status[m_options[MOUSE_DEVICE_ASSIGN]], OPTION_PRIORITY_CMDLINE, error_string);
+	for (int d = 1; d < LAST_DEVICE_ASSIGN; ++d)
+		machine().options().set_value(m_options[d].option, device_status[m_options[d].status], OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 //-------------------------------------------------
@@ -61,7 +63,7 @@ void ui_menu_controller_mapping::handle()
 		{
 			changed = true;
 			int value = (FPTR)menu_event->itemref;
-			(menu_event->iptkey == IPT_UI_RIGHT) ? m_options[value]++ : m_options[value]--;
+			(menu_event->iptkey == IPT_UI_RIGHT) ? m_options[value].status++ : m_options[value].status--;
 		}
 	}
 
@@ -75,36 +77,13 @@ void ui_menu_controller_mapping::handle()
 
 void ui_menu_controller_mapping::populate()
 {
-	// add lightgun device assignment option
-	UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[LIGHTGUN_DEVICE_ASSIGN]);
-	item_append("Lightgun Device Assignment", device_status[m_options[LIGHTGUN_DEVICE_ASSIGN]], arrow_flags, (void *)LIGHTGUN_DEVICE_ASSIGN);
-
-	// add paddle device assignment option
-	arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[PADDLE_DEVICE_ASSIGN]);
-	item_append("Paddle Device Assignment", device_status[m_options[PADDLE_DEVICE_ASSIGN]], arrow_flags, (void *)PADDLE_DEVICE_ASSIGN);
-
-	// add adstick device assignment option
-	arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[ADSTICK_DEVICE_ASSIGN]);
-	item_append("Adstick Device Assignment", device_status[m_options[ADSTICK_DEVICE_ASSIGN]], arrow_flags, (void *)ADSTICK_DEVICE_ASSIGN);
-
-	// add trackball device assignment option
-	arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[TRACKBALL_DEVICE_ASSIGN]);
-	item_append("Trackball Device Assignment", device_status[m_options[TRACKBALL_DEVICE_ASSIGN]], arrow_flags, (void *)TRACKBALL_DEVICE_ASSIGN);
-
-	// add positional device assignment option
-	arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[POSITIONAL_DEVICE_ASSIGN]);
-	item_append("Positional Device Assignment", device_status[m_options[POSITIONAL_DEVICE_ASSIGN]], arrow_flags, (void *)POSITIONAL_DEVICE_ASSIGN);
-
-	// add dial device assignment option
-	arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[DIAL_DEVICE_ASSIGN]);
-	item_append("Dial Device Assignment", device_status[m_options[DIAL_DEVICE_ASSIGN]], arrow_flags, (void *)DIAL_DEVICE_ASSIGN);
-
-	// add mouse device assignment option
-	arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[MOUSE_DEVICE_ASSIGN]);
-	item_append("Mouse Device Assignment", device_status[m_options[MOUSE_DEVICE_ASSIGN]], arrow_flags, (void *)MOUSE_DEVICE_ASSIGN);
-
+	// add options
+	for (int d = 1; d < LAST_DEVICE_ASSIGN; ++d)
+	{
+		UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[d].status);
+		item_append(m_options[d].description, device_status[m_options[d].status], arrow_flags, (void *)(FPTR)d);
+	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-
 	customtop =  machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
@@ -145,12 +124,18 @@ void ui_menu_controller_mapping::custom_render(void *selectedref, float top, flo
 //  return current value
 //-------------------------------------------------
 
-int ui_menu_controller_mapping::check_status(const char *status)
+int ui_menu_controller_mapping::check_status(const char *status, const char *option)
 {
 	for (int d = 0; *device_status[d]; d++)
 		if (!strcmp(device_status[d], status))
 			return d;
 
-	return 0;
+	emu_options def_opt;
+	const char *def_val = def_opt.value(option);
 
+	for (int d = 0; *device_status[d]; d++)
+		if (!strcmp(device_status[d], def_val))
+			return d;
+
+	return 1;
 }

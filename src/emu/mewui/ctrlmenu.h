@@ -12,6 +12,13 @@
 #ifndef __MEWUI_CTRLMENU_H__
 #define __MEWUI_CTRLMENU_H__
 
+struct ctrl_option
+{
+	int         status;
+	const char  *description;
+	const char  *option;
+};
+
 //-------------------------------------------------
 //  class controller mapping menu
 //-------------------------------------------------
@@ -30,6 +37,7 @@ private:
 	{
 		LIGHTGUN_DEVICE_ASSIGN = 1,
 		TRACKBALL_DEVICE_ASSIGN,
+		PEDAL_DEVICE_ASSIGN,
 		ADSTICK_DEVICE_ASSIGN,
 		PADDLE_DEVICE_ASSIGN,
 		DIAL_DEVICE_ASSIGN,
@@ -39,8 +47,7 @@ private:
 	};
 
 	static const char *device_status[];
-	int check_status(const char *status);
-	int m_options[LAST_DEVICE_ASSIGN];
+	int check_status(const char *status, const char *option);
 };
 
 #endif /* __MEWUI_CTRLMENU_H__ */

@@ -169,7 +169,7 @@ public:
     void process_natural_keyboard();
 
     // MEWUI word wrap
-    void wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int *totallines, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
+    void wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int &totallines, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
 
     // draw an outlined box with given line color and filled with a texture
     void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = NULL, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
