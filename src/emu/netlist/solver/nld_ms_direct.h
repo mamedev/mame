@@ -265,6 +265,33 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		psort_list(t->m_nz);
 	}
 
+	/* create a list of non zero elements below diagonal k
+	 * This should reduce cache misses ...
+	 */
+
+	bool touched[_storage_N][_storage_N] = { false };
+	for (unsigned k = 0; k < N(); k++)
+	{
+		m_terms[k]->m_nzbd.clear();
+		for (unsigned j = 0; j < m_terms[k]->m_nz.size(); j++)
+			touched[k][m_terms[k]->m_nz[j]] = true;
+	}
+
+	for (unsigned k = 0; k < N(); k++)
+	{
+		for (unsigned row = k + 1; row < N(); row++)
+		{
+			if (touched[row][k])
+			{
+				if (!m_terms[k]->m_nzbd.contains(row))
+					m_terms[k]->m_nzbd.add(row);
+				for (unsigned col = k; col < N(); col++)
+					if (touched[k][col])
+						touched[row][col] = true;
+			}
+		}
+	}
+
 	if (0)
 		for (unsigned k = 0; k < N(); k++)
 		{
@@ -393,37 +420,22 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 		{
 			/* FIXME: Singular matrix? */
 			const nl_double f = 1.0 / A(i,i);
-			const unsigned *p = m_terms[i]->m_nzrd.data();
+			const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
 			const unsigned e = m_terms[i]->m_nzrd.size();
 
 			/* Eliminate column i from row j */
 
-			for (unsigned j = i + 1; j < kN; j++)
+			const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
+			const unsigned eb = m_terms[i]->m_nzbd.size();
+			for (unsigned jb = 0; jb < eb; jb++)
 			{
-				if (A(j,i) != NL_FCONST(0.0))
+				const unsigned j = pb[jb];
+				const nl_double f1 = - A(j,i) * f;
+				for (unsigned k = 0; k < e; k++)
 				{
-					const nl_double f1 = - A(j,i) * f;
-	#if 0
-					/*  The code below is 30% faster than the original
-					 *  implementation which is given here for reference.
-					 *
-					 *  for (unsigned k = i + 1; k < kN; k++)
-					 *      m_A[j][k] = m_A[j][k] + m_A[i][k] * f1;
-					 */
-					double * RESTRICT d = &m_A[j][i+1];
-					const double * RESTRICT s = &m_A[i][i+1];
-					const int e = kN - i - 1;
-					for (int k = 0; k < e; k++)
-						d[k] = d[k] + s[k] * f1;
-	#else
-					for (unsigned k = 0; k < e; k++)
-					{
-						const unsigned pk = p[k];
-						A(j,pk) += A(i,pk) * f1;
-					}
-	#endif
-					m_RHS[j] += m_RHS[i] * f1;
+					A(j,p[k]) += A(i,p[k]) * f1;
 				}
+				m_RHS[j] += m_RHS[i] * f1;
 			}
 		}
 	}
