@@ -16,57 +16,65 @@ to what is described here needs further investigation.
 In type-2 PCBs, the encrypted data is always contained in the first ROM of the
 game (8E), and it's always stored spanning an integer number of NAND blocks
 (the K9F2808U0B is organized in blocks of 16 KiB, each containing 32 pages of
-0x200 bytes). The first part of the encrypted data is stored at about the end
-of the ROM, and apparently all the blocks in that area are processed in
-reverse order (first the one nearest the end, then the second nearest, etc);
-the second part goes immediately after it from a logic perspective, but it's
-physically located at the area starting at 0x28000 in the ROM. Games, after
+0x200 bytes). Usually the first part of the encrypted data is stored at about the end
+of the ROM, with all the blocks in that area processed in reverse order (first the 
+one nearest the end, then the second nearest, etc); the second part goes immediately
+after it from a logic perspective, but it's, usually, physically located at the area 
+starting at 0x28000 in the ROM. However, in at least a couple of games, there are
+out-of-order blocks (details below). Games, after
 some bootup code has been executed, will copy the encrypted content from
 the NANDs to RAM, moment at which the decryption is triggered. Physical locations
 of the encrypted programs in the first NAND, together with the RAM region where 
-they are loaded, are summarized in the following table:
+they are loaded, are summarized in the following table ( ' indicating processing
+in reverse order of the constituting blocks) :
 
-game        head region         tail region        RAM address
---------    ----------------    --------------     -----------
-chocovdr    [fdc000,1000000)    [28000,1dc000)     80010000
-gamshara    [fdc000,1000000)    [28000,144000)     80010000
-knpuzzle    [fc8000,fcc000)     [28000,40c000)     80030000
-konotako    [fdc000,1000000)    [28000,b4000)      80010000
-mrdrilrg    [fd4000,fd8000)     [28000,3dc000)     80030000
-nflclsfb    [fdc000,1000000)    [28000,204000)     80010000
-startrgn    [fdc000,1000000)    [28000,b4000)      80010000
+game        data regions                           RAM address
+--------    ----------------------------------     -----------
+chocovdr    [fdc000,1000000)' + [28000,1dc000)     80010000
+gamshara    [fdc000,1000000)' + [28000,144000)     80010000
+gjspace     [fd4000,ff8000)'  + [28000,80000)      80010000
+            + [fd0000,fd4000) + [80000,200000)
+knpuzzle    [fc8000,fcc000)'  + [28000,40c000)     80030000
+            + [fc4000,fc8000) + [40c000,458000)
+konotako    [fdc000,1000000)' + [28000,b4000)      80010000
+mrdrilrg    [fd4000,fd8000)'  + [28000,3dc000)     80030000
+nflclsfb    [fdc000,1000000)' + [28000,204000)     80010000
+panikuru    [fdc000,fe0000)'  + [28000,ac000)      80030000
+startrgn    [fdc000,1000000)' + [28000,b4000)      80010000
 
-knpuzzle constitutes an interesting case, as it seem to be playing some tricks
-in order to obfuscate the location of the main program; first, both regions
-are padded by encrypted blank regions (at [fc4000,fc8000) & [40c000,458000)),
-maybe in an attempt to hinder the recognition of the extremes of the
-encrypted data; second, some kind of protection trap seem to simulate a loading
-of the encrypted region as if it were using the same head region and RAM address
-than most sets ([fdc000,1000000) & 80010000), while those aren't the correct
-values for it.  
+Both knpuzzle & gjspace present a NAND block which is out of order with respect
+to the normal layout; besides, that block is physically located immediately before
+the end-of-ROM region, in what maybe is an attempt to hinder the 
+recognition/reconstruction of the encrypted data.
 
 Most games do a single decryption run, so the process is only initialized once;
-however, at least one game (gamshara) does write to the triggering register
-more than once, effectively resetting the internal state of the decrypter
-several times. (gamshara do it every 5 NAND blocks; the lowest nibble written to
-the register seem to control the initial value of the state; see details in the
-implementation).
+however, at least three of them (gamshara, mrdrilrg & panikuru) do reinitialize the
+internal state of the decrypted several times. As of 2015-08-19, only gamshara shows signs 
+of doing it by writing to the triggering register; how the others two are triggering the
+reinitializations is still unclear. gamshara does a reinitialization every 5 NAND blocks
+(16 times in total); mrdrilrg does the second one after 0x38000 bytes and then subsequent
+ones every 32 blocks (8 times in total); panikuru does one every 2 blocks up to a total
+of 16 times.
 
 The calculation of the XOR masks seem to operate this way: most bits are
 calculated by using linear equations over GF(2) taking as input data the bits from
 previously processed words; however, one nonlinear calculation is performed
-per word processed, and that calculation can affect several bits from the
-mask (but, apparently, the same nonlinear terms affect all of them),
-though in most cases only one bit is involved. Till now, most of the linear
-relations seem to depend only on the previous 3 words, but there are some
-bits from those showing nonlinear behaviour which seem to use farther words;
-this is still being investigated, and the implementation is probable to
-change to reflect new findings.
+per word processed, and that calculation typically affect just one bit (the only
+known exception is mrdrilrg, where the same nonlinear terms are 
+affecting two of them). Till now, all the formulae seem to depend only on the 
+previous 3 words, and the first mask after a (re-)initialization is always zero, so
+chances are the mask bits are calculated one word in advance, having access to the 
+current encrypted and decrypted words plus two further words in each sequence, maybe stored
+in 32 bits registers. All the nonlinear terms reverse-engineered till now are of the form
+A x B, where A and B are linear formulae; thus, as everything else in the schema involves
+only linear relations, those nonlinear terms are probably caused by an Y-combinator taking
+the resuls of two such linear relations as input, and deciding between both branches based
+on another linear formula.
 
 The bits affected by the nonlinear calculations are given below:
 chocovdr  -> #10
 gamshara  -> #2
-gjspace   -> a subset of {#3, #4, #5, #10, #11}, maybe all of them
+gjspace   -> none
 gunbalina -> #11
 knpuzzle  -> #1
 konotako  -> #15
@@ -85,9 +93,9 @@ equivalent datasets, nothing else.
 
 
 TO-DO:
-* Research the nonlinear calculations in most of the games.
-* Determine how many previous words the hardware is really using, and change
-the implementation accordingly.
+* If further dumps support the theory of the calculations just depending on 3 previous words,
+change the implementation accordingly to reflect that.
+* Research how type-1 encryption is related to this.
 
 Observing the linear equations, there is a keen difference between bits using
 just a bunch of previous bits, and others using much more bits from more words;
@@ -107,6 +115,7 @@ really exist.
 
 const device_type CHOCOVDR_DECRYPTER = &device_creator<chocovdr_decrypter_device>;
 const device_type GAMSHARA_DECRYPTER = &device_creator<gamshara_decrypter_device>;
+const device_type  GJSPACE_DECRYPTER = &device_creator<gjspace_decrypter_device>;
 const device_type KNPUZZLE_DECRYPTER = &device_creator<knpuzzle_decrypter_device>;
 const device_type KONOTAKO_DECRYPTER = &device_creator<konotako_decrypter_device>;
 const device_type NFLCLSFB_DECRYPTER = &device_creator<nflclsfb_decrypter_device>;
@@ -205,9 +214,14 @@ int gf2_reducer::gf2_reduce(UINT64 num)const
 // static UINT16 mrdrilrg_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
 // {
 	// UINT64 previous_masks = previous_cipherwords ^ previous_plainwords;
-	// return (reducer.gf2_reduce(0x00000a00a305c826ull & previousMasks) & reducer.gf2_reduce(0x0000011800020000ull & previousMasks)) * 0x0011;
+	// return (reducer.gf2_reduce(0x00000a00a305c826ull & previous_masks) & reducer.gf2_reduce(0x0000011800020000ull & previous_masks)) * 0x0011;
 // }
 
+// static UINT16 panikuru_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
+// {
+	// return ((reducer.gf2_reduce(0x0000000088300281ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000004600281ull & previous_plainwords))
+ 		  // & (reducer.gf2_reduce(0x0000a13140090000ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000806240090000ull & previous_plainwords))) << 2;
+// }
 
 static UINT16 chocovdr_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
 {
@@ -251,6 +265,27 @@ static const ns10_decrypter_device::ns10_crypto_logic gamshara_crypto_logic = {
 	},
 	0x25ab,
 	gamshara_nonlinear_calc
+};
+
+static UINT16 gjspace_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer&)
+{
+	return 0;
+}
+
+static const ns10_decrypter_device::ns10_crypto_logic gjspace_crypto_logic = {
+	{
+		0x0000000000000240ull, 0x0000d617eb0f1ab1ull, 0x00000000451111c0ull, 0x00000000013b1f44ull,
+		0x0000aab0b356abceull, 0x00007ca76b89602aull, 0x0000000000001800ull, 0x00000000031d1303ull,
+		0x0000000000000801ull, 0x0000000030111160ull, 0x0000000001ab3978ull, 0x00000000c131b160ull,
+		0x0000000000001110ull, 0x0000000000008002ull, 0x00000000e1113540ull, 0x0000d617fdce8bfcull,
+	}, {
+		0x0000000000008240ull, 0x000000002f301ab1ull, 0x00000000050011c0ull, 0x00000000412817c4ull,
+		0x00000004c338abc6ull, 0x000000046108602aull, 0x0000000000005800ull, 0x00000000c3081347ull,
+		0x0000000000000801ull, 0x0000000061001160ull, 0x0000000061183978ull, 0x00000000e520b142ull,
+		0x0000000000001101ull, 0x000000000000a002ull, 0x0000000029001740ull, 0x00000000a4309bfcull,
+	},
+	0x2e7f,
+	gjspace_nonlinear_calc
 };
 
 static UINT16 knpuzzle_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
@@ -351,6 +386,11 @@ chocovdr_decrypter_device::chocovdr_decrypter_device(const machine_config &mconf
 
 gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ns10_decrypter_device(GAMSHARA_DECRYPTER, gamshara_crypto_logic, mconfig, tag, owner, clock)
+{
+}
+
+gjspace_decrypter_device::gjspace_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ns10_decrypter_device(GJSPACE_DECRYPTER, gjspace_crypto_logic, mconfig, tag, owner, clock)
 {
 }
 
