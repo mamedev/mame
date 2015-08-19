@@ -260,6 +260,7 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   x--- ----
 
   all cm/cmaster use the same scheme
+  cmv4, cmv801 and crazybon don't light the Take button when it's available for hold pair
   tonypok uses lamps to indicate current button functions rather than active buttons
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
@@ -1456,7 +1457,7 @@ static INPUT_PORTS_START( cmv801 )
 
 	PORT_INCLUDE( cmv4_dsw1 )
 	PORT_MODIFY("DSW1")
-	/* Hold Pair OK */
+	/* Hold Pair OK - use Take button */
 	/* Hopper Out Switch not checked */
 	/* Payout Mode not checked */
 	/* '7' In Double Up Game OK */
@@ -1508,7 +1509,7 @@ static INPUT_PORTS_START( cmv4 )
 
 	PORT_INCLUDE( cmv4_dsw1 )
 	PORT_MODIFY("DSW1")
-	/* Hold Pair OK */
+	/* Hold Pair OK - use Take button */
 	/* Hopper Out Switch not checked */
 	/* Payout Mode not checked */
 	/* '7' In Double Up Game OK */
@@ -6012,7 +6013,7 @@ static INPUT_PORTS_START( crazybon )
 	PORT_INCLUDE( cmv4_service )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Hold Pair" )                 PORT_DIPLOCATION("DSW1:1")      /* OK */
+	PORT_DIPNAME( 0x01, 0x00, "Hold Pair" )                 PORT_DIPLOCATION("DSW1:1")      /* OK - use Take button */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:2")      /* not checked */
