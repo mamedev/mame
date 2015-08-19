@@ -1221,7 +1221,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmv4_dsw1 )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Hold Pair" )                 PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:2")
@@ -1456,7 +1456,7 @@ static INPUT_PORTS_START( cmv801 )
 
 	PORT_INCLUDE( cmv4_dsw1 )
 	PORT_MODIFY("DSW1")
-	/* DSW1-1 unused */
+	/* Hold Pair OK */
 	/* Hopper Out Switch not checked */
 	/* Payout Mode not checked */
 	/* '7' In Double Up Game OK */
@@ -1508,7 +1508,7 @@ static INPUT_PORTS_START( cmv4 )
 
 	PORT_INCLUDE( cmv4_dsw1 )
 	PORT_MODIFY("DSW1")
-	/* DSW1-1 unused */
+	/* Hold Pair OK */
 	/* Hopper Out Switch not checked */
 	/* Payout Mode not checked */
 	/* '7' In Double Up Game OK */
@@ -1564,7 +1564,9 @@ static INPUT_PORTS_START( cmaster )
 
 	PORT_INCLUDE( cmv4_dsw1 )
 	PORT_MODIFY("DSW1")
-	/* DSW1-1 unused */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Hopper Out Switch not checked */
 	/* Payout Mode not checked */
 	/* '7' In Double Up Game OK */
@@ -1620,7 +1622,9 @@ static INPUT_PORTS_START( cmasterb )
 
 	PORT_INCLUDE( cmv4_dsw1 )
 	PORT_MODIFY("DSW1")
-	/* DSW1-1 unused */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Hopper Out Switch not checked */
 	/* Payout Mode not checked */
 	/* '7' In Double Up Game OK */
@@ -1676,7 +1680,9 @@ static INPUT_PORTS_START( cmasterc )
 
 	PORT_INCLUDE( cmv4_dsw1 )
 	PORT_MODIFY("DSW1")
-	/* DSW1-1 unused */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Hopper Out Switch not checked */
 	/* Payout Mode not checked */
 	/* '7' In Double Up Game OK */
