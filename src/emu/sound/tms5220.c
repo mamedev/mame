@@ -755,6 +755,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 		 * which happens 4 T-cycles later), we change on the latter.
 		 * The indices are updated here ~12 PCs before the new frame is applied.
 		 */
+		/** TODO: the patents 4331836, 4335277, and 4419540 disagree about the timing of this **/
 		if ((m_IP == 0) && (m_PC == 0) && (m_subcycle < 2))
 		{
 			m_OLDE = (m_new_frame_energy_idx == 0);
@@ -790,6 +791,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 #endif
 				if (m_speaking_now == 1) // we're done, set all coeffs to idle state but keep going for a bit...
 				{
+					/**TODO: should index clearing be done here, or elsewhere? **/
 					m_new_frame_energy_idx = 0;
 					m_new_frame_pitch_idx = 0;
 					for (i = 0; i < 4; i++)
@@ -828,11 +830,13 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 			   Interpolation inhibit cases:
 			 * Old frame was voiced, new is unvoiced
 			 * Old frame was silence/zero energy, new has nonzero energy
-			 * Old frame was unvoiced, new is voiced (note this is the case on the patent but may not be correct on the real final chip)
+			 * Old frame was unvoiced, new is voiced
+			 * Old frame was unvoiced, new frame is silence/zero energy (unique to tms52xx)
 			 */
 			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
-				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0)) /* this line needs further investigation, starwars tie fighters may sound better without it */
-				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
+				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
+				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0))
+				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) )
 				m_inhibit = 1;
 			else // normal frame, normal interpolation
 				m_inhibit = 0;

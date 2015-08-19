@@ -141,9 +141,6 @@ void ui_menu_sliders::populate()
 		if (curval < curslider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
 		item_append(curslider->description, tempstring.c_str(), flags, (void *)curslider);
-
-		if (menuless_mode)
-			break;
 	}
 
 	/* add OSD sliders */
