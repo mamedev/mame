@@ -1454,7 +1454,7 @@ GAME( 1981, qixa,     qix,      qix,      qix,      driver_device, 0,        ROT
 GAME( 1981, qixb,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, qixo,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
 GAME( 1981, qix2,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, sdungeon, 0,        mcu,      sdungeon, driver_device, 0,        ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sdungeon, 0,        mcu,      sdungeon, driver_device, 0,        ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
 GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
 GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
 GAME( 1982, kram,     0,        mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
