@@ -750,6 +750,7 @@ ssam88s
 
 // Non-PC msdos
 pcd     // Siemens PC-D
+pcx     // Siemens PC-X
 slicer  // 1983 Slicer Computers
 olypeopl // Olympia People PC
 
