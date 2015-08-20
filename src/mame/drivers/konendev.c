@@ -99,6 +99,8 @@ READ32_MEMBER(konendev_state::mcu2_r)
 	if (ACCESSING_BITS_0_7)
 	{
 		r |= 0x40;			// logic door
+		r |= 0x04;			// battery 1 status
+		r |= 0x10;			// battery 2 status
 	}
 
 	return r;
@@ -152,6 +154,7 @@ static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
 //	AM_RANGE(0x78000000, 0x78000003) AM_READNOP
 //	AM_RANGE(0x78100000, 0x7810001b) AM_RAM
 //	AM_RANGE(0x78a00014, 0x78a00017) AM_WRITENOP
+	AM_RANGE(0x79000000, 0x79000003) AM_DEVWRITE("gcu", k057714_device, fifo_w)
 	AM_RANGE(0x79800000, 0x798000ff) AM_DEVREADWRITE("gcu", k057714_device, read, write)
 	AM_RANGE(0x7a000000, 0x7a01ffff) AM_RAM AM_SHARE("nvram0")
 	AM_RANGE(0x7a100000, 0x7a11ffff) AM_RAM AM_SHARE("nvram1")

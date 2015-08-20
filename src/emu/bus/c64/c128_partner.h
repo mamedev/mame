@@ -40,11 +40,11 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw);
 
 	// device_vcs_control_port_interface overrides
 	virtual void vcs_joy_w(UINT8 data);
@@ -52,9 +52,9 @@ protected:
 private:
 	optional_shared_ptr<UINT8> m_ram;
 
+	emu_timer *t_joyb2;
 	int m_ram_a12_a7;
 	int m_ls74_cd;
-	int m_ls74_d1;
 	int m_ls74_q1;
 	int m_ls74_q2;
 	int m_joyb2;

@@ -15,6 +15,7 @@ public:
 
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
+	DECLARE_WRITE32_MEMBER(fifo_w);
 
 	struct framebuffer
 	{
@@ -46,6 +47,11 @@ private:
 	UINT32 m_command_fifo0_ptr;
 	UINT32 m_command_fifo1[4];
 	UINT32 m_command_fifo1_ptr;
+	UINT32 m_ext_fifo_addr;
+	UINT32 m_ext_fifo_count;
+	UINT32 m_ext_fifo_line;
+	UINT32 m_ext_fifo_num_lines;
+	UINT32 m_ext_fifo_width;
 
 	framebuffer m_frame[4];
 	UINT32 m_fb_origin_x;

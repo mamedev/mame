@@ -11,44 +11,46 @@ CPU: Z80 or 68000
 Sound: (AY-3-8910) + YM2413 + MSM6295
 Other: Real Time Clock (Oki MSM6242B or 72421B)
 
---------------------------------------------------------------------------------------------------------------------
-Year + Game                Board               CPU   Sound               Custom                                Other
---------------------------------------------------------------------------------------------------------------------
-92 Monkey Mole Panic                           2xZ80 AY8910 YM2413 M6295 NL-001 1108(x2)   1427(x2)            8251
-93 Animalandia Jr.                             2xZ80 AY8910 YM2413 M6295 NL-001 NL-003(x2) NL-004(x2)          8251
-93 Quiz Channel Question   N7311208L1-2        Z80          YM2413 M6295 NL-002 1108F0405  1427F0071
-93 First Funky Fighter     N7403208L-2         2xZ80 YM2149 YM2413 M6295 NL-001 NL-002     NL-005
-94 Mj Mysterious World     D7107058L1-1        Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
-94 Mj Mysterious Universe  D7107058L1-1        Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
-94 Mj Mysterious Orient    D7107058L1-1        Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
-94 Quiz 365                                    68000 AY8910 YM2413 M6295
-94 Rong Rong (J)           N8010178L1          Z80          YM2413 M6295 NL-002 1108F0405  1427F0071 4L02F2637
-94 Hf Hana Ginga           D8102048L1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
-94 Super Hana Paradise     N8010178L1+N73RSUB  Z80          YM2413 M6295 NL-002 1108F0406  1427F0071 4L02F2637
-95 Mj Dai Chuuka Ken       D11107218L1         Z80   AY8910 YM2413 M6295 70C160F009
-95 Mj Super Dai Chuuka Ken D11510198L1         Z80   AY8910 YM2413 M6295
-95 Hf Hana Gokou           N83061581L1         Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
-95 Hf Hana Gokou Bangaihen N10805078L1         Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
-95 Nettoh Quiz Champion                        68000 AY8910 YM2413 M6295
-95 Ultra Champion (K)      N11309208L1+N114SUB 68000 AY8910 YM2413 M6295 NL-005
-95 Don Den Lover (J)       D1120901L8          68000 YMZ284 YM2413 M6295 NL-005
-96 Don Den Lover (HK)      D11309208L1         68000 YMZ284 YM2413 M6295 NL-005
-96 Panel&Variety Akamaru                       68000 YMZ284 YM2413 M6295 NL-005
-96 Mj Fantasic Love        NS5000101+?         Z80   YMZ284 YM2413 M6295 NL-005
-96 Hana Kanzashi                               Z80          YM2413 M6295 70C160F011?
-96 Mj Seiryu Densetsu      NM5020403           Z80   YMZ284 YM2413 M6295 70C160F011?
-96 Mj Janshin Plus         NM7001004           Z80   YMZ284 YM2413 M6295 TZ-2053P
-96 Mj Dai Touyouken        NM7001004           Z80   YMZ284 YM2413 M6295 TZ-2053P
-96 Return Of Sel Jan II    NM504-2             Z80   YM2149 YM2413 M6295 TZ-2053P?
-97 Hana Kagerou                                KC80         YM2413 M6295 70C160F011
-97 Kkot Bi Nyo             9090123-2           KC80         YM2413 M6295 70C160F011                            A1010
-97 Kkot Bi Nyo Special     9090123-3           KC80         YM2413 M6295 ?
-98 Mj Chuukanejyo          D11107218L1         Z80   AY8910 YM2413 M6295 70C160F009
-98 Mj Reach Ippatsu                            KC80         YM2413 M6295 70C160F011
-99 Mj Jong-Tei             NM532-9902          Z80          YM2413 M6295 4L10FXXXX?
-00 Mj Gorgeous Night       TSM003-0002         Z80          YM2413 M6295 4L10FXXXX?
-02 Mj Daimyojin            TSM015-0111         Z80          YM2413 M6295 70C160F011
-04 Mj Momotarou            TSM015-0111?        Z80          YM2413 M6295 70C160F011?
+----------------------------------------------------------------------------------------------------------------------
+Year + Game                Board                 CPU   Sound               Custom                                Other
+----------------------------------------------------------------------------------------------------------------------
+92 Hf Hana Tengoku         D6502208L1+D6107068L1 Z80   YM2149 YM2413
+92 Monkey Mole Panic                             2xZ80 AY8910 YM2413 M6295 NL-001 1108(x2)   1427(x2)            8251
+92 Mj Mysterious Orient    D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
+93 Mj Mysterious Orient 2  D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
+93 Quiz Channel Question   N7311208L1-2          Z80          YM2413 M6295 NL-002 1108F0405  1427F0071
+93 First Funky Fighter     N7403208L-2           2xZ80 YM2149 YM2413 M6295 NL-001 NL-002     NL-005
+93 Animalandia Jr.                               2xZ80 AY8910 YM2413 M6295 NL-001 NL-003(x2) NL-004(x2)          8251
+94 Mj Mysterious World     D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
+94 Mj Mysterious Universe  D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
+94 Quiz 365                                      68000 AY8910 YM2413 M6295
+94 Rong Rong (J)           N8010178L1            Z80          YM2413 M6295 NL-002 1108F0405  1427F0071 4L02F2637
+94 Hf Hana Ginga           D8102048L1            Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
+94 Super Hana Paradise     N8010178L1+N73RSUB    Z80          YM2413 M6295 NL-002 1108F0406  1427F0071 4L02F2637
+95 Mj Dai Chuuka Ken       D11107218L1           Z80   AY8910 YM2413 M6295 70C160F009
+95 Mj Super Dai Chuuka Ken D11510198L1           Z80   AY8910 YM2413 M6295
+95 Hf Hana Gokou           N83061581L1           Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
+95 Hf Hana Gokou Bangaihen N10805078L1           Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
+95 Nettoh Quiz Champion                          68000 AY8910 YM2413 M6295
+95 Ultra Champion (K)      N11309208L1+N114SUB   68000 AY8910 YM2413 M6295 NL-005
+95 Don Den Lover (J)       D1120901L8            68000 YMZ284 YM2413 M6295 NL-005
+96 Don Den Lover (HK)      D11309208L1           68000 YMZ284 YM2413 M6295 NL-005
+96 Panel&Variety Akamaru                         68000 YMZ284 YM2413 M6295 NL-005
+96 Mj Fantasic Love        NS5000101+?           Z80   YMZ284 YM2413 M6295 NL-005
+96 Hana Kanzashi                                 Z80          YM2413 M6295 70C160F011?
+96 Mj Seiryu Densetsu      NM5020403             Z80   YMZ284 YM2413 M6295 70C160F011?
+96 Mj Janshin Plus         NM7001004             Z80   YMZ284 YM2413 M6295 TZ-2053P
+96 Mj Dai Touyouken        NM7001004             Z80   YMZ284 YM2413 M6295 TZ-2053P
+96 Return Of Sel Jan II    NM504-2               Z80   YM2149 YM2413 M6295 TZ-2053P?
+97 Hana Kagerou                                  KC80         YM2413 M6295 70C160F011
+97 Kkot Bi Nyo             9090123-2             KC80         YM2413 M6295 70C160F011                            A1010
+97 Kkot Bi Nyo Special     9090123-3             KC80         YM2413 M6295 ?
+98 Mj Chuukanejyo          D11107218L1           Z80   AY8910 YM2413 M6295 70C160F009
+98 Mj Reach Ippatsu                              KC80         YM2413 M6295 70C160F011
+99 Mj Jong-Tei             NM532-9902            Z80          YM2413 M6295 4L10FXXXX?
+00 Mj Gorgeous Night       TSM003-0002           Z80          YM2413 M6295 4L10FXXXX?
+02 Mj Daimyojin            TSM015-0111           Z80          YM2413 M6295 70C160F011
+04 Mj Momotarou            TSM015-0111?          Z80          YM2413 M6295 70C160F011?
 --------------------------------------------------------------------------------------------------------------------
 
 TODO:
@@ -4845,7 +4847,7 @@ INPUT_PORTS_EXTERN( HANAFUDA_KEYS_BET );
 
 static INPUT_PORTS_START( htengoku )
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE4 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // analyzer
@@ -4916,7 +4918,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x04, "10" )
-	PORT_DIPNAME( 0x08, 0x08, "Max Bet" )
+	PORT_DIPNAME( 0x08, 0x08, "Max Rate" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPNAME( 0x30, 0x30, "Min Rate To Play" )
@@ -5455,7 +5457,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanakanz )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -5677,7 +5679,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hkagerou )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -6119,7 +6121,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjreach1 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -6231,7 +6233,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -6352,7 +6354,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( jongtei )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -6464,7 +6466,7 @@ static INPUT_PORTS_START( jongtei )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -6478,9 +6480,9 @@ static INPUT_PORTS_START( jongtei )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//  PORT_DIPSETTING(    0x04, "3" )
-//  PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x30, 0x30, "Payout" )
 	PORT_DIPSETTING(    0x30, "300" )
 	PORT_DIPSETTING(    0x20, "500" )
@@ -6641,7 +6643,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjchuuka )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -6753,7 +6755,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -6767,9 +6769,9 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//  PORT_DIPSETTING(    0x04, "3" )
-//  PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "255" )
@@ -6874,7 +6876,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjschuka )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -6986,7 +6988,7 @@ static INPUT_PORTS_START( mjschuka )
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -7208,7 +7210,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjmyster )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -7280,7 +7282,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -7294,9 +7296,9 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//  PORT_DIPSETTING(    0x04, "3" )
-//  PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x70, "Cut" )
 	PORT_DIPSETTING(    0x60, "1 T" )
@@ -7388,7 +7390,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hginga )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 //  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -7608,7 +7610,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hgokou )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -7822,7 +7824,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjmyornt )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -7894,7 +7896,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -7902,15 +7904,21 @@ static INPUT_PORTS_START( mjmyornt )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
+
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//  PORT_DIPSETTING(    0x04, "3" )
-//  PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x70, "Cut" )
 	PORT_DIPSETTING(    0x60, "1 T" )
@@ -7925,11 +7933,11 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
-//  PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x03, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x01, "3?" )
+	PORT_DIPNAME( 0x03, 0x03, "Bonus Game" )
+	PORT_DIPSETTING(    0x00, "Slot? (duplicate)" )
+	PORT_DIPSETTING(    0x03, "Slot?" )
+	PORT_DIPSETTING(    0x02, "Slot + Girls?" )
+	PORT_DIPSETTING(    0x01, "Girl Choice" ) // 4 choices in gal mode check (instead of 3)
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -7967,7 +7975,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "Set Clock" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
@@ -7975,195 +7983,15 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x03, 0x03, "Computer Strength?" )
-	PORT_DIPSETTING(    0x03, "Weak" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ))
-	PORT_DIPSETTING(    0x01, "Strong" )
-	PORT_DIPSETTING(    0x00, "Very Strong" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DonDen Key" )
-	PORT_DIPSETTING(    0x08, "Start" )
-	PORT_DIPSETTING(    0x00, "Flip Flop" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" )
-	PORT_DIPSETTING(    0x40, "5" )
-	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-INPUT_PORTS_END
-
-#ifdef UNUSED_DEFINITION
-static INPUT_PORTS_START( mjmyuniv )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // data clear
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )  // A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )  // E
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )  // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )  // M
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) // Start 1
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )  // B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )  // F
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )  // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )  // N
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )  // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )    // BET
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )  // C
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )  // G
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )  // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )  // D
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )  // H
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )  // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )    // Pon
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
-	PORT_DIPSETTING(    0xc0, "1" )
-	PORT_DIPSETTING(    0x80, "5" )
-	PORT_DIPSETTING(    0x40, "10" )
-	PORT_DIPSETTING(    0x00, "20" )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
-	PORT_DIPSETTING(    0x0c, "1" )
-//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//  PORT_DIPSETTING(    0x04, "3" )
-//  PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
-	PORT_DIPSETTING(    0x70, "Cut" )
-	PORT_DIPSETTING(    0x60, "1 T" )
-	PORT_DIPSETTING(    0x50, "300" )
-	PORT_DIPSETTING(    0x40, "500" )
-	PORT_DIPSETTING(    0x30, "700" )
-	PORT_DIPSETTING(    0x20, "1000" )
-	PORT_DIPSETTING(    0x10, "1000?" )
-	PORT_DIPSETTING(    0x00, "1000?" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
-//  PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x03, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x01, "3?" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Payout" )
-	PORT_DIPSETTING(    0x18, "300" )
-	PORT_DIPSETTING(    0x10, "500" )
-	PORT_DIPSETTING(    0x08, "700" )
-	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01, 0x01, "Alternate Coinage" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In Game Music" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x03, 0x03, "Computer Strength?" )
-	PORT_DIPSETTING(    0x03, "Weak" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ))
-	PORT_DIPSETTING(    0x01, "Strong" )
-	PORT_DIPSETTING(    0x00, "Very Strong" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "DonDen Key" )
 	PORT_DIPSETTING(    0x08, "Start" )
 	PORT_DIPSETTING(    0x00, "Flip Flop" )
@@ -8180,7 +8008,22 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
-#endif
+
+static INPUT_PORTS_START( mjmyorn2 )
+	PORT_INCLUDE(mjmyornt)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
+
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00) // different alternate coinage
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( akamaru )
 	PORT_START("P1")
@@ -8583,7 +8426,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sryudens )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -8695,7 +8538,7 @@ static INPUT_PORTS_START( sryudens )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -8709,9 +8552,9 @@ static INPUT_PORTS_START( sryudens )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//  PORT_DIPSETTING(    0x04, "3" )
-//  PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x30, 0x30, "Payout" )
 	PORT_DIPSETTING(    0x30, "300" )
 	PORT_DIPSETTING(    0x20, "500" )
@@ -8816,7 +8659,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( seljan2 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -8928,7 +8771,7 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0x40, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x40, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -9049,7 +8892,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( janshinp )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -9161,7 +9004,7 @@ static INPUT_PORTS_START( janshinp )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0x40, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x40, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -9281,7 +9124,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dtoyoken )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -9393,7 +9236,7 @@ static INPUT_PORTS_START( dtoyoken )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0x40, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x40, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -9514,7 +9357,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( daimyojn )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )   // medal out
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
@@ -9627,7 +9470,7 @@ static INPUT_PORTS_START( daimyojn )
 //  PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
 //  PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 //  PORT_DIPSETTING(    0x30, "2 3 6 8 12 15 30 50" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -10555,6 +10398,9 @@ static MACHINE_CONFIG_DERIVED( mjmyornt, quizchq )
 	MCFG_CPU_PROGRAM_MAP(quizchq_map)
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 4, 256-16+4-1)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -12287,7 +12133,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong The Mysterious Orient
-Dynax, 1994
+Dynax, 1992
 
 PCB Layout
 ----------
@@ -12343,6 +12189,32 @@ ROM_START( mjmyornt )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "7101.1e", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
+ROM_END
+
+/***************************************************************************
+
+Mahjong The Mysterious Orient Part 2
+Dynax, 1993
+
+Same PCB as Mysterious Orient / Mysterious Universe (D7107058L1-1).
+ROM labels are blank, so their file names are just the location.
+
+***************************************************************************/
+
+ROM_START( mjmyorn2 )
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_LOAD( "3d", 0x00000, 0x40000, CRC(7ef07c1e) SHA1(3fabd429c71224ddfaa4552e54f1d763e7e40c18) )
+	ROM_RELOAD(     0x10000, 0x40000 )
+
+	ROM_REGION( 0x1c0000, "blitter", 0 )    /* blitter data */
+	ROM_LOAD( "12b", 0x000000, 0x80000, CRC(1debae36) SHA1(670fa1203b9f127f9ce3150a4a0cae730cbc426f) )
+	ROM_LOAD( "11b", 0x080000, 0x80000, CRC(fe9953f7) SHA1(db7bef218f830f7a0e7d68ee6ff363f9b5c2966c) )
+	ROM_LOAD( "10b", 0x100000, 0x80000, CRC(6d0fd29a) SHA1(9b31668acf1790d9aecd1f8e8c0cb52a7a625d2d) )
+	ROM_LOAD( "9b",  0x180000, 0x40000, CRC(36228e6a) SHA1(f6153d6fc1c53d1ffa54820b2803967c50a148dd) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "1e", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
+	ROM_RELOAD(     0x20000, 0x20000 )
 ROM_END
 
 
@@ -13152,18 +13024,19 @@ ROM_END
 
 GAME( 1992, htengoku,  0,        htengoku,  htengoku, driver_device, 0,        ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                   0)
 GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
-GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (set 1)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
-GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (set 2)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 - Exotic Dream",             MACHINE_NO_COCKTAIL  )
+GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 1)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
+GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 2)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, quizchq,   0,        quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, animaljr,  0,        mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
-GAME( 1994, hginga,    0,        hginga,    hginga,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             MACHINE_NO_COCKTAIL  )
 GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            MACHINE_NO_COCKTAIL  )
 GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyornt,  0,        mjmyornt,  mjmyornt, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe",                                 MACHINE_NO_COCKTAIL  )
+GAME( 1994, hginga,    0,        hginga,    hginga,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                    MACHINE_NO_COCKTAIL  )
 GAME( 1994, quiz365,   0,        quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state,rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Europe)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )

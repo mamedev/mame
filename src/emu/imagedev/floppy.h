@@ -20,11 +20,15 @@
 #include "formats/cqm_dsk.h"
 #include "formats/dsk_dsk.h"
 #include "ui/imgcntrl.h"
+#include "sound/samples.h"
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
 	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	static_cast<floppy_connector *>(device)->set_formats(_formats);
+
+#define MCFG_FLOPPY_DRIVE_SOUND(_doit) \
+	static_cast<floppy_connector *>(device)->enable_sound(_doit);
 
 #define DECLARE_FLOPPY_FORMATS(_name) \
 	static const floppy_format_type _name []
@@ -44,6 +48,7 @@
 		FLOPPY_DSK_FORMAT, \
 		NULL };
 
+class floppy_sound_device;
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -129,12 +134,17 @@ public:
 
 	static const floppy_format_type default_floppy_formats[];
 
+	// Enable sound
+	void    enable_sound(bool doit) { m_make_sound = doit; }
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual void setup_characteristics() = 0;
 
@@ -187,6 +197,10 @@ protected:
 	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
 	void commit_image();
 	attotime get_next_index_time(std::vector<UINT32> &buf, int index, int delta, attotime base);
+
+	// Sound
+	bool    m_make_sound;
+	floppy_sound_device* m_sound_out;
 };
 
 class ui_menu_control_floppy_image : public ui_menu_control_device_image {
@@ -249,6 +263,43 @@ DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55f, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55g, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(alps_3255190x, "floppy_5_25")
 
+extern const device_type FLOPPYSOUND;
+
+/*
+    Floppy drive sound
+*/
+class floppy_sound_device : public samples_device
+{
+public:
+	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void motor(bool on);
+	void step(bool on);
+	bool samples_loaded() { return m_loaded; }
+
+protected:
+	void device_start();
+
+private:
+	// device_sound_interface overrides
+	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	sound_stream*   m_sound;
+	bool            m_loaded;
+
+	int             m_sampleend_motor;
+	int             m_samplepos_motor;
+	int             m_samplestart_motor;
+	int             m_motor_mintime;        // min time for the samples; sound persists for that time
+	int             m_motor_time;
+	bool            m_motor;
+
+	int             m_sampleend_step;
+	int             m_samplestart_step;
+	int             m_samplepos_step;
+	int             m_step_mintime;
+	int             m_step_time;
+	bool            m_step;
+};
 
 class floppy_connector: public device_t,
 						public device_slot_interface
@@ -259,6 +310,7 @@ public:
 
 	void set_formats(const floppy_format_type *formats);
 	floppy_image_device *get_device();
+	void enable_sound(bool doit) { m_enable_sound = doit; }
 
 protected:
 	virtual void device_start();
@@ -266,6 +318,7 @@ protected:
 
 private:
 	const floppy_format_type *formats;
+	bool    m_enable_sound;
 };
 
 

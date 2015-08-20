@@ -128,6 +128,8 @@ enum
 	devcb = &psxcpu_device::set_cd_read_handler(*device, DEVCB_##_devcb);
 #define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
 	devcb = &psxcpu_device::set_cd_write_handler(*device, DEVCB_##_devcb);
+#define MCFG_PSX_DISABLE_ROM_BERR \
+	downcast<psxcpu_device *>(device)->set_disable_rom_berr(true);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -196,6 +198,7 @@ public:
 	DECLARE_READ32_MEMBER( com_delay_r );
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
+	void set_disable_rom_berr(bool mode);
 
 protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -346,6 +349,7 @@ protected:
 	devcb_write8 m_cd_write_handler;
 	required_device<ram_device> m_ram;
 	memory_region *m_rom;
+	bool m_disable_rom_berr;
 
 private:
 	// disassembler interface
