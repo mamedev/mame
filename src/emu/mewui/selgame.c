@@ -109,7 +109,7 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 		build_available_list();
 
 	// load custom filter
-	load_custom_filters(machine);
+	load_custom_filters();
 
 	if (!machine.options().remember_last())
 	{
@@ -1791,4 +1791,63 @@ bool ui_mewui_select_game::load_available_machines()
 	}
 	myfile.close();
 	return true;
+}
+
+//-------------------------------------------------
+//  load custom filters info from file
+//-------------------------------------------------
+
+void ui_mewui_select_game::load_custom_filters()
+{
+	// attempt to open the output file
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_READ);
+	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
+	{
+		char buffer[MAX_CHAR_INFO];
+
+		// get number of filters
+		file.gets(buffer, MAX_CHAR_INFO);
+		char *pb = strchr(buffer, '=');
+		custfltr::numother = atoi(++pb) - 1;
+
+		// get main filter
+		file.gets(buffer, MAX_CHAR_INFO);
+		pb = strchr(buffer, '=') + 2;
+
+		for (int y = 0; y < mewui_globals::s_filter_text; y++)
+			if (!strncmp(pb, mewui_globals::filter_text[y], strlen(mewui_globals::filter_text[y])))
+			{
+				custfltr::main_filter = y;
+				break;
+			}
+
+		for (int x = 1; x <= custfltr::numother; x++)
+		{
+			file.gets(buffer, MAX_CHAR_INFO);
+			char *cb = strchr(buffer, '=') + 2;
+			for (int y = 0; y < mewui_globals::s_filter_text; y++)
+				if (!strncmp(cb, mewui_globals::filter_text[y], strlen(mewui_globals::filter_text[y])))
+				{
+					custfltr::other[x] = y;
+					if (y == FILTER_MANUFACTURER)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *ab = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < c_mnfct::ui.size(); z++)
+							if (!strncmp(ab, c_mnfct::ui[z].c_str(), c_mnfct::ui[z].length()))
+								custfltr::mnfct[x] = z;
+					}
+					else if (y == FILTER_YEAR)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *db = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < c_year::ui.size(); z++)
+							if (!strncmp(db, c_year::ui[z].c_str(), c_year::ui[z].length()))
+								custfltr::year[x] = z;
+					}
+				}
+		}
+		file.close();
+	}
+
 }

@@ -40,6 +40,7 @@ private:
 	};
 
 	bool single_menu, added;
+	void save_custom_filters();
 };
 
 #endif  /* __MEWUI_CUSTMENU_H__ */

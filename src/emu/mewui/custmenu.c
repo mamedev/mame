@@ -31,8 +31,7 @@ ui_menu_custom_filter::~ui_menu_custom_filter()
 {
 	if (single_menu)
 		ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
-
-	save_custom_filters(machine());
+	save_custom_filters();
 }
 
 //-------------------------------------------------
@@ -237,4 +236,32 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 	// draw the text within it
 	machine().ui().draw_text_full(container, "Select custom filters:", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+}
+
+//-------------------------------------------------
+//  save custom filters info to file
+//-------------------------------------------------
+
+void ui_menu_custom_filter::save_custom_filters()
+{
+	// attempt to open the output file
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
+	{
+		// generate custom filters info
+		std::string cinfo;
+		strprintf(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
+		cinfo.append("Main filter = ").append(mewui_globals::filter_text[custfltr::main_filter]).append("\n");
+
+		for (int x = 1; x <= custfltr::numother; x++)
+		{
+			cinfo.append("Other filter = ").append(mewui_globals::filter_text[custfltr::other[x]]).append("\n");
+			if (custfltr::other[x] == FILTER_MANUFACTURER)
+				cinfo.append("  Manufacturer filter = ").append(c_mnfct::ui[custfltr::mnfct[x]]).append("\n");
+			else if (custfltr::other[x] == FILTER_YEAR)
+				cinfo.append("  Year filter = ").append(c_year::ui[custfltr::year[x]]).append("\n");
+		}
+		file.puts(cinfo.c_str());
+		file.close();
+	}
 }

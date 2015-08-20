@@ -32,7 +32,7 @@ ui_menu_swcustom_filter::ui_menu_swcustom_filter(running_machine &machine, rende
 ui_menu_swcustom_filter::~ui_menu_swcustom_filter()
 {
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
-	save_sw_custom_filters(machine(), driver, m_region, m_publisher, m_year, m_type, m_list);
+	save_sw_custom_filters();
 }
 
 //-------------------------------------------------
@@ -320,4 +320,38 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 	// draw the text within it
 	machine().ui().draw_text_full(container, "Select custom filters:", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+}
+
+//-------------------------------------------------
+//  save custom filters info to file
+//-------------------------------------------------
+
+void ui_menu_swcustom_filter::save_sw_custom_filters()
+{
+	// attempt to open the output file
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open("custom_", driver->name, "_filter.ini") == FILERR_NONE)
+	{
+		// generate custom filters info
+		std::string cinfo;
+		strprintf(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
+		cinfo.append("Main filter = ").append(mewui_globals::sw_filter_text[sw_custfltr::main_filter]).append("\n");
+
+		for (int x = 1; x <= sw_custfltr::numother; x++)
+		{
+			cinfo.append("Other filter = ").append(mewui_globals::sw_filter_text[sw_custfltr::other[x]]).append("\n");
+			if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS)
+				cinfo.append("  Manufacturer filter = ").append(m_publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
+				cinfo.append("  Software List filter = ").append(m_list.name[sw_custfltr::list[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
+				cinfo.append("  Year filter = ").append(m_year.ui[sw_custfltr::year[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_TYPE)
+				cinfo.append("  Type filter = ").append(m_type.ui[sw_custfltr::type[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_REGION)
+				cinfo.append("  Region filter = ").append(m_region.ui[sw_custfltr::region[x]]).append("\n");
+		}
+		file.puts(cinfo.c_str());
+		file.close();
+	}
 }

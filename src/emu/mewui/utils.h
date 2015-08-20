@@ -185,11 +185,6 @@ struct cache_info
 	UINT8 b_vector, b_stereo, b_samples, b_chd;
 };
 
-struct reselect_last
-{
-	static std::string driver, software, swlist;
-};
-
 // Manufacturers
 struct c_mnfct
 {
@@ -286,10 +281,6 @@ struct sw_custfltr
 };
 
 // GLOBAL FUNCTIONS
-int get_bios_count(const game_driver *driver, std::vector<std::string> &biosname);
-
-// save options to file
-void save_game_options(running_machine &machine);
 
 // General info
 void general_info(running_machine &machine, const game_driver *driver, std::string &buffer);
@@ -297,14 +288,6 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 // advanced search function
 int fuzzy_substring(const char *needle, const char *haystack);
 int fuzzy_substring2(const char *needle, const char *haystack);
-
-// custom filter load and save
-void load_custom_filters(running_machine &machine);
-void save_custom_filters(running_machine &machine);
-
-// custom software filter load and save
-void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type, c_sw_list &_list);
-void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type, c_sw_list &_list);
 
 // jpeg loader
 template <typename _T>

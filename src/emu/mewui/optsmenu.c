@@ -318,3 +318,22 @@ void ui_menu_game_options::custom_render(void *selectedref, float top, float bot
 	machine().ui().draw_text_full(container, "Settings", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
+
+//-------------------------------------------------
+//  save game options
+//-------------------------------------------------
+
+void save_game_options(running_machine &machine)
+{
+	// attempt to open the output file
+	emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+	{
+		// generate the updated INI
+		std::string initext;
+		file.puts(machine.options().output_ini(initext));
+		file.close();
+	}
+	else
+		popmessage("**Error to save %s.ini**", emulator_info::get_configname());
+}

@@ -57,6 +57,7 @@ private:
 	void save_cache_info();
 	void save_available_machines();
 	bool load_available_machines();
+	void load_custom_filters();
 
 	// handlers
 	void inkey_select(const ui_menu_event *menu_event);

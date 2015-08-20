@@ -48,6 +48,7 @@ private:
 	void build_list(std::vector<ui_software_info *> &vec, const char *filter_text = NULL, int filter = -1);
 	void build_custom();
 	void find_matches(const char *str, int count);
+	void load_sw_custom_filters();
 
 	// handlers
 	void inkey_select(const ui_menu_event *menu_event);
@@ -84,5 +85,14 @@ private:
 	void *driver;
 	bool software, inlist;
 };
+
+struct reselect_last
+{
+	static std::string driver, software, swlist;
+};
+
+// Getter
+int get_bios_count(const game_driver *driver, std::vector<std::string> &biosname);
+
 
 #endif /* __MEWUI_SELSOFT_H__ */

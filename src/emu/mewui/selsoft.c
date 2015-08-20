@@ -21,6 +21,10 @@
 #include "mewui/selector.h"
 #include "mewui/swcustmenu.h"
 
+std::string reselect_last::driver;
+std::string reselect_last::software;
+std::string reselect_last::swlist;
+
 static const char *region_lists[] = { "arab", "arg", "asia", "aus", "aut", "bel", "blr", "bra", "can", "chi", "chn", "cze", "den",
                                       "ecu", "esp", "euro", "fin", "fra", "gbr", "ger", "gre", "hkg", "hun", "irl", "isr",
                                       "isv", "ita", "jpn", "kaz", "kor", "lat", "lux", "mex", "ned", "nld", "nor", "nzl",
@@ -79,6 +83,23 @@ bool compare_software(ui_software_info a, ui_software_info b)
 }
 
 //-------------------------------------------------
+//  get bios count
+//-------------------------------------------------
+
+int get_bios_count(const game_driver *driver, std::vector<std::string> &biosname)
+{
+	int bios_count = 0;
+	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		{
+			std::string name(ROM_GETHASHDATA(rom));
+			biosname.push_back(name);
+			bios_count++;
+		}
+	return bios_count;
+}
+
+//-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
@@ -91,7 +112,7 @@ ui_menu_select_software::ui_menu_select_software(running_machine &machine, rende
 
 	ui_driver = driver;
 	build_software_list();
-	load_sw_custom_filters(machine, driver, m_region, m_publisher, m_year, m_type, m_swlist);
+	load_sw_custom_filters();
 
 	mewui_globals::curimage_view = SNAPSHOT_VIEW;
 	mewui_globals::switch_image = true;
@@ -891,6 +912,89 @@ void ui_menu_select_software::inkey_special(const ui_menu_event *menu_event)
 		m_search[buflen] = 0;
 		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
+}
+
+//-------------------------------------------------
+//  load custom filters info from file
+//-------------------------------------------------
+
+void ui_menu_select_software::load_sw_custom_filters()
+{
+	// attempt to open the output file
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_READ);
+	if (file.open("custom_", ui_driver->name, "_filter.ini") == FILERR_NONE)
+	{
+		char buffer[MAX_CHAR_INFO];
+
+		// get number of filters
+		file.gets(buffer, MAX_CHAR_INFO);
+		char *pb = strchr(buffer, '=');
+		sw_custfltr::numother = atoi(++pb) - 1;
+
+		// get main filter
+		file.gets(buffer, MAX_CHAR_INFO);
+		pb = strchr(buffer, '=') + 2;
+
+		for (int y = 0; y < mewui_globals::sw_filter_len; y++)
+			if (!strncmp(pb, mewui_globals::sw_filter_text[y], strlen(mewui_globals::sw_filter_text[y])))
+			{
+				sw_custfltr::main_filter = y;
+				break;
+			}
+
+		for (int x = 1; x <= sw_custfltr::numother; x++)
+		{
+			file.gets(buffer, MAX_CHAR_INFO);
+			char *cb = strchr(buffer, '=') + 2;
+			for (int y = 0; y < mewui_globals::sw_filter_len; y++)
+				if (!strncmp(cb, mewui_globals::sw_filter_text[y], strlen(mewui_globals::sw_filter_text[y])))
+				{
+					sw_custfltr::other[x] = y;
+					if (y == MEWUI_SW_PUBLISHERS)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *ab = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < m_publisher.ui.size(); z++)
+							if (!strncmp(ab, m_publisher.ui[z].c_str(), m_publisher.ui[z].length()))
+								sw_custfltr::mnfct[x] = z;
+					}
+					else if (y == MEWUI_SW_YEARS)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *db = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < m_year.ui.size(); z++)
+							if (!strncmp(db, m_year.ui[z].c_str(), m_year.ui[z].length()))
+								sw_custfltr::year[x] = z;
+					}
+					else if (y == MEWUI_SW_LIST)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *gb = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < m_swlist.name.size(); z++)
+							if (!strncmp(gb, m_swlist.name[z].c_str(), m_swlist.name[z].length()))
+								sw_custfltr::list[x] = z;
+					}
+					else if (y == MEWUI_SW_TYPE)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *fb = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < m_type.ui.size(); z++)
+							if (!strncmp(fb, m_type.ui[z].c_str(), m_type.ui[z].length()))
+								sw_custfltr::type[x] = z;
+					}
+					else if (y == MEWUI_SW_REGION)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *eb = strchr(buffer, '=') + 2;
+						for (size_t z = 0; z < m_region.ui.size(); z++)
+							if (!strncmp(eb, m_region.ui[z].c_str(), m_region.ui[z].length()))
+								sw_custfltr::region[x] = z;
+					}
+				}
+		}
+		file.close();
+	}
+
 }
 
 //-------------------------------------------------

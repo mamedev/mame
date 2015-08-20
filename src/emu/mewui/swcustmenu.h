@@ -50,7 +50,7 @@ private:
 	c_sw_year &m_year;
 	c_sw_type &m_type;
 	c_sw_list &m_list;
-
+	void save_sw_custom_filters();
 };
 
 #endif  /* __MEWUI_SWCUSTMENU_H__ */

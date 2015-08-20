@@ -14,6 +14,7 @@
 #include "mewui/inifile.h"
 #include "mewui/datfile.h"
 #include "mewui/utils.h"
+#include "mewui/optsmenu.h"
 
 static const folders_entry s_folders_entry[] =
 {

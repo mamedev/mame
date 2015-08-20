@@ -44,4 +44,7 @@ private:
 	};
 };
 
+// save options to file
+void save_game_options(running_machine &machine);
+
 #endif /* __MEWUI_OPTSMENU_H__ */
