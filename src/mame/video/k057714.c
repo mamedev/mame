@@ -116,6 +116,14 @@ WRITE32_MEMBER(k057714_device::write)
 		case 0x18:      // ?
 			break;
 
+		case 0x1c:		// set to 1 on "media bus" access
+			if ((data >> 16) == 1)
+			{
+				m_ext_fifo_count = 0;
+				m_ext_fifo_line = 0;
+			}
+			break;
+
 		case 0x20:      // Framebuffer 0 Origin(?)
 			break;
 
@@ -184,6 +192,17 @@ WRITE32_MEMBER(k057714_device::write)
 #endif
 			break;
 
+		case 0x54:
+			if (ACCESSING_BITS_16_31)
+				m_ext_fifo_num_lines = data >> 16;
+			if (ACCESSING_BITS_0_15)
+				m_ext_fifo_width = data & 0xffff;
+			break;
+
+		case 0x58:
+			m_ext_fifo_addr = (data & 0xffffff);
+			break;
+
 		case 0x5c:      // VRAM Read Address
 			m_vram_read_addr = (data & 0xffffff) / 2;
 			break;
@@ -250,8 +269,38 @@ WRITE32_MEMBER(k057714_device::write)
 			break;
 
 		default:
-			//printf("%s_w: %02X, %08X, %08X\n", basetag(), reg, data, mem_mask);
+			//printf("%s_w: %02X, %08X, %08X at %08X\n", basetag(), reg, data, mem_mask, space.device().safe_pc());
 			break;
+	}
+}
+
+WRITE32_MEMBER(k057714_device::fifo_w)
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		if (m_ext_fifo_count != 0)		// first access is a dummy write
+		{
+			int count = m_ext_fifo_count - 1;
+			UINT32 addr = (((m_ext_fifo_addr >> 10) + m_ext_fifo_line) * 1024) + count;
+
+			if ((count & 1) == 0)
+			{
+				m_vram[addr >> 1] &= 0x0000ffff;
+				m_vram[addr >> 1] |= (data & 0xffff0000);
+			}
+			else
+			{
+				m_vram[addr >> 1] &= 0xffff0000;
+				m_vram[addr >> 1] |= (data >> 16);
+			}
+		}
+		m_ext_fifo_count++;
+
+		if (m_ext_fifo_count > m_ext_fifo_width+1)
+		{
+			m_ext_fifo_line++;
+			m_ext_fifo_count = 0;
+		}
 	}
 }
 
