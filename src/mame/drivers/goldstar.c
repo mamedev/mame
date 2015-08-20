@@ -1492,11 +1492,14 @@ static INPUT_PORTS_START( cmv801 )
 	PORT_INCLUDE( cmv4_dsw4 )   /* Display Of Payout Limit not working; all others OK */
 
 	PORT_INCLUDE( cmv4_dsw5 )
+	PORT_MODIFY("DSW5")
 	/* Display of Doll On Demo only affects payout table screen */
 	/* Coin In Limit OK */
 	/* Condition For 3 Kind Of Bonus not checked */
 	/* Display Of Doll At All Fr. Bonus not checked */
-	/* DSW5-7 listed as unused */
+	PORT_DIPNAME( 0x40, 0x40, "Card Shuffle Animation" )    PORT_DIPLOCATION("DSW5:7")  /* OK */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Test Mode For Disp. Of Doll not working */
 INPUT_PORTS_END
 
