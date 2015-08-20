@@ -13,19 +13,19 @@
 #include "mewui/miscmenu.h"
 #include "mewui/utils.h"
 
-const char *ui_menu_misc_options::description[] = {
-	NULL,
-	"Re-select last game / system played",
-	"Enlarge images in the right panel",
-	"DATs info",
-	"Cheats",
-	"Show mouse pointer",
-	"Confirm quit from machines",
-	"Skip displaying information's screen at startup",
-	"Force 4:3 appearance for software snapshot",
-	"Use image as background",
-	"Skip bios selection menu",
-	"Skip software parts selection menu"
+static misc_option m_options[] = {
+	{ 0, NULL, NULL },
+	{ 0, "Re-select last game / system played",             OPTION_REMEMBER_LAST },
+	{ 0, "Enlarge images in the right panel",               OPTION_ENLARGE_SNAPS },
+	{ 0, "DATs info",                                       OPTION_DATS_ENABLED },
+	{ 0, "Cheats",                                          OPTION_CHEAT },
+	{ 0, "Show mouse pointer",                              OPTION_UI_MOUSE },
+	{ 0, "Confirm quit from machines",                      OPTION_CONFIRM_QUIT },
+	{ 0, "Skip displaying information's screen at startup", OPTION_SKIP_GAMEINFO },
+	{ 0, "Force 4:3 appearance for software snapshot",      OPTION_FORCED4X3 },
+	{ 0, "Use image as background",                         OPTION_USE_BACKGROUND },
+	{ 0, "Skip bios selection menu",                        OPTION_SKIP_BIOS_MENU },
+	{ 0, "Skip software parts selection menu",              OPTION_SKIP_PARTS_MENU }
 };
 
 //-------------------------------------------------
@@ -34,33 +34,15 @@ const char *ui_menu_misc_options::description[] = {
 
 ui_menu_misc_options::ui_menu_misc_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-	m_options[REMEMBER_LAST_GAME] = machine.options().remember_last();
-	m_options[ENLARGE_ARTS] = machine.options().enlarge_snaps();
-	m_options[DATS_ENABLED] = machine.options().enabled_dats();
-	m_options[CHEAT_ENABLED] = machine.options().cheat();
-	m_options[MOUSE_ENABLED] = machine.options().ui_mouse();
-	m_options[CONFIRM_QUIT_ENABLED] = machine.options().confirm_quit();
-	m_options[SKIP_GAMEINFO_ENABLED] = machine.options().skip_gameinfo();
-	m_options[FORCED_4X3] = machine.options().forced_4x3_snapshot();
-	m_options[USE_BGRND] = machine.options().use_background_image();
-	m_options[SKIP_BIOS] = machine.options().skip_bios_menu();
-	m_options[SKIP_PARTS] = machine.options().skip_parts_menu();
+	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
+		m_options[d].status = machine.options().bool_value(m_options[d].option);
 }
 
 ui_menu_misc_options::~ui_menu_misc_options()
 {
 	std::string error_string;
-	machine().options().set_value(OPTION_REMEMBER_LAST, m_options[REMEMBER_LAST_GAME], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_ENLARGE_SNAPS, m_options[ENLARGE_ARTS], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_DATS_ENABLED, m_options[DATS_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_CHEAT, m_options[CHEAT_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_UI_MOUSE, m_options[MOUSE_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_CONFIRM_QUIT, m_options[CONFIRM_QUIT_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_SKIP_GAMEINFO, m_options[SKIP_GAMEINFO_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_FORCED4X3, m_options[FORCED_4X3], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_USE_BACKGROUND, m_options[USE_BGRND], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_SKIP_BIOS_MENU, m_options[SKIP_BIOS], OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_SKIP_PARTS_MENU, m_options[SKIP_PARTS], OPTION_PRIORITY_CMDLINE, error_string);
+	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
+		machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 	mewui_globals::force_reset_main = true;
 }
 
@@ -80,9 +62,9 @@ void ui_menu_misc_options::handle()
 		{
 			changed = true;
 			int value = (FPTR)menu_event->itemref;
-			if (value == ENLARGE_ARTS)
+			if (!strcmp(m_options[value].option, OPTION_ENLARGE_SNAPS))
 				mewui_globals::switch_image = true;
-			m_options[value] = !m_options[value];
+			m_options[value].status = !m_options[value].status;
 		}
 	}
 
@@ -97,8 +79,8 @@ void ui_menu_misc_options::handle()
 void ui_menu_misc_options::populate()
 {
 	// add options items
-	for (int opt = 1; opt < LAST_MOPTION; ++opt)
-		item_append(description[opt], m_options[opt] ? "On" : "Off", m_options[opt] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
+	for (int opt = 1; opt < ARRAY_LENGTH(m_options); ++opt)
+		item_append(m_options[opt].description, m_options[opt].status ? "On" : "Off", m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);

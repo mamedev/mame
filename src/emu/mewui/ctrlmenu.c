@@ -16,14 +16,14 @@ const char *ui_menu_controller_mapping::device_status[] = { "none", "keyboard", 
 
 static ctrl_option m_options[] = {
 	{ 0, NULL, NULL },
-	{ 0, "Lightgun Device Assignment", OPTION_LIGHTGUN_DEVICE },
-	{ 0, "Trackball Device Assignment", OPTION_TRACKBALL_DEVICE },
-	{ 0, "Pedal Device Assignment", OPTION_PEDAL_DEVICE },
-	{ 0, "Adstick Device Assignment", OPTION_ADSTICK_DEVICE },
-	{ 0, "Paddle Device Assignment", OPTION_PADDLE_DEVICE },
-	{ 0, "Dial Device Assignment", OPTION_DIAL_DEVICE },
+	{ 0, "Lightgun Device Assignment",   OPTION_LIGHTGUN_DEVICE },
+	{ 0, "Trackball Device Assignment",  OPTION_TRACKBALL_DEVICE },
+	{ 0, "Pedal Device Assignment",      OPTION_PEDAL_DEVICE },
+	{ 0, "Adstick Device Assignment",    OPTION_ADSTICK_DEVICE },
+	{ 0, "Paddle Device Assignment",     OPTION_PADDLE_DEVICE },
+	{ 0, "Dial Device Assignment",       OPTION_DIAL_DEVICE },
 	{ 0, "Positional Device Assignment", OPTION_POSITIONAL_DEVICE },
-	{ 0, "Mouse Device Assignment", OPTION_MOUSE_DEVICE }
+	{ 0, "Mouse Device Assignment",      OPTION_MOUSE_DEVICE }
 };
 
 //-------------------------------------------------
@@ -32,7 +32,7 @@ static ctrl_option m_options[] = {
 
 ui_menu_controller_mapping::ui_menu_controller_mapping(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-	for (int d = 1; d < LAST_DEVICE_ASSIGN; ++d)
+	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 		m_options[d].status = check_status(machine.options().value(m_options[d].option), m_options[d].option);
 }
 
@@ -43,7 +43,7 @@ ui_menu_controller_mapping::ui_menu_controller_mapping(running_machine &machine,
 ui_menu_controller_mapping::~ui_menu_controller_mapping()
 {
 	std::string error_string;
-	for (int d = 1; d < LAST_DEVICE_ASSIGN; ++d)
+	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 		machine().options().set_value(m_options[d].option, device_status[m_options[d].status], OPTION_PRIORITY_CMDLINE, error_string);
 }
 
@@ -78,7 +78,7 @@ void ui_menu_controller_mapping::handle()
 void ui_menu_controller_mapping::populate()
 {
 	// add options
-	for (int d = 1; d < LAST_DEVICE_ASSIGN; ++d)
+	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 	{
 		UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[d].status);
 		item_append(m_options[d].description, device_status[m_options[d].status], arrow_flags, (void *)(FPTR)d);

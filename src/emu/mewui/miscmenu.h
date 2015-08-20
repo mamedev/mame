@@ -12,6 +12,13 @@
 #ifndef __MEWUI_MISCMENU_H__
 #define __MEWUI_MISCMENU_H__
 
+struct misc_option
+{
+	bool        status;
+	const char  *description;
+	const char  *option;
+};
+
 //-------------------------------------------------
 //  class miscellaneous options menu
 //-------------------------------------------------
@@ -23,26 +30,6 @@ public:
 	virtual void populate();
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-
-private:
-	enum
-	{
-		REMEMBER_LAST_GAME = 1,
-		ENLARGE_ARTS,
-		DATS_ENABLED,
-		CHEAT_ENABLED,
-		MOUSE_ENABLED,
-		CONFIRM_QUIT_ENABLED,
-		SKIP_GAMEINFO_ENABLED,
-		FORCED_4X3,
-		USE_BGRND,
-		SKIP_BIOS,
-		SKIP_PARTS,
-		LAST_MOPTION
-	};
-
-	bool m_options[LAST_MOPTION];
-	static const char *description[];
 };
 
 #endif /* __MEWUI_MISCMENU_H__ */
