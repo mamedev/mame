@@ -670,9 +670,13 @@ MACHINE_CONFIG_FRAGMENT( bwg_fdc )
 	MCFG_MM58274C_DAY1(0)   // sunday
 
 	MCFG_FLOPPY_DRIVE_ADD("0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("2", bwg_floppies, NULL, snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, NULL, snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 ROM_START( bwg_fdc )

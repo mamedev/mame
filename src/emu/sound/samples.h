@@ -92,7 +92,6 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-private:
 	// internal classes
 	struct channel_t
 	{
@@ -111,7 +110,7 @@ private:
 	// internal helpers
 	static bool read_wav_sample(emu_file &file, sample_t &sample);
 	static bool read_flac_sample(emu_file &file, sample_t &sample);
-	void load_samples();
+	bool load_samples();
 
 	// internal state
 	std::vector<channel_t>    m_channel;

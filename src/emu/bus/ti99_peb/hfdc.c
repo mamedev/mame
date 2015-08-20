@@ -1027,9 +1027,13 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_HDC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
 
 	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("f3", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// NB: Hard disks don't go without image (other than floppy drives)
 	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
