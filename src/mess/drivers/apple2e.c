@@ -610,8 +610,11 @@ void apple2e_state::machine_start()
 	if (m_a2eauxslot)
 	{
 		m_auxslotdevice = m_a2eauxslot->get_a2eauxslot_card();
-		m_aux_ptr = m_auxslotdevice->get_vram_ptr();
-		m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
+		if (m_auxslotdevice)
+		{
+			m_aux_ptr = m_auxslotdevice->get_vram_ptr();
+			m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
+		}
 	}
 	else    // IIc has 128K right on the motherboard
 	{
