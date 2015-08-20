@@ -99,6 +99,8 @@ READ32_MEMBER(konendev_state::mcu2_r)
 	if (ACCESSING_BITS_0_7)
 	{
 		r |= 0x40;			// logic door
+		r |= 0x04;			// battery 1 status
+		r |= 0x10;			// battery 2 status
 	}
 
 	return r;
