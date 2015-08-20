@@ -1173,8 +1173,8 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 static const char *const floppy_sample_names[] =
 {
 	"*floppy",
-	"flop_35_motor",
-	"flop_35_step",
+	"floppy_35_motor",
+	"floppy_35_step",
 	0
 };
 
