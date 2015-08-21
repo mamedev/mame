@@ -1,6 +1,5 @@
 language: cpp
 compiler:
-  - gcc
   - clang
 env:
   - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
