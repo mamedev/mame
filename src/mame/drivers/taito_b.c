@@ -3213,7 +3213,7 @@ ROM_START( hiticej ) /* 2 Player version */
 	ROM_LOAD( "pal16r4b-c59-07.61", 0x600, 0x104, CRC(cf64bd95) SHA1(5acada8bd6da40b5342bdd7ec494ee0e615492f0) )
 ROM_END
 
-ROM_START( rambo3 )
+ROM_START( rambo3 ) /* all of the following roms should most likely have the names "B93-xx" rather than "ramb3-xx" */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "ramb3-11.bin",  0x00000, 0x20000, CRC(1cc42247) SHA1(e5a226a0016ec329fc23046c426c6303e452ef1d) )
 	ROM_LOAD16_BYTE( "ramb3-14.bin",  0x00001, 0x20000, CRC(7d917c21) SHA1(2850c46d6bdabfb76c40a7dc78ebc14b69ce95c9) )
