@@ -453,13 +453,13 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/at29040a.h,MACHINES["AT29040"] = true
+--@src/emu/machine/at29x.h,MACHINES["AT29X"] = true
 ---------------------------------------------------
 
-if (MACHINES["AT29040"]~=null) then
+if (MACHINES["AT29X"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/at29040a.c",
-		MAME_DIR .. "src/emu/machine/at29040a.h",
+		MAME_DIR .. "src/emu/machine/at29x.c",
+		MAME_DIR .. "src/emu/machine/at29x.h",
 	}
 end
 
