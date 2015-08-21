@@ -269,7 +269,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 	 * This should reduce cache misses ...
 	 */
 
-	bool touched[_storage_N][_storage_N] = { false };
+	bool touched[_storage_N][_storage_N] = { { false } };
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k]->m_nzbd.clear();
