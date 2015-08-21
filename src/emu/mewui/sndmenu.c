@@ -19,7 +19,7 @@
 #include "../osd/modules/lib/osdobj_common.h"
 #endif
 
-const int ui_menu_sound_options::sound_rate[] = { 11025, 22050, 44100, 48000 };
+const int ui_menu_sound_options::m_sound_rate[] = { 11025, 22050, 44100, 48000 };
 
 //-------------------------------------------------
 //  ctor
@@ -37,14 +37,14 @@ ui_menu_sound_options::ui_menu_sound_options(running_machine &machine, render_co
 	m_sound = (strcmp(options.sound(), OSDOPTVAL_NONE) && strcmp(options.sound(), "0"));
 	m_samples = machine.options().samples();
 
-	int total = ARRAY_LENGTH(sound_rate);
+	int total = ARRAY_LENGTH(m_sound_rate);
 
-	for (cur_rates = 0; cur_rates < total; cur_rates++)
-		if (m_sample_rate == sound_rate[cur_rates])
+	for (m_cur_rates = 0; m_cur_rates < total; m_cur_rates++)
+		if (m_sample_rate == m_sound_rate[m_cur_rates])
 			break;
 
-	if (cur_rates == total)
-		cur_rates = 2;
+	if (m_cur_rates == total)
+		m_cur_rates = 2;
 }
 
 //-------------------------------------------------
@@ -60,7 +60,7 @@ ui_menu_sound_options::~ui_menu_sound_options()
 	else
 		machine().options().set_value(OSDOPTION_SOUND, OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE, error_string);
 
-	machine().options().set_value(OPTION_SAMPLERATE, sound_rate[cur_rates], OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE, error_string);
 }
 
@@ -90,17 +90,17 @@ void ui_menu_sound_options::handle()
 			case SAMPLE_RATE:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					(menu_event->iptkey == IPT_UI_LEFT) ? cur_rates-- : cur_rates++;
+					(menu_event->iptkey == IPT_UI_LEFT) ? m_cur_rates-- : m_cur_rates++;
 					changed = true;
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					int total = ARRAY_LENGTH(sound_rate);
+					int total = ARRAY_LENGTH(m_sound_rate);
 					std::vector<std::string> s_sel(total);
 					for (int index = 0; index < total; index++)
-						strprintf(s_sel[index], "%d", sound_rate[index]);
+						strprintf(s_sel[index], "%d", m_sound_rate[index]);
 
-					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &cur_rates)));
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &m_cur_rates)));
 				}
 				break;
 
@@ -125,8 +125,8 @@ void ui_menu_sound_options::handle()
 
 void ui_menu_sound_options::populate()
 {
-	UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(sound_rate) - 1, cur_rates);
-	m_sample_rate = sound_rate[cur_rates];
+	UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_sound_rate) - 1, m_cur_rates);
+	m_sample_rate = m_sound_rate[m_cur_rates];
 	std::string s_text;
 	strprintf(s_text, "%d", m_sample_rate);
 

@@ -62,7 +62,7 @@ void inifile_manager::directory_scan()
 			if (ParseOpen(file_name.c_str()))
 			{
 				std::vector<IniCategoryIndex> tmp;
-				init_category(tmp, fullpath);
+				init_category(tmp, m_fullpath);
 				if (!tmp.empty())
 				{
 					IniFileIndex tfile;
@@ -123,7 +123,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 
 	if (ParseOpen(file_name.c_str()))
 	{
-		std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
+		std::ifstream myfile(m_fullpath.c_str(), std::ifstream::binary);
 		int num_game = driver_list::total();
 		std::string readbuf;
 		myfile.seekg(offset, myfile.beg);
@@ -164,7 +164,7 @@ bool inifile_manager::ParseOpen(const char *filename)
 
 	if (fp.open(filename) == FILERR_NONE)
 	{
-		fullpath.assign(fp.fullpath());
+		m_fullpath.assign(fp.fullpath());
 		fp.close();
 		return true;
 	}
@@ -209,7 +209,7 @@ void favorite_manager::add_favorite_game(const game_driver *driver)
 	tmpmatches.usage.clear();
 	tmpmatches.devicetype.clear();
 	tmpmatches.available = true;
-	favorite_list.push_back(tmpmatches);
+	m_favorite_list.push_back(tmpmatches);
 	save_favorite_games();
 }
 
@@ -219,7 +219,7 @@ void favorite_manager::add_favorite_game(const game_driver *driver)
 
 void favorite_manager::add_favorite_game(ui_software_info &swinfo)
 {
-	favorite_list.push_back(swinfo);
+	m_favorite_list.push_back(swinfo);
 	save_favorite_games();
 }
 
@@ -278,7 +278,7 @@ void favorite_manager::add_favorite_game()
 			if (image->image_type_name()) tmpmatches.devicetype.assign(image->image_type_name());
 			tmpmatches.available = true;
 			software_avail = true;
-			favorite_list.push_back(tmpmatches);
+			m_favorite_list.push_back(tmpmatches);
 			save_favorite_games();
 		}
 	}
@@ -293,10 +293,10 @@ void favorite_manager::add_favorite_game()
 
 void favorite_manager::remove_favorite_game(ui_software_info &swinfo)
 {
-	for (size_t x = 0; x < favorite_list.size(); x++)
-		if (favorite_list[x] == swinfo)
+	for (size_t x = 0; x < m_favorite_list.size(); x++)
+		if (m_favorite_list[x] == swinfo)
 		{
-			favorite_list.erase(favorite_list.begin() + x);
+			m_favorite_list.erase(m_favorite_list.begin() + x);
 			break;
 		}
 
@@ -309,7 +309,7 @@ void favorite_manager::remove_favorite_game(ui_software_info &swinfo)
 
 void favorite_manager::remove_favorite_game()
 {
-	favorite_list.erase(favorite_list.begin() + current_favorite);
+	m_favorite_list.erase(m_favorite_list.begin() + m_current_favorite);
 	save_favorite_games();
 }
 
@@ -332,11 +332,11 @@ bool favorite_manager::isgame_favorite()
 			image_loaded = true;
 			const software_info *swinfo = image->software_entry();
 
-			for (size_t current = 0; current < favorite_list.size(); current++)
-				if (!favorite_list[current].shortname.compare(swinfo->shortname()) &&
-				    !favorite_list[current].listname.compare(image->software_list_name()))
+			for (size_t current = 0; current < m_favorite_list.size(); current++)
+				if (!m_favorite_list[current].shortname.compare(swinfo->shortname()) &&
+				    !m_favorite_list[current].listname.compare(image->software_list_name()))
 				{
-					current_favorite = current;
+					m_current_favorite = current;
 					return true;
 				}
 		}
@@ -345,7 +345,7 @@ bool favorite_manager::isgame_favorite()
 	if (!image_loaded)
 		return isgame_favorite(&machine().system());
 
-	current_favorite = -1;
+	m_current_favorite = -1;
 	return false;
 }
 
@@ -355,14 +355,14 @@ bool favorite_manager::isgame_favorite()
 
 bool favorite_manager::isgame_favorite(const game_driver *driver)
 {
-	for (size_t x = 0; x < favorite_list.size(); x++)
-		if (favorite_list[x].driver == driver && favorite_list[x].shortname.compare(driver->name) == 0)
+	for (size_t x = 0; x < m_favorite_list.size(); x++)
+		if (m_favorite_list[x].driver == driver && m_favorite_list[x].shortname.compare(driver->name) == 0)
 		{
-			current_favorite = x;
+			m_current_favorite = x;
 			return true;
 		}
 
-	current_favorite = -1;
+	m_current_favorite = -1;
 	return false;
 }
 
@@ -372,14 +372,14 @@ bool favorite_manager::isgame_favorite(const game_driver *driver)
 
 bool favorite_manager::isgame_favorite(ui_software_info &swinfo)
 {
-	for (size_t x = 0; x < favorite_list.size(); x++)
-		if (favorite_list[x] == swinfo)
+	for (size_t x = 0; x < m_favorite_list.size(); x++)
+		if (m_favorite_list[x] == swinfo)
 		{
-			current_favorite = x;
+			m_current_favorite = x;
 			return true;
 		}
 
-	current_favorite = -1;
+	m_current_favorite = -1;
 	return false;
 }
 
@@ -437,7 +437,7 @@ void favorite_manager::parse_favorite()
 			tmpmatches.devicetype = strtrimspace(text.assign(readbuf));
 			file.gets(readbuf, 1024);
 			tmpmatches.available = atoi(readbuf);
-			favorite_list.push_back(tmpmatches);
+			m_favorite_list.push_back(tmpmatches);
 		}
 		file.close();
 	}
@@ -454,7 +454,7 @@ void favorite_manager::save_favorite_games()
 
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{
-		if (favorite_list.empty())
+		if (m_favorite_list.empty())
 		{
 			file.remove_on_close();
 			file.close();
@@ -464,24 +464,24 @@ void favorite_manager::save_favorite_games()
 		// generate the favorite INI
 		std::string text("[ROOT_FOLDER]\n[Favorite]\n\n");
 
-		for (size_t current = 0; current < favorite_list.size(); current++)
+		for (size_t current = 0; current < m_favorite_list.size(); current++)
 		{
-			text += favorite_list[current].shortname + "\n";
-			text += favorite_list[current].longname + "\n";
-			text += favorite_list[current].parentname + "\n";
-			text += favorite_list[current].year + "\n";
-			text += favorite_list[current].publisher + "\n";
-			strcatprintf(text, "%d\n", favorite_list[current].supported);
-			text += favorite_list[current].part + "\n";
-			strcatprintf(text, "%s\n", favorite_list[current].driver->name);
-			text += favorite_list[current].listname + "\n";
-			text += favorite_list[current].interface + "\n";
-			text += favorite_list[current].instance + "\n";
-			strcatprintf(text, "%d\n", favorite_list[current].startempty);
-			text += favorite_list[current].parentlongname + "\n";
-			text += favorite_list[current].usage + "\n";
-			text += favorite_list[current].devicetype + "\n";
-			strcatprintf(text, "%d\n", favorite_list[current].available);
+			text += m_favorite_list[current].shortname + "\n";
+			text += m_favorite_list[current].longname + "\n";
+			text += m_favorite_list[current].parentname + "\n";
+			text += m_favorite_list[current].year + "\n";
+			text += m_favorite_list[current].publisher + "\n";
+			strcatprintf(text, "%d\n", m_favorite_list[current].supported);
+			text += m_favorite_list[current].part + "\n";
+			strcatprintf(text, "%s\n", m_favorite_list[current].driver->name);
+			text += m_favorite_list[current].listname + "\n";
+			text += m_favorite_list[current].interface + "\n";
+			text += m_favorite_list[current].instance + "\n";
+			strcatprintf(text, "%d\n", m_favorite_list[current].startempty);
+			text += m_favorite_list[current].parentlongname + "\n";
+			text += m_favorite_list[current].usage + "\n";
+			text += m_favorite_list[current].devicetype + "\n";
+			strcatprintf(text, "%d\n", m_favorite_list[current].available);
 		}
 		file.puts(text.c_str());
 		file.close();

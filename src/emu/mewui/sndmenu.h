@@ -33,8 +33,8 @@ private:
 		ENABLE_SAMPLES
 	};
 
-	UINT16            cur_rates;
-	static const int  sound_rate[];
+	UINT16            m_cur_rates;
+	static const int  m_sound_rate[];
 	int               m_sample_rate;
 	bool              m_samples, m_sound;
 };

@@ -558,27 +558,27 @@ void ui_mewui_select_game::populate()
 		flags_mewui |= MENU_FLAG_MEWUI_FAVORITE;
 
 		// iterate over entries
-		for (size_t x = 0; x < machine().favorite().favorite_list.size(); x++)
+		for (size_t x = 0; x < machine().favorite().m_favorite_list.size(); x++)
 		{
-			if (machine().favorite().favorite_list[x].startempty == 1)
+			if (machine().favorite().m_favorite_list[x].startempty == 1)
 			{
-				bool cloneof = strcmp(machine().favorite().favorite_list[x].driver->parent, "0");
+				bool cloneof = strcmp(machine().favorite().m_favorite_list[x].driver->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(machine().favorite().favorite_list[x].driver->parent);
+					int cx = driver_list::find(machine().favorite().m_favorite_list[x].driver->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
-				item_append(machine().favorite().favorite_list[x].longname.c_str(), NULL,
+				item_append(machine().favorite().m_favorite_list[x].longname.c_str(), NULL,
 							(cloneof) ? (MENU_FLAG_INVERT | flags_mewui) : flags_mewui,
-							(void *)&machine().favorite().favorite_list[x]);
+							(void *)&machine().favorite().m_favorite_list[x]);
 			}
 			else
-				item_append(machine().favorite().favorite_list[x].longname.c_str(),
-							machine().favorite().favorite_list[x].devicetype.c_str(),
-							machine().favorite().favorite_list[x].parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
-							(void *)&machine().favorite().favorite_list[x]);
+				item_append(machine().favorite().m_favorite_list[x].longname.c_str(),
+							machine().favorite().m_favorite_list[x].devicetype.c_str(),
+							machine().favorite().m_favorite_list[x].parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
+							(void *)&machine().favorite().m_favorite_list[x]);
 		}
 	}
 

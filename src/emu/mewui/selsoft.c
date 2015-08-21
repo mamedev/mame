@@ -110,7 +110,7 @@ ui_menu_select_software::ui_menu_select_software(running_machine &machine, rende
 
 	mewui_globals::actual_sw_filter = 0;
 
-	ui_driver = driver;
+	m_driver = driver;
 	build_software_list();
 	load_sw_custom_filters();
 
@@ -200,7 +200,7 @@ void ui_menu_select_software::handle()
 			ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 
 			if ((FPTR)ui_swinfo > 1)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_history_sw(machine(), container, ui_swinfo, ui_driver)));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_history_sw(machine(), container, ui_swinfo, m_driver)));
 		}
 
 		// handle UI_UP_FILTER
@@ -315,7 +315,7 @@ void ui_menu_select_software::handle()
 		else if (l_sw_hover == MEWUI_SW_CUSTOM)
 		{
 			mewui_globals::actual_sw_filter = l_sw_hover;
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_swcustom_filter(machine(), container, ui_driver, m_region, m_publisher, m_year, m_type, m_swlist)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_swcustom_filter(machine(), container, m_driver, m_region, m_publisher, m_year, m_type, m_swlist)));
 		}
 		else
 		{
@@ -332,16 +332,16 @@ void ui_menu_select_software::handle()
 void ui_menu_select_software::populate()
 {
 	UINT32 flags_mewui = MENU_FLAG_MEWUI_SWLIST | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
-	has_empty_start = true;
+	m_has_empty_start = true;
 	int old_software = -1;
 
-	machine_config config(*ui_driver, machine().options());
+	machine_config config(*m_driver, machine().options());
 	image_interface_iterator iter(config.root_device());
 
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 		if (image->filename() == NULL && image->must_be_loaded())
 		{
-			has_empty_start = false;
+			m_has_empty_start = false;
 			break;
 		}
 
@@ -349,7 +349,7 @@ void ui_menu_select_software::populate()
 	if (m_search[0] == 0)
 	{
 		// if the device can be loaded empty, add an item
-		if (has_empty_start)
+		if (m_has_empty_start)
 			item_append("[Start empty]", NULL, flags_mewui, (void *)&m_swinfo[0]);
 
 		m_displaylist.clear();
@@ -394,7 +394,7 @@ void ui_menu_select_software::populate()
 
 			else if (!reselect_last::software.empty() && m_displaylist[curitem]->shortname.compare(reselect_last::software) == 0
 			         && m_displaylist[curitem]->listname.compare(reselect_last::swlist) == 0)
-				old_software = has_empty_start ? curitem + 1 : curitem;
+				old_software = m_has_empty_start ? curitem + 1 : curitem;
 
 			item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
 			            m_displaylist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui), (void *)m_displaylist[curitem]);
@@ -405,10 +405,10 @@ void ui_menu_select_software::populate()
 	{
 		find_matches(m_search, VISIBLE_GAMES_IN_SEARCH);
 
-		for (int curitem = 0; searchlist[curitem]; curitem++)
-			item_append(searchlist[curitem]->longname.c_str(), searchlist[curitem]->devicetype.c_str(),
-			            searchlist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
-			            (void *)searchlist[curitem]);
+		for (int curitem = 0; m_searchlist[curitem]; curitem++)
+			item_append(m_searchlist[curitem]->longname.c_str(), m_searchlist[curitem]->devicetype.c_str(),
+			            m_searchlist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
+			            (void *)m_searchlist[curitem]);
 	}
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, flags_mewui, NULL);
@@ -437,14 +437,14 @@ void ui_menu_select_software::build_software_list()
 {
 	// add start empty item
 	ui_software_info first_swlist;
-	first_swlist.shortname.assign(ui_driver->name);
-	first_swlist.longname.assign(ui_driver->description);
+	first_swlist.shortname.assign(m_driver->name);
+	first_swlist.longname.assign(m_driver->description);
 	first_swlist.parentname.clear();
 	first_swlist.year.clear();
 	first_swlist.publisher.clear();
 	first_swlist.supported = 0;
 	first_swlist.part.clear();
-	first_swlist.driver = ui_driver;
+	first_swlist.driver = m_driver;
 	first_swlist.listname.clear();
 	first_swlist.interface.clear();
 	first_swlist.instance.clear();
@@ -455,7 +455,7 @@ void ui_menu_select_software::build_software_list()
 	first_swlist.available = true;
 	m_swinfo.push_back(first_swlist);
 
-	machine_config config(*ui_driver, machine().options());
+	machine_config config(*m_driver, machine().options());
 	software_list_device_iterator deviter(config.root_device());
 
 	// iterate thru all software lists
@@ -498,7 +498,7 @@ void ui_menu_select_software::build_software_list()
 				if (swinfo->publisher()) tmpmatches.publisher.assign(swinfo->publisher());
 				tmpmatches.supported = swinfo->supported();
 				if (part->name()) tmpmatches.part.assign(part->name());
-				tmpmatches.driver = ui_driver;
+				tmpmatches.driver = m_driver;
 				if (swlist->list_name()) tmpmatches.listname.assign(swlist->list_name());
 				if (part->interface()) tmpmatches.interface.assign(part->interface());
 				tmpmatches.startempty = 0;
@@ -604,9 +604,9 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	float tbarspace = (1.0f / container->manager().ui_target().height()) * 32;
 
 	// determine the text for the header
-	int vis_item = (m_search[0] != 0) ? visible_items : (has_empty_start ? visible_items - 1 : visible_items);
+	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
 	strprintf(tempbuf[0], "MEWUI %s ( %d / %d softwares )", mewui_version, vis_item, (int)m_swinfo.size() - 1);
-	tempbuf[1].assign("Driver: \"").append(ui_driver->description).append("\" software list ");
+	tempbuf[1].assign("Driver: \"").append(m_driver->description).append("\" software list ");
 
 	if (mewui_globals::actual_sw_filter == MEWUI_SW_REGION && m_region.ui.size() != 0)
 		filtered.assign("Region: ").append(m_region.ui[m_region.actual]).append(" - ");
@@ -837,7 +837,7 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 		media_auditor auditor(drivlist);
 		drivlist.next();
 		software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
-		swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 
@@ -922,7 +922,7 @@ void ui_menu_select_software::load_sw_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(machine().options().mewui_path(), OPEN_FLAG_READ);
-	if (file.open("custom_", ui_driver->name, "_filter.ini") == FILERR_NONE)
+	if (file.open("custom_", m_driver->name, "_filter.ini") == FILERR_NONE)
 	{
 		char buffer[MAX_CHAR_INFO];
 
@@ -1198,14 +1198,14 @@ void ui_menu_select_software::find_matches(const char *str, int count)
 			if (matchnum < count - 1)
 			{
 				penalty[matchnum + 1] = penalty[matchnum];
-				searchlist[matchnum + 1] = searchlist[matchnum];
+				m_searchlist[matchnum + 1] = m_searchlist[matchnum];
 			}
 
-			searchlist[matchnum] = m_displaylist[index];
+			m_searchlist[matchnum] = m_displaylist[index];
 			penalty[matchnum] = curpenalty;
 		}
 	}
-	(index < count) ? searchlist[index] = NULL : searchlist[count] = NULL;
+	(index < count) ? m_searchlist[index] = NULL : m_searchlist[count] = NULL;
 }
 
 //-------------------------------------------------
@@ -1348,9 +1348,9 @@ void ui_mewui_software_parts::custom_render(void *selectedref, float top, float 
 ui_mewui_bios_selection::ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<std::string> biosname, void *_driver, bool _software, bool _inlist) : ui_menu(machine, container)
 {
 	m_bios = biosname;
-	driver = _driver;
-	software = _software;
-	inlist = _inlist;
+	m_driver = _driver;
+	m_software = _software;
+	m_inlist = _inlist;
 }
 
 //-------------------------------------------------
@@ -1386,11 +1386,11 @@ void ui_mewui_bios_selection::handle()
 		for (size_t idx = 0; idx < m_bios.size(); idx++)
 			if ((void*)&m_bios[idx] == event->itemref)
 			{
-				if (!software)
+				if (!m_software)
 				{
-					const game_driver *s_driver = (const game_driver *)driver;
+					const game_driver *s_driver = (const game_driver *)m_driver;
 					reselect_last::driver.assign(s_driver->name);
-					if (inlist)
+					if (m_inlist)
 						reselect_last::software.assign("[Start empty]");
 					else
 						reselect_last::software.clear();
@@ -1404,7 +1404,7 @@ void ui_mewui_bios_selection::handle()
 				}
 				else
 				{
-					ui_software_info *ui_swinfo = (ui_software_info *)driver;
+					ui_software_info *ui_swinfo = (ui_software_info *)m_driver;
 					std::string error;
 					machine().options().set_value("bios", (int)idx, OPTION_PRIORITY_CMDLINE, error);
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);

@@ -36,20 +36,20 @@ private:
 		ADD_FILTER,
 		REMOVE_FILTER,
 		MNFCT_FILTER,
-		YEAR_FILTER = MNFCT_FILTER + MAX_CUST_FILTER + 1,
-		REGION_FILTER = YEAR_FILTER + MAX_CUST_FILTER + 1,
-		TYPE_FILTER = REGION_FILTER + MAX_CUST_FILTER + 1,
-		LIST_FILTER = TYPE_FILTER + MAX_CUST_FILTER + 1,
-		OTHER_FILTER = LIST_FILTER + MAX_CUST_FILTER + 1
+		YEAR_FILTER   = MNFCT_FILTER  + MAX_CUST_FILTER + 1,
+		REGION_FILTER = YEAR_FILTER   + MAX_CUST_FILTER + 1,
+		TYPE_FILTER   = REGION_FILTER + MAX_CUST_FILTER + 1,
+		LIST_FILTER   = TYPE_FILTER   + MAX_CUST_FILTER + 1,
+		OTHER_FILTER  = LIST_FILTER   + MAX_CUST_FILTER + 1
 	};
 
-	bool added;
-	const game_driver *driver;
-	c_sw_region &m_region;
-	c_sw_publisher &m_publisher;
-	c_sw_year &m_year;
-	c_sw_type &m_type;
-	c_sw_list &m_list;
+	bool              m_added;
+	const game_driver *m_driver;
+	c_sw_region       &m_region;
+	c_sw_publisher    &m_publisher;
+	c_sw_year         &m_year;
+	c_sw_type         &m_type;
+	c_sw_list         &m_list;
 	void save_sw_custom_filters();
 };
 

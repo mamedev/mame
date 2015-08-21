@@ -25,7 +25,7 @@
 ui_menu_swcustom_filter::ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver,
                                                  c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type,
                                                  c_sw_list &_list) :
-	ui_menu(machine, container), driver(_driver), m_region(_region), m_publisher(_publisher), m_year(_year), m_type(_type), m_list(_list)
+	ui_menu(machine, container), m_driver(_driver), m_region(_region), m_publisher(_publisher), m_year(_year), m_type(_type), m_list(_list)
 {
 }
 
@@ -41,7 +41,7 @@ ui_menu_swcustom_filter::~ui_menu_swcustom_filter()
 void ui_menu_swcustom_filter::handle()
 {
 	bool changed = false;
-	added = false;
+	m_added = false;
 
 	// process the menu
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
@@ -62,7 +62,7 @@ void ui_menu_swcustom_filter::handle()
 				{
 					sw_custfltr::numother++;
 					sw_custfltr::other[sw_custfltr::numother] = MEWUI_SW_UNAVAILABLE + 1;
-					added = true;
+					m_added = true;
 				}
 				break;
 
@@ -186,7 +186,7 @@ void ui_menu_swcustom_filter::handle()
 
 	if (changed)
 		reset(UI_MENU_RESET_REMEMBER_REF);
-	else if (added)
+	else if (m_added)
 		reset(UI_MENU_RESET_SELECT_FIRST);
 }
 
@@ -208,7 +208,7 @@ void ui_menu_swcustom_filter::populate()
 		arrow_flags = get_arrow_flags((int)MEWUI_SW_UNAVAILABLE + 1, (int)MEWUI_SW_LAST - 1, sw_custfltr::other[x]);
 		item_append("Other filter", mewui_globals::sw_filter_text[sw_custfltr::other[x]], arrow_flags, (void *)(FPTR)(OTHER_FILTER + x));
 
-		if (added)
+		if (m_added)
 			selected = item.size() - 2;
 
 		// add publisher subitem
@@ -330,7 +330,7 @@ void ui_menu_swcustom_filter::save_sw_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open("custom_", driver->name, "_filter.ini") == FILERR_NONE)
+	if (file.open("custom_", m_driver->name, "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info
 		std::string cinfo;

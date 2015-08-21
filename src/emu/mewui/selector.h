@@ -39,11 +39,11 @@ public:
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	char                       m_search[40];
-	UINT16                     *selector;
+	UINT16                     *m_selector;
 	int                        p_category, hover;
-	bool                       first_pass;
-	std::vector<std::string>   str_items;
-	std::string                *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	bool                       m_first_pass;
+	std::vector<std::string>   m_str_items;
+	std::string                *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 
 	void find_matches(const char *str);
 };

@@ -35,11 +35,11 @@ private:
 		ADD_FILTER,
 		REMOVE_FILTER,
 		MNFCT_FILTER,
-		YEAR_FILTER = MNFCT_FILTER + MAX_CUST_FILTER + 1,
-		OTHER_FILTER = YEAR_FILTER + MAX_CUST_FILTER + 1
+		YEAR_FILTER  = MNFCT_FILTER + MAX_CUST_FILTER + 1,
+		OTHER_FILTER = YEAR_FILTER  + MAX_CUST_FILTER + 1
 	};
 
-	bool single_menu, added;
+	bool m_single_menu, m_added;
 	void save_custom_filters();
 };
 

@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /*********************************************************************
 
-    mewui/selector.c
+    mewui/m_selector.c
 
     Internal MEWUI user interface.
 
@@ -21,10 +21,10 @@
 ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> s_sel, UINT16 *s_actual, int category, int _hover) : ui_menu(machine, container)
 {
 	p_category = category;
-	selector = s_actual;
-	first_pass = true;
+	m_selector = s_actual;
+	m_first_pass = true;
 	hover = _hover;
-	str_items = s_sel;
+	m_str_items = s_sel;
 }
 
 ui_menu_selector::~ui_menu_selector()
@@ -44,20 +44,20 @@ void ui_menu_selector::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			for (size_t idx = 0; idx < str_items.size(); idx++)
-				if ((void*)&str_items[idx] == menu_event->itemref)
-					*selector = idx;
+			for (size_t idx = 0; idx < m_str_items.size(); idx++)
+				if ((void*)&m_str_items[idx] == menu_event->itemref)
+					*m_selector = idx;
 
 			switch (p_category)
 			{
 				case SELECTOR_INIFILE:
-					machine().inifile().current_file = *selector;
+					machine().inifile().current_file = *m_selector;
 					machine().inifile().current_category = 0;
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 					break;
 
 				case SELECTOR_CATEGORY:
-					machine().inifile().current_category = *selector;
+					machine().inifile().current_category = *m_selector;
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 					break;
 
@@ -118,26 +118,26 @@ void ui_menu_selector::populate()
 	{
 		find_matches(m_search);
 
-		for (int curitem = 0; searchlist[curitem]; curitem++)
-			item_append(searchlist[curitem]->c_str(), NULL, 0, (void *)searchlist[curitem]);
+		for (int curitem = 0; m_searchlist[curitem]; curitem++)
+			item_append(m_searchlist[curitem]->c_str(), NULL, 0, (void *)m_searchlist[curitem]);
 	}
 	else
 	{
-		for (size_t index = 0, added = 0; index < str_items.size(); index++)
-			if (str_items[index].compare("_skip_") != 0)
+		for (size_t index = 0, added = 0; index < m_str_items.size(); index++)
+			if (m_str_items[index].compare("_skip_") != 0)
 			{
-				if (first_pass && *selector == index)
+				if (m_first_pass && *m_selector == index)
 					selected = added;
 
 				added++;
-				item_append(str_items[index].c_str(), NULL, 0, (void *)&str_items[index]);
+				item_append(m_str_items[index].c_str(), NULL, 0, (void *)&m_str_items[index]);
 			}
 	}
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	first_pass = false;
+	m_first_pass = false;
 }
 
 //-------------------------------------------------
@@ -213,14 +213,14 @@ void ui_menu_selector::find_matches(const char *str)
 	std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
 	int index = 0;
 
-	for (; index < str_items.size(); index++)
+	for (; index < m_str_items.size(); index++)
 	{
-		if (!str_items[index].compare("_skip_"))
+		if (!m_str_items[index].compare("_skip_"))
 			continue;
 
 		// pick the best match between driver name and description
-		int curpenalty = fuzzy_substring(str, str_items[index].c_str());
-		int tmp = fuzzy_substring(str, str_items[index].c_str());
+		int curpenalty = fuzzy_substring(str, m_str_items[index].c_str());
+		int tmp = fuzzy_substring(str, m_str_items[index].c_str());
 		curpenalty = MIN(curpenalty, tmp);
 
 		// insert into the sorted table of matches
@@ -234,12 +234,12 @@ void ui_menu_selector::find_matches(const char *str)
 			if (matchnum < VISIBLE_GAMES_IN_SEARCH - 1)
 			{
 				penalty[matchnum + 1] = penalty[matchnum];
-				searchlist[matchnum + 1] = searchlist[matchnum];
+				m_searchlist[matchnum + 1] = m_searchlist[matchnum];
 			}
 
-			searchlist[matchnum] = &str_items[index];
+			m_searchlist[matchnum] = &m_str_items[index];
 			penalty[matchnum] = curpenalty;
 		}
 	}
-	(index < VISIBLE_GAMES_IN_SEARCH) ? searchlist[index] = NULL : searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
+	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = NULL : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
 }

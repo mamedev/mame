@@ -24,12 +24,12 @@
 //-------------------------------------------------
 ui_menu_custom_filter::ui_menu_custom_filter(running_machine &machine, render_container *container, bool _single_menu) : ui_menu(machine, container)
 {
-	single_menu = _single_menu;
+	m_single_menu = _single_menu;
 }
 
 ui_menu_custom_filter::~ui_menu_custom_filter()
 {
-	if (single_menu)
+	if (m_single_menu)
 		ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 	save_custom_filters();
 }
@@ -40,7 +40,7 @@ ui_menu_custom_filter::~ui_menu_custom_filter()
 void ui_menu_custom_filter::handle()
 {
 	bool changed = false;
-	added = false;
+	m_added = false;
 
 	// process the menu
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
@@ -61,7 +61,7 @@ void ui_menu_custom_filter::handle()
 				{
 					custfltr::numother++;
 					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
-					added = true;
+					m_added = true;
 				}
 				break;
 
@@ -141,7 +141,7 @@ void ui_menu_custom_filter::handle()
 
 	if (changed)
 		reset(UI_MENU_RESET_REMEMBER_REF);
-	else if (added)
+	else if (m_added)
 		reset(UI_MENU_RESET_SELECT_FIRST);
 }
 
@@ -163,7 +163,7 @@ void ui_menu_custom_filter::populate()
 		arrow_flags = get_arrow_flags((int)FILTER_UNAVAILABLE + 1, (int)FILTER_LAST - 1, custfltr::other[x]);
 		item_append("Other filter", mewui_globals::filter_text[custfltr::other[x]], arrow_flags, (void *)(FPTR)(OTHER_FILTER + x));
 
-		if (added)
+		if (m_added)
 			selected = item.size() - 2;
 
 		// add manufacturer subitem
