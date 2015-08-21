@@ -199,14 +199,13 @@ ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic
 		{
 			nl_double Idrive = 0;
 
-			const nl_ext_double * RESTRICT A = &this->m_A[k][0];
 			const unsigned *p = this->m_terms[k]->m_nz.data();
 			const unsigned e = this->m_terms[k]->m_nz.size();
 
 			for (unsigned i = 0; i < e; i++)
-				Idrive = Idrive + A[p[i]] * new_v[p[i]];
+				Idrive = Idrive + this->A(k,p[i]) * new_v[p[i]];
 
-			const nl_double delta = m_omega * (this->m_RHS[k] - Idrive) / A[k];
+			const nl_double delta = m_omega * (this->m_RHS[k] - Idrive) / this->A(k,k);
 			cerr = std::max(cerr, nl_math::abs(delta));
 			new_v[k] += delta;
 		}

@@ -296,6 +296,35 @@ IC Type       27C2048   27C2048   27C4200   27C4200   27C1000   27C160    27C160
 Stadium Cross EPR15093  EPR15094  EPR15018  EPR15019  EPR15192  EPR15020  EPR15021  EPR15022  EPR15023  EPR15024  EPR15025  EPR15026  EPR15027  EPR15028  EPR15029  EPR15031  EPR15032  -
 
 
+System 32 Multi COMM board
+--------------------------
+
+SEGA 1992 837-8792
+sticker: 837-9016-03
+|--------------------------------------------------------|
+|           CN3                           CN4            |
+|                                                        |
+|   32MHz   JP1(1-2)                                     |
+|        Z80        MB89374      MB89237A    MB8421      |
+|                                                        |
+|  JP2(1-2)                                              |
+|     EPR-15033.IC17                                     |
+|  JP3(2-3)                                              |
+|  JP4(1-2)                                              |
+|     8464            GAL16V8                GAL16V8     |
+|                     (315-5610)             (315-5506)  |
+|           CN1                           CN2            |
+|                      CN8  CN9                          |
+|--------------------------------------------------------|
+EPR-15033 - AM27C100 EPROM found on Stadium Cross
+  MB89374 - Fujitsu MB89374 Data Link Controller. Clock input 8MHz [32/4]
+ MB89237A - Fujitsu MB89237A DMA Controller
+     8464 - Fujitsu MB8464 8k x8 SRAM
+      CN8 - TX connector
+      CN9 - RX connector
+    CN1-4 - Joins to Main Board. Connections on top allow plugging in the ROM PCB
+
+
 *********************************************************************************************
 
 

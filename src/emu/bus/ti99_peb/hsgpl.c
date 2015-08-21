@@ -476,7 +476,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 			{
 				logerror("%s: invalid write %04x <- %02x\n", tag(), offset, data);
 			// feeprom is normally written to using GPL ports, and I don't know
-			// writing through >6000 page is enabled
+			// whether writing through >6000 page is enabled
 /*
             at29c040a_w(feeprom_rom6, 1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data);
             at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);
@@ -640,10 +640,10 @@ void snug_high_speed_gpl_device::device_reset()
 
 void snug_high_speed_gpl_device::device_config_complete(void)
 {
-	m_dsr_eeprom = subdevice<at29040a_device>(DSR_EEPROM);
-	m_rom6_eeprom = subdevice<at29040a_device>(ROM6_EEPROM);
-	m_grom_a_eeprom = subdevice<at29040a_device>(GROM_A_EEPROM);
-	m_grom_b_eeprom = subdevice<at29040a_device>(GROM_B_EEPROM);
+	m_dsr_eeprom = subdevice<at29c040a_device>(DSR_EEPROM);
+	m_rom6_eeprom = subdevice<at29c040a_device>(ROM6_EEPROM);
+	m_grom_a_eeprom = subdevice<at29c040a_device>(GROM_A_EEPROM);
+	m_grom_b_eeprom = subdevice<at29c040a_device>(GROM_B_EEPROM);
 }
 
 void snug_high_speed_gpl_device::device_stop()
@@ -661,10 +661,10 @@ INPUT_PORTS_START( ti99_hsgpl)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_FRAGMENT( ti99_hsgpl )
-	MCFG_AT29040A_ADD( DSR_EEPROM )
-	MCFG_AT29040A_ADD( GROM_B_EEPROM )
-	MCFG_AT29040A_ADD( GROM_A_EEPROM )
-	MCFG_AT29040A_ADD( ROM6_EEPROM )
+	MCFG_AT29C040A_ADD( DSR_EEPROM )
+	MCFG_AT29C040A_ADD( GROM_B_EEPROM )
+	MCFG_AT29C040A_ADD( GROM_A_EEPROM )
+	MCFG_AT29C040A_ADD( ROM6_EEPROM )
 MACHINE_CONFIG_END
 
 machine_config_constructor snug_high_speed_gpl_device::device_mconfig_additions() const
