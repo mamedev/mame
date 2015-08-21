@@ -18,6 +18,7 @@
 #include "machine/mm58274c.h"
 #include "video/v9938.h"
 #include "cpu/tms9900/tms9995.h"
+#include "machine/at29x.h"
 
 extern const device_type GENEVE_MOUSE;
 extern const device_type GENEVE_KEYBOARD;
@@ -109,25 +110,27 @@ class geneve_mapper_device : public device_t
 {
 public:
 	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	inline void set_geneve_mode(bool geneve) { m_geneve_mode = geneve; }
-	inline void set_direct_mode(bool direct) { m_direct_mode = direct; }
-	inline void set_cartridge_size(int size) { m_cartridge_size = size; }
-	inline void set_cartridge_writable(int base, bool write)
-	{
-		if (base==0x6000)  m_cartridge6_writable = write;
-		else  m_cartridge7_writable = write;
-	}
-	inline void set_video_waitstates(bool wait) { m_video_waitstates = wait; }
-	inline void set_extra_waitstates(bool wait) { m_extra_waitstates = wait; }
+	void set_geneve_mode(bool geneve);
+	void set_direct_mode(bool direct);
+	void set_cartridge_size(int size);
+	void set_cartridge_writable(int base, bool write);
+	void set_video_waitstates(bool wait);
+	void set_extra_waitstates(bool wait);
 
 	DECLARE_READ8_MEMBER( readm );
 	DECLARE_WRITE8_MEMBER( writem );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
 
-	DECLARE_INPUT_CHANGED_MEMBER( gm_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
+
+	// PFM support
+	DECLARE_WRITE_LINE_MEMBER( pfm_select_lsb );
+	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
+	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
+
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
 
 protected:
@@ -177,6 +180,15 @@ private:
 	bool    m_genmod;
 	bool    m_timode;
 
+	// PFM mod (0 = none, 1 = AT29C040, 2 = AT29C040A)
+	DECLARE_READ8_MEMBER( read_from_pfm );
+	DECLARE_WRITE8_MEMBER( write_to_pfm );
+	void    set_boot_rom(int selection);
+	int     m_pfm_mode;
+	int     m_pfm_bank;
+	bool    m_pfm_output_enable;
+
+	// SRAM access
 	int     m_sram_mask;
 	int     m_sram_val;
 
@@ -190,6 +202,8 @@ private:
 	// Devices
 	mm58274c_device*        m_clock;
 	tms9995_device*         m_cpu;
+	at29c040_device*         m_pfm512;
+	at29c040a_device*        m_pfm512a;
 
 	geneve_keyboard_device* m_keyboard;
 	bus8z_device*           m_video;

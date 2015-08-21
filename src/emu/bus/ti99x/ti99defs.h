@@ -51,6 +51,8 @@
 #define GMAPPER_TAG     "gmapper"
 #define GMOUSE_TAG      "gmouse"
 #define GCLOCK_TAG      "mm58274c"
+#define PFM512_TAG      "pfm512"
+#define PFM512A_TAG     "pfm512a"
 
 #define READ16Z_MEMBER(name)            void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset,  ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask)
 #define DECLARE_READ16Z_MEMBER(name)    void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask = 0xffff)
@@ -106,7 +108,9 @@ enum
 enum
 {
 	GENEVE_098 = 0,
-	GENEVE_100 = 1
+	GENEVE_100,
+	GENEVE_PFM512,
+	GENEVE_PFM512A
 };
 
 #endif

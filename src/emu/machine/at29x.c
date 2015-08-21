@@ -39,11 +39,11 @@
 
 #include "at29x.h"
 
-#define TRACE_PRG 1
+#define TRACE_PRG 0
 #define TRACE_READ 0
-#define TRACE_WRITE 1
-#define TRACE_CONFIG 1
-#define TRACE_STATE 1
+#define TRACE_WRITE 0
+#define TRACE_CONFIG 0
+#define TRACE_STATE 0
 
 enum
 {
@@ -228,7 +228,7 @@ READ8_MEMBER( at29x_device::read )
 			break;
 
 		case 0x00001:
-			reply = 0xa4;       // Device code
+			reply = m_device_id;       // Device code
 			break;
 
 		// Boot block lockout detection [1]
