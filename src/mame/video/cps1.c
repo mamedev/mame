@@ -1477,7 +1477,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"3wondersr1",  CPS_B_21_BT1, mapper_RT24B },
 	{"3wondersu",   CPS_B_21_BT1, mapper_RT24B },
 	{"wonder3",     CPS_B_21_BT1, mapper_RT22B },   // equivalent to RT24B
-	{"3wondersb",   CPS_B_21_BT1, mapper_RT24B },
+	{"3wondersb",   CPS_B_21_BT1, mapper_RT24B,  0x36, 0, 0, 0x88 }, // same as 3wonders except some registers are hard wired rather than written to
 	{"3wondersh",   CPS_B_02    , mapper_RT24B },   /* Not 100% sure of the CPS B-ID */
 	{"kod",         CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodr1",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
@@ -1949,6 +1949,18 @@ void cps_state::cps1_get_video_base()
 		scroll1xoff = -0x08;
 		scroll2xoff = -0x0b;
 		scroll3xoff = -0x0c;
+	}
+	else
+	if (m_game_config->bootleg_kludge == 0x88) // 3wondersb
+	{
+		scroll1xoff = 0x4;
+		scroll2xoff = 0x6;
+		scroll3xoff = 0xa;
+		m_cps_b_regs[0x30/2] = 0x3f;
+		m_cps_a_regs[CPS1_VIDEOCONTROL] = 0x3e;
+		m_cps_a_regs[CPS1_SCROLL2_BASE] = 0x90c0;
+		m_cps_a_regs[CPS1_SCROLL3_BASE] = 0x9100;
+		m_cps_a_regs[CPS1_PALETTE_BASE] = 0x9140;
 	}
 
 	m_obj = cps1_base(CPS1_OBJ_BASE, m_obj_size);
@@ -2958,6 +2970,9 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 
 	if (m_cps_version == 1)
 	{
+		if BIT(m_game_config->bootleg_kludge, 7)
+			cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
+
 		cps1_render_layer(screen, bitmap, cliprect, l0, 0);
 
 		if (l1 == 0)
