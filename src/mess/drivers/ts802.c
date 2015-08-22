@@ -213,6 +213,7 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 
 	MCFG_FD1793_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /* ROM definition */

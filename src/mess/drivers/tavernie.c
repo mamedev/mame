@@ -373,6 +373,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 
 	MCFG_FD1795_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /* ROM definition */

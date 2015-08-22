@@ -434,7 +434,9 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(altos5_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("z80dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "altos5")
 MACHINE_CONFIG_END
