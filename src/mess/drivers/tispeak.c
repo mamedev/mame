@@ -48,7 +48,7 @@ above expectations. TI continued to manufacture many products for this line.
       with no module inserted
 
     Speak & Spell (US), 1980
-    - MCU: TMC0271* (same as 1979 version)
+    - MCU: same as 1979 version
     - TMS51xx: TMC0281D
     - VSM: 16KB CD2350(rev.A)
     - notes: only 1 VSM, meaning much smaller internal vocabulary
@@ -74,6 +74,7 @@ above expectations. TI continued to manufacture many products for this line.
     - MCU: TMC0271* (assume same as US 1979 version)
     - TMS51xx: CD2801
     - VSM: 16KB CD62175
+    - VFD: same as Speak & Math(!)
     - notes: this one has a dedicated voice actor
 
     Speak & Spell (France) "La Dictee Magique", 1980
@@ -89,12 +90,14 @@ above expectations. TI continued to manufacture many products for this line.
     Speak & Spell (Italy) "Grillo Parlante", 1982
     - MCU & TMS51xx: same as French 1980 version
     - VSM: 16KB CD62190
+    - VFD: same as Speak & Math
+    - notes: it appears that TI ran out of original snspell VFDs in the early 80s?
 
     Speak & Spell Compact (US), 1981
     - MCU: CD8011**
     - TMS51xx: TMC0281D
     - VSM: 16KB CD2354, CD2354(rev.A)
-    - notes: no display, MCU is TMS1100 instead of TMS0270
+    - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
 
     Speak & Spell Compact (UK) "Speak & Write", 1981
     - MCU & TMS51xx: same as US 1981 version
@@ -140,6 +143,7 @@ Speak & Math:
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2392
     - VSM(2/2): 16KB CD2393
+    - VFD: NEC FIP9xxx
     - notes: As with the Speak & Spell, the voice actor was a radio announcer.
       However, the phrase "is greater than or less than" had to be added in a
       hurry by one of the TI employees in a hurry, the day before a demo.
@@ -166,6 +170,7 @@ Speak & Read:
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2394(rev.A)
     - VSM(2/2): 16KB CD2395(rev.A)
+    - VFD: same as Language Tutor, rightmost digit unused
 
 Speak & Read modules:
 
@@ -297,6 +302,7 @@ A later device, called Language Teacher, was released without speech hardware.
     Language Tutor (US), 1978
     - MCU: TMC0275*
     - TMS51xx: CD2801
+    - VFD: NEC FIP10xxx
     - notes: external module is required (see below)
 
 Language Tutor modules:
@@ -344,6 +350,7 @@ Language Tutor modules:
 
 // internal artwork
 #include "lantutor.lh"
+#include "snmath.lh"
 #include "snspell.lh"
 #include "tntell.lh" // keyboard overlay
 
@@ -478,7 +485,7 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 void tispeak_state::prepare_display()
 {
-	display_matrix_seg(16, 16, m_o, (m_r & 0x8000) ? (m_r & 0x21ff) : 0, 0x3fff);
+	display_matrix_seg(16, 16, m_plate, (m_r & 0x8000) ? m_grid : 0, 0x3fff);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
@@ -491,14 +498,16 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	// R15: filament on
 	// other bits: MCU internal use
 	m_r = m_inp_mux = data;
+	m_grid = data & 0x1ff;
 	prepare_display();
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
+	// note: lantutor and snread VFD has an accent triangle instead of DP, and no AP
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
-	m_o = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
+	m_plate = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	prepare_display();
 }
 
@@ -523,9 +532,9 @@ void tispeak_state::snspell_power_off()
 
 WRITE16_MEMBER(tispeak_state::snmath_write_o)
 {
-	// reorder opla to led14seg, plus DP as d14 and AP as d15:
-	// [DP],D,C,H,F,B,I,M,L,K,N,J,[AP],E,G,A (sidenote: TI KLMN = MAME MLNK)
-	m_o = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
+	// reorder opla to led14seg, plus DP as d14 and CT as d15:
+	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
+	m_plate = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
 	prepare_display();
 }
 
@@ -536,6 +545,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
+	m_grid = data & 0x21ff;
 	prepare_display();
 }
 
@@ -909,7 +919,7 @@ static MACHINE_CONFIG_START( snmath, tispeak_state )
 	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5110_device, pdc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_snspell) // max 9 digits
+	MCFG_DEFAULT_LAYOUT(layout_snmath)
 
 	/* no video! */
 
@@ -927,6 +937,8 @@ static MACHINE_CONFIG_DERIVED( sns_cd2801, snmath )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+
+	MCFG_DEFAULT_LAYOUT(layout_snspell)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
@@ -950,12 +962,20 @@ static MACHINE_CONFIG_DERIVED( sns_tmc0281d, sns_cd2801 )
 	MCFG_FRAGMENT_ADD(tms5110_route)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sns_cd2801_m, sns_cd2801 )
+
+	/* basic machine hardware */
+	MCFG_DEFAULT_LAYOUT(layout_snmath)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( snread, snmath )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+
+	MCFG_DEFAULT_LAYOUT(layout_lantutor)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snread")
@@ -1024,6 +1044,8 @@ MACHINE_CONFIG_END
   Game driver(s)
 
 ***************************************************************************/
+
+#define rom_snspellp rom_snspell // until we have a correct dump
 
 ROM_START( snspell )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -1289,14 +1311,15 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT COMPAT MACHINE     INPUT     INIT                     COMPANY, FULLNAME, FLAGS */
-COMP( 1978, snspell,    0,        0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1979, snspella,   snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1978, snspell,    0,        0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1978, snspellp,   snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1979, snspella,   snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 COMP( 1980, snspellb,   snspell,  0, sns_tmc0281d,snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
-COMP( 1981, snspelluka, snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1981, snspelluka, snspell,  0, sns_cd2801_m,snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
-COMP( 1982, snspellit,  snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1982, snspellit,  snspell,  0, sns_cd2801_m,snspell,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 
 COMP( 1986, snmath,     0,        0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snmathp,    snmath,   0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
@@ -1306,8 +1329,8 @@ COMP( 1980, snread,     0,        0, snread,      snread,   tispeak_state, snspe
 COMP( 1979, lantutor,   0,        0, lantutor,    lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 COMP( 1981, tntell,     0,        0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK ) // assume there is an older version too, with CD8010 MCU
+COMP( 1980, tntellp,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 COMP( 1981, tntelluk,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
 COMP( 1981, tntellfr,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-COMP( 1980, tntellp,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 
 COMP( 1982, vocaid,     0,        0, vocaid,      tntell,   driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )

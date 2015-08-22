@@ -49,6 +49,9 @@ public:
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
+	UINT32 m_grid;                      // VFD current row data
+	UINT32 m_plate;                     // VFD current column data
+
 	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
