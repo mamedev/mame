@@ -1322,21 +1322,21 @@ WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_lsb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 1;
 	else m_pfm_bank &= 0xfe;
-	logerror("%s: Setting bank (l) = %d\n", tag(), m_pfm_bank);
+	if (TRACE_PFM) logerror("%s: Setting bank (l) = %d\n", tag(), m_pfm_bank);
 }
 
 WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_msb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 2;
 	else m_pfm_bank &= 0xfd;
-	logerror("%s: Setting bank (u) = %d\n", tag(), m_pfm_bank);
+	if (TRACE_PFM) logerror("%s: Setting bank (u) = %d\n", tag(), m_pfm_bank);
 }
 
 WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
 {
 	// Negative logic
 	m_pfm_output_enable = (state==CLEAR_LINE);
-	logerror("%s: PFM output %s\n", tag(), m_pfm_output_enable? "enable" : "disable");
+	if (TRACE_PFM) logerror("%s: PFM output %s\n", tag(), m_pfm_output_enable? "enable" : "disable");
 }
 
 //====================================================================

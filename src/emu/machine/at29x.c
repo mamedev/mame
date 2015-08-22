@@ -221,28 +221,23 @@ READ8_MEMBER( at29x_device::read )
 
 	if (m_id_mode)
 	{
-		switch (offset)
+		// Experiments showed that the manufacturer code and device code
+		// are returned for every address 0 and 1 modulo sector_size.
+		//
+		if ((offset % m_sector_size)==0) reply = 0x1f; // Manufacturer code
+		else
 		{
-		case 0x00000:
-			reply = 0x1f;       // Manufacturer code
-			break;
-
-		case 0x00001:
-			reply = m_device_id;       // Device code
-			break;
-
-		// Boot block lockout detection [1]
-		case 0x00002:
-			reply = m_lower_bbl? 0xff : 0xfe;
-			break;
-
-		case 0x7fff2:
-			reply = m_higher_bbl? 0xff : 0xfe;
-			break;
-
-		default:
-			reply = 0;
-			break;
+			if ((offset % m_sector_size)==1) reply = m_device_id; // Device code
+			else
+			{
+				// Boot block lockout detection [1]
+				if (offset == 0x00002) reply = m_lower_bbl? 0xff : 0xfe;
+				else
+				{
+					if (offset == 0x7fff2) reply = m_higher_bbl? 0xff : 0xfe;
+					else reply = 0;
+				}
+			}
 		}
 	}
 	else if ((m_pgm == PGM_2) || (m_pgm == PGM_3))
