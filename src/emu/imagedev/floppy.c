@@ -600,7 +600,7 @@ void floppy_image_device::stp_w(int state)
 		}
 		subcyl = 0;
 		// Do we want a stepper sound?
-		if (m_make_sound) m_sound_out->step(state==0);
+		if (m_make_sound) m_sound_out->step();
 	}
 }
 
@@ -1069,7 +1069,6 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__)
 {
 	m_motor = false;
-	m_step = false;
 	m_loaded = false;
 }
 
@@ -1097,6 +1096,9 @@ void floppy_sound_device::device_start()
 	m_motor_time = 0;
 	m_step_time = 0;
 
+	// Number of updates until the step pulse may restart the sample
+	m_step_ignore_time = 44;    // 1 ms
+
 	// Initialize position
 	m_samplepos_step = m_samplestart_step;
 	m_samplepos_motor = m_samplestart_motor;
@@ -1111,15 +1113,21 @@ void floppy_sound_device::motor(bool state)
 	m_motor = state;
 }
 
-void floppy_sound_device::step(bool state)
+/*
+    Activate the step sound.
+
+    Since some drives may use another polarity of the step pulse, we remove
+    the state dependence. Whenever something happens with the head, the
+    sound starts, unless it is too close to the previous sound event.
+*/
+void floppy_sound_device::step()
 {
 	m_sound->update();  // required
-	if (state==true)
+	if (m_step_time < m_step_mintime - m_step_ignore_time)
 	{
 		m_step_time = m_step_mintime;
 		m_samplepos_step = m_samplestart_step;
 	}
-	m_step = state;
 }
 
 //-------------------------------------------------
@@ -1140,6 +1148,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 	while (samples-- > 0)
 	{
+		out = 0;
 		// Motor sound
 		if (m_motor_time > 0)
 		{
@@ -1162,8 +1171,8 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			else
 				m_samplepos_step = m_samplestart_step;
 
-			// When the step is turned off, count down the samples
-			if (!m_step) m_step_time--;
+			// Count down the samples
+			m_step_time--;
 		}
 		// Write to the stream buffer
 		*(samplebuffer++) = out;
