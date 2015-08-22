@@ -460,7 +460,6 @@ void ui_menu_colors_ui::handle()
 
 	if (changed)
 		reset(UI_MENU_RESET_REMEMBER_REF);
-
 }
 
 //-------------------------------------------------
@@ -499,7 +498,7 @@ void ui_menu_colors_ui::populate()
 
 void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth = origx2 - origx1;
+	float width, maxwidth = origx2 - origx1;
 	float line_height = machine().ui().get_line_height();
 
 	// top text
@@ -511,10 +510,10 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	maxwidth = MAX(maxwidth, width);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -851,23 +850,20 @@ void ui_menu_rgb_ui::populate()
 
 void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth;
+	float width, maxwidth = origx2 - origx1;
 
 	// top text
 	std::string topbuf = std::string(title).append(" - ARGB Settings");
-
-	maxwidth = origx2 - origx1;
-
 	machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -882,7 +878,6 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	std::string sampletxt("Color preview =");
-
 	maxwidth = origx2 - origx1;
 	machine().ui().draw_text_full(container, sampletxt.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);

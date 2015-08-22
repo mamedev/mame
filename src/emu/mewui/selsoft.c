@@ -88,12 +88,21 @@ bool compare_software(ui_software_info a, ui_software_info b)
 
 int get_bios_count(const game_driver *driver, std::vector<std::string> &biosname)
 {
+	if (driver->rom == NULL)
+		return 0;
+
 	int bios_count = 0;
 	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
 			std::string name(ROM_GETHASHDATA(rom));
-			biosname.push_back(name);
+			if (ROM_GETBIOSFLAGS(rom) == 1)
+			{
+				name.append(" (default)");
+				biosname.insert(biosname.begin(), name);
+			}
+			else
+				biosname.push_back(name);
 			bios_count++;
 		}
 	return bios_count;

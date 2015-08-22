@@ -65,11 +65,11 @@ public:
 	void load_software_info(const char *soft_list, std::string &buffer, const char *soft_name);
 	void command_sub_menu(const game_driver *drv, std::vector<std::string> &menu_item);
 
-	std::string rev_history() const { return history_revision; }
-	std::string rev_mameinfo() const { return mame_revision; }
-	std::string rev_messinfo() const { return mess_revision; }
-	std::string rev_sysinfo() const { return sysinfo_revision; }
-	std::string rev_storyinfo() const { return story_revision; }
+	std::string rev_history() const { return m_history_rev; }
+	std::string rev_mameinfo() const { return m_mame_rev; }
+	std::string rev_messinfo() const { return m_mess_rev; }
+	std::string rev_sysinfo() const { return m_sysinfo_rev; }
+	std::string rev_storyinfo() const { return m_story_rev; }
 
 private:
 
@@ -100,9 +100,9 @@ private:
 	int find_or_allocate(std::string name);
 
 	// internal state
-	running_machine  &m_machine;             // reference to our machine
-	std::string         fullpath;
-	static std::string  history_revision, mame_revision, mess_revision, sysinfo_revision, story_revision;
+	running_machine     &m_machine;             // reference to our machine
+	std::string         m_fullpath;
+	static std::string  m_history_rev, m_mame_rev, m_mess_rev, m_sysinfo_rev, m_story_rev;
 };
 
 
