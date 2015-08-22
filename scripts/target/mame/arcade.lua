@@ -3579,6 +3579,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/usgames.c",
 	MAME_DIR .. "src/mame/video/usgames.c",
 	MAME_DIR .. "src/mame/drivers/vamphalf.c",
+	MAME_DIR .. "src/mame/drivers/vampire.c",
 	MAME_DIR .. "src/mame/drivers/vcombat.c",
 	MAME_DIR .. "src/mame/drivers/vectrex.c",
 	MAME_DIR .. "src/mame/video/vectrex.c",

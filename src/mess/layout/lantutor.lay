@@ -20,6 +20,8 @@
 	<view name="Internal Layout">
 		<bounds left="0" right="111" top="0" bottom="19" />
 
+	<!-- 10 digits (snread doesn't use the last digit) -->
+
 		<bezel name="digit0" element="digit"><bounds x="0" y="4" width="10" height="15" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="11" y="4" width="10" height="15" /></bezel>
 		<bezel name="digit2" element="digit"><bounds x="22" y="4" width="10" height="15" /></bezel>

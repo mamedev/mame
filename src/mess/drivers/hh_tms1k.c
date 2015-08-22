@@ -146,6 +146,8 @@ void hh_tms1k_state::machine_start()
 	m_inp_mux = 0;
 	m_power_led = false;
 	m_power_on = false;
+	m_grid = 0;
+	m_plate = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -162,6 +164,8 @@ void hh_tms1k_state::machine_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_power_on));
+	save_item(NAME(m_grid));
+	save_item(NAME(m_plate));
 }
 
 void hh_tms1k_state::machine_reset()
