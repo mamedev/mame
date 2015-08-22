@@ -767,7 +767,9 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "drive5a", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive5b", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee128, mbee56 )
@@ -789,7 +791,9 @@ static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "drive5a", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive5b", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee256, mbee128p )
@@ -801,7 +805,9 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128p )
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "drive3a", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive3b", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )

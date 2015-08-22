@@ -246,7 +246,9 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
@@ -309,7 +311,9 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kaypro10, kaypro2x )

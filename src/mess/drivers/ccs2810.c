@@ -356,6 +356,7 @@ static MACHINE_CONFIG_START( ccs2422, ccs_state )
 	/* Devices */
 	MCFG_MB8877_ADD("fdc", XTAL_16MHz / 8) // UB1793 or MB8877
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /* ROM definition */

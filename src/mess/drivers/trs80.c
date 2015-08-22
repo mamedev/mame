@@ -604,7 +604,9 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
 

@@ -181,6 +181,7 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", ampro_state, ctc_tick, attotime::from_hz(XTAL_16MHz / 8))
 	MCFG_WD1772_ADD("fdc", XTAL_16MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ampro")
 MACHINE_CONFIG_END
 

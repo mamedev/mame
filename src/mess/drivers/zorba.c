@@ -403,9 +403,10 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(zorba_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
-	//MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
