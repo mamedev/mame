@@ -20,7 +20,7 @@
 #define Z80_TAG		"pdc_z80" // U19
 #define FDC_TAG         "fdc"
 #define HDC_TAG		"hdc"
-#define FDCDMA_TAG	"8237dma"
+#define FDCDMA_TAG	"i8237dma"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -103,6 +103,7 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( pdc )
+	// CPU - Zilog Z0840006PSC
         MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
         MCFG_CPU_PROGRAM_MAP(pdc_mem)
 	MCFG_CPU_IO_MAP(pdc_io)
@@ -130,18 +131,20 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 //        MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1541_base_t, byte_w))
 //        MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_base_t::floppy_formats)
 
-	// upD765a FDC
+	// uPD765a FDC - NEC D765AC-2
 //	MCFG_UPD765A_ADD("upd765a", true, false)
-	MCFG_UPD765A_ADD(FDC_TAG, true, false)
-//	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG, pdc_floppies, "35hd", pdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats)
+	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 //	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("8237dma", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(FDCDMA_TAG, am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
 
-	// uPD765A DMA Controller
-	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL_14_31818MHz/2) // Verify XTAL
-//	MCFG_Ii8237_IN_MEMR_CB(READ8(pdc_device, memory_read_byte))
-//	MCFG_Ii8237_OUT_MEMW_CB(WRITE8(pdc_device, memory_write_byte))
+	// Floppy disk drive
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats)
+
+	// FDC DMA Controller - Intel P8237A-5
+	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL_10MHz / 2)
+//	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, memory_read_byte))
+//	MCFG_I8237_OUT_MEMW_CB(WRITE8(pdc_device, memory_write_byte))
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pdc_device, i8237_hreq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(pdc_device, i8237_eop_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, i8237_dma_mem_r))
@@ -150,6 +153,7 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pdc_device, i8237_fdc_dma_w))
         // MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(pdc_device, fdc_dack_w))
 
+	// HDC9224 HDC
 	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)
 	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
 MACHINE_CONFIG_END
@@ -184,7 +188,7 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
         //m_ga(*this, C64H156_TAG),
         //m_floppy(*this, C64H156_TAG":0:525ssqd"),
 //	m_fdc(*this, FDC_TAG ":35hd")
-	m_dma8237(*this, "8237dma"),
+	m_dma8237(*this, FDCDMA_TAG),
 	m_fdc(*this, FDC_TAG),
 	m_floppy(*this, FDC_TAG ":0"),
 	m_hdc9224(*this, HDC_TAG),
