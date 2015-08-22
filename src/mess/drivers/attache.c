@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
  * attache.c
@@ -1007,4 +1007,4 @@ ROM_START( attache )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attaché",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)
+COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)
