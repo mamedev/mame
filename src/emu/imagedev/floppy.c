@@ -1072,6 +1072,21 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 	m_loaded = false;
 }
 
+void floppy_sound_device::register_for_save_states()
+{
+	save_item(NAME(m_sampleend_motor));
+	save_item(NAME(m_samplepos_motor));
+	save_item(NAME(m_motor_mintime));
+	save_item(NAME(m_motor_time));
+	save_item(NAME(m_motor));
+	save_item(NAME(m_sampleend_step));
+	save_item(NAME(m_samplestart_step));
+	save_item(NAME(m_samplepos_step));
+	save_item(NAME(m_step_mintime));
+	save_item(NAME(m_step_time));
+	save_item(NAME(m_step_ignore_time));
+}
+
 void floppy_sound_device::device_start()
 {
 	// Read audio samples. The samples are stored in the list m_samples.
