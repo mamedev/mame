@@ -34,6 +34,7 @@ public:
 
 private:
 	static const char *video_modes[], *video_modes_label[];
+	static dspl_option m_options[];
 };
 
 #endif /* __MEWUI_DSPLMENU_H__ */

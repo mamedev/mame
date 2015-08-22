@@ -12,9 +12,9 @@
 #include "ui/ui.h"
 #include "mewui/ctrlmenu.h"
 
-const char *ui_menu_controller_mapping::device_status[] = { "none", "keyboard", "mouse", "lightgun", "joystick" };
+const char *ui_menu_controller_mapping::m_device_status[] = { "none", "keyboard", "mouse", "lightgun", "joystick" };
 
-static ctrl_option m_options[] = {
+ctrl_option ui_menu_controller_mapping::m_options[] = {
 	{ 0, NULL, NULL },
 	{ 0, "Lightgun Device Assignment",   OPTION_LIGHTGUN_DEVICE },
 	{ 0, "Trackball Device Assignment",  OPTION_TRACKBALL_DEVICE },
@@ -44,7 +44,7 @@ ui_menu_controller_mapping::~ui_menu_controller_mapping()
 {
 	std::string error_string;
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
-		machine().options().set_value(m_options[d].option, device_status[m_options[d].status], OPTION_PRIORITY_CMDLINE, error_string);
+		machine().options().set_value(m_options[d].option, m_device_status[m_options[d].status], OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 //-------------------------------------------------
@@ -80,8 +80,8 @@ void ui_menu_controller_mapping::populate()
 	// add options
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 	{
-		UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(device_status) - 1, m_options[d].status);
-		item_append(m_options[d].description, device_status[m_options[d].status], arrow_flags, (void *)(FPTR)d);
+		UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_device_status) - 1, m_options[d].status);
+		item_append(m_options[d].description, m_device_status[m_options[d].status], arrow_flags, (void *)(FPTR)d);
 	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	customtop =  machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
@@ -126,15 +126,15 @@ void ui_menu_controller_mapping::custom_render(void *selectedref, float top, flo
 
 int ui_menu_controller_mapping::check_status(const char *status, const char *option)
 {
-	for (int d = 0; *device_status[d]; d++)
-		if (!strcmp(device_status[d], status))
+	for (int d = 0; *m_device_status[d]; d++)
+		if (!strcmp(m_device_status[d], status))
 			return d;
 
 	emu_options def_opt;
 	const char *def_val = def_opt.value(option);
 
-	for (int d = 0; *device_status[d]; d++)
-		if (!strcmp(device_status[d], def_val))
+	for (int d = 0; *m_device_status[d]; d++)
+		if (!strcmp(m_device_status[d], def_val))
 			return d;
 
 	return 1;

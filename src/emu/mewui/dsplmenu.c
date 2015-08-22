@@ -25,7 +25,7 @@ const char *ui_menu_display_options::video_modes[] = { "auto", "opengl", "soft",
 const char *ui_menu_display_options::video_modes_label[] = { "Auto", "OpenGL", "Software", "SDL2 Accelerated" };
 #endif
 
-static dspl_option m_options[] = {
+dspl_option ui_menu_display_options::m_options[] = {
 	{ 0, NULL, NULL },
 	{ 0, "Video Mode",               OSDOPTION_VIDEO },
 #ifdef MEWUI_WINDOWS

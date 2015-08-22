@@ -13,7 +13,7 @@
 #include "mewui/miscmenu.h"
 #include "mewui/utils.h"
 
-static misc_option m_options[] = {
+misc_option ui_menu_misc_options::m_options[] = {
 	{ 0, NULL, NULL },
 	{ 0, "Re-select last game / system played",             OPTION_REMEMBER_LAST },
 	{ 0, "Enlarge images in the right panel",               OPTION_ENLARGE_SNAPS },

@@ -30,6 +30,9 @@ public:
 	virtual void populate();
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+
+private:
+	static misc_option m_options[];
 };
 
 #endif /* __MEWUI_MISCMENU_H__ */

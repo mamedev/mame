@@ -33,7 +33,8 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	static const char *device_status[];
+	static const char *m_device_status[];
+	static ctrl_option m_options[];
 	int check_status(const char *status, const char *option);
 };
 

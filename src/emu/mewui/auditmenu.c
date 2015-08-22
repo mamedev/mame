@@ -31,18 +31,18 @@ inline int cs_stricmp(const char *s1, const char *s2)
 	}
 }
 
-bool sorted_game_list(const game_driver *x, const game_driver *y)
+bool sorted_game_list(const game_driver *m_x, const game_driver *y)
 {
-	bool clonex = strcmp(x->parent, "0");
+	bool clonex = strcmp(m_x->parent, "0");
 	bool cloney = strcmp(y->parent, "0");
 
 	if (!clonex && !cloney)
-		return (cs_stricmp(x->description, y->description) < 0);
+		return (cs_stricmp(m_x->description, y->description) < 0);
 
 	int cx = -1, cy = -1;
 	if (clonex)
 	{
-		cx = driver_list::find(x->parent);
+		cx = driver_list::find(m_x->parent);
 		if (cx == -1 || (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0)))
 			clonex = false;
 	}
@@ -55,24 +55,24 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 	}
 
 	if (!clonex && !cloney)
-		return (cs_stricmp(x->description, y->description) < 0);
+		return (cs_stricmp(m_x->description, y->description) < 0);
 	else if (clonex && cloney)
 	{
-		if (!cs_stricmp(x->parent, y->parent))
-			return (cs_stricmp(x->description, y->description) < 0);
+		if (!cs_stricmp(m_x->parent, y->parent))
+			return (cs_stricmp(m_x->description, y->description) < 0);
 		else
 			return (cs_stricmp(driver_list::driver(cx).description, driver_list::driver(cy).description) < 0);
 	}
 	else if (!clonex && cloney)
 	{
-		if (!cs_stricmp(x->name, y->parent))
+		if (!cs_stricmp(m_x->name, y->parent))
 			return true;
 		else
-			return (cs_stricmp(x->description, driver_list::driver(cy).description) < 0);
+			return (cs_stricmp(m_x->description, driver_list::driver(cy).description) < 0);
 	}
 	else
 	{
-		if (!cs_stricmp(x->parent, y->name))
+		if (!cs_stricmp(m_x->parent, y->name))
 			return false;
 		else
 			return (cs_stricmp(driver_list::driver(cx).description, y->description) < 0);
@@ -88,14 +88,14 @@ ui_menu_audit::ui_menu_audit(running_machine &machine, render_container *contain
 		m_availablesorted(availablesorted), m_unavailablesorted(unavailablesorted), m_audit_mode(_audit_mode)
 {
 	if (m_audit_mode == 1)
-		x = m_size = m_unavailable.size();
+		m_x = m_size = m_unavailable.size();
 	else
 	{
 		m_available.clear();
 		m_unavailable.clear();
 		m_availablesorted.clear();
 		m_unavailablesorted.clear();
-		x = m_size = driver_list::total();
+		m_x = m_size = driver_list::total();
 	}
 }
 
@@ -111,19 +111,19 @@ void ui_menu_audit::handle()
 {
 	process(UI_MENU_PROCESS_CUSTOM_ONLY);
 
-	if (x == m_size)
+	if (m_x == m_size)
 	{
 		process(UI_MENU_PROCESS_CUSTOM_ONLY);
 		machine().ui().draw_text_box(container, "Audit in progress...", JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
-		x = m_size - 1;
+		m_x = m_size - 1;
 		return;
 	}
 
 	if (m_audit_mode == 1)
 	{
-		for (; x >= 0; --x)
+		for (; m_x >= 0; --m_x)
 		{
-			driver_enumerator enumerator(machine().options(), m_unavailable[x]->name);
+			driver_enumerator enumerator(machine().options(), m_unavailable[m_x]->name);
 			enumerator.next();
 			media_auditor auditor(enumerator);
 			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
@@ -131,16 +131,16 @@ void ui_menu_audit::handle()
 			// if everything looks good, include the driver
 			if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 			{
-				m_available.push_back(m_unavailable[x]);
-				m_unavailable.erase(m_unavailable.begin() + x);
+				m_available.push_back(m_unavailable[m_x]);
+				m_unavailable.erase(m_unavailable.begin() + m_x);
 			}
 		}
 	}
 	else
 	{
-		for (; x >= 0; --x)
+		for (; m_x >= 0; --m_x)
 		{
-			const game_driver *driver = &driver_list::driver(x);
+			const game_driver *driver = &driver_list::driver(m_x);
 			if (!strcmp("___empty", driver->name))
 				continue;
 
@@ -199,20 +199,20 @@ void ui_menu_audit::save_available_machines()
 		int find = 0;
 
 		// generate available list
-		for (size_t x = 0; x < m_available.size(); ++x)
+		for (size_t m_x = 0; m_x < m_available.size(); ++m_x)
 		{
-			find = driver_list::find(m_available[x]->name);
+			find = driver_list::find(m_available[m_x]->name);
 			myfile << find << space;
-			find = driver_list::find(m_availablesorted[x]->name);
+			find = driver_list::find(m_availablesorted[m_x]->name);
 			myfile << find << space;
 		}
 
 		// generate unavailable list
-		for (size_t x = 0; x < m_unavailable.size(); ++x)
+		for (size_t m_x = 0; m_x < m_unavailable.size(); ++m_x)
 		{
-			find = driver_list::find(m_unavailable[x]->name);
+			find = driver_list::find(m_unavailable[m_x]->name);
 			myfile << find << space;
-			find = driver_list::find(m_unavailablesorted[x]->name);
+			find = driver_list::find(m_unavailablesorted[m_x]->name);
 			myfile << find << space;
 		}
 		myfile.close();
