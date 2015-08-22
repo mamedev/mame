@@ -14,34 +14,6 @@
 #define __MEWUI_DIRMENU_H__
 
 // GLOBAL
-enum
-{
-	ROM_FOLDERS = 1,
-	MEWUI_FOLDERS,
-	SAMPLE_FOLDERS,
-	HISTORY_FOLDERS,
-	INI_FOLDERS,
-	EXTRAINI_FOLDERS,
-	ICON_FOLDERS,
-	CHEAT_FOLDERS,
-	SNAPSHOT_FOLDERS,
-	CABINET_FOLDERS,
-	FLYER_FOLDERS,
-	TITLE_FOLDERS,
-	PCB_FOLDERS,
-	MARQUEES_FOLDERS,
-	CPANEL_FOLDERS,
-	CROSSHAIR_FOLDERS,
-	ARTWORK_FOLDERS,
-	BOSSES_FOLDERS,
-	ARTPREV_FOLDERS,
-	SELECT_FOLDERS,
-	GAMEOVER_FOLDERS,
-	HOWTO_FOLDERS,
-	LOGO_FOLDERS,
-	SCORES_FOLDERS,
-	VERSUS_FOLDERS
-};
 
 struct folders_entry
 {
@@ -61,6 +33,36 @@ public:
 	virtual void populate();
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+
+private:
+	enum
+	{
+		ROM_FOLDERS = 1,
+		MEWUI_FOLDERS,
+		SAMPLE_FOLDERS,
+		HISTORY_FOLDERS,
+		INI_FOLDERS,
+		EXTRAINI_FOLDERS,
+		ICON_FOLDERS,
+		CHEAT_FOLDERS,
+		SNAPSHOT_FOLDERS,
+		CABINET_FOLDERS,
+		FLYER_FOLDERS,
+		TITLE_FOLDERS,
+		PCB_FOLDERS,
+		MARQUEES_FOLDERS,
+		CPANEL_FOLDERS,
+		CROSSHAIR_FOLDERS,
+		ARTWORK_FOLDERS,
+		BOSSES_FOLDERS,
+		ARTPREV_FOLDERS,
+		SELECT_FOLDERS,
+		GAMEOVER_FOLDERS,
+		HOWTO_FOLDERS,
+		LOGO_FOLDERS,
+		SCORES_FOLDERS,
+		VERSUS_FOLDERS
+	};
 };
 
 //-------------------------------------------------
@@ -70,16 +72,17 @@ public:
 class ui_menu_display_actual : public ui_menu
 {
 public:
-	ui_menu_display_actual(running_machine &machine, render_container *container, int selectedref);
+	ui_menu_display_actual(running_machine &machine, render_container *container, int selectedref, bool _change);
 	virtual ~ui_menu_display_actual();
 	virtual void populate();
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	std::string              tempbuf, searchpath;
-	std::vector<std::string> folders;
-	int                      ref_path;
+	std::string              m_tempbuf, m_searchpath;
+	std::vector<std::string> m_folders;
+	int                      m_ref;
+	bool                     m_change;
 
 	enum
 	{
@@ -103,8 +106,8 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	std::string  searchpath;
-	int          path_ref;
+	std::string  m_searchpath;
+	int          m_ref;
 };
 
 //-------------------------------------------------
@@ -123,10 +126,10 @@ public:
 	virtual bool menu_has_search_active() { return (m_search[0] != 0); }
 
 private:
-	int          path_ref;
-	std::string  current_path;
+	int          m_ref;
+	std::string  m_current_path;
 	char         m_search[40];
-	bool         change;
+	bool         m_change;
 };
 
 #endif /* __MEWUI_DIRMENU_H__ */
