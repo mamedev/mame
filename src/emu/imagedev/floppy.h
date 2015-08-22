@@ -273,7 +273,7 @@ class floppy_sound_device : public samples_device
 public:
 	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void motor(bool on);
-	void step(bool on);
+	void step();
 	bool samples_loaded() { return m_loaded; }
 
 protected:
@@ -298,7 +298,7 @@ private:
 	int             m_samplepos_step;
 	int             m_step_mintime;
 	int             m_step_time;
-	bool            m_step;
+	int             m_step_ignore_time;
 };
 
 class floppy_connector: public device_t,
