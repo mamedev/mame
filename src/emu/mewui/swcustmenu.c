@@ -22,10 +22,8 @@
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
-ui_menu_swcustom_filter::ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver,
-                                                 c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type,
-                                                 c_sw_list &_list) :
-	ui_menu(machine, container), m_driver(_driver), m_region(_region), m_publisher(_publisher), m_year(_year), m_type(_type), m_list(_list)
+ui_menu_swcustom_filter::ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver, s_filter &_filter) :
+	ui_menu(machine, container), m_driver(_driver), m_filter(_filter)
 {
 }
 
@@ -110,13 +108,13 @@ void ui_menu_swcustom_filter::handle()
 				sw_custfltr::year[pos]--;
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::year[pos] < m_year.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::year[pos] < m_filter.m_year.ui.size() - 1)
 			{
 				sw_custfltr::year[pos]++;
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_year.ui, &sw_custfltr::year[pos])));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_filter.m_year.ui, &sw_custfltr::year[pos])));
 		}
 		else if ((FPTR)menu_event->itemref >= TYPE_FILTER && (FPTR)menu_event->itemref < TYPE_FILTER + MAX_CUST_FILTER)
 		{
@@ -126,13 +124,13 @@ void ui_menu_swcustom_filter::handle()
 				sw_custfltr::type[pos]--;
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::type[pos] < m_type.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::type[pos] < m_filter.m_type.ui.size() - 1)
 			{
 				sw_custfltr::type[pos]++;
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_type.ui, &sw_custfltr::type[pos])));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_filter.m_type.ui, &sw_custfltr::type[pos])));
 		}
 		else if ((FPTR)menu_event->itemref >= MNFCT_FILTER && (FPTR)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
@@ -142,13 +140,13 @@ void ui_menu_swcustom_filter::handle()
 				sw_custfltr::mnfct[pos]--;
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::mnfct[pos] < m_publisher.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::mnfct[pos] < m_filter.m_publisher.ui.size() - 1)
 			{
 				sw_custfltr::mnfct[pos]++;
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_publisher.ui, &sw_custfltr::mnfct[pos])));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_filter.m_publisher.ui, &sw_custfltr::mnfct[pos])));
 		}
 		else if ((FPTR)menu_event->itemref >= REGION_FILTER && (FPTR)menu_event->itemref < REGION_FILTER + MAX_CUST_FILTER)
 		{
@@ -158,13 +156,13 @@ void ui_menu_swcustom_filter::handle()
 				sw_custfltr::region[pos]--;
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::region[pos] < m_region.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::region[pos] < m_filter.m_region.ui.size() - 1)
 			{
 				sw_custfltr::region[pos]++;
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_region.ui, &sw_custfltr::region[pos])));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_filter.m_region.ui, &sw_custfltr::region[pos])));
 		}
 		else if ((FPTR)menu_event->itemref >= LIST_FILTER && (FPTR)menu_event->itemref < LIST_FILTER + MAX_CUST_FILTER)
 		{
@@ -174,13 +172,13 @@ void ui_menu_swcustom_filter::handle()
 				sw_custfltr::list[pos]--;
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::list[pos] < m_list.name.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::list[pos] < m_filter.m_swlist.name.size() - 1)
 			{
 				sw_custfltr::list[pos]++;
 				changed = true;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_list.description, &sw_custfltr::list[pos])));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_filter.m_swlist.description, &sw_custfltr::list[pos])));
 		}
 	}
 
@@ -212,68 +210,68 @@ void ui_menu_swcustom_filter::populate()
 			selected = item.size() - 2;
 
 		// add publisher subitem
-		if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS && m_publisher.ui.size() > 0)
+		if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS && m_filter.m_publisher.ui.size() > 0)
 		{
-			if (m_publisher.ui.size() == 1)
+			if (m_filter.m_publisher.ui.size() == 1)
 				arrow_flags = 0;
 			else
-				arrow_flags = get_arrow_flags(0, m_publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
+				arrow_flags = get_arrow_flags(0, m_filter.m_publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
 
 			std::string fbuff("^!Publisher");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_publisher.ui[sw_custfltr::mnfct[x]].c_str(), arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
+			item_append(fbuff.c_str(), m_filter.m_publisher.ui[sw_custfltr::mnfct[x]].c_str(), arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
 		}
 
 		// add year subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_YEARS && m_year.ui.size() > 0)
+		else if (sw_custfltr::other[x] == MEWUI_SW_YEARS && m_filter.m_year.ui.size() > 0)
 		{
-			if (m_year.ui.size() == 1)
+			if (m_filter.m_year.ui.size() == 1)
 				arrow_flags = 0;
 			else
-				arrow_flags = get_arrow_flags(0, m_year.ui.size() - 1, sw_custfltr::year[x]);
+				arrow_flags = get_arrow_flags(0, m_filter.m_year.ui.size() - 1, sw_custfltr::year[x]);
 
 			std::string fbuff("^!Year");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_year.ui[sw_custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
+			item_append(fbuff.c_str(), m_filter.m_year.ui[sw_custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
 		}
 
 		// add year subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_LIST && m_list.name.size() > 0)
+		else if (sw_custfltr::other[x] == MEWUI_SW_LIST && m_filter.m_swlist.name.size() > 0)
 		{
-			if (m_list.name.size() == 1)
+			if (m_filter.m_swlist.name.size() == 1)
 				arrow_flags = 0;
 			else
-				arrow_flags = get_arrow_flags(0, m_list.name.size() - 1, sw_custfltr::list[x]);
+				arrow_flags = get_arrow_flags(0, m_filter.m_swlist.name.size() - 1, sw_custfltr::list[x]);
 
 			std::string fbuff("^!Software List");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_list.description[sw_custfltr::list[x]].c_str(), arrow_flags, (void *)(FPTR)(LIST_FILTER + x));
+			item_append(fbuff.c_str(), m_filter.m_swlist.description[sw_custfltr::list[x]].c_str(), arrow_flags, (void *)(FPTR)(LIST_FILTER + x));
 		}
 
 		// add device type subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_TYPE && m_type.ui.size() > 0)
+		else if (sw_custfltr::other[x] == MEWUI_SW_TYPE && m_filter.m_type.ui.size() > 0)
 		{
-			if (m_type.ui.size() == 1)
+			if (m_filter.m_type.ui.size() == 1)
 				arrow_flags = 0;
 			else
-				arrow_flags = get_arrow_flags(0, m_type.ui.size() - 1, sw_custfltr::type[x]);
+				arrow_flags = get_arrow_flags(0, m_filter.m_type.ui.size() - 1, sw_custfltr::type[x]);
 
 			std::string fbuff("^!Device type");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_type.ui[sw_custfltr::type[x]].c_str(), arrow_flags, (void *)(FPTR)(TYPE_FILTER + x));
+			item_append(fbuff.c_str(), m_filter.m_type.ui[sw_custfltr::type[x]].c_str(), arrow_flags, (void *)(FPTR)(TYPE_FILTER + x));
 		}
 
 		// add region subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_REGION && m_region.ui.size() > 0)
+		else if (sw_custfltr::other[x] == MEWUI_SW_REGION && m_filter.m_region.ui.size() > 0)
 		{
-			if (m_region.ui.size() == 1)
+			if (m_filter.m_region.ui.size() == 1)
 				arrow_flags = 0;
 			else
-				arrow_flags = get_arrow_flags(0, m_region.ui.size() - 1, sw_custfltr::region[x]);
+				arrow_flags = get_arrow_flags(0, m_filter.m_region.ui.size() - 1, sw_custfltr::region[x]);
 
 			std::string fbuff("^!Region");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_region.ui[sw_custfltr::region[x]].c_str(), arrow_flags, (void *)(FPTR)(REGION_FILTER + x));
+			item_append(fbuff.c_str(), m_filter.m_region.ui[sw_custfltr::region[x]].c_str(), arrow_flags, (void *)(FPTR)(REGION_FILTER + x));
 		}
 	}
 
@@ -341,15 +339,15 @@ void ui_menu_swcustom_filter::save_sw_custom_filters()
 		{
 			cinfo.append("Other filter = ").append(mewui_globals::sw_filter_text[sw_custfltr::other[x]]).append("\n");
 			if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS)
-				cinfo.append("  Manufacturer filter = ").append(m_publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
+				cinfo.append("  Manufacturer filter = ").append(m_filter.m_publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
-				cinfo.append("  Software List filter = ").append(m_list.name[sw_custfltr::list[x]]).append("\n");
+				cinfo.append("  Software List filter = ").append(m_filter.m_swlist.name[sw_custfltr::list[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
-				cinfo.append("  Year filter = ").append(m_year.ui[sw_custfltr::year[x]]).append("\n");
+				cinfo.append("  Year filter = ").append(m_filter.m_year.ui[sw_custfltr::year[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_TYPE)
-				cinfo.append("  Type filter = ").append(m_type.ui[sw_custfltr::type[x]]).append("\n");
+				cinfo.append("  Type filter = ").append(m_filter.m_type.ui[sw_custfltr::type[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_REGION)
-				cinfo.append("  Region filter = ").append(m_region.ui[sw_custfltr::region[x]]).append("\n");
+				cinfo.append("  Region filter = ").append(m_filter.m_region.ui[sw_custfltr::region[x]]).append("\n");
 		}
 		file.puts(cinfo.c_str());
 		file.close();

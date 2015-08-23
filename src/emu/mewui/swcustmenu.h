@@ -22,8 +22,7 @@
 class ui_menu_swcustom_filter : public ui_menu
 {
 public:
-	ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver,
-							c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type, c_sw_list &_list);
+	ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver, s_filter &_filter);
 	virtual ~ui_menu_swcustom_filter();
 	virtual void populate();
 	virtual void handle();
@@ -45,11 +44,7 @@ private:
 
 	bool              m_added;
 	const game_driver *m_driver;
-	c_sw_region       &m_region;
-	c_sw_publisher    &m_publisher;
-	c_sw_year         &m_year;
-	c_sw_type         &m_type;
-	c_sw_list         &m_list;
+	s_filter          &m_filter;
 	void save_sw_custom_filters();
 };
 

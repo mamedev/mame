@@ -31,11 +31,7 @@ private:
 	char                m_search[40];
 	const game_driver   *m_driver;
 	bool                m_has_empty_start;
-	c_sw_region         m_region;
-	c_sw_publisher      m_publisher;
-	c_sw_year           m_year;
-	c_sw_type           m_type;
-	c_sw_list           m_swlist;
+	s_filter            m_filter;
 
 	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *>   m_displaylist;
@@ -65,8 +61,8 @@ public:
 
 private:
 
-	std::vector<std::string> m_nameparts, m_descpart;
-	ui_software_info *m_uiinfo;
+	ui_software_info          *m_uiinfo;
+	std::vector<std::string>  m_nameparts, m_descpart;
 };
 
 class ui_mewui_bios_selection : public ui_menu
@@ -80,9 +76,9 @@ public:
 
 private:
 
-	std::vector<std::string> m_bios;
-	void *m_driver;
-	bool m_software, m_inlist;
+	void                      *m_driver;
+	bool m_software,          m_inlist;
+	std::vector<std::string>  m_bios;
 };
 
 struct reselect_last

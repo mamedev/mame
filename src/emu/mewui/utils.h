@@ -244,6 +244,15 @@ struct c_sw_year
 	void set(const char *str);
 };
 
+struct s_filter
+{
+	c_sw_region         m_region;
+	c_sw_publisher      m_publisher;
+	c_sw_year           m_year;
+	c_sw_type           m_type;
+	c_sw_list           m_swlist;
+};
+
 // GLOBAL CLASS
 struct mewui_globals
 {
