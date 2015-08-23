@@ -118,7 +118,7 @@ template<typename F>
 const pstring_t<F> pstring_t<F>::substr(int start, int count) const
 {
 	pstring_t ret;
-	unsigned alen = len();
+	int alen = (int) len();
 	if (start < 0)
 		start = 0;
 	if (start >= alen)
@@ -148,7 +148,7 @@ const pstring_t<F> pstring_t<F>::ucase() const
 {
 	pstring_t ret = *this;
 	ret.pcopy(cstr(), blen());
-	for (int i=0; i<ret.len(); i++)
+	for (unsigned i=0; i<ret.len(); i++)
 		ret.m_ptr->str()[i] = toupper((unsigned) ret.m_ptr->str()[i]);
 	return ret;
 }
@@ -159,11 +159,11 @@ int pstring_t<F>::find_first_not_of(const pstring_t &no) const
 	char *t = m_ptr->str();
 	unsigned nolen = no.len();
 	unsigned tlen = len();
-	for (int i=0; i < tlen; i++)
+	for (unsigned i=0; i < tlen; i++)
 	{
 		char *n = no.m_ptr->str();
 		bool f = true;
-		for (int j=0; j < nolen; j++)
+		for (unsigned j=0; j < nolen; j++)
 		{
 			if (F::code(t) == F::code(n))
 				f = false;
@@ -183,11 +183,11 @@ int pstring_t<F>::find_last_not_of(const pstring_t &no) const
 	unsigned nolen = no.len();
 	unsigned tlen = len();
 	int last_found = -1;
-	for (int i=0; i < tlen; i++)
+	for (unsigned i=0; i < tlen; i++)
 	{
 		char *n = no.m_ptr->str();
 		bool f = true;
-		for (int j=0; j < nolen; j++)
+		for (unsigned j=0; j < nolen; j++)
 		{
 			if (F::code(t) == F::code(n))
 				f = false;
@@ -251,7 +251,7 @@ const pstring_t<F> pstring_t<F>::rtrim(const pstring_t &ws) const
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::rpad(const pstring_t &ws, const int cnt) const
+const pstring_t<F> pstring_t<F>::rpad(const pstring_t &ws, const unsigned cnt) const
 {
 	// FIXME: pstringbuffer ret(*this);
 
@@ -363,7 +363,7 @@ int pstring_t<F>::find(const pstring_t &search, unsigned start) const
 	const char *s = search.cstr();
 	const unsigned startt = std::min(start, tlen);
 	const char *t = cstr();
-	for (int i=0; i<startt; i++)
+	for (unsigned i=0; i<startt; i++)
 		t += F::codelen(t);
 	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
 	{
@@ -392,7 +392,7 @@ int pstring_t<F>::find(const mem_t *search, unsigned start) const
 	const char *s = search;
 	const unsigned startt = std::min(start, tlen);
 	const char *t = cstr();
-	for (int i=0; i<startt; i++)
+	for (unsigned i=0; i<startt; i++)
 		t += F::codelen(t);
 	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
 	{
@@ -426,7 +426,7 @@ bool pstring_t<F>::endsWith(const pstring_t &arg) const
 template<typename F>
 bool pstring_t<F>::startsWith(const mem_t *arg) const
 {
-	int alen = strlen(arg);
+	unsigned alen = strlen(arg);
 	if (alen > blen())
 		return false;
 	else

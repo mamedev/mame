@@ -566,7 +566,7 @@ public:
 			p = pn + onstr.len();
 			pn = str.find(onstr, p);
 		}
-		if (p<str.len())
+		if (p < (int) str.len())
 		{
 			pstring t = str.substr(p);
 			if (!ignore_empty || t.len() != 0)
@@ -579,7 +579,7 @@ public:
 		pstring_list_t temp;
 		pstring col = "";
 
-		int i = 0;
+		unsigned i = 0;
 		while (i<str.blen())
 		{
 			int p = -1;
@@ -715,6 +715,7 @@ public:
 
 	void clear()
 	{
+#if 0
 		if (0)
 		{
 			unsigned cnt = 0;
@@ -727,6 +728,7 @@ public:
 			else
 				printf("phashmap: No elements .. \n");
 		}
+#endif
 		m_values.clear();
 		for (unsigned i=0; i<m_hash.size(); i++)
 			m_hash[i] = -1;

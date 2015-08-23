@@ -615,7 +615,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/nltool.c",
+	MAME_DIR .. "src/emu/netlist/prg/nltool.c",
 }
 
 --------------------------------------------------
@@ -651,7 +651,7 @@ includedirs {
 }
 
 files {
-  MAME_DIR .. "src/tools/nlwav.c",
+  MAME_DIR .. "src/emu/netlist/prg/nlwav.c",
 }
 
 --------------------------------------------------

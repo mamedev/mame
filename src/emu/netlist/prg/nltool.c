@@ -11,9 +11,9 @@
 #include <cstdio>
 
 #ifdef PSTANDALONE
-	#if (PSTANDALONE)
+#if (PSTANDALONE)
 #define PSTANDALONE_PROVIDED
-	#endif
+#endif
 #endif
 
 #include "plib/poptions.h"
@@ -30,7 +30,7 @@
 
 #include <ctime>
 
-#define osd_ticks_t clock_t
+#define osd_ticks_t clock_t 
 
 inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
 
@@ -98,12 +98,12 @@ class tool_options_t : public poptions
 public:
 	tool_options_t() :
 		poptions(),
-		opt_ttr ("t", "time_to_run", 1.0,     "time to run the emulation (seconds)", this),
+		opt_ttr ("t", "time_to_run", 1.0, 	"time to run the emulation (seconds)", this),
 		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
 		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
 		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
 		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
-		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
+		opt_cmd ("c", "cmd",		 "run",   "run|convert|listdevices", this),
 		opt_inp( "i", "input",       "",      "input file to process (default is none)", this),
 		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
 		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
@@ -113,7 +113,7 @@ public:
 	poption_double opt_ttr;
 	poption_str    opt_name;
 	poption_str    opt_logs;
-	poption_str    opt_file;
+	poption_str	   opt_file;
 	poption_str_limit opt_type;
 	poption_str    opt_cmd;
 	poption_str    opt_inp;
@@ -211,7 +211,7 @@ public:
 	{
 		log().debug("Creating dynamic logs ...\n");
 		pstring_list_t ll(m_opts ? m_opts->opt_logs() : "" , ":");
-		for (int i=0; i < ll.size(); i++)
+		for (unsigned i=0; i < ll.size(); i++)
 		{
 			pstring name = "log_" + ll[i];
 			/*netlist_device_t *nc = */ m_setup->register_dev("LOG", name);
@@ -380,7 +380,7 @@ static void listdevices()
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
 
-	for (int i=0; i < list.size(); i++)
+	for (unsigned i=0; i < list.size(); i++)
 	{
 		netlist::base_factory_t *f = list.value_at(i);
 		pstring out = pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
@@ -391,7 +391,7 @@ static void listdevices()
 		d->start_dev();
 
 		// get the list of terminals ...
-		for (int j=0; j < d->m_terminals.size(); j++)
+		for (unsigned j=0; j < d->m_terminals.size(); j++)
 		{
 			pstring inp = d->m_terminals[j];
 			if (inp.startsWith(d->name() + "."))
