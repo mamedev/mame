@@ -143,7 +143,7 @@ Speak & Math:
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2392
     - VSM(2/2): 16KB CD2393
-    - VFD: NEC FIP9xxx
+    - VFD: itron brand, label?
     - notes: As with the Speak & Spell, the voice actor was a radio announcer.
       However, the phrase "is greater than or less than" had to be added in a
       hurry by one of the TI employees in a hurry, the day before a demo.
@@ -302,7 +302,7 @@ A later device, called Language Teacher, was released without speech hardware.
     Language Tutor (US), 1978
     - MCU: TMC0275*
     - TMS51xx: CD2801
-    - VFD: NEC FIP10xxx
+    - VFD: NEC FIP10xxx?
     - notes: external module is required (see below)
 
 Language Tutor modules:
