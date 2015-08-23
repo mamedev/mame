@@ -237,7 +237,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy
   - World: UFO Master-Blaster Station
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -349,7 +349,7 @@ MACHINE_CONFIG_END
   Then choose a formation(A,B,C) and either pass the ball, and/or start
   running. For more information, refer to the official manual.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -489,7 +489,7 @@ MACHINE_CONFIG_END
   player 1 presses one of the directional keys. In 2-player mode, player 2
   controls the goalkeeper, defensive players are still controlled by the CPU.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -611,7 +611,7 @@ MACHINE_CONFIG_END
   * NEC uCOM-44 MCU, labeled EMIX D552C 049
   * cyan VFD display Emix-108
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -720,7 +720,7 @@ MACHINE_CONFIG_END
   This is basically a revamp of their earlier Boxing game (ET-06), case and
   buttons are exactly the same.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -873,7 +873,7 @@ MACHINE_CONFIG_END
   - Japan: FL Crazy Climbing
   - USA: Crazy Climber
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1094,7 +1094,7 @@ MACHINE_CONFIG_END
   - USA: Invader From Space
   - UK: Invader From Space, published by Grandstand
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1308,7 +1308,7 @@ MACHINE_CONFIG_END
   - Japan: Astro Wars
   - UK: Astro Wars, published by Grandstand
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1410,7 +1410,7 @@ MACHINE_CONFIG_END
   - USA: Astro Command, published by Tandy
   - UK: Scramble, published by Grandstand
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1519,7 +1519,7 @@ MACHINE_CONFIG_END
   - USA: Dracula, red case
   - Other: Dracula, yellow case, published by Hales
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1720,7 +1720,7 @@ MACHINE_CONFIG_END
   - USA: Cosmic Combat
   - Japan: Space Attack
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1819,7 +1819,7 @@ MACHINE_CONFIG_END
   Press the Serve button to start, then hit the ball by pressing one of the
   positional buttons when the ball flies over it.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1981,7 +1981,7 @@ MACHINE_CONFIG_END
   The game will start automatically after turning it on. This Pac Man refuses
   to eat dots with his butt, you can only eat them going right-to-left.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2085,7 +2085,7 @@ MACHINE_CONFIG_END
   - UK: Astro Blaster, published by Hales (Epoch Astro Command was named Scramble)
   - Germany: Rambler
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2186,7 +2186,7 @@ MACHINE_CONFIG_END
   - USA: Caveman, published by Tandy
   - UK: Cave Man - Jr. Caveman vs Dinosaur, published by Grandstand
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2285,7 +2285,7 @@ MACHINE_CONFIG_END
 
   To start the game, simply press [UP]. Hold a joystick direction to move around.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 

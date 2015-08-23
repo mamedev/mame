@@ -224,7 +224,7 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -339,7 +339,7 @@ MACHINE_CONFIG_END
   * Mitsubishi M58846-702P MCU
   * cyan/red/green VFD display Itron CP5143GLR SGA, with light-yellow color overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
