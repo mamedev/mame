@@ -91,19 +91,25 @@ int get_bios_count(const game_driver *driver, std::vector<std::string> &biosname
 	if (driver->rom == NULL)
 		return 0;
 
+	std::string default_name;
+	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			default_name.assign(ROM_GETNAME(rom));
+
 	int bios_count = 0;
 	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
+			bios_count++;
 			std::string name(ROM_GETHASHDATA(rom));
-			if (ROM_GETBIOSFLAGS(rom) == 1)
+			std::string bname(ROM_GETNAME(rom));
+			if (bname == default_name)
 			{
 				name.append(" (default)");
 				biosname.insert(biosname.begin(), name);
 			}
 			else
 				biosname.push_back(name);
-			bios_count++;
 		}
 	return bios_count;
 }
