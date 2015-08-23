@@ -1412,7 +1412,7 @@ void tms9995_device::decode(UINT16 inst)
 	if (decoded == NULL)
 	{
 		// not found
-		logerror("tms9995: Unknown opcode %04x, will trigger MID\n", inst);
+		logerror("tms9995: Undefined opcode %04x at logical address %04x, will trigger MID\n", inst, PC);
 		m_decoded[dindex].IR = 0;
 		m_decoded[dindex].command = MID;
 	}
