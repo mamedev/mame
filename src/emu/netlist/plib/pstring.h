@@ -356,6 +356,7 @@ public:
 
 	void cat(const pstring &s) { pcat(s); }
 	void cat(const char *s) { pcat(s); }
+	void cat(const void *m, unsigned l) { pcat(m, l); }
 
 private:
 
@@ -372,6 +373,7 @@ private:
 	void pcopy(const pstring &from);
 	void pcat(const char *s);
 	void pcat(const pstring &s);
+	void pcat(const void *m, unsigned l);
 
 	char *m_ptr;
 	std::size_t m_size;
@@ -387,7 +389,7 @@ struct ptype_treats
 template<>
 struct ptype_treats<char>
 {
-	typedef short cast_type;
+	static short cast(char x) { return x; }
 	static const bool is_signed = true;
 	static const char *size_specifier() { return "h"; }
 };
@@ -395,7 +397,7 @@ struct ptype_treats<char>
 template<>
 struct ptype_treats<short>
 {
-	typedef short cast_type;
+	static short cast(short x) { return x; }
 	static const bool is_signed = true;
 	static const char *size_specifier() { return "h"; }
 };
@@ -403,7 +405,7 @@ struct ptype_treats<short>
 template<>
 struct ptype_treats<int>
 {
-	typedef int cast_type;
+	static int cast(int x) { return x; }
 	static const bool is_signed = true;
 	static const char *size_specifier() { return ""; }
 };
@@ -411,7 +413,7 @@ struct ptype_treats<int>
 template<>
 struct ptype_treats<long>
 {
-	typedef long cast_type;
+	static long cast(long x) { return x; }
 	static const bool is_signed = true;
 	static const char *size_specifier() { return "l"; }
 };
@@ -419,7 +421,7 @@ struct ptype_treats<long>
 template<>
 struct ptype_treats<long long>
 {
-	typedef long long cast_type;
+	static long long cast(long long x) { return x; }
 	static const bool is_signed = true;
 	static const char *size_specifier() { return "ll"; }
 };
@@ -427,7 +429,7 @@ struct ptype_treats<long long>
 template<>
 struct ptype_treats<unsigned char>
 {
-	typedef unsigned short cast_type;
+	static unsigned short cast(unsigned char x) { return x; }
 	static const bool is_signed = false;
 	static const char *size_specifier() { return "h"; }
 };
@@ -435,7 +437,7 @@ struct ptype_treats<unsigned char>
 template<>
 struct ptype_treats<unsigned short>
 {
-	typedef unsigned short cast_type;
+	static unsigned short cast(unsigned short x) { return x; }
 	static const bool is_signed = false;
 	static const char *size_specifier() { return "h"; }
 };
@@ -443,7 +445,7 @@ struct ptype_treats<unsigned short>
 template<>
 struct ptype_treats<unsigned int>
 {
-	typedef unsigned int cast_type;
+	static unsigned int cast(unsigned int x) { return x; }
 	static const bool is_signed = false;
 	static const char *size_specifier() { return ""; }
 };
@@ -451,7 +453,7 @@ struct ptype_treats<unsigned int>
 template<>
 struct ptype_treats<unsigned long>
 {
-	typedef unsigned long cast_type;
+	static unsigned long cast(unsigned long x) { return x; }
 	static const bool is_signed = false;
 	static const char *size_specifier() { return "l"; }
 };
@@ -459,7 +461,7 @@ struct ptype_treats<unsigned long>
 template<>
 struct ptype_treats<unsigned long long>
 {
-	typedef unsigned long long cast_type;
+	static unsigned long long cast(unsigned long long x) { return x; }
 	static const bool is_signed = false;
 	static const char *size_specifier() { return "ll"; }
 };
@@ -471,33 +473,34 @@ public:
 
 	virtual ~pformat_base() { }
 
-	P &operator ()(const double x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this); }
-	P &          e(const double x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
-	P &          f(const double x, const char *f = "") { format_element(f, "", "f", x); return static_cast<P &>(*this);  }
+	ATTR_COLD P &operator ()(const double x, const char *f = "") { format_element(f, "", "f", x); return static_cast<P &>(*this); }
+	ATTR_COLD P &          e(const double x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
+	ATTR_COLD P &          g(const double x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this);  }
 
-	P &operator ()(const char *x, const char *f = "") { format_element(f, "", "s", x); return static_cast<P &>(*this);  }
-	P &operator ()(const void *x, const char *f = "") { format_element(f, "", "p", x); return static_cast<P &>(*this);  }
-	P &operator ()(const pstring &x, const char *f = "") { format_element(f, "", "s", x.cstr() ); return static_cast<P &>(*this);  }
+	ATTR_COLD P &operator ()(const char *x, const char *f = "") { format_element(f, "", "s", x); return static_cast<P &>(*this);  }
+	ATTR_COLD P &operator ()(char *x, const char *f = "") { format_element(f, "", "s", x); return static_cast<P &>(*this);  }
+	ATTR_COLD P &operator ()(const void *x, const char *f = "") { format_element(f, "", "p", x); return static_cast<P &>(*this);  }
+	ATTR_COLD P &operator ()(const pstring &x, const char *f = "") { format_element(f, "", "s", x.cstr() ); return static_cast<P &>(*this);  }
 
 	template<typename T>
-	P &operator ()(const T x, const char *f = "")
+	ATTR_COLD P &operator ()(const T x, const char *f = "")
 	{
 		if (ptype_treats<T>::is_signed)
-			format_element(f, ptype_treats<T>::size_specifier(), "d", (typename ptype_treats<T>::cast_type) x);
+			format_element(f, ptype_treats<T>::size_specifier(), "d", ptype_treats<T>::cast(x));
 		else
-			format_element(f, ptype_treats<T>::size_specifier(), "u", (typename ptype_treats<T>::cast_type) x);
+			format_element(f, ptype_treats<T>::size_specifier(), "u", ptype_treats<T>::cast(x));
 		return static_cast<P &>(*this);
 	}
 
 	template<typename T>
-	P &x(const T x, const char *f = "")
+	ATTR_COLD P &x(const T x, const char *f = "")
 	{
 		format_element(f, ptype_treats<T>::size_specifier(), "x", x);
 		return static_cast<P &>(*this);
 	}
 
 	template<typename T>
-	P &o(const T x, const char *f = "")
+	ATTR_COLD P &o(const T x, const char *f = "")
 	{
 		format_element(f, ptype_treats<T>::size_specifier(), "o", x);
 		return static_cast<P &>(*this);
@@ -509,11 +512,11 @@ protected:
 
 };
 
-class pformat : public pformat_base<pformat>
+class pfmt : public pformat_base<pfmt>
 {
 public:
-	pformat(const pstring &fmt);
-	pformat(const char *fmt);
+	ATTR_COLD pfmt(const pstring &fmt);
+	ATTR_COLD pfmt(const char *fmt);
 
 	operator pstring() const { return m_str; }
 
@@ -529,5 +532,117 @@ private:
 	unsigned m_arg;
 };
 
+enum plog_level
+{
+	DEBUG,
+	INFO,
+	VERBOSE,
+	WARNING,
+	ERROR,
+	FATAL
+};
+
+class plog_dispatch_intf;
+
+template <bool build_enabled = true>
+class pfmt_writer_t
+{
+public:
+	pfmt_writer_t()  { }
+	virtual ~pfmt_writer_t() { }
+
+	ATTR_COLD void operator ()(const char *fmt) const
+	{
+		if (build_enabled) vdowrite(fmt);
+	}
+
+	template<typename T1>
+	ATTR_COLD void operator ()(const char *fmt, const T1 &v1) const
+	{
+		if (build_enabled) vdowrite(pfmt(fmt)(v1));
+	}
+
+	template<typename T1, typename T2>
+	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2) const
+	{
+		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2));
+	}
+
+	template<typename T1, typename T2, typename T3>
+	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
+	{
+		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3));
+	}
+
+	template<typename T1, typename T2, typename T3, typename T4>
+	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
+	{
+		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4));
+	}
+
+	template<typename T1, typename T2, typename T3, typename T4, typename T5>
+	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
+	{
+		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4)(v5));
+	}
+
+protected:
+	virtual void vdowrite(const pstring &ls) const {}
+
+};
+
+template <plog_level L, bool build_enabled = true>
+class plog_channel : public pfmt_writer_t<build_enabled>
+{
+public:
+	plog_channel(plog_dispatch_intf *b) : pfmt_writer_t<build_enabled>(),  m_base(b) { }
+	virtual ~plog_channel() { }
+
+protected:
+	virtual void vdowrite(const pstring &ls) const;
+
+private:
+	plog_dispatch_intf *m_base;
+};
+
+class plog_dispatch_intf
+{
+	template<plog_level, bool> friend class plog_channel;
+
+public:
+	virtual ~plog_dispatch_intf() { }
+protected:
+	virtual void vlog(const plog_level &l, const pstring &ls) const = 0;
+};
+
+template<bool debug_enabled>
+class plog_base
+{
+public:
+
+	plog_base(plog_dispatch_intf *proxy)
+	: debug(proxy),
+	  info(proxy),
+	  verbose(proxy),
+	  warning(proxy),
+	  error(proxy),
+      fatal(proxy)
+	{}
+	virtual ~plog_base() {};
+
+	plog_channel<DEBUG, debug_enabled> debug;
+	plog_channel<INFO> info;
+	plog_channel<VERBOSE> verbose;
+	plog_channel<WARNING> warning;
+	plog_channel<ERROR> error;
+	plog_channel<FATAL> fatal;
+};
+
+
+template <plog_level L, bool build_enabled>
+void plog_channel<L, build_enabled>::vdowrite(const pstring &ls) const
+{
+	m_base->vlog(L, ls);
+}
 
 #endif /* _PSTRING_H_ */

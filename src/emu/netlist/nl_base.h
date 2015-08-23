@@ -252,11 +252,11 @@ virtual logic_family_desc_t *default_logic_family()                             
 //============================================================
 
 #if defined(MAME_DEBUG)
-#define nl_assert(x)               do { if (1) if (!(x)) throw fatalerror_e(pformat("assert: %1:%2: %3")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)               do { if (1) if (!(x)) throw fatalerror_e(pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #else
-#define nl_assert(x)               do { if (0) if (!(x)) throw fatalerror_e(pformat("assert: %1:%2: %3")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)               do { if (0) if (!(x)) throw fatalerror_e(pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #endif
-#define nl_assert_always(x, msg)    do { if (!(x)) throw fatalerror_e(pformat("Fatal error: %1\nCaused by assert: %2:%3: %4")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) throw fatalerror_e(pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
 
 
 // -----------------------------------------------------------------------------
@@ -444,7 +444,7 @@ namespace netlist
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 
-		core_device_t &device() const { return *m_device; }
+		ATTR_HOT core_device_t &device() const { return *m_device; }
 	private:
 		core_device_t * m_device;
 	};
@@ -1019,7 +1019,6 @@ namespace netlist
 
 		ATTR_HOT  netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
-			//printf("%s %d\n", inp.name().cstr(), inp.state());
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
 			return inp.Q();
 		}
@@ -1152,7 +1151,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public object_t, public pstate_manager_t
+	class netlist_t : public object_t, public pstate_manager_t, public plog_dispatch_intf
 	{
 		P_PREVENT_COPYING(netlist_t)
 	public:
@@ -1185,12 +1184,8 @@ namespace netlist
 
 		ATTR_COLD net_t *find_net(const pstring &name);
 
-		ATTR_COLD void error(const char *format, ...) const ATTR_PRINTF(2,3);
-		ATTR_COLD void warning(const char *format, ...) const ATTR_PRINTF(2,3);
-		ATTR_COLD void log(const char *format, ...) const ATTR_PRINTF(2,3);
-
 		template<class _C>
-		plist_t<_C *> get_device_list()
+		ATTR_COLD plist_t<_C *> get_device_list()
 		{
 			plist_t<_C *> tmp;
 			for (std::size_t i = 0; i < m_devices.size(); i++)
@@ -1203,7 +1198,7 @@ namespace netlist
 		}
 
 		template<class _C>
-		_C *get_first_device()
+		ATTR_COLD _C *get_first_device()
 		{
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
@@ -1215,7 +1210,7 @@ namespace netlist
 		}
 
 		template<class _C>
-		_C *get_single_device(const char *classname)
+		ATTR_COLD _C *get_single_device(const char *classname)
 		{
 			_C *ret = NULL;
 			for (std::size_t i = 0; i < m_devices.size(); i++)
@@ -1224,7 +1219,7 @@ namespace netlist
 				if (dev != NULL)
 				{
 					if (ret != NULL)
-						this->error("more than one %s device found", classname);
+						this->log().fatal("more than one {1} device found", classname);
 					else
 						ret = dev;
 				}
@@ -1238,18 +1233,12 @@ namespace netlist
 		pnamedlist_t<core_device_t *> m_started_devices;
 	#endif
 
+	ATTR_COLD const plog_base<NL_DEBUG> &log() const { return m_log; }
+
 	protected:
 
-		enum loglevel_e
-		{
-			NL_ERROR,
-			NL_WARNING,
-			NL_LOG
-		};
-
-		// any derived netlist must override this ...
-		virtual void verror(const loglevel_e level,
-				const char *format, va_list ap) const = 0;
+		// any derived netlist must override vlog inherited from plog_base
+		// 	virtual void vlog(const plog_level &l, const pstring &ls) = 0;
 
 		/* from netlist_object */
 		virtual void reset();
@@ -1267,7 +1256,7 @@ namespace netlist
 
 		netlist_time                m_time;
 		bool                        m_use_deactivate;
-		queue_t             m_queue;
+		queue_t       			    m_queue;
 
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
@@ -1277,6 +1266,7 @@ namespace netlist
 
 		devices::NETLIB_NAME(netlistparams) *m_params;
 		setup_t *m_setup;
+		plog_base<NL_DEBUG> m_log;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1325,7 +1315,6 @@ namespace netlist
 	{
 		if (EXPECTED(!is_state(STATE_INP_PASSIVE)))
 		{
-			//printf("inactivate %s\n", name().cstr());
 			set_state(STATE_INP_PASSIVE);
 			net().as_logic().dec_active(*this);
 		}

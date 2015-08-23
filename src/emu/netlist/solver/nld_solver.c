@@ -113,7 +113,7 @@ ATTR_COLD matrix_solver_t::~matrix_solver_t()
 
 ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 {
-	NL_VERBOSE_OUT(("New solver setup\n"));
+	log().debug("New solver setup\n");
 
 	m_nets.clear();
 
@@ -124,7 +124,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 
 	for (std::size_t k = 0; k < nets.size(); k++)
 	{
-		NL_VERBOSE_OUT(("setting up net\n"));
+		log().debug("setting up net\n");
 
 		analog_net_t *net = nets[k];
 
@@ -133,7 +133,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 		for (std::size_t i = 0; i < net->m_core_terms.size(); i++)
 		{
 			core_terminal_t *p = net->m_core_terms[i];
-			NL_VERBOSE_OUT(("%s %s %d\n", p->name().cstr(), net->name().cstr(), (int) net->isRailNet()));
+			log().debug("{1} {2} {3}\n", p->name(), net->name(), (int) net->isRailNet());
 			switch (p->type())
 			{
 				case terminal_t::TERMINAL:
@@ -147,7 +147,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 						case device_t::DIODE:
 						case device_t::LVCCS:
 						case device_t::BJT_SWITCH:
-							NL_VERBOSE_OUT(("found BJT/Diode/LVCCS\n"));
+							log().debug("found BJT/Diode/LVCCS\n");
 							if (!m_dynamic_devices.contains(&p->device()))
 								m_dynamic_devices.add(&p->device());
 							break;
@@ -158,7 +158,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 						terminal_t *pterm = dynamic_cast<terminal_t *>(p);
 						add_term(k, pterm);
 					}
-					NL_VERBOSE_OUT(("Added terminal\n"));
+					log().debug("Added terminal\n");
 					break;
 				case terminal_t::INPUT:
 					{
@@ -173,22 +173,22 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 						if (net_proxy_output == NULL)
 						{
 							net_proxy_output = palloc(analog_output_t);
-							net_proxy_output->init_object(*this, this->name() + "." + pformat("m%1")(m_inps.size()));
+							net_proxy_output->init_object(*this, this->name() + "." + pfmt("m{1}")(m_inps.size()));
 							m_inps.add(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
 						}
 						net_proxy_output->net().register_con(*p);
 						// FIXME: repeated
 						net_proxy_output->net().rebuild_list();
-						NL_VERBOSE_OUT(("Added input\n"));
+						log().debug("Added input\n");
 					}
 					break;
 				default:
-					netlist().error("unhandled element found\n");
+					log().fatal("unhandled element found\n");
 					break;
 			}
 		}
-		NL_VERBOSE_OUT(("added net with %" SIZETFMT " populated connections\n", net->m_core_terms.size()));
+		log().debug("added net with {1} populated connections\n", net->m_core_terms.size());
 	}
 
 }
@@ -199,7 +199,6 @@ ATTR_HOT void matrix_solver_t::update_inputs()
 	// avoid recursive calls. Inputs are updated outside this call
 	for (std::size_t i=0; i<m_inps.size(); i++)
 		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->m_cur_Analog);
-
 }
 
 ATTR_HOT void matrix_solver_t::update_dynamic()
@@ -273,7 +272,7 @@ void matrix_solver_t::solve_base(C *p)
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-			netlist().warning("NEWTON_LOOPS exceeded on net %s... reschedule", this->name().cstr());
+			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
 			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
 		}
 	}
@@ -317,13 +316,13 @@ void matrix_solver_t::log_stats()
 {
 	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
-		this->netlist().log("==============================================");
-		this->netlist().log("Solver %s", this->name().cstr());
-		this->netlist().log("       ==> %d nets", (unsigned) this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
-		this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
-		this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
+		log().verbose("==============================================");
+		log().verbose("Solver {1}", this->name());
+		log().verbose("       ==> {1} nets", this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
+		log().verbose("       has {1} elements", this->is_dynamic() ? "dynamic" : "no dynamic");
+		log().verbose("       has {1} elements", this->is_timestep() ? "timestep" : "no timestep");
+		log().verbose("       {1:6.3} average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+		log().verbose("       {1:10} invocations ({2:6} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 				this->m_stat_calculations,
 				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
 				this->m_iterative_fail,
@@ -479,7 +478,7 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 			}
 			else
 			{
-				netlist().error("Unknown solver type: %s\n", m_iterative_solver.Value().cstr());
+				netlist().log().fatal("Unknown solver type: {1}\n", m_iterative_solver.Value());
 				return NULL;
 			}
 		}
@@ -525,14 +524,14 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	else
 		m_params.m_log_stats = (bool) m_log_stats.Value();
 
-	netlist().log("Scanning net groups ...");
+	netlist().log().verbose("Scanning net groups ...");
 	// determine net groups
 	for (std::size_t i=0; i<netlist().m_nets.size(); i++)
 	{
-		SOLVER_VERBOSE_OUT(("processing %s\n", netlist().m_nets[i]->name().cstr()));
+		netlist().log().debug("processing {1}\n", netlist().m_nets[i]->name());
 		if (!netlist().m_nets[i]->isRailNet())
 		{
-			SOLVER_VERBOSE_OUT(("   ==> not a rail net\n"));
+			netlist().log().debug("   ==> not a rail net\n");
 			analog_net_t *n = &netlist().m_nets[i]->as_analog();
 			if (!n->already_processed(groups, cur_group))
 			{
@@ -543,7 +542,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 
 	// setup the solvers
-	netlist().log("Found %d net groups in %" SIZETFMT " nets\n", cur_group + 1, SIZET_PRINTF(netlist().m_nets.size()));
+	netlist().log().verbose("Found {1} net groups in {2} nets\n", cur_group + 1, netlist().m_nets.size());
 	for (int i = 0; i <= cur_group; i++)
 	{
 		matrix_solver_t *ms;
@@ -599,7 +598,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				break;
 #endif
 			default:
-				netlist().warning("No specific solver found for netlist of size %d", (unsigned) net_count);
+				netlist().log().warning("No specific solver found for netlist of size {1}", (unsigned) net_count);
 				if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, use_specific);
@@ -619,31 +618,31 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				}
 				else
 				{
-					netlist().error("Encountered netgroup with > 128 nets");
+					netlist().log().fatal("Encountered netgroup with > 128 nets");
 					ms = NULL; /* tease compilers */
 				}
 
 				break;
 		}
 
-		register_sub(pformat("Solver_%1")(m_mat_solvers.size()), *ms);
+		register_sub(pfmt("Solver_{1}")(m_mat_solvers.size()), *ms);
 
 		ms->vsetup(groups[i]);
 
 		m_mat_solvers.add(ms);
 
-		netlist().log("Solver %s", ms->name().cstr());
-		netlist().log("       # %d ==> %" SIZETFMT " nets", i, SIZET_PRINTF(groups[i].size())); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		netlist().log("       has %s elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
-		netlist().log("       has %s elements", ms->is_timestep() ? "timestep" : "no timestep");
+		netlist().log().verbose("Solver {1}", ms->name());
+		netlist().log().verbose("       # {1} ==> {2} nets", i, groups[i].size());
+		netlist().log().verbose("       has {1} elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
+		netlist().log().verbose("       has {1} elements", ms->is_timestep() ? "timestep" : "no timestep");
 		for (std::size_t j=0; j<groups[i].size(); j++)
 		{
-			netlist().log("Net %" SIZETFMT ": %s", SIZET_PRINTF(j), groups[i][j]->name().cstr());
+			netlist().log().verbose("Net {1}: {2}", j, groups[i][j]->name());
 			net_t *n = groups[i][j];
 			for (std::size_t k = 0; k < n->m_core_terms.size(); k++)
 			{
 				const core_terminal_t *p = n->m_core_terms[k];
-				netlist().log("   %s", p->name().cstr());
+				netlist().log().verbose("   {1}", p->name());
 			}
 		}
 	}

@@ -197,6 +197,9 @@ namespace netlist
 		nl_double model_value(model_map_t &map, const pstring &entity);
 
 		void model_parse(const pstring &model, model_map_t &map);
+
+		const plog_base<NL_DEBUG> &log() const { return netlist().log(); }
+
 	protected:
 
 	private:

@@ -175,11 +175,11 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &set
 	if (snd_in == NULL)
 		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT"));
 
-	pstring sparam = pformat("STREAM_INPUT.CHAN%1")(m_channel);
+	pstring sparam = pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
 	setup.register_param(sparam, m_param_name);
-	sparam = pformat("STREAM_INPUT.MULT%1")(m_channel);
+	sparam = pfmt("STREAM_INPUT.MULT{1}")(m_channel);
 	setup.register_param(sparam, m_mult);
-	sparam = pformat("STREAM_INPUT.OFFSET%1")(m_channel);
+	sparam = pfmt("STREAM_INPUT.OFFSET{1}")(m_channel);
 	setup.register_param(sparam, m_offset);
 }
 
@@ -210,7 +210,7 @@ void netlist_mame_stream_output_t::device_start()
 void netlist_mame_stream_output_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	//NETLIB_NAME(sound_out) *snd_out;
-	pstring sname = pformat("STREAM_OUT_%1")(m_channel);
+	pstring sname = pfmt("STREAM_OUT_{1}")(m_channel);
 
 	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
 	setup.register_dev("NETDEV_SOUND_OUT", sname);
@@ -226,19 +226,28 @@ void netlist_mame_stream_output_t::custom_netlist_additions(netlist::setup_t &se
 // netlist_mame_t
 // ----------------------------------------------------------------------------------------
 
-void netlist_mame_t::verror(const loglevel_e level, const char *format, va_list ap) const
+void netlist_mame_t::vlog(const plog_level &l, const pstring &ls) const
 {
-	pstring errstr = pstring(format).vprintf(ap);
+	pstring errstr = ls;
 
-	switch (level)
+	switch (l)
 	{
-		case NL_WARNING:
+		case DEBUG:
+			logerror("netlist DEBUG: %s\n", errstr.cstr());
+			break;
+		case INFO:
+			logerror("netlist INFO: %s\n", errstr.cstr());
+			break;
+		case VERBOSE:
+			logerror("netlist VERBOSE: %s\n", errstr.cstr());
+			break;
+		case WARNING:
 			logerror("netlist WARNING: %s\n", errstr.cstr());
 			break;
-		case NL_LOG:
-			logerror("netlist LOG: %s\n", errstr.cstr());
+		case ERROR:
+			logerror("netlist ERROR: %s\n", errstr.cstr());
 			break;
-		case NL_ERROR:
+		case FATAL:
 			emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());
 			throw error;
 	}
@@ -328,12 +337,8 @@ void netlist_mame_device_t::device_start()
 
 void netlist_mame_device_t::device_clock_changed()
 {
-	//printf("device_clock_changed\n");
 	m_div = netlist::netlist_time::from_hz(clock());
-	//m_rem = 0;
-	//NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clock(), m_div));
-	NL_VERBOSE_OUT(("Setting clock %d and divisor %f\n", clock(), m_div.as_double()));
-	//printf("Setting clock %d and divisor %d\n", clock(), m_div);
+	netlist().log().debug("Setting clock {1} and divisor {2}\n", clock(), m_div.as_double());
 }
 
 
@@ -398,7 +403,7 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 	for (int i=0; i< netlist().save_list().size(); i++)
 	{
 		pstate_entry_t *s = netlist().save_list()[i];
-		NL_VERBOSE_OUT(("saving state for %s\n", s->m_name.cstr()));
+		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
 		switch (s->m_dt)
 		{
 			case DT_DOUBLE:
@@ -438,7 +443,7 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 				break;
 			case NOT_SUPPORTED:
 			default:
-				netlist().error("found unsupported save element %s\n", s->m_name.cstr());
+				netlist().log().fatal("found unsupported save element %s\n", s->m_name);
 				break;
 		}
 	}
@@ -575,7 +580,7 @@ void netlist_mame_sound_device_t::device_start()
 	{
 		int chan = outdevs[i]->m_channel.Value();
 
-		netlist().log("Output %d on channel %d", i, chan);
+		netlist().log().verbose("Output %d on channel %d", i, chan);
 
 		if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.size())
 			fatalerror("illegal channel number");

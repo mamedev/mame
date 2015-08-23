@@ -2,7 +2,12 @@
 // copyright-holders:Luca Elia
 /***************************************************************************
 
-Sound board for an unknown game.
+Sound board for an unknown game. Most probably a bubble hockey EM game
+titled "Face-Off", an illegal? copy of Chexx Hockey by ICE. See here:
+
+http://valker.us/gameroom/SegaFaceOff.htm
+https://casetext.com/case/innovative-concepts-in-ent-v-entertainment-enter
+http://www.pinrepair.com/arcade/chexx.htm
 
 "Copyright (c) 1983  SoftLogic JAPAN" in the program rom.
 
@@ -31,10 +36,10 @@ Misc:   XTAL 4MHz, DSW4, 42-pin connector
 
 #define MAIN_CLOCK XTAL_4MHz
 
-class vampire_state : public driver_device
+class faceoffh_state : public driver_device
 {
 public:
-	vampire_state(const machine_config &mconfig, device_type type, const char *tag)
+	faceoffh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_audiocpu(*this, "audiocpu"),
 			m_digitalker(*this, "digitalker"),
@@ -69,9 +74,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_out);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_out);
 
-	DECLARE_WRITE8_MEMBER(vampire_ay_w);
-	DECLARE_READ8_MEMBER(vampire_coin_r);
-	DECLARE_WRITE8_MEMBER(vampire_coin_w);
+	DECLARE_WRITE8_MEMBER(faceoffh_ay_w);
+	DECLARE_READ8_MEMBER(faceoffh_coin_r);
+	DECLARE_WRITE8_MEMBER(faceoffh_coin_w);
 
 	// digitalker
 	void digitalker_set_bank(UINT8 bank);
@@ -86,44 +91,44 @@ public:
 
 // VIA
 
-READ8_MEMBER(vampire_state::via_a_in)
+READ8_MEMBER(faceoffh_state::via_a_in)
 {
 	UINT8 ret = 0;
 	logerror("%s: VIA read A: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(vampire_state::via_b_in)
+READ8_MEMBER(faceoffh_state::via_b_in)
 {
 	UINT8 ret = 0;
 	logerror("%s: VIA read B: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vampire_state::via_a_out)
+WRITE8_MEMBER(faceoffh_state::via_a_out)
 {
 	m_port_a = data;	// multiplexer
 //	logerror("%s: VIA write A = %02X\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(vampire_state::via_b_out)
+WRITE8_MEMBER(faceoffh_state::via_b_out)
 {
 	m_port_b = data;
 //	logerror("%s: VIA write B = %02X\n", machine().describe_context(), data);
 }
 
-WRITE_LINE_MEMBER(vampire_state::via_ca2_out)
+WRITE_LINE_MEMBER(faceoffh_state::via_ca2_out)
 {
 //	logerror("%s: VIA write CA2 = %02X\n", machine().describe_context(), state);
 }
-WRITE_LINE_MEMBER(vampire_state::via_cb1_out)
+WRITE_LINE_MEMBER(faceoffh_state::via_cb1_out)
 {
 //	logerror("%s: VIA write CB1 = %02X\n", machine().describe_context(), state);
 }
-WRITE_LINE_MEMBER(vampire_state::via_cb2_out)
+WRITE_LINE_MEMBER(faceoffh_state::via_cb2_out)
 {
 	m_shift = ((m_shift << 1) & 0xffffff) | state;
 //	logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
-WRITE_LINE_MEMBER(vampire_state::via_irq_out)
+WRITE_LINE_MEMBER(faceoffh_state::via_irq_out)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 //	logerror("%s: VIA write IRQ = %02X\n", machine().describe_context(), state);
@@ -131,11 +136,11 @@ WRITE_LINE_MEMBER(vampire_state::via_irq_out)
 
 // Video
 
-void vampire_state::video_start()
+void faceoffh_state::video_start()
 {
 }
 
-UINT32 vampire_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+UINT32 faceoffh_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	// NMI on coin-in?
 	UINT8 coin = (~ioport("INPUTS")->read()) & 0x03;
@@ -169,9 +174,9 @@ UINT32 vampire_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		m_digitalker->digitalker_0_wr_w(ASSERT_LINE);
 	}	
 
-	popmessage("COIN: %02X VIAB: %02X\nCOUNT: %02X %02X %02X\nSAMPLE: %02X (B%X)",
+	popmessage("COIN: %02X VIAB: %02X\nCOUNT: %02X %02X LEDS: %02X\nSAMPLE: %02X (B%X)",
 				m_coin, m_port_b,
-				(m_shift >> 16) & 0xff, (m_shift >> 8) & 0xff, (m_shift >> 0) & 0xff,	// 3 x 7-seg?
+				(m_shift >> 16) & 0xff, (m_shift >> 8) & 0xff, (m_shift >> 0) & 0xff,	// 2 x 7-seg, 3 leds
 				sample, bank
 	);
 	return 0;
@@ -180,12 +185,12 @@ UINT32 vampire_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 // Sound
 
 #if 0
-READ8_MEMBER(scramble_state::vampire_digitalker_intr_r)
+READ8_MEMBER(scramble_state::faceoffh_digitalker_intr_r)
 {
 	return m_digitalker->digitalker_0_intr_r();
 }
 
-WRITE8_MEMBER(scramble_state::vampire_digitalker_control_w)
+WRITE8_MEMBER(scramble_state::faceoffh_digitalker_control_w)
 {
 	m_digitalker->digitalker_0_cs_w (data & 1 ? ASSERT_LINE : CLEAR_LINE);
 	m_digitalker->digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
@@ -193,7 +198,7 @@ WRITE8_MEMBER(scramble_state::vampire_digitalker_control_w)
 }
 #endif
 
-WRITE8_MEMBER(vampire_state::vampire_ay_w)
+WRITE8_MEMBER(faceoffh_state::faceoffh_ay_w)
 {
 	if (offset)
 	{
@@ -216,7 +221,7 @@ WRITE8_MEMBER(vampire_state::vampire_ay_w)
 
 // Memory Map
 
-READ8_MEMBER(vampire_state::vampire_coin_r)
+READ8_MEMBER(faceoffh_state::faceoffh_coin_r)
 {
 	UINT8 ret = ioport("DSW")->read();			// bits 0-3
 	UINT8 inp = ioport("INPUTS")->read();		// bit 7 (multiplexed)
@@ -228,7 +233,7 @@ READ8_MEMBER(vampire_state::vampire_coin_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vampire_state::vampire_coin_w)
+WRITE8_MEMBER(faceoffh_state::faceoffh_coin_w)
 {
 	m_coin = data;
 //	coin_counter_w(machine(), 0, data & 0x01);
@@ -238,24 +243,24 @@ WRITE8_MEMBER(vampire_state::vampire_coin_w)
 }
 
 //M58725P - 2KB
-static ADDRESS_MAP_START( vampire_map, AS_PROGRAM, 8, vampire_state )
+static ADDRESS_MAP_START( faceoffh_map, AS_PROGRAM, 8, faceoffh_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 
 	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 
-	AM_RANGE(0x8000, 0x8000) AM_READ(vampire_coin_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(faceoffh_coin_r)
 
-	AM_RANGE(0xa000, 0xa001) AM_WRITE(vampire_ay_w)
+	AM_RANGE(0xa000, 0xa001) AM_WRITE(faceoffh_ay_w)
 
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(vampire_coin_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(faceoffh_coin_w)
 
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
 // Inputs
 
-static INPUT_PORTS_START( vampire )
+static INPUT_PORTS_START( faceoffh )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(1) // coin 1 (start music)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2   ) PORT_IMPULSE(1) // coin 2 (start music)
@@ -267,27 +272,27 @@ static INPUT_PORTS_START( vampire )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, "Coins Per Credit?" ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPNAME( 0x0c, 0x00, "Music Delay?" ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x00, "40" )
-	PORT_DIPSETTING(    0x04, "60" )
-	PORT_DIPSETTING(    0x08, "80" )
-	PORT_DIPSETTING(    0x0c, "100" )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0c, 0x00, "Game Duration (mins)" ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "2" ) // 40
+	PORT_DIPSETTING(    0x04, "3" ) // 60
+	PORT_DIPSETTING(    0x08, "4" ) // 80
+	PORT_DIPSETTING(    0x0c, "5" ) // 100
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) // multiplexed inputs
 INPUT_PORTS_END
 
 // Machine
 
-void vampire_state::machine_start()
+void faceoffh_state::machine_start()
 {
 }
 
-void vampire_state::digitalker_set_bank(UINT8 bank)
+void faceoffh_state::digitalker_set_bank(UINT8 bank)
 {
 	if (m_bank != bank)
 	{
@@ -300,38 +305,38 @@ void vampire_state::digitalker_set_bank(UINT8 bank)
 	}
 }
 
-void vampire_state::machine_reset()
+void faceoffh_state::machine_reset()
 {
 	m_bank = -1;
 	digitalker_set_bank(0);
 }
 
-static MACHINE_CONFIG_START( vampire, vampire_state )
+static MACHINE_CONFIG_START( faceoffh, faceoffh_state )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("audiocpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(vampire_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", vampire_state, irq0_line_hold)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", vampire_state, nmi_line_pulse)
+	MCFG_CPU_PROGRAM_MAP(faceoffh_map)
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", faceoffh_state, irq0_line_hold)
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", faceoffh_state, nmi_line_pulse)
 
 	// via
 	MCFG_DEVICE_ADD("via6522", VIA6522, MAIN_CLOCK/4)
 
-	MCFG_VIA6522_READPA_HANDLER(READ8(vampire_state,via_a_in))
-	MCFG_VIA6522_READPB_HANDLER(READ8(vampire_state,via_b_in))
+	MCFG_VIA6522_READPA_HANDLER(READ8(faceoffh_state,via_a_in))
+	MCFG_VIA6522_READPB_HANDLER(READ8(faceoffh_state,via_b_in))
 
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vampire_state, via_a_out))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vampire_state, via_b_out))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(faceoffh_state, via_a_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(faceoffh_state, via_b_out))
 
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vampire_state, via_ca2_out))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(vampire_state, via_cb1_out))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vampire_state, via_cb2_out))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vampire_state, via_irq_out)/*DEVWRITELINE("audiocpu", m6502_device, write_irq4)*/)
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(faceoffh_state, via_ca2_out))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(faceoffh_state, via_cb1_out))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(faceoffh_state, via_cb2_out))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(faceoffh_state, via_irq_out)/*DEVWRITELINE("audiocpu", m6502_device, write_irq4)*/)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(vampire_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(faceoffh_state, screen_update)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
@@ -349,7 +354,7 @@ MACHINE_CONFIG_END
 
 // ROMs
 
-ROM_START( vampire )
+ROM_START( faceoffh )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "1.5d", 0x0000, 0x1000, CRC(6ab050be) SHA1(ebecae855e22e9c3c46bdee51f84fd5352bf191a) )
 
@@ -367,4 +372,4 @@ ROM_START( vampire )
 	ROM_LOAD( "4.3b", 0xa000, 0x2000, CRC(c3386d51) SHA1(7882e88db55ba914be81075e4b2d76e246c34d3b) )
 ROM_END
 
-GAME( 1983, vampire, 0, vampire, vampire, driver_device, 0, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Vampire?", MACHINE_NOT_WORKING )
+GAME( 1983, faceoffh, 0, faceoffh, faceoffh, driver_device, 0, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_IMPERFECT_SOUND )

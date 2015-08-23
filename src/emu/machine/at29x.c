@@ -251,6 +251,7 @@ READ8_MEMBER( at29x_device::read )
 			m_programming_timer->adjust(attotime::from_msec(m_cycle_time*7/10));
 		}
 
+		if (TRACE_READ) logerror("%s: DATA poll; toggle bit 1\n", tag());
 		reply = m_toggle_bit? 0x02 : 0x00;
 		m_toggle_bit = !m_toggle_bit;
 
@@ -264,7 +265,7 @@ READ8_MEMBER( at29x_device::read )
 		// Simple case: just read the memory contents
 		reply = m_eememory[offset+2];
 
-	if (TRACE_READ) logerror("%s: %05x -> %02x\n", tag(), offset, reply);
+	if (TRACE_READ) logerror("%s: %05x -> %02x (PGM=%d)\n", tag(), offset, reply, m_pgm);
 
 	return reply;
 }

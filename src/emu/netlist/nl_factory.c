@@ -68,7 +68,7 @@ device_t *factory_list_t::new_device_by_classname(const pstring &classname) cons
 
 void factory_list_t::error(const pstring &s)
 {
-	m_setup.netlist().error("%s", s.cstr());
+	m_setup.log().fatal("{1}", s);
 }
 
 device_t *factory_list_t::new_device_by_name(const pstring &name)
@@ -83,7 +83,7 @@ base_factory_t * factory_list_t::factory_by_name(const pstring &name)
 		return (*this)[name];
 	else
 	{
-		m_setup.netlist().error("Class %s not found!\n", name.cstr());
+		m_setup.log().fatal("Class {1} not found!\n", name);
 		return NULL; // appease code analysis
 	}
 }

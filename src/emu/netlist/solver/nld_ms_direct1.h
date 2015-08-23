@@ -41,7 +41,7 @@ ATTR_HOT inline int matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED cons
 	analog_net_t *net = m_nets[0];
 	this->build_LE_A();
 	this->build_LE_RHS(m_RHS);
-	//NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
+	//NL_VERBOSE_OUT(("{1} {2}\n", new_val, m_RHS[0] / m_A[0][0]);
 
 	nl_double new_val =  m_RHS[0] / A(0,0);
 

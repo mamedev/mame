@@ -135,6 +135,7 @@ public:
 	ATTR_COLD int get_net_idx(net_t *net);
 
 	inline eSolverType type() const { return m_type; }
+	const plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
 	virtual void log_stats();
 

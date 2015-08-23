@@ -403,7 +403,6 @@ protected:
 
 	ATTR_HOT void update()
 	{
-		//printf("%s: %f\n", name().cstr(), m_I.Q_Analog());
 		if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
 			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
 		else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
@@ -478,7 +477,7 @@ public:
 
 	ATTR_COLD factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: base_factory_t(name, classname, def_param), m_setup(setup) {  printf("devname %s\n", classname.cstr()); }
+	: base_factory_t(name, classname, def_param), m_setup(setup) {  }
 
 	class dummy : public device_t
 	{

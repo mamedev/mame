@@ -16,9 +16,6 @@
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #endif
 
-//#undef NL_VERBOSE_OUT
-//#define NL_VERBOSE_OUT(x) printf x
-
 namespace netlist
 {
 // ----------------------------------------------------------------------------------------
@@ -27,8 +24,8 @@ namespace netlist
 
 ATTR_COLD void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
 {
-	m_setup.netlist().error("line %d: error: %s\n\t\t%s\n", line_num,
-			msg.cstr(), line.cstr());
+	m_setup.log().fatal("line {1}: error: {2}\n\t\t{3}\n", line_num,
+			msg, line);
 
 	//throw error;
 }
@@ -77,7 +74,7 @@ bool parser_t::parse(const pstring nlname)
 		if (token.is_type(ENDOFFILE))
 		{
 			return false;
-			//error("EOF while searching for <%s>", nlname.cstr());
+			//error("EOF while searching for <{1}>", nlname);
 		}
 
 		if (token.is(m_tok_NETLIST_END))
@@ -118,7 +115,7 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			return;
 
 		require_token(m_tok_param_left);
-		NL_VERBOSE_OUT(("Parser: Device: %s\n", token.str().cstr()));
+		m_setup.log().debug("Parser: Device: {1}\n", token.str());
 
 		if (token.is(m_tok_ALIAS))
 			net_alias();
@@ -279,7 +276,7 @@ void parser_t::net_alias()
 
 	require_token(m_tok_param_right);
 
-	NL_VERBOSE_OUT(("Parser: Alias: %s %s\n", alias.cstr(), out.cstr()));
+	m_setup.log().debug("Parser: Alias: {1} {2}\n", alias, out);
 	m_setup.register_alias(alias, out);
 }
 
@@ -292,12 +289,12 @@ void parser_t::net_c()
 	{
 		pstring t1 = get_identifier();
 		m_setup.register_link(first , t1);
-		NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", first.cstr(), t1.cstr()));
+		m_setup.log().debug("Parser: Connect: {1} {2}\n", first, t1);
 		token_t n = get_token();
 		if (n.is(m_tok_param_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(pformat("expected a comma, found <%1>")(n.str()) );
+			error(pfmt("expected a comma, found <{1}>")(n.str()) );
 	}
 
 }
@@ -317,15 +314,15 @@ void parser_t::dippins()
 		if (n.is(m_tok_param_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(pformat("expected a comma, found <%1>")(n.str()) );
+			error(pfmt("expected a comma, found <{1}>")(n.str()) );
 	}
 	if ((pins.size() % 2) == 1)
 		error("You must pass an equal number of pins to DIPPINS");
 	unsigned n = pins.size();
 	for (unsigned i = 0; i < n / 2; i++)
 	{
-		m_setup.register_alias(pformat("%1")(i+1), pins[i*2]);
-		m_setup.register_alias(pformat("%1")(n-i), pins[i*2 + 1]);
+		m_setup.register_alias(pfmt("{1}")(i+1), pins[i*2]);
+		m_setup.register_alias(pfmt("{1}")(n-i), pins[i*2 + 1]);
 	}
 }
 
@@ -337,14 +334,14 @@ void parser_t::netdev_param()
 	token_t tok = get_token();
 	if (tok.is_type(STRING))
 	{
-		NL_VERBOSE_OUT(("Parser: Param: %s %s\n", param.cstr(), tok.str().cstr()));
+		m_setup.log().debug("Parser: Param: {1} {2}\n", param, tok.str());
 		m_setup.register_param(param, tok.str());
 	}
 	else
 	{
 		nl_double val = eval_param(tok);
-	NL_VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
-	m_setup.register_param(param, val);
+		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
+		m_setup.register_param(param, val);
 	}
 	require_token(m_tok_param_right);
 }
@@ -373,14 +370,14 @@ void parser_t::device(const pstring &dev_type)
 		dev = f->Create();
 		m_setup.register_dev(dev, devname);
 
-		NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
+		m_setup.log().debug("Parser: IC: {1}\n", devname);
 
 		cnt = 0;
 		while (cnt < def_params.size())
 		{
 			pstring paramfq = devname + "." + def_params[cnt];
 
-			NL_VERBOSE_OUT(("Defparam: %s\n", paramfq.cstr()));
+			m_setup.log().debug("Defparam: {1}\n", paramfq);
 			require_token(m_tok_comma);
 			token_t tok = get_token();
 			if (tok.is_type(STRING))
@@ -407,7 +404,7 @@ void parser_t::device(const pstring &dev_type)
 			tok = get_token();
 		}
 		if (cnt != termlist.size())
-			m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %" SIZETFMT "\n", devname.cstr(), SIZET_PRINTF(termlist.size()), SIZET_PRINTF(cnt));
+			m_setup.log().fatal("netlist: input count mismatch for {1} - expected {2} found {3}\n", devname, termlist.size(), cnt);
 		require_token(tok, m_tok_param_right);
 	}
 }
@@ -428,7 +425,7 @@ nl_double parser_t::eval_param(const token_t tok)
 	nl_double ret;
 	pstring val;
 
-	//printf("param %s\n", tok.m_token.cstr());
+	//printf("param {1}\n", tok.m_token);
 	for (i=1; i<6;i++)
 		if (tok.str().equals(macs[i]))
 			f = i;
@@ -460,7 +457,7 @@ nl_double parser_t::eval_param(const token_t tok)
 	ret = val.as_double(&e);
 
 	if (e)
-		error("Error with parameter ...\n");
+		fatal("Error with parameter ...\n");
 	if (f>0)
 		require_token(m_tok_param_right);
 	return ret * facs[f];

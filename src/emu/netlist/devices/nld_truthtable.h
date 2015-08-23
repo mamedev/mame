@@ -157,7 +157,6 @@ public:
 			const int idx = inout.indexof(tmp);
 			if (idx>=0)
 			{
-				//printf("connecting %s %d\n", out[i].cstr(), idx);
 				connect_late(m_Q[i], m_I[idx]);
 				// disable ignore for this inputs altogether.
 				// FIXME: This shouldn't be necessary

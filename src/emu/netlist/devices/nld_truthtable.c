@@ -135,7 +135,7 @@ void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
 		{
 			// cutoff previous inputs and outputs for ignore
 			if (m_outs[nstate] != ~0U &&  m_outs[nstate] != val)
-				fatalerror_e(pformat("Error in truthtable: State %1 already set, %2 != %3\n")
+				fatalerror_e(pfmt("Error in truthtable: State {1} already set, {2} != {3}\n")
 						.x(nstate,"04")(m_outs[nstate])(val) );
 			m_outs[nstate] = val;
 			for (unsigned j=0; j<m_NO; j++)
@@ -231,7 +231,7 @@ void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32 disabled_
 	for (UINT32 i=0; i<m_size; i++)
 	{
 		if (m_outs[i] == ~0U)
-			throw fatalerror_e(pformat("truthtable: found element not set %1\n").x(i) );
+			throw fatalerror_e(pfmt("truthtable: found element not set {1}\n").x(i) );
 		m_outs[i] |= ((ign[i] & ~disabled_ignore)  << m_NO);
 	}
 	*m_initialized = true;
@@ -264,8 +264,8 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 		ENTRY(9);
 		ENTRY(10);
 		default:
-			pstring msg = pformat("unable to create truthtable<%1,%2,%3>")(ni)(no)(has_state);
-			nl_assert_always(false, msg.cstr());
+			pstring msg = pfmt("unable to create truthtable<{1},{2},{3}>")(ni)(no)(has_state);
+			nl_assert_always(false, msg);
 	}
 	return NULL;
 }

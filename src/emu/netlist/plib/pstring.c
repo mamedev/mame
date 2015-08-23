@@ -494,6 +494,15 @@ void pstringbuffer::pcat(const char *s)
 	m_len += slen;
 }
 
+void pstringbuffer::pcat(const void *m, unsigned l)
+{
+	const std::size_t nl = m_len + l + 1;
+	resize(nl);
+	std::memcpy(m_ptr + m_len, m, l);
+	m_len += l;
+	*(m_ptr + m_len) = 0;
+}
+
 void pstringbuffer::pcat(const pstring &s)
 {
 	const std::size_t slen = s.blen();
@@ -504,19 +513,20 @@ void pstringbuffer::pcat(const pstring &s)
 	m_ptr[m_len] = 0;
 }
 
-pformat::pformat(const pstring &fmt)
+pfmt::pfmt(const pstring &fmt)
 : m_arg(0)
 {
 	memcpy(m_str, fmt.cstr(), fmt.blen() + 1);
 }
 
-pformat::pformat(const char *fmt)
+pfmt::pfmt(const char *fmt)
 : m_arg(0)
 {
 	strncpy(m_str, fmt, sizeof(m_str) - 1);
 	m_str[sizeof(m_str) - 1] = 0;
 }
 
+#if 0
 void pformat::format_element(const char *f, const char *l, const char *fmt_spec,  ...)
 {
 	va_list ap;
@@ -539,7 +549,54 @@ void pformat::format_element(const char *f, const char *l, const char *fmt_spec,
 	}
 	va_end(ap);
 }
-
+#else
+void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  ...)
+{
+	va_list ap;
+	va_start(ap, fmt_spec);
+	char fmt[30] = "%";
+	char search[10] = "";
+	char buf[1024];
+	m_arg++;
+	int sl = sprintf(search, "{%d:", m_arg);
+	char *p = strstr(m_str, search);
+	if (p == NULL)
+	{
+		sl = sprintf(search, "{%d}", m_arg);
+		p = strstr(m_str, search);
+		if (p == NULL)
+		{
+			sl = 2;
+			p = strstr(m_str, "{}");
+		}
+		strcat(fmt, f);
+	}
+	else
+	{
+		char *p1 = strstr(p, "}");
+		if (p1 != NULL)
+		{
+			sl = p1 - p + 1;
+			if (m_arg>=10)
+				strncat(fmt, p+4, p1 - p - 4);
+			else
+				strncat(fmt, p+3, p1 - p - 3);
+		}
+		else
+			strcat(fmt, f);
+	}
+	strcat(fmt, l);
+	strcat(fmt, fmt_spec);
+	int nl = vsprintf(buf, fmt, ap);
+	if (p != NULL)
+	{
+		// Make room
+		memmove(p+nl, p+sl, strlen(p) + 1 - sl);
+		memcpy(p, buf, nl);
+	}
+	va_end(ap);
+}
+#endif
 
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;

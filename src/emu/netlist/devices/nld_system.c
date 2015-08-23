@@ -299,7 +299,7 @@ NETLIB_START(function)
 	register_output("Q", m_Q);
 
 	for (int i=0; i < m_N; i++)
-		register_input(pformat("A%1")(i), m_I[i]);
+		register_input(pfmt("A{1}")(i), m_I[i]);
 
 	pstring_list_t cmds(m_func.Value(), " ");
 	m_precompiled.clear();
@@ -329,7 +329,7 @@ NETLIB_START(function)
 			rc.m_cmd = PUSH_CONST;
 			rc.m_param = cmd.as_double(&err);
 			if (err)
-				netlist().error("nld_function: unknown/misformatted token <%s> in <%s>", cmd.cstr(), m_func.Value().cstr());
+				netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func.Value());
 		}
 		m_precompiled.add(rc);
 	}

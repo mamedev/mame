@@ -299,7 +299,6 @@ private:
 	int             m_samplepos_step;
 	int             m_step_mintime;
 	int             m_step_time;
-	int             m_step_ignore_time;
 };
 
 class floppy_connector: public device_t,

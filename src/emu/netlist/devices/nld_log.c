@@ -16,7 +16,7 @@ NETLIB_START(log)
 {
 	register_input("I", m_I);
 
-	pstring filename = pformat("%1.log")(name());
+	pstring filename = pfmt("{1}.log")(name());
 	m_strm = palloc(pofilestream(filename));
 }
 
@@ -27,8 +27,7 @@ NETLIB_RESET(log)
 NETLIB_UPDATE(log)
 {
 	/* use pstring::sprintf, it is a LOT faster */
-//	m_strm->writeline(pstring::sprintf("%20.9e %e", netlist().time().as_double(), (nl_double) INPANALOG(m_I)).cstr());
-	m_strm->writeline(pformat("%1 %2").e(netlist().time().as_double(),".9").e((nl_double) INPANALOG(m_I)).cstr());
+	m_strm->writeline(pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) INPANALOG(m_I)));
 }
 
 NETLIB_NAME(log)::~NETLIB_NAME(log)()
@@ -49,11 +48,11 @@ NETLIB_RESET(logD)
 
 NETLIB_UPDATE(logD)
 {
-	m_strm->writeline(pstring::sprintf("%e %e", netlist().time().as_double(), (nl_double) (INPANALOG(m_I) - INPANALOG(m_I2))).cstr());
+	m_strm->writeline(pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) (INPANALOG(m_I) - INPANALOG(m_I2))));
 }
 
 // FIXME: Implement wav later, this must be clock triggered device where the input to be written
-//        is on a subdevice ...
+//        is on a subdevice ..
 #if 0
 NETLIB_START(wav)
 {

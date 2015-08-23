@@ -63,13 +63,8 @@ typedef __int128_t INT128;
 
 #if !(PSTANDALONE)
 
-#undef ATTR_COLD
-#define ATTR_COLD
-
-static inline std::size_t SIZET_PRINTF(const std::size_t &v)
-{
-	return (unsigned) v;
-}
+//#undef ATTR_COLD
+//#define ATTR_COLD
 
 /* use MAME */
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
@@ -170,11 +165,6 @@ typedef int64_t      INT64;
 #define SIZETFMT   "u"
 #endif
 #endif
-
-static inline std::size_t SIZET_PRINTF(const std::size_t &v)
-{
-	return (unsigned) v;
-}
 
 #endif
 
