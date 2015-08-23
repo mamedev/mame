@@ -275,6 +275,7 @@ public:
 	void motor(bool on);
 	void step();
 	bool samples_loaded() { return m_loaded; }
+	void register_for_save_states();
 
 protected:
 	void device_start();
