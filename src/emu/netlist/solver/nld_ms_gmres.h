@@ -190,7 +190,9 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 #if 1
-	int mr = std::min((int) iN-1,(int) sqrt(iN));
+	int mr = _storage_N;
+	if (_storage_N > 3 )
+		mr = (int) sqrt(iN);
 	mr = std::min(mr, this->m_params.m_gs_loops);
 	int iter = 4;
 	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);

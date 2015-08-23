@@ -63,9 +63,6 @@ typedef __int128_t INT128;
 
 #if !(PSTANDALONE)
 
-//#undef ATTR_COLD
-//#define ATTR_COLD
-
 /* use MAME */
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
 #define PHAS_PMF_INTERNAL 1
@@ -101,10 +98,10 @@ typedef __int128_t INT128;
 /* ATTR_HOT and ATTR_COLD cause performance degration in 5.1 */
 //#define ATTR_HOT
 //#define ATTR_COLD
-#define ATTR_HOT                __attribute__((hot))
+#define ATTR_HOT               __attribute__((hot))
 #define ATTR_COLD              __attribute__((cold))
 
-#define RESTRICT
+#define RESTRICT				__restrict__
 #define EXPECTED(x)     (x)
 #define UNEXPECTED(x)   (x)
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
@@ -142,28 +139,6 @@ typedef int64_t      INT64;
 #else
 #define U64(val) val
 #define S64(val) val
-#endif
-
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
-#if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))) || defined(_MSC_VER)
-#define I64FMT   "I64"
-#else
-#define I64FMT   "ll"
-#endif
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#if (PTR64)
-#define SIZETFMT   "I64u"
-#else
-#define SIZETFMT   "u"
-#endif
-#else
-//#define SIZETFMT   "zu"
-#if (PTR64)
-#define SIZETFMT   "lu"
-#else
-#define SIZETFMT   "u"
-#endif
 #endif
 
 #endif

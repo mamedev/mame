@@ -21,7 +21,7 @@
 
 class pstream
 {
-	P_PREVENT_COPYING(pstream);
+	P_PREVENT_COPYING(pstream)
 public:
 
 	typedef long unsigned pos_type;
@@ -93,7 +93,7 @@ private:
 
 class pistream : public pstream
 {
-	P_PREVENT_COPYING(pistream);
+	P_PREVENT_COPYING(pistream)
 public:
 
 	pistream(unsigned flags) : pstream(flags) {}
@@ -148,7 +148,7 @@ private:
 
 class postream : public pstream
 {
-	P_PREVENT_COPYING(postream);
+	P_PREVENT_COPYING(postream)
 public:
 
 	postream(unsigned flags) : pstream(flags) {}
@@ -190,7 +190,7 @@ private:
 
 class pomemstream : public postream
 {
-	P_PREVENT_COPYING(pomemstream);
+	P_PREVENT_COPYING(pomemstream)
 public:
 
 	pomemstream();
@@ -214,7 +214,7 @@ private:
 
 class postringstream : public postream
 {
-	P_PREVENT_COPYING(postringstream );
+	P_PREVENT_COPYING(postringstream )
 
 public:
 
@@ -242,7 +242,7 @@ private:
 
 class pofilestream : public postream
 {
-	P_PREVENT_COPYING(pofilestream);
+	P_PREVENT_COPYING(pofilestream)
 public:
 
 	pofilestream(const pstring &fname);
@@ -267,7 +267,7 @@ private:
 
 class pifilestream : public pistream
 {
-	P_PREVENT_COPYING(pifilestream);
+	P_PREVENT_COPYING(pifilestream)
 public:
 
 	pifilestream(const pstring &fname);
@@ -292,7 +292,7 @@ private:
 
 class pimemstream : public pistream
 {
-	P_PREVENT_COPYING(pimemstream);
+	P_PREVENT_COPYING(pimemstream)
 public:
 
 	pimemstream(const void *mem, const pos_type len);
@@ -317,7 +317,7 @@ private:
 
 class pistringstream : public pimemstream
 {
-	P_PREVENT_COPYING(pistringstream);
+	P_PREVENT_COPYING(pistringstream)
 public:
 
 	pistringstream(const pstring &str) : pimemstream(str.cstr(), str.len()), m_str(str) { }
@@ -333,7 +333,7 @@ private:
 
 class pstream_fmt_writer_t : public pfmt_writer_t<>
 {
-	P_PREVENT_COPYING(pstream_fmt_writer_t);
+	P_PREVENT_COPYING(pstream_fmt_writer_t)
 public:
 
 	pstream_fmt_writer_t(postream &strm) : m_strm(strm) {}

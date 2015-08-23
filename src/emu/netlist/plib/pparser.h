@@ -138,7 +138,7 @@ private:
 	pstring m_number_chars_start;
 	plist_t<pstring> m_tokens;
 	pstring m_whitespace;
-	char  m_string;
+	pstring::code_t  m_string;
 
 	token_id_t m_tok_comment_start;
 	token_id_t m_tok_comment_end;
