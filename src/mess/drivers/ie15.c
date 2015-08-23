@@ -396,24 +396,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ie15_io, AS_IO, 8, ie15_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(000, 000) AM_READ(mem_r) AM_WRITE(mem_w)   // 00h W: memory request, R: memory data [6.1.2.2]
+	AM_RANGE(000, 000) AM_READWRITE(mem_r, mem_w)   // 00h W: memory request, R: memory data [6.1.2.2]
 	AM_RANGE(001, 001) AM_READ(serial_rx_ready_r) AM_WRITENOP   // 01h W: memory latch [6.1.2.2]
 	AM_RANGE(002, 002) AM_WRITE(mem_addr_hi_w)      // 02h W: memory address high [6.1.2.2]
 	AM_RANGE(003, 003) AM_WRITE(mem_addr_lo_w)      // 03h W: memory address low [6.1.2.2]
 	AM_RANGE(004, 004) AM_WRITE(mem_addr_inc_w)     // 04h W: memory address counter + [6.1.2.2]
 	AM_RANGE(005, 005) AM_WRITE(mem_addr_dec_w)     // 05h W: memory address counter - [6.1.2.2]
-	AM_RANGE(006, 006) AM_READ(serial_r) AM_WRITE(serial_w)     // 06h W: serial port data [6.1.5.4]
+	AM_RANGE(006, 006) AM_READWRITE(serial_r, serial_w)     // 06h W: serial port data [6.1.5.4]
 // port 7 is handled in cpu core
-	AM_RANGE(010, 010) AM_READ(serial_tx_ready_r) AM_WRITE(beep_w)  // 08h W: speaker control [6.1.5.4]
+	AM_RANGE(010, 010) AM_READWRITE(serial_tx_ready_r, beep_w)  // 08h W: speaker control [6.1.5.4]
 	AM_RANGE(011, 011) AM_READ(kb_r)            // 09h R: keyboard data [6.1.5.2]
 	AM_RANGE(012, 012) AM_READ(kb_s_red_r)          // 0Ah I: keyboard mode "RED" [6.1.5.2]
 	AM_RANGE(013, 013) AM_READ(kb_ready_r)          // 0Bh R: keyboard data ready [6.1.5.2]
-	AM_RANGE(014, 014) AM_READ(kb_s_sdv_r) AM_WRITE(serial_speed_w) // 0Ch W: serial port speed [6.1.3.1], R: keyboard mode "SDV" [6.1.5.2]
-	AM_RANGE(015, 015) AM_READ(kb_s_dk_r) AM_WRITE(kb_ready_w)  // 0Dh I: keyboard mode "DK" [6.1.5.2]
+	AM_RANGE(014, 014) AM_READWRITE(kb_s_sdv_r, serial_speed_w) // 0Ch W: serial port speed [6.1.3.1], R: keyboard mode "SDV" [6.1.5.2]
+	AM_RANGE(015, 015) AM_READWRITE(kb_s_dk_r, kb_ready_w)  // 0Dh I: keyboard mode "DK" [6.1.5.2]
 	AM_RANGE(016, 016) AM_READ(kb_s_dupl_r)         // 0Eh I: keyboard mode "DUPL" [6.1.5.2]
 	AM_RANGE(017, 017) AM_READ(kb_s_lin_r)          // 0Fh I: keyboard mode "LIN" [6.1.5.2]
 // simulation of flag registers
-	AM_RANGE(020, 027) AM_READ(flag_r) AM_WRITE(flag_w)
+	AM_RANGE(020, 027) AM_READWRITE(flag_r, flag_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -454,8 +454,7 @@ void ie15_state::machine_reset()
 	m_serial_tx_ready = m_serial_rx_ready = IE_TRUE;
 	set_data_frame(1 /* start bits */, 8 /* data bits */, PARITY_NONE, STOP_BITS_1);
 	// device supports rates from 150 to 9600 baud but null_modem has hardcoded 9600
-	set_tra_rate(9600);
-	set_rcv_rate(9600);
+	set_rate(9600);
 }
 
 void ie15_state::video_start()
