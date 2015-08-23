@@ -1117,6 +1117,7 @@ void floppy_sound_device::device_start()
 	// Initialize position
 	m_samplepos_step = m_samplestart_step;
 	m_samplepos_motor = m_samplestart_motor;
+	register_for_save_states();
 }
 
 void floppy_sound_device::motor(bool state)
