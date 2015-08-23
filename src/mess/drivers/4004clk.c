@@ -5,8 +5,6 @@
         4004 Nixie Clock
 
         03/08/2009 Initial driver
-        
-        note: MAME external artwork is not required, 
 
 ****************************************************************************/
 
