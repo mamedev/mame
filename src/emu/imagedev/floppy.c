@@ -591,7 +591,11 @@ void floppy_image_device::stp_w(int state)
 				if ( cyl < tracks-1 ) cyl++;
 			}
 			if(ocyl != cyl)
+			{
 				if (TRACE_STEP) logerror("%s: track %d\n", tag(), cyl);
+				// Do we want a stepper sound?
+				if (m_make_sound) m_sound_out->step();
+			}
 			/* Update disk detection if applicable */
 			if (exists())
 			{
@@ -599,8 +603,6 @@ void floppy_image_device::stp_w(int state)
 			}
 		}
 		subcyl = 0;
-		// Do we want a stepper sound?
-		if (m_make_sound) m_sound_out->step();
 	}
 }
 
@@ -1084,7 +1086,6 @@ void floppy_sound_device::register_for_save_states()
 	save_item(NAME(m_samplepos_step));
 	save_item(NAME(m_step_mintime));
 	save_item(NAME(m_step_time));
-	save_item(NAME(m_step_ignore_time));
 }
 
 void floppy_sound_device::device_start()
@@ -1111,9 +1112,6 @@ void floppy_sound_device::device_start()
 	m_motor_time = 0;
 	m_step_time = 0;
 
-	// Number of updates until the step pulse may restart the sample
-	m_step_ignore_time = 44;    // 1 ms
-
 	// Initialize position
 	m_samplepos_step = m_samplestart_step;
 	m_samplepos_motor = m_samplestart_motor;
@@ -1131,19 +1129,12 @@ void floppy_sound_device::motor(bool state)
 
 /*
     Activate the step sound.
-
-    Since some drives may use another polarity of the step pulse, we remove
-    the state dependence. Whenever something happens with the head, the
-    sound starts, unless it is too close to the previous sound event.
 */
 void floppy_sound_device::step()
 {
 	m_sound->update();  // required
-	if (m_step_time < m_step_mintime - m_step_ignore_time)
-	{
-		m_step_time = m_step_mintime;
-		m_samplepos_step = m_samplestart_step;
-	}
+	m_step_time = m_step_mintime;
+	m_samplepos_step = m_samplestart_step;
 }
 
 //-------------------------------------------------
