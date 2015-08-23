@@ -9,7 +9,9 @@
   These devices, mostly edu-toys, are based around an MCU(TMS0270/TMS1100),
   TMS51xx speech, and VSM ROM(s). Newer devices, such as Speak & Music,
   are based around the TMP50C40 and belong in another driver, probably.
-
+  
+  note: except for tntell, MAME external artwork is not required. But it
+  is objectively a large improvement.
 
 ----------------------------------------------------------------------------
 
@@ -143,7 +145,7 @@ Speak & Math:
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2392
     - VSM(2/2): 16KB CD2393
-    - VFD: itron brand, label?
+    - VFD: Futaba 9SY -02Z 7E
     - notes: As with the Speak & Spell, the voice actor was a radio announcer.
       However, the phrase "is greater than or less than" had to be added in a
       hurry by one of the TI employees in a hurry, the day before a demo.
