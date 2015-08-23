@@ -67,6 +67,7 @@ Note *: Ganbare! Gonta!! 2 / Lady Killer Part 2 - Party Time
     Custom chip 59  = 68000 cpu
     Custom chip 101 = Arm6 cpu
     Custom chip 113 = Alpha blending
+    Custom chip 153 = Alpha blending (same functions as 113, smaller PQFP package)
     Custom chip 99  = 'Ace' chip (Special alpha blending?)
     Custom chip 156 = Encrypted ARM cpu
     Custom chip 102 = Encrypted 68000 cpu
