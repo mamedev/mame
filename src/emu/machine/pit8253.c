@@ -113,7 +113,7 @@ void pit8253_device::device_start()
 		pit8253_timer *timer = get_timer(timerno);
 
 		/* initialize timer */
-		timer->updatetimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pit8253_device::update_timer_cb),this));
+		timer->updatetimer = timer_alloc(timerno);
 		timer->updatetimer->adjust(attotime::never, timerno);
 
 		/* set up state save values */
@@ -513,7 +513,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 				if (elapsed_cycles > 0 && timer->phase == 3)
 				{
 					/* Reload counter, output goes high */
-					--elapsed_cycles;
+					elapsed_cycles -= adjusted_value;
 					timer->phase = 2;
 					load_counter_value(timer);
 					adjusted_value = adjusted_count(bcd, timer->value);
@@ -741,16 +741,6 @@ void pit8253_device::update(pit8253_timer *timer)
 }
 
 
-TIMER_CALLBACK_MEMBER( pit8253_device::update_timer_cb )
-{
-	pit8253_timer *timer = get_timer(param);
-
-	LOG2(("pit8253: output_changed(): timer %d\n", param));
-
-	update(timer);
-}
-
-
 /* We recycle bit 0 of timer->value to hold the phase in mode 3 when count is
    odd. Since read commands in mode 3 always return even numbers, we need to
    mask this bit off. */
@@ -941,6 +931,10 @@ void pit8254_device::readback_command(UINT8 data)
 		readback(get_timer(2), read_command);
 }
 
+void pit8253_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	update(get_timer(id));
+}
 
 WRITE8_MEMBER( pit8253_device::write )
 {
