@@ -257,7 +257,6 @@ public:
 		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 #endif
-		//printf("%p nVd %f m_Vd %f Vcrit %f\n", this, nVd, m_Vd, m_Vcrit);
 	}
 
 	ATTR_COLD void set_param(const nl_double Is, const nl_double n, nl_double gmin);

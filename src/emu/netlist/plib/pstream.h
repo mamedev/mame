@@ -158,7 +158,7 @@ public:
 
 	void writeline(const pstring &line)
 	{
-		write(line.cstr(), line.blen());
+		write(line);
 		write(10);
 	}
 
@@ -210,6 +210,30 @@ private:
 	pos_type m_capacity;
 	pos_type m_size;
 	char *m_mem;
+};
+
+class postringstream : public postream
+{
+	P_PREVENT_COPYING(postringstream );
+
+public:
+
+	postringstream() : postream(0) { }
+	virtual ~postringstream() { }
+
+	const pstringbuffer &str() { return m_buf; }
+
+protected:
+	/* write n bytes to stream */
+	virtual void vwrite(const void *buf, unsigned n)
+	{
+		m_buf.cat(buf, n);
+	}
+	virtual void vseek(pos_type n) { }
+	virtual pos_type vtell() { return m_buf.len(); }
+
+private:
+	pstringbuffer m_buf;
 };
 
 // -----------------------------------------------------------------------------
@@ -303,5 +327,26 @@ private:
 	pstring m_str;
 };
 
+// -----------------------------------------------------------------------------
+// pstream_fmt_writer_t: writer on top of ostream
+// -----------------------------------------------------------------------------
+
+class pstream_fmt_writer_t : public pfmt_writer_t<>
+{
+	P_PREVENT_COPYING(pstream_fmt_writer_t);
+public:
+
+	pstream_fmt_writer_t(postream &strm) : m_strm(strm) {}
+	virtual ~pstream_fmt_writer_t() { }
+
+protected:
+	virtual void vdowrite(const pstring &ls) const
+	{
+		m_strm.write(ls);
+	}
+
+private:
+	postream &m_strm;
+};
 
 #endif /* _PSTREAM_H_ */

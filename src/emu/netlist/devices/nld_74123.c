@@ -77,7 +77,6 @@ NETLIB_UPDATE(74123)
 		//res = res | INPLOGIC(m_A) | (INPLOGIC(m_B) ^ 1);
 		t_AB_to_Q = NLTIME_FROM_NS(300);
 		t_C_to_Q = NLTIME_FROM_NS(250);
-		//printf("m_trig %d res %d\n", m_trig, res);
 	}
 
 	if (res)

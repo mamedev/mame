@@ -222,13 +222,12 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal
 		if (ot>=0)
 		{
 			m_terms[k]->add(term, ot, true);
-			SOLVER_VERBOSE_OUT(("Net %d Term %s %f %f\n", k, terms[i]->name().cstr(), terms[i]->m_gt, terms[i]->m_go));
 		}
 		/* Should this be allowed ? */
 		else // if (ot<0)
 		{
 			m_rails_temp[k].add(term, ot, true);
-			netlist().error("found term with missing othernet %s\n", term->name().cstr());
+			netlist().error("found term with missing othernet {1}\n", term->name());
 		}
 	}
 }
@@ -238,7 +237,7 @@ template <unsigned m_N, unsigned _storage_N>
 ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
-		netlist().error("Dimension %d less than %" SIZETFMT, m_dim, SIZET_PRINTF(nets.size()));
+		netlist().error("Dimension {1} less than {2}", m_dim, SIZET_PRINTF(nets.size()));
 
 	for (unsigned k = 0; k < N(); k++)
 	{
@@ -348,9 +347,9 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 	if(0)
 		for (unsigned k = 0; k < N(); k++)
 		{
-			netlist().log("%3d: ", k);
+			netlist().log("{1:3}: ", k);
 			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				netlist().log(" %3d", m_terms[k]->m_nzrd[j]);
+				netlist().log(" {1:3}", m_terms[k]->m_nzrd[j]);
 			netlist().log("\n");
 		}
 
@@ -363,7 +362,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		pstring num = pformat("%1")(k);
+		pstring num = pfmt("{1}")(k);
 
 		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
 		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
@@ -430,15 +429,6 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * 
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 {
-#if 0
-	for (int i = 0; i < N(); i++)
-	{
-		for (int k = 0; k < N(); k++)
-			printf("%f ", m_A[i][k]);
-		printf("| %f = %f \n", x[i], m_RHS[i]);
-	}
-	printf("\n");
-#endif
 
 	const unsigned kN = N();
 
@@ -550,17 +540,6 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 			sum -= A(i,j)*x[j];
 		x[i] = sum / A(i,i);
 	}
-
-#if 0
-	printf("Solution:\n");
-	for (unsigned i = 0; i < N(); i++)
-	{
-		for (unsigned k = 0; k < N(); k++)
-			printf("%f ", m_A[i][k]);
-		printf("| %f = %f \n", x[i], m_RHS[i]);
-	}
-	printf("\n");
-#endif
 
 }
 

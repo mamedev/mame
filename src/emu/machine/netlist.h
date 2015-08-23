@@ -97,7 +97,7 @@ public:
 
 protected:
 
-	void verror(const loglevel_e level, const char *format, va_list ap) const;
+	void vlog(const plog_level &l, const pstring &ls) const;
 
 private:
 	netlist_mame_device_t &m_parent;
@@ -583,7 +583,7 @@ public:
 	{
 		int pos = (upto - m_last_buffer) / m_sample;
 		if (pos >= BUFSIZE)
-			netlist().error("sound %s: exceeded BUFSIZE\n", name().cstr());
+			netlist().log().fatal("sound {1}: exceeded BUFSIZE\n", name().cstr());
 		while (m_last_pos < pos )
 		{
 			m_buffer[m_last_pos++] = (stream_sample_t) m_cur;
@@ -648,9 +648,9 @@ public:
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			register_param(pformat("CHAN%1")(i), m_param_name[i], "");
-			register_param(pformat("MULT%1")(i), m_param_mult[i], 1.0);
-			register_param(pformat("OFFSET%1")(i), m_param_offset[i], 0.0);
+			register_param(pfmt("CHAN{1}")(i), m_param_name[i], "");
+			register_param(pfmt("MULT{1}")(i), m_param_mult[i], 1.0);
+			register_param(pfmt("OFFSET{1}")(i), m_param_offset[i], 0.0);
 		}
 		m_num_channel = 0;
 	}
@@ -670,7 +670,7 @@ public:
 			if (m_param_name[i].Value() != "")
 			{
 				if (i != m_num_channel)
-					netlist().error("sound input numbering has to be sequential!");
+					netlist().log().fatal("sound input numbering has to be sequential!");
 				m_num_channel++;
 				m_param[i] = dynamic_cast<netlist::param_double_t *>(setup().find_param(m_param_name[i].Value(), true));
 			}

@@ -16,9 +16,6 @@
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #endif
 
-//#undef NL_VERBOSE_OUT
-//#define NL_VERBOSE_OUT(x) printf x
-
 // ----------------------------------------------------------------------------------------
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
@@ -75,7 +72,7 @@ void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
-		error(pformat("Expected token <%1> got <%2>")(m_tokens[token_num.id()])(tok.str()) );
+		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[token_num.id()])(tok.str()) );
 	}
 }
 
@@ -84,7 +81,7 @@ pstring ptokenizer::get_string()
 	token_t tok = get_token();
 	if (!tok.is_type(STRING))
 	{
-		error(pformat("Expected a string, got <%1>")(tok.str()) );
+		error(pfmt("Expected a string, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -94,7 +91,7 @@ pstring ptokenizer::get_identifier()
 	token_t tok = get_token();
 	if (!tok.is_type(IDENTIFIER))
 	{
-		error(pformat("Expected an identifier, got <%1>")(tok.str()) );
+		error(pfmt("Expected an identifier, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -104,7 +101,7 @@ pstring ptokenizer::get_identifier_or_number()
 	token_t tok = get_token();
 	if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
 	{
-		error(pformat("Expected an identifier, got <%1>")(tok.str()) );
+		error(pfmt("Expected an identifier, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -114,12 +111,12 @@ double ptokenizer::get_number_double()
 	token_t tok = get_token();
 	if (!tok.is_type(NUMBER))
 	{
-		error(pformat("Expected a number, got <%1>")(tok.str()) );
+		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
 	bool err = false;
 	double ret = tok.str().as_double(&err);
 	if (err)
-		error(pformat("Expected a number, got <%1>")(tok.str()) );
+		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	return ret;
 }
 
@@ -128,12 +125,12 @@ long ptokenizer::get_number_long()
 	token_t tok = get_token();
 	if (!tok.is_type(NUMBER))
 	{
-		error(pformat("Expected a long int, got <%1>")(tok.str()) );
+		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
 	bool err = false;
 	long ret = tok.str().as_long(&err);
 	if (err)
-		error(pformat("Expected a long int, got <%1>")(tok.str()) );
+		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	return ret;
 }
 
@@ -388,7 +385,7 @@ static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstr
 		ret.cat(elems[i]);
 		ret.cat(sep);
 	}
-	return pstring(ret.cstr());
+	return ret;
 }
 
 pstring  ppreprocessor::process_line(const pstring &line)
@@ -448,12 +445,12 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			if (m_ifflag == 0)
 			{
 				if (lti.size() != 3)
-					error("PREPRO: only simple defines allowed: %s" + line);
+					error("PREPRO: only simple defines allowed: " + line);
 				m_defines.add(lti[1], define_t(lti[1], lti[2]));
 			}
 		}
 		else
-			error(pformat("unknown directive on line %1: %2")(m_lineno)(line));
+			error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(line));
 	}
 	else
 	{

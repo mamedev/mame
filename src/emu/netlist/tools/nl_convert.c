@@ -42,15 +42,6 @@ static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
     convert - convert a spice netlist
 -------------------------------------------------*/
 
-
-void nl_convert_base_t::out(const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	m_buf += pstring(format).vprintf(ap);
-	va_end(ap);
-}
-
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
 	m_pins.add(palloc(pin_alias_t(devname + "." + name, devname + "." + alias)), false);
@@ -98,7 +89,7 @@ void nl_convert_base_t::dump_nl()
 	{
 		net_t *net = m_nets.find_by_name(m_ext_alias[i]);
 		// use the first terminal ...
-		out("ALIAS(%s, %s)\n", m_ext_alias[i].cstr(), net->terminals()[0].cstr());
+		out("ALIAS({}, {})\n", m_ext_alias[i].cstr(), net->terminals()[0].cstr());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
@@ -109,13 +100,13 @@ void nl_convert_base_t::dump_nl()
 		std::size_t j = sorted[i];
 
 		if (m_devs[j]->has_value())
-			out("%s(%s, %s)\n", m_devs[j]->type().cstr(),
+			out("{}({}, {})\n", m_devs[j]->type().cstr(),
 					m_devs[j]->name().cstr(), get_nl_val(m_devs[j]->value()).cstr());
 		else if (m_devs[j]->has_model())
-			out("%s(%s, \"%s\")\n", m_devs[j]->type().cstr(),
+			out("{}({}, \"{}\")\n", m_devs[j]->type().cstr(),
 					m_devs[j]->name().cstr(), m_devs[j]->model().cstr());
 		else
-			out("%s(%s)\n", m_devs[j]->type().cstr(),
+			out("{}({})\n", m_devs[j]->type().cstr(),
 					m_devs[j]->name().cstr());
 	}
 	// print nets
@@ -124,11 +115,11 @@ void nl_convert_base_t::dump_nl()
 		net_t * net = m_nets[i];
 		if (!net->is_no_export())
 		{
-			//printf("Net %s\n", net->name().cstr());
-			out("NET_C(%s", net->terminals()[0].cstr() );
+			//printf("Net {}\n", net->name().cstr());
+			out("NET_C({}", net->terminals()[0].cstr() );
 			for (std::size_t j=1; j<net->terminals().size(); j++)
 			{
-				out(", %s", net->terminals()[j].cstr() );
+				out(", {}", net->terminals()[j].cstr() );
 			}
 			out(")\n");
 		}
@@ -149,7 +140,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 				break;
 			i++;
 		}
-		return pformat(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
+		return pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
@@ -174,28 +165,27 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 	pstring unit = sin.substr(p + 1);
 
 	double ret = get_sp_unit(unit) * val.as_double();
-	//printf("<%s> %s %d ==> %f\n", sin.cstr(), unit.cstr(), p, ret);
 	return ret;
 }
 
 nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"T",   "",      1.0e12 },
 		{"G",   "",      1.0e9  },
-		{"MEG", "RES_M(%1)", 1.0e6  },
-		{"k",   "RES_K(%1)", 1.0e3  }, /* eagle */
-		{"K",   "RES_K(%1)", 1.0e3  },
-		{"",    "%1",        1.0e0  },
-		{"M",   "CAP_M(%1)", 1.0e-3 },
-		{"u",   "CAP_U(%1)", 1.0e-6 }, /* eagle */
-		{"U",   "CAP_U(%1)", 1.0e-6 },
-		{"??",   "CAP_U(%1)", 1.0e-6    },
-		{"N",   "CAP_N(%1)", 1.0e-9 },
-		{"P",   "CAP_P(%1)", 1.0e-12},
-		{"F",   "%1e-15",    1.0e-15},
+		{"MEG", "RES_M({1})", 1.0e6  },
+		{"k",   "RES_K({1})", 1.0e3  }, /* eagle */
+		{"K",   "RES_K({1})", 1.0e3  },
+		{"",    "{1}",        1.0e0  },
+		{"M",   "CAP_M({1})", 1.0e-3 },
+		{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
+		{"U",   "CAP_U({1})", 1.0e-6 },
+		{"??",   "CAP_U({1})", 1.0e-6    },
+		{"N",   "CAP_N({1})", 1.0e-9 },
+		{"P",   "CAP_P({1})", 1.0e-12},
+		{"F",   "{1}e-15",    1.0e-15},
 
-		{"MIL", "%1",  25.4e-6},
+		{"MIL", "{1}",  25.4e-6},
 
-		{"-",   "%1",  1.0  }
+		{"-",   "{1}",  1.0  }
 };
 
 
@@ -238,15 +228,15 @@ void nl_convert_spice_t::process_line(const pstring &line)
 		switch (tt[0].code_at(0))
 		{
 			case ';':
-				out("// %s\n", line.substr(1).cstr());
+				out("// {}\n", line.substr(1).cstr());
 				break;
 			case '*':
-				out("// %s\n", line.substr(1).cstr());
+				out("// {}\n", line.substr(1).cstr());
 				break;
 			case '.':
 				if (tt[0].equals(".SUBCKT"))
 				{
-					out("NETLIST_START(%s)\n", tt[1].cstr());
+					out("NETLIST_START({})\n", tt[1].cstr());
 					for (std::size_t i=2; i<tt.size(); i++)
 						add_ext_alias(tt[i]);
 				}
@@ -256,7 +246,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					out("NETLIST_END()\n");
 				}
 				else
-					out("// %s\n", line.cstr());
+					out("// {}\n", line.cstr());
 				break;
 			case 'Q':
 			{
@@ -345,13 +335,13 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = pformat("%1.%2")(xname)(i);
+					pstring term = pfmt("{1}.{2}")(xname)(i);
 					add_term(tt[i], term);
 				}
 				break;
 			}
 			default:
-				out("// IGNORED %s: %s\n", tt[0].cstr(), line.cstr());
+				out("// IGNORED {}: {}\n", tt[0].cstr(), line.cstr());
 		}
 	}
 }
@@ -457,7 +447,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		}
 		else
 		{
-			out("Unexpected %s\n", token.str().cstr());
+			out("Unexpected {}\n", token.str().cstr());
 			return;
 		}
 	}

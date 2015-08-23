@@ -22,7 +22,7 @@ class nl_convert_base_t
 {
 public:
 
-	nl_convert_base_t() {};
+	nl_convert_base_t() : out(m_buf) {};
 	virtual ~nl_convert_base_t()
 	{
 		m_nets.clear_and_free();
@@ -30,12 +30,12 @@ public:
 		m_pins.clear_and_free();
 	}
 
-	const pstringbuffer &result() { return m_buf; }
+	const pstringbuffer &result() { return m_buf.str(); }
+
 	virtual void convert(const pstring &contents) = 0;
 
 protected:
 
-	void out(const char *format, ...) ATTR_PRINTF(2,3);
 	void add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias);
 
 	void add_ext_alias(const pstring &alias);
@@ -53,6 +53,7 @@ protected:
 
 	double get_sp_val(const pstring &sin);
 
+	pstream_fmt_writer_t out;
 private:
 	struct net_t
 	{
@@ -123,7 +124,7 @@ private:
 
 private:
 
-	pstringbuffer m_buf;
+	postringstream m_buf;
 
 	pnamedlist_t<dev_t *> m_devs;
 	pnamedlist_t<net_t *> m_nets;
@@ -198,7 +199,7 @@ public:
 
 		void verror(const pstring &msg, int line_num, const pstring &line)
 		{
-			m_convert.out("%s (line %d): %s\n", msg.cstr(), line_num, line.cstr());
+			m_convert.out("{} (line {}): {}\n", msg.cstr(), line_num, line.cstr());
 		}
 
 

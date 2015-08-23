@@ -52,7 +52,6 @@ NETLIB_RESET(VCCS)
 	const nl_double m_mult = m_G.Value() * m_gfac; // 1.0 ==> 1V ==> 1A
 	const nl_double GI = NL_FCONST(1.0) / m_RI.Value();
 
-	//printf("VCCS %s RI %f\n", name().cstr(), m_RI.Value());
 	m_IP.set(GI);
 	m_IN.set(GI);
 
@@ -127,8 +126,6 @@ NETLIB_UPDATE_TERMINALS(LVCCS)
 
 	m_ON.set(-beta, NL_FCONST(0.0), -I);
 	m_ON1.set(beta, NL_FCONST(0.0));
-	//printf("vi %f beta %f I %f\n", vi, beta, I);
-
 }
 
 // ----------------------------------------------------------------------------------------

@@ -209,7 +209,7 @@ public:
 
 	void log_setup()
 	{
-		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
+		log().debug("Creating dynamic logs ...\n");
 		pstring_list_t ll(m_opts ? m_opts->opt_logs() : "" , ":");
 		for (int i=0; i < ll.size(); i++)
 		{
@@ -223,27 +223,30 @@ public:
 
 protected:
 
-	void verror(const loglevel_e level, const char *format, va_list ap) const
+	void vlog(const plog_level &l, const pstring &ls) const
 	{
-		switch (level)
+		switch (l)
 		{
-			case NL_LOG:
+			case DEBUG:
+			case INFO:
+				break;
+			case VERBOSE:
 				if (m_opts ? m_opts->opt_verb() : false)
 				{
-					vprintf(format, ap);
-					printf("\n");
+					printf("%s\n", ls.cstr());
 				}
 				break;
-			case NL_WARNING:
+			case WARNING:
 				if (!(m_opts ? m_opts->opt_quiet() : false))
 				{
-					vprintf(format, ap);
-					printf("\n");
+					printf("%s\n", ls.cstr());
 				}
 				break;
-			case NL_ERROR:
-				vprintf(format, ap);
-				printf("\n");
+			case ERROR:
+				printf("%s\n", ls.cstr());
+				break;
+			case FATAL:
+				printf("%s\n", ls.cstr());
 				throw;
 		}
 	}
@@ -277,7 +280,7 @@ struct input_t
 		double t;
 		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
-			throw netlist::fatalerror_e(pformat("error %1 scanning line %2\n")(e)(line));
+			throw netlist::fatalerror_e(pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
 		m_param = netlist->setup().find_param(buf, true);
 	}
@@ -288,7 +291,7 @@ struct input_t
 		{
 			case netlist::param_t::MODEL:
 			case netlist::param_t::STRING:
-				throw netlist::fatalerror_e(pformat("param %1 is not numeric\n")(m_param->name()));
+				throw netlist::fatalerror_e(pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
 				break;
@@ -380,11 +383,11 @@ static void listdevices()
 	for (int i=0; i < list.size(); i++)
 	{
 		netlist::base_factory_t *f = list.value_at(i);
-		pstring out = pformat("%1 %2(<id>")(f->classname(),"-20")(f->name());
+		pstring out = pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		pstring terms("");
 
 		netlist::device_t *d = f->Create();
-		d->init(nt, pformat("dummy%1")(i));
+		d->init(nt, pfmt("dummy{1}")(i));
 		d->start_dev();
 
 		// get the list of terminals ...

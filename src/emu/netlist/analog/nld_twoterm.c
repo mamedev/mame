@@ -333,7 +333,6 @@ NETLIB_START(CS)
 NETLIB_RESET(CS)
 {
 	NETLIB_NAME(twoterm)::reset();
-	printf("m_I %f\n", m_I.Value());
 	this->set(0.0, 0.0, m_I);
 }
 

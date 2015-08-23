@@ -85,7 +85,7 @@ queue_t::queue_t(netlist_t &nl)
 
 void queue_t::register_state(pstate_manager_t &manager, const pstring &module)
 {
-	NL_VERBOSE_OUT(("register_state\n"));
+	netlist().log().debug("register_state\n");
 	manager.save_item(m_qsize, this, module + "." + "qsize");
 	manager.save_item(&m_times[0], this, module + "." + "times", m_times.size());
 	manager.save_item(&(m_names[0].m_buf[0]), this, module + "." + "names", m_names.size() * sizeof(names_t));
@@ -93,9 +93,9 @@ void queue_t::register_state(pstate_manager_t &manager, const pstring &module)
 
 void queue_t::on_pre_save()
 {
-	NL_VERBOSE_OUT(("on_pre_save\n"));
+	netlist().log().debug("on_pre_save\n");
 	m_qsize = this->count();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", netlist().time().as_double(), m_qsize));
+	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].exec_time().as_raw();
@@ -111,12 +111,12 @@ void queue_t::on_pre_save()
 void queue_t::on_post_load()
 {
 	this->clear();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", netlist().time().as_double(), m_qsize));
+	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		net_t *n = netlist().find_net(m_names[i].m_buf);
-		//NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
-		//NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
+		//log().debug("Got {1} ==> {2}\n", qtemp[i].m_name, n));
+		//log().debug("schedule time {1} ({2})\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
 		this->push(queue_t::entry_t(netlist_time::from_raw(m_times[i]), n));
 	}
 }
@@ -145,7 +145,7 @@ ATTR_COLD void object_t::init_object(netlist_t &nl, const pstring &aname)
 ATTR_COLD const pstring &object_t::name() const
 {
 	if (m_name == "")
-		netlist().error("object not initialized");
+		netlist().log().fatal("object not initialized");
 	return m_name;
 }
 
@@ -180,7 +180,8 @@ netlist_t::netlist_t()
 		m_mainclock(NULL),
 		m_solver(NULL),
 		m_gnd(NULL),
-		m_setup(NULL)
+		m_setup(NULL),
+		m_log(this)
 {
 }
 
@@ -217,7 +218,7 @@ ATTR_COLD void netlist_t::start()
 {
 	/* find the main clock and solver ... */
 
-	NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
+	log().debug("Searching for mainclock and solver ...\n");
 
 	m_mainclock = get_single_device<devices:: NETLIB_NAME(mainclock)>("mainclock");
 	m_solver = get_single_device<devices::NETLIB_NAME(solver)>("solver");
@@ -236,7 +237,7 @@ ATTR_COLD void netlist_t::start()
 
 	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
 
-	NL_VERBOSE_OUT(("Initializing devices ...\n"));
+	log().debug("Initializing devices ...\n");
 	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		device_t *dev = m_devices[i];
@@ -250,7 +251,7 @@ ATTR_COLD void netlist_t::stop()
 {
 	/* find the main clock and solver ... */
 
-	NL_VERBOSE_OUT(("Stopping all devices ...\n"));
+	log().debug("Stopping all devices ...\n");
 
 	// Step all devices once !
 	for (std::size_t i = 0; i < m_devices.size(); i++)
@@ -360,31 +361,6 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 	}
 }
 
-ATTR_COLD void netlist_t::error(const char *format, ...) const
-{
-	va_list ap;
-	va_start(ap, format);
-	verror(NL_ERROR, format, ap);
-	va_end(ap);
-}
-
-ATTR_COLD void netlist_t::warning(const char *format, ...) const
-{
-	va_list ap;
-	va_start(ap, format);
-	verror(NL_WARNING, format, ap);
-	va_end(ap);
-}
-
-ATTR_COLD void netlist_t::log(const char *format, ...) const
-{
-	va_list ap;
-	va_start(ap, format);
-	verror(NL_LOG, format, ap);
-	va_end(ap);
-}
-
-
 // ----------------------------------------------------------------------------------------
 // Default netlist elements ...
 // ----------------------------------------------------------------------------------------
@@ -473,7 +449,7 @@ device_t::device_t(const family_t afamily)
 
 device_t::~device_t()
 {
-	//NL_VERBOSE_OUT(("~net_device_t\n");
+	//log().debug("~net_device_t\n");
 }
 
 ATTR_COLD setup_t &device_t::setup()
@@ -563,7 +539,7 @@ ATTR_COLD void device_t::connect_late(const pstring &t1, const pstring &t2)
 ATTR_COLD void device_t::connect_direct(core_terminal_t &t1, core_terminal_t &t2)
 {
 	if (!setup().connect(t1, t2))
-		netlist().error("Error connecting %s to %s\n", t1.name().cstr(), t2.name().cstr());
+		netlist().log().fatal("Error connecting {1} to {2}\n", t1.name(), t2.name());
 }
 
 
@@ -670,8 +646,6 @@ ATTR_COLD void net_t::rebuild_list()
 			m_list_active.add(*m_core_terms[i]);
 			cnt++;
 		}
-	//if (cnt != m_active)
-		//printf("ARgh %s ==> %d != %d\n", name().cstr(), cnt, m_active);
 	m_active = cnt;
 }
 
@@ -784,22 +758,22 @@ ATTR_COLD void net_t::move_connections(net_t *dest_net)
 
 ATTR_COLD void net_t::merge_net(net_t *othernet)
 {
-	NL_VERBOSE_OUT(("merging nets ...\n"));
+	netlist().log().debug("merging nets ...\n");
 	if (othernet == NULL)
 		return; // Nothing to do
 
 	if (othernet == this)
 	{
-		netlist().warning("Connecting %s to itself. This may be right, though\n", this->name().cstr());
+		netlist().log().warning("Connecting {1} to itself. This may be right, though\n", this->name());
 		return; // Nothing to do
 	}
 
 	if (this->isRailNet() && othernet->isRailNet())
-		netlist().error("Trying to merge two rail nets: %s and %s\n", this->name().cstr(), othernet->name().cstr());
+		netlist().log().fatal("Trying to merge two rail nets: {1} and {2}\n", this->name(), othernet->name());
 
 	if (othernet->isRailNet())
 	{
-		NL_VERBOSE_OUT(("othernet is railnet\n"));
+		netlist().log().debug("othernet is railnet\n");
 		othernet->merge_net(this);
 	}
 	else
@@ -870,15 +844,12 @@ ATTR_COLD void analog_net_t::process_net(list_t *groups, int &cur_group)
 	if (num_cons() == 0)
 		return;
 	/* add the net */
-	//SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, name().cstr()));
 	groups[cur_group].add(this);
 	for (std::size_t i = 0; i < m_core_terms.size(); i++)
 	{
 		core_terminal_t *p = m_core_terms[i];
-		//SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
 		if (p->isType(terminal_t::TERMINAL))
 		{
-			//SOLVER_VERBOSE_OUT(("isterminal\n"));
 			terminal_t *pt = static_cast<terminal_t *>(p);
 			analog_net_t *other_net = &pt->m_otherterm->net().as_analog();
 			if (!other_net->already_processed(groups, cur_group))

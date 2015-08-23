@@ -103,7 +103,7 @@ NETLIB_START(OPAMP)
 		connect_late("EBUF.IP", "RP1.1");
 	}
 	else
-		netlist().error("Unknown opamp type: %d", m_type);
+		netlist().log().fatal("Unknown opamp type: {1}", m_type);
 }
 
 /* .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
@@ -150,7 +150,6 @@ NETLIB_RESET(OPAMP)
 		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
 
-		//printf("CP=%e RP=%f G=%f\n", CP, RP, G);
 		m_CP.m_C.setTo(CP);
 		m_RP.set_R(RP);
 		m_G1.m_G.setTo(G);
