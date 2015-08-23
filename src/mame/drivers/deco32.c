@@ -231,6 +231,43 @@ Data East, 1993
 PCB Layout
 ----------
 
+DE-0395-1   DEC-22VO
+|-----------------------------------------------------|
+| TA8205AH  6164                      MBF-05    2M-8M*|
+|           LE02  HuC6280A            MBF-04       8M*|
+|           YM2151            52*     MBF-03   4M-16M*|
+|     YM3012      32.220MHz           MBF-02      16M*|
+|  JP1   MBF-07   93C45                        4M-16M*|
+|CN2     MBF-06                                   16M*|
+|  M6295(1)                   52*                     |
+|     M6295(2)                                        |
+|      |-----|                       |-----|          |
+|J     | 75  |   113/153*            | 52  |          |
+|A     |     |             |-----|   |     |          |
+|M     |-----|             | 113 |   |-----|          |
+|M                         |     |            28MHz   |
+|A                         |-----|                    |
+|            PAL*                                     |
+|      99*   KT-00             |-----| 6164    MBF-01 |
+|                              | 74  | 6164           |
+|                              |     |         MBF-00 |
+|      |-----|  |-----|        |-----|                |
+|      | 113 |  | 200 |        |-----| 6164           |
+|      |     |  |     |        | 56  | 6164           |
+|      |-----|  |-----|        |     |  VE-01A        |
+|TEST_SW                       |-----|  VE-00 |-----| |
+|                                             | 156 | |
+|  CN4      LH52250  LH52250   LE01           |     | |
+|  CN3*     LH52250  LH52250   LE00           |-----| |
+|-----------------------------------------------------|
+
+Very similar to the DE-0396-0 described below with the notable exceptions:
+  The sound area reworked to use the HuC6280A instead of a standard Z80
+  Uses the larger 113 instead of the 153 chips, however both PCBs have
+    solder pads in the same locations for either chip.
+  Uses the 56 instead of the 141
+
+
 DE-0396-0   DEC-22VO
 |-----------------------------------------------------|
 | TA8205AH  Z80                       MBF-05    2M-8M*|
@@ -242,7 +279,7 @@ DE-0396-0   DEC-22VO
 |  M6295(1)                   52*                     |
 |     M6295(2)                                        |
 |      |-----|                       |-----|          |
-|J     | 75  |   153*                | 52  |          |
+|J     | 75  |   113/153*            | 52  |          |
 |A     |     |             |-----|   |     |          |
 |M     |-----|             | 153 |   |-----|          |
 |M                         |     |            28MHz   |
@@ -256,7 +293,7 @@ DE-0396-0   DEC-22VO
 |      |     |  |     |        | 141 | 6164           |
 |      |-----|  |-----|        |     |  VE-01A        |
 |TEST_SW                       |-----|  VE-00 |-----| |
-|                                             | 101 | |
+|                                             | 156 | |
 |  CN4      LH52250  LH52250   LJ01-3         |     | |
 |  CN3*     LH52250  LH52250   LJ00-3         |-----| |
 |-----------------------------------------------------|
@@ -266,7 +303,7 @@ This PCB is very close to the DE-397-0 listed above
        Custom ICs-
                    DE #            Package Type      Additional #'s (for reference of scratched-off chips on other PCB's)
                    ------------------------------------------------------------------------------------------------------
-                   101 (CPU)       100 Pin PQFP      9321EV 301811
+                   156 (CPU)       100 Pin PQFP      9321EV 301811 (Doesn't use encryption functions of the 156)
                    141             160 Pin PQFP      24220F008
                    74              160 Pin PQFP      24220F009
                    52              128 Pin PQFP      9313EV 211771 VC5259-0001
