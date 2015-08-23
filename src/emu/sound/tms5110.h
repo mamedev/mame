@@ -82,7 +82,10 @@ protected:
 
 	void set_variant(int variant);
 
-	UINT8 m_talk_status;
+	UINT8 m_SPEN;             /* set on speak command, cleared on stop command or reset command */
+	UINT8 m_TALK;             /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */
+#define TALK_STATUS (m_SPEN|m_TALKD)
+	UINT8 m_TALKD;            /* TALK(TCON) value, latched every RESETL4 */
 	sound_stream *m_stream;
 
 private:
@@ -99,7 +102,14 @@ private:
 	void PDC_set(int data);
 	void parse_frame();
 
-	/* these contain data that describes the 64 bits FIFO */
+	// internal state
+	/* coefficient tables */
+	int m_variant;                /* Variant of the 5110 - see tms5110.h */
+
+	/* coefficient tables */
+	const struct tms5100_coeffs *m_coeff;
+
+	/* these contain data that describes the 4 bit "FIFO" */
 	UINT8 m_fifo[FIFO_SIZE];
 	UINT8 m_fifo_head;
 	UINT8 m_fifo_tail;
@@ -108,8 +118,6 @@ private:
 	/* these contain global status bits */
 	UINT8 m_PDC;
 	UINT8 m_CTL_pins;
-	UINT8 m_speaking_now;
-	// UINT8 m_talk_status is a protected member, see above
 	UINT8 m_state;
 
 	/* Rom interface */
@@ -149,22 +157,15 @@ private:
 	INT16 m_current_energy;
 	INT16 m_current_pitch;
 	INT16 m_current_k[10];
-
-	INT16 m_target_energy;
-	INT16 m_target_pitch;
-	INT16 m_target_k[10];
 #else
 	UINT8 m_old_frame_energy_idx;
 	UINT8 m_old_frame_pitch_idx;
 	UINT8 m_old_frame_k_idx[10];
+	UINT8 m_old_zpar;
 
 	INT32 m_current_energy;
 	INT32 m_current_pitch;
 	INT32 m_current_k[10];
-
-	INT32 m_target_energy;
-	INT32 m_target_pitch;
-	INT32 m_target_k[10];
 #endif
 
 	UINT16 m_previous_energy; /* needed for lattice filter to match patent */
@@ -172,15 +173,18 @@ private:
 	UINT8 m_subcycle;         /* contains the current subcycle for a given PC: 0 is A' (only used on SPKSLOW mode on 51xx), 1 is A, 2 is B */
 	UINT8 m_subc_reload;      /* contains 1 for normal speech, 0 when SPKSLOW is active */
 	UINT8 m_PC;               /* current parameter counter (what param is being interpolated), ranges from 0 to 12 */
-	/* TODO/NOTE: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
+	/* NOTE: the interpolation period counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
 	UINT8 m_IP;               /* the current interpolation period */
 	UINT8 m_inhibit;          /* If 1, interpolation is inhibited until the DIV1 period */
+	UINT8 m_uv_zpar;          /* If 1, zero k5 thru k10 coefficients */
+	UINT8 m_zpar;             /* If 1, zero ALL parameters. */
+	UINT8 m_pitch_zero;       /* circuit 412; pitch is forced to zero under certain circumstances */
 	UINT16 m_pitch_count;     /* pitch counter; provides chirp rom address */
 
 	INT32 m_u[11];
 	INT32 m_x[10];
 
-	INT32 m_RNG;  /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+	UINT16 m_RNG;             /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 TODO: no it isn't */
 	INT16 m_excitation_data;
 
 	/* The TMS51xx has two different ways of providing output data: the
@@ -196,12 +200,6 @@ private:
 
 	UINT8 m_romclk_hack_timer_started;
 	UINT8 m_romclk_hack_state;
-
-	/* coefficient tables */
-	int m_variant;                /* Variant of the 5110 - see tms5110.h */
-
-	/* coefficient tables */
-	const struct tms5100_coeffs *m_coeff;
 
 	emu_timer *m_romclk_hack_timer;
 	const UINT8 *m_table;
