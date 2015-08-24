@@ -9,7 +9,7 @@
   to create the illusion of a moving ball, and even the flippers are leds.
   A drawing of a pinball table is added as overlay.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 
   TODO:

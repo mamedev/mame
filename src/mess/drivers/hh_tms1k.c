@@ -1530,7 +1530,7 @@ MACHINE_CONFIG_END
   TMS1100, the second more widespread release runs on a COP400. There are
   also differences with the overlay mask.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1899,7 +1899,7 @@ MACHINE_CONFIG_END
     8 = lamp42     18 = lamp73     28 = lamp84     38 = lamp82
     9 = lamp43     19 = -          29 = lamp94     39 = lamp83
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 

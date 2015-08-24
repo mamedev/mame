@@ -210,6 +210,8 @@ UINT8 tms5110_device::new_int_read()
 
 void tms5110_device::register_for_save_states()
 {
+	save_item(NAME(m_variant));
+
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_head));
 	save_item(NAME(m_fifo_tail));
@@ -217,8 +219,9 @@ void tms5110_device::register_for_save_states()
 
 	save_item(NAME(m_PDC));
 	save_item(NAME(m_CTL_pins));
-	save_item(NAME(m_speaking_now));
-	save_item(NAME(m_talk_status));
+	save_item(NAME(m_SPEN));
+	save_item(NAME(m_TALK));
+	save_item(NAME(m_TALKD));
 	save_item(NAME(m_state));
 
 	save_item(NAME(m_address));
@@ -242,10 +245,6 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_current_pitch));
 	save_item(NAME(m_current_k));
 
-	save_item(NAME(m_target_energy));
-	save_item(NAME(m_target_pitch));
-	save_item(NAME(m_target_k));
-
 	save_item(NAME(m_previous_energy));
 
 	save_item(NAME(m_subcycle));
@@ -253,6 +252,9 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_PC));
 	save_item(NAME(m_IP));
 	save_item(NAME(m_inhibit));
+	save_item(NAME(m_uv_zpar));
+	save_item(NAME(m_zpar));
+	save_item(NAME(m_pitch_zero));
 	save_item(NAME(m_pitch_count));
 
 	save_item(NAME(m_u));
@@ -267,8 +269,6 @@ void tms5110_device::register_for_save_states()
 
 	save_item(NAME(m_romclk_hack_timer_started));
 	save_item(NAME(m_romclk_hack_state));
-
-	save_item(NAME(m_variant));
 }
 
 /**********************************************************************************************
@@ -385,15 +385,15 @@ void tms5110_device::perform_dummy_read()
 void tms5110_device::process(INT16 *buffer, unsigned int size)
 {
 	int buf_count=0;
-	int i, bitout, zpar;
+	int i, bitout;
 	INT32 this_sample;
 
 	/* if we're not speaking, fill with nothingness */
-	if (!m_speaking_now)
+	if (!m_TALKD)
 		goto empty;
 
 	/* loop until the buffer is full or we've stopped speaking */
-	while ((size > 0) && m_speaking_now)
+	while ((size > 0) && m_TALKD)
 	{
 		/* if it is the appropriate time to update the old energy/pitch indices,
 		 * i.e. when IP=7, PC=12, T=17, subcycle=2, do so. Since IP=7 PC=12 T=17
@@ -401,6 +401,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 		 * which happens 4 T-cycles later), we change on the latter.
 		 * The indices are updated here ~12 PCs before the new frame is applied.
 		 */
+		/** TODO: the patents 4331836, 4335277, and 4419540 disagree about the timing of this **/
 		if ((m_IP == 0) && (m_PC == 0) && (m_subcycle < 2))
 		{
 			m_OLDE = (m_new_frame_energy_idx == 0);
@@ -425,46 +426,19 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				m_old_frame_k_idx[i] = m_new_frame_k_idx[i];
 #endif
 
-			/* if the talk status was clear last frame, halt speech now. */
-			if (m_talk_status == 0)
-			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"tms5110_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
-#endif
-				if (m_speaking_now == 1) // we're done, set all coeffs to idle state but keep going for a bit...
-				{
-					m_new_frame_energy_idx = 0;
-					m_new_frame_pitch_idx = 0;
-					for (i = 0; i < 4; i++)
-						m_new_frame_k_idx[i] = 0;
-					for (i = 4; i < 7; i++)
-						m_new_frame_k_idx[i] = 0xF;
-					for (i = 7; i < m_coeff->num_k; i++)
-						m_new_frame_k_idx[i] = 0x7;
-					m_speaking_now = 2; // wait 8 extra interp periods before shutting down so we can interpolate everything to zero state
-				}
-				else // m_speaking_now == 2 // now we're really done.
-				{
-					m_speaking_now = 0; // finally halt speech
-					goto empty;
-				}
-				//m_speaking_now = 0; // finally halt speech
-				//goto empty;
-			}
-			
-
-
-			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[],
-			 * but only if we're not just about to end speech */
-			if (m_speaking_now == 1) parse_frame();
+			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
+			parse_frame();
 #ifdef DEBUG_PARSE_FRAME_DUMP
 			fprintf(stderr,"\n");
 #endif
+			/* if the new frame is unvoiced (or silenced via ZPAR), be sure to zero out the k5-k10 parameters */
+			m_uv_zpar = NEW_FRAME_UNVOICED_FLAG | m_zpar;
 
-			/* if the new frame is a stop frame, unset talk status */
-			/** TODO: investigate this later! **/
+			/* if the new frame is a stop frame, unset both TALK and SPEN. TALKD remains active while the energy is ramping to 0. */
 			if (NEW_FRAME_STOP_FLAG == 1)
-					m_talk_status = 0;
+			{
+				m_TALK = m_SPEN = 0;
+			}
 
 			/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
 			   Interpolation inhibit cases:
@@ -479,15 +453,6 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			else // normal frame, normal interpolation
 				m_inhibit = 0;
 
-			/* load new frame targets from tables, using parsed indices */
-			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx];
-			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
-			for (i = 0; i < 4; i++)
-				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]];
-			for (i = 4; i < m_coeff->num_k; i++)
-				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
-
 #ifdef DEBUG_GENERATION
 			/* Debug info for current parsed frame */
 			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
@@ -497,17 +462,22 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			else
 				fprintf(stderr,"Interpolation Inhibited\n");
 			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
+			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",
+				(m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)),
+				m_new_frame_energy_idx,
+				(m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar)),
+				(m_coeff->ktable[0][m_new_frame_k_idx[0]] * (1-m_zpar)),
+				(m_coeff->ktable[1][m_new_frame_k_idx[1]] * (1-m_zpar)),
+				(m_coeff->ktable[2][m_new_frame_k_idx[2]] * (1-m_zpar)),
+				(m_coeff->ktable[3][m_new_frame_k_idx[3]] * (1-m_zpar)),
+				(m_coeff->ktable[4][m_new_frame_k_idx[4]] * (1-m_uv_zpar)),
+				(m_coeff->ktable[5][m_new_frame_k_idx[5]] * (1-m_uv_zpar)),
+				(m_coeff->ktable[6][m_new_frame_k_idx[6]] * (1-m_uv_zpar)),
+				(m_coeff->ktable[7][m_new_frame_k_idx[7]] * (1-m_uv_zpar)),
+				(m_coeff->ktable[8][m_new_frame_k_idx[8]] * (1-m_uv_zpar)),
+				(m_coeff->ktable[9][m_new_frame_k_idx[9]] * (1-m_uv_zpar)) );
 #endif
 
-			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
-			if (m_talk_status == 0)
-			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
-#endif
-				m_target_energy = 0;
-			}
 		}
 		else // Not a new frame, just interpolate the existing frame.
 		{
@@ -516,30 +486,28 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
 			//int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
 			int current_sample = (m_subcycle - m_subc_reload)+(m_PC*(3-m_subc_reload))+((m_subc_reload?25:38)*((m_IP-1)&7));
-
-			zpar = OLD_FRAME_UNVOICED_FLAG;
 			//fprintf(stderr, "CS: %03d", current_sample);
 			// reset the current energy, pitch, etc to what it was at frame start
-			m_current_energy = m_coeff->energytable[m_old_frame_energy_idx];
-			m_current_pitch = m_coeff->pitchtable[m_old_frame_pitch_idx];
+			m_current_energy = (m_coeff->energytable[m_old_frame_energy_idx] * (1-m_zpar));
+			m_current_pitch = (m_coeff->pitchtable[m_old_frame_pitch_idx] * (1-m_old_zpar));
 			for (i = 0; i < 4; i++)
-				m_current_k[i] = m_coeff->ktable[i][m_old_frame_k_idx[i]];
+				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-m_old_zpar));
 			for (i = 4; i < m_coeff->num_k; i++)
-				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-zpar));
+				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-m_uv_zpar));
 			// now adjust each value to be exactly correct for each of the samples per frame
 			if (m_IP != 0) // if we're still interpolating...
 			{
-				m_current_energy += (((m_target_energy - m_current_energy)*(1-inhibit_state))*current_sample)/samples_per_frame;
-				m_current_pitch += (((m_target_pitch - m_current_pitch)*(1-inhibit_state))*current_sample)/samples_per_frame;
+				m_current_energy += ((((m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)) - m_current_energy)*(1-inhibit_state))*current_sample)/samples_per_frame;
+				m_current_pitch += ((((m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar)) - m_current_pitch)*(1-inhibit_state))*current_sample)/samples_per_frame;
 				for (i = 0; i < m_coeff->num_k; i++)
-					m_current_k[i] += (((m_target_k[i] - m_current_k[i])*(1-inhibit_state))*current_sample)/samples_per_frame;
+					m_current_k[i] += ((((m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-((i<4)?m_zpar:m_uv_zpar))) - m_current_k[i])*(1-inhibit_state))*current_sample)/samples_per_frame;
 			}
 			else // we're done, play this frame for 1/8 frame.
 			{
-				m_current_energy = m_target_energy;
-				m_current_pitch = m_target_pitch;
+				m_current_energy = (m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar));
+				m_current_pitch = (m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar));
 				for (i = 0; i < m_coeff->num_k; i++)
-					m_current_k[i] = m_target_k[i];
+					m_current_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-((i<4)?m_zpar:m_uv_zpar)));
 			}
 #else
 			//Updates to parameters only happen on subcycle '2' (B cycle) of PCs.
@@ -548,14 +516,14 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				switch(m_PC)
 				{
 					case 0: /* PC = 0, B cycle, write updated energy */
-					m_current_energy += (((m_target_energy - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT);
+					m_current_energy += ((((m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)) - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT);
 					break;
 					case 1: /* PC = 1, B cycle, write updated pitch */
-					m_current_pitch += (((m_target_pitch - m_current_pitch)*(1-inhibit_state)) INTERP_SHIFT);
+					m_current_pitch += ((((m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar)) - m_current_pitch)*(1-inhibit_state)) INTERP_SHIFT);
 					break;
 					case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11:
 					/* PC = 2 through 11, B cycle, write updated K1 through K10 */
-					m_current_k[m_PC-2] += (((m_target_k[m_PC-2] - m_current_k[m_PC-2])*(1-inhibit_state)) INTERP_SHIFT);
+					m_current_k[m_PC-2] += ((((m_coeff->ktable[m_PC-2][m_new_frame_k_idx[m_PC-2]] * (1-(((m_PC-2)<4)?m_zpar:m_uv_zpar))) - m_current_k[m_PC-2])*(1-inhibit_state)) INTERP_SHIFT);
 					break;
 					case 12: /* PC = 12, do nothing */
 					break;
@@ -631,7 +599,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 		// Update all counts
 
 		m_subcycle++;
-		if ((m_subcycle == 2) && (m_PC == 12))
+		if ((m_subcycle == 2) && (m_PC == 12)) // RESETF3
 		{
 			/* Circuit 412 in the patent acts a reset, resetting the pitch counter to 0
 			 * if INHIBIT was true during the most recent frame transition.
@@ -641,7 +609,22 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			 * (and hence INHIBIT itself 2 t-cycles later). We do it here because it is
 			 * convenient and should make no difference in output.
 			 */
-			if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_count = 0;
+			if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_zero = 1;
+			if ((m_IP == 0)&&(m_pitch_zero = 1)) m_pitch_zero = 0;
+#ifdef PERFECT_INTERPOLATION_HACK
+			m_old_zpar = m_zpar;
+#endif
+			m_zpar = 0; /* this gets effectively reset by resetf3, same signal which resets m_PC to 0 */
+			if (m_IP == 7) // RESETL4
+			{
+				/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
+#ifdef DEBUG_GENERATION
+				if (m_TALK == 0)
+					fprintf(stderr,"tms5110_process: processing frame: TALKD = 0 caused by stop frame or buffer empty, halting speech.\n");
+#endif
+				m_TALKD = m_TALK; // TALKD is latched from TALK
+				m_TALK = m_SPEN; // TALK is latched from SPEN
+			}
 			m_subcycle = m_subc_reload;
 			m_PC = 0;
 			m_IP++;
@@ -653,7 +636,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			m_PC++;
 		}
 		m_pitch_count++;
-		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0;
+		if ((m_pitch_count >= m_current_pitch)||(m_pitch_zero == 1)) m_pitch_count = 0;
 		m_pitch_count &= 0x1FF;
 		buf_count++;
 		size--;
@@ -664,8 +647,13 @@ empty:
 	while (size > 0)
 	{
 		m_subcycle++;
-		if ((m_subcycle == 2) && (m_PC == 12))
+		if ((m_subcycle == 2) && (m_PC == 12)) // RESETF3
 		{
+			if (m_IP == 7) // RESETL4
+			{
+				m_TALKD = m_TALK; // TALKD is latched from TALK
+				m_TALK = m_SPEN; // TALK is latched from SPEN
+			}
 			m_subcycle = m_subc_reload;
 			m_PC = 0;
 			m_IP++;
@@ -822,7 +810,6 @@ INT32 tms5110_device::lattice_filter()
 
 void tms5110_device::PDC_set(int data)
 {
-	int i;
 	if (m_PDC != (data & 0x1) )
 	{
 		m_PDC = data & 0x1;
@@ -908,21 +895,13 @@ void tms5110_device::PDC_set(int data)
 					fprintf(stderr,"SPKSLOW\n");
 #endif
 					perform_dummy_read();
-					m_speaking_now = 1;
-					m_talk_status = 1;  /* start immediately */
+					m_SPEN = 1; /* start immediately */
 					/* clear out variables before speaking */
+					m_zpar = 1; // zero all the parameters
 					m_subc_reload = 0; // SPKSLOW means this is 0
 					m_subcycle = m_subc_reload;
 					m_PC = 0;
 					m_IP = 0;
-					m_new_frame_energy_idx = 0;
-					m_new_frame_pitch_idx = 0;
-					for (i = 0; i < 4; i++)
-						m_new_frame_k_idx[i] = 0;
-					for (i = 4; i < 7; i++)
-						m_new_frame_k_idx[i] = 0xF;
-					for (i = 7; i < m_coeff->num_k; i++)
-						m_new_frame_k_idx[i] = 0x7;
 					break;
 
 				case TMS5110_CMD_READ_BIT:
@@ -948,21 +927,13 @@ void tms5110_device::PDC_set(int data)
 					fprintf(stderr,"SPEAK\n");
 #endif
 					perform_dummy_read();
-					m_speaking_now = 1;
-					m_talk_status = 1;  /* start immediately */
+					m_SPEN = 1; /* start immediately */
 					/* clear out variables before speaking */
+					m_zpar = 1; // zero all the parameters
 					m_subc_reload = 1; // SPEAK means this is 1
 					m_subcycle = m_subc_reload;
 					m_PC = 0;
 					m_IP = 0;
-					m_new_frame_energy_idx = 0;
-					m_new_frame_pitch_idx = 0;
-					for (i = 0; i < 4; i++)
-						m_new_frame_k_idx[i] = 0;
-					for (i = 4; i < 7; i++)
-						m_new_frame_k_idx[i] = 0xF;
-					for (i = 7; i < m_coeff->num_k; i++)
-						m_new_frame_k_idx[i] = 0x7;
 					break;
 
 				case TMS5110_CMD_READ_BRANCH:
@@ -1272,7 +1243,7 @@ void tms5110_device::device_reset()
 	m_fifo_head = m_fifo_tail = m_fifo_count = 0;
 
 	/* initialize the chip state */
-	m_speaking_now = m_talk_status = 0;
+	m_SPEN = m_TALK = m_TALKD = 0;
 	m_CTL_pins = 0;
 	m_RNG = 0x1fff;
 	m_CTL_buffer = 0;
@@ -1282,16 +1253,17 @@ void tms5110_device::device_reset()
 #ifdef PERFECT_INTERPOLATION_HACK
 	m_old_frame_energy_idx = m_old_frame_pitch_idx = 0;
 	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
+	m_old_zpar = 0;
 #endif
-	m_new_frame_energy_idx = m_current_energy = m_target_energy = m_previous_energy = 0;
-	m_new_frame_pitch_idx = m_current_pitch = m_target_pitch = 0;
+	m_new_frame_energy_idx = m_current_energy = m_previous_energy = 0;
+	m_new_frame_pitch_idx = m_current_pitch = 0;
+	m_zpar = m_uv_zpar = 0;
 	memset(m_new_frame_k_idx, 0, sizeof(m_new_frame_k_idx));
 	memset(m_current_k, 0, sizeof(m_current_k));
-	memset(m_target_k, 0, sizeof(m_target_k));
 
 	/* initialize the sample generators */
 	m_inhibit = 1;
-	m_subcycle = m_pitch_count = m_PC = 0;
+	m_subcycle = m_pitch_count = m_pitch_zero = m_PC = m_zpar = 0;
 	m_subc_reload = 1;
 	m_OLDE = m_OLDP = 1;
 	m_IP = 0;
@@ -1370,8 +1342,8 @@ READ8_MEMBER( tms5110_device::ctl_r )
 	m_stream->update();
 	if (m_state == CTL_STATE_TTALK_OUTPUT)
 	{
-		if (DEBUG_5110) logerror("Status read while outputting Test Talk (status=%2d)\n", m_talk_status);
-		return (m_talk_status << 0); /*CTL1 = still talking ? */
+		if (DEBUG_5110) logerror("Status read while outputting Test Talk (status=%2d)\n", TALK_STATUS);
+		return (TALK_STATUS << 0); /*CTL1 = still talking ? */
 	}
 	else if (m_state == CTL_STATE_OUTPUT)
 	{
@@ -1389,7 +1361,7 @@ READ8_MEMBER( m58817_device::status_r )
 {
 	/* bring up to date first */
 	m_stream->update();
-	return (m_talk_status << 0); /*CTL1 = still talking ? */
+	return (TALK_STATUS << 0); /*CTL1 = still talking ? */
 }
 
 /******************************************************************************

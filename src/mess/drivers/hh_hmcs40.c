@@ -334,7 +334,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   * Hitachi HD38750A08 MCU
   * green VFD display Emix-106, with bezel overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -446,7 +446,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38750A07 MCU
   * cyan VFD display Emix-103, with blue or green color overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -582,7 +582,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800A77 MCU
   * cyan/red/green VFD display Futaba DM-43ZK 2E
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -712,7 +712,7 @@ MACHINE_CONFIG_END
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -823,7 +823,7 @@ MACHINE_CONFIG_END
   - Japan: ?
   - USA: Star Hawk, published by Mattel
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -951,7 +951,7 @@ MACHINE_CONFIG_END
   * cyan/red/blue VFD display NEC FIP11BM24T no. 4-8, half of it reflected
     with a one-way mirror to give the illusion of a 3D display
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A49 MCU
   * cyan/red/yellow VFD display Futaba DM-53Z 3E, with color overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1190,7 +1190,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A63 MCU
   * cyan/red/blue VFD display Futaba DM-68ZK 3D DM-63
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1318,7 +1318,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A65 MCU
   * cyan/red/green VFD display NEC FIP6AM25T no. 21-21
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1442,7 +1442,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B43 MCU
   * cyan/red/blue VFD display Futaba DM-71
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1540,7 +1540,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B52 MCU
   * cyan/red/blue VFD display NEC FIP8BM25T no. 21-8 2
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1630,7 +1630,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A85 MCU
   * cyan/red/green VFD display NEC FIP5CM33T no. 4 21
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1876,7 +1876,7 @@ MACHINE_CONFIG_END
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
   action-oriented game.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1987,7 +1987,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A45 MCU
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2121,7 +2121,7 @@ MACHINE_CONFIG_END
   - P2 Left:  Head-to-Head Galaxian (2-player mode, short)
   - P2 Right: Head-to-Head Galaxian (2-player mode, long)
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2254,7 +2254,7 @@ MACHINE_CONFIG_END
 
   BTANB note: 1st version doesn't show the whole maze on power-on
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2370,7 +2370,7 @@ MACHINE_CONFIG_END
 
   BTANB note: in demo-mode, she hardly ever walks to the upper two rows
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2479,7 +2479,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2603,7 +2603,7 @@ MACHINE_CONFIG_END
 
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 #if 0
@@ -2661,7 +2661,7 @@ INPUT_PORTS_END
   * COP411L sub MCU, labeled COP411L-KED/N
   * cyan/red/green VFD display NEC FIP15BM32T
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2854,7 +2854,7 @@ MACHINE_CONFIG_END
   * COP411L sub MCU, labeled ~/B8236 COP411L-KEC/N
   * cyan/red/green VFD display NEC FIP15AM32T (EL628-003) no. 2-421, with partial color overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2964,7 +2964,7 @@ MACHINE_CONFIG_END
   - Japan: Heiankyo Alien
   - USA: Earth Invaders, published by CGL
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3080,7 +3080,7 @@ MACHINE_CONFIG_END
   - Japan: Crazy Kong
   - USA: Super Kong, published by CGL
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3203,7 +3203,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A69 MCU
   * cyan/red/green VFD display Futaba DM-69Z 3F, with color overlay
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3328,7 +3328,7 @@ MACHINE_CONFIG_END
   turn the game on while holding the 1-key and use the visitor's side keypad
   to play offsense.
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3486,7 +3486,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A70 MCU
   * cyan/red/green/darkgreen VFD display Itron CP5137
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3574,7 +3574,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3695,7 +3695,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD display NEC FIP10AM24T no. 2-8 1
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3820,7 +3820,7 @@ MACHINE_CONFIG_END
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 
-  NOTE!: MAME external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 

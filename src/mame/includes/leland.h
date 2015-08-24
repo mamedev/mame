@@ -237,7 +237,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	int m_type;
 
 	enum {
@@ -247,7 +246,14 @@ protected:
 		TYPE_WSF
 	};
 
-	required_device<dac_device> m_dac;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
+	required_device<dac_device> m_dac3;
+	required_device<dac_device> m_dac4;
+	optional_device<dac_device> m_dac5;
+	optional_device<dac_device> m_dac6;
+	optional_device<dac_device> m_dac7;
+	optional_device<dac_device> m_dac8;
 
 private:
 	void command_lo_sync(void *ptr, int param);
@@ -266,9 +272,6 @@ private:
 	UINT32 m_ext_stop;
 	UINT8 m_ext_active;
 	UINT8* m_ext_base;
-	INT16 m_dac_sample[8];
-	UINT8 m_dac_volume[8];
-	emu_timer *m_dac_timer;
 
 	required_device<pit8254_device> m_pit0;
 	optional_device<pit8254_device> m_pit1;

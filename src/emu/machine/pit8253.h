@@ -93,6 +93,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// internal state
 	struct pit8253_timer
@@ -140,8 +141,6 @@ private:
 	};
 
 	pit8253_timer m_timers[PIT8253_MAX_TIMER];
-
-	TIMER_CALLBACK_MEMBER(update_timer_cb);
 
 	inline UINT32 adjusted_count(int bcd, UINT16 val);
 	void decrease_counter_value(pit8253_timer *timer, INT64 cycles);

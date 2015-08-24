@@ -21,7 +21,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
 		m_input(*this, "INPUT")
-		{ }
+	{ }
 
 	required_device<i4004_cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
@@ -155,7 +155,6 @@ static MACHINE_CONFIG_START( 4004clk, nixieclock_state )
 	MCFG_CPU_DATA_MAP(4004clk_mem)
 	MCFG_CPU_IO_MAP(4004clk_io)
 
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_4004clk)
 
@@ -190,5 +189,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY               FULLNAME            FLAGS */
-SYST( 2008, 4004clk,  0,      0,       4004clk,   4004clk, driver_device, 0,      "John L. Weinrich",   "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT              COMPANY             FULLNAME            FLAGS */
+SYST( 2008, 4004clk,  0,      0,       4004clk,   4004clk, driver_device, 0, "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )
