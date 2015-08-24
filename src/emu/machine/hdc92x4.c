@@ -23,6 +23,7 @@
 #include "formats/imageutl.h"
 
 // Per-command debugging
+#define TRACE_COMMAND 0
 #define TRACE_SELECT 0
 #define TRACE_STEP 0
 #define TRACE_RESTORE 0
@@ -787,7 +788,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			break;
 
 		default:
-			logerror("%s: unknown substate %02x in read_id\n", tag(), m_substate);
+			logerror("%s: BUG: Unknown substate %02x in read_id, aborting command\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -899,7 +900,7 @@ void hdc92x4_device::verify(int& cont)
 			break;
 
 		default:
-			logerror("%s: unknown substate %02x in verify\n", tag(), m_substate);
+			logerror("%s: BUG: Unknown substate %02x in verify, aborting command\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1071,7 +1072,7 @@ void hdc92x4_device::data_transfer(int& cont)
 			break;
 
 		default:
-			logerror("%s: unknown substate %02x in data_transfer\n", tag(), m_substate);
+			logerror("%s: BUG: Unknown substate %02x in data_transfer, aborting command\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1522,7 +1523,8 @@ void hdc92x4_device::seek_read_id()
 			cont = SUCCESS;
 			break;
 		default:
-			logerror("%s: unknown substate %02x in seek_read_id\n", tag(), m_substate);
+			logerror("%s: BUG: Unknown substate %02x in seek_read_id, aborting command\n", tag(), m_substate);
+			set_command_done(TC_DATAERR);
 			cont = ERROR;
 		}
 	}
@@ -1584,7 +1586,8 @@ void hdc92x4_device::read_sectors()
 			data_transfer(cont);
 			break;
 		default:
-			logerror("%s: unknown substate %02x in read_sectors\n", tag(), m_substate);
+			logerror("%s: BUG: Unknown substate %02x in read_sectors, aborting command\n", tag(), m_substate);
+			set_command_done(TC_DATAERR);
 			cont = ERROR;
 		}
 	}
@@ -1866,7 +1869,8 @@ void hdc92x4_device::write_sectors()
 			data_transfer(cont);
 			break;
 		default:
-			logerror("%s: unknown substate %02x in write_sectors\n", tag(), m_substate);
+			logerror("%s: BUG: Unknown substate %02x in write_sectors, aborting command\n", tag(), m_substate);
+			set_command_done(TC_DATAERR);
 			cont = ERROR;
 		}
 	}
@@ -3898,12 +3902,11 @@ UINT16 hdc92x4_device::encode_a1_hd()
 READ8_MEMBER( hdc92x4_device::read )
 {
 	UINT8 reply = 0;
-
 	if ((offset & 1) == 0)
 	{
 		// Data register
 		reply = m_register_r[m_register_pointer];
-		if (TRACE_READREG) logerror("%s: read register[%d] -> %02x\n", tag(), m_register_pointer, reply);
+		if (TRACE_READREG) logerror("%s: Read register[%d] -> %02x\n", tag(), m_register_pointer, reply);
 
 		// Autoincrement until DATA is reached.
 		if (m_register_pointer < DATA)  m_register_pointer++;
@@ -3915,7 +3918,7 @@ READ8_MEMBER( hdc92x4_device::read )
 
 		// "The interrupt pin is reset to its inactive state
 		// when the UDC interrupt status register is read." [1] (p.3)
-		if (TRACE_READREG) logerror("%s: read interrupt status register -> %02x\n", tag(), reply);
+		if (TRACE_READREG) logerror("%s: Read interrupt status register -> %02x\n", tag(), reply);
 		set_interrupt(CLEAR_LINE);
 
 		// Clear the bits due to interrupt status register read.
@@ -3935,15 +3938,18 @@ WRITE8_MEMBER( hdc92x4_device::write )
 {
 	if ((offset & 1) == 0)
 	{
-		m_regvalue = data & 0xff;
-		wait_time(m_cmd_timer, attotime::from_nsec(REGISTER_COMMIT), REGISTER_ACCESS);
+		if (TRACE_COMMAND) logerror("%s: New register write access %02x\n", tag(), data & 0xff);
+		if (m_executing) logerror("%s: Error - previous command %02x not completed; register access ignored\n", tag(), current_command());
+		else
+		{
+			m_regvalue = data & 0xff;
+			wait_time(m_cmd_timer, attotime::from_nsec(REGISTER_COMMIT), REGISTER_ACCESS);
+		}
 	}
 	else
 	{
-		if (m_executing)
-		{
-			logerror("%s: [%s] Error - previous command %02x not completed; new command %02x ignored\n", tag(), ttsn().c_str(), current_command(), data);
-		}
+		if (TRACE_COMMAND) logerror("%s: New incoming command %02x\n", tag(), data);
+		if (m_executing) logerror("%s: Error - previous command %02x not completed; new command %02x ignored\n", tag(), current_command(), data);
 		else
 		{
 			m_register_w[COMMAND] = data;
