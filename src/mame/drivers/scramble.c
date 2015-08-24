@@ -2164,6 +2164,32 @@ ROM_START( mimonscr )
 	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+
+ROM_START( mimonscra )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.c2",          0x0000, 0x1000, CRC(cfff26f3) SHA1(6e611e370ce5a93099bdcdb3b34b86c9c6d49180) )
+	ROM_LOAD( "2.e2",          0x1000, 0x1000, CRC(1fca805f) SHA1(eb85d3c08b141d8bd85da38936a5fafcdd2ff709) )
+	ROM_LOAD( "3.f2",          0x2000, 0x1000, CRC(24ce1ce3) SHA1(ae5ba6913cabab2152bf48c0c0d5983ecbe5c700) )
+	ROM_LOAD( "4.h2",          0x3000, 0x1000, CRC(c83fb639) SHA1(38ddd80b25cc0707b9e53396c322fe731ea8bc3e) )
+	ROM_LOAD( "5.j2",          0xc000, 0x1000, CRC(a9f12dfc) SHA1(c279e3ac84194cc83642a2c330fd869eaae8f063) )
+	ROM_LOAD( "6.l2",          0xd000, 0x1000, CRC(e492a40c) SHA1(d01d6f9c18821fd8c7ed11d65d13bd0c9595881f) )
+	ROM_LOAD( "7.m2",          0xe000, 0x1000, CRC(5339928d) SHA1(7c28516fb7d762e2f77d0ed3dc56a57d0213dbf9) )
+	ROM_LOAD( "8.p2",          0xf000, 0x1000, CRC(0b9915b8) SHA1(bb5155eede699d0b612cae458499bd245ab44b4d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "2732.c5",      0x0000, 0x1000, CRC(5995f24b) SHA1(e3cad71006346e6ca6579c09e65195718687dca1) )
+	ROM_LOAD( "2732.d5",      0x1000, 0x1000, CRC(35ed0f96) SHA1(5aaacae5c2acf97540b72491f71ea823f5eeae1a) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "top.g5",      0x0000, 0x1000, CRC(f73a8412) SHA1(9baf4336cceb9b039372b0a1c733910aeab5ec6d) )
+	ROM_LOAD( "bottom.g5",   0x1000, 0x1000, CRC(3828c9db) SHA1(eaf9e81c803ad2be6c2db3104f07f80788378286) )
+	ROM_LOAD( "top.f5",      0x2000, 0x1000, CRC(9e0e9289) SHA1(79d412dbceb364bc798feda658b15792feb63338) )
+	ROM_LOAD( "bottom.f5",   0x3000, 0x1000, CRC(92085b0c) SHA1(a791703fa9f17e42450c871d902430fc3c6b10ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.e6",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
 ROM_START( ad2083 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ad0.10o",      0x0000, 0x2000, CRC(4d34325a) SHA1(4a0eb1cd94382c44ab2642d734d3da9025872eba) )
@@ -2265,7 +2291,8 @@ GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, scramble_ppi
 
 GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, cavelon,      ROT90, "Jetsoft",             "Cavelon",                        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg",             "Mighty Monkey (bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, ad2083,       ROT90, "Midcoin",             "A. D. 2083",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
