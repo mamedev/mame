@@ -400,4 +400,16 @@
 		</part>
 	</software>
 
+	<software name="edex44fr">
+		<description>Edex (France, v4.4)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="edex_4.4_fr_91d9.ud11" size="0x1000" crc="82993411" sha1="d4bf02217e6b589bf0985ae81a9000119ac781c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
