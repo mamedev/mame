@@ -1885,6 +1885,28 @@ static INPUT_PORTS_START( kbash )
 //  PORT_CONFSETTING(        0x00f0, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kbashk )
+	PORT_INCLUDE( kbash )
+
+	PORT_MODIFY("JMPR")
+	PORT_CONFNAME( 0x00f0,  0x0000, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!4,!3,!2,!1")
+	PORT_CONFSETTING(       0x0000, "Japan (Taito license)" ) // Taito license
+	PORT_CONFSETTING(       0x0010, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x0020, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x0030, DEF_STR( Korea ) )
+	PORT_CONFSETTING(       0x0040, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(       0x0050, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(       0x0060, DEF_STR( Southeast_Asia ) )
+    PORT_CONFSETTING(       0x0070, DEF_STR( Unused ) )
+    PORT_CONFSETTING(       0x0080, DEF_STR( Japan ) ) // no Taito license
+	PORT_CONFSETTING(       0x0090, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x00a0, DEF_STR( Unused ) )
+    PORT_CONFSETTING(       0x00b0, DEF_STR( Korea ) )
+    PORT_CONFSETTING(       0x00c0, DEF_STR( Hong_Kong ))
+    PORT_CONFSETTING(       0x00d0, DEF_STR( Taiwan ))
+    PORT_CONFSETTING(       0x00e0, DEF_STR( Southeast_Asia ))
+    PORT_CONFSETTING(       0x00f0, DEF_STR( Unused ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( kbash2 )
 	PORT_INCLUDE( kbash )
@@ -4135,7 +4157,25 @@ ROM_START( kbash )
 	ROM_LOAD( "tp023_7.bin", 0x00000, 0x40000, CRC(3732318f) SHA1(f0768459f5ad2dee53d408a0a5ae3a314864e667) )
 ROM_END
 
+ROM_START( kbashk )
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "tp023_01.u52", 0x000000, 0x080000, CRC(099aefbc) SHA1(8daa0deffe221e1bb5a8744ced18c23ad319ffd3) ) // same label as parent?
 
+	/* Secondary CPU is a Toaplan marked chip, (TS-004-Dash  TOA PLAN) */
+	/* It's a NEC V25 (PLCC94) (encrypted) */
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )         /* Sound CPU code */
+	ROM_LOAD( "tp023_02.bin", 0x0000, 0x8000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
+
+	ROM_REGION( 0x800000, "gp9001", 0 )
+	ROM_LOAD( "tp023_3.bin", 0x000000, 0x200000, CRC(32ad508b) SHA1(e473489beaf649d3e5236770eb043327e309850c) )
+	ROM_LOAD( "tp023_5.bin", 0x200000, 0x200000, CRC(b84c90eb) SHA1(17a1531d884d9a9696d1b25d65f9155f02396e0e) )
+	ROM_LOAD( "tp023_4.bin", 0x400000, 0x200000, CRC(e493c077) SHA1(0edcfb70483ad07206695d9283031b85cd198a36) )
+	ROM_LOAD( "tp023_6.bin", 0x600000, 0x200000, CRC(9084b50a) SHA1(03b58278619524d2f09a4b1c152d5e057e792a56) )
+
+	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM Samples */
+	ROM_LOAD( "tp023_7.bin", 0x00000, 0x40000, CRC(3732318f) SHA1(f0768459f5ad2dee53d408a0a5ae3a314864e667) )
+ROM_END
 /*
 Knuckle Bash 2
 This is a hacked version of Knuckle Bash on bootleg/Korean/Chinese
@@ -5313,7 +5353,8 @@ GAME( 1992, dogyuun,    0,        dogyuun,  dogyuun, toaplan2_state,  dogyuun,  
 GAME( 1992, dogyuuna,   dogyuun,  dogyuun,  dogyuuna, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (older set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dogyuunt,   dogyuun,  dogyuun,  dogyuunt, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, kbash,      0,        kbash,    kbash, driver_device,    0,        ROT0,   "Toaplan", "Knuckle Bash", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, kbash,      0,        kbash,    kbash, driver_device,    0,        ROT0,   "Toaplan / Atari", "Knuckle Bash", MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
+GAME( 1993, kbashk,     kbash,    kbash,    kbashk,driver_device,    0,        ROT0,   "Toaplan / Taito", "Knuckle Bash (Korean PCB)", MACHINE_SUPPORTS_SAVE ) // Japan region has optional Taito license, maybe the original Japan release?
 
 GAME( 1999, kbash2,     0,        kbash2,   kbash2, driver_device,   0,        ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", MACHINE_SUPPORTS_SAVE )
 
