@@ -470,7 +470,7 @@ void ti99_datamux_device::device_reset(void)
 
 INPUT_PORTS_START( datamux )
 	PORT_START( "RAM" ) /* config */
-	PORT_CONFNAME( 0x01, 0x01, "Console 32 KiB RAM upgrade (16 bit)" )
+	PORT_CONFNAME( 0x01, 0x00, "Console 32 KiB RAM upgrade (16 bit)" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
