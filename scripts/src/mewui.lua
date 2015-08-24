@@ -39,8 +39,6 @@ files {
 	MAME_DIR .. "src/emu/mewui/sndmenu.c",
 	MAME_DIR .. "src/emu/mewui/sndmenu.h",
 	MAME_DIR .. "src/emu/mewui/starimg.h",
-	MAME_DIR .. "src/emu/mewui/swcustmenu.c",
-	MAME_DIR .. "src/emu/mewui/swcustmenu.h",
 	MAME_DIR .. "src/emu/mewui/toolbar.h",
 	MAME_DIR .. "src/emu/mewui/utils.c",
 	MAME_DIR .. "src/emu/mewui/utils.h",

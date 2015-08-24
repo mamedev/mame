@@ -24,7 +24,7 @@
 
 ui_menu_command::ui_menu_command(running_machine &machine, render_container *container, const game_driver *driver) : ui_menu(machine, container)
 {
-	ui_driver = (driver == NULL) ? &machine.system() : driver;
+	m_driver = (driver == NULL) ? &machine.system() : driver;
 }
 
 ui_menu_command::~ui_menu_command()
@@ -38,7 +38,7 @@ ui_menu_command::~ui_menu_command()
 void ui_menu_command::populate()
 {
 	std::vector<std::string> text;
-	machine().datfile().command_sub_menu(ui_driver, text);
+	machine().datfile().command_sub_menu(m_driver, text);
 
 	if (!text.empty())
 	{
@@ -64,8 +64,8 @@ void ui_menu_command::handle()
 
 	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT)
 	{
-		std::string title(item[selected].text);
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_command_content(machine(), container, (FPTR)menu_event->itemref, title, ui_driver)));
+		std::string m_title(item[selected].text);
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_command_content(machine(), container, (FPTR)menu_event->itemref, m_title, m_driver)));
 	}
 }
 
@@ -76,7 +76,7 @@ void ui_menu_command::handle()
 void ui_menu_command::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	std::string tempbuf = std::string("Command Info - Game: ").append(ui_driver->description);
+	std::string tempbuf = std::string("Command Info - Game: ").append(m_driver->description);
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
@@ -110,9 +110,9 @@ void ui_menu_command::custom_render(void *selectedref, float top, float bottom, 
 
 ui_menu_command_content::ui_menu_command_content(running_machine &machine, render_container *container, FPTR p_param, std::string p_title, const game_driver *driver) : ui_menu(machine, container)
 {
-	ui_driver = (driver == NULL) ? &machine.system() : driver;
-	param = p_param;
-	title = p_title;
+	m_driver = (driver == NULL) ? &machine.system() : driver;
+	m_param = p_param;
+	m_title = p_title;
 }
 
 ui_menu_command_content::~ui_menu_command_content()
@@ -138,11 +138,10 @@ void ui_menu_command_content::populate()
 	std::string buffer;
 	int game_paused = machine().paused();
 
-	// make sure machine is paused to prevent strange sound
 	if (!game_paused)
 		machine().pause();
 
-	machine().datfile().load_command_info(buffer, param);
+	machine().datfile().load_command_info(buffer, m_param);
 
 	if (!buffer.empty())
 	{
@@ -176,7 +175,6 @@ void ui_menu_command_content::populate()
 		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	}
 
-	// Resume machine
 	if (!game_paused)
 		machine().resume();
 
@@ -193,7 +191,7 @@ void ui_menu_command_content::custom_render(void *selectedref, float top, float 
 	float width;
 
 	// get the size of the text
-	machine().ui().draw_text_full(container, title.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+	machine().ui().draw_text_full(container, m_title.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
@@ -214,10 +212,10 @@ void ui_menu_command_content::custom_render(void *selectedref, float top, float 
 	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	machine().ui().draw_text_full(container, title.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	machine().ui().draw_text_full(container, m_title.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
-	std::string tempbuf = std::string("Command Info - Game: ").append(ui_driver->description);
+	std::string tempbuf = std::string("Command Info - Game: ").append(m_driver->description);
 
 	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
@@ -252,10 +250,10 @@ void ui_menu_command_content::custom_render(void *selectedref, float top, float 
 
 ui_menu_history_sw::ui_menu_history_sw(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver) : ui_menu(machine, container)
 {
-	listname = swinfo->listname.c_str();
-	shortname = swinfo->shortname.c_str();
-	longname = swinfo->longname.c_str();
-	ui_driver = (driver == NULL) ? &machine.system() : driver;
+	m_list = swinfo->listname.c_str();
+	m_short = swinfo->shortname.c_str();
+	m_long = swinfo->longname.c_str();
+	m_driver = (driver == NULL) ? &machine.system() : driver;
 }
 
 ui_menu_history_sw::ui_menu_history_sw(running_machine &machine, render_container *container, const game_driver *driver) : ui_menu(machine, container)
@@ -265,12 +263,12 @@ ui_menu_history_sw::ui_menu_history_sw(running_machine &machine, render_containe
 	{
 		if (image->filename())
 		{
-			listname = image->software_list_name();
-			shortname = image->filename();
-			longname = image->longname();
+			m_list = image->software_list_name();
+			m_short = image->filename();
+			m_long = image->longname();
 		}
 	}
-	ui_driver = (driver == NULL) ? &machine.system() : driver;
+	m_driver = (driver == NULL) ? &machine.system() : driver;
 }
 
 ui_menu_history_sw::~ui_menu_history_sw()
@@ -296,11 +294,10 @@ void ui_menu_history_sw::populate()
 	std::string buffer;
 	int game_paused = machine().paused();
 
-	// make sure MESS / UME is paused
 	if (!game_paused)
 		machine().pause();
 
-	machine().datfile().load_software_info(listname, buffer, shortname);
+	machine().datfile().load_software_info(m_list, buffer, m_short);
 
 	if (!buffer.empty())
 	{
@@ -323,7 +320,6 @@ void ui_menu_history_sw::populate()
 	else
 		item_append("No available history info for this software.", NULL, MENU_FLAG_DISABLE, NULL);
 
-	// Resume MESS / UME machine if necessary
 	if (!game_paused)
 		machine().resume();
 
@@ -339,7 +335,7 @@ void ui_menu_history_sw::populate()
 void ui_menu_history_sw::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	std::string tempbuf = std::string("Software info - ").append(longname);
+	std::string tempbuf = std::string("Software info - ").append(m_long);
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
@@ -365,7 +361,7 @@ void ui_menu_history_sw::custom_render(void *selectedref, float top, float botto
 	machine().ui().draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
-	tempbuf.assign("System driver: ").append(ui_driver->description);
+	tempbuf.assign("System driver: ").append(m_driver->description);
 
 	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
@@ -400,8 +396,8 @@ void ui_menu_history_sw::custom_render(void *selectedref, float top, float botto
 
 ui_menu_dats::ui_menu_dats(running_machine &machine, render_container *container, int _flags, const game_driver *driver) : ui_menu(machine, container)
 {
-	ui_driver = (driver == NULL) ? &machine.system() : driver;
-	flags = _flags;
+	m_driver = (driver == NULL) ? &machine.system() : driver;
+	m_flags = _flags;
 }
 
 ui_menu_dats::~ui_menu_dats()
@@ -426,17 +422,16 @@ void ui_menu_dats::populate()
 {
 	int game_paused = machine().paused();
 
-	// make sure MAME is paused
 	if (!game_paused)
 		machine().pause();
 
-	switch (flags)
+	switch (m_flags)
 	{
 		case MEWUI_HISTORY_LOAD:
-			if (get_data(ui_driver, flags))
+			if (get_data(m_driver, m_flags))
 			{
 				// determine which drivers to output
-				driver_enumerator drivlist(machine().options(), *ui_driver);
+				driver_enumerator drivlist(machine().options(), *m_driver);
 				std::string tempstr, headstr;
 				while (drivlist.next())
 				{
@@ -490,27 +485,26 @@ void ui_menu_dats::populate()
 			break;
 
 		case MEWUI_MAMEINFO_LOAD:
-			if (!get_data(ui_driver, flags))
+			if (!get_data(m_driver, m_flags))
 				item_append("No available MameInfo for this game.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 
 		case MEWUI_MESSINFO_LOAD:
-			if (!get_data(ui_driver, flags))
+			if (!get_data(m_driver, m_flags))
 				item_append("No available MessInfo for this system.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 
 		case MEWUI_STORY_LOAD:
-			if (!get_data(ui_driver, MEWUI_STORY_LOAD))
+			if (!get_data(m_driver, MEWUI_STORY_LOAD))
 				item_append("No available mamescore for this game.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 
 		case MEWUI_SYSINFO_LOAD:
-			if (!get_data(ui_driver, MEWUI_SYSINFO_LOAD))
+			if (!get_data(m_driver, MEWUI_SYSINFO_LOAD))
 				item_append("No available sysinfo for this system.", NULL, MENU_FLAG_DISABLE, NULL);
 			break;
 	}
 
-	// Resume MAME machine if necessary
 	if (!game_paused)
 		machine().resume();
 
@@ -528,30 +522,30 @@ void ui_menu_dats::custom_render(void *selectedref, float top, float bottom, flo
 	float width;
 	std::string tempbuf, revision;
 
-	switch (flags)
+	switch (m_flags)
 	{
 		case MEWUI_HISTORY_LOAD:
-			tempbuf.assign("History - Game / System: ").append(ui_driver->description);
+			tempbuf.assign("History - Game / System: ").append(m_driver->description);
 			revision.assign("History.dat Revision: ").append(machine().datfile().rev_history());
 			break;
 
 		case MEWUI_MESSINFO_LOAD:
-			tempbuf.assign("MessInfo - System: ").append(ui_driver->description);
+			tempbuf.assign("MessInfo - System: ").append(m_driver->description);
 			revision.assign("Messinfo.dat Revision: ").append(machine().datfile().rev_messinfo());
 			break;
 
 		case MEWUI_MAMEINFO_LOAD:
-			tempbuf.assign("MameInfo - Game: ").append(ui_driver->description);
+			tempbuf.assign("MameInfo - Game: ").append(m_driver->description);
 			revision.assign("Mameinfo.dat Revision: ").append(machine().datfile().rev_mameinfo());
 			break;
 
 		case MEWUI_SYSINFO_LOAD:
-			tempbuf.assign("Sysinfo - System: ").append(ui_driver->description);
+			tempbuf.assign("Sysinfo - System: ").append(m_driver->description);
 			revision.assign("Sysinfo.dat Revision: ").append(machine().datfile().rev_sysinfo());
 			break;
 
 		case MEWUI_STORY_LOAD:
-			tempbuf.assign("MAMESCORE - Game: ").append(ui_driver->description);
+			tempbuf.assign("MAMESCORE - Game: ").append(m_driver->description);
 			revision.assign("Story.dat Revision: ").append(machine().datfile().rev_storyinfo());
 			break;
 	}
@@ -608,10 +602,10 @@ void ui_menu_dats::custom_render(void *selectedref, float top, float bottom, flo
 //  load data from DATs
 //-------------------------------------------------
 
-bool ui_menu_dats::get_data(const game_driver *ui_driver, int flags)
+bool ui_menu_dats::get_data(const game_driver *m_driver, int m_flags)
 {
 	std::string buffer;
-	machine().datfile().load_data_info(ui_driver, buffer, flags);
+	machine().datfile().load_data_info(m_driver, buffer, m_flags);
 
 	if (!buffer.empty())
 	{
@@ -628,7 +622,7 @@ bool ui_menu_dats::get_data(const game_driver *ui_driver, int flags)
 			std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
 
 			// special case for mamescore
-			if (flags == MEWUI_STORY_LOAD && tempbuf.find_last_of('_') != -1)
+			if (m_flags == MEWUI_STORY_LOAD && tempbuf.find_last_of('_') != -1)
 			{
 				int last_underscore = tempbuf.find_last_of('_');
 				std::string last_part(tempbuf.substr(last_underscore + 1));

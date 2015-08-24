@@ -62,8 +62,8 @@ public:
 private:
 	enum
 	{
-		M_UI_FONT = 1,
-		M_UI_COLORS
+		FONT_MENU = 1,
+		COLORS_MENU
 	};
 };
 
@@ -100,12 +100,13 @@ private:
 
 #ifdef MEWUI_WINDOWS
 	c_uifonts m_class;
-	void      list();
 	bool      m_bold, m_italic;
+
+	void      list();
 #endif
 
-	float info_min_size, info_max_size, info_size;
-	int font_min_size, font_max_size, font_size;
+	float m_info_min, m_info_max, m_info_size;
+	int m_font_min, m_font_max, m_font_size;
 };
 
 /***************************************************************************
@@ -122,7 +123,7 @@ public:
 
 private:
 
-	s_color_table color_table[MUI_RESTORE];
+	s_color_table m_color_table[MUI_RESTORE];
 	void restore_colors();
 };
 
@@ -140,11 +141,11 @@ public:
 
 private:
 
-	rgb_t           *color;
+	rgb_t           *m_color;
 	char            m_search[4];
-	bool            key_active;
-	int             lock_ref;
-	std::string     title;
+	bool            m_key_active;
+	int             m_lock_ref;
+	std::string     m_title;
 
 	enum
 	{
@@ -164,8 +165,8 @@ private:
 
 struct palcolor
 {
-	const char *m_name;
-	const char *m_argb;
+	const char *name;
+	const char *argb;
 };
 
 class ui_menu_palette_sel : public ui_menu

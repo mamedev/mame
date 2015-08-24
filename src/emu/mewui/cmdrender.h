@@ -13,13 +13,13 @@
 
 void convert_command_glyph(std::string &str)
 {
-	int i, j;
+	int j;
 	const char *s = str.c_str();
 	int len = str.length();
 	int buflen = (len + 2) * 2;
 	char *d = global_alloc_array(char, buflen);
 
-	for (i = j = 0; i < len;)
+	for (int i = j = 0; i < len;)
 	{
 		fix_command_t *fixcmd = NULL;
 		unicode_char uchar;
@@ -27,8 +27,7 @@ void convert_command_glyph(std::string &str)
 		int ucharcount = uchar_from_utf8(&uchar, s + i, len - i);
 		if (ucharcount == -1)
 			break;
-
-		if (ucharcount != 1)
+		else if (ucharcount != 1)
 			goto process_next;
 
 		if (s[i] == '\n')
@@ -102,22 +101,20 @@ process_next:
 void render_font::render_font_command_glyph()
 {
 	emu_file ramfile(OPEN_FLAG_READ);
+
 	if (ramfile.open_ram(font_uicmd14, sizeof(font_uicmd14)) == FILERR_NONE)
 		load_cached_cmd(ramfile, 0);
 }
 
 bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
 {
-	// get the file size
 	UINT64 filesize = file.size();
-
-	// first read the header
 	UINT8 header[CACHED_HEADER_SIZE];
 	UINT32 bytes_read = file.read(header, CACHED_HEADER_SIZE);
+
 	if (bytes_read != CACHED_HEADER_SIZE)
 		return false;
 
-	// validate the header
 	if (header[0] != 'f' || header[1] != 'o' || header[2] != 'n' || header[3] != 't')
 		return false;
 	if (header[4] != (UINT8)(hash >> 24) || header[5] != (UINT8)(hash >> 16) || header[6] != (UINT8)(hash >> 8) || header[7] != (UINT8)hash)
@@ -128,7 +125,6 @@ bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
 	if (filesize - CACHED_HEADER_SIZE < numchars * CACHED_CHAR_SIZE)
 		return false;
 
-	// now read the rest of the data
 	m_rawdata_cmd.resize(filesize - CACHED_HEADER_SIZE);
 	bytes_read = file.read(&m_rawdata_cmd[0], filesize - CACHED_HEADER_SIZE);
 	if (bytes_read != filesize - CACHED_HEADER_SIZE)
@@ -137,22 +133,20 @@ bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
 		return false;
 	}
 
-	// extract the data from the data
 	UINT64 offset = numchars * CACHED_CHAR_SIZE;
 	for (int chindex = 0; chindex < numchars; chindex++)
 	{
 		const UINT8 *info = reinterpret_cast<UINT8 *>(&m_rawdata_cmd[chindex * CACHED_CHAR_SIZE]);
 		int chnum = (info[0] << 8) | info[1];
 
-		// if we don't have a subtable yet, make one
 		if (!m_glyphs_cmd[chnum / 256])
 			m_glyphs_cmd[chnum / 256] = new glyph[256];
 
-		// fill in the entry
 		glyph &gl = m_glyphs_cmd[chnum / 256][chnum % 256];
-		//mamep: color glyph
+
 		if (chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + COLOR_BUTTONS)
 			gl.color = color_table[chnum - COMMAND_UNICODE];
+
 		gl.width = (info[2] << 8) | info[3];
 		gl.xoffs = (INT16)((info[4] << 8) | info[5]);
 		gl.yoffs = (INT16)((info[6] << 8) | info[7]);
@@ -160,7 +154,6 @@ bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
 		gl.bmheight = (info[10] << 8) | info[11];
 		gl.rawdata = &m_rawdata_cmd[offset];
 
-		// advance the offset past the character
 		offset += (gl.bmwidth * gl.bmheight + 7) / 8;
 		if (offset > filesize - CACHED_HEADER_SIZE)
 		{
@@ -169,7 +162,5 @@ bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
 		}
 	}
 
-	// reuse the chartable as a temporary buffer
-	//m_rawdata_cmd = (char *)data;
 	return true;
 }

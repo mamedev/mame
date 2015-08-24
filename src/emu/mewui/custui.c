@@ -46,11 +46,11 @@ void ui_menu_custom_ui::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL && menu_event->iptkey == IPT_UI_SELECT)
 		switch ((FPTR)menu_event->itemref)
 		{
-			case M_UI_FONT:
+			case FONT_MENU:
 				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_font_ui(machine(), container)));
 				break;
 
-			case M_UI_COLORS:
+			case COLORS_MENU:
 				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_colors_ui(machine(), container)));
 				break;
 		}
@@ -62,9 +62,8 @@ void ui_menu_custom_ui::handle()
 
 void ui_menu_custom_ui::populate()
 {
-	item_append("Fonts", NULL, 0, (void *)M_UI_FONT);
-	item_append("Colors", NULL, 0, (void *)M_UI_COLORS);
-
+	item_append("Fonts", NULL, 0, (void *)FONT_MENU);
+	item_append("Colors", NULL, 0, (void *)COLORS_MENU);
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -131,21 +130,21 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 	}
 #endif
 
-	info_size = machine.options().infos_size();
-	font_size = machine.options().font_rows();
+	m_info_size = machine.options().infos_size();
+	m_font_size = machine.options().font_rows();
 
 	for (emu_options::entry *f_entry = machine.options().first(); f_entry != NULL; f_entry = f_entry->next())
 	{
 		const char *name = f_entry->name();
 		if (name && strlen(name) && !strcmp(OPTION_INFOS_SIZE, f_entry->name()))
 		{
-			info_max_size = atof(f_entry->maximum());
-			info_min_size = atof(f_entry->minimum());
+			m_info_max = atof(f_entry->maximum());
+			m_info_min = atof(f_entry->minimum());
 		}
 		else if (name && strlen(name) && !strcmp(OPTION_FONT_ROWS, f_entry->name()))
 		{
-			font_max_size = atof(f_entry->maximum());
-			font_min_size = atof(f_entry->minimum());
+			m_font_max = atof(f_entry->maximum());
+			m_font_min = atof(f_entry->minimum());
 		}
 	}
 
@@ -209,8 +208,8 @@ ui_menu_font_ui::~ui_menu_font_ui()
 	machine().options().set_value(OPTION_UI_FONT, name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 #endif
 
-	machine().options().set_value(OPTION_INFOS_SIZE, info_size, OPTION_PRIORITY_CMDLINE, error_string);
-	machine().options().set_value(OPTION_FONT_ROWS, font_size, OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OPTION_FONT_ROWS, m_font_size, OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 //-------------------------------------------------
@@ -230,7 +229,7 @@ void ui_menu_font_ui::handle()
 			case INFOS_SIZE:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					(menu_event->iptkey == IPT_UI_RIGHT) ? info_size += 0.05f : info_size -= 0.05f;
+					(menu_event->iptkey == IPT_UI_RIGHT) ? m_info_size += 0.05f : m_info_size -= 0.05f;
 					changed = true;
 				}
 				break;
@@ -238,7 +237,7 @@ void ui_menu_font_ui::handle()
 			case FONT_SIZE:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					(menu_event->iptkey == IPT_UI_RIGHT) ? font_size++ : font_size--;
+					(menu_event->iptkey == IPT_UI_RIGHT) ? m_font_size++ : m_font_size--;
 					changed = true;
 				}
 				break;
@@ -295,16 +294,16 @@ void ui_menu_font_ui::populate()
 	}
 #endif
 
-	arrow_flags = get_arrow_flags(font_min_size, font_max_size, font_size);
-	strprintf(tmptxt, "%2d", font_size);
+	arrow_flags = get_arrow_flags(m_font_min, m_font_max, m_font_size);
+	strprintf(tmptxt, "%2d", m_font_size);
 	item_append("Lines", tmptxt.c_str(), arrow_flags, (void *)FONT_SIZE);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	// add item
 	tmptxt.clear();
-	strprintf(tmptxt, "%3.2f", info_size);
-	arrow_flags = get_arrow_flags(info_min_size, info_max_size, info_size);
+	strprintf(tmptxt, "%3.2f", m_info_size);
+	arrow_flags = get_arrow_flags(m_info_min, m_info_max, m_info_size);
 	item_append("Infos text size", tmptxt.c_str(), arrow_flags, (void *)INFOS_SIZE);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
@@ -352,7 +351,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 		topbuf.assign("Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
 		machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-		                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL, info_size);
+		                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL, m_info_size);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(origx2 - origx1, width);
 
@@ -372,7 +371,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 
 		// draw the text within it
 		machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, info_size);
+		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, m_info_size);
 	}
 }
 
@@ -386,38 +385,38 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 
 ui_menu_colors_ui::ui_menu_colors_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-	color_table[MUI_BACKGROUND_COLOR].color = UI_BACKGROUND_COLOR;
-	color_table[MUI_BACKGROUND_COLOR].option = OPTION_UI_BACKGROUND_COLOR;
-	color_table[MUI_BORDER_COLOR].color = UI_BORDER_COLOR;
-	color_table[MUI_BORDER_COLOR].option = OPTION_UI_BORDER_COLOR;
-	color_table[MUI_CLONE_COLOR].color = UI_CLONE_COLOR;
-	color_table[MUI_CLONE_COLOR].option = OPTION_UI_CLONE_COLOR;
-	color_table[MUI_DIPSW_COLOR].color = UI_DIPSW_COLOR;
-	color_table[MUI_DIPSW_COLOR].option = OPTION_UI_DIPSW_COLOR;
-	color_table[MUI_GFXVIEWER_BG_COLOR].color = UI_GFXVIEWER_BG_COLOR;
-	color_table[MUI_GFXVIEWER_BG_COLOR].option = OPTION_UI_GFXVIEWER_BG_COLOR;
-	color_table[MUI_MOUSEDOWN_BG_COLOR].color = UI_MOUSEDOWN_BG_COLOR;
-	color_table[MUI_MOUSEDOWN_BG_COLOR].option = OPTION_UI_MOUSEDOWN_BG_COLOR;
-	color_table[MUI_MOUSEDOWN_COLOR].color = UI_MOUSEDOWN_COLOR;
-	color_table[MUI_MOUSEDOWN_COLOR].option = OPTION_UI_MOUSEDOWN_COLOR;
-	color_table[MUI_MOUSEOVER_BG_COLOR].color = UI_MOUSEOVER_BG_COLOR;
-	color_table[MUI_MOUSEOVER_BG_COLOR].option = OPTION_UI_MOUSEOVER_BG_COLOR;
-	color_table[MUI_MOUSEOVER_COLOR].color = UI_MOUSEOVER_COLOR;
-	color_table[MUI_MOUSEOVER_COLOR].option = OPTION_UI_MOUSEOVER_COLOR;
-	color_table[MUI_SELECTED_BG_COLOR].color = UI_SELECTED_BG_COLOR;
-	color_table[MUI_SELECTED_BG_COLOR].option = OPTION_UI_SELECTED_BG_COLOR;
-	color_table[MUI_SELECTED_COLOR].color = UI_SELECTED_COLOR;
-	color_table[MUI_SELECTED_COLOR].option = OPTION_UI_SELECTED_COLOR;
-	color_table[MUI_SLIDER_COLOR].color = UI_SLIDER_COLOR;
-	color_table[MUI_SLIDER_COLOR].option = OPTION_UI_SLIDER_COLOR;
-	color_table[MUI_SUBITEM_COLOR].color = UI_SUBITEM_COLOR;
-	color_table[MUI_SUBITEM_COLOR].option = OPTION_UI_SUBITEM_COLOR;
-	color_table[MUI_TEXT_BG_COLOR].color = UI_TEXT_BG_COLOR;
-	color_table[MUI_TEXT_BG_COLOR].option = OPTION_UI_TEXT_BG_COLOR;
-	color_table[MUI_TEXT_COLOR].color = UI_TEXT_COLOR;
-	color_table[MUI_TEXT_COLOR].option = OPTION_UI_TEXT_COLOR;
-	color_table[MUI_UNAVAILABLE_COLOR].color = UI_UNAVAILABLE_COLOR;
-	color_table[MUI_UNAVAILABLE_COLOR].option = OPTION_UI_UNAVAILABLE_COLOR;
+	m_color_table[MUI_BACKGROUND_COLOR].color = UI_BACKGROUND_COLOR;
+	m_color_table[MUI_BACKGROUND_COLOR].option = OPTION_UI_BACKGROUND_COLOR;
+	m_color_table[MUI_BORDER_COLOR].color = UI_BORDER_COLOR;
+	m_color_table[MUI_BORDER_COLOR].option = OPTION_UI_BORDER_COLOR;
+	m_color_table[MUI_CLONE_COLOR].color = UI_CLONE_COLOR;
+	m_color_table[MUI_CLONE_COLOR].option = OPTION_UI_CLONE_COLOR;
+	m_color_table[MUI_DIPSW_COLOR].color = UI_DIPSW_COLOR;
+	m_color_table[MUI_DIPSW_COLOR].option = OPTION_UI_DIPSW_COLOR;
+	m_color_table[MUI_GFXVIEWER_BG_COLOR].color = UI_GFXVIEWER_BG_COLOR;
+	m_color_table[MUI_GFXVIEWER_BG_COLOR].option = OPTION_UI_GFXVIEWER_BG_COLOR;
+	m_color_table[MUI_MOUSEDOWN_BG_COLOR].color = UI_MOUSEDOWN_BG_COLOR;
+	m_color_table[MUI_MOUSEDOWN_BG_COLOR].option = OPTION_UI_MOUSEDOWN_BG_COLOR;
+	m_color_table[MUI_MOUSEDOWN_COLOR].color = UI_MOUSEDOWN_COLOR;
+	m_color_table[MUI_MOUSEDOWN_COLOR].option = OPTION_UI_MOUSEDOWN_COLOR;
+	m_color_table[MUI_MOUSEOVER_BG_COLOR].color = UI_MOUSEOVER_BG_COLOR;
+	m_color_table[MUI_MOUSEOVER_BG_COLOR].option = OPTION_UI_MOUSEOVER_BG_COLOR;
+	m_color_table[MUI_MOUSEOVER_COLOR].color = UI_MOUSEOVER_COLOR;
+	m_color_table[MUI_MOUSEOVER_COLOR].option = OPTION_UI_MOUSEOVER_COLOR;
+	m_color_table[MUI_SELECTED_BG_COLOR].color = UI_SELECTED_BG_COLOR;
+	m_color_table[MUI_SELECTED_BG_COLOR].option = OPTION_UI_SELECTED_BG_COLOR;
+	m_color_table[MUI_SELECTED_COLOR].color = UI_SELECTED_COLOR;
+	m_color_table[MUI_SELECTED_COLOR].option = OPTION_UI_SELECTED_COLOR;
+	m_color_table[MUI_SLIDER_COLOR].color = UI_SLIDER_COLOR;
+	m_color_table[MUI_SLIDER_COLOR].option = OPTION_UI_SLIDER_COLOR;
+	m_color_table[MUI_SUBITEM_COLOR].color = UI_SUBITEM_COLOR;
+	m_color_table[MUI_SUBITEM_COLOR].option = OPTION_UI_SUBITEM_COLOR;
+	m_color_table[MUI_TEXT_BG_COLOR].color = UI_TEXT_BG_COLOR;
+	m_color_table[MUI_TEXT_BG_COLOR].option = OPTION_UI_TEXT_BG_COLOR;
+	m_color_table[MUI_TEXT_COLOR].color = UI_TEXT_COLOR;
+	m_color_table[MUI_TEXT_COLOR].option = OPTION_UI_TEXT_COLOR;
+	m_color_table[MUI_UNAVAILABLE_COLOR].color = UI_UNAVAILABLE_COLOR;
+	m_color_table[MUI_UNAVAILABLE_COLOR].option = OPTION_UI_UNAVAILABLE_COLOR;
 }
 
 //-------------------------------------------------
@@ -431,8 +430,8 @@ ui_menu_colors_ui::~ui_menu_colors_ui()
 
 	for (int index = 1; index < MUI_RESTORE; index++)
 	{
-		sprintf(dec_color, "%x", (UINT32)color_table[index].color);
-		machine().options().set_value(color_table[index].option, dec_color, OPTION_PRIORITY_CMDLINE, error_string);
+		sprintf(dec_color, "%x", (UINT32)m_color_table[index].color);
+		machine().options().set_value(m_color_table[index].option, dec_color, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 }
 
@@ -450,7 +449,7 @@ void ui_menu_colors_ui::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL && menu_event->iptkey == IPT_UI_SELECT)
 	{
 		if ((FPTR)menu_event->itemref != MUI_RESTORE)
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_rgb_ui(machine(), container, &color_table[(FPTR)menu_event->itemref].color, item[selected].text)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_rgb_ui(machine(), container, &m_color_table[(FPTR)menu_event->itemref].color, item[selected].text)));
 		else
 		{
 			changed = true;
@@ -469,21 +468,21 @@ void ui_menu_colors_ui::handle()
 void ui_menu_colors_ui::populate()
 {
 	item_append("Normal text", NULL, 0, (void *)MUI_TEXT_COLOR);
-	item_append("Selected color", NULL, 0, (void *)MUI_SELECTED_COLOR);
+	item_append("Selected m_color", NULL, 0, (void *)MUI_SELECTED_COLOR);
 	item_append("Normal text background", NULL, 0, (void *)MUI_TEXT_BG_COLOR);
-	item_append("Selected background color", NULL, 0, (void *)MUI_SELECTED_BG_COLOR);
-	item_append("Subitem color", NULL, 0, (void *)MUI_SUBITEM_COLOR);
+	item_append("Selected background m_color", NULL, 0, (void *)MUI_SELECTED_BG_COLOR);
+	item_append("Subitem m_color", NULL, 0, (void *)MUI_SUBITEM_COLOR);
 	item_append("Clone", NULL, 0, (void *)MUI_CLONE_COLOR);
 	item_append("Border", NULL, 0, (void *)MUI_BORDER_COLOR);
 	item_append("Background", NULL, 0, (void *)MUI_BACKGROUND_COLOR);
 	item_append("Dipswitch", NULL, 0, (void *)MUI_DIPSW_COLOR);
-	item_append("Unavailable color", NULL, 0, (void *)MUI_UNAVAILABLE_COLOR);
-	item_append("Slider color", NULL, 0, (void *)MUI_SLIDER_COLOR);
+	item_append("Unavailable m_color", NULL, 0, (void *)MUI_UNAVAILABLE_COLOR);
+	item_append("Slider m_color", NULL, 0, (void *)MUI_SLIDER_COLOR);
 	item_append("Gfx viewer background", NULL, 0, (void *)MUI_GFXVIEWER_BG_COLOR);
-	item_append("Mouse over color", NULL, 0, (void *)MUI_MOUSEOVER_COLOR);
-	item_append("Mouse over background color", NULL, 0, (void *)MUI_MOUSEOVER_BG_COLOR);
-	item_append("Mouse down color", NULL, 0, (void *)MUI_MOUSEDOWN_COLOR);
-	item_append("Mouse down background color", NULL, 0, (void *)MUI_MOUSEDOWN_BG_COLOR);
+	item_append("Mouse over m_color", NULL, 0, (void *)MUI_MOUSEOVER_COLOR);
+	item_append("Mouse over background m_color", NULL, 0, (void *)MUI_MOUSEOVER_BG_COLOR);
+	item_append("Mouse down m_color", NULL, 0, (void *)MUI_MOUSEDOWN_COLOR);
+	item_append("Mouse down background m_color", NULL, 0, (void *)MUI_MOUSEDOWN_BG_COLOR);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Restore originals colors", NULL, 0, (void *)MUI_RESTORE);
@@ -531,7 +530,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	// get the text for 'UI Select'
 	std::string ui_select_text;
 	machine().input().seq_name(ui_select_text, machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
-	topbuf.assign("Double click or press ").append(ui_select_text.c_str()).append(" to change the color value");
+	topbuf.assign("Double click or press ").append(ui_select_text.c_str()).append(" to change the m_color value");
 
 	machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
@@ -605,7 +604,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y2 = y1 + 5.0f * line_height + 2.0f * UI_BOX_TB_BORDER;
 
 	// draw a box
-	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, color_table[MUI_BACKGROUND_COLOR].color);
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, m_color_table[MUI_BACKGROUND_COLOR].color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -614,29 +613,29 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 
 	// draw normal text
 	machine().ui().draw_text_full(container, sampletxt[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, color_table[MUI_TEXT_COLOR].color, color_table[MUI_TEXT_BG_COLOR].color, NULL, NULL);
+	                              DRAW_NORMAL, m_color_table[MUI_TEXT_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, NULL, NULL);
 	y1 += line_height;
 
 	// draw subitem text
 	machine().ui().draw_text_full(container, sampletxt[1].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, color_table[MUI_SUBITEM_COLOR].color, color_table[MUI_TEXT_BG_COLOR].color, NULL, NULL);
+	                              DRAW_NORMAL, m_color_table[MUI_SUBITEM_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, NULL, NULL);
 	y1 += line_height;
 
 	// draw selected text
-	highlight(container, x1, y1, x2, y1 + line_height, color_table[MUI_SELECTED_BG_COLOR].color);
+	highlight(container, x1, y1, x2, y1 + line_height, m_color_table[MUI_SELECTED_BG_COLOR].color);
 	machine().ui().draw_text_full(container, sampletxt[2].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, color_table[MUI_SELECTED_COLOR].color, color_table[MUI_SELECTED_BG_COLOR].color, NULL, NULL);
+	                              DRAW_NORMAL, m_color_table[MUI_SELECTED_COLOR].color, m_color_table[MUI_SELECTED_BG_COLOR].color, NULL, NULL);
 	y1 += line_height;
 
 	// draw mouse over text
-	highlight(container, x1, y1, x2, y1 + line_height, color_table[MUI_MOUSEOVER_BG_COLOR].color);
+	highlight(container, x1, y1, x2, y1 + line_height, m_color_table[MUI_MOUSEOVER_BG_COLOR].color);
 	machine().ui().draw_text_full(container, sampletxt[3].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, color_table[MUI_MOUSEOVER_COLOR].color, color_table[MUI_MOUSEOVER_BG_COLOR].color, NULL, NULL);
+	                              DRAW_NORMAL, m_color_table[MUI_MOUSEOVER_COLOR].color, m_color_table[MUI_MOUSEOVER_BG_COLOR].color, NULL, NULL);
 	y1 += line_height;
 
 	// draw clone text
 	machine().ui().draw_text_full(container, sampletxt[4].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, color_table[MUI_CLONE_COLOR].color, color_table[MUI_TEXT_BG_COLOR].color, NULL, NULL);
+	                              DRAW_NORMAL, m_color_table[MUI_CLONE_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, NULL, NULL);
 
 }
 
@@ -648,7 +647,7 @@ void ui_menu_colors_ui::restore_colors()
 {
 	emu_options options;
 	for (int index = 1; index < MUI_RESTORE; index++)
-		color_table[index].color = rgb_t((UINT32)strtoul(options.value(color_table[index].option), NULL, 16));
+		m_color_table[index].color = rgb_t((UINT32)strtoul(options.value(m_color_table[index].option), NULL, 16));
 }
 
 /***************************************************************************
@@ -660,10 +659,10 @@ void ui_menu_colors_ui::restore_colors()
 
 ui_menu_rgb_ui::ui_menu_rgb_ui(running_machine &machine, render_container *container, rgb_t *_color, std::string _title) : ui_menu(machine, container)
 {
-	color = _color;
-	key_active = false;
-	lock_ref = 0;
-	title.assign(_title);
+	m_color = _color;
+	m_key_active = false;
+	m_lock_ref = 0;
+	m_title.assign(_title);
 }
 
 //-------------------------------------------------
@@ -685,7 +684,7 @@ void ui_menu_rgb_ui::handle()
 	// process the menu
 	const ui_menu_event *menu_event;
 
-	if (!key_active)
+	if (!m_key_active)
 		menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
 	else
 		menu_event = process(UI_MENU_PROCESS_ONLYCHAR);
@@ -695,15 +694,15 @@ void ui_menu_rgb_ui::handle()
 		switch ((FPTR)menu_event->itemref)
 		{
 			case RGB_ALPHA:
-				if (menu_event->iptkey == IPT_UI_LEFT && color->a() > 1)
+				if (menu_event->iptkey == IPT_UI_LEFT && m_color->a() > 1)
 				{
-					color->set_a(color->a() - 1);
+					m_color->set_a(m_color->a() - 1);
 					changed = true;
 				}
 
-				else if (menu_event->iptkey == IPT_UI_RIGHT && color->a() < 255)
+				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->a() < 255)
 				{
-					color->set_a(color->a() + 1);
+					m_color->set_a(m_color->a() + 1);
 					changed = true;
 				}
 
@@ -716,15 +715,15 @@ void ui_menu_rgb_ui::handle()
 				break;
 
 			case RGB_RED:
-				if (menu_event->iptkey == IPT_UI_LEFT && color->r() > 1)
+				if (menu_event->iptkey == IPT_UI_LEFT && m_color->r() > 1)
 				{
-					color->set_r(color->r() - 1);
+					m_color->set_r(m_color->r() - 1);
 					changed = true;
 				}
 
-				else if (menu_event->iptkey == IPT_UI_RIGHT && color->r() < 255)
+				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->r() < 255)
 				{
-					color->set_r(color->r() + 1);
+					m_color->set_r(m_color->r() + 1);
 					changed = true;
 				}
 
@@ -737,15 +736,15 @@ void ui_menu_rgb_ui::handle()
 				break;
 
 			case RGB_GREEN:
-				if (menu_event->iptkey == IPT_UI_LEFT && color->g() > 1)
+				if (menu_event->iptkey == IPT_UI_LEFT && m_color->g() > 1)
 				{
-					color->set_g(color->g() - 1);
+					m_color->set_g(m_color->g() - 1);
 					changed = true;
 				}
 
-				else if (menu_event->iptkey == IPT_UI_RIGHT && color->g() < 255)
+				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->g() < 255)
 				{
-					color->set_g(color->g() + 1);
+					m_color->set_g(m_color->g() + 1);
 					changed = true;
 				}
 
@@ -758,15 +757,15 @@ void ui_menu_rgb_ui::handle()
 				break;
 
 			case RGB_BLUE:
-				if (menu_event->iptkey == IPT_UI_LEFT && color->b() > 1)
+				if (menu_event->iptkey == IPT_UI_LEFT && m_color->b() > 1)
 				{
-					color->set_b(color->b() - 1);
+					m_color->set_b(m_color->b() - 1);
 					changed = true;
 				}
 
-				else if (menu_event->iptkey == IPT_UI_RIGHT && color->b() < 255)
+				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->b() < 255)
 				{
-					color->set_b(color->b() + 1);
+					m_color->set_b(m_color->b() + 1);
 					changed = true;
 				}
 
@@ -780,7 +779,7 @@ void ui_menu_rgb_ui::handle()
 
 			case PALETTE_CHOOSE:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_palette_sel(machine(), container, *color)));
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_palette_sel(machine(), container, *m_color)));
 				break;
 		}
 	}
@@ -800,37 +799,37 @@ void ui_menu_rgb_ui::populate()
 	std::string text;
 	std::string s_text = std::string(m_search).append("_");
 
-	if (lock_ref != RGB_ALPHA)
+	if (m_lock_ref != RGB_ALPHA)
 	{
-		arrow_flags = get_arrow_flags(0, 255, color->a());
-		strprintf(text, "%3d", color->a());
+		arrow_flags = get_arrow_flags(0, 255, m_color->a());
+		strprintf(text, "%3d", m_color->a());
 		item_append("Alpha", text.c_str(), arrow_flags, (void *)RGB_ALPHA);
 	}
 	else
 		item_append("Alpha", s_text.c_str(), 0, (void *)RGB_ALPHA);
 
-	if (lock_ref != RGB_RED)
+	if (m_lock_ref != RGB_RED)
 	{
-		arrow_flags = get_arrow_flags(0, 255, color->r());
-		strprintf(text, "%3d", color->r());
+		arrow_flags = get_arrow_flags(0, 255, m_color->r());
+		strprintf(text, "%3d", m_color->r());
 		item_append("Red", text.c_str(), arrow_flags, (void *)RGB_RED);
 	}
 	else
 		item_append("Red", s_text.c_str(), 0, (void *)RGB_RED);
 
-	if (lock_ref != RGB_GREEN)
+	if (m_lock_ref != RGB_GREEN)
 	{
-		arrow_flags = get_arrow_flags(0, 255, color->g());
-		strprintf(text, "%3d", color->g());
+		arrow_flags = get_arrow_flags(0, 255, m_color->g());
+		strprintf(text, "%3d", m_color->g());
 		item_append("Green", text.c_str(), arrow_flags, (void *)RGB_GREEN);
 	}
 	else
 		item_append("Green", s_text.c_str(), 0, (void *)RGB_GREEN);
 
-	if (lock_ref != RGB_BLUE)
+	if (m_lock_ref != RGB_BLUE)
 	{
-		arrow_flags = get_arrow_flags(0, 255, color->b());
-		strprintf(text, "%3d", color->b());
+		arrow_flags = get_arrow_flags(0, 255, m_color->b());
+		strprintf(text, "%3d", m_color->b());
 		item_append("Blue", text.c_str(), arrow_flags, (void *)RGB_BLUE);
 	}
 	else
@@ -853,7 +852,7 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	float width, maxwidth = origx2 - origx1;
 
 	// top text
-	std::string topbuf = std::string(title).append(" - ARGB Settings");
+	std::string topbuf = std::string(m_title).append(" - ARGB Settings");
 	machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
@@ -907,7 +906,7 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	x2 = t_x2;
 	y1 -= UI_BOX_TB_BORDER;
 
-	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, *color);
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, *m_color);
 
 }
 
@@ -919,40 +918,40 @@ void ui_menu_rgb_ui::inkey_special(const ui_menu_event *menu_event)
 {
 	if (menu_event->iptkey == IPT_UI_SELECT)
 	{
-		key_active = !key_active;
-		lock_ref = (FPTR)menu_event->itemref;
+		m_key_active = !m_key_active;
+		m_lock_ref = (FPTR)menu_event->itemref;
 
-		if (!key_active)
+		if (!m_key_active)
 		{
 			int val = atoi(m_search);
-			val = color->clamp(val);
+			val = m_color->clamp(val);
 
 			switch ((FPTR)menu_event->itemref)
 			{
 				case RGB_ALPHA:
-					color->set_a(val);
+					m_color->set_a(val);
 					break;
 
 				case RGB_RED:
-					color->set_r(val);
+					m_color->set_r(val);
 					break;
 
 				case RGB_GREEN:
-					color->set_g(val);
+					m_color->set_g(val);
 					break;
 
 				case RGB_BLUE:
-					color->set_b(val);
+					m_color->set_b(val);
 					break;
 			}
 
 			m_search[0] = 0;
-			lock_ref = 0;
+			m_lock_ref = 0;
 			return;
 		}
 	}
 
-	if (!key_active)
+	if (!m_key_active)
 	{
 		m_search[0] = 0;
 		return;
@@ -1033,7 +1032,7 @@ void ui_menu_palette_sel::handle()
 void ui_menu_palette_sel::populate()
 {
 	for (int x = 0; x < ARRAY_LENGTH(m_palette); ++x)
-		item_append(m_palette[x].m_name, m_palette[x].m_argb, MENU_FLAG_MEWUI_PALETTE, (void *)(FPTR)(x + 1));
+		item_append(m_palette[x].name, m_palette[x].argb, MENU_FLAG_MEWUI_PALETTE, (void *)(FPTR)(x + 1));
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 }

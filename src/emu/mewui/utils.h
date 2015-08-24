@@ -202,57 +202,6 @@ struct c_year
 	static UINT16 actual;
 };
 
-// Software region
-struct c_sw_region
-{
-	std::vector<std::string> ui;
-	UINT16 actual;
-	void set(const char *str);
-	std::string getname(const char *str);
-};
-
-// Software publishers
-struct c_sw_publisher
-{
-	std::vector<std::string> ui;
-	UINT16 actual;
-	void set(const char *str);
-	std::string getname(const char *str);
-};
-
-// Software device type
-struct c_sw_type
-{
-	std::vector<std::string> ui;
-	UINT16 actual;
-	void set(const char *str);
-};
-
-// Software device type
-struct c_sw_list
-{
-	std::vector<std::string> name;
-	std::vector<std::string> description;
-	UINT16 actual;
-};
-
-// Software years
-struct c_sw_year
-{
-	std::vector<std::string> ui;
-	UINT16 actual;
-	void set(const char *str);
-};
-
-struct s_filter
-{
-	c_sw_region         m_region;
-	c_sw_publisher      m_publisher;
-	c_sw_year           m_year;
-	c_sw_type           m_type;
-	c_sw_list           m_swlist;
-};
-
 // GLOBAL CLASS
 struct mewui_globals
 {
