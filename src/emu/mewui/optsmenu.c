@@ -222,21 +222,12 @@ void ui_menu_game_options::populate()
 	{
 		int actual_file = machine().inifile().current_file;
 
-		if (machine().inifile().ini_index.size() == 1)
-			arrow_flags = 0;
-		else
-			arrow_flags = get_arrow_flags(0, machine().inifile().ini_index.size() - 1, actual_file);
-
+		arrow_flags = get_arrow_flags(0, machine().inifile().ini_index.size() - 1, actual_file);
 		convert_command_glyph(fbuff);
 		item_append(fbuff.c_str(), machine().inifile().ini_index[actual_file].name.c_str(), arrow_flags, (void *)FILE_CATEGORY_FILTER);
 
 		int actual_category = machine().inifile().current_category;
-
-		if (machine().inifile().ini_index[actual_file].category.size() == 1)
-			arrow_flags = 0;
-		else
-			arrow_flags = get_arrow_flags(0, machine().inifile().ini_index[actual_file].category.size() - 1, actual_category);
-
+		arrow_flags = get_arrow_flags(0, machine().inifile().ini_index[actual_file].category.size() - 1, actual_category);
 		fbuff.assign(" ^!Category");
 		convert_command_glyph(fbuff);
 		item_append(fbuff.c_str(), machine().inifile().ini_index[actual_file].category[actual_category].name.c_str(), arrow_flags, (void *)CATEGORY_FILTER);
@@ -244,11 +235,7 @@ void ui_menu_game_options::populate()
 	// add manufacturer subitem
 	else if (mewui_globals::actual_filter == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 	{
-		if (c_mnfct::ui.size() == 1)
-			arrow_flags = 0;
-		else
-			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
-
+		arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
 		fbuff.assign("^!Manufacturer");
 		convert_command_glyph(fbuff);
 		item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)MANUFACT_CAT_FILTER);
@@ -256,11 +243,7 @@ void ui_menu_game_options::populate()
 	// add year subitem
 	else if (mewui_globals::actual_filter == FILTER_YEAR && c_year::ui.size() > 0)
 	{
-		if (c_year::ui.size() == 1)
-			arrow_flags = 0;
-		else
-			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
-
+		arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
 		fbuff.assign("^!Year");
 		convert_command_glyph(fbuff);
 		item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)YEAR_CAT_FILTER);

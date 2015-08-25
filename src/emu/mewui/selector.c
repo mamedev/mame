@@ -20,10 +20,10 @@
 
 ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> s_sel, UINT16 *s_actual, int category, int _hover) : ui_menu(machine, container)
 {
-	p_category = category;
+	m_category = category;
 	m_selector = s_actual;
 	m_first_pass = true;
-	hover = _hover;
+	m_hover = _hover;
 	m_str_items = s_sel;
 }
 
@@ -48,7 +48,7 @@ void ui_menu_selector::handle()
 				if ((void*)&m_str_items[idx] == menu_event->itemref)
 					*m_selector = idx;
 
-			switch (p_category)
+			switch (m_category)
 			{
 				case SELECTOR_INIFILE:
 					machine().inifile().current_file = *m_selector;
@@ -62,12 +62,12 @@ void ui_menu_selector::handle()
 					break;
 
 				case SELECTOR_GAME:
-					mewui_globals::actual_filter = hover;
+					mewui_globals::actual_filter = m_hover;
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
 					break;
 
 				case SELECTOR_SOFTWARE:
-					mewui_globals::actual_sw_filter = hover;
+					mewui_globals::actual_sw_filter = m_hover;
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
 					break;
 

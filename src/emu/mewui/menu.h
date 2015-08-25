@@ -23,7 +23,10 @@ public:
 	template <typename _T1, typename _T2, typename _T3>
 	UINT32 get_arrow_flags(_T1 min, _T2 max, _T3 actual)
 	{
-		return ((actual <= min) ? MENU_FLAG_RIGHT_ARROW : (actual >= max ? MENU_FLAG_LEFT_ARROW : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)));
+		if (max == 0)
+			return 0;
+		else
+			return ((actual <= min) ? MENU_FLAG_RIGHT_ARROW : (actual >= max ? MENU_FLAG_LEFT_ARROW : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)));
 	}
 
 protected:
