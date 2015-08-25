@@ -814,7 +814,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 	{
 	case 0x00:
 		m_sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
-		// TODO: implement a decent, not slow, brightness control
+		m_screen->set_brightness(m_sysport.contrast * 0x11);
 		break;
 	case 0x01:
 		m_sysport.monitor = data & 0x08;
