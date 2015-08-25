@@ -35,6 +35,8 @@
 #include "config.h"
 #include "winutf8.h"
 
+#include "winutil.h"
+
 extern int drawnone_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawgdi_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawdd_init(running_machine &machine, osd_draw_callbacks *callbacks);
@@ -885,7 +887,7 @@ static void create_window_class(void)
 
 		// initialize the description of the window class
 		wc.lpszClassName    = TEXT("MAME");
-		wc.hInstance        = GetModuleHandle(NULL);
+		wc.hInstance        = GetModuleHandleUni();
 		wc.lpfnWndProc      = winwindow_video_window_proc_ui;
 		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
 		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
@@ -1191,7 +1193,7 @@ int win_window_info::complete_create()
 						monitorbounds.left() + 100, monitorbounds.top() + 100,
 						NULL,//(win_window_list != NULL) ? win_window_list->m_hwnd : NULL,
 						menu,
-						GetModuleHandle(NULL),
+						GetModuleHandleUni(),
 						NULL);
 	if (m_hwnd == NULL)
 		return 1;
