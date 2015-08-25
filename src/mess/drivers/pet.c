@@ -833,6 +833,15 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
+//  INPUT_PORTS( petb_fr )
+//-------------------------------------------------
+
+INPUT_PORTS_START( petb_fr )
+	PORT_INCLUDE( petb )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( petb_se )
 //-------------------------------------------------
 
@@ -2296,6 +2305,23 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( cbm8032_fr )
+//-------------------------------------------------
+
+ROM_START( cbm8032_fr )
+	ROM_REGION( 0x7000, M6502_TAG, 0 )
+	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "8032_editor_80c_fr_a1ab.ud7", 0x5000, 0x1000, CRC(4d3d9918) SHA1(eedac298a201a28ad86a5939b569a46f9f12c16f) )
+	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "8032_chargen_80c_fr_b9c1.ua3", 0x0000, 0x1000, CRC(d7424620) SHA1(e74c0eabb921d4a34032b57a7ee61ce61ec8a10c) )
+ROM_END
+
+
+//-------------------------------------------------
 //  ROM( cbm8032_se )
 //-------------------------------------------------
 
@@ -2580,6 +2606,7 @@ COMP( 1980, cbm4032b,   pet4032b,   0,      cbm4032b,   petb,       driver_devic
 COMP( 1980, pet8032,    0,          0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "PET 8032",     MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032,    pet8032,    0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8032",     MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032_de, pet8032,    0,      pet8032,    petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_fr, pet8032,    0,      pet8032,    petb_fr,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (France)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032_se, pet8032,    0,      pet8032,    petb_se,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    MACHINE_SUPPORTS_SAVE )
 COMP( 1981, superpet,   pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1981, mmf9000,    pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -27,10 +27,14 @@
 #define WAVERAM1_WIDTH      512
 #define WAVERAM1_HEIGHT     512
 
-#define BLEND_OPAQUE		0x00000000
+#define BLEND_OPAQUE1		0x00000000
 #define BLEND_OPAQUE2		0x4b23cb00
-#define BLEND_ADD			0x40b68800
-#define BLEND_SUB			0x4093c800
+#define BLEND_OPAQUE3		0x4b23dd00
+#define BLEND_OPAQUE4		0x00004800
+#define BLEND_OPAQUE5		0xdd23dd00
+#define BLEND_ADD1			0x40b68800
+#define BLEND_ADD2			0xc9b78800
+#define BLEND_MUL1			0x4093c800
 
 
 /*************************************
@@ -41,18 +45,21 @@
 
 struct mz_poly_extra_data
 {
-	const void *    palbase;
-	const void *    texbase;
-	UINT16          solidcolor;
-	UINT16          voffset;
-	INT16           zoffset;
-	UINT16          transcolor;
-	UINT16          texwidth;
-	UINT16          color;
-	UINT32          alpha;
+	const void *	palbase;
+	const void *	texbase;
+	UINT16			solidcolor;
+	UINT16			voffset;
+	INT16			zoffset;
+	UINT16			transcolor;
+	UINT16			texwidth;
+	UINT16			color;
+	UINT32			alpha;
+	UINT32			ctrl_word;
 	bool			blend_enable;
+	bool			depth_test_enable;
+	bool			depth_write_enable;
 	UINT32			blend;
-	UINT8           (*get_texel)(const void *, int, int, int);
+	UINT8			(*get_texel)(const void *, int, int, int);
 };
 
 
@@ -73,6 +80,7 @@ static INT32 zeus_point[3];
 static INT16 zeus_light[3];
 static void *zeus_renderbase;
 static UINT32 zeus_palbase;
+static UINT32 zeus_unkbase;
 static int zeus_enable_logging;
 static UINT32 zeus_objdata;
 static rectangle zeus_cliprect;
@@ -94,9 +102,7 @@ INLINE UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width);
 INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width);
 INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width);
 
-static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
-static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
-static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 static void render_poly_solid_fixedz(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 
@@ -172,12 +178,6 @@ INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
  *
  *************************************/
 
-INLINE void waveram_plot(int y, int x, UINT16 color)
-{
-	if (zeus_cliprect.contains(x, y))
-		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
-}
-
 INLINE void waveram_plot_depth(int y, int x, UINT16 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
@@ -185,6 +185,13 @@ INLINE void waveram_plot_depth(int y, int x, UINT16 color, UINT16 depth)
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 		WAVERAM_WRITEDEPTH(zeus_renderbase, y, x, depth);
 	}
+}
+
+#ifdef UNUSED_FUNCTION
+INLINE void waveram_plot(int y, int x, UINT16 color)
+{
+	if (zeus_cliprect.contains(x, y))
+		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 }
 
 INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
@@ -200,7 +207,6 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
@@ -219,31 +225,30 @@ INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 
  *
  *************************************/
 
-INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
-{
-	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
-	return WAVERAM_READ8(base, byteoffs);
-}
-
-
-INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width)
-{
-	UINT32 byteoffs =  (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
-	return WAVERAM_READ8(base, byteoffs);
-}
-
-
+// 4x2 block size
 INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 }
 
+INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
+{
+	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
+	return WAVERAM_READ8(base, byteoffs);
+}
 
+// 2x2 block size
 INLINE UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
+}
+
+INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width)
+{
+	UINT32 byteoffs =  (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
+	return WAVERAM_READ8(base, byteoffs);
 }
 
 /*************************************
@@ -488,6 +493,12 @@ void midzeus_state::zeus_pointer_w(UINT32 which, UINT32 data, int logit)
 			if (logit)
 				logerror(" -- setptr(palbase)\n");
 			zeus_palbase = data;
+			break;
+
+		case 0x02c0f0:
+			if (logit)
+				logerror(" -- setptr(unkbase)\n");
+			zeus_unkbase = data;
 			break;
 
 
@@ -907,13 +918,12 @@ int midzeus_state::zeus_fifo_process(const UINT32 *data, int numwords)
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, "");
-				logerror(" -- additional xyz = %d,%d,%d\n", (INT16)data[0], (INT16)(data[1] >> 16), (INT16)data[1]);
-
-				/* guessing this might be a light source? */
-				zeus_light[0] = (INT16)data[0];
-				zeus_light[1] = (INT16)(data[1] >> 16);
-				zeus_light[2] = (INT16)data[1];
+				logerror(" -- light xyz = %d,%d,%d\n", (INT16)data[1], (INT16)(data[1] >> 16), (INT16)data[0]);
 			}
+
+			zeus_light[0] = (INT16)(data[1] & 0xffff);
+			zeus_light[1] = (INT16)(data[1] >> 16);
+			zeus_light[2] = (INT16)(data[0] & 0xffff);
 			break;
 		/* 0x25: display control? */
 		/* 0x28: same for mk4b */
@@ -1092,58 +1102,22 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 	mz_poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
-	float uscale, vscale;
+	UINT32 ushift, vshift;
 	float maxy, maxx;
-	int val2, texbase, texwshift;
-	int numverts;
-	int i;
-	INT16 normal[3];
-	INT32 rotnormal[3];
+	UINT32 texbase, texwshift;
+	UINT32 numverts;
 
-	INT32 ctrl_word = databuffer[long_fmt ? 1 : 9];
-
-	/* look for interesting data patterns  */
-	if (
-		(ctrl_word & 0xffffffff) != 0x200c0000 && /* mk4 sometimes */
-		(ctrl_word & 0xfffe0000) != 0x21000000 && /* most of mk4 */
-		(ctrl_word & 0xffffffff) != 0x008c0000 && /* invasn */
-		(ctrl_word & 0xfffeffff) != 0x028c0000 && /* invasn */
-		(ctrl_word & 0xfffe0000) != 0x21800000 && /* invasn */
-		(ctrl_word & 0xfffe0000) != 0x23800000 && /* invasn */
-		1)
-		printf("zeus_draw_quad: ctrl_word = %08X\n", ctrl_word);
-
-
-	/* do a simple backface cull; not sure if the hardware does it, but I see no other
-	   reason for a polygon normal here */
-
-	/* extract the polygon normal */
-	normal[0] = (INT8)(databuffer[0] >> 0);
-	normal[1] = (INT8)(databuffer[0] >> 8);
-	normal[2] = (INT8)(databuffer[0] >> 16);
-
-	/* rotate the normal into camera view; we only need the Z coordinate */
-	rotnormal[2] = normal[0] * zeus_matrix[2][0] + normal[1] * zeus_matrix[2][1] + normal[2] * zeus_matrix[2][2];
-
-	/* if we're pointing away from the camera, toss */
-	if (rotnormal[2] > 0)
-	{
-		if (logit)
-			logerror("quad (culled %08X)\n", rotnormal[2]);
-//      if (machine().input().code_pressed(KEYCODE_COMMA))
-//          return;
-	}
+	UINT32 ctrl_word = databuffer[long_fmt ? 1 : 9];
 
 	texbase = ((texdata >> 10) & 0x3f0000) | (texdata & 0xffff);
-	val2 = (texdata >> 16) & 0x3ff;
-	texwshift = (val2 >> 6) & 7;
+	texwshift = (texdata >> 22) & 7;
 
-	uscale = (8 >> ((m_zeusbase[0x04] >> 4) & 3)) * 0.125f * 256.0f;
-	vscale = (8 >> ((m_zeusbase[0x04] >> 6) & 3)) * 0.125f * 256.0f;
+	ushift = 8 - ((m_zeusbase[0x04] >> 4) & 3);
+	vshift = 8 - ((m_zeusbase[0x04] >> 6) & 3);
 
 	int xy_offset = long_fmt ? 2 : 1;
 
-	for (i = 0; i < 4; i++)
+	for (UINT32 i = 0; i < 4; i++)
 	{
 		UINT32 ixy = databuffer[xy_offset + i*2];
 		UINT32 iuvz = databuffer[xy_offset + 1 + i*2];
@@ -1152,41 +1126,64 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 		INT32 zo = (INT16)iuvz;
 		UINT8 u = iuvz >> 16;
 		UINT8 v = iuvz >> 24;
-		INT32 dotnormal = 0;
 		INT64 x, y, z;
+
 
 		x = (INT64)(xo * zeus_matrix[0][0]) + (INT64)(yo * zeus_matrix[0][1]) + (INT64)(zo * zeus_matrix[0][2]) + zeus_point[0];
 		y = (INT64)(xo * zeus_matrix[1][0]) + (INT64)(yo * zeus_matrix[1][1]) + (INT64)(zo * zeus_matrix[1][2]) + zeus_point[1];
 		z = (INT64)(xo * zeus_matrix[2][0]) + (INT64)(yo * zeus_matrix[2][1]) + (INT64)(zo * zeus_matrix[2][2]) + zeus_point[2];
 
+		// Rounding hack
+		x = (x + 0x00004000) & ~0x00007fffULL;
+		y = (y + 0x00004000) & ~0x00007fffULL;
+		z = (z + 0x00004000) & ~0x00007fffULL;
+
+		// back face cull using polygon normal and first vertex
+		if (i == 0)
+		{
+			INT16 normal[3];
+			INT32 rotnormal[3];
+
+			normal[0] = (INT8)(databuffer[0] >> 0);
+			normal[1] = (INT8)(databuffer[0] >> 8);
+			normal[2] = (INT8)(databuffer[0] >> 16);
+
+			rotnormal[0] = normal[0] * zeus_matrix[0][0] + normal[1] * zeus_matrix[0][1] + normal[2] * zeus_matrix[0][2];
+			rotnormal[1] = normal[0] * zeus_matrix[1][0] + normal[1] * zeus_matrix[1][1] + normal[2] * zeus_matrix[1][2];
+			rotnormal[2] = normal[0] * zeus_matrix[2][0] + normal[1] * zeus_matrix[2][1] + normal[2] * zeus_matrix[2][2];
+
+			INT64 dot = rotnormal[0] * x + rotnormal[1] * y + rotnormal[2] * z;
+
+			if (dot >= 0)
+				return;
+		}
+
 		if (long_fmt)
 		{
+#if 0
+			// TODO: Lighting
 			UINT32 inormal = databuffer[10 + i];
-			INT32 xn = (INT32)(inormal <<  2) >> 20;
-			INT32 yn = (INT32)(inormal << 12) >> 20;
-			INT32 zn = (INT32)(inormal << 22) >> 20;
-
-			rotnormal[0] = ((INT64)(xn * zeus_matrix[0][0]) + (INT64)(yn * zeus_matrix[0][1]) + (INT64)(zn * zeus_matrix[0][2])) >> 14;
-			rotnormal[1] = ((INT64)(xn * zeus_matrix[1][0]) + (INT64)(yn * zeus_matrix[1][1]) + (INT64)(zn * zeus_matrix[1][2])) >> 14;
-			rotnormal[2] = ((INT64)(xn * zeus_matrix[2][0]) + (INT64)(yn * zeus_matrix[2][1]) + (INT64)(zn * zeus_matrix[2][2])) >> 14;
-
-			dotnormal = rotnormal[0] * ((x >> 16) + zeus_light[0]) + rotnormal[1] * ((y >> 16) + zeus_light[1]) + rotnormal[2] * ((z >> 16) + zeus_light[2]);
+			INT32 xn = (INT32)(((inormal >>  0) & 0x3ff) << 22) >> 22;
+			INT32 yn = (INT32)(((inormal >> 10) & 0x3ff) << 22) >> 22;
+			INT32 zn = (INT32)(((inormal >> 20) & 0x3ff) << 22) >> 22;
+#endif
 		}
 
 		vert[i].x = x;
 		vert[i].y = y;
 		vert[i].p[0] = z;
-		vert[i].p[1] = u * uscale;
-		vert[i].p[2] = v * vscale;
-		vert[i].p[3] = dotnormal;
+		vert[i].p[1] = u << ushift;
+		vert[i].p[2] = v << vshift;
+		vert[i].p[3] = 0xffff;
 
 		if (logit)
 		{
-			logerror("\t\t(%f,%f,%f) (%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
+			logerror("\t\t(%f,%f,%f) UV:(%02X,%02X) UV_SCALE:(%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
 					(double) vert[i].x * (1.0 / 65536.0), (double) vert[i].y * (1.0 / 65536.0), (double) vert[i].p[0] * (1.0 / 65536.0),
+				   (iuvz >> 16) & 0xff, (iuvz >> 24) & 0xff,
 					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f),
 					(databuffer[10 + i] >> 20) & 0x3ff, (databuffer[10 + i] >> 10) & 0x3ff, (databuffer[10 + i] >> 0) & 0x3ff,
-					dotnormal);
+					0);
 		}
 	}
 
@@ -1195,7 +1192,7 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 		return;
 
 	maxx = maxy = -1000.0f;
-	for (i = 0; i < numverts; i++)
+	for (UINT32 i = 0; i < numverts; i++)
 	{
 		float ooz = 512.0f / clipvert[i].p[0];
 
@@ -1206,10 +1203,11 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 
 		maxx = MAX(maxx, clipvert[i].x);
 		maxy = MAX(maxy, clipvert[i].y);
+
 		if (logit)
-			logerror("\t\t\tTranslated=(%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y);
+			logerror("\t\t\tTranslated=(%f,%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y, (double) clipvert[i].p[0]);
 	}
-	for (i = 0; i < numverts; i++)
+	for (UINT32 i = 0; i < numverts; i++)
 	{
 		if (clipvert[i].x == maxx)
 			clipvert[i].x += 0.0005f;
@@ -1219,30 +1217,21 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 
 	extra = (mz_poly_extra_data *)poly_get_extra_data(poly);
 
-	if ((ctrl_word & 0x000c0000) == 0x000c0000)
+	if (ctrl_word & 0x01000000)
 	{
-		callback = render_poly_solid;
-	}
-	else if (val2 == 0x182)
-	{
-		callback = render_poly_shade;
-	}
-	else if (ctrl_word & 0x01000000)
-	{
-		int tex_type = val2 & 3;
-
-		callback = render_poly_texture;
+		UINT32 tex_type = (texdata >> 16) & 3;
 		extra->texwidth = 512 >> texwshift;
 		extra->voffset = ctrl_word & 0xffff;
+
 		extra->texbase = waveram0_ptr_from_texture_addr(texbase, extra->texwidth);
 
 		if (tex_type == 1)
 		{
-			extra->get_texel = (val2 & 0x20) ? get_texel_8bit : get_texel_4bit;
+			extra->get_texel = texdata & 0x00200000 ? get_texel_8bit : get_texel_4bit;
 		}
 		else if (tex_type == 2)
 		{
-			extra->get_texel = (val2 & 0x20) ? get_texel_alt_8bit : get_texel_alt_4bit;
+			extra->get_texel = texdata & 0x00200000 ? get_texel_alt_8bit : get_texel_alt_4bit;
 		}
 		else
 		{
@@ -1250,16 +1239,16 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 			return;
 		}
 	}
-	else
-	{
-		printf("Unknown draw mode: %.8x\n", ctrl_word);
-		return;
-	}
+
+	callback = render_poly;
+
+	extra->ctrl_word = ctrl_word;
 	extra->solidcolor = m_zeusbase[0x00] & 0x7fff;
 	extra->zoffset = m_zeusbase[0x7e] >> 16;
 	extra->alpha = m_zeusbase[0x4e];
 	extra->blend = m_zeusbase[0x5c];
-	extra->blend_enable = m_zeusbase[0x5c] == BLEND_ADD || m_zeusbase[0x5c] == BLEND_SUB;
+	extra->depth_test_enable = !(m_zeusbase[0x04] & 0x800);
+	extra->depth_write_enable = m_zeusbase[0x04] & 0x200;
 	extra->transcolor = ((ctrl_word >> 16) & 1) ? 0 : 0x100;
 	extra->palbase = waveram0_ptr_from_block_addr(zeus_palbase);
 
@@ -1274,147 +1263,214 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
  *
  *************************************/
 
-static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
-	//INT32 curi = extent->param[3].start;
+	INT32 curi = extent->param[3].start;
 	INT32 dzdx = extent->param[0].dpdx;
 	INT32 dudx = extent->param[1].dpdx;
 	INT32 dvdx = extent->param[2].dpdx;
-	//INT32 didx = extent->param[3].dpdx;
+	INT32 didx = extent->param[3].dpdx;
 	const void *texbase = extra->texbase;
 	const void *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
-	int texwidth = extra->texwidth;
-	int x;
+	UINT32 texwidth = extra->texwidth;
 
-	for (x = extent->startx; x < extent->stopx; x++)
+	for (UINT32 x = extent->startx; x < extent->stopx; x++)
 	{
 		UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, scanline, x);
 		INT32 depth = (curz >> 16) + extra->zoffset;
-		if (depth > 0x7fff) depth = 0x7fff;
-		if (depth >= 0 && depth <= *depthptr)
+
+		if (depth > 0x7fff)
+			depth = 0x7fff;
+
+		UINT32 i8 = curi >> 8;
+
+		bool depth_pass;
+
+		if (extra->depth_test_enable)
+			depth_pass = depth >= 0 && depth <= *depthptr;
+		else
+			depth_pass = true;
+
+		if (depth_pass)
 		{
-			int u0 = (curu >> 8);
-			int v0 = (curv >> 8) + extra->voffset;
-			int u1 = (u0 + 1);
-			int v1 = (v0 + 1);
-			UINT8 texel0 = extra->get_texel(texbase, v0, u0, texwidth);
-			UINT8 texel1 = extra->get_texel(texbase, v0, u1, texwidth);
-			UINT8 texel2 = extra->get_texel(texbase, v1, u0, texwidth);
-			UINT8 texel3 = extra->get_texel(texbase, v1, u1, texwidth);
-			if (texel0 != transcolor)
+			rgb_t src=0;
+
+			bool src_valid = true;
+
+			if ((extra->ctrl_word & 0x000c0000) == 0x000c0000)
 			{
-				rgb_t color0 = WAVERAM_READ16(palbase, texel0);
-				rgb_t color1 = WAVERAM_READ16(palbase, texel1);
-				rgb_t color2 = WAVERAM_READ16(palbase, texel2);
-				rgb_t color3 = WAVERAM_READ16(palbase, texel3);
-				color0 = ((color0 & 0x7fe0) << 6) | (color0 & 0x1f);
-				color1 = ((color1 & 0x7fe0) << 6) | (color1 & 0x1f);
-				color2 = ((color2 & 0x7fe0) << 6) | (color2 & 0x1f);
-				color3 = ((color3 & 0x7fe0) << 6) | (color3 & 0x1f);
-				rgb_t filtered = rgbaint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
+				src.set_r(pal5bit(extra->solidcolor >> 10));
+				src.set_g(pal5bit(extra->solidcolor >> 5));
+				src.set_b(pal5bit(extra->solidcolor));
+			}
+			else
+			{
+				UINT32 u0 = curu >> 8;
+				UINT32 v0 = extra->voffset + (curv >> 8);
+				UINT32 u1 = u0 + 1;
+				UINT32 v1 = v0 + 1;
 
-				if (extra->blend_enable)
+				UINT8 texels[4];
+
+				texels[0] = extra->get_texel(texbase, v0, u0, texwidth);
+				texels[1] = extra->get_texel(texbase, v0, u1, texwidth);
+				texels[2] = extra->get_texel(texbase, v1, u0, texwidth);
+				texels[3] = extra->get_texel(texbase, v1, u1, texwidth);
+
+				if (texels[0] != transcolor)
 				{
-					UINT16 dst = WAVERAM_READPIX(zeus_renderbase, scanline, x);
-					INT32 dst_r = (dst >> 10) & 0x1f;
-					INT32 dst_g = (dst >> 5) & 0x1f;
-					INT32 dst_b = dst & 0x1f;
+					rgb_t color[4];
 
-					INT32 src_r = filtered.r();
-					INT32 src_g = filtered.g() >> 3;
-					INT32 src_b = filtered.b();
+					for (UINT32 i = 0; i < 4; ++i)
+					{
+						UINT16 pix = WAVERAM_READ16(palbase, texels[i]);
 
-					if (extra->blend == BLEND_ADD)
-					{
-						dst_r += src_r;
-						dst_g += src_g;
-						dst_b += src_b;
-						dst_r = ((dst_r > 0x1f) ? 0x1f : dst_r);
-						dst_g = ((dst_g > 0x1f) ? 0x1f : dst_g);
-						dst_b = ((dst_b > 0x1f) ? 0x1f : dst_b);
+						color[i].set_r(pal5bit(pix >> 10));
+						color[i].set_g(pal5bit(pix >> 5));
+						color[i].set_b(pal5bit(pix));
 					}
-					else if (extra->blend == BLEND_SUB)
-					{
-						dst_r -= src_r;
-						dst_g -= src_g;
-						dst_b -= src_b;
-						dst_r = ((dst_r < 0) ? 0 : dst_r);
-						dst_g = ((dst_g < 0) ? 0 : dst_g);
-						dst_b = ((dst_b < 0) ? 0 : dst_b);
-					}
-					WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, (dst_r << 10) | (dst_g << 5) | dst_b);
+
+					src = rgbaint_t::bilinear_filter(color[0], color[1], color[2], color[3], curu & 0xff, curv & 0xff);
 				}
 				else
 				{
-					WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, ((filtered >> 6) & 0x7fe0) | (filtered & 0x1f));
+					src_valid = false;
 				}
-				*depthptr = depth;
+			}
+
+			if (src_valid)
+			{
+				UINT32 srcr = src.r();
+				UINT32 srcg = src.g();
+				UINT32 srcb = src.b();
+
+				UINT32 dstr = 0;
+				UINT32 dstg = 0;
+				UINT32 dstb = 0;
+
+				UINT32 outr = 0;
+				UINT32 outg = 0;
+				UINT32 outb = 0;
+
+				UINT32 srca = extra->alpha & 0xff;
+				UINT32 dsta = (extra->alpha >> 8) & 0xff;
+
+				// Destination enable?
+				if (extra->blend & 0x00800000)
+				{
+					UINT16 dst = WAVERAM_READPIX(zeus_renderbase, scanline, x);
+
+					dstr = (dst >> 10) & 0x1f;
+					dstg = (dst >> 5) & 0x1f;
+					dstb = dst & 0x1f;
+
+					dstr = (dstr << 3) | (dstr >> 2);
+					dstg = (dstg << 3) | (dstg >> 2);
+					dstb = (dstb << 3) | (dstb >> 2);
+				}
+
+				switch (extra->blend)
+				{
+					case BLEND_OPAQUE1:
+					{
+						outr = srcr;
+						outg = srcg;
+						outb = srcb;
+						break;
+					}
+
+					case BLEND_OPAQUE2:
+					{
+						outr = (srcr * i8) >> 8;
+						outg = (srcg * i8) >> 8;
+						outb = (srcb * i8) >> 8;
+						break;
+					}
+
+					case BLEND_OPAQUE3:
+					{
+						outr = (srcr * i8) >> 8;
+						outg = (srcg * i8) >> 8;
+						outb = (srcb * i8) >> 8;
+						break;
+					}
+
+					case BLEND_OPAQUE4:
+					{
+						outr = srcr;
+						outg = srcg;
+						outb = srcb;
+						break;
+					}
+
+					case BLEND_OPAQUE5:
+					{
+						// TODO: Fog factor?
+						outr = (srcr * srca) >> 8;
+						outg = (srcg * srca) >> 8;
+						outb = (srcb * srca) >> 8;
+						break;
+					}
+
+					case BLEND_ADD1:
+					{
+						outr = ((srcr * srca) >> 8) + dstr;
+						outg = ((srcg * srca) >> 8) + dstg;
+						outb = ((srcb * srca) >> 8) + dstb;
+						break;
+					}
+
+					case BLEND_ADD2:
+					{
+						outr = ((srcr * srca) >> 8) + ((dstr * (dsta << 1)) >> 8);
+						outg = ((srcg * srca) >> 8) + ((dstg * (dsta << 1)) >> 8);
+						outb = ((srcb * srca) >> 8) + ((dstb * (dsta << 1)) >> 8);
+						break;
+					}
+
+					case BLEND_MUL1:
+					{
+						outr = (((srcr * (srca << 1)) >> 8) * dstr) >> 8;
+						outg = (((srcg * (srca << 1)) >> 8) * dstg) >> 8;
+						outb = (((srcb * (srca << 1)) >> 8) * dstb) >> 8;
+						break;
+					}
+					default:
+					{
+						outr = srcr;
+						outg = srcg;
+						outb = srcb;
+						break;
+					}
+				}
+
+				outr = outr > 0xff ? 0xff : outr;
+				outg = outg > 0xff ? 0xff : outg;
+				outb = outb > 0xff ? 0xff : outb;
+
+				outr >>= 3;
+				outg >>= 3;
+				outb >>= 3;
+
+				WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, (outr << 10) | (outg << 5) | outb);
+
+				if (extra->depth_write_enable)
+					*depthptr = depth;
 			}
 		}
 
 		curz += dzdx;
 		curu += dudx;
 		curv += dvdx;
-		//curi += didx;
+		curi += didx;
 	}
 }
 
-static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
-{
-	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
-	int x;
-
-	for (x = extent->startx; x < extent->stopx; x++)
-	{
-		if (x >= 0 && x < 400)
-		{
-			if (extra->alpha <= 0x80)
-			{
-				UINT16 *ptr = WAVERAM_PTRPIX(zeus_renderbase, scanline, x);
-				UINT16 pix = *ptr;
-
-				*ptr = ((((pix & 0x7c00) * extra->alpha) >> 7) & 0x7c00) |
-						((((pix & 0x03e0) * extra->alpha) >> 7) & 0x03e0) |
-						((((pix & 0x001f) * extra->alpha) >> 7) & 0x001f);
-			}
-			else
-			{
-				waveram_plot(scanline, x, 0);
-			}
-		}
-	}
-}
-
-
-static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
-{
-	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
-	UINT16 color = extra->solidcolor;
-	INT32 curz = (INT32)(extent->param[0].start);
-	INT32 curv = extent->param[2].start;
-	INT32 dzdx = (INT32)(extent->param[0].dpdx);
-	INT32 dvdx = extent->param[2].dpdx;
-	int x;
-
-	for (x = extent->startx; x < extent->stopx; x++)
-	{
-		INT32 depth = (curz >> 16) + extra->zoffset;
-		if (depth > 0x7fff) depth = 0x7fff;
-		if (depth >= 0)
-		{
-//          UINT32 finalcolor = (((color & 0x7c00) * curv) & 0x7c000000) | (((color & 0x03e0) * curv) & 0x03e00000) | (((color & 0x001f) * curv) & 0x001f0000);
-//          waveram_plot_check_depth(scanline, x, finalcolor >> 16, depth);
-			waveram_plot_check_depth(scanline, x, color, depth);
-		}
-		curz += dzdx;
-		curv += dvdx;
-	}
-}
 
 
 static void render_poly_solid_fixedz(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)

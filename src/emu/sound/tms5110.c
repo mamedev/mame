@@ -610,7 +610,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			 * convenient and should make no difference in output.
 			 */
 			if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_zero = 1;
-			if ((m_IP == 0)&&(m_pitch_zero = 1)) m_pitch_zero = 0;
+			if ((m_IP == 0)&&(m_pitch_zero==1)) m_pitch_zero = 0;
 #ifdef PERFECT_INTERPOLATION_HACK
 			m_old_zpar = m_zpar;
 #endif

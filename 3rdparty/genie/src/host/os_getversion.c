@@ -232,6 +232,30 @@ void getversion(struct OsVersionInfo* info)
 
 /*************************************************************/
 
+#elif defined(PLATFORM_OS2)
+
+#define INCL_DOS
+#include <os2.h>
+
+void getversion(struct OsVersionInfo* info)
+{
+	ULONG ulMajor;
+	ULONG ulMinor;
+	ULONG ulRev;
+
+	DosQuerySysInfo(QSV_VERSION_MAJOR, QSV_VERSION_MAJOR, &ulMajor, sizeof(ulMajor));
+	DosQuerySysInfo(QSV_VERSION_MINOR, QSV_VERSION_MINOR, &ulMinor, sizeof(ulMinor));
+	DosQuerySysInfo(QSV_VERSION_REVISION, QSV_VERSION_REVISION,
+					&ulRev, sizeof(ulRev));
+
+	info->majorversion = ulMajor;
+	info->minorversion = ulMinor;
+	info->revision = ulRev;
+	info->description = PLATFORM_STRING;
+}
+
+/*************************************************************/
+
 #else
 
 void getversion(struct OsVersionInfo* info)

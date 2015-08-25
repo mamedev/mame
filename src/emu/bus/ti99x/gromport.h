@@ -282,6 +282,8 @@ protected:
 	void                set_cartridge(ti99_cartridge_device *cart);
 	UINT16              grom_base();
 	UINT16              grom_mask();
+	const char*         tag() { return m_tag; }
+	void                set_tag(const char* tag) { m_tag = tag; }
 
 	ti99_cartridge_device*  m_cart;
 	ti99_grom_device*   m_grom[5];
@@ -290,12 +292,12 @@ protected:
 	int                 m_ram_size;
 
 	UINT8*              m_rom_ptr;
-	UINT8*              m_rom2_ptr;
 	UINT8*              m_ram_ptr;
 	int                 m_rom_page;     // for some cartridge types
 	UINT8*              m_grom_ptr;     // for gromemu
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
+	const char*         m_tag;
 private:
 };
 
@@ -359,6 +361,30 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 private:
 	int     get_paged379i_bank(int rompage);
+};
+
+/********************** Paged 378 ************************************/
+
+class ti99_paged378_cartridge : public ti99_cartridge_pcb
+{
+public:
+	~ti99_paged378_cartridge() { };
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
+private:
+	int     get_paged378_bank(int rompage);
+};
+
+/********************** Paged 377 ************************************/
+
+class ti99_paged377_cartridge : public ti99_cartridge_pcb
+{
+public:
+	~ti99_paged377_cartridge() { };
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
+private:
+	int     get_paged377_bank(int rompage);
 };
 
 /********************** Paged CRU  ************************************/

@@ -25,6 +25,7 @@ newoption {
 		{ "nacl",          "Native Client"          },
 		{ "nacl-arm",      "Native Client - ARM"    },
 		{ "netbsd",        "NetBSD"                },
+		{ "os2",           "OS/2"                   },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "pnacl",         "Native Client - PNaCl"  },
@@ -309,6 +310,10 @@ function toolchain(_buildDir, _subDir)
 
 		if "rpi" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
+		end
+
+		if "os2" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-os2")
 		end
 	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
 
@@ -857,6 +862,15 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "rpi" .. "/bin")
 		objdir (_buildDir .. "rpi" .. "/obj")
 
+	configuration { "os2" }
+		objdir (_buildDir .. "os2" .. "/obj")
+
+	configuration { "os2", "Release" }
+		targetdir (_buildDir .. "os2" .. "/bin/Release")
+
+	configuration { "os2", "Debug" }
+		targetdir (_buildDir .. "os2" .. "/bin/Debug")
+
 	configuration {} -- reset configuration
 
 	return true
@@ -917,6 +931,12 @@ function strip()
 			"$(SILENT) echo Running asmjs finalize.",
 			"$(SILENT) $(EMSCRIPTEN)/emcc -O2 -s TOTAL_MEMORY=268435456 \"$(TARGET)\" -o \"$(TARGET)\".html"
 			-- ALLOW_MEMORY_GROWTH
+		}
+
+	configuration { "os2", "Release" }
+		postbuildcommands {
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) lxlite /B- /L- /CS \"$(TARGET)\""
 		}
 
 	configuration {} -- reset configuration
