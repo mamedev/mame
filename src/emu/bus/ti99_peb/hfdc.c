@@ -350,10 +350,11 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 
        7     6     5     4     3     2     1     0
     +-----+-----+-----+-----+-----+-----+-----+-----+
-    |  0  |  0  |  0  |  0  |  0  | MON | DIP | IRQ |
+    |  0  |  0  |  0  |  0  | WAIT| MON*| DIP | IRQ |
     +-----+-----+-----+-----+-----+-----+-----+-----+
 
-    MON = Motor on
+    WAIT = Wait for WDS1 to become ready
+    MON* = Motor on
     DIP = DMA in progress
     IRQ = Interrupt request
     ---
@@ -375,7 +376,8 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 				reply = 0;
 				if (m_irq == ASSERT_LINE)  reply |= 0x01;
 				if (m_dip == ASSERT_LINE)  reply |= 0x02;
-				if (m_motor_running) reply |= 0x04;
+				if (!m_motor_running) reply |= 0x04;
+				if (m_wait_for_hd1) reply |= 0x08;
 			}
 			*value = reply;
 		}
@@ -888,6 +890,7 @@ void myarc_hfdc_device::device_reset()
 	}
 
 	m_cru_base = ioport("CRUHFDC")->read();
+	m_wait_for_hd1 = ioport("WAITHD1")->read();
 
 	// Resetting values
 	m_rom_page = 0;
@@ -956,6 +959,11 @@ void myarc_hfdc_device::device_config_complete()
     the drives 1 to 4 are renamed to DSK5-DSK8 (see [1] p. 7).
 */
 INPUT_PORTS_START( ti99_hfdc )
+	PORT_START( "WAITHD1" )
+	PORT_DIPNAME( 0x01, 0x00, "HFDC Wait for HD1" )
+		PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+
 	PORT_START( "CRUHFDC" )
 	PORT_DIPNAME( 0x1f00, 0x1100, "HFDC CRU base" )
 		PORT_DIPSETTING( 0x1000, "1000" )

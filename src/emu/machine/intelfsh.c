@@ -425,10 +425,10 @@ amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f080", __FILE__) { }
 
 amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F400 Flash", tag, owner, clock, FLASH_AMD_29F400T, "amd_29f400t", __FILE__) { }
+	: intelfsh8_device(mconfig, AMD_29F400T, "AMD 29F400 Flash", tag, owner, clock, FLASH_AMD_29F400T, "amd_29f400t", __FILE__) { }
 
 amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F800 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f800t", __FILE__) { }
+	: intelfsh8_device(mconfig, AMD_29F800T, "AMD 29F800 Flash", tag, owner, clock, FLASH_AMD_29F800T, "amd_29f800t", __FILE__) { }
 
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, "AMD 29LV200T Flash", tag, owner, clock, FLASH_AMD_29LV200T, "amd_29lv200t", __FILE__) { }
