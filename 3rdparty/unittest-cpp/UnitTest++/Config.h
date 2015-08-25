@@ -20,7 +20,8 @@
 #endif
 
 #if defined(unix) || defined(__unix__) || defined(__unix) || defined(linux) || \
-    defined(__APPLE__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__)        
+    defined(__APPLE__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__) || \
+    defined(__OS2__)
     #define UNITTEST_POSIX
 #endif
 
