@@ -142,6 +142,9 @@ private:
 	// DMA in progress
 	bool m_dma_in_progress;
 
+	// Wait for HD. This was an addition in later cards.
+	bool m_wait_for_hd1;
+
 	// Device Service Routine ROM (firmware)
 	UINT8*  m_dsrrom;
 
