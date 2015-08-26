@@ -2756,7 +2756,7 @@ ROM_START( wg3dh )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version L1.2 (10/8/96) */
 	ROM_LOAD( "wg3dh_12.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96) */
 	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) )
@@ -2770,7 +2770,7 @@ ROM_START( mace )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.0ce 7/2/97 */
 	ROM_LOAD( "mace10ce.u32", 0x000000, 0x80000, CRC(7a50b37e) SHA1(33788835f84a9443566c80bee9f20a1691490c6d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97) */
 	DISK_IMAGE( "mace", 0, SHA1(96ec8d3ff5dd894e21aa81403bcdbeba44bb97ea) )
@@ -2784,7 +2784,7 @@ ROM_START( macea )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version ??? 5/7/97 */
 	ROM_LOAD( "maceboot.u32", 0x000000, 0x80000, CRC(effe3ebc) SHA1(7af3ca3580d6276ffa7ab8b4c57274e15ee6bcbb) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97) */
 	DISK_IMAGE( "macea", 0, BAD_DUMP SHA1(9bd4a60627915d71932cab24f89c48ea21f4c1cb) )
@@ -2798,7 +2798,7 @@ ROM_START( sfrush )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version L1.0 */
 	ROM_LOAD( "hdboot.u32", 0x000000, 0x80000, CRC(39a35f1b) SHA1(c46d83448399205d38e6e41dd56abbc362254254) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
 	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
@@ -2818,7 +2818,7 @@ ROM_START( sfrushrk )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code */
 	ROM_LOAD( "boot.bin",   0x000000, 0x080000, CRC(0555b3cf) SHA1(a48abd6d06a26f4f9b6c52d8c0af6095b6be57fd) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
@@ -2838,7 +2838,7 @@ ROM_START( calspeed )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98) */
 	DISK_IMAGE( "calspeed", 0, SHA1(08d411c591d4b8bbdd6437ea80d01c4cec8516f8) )
@@ -2851,7 +2851,7 @@ ROM_START( calspeeda )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */
 	DISK_IMAGE( "cs_10r8a", 0, SHA1(ba4e7589740e0647938c81c5082bb71d8826bad4) )
@@ -2864,7 +2864,7 @@ ROM_START( calspeedb )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98) */
 	DISK_IMAGE( "calspeda", 0, SHA1(6b1c3a7530195ef7309b06a651b01c8b3ece92c6) )
@@ -2881,7 +2881,7 @@ ROM_START( vaportrx )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "vtrxboot.bin", 0x000000, 0x80000, CRC(ee487a6c) SHA1(fb9efda85047cf615f24f7276a9af9fd542f3354) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "vaportrx", 0, SHA1(fe53ca7643d2ed2745086abb7f2243c69678cab1) )
@@ -2895,7 +2895,7 @@ ROM_START( vaportrxp )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "vtrxboot.bin", 0x000000, 0x80000, CRC(ee487a6c) SHA1(fb9efda85047cf615f24f7276a9af9fd542f3354) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	DISK_REGION( "ide:0:hdd:image" ) /* Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44 */
 	DISK_IMAGE( "vaportrp", 0, SHA1(6c86637c442ebd6994eee8c0ae0dce343c35dbe9) )
@@ -2909,7 +2909,7 @@ ROM_START( biofreak )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Seattle System Boot ROM Version 0.1i Apr 14 1997  14:52:53 */
 	ROM_LOAD( "biofreak.u32", 0x000000, 0x80000, CRC(cefa00bb) SHA1(7e171610ede1e8a448fb8d175f9cb9e7d549de28) )
@@ -2923,7 +2923,7 @@ ROM_START( blitz )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 */
 	ROM_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f) )
@@ -2937,7 +2937,7 @@ ROM_START( blitz11 )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.1 */
 	ROM_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f) )
@@ -2951,7 +2951,7 @@ ROM_START( blitz99 )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.0 */
 	ROM_LOAD( "bltz9910.u32", 0x000000, 0x80000, CRC(777119b2) SHA1(40d255181c2f3a787919c339e83593fd506779a5) )
@@ -2970,7 +2970,7 @@ ROM_START( blitz99a )
 	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) // to use this rom run with -bios up130 and go into TEST mode to update.
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 	ROM_SYSTEM_BIOS( 1, "up130",       "Update to 1.30" )
-	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(2) )	
+	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(2) )
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Hard Drive Version 1.30 */
 	DISK_IMAGE( "blitz99a", 0, SHA1(43f834727ce01d7a63b482fc28cbf292477fc6f2) )
@@ -2981,7 +2981,7 @@ ROM_START( blitz2k )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.4 */
 	ROM_LOAD( "bltz2k14.u32", 0x000000, 0x80000, CRC(ac4f0051) SHA1(b8125c17370db7bfd9b783230b4ef3d5b22a2025) )
@@ -2995,7 +2995,7 @@ ROM_START( carnevil )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
@@ -3009,7 +3009,7 @@ ROM_START( carnevil1 )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
@@ -3023,7 +3023,7 @@ ROM_START( hyprdriv )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, BAD_DUMP CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 9. */
 	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )

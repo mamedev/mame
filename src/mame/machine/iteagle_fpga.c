@@ -146,7 +146,7 @@ void iteagle_fpga_device::update_sequence_eg1(UINT32 data)
 		m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2) & 0xff);
 	}
 		if (0 && LOG_FPGA)
-		logerror("%s:fpga update_sequence In: %02X Seq: %06X Out: %02X other %02X%02X%02X\n", machine().describe_context(), 
+		logerror("%s:fpga update_sequence In: %02X Seq: %06X Out: %02X other %02X%02X%02X\n", machine().describe_context(),
 			data, m_seq, m_fpga_regs[offset]&0xff, m_seq_rem2, m_seq_rem1, val1);
 }
 
@@ -731,7 +731,7 @@ READ32_MEMBER( iteagle_ide_device::ide_r )
 {
 	UINT32 result = m_ide->read_cs0(space, offset, mem_mask);
 	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 && 	m_irq_status==1) {
+		if (m_irq_num!=-1 &&    m_irq_status==1) {
 			m_irq_status = 0;
 			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
 			if (LOG_IDE)
@@ -746,7 +746,7 @@ WRITE32_MEMBER( iteagle_ide_device::ide_w )
 {
 	m_ide->write_cs0(space, offset, data, mem_mask);
 	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 && 	m_irq_status==1) {
+		if (m_irq_num!=-1 &&    m_irq_status==1) {
 			m_irq_status = 0;
 			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
 			if (LOG_IDE)
@@ -783,7 +783,7 @@ READ32_MEMBER( iteagle_ide_device::ide2_r )
 {
 	UINT32 result = m_ide2->read_cs0(space, offset, mem_mask);
 	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 && 	m_irq_status==1) {
+		if (m_irq_num!=-1 &&    m_irq_status==1) {
 			m_irq_status = 0;
 			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
 			if (LOG_IDE_CTRL)
@@ -798,7 +798,7 @@ WRITE32_MEMBER( iteagle_ide_device::ide2_w )
 {
 	m_ide2->write_cs0(space, offset, data, mem_mask);
 	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 && 	m_irq_status==1) {
+		if (m_irq_num!=-1 &&    m_irq_status==1) {
 			m_irq_status = 0;
 			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
 			if (LOG_IDE_CTRL)

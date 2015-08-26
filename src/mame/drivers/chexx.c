@@ -40,7 +40,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<digitalker_device> m_digitalker;
-	optional_device<ay8910_device> m_aysnd;	// only faceoffh
+	optional_device<ay8910_device> m_aysnd; // only faceoffh
 
 	// vars
 	UINT8  m_port_a, m_port_b;
@@ -95,11 +95,11 @@ READ8_MEMBER(chexx_state::via_b_in)
 
 WRITE8_MEMBER(chexx_state::via_a_out)
 {
-	m_port_a = data;	// multiplexer
+	m_port_a = data;    // multiplexer
 
 	m_digitalker->digitalker_data_w(space, 0, data, 0);
 
-//	logerror("%s: VIA write A = %02X\n", machine().describe_context(), data);
+//  logerror("%s: VIA write A = %02X\n", machine().describe_context(), data);
 }
 WRITE8_MEMBER(chexx_state::via_b_out)
 {
@@ -111,7 +111,7 @@ WRITE8_MEMBER(chexx_state::via_b_out)
 	// bit 4 is EJECT
 	// bit 7 is related to speaker out
 
-//	logerror("%s: VIA write B = %02X\n", machine().describe_context(), data);
+//  logerror("%s: VIA write B = %02X\n", machine().describe_context(), data);
 }
 
 WRITE_LINE_MEMBER(chexx_state::via_ca2_out)
@@ -120,11 +120,11 @@ WRITE_LINE_MEMBER(chexx_state::via_ca2_out)
 	m_digitalker->digitalker_0_cs_w(CLEAR_LINE);
 	m_digitalker->digitalker_0_wr_w(state ? ASSERT_LINE : CLEAR_LINE);
 
-//	logerror("%s: VIA write CA2 = %02X\n", machine().describe_context(), state);
+//  logerror("%s: VIA write CA2 = %02X\n", machine().describe_context(), state);
 }
 WRITE_LINE_MEMBER(chexx_state::via_cb1_out)
 {
-//	logerror("%s: VIA write CB1 = %02X\n", machine().describe_context(), state);
+//  logerror("%s: VIA write CB1 = %02X\n", machine().describe_context(), state);
 }
 WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 {
@@ -144,18 +144,18 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	output_set_led_value(1, BIT(m_shift,1));
 	output_set_led_value(2, BIT(m_shift,0));
 
-//	logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
+//  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
 WRITE_LINE_MEMBER(chexx_state::via_irq_out)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-//	logerror("%s: VIA write IRQ = %02X\n", machine().describe_context(), state);
+//  logerror("%s: VIA write IRQ = %02X\n", machine().describe_context(), state);
 }
 
 READ8_MEMBER(chexx_state::input_r)
 {
-	UINT8 ret = ioport("DSW")->read();			// bits 0-3
-	UINT8 inp = ioport("INPUT")->read();		// bit 7 (multiplexed)
+	UINT8 ret = ioport("DSW")->read();          // bits 0-3
+	UINT8 inp = ioport("INPUT")->read();        // bit 7 (multiplexed)
 
 	for (int i = 0; i < 8; ++i)
 		if ( ((~m_port_a) & (1 << i)) && ((~inp) & (1 << i)) )
@@ -193,12 +193,12 @@ WRITE8_MEMBER(chexx_state::ay_w)
 	if (m_ay_cmd == 0x00 && data == 0x03)
 	{
 		m_aysnd->address_w(space, offset, m_ay_data, mem_mask);
-//		logerror("%s: AY addr = %02X\n", machine().describe_context(), m_ay_data);
+//      logerror("%s: AY addr = %02X\n", machine().describe_context(), m_ay_data);
 	}
 	else if (m_ay_cmd == 0x00 && data == 0x02)
 	{
 		m_aysnd->data_w(space, offset, m_ay_data, mem_mask);
-//		logerror("%s: AY data = %02X\n", machine().describe_context(), m_ay_data);
+//      logerror("%s: AY data = %02X\n", machine().describe_context(), m_ay_data);
 	}
 	m_ay_cmd = data;
 }
@@ -403,13 +403,13 @@ ROM_START( faceoffh )
 	// bank switched (from samples region)
 
 	ROM_REGION( 0x10000, "samples", 0 )
-	ROM_LOAD( "9.2a", 0x0000, 0x2000, CRC(059b3725) SHA1(5837bee1ef34ce19a3101b851ca55029776e4b3e) )	// digitalker header
+	ROM_LOAD( "9.2a", 0x0000, 0x2000, CRC(059b3725) SHA1(5837bee1ef34ce19a3101b851ca55029776e4b3e) )    // digitalker header
 	ROM_LOAD( "8.2b", 0x2000, 0x2000, CRC(679da4e1) SHA1(01a5b9dd132c1b0de97c153d7de226f5bf357338) )
 
-	ROM_LOAD( "7.2c", 0x4000, 0x2000, CRC(f8461b33) SHA1(717a8842e0ce9ba94dd59504a324bede4844e389) )	// digitalker header
+	ROM_LOAD( "7.2c", 0x4000, 0x2000, CRC(f8461b33) SHA1(717a8842e0ce9ba94dd59504a324bede4844e389) )    // digitalker header
 	ROM_LOAD( "6.2d", 0x6000, 0x2000, CRC(156c91e0) SHA1(6017d4b5609b214a6e66dcd76493a7d1442c04d4) )
 
-	ROM_LOAD( "5.3a", 0x8000, 0x2000, CRC(19904604) SHA1(633c211a9a822cdf597a6f3c221ae9c8d6482e82) )	// digitalker header
+	ROM_LOAD( "5.3a", 0x8000, 0x2000, CRC(19904604) SHA1(633c211a9a822cdf597a6f3c221ae9c8d6482e82) )    // digitalker header
 	ROM_LOAD( "4.3b", 0xa000, 0x2000, CRC(c3386d51) SHA1(7882e88db55ba914be81075e4b2d76e246c34d3b) )
 
 	ROM_FILL(         0xc000, 0x2000, 0xff ) // unpopulated

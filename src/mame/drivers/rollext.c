@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
 /*
-	Rolling Extreme
-	Gaelco, 1999
+    Rolling Extreme
+    Gaelco, 1999
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
     REF.991015
       |--------------------------------------------------|
@@ -39,33 +39,33 @@
 
 /*
 
-	MP Interrupts:
+    MP Interrupts:
 
-		External Interrupt 1:		0x4003ef78
-		External Interrupt 2:		-
-		External Interrupt 3:		0x40041d30
-		Memory Fault:				0x40043ae8
+        External Interrupt 1:       0x4003ef78
+        External Interrupt 2:       -
+        External Interrupt 3:       0x40041d30
+        Memory Fault:               0x40043ae8
 
-	PP0 Interrupts:
-		Task:						0x400010a0 / 0x400001a0
+    PP0 Interrupts:
+        Task:                       0x400010a0 / 0x400001a0
 
-	PP1 Interrupts:
-		Task:						0x4004c6e8
-
-
-	Memory locations:
-
-		[0x00000084] PP0 busy flag?
-		[0x00000090] PP0 fifo write pointer?
-		[0x00000094] PP0 fifo read pointer?
-		[0x00000320] 2000000-TCOUNT in XINT3 handler
-		[0x01010668] copied from (word)0xb0000004 in XINT3 handler
+    PP1 Interrupts:
+        Task:                       0x4004c6e8
 
 
-	Texture ROM decode:
+    Memory locations:
 
- 	  {ic45}     {ic47}     {ic58}     {ic60}
-	[2,0][0,0] [2,1][0,1] [3,0][1,0] [3,1][1,1]
+        [0x00000084] PP0 busy flag?
+        [0x00000090] PP0 fifo write pointer?
+        [0x00000094] PP0 fifo read pointer?
+        [0x00000320] 2000000-TCOUNT in XINT3 handler
+        [0x01010668] copied from (word)0xb0000004 in XINT3 handler
+
+
+    Texture ROM decode:
+
+      {ic45}     {ic47}     {ic58}     {ic60}
+    [2,0][0,0] [2,1][0,1] [3,0][1,0] [3,1][1,1]
 
 */
 
@@ -231,12 +231,12 @@ UINT32 rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			y[j] = (int)((u2f(iy) / 2.0f) + 192.0f);
 		}
 
-		
+
 		draw_line(bitmap, cliprect, x[0], y[0], x[1], y[1]);
 		draw_line(bitmap, cliprect, x[1], y[1], x[2], y[2]);
 		draw_line(bitmap, cliprect, x[3], y[3], x[2], y[2]);
 		draw_line(bitmap, cliprect, x[0], y[0], x[3], y[3]);
-		
+
 	}
 
 	m_disp_ram[0xffffc/4] = 0;
@@ -250,7 +250,7 @@ READ32_MEMBER(rollext_state::a0000000_r)
 {
 	switch (offset)
 	{
-		case 0:			// ??
+		case 0:         // ??
 		{
 			UINT32 data = 0x20200;
 
@@ -276,9 +276,9 @@ READ32_MEMBER(rollext_state::b0000000_r)
 {
 	switch (offset)
 	{
-		case 0:		// ??
+		case 0:     // ??
 			return 0xffff;
-		case 1:		// ??
+		case 1:     // ??
 			return 0;
 	}
 
@@ -290,8 +290,8 @@ READ32_MEMBER(rollext_state::b0000000_r)
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 32, rollext_state)
 	AM_RANGE(0x40000000, 0x40ffffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_SHARE("disp_ram")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM	AM_SHARE("palette_ram")
-	AM_RANGE(0x90000000, 0x9007ffff) AM_RAM	AM_SHARE("texture_mask")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM AM_SHARE("palette_ram")
+	AM_RANGE(0x90000000, 0x9007ffff) AM_RAM AM_SHARE("texture_mask")
 	AM_RANGE(0xa0000000, 0xa00000ff) AM_READWRITE(a0000000_r, a0000000_w)
 	AM_RANGE(0xb0000000, 0xb0000007) AM_READ(b0000000_r)
 	AM_RANGE(0xc0000000, 0xc03fffff) AM_ROM AM_REGION("rom1", 0)
@@ -355,7 +355,7 @@ ROM_START(rollext)
 	ROM_REGION32_BE(0x400000, "rom1", 0)
 	ROM_LOAD32_DWORD("roe.ic38", 0x000000, 0x400000, CRC(d9bcfb7c) SHA1(eda9870881732d4dc7cdacb65c6d40af3451dc9d))
 
-	ROM_REGION32_BE(0x2000000, "texture", 0)			// Texture ROMs
+	ROM_REGION32_BE(0x2000000, "texture", 0)            // Texture ROMs
 	ROM_LOAD32_BYTE("roe.ic45", 0x000000, 0x800000, CRC(0f7fe365) SHA1(ed50fd2b76840eac6ce394a0c748109f615b775a))
 	ROM_LOAD32_BYTE("roe.ic47", 0x000001, 0x800000, CRC(44d7ccee) SHA1(2fec682396e4cca704bd1237016acec0e7b4b428))
 	ROM_LOAD32_BYTE("roe.ic58", 0x000002, 0x800000, CRC(67ad4561) SHA1(56f41b4ebd827fec49902f377c5ed054c02d9e6c))

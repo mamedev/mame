@@ -121,11 +121,11 @@ public:
 
 	void normalize()
 	{
-		  while (m_attoseconds >= ATTOSECONDS_PER_SECOND)
-		  {
-			  m_seconds++;
-			  m_attoseconds -= ATTOSECONDS_PER_SECOND;
-		  }
+			while (m_attoseconds >= ATTOSECONDS_PER_SECOND)
+			{
+				m_seconds++;
+				m_attoseconds -= ATTOSECONDS_PER_SECOND;
+			}
 	}
 
 	attoseconds_t attoseconds() const { return m_attoseconds; }

@@ -1001,7 +1001,7 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
 |--------------------|
 Notes:
       This is the I/O board used in Dynamic Golf, Out Trigger, Shootout Pool,
-      Shootout Pool Prize, Kick'4'Cash, Crackin' DJ 1&2 
+      Shootout Pool Prize, Kick'4'Cash, Crackin' DJ 1&2
       for the trackballs and other rotary type game controls.
       It must be daisy-chained to the normal I/O board with a USB cable.
 
@@ -5091,7 +5091,7 @@ ROM_START( otrigger )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-        ROM_REGION( 0x10000, "io_board", 0)
+		ROM_REGION( 0x10000, "io_board", 0)
 	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
 	ROM_REGION( 0xa000000, "rom_board", ROMREGION_ERASEFF)

@@ -36,13 +36,13 @@ static const INT16 sine_wave[32] =
 void exidy_state::adjust_sample(UINT8 freq)
 {
 	m_tone_freq = freq;
-	
+
 	if (!m_samples->playing(3))
 	{
 		m_samples->set_volume(3, 0);
 		m_samples->start_raw(3, sine_wave, 32, 1000, true);
 	}
-	
+
 	if ((m_tone_freq == 0xff) || (m_tone_freq == 0x00))
 		m_samples->set_volume(3, 0);
 	else

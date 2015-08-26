@@ -474,7 +474,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 READ16_MEMBER(namcos10_state::i2c_clock_r)
 {
 	UINT16 res = i2c_dev_clock & i2c_host_clock & 1;
-	//	logerror("i2c_clock_r %d (%x)\n", res, space.device().safe_pc());
+	//  logerror("i2c_clock_r %d (%x)\n", res, space.device().safe_pc());
 	return res;
 }
 
@@ -482,14 +482,14 @@ READ16_MEMBER(namcos10_state::i2c_clock_r)
 WRITE16_MEMBER(namcos10_state::i2c_clock_w)
 {
 	COMBINE_DATA(&i2c_host_clock);
-	//	logerror("i2c_clock_w %d (%x)\n", data, space.device().safe_pc());
+	//  logerror("i2c_clock_w %d (%x)\n", data, space.device().safe_pc());
 	i2c_update();
 }
 
 READ16_MEMBER(namcos10_state::i2c_data_r)
 {
 	UINT16 res = i2c_dev_data & i2c_host_data & 1;
-	//	logerror("i2c_data_r %d (%x)\n", res, space.device().safe_pc());
+	//  logerror("i2c_data_r %d (%x)\n", res, space.device().safe_pc());
 	return res;
 }
 
@@ -497,7 +497,7 @@ READ16_MEMBER(namcos10_state::i2c_data_r)
 WRITE16_MEMBER(namcos10_state::i2c_data_w)
 {
 	COMBINE_DATA(&i2c_host_data);
-	//	logerror("i2c_data_w %d (%x)\n", data, space.device().safe_pc());
+	//  logerror("i2c_data_w %d (%x)\n", data, space.device().safe_pc());
 	i2c_update();
 }
 
@@ -524,7 +524,7 @@ void namcos10_state::i2c_update()
 			i2cp_mode = I2CP_IDLE;
 		} else if(clock && !i2c_prev_clock) {
 			i2c_byte |= (data << i2c_bit);
-			//			logerror("i2c_byte = %02x (%d)\n", i2c_byte, i2c_bit);
+			//          logerror("i2c_byte = %02x (%d)\n", i2c_byte, i2c_bit);
 			i2c_bit--;
 			if(i2c_bit < 0) {
 				i2cp_mode = I2CP_RECIEVE_ACK_1;
@@ -536,13 +536,13 @@ void namcos10_state::i2c_update()
 		break;
 	case I2CP_RECIEVE_ACK_1:
 		if(clock && !i2c_prev_clock) {
-			//			logerror("i2c ack on\n");
+			//          logerror("i2c ack on\n");
 			i2cp_mode = I2CP_RECIEVE_ACK_0;
 		}
 		break;
 	case I2CP_RECIEVE_ACK_0:
 		if(!clock && i2c_prev_clock) {
-			//			logerror("i2c ack off\n");
+			//          logerror("i2c ack off\n");
 			i2c_dev_data = 1;
 			data = i2c_host_data & 1;
 			i2c_byte = 0;
@@ -574,7 +574,7 @@ WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 	printf("crypto_switch_w: %04x\n", data);
 	if (decrypter == 0)
 		return;
-	
+
 	if (BIT(data, 15) != 0)
 		decrypter->activate(data & 0xf);
 	else
@@ -628,14 +628,14 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 
 	//  logerror("read %08x = %04x\n", nand_address*2, data);
 	// printf("read %08x = %04x\n", nand_address*2, data);
-	  
+
 
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
 
 	if (decrypter == 0)
 		return data;
-	
+
 	if (decrypter->is_active())
 		return decrypter->decrypt(data);
 	else

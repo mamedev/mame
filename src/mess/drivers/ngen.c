@@ -744,7 +744,7 @@ WRITE8_MEMBER(ngen_state::dma_write_word)
 MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 {
 	UINT16 addr = ma;
-	
+
 	for(int x=0;x<bitmap.width();x+=9)
 	{
 		UINT8 ch = m_vram.read16(addr++) & 0xff;
@@ -893,7 +893,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_io, AS_IO, 32, ngen_state )
 	AM_RANGE(0x0000, 0x0003) AM_READWRITE16(xbus_r, xbus_w, 0x0000ffff)
-//	AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
+//  AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
 	AM_RANGE(0xfd08, 0xfd0b) AM_READWRITE16(b38_crtc_r, b38_crtc_w,0xffffffff)
 	AM_RANGE(0xfd0c, 0xfd0f) AM_READWRITE16(b38_keyboard_r, b38_keyboard_w,0xffffffff)
 ADDRESS_MAP_END

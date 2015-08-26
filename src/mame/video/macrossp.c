@@ -238,7 +238,7 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 		if(pri <= 1) primask |= GFX_PMASK_2;
 		if(pri <= 2) primask |= GFX_PMASK_4;
 		if(pri <= 3) primask |= GFX_PMASK_8;
-				
+
 		switch (source[0] & 0x0000c000)
 		{
 			case 0x00008000:
@@ -265,10 +265,10 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 		if(flipy) {
 			yoffst = (high * yzoom * 16);
 			ymin = high;
-			ymax = -1;	
+			ymax = -1;
 			yinc = -1;
 		}
-		
+
 		int xmin = 0;
 		int xmax = wide+1;
 		int xinc = 1;
@@ -288,15 +288,15 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				int fudged_xzoom = xzoom<<8;
 				int fudged_yzoom = yzoom<<8;
-				
+
 				/* cover seams as don't know exactly how many pixels on target will cover, and can't specify fractional offsets to start */
 				if(xzoom < 0x100) fudged_xzoom += 0x600;
 				if(yzoom < 0x100) fudged_yzoom += 0x600;
-					
+
 				gfx->prio_zoom_alpha(bitmap,cliprect,tileno+loopno,col,
-									 flipx,flipy,xpos+(xoffset>>8),ypos+(yoffset>>8),
-									 fudged_xzoom,fudged_yzoom,
-									 screen.priority(),primask,0,alpha);
+										flipx,flipy,xpos+(xoffset>>8),ypos+(yoffset>>8),
+										fudged_xzoom,fudged_yzoom,
+										screen.priority(),primask,0,alpha);
 
 				xoffset += ((xzoom*16) * xinc);
 				loopno++;
@@ -357,10 +357,10 @@ void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, co
 		starty -= (240/2) * (incy - 0x10000);
 
 // previous logic, which gives mostly comparable results, vr[1] is now unused
-//		startx = (vr[1] & 0x0000ffff) << 16;
-//		starty = (vr[1] & 0xffff0000) >> 0;
-//		startx -= (368/2) * incx;
-//		starty -= (240/2) * incy;
+//      startx = (vr[1] & 0x0000ffff) << 16;
+//      starty = (vr[1] & 0xffff0000) >> 0;
+//      startx -= (368/2) * incx;
+//      starty -= (240/2) * incy;
 
 		tm->draw_roz(screen, bitmap, cliprect,
 				startx,starty,incx,0,0,incy,
@@ -415,13 +415,13 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 		if(lay_debug && !machine().input().code_pressed(lay_keys[pri]))
 			continue;
 #endif
-	
+
 		if(!backgrounds)
 			continue;
-		
+
 		for (int y=0; y<240; y++) {
 			clip.min_y = clip.max_y = y;
-			
+
 			/* quizmoon map requires that layer 2 be drawn over layer 3 when same pri */
 			for(int layer = 2; layer >= 0; layer--) {
 				if(layerpri[layer] == pri) {
@@ -439,7 +439,7 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 
 	if(sprites) draw_sprites(screen, bitmap, cliprect);
 
-	
+
 #if 0
 popmessage  ("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",
 m_scra_videoregs[0]&0xffffffff, // yyyyxxxx

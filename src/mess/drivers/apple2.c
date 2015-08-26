@@ -377,7 +377,7 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				if (!strcmp(machine().system().name, "ivelultr")) 
+				if (!strcmp(machine().system().name, "ivelultr"))
 				{
 					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
 				}
@@ -396,7 +396,7 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				if (!strcmp(machine().system().name, "ivelultr")) 
+				if (!strcmp(machine().system().name, "ivelultr"))
 				{
 					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
 				}
@@ -413,7 +413,7 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	else
 	{
-		if (!strcmp(machine().system().name, "ivelultr")) 
+		if (!strcmp(machine().system().name, "ivelultr"))
 		{
 			m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
 		}

@@ -119,4 +119,3 @@ void dc_controller_device::device_start()
 		port[i] = ioport(port_tag[i]);
 	}
 }
-

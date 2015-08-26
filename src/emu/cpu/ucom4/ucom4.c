@@ -268,12 +268,12 @@ void ucom4_cpu_device::output_w(int index, UINT8 data)
 UINT8 upd557l_cpu_device::input_r(int index)
 {
 	index &= 0xf;
-	
+
 	if (index == NEC_UCOM4_PORTB)
 		logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
 	else
 		return ucom4_cpu_device::input_r(index);
-	
+
 	return 0;
 }
 

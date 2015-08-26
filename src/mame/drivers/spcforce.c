@@ -272,7 +272,6 @@ PALETTE_INIT_MEMBER(spcforce_state, spcforce)
 
 INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(3, HOLD_LINE);
 }

@@ -16,7 +16,7 @@ private:
 class ns10_decrypter_device : public device_t
 {
 public:
-	// this encodes the decryption logic, which varies per game 
+	// this encodes the decryption logic, which varies per game
 	// and is probably hard-coded into the CPLD
 	struct ns10_crypto_logic
 	{

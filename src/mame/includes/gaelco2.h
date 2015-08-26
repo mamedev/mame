@@ -107,4 +107,3 @@ public:
 	DECLARE_WRITE16_MEMBER(wrally2_adc_cs);
 	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
 };
-

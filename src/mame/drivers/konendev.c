@@ -84,7 +84,7 @@ READ32_MEMBER(konendev_state::mcu2_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= 0x11000000;		// MCU2 version
+		r |= 0x11000000;        // MCU2 version
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -92,15 +92,15 @@ READ32_MEMBER(konendev_state::mcu2_r)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r &= ~0x4000;		// MCU2 presence
-		r &= ~0x2000;		// IFU2 presence
-		r &= ~0x1000;		// FMU2 presence	
+		r &= ~0x4000;       // MCU2 presence
+		r &= ~0x2000;       // IFU2 presence
+		r &= ~0x1000;       // FMU2 presence
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= 0x40;			// logic door
-		r |= 0x04;			// battery 1 status
-		r |= 0x10;			// battery 2 status
+		r |= 0x40;          // logic door
+		r |= 0x04;          // battery 1 status
+		r |= 0x10;          // battery 2 status
 	}
 
 	return r;
@@ -112,7 +112,7 @@ READ32_MEMBER(konendev_state::ifu2_r)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= 0x11;			// IFU2 version
+		r |= 0x11;          // IFU2 version
 	}
 
 	return r;
@@ -151,9 +151,9 @@ static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
 	AM_RANGE(0x78800004, 0x78800007) AM_READ(unk_78800004_r)
 	AM_RANGE(0x78a00000, 0x78a0001f) AM_READ(unk_78a00000_r)
 	AM_RANGE(0x78e00000, 0x78e00003) AM_READ(unk_78e00000_r)
-//	AM_RANGE(0x78000000, 0x78000003) AM_READNOP
-//	AM_RANGE(0x78100000, 0x7810001b) AM_RAM
-//	AM_RANGE(0x78a00014, 0x78a00017) AM_WRITENOP
+//  AM_RANGE(0x78000000, 0x78000003) AM_READNOP
+//  AM_RANGE(0x78100000, 0x7810001b) AM_RAM
+//  AM_RANGE(0x78a00014, 0x78a00017) AM_WRITENOP
 	AM_RANGE(0x79000000, 0x79000003) AM_DEVWRITE("gcu", k057714_device, fifo_w)
 	AM_RANGE(0x79800000, 0x798000ff) AM_DEVREADWRITE("gcu", k057714_device, read, write)
 	AM_RANGE(0x7a000000, 0x7a01ffff) AM_RAM AM_SHARE("nvram0")
@@ -218,7 +218,7 @@ ROM_START( enchlamp )
 	ROM_LOAD( "enl5r211.fmu.bin", 0x0000, 0x1800000, CRC(592c3c7f) SHA1(119b3c6223d656981c399c399d7edccfdbb50dc7) )
 
 	ROM_REGION32_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )			// empty eeprom with Konami header
+	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )          // empty eeprom with Konami header
 ROM_END
 
 
@@ -348,7 +348,7 @@ ROM_START( konzero )
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
 
 	ROM_REGION32_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )			// empty eeprom with Konami header
+	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )          // empty eeprom with Konami header
 ROM_END
 
 DRIVER_INIT_MEMBER(konendev_state,konendev)
@@ -358,9 +358,9 @@ DRIVER_INIT_MEMBER(konendev_state,konendev)
 DRIVER_INIT_MEMBER(konendev_state,enchlamp)
 {
 	UINT32 *rom = (UINT32*)memregion("program")->base();
-	rom[0x24/4] = 0x00002743;		// patch flash checksum for now
+	rom[0x24/4] = 0x00002743;       // patch flash checksum for now
 
-	rom[0] = 0xd43eb930;				// new checksum for program rom
+	rom[0] = 0xd43eb930;                // new checksum for program rom
 }
 
 // has a flash dump?

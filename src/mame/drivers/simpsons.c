@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240)
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_UPDATE_DRIVER(simpsons_state, screen_update_simpsons)
 	MCFG_SCREEN_PALETTE("palette")

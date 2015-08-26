@@ -124,4 +124,3 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<votrax_sc01_device> m_votrax;
 };
-

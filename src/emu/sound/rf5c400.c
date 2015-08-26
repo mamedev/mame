@@ -413,16 +413,16 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			case 0x08:      // relative to env attack (channel no)
 			case 0x09:      // relative to env attack (0x0c00/ 0x1c00)
 
-			case 0x11:		// ? counter for 0x13?
+			case 0x11:      // ? counter for 0x13?
 			{
 				break;
 			}
-			case 0x13:		// ? bujutsu writes sample data here
+			case 0x13:      // ? bujutsu writes sample data here
 			{
 				break;
 			}
 
-			case 0x14:		// ? related to 0x11/0x13 ?
+			case 0x14:      // ? related to 0x11/0x13 ?
 				break;
 
 			case 0x21:      // reverb(character).w

@@ -27,7 +27,7 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_irq_mask;
-	
+
 	DECLARE_WRITE8_MEMBER(rocnrope_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(rocnrope_videoram_w);

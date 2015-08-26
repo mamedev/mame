@@ -24,8 +24,8 @@
 // ======================> partner128_t
 
 class partner128_t : public device_t,
-					 public device_c64_expansion_card_interface
-					 //public device_vcs_control_port_interface
+						public device_c64_expansion_card_interface
+						//public device_vcs_control_port_interface
 {
 public:
 	// construction/destruction

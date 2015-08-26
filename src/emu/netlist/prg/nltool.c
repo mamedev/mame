@@ -30,7 +30,7 @@
 
 #include <ctime>
 
-#define osd_ticks_t clock_t 
+#define osd_ticks_t clock_t
 
 inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
 
@@ -98,12 +98,12 @@ class tool_options_t : public poptions
 public:
 	tool_options_t() :
 		poptions(),
-		opt_ttr ("t", "time_to_run", 1.0, 	"time to run the emulation (seconds)", this),
+		opt_ttr ("t", "time_to_run", 1.0,   "time to run the emulation (seconds)", this),
 		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
 		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
 		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
 		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
-		opt_cmd ("c", "cmd",		 "run",   "run|convert|listdevices", this),
+		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
 		opt_inp( "i", "input",       "",      "input file to process (default is none)", this),
 		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
 		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
@@ -113,7 +113,7 @@ public:
 	poption_double opt_ttr;
 	poption_str    opt_name;
 	poption_str    opt_logs;
-	poption_str	   opt_file;
+	poption_str    opt_file;
 	poption_str_limit opt_type;
 	poption_str    opt_cmd;
 	poption_str    opt_inp;

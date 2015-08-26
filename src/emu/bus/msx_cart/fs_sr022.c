@@ -69,4 +69,3 @@ WRITE8_MEMBER(msx_cart_fs_sr022::write_cart)
 			break;
 	}
 }
-

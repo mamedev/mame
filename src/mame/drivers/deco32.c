@@ -2036,7 +2036,7 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fghthistz, fghthsta ) 
+static MACHINE_CONFIG_DERIVED( fghthistz, fghthsta )
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	MCFG_CPU_ADD("audiocpu", Z80, 32220000/9)

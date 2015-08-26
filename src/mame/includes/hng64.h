@@ -125,7 +125,7 @@ public:
 		m_com_ram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")	{ }
+		m_palette(*this, "palette") { }
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;

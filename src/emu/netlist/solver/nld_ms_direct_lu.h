@@ -429,7 +429,6 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * 
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 {
-
 	const unsigned kN = N();
 
 	ATTR_UNUSED int imax;
@@ -501,7 +500,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 		indx[j]=imax;
 #endif
 		//if (m_A[j][j] == 0.0)
-		//	m_A[j][j] = 1e-20;
+		//  m_A[j][j] = 1e-20;
 		double dum = 1.0 / A(j,j);
 		for (int i = j+1; i < kN; i++)
 			A(i,j) *= dum;
@@ -521,7 +520,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 	// ii=-1
 
 	//for (int i=0; i < kN; i++)
-	//	x[i] = m_RHS[i];
+	//  x[i] = m_RHS[i];
 
 	for (int i=0; i < kN; i++)
 	{

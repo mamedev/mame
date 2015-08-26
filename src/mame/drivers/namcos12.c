@@ -1878,7 +1878,7 @@ static INPUT_PORTS_START( technodr )
 	PORT_BIT( 0x7eff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN23")
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1 )	// coin switch
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1 ) // coin switch
 	PORT_BIT(0xf7ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SERVICE")
@@ -3000,7 +3000,7 @@ GAME( 1998, ehrgeizaa, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC035 */
 GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC0?? */
-GAME( 1998, technodr,  0,        technodr, technodr, namcos12_state, namcos12, ROT0, "Namco",   		"Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
+GAME( 1998, technodr,  0,        technodr, technodr, namcos12_state, namcos12, ROT0, "Namco",           "Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Asia, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC037 */

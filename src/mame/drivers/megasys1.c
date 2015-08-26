@@ -3591,7 +3591,7 @@ ROM_END
 
 Bootleg version of Saint Dragon. Two PCBs connected by two flat cables.
 Sound section can host two oki chips (and roms) but only one is populated.
-No ASICs just logic chips. 
+No ASICs just logic chips.
 
 - ROMs A-19 and A-20 are fitted 'piggy backed' with one pin
   from A-20 bent out and wired to a nearby TTL.

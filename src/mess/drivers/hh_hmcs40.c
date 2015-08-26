@@ -1718,7 +1718,7 @@ MACHINE_CONFIG_END
   * PCB label Kaken Corp. PT-460
   * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio)
   * cyan/red VFD display
-  
+
   This is a memory game, the difference is instead of pictures, the player
   needs to match sound effects. It has an extra MCU for sound. The case is
   shaped like a glossy black pyramid. Star Trek fans will recognize it as
@@ -1758,13 +1758,13 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 {
 	// D7: sound reset (to audiocpu reset line)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	// D9: sound start (to audiocpu INT0)
 	m_audiocpu->set_input_line(0, (data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	// D10,D15: input mux
 	m_inp_mux = (data >> 10 & 1) | (data >> 14 & 2);
-	
+
 	// D0-D5: vfd matrix grid
 	m_grid = data & 0x3f;
 	display_matrix(12, 6, m_plate, m_grid);
@@ -1795,7 +1795,7 @@ WRITE16_MEMBER(pairmtch_state::speaker_w)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
-	
+
 	// D1: sound ack (to maincpu INT0)
 	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -356,4 +356,3 @@ ROM_END
 
 
 COMP(1985, hp_ipc, 0, 0, hp_ipc, hp_ipc, driver_device, 0, "HP", "Integral Personal Computer", MACHINE_IS_SKELETON)
-
