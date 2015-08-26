@@ -130,6 +130,6 @@ BOOL win_is_gui_application(void)
 HMODULE WINAPI GetModuleHandleUni()
 {
 	MEMORY_BASIC_INFORMATION mbi;
-	VirtualQuery(GetModuleHandleUni, &mbi, sizeof(mbi));
+	VirtualQuery((LPCVOID)GetModuleHandleUni, &mbi, sizeof(mbi));
 	return (HMODULE)mbi.AllocationBase;
 }
