@@ -690,7 +690,7 @@ ROM_START( lethalj )
 	ROM_LOAD16_BYTE( "gr4.gr4",             0x200000, 0x100000, CRC(c5838b4c) SHA1(9ad03d0f316eb31fdf0ca6f65c02a27d3406d072) )
 	ROM_LOAD16_BYTE( "gr3.gr3",             0x200001, 0x100000, CRC(ba9fa057) SHA1(db6f11a8964870f04f94fef6f1b1a58168a942ad) )
 	ROM_LOAD16_BYTE( "lethal_gr6_2.3.gr6",  0x400000, 0x100000, CRC(51c99b85) SHA1(9a23bf21a73d2884b49c64a8f42c288534c79dc5) ) /* Labeled as LETHAL GR6 2.3, also found labeled as GR-6 */
-	ROM_LOAD16_BYTE( "lethal_gr5_2.3.gr5",  0x400001, 0x100000, CRC(80dda9b5) SHA1(d8a79cad112bc7d9e4ba31a950e4807581f3bf46) ) /* Labeled as LETHAL GR5 2.3, also found labeled as GR-6 */
+	ROM_LOAD16_BYTE( "lethal_gr5_2.3.gr5",  0x400001, 0x100000, CRC(80dda9b5) SHA1(d8a79cad112bc7d9e4ba31a950e4807581f3bf46) ) /* Labeled as LETHAL GR5 2.3, also found labeled as GR-5 */
 
 	ROM_REGION( 0x40000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "sound1.u20", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
