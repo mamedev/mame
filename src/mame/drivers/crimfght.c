@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 416, 256, 16, 240) // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(crimfght_state, screen_update_crimfght)
 	MCFG_SCREEN_PALETTE("palette")
 

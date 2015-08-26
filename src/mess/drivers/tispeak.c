@@ -9,7 +9,7 @@
   These devices, mostly edu-toys, are based around an MCU(TMS0270/TMS1100),
   TMS51xx speech, and VSM ROM(s). Newer devices, such as Speak & Music,
   are based around the TMP50C40 and belong in another driver, probably.
-  
+
   note: except for tntell, MAME external artwork is not required. But it
   is objectively a large improvement.
 
@@ -430,7 +430,7 @@ void tispeak_state::machine_start()
 void tispeak_state::init_cartridge()
 {
 	m_overlay = 0;
-	
+
 	if (m_cart != NULL && m_cart->exists())
 	{
 		std::string region_tag;
@@ -558,7 +558,7 @@ WRITE16_MEMBER(tispeak_state::tntell_write_r)
 {
 	// R10: CD2802 PDC pin
 	m_tms5100->pdc_w(data >> 10);
-	
+
 	// R9: power-off request, on falling edge
 	if ((m_r >> 9 & 1) && !(data >> 9 & 1))
 		snspell_power_off();
@@ -578,7 +578,7 @@ READ8_MEMBER(tispeak_state::tntell_read_k)
 {
 	// multiplexed inputs (and K2 from on-button)
 	UINT8 k = m_inp_matrix[9]->read() | read_inputs(9);
-	
+
 	// K4: CD2802 CTL1
 	if (m_tms5100->ctl_r(space, 0) & 1)
 		k |= 4;
@@ -586,7 +586,7 @@ READ8_MEMBER(tispeak_state::tntell_read_k)
 	// K8: overlay code from R5,O4-O7
 	if (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay)
 		k |= 8;
-	
+
 	return k;
 }
 
@@ -596,13 +596,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// which one is active(if any). If it matches with the internal ROM or
 	// external module, the game continues.
 	// 00 for none, 1F for diagnostics, see comment section above for a list
-	
+
 	// try to get overlay code from artwork file(in decimal), otherwise pick the
 	// one that was selected in machine configuration
 	m_overlay = output_get_value("overlay_code") & 0x1f;
 	if (m_overlay == 0)
 		m_overlay = m_inp_matrix[10]->read();
-	
+
 	for (int i = 0; i < 5; i++)
 		output_set_indexed_value("ol", i+1, m_overlay >> i & 1);
 }
@@ -1252,7 +1252,7 @@ ROM_START( tntell )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
-	
+
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
 	ROM_LOAD( "cd2610.vsm", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
 ROM_END
@@ -1265,7 +1265,7 @@ ROM_START( tntelluk )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
-	
+
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
 	ROM_LOAD( "cd62170.vsm", 0x0000, 0x4000, CRC(6dc9d072) SHA1(9d2c9ff57c4f8fe69768666ffa41fcac649279ef) )
 ROM_END
@@ -1278,7 +1278,7 @@ ROM_START( tntellfr )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
-	
+
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
 	ROM_LOAD( "cd62171.vsm", 0x0000, 0x4000, CRC(cc26f7d1) SHA1(2b03e37b3bf3cbeca36980acfc45246dac706b83) )
 ROM_END

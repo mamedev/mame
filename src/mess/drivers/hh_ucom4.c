@@ -969,7 +969,7 @@ MACHINE_CONFIG_END
   Castle Toy Tactix
   * NEC uCOM-43 MCU, labeled D557LC 512
   * 16 LEDs behind buttons
-  
+
   Tactix is similar to Merlin, for 1 or 2 players. In 2-player mode, simply
   don't press the Comp Turn button. The four included minigames are:
   1: Capture (reversi)
@@ -1194,7 +1194,7 @@ MACHINE_CONFIG_END
   known releases:
   - USA: Electronic Football (aka Pro-Bowl Football)
   - Japan: American Football
-  
+
   note: MAME external artwork is not needed for this game
 
 ***************************************************************************/

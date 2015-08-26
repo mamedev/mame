@@ -19,7 +19,6 @@ const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time:
 
 namespace netlist
 {
-
 // ----------------------------------------------------------------------------------------
 // logic_family_ttl_t
 // ----------------------------------------------------------------------------------------

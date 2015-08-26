@@ -116,7 +116,7 @@ WRITE32_MEMBER(k057714_device::write)
 		case 0x18:      // ?
 			break;
 
-		case 0x1c:		// set to 1 on "media bus" access
+		case 0x1c:      // set to 1 on "media bus" access
 			if ((data >> 16) == 1)
 			{
 				m_ext_fifo_count = 0;
@@ -278,7 +278,7 @@ WRITE32_MEMBER(k057714_device::fifo_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		if (m_ext_fifo_count != 0)		// first access is a dummy write
+		if (m_ext_fifo_count != 0)      // first access is a dummy write
 		{
 			int count = m_ext_fifo_count - 1;
 			UINT32 addr = (((m_ext_fifo_addr >> 10) + m_ext_fifo_line) * 1024) + count;

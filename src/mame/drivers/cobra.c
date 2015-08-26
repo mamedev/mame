@@ -1581,18 +1581,18 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		{
 			// install HD patches for bujutsu
 			if (strcmp(space.machine().system().name, "bujutsu") == 0)
-			{				
+			{
 				UINT32 *main_ram = (UINT32*)(UINT64*)m_main_ram;
 				UINT32 *sub_ram = (UINT32*)m_sub_ram;
 				UINT32 *gfx_ram = (UINT32*)(UINT64*)m_gfx_ram0;
 
-				main_ram[(0x0005ac^4) / 4] = 0x60000000;		// skip IRQ fail
-				main_ram[(0x001ec4^4) / 4] = 0x60000000;		// waiting for IRQ?
-				main_ram[(0x001f00^4) / 4] = 0x60000000;		// waiting for IRQ?
-				
-				sub_ram[0x568 / 4] = 0x60000000;				// skip IRQ fail
+				main_ram[(0x0005ac^4) / 4] = 0x60000000;        // skip IRQ fail
+				main_ram[(0x001ec4^4) / 4] = 0x60000000;        // waiting for IRQ?
+				main_ram[(0x001f00^4) / 4] = 0x60000000;        // waiting for IRQ?
 
-				gfx_ram[(0x38632c^4) / 4] = 0x38600000;		// skip check_one_scene()
+				sub_ram[0x568 / 4] = 0x60000000;                // skip IRQ fail
+
+				gfx_ram[(0x38632c^4) / 4] = 0x38600000;     // skip check_one_scene()
 			}
 		}
 

@@ -692,7 +692,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 {
 	m_tx_data = data;
 
-        LOG(("data_w %02x\n" , data));
+		LOG(("data_w %02x\n" , data));
 //  printf("i8251 transmit char: %02x\n",data);
 
 	/* writing clears */
@@ -714,7 +714,6 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 void i8251_device::receive_character(UINT8 ch)
 {
-
 	m_rx_data = ch;
 
 	/* char has not been read and another has arrived! */
@@ -735,7 +734,7 @@ void i8251_device::receive_character(UINT8 ch)
 
 READ8_MEMBER(i8251_device::data_r)
 {
-    LOG(("read data: %02x, STATUS=%02x\n",m_rx_data,m_status));
+	LOG(("read data: %02x, STATUS=%02x\n",m_rx_data,m_status));
 	/* reading clears */
 	m_status &= ~I8251_STATUS_RX_READY;
 

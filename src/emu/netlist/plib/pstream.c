@@ -264,4 +264,3 @@ pstream::pos_type pomemstream::vtell()
 {
 	return m_pos;
 }
-

@@ -34,7 +34,7 @@ K051960_CB_MEMBER(bottom9_state::sprite_callback)
 	*priority = 0;
 	if ( *color & 0x10) *priority |= GFX_PMASK_1;
 	if (~*color & 0x20) *priority |= GFX_PMASK_2;
-	
+
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 

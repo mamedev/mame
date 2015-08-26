@@ -298,24 +298,24 @@ void tms32082_mp_device::processor_command(UINT32 command)
 
 			for (int i=0; i < num; i++)
 			{
-				printf("Entry %d:\n", i);
-				for (int k=0; k < 6; k++)
-				{
-					for (int l=0; l < 4; l++)
-					{
-						UINT32 dd = m_program->read_dword(ra);
-						ra += 4;
+			    printf("Entry %d:\n", i);
+			    for (int k=0; k < 6; k++)
+			    {
+			        for (int l=0; l < 4; l++)
+			        {
+			            UINT32 dd = m_program->read_dword(ra);
+			            ra += 4;
 
-						printf("%08X(%f) ", dd, u2f(dd));
-					}
-					printf("\n");
-				}
-				printf("\n");
+			            printf("%08X(%f) ", dd, u2f(dd));
+			        }
+			        printf("\n");
+			    }
+			    printf("\n");
 			}
 			*/
 
 			UINT32 ra = 0x1000280;
-			
+
 			int oldnum = m_program->read_dword(0x600ffffc);
 			UINT32 rb = 0x60000000 + (oldnum * 0x60);
 
@@ -367,7 +367,7 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 		case 0xa:           // PPERROR
 			return 0xe0000;
 
-		case 0xe:			// TCOUNT
+		case 0xe:           // TCOUNT
 			return m_tcount;
 
 		case 0x4000:        // IN0P
@@ -413,7 +413,7 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 			printf("IE = %08X\n", data);
 			break;
 
-		case 0xe:			// TCOUNT
+		case 0xe:           // TCOUNT
 			m_tcount = data;
 			break;
 

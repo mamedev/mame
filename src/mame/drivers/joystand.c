@@ -338,12 +338,12 @@ UINT32 joystand_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	m_bg2_tmap->set_scrolly(0, m_scroll[1]);
 
 	draw_bg15_tilemap();
-		
+
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	if (layers_ctrl & 4)	copybitmap_trans(bitmap, m_bg15_bitmap[0], 0, 0, 1, 0, cliprect, BG15_TRANSPARENT);
-	if (layers_ctrl & 8)	copybitmap_trans(bitmap, m_bg15_bitmap[1], 0, 0, 0, 0, cliprect, BG15_TRANSPARENT);
-	if (layers_ctrl & 1)	m_bg1_tmap->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 2)	m_bg2_tmap->draw(screen, bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 4)    copybitmap_trans(bitmap, m_bg15_bitmap[0], 0, 0, 1, 0, cliprect, BG15_TRANSPARENT);
+	if (layers_ctrl & 8)    copybitmap_trans(bitmap, m_bg15_bitmap[1], 0, 0, 0, 0, cliprect, BG15_TRANSPARENT);
+	if (layers_ctrl & 1)    m_bg1_tmap->draw(screen, bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_bg2_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	popmessage("S0: %04X S1: %04X EN: %04X OUT: %04X", m_scroll[0], m_scroll[1], m_enable[0], m_outputs[0]);
 	return 0;
@@ -394,17 +394,17 @@ WRITE16_MEMBER(joystand_state::outputs_w)
 	COMBINE_DATA(&m_outputs[0]);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0,			BIT(data, 0)); // coin counter 1
-		coin_counter_w(machine(), 1,			BIT(data, 1)); // coin counter 2
+		coin_counter_w(machine(), 0,            BIT(data, 0)); // coin counter 1
+		coin_counter_w(machine(), 1,            BIT(data, 1)); // coin counter 2
 
-		output_set_value("blocker",				BIT(data, 2));
-		output_set_value("error_lamp",			BIT(data, 3)); // counter error
-		output_set_value("photo_lamp",			BIT(data, 4)); // during photo 
+		output_set_value("blocker",             BIT(data, 2));
+		output_set_value("error_lamp",          BIT(data, 3)); // counter error
+		output_set_value("photo_lamp",          BIT(data, 4)); // during photo
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("ok_button_led",		BIT(data, 8));
-		output_set_value("cancel_button_led",	BIT(data, 9));
+		output_set_value("ok_button_led",       BIT(data, 8));
+		output_set_value("cancel_button_led",   BIT(data, 9));
 	}
 }
 
@@ -449,7 +449,7 @@ static ADDRESS_MAP_START( joystand_map, AS_PROGRAM, 16, joystand_state )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN0") // r/w
 	AM_RANGE(0x200012, 0x200013) AM_RAM_WRITE(outputs_w) AM_SHARE("outputs") // r/w
 	AM_RANGE(0x200014, 0x200015) AM_READWRITE(fpga_r, oki_bank_w) // r/w
-//	AM_RANGE(0x200016, 0x200017) // write $9190 at boot
+//  AM_RANGE(0x200016, 0x200017) // write $9190 at boot
 
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM_WRITE(bg15_0_w) AM_SHARE("bg15_0_ram") // r5g5b5 200x200 pixel-based
 	AM_RANGE(0x480000, 0x4fffff) AM_RAM // more rgb layers? (writes at offset 0)
@@ -464,7 +464,7 @@ static ADDRESS_MAP_START( joystand_map, AS_PROGRAM, 16, joystand_state )
 	AM_RANGE(0x60c00c, 0x60c00d) AM_RAM AM_SHARE("enable") // write
 
 	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE(cart_r, cart_w) // r/w (cart flash)
-//	AM_RANGE(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
+//  AM_RANGE(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ(e00000_r) // copy slot
 	AM_RANGE(0xe00020, 0xe00021) AM_READ(e00020_r) // master slot
 
@@ -478,7 +478,7 @@ static INPUT_PORTS_START( joystand )
 	// Cart status:
 	// mask 0x1000 -> cart flash addressing (0 = sequential, 1 = interleaved even/odd)
 	// mask 0x6000 == 0 -> cart present?
-	// mask 0x8000 -> cart ready? 
+	// mask 0x8000 -> cart ready?
 
 	PORT_START("MASTER")
 	PORT_CONFNAME( 0x1000, 0x1000, "Master Flash Addressing" )
@@ -559,12 +559,12 @@ GFXDECODE_END
 
 void joystand_state::machine_start()
 {
-	m_cart_flash[0]  = m_cart_u11;		m_cart_flash[1]  = m_cart_u5;
-	m_cart_flash[2]  = m_cart_u12;		m_cart_flash[3]  = m_cart_u6;
-	m_cart_flash[4]  = m_cart_u9;		m_cart_flash[5]  = m_cart_u3;
-	m_cart_flash[6]  = m_cart_u10;		m_cart_flash[7]  = m_cart_u4;
-	m_cart_flash[8]  = m_cart_u7;		m_cart_flash[9]  = m_cart_u1;
-	m_cart_flash[10] = m_cart_u8;		m_cart_flash[11] = m_cart_u2;
+	m_cart_flash[0]  = m_cart_u11;      m_cart_flash[1]  = m_cart_u5;
+	m_cart_flash[2]  = m_cart_u12;      m_cart_flash[3]  = m_cart_u6;
+	m_cart_flash[4]  = m_cart_u9;       m_cart_flash[5]  = m_cart_u3;
+	m_cart_flash[6]  = m_cart_u10;      m_cart_flash[7]  = m_cart_u4;
+	m_cart_flash[8]  = m_cart_u7;       m_cart_flash[9]  = m_cart_u1;
+	m_cart_flash[10] = m_cart_u8;       m_cart_flash[11] = m_cart_u2;
 }
 
 void joystand_state::machine_reset()

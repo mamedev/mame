@@ -488,7 +488,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst_full(
 	// ii=-1
 
 	//for (int i=0; i < kN; i++)
-	//	x[i] = m_RHS[i];
+	//  x[i] = m_RHS[i];
 
 	for (int i=0; i < kN; i++)
 	{

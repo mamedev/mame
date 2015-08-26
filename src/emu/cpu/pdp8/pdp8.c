@@ -12,37 +12,37 @@
 
 CPU_DISASSEMBLE( pdp8 );
 
-#define OP			((op >> 011) & 07)
+#define OP          ((op >> 011) & 07)
 
-#define MR_IND		((op >> 010) & 01)
-#define MR_PAGE		((op >> 07) & 01)
-#define MR_ADDR		(op & 0177)
+#define MR_IND      ((op >> 010) & 01)
+#define MR_PAGE     ((op >> 07) & 01)
+#define MR_ADDR     (op & 0177)
 
-#define IOT_DEVICE	((op >> 03) & 077)
-#define IOT_IOP1	(op & 01)
-#define IOT_IOP2	((op >> 01) & 01)
-#define IOT_IOP4	((op >> 02) & 01)
+#define IOT_DEVICE  ((op >> 03) & 077)
+#define IOT_IOP1    (op & 01)
+#define IOT_IOP2    ((op >> 01) & 01)
+#define IOT_IOP4    ((op >> 02) & 01)
 
-#define OPR_GROUP	((op >> 010) & 01)
-#define OPR_CLA		((op >> 07) & 01)
-#define OPR_CLL		((op >> 06) & 01)
-#define OPR_CMA		((op >> 05) & 01)
-#define OPR_CML		((op >> 04) & 01)
-#define OPR_ROR		((op >> 03) & 01)
-#define OPR_ROL		((op >> 02) & 01)
-#define OPR_ROT2	((op >> 01) & 01)
-#define OPR_IAC		(op & 01)
+#define OPR_GROUP   ((op >> 010) & 01)
+#define OPR_CLA     ((op >> 07) & 01)
+#define OPR_CLL     ((op >> 06) & 01)
+#define OPR_CMA     ((op >> 05) & 01)
+#define OPR_CML     ((op >> 04) & 01)
+#define OPR_ROR     ((op >> 03) & 01)
+#define OPR_ROL     ((op >> 02) & 01)
+#define OPR_ROT2    ((op >> 01) & 01)
+#define OPR_IAC     (op & 01)
 
-#define OPR_SMA		OPR_CLL
-#define OPR_SZA		OPR_CMA
-#define OPR_SNL		OPR_CML
-#define OPR_REVSKIP	OPR_ROR
-#define OPR_OSR		OPR_ROL
-#define OPR_HLT		OPR_ROT2
+#define OPR_SMA     OPR_CLL
+#define OPR_SZA     OPR_CMA
+#define OPR_SNL     OPR_CML
+#define OPR_REVSKIP OPR_ROR
+#define OPR_OSR     OPR_ROL
+#define OPR_HLT     OPR_ROT2
 
-#define OPR_GROUP_MASK	0401
-#define OPR_GROUP1_VAL	0000
-#define OPR_GROUP2_VAL	0400
+#define OPR_GROUP_MASK  0401
+#define OPR_GROUP1_VAL  0000
+#define OPR_GROUP2_VAL  0400
 
 const device_type PDP8CPU = &device_creator<pdp8_device>;
 

@@ -101,7 +101,7 @@ typedef __int128_t INT128;
 #define ATTR_HOT               __attribute__((hot))
 #define ATTR_COLD              __attribute__((cold))
 
-#define RESTRICT				__restrict__
+#define RESTRICT                __restrict__
 #define EXPECTED(x)     (x)
 #define UNEXPECTED(x)   (x)
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))

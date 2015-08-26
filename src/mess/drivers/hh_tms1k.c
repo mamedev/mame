@@ -235,7 +235,7 @@ void hh_tms1k_state::display_update()
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
-	
+
 	// output optional power led
 	if (m_power_led != m_power_on)
 	{

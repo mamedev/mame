@@ -2,29 +2,29 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	Timeworks PARTNER 128 cartridge emulation
+    Timeworks PARTNER 128 cartridge emulation
 
 **********************************************************************/
 
 /*
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	|---------------|
-	|LS74  SW     * |
-	|LS09      LS273|
-	|LS139   RAM    |
-	|LS133          |
-	|     LS240     |
-	|LS33    ROM    |
-	|LS09           |
-	 |||||||||||||||
+    |---------------|
+    |LS74  SW     * |
+    |LS09      LS273|
+    |LS139   RAM    |
+    |LS133          |
+    |     LS240     |
+    |LS33    ROM    |
+    |LS09           |
+     |||||||||||||||
 
-	ROM     - Toshiba TMM24128AP 16Kx8 EPROM (blank label)
-	RAM     - Sony CXK5864PN-15L 8Kx8 SRAM
-	SW      - push button switch
-	*       - solder point for joystick port dongle
+    ROM     - Toshiba TMM24128AP 16Kx8 EPROM (blank label)
+    RAM     - Sony CXK5864PN-15L 8Kx8 SRAM
+    SW      - push button switch
+    *       - solder point for joystick port dongle
 
 */
 
@@ -193,16 +193,16 @@ void partner128_t::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int
 		{
 			/*
 
-				bit 	description
+			    bit     description
 
-				0		RAM A7
-				1		RAM A8
-				2		RAM A9
-				3		RAM A10
-				4		RAM A11
-				5		RAM A12
-				6		LS74 1Cd,2Cd
-				7		N/C
+			    0       RAM A7
+			    1       RAM A8
+			    2       RAM A9
+			    3       RAM A10
+			    4       RAM A11
+			    5       RAM A12
+			    6       LS74 1Cd,2Cd
+			    7       N/C
 
 			*/
 

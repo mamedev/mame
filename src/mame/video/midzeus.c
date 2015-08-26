@@ -27,14 +27,14 @@
 #define WAVERAM1_WIDTH      512
 #define WAVERAM1_HEIGHT     512
 
-#define BLEND_OPAQUE1		0x00000000
-#define BLEND_OPAQUE2		0x4b23cb00
-#define BLEND_OPAQUE3		0x4b23dd00
-#define BLEND_OPAQUE4		0x00004800
-#define BLEND_OPAQUE5		0xdd23dd00
-#define BLEND_ADD1			0x40b68800
-#define BLEND_ADD2			0xc9b78800
-#define BLEND_MUL1			0x4093c800
+#define BLEND_OPAQUE1       0x00000000
+#define BLEND_OPAQUE2       0x4b23cb00
+#define BLEND_OPAQUE3       0x4b23dd00
+#define BLEND_OPAQUE4       0x00004800
+#define BLEND_OPAQUE5       0xdd23dd00
+#define BLEND_ADD1          0x40b68800
+#define BLEND_ADD2          0xc9b78800
+#define BLEND_MUL1          0x4093c800
 
 
 /*************************************
@@ -45,21 +45,21 @@
 
 struct mz_poly_extra_data
 {
-	const void *	palbase;
-	const void *	texbase;
-	UINT16			solidcolor;
-	UINT16			voffset;
-	INT16			zoffset;
-	UINT16			transcolor;
-	UINT16			texwidth;
-	UINT16			color;
-	UINT32			alpha;
-	UINT32			ctrl_word;
-	bool			blend_enable;
-	bool			depth_test_enable;
-	bool			depth_write_enable;
-	UINT32			blend;
-	UINT8			(*get_texel)(const void *, int, int, int);
+	const void *    palbase;
+	const void *    texbase;
+	UINT16          solidcolor;
+	UINT16          voffset;
+	INT16           zoffset;
+	UINT16          transcolor;
+	UINT16          texwidth;
+	UINT16          color;
+	UINT32          alpha;
+	UINT32          ctrl_word;
+	bool            blend_enable;
+	bool            depth_test_enable;
+	bool            depth_write_enable;
+	UINT32          blend;
+	UINT8           (*get_texel)(const void *, int, int, int);
 };
 
 
@@ -1180,7 +1180,7 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 		{
 			logerror("\t\t(%f,%f,%f) UV:(%02X,%02X) UV_SCALE:(%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
 					(double) vert[i].x * (1.0 / 65536.0), (double) vert[i].y * (1.0 / 65536.0), (double) vert[i].p[0] * (1.0 / 65536.0),
-				   (iuvz >> 16) & 0xff, (iuvz >> 24) & 0xff,
+					(iuvz >> 16) & 0xff, (iuvz >> 24) & 0xff,
 					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f),
 					(databuffer[10 + i] >> 20) & 0x3ff, (databuffer[10 + i] >> 10) & 0x3ff, (databuffer[10 + i] >> 0) & 0x3ff,
 					0);

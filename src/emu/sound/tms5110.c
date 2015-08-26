@@ -998,26 +998,26 @@ void tms5110_device::parse_frame()
 	fprintf(stderr," ");
 #endif
 
-	/* if the energy index is 0 or 15, we're done 
+	/* if the energy index is 0 or 15, we're done
 
 	if ((indx == 0) || (indx == 15))
 	{
-		if (DEBUG_5110) logerror("  (4-bit energy=%d frame)\n",m_new_energy);
+	    if (DEBUG_5110) logerror("  (4-bit energy=%d frame)\n",m_new_energy);
 
-	// clear the k's 
-		if (indx == 0)
-		{
-			for (i = 0; i < m_coeff->num_k; i++)
-				m_new_k[i] = 0;
-		}
+	// clear the k's
+	    if (indx == 0)
+	    {
+	        for (i = 0; i < m_coeff->num_k; i++)
+	            m_new_k[i] = 0;
+	    }
 
-		// clear fifo if stop frame encountered 
-		if (indx == 15)
-		{
-			if (DEBUG_5110) logerror("  (4-bit energy=%d STOP frame)\n",m_new_energy);
-			m_fifo_head = m_fifo_tail = m_fifo_count = 0;
-		}
-		return;
+	    // clear fifo if stop frame encountered
+	    if (indx == 15)
+	    {
+	        if (DEBUG_5110) logerror("  (4-bit energy=%d STOP frame)\n",m_new_energy);
+	        m_fifo_head = m_fifo_tail = m_fifo_count = 0;
+	    }
+	    return;
 	}*/
 	// if the energy index is 0 or 15, we're done
 	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))

@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
 	MCFG_SCREEN_PALETTE("palette")
 

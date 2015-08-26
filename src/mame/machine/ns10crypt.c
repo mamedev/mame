@@ -8,7 +8,7 @@ out knowledge progress.)
 
 The decryption used by type-2 System10 PCBs (MEM-N) acts on 16-bit words and is
 designed to operate in a serial way: once the decryption is triggered, every
-word is XORed with a mask calculated over data taken from the previous words 
+word is XORed with a mask calculated over data taken from the previous words
 (both encrypted and decrypted). Type-1 PCBs seem to use a similar
 scheme, probably involving the word address too and a bitswap, but his relation
 to what is described here needs further investigation.
@@ -17,14 +17,14 @@ In type-2 PCBs, the encrypted data is always contained in the first ROM of the
 game (8E), and it's always stored spanning an integer number of NAND blocks
 (the K9F2808U0B is organized in blocks of 16 KiB, each containing 32 pages of
 0x200 bytes). Usually the first part of the encrypted data is stored at about the end
-of the ROM, with all the blocks in that area processed in reverse order (first the 
+of the ROM, with all the blocks in that area processed in reverse order (first the
 one nearest the end, then the second nearest, etc); the second part goes immediately
-after it from a logic perspective, but it's, usually, physically located at the area 
+after it from a logic perspective, but it's, usually, physically located at the area
 starting at 0x28000 in the ROM. However, in at least a couple of games, there are
 out-of-order blocks (details below). Games, after
 some bootup code has been executed, will copy the encrypted content from
 the NANDs to RAM, moment at which the decryption is triggered. Physical locations
-of the encrypted programs in the first NAND, together with the RAM region where 
+of the encrypted programs in the first NAND, together with the RAM region where
 they are loaded, are summarized in the following table ( ' indicating processing
 in reverse order of the constituting blocks) :
 
@@ -44,12 +44,12 @@ startrgn    [fdc000,1000000)' + [28000,b4000)      80010000
 
 Both knpuzzle & gjspace present a NAND block which is out of order with respect
 to the normal layout; besides, that block is physically located immediately before
-the end-of-ROM region, in what maybe is an attempt to hinder the 
+the end-of-ROM region, in what maybe is an attempt to hinder the
 recognition/reconstruction of the encrypted data.
 
 Most games do a single decryption run, so the process is only initialized once;
 however, at least three of them (gamshara, mrdrilrg & panikuru) do reinitialize the
-internal state of the decrypted several times. As of 2015-08-19, only gamshara shows signs 
+internal state of the decrypted several times. As of 2015-08-19, only gamshara shows signs
 of doing it by writing to the triggering register; how the others two are triggering the
 reinitializations is still unclear. gamshara does a reinitialization every 5 NAND blocks
 (16 times in total); mrdrilrg does the second one after 0x38000 bytes and then subsequent
@@ -60,10 +60,10 @@ The calculation of the XOR masks seem to operate this way: most bits are
 calculated by using linear equations over GF(2) taking as input data the bits from
 previously processed words; however, one nonlinear calculation is performed
 per word processed, and that calculation typically affect just one bit (the only
-known exception is mrdrilrg, where the same nonlinear terms are 
-affecting two of them). Till now, all the formulae seem to depend only on the 
+known exception is mrdrilrg, where the same nonlinear terms are
+affecting two of them). Till now, all the formulae seem to depend only on the
 previous 3 words, and the first mask after a (re-)initialization is always zero, so
-chances are the mask bits are calculated one word in advance, having access to the 
+chances are the mask bits are calculated one word in advance, having access to the
 current encrypted and decrypted words plus two further words in each sequence, maybe stored
 in 32 bits registers. All the nonlinear terms reverse-engineered till now are of the form
 A x B, where A and B are linear formulae; thus, as everything else in the schema involves
@@ -104,7 +104,7 @@ hardware is doing. Two possible simplifications could be:
 A) The linear relations are creating lots of identities involving the bits
 from the sequence; they could be exploited to simplify the equations (but
 only when the implementation be stable, to avoid duplicating work).
-B) It's possible that some of those calculations are being stored and then 
+B) It's possible that some of those calculations are being stored and then
 used as another input bits for subsequent masks. Determining that (supposed)
 bits and factoring out them would simplify the expressions, in case they
 really exist.
@@ -123,7 +123,7 @@ const device_type STARTRGN_DECRYPTER = &device_creator<startrgn_decrypter_device
 
 // this could perfectly be part of the per-game logic; by now, only gamshara seems to use it, so we keep it global
 const int ns10_decrypter_device::initSbox[16] = {0,12,13,6,2,4,9,8,11,1,7,15,10,5,14,3};
- 
+
 ns10_decrypter_device::ns10_decrypter_device(device_type type, const ns10_crypto_logic &logic, const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, "Namco System 10 Decrypter", tag, owner, clock, "ns10_crypto", __FILE__)
 	, _active(false)
@@ -155,7 +155,7 @@ UINT16 ns10_decrypter_device::decrypt(UINT16 cipherword)
 	_previous_cipherwords  ^= cipherword;
 	_previous_plainwords  <<= 16;
 	_previous_plainwords   ^= plainword;
-	
+
 	_mask = 0;
 	for (int j = 15; j >= 0; --j)
 	{
@@ -220,7 +220,7 @@ int gf2_reducer::gf2_reduce(UINT64 num)const
 // static UINT16 panikuru_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)
 // {
 	// return ((reducer.gf2_reduce(0x0000000088300281ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000004600281ull & previous_plainwords))
- 		  // & (reducer.gf2_reduce(0x0000a13140090000ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000806240090000ull & previous_plainwords))) << 2;
+			// & (reducer.gf2_reduce(0x0000a13140090000ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000806240090000ull & previous_plainwords))) << 2;
 // }
 
 static UINT16 chocovdr_nonlinear_calc(UINT64 previous_cipherwords, UINT64 previous_plainwords, const gf2_reducer& reducer)

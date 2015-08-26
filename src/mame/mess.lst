@@ -99,7 +99,7 @@ multmega  // 1994 Sega Multi-Mega (Europe)
 32xe
 32xj
 32x_scd   // 1994 Sega Sega CD (USA w/32X addon)
-segapm	  // 1996 Sega Picture Magic (32x type hardware)
+segapm    // 1996 Sega Picture Magic (32x type hardware)
 
 saturnjp  // 1994 Sega Saturn (Japan)
 saturn  // 1995 Sega Saturn (USA)
@@ -2729,4 +2729,3 @@ bitgrphb
 tvgame
 aussieby
 hp_ipc
-

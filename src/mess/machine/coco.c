@@ -705,7 +705,7 @@ void coco_state::update_sound(void)
 	 */
 	if ((status & SOUNDMUX_ENABLE) != 0)
 	{
-	    m_analog_audio_level = dac_sound + cassette_sound + cart_sound;
+		m_analog_audio_level = dac_sound + cassette_sound + cart_sound;
 	}
 
 	m_dac->write_unsigned8(single_bit_sound + m_analog_audio_level);

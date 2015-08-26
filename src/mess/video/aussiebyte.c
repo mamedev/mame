@@ -70,7 +70,7 @@ READ8_MEMBER( aussiebyte_state::port37_r )
 MC6845_ON_UPDATE_ADDR_CHANGED( aussiebyte_state::crtc_update_addr )
 {
 /* not sure what goes in here - parameters passed are device, address, strobe */
-//	m_video_address = address;// & 0x7ff;
+//  m_video_address = address;// & 0x7ff;
 }
 
 WRITE8_MEMBER( aussiebyte_state::address_w )
@@ -147,7 +147,7 @@ UINT8 aussiebyte_state::crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16
 			gfx = m_p_chargen[((ac_chr & 0x7f)<<4) | ac_ra];
 			break;
 	}
-	
+
 	if (BIT(ac_attr, 3) & (ac_ra == 11)) // underline
 		gfx = 0xff;
 	if (BIT(ac_attr, 2) & ((ac_ra == 5) | (ac_ra == 6))) // strike-through
@@ -194,4 +194,3 @@ MC6845_UPDATE_ROW( aussiebyte_state::crtc_update_row )
 		*p++ = palette[BIT(gfx, 0)];
 	}
 }
-

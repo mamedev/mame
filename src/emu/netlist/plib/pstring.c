@@ -600,4 +600,3 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;
-

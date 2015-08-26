@@ -20,7 +20,7 @@ typedef device_delegate<void (int layer, int bank, int *code, int *color, int *f
 	devcb = &k052109_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 
-class k052109_device : public device_t,	public device_gfx_interface
+class k052109_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout charlayout;
 	static const gfx_layout charlayout_ram;

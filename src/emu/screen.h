@@ -287,8 +287,8 @@ private:
 	INT32               m_last_partial_scan;        // scanline of last partial update
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
 	UINT32              m_unique_id;                // unique id for this screen_device
-	rgb_t				m_color;					// render color
-	UINT8				m_brightness;				// global brightness
+	rgb_t               m_color;                    // render color
+	UINT8               m_brightness;               // global brightness
 
 	// screen timing
 	attoseconds_t       m_frame_period;             // attoseconds per frame

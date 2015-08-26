@@ -130,11 +130,11 @@ void xbox_state::hack_eeprom()
 }
 
 /*static const struct {
-	const char *game_name;
-	struct {
-		UINT32 address;
-		UINT8 write_byte;
-	} modify[16];
+    const char *game_name;
+    struct {
+        UINT32 address;
+        UINT8 write_byte;
+    } modify[16];
 } hacks[] = { { "chihiro",{ { 0x6a79f, 0x01 },{ 0x6a7a0, 0x00 },{ 0x6b575, 0x00 },{ 0x6b576, 0x00 },{ 0x6b5af, 0x75 },{ 0x6b78a, 0x75 },{ 0x6b7ca, 0x00 },{ 0x6b7b8, 0x00 },{ 0x8f5b2, 0x75 },{ 0x79a9e, 0x74 },{ 0x79b80, 0x74 },{ 0x79b97, 0x74 },{ 0, 0 } } },
 { "outr2",{ { 0x12e4cf, 0x01 },{ 0x12e4d0, 0x00 },{ 0x4793e, 0x01 },{ 0x4793f, 0x00 },{ 0x47aa3, 0x01 },{ 0x47aa4, 0x00 },{ 0x14f2b6, 0x84 },{ 0x14f2d1, 0x75 },{ 0x8732f, 0x7d },{ 0x87384, 0x7d },{ 0x87388, 0xeb },{ 0, 0 } } } };*/
 
@@ -150,9 +150,9 @@ void xbox_state::hack_usb()
 		p = -1;
 	if (p >= 0) {
 		/*for (int a = 0; a < 16; a++) {
-			if (hacks[p].modify[a].address == 0)
-				break;
-			m_maincpu->space(0).write_byte(hacks[p].modify[a].address, hacks[p].modify[a].write_byte);
+		    if (hacks[p].modify[a].address == 0)
+		        break;
+		    m_maincpu->space(0).write_byte(hacks[p].modify[a].address, hacks[p].modify[a].write_byte);
 		}*/
 	}
 	usbhack_counter++;
@@ -164,10 +164,10 @@ void xbox_state::machine_start()
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	usbhack_index = -1;
 	/*for (int a = 1; a < 2; a++)
-		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
-			usbhack_index = a;
-			break;
-		}*/
+	    if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
+	        usbhack_index = a;
+	        break;
+	    }*/
 	usbhack_counter = 0;
 	// savestates
 	save_item(NAME(usbhack_counter));

@@ -241,7 +241,7 @@ struct putf8_traits
 			return 2;
 		else if (c < 0x10000)
 			return 3;
-		else /* U+10000	U+1FFFFF */
+		else /* U+10000 U+1FFFFF */
 			return 4; /* no checks */
 	}
 	static code_t code(const mem_t *p)
@@ -276,7 +276,7 @@ struct putf8_traits
 			m[1] = 0x80 | ((c>>6) & 0x3f);
 			m[2] = 0x80 | (c & 0x3f);
 		}
-		else /* U+10000	U+1FFFFF */
+		else /* U+10000 U+1FFFFF */
 		{
 			m[0] = 0xF0 | (c >> 18);
 			m[1] = 0x80 | ((c>>12) & 0x3f);
@@ -622,11 +622,11 @@ public:
 
 	plog_base(plog_dispatch_intf *proxy)
 	: debug(proxy),
-	  info(proxy),
-	  verbose(proxy),
-	  warning(proxy),
-	  error(proxy),
-      fatal(proxy)
+		info(proxy),
+		verbose(proxy),
+		warning(proxy),
+		error(proxy),
+		fatal(proxy)
 	{}
 	virtual ~plog_base() {};
 

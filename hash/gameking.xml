@@ -227,16 +227,16 @@
 	</software>
 
 <!-- Same hashes as trojanl, why is there a new entry?
-	<software name="trojanla" cloneof="trojanl" supported="no">
-		<description>Trojan Legend (Alt Revision)</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="trojan legend (alt).bin" size="131072" crc="b832db4f" sha1="5a152bfb2ba2150cff9dc66729ceadc0b47d4f17" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="trojanla" cloneof="trojanl" supported="no">
+        <description>Trojan Legend (Alt Revision)</description>
+        <year>200?</year>
+        <publisher>TimeTop</publisher>
+        <part name="cart" interface="gameking_cart">
+            <dataarea name="rom" size="131072">
+                <rom name="trojan legend (alt).bin" size="131072" crc="b832db4f" sha1="5a152bfb2ba2150cff9dc66729ceadc0b47d4f17" offset="0x00000" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 

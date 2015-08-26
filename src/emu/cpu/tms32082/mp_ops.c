@@ -465,7 +465,7 @@ void tms32082_mp_device::execute_short_imm()
 			break;
 		}
 
-		case 0x12:			// and.tf
+		case 0x12:          // and.tf
 		{
 			int rd = OP_RD();
 			int rs = OP_RS();
@@ -692,7 +692,7 @@ void tms32082_mp_device::execute_short_imm()
 			break;
 		}
 
-		case 0x45:			// jsr.a
+		case 0x45:          // jsr.a
 		{
 			int link = OP_LINK();
 			int base = OP_BASE();
@@ -929,12 +929,12 @@ void tms32082_mp_device::execute_reg_long_imm()
 			UINT32 compmask = endmask & shiftmask;
 
 			UINT32 res = 0;
-			if (r)		// right
+			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
 				res = SIGN_EXTEND(res, rot);
 			}
-			else		// left
+			else        // left
 			{
 				res = ROTATE_L(source, rot) & compmask;
 			}
@@ -1022,7 +1022,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 		}
 
 		case 0x3a:
-		case 0x3b:			// or.ft
+		case 0x3b:          // or.ft
 		{
 			int rd = OP_RD();
 			int rs = OP_RS();

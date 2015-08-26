@@ -1064,8 +1064,8 @@ static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs0, write_cs0)
 	AM_RANGE(0x340000, 0x34000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs1, write_cs1)
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf5c400", rf5c400_device, rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM			// SDRAM
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAM			// SDRAM
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM         // SDRAM
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAM         // SDRAM
 ADDRESS_MAP_END
 
 /*****************************************************************************/

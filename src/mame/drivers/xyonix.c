@@ -274,4 +274,3 @@ ROM_END
 /* GAME drivers **************************************************************/
 
 GAME( 1989, xyonix, 0, xyonix, xyonix, driver_device, 0, ROT0, "Philko", "Xyonix", MACHINE_SUPPORTS_SAVE )
-	

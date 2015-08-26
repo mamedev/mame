@@ -1238,7 +1238,7 @@ namespace netlist
 	protected:
 
 		// any derived netlist must override vlog inherited from plog_base
-		// 	virtual void vlog(const plog_level &l, const pstring &ls) = 0;
+		//  virtual void vlog(const plog_level &l, const pstring &ls) = 0;
 
 		/* from netlist_object */
 		virtual void reset();
@@ -1256,7 +1256,7 @@ namespace netlist
 
 		netlist_time                m_time;
 		bool                        m_use_deactivate;
-		queue_t       			    m_queue;
+		queue_t                     m_queue;
 
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;

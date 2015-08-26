@@ -595,4 +595,3 @@ void emu_options::update_cached_options()
 	m_sleep = bool_value(OPTION_SLEEP);
 	m_refresh_speed = bool_value(OPTION_REFRESHSPEED);
 }
-

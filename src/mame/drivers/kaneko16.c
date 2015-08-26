@@ -36,7 +36,7 @@ Year + Game                    PCB         Notes
 94  Great 1000 Miles Rally     Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
     Bonk's Adventure           Z09AF-003   TBSOP01 MCU protection (EEPROM handling, 68k code snippet, data)
     Blood Warrior              Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
-	Pack'n Bang Bang           BW-002      (prototype)
+    Pack'n Bang Bang           BW-002      (prototype)
 95  Great 1000 Miles Rally 2   M201F00138  TBSOP02 MCU protection (EEPROM handling etc.)
 ----------------------------------------------------------------------------------------
 
@@ -1505,7 +1505,7 @@ static INPUT_PORTS_START( packbang )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
-	PORT_START("DSW2")  
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )

@@ -538,7 +538,7 @@ ROM_START( gunsmokeua )
 	ROM_LOAD( "gsr_03a.9n",  0x00000, 0x8000, CRC(2f6e6ad7) SHA1(e9e4a367c240a35a1ba2eeaec9458996f7926f16) ) /* Code 0000-7fff */
 	ROM_LOAD( "gs04.10n", 0x10000, 0x8000, CRC(8d4b423f) SHA1(149274c2ed1526ca1f419fdf8a24059ff138f7f2) ) /* Paged code */
 	ROM_LOAD( "gs05.12n", 0x18000, 0x8000, CRC(2b5667fb) SHA1(5b689bca1e76d803b4cae22feaa7744fa528e93f) ) /* Paged code */
-	
+
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gs02.14h", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 

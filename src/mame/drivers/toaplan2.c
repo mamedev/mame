@@ -1897,15 +1897,15 @@ static INPUT_PORTS_START( kbashk )
 	PORT_CONFSETTING(       0x0040, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(       0x0050, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(       0x0060, DEF_STR( Southeast_Asia ) )
-    PORT_CONFSETTING(       0x0070, DEF_STR( Unused ) )
-    PORT_CONFSETTING(       0x0080, DEF_STR( Japan ) ) // no Taito license
+	PORT_CONFSETTING(       0x0070, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x0080, DEF_STR( Japan ) ) // no Taito license
 	PORT_CONFSETTING(       0x0090, DEF_STR( Unused ) )
 	PORT_CONFSETTING(       0x00a0, DEF_STR( Unused ) )
-    PORT_CONFSETTING(       0x00b0, DEF_STR( Korea ) )
-    PORT_CONFSETTING(       0x00c0, DEF_STR( Hong_Kong ))
-    PORT_CONFSETTING(       0x00d0, DEF_STR( Taiwan ))
-    PORT_CONFSETTING(       0x00e0, DEF_STR( Southeast_Asia ))
-    PORT_CONFSETTING(       0x00f0, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x00b0, DEF_STR( Korea ) )
+	PORT_CONFSETTING(       0x00c0, DEF_STR( Hong_Kong ))
+	PORT_CONFSETTING(       0x00d0, DEF_STR( Taiwan ))
+	PORT_CONFSETTING(       0x00e0, DEF_STR( Southeast_Asia ))
+	PORT_CONFSETTING(       0x00f0, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kbash2 )

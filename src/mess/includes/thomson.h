@@ -390,7 +390,7 @@ protected:
 	optional_memory_bank m_rambank;
 	required_memory_bank m_flopbank;
 	required_memory_bank m_basebank;
-	required_memory_bank m_syslobank;     
+	required_memory_bank m_syslobank;
 	optional_memory_bank m_syshibank;
 	optional_memory_bank m_datalobank;
 	optional_memory_bank m_datahibank;
