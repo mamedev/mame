@@ -7,7 +7,7 @@
 
 #include "emu.h"
 
-#define FIFO_SIZE               64 // TODO: technically the tms51xx chips don't have a fifo at all
+#undef PERFECT_INTERPOLATION_HACK
 
 /* TMS5110 commands */
 										/* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
@@ -15,7 +15,7 @@
 #define TMS5110_CMD_RESET        (0) /*    0     0     0     x  |     1    */
 #define TMS5110_CMD_LOAD_ADDRESS (2) /*    0     0     1     x  |     2    */
 #define TMS5110_CMD_OUTPUT       (4) /*    0     1     0     x  |     3    */
-#define TMS5110_CMD_SPKSLOW      (6) /*    0     1     1     x  |     1    | Note: this command is undocumented on the datasheets, it only appears on the patents. It might not actually work properly on some of the real chips as manufactured. Acts the same as CMD_SPEAK, but makes the interpolator take two A cycles whereever it would normally only take one, effectively making speech of any given word take about twice as long as normal. */
+#define TMS5110_CMD_SPKSLOW      (6) /*    0     1     1     x  |     1    | Note: this command is undocumented on the datasheets, it only appears on the patents. It might not actually work properly on some of the real chips as manufactured. Acts the same as CMD_SPEAK, but makes the interpolator take three A cycles whereever it would normally only take one, effectively making speech of any given word take twice as long as normal. */
 #define TMS5110_CMD_READ_BIT     (8) /*    1     0     0     x  |     1    */
 #define TMS5110_CMD_SPEAK       (10) /*    1     0     1     x  |     1    */
 #define TMS5110_CMD_READ_BRANCH (12) /*    1     1     0     x  |     1    */
@@ -64,7 +64,6 @@ public:
 	 */
 	DECLARE_READ8_MEMBER( romclk_hack_r );
 
-	int ready_r();
 	void set_frequency(int frequency);
 
 	int _speech_rom_read_bit();
@@ -93,9 +92,7 @@ private:
 	void new_int_write_addr(UINT8 addr);
 	UINT8 new_int_read();
 	void register_for_save_states();
-	void FIFO_data_write(int data);
 	int extract_bits(int count);
-	void request_bits(int no);
 	void perform_dummy_read();
 	INT32 lattice_filter();
 	void process(INT16 *buffer, unsigned int size);
@@ -108,12 +105,6 @@ private:
 
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
-
-	/* these contain data that describes the 4 bit "FIFO" */
-	UINT8 m_fifo[FIFO_SIZE];
-	UINT8 m_fifo_head;
-	UINT8 m_fifo_tail;
-	UINT8 m_fifo_count;
 
 	/* these contain global status bits */
 	UINT8 m_PDC;

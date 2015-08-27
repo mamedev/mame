@@ -14,7 +14,6 @@
 
      Todo:
         - implement CS
-        - implement missing commands
         - TMS5110_CMD_TEST_TALK is only partially implemented
 
      TMS5100:
@@ -212,11 +211,6 @@ void tms5110_device::register_for_save_states()
 {
 	save_item(NAME(m_variant));
 
-	save_item(NAME(m_fifo));
-	save_item(NAME(m_fifo_head));
-	save_item(NAME(m_fifo_tail));
-	save_item(NAME(m_fifo_count));
-
 	save_item(NAME(m_PDC));
 	save_item(NAME(m_CTL_pins));
 	save_item(NAME(m_SPEN));
@@ -310,59 +304,25 @@ static void printbits(long data, int num)
 }
 #endif
 
-
 /******************************************************************************************
 
-     FIFO_data_write -- handle bit data write to the TMS5110 (as a result of toggling M0 pin)
-
-******************************************************************************************/
-void tms5110_device::FIFO_data_write(int data)
-{
-	/* add this bit to the FIFO */
-	if (m_fifo_count < FIFO_SIZE)
-	{
-		m_fifo[m_fifo_tail] = (data&1); /* set bit to 1 or 0 */
-
-		m_fifo_tail = (m_fifo_tail + 1) % FIFO_SIZE;
-		m_fifo_count++;
-
-		if (DEBUG_5110) logerror("Added bit to FIFO (size=%2d)\n", m_fifo_count);
-	}
-	else
-	{
-		if (DEBUG_5110) logerror("Ran out of room in the FIFO!\n");
-	}
-}
-
-/******************************************************************************************
-
-     extract_bits -- extract a specific number of bits from the FIFO
+     extract_bits -- extract a specific number of bits from the VSM
 
 ******************************************************************************************/
 
 int tms5110_device::extract_bits(int count)
 {
 	int val = 0;
-	if (DEBUG_5110) logerror("requesting %d bits from fifo: ", count);
-	while (count--)
+	if (DEBUG_5110) logerror("requesting %d bits", count);
+	for (int i = 0; i < count; i++)
 	{
-		val = (val << 1) | (m_fifo[m_fifo_head] & 1);
-		m_fifo_count--;
-		m_fifo_head = (m_fifo_head + 1) % FIFO_SIZE;
+		val = (val<<1) | new_int_read();
+		if (DEBUG_5110) logerror("bit read: %d\n", val&1);
 	}
 	if (DEBUG_5110) logerror("returning: %02x\n", val);
 	return val;
 }
 
-void tms5110_device::request_bits(int no)
-{
-	for (int i = 0; i < no; i++)
-	{
-		UINT8 data = new_int_read();
-		if (DEBUG_5110) logerror("bit added to fifo: %d\n", data);
-		FIFO_data_write(data);
-	}
-}
 
 void tms5110_device::perform_dummy_read()
 {
@@ -612,10 +572,6 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			 */
 			if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_zero = 1;
 			if ((m_IP == 0)&&(m_pitch_zero==1)) m_pitch_zero = 0;
-#ifdef PERFECT_INTERPOLATION_HACK
-			m_old_zpar = m_zpar;
-#endif
-			m_zpar = 0; /* this gets effectively reset by resetf3, same signal which resets m_PC to 0 */
 			if (m_IP == 7) // RESETL4
 			{
 				/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
@@ -625,6 +581,10 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 #endif
 				m_TALKD = m_TALK; // TALKD is latched from TALK
 				m_TALK = m_SPEN; // TALK is latched from SPEN
+#ifdef PERFECT_INTERPOLATION_HACK
+				m_old_zpar = m_zpar;
+#endif
+				m_zpar = 1 - m_TALKD; // ZPAR is inverse of m_TALKD
 			}
 			m_subcycle = m_subc_reload;
 			m_PC = 0;
@@ -654,6 +614,10 @@ empty:
 			{
 				m_TALKD = m_TALK; // TALKD is latched from TALK
 				m_TALK = m_SPEN; // TALK is latched from SPEN
+#ifdef PERFECT_INTERPOLATION_HACK
+				m_old_zpar = m_zpar;
+#endif
+				m_zpar = 1 - m_TALKD; // ZPAR is inverse of m_TALKD
 			}
 			m_subcycle = m_subc_reload;
 			m_PC = 0;
@@ -916,7 +880,6 @@ void tms5110_device::PDC_set(int data)
 #ifdef DEBUG_COMMAND_DUMP
 						fprintf(stderr,"actually reading a bit now\n");
 #endif
-						request_bits(1);
 						m_CTL_buffer >>= 1;
 						m_CTL_buffer |= (extract_bits(1)<<3);
 						m_CTL_buffer &= 0xF;
@@ -979,18 +942,8 @@ void tms5110_device::PDC_set(int data)
 
 void tms5110_device::parse_frame()
 {
-	int bits, i, rep_flag;
-	/** TODO: get rid of bits handling here and move into extract_bits (as in tms5220.c) **/
-	/* count the total number of bits available */
-	bits = m_fifo_count;
+	int i, rep_flag;
 
-	/* attempt to extract the energy index */
-	bits -= m_coeff->energy_bits;
-	if (bits < 0)
-	{
-		request_bits( -bits ); /* toggle M0 to receive needed bits */
-		bits = 0;
-	}
 	// attempt to extract the energy index
 	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
@@ -998,52 +951,16 @@ void tms5110_device::parse_frame()
 	fprintf(stderr," ");
 #endif
 
-	/* if the energy index is 0 or 15, we're done
-
-	if ((indx == 0) || (indx == 15))
-	{
-	    if (DEBUG_5110) logerror("  (4-bit energy=%d frame)\n",m_new_energy);
-
-	// clear the k's
-	    if (indx == 0)
-	    {
-	        for (i = 0; i < m_coeff->num_k; i++)
-	            m_new_k[i] = 0;
-	    }
-
-	    // clear fifo if stop frame encountered
-	    if (indx == 15)
-	    {
-	        if (DEBUG_5110) logerror("  (4-bit energy=%d STOP frame)\n",m_new_energy);
-	        m_fifo_head = m_fifo_tail = m_fifo_count = 0;
-	    }
-	    return;
-	}*/
 	// if the energy index is 0 or 15, we're done
 	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
 		return;
 
-
-	/* attempt to extract the repeat flag */
-	bits -= 1;
-	if (bits < 0)
-	{
-		request_bits( -bits ); /* toggle M0 to receive needed bits */
-		bits = 0;
-	}
 	rep_flag = extract_bits(1);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(rep_flag, 1);
 	fprintf(stderr," ");
 #endif
 
-	/* attempt to extract the pitch */
-	bits -= m_coeff->pitch_bits;
-	if (bits < 0)
-	{
-		request_bits( -bits ); /* toggle M0 to receive needed bits */
-		bits = 0;
-	}
 	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
@@ -1056,13 +973,6 @@ void tms5110_device::parse_frame()
 	// extract first 4 K coefficients
 	for (i = 0; i < 4; i++)
 	{
-		/* attempt to extract 4 K's */
-		bits -= m_coeff->kbits[i];
-		if (bits < 0)
-		{
-			request_bits( -bits ); /* toggle M0 to receive needed bits */
-			bits = 0;
-		}
 		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
@@ -1080,12 +990,6 @@ void tms5110_device::parse_frame()
 	// If we got here, we need the remaining 6 K's
 	for (i = 4; i < m_coeff->num_k; i++)
 	{
-		bits -= m_coeff->kbits[i];
-		if (bits < 0)
-		{
-			request_bits( -bits ); /* toggle M0 to receive needed bits */
-			bits = 0;
-		}
 		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
@@ -1093,9 +997,6 @@ void tms5110_device::parse_frame()
 #endif
 	}
 #ifdef VERBOSE
-	if (m_speak_external)
-		logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
-	else
 		logerror("Parsed a frame successfully in ROM\n");
 #endif
 	return;
@@ -1239,9 +1140,6 @@ void m58817_device::device_start()
 void tms5110_device::device_reset()
 {
 	m_digital_select = FORCE_DIGITAL; // assume analog output
-	/* initialize the FIFO */
-	memset(m_fifo, 0, sizeof(m_fifo));
-	m_fifo_head = m_fifo_tail = m_fifo_count = 0;
 
 	/* initialize the chip state */
 	m_SPEN = m_TALK = m_TALKD = 0;
@@ -1389,22 +1287,6 @@ READ8_MEMBER( tms5110_device::romclk_hack_r )
 	}
 	return m_romclk_hack_state;
 }
-
-
-
-/******************************************************************************
-
-     tms5110_ready_r -- return the not ready status from the sound chip
-
-******************************************************************************/
-
-int tms5110_device::ready_r()
-{
-	/* bring up to date first */
-	m_stream->update();
-	return (m_fifo_count < FIFO_SIZE-1);
-}
-
 
 
 /******************************************************************************

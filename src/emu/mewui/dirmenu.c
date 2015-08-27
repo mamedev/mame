@@ -333,11 +333,13 @@ void ui_menu_directory::handle()
 {
 	// process the menu
 	const ui_menu_event *menu_event = process(0);
-	int ref = (FPTR)menu_event->itemref;
-	bool change = (ref == HISTORY_FOLDERS || ref == EXTRAINI_FOLDERS || ref == MEWUI_FOLDERS);
 
 	if (menu_event != NULL && menu_event->itemref != NULL && menu_event->iptkey == IPT_UI_SELECT)
+	{
+		int ref = (FPTR)menu_event->itemref;
+		bool change = (ref == HISTORY_FOLDERS || ref == EXTRAINI_FOLDERS || ref == MEWUI_FOLDERS);
 		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_display_actual(machine(), container, ref, change)));
+	}
 }
 
 //-------------------------------------------------
