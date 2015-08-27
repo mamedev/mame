@@ -891,6 +891,8 @@ static void create_window_class(void)
 		wc.lpfnWndProc      = winwindow_video_window_proc_ui;
 		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
 		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
+		
+		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
@@ -1393,7 +1395,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				break;
 			}
 			return DefWindowProc(wnd, message, wparam, lparam);
-		}
+		}c
 
 		// track whether we are in the foreground
 		case WM_ACTIVATEAPP:
