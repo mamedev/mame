@@ -20,7 +20,7 @@ Titles, publishers and release dates taken from:
 		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
 		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
-			<dataarea name="side1" size="158090">
+			<dataarea name="side1" size="12742140">
 				<rom name="alamein.wav" size="12742140" crc="04e00f60" sha1="42f3ef356fdb67ddd0fbdb57e473c23d267f9bf4" offset="0" />
 			</dataarea>
 		</part>
@@ -97,7 +97,7 @@ Titles, publishers and release dates taken from:
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="キャノンボール"/>
 		<part name="cass" interface="x1_cass">
-			<dataarea name="side1" size="10807804">
+			<dataarea name="side1" size="4857558">
 				<rom name="cball.wav" size="4857558" crc="4405cf21" sha1="769a43d97f69b5d72347ca8b72547e464b9d059b" offset="0" />
 			</dataarea>
 		</part>
@@ -329,7 +329,7 @@ Titles, publishers and release dates taken from:
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="銀行強盗 マシンガンジョー VS ザ・マフィア"/>
 		<part name="cass" interface="x1_cass">
-			<dataarea name="side1" size="10807804">
+			<dataarea name="side1" size="15591932">
 				<rom name="machgjoe.wav" size="15591932" crc="3769199a" sha1="81614c317f432055f2c5fdcce51438de9fbdad7f" offset="0" />
 			</dataarea>
 		</part>
