@@ -14,6 +14,7 @@
 
 #include "pstring.h"
 #include "palloc.h"
+#include "plists.h"
 
 template<>
 pstr_t pstring_t<putf8_traits>::m_zero = pstr_t(0);
@@ -305,6 +306,106 @@ long pstring_t<F>::as_long(bool *error) const
 // static stuff ...
 // ----------------------------------------------------------------------------------------
 
+/*
+ * Cached allocation of string memory
+ *
+ * This improves startup performance by 30%.
+ */
+
+#if 1
+
+static pstack_t<pstr_t *> *stk = NULL;
+
+static inline unsigned countleadbits(unsigned x)
+{
+#ifndef count_leading_zeros
+	unsigned msk;
+	unsigned ret;
+	if (x < 0x100)
+	{
+		msk = 0x80;
+		ret = 24;
+	}
+	else if (x < 0x10000)
+	{
+		msk = 0x8000;
+		ret = 16;
+	}
+	else if (x < 0x1000000)
+	{
+		msk = 0x800000;
+		ret = 8;
+	}
+	else
+	{
+		msk = 0x80000000;
+		ret = 0;
+	}
+	while ((msk & x) == 0 && ret < 31)
+	{
+		msk = msk >> 1;
+		ret++;
+	}
+	return ret;
+#else
+	return count_leading_zeros(x);
+#endif
+}
+
+template<typename F>
+void pstring_t<F>::sfree(pstr_t *s)
+{
+	s->m_ref_count--;
+	if (s->m_ref_count == 0 && s != &m_zero)
+	{
+		if (stk != NULL)
+		{
+			unsigned sn= ((32 - countleadbits(s->len())) + 1) / 2;
+			stk[sn].push(s);
+		}
+		else
+			pfree_array(((char *)s));
+		//_mm_free(((char *)s));
+	}
+}
+
+template<typename F>
+pstr_t *pstring_t<F>::salloc(int n)
+{
+	if (stk == NULL)
+		stk = palloc_array(pstack_t<pstr_t *>, 17);
+	pstr_t *p;
+	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
+	unsigned size = sizeof(pstr_t) + (1<<(sn * 2)) + 1;
+	if (stk[sn].empty())
+		p = (pstr_t *) palloc_array(char, size);
+	else
+	{
+		//printf("%u %u\n", sn, (unsigned) stk[sn].count());
+		p = stk[sn].pop();
+	}
+
+	//  str_t *p = (str_t *) _mm_malloc(size, 8);
+	p->init(n);
+	return p;
+}
+template<typename F>
+void pstring_t<F>::resetmem()
+{
+	if (stk != NULL)
+	{
+		for (unsigned i=0; i<=16; i++)
+		{
+			for (; stk[i].count() > 0; )
+				pfree_array(stk[i].pop());
+		}
+		pfree_array(stk);
+		stk = NULL;
+	}
+}
+
+
+#else
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
@@ -331,6 +432,8 @@ void pstring_t<F>::resetmem()
 {
 	// Release the 0 string
 }
+#endif
+
 
 // ----------------------------------------------------------------------------------------
 // pstring ...
