@@ -1395,7 +1395,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				break;
 			}
 			return DefWindowProc(wnd, message, wparam, lparam);
-		}c
+		}
 
 		// track whether we are in the foreground
 		case WM_ACTIVATEAPP:
