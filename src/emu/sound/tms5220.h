@@ -105,9 +105,12 @@ private:
 
 
 	/* these contain global status bits */
-	UINT8 m_speaking_now;     /* True only if actual speech is being generated right now. Is set when a speak vsm command happens OR when speak external happens and buffer low becomes nontrue; Is cleared when speech halts after the last stop frame or the last frame after talk status is otherwise cleared.*/
-	UINT8 m_speak_external;   /* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
-	UINT8 m_talk_status;      /* If 1, TS status bit is 1, i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared by 3 things: 1. when a STOP command has just been processed as a new frame in the speech stream; 2. if the fifo runs out in speak external mode; 3. on power-up/during a reset command; When it gets cleared, speak_external is also cleared, an interrupt is generated, and speaking_now will be cleared when the next frame starts. */
+	UINT8 m_previous_TALK_STATUS;      /* this is the OLD value of TALK_STATUS (i.e. previous value of m_SPEN|m_TALKD), needed for generating interrupts on a falling TALK_STATUS edge */
+	UINT8 m_SPEN;             /* set on speak(or speak external and BL falling edge) command, cleared on stop command, reset command, or buffer out */
+	UINT8 m_DDIS;             /* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
+	UINT8 m_TALK;             /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */
+#define TALK_STATUS (m_SPEN|m_TALKD)
+	UINT8 m_TALKD;            /* TALK(TCON) value, latched every RESETL4 */
 	UINT8 m_buffer_low;       /* If 1, FIFO has less than 8 bytes in it */
 	UINT8 m_buffer_empty;     /* If 1, FIFO is empty */
 	UINT8 m_irq_pin;          /* state of the IRQ pin (output) */
@@ -132,22 +135,16 @@ private:
 	INT16 m_current_energy;
 	INT16 m_current_pitch;
 	INT16 m_current_k[10];
-
-	INT16 m_target_energy;
-	INT16 m_target_pitch;
-	INT16 m_target_k[10];
 #else
 	UINT8 m_old_frame_energy_idx;
 	UINT8 m_old_frame_pitch_idx;
 	UINT8 m_old_frame_k_idx[10];
+	UINT8 m_old_zpar;
+	UINT8 m_old_uv_zpar;
 
 	INT32 m_current_energy;
 	INT32 m_current_pitch;
 	INT32 m_current_k[10];
-
-	INT32 m_target_energy;
-	INT32 m_target_pitch;
-	INT32 m_target_k[10];
 #endif
 
 	UINT16 m_previous_energy; /* needed for lattice filter to match patent */
@@ -155,16 +152,19 @@ private:
 	UINT8 m_subcycle;         /* contains the current subcycle for a given PC: 0 is A' (only used on SPKSLOW mode on 51xx), 1 is A, 2 is B */
 	UINT8 m_subc_reload;      /* contains 1 for normal speech, 0 when SPKSLOW is active */
 	UINT8 m_PC;               /* current parameter counter (what param is being interpolated), ranges from 0 to 12 */
-	/* TODO/NOTE: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
+	/* NOTE: the interpolation period counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
 	UINT8 m_IP;               /* the current interpolation period */
 	UINT8 m_inhibit;          /* If 1, interpolation is inhibited until the DIV1 period */
+	UINT8 m_uv_zpar;          /* If 1, zero k5 thru k10 coefficients */
+	UINT8 m_zpar;             /* If 1, zero ALL parameters. */
+	UINT8 m_pitch_zero;       /* circuit 412; pitch is forced to zero under certain circumstances */
 	UINT8 m_c_variant_rate;    /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	UINT16 m_pitch_count;     /* pitch counter; provides chirp rom address */
 
 	INT32 m_u[11];
 	INT32 m_x[10];
 
-	UINT16 m_RNG;             /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+	UINT16 m_RNG;             /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 TODO: no it isn't */
 	INT16 m_excitation_data;
 
 	/* R Nabet : These have been added to emulate speech Roms */
