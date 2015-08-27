@@ -235,6 +235,7 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_old_frame_pitch_idx));
 	save_item(NAME(m_old_frame_k_idx));
 	save_item(NAME(m_old_zpar));
+	save_item(NAME(m_old_uv_zpar));
 #endif
 	save_item(NAME(m_current_energy));
 	save_item(NAME(m_current_pitch));
@@ -353,21 +354,10 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 	if (!m_TALKD)
 		goto empty;
 
+render:
 	/* loop until the buffer is full or we've stopped speaking */
 	while ((size > 0) && m_TALKD)
 	{
-		/* if it is the appropriate time to update the old energy/pitch indices,
-		 * i.e. when IP=7, PC=12, T=17, subcycle=2, do so. Since IP=7 PC=12 T=17
-		 * is JUST BEFORE the transition to IP=0 PC=0 T=0 sybcycle=(0 or 1),
-		 * which happens 4 T-cycles later), we change on the latter.
-		 * The indices are updated here ~12 PCs before the new frame is applied.
-		 */
-		/** TODO: the patents 4331836, 4335277, and 4419540 disagree about the timing of this **/
-		if ((m_IP == 0) && (m_PC == 0) && (m_subcycle < 2))
-		{
-			m_OLDE = (m_new_frame_energy_idx == 0);
-			m_OLDP = (m_new_frame_pitch_idx == 0);
-		}
 
 		/* if we're ready for a new frame to be applied, i.e. when IP=0, PC=12, Sub=1
 		 * (In reality, the frame was really loaded incrementally during the entire IP=0
@@ -389,13 +379,22 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame();
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
-			/* if the new frame is unvoiced (or silenced via ZPAR), be sure to zero out the k5-k10 parameters */
-			m_uv_zpar = NEW_FRAME_UNVOICED_FLAG | m_zpar;
 
-			/* if the new frame is a stop frame, unset both TALK and SPEN. TALKD remains active while the energy is ramping to 0. */
+			// if the new frame is unvoiced (or silenced via ZPAR), be sure to zero out the k5-k10 parameters
+			// NOTE: this is probably the bug the tms5100/tmc0280 has, pre-rev D, I think.
+			// GUESS: Pre-rev D versions start zeroing k5-k10 immediately upon new frame load regardless of interpolation inhibit
+			// I.e. ZPAR = /TALKD || (PC>5&&P=0)
+			// GUESS: D and later versions only start or stop zeroing k5-k10 at the IP7->IP0 transition AFTER the frame
+			// I.e. ZPAR = /TALKD || (PC>5&&OLDP)
+#ifdef PERFECT_INTERPOLATION_HACK
+			m_old_uv_zpar = m_uv_zpar;
+			m_old_zpar = m_zpar; // unset old zpar on new frame
+#endif
+			m_zpar = 0;
+			//m_uv_zpar = (OLD_FRAME_UNVOICED_FLAG||m_zpar); // GUESS: fixed version in tmc0280d/tms5100a/cd280x/tms5110
+			m_uv_zpar = (NEW_FRAME_UNVOICED_FLAG||m_zpar); // GUESS: buggy version in tmc0280/tms5100
+
+			/* if the new frame is a stop frame, unset both TALK and SPEN (via TCON). TALKD remains active while the energy is ramping to 0. */
 			if (NEW_FRAME_STOP_FLAG == 1)
 			{
 				m_TALK = m_SPEN = 0;
@@ -417,7 +416,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 #ifdef DEBUG_GENERATION
 			/* Debug info for current parsed frame */
 			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
-			fprintf(stderr,"Processing frame: ");
+			fprintf(stderr,"Processing new frame: ");
 			if (m_inhibit == 0)
 				fprintf(stderr, "Normal Frame\n");
 			else
@@ -449,19 +448,17 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			int current_sample = (m_subcycle - m_subc_reload)+(m_PC*(3-m_subc_reload))+((m_subc_reload?25:38)*((m_IP-1)&7));
 			//fprintf(stderr, "CS: %03d", current_sample);
 			// reset the current energy, pitch, etc to what it was at frame start
-			m_current_energy = (m_coeff->energytable[m_old_frame_energy_idx] * (1-m_zpar));
+			m_current_energy = (m_coeff->energytable[m_old_frame_energy_idx] * (1-m_old_zpar));
 			m_current_pitch = (m_coeff->pitchtable[m_old_frame_pitch_idx] * (1-m_old_zpar));
-			for (i = 0; i < 4; i++)
-				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-m_old_zpar));
-			for (i = 4; i < m_coeff->num_k; i++)
-				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-m_uv_zpar));
+			for (i = 0; i < m_coeff->num_k; i++)
+				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-((i<4)?m_old_zpar:m_old_uv_zpar)));
 			// now adjust each value to be exactly correct for each of the samples per frame
 			if (m_IP != 0) // if we're still interpolating...
 			{
-				m_current_energy += ((((m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)) - m_current_energy)*(1-inhibit_state))*current_sample)/samples_per_frame;
-				m_current_pitch += ((((m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar)) - m_current_pitch)*(1-inhibit_state))*current_sample)/samples_per_frame;
+				m_current_energy = (m_current_energy + (((m_coeff->energytable[m_new_frame_energy_idx] - m_current_energy)*(1-inhibit_state))*current_sample)/samples_per_frame)*(1-m_zpar);
+				m_current_pitch = (m_current_pitch + (((m_coeff->pitchtable[m_new_frame_pitch_idx] - m_current_pitch)*(1-inhibit_state))*current_sample)/samples_per_frame)*(1-m_zpar);
 				for (i = 0; i < m_coeff->num_k; i++)
-					m_current_k[i] += ((((m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-((i<4)?m_zpar:m_uv_zpar))) - m_current_k[i])*(1-inhibit_state))*current_sample)/samples_per_frame;
+					m_current_k[i] = (m_current_k[i] + (((m_coeff->ktable[i][m_new_frame_k_idx[i]] - m_current_k[i])*(1-inhibit_state))*current_sample)/samples_per_frame)*(1-((i<4)?m_zpar:m_uv_zpar));
 			}
 			else // we're done, play this frame for 1/8 frame.
 			{
@@ -477,16 +474,17 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				switch(m_PC)
 				{
 					case 0: /* PC = 0, B cycle, write updated energy */
-					m_current_energy += ((((m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)) - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT);
+					m_current_energy = (m_current_energy + (((m_coeff->energytable[m_new_frame_energy_idx] - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT))*(1-m_zpar);
 					break;
 					case 1: /* PC = 1, B cycle, write updated pitch */
-					m_current_pitch += ((((m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar)) - m_current_pitch)*(1-inhibit_state)) INTERP_SHIFT);
+					m_current_pitch = (m_current_pitch + (((m_coeff->pitchtable[m_new_frame_pitch_idx] - m_current_pitch)*(1-inhibit_state)) INTERP_SHIFT))*(1-m_zpar);
 					break;
 					case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11:
 					/* PC = 2 through 11, B cycle, write updated K1 through K10 */
-					m_current_k[m_PC-2] += ((((m_coeff->ktable[m_PC-2][m_new_frame_k_idx[m_PC-2]] * (1-(((m_PC-2)<4)?m_zpar:m_uv_zpar))) - m_current_k[m_PC-2])*(1-inhibit_state)) INTERP_SHIFT);
+					m_current_k[m_PC-2] = (m_current_k[m_PC-2] + (((m_coeff->ktable[m_PC-2][m_new_frame_k_idx[m_PC-2]] - m_current_k[m_PC-2])*(1-inhibit_state)) INTERP_SHIFT))*(((m_PC-2)>4)?(1-m_uv_zpar):(1-m_zpar));
 					break;
-					case 12: /* PC = 12, do nothing */
+					case 12: /* PC = 12 */
+					/* we should NEVER reach this point, PC=12 doesn't have a subcycle 2 */
 					break;
 				}
 			}
@@ -534,7 +532,12 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
 		for (i=0; i<10; i++)
 			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-		fprintf(stderr,"Out:%06d", this_sample);
+		fprintf(stderr,"Out:%06d ", this_sample);
+//#ifdef PERFECT_INTERPOLATION_HACK
+//		fprintf(stderr,"%d%d%d%d",m_old_zpar,m_zpar,m_old_uv_zpar,m_uv_zpar);
+//#else
+//		fprintf(stderr,"x%dx%d",m_zpar,m_uv_zpar);
+//#endif
 		fprintf(stderr,"\n");
 #endif
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
@@ -574,6 +577,9 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 			if ((m_IP == 0)&&(m_pitch_zero==1)) m_pitch_zero = 0;
 			if (m_IP == 7) // RESETL4
 			{
+				// Latch OLDE and OLDP
+				OLD_FRAME_SILENCE_FLAG = NEW_FRAME_SILENCE_FLAG; // m_OLDE
+				OLD_FRAME_UNVOICED_FLAG = NEW_FRAME_UNVOICED_FLAG; // m_OLDP
 				/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
 #ifdef DEBUG_GENERATION
 				if (m_TALK == 0)
@@ -581,10 +587,6 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 #endif
 				m_TALKD = m_TALK; // TALKD is latched from TALK
 				m_TALK = m_SPEN; // TALK is latched from SPEN
-#ifdef PERFECT_INTERPOLATION_HACK
-				m_old_zpar = m_zpar;
-#endif
-				m_zpar = 1 - m_TALKD; // ZPAR is inverse of m_TALKD
 			}
 			m_subcycle = m_subc_reload;
 			m_PC = 0;
@@ -605,6 +607,9 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 
 empty:
 
+#ifdef VERBOSE
+	fprintf(stderr,"empty called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+#endif
 	while (size > 0)
 	{
 		m_subcycle++;
@@ -614,15 +619,12 @@ empty:
 			{
 				m_TALKD = m_TALK; // TALKD is latched from TALK
 				m_TALK = m_SPEN; // TALK is latched from SPEN
-#ifdef PERFECT_INTERPOLATION_HACK
-				m_old_zpar = m_zpar;
-#endif
-				m_zpar = 1 - m_TALKD; // ZPAR is inverse of m_TALKD
 			}
 			m_subcycle = m_subc_reload;
 			m_PC = 0;
 			m_IP++;
 			m_IP&=0x7;
+			if (m_TALKD) goto render;
 		}
 		else if (m_subcycle == 3)
 		{
@@ -863,10 +865,14 @@ void tms5110_device::PDC_set(int data)
 					m_SPEN = 1; /* start immediately */
 					/* clear out variables before speaking */
 					m_zpar = 1; // zero all the parameters
+					m_uv_zpar = 1; // zero k4-k10 as well
+					m_OLDE = 1; // 'silence/zpar' frames are zero energy
+					m_OLDP = 1; // 'silence/zpar' frames are zero pitch
+#ifdef PERFECT_INTERPOLATION_HACK
+					m_old_zpar = 1; // zero all the old parameters
+					m_old_uv_zpar = 1; // zero old k4-k10 as well
+#endif
 					m_subc_reload = 0; // SPKSLOW means this is 0
-					m_subcycle = m_subc_reload;
-					m_PC = 0;
-					m_IP = 0;
 					break;
 
 				case TMS5110_CMD_READ_BIT:
@@ -894,10 +900,14 @@ void tms5110_device::PDC_set(int data)
 					m_SPEN = 1; /* start immediately */
 					/* clear out variables before speaking */
 					m_zpar = 1; // zero all the parameters
+					m_uv_zpar = 1; // zero k4-k10 as well
+					m_OLDE = 1; // 'silence/zpar' frames are zero energy
+					m_OLDP = 1; // 'silence/zpar' frames are zero pitch
+#ifdef PERFECT_INTERPOLATION_HACK
+					m_old_zpar = 1; // zero all the old parameters
+					m_old_uv_zpar = 1; // zero old k4-k10 as well
+#endif
 					m_subc_reload = 1; // SPEAK means this is 1
-					m_subcycle = m_subc_reload;
-					m_PC = 0;
-					m_IP = 0;
 					break;
 
 				case TMS5110_CMD_READ_BRANCH:
@@ -996,6 +1006,9 @@ void tms5110_device::parse_frame()
 		fprintf(stderr," ");
 #endif
 	}
+#ifdef DEBUG_PARSE_FRAME_DUMP
+			fprintf(stderr,"\n");
+#endif
 #ifdef VERBOSE
 		logerror("Parsed a frame successfully in ROM\n");
 #endif
@@ -1152,7 +1165,7 @@ void tms5110_device::device_reset()
 #ifdef PERFECT_INTERPOLATION_HACK
 	m_old_frame_energy_idx = m_old_frame_pitch_idx = 0;
 	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
-	m_old_zpar = 0;
+	m_old_zpar = m_old_uv_zpar = 0;
 #endif
 	m_new_frame_energy_idx = m_current_energy = m_previous_energy = 0;
 	m_new_frame_pitch_idx = m_current_pitch = 0;
