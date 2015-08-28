@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstr??m
 /***************************************************************************
  *
@@ -252,7 +252,7 @@ INPUT_PORTS_END
  */
 WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
 {
-        LOG (logerror ("centronics_ack_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
+//      LOG (logerror ("centronics_ack_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
         m_centronics_ack = state;
         m_pit->h1_set (state);
 }
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
  * The centronics busy signal is not used by the ROM driver afaik
  */
 WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
-        LOG (logerror ("centronics_busy_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
+//      LOG (logerror ("centronics_busy_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
         m_centronics_busy = state;
 }
 
@@ -269,7 +269,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
  * The centronics perror signal is not used by the ROM driver afaik
  */
 WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
-        LOG (logerror ("centronics_perror_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
+//      LOG (logerror ("centronics_perror_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
         m_centronics_perror = state;
 }
 
@@ -277,7 +277,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
  * The centronics select signal is expected by the ROM on Port B bit 0
  */
 WRITE_LINE_MEMBER (force68k_state::centronics_select_w){
-        LOG (logerror ("centronics_select_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
+//      LOG (logerror ("centronics_select_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
         m_centronics_select = state;
         m_pit->portb_setbit (0, state);
 }
