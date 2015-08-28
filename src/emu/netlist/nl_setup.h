@@ -198,6 +198,7 @@ namespace netlist
 
 		void model_parse(const pstring &model, model_map_t &map);
 
+		plog_base<NL_DEBUG> &log() { return netlist().log(); }
 		const plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
 	protected:
