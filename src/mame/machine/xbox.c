@@ -465,10 +465,7 @@ void xbox_base_state::debug_generate_irq(int irq, bool active)
 
 void xbox_base_state::vblank_callback(screen_device &screen, bool state)
 {
-	if (nvidia_nv2a->vblank_callback(screen, state))
-		xbox_base_devs.pic8259_1->ir3_w(1); // IRQ 3
-	else
-		xbox_base_devs.pic8259_1->ir3_w(0); // IRQ 3
+	nvidia_nv2a->vblank_callback(screen, state);
 }
 
 UINT32 xbox_base_state::screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1460,6 +1457,11 @@ void xbox_base_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command(machine(), "xbox", CMDFLAG_NONE, 0, 1, 4, xbox_debug_commands);
 	memset(&ohcist, 0, sizeof(ohcist));
+	// PIC challenge handshake data
+	pic16lc_buffer[0x1c] = 0x0c;
+	pic16lc_buffer[0x1d] = 0x0d;
+	pic16lc_buffer[0x1e] = 0x0e;
+	pic16lc_buffer[0x1f] = 0x0f;
 #ifdef USB_ENABLED
 	ohcist.hc_regs[HcRevision] = 0x10;
 	ohcist.hc_regs[HcFmInterval] = 0x2edf;
@@ -1483,6 +1485,7 @@ void xbox_base_state::machine_start()
 	save_item(NAME(smbusst.rw));
 	save_item(NAME(smbusst.words));
 	save_item(NAME(pic16lc_buffer));
+	nvidia_nv2a->set_interrupt_device(xbox_base_devs.pic8259_1);
 	nvidia_nv2a->start(&m_maincpu->space());
 	nvidia_nv2a->savestate_items();
 }
