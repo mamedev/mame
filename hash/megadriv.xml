@@ -16204,6 +16204,7 @@ but dumps still have to be confirmed.
 		<info name="release" value="19920710"/>
 		<info name="alt_title" value="炎の闘球児 ドッジ弾平"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_eeprom"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-14856.bin" size="524288" crc="630f07c6" sha1="ebdf20fd8aaeb3c7ec97302089b3330265118cf0" offset="0x000000"/>
 			</dataarea>
@@ -18270,8 +18271,11 @@ but dumps still have to be confirmed.
 		<info name="release" value="19941021"/>
 		<info name="alt_title" value="ロックマン メガワールド"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="rockman mega world (jpn) (alt).bin" size="2097152" crc="85c956ef" sha1="a435ac53589a29dbb655662c942daab425d3f6bd" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20362,6 +20366,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19911205"/>
 		<info name="alt_title" value="忍者武雷伝説"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_eeprom"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ninja burai densetsu (jpn).bin" size="1048576" crc="a8d828a0" sha1="9cc3419ca7ecaf0d106aa896ffc0266c7145fff7" offset="0x000000"/>
 			</dataarea>
