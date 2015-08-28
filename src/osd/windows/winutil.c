@@ -92,7 +92,7 @@ BOOL win_is_gui_application(void)
 		is_first_time = FALSE;
 
 		// get the current module
-		module = GetModuleHandle(NULL);
+		module = GetModuleHandleUni();
 		if (!module)
 			return FALSE;
 		image_ptr = (BYTE*) module;
@@ -121,4 +121,15 @@ BOOL win_is_gui_application(void)
 		}
 	}
 	return is_gui_frontend;
+}
+
+//-------------------------------------------------
+//  Universal way to get module handle
+//-------------------------------------------------
+
+HMODULE WINAPI GetModuleHandleUni()
+{
+	MEMORY_BASIC_INFORMATION mbi;
+	VirtualQuery((LPCVOID)GetModuleHandleUni, &mbi, sizeof(mbi));
+	return (HMODULE)mbi.AllocationBase;
 }
