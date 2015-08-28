@@ -2,7 +2,7 @@
 -- copyright-holders:MAMEdev Team
 
 function mainProject(_target, _subtarget)
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["DRIVERS"] == nil) then
 	if (_target == _subtarget) then
 		project (_target)
 	else
@@ -11,10 +11,10 @@ if (_OPTIONS["DRIVERS"] == nil) then
 		else
 			project (_target .. _subtarget)
 		end
-	end	
+	end
 else
 	project (_subtarget)
-end	
+end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
@@ -23,7 +23,7 @@ end
 	}
 	flags {
 		"NoManifest",
-		"Symbols", -- always include minimum symbols for executables 
+		"Symbols", -- always include minimum symbols for executables
 	}
 
 	if _OPTIONS["SYMBOLS"] then
@@ -33,12 +33,12 @@ end
 				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
 			}
 	end
-	
+
 	configuration { "vs*" }
 	flags {
 		"Unicode",
 	}
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["DRIVERS"] == nil) then
 	configuration { "x64", "Release" }
 		targetsuffix "64"
 		if _OPTIONS["PROFILE"] then
@@ -52,15 +52,15 @@ if (_OPTIONS["DRIVERS"] == nil) then
 		end
 
 	configuration { "x32", "Release" }
-		targetsuffix ""
+		targetsuffix "32"
 		if _OPTIONS["PROFILE"] then
-			targetsuffix "p"
+			targetsuffix "32p"
 		end
 
 	configuration { "x32", "Debug" }
-		targetsuffix "d"
+		targetsuffix "32d"
 		if _OPTIONS["PROFILE"] then
-			targetsuffix "dp"
+			targetsuffix "32dp"
 		end
 
 	configuration { "Native", "Release" }
@@ -79,19 +79,19 @@ end
 		targetextension ".exe"
 
 	configuration { "asmjs" }
-		targetextension ".bc"  
+		targetextension ".bc"
 
 	configuration { }
 
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
+	if _OPTIONS["SEPARATE_BIN"]~="1" then
 		targetdir(MAME_DIR)
 	end
-	
+
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 	links {
 		"osd_" .. _OPTIONS["osd"],
 	}
-	if (_OPTIONS["DRIVERS"] == nil) then 
+	if (_OPTIONS["DRIVERS"] == nil) then
 		links {
 			"bus",
 		}
@@ -156,9 +156,9 @@ end
 	links{
 		"ocore_" .. _OPTIONS["osd"],
 	}
-	
+
 	override_resources = false;
-	
+
 	maintargetosdoptions(_target,_subtarget)
 
 	includedirs {
@@ -212,7 +212,7 @@ end
 			dependency {
 				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", true  },
 			}
-		end	
+		end
 	end
 
 	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".c"
@@ -224,8 +224,8 @@ end
 		MAME_DIR .. "src/version.c",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
 	}
-	
-if (_OPTIONS["DRIVERS"] == nil) then 	
+
+if (_OPTIONS["DRIVERS"] == nil) then
 	dependency {
 		{ "../../../../generated/mame/mame/drivlist.c",  MAME_DIR .. "src/mame/mess.lst", true },
 		{ "../../../../generated/mame/mame/drivlist.c" , MAME_DIR .. "src/mame/arcade.lst", true},
@@ -233,7 +233,7 @@ if (_OPTIONS["DRIVERS"] == nil) then
 	custombuildtask {
 		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",    {  MAME_DIR .. "src/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
 	}
-end	
+end
 	configuration { "gmake" }
 		dependency {
 			{ ".PHONY", ".FORCE", true },
@@ -241,18 +241,18 @@ end
 		}
 
 	configuration { "mingw*" }
-		custombuildtask {	
+		custombuildtask {
 			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
-		}	
-	
+		}
+
 	configuration { "vs*" }
-		prebuildcommands {	
+		prebuildcommands {
 			"mkdir " .. path.translate(GEN_DIR  .. "/resource/","\\") .. " 2>NUL",
 			"@echo Emitting ".. rctarget .. "vers.rc...",
 			PYTHON .. " " .. path.translate(MAME_DIR .. "src/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(MAME_DIR .. "src/version.c","\\") .. " > " .. path.translate(GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", "\\") ,
-		}	
-	
-	 
+		}
+
+
 	configuration { }
 
 	debugdir (MAME_DIR)

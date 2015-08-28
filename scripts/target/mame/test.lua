@@ -1,5 +1,5 @@
 -- license:BSD-3-Clause
--- copyright-holders:MAMEdev Team
+-- copyright-holders:Dankan1890
 
 ---------------------------------------------------------------------------
 --
@@ -9,8 +9,6 @@
 --
 ---------------------------------------------------------------------------
 
---dofile("arcade.lua")
---dofile("mess.lua")
 
 --------------------------------------------------
 -- specify available BUSES cores
@@ -187,11 +185,11 @@ SOUNDS["YM2610"] = true
 SOUNDS["YM3526"] = true
 
 
-function createProjects_mame_mewuitest(_target, _subtarget)
-	project ("mame_mewuitest")
+function createProjects_mame_test(_target, _subtarget)
+	project ("mame_test")
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
-	uuid (os.uuid("drv-mame_mewuitest"))
+	uuid (os.uuid("drv-mame_test"))
 
 	options {
 		"ForceCPP",
@@ -474,8 +472,8 @@ function createProjects_mame_mewuitest(_target, _subtarget)
 	}
 end
 
-function linkProjects_mame_mewuitest(_target, _subtarget)
+function linkProjects_mame_test(_target, _subtarget)
 	links {
-		"mame_mewuitest",
+		"mame_test",
 	}
 end
