@@ -1232,9 +1232,10 @@ files {
 }
 
 createMESSProjects(_target, _subtarget, "canon")
-files {
-	MAME_DIR .. "src/mess/drivers/cat.c",
-	MAME_DIR .. "src/mess/drivers/x07.c",
+files {             
+	MAME_DIR .. "src/mess/drivers/cat.c",       
+	MAME_DIR .. "src/mess/drivers/x07.c",       
+	MAME_DIR .. "src/mess/drivers/canon_s80.c",
 }
 
 createMESSProjects(_target, _subtarget, "cantab")
