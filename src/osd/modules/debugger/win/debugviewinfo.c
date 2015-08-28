@@ -15,6 +15,8 @@
 
 #include "strconv.h"
 
+#include "winutil.h"
+
 
 // debugger view styles
 #define DEBUG_VIEW_STYLE    WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
@@ -48,15 +50,15 @@ debugview_info::debugview_info(debugger_windows_interface &debugger, debugwin_in
 
 	// create the child view
 	m_wnd = CreateWindowEx(DEBUG_VIEW_STYLE_EX, TEXT("MAMEDebugView"), NULL, DEBUG_VIEW_STYLE,
-			0, 0, 100, 100, parent, NULL, GetModuleHandle(NULL), this);
+		    0, 0, 100, 100, parent, NULL, GetModuleHandleUni(), this);
 	if (m_wnd == NULL)
 		goto cleanup;
 
 	// create the scroll bars
 	m_hscroll = CreateWindowEx(HSCROLL_STYLE_EX, TEXT("SCROLLBAR"), NULL, HSCROLL_STYLE,
-			0, 0, 100, CW_USEDEFAULT, m_wnd, NULL, GetModuleHandle(NULL), this);
+			0, 0, 100, CW_USEDEFAULT, m_wnd, NULL, GetModuleHandleUni(), this);
 	m_vscroll = CreateWindowEx(VSCROLL_STYLE_EX, TEXT("SCROLLBAR"), NULL, VSCROLL_STYLE,
-			0, 0, CW_USEDEFAULT, 100, m_wnd, NULL, GetModuleHandle(NULL), this);
+			0, 0, CW_USEDEFAULT, 100, m_wnd, NULL, GetModuleHandleUni(), this);
 	if ((m_hscroll == NULL) || (m_vscroll == NULL))
 		goto cleanup;
 
@@ -254,7 +256,7 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 {
 	// create a combo box
 	HWND const result = CreateWindowEx(COMBO_BOX_STYLE_EX, TEXT("COMBOBOX"), NULL, COMBO_BOX_STYLE,
-			0, 0, 100, 1000, parent, NULL, GetModuleHandle(NULL), NULL);
+			0, 0, 100, 1000, parent, NULL, GetModuleHandleUni(), NULL);
 	SetWindowLongPtr(result, GWLP_USERDATA, userdata);
 	SendMessage(result, WM_SETFONT, (WPARAM)metrics().debug_font(), (LPARAM)FALSE);
 
@@ -789,7 +791,7 @@ void debugview_info::register_window_class()
 
 		// initialize the description of the window class
 		wc.lpszClassName    = TEXT("MAMEDebugView");
-		wc.hInstance        = GetModuleHandle(NULL);
+		wc.hInstance        = GetModuleHandleUni();
 		wc.lpfnWndProc      = &debugview_info::static_view_proc;
 		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
 		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
@@ -798,6 +800,8 @@ void debugview_info::register_window_class()
 		wc.style            = 0;
 		wc.cbClsExtra       = 0;
 		wc.cbWndExtra       = 0;
+		
+		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))

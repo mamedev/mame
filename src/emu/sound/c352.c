@@ -13,6 +13,14 @@
     Supports 8-bit linear and 8-bit muLaw samples
     Output: digital, 16 bit, 4 channels
     Output sample rate is the input clock / (288 * 2).
+	
+    superctr: The clock divider appears to be configurable for each system.
+    Below is a list of the divider values followed by the systems that use it.
+	
+    * 228: System 11.
+    * 288: System 22, Super 22, NB-1/2, ND-1, FL.
+    * 296: System 23, Super 23.
+    * 332: System 12.
  */
 
 #include "emu.h"
@@ -468,7 +476,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 
 void c352_device::device_start()
 {
-	int i, divider;
+	int i;
 	double x_max = 32752.0;
 	double y_max = 127.0;
 	double u = 10.0;
@@ -476,21 +484,7 @@ void c352_device::device_start()
 	// find our direct access
 	m_direct = &space().direct();
 
-	switch(m_divider)
-	{
-		case C352_DIVIDER_228:
-			divider=228;
-			break;
-		case C352_DIVIDER_288:
-		default:
-			divider=288;
-			break;
-		case C352_DIVIDER_332:
-			divider=332;
-			break;
-	}
-
-	m_sample_rate_base = clock() / divider;
+	m_sample_rate_base = clock() / m_divider;
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
 
