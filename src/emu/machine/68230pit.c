@@ -131,6 +131,10 @@ WRITE8_MEMBER (pit68230_device::write){
                 m_pbddr = data;
                 break;
 
+        case PIT_68230_PCDDR:
+                m_pcddr = data;
+                break;
+
         case PIT_68230_PACR:
                 m_pacr = data;
                 // callbacks
@@ -203,6 +207,10 @@ READ8_MEMBER (pit68230_device::read){
 
         case PIT_68230_PBDDR:
                 data = m_pbddr;
+                break;
+
+        case PIT_68230_PCDDR:
+                data = m_pcddr;
                 break;
 
         case PIT_68230_PACR:
