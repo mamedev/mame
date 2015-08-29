@@ -487,7 +487,8 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 void tispeak_state::prepare_display()
 {
-	display_matrix_seg(16, 16, m_plate, (m_r & 0x8000) ? m_grid : 0, 0x3fff);
+	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000;
+	display_matrix_seg(16+1, 16, m_plate | 0x10000, m_grid & gridmask, 0x3fff);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
@@ -500,7 +501,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	// R15: filament on
 	// other bits: MCU internal use
 	m_r = m_inp_mux = data;
-	m_grid = data & 0x1ff;
+	m_grid = data & 0x81ff;
 	prepare_display();
 }
 
@@ -547,7 +548,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
-	m_grid = data & 0x21ff;
+	m_grid = data & 0xa1ff;
 	prepare_display();
 }
 
