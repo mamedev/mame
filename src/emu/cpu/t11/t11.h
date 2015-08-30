@@ -66,7 +66,7 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const { return 6; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
-private:
+protected:
 	address_space_config m_program_config;
 
 	UINT16 c_initial_mode;
