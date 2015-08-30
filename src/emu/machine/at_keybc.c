@@ -24,6 +24,15 @@ static ADDRESS_MAP_START( at_keybc_io, AS_IO, 8, at_keyboard_controller_device)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ( p1_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
+
+static INPUT_PORTS_START( at_keybc )
+	PORT_START("DSW")
+	PORT_BIT(     0xbf, 0xbf, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x40, "Display switch")
+	PORT_DIPSETTING(    0x40, "Monochrome adapter" )
+	PORT_DIPSETTING(    0x00, "Color/Graphics adapter" )
+INPUT_PORTS_END
+
 // machine fragment
 static MACHINE_CONFIG_FRAGMENT( at_keybc )
 	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
@@ -69,6 +78,15 @@ at_keyboard_controller_device::at_keyboard_controller_device(const machine_confi
 const rom_entry *at_keyboard_controller_device::device_rom_region() const
 {
 	return ROM_NAME(at_keybc);
+}
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor at_keyboard_controller_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( at_keybc );
 }
 
 //-------------------------------------------------
@@ -139,7 +157,7 @@ READ8_MEMBER( at_keyboard_controller_device::t1_r )
 */
 READ8_MEMBER( at_keyboard_controller_device::p1_r )
 {
-	return 0xbf;
+	return ioport("DSW")->read();
 }
 
 READ8_MEMBER( at_keyboard_controller_device::p2_r )
