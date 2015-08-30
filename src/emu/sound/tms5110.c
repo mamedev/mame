@@ -78,9 +78,13 @@ static INT16 clip_analog(INT16 cliptemp);
 //define INTERP_SHIFT / (1<<m_coeff->interp_coeff[m_IP])
 
 /* Other hacks */
-/* HACK?: if defined, outputs the low 4 bits of the lattice filter to the i/o
+/* HACK: if defined, outputs the low 4 bits of the lattice filter to the i/o
  * or clip logic, even though the real hardware doesn't do this, partially verified by decap */
 #undef ALLOW_4_LSB
+
+/* forces m_TALK active instantly whenever m_SPEN would be activated, causing speech delay to be reduced by up to one frame time */
+/* for some reason, this hack makes snmath behave marginally more accurate to hardware, though it does not match the patent */
+#define FAST_START_HACK 1
 
 
 /* *****configuration of chip connection stuff***** */
@@ -851,6 +855,9 @@ void tms5110_device::PDC_set(int data)
 #endif
 					perform_dummy_read();
 					m_SPEN = 1; /* start immediately */
+#ifdef FAST_START_HACK
+					m_TALK = 1;
+#endif
 					/* clear out variables before speaking */
 					m_zpar = 1; // zero all the parameters
 					m_uv_zpar = 1; // zero k4-k10 as well
@@ -886,6 +893,9 @@ void tms5110_device::PDC_set(int data)
 #endif
 					perform_dummy_read();
 					m_SPEN = 1; /* start immediately */
+#ifdef FAST_START_HACK
+					m_TALK = 1;
+#endif
 					/* clear out variables before speaking */
 					m_zpar = 1; // zero all the parameters
 					m_uv_zpar = 1; // zero k4-k10 as well
