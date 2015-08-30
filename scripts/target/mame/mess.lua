@@ -1443,6 +1443,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/bk.c",
 	MAME_DIR .. "src/mess/machine/bk.c",
 	MAME_DIR .. "src/mess/video/bk.c",
+	MAME_DIR .. "src/mess/drivers/dvk_kcgd.c",
 	MAME_DIR .. "src/mess/drivers/dvk_ksm.c",
 	MAME_DIR .. "src/mess/machine/ms7004.c",
 	MAME_DIR .. "src/mess/drivers/mk85.c",

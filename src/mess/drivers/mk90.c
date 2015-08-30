@@ -68,8 +68,8 @@ UINT32 mk90_state::screen_update_mk90(screen_device &screen, bitmap_ind16 &bitma
 
 static MACHINE_CONFIG_START( mk90, mk90_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
-	MCFG_T11_INITIAL_MODE(0xf600)
+	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_4MHz)
+	MCFG_T11_INITIAL_MODE(0x8000)
 	MCFG_CPU_PROGRAM_MAP(mk90_mem)
 
 
