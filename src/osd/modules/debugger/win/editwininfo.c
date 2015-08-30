@@ -13,6 +13,8 @@
 
 #include "strconv.h"
 
+#include "winutil.h"
+
 
 // edit box styles
 #define EDIT_BOX_STYLE      WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL
@@ -32,7 +34,7 @@ editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_co
 
 	// create an edit box and override its key handling
 	m_editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
-			0, 0, 100, 100, window(), NULL, GetModuleHandle(NULL), NULL);
+			0, 0, 100, 100, window(), NULL, GetModuleHandleUni(), NULL);
 	m_original_editproc = (WNDPROC)(FPTR)GetWindowLongPtr(m_editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(m_editwnd, GWLP_USERDATA, (LONG_PTR)this);
 	SetWindowLongPtr(m_editwnd, GWLP_WNDPROC, (LONG_PTR)&editwin_info::static_edit_proc);

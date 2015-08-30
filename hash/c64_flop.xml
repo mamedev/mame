@@ -602,6 +602,34 @@
 		</part>
 	</software>
 
+	<software name="elktrgld">
+		<!-- Flippy disk, a800 version on side B -->
+		<description>Elektra Glide</description>
+		<year>1986</year>
+		<publisher>Mastertronic</publisher>
+		<info name="serial" value="64712" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="elektraglide.g64" size="287512" crc="ccb7b7c1" sha1="699bc6111a0f3c26d61c63f7b23eeb7462649461" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koalapnt">
+		<!-- Flippy disk, a800 version on side B -->
+		<description>KoalaPainter (Light Pen)</description>
+		<year>1984</year>
+		<publisher>Koala Technologies</publisher>
+		<info name="serial" value="00626-001" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="koalapainter.g64" size="287512" crc="56f06305" sha1="a4bb43f8f46c3e733e4a2ab7f6cdfa8483159df5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Test/Demo disks -->
 
 	<software name="1541demo">

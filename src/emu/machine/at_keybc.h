@@ -79,6 +79,7 @@ protected:
 	virtual void device_reset();
 
 	virtual const rom_entry *device_rom_region() const;
+	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:

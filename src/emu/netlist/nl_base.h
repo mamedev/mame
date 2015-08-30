@@ -1233,6 +1233,7 @@ namespace netlist
 		pnamedlist_t<core_device_t *> m_started_devices;
 	#endif
 
+	ATTR_COLD plog_base<NL_DEBUG> &log() { return m_log; }
 	ATTR_COLD const plog_base<NL_DEBUG> &log() const { return m_log; }
 
 	protected:

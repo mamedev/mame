@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "video/poly.h"
 #include "bitmap.h"
+#include "machine/pic8259.h"
 #include "includes/chihiro.h"
 
 //#define LOG_NV2A
@@ -945,14 +946,20 @@ int nv2a_renderer::geforce_commandkind(UINT32 word)
 UINT32 nv2a_renderer::geforce_object_offset(UINT32 handle)
 {
 	UINT32 h = ((((handle >> 11) ^ handle) >> 11) ^ handle) & 0x7ff;
-	UINT32 o = (pfifo[0x210 / 4] & 0x1f) << 8; // or 12 ?
+	UINT32 o = (pfifo[0x210 / 4] & 0x1ff) << 8; // 0x1ff is not certain
 	UINT32 e = o + h * 8; // at 0xfd000000+0x00700000
 	UINT32 w;
 
-	if (ramin[e / 4] != handle)
-		e = 0;
+	if (ramin[e / 4] != handle) {
+		// this should never happen
+		for (UINT32 aa = o / 4; aa < (sizeof(ramin) / 4); aa = aa + 2) {
+			if (ramin[aa] == handle) {
+				e = aa * 4;
+			}
+		}
+	}
 	w = ramin[e / 4 + 1];
-	return (w & 0xffff) * 0x10;
+	return (w & 0xffff) * 0x10; // 0xffff is not certain
 }
 
 void nv2a_renderer::geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT32 &size)
@@ -1246,7 +1253,9 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 		addr = rendertarget + (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]);
 	else // type_rendertarget == LINEAR*/
 		addr = rendertarget + (pitch_rendertarget / 4)*y + x;
-	fbcolor = *addr;
+	fbcolor = 0;
+	if (color_mask != 0)
+		fbcolor = *addr;
 	daddr=depthbuffer + (pitch_depthbuffer / 4)*y + x;
 	deptsten = *daddr;
 	c[3] = color >> 24;
@@ -1772,8 +1781,12 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 				break;
 		}
 	}
-	fbcolor = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
-	*addr = fbcolor;
+	if (color_mask != 0) {
+		UINT32 fbcolor_tmp;
+
+		fbcolor_tmp = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
+		*addr = (fbcolor & ~color_mask) | (fbcolor_tmp & color_mask);
+	}
 	if (depth_write_enabled)
 		dep = depth;
 	deptsten = (dep << 8) | sten;
@@ -2233,6 +2246,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	maddress = method * 4;
 	data = space.read_dword(address);
 	channel[chanel][subchannel].object.method[method] = data;
+#ifdef LOG_NV2A
+	printf("A:%08X MTHD:%08X D:%08X\n\r",address,maddress,data);
+#endif
 	if (maddress == 0x17fc) {
 		indexesleft_count = 0;
 		indexesleft_first = 0;
@@ -2267,6 +2283,21 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				read_vertices_0x1810(space, vert, n + offset, 4);
 				convert_vertices_poly(vert, xy, 4);
 				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+			}
+			wait();
+		}
+		else if (type == nv2a_renderer::TRIANGLE_FAN) {
+			vertex_nv vert[3];
+			vertex_t xy[3];
+
+			read_vertices_0x1810(space, vert, offset, 2);
+			convert_vertices_poly(vert, xy, 2);
+			count = count - 2;
+			offset = offset + 2;
+			for (n = 0; n <= count; n++) {
+				read_vertices_0x1810(space, vert + (((n + 1) & 1) + 1), offset + n, 1);
+				convert_vertices_poly(vert + (((n + 1) & 1) + 1), xy + (((n + 1) & 1) + 1), 1);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~(n + 1) & 1) + 1], xy[((n + 1) & 1) + 1]);
 			}
 			wait();
 		}
@@ -2311,9 +2342,6 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		// each dword after 1800 contains two 16 bit index values to select the vartices
 		// each dword after 1808 contains a 32 bit index value to select the vartices
 		type = channel[chanel][subchannel].object.method[0x17fc / 4];
-#ifdef LOG_NV2A
-		printf("vertex %d %d %d\n\r", type, offset, count);
-#endif
 		if (type == nv2a_renderer::QUADS) {
 			while (1) {
 				vertex_nv vert[4];
@@ -2330,6 +2358,34 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				countlen = countlen - c;
 				convert_vertices_poly(vert, xy, 4);
 				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+			}
+		}
+		else if (type == nv2a_renderer::TRIANGLE_FAN) {
+			if ((countlen * mult + indexesleft_count) >= 3) {
+				vertex_nv vert[3];
+				vertex_t xy[3];
+				int c, count;
+
+				if (mult == 1)
+					c = read_vertices_0x1808(space, vert, address, 2);
+				else
+					c = read_vertices_0x1800(space, vert, address, 2);
+				convert_vertices_poly(vert, xy, 2);
+				address = address + c * 4;
+				countlen = countlen - c;
+				count = countlen * mult + indexesleft_count;
+				for (n = 1; n <= count; n++) {
+					if (mult == 1)
+						c = read_vertices_0x1808(space, vert + ((n & 1) + 1), address, 1);
+					else
+						c = read_vertices_0x1800(space, vert + ((n & 1) + 1), address, 1);
+
+					convert_vertices_poly(vert + ((n & 1) + 1), xy + ((n & 1) + 1), 1);
+					address = address + c * 4;
+					countlen = countlen - c;
+					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
+				}
+				wait();
 			}
 		}
 		else if (type == nv2a_renderer::TRIANGLES) {
@@ -2445,6 +2501,24 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
 			}
 			wait();
+		}
+		else if (type == nv2a_renderer::TRIANGLES) {
+			while (countlen > 0) {
+				vertex_nv vert[3];
+				vertex_t xy[3];
+				int c;
+
+				c = read_vertices_0x1818(space, vert, address, 3);
+				convert_vertices_poly(vert, xy, 3);
+				countlen = countlen - c;
+				if (countlen < 0) {
+					logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					countlen = 0;
+					break;
+				}
+				address = address + c * 3;
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
+			}
 		}
 		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
 			vertex_nv vert[4];
@@ -2613,7 +2687,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			// clear colors
 			UINT32 color = channel[chanel][subchannel].object.method[0x1d90 / 4];
 			bm.fill(color);
-			//printf("clearscreen\n\r");
+#ifdef LOG_NV2A
+			printf("clearscreen\n\r");
+#endif
 		}
 		if ((data & 0x03) == 3) {
 			bitmap_rgb32 bm(depthbuffer, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4); // why *2 ?
@@ -2649,19 +2725,28 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		dilate_rendertarget = dilatechose[(log2width_rendertarget << 4) + log2height_rendertarget];
 	}
 	if (maddress == 0x020c) {
-		// line size ?
 		pitch_rendertarget=data & 0xffff;
 		pitch_depthbuffer=(data >> 16) & 0xffff;
-		//printf("Pitch color %04X zbuffer %04X\n\r",pitch_rendertarget,pitch_depthbuffer);
+#ifdef LOG_NV2A
+		printf("Pitch color %04X zbuffer %04X\n\r",pitch_rendertarget,pitch_depthbuffer);
+#endif
 		countlen--;
 	}
 	if (maddress == 0x0100) {
-		// just temporarily
-		if ((data & 0x1f) == 1) {
-			data = data >> 5;
-			data = data & 0x0ffffff0;
-			displayedtarget = (UINT32 *)direct_access_ptr(data);
+		countlen--;
+		if (data != 0) {
+			pgraph[0x704 / 4] = 0x100;
+			pgraph[0x708 / 4] = data;
+			pgraph[0x100 / 4] |= 1;
+			pgraph[0x108 / 4] |= 1;
+			if (update_interrupts() == true)
+				interruptdevice->ir3_w(1); // IRQ 3
+			else
+				interruptdevice->ir3_w(0); // IRQ 3
+			return 2;
 		}
+		else
+			return 0;
 	}
 	if (maddress == 0x0130) {
 		countlen--;
@@ -2670,16 +2755,32 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		else
 			return 0;
 	}
+	if (maddress == 0x1d8c) {
+		countlen--;
+		// it is used to specify the clear value for the depth buffer (zbuffer)
+		// but also as a parameter for interrupt routines
+		pgraph[0x1a88 / 4] = data;
+	}
+	if (maddress == 0x1d90) {
+		countlen--;
+		// it is used to specify the clear value for the color buffer
+		// but also as a parameter for interrupt routines
+		pgraph[0x186c / 4] = data;
+	}
 	if (maddress == 0x0210) {
 		// framebuffer offset ?
 		rendertarget = (UINT32 *)direct_access_ptr(data);
-		//printf("Render target at %08X\n\r",data);
+#ifdef LOG_NV2A
+		printf("Render target at %08X\n\r", data);
+#endif
 		countlen--;
 	}
 	if (maddress == 0x0214) {
 		// zbuffer offset ?
 		depthbuffer = (UINT32 *)direct_access_ptr(data);
-		//printf("Depth buffer at %08X\n\r",data);
+#ifdef LOG_NV2A
+		printf("Depth buffer at %08X\n\r",data);
+#endif
 		if ((data == 0) || (data > 0x7ffffffc))
 			depth_write_enabled = false;
 		else if (channel[chanel][subchannel].object.method[0x035c / 4] != 0)
@@ -2708,6 +2809,18 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	}
 	if (maddress == 0x0354) {
 		depth_function = data;
+	}
+	if (maddress == 0x0358) {
+		//color_mask = data;
+		if (data & 0x000000ff)
+			data |= 0x000000ff;
+		if (data & 0x0000ff00)
+			data |= 0x0000ff00;
+		if (data & 0x00ff0000)
+			data |= 0x00ff0000;
+		if (data & 0xff000000)
+			data |= 0xff000000;
+		color_mask = data;
 	}
 	if (maddress == 0x035c) {
 		UINT32 g = channel[chanel][subchannel].object.method[0x0214 / 4];
@@ -3648,22 +3761,40 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 	combiner.function_Aop3 = MAX(MIN((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
 }
 
-bool nv2a_renderer::vblank_callback(screen_device &screen, bool state)
+void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
 {
-	//printf("vblank_callback\n\r");
-	if (state == true)
-		pcrtc[0x100 / 4] |= 1;
-	else
-		pcrtc[0x100 / 4] &= ~1;
-	if (pcrtc[0x100 / 4] & pcrtc[0x140 / 4])
-		pmc[0x100 / 4] |= 0x1000000;
-	else
-		pmc[0x100 / 4] &= ~0x1000000;
+#ifdef LOG_NV2A
+	printf("vblank_callback\n\r");
+#endif
 	if ((state == true) && (puller_waiting == 1)) {
 		puller_waiting = 0;
 		puller_timer_work(NULL, 0);
 	}
-	if ((pmc[0x100 / 4] != 0) && (pmc[0x140 / 4] != 0)) {
+	if (state == true) {
+		pcrtc[0x100 / 4] |= 1;
+		pcrtc[0x808 / 4] |= 0x10000;
+	}
+	else {
+		pcrtc[0x100 / 4] &= ~1;
+		pcrtc[0x808 / 4] &= ~0x10000;
+	}
+	if (update_interrupts() == true)
+		interruptdevice->ir3_w(1); // IRQ 3
+	else
+		interruptdevice->ir3_w(0); // IRQ 3
+}
+
+bool nv2a_renderer::update_interrupts()
+{
+	if (pcrtc[0x100 / 4] & pcrtc[0x140 / 4])
+		pmc[0x100 / 4] |= 0x1000000;
+	else
+		pmc[0x100 / 4] &= ~0x1000000;
+	if (pgraph[0x100 / 4] & pgraph[0x140 / 4])
+		pmc[0x100 / 4] |= 0x1000;
+	else
+		pmc[0x100 / 4] &= ~0x1000;
+	if (((pmc[0x100 / 4] & 0x7fffffff) && (pmc[0x140 / 4] & 1)) || ((pmc[0x100 / 4] & 0x80000000) && (pmc[0x140 / 4] & 2))) {
 		// send interrupt
 		return true;
 	}
@@ -3692,6 +3823,9 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	int countlen;
 	int ret;
 	address_space *space = puller_space;
+#ifdef LOG_NV2A
+	UINT32 subch;
+#endif
 
 	chanel = puller_channel;
 	subchannel = puller_subchannel;
@@ -3748,7 +3882,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 				}
 				if (ret != 0) {
 					puller_timer->enable(false);
-					puller_waiting = 1;
+					puller_waiting = ret;
 					return;
 				}
 			}
@@ -3847,6 +3981,7 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		//logerror("NV_2A: read PRAMIN[%06X] value %08X\n",offset*4-0x00700000,ret);
 	}
 	else if ((offset >= 0x00400000 / 4) && (offset < 0x00402000 / 4)) {
+		ret = pgraph[offset - 0x00400000 / 4];
 		//logerror("NV_2A: read PGRAPH[%06X] value %08X\n",offset*4-0x00400000,ret);
 	}
 	else if ((offset >= 0x00600000 / 4) && (offset < 0x00601000 / 4)) {
@@ -3870,16 +4005,16 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		//logerror("NV_2A: read channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,ret);
 		return ret;
 	}
-	else
-	{
-		/* nothing */
-	}
 	//logerror("NV_2A: read at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,ret);
 	return ret;
 }
 
 WRITE32_MEMBER(nv2a_renderer::geforce_w)
 {
+	UINT32 old;
+	bool update_int;
+
+	update_int = false;
 	if ((offset >= 0x00101000 / 4) && (offset < 0x00102000 / 4)) {
 		//logerror("NV_2A: write STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,data);
 	}
@@ -3898,16 +4033,47 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		//logerror("NV_2A: write PRAMIN[%06X]=%08X\n",offset*4-0x00700000,data & mem_mask);
 	}
 	else if ((offset >= 0x00400000 / 4) && (offset < 0x00402000 / 4)) {
+		int e = offset - 0x00400000 / 4;
+		if (e >= (sizeof(pgraph) / sizeof(UINT32)))
+			return;
+		old = pgraph[e];
+		COMBINE_DATA(pgraph + e);
+		if (e == 0x100 / 4) {
+			pgraph[e] = old & ~data;
+			if (data & 1)
+				pgraph[0x108 / 4] = 0;
+			update_int = true;
+		}
+		if (e == 0x140 / 4)
+			update_int = true;
+		if (e == 0x720 / 4) {
+			if ((data & 1) && (puller_waiting == 2)) {
+				puller_waiting = 0;
+				puller_timer->enable();
+				puller_timer->adjust(attotime::zero);
+			}
+		}
+		if ((e >= 0x900 / 4) && (e < 0xa00 / 4))
+			pgraph[e] = 0;
 		//logerror("NV_2A: write PGRAPH[%06X]=%08X\n",offset*4-0x00400000,data & mem_mask);
 	}
 	else if ((offset >= 0x00600000 / 4) && (offset < 0x00601000 / 4)) {
 		int e = offset - 0x00600000 / 4;
 		if (e >= (sizeof(pcrtc) / sizeof(UINT32)))
 			return;
+		old = pcrtc[e];
 		COMBINE_DATA(pcrtc + e);
+		if (e == 0x100 / 4) {
+			pcrtc[e] = old & ~data;
+			update_int = true;
+		}
+		if (e == 0x140 / 4)
+			update_int = true;
 		if (e == 0x800 / 4) {
-			displayedtarget = (UINT32 *)direct_access_ptr(data);
-			//printf("crtc buffer %08X\n\r", data);
+			displayedtarget = (UINT32 *)direct_access_ptr(pcrtc[e]);
+#ifdef LOG_NV2A
+			printf("crtc buffer %08X\n\r", data);
+#endif
 		}
 		//logerror("NV_2A: write PCRTC[%06X]=%08X\n",offset*4-0x00600000,data & mem_mask);
 	}
@@ -3922,9 +4088,6 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each
 		int chanel, subchannel, suboffset;
 		//int method, count, handle, objclass;
-#ifdef LOG_NV2A
-		int subch;
-#endif
 
 		suboffset = offset - 0x00800000 / 4;
 		chanel = (suboffset >> (16 - 2)) & 31;
@@ -3959,6 +4122,12 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 	}
 	//else
 	//      logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
+	if (update_int == true) {
+		if (update_interrupts() == true)
+			interruptdevice->ir3_w(1); // IRQ 3
+		else
+			interruptdevice->ir3_w(0); // IRQ 3
+	}
 }
 
 void nv2a_renderer::savestate_items()
@@ -3970,4 +4139,9 @@ void nv2a_renderer::start(address_space *cpu_space)
 	basemempointer = (UINT8 *)cpu_space->get_read_ptr(0);
 	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nv2a_renderer::puller_timer_work), this), (void *)"NV2A Puller Timer");
 	puller_timer->enable(false);
+}
+
+void nv2a_renderer::set_interrupt_device(pic8259_device *device)
+{
+	interruptdevice = device;
 }

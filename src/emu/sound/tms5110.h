@@ -7,6 +7,7 @@
 
 #include "emu.h"
 
+/* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
 #undef PERFECT_INTERPOLATION_HACK
 
 /* TMS5110 commands */
@@ -153,6 +154,7 @@ private:
 	UINT8 m_old_frame_pitch_idx;
 	UINT8 m_old_frame_k_idx[10];
 	UINT8 m_old_zpar;
+	UINT8 m_old_uv_zpar;
 
 	INT32 m_current_energy;
 	INT32 m_current_pitch;

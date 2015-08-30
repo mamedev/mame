@@ -185,6 +185,7 @@ public:
 		memset(pfifo, 0, sizeof(pfifo));
 		memset(pcrtc, 0, sizeof(pcrtc));
 		memset(pmc, 0, sizeof(pmc));
+		memset(pgraph, 0, sizeof(pgraph));
 		memset(ramin, 0, sizeof(ramin));
 		computedilated();
 		objectdata = &(object_data_alloc());
@@ -194,6 +195,7 @@ public:
 		enabled_vertex_attributes = 0;
 		indexesleft_count = 0;
 		vertex_pipeline = 4;
+		color_mask = 0xffffffff;
 		alpha_test_enabled = false;
 		alpha_reference = 0;
 		alpha_func = nv2a_renderer::ALWAYS;
@@ -238,8 +240,10 @@ public:
 	}
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);
-	bool vblank_callback(screen_device &screen, bool state);
+	void vblank_callback(screen_device &screen, bool state);
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	bool update_interrupts();
+	void set_interrupt_device(pic8259_device *device);
 
 	void render_texture_simple(INT32 scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
 	void render_color(INT32 scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
@@ -303,10 +307,12 @@ public:
 	UINT32 pfifo[0x2000 / 4];
 	UINT32 pcrtc[0x1000 / 4];
 	UINT32 pmc[0x1000 / 4];
+	UINT32 pgraph[0x2000 / 4];
 	UINT32 ramin[0x100000 / 4];
 	UINT32 dma_offset[2];
 	UINT32 dma_size[2];
 	UINT8 *basemempointer;
+	pic8259_device *interruptdevice;
 	rectangle limits_rendertarget;
 	UINT32 pitch_rendertarget;
 	UINT32 pitch_depthbuffer;
@@ -441,6 +447,7 @@ public:
 		int used;
 		osd_lock *lock;
 	} combiner;
+	UINT32 color_mask;
 	bool alpha_test_enabled;
 	int alpha_func;
 	int alpha_reference;

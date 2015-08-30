@@ -22,21 +22,21 @@
 	struct pstr_t
 	{
 		//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
-		pstr_t(const int alen)
+		pstr_t(const unsigned alen)
 		{
 			init(alen);
 		}
-		void init(const int alen)
+		void init(const unsigned alen)
 		{
 				m_ref_count = 1;
 				m_len = alen;
 				m_str[0] = 0;
 		}
 		char *str() { return &m_str[0]; }
-		int len() const  { return m_len; }
+		unsigned len() const  { return m_len; }
 		int m_ref_count;
 	private:
-		int m_len;
+		unsigned m_len;
 		char m_str[1];
 	};
 
@@ -548,46 +548,56 @@ template <bool build_enabled = true>
 class pfmt_writer_t
 {
 public:
-	pfmt_writer_t()  { }
+	pfmt_writer_t() : m_enabled(true)  { }
 	virtual ~pfmt_writer_t() { }
 
 	ATTR_COLD void operator ()(const char *fmt) const
 	{
-		if (build_enabled) vdowrite(fmt);
+		if (build_enabled && m_enabled) vdowrite(fmt);
 	}
 
 	template<typename T1>
 	ATTR_COLD void operator ()(const char *fmt, const T1 &v1) const
 	{
-		if (build_enabled) vdowrite(pfmt(fmt)(v1));
+		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1));
 	}
 
 	template<typename T1, typename T2>
 	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2) const
 	{
-		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2));
+		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2));
 	}
 
 	template<typename T1, typename T2, typename T3>
 	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
 	{
-		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3));
+		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4>
 	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
 	{
-		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4));
+		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4, typename T5>
 	ATTR_COLD void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
 	{
-		if (build_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4)(v5));
+		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4)(v5));
 	}
+
+	void set_enabled(const bool v)
+	{
+		m_enabled = v;
+	}
+
+	bool is_enabled() const { return m_enabled; }
 
 protected:
 	virtual void vdowrite(const pstring &ls) const {}
+
+private:
+	bool m_enabled;
 
 };
 

@@ -38,6 +38,8 @@
 #include "strconv.h"
 #include "config.h"
 
+#include "winutil.h"
+
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -1117,7 +1119,7 @@ static void dinput_init(running_machine &machine)
 	int didevtype_joystick = DI8DEVCLASS_GAMECTRL;
 
 	dinput_version = DIRECTINPUT_VERSION;
-	result = DirectInput8Create(GetModuleHandle(NULL), dinput_version, IID_IDirectInput8, (void **)&dinput, NULL);
+	result = DirectInput8Create(GetModuleHandleUni(), dinput_version, IID_IDirectInput8, (void **)&dinput, NULL);
 	if (result != DI_OK)
 	{
 		dinput_version = 0;
@@ -1130,17 +1132,17 @@ static void dinput_init(running_machine &machine)
 
 	// first attempt to initialize DirectInput at the current version
 	dinput_version = DIRECTINPUT_VERSION;
-	result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
+	result = DirectInputCreate(GetModuleHandleUni(), dinput_version, &dinput, NULL);
 	if (result != DI_OK)
 	{
 		// if that fails, try version 5
 		dinput_version = 0x0500;
-		result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
+		result = DirectInputCreate(GetModuleHandleUni(), dinput_version, &dinput, NULL);
 		if (result != DI_OK)
 		{
 			// if that fails, try version 3
 			dinput_version = 0x0300;
-			result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
+			result = DirectInputCreate(GetModuleHandleUni(), dinput_version, &dinput, NULL);
 			if (result != DI_OK)
 			{
 				dinput_version = 0;
