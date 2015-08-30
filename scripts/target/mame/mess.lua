@@ -736,6 +736,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"heathkit",
 		"hec2hrp",
 		"hegener",
+		"heurikon",
 		"hitachi",
 		"homebrew",
 		"homelab",
@@ -1633,6 +1634,11 @@ files {
 	MAME_DIR .. "src/mess/machine/hecdisk2.c",
 	MAME_DIR .. "src/mess/video/hec2video.c",
 	MAME_DIR .. "src/mess/drivers/interact.c",
+}
+
+createMESSProjects(_target, _subtarget, "heurikon")
+files {          
+	MAME_DIR .. "src/mess/drivers/hk68v10.c",  
 }
 
 createMESSProjects(_target, _subtarget, "intel")

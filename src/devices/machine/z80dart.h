@@ -6,6 +6,7 @@
     NEC uPD7201 Multiprotocol Serial Communications Controller emulation
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
     Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
+    Z80-SCC Serial Communications Controller emulation (experimental)
 
 ****************************************************************************
                             _____   _____
@@ -140,6 +141,29 @@
                  _DCDA  19 |             | 22  _DCDB
                    CLK  20 |_____________| 21  _RESET
 
+
+                            _____   _____
+                    D1   1 |*    \_/     | 40  D0
+                    D3   2 |             | 39  D2
+                    D5   3 |             | 38  D4
+                    D7   4 |             | 37  D6
+                  _INT   5 |             | 36  _RD
+                   IEO   6 |             | 35  _WR
+                   IEI   7 |             | 34  B/_A  
+                _INTAK   8 |             | 33  _CE
+                   VCC   9 |             | 32  C/_D  
+               _W/REQA   10|    Z80-SCC  | 31  GND
+                _SYNCA   11|    Z8530    | 30  _W/REQB
+                _RTxCA   12|             | 29  _SYNCB
+                  RxDA   13|             | 28  _RTxCB
+                _TRxCA   14|             | 27  RxDB
+                  TxDA   15|             | 26  _TRxCB
+             _DTR/REQA   16|             | 25  TxDB
+                 _RTSA   17|             | 24  _DTR/REQB
+                 _CTSA   18|             | 23  _RTSB
+                 _DCDA   19|             | 22  _CTSB
+                   CLK   20|_____________| 21  _DCDB
+
 ***************************************************************************/
 
 #ifndef __Z80DART_H__
@@ -183,6 +207,10 @@
 
 #define MCFG_UPD7201_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, UPD7201, _clock) \
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
+
+#define MCFG_Z80SCC_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
+	MCFG_DEVICE_ADD(_tag, Z80SCC, _clock)  \
 	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
 
@@ -282,8 +310,8 @@ public:
 	int m_txc;
 
 	// register state
-	UINT8 m_rr[3];              // read register
-	UINT8 m_wr[6];              // write register
+	UINT8 m_rr[16];              // read registers, DART=3 SCC=16
+	UINT8 m_wr[16];              // write register, DART=6 SCC=16
 
 protected:
 	enum
@@ -335,6 +363,13 @@ protected:
 		WR0_CRC_RESET_TX          = 0x80, // not supported
 		WR0_CRC_RESET_TX_UNDERRUN = 0xc0  // not supported
 	};
+
+        enum /* SCC specifics */
+        {
+		WR0_REGISTER_MASK_SCC     = 0x0f,
+                WR0_POINT_HIGH            = 0x08,
+                
+        };
 
 	enum
 	{
@@ -418,6 +453,34 @@ protected:
 		WR5_DTR                   = 0x80
 	};
 
+        /* SCC specifics */
+        enum
+        {
+                WR9_CMD_MASK          = 0xC0,
+                WR9_CMD_NORESET       = 0x00,
+                WR9_CMD_CHNB_RESET    = 0x40,
+                WR9_CMD_CHNA_RESET    = 0x80,
+                WR9_CMD_HW_RESET      = 0xC0,
+                WR9_BIT_VIS           = 0x01,
+                WR9_BIT_NV            = 0x02,
+                WR9_BIT_DLC           = 0x04,
+                WR9_BIT_MIE           = 0x08,
+                WR9_BIT_SHSL          = 0x10,
+                WR9_BIT_IACK          = 0x20
+        };
+
+        enum
+        {
+                WR14_DPLL_CMD_MASK    = 0xe0,
+                WR14_CMD_NULL         = 0x00,
+                WR14_CMD_ESM          = 0x20, 
+                WR14_CMD_RMC          = 0x40,
+                WR14_CMD_SS_BGR       = 0x80,
+                WR14_CMD_SS_RTXC      = 0xa0,
+                WR14_CMD_SET_FM       = 0xc0,
+                WR14_CMD_SET_NRZI     = 0xe0
+        };
+
 	void update_serial();
 	void set_dtr(int state);
 	void set_rts(int state);
@@ -455,6 +518,9 @@ protected:
 
 	int m_index;
 	z80dart_device *m_uart;
+
+	// SCC specifics
+	int m_ph;                   // Point high command to access regs 08-0f
 };
 
 
@@ -555,7 +621,8 @@ protected:
 		TYPE_SIO3,
 		TYPE_SIO4,
 		TYPE_I8274,
-		TYPE_UPD7201
+		TYPE_UPD7201,
+		TYPE_Z80SCC
 	};
 
 	enum
@@ -669,6 +736,16 @@ public:
 };
 
 
+// ======================> scc8530_device
+
+class scc8530_device : public z80dart_device
+{
+public :
+	// construction/destruction
+	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // device type definition
 extern const device_type Z80DART_CHANNEL;
 extern const device_type Z80DART;
@@ -679,6 +756,7 @@ extern const device_type Z80SIO3;
 extern const device_type Z80SIO4;
 extern const device_type I8274;
 extern const device_type UPD7201;
+extern const device_type Z80SCC;
 
 
 #endif
