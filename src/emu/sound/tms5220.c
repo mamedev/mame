@@ -48,13 +48,9 @@ TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
 TODO:
     * Ever since the big rewrite, there are glitches on certain frame transitions
-      for example in the word 'robots' during the eprom attract mode,
+      for example in the word 'rid' during the eprom attract mode,
       I (LN) am not entirely sure why the real chip doesn't have these as well.
       Needs more real hardware testing/dumps for comparison.
-    * Ever since the timing rewrite, the above problem is slightly worse. This
-      time, however, it is probably a 'real' bug, which I (LN) am in the process
-      of tracking down.
-      i.e. the word 'congratulations' in victory when you get a high score.
     * Implement a ready callback for pc interfaces
     - this will be quite a challenge since for it to be really accurate
       the whole emulation has to run in sync (lots of timers) with the
@@ -62,7 +58,6 @@ TODO:
     * If a command is still executing, /READY will be kept high until the command has
       finished if the next command is written.
     * tomcat has a 5220 which is not hooked up at all
-    * Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct? I'm (LN) guessing no. The patent schematics state that TS=0 shuts off the output dac completely, though doesn't affect the I/O pin.
 
 Pedantic detail from observation of real chip:
 The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
@@ -267,7 +262,7 @@ static INT16 clip_analog(INT16 cliptemp);
 //define INTERP_SHIFT / (1<<m_coeff->interp_coeff[m_IP])
 
 /* Other hacks */
-/* HACK?: if defined, outputs the low 4 bits of the lattice filter to the i/o
+/* HACK: if defined, outputs the low 4 bits of the lattice filter to the i/o
  * or clip logic, even though the real hardware doesn't do this, partially verified by decap */
 #undef ALLOW_4_LSB
 
