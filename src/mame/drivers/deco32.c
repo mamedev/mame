@@ -223,7 +223,46 @@ Notes:
 
                    PROM.9J     Fujitsu MB7124 compatible with 82S147  Labelled 'LN-00'
 
+Night Slashers
+Data East, 1993
+				   
+DE-0395-1   DEC-22VO
+|-----------------------------------------------------|
+| TA8205AH  6164            |-----|   2M-16M*   MBH-07|
+|            02-  HuC6280A  | 52  |   MBH-09    MBH-06|
+|           YM2151          |     |   2M-16M*   MBH-05|
+|     YM3012      32.220MHz |-----|   MBH-08    MBH-04|
+|  JP1   MBH-11   93C45     |-----|             MBH-03|
+|CN2     MBH-10             | 52  |             MBH-02|
+|  M6295(1)                 |     |                   |
+|     M6295(2)              |-----|                   |
+|      |-----|                       |-----|          |
+|J     | 104 |    |-----|  |-----|   | 52  |          |
+|A     |     |    | 153 |  | 113 |   |     |          |
+|M     |-----|    |     |  |     |   |-----|          |
+|M                |-----|  |-----|            28MHz   |
+|A  |-----|                                           |
+|   | 99  |  VM-02                                    |
+|   |     |  LN-00             |-----| 6164    MBF-01 |
+|   |-----|                    | 74  | 6164           |
+|                              |     |         MBF-00 |
+|      |-----|  |-----|        |-----|                |
+|      | 113 |  | 200 |        |-----| 6164           |
+|      |     |  |     |        | 141 | 6164           |
+|      |-----|  |-----|        |     |  VE-01A        |
+|TEST_SW                       |-----|  VE-00 |-----| |
+|                                             | 156 | |
+|  CN4      LH52250  LH52250     01-          |     | |
+|  CN3      LH52250  LH52250     00-          |-----| |
+|-----------------------------------------------------|
 
+NOTE: Program EPROMs did NOT have regional letter codes, just 00, 01 & 02
+
+Same PCB as shown below for Fighter's History, but populated with more
+chips as needed. It is worth noting that Night Slashers uses the encryption
+features of the 156 chip where as Fighter's History does not.
+
+*****************************************************************************************************
 
 Fighter's History
 Data East, 1993
@@ -260,6 +299,7 @@ DE-0395-1   DEC-22VO
 |  CN4      LH52250  LH52250   LE01           |     | |
 |  CN3*     LH52250  LH52250   LE00           |-----| |
 |-----------------------------------------------------|
+
 
 Very similar to the DE-0396-0 described below with the notable exceptions:
   The sound area reworked to use the HuC6280A instead of a standard Z80
