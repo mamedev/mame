@@ -43,7 +43,7 @@
 #include "includes/namcos22.h"
 
 
-// polynew constructor
+// poly constructor
 namcos22_renderer::namcos22_renderer(namcos22_state &state)
 	: poly_manager<float, namcos22_object_data, 4, 8000>(state.machine()),
 		m_state(state)
@@ -63,7 +63,7 @@ void namcos22_renderer::reset()
 
 /*********************************************************************************************/
 
-// polynew scanline callbacks
+// poly scanline callbacks
 void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
 {
 	float z = extent.param[0].start;
