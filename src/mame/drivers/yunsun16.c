@@ -928,6 +928,29 @@ ROM_START( shockingk )
 
 ROM_END
 
+ROM_START( shockingko )
+
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "shoc_kor.u33", 0x000000, 0x040000, CRC(646303ec) SHA1(d01264f8495fdea882a9d75129665a67a9acfc42) )
+	ROM_LOAD16_BYTE( "shoc_kor.u32", 0x000001, 0x040000, CRC(6d9ac2f2) SHA1(2374cc053233940d5da610ec95539b43dfbeef3b) )
+
+	ROM_REGION( 0x200000*8, "gfx1", ROMREGION_ERASEFF ) /* 16x16x8 */
+	ROMX_LOAD( "shoc_kor.u67", 0x000000, 0x080000, CRC(7b0f3944) SHA1(0954610e0a1b39e8e68411b98c3fe487da6bd77a) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "shoc_kor.u68", 0x000002, 0x080000, CRC(aa736da6) SHA1(0d8bbfc1fb014c6e662e4dc376bcd87b4157a7aa) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "shoc_kor.u69", 0x000004, 0x080000, CRC(292bb626) SHA1(78a7ecc72dde6d397d2137e528dabcd247d382bd) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "shoc_kor.u70", 0x000006, 0x080000, CRC(2f9eeb81) SHA1(4e84c4451cbe3feee95a828790830e95f278f2e7) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* 16x16x4 */
+	ROM_LOAD( "shoc_kor.u20", 0x000000, 0x040000, CRC(9f729220) SHA1(3206c87c7aebd8912d3486225ccae0a6e3b2061e) )
+	ROM_LOAD( "shoc_kor.u21", 0x040000, 0x040000, CRC(cde84679) SHA1(261a6570449bce22458c49edee427dda6dc504b7) )
+	ROM_LOAD( "shoc_kor.u22", 0x080000, 0x040000, CRC(61fe98ab) SHA1(745fe3b9d513b8e10c405d9ba2e055de1a261e33) )
+	ROM_LOAD( "shoc_kor.u23", 0x0c0000, 0x040000, CRC(50c29191) SHA1(bb2c22f2f452ca0940e98df6efc754c7522696bd) )
+
+	ROM_REGION( 0x080000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "yunsun16.131", 0x000000, 0x080000, CRC(d0a1bb8c) SHA1(10f33521bd6031ed73ee5c7be1382165925aa8f8) )
+
+ROM_END
+
 
 /***************************************************************************
 
@@ -991,11 +1014,12 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 199?, magicbub,  0,        magicbub, magicbub, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbuba, magicbub, magicbub, magicbua, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbubb, magicbub, shocking, magicbua, driver_device,  0,        ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paprazzi,  0,        shocking, paprazzi, driver_device,  0,        ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shocking,  0,        shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingk, shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea)",                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkick,  0,        shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkicka, bombkick, shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbub,   0,        magicbub, magicbub, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbubb,  magicbub, shocking, magicbua, driver_device,  0,        ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paprazzi,   0,        shocking, paprazzi, driver_device,  0,        ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shocking,   0,        shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingk,  shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingko, shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkick,   0,        shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkicka,  bombkick, shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
