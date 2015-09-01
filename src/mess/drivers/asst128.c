@@ -58,8 +58,9 @@ public:
 
 void asst128_state::machine_start()
 {
-	memory_region* font = memregion(":isa_cga:cga_mc1502:gfx1");
-	memcpy(font->base(), memregion("gfx1")->base(), 0x2000);
+	memory_region* font = memregion(":board0:cga_mc1502:gfx1");
+	memcpy(font->base(), memregion("maincpu")->base()+0xffa6e, 0x0400);
+	memcpy(font->base()+0x0400, memregion("maincpu")->base()+0xf4000, 0x0400);
 }
 
 WRITE8_MEMBER(asst128_state::asst128_fdc_dor_w)
@@ -107,13 +108,14 @@ static MACHINE_CONFIG_START( asst128, asst128_state )
 	asst128_mb_device::static_set_cputag(*device, "maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
+//	MCFG_DEVICE_REMOVE("mb:dma8237")
+
 	MCFG_DEVICE_REMOVE("mb:cassette")
 	MCFG_CASSETTE_ADD("mb:cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_cga", pc_isa8_cards, "cga_mc1502", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_lpt", pc_isa8_cards, "lpt", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_com", pc_isa8_cards, "com", true)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "board0", pc_isa8_cards, "cga_mc1502", true)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "board1", pc_isa8_cards, "lpt", true)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
@@ -124,25 +126,19 @@ static MACHINE_CONFIG_START( asst128, asst128_state )
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
-	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
 ROM_START( asst128 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-	ROM_DEFAULT_BIOS("floppy")
-	/* BASIC ROM taken from IBM 5150 and needs dumping */
-	ROM_LOAD( "basic-1.10.rom",    0xf6000, 0x8000, CRC(ebacb791) SHA1(07449ebca18f979b9ab748582b736e402f2bf940))
-	ROM_LOAD( "asf400-f600.bin",   0xf4000, 0x2000, CRC(e3bf22de) SHA1(d4319edc82c0015ca0adc6c8771e887659717e62))
-	ROM_SYSTEM_BIOS(0, "floppy", "3rd party floppy support")
-	ROMX_LOAD( "rombios7.bin",     0xfc001, 0x2000, CRC(7d7c8d6a) SHA1(a731a65ee547f1d78cfc91461f38166da014f3dc), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "rombios8.bin",     0xfc000, 0x2000, CRC(ba304663) SHA1(b2533b8f8240f72b7315f27c7b64f95ac52687ca), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "stock", "cassette-only BIOS?")
-	ROMX_LOAD( "mainbios.bin",     0xfe000, 0x2000, CRC(8426cbf5) SHA1(41d14137ffa651977041da22aa8071c0f7854158), ROM_BIOS(2))
+	ROM_LOAD( "extbios.bin",      0xf4000, 0x2000, CRC(e3bf22de) SHA1(d4319edc82c0015ca0adc6c8771e887659717e62))
+	ROM_LOAD( "basic.bin",        0xf6000, 0x8000, CRC(a4ec66f6) SHA1(80e934986022681ccde180e92aa108e716c4f19b))
+	ROM_LOAD( "mainbios.bin",     0xfe000, 0x2000, CRC(8426cbf5) SHA1(41d14137ffa651977041da22aa8071c0f7854158))
+
+	// XXX needs dumping
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_COPY( "maincpu", 0xffa6e, 0x0000, 0x0400 )
-	ROM_COPY( "maincpu", 0xfc000, 0x0400, 0x0400 )
+	ROM_LOAD( "asst128cg.bin", 0, 0x2000, NO_DUMP )
 ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
