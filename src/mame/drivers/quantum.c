@@ -333,10 +333,10 @@ ROM_START( quantum )
 	ROM_LOAD16_BYTE( "136016.110",   0x010001, 0x002000, CRC(acb50363) SHA1(9efa9ca88efdd2d5e212bd537903892b67b4fe53) )
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* Not dumped from a Quantum PCB, assumes all Atari 136002-125 PROMs are the same data */
 
 	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "137290-001.1b",   0x0000, 0x0117, CRC(938a4598) SHA1(e5b6ddb1b4bb5546d3a0da5d00ce7c57a9e8e769) ) // GAL16V8
+	ROM_LOAD( "137290-001.1b",   0x0000, 0x0117, CRC(938a4598) SHA1(e5b6ddb1b4bb5546d3a0da5d00ce7c57a9e8e769) ) /* Original chip is a 82S153, recompiled equations for a GAL16V8 replacement */
 ROM_END
 
 
@@ -354,10 +354,10 @@ ROM_START( quantum1 )
 	ROM_LOAD16_BYTE( "136016.110",   0x010001, 0x002000, CRC(acb50363) SHA1(9efa9ca88efdd2d5e212bd537903892b67b4fe53) )
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* Not dumped from a Quantum PCB, assumes all Atari 136002-125 PROMs are the same data */
 
 	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "137290-001.1b",   0x0000, 0x0117, CRC(938a4598) SHA1(e5b6ddb1b4bb5546d3a0da5d00ce7c57a9e8e769) ) // GAL16V8
+	ROM_LOAD( "137290-001.1b",   0x0000, 0x0117, CRC(938a4598) SHA1(e5b6ddb1b4bb5546d3a0da5d00ce7c57a9e8e769) ) /* Original chip is a 82S153, recompiled equations for a GAL16V8 replacement */
 ROM_END
 
 
@@ -375,10 +375,10 @@ ROM_START( quantump )
 	ROM_LOAD16_BYTE( "quantump.3l",  0x010001, 0x002000, CRC(e19de844) SHA1(cb4f9d80807b26d6b95405b2d830799984667f54) )
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* Not dumped from a Quantum PCB, assumes all Atari 136002-125 PROMs are the same data */
 
 	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "137290-001.1b",   0x0000, 0x0117, CRC(938a4598) SHA1(e5b6ddb1b4bb5546d3a0da5d00ce7c57a9e8e769) ) // GAL16V8
+	ROM_LOAD( "137290-001.1b",   0x0000, 0x0117, CRC(938a4598) SHA1(e5b6ddb1b4bb5546d3a0da5d00ce7c57a9e8e769) ) /* Original chip is a 82S153, recompiled equations for a GAL16V8 replacement */
 ROM_END
 
 
