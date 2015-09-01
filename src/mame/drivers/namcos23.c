@@ -1234,7 +1234,7 @@ Notes:
 
 #include "emu.h"
 #include <float.h>
-#include "video/polylgcy.h"
+#include "video/poly.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
@@ -1263,6 +1263,27 @@ Notes:
 #define MAIN_C451_IRQ   0x40
 
 enum { MODEL, FLUSH };
+
+enum { RENDER_MAX_ENTRIES = 1000, POLY_MAX_ENTRIES = 10000 };
+
+class namcos23_state;
+struct namcos23_render_data;
+
+class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
+{
+public:
+    namcos23_renderer(namcos23_state &state);
+    
+    void render_flush(bitmap_rgb32& bitmap);
+    void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
+    
+private:
+    namcos23_state& m_state;
+    bitmap_rgb32 m_bitmap;
+};
+
+typedef namcos23_renderer::vertex_t poly_vertex;
+
 
 struct namcos23_render_entry
 {
@@ -1295,9 +1316,6 @@ struct namcos23_poly_entry
 	int vertex_count;
 	poly_vertex pv[16];
 };
-
-enum { RENDER_MAX_ENTRIES = 1000, POLY_MAX_ENTRIES = 10000 };
-
 
 struct c417_t
 {
@@ -1344,7 +1362,7 @@ struct c404_t
 
 struct render_t
 {
-	legacy_poly_manager *polymgr;
+    namcos23_renderer *polymgr;
 	int cur;
 	int poly_count;
 	int count[2];
@@ -1540,7 +1558,6 @@ public:
 	void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z);
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
-	void render_flush(bitmap_rgb32 &bitmap);
 	void render_run(bitmap_rgb32 &bitmap);
 };
 
@@ -1566,6 +1583,12 @@ UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
   Video
 
 ***************************************************************************/
+
+namcos23_renderer::namcos23_renderer(namcos23_state &state)
+    : poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
+      m_state(state),
+      m_bitmap(state.m_screen->width(), state.m_screen->height())
+{}
 
 // 3D hardware, to throw at least in part in video/namcos23.c
 
@@ -1857,24 +1880,23 @@ WRITE32_MEMBER(namcos23_state::c435_w)
 
 
 
-static void render_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid)
 {
-	const namcos23_render_data *rd = (const namcos23_render_data *)extradata;
+	const namcos23_render_data& rd = object;
 
-	float w = extent->param[0].start;
-	float u = extent->param[1].start;
-	float v = extent->param[2].start;
-	float l = extent->param[3].start;
-	float dw = extent->param[0].dpdx;
-	float du = extent->param[1].dpdx;
-	float dv = extent->param[2].dpdx;
-	float dl = extent->param[3].dpdx;
-	bitmap_rgb32 *bitmap = (bitmap_rgb32 *)dest;
-	UINT32 *img = &bitmap->pix32(scanline, extent->startx);
+	float w = extent.param[0].start;
+	float u = extent.param[1].start;
+	float v = extent.param[2].start;
+	float l = extent.param[3].start;
+	float dw = extent.param[0].dpdx;
+	float du = extent.param[1].dpdx;
+	float dv = extent.param[2].dpdx;
+	float dl = extent.param[3].dpdx;
+	UINT32 *img = &m_bitmap.pix32(scanline, extent.startx);
 
-	for(int x = extent->startx; x < extent->stopx; x++) {
+	for(int x = extent.startx; x < extent.stopx; x++) {
 		float z = w ? 1/w : 0;
-		UINT32 pcol = rd->texture_lookup(*rd->machine, rd->pens, u*z, v*z);
+		UINT32 pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 
@@ -2013,7 +2035,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 
 		namcos23_poly_entry *p = render.polys + render.poly_count;
 
-		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001f);
+		p->vertex_count = render.polymgr->zclip_if_less(ne, pv, p->pv, 4, 0.001f);
 
 		if(p->vertex_count >= 3) {
 			for(int i=0; i<p->vertex_count; i++) {
@@ -2047,9 +2069,9 @@ static int render_poly_compare(const void *i1, const void *i2)
 	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
 }
 
-void namcos23_state::render_flush(bitmap_rgb32 &bitmap)
+void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 {
-	render_t &render = m_render;
+	render_t &render = m_state.m_render;
 
 	if(!render.poly_count)
 		return;
@@ -2063,11 +2085,19 @@ void namcos23_state::render_flush(bitmap_rgb32 &bitmap)
 
 	for(int i=0; i<render.poly_count; i++) {
 		const namcos23_poly_entry *p = render.poly_order[i];
-		namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(render.polymgr);
-		*rd = p->rd;
-		poly_render_triangle_fan(render.polymgr, &bitmap, scissor, render_scanline, 4, p->vertex_count, p->pv);
+        namcos23_render_data& extra = render.polymgr->object_data_alloc();
+        extra = p->rd;
+        
+        if (p->vertex_count == 3)
+            render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv[0], p->pv[1], p->pv[2]);
+        else if (p->vertex_count == 4)
+            render_polygon<4>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+        else if (p->vertex_count == 5)
+            render_polygon<5>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
 	}
 	render.poly_count = 0;
+    
+    copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, scissor);
 }
 
 void namcos23_state::render_run(bitmap_rgb32 &bitmap)
@@ -2082,14 +2112,13 @@ void namcos23_state::render_run(bitmap_rgb32 &bitmap)
 			render_one_model(re);
 			break;
 		case FLUSH:
-			render_flush(bitmap);
+			render.polymgr->render_flush(bitmap);
 			break;
 		}
 		re++;
 	}
-	render_flush(bitmap);
-
-	poly_wait(render.polymgr, "render_run");
+	render.polymgr->render_flush(bitmap);
+    render.polymgr->wait();
 }
 
 
@@ -2161,7 +2190,7 @@ VIDEO_START_MEMBER(namcos23_state,s23)
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
-	m_render.polymgr = poly_alloc(machine(), 10000, sizeof(namcos23_render_data), 0);
+    m_render.polymgr = auto_alloc(machine(), namcos23_renderer(*this));
 }
 
 
