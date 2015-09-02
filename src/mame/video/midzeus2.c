@@ -65,11 +65,8 @@ public:
     
     void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
     
-    bitmap_rgb32 &screenbits() { return m_screenbits; }
-    
 private:
 	midzeus2_state& m_state;
-    bitmap_rgb32 m_screenbits;
 };
 
 typedef midzeus2_renderer::vertex_t poly_vertex;
@@ -78,7 +75,6 @@ typedef midzeus2_renderer::extent_t poly_extent;
 midzeus2_renderer::midzeus2_renderer(midzeus2_state &state)
     : poly_manager<float, mz2_poly_extra_data, 4, 10000>(state.machine())
     , m_state(state)
-    , m_screenbits(state.m_screen->width(), state.m_screen->height())
 {
     
 }
