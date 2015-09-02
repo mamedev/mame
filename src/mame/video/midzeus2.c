@@ -90,7 +90,7 @@ midzeus2_renderer::midzeus2_renderer(midzeus2_state &state)
  *
  *************************************/
 
-static midzeus2_renderer* polyNew;
+static midzeus2_renderer* poly;
 static UINT8 log_fifo;
 
 static UINT32 zeus_fifo[20];
@@ -283,7 +283,7 @@ VIDEO_START_MEMBER(midzeus2_state,midzeus2)
 	waveram[1] = auto_alloc_array(machine(), UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
 
 	/* initialize polygon engine */
-    polyNew = auto_alloc(machine(), midzeus2_renderer(*this));
+    poly = auto_alloc(machine(), midzeus2_renderer(*this));
     
 	/* we need to cleanup on exit */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus2_state::exit_handler2), this));
@@ -374,7 +374,7 @@ UINT32 midzeus2_state::screen_update_midzeus2(screen_device &screen, bitmap_rgb3
 {
 	int x, y;
 
-    polyNew->wait();
+    poly->wait();
     
 if (machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", (double) zbase); }
 if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", (double) zbase); }
@@ -1031,7 +1031,7 @@ void midzeus2_state::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 						break;
 
 					case 0x38:  /* crusnexo/thegrid */
-						polyNew->zeus2_draw_quad(databuffer, texoffs, logit);
+						poly->zeus2_draw_quad(databuffer, texoffs, logit);
 						break;
 
 					default:
@@ -1199,7 +1199,7 @@ In memory:
 		}
 	}
 
-	numverts = polyNew->zclip_if_less(4, &vert[0], &clipvert[0], 4, 1.0f / 512.0f / 4.0f);
+	numverts = poly->zclip_if_less(4, &vert[0], &clipvert[0], 4, 1.0f / 512.0f / 4.0f);
 	if (numverts < 3)
 		return;
 
@@ -1230,7 +1230,7 @@ In memory:
 			clipvert[i].y += 0.0005f;
 	}
 
-    mz2_poly_extra_data& extra = polyNew->object_data_alloc();
+    mz2_poly_extra_data& extra = poly->object_data_alloc();
 	switch (texmode)
 	{
 		case 0x01d:     /* crusnexo: RHS of score bar */
