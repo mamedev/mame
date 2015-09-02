@@ -1266,25 +1266,6 @@ enum { MODEL, FLUSH };
 
 enum { RENDER_MAX_ENTRIES = 1000, POLY_MAX_ENTRIES = 10000 };
 
-class namcos23_state;
-struct namcos23_render_data;
-
-class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
-{
-public:
-    namcos23_renderer(namcos23_state &state);
-    
-    void render_flush(bitmap_rgb32& bitmap);
-    void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
-    
-private:
-    namcos23_state& m_state;
-    bitmap_rgb32 m_bitmap;
-};
-
-typedef namcos23_renderer::vertex_t poly_vertex;
-
-
 struct namcos23_render_entry
 {
 	int type;
@@ -1308,6 +1289,23 @@ struct namcos23_render_data
 	UINT32 (*texture_lookup)(running_machine &machine, const pen_t *pens, float x, float y);
 };
 
+class namcos23_state;
+
+class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
+{
+public:
+    namcos23_renderer(namcos23_state &state);
+    
+    void render_flush(bitmap_rgb32& bitmap);
+    void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
+    
+private:
+    namcos23_state& m_state;
+    bitmap_rgb32 m_bitmap;
+};
+
+typedef namcos23_renderer::vertex_t poly_vertex;
+
 struct namcos23_poly_entry
 {
 	namcos23_render_data rd;
@@ -1316,6 +1314,7 @@ struct namcos23_poly_entry
 	int vertex_count;
 	poly_vertex pv[16];
 };
+
 
 struct c417_t
 {
