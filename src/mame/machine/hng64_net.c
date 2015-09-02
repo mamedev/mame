@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
 /* HNG64 Communication / Network CPU */
 
 // this is driven by a KL5C80A12CFP which is basically a super-charged Z80

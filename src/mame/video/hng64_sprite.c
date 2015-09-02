@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
 
 /* Hyper NeoGeo 64 Sprite bits */
 
