@@ -21,8 +21,15 @@ if _OPTIONS["SEPARATE_BIN"]~="1" then
 	targetdir(MAME_DIR)
 end
 
+configuration { "gmake" }
+	buildoptions {
+		"-Wno-undef",
+	}
+
+configuration { }
+
 links {
-	"unittest-cpp",
+	"gtest",
 	"utils",
 	"expat",
 	"zlib",
@@ -30,7 +37,7 @@ links {
 }
 
 includedirs {
-	MAME_DIR .. "3rdparty/unittest-cpp",
+	MAME_DIR .. "3rdparty/googletest/googletest/include",
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }

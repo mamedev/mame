@@ -795,73 +795,25 @@ links {
 end
 		
 --------------------------------------------------
--- UnitTest++ library objects
+-- GoogleTest library objects
 --------------------------------------------------
 
-project "unittest-cpp"
-	uuid "717d39e5-b6ff-4507-a092-c27c05b60ab5"
+project "gtest"
+	uuid "fa306a8d-fb10-4d4a-9d2e-fdb9076407b4"
 	kind "StaticLib"
 
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-undef",
+			"-Wno-unused-variable",
+		}
+
+	configuration { }
+
+	includedirs {
+		MAME_DIR .. "3rdparty/googletest/googletest/include",
+		MAME_DIR .. "3rdparty/googletest/googletest",
+	}	
 	files {		
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CheckMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Config.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExceptionMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExecuteTest.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/HelperMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssertImpl.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestSuite.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeHelpers.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTest++.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTestPP.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.h",
+		MAME_DIR .. "3rdparty/googletest/googletest/src/gtest-all.cc",
 	}
-
-	if _OPTIONS["targetos"]~="windows" then
-		files {
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.cpp",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.h",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.cpp",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.h",
-		}
-	end
-
-	if _OPTIONS["targetos"]=="windows" then
-		files {
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.cpp",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.h",
-		}
-	end

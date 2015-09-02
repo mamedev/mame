@@ -223,7 +223,46 @@ Notes:
 
                    PROM.9J     Fujitsu MB7124 compatible with 82S147  Labelled 'LN-00'
 
+Night Slashers
+Data East, 1993
+				   
+DE-0395-1   DEC-22VO
+|-----------------------------------------------------|
+| TA8205AH  6164            |-----|   2M-16M*   MBH-07|
+|            02-  HuC6280A  | 52  |   MBH-09    MBH-06|
+|           YM2151          |     |   2M-16M*   MBH-05|
+|     YM3012      32.220MHz |-----|   MBH-08    MBH-04|
+|  JP1   MBH-11   93C45     |-----|             MBH-03|
+|CN2     MBH-10             | 52  |             MBH-02|
+|  M6295(1)                 |     |                   |
+|     M6295(2)              |-----|                   |
+|      |-----|                       |-----|          |
+|J     | 104 |    |-----|  |-----|   | 52  |          |
+|A     |     |    | 153 |  | 113 |   |     |          |
+|M     |-----|    |     |  |     |   |-----|          |
+|M                |-----|  |-----|            28MHz   |
+|A  |-----|                                           |
+|   | 99  |  VM-02                                    |
+|   |     |  LN-00             |-----| 6164    MBH-01 |
+|   |-----|                    | 74  | 6164           |
+|                              |     |         MBH-00 |
+|      |-----|  |-----|        |-----|                |
+|      | 113 |  | 200 |        |-----| 6164           |
+|      |     |  |     |        | 141 | 6164           |
+|      |-----|  |-----|        |     |  VE-01A        |
+|TEST_SW                       |-----|  VE-00 |-----| |
+|                                             | 156 | |
+|  CN4      LH52250  LH52250     01-          |     | |
+|  CN3      LH52250  LH52250     00-          |-----| |
+|-----------------------------------------------------|
 
+NOTE: Program EPROMs did NOT have regional letter codes, just 00, 01 & 02
+
+Same PCB as shown below for Fighter's History, but populated with more
+chips as needed. It is worth noting that Night Slashers uses the encryption
+features of the 156 chip where as Fighter's History does not.
+
+*****************************************************************************************************
 
 Fighter's History
 Data East, 1993
@@ -260,6 +299,7 @@ DE-0395-1   DEC-22VO
 |  CN4      LH52250  LH52250   LE01           |     | |
 |  CN3*     LH52250  LH52250   LE00           |-----| |
 |-----------------------------------------------------|
+
 
 Very similar to the DE-0396-0 described below with the notable exceptions:
   The sound area reworked to use the HuC6280A instead of a standard Z80
@@ -2472,7 +2512,7 @@ MACHINE_CONFIG_END
 
 /**********************************************************************************/
 
-ROM_START( captaven )
+ROM_START( captaven ) /* DE-0351-x PCB (x=3 or 4) */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hn_00-4.1e",  0x000000, 0x20000, CRC(147fb094) SHA1(6bd759c42f4b7f9e1c3f2d3ece0b3ec72de1a982) )
 	ROM_LOAD32_BYTE( "hn_01-4.1h",  0x000001, 0x20000, CRC(11ecdb95) SHA1(832b56f05ae7e15e67fbdd321da8c1cc5e7629a0) )
@@ -2522,9 +2562,14 @@ ROM_START( captaven )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "man-11.16k", 0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "ts-00.4h",  0x0000, 0x0117, CRC(ebc2908e) SHA1(dca14a55abd1d88ee09092d4122614e55c3e7f53) )
+	ROM_LOAD( "ts-01.5h",  0x0200, 0x0117, CRC(c776a980) SHA1(cd4bdcfb755f561fefa4c88fab5d6d2397332aa7) )
+	ROM_LOAD( "ts-02.12l", 0x0400, 0x01bf, CRC(6f26528c) SHA1(2cf869b2a789a9b0646162a61c147bcbb13c9141) )
 ROM_END
 
-ROM_START( captavena )
+ROM_START( captavena ) /* DE-0351-x PCB (x=3 or 4) */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hn_00.e1",    0x000000, 0x20000, CRC(12dd0c71) SHA1(77bd0e5f1b105ec70de5e76cb9c8138f02a496be) )
 	ROM_LOAD32_BYTE( "hn_01.h1",    0x000001, 0x20000, CRC(ac5ea492) SHA1(e08fa2b3e3a40cba6dcdf07049d67056d59ed72a) )
@@ -2574,9 +2619,14 @@ ROM_START( captavena )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "man-11.16k", 0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "ts-00.4h",  0x0000, 0x0117, CRC(ebc2908e) SHA1(dca14a55abd1d88ee09092d4122614e55c3e7f53) )
+	ROM_LOAD( "ts-01.5h",  0x0200, 0x0117, CRC(c776a980) SHA1(cd4bdcfb755f561fefa4c88fab5d6d2397332aa7) )
+	ROM_LOAD( "ts-02.12l", 0x0400, 0x01bf, CRC(6f26528c) SHA1(2cf869b2a789a9b0646162a61c147bcbb13c9141) )
 ROM_END
 
-ROM_START( captavene )
+ROM_START( captavene ) /* DE-0351-x PCB (x=3 or 4) */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hg_00-4.1e",  0x000000, 0x20000, CRC(7008d43c) SHA1(a39143e13075ebc58ecc576391f04d2649675dfb) )
 	ROM_LOAD32_BYTE( "hg_01-4.1h",  0x000001, 0x20000, CRC(53dc1042) SHA1(4547ad20e5bc3b9cedae53f73f1628fa3493aafa) )
@@ -2628,13 +2678,13 @@ ROM_START( captavene )
 	ROM_LOAD( "man-11.16k", 0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "pal16l8a.12l", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.4h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.5h",  0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "ts-00.4h",  0x0000, 0x0117, CRC(ebc2908e) SHA1(dca14a55abd1d88ee09092d4122614e55c3e7f53) )
+	ROM_LOAD( "ts-01.5h",  0x0200, 0x0117, CRC(c776a980) SHA1(cd4bdcfb755f561fefa4c88fab5d6d2397332aa7) )
+	ROM_LOAD( "ts-02.12l", 0x0400, 0x01bf, CRC(6f26528c) SHA1(2cf869b2a789a9b0646162a61c147bcbb13c9141) )
 	ROM_LOAD( "pal16r8b.14c", 0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( captavenu )
+ROM_START( captavenu ) /* DE-0351-x PCB (x=3 or 4) */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hh_00-19.1e", 0x000000, 0x20000, CRC(08b870e0) SHA1(44c837e3c5dfc9764d89b0ebb3e9b7a40fe4d76f) )
 	ROM_LOAD32_BYTE( "hh_01-19.1h", 0x000001, 0x20000, CRC(0dc0feca) SHA1(cb1c97aac59dabcf6c37bc1562cf2f62bca951f1) )
@@ -2684,9 +2734,14 @@ ROM_START( captavenu )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "man-11.16k", 0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "ts-00.4h",  0x0000, 0x0117, CRC(ebc2908e) SHA1(dca14a55abd1d88ee09092d4122614e55c3e7f53) )
+	ROM_LOAD( "ts-01.5h",  0x0200, 0x0117, CRC(c776a980) SHA1(cd4bdcfb755f561fefa4c88fab5d6d2397332aa7) )
+	ROM_LOAD( "ts-02.12l", 0x0400, 0x01bf, CRC(6f26528c) SHA1(2cf869b2a789a9b0646162a61c147bcbb13c9141) )
 ROM_END
 
-ROM_START( captavenuu )
+ROM_START( captavenuu ) /* DE-0351-x PCB (x=3 or 4) */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hh-00.1e",    0x000000, 0x20000, CRC(c34da654) SHA1(a1988a6a45991db6dee10b484049f6703b4671c9) )
 	ROM_LOAD32_BYTE( "hh-01.1h",    0x000001, 0x20000, CRC(55abe63f) SHA1(98772eff3ebb5a4f243c7a77d398eb142d1505cb) )
@@ -2736,9 +2791,14 @@ ROM_START( captavenuu )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "man-11.16k", 0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "ts-00.4h",  0x0000, 0x0117, CRC(ebc2908e) SHA1(dca14a55abd1d88ee09092d4122614e55c3e7f53) )
+	ROM_LOAD( "ts-01.5h",  0x0200, 0x0117, CRC(c776a980) SHA1(cd4bdcfb755f561fefa4c88fab5d6d2397332aa7) )
+	ROM_LOAD( "ts-02.12l", 0x0400, 0x01bf, CRC(6f26528c) SHA1(2cf869b2a789a9b0646162a61c147bcbb13c9141) )
 ROM_END
 
-ROM_START( captavenua )
+ROM_START( captavenua ) /* DE-0351-x PCB (x=3 or 4) */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hh_00-4.2e",   0x000000, 0x20000, CRC(0e1acc05) SHA1(7eb6206efad233f9f4ee51102f9fe6b58f0719ea) )
 	ROM_LOAD32_BYTE( "hh_01-4.2h",   0x000001, 0x20000, CRC(4ff0351d) SHA1(15fc2662ff0d32986c4d4d074b985ad853da34e1) )
@@ -2788,9 +2848,14 @@ ROM_START( captavenua )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "man-11.16k", 0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "ts-00.4h",  0x0000, 0x0117, CRC(ebc2908e) SHA1(dca14a55abd1d88ee09092d4122614e55c3e7f53) )
+	ROM_LOAD( "ts-01.5h",  0x0200, 0x0117, CRC(c776a980) SHA1(cd4bdcfb755f561fefa4c88fab5d6d2397332aa7) )
+	ROM_LOAD( "ts-02.12l", 0x0400, 0x01bf, CRC(6f26528c) SHA1(2cf869b2a789a9b0646162a61c147bcbb13c9141) )
 ROM_END
 
-ROM_START( captavenj )
+ROM_START( captavenj ) /* DE-0351-x PCB (x=3 or 4) */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hj_00-2.1e",  0x000000, 0x20000, CRC(10b1faaf) SHA1(9d76885200a846b4751c8d44ff591e2aff7c4148) )
 	ROM_LOAD32_BYTE( "hj_01-2.1h",  0x000001, 0x20000, CRC(62c59f27) SHA1(20bbb7f3ff63a8c795686c1d56d51e90305daa77) )
@@ -2840,6 +2905,11 @@ ROM_START( captavenj )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "man-11.16k", 0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "ts-00.4h",  0x0000, 0x0117, CRC(ebc2908e) SHA1(dca14a55abd1d88ee09092d4122614e55c3e7f53) )
+	ROM_LOAD( "ts-01.5h",  0x0200, 0x0117, CRC(c776a980) SHA1(cd4bdcfb755f561fefa4c88fab5d6d2397332aa7) )
+	ROM_LOAD( "ts-02.12l", 0x0400, 0x01bf, CRC(6f26528c) SHA1(2cf869b2a789a9b0646162a61c147bcbb13c9141) )
 ROM_END
 
 ROM_START( dragngun )
@@ -3022,8 +3092,8 @@ ROM_START( fghthist ) /* DE-0380-2 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0117, CRC(4ba7e6a9) SHA1(b65d696a3519e792df226f9f148c759cdb0e1e43) )
 ROM_END
 
 ROM_START( fghthista ) /* DE-0380-2 PCB */
@@ -3056,8 +3126,9 @@ ROM_START( fghthista ) /* DE-0380-2 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0117, CRC(4ba7e6a9) SHA1(b65d696a3519e792df226f9f148c759cdb0e1e43) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( fghthistu ) /* DE-0396-0 PCB */
@@ -3090,8 +3161,9 @@ ROM_START( fghthistu ) /* DE-0396-0 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0117, CRC(4ba7e6a9) SHA1(b65d696a3519e792df226f9f148c759cdb0e1e43) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( fghthistua ) /* DE-0395-1 PCB */
@@ -3124,8 +3196,9 @@ ROM_START( fghthistua ) /* DE-0395-1 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0117, CRC(109613c8) SHA1(5991e010c1bc2a827c8ee2c85a9b40e00a3167b3) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( fghthistub ) /* DE-0395-1 PCB */
@@ -3158,8 +3231,9 @@ ROM_START( fghthistub ) /* DE-0395-1 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0117, CRC(109613c8) SHA1(5991e010c1bc2a827c8ee2c85a9b40e00a3167b3) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( fghthistuc ) /* DE-0380-2 PCB */
@@ -3192,8 +3266,9 @@ ROM_START( fghthistuc ) /* DE-0380-2 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0117, CRC(4ba7e6a9) SHA1(b65d696a3519e792df226f9f148c759cdb0e1e43) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( fghthistj ) /* DE-0395-1 PCB */
@@ -3226,8 +3301,9 @@ ROM_START( fghthistj ) /* DE-0395-1 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0117, CRC(109613c8) SHA1(5991e010c1bc2a827c8ee2c85a9b40e00a3167b3) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( fghthistja ) /* DE-0380-2 PCB */
@@ -3260,8 +3336,9 @@ ROM_START( fghthistja ) /* DE-0380-2 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0117, CRC(4ba7e6a9) SHA1(b65d696a3519e792df226f9f148c759cdb0e1e43) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( fghthistjb ) /* DE-0380-1 PCB */
@@ -3294,8 +3371,9 @@ ROM_START( fghthistjb ) /* DE-0380-1 PCB */
 	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
-	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0117, CRC(4ba7e6a9) SHA1(b65d696a3519e792df226f9f148c759cdb0e1e43) )
+	/* PAL16L8BCN at 8J is unpopulated */
 ROM_END
 
 ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly different hardware, a unique PCB and not a Dragongun conversion */
@@ -3673,14 +3751,13 @@ ROM_START( tattassa )
 	ROM_LOAD( "eeprom-tattass.bin", 0x0000, 0x0400, CRC(7140f40c) SHA1(4fb7897933046b6adaf00b4626d5fd23d0e8a666) )
 ROM_END
 
-ROM_START( nslasher )
+ROM_START( nslasher ) /* DE-0397-0 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* Encrypted ARM 32 bit code */
 	ROM_LOAD32_WORD( "mainprg.1f", 0x000000, 0x80000, CRC(507acbae) SHA1(329a2bb244f2f3adb8d75cab5aa2dcb129d70712) )
 	ROM_LOAD32_WORD( "mainprg.2f", 0x000002, 0x80000, CRC(931fc7ee) SHA1(54eb12abfa3f332ce9b43a45ec424aaee88641a6) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "sndprg.17l",  0x00000,  0x10000,  CRC(18939e92) SHA1(50b37a78d9d2259d4b140dd17393c4e5ca92bca5) )
-
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "mbh-00.8c",  0x000000,  0x200000,  CRC(a877f8a3) SHA1(79253525f360a73161894f31e211e4d6b38d307a) ) /* Encrypted tiles */
@@ -3708,9 +3785,14 @@ ROM_START( nslasher )
 
 	ROM_REGION(0x200, "prom", 0 )
 	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "vm-00.3d",  0x0000, 0x0117, NO_DUMP ) /* 16L8ACN is read protected */
+	ROM_LOAD( "vm-01.4d",  0x0200, 0x0117, NO_DUMP ) /* 16L8ACN is read protected */
+	ROM_LOAD( "vm-02.8j",  0x0400, 0x0117, CRC(53692426) SHA1(b8f8cf6b1f6b637fcd1fcd62474e637f5d4a6901) )
 ROM_END
 
-ROM_START( nslasherj )
+ROM_START( nslasherj ) /* DE-0397-0 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* Encrypted ARM 32 bit code */
 	ROM_LOAD32_WORD( "lx-00.1f", 0x000000, 0x80000, CRC(6ed5fb88) SHA1(84350da7939a479968a523c84e254e3ee54b8da2) )
 	ROM_LOAD32_WORD( "lx-01.2f", 0x000002, 0x80000, CRC(a6df2152) SHA1(6fe7e0b2e71c5f807951dcc81a6a3cff55247961) )
@@ -3744,9 +3826,14 @@ ROM_START( nslasherj )
 
 	ROM_REGION(0x200, "prom", 0 )
 	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "vm-00.3d",  0x0000, 0x0117, NO_DUMP ) /* 16L8ACN is read protected */
+	ROM_LOAD( "vm-01.4d",  0x0200, 0x0117, NO_DUMP ) /* 16L8ACN is read protected */
+	ROM_LOAD( "vm-02.8j",  0x0400, 0x0117, CRC(53692426) SHA1(b8f8cf6b1f6b637fcd1fcd62474e637f5d4a6901) )
 ROM_END
 
-ROM_START( nslashers )
+ROM_START( nslashers ) /* DE-0397-0 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* Encrypted ARM 32 bit code */
 	ROM_LOAD32_WORD( "ly-00.1f", 0x000000, 0x80000, CRC(fa0646f9) SHA1(7f9633bda230a0ced59171cdc5ab40a6d56c3d34) )
 	ROM_LOAD32_WORD( "ly-01.2f", 0x000002, 0x80000, CRC(ae508149) SHA1(3592949e5fb2770adb9c9daa4e38c4e75f3e2554) )
@@ -3780,9 +3867,14 @@ ROM_START( nslashers )
 
 	ROM_REGION(0x200, "prom", 0 )
 	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "vm-00.3d",  0x0000, 0x0117, NO_DUMP ) /* 16L8ACN is read protected */
+	ROM_LOAD( "vm-01.4d",  0x0200, 0x0117, NO_DUMP ) /* 16L8ACN is read protected */
+	ROM_LOAD( "vm-02.8j",  0x0400, 0x0117, CRC(53692426) SHA1(b8f8cf6b1f6b637fcd1fcd62474e637f5d4a6901) )
 ROM_END
 
-ROM_START( nslasheru )
+ROM_START( nslasheru ) /* DE-0395-1 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* Encrypted ARM 32 bit code */
 	ROM_LOAD32_WORD( "00.f1", 0x000000, 0x80000, CRC(944f3329) SHA1(7e7909e203b9752de3d3d798c6f84ac6ae824a07) )
 	ROM_LOAD32_WORD( "01.f2", 0x000002, 0x80000, CRC(ac12d18a) SHA1(7cd4e843bf575c70c5c39a8afa78b803106f59b0) )
@@ -3816,6 +3908,11 @@ ROM_START( nslasheru )
 
 	ROM_REGION(0x200, "prom", 0 )
 	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0117, CRC(384d316c) SHA1(61b50c695d4210c199cf6f7bbe50c8a5ecd1d21c) )
+	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0117, CRC(109613c8) SHA1(5991e010c1bc2a827c8ee2c85a9b40e00a3167b3) )
+	ROM_LOAD( "vm-02.8j",  0x0400, 0x0117, CRC(53692426) SHA1(b8f8cf6b1f6b637fcd1fcd62474e637f5d4a6901) )
 ROM_END
 
 DRIVER_INIT_MEMBER(deco32_state,captaven)
@@ -3978,24 +4075,26 @@ GAME( 1991, captavenuu, captaven, captaven, captaven, deco32_state,   captaven, 
 GAME( 1991, captavenua, captaven, captaven, captaven, deco32_state,   captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, captavenj,  captaven, captaven, captaven, deco32_state,   captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)", MACHINE_SUPPORTS_SAVE )
 
-// DE-0396-0 PCB sets (uses a Z80)
+// DE-0396-0 PCB sets (Z80 for sound)
 GAME( 1993, fghthistu,  fghthist, fghthistz,fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-09, DE-0396-0 PCB)", MACHINE_SUPPORTS_SAVE )
-// DE-0395-1 PCB sets
+// DE-0395-1 PCB sets (HuC6280 for sound)
 GAME( 1993, fghthistua, fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-06, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthistub, fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthistj,  fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-07, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
-// DE-0380-2 PCB sets
+// DE-0380-2 PCB sets (HuC6280 for sound)
 GAME( 1993, fghthist,   0,        fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-07, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthista,  fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthistuc, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, fghthistja, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
-// DE-0380-1 PCB sets
+// DE-0380-1 PCB sets (HuC6280 for sound)
 GAME( 1993, fghthistjb, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-04, DE-0380-1 PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, nslasher,   0,        nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nslasherj,  nslasher, nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Japan Rev 1.2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nslashers,  nslasher, nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Over Sea Rev 1.2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nslasheru,  nslasher, nslasheru,nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, HuC6280 Sound CPU)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// DE-0397-0 PCB sets (Z80 for sound)
+GAME( 1994, nslasher,   0,        nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3, DE-0397-0 PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslasherj,  nslasher, nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Japan Rev 1.2, DE-0397-0 PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslashers,  nslasher, nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Over Sea Rev 1.2, DE-0397-0 PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// DE-0395-1 PCB sets (HuC6280 for sound)
+GAME( 1994, nslasheru,  nslasher, nslasheru,nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, DE-0395-1 PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, tattass,    0,        tattass,  tattass,  deco32_state,   tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, tattassa,   tattass,  tattass,  tattass,  deco32_state,   tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

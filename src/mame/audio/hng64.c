@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
 /* Hyper NeoGeo 64 Audio */
 
 // uses a V53A ( == V33A with extra peripherals eg. DMA, Timers, MMU giving virtual 24-bit address space etc.)

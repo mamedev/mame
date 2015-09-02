@@ -34,8 +34,8 @@
 
 #pragma once
 
-#ifndef __POLYNEW_H__
-#define __POLYNEW_H__
+#ifndef __POLYLGCY_H__
+#define __POLYLGCY_H__
 
 
 /***************************************************************************
@@ -152,4 +152,4 @@ UINT32 poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangl
 int poly_zclip_if_less(int numverts, const poly_vertex *v, poly_vertex *outv, int paramcount, float clipval);
 
 
-#endif  /* __POLY_H__ */
+#endif  /* __POLYLGCY_H__ */

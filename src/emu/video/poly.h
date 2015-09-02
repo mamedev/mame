@@ -34,8 +34,8 @@
 
 #pragma once
 
-#ifndef __POLYNEW_H__
-#define __POLYNEW_H__
+#ifndef __POLY_H__
+#define __POLY_H__
 
 #include <limits.h>
 
@@ -1172,4 +1172,4 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 	return nextout - outv;
 }
 
-#endif  // __POLYNEW_H__
+#endif  // __POLY_H__

@@ -1,3 +1,0 @@
-[submodule "docs"]
-	path = docs
-	url = https://github.com/unittest-cpp/unittest-cpp.wiki.git

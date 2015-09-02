@@ -36,10 +36,11 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	DECLARE_READ8_MEMBER( ram_r );
+	DECLARE_WRITE8_MEMBER( ram_w );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t0_r );
 	DECLARE_READ8_MEMBER( t1_r );
 
 protected:
@@ -69,7 +70,17 @@ private:
 	required_ioport m_md13;
 	required_ioport m_md14;
 	required_ioport m_md15;
+	required_ioport m_md16;
+	required_ioport m_md17;
+	required_ioport m_md18;
+	required_ioport m_md19;
+	required_ioport m_md20;
+	required_ioport m_md21;
+	required_ioport m_md22;
+	required_ioport m_md23;
 
+	dynamic_buffer m_ram;
+	UINT8 m_bus;
 	UINT8 m_p1;
 	UINT8 m_p2;
 	int m_q;
