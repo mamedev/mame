@@ -117,8 +117,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	#else
 	struct stat64 st;
 	#endif
-	char *tmpstr, *envstr;
-	int i, j;
+	char *tmpstr;
 	file_error filerr = FILERR_NONE;
 
 	tmpstr = NULL;
@@ -169,42 +168,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		goto error;
 	}
 
-	tmpstr = (char *) osd_malloc_array(strlen((*file)->filename)+1);
-	strcpy(tmpstr, (*file)->filename);
-
-	// does path start with an environment variable?
-	if (tmpstr[0] == '$')
-	{
-		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
-
-		strcpy(envstr, tmpstr);
-
-		i = 0;
-		while (envstr[i] != PATHSEPCH && envstr[i] != 0 && envstr[i] != '.')
-		{
-			i++;
-		}
-
-		envstr[i] = '\0';
-
-		const char *envval = osd_getenv(&envstr[1]);
-		if (envval != NULL)
-		{
-			j = strlen(envval) + strlen(tmpstr) + 1;
-			osd_free(tmpstr);
-			tmpstr = (char *) osd_malloc_array(j);
-
-			// start with the value of $HOME
-			strcpy(tmpstr, envval);
-			// replace the null with a path separator again
-			envstr[i] = PATHSEPCH;
-			// append it
-			strcat(tmpstr, &envstr[i]);
-		}
-		else
-			fprintf(stderr, "Warning: osd_open environment variable %s not found.\n", envstr);
-		osd_free(envstr);
-	}
+	osd_subst_env(&tmpstr, (*file)->filename);
 
 	#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 	access |= O_BINARY;
@@ -597,4 +561,50 @@ const char *osd_get_volume_name(int idx)
 	return "/";
 }
 
+//============================================================
+//  osd_subst_env
+//============================================================
+void osd_subst_env(char **dst, const char *src)
+{
+	int i, j;
+	char *envstr;
+
+	osd_free(*dst);
+	*dst = (char *) osd_malloc_array(strlen(src)+1);
+	strcpy(*dst, src);
+
+	// start with an environment variable?
+	if (*dst[0] == '$')
+	{
+
+		envstr = (char *) osd_malloc_array(strlen(src)+1);
+		strcpy(envstr, src);
+
+		i = 0;
+		while (!osd_is_path_separator(envstr[i]) && envstr[i] != 0 && envstr[i] != '.')
+		{
+			i++;
+		}
+
+		envstr[i] = '\0';
+
+		const char *envval = osd_getenv(&envstr[1]);
+		if (envval != NULL)
+		{
+			j = strlen(envval) + strlen(*dst) + 1;
+			osd_free(*dst);
+			*dst = (char *) osd_malloc_array(j);
+
+			// start with the value of $HOME
+			strcpy(*dst, envval);
+			// replace the null with a path separator again
+			envstr[i] = PATHSEPCH;
+			// append it
+			strcat(*dst, &envstr[i]);
+		}
+		else
+			fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", envstr);
+		osd_free(envstr);
+	}
+}
 #endif
