@@ -43,7 +43,8 @@ public:
 		m_light0_y(*this, "LIGHT0_Y"),
 		m_light1_x(*this, "LIGHT1_X"),
 		m_light1_y(*this, "LIGHT1_Y"),
-		m_eepromout(*this, "EEPROMOUT")
+		m_eepromout(*this, "EEPROMOUT"),
+		m_use_68020_post_clock_hack(0)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -252,6 +253,9 @@ public:
 
 	int m_konamigx_type3_psac2_actual_bank;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
+
+	DECLARE_DRIVER_INIT(posthack);
+	int m_use_68020_post_clock_hack;
 };
 
 // Sprite Callbacks
