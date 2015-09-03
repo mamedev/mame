@@ -11,8 +11,8 @@
     console support originally by Nathan Woods
 
     CoJag Games supported:
-        * Area 51 (3 Sets)
-        * Maximum Force (2 Sets)
+        * Area 51 (4 Sets)
+        * Maximum Force (3 Sets)
         * Area 51/Maximum Force Duo (2 Sets)
         * Vicious Circle
         * Fishin' Frenzy
@@ -2673,25 +2673,26 @@ DRIVER_INIT_MEMBER(jaguar_state,vcircle)
  *
  *************************************/
 
-/*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY    FULLNAME */
-CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar_state, jaguar,   "Atari",   "Jaguar", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT                   INIT      COMPANY    FULLNAME */
+CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar_state, jaguar,   "Atari",   "Jaguar",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 CONS( 1995,  jaguarcd, jaguar,   0,      jaguarcd, jaguar,   jaguar_state, jaguarcd, "Atari",   "Jaguar CD", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 1996, area51,    0,        cojagr3k,  area51, jaguar_state,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
-GAME( 1995, area51t,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
-GAME( 1995, area51ta,  area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 15, 1995)", 0 )
-GAME( 1995, area51a,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
-GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, jaguar_state, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
-GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
-GAME( 1996, freezeatjp,freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
-GAME( 1996, freezeat2, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat2,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
-GAME( 1996, freezeat3, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat3,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
-GAME( 1996, freezeat4, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat4,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
-GAME( 1996, freezeat5, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat5,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
-GAME( 1996, freezeat6, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat6,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
-GAME( 1996, maxforce,  0,        cojagr3k,  area51, jaguar_state,   maxforce, ROT0, "Atari Games", "Maximum Force v1.05", 0 )
-GAME( 1996, maxf_102,  maxforce, cojagr3k,  area51, jaguar_state,   maxforce, ROT0, "Atari Games", "Maximum Force v1.02", 0 )
-GAME( 1996, maxf_ng,   maxforce, cojagr3k,  area51, jaguar_state,   maxforce, ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
-GAME( 1998, area51mx,  0,        cojag68k,  area51, jaguar_state,   area51mx, ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
-GAME( 1998, a51mxr3k,  area51mx, cojagr3k,  area51, jaguar_state,   a51mxr3k, ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
-GAME( 1996, vcircle,   0,        cojagr3k,  vcircle, jaguar_state,  vcircle,  ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )
+/*    YEAR   NAME      PARENT    MACHINE        INPUT                   INIT             COMPANY        FULLNAME */
+GAME( 1996, area51,    0,        cojagr3k,      area51,   jaguar_state, area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )
+GAME( 1995, area51t,   area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
+GAME( 1995, area51ta,  area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 15, 1995)", 0 )
+GAME( 1995, area51a,   area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
+GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, jaguar_state, fishfren,  ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
+GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, jaguar_state, freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
+GAME( 1996, freezeatjp,freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
+GAME( 1996, freezeat2, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat2, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
+GAME( 1996, freezeat3, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat3, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
+GAME( 1996, freezeat4, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat4, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
+GAME( 1996, freezeat5, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat5, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
+GAME( 1996, freezeat6, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat6, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
+GAME( 1996, maxforce,  0,        cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force v1.05", 0 )
+GAME( 1996, maxf_102,  maxforce, cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force v1.02", 0 )
+GAME( 1996, maxf_ng,   maxforce, cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
+GAME( 1998, area51mx,  0,        cojag68k,      area51,   jaguar_state, area51mx,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
+GAME( 1998, a51mxr3k,  area51mx, cojagr3k,      area51,   jaguar_state, a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
+GAME( 1996, vcircle,   0,        cojagr3k,      vcircle,  jaguar_state, vcircle,   ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )

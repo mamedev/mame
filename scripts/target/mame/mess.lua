@@ -762,6 +762,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"mit",
 		"mits",
 		"mitsubishi",
+		"mizar",
 		"morrow",
 		"mos",
 		"motorola",
@@ -1794,6 +1795,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/hh_melps4.c",
 	MAME_DIR .. "src/mess/drivers/multi8.c",
 	MAME_DIR .. "src/mess/drivers/multi16.c",
+}
+
+createMESSProjects(_target, _subtarget, "mizar")
+files {          
+	MAME_DIR .. "src/mess/drivers/mzr8105.c",  
 }
 
 createMESSProjects(_target, _subtarget, "morrow")

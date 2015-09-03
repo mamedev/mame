@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "includes/midzeus.h"
-#include "video/polylgcy.h"
+#include "video/poly.h"
 #include "video/rgbutil.h"
 
 
@@ -63,6 +63,23 @@ struct mz_poly_extra_data
 };
 
 
+class midzeus_renderer : public poly_manager<float, mz_poly_extra_data, 4, 10000>
+{
+public:
+    midzeus_renderer(midzeus_state &state);
+    
+    void render_poly(INT32 scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid);
+    void render_poly_solid_fixedz(INT32 scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid);
+    
+    void zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit);
+    void zeus_draw_debug_quad(const rectangle& rect, const vertex_t* vert);
+    
+private:
+    midzeus_state& m_state;
+};
+
+typedef midzeus_renderer::vertex_t poly_vertex;
+
 
 /*************************************
  *
@@ -70,7 +87,7 @@ struct mz_poly_extra_data
  *
  *************************************/
 
-static legacy_poly_manager *poly;
+static midzeus_renderer *poly;
 static UINT8 log_fifo;
 
 static UINT32 zeus_fifo[20];
@@ -101,9 +118,6 @@ INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width);
 INLINE UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width);
 INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width);
 INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width);
-
-static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
-static void render_poly_solid_fixedz(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 
 /*************************************
@@ -257,6 +271,11 @@ INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width)
  *
  *************************************/
 
+midzeus_renderer::midzeus_renderer(midzeus_state &state)
+    : poly_manager<float, mz_poly_extra_data, 4, 10000>(state.machine()),
+      m_state(state)
+{}
+
 VIDEO_START_MEMBER(midzeus_state,midzeus)
 {
 	int i;
@@ -270,8 +289,8 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 		m_palette->set_pen_color(i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 
 	/* initialize polygon engine */
-	poly = poly_alloc(machine(), 10000, sizeof(mz_poly_extra_data), POLYFLAG_ALLOW_QUADS);
-
+    poly = auto_alloc(machine(), midzeus_renderer(*this));
+    
 	/* we need to cleanup on exit */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus_state::exit_handler), this));
 
@@ -315,8 +334,6 @@ void midzeus_state::exit_handler()
 	}
 	fclose(f);
 #endif
-
-	poly_free(poly);
 }
 
 
@@ -331,7 +348,7 @@ UINT32 midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind16 
 {
 	int x, y;
 
-	poly_wait(poly, "VIDEO_UPDATE");
+	poly->wait("VIDEO_UPDATE");
 
 	/* normal update case */
 	if (!machine().input().code_pressed(KEYCODE_W))
@@ -639,7 +656,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					// m_zeusbase[0x46] = ??? = 0x00000000
 					// m_zeusbase[0x4c] = ??? = 0x00808080 (brightness?)
 					// m_zeusbase[0x4e] = ??? = 0x00808080 (brightness?)
-					mz_poly_extra_data *extra = (mz_poly_extra_data *)poly_get_extra_data(poly);
+                    mz_poly_extra_data& extra = poly->object_data_alloc();
 					poly_vertex vert[4];
 
 					vert[0].x = (INT16)m_zeusbase[0x08];
@@ -651,11 +668,11 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					vert[3].x = (INT16)m_zeusbase[0x0e];
 					vert[3].y = (INT16)(m_zeusbase[0x0e] >> 16);
 
-					extra->solidcolor = m_zeusbase[0x00];
-					extra->zoffset = 0x7fff;
+					extra.solidcolor = m_zeusbase[0x00];
+					extra.zoffset = 0x7fff;
 
-					poly_render_quad(poly, NULL, zeus_cliprect, render_poly_solid_fixedz, 0, &vert[0], &vert[1], &vert[2], &vert[3]);
-					poly_wait(poly, "Normal");
+                    poly->zeus_draw_debug_quad(zeus_cliprect, vert);
+					poly->wait("Normal");
 				}
 				else
 					logerror("Execute unknown command\n");
@@ -728,7 +745,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 				else
 					src = (const UINT32 *)waveram0_ptr_from_expanded_addr(m_zeusbase[0xb4]);
 
-				poly_wait(poly, "vram_read");
+				poly->wait("vram_read");
 				m_zeusbase[0xb0] = WAVERAM_READ32(src, 0);
 				m_zeusbase[0xb2] = WAVERAM_READ32(src, 1);
 			}
@@ -958,7 +975,7 @@ int midzeus_state::zeus_fifo_process(const UINT32 *data, int numwords)
 			else
 			{
 				UINT32 texdata = (m_zeusbase[0x06] << 16) | (m_zeusbase[0x00] >> 16);
-				zeus_draw_quad(FALSE, data, texdata, log_fifo);
+				poly->zeus_draw_quad(FALSE, data, texdata, log_fifo);
 			}
 			break;
 
@@ -1072,7 +1089,7 @@ void midzeus_state::zeus_draw_model(UINT32 texdata, int logit)
 					case 0x25:  /* mk4 */
 					case 0x28:  /* mk4r1 */
 					case 0x30:  /* invasn */
-						zeus_draw_quad(TRUE, databuffer, texdata, logit);
+						poly->zeus_draw_quad(TRUE, databuffer, texdata, logit);
 						break;
 
 					default:
@@ -1096,10 +1113,8 @@ void midzeus_state::zeus_draw_model(UINT32 texdata, int logit)
  *
  *************************************/
 
-void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit)
+void midzeus_renderer::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit)
 {
-	poly_draw_scanline_func callback;
-	mz_poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
 	UINT32 ushift, vshift;
@@ -1112,8 +1127,8 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 	texbase = ((texdata >> 10) & 0x3f0000) | (texdata & 0xffff);
 	texwshift = (texdata >> 22) & 7;
 
-	ushift = 8 - ((m_zeusbase[0x04] >> 4) & 3);
-	vshift = 8 - ((m_zeusbase[0x04] >> 6) & 3);
+	ushift = 8 - ((m_state.m_zeusbase[0x04] >> 4) & 3);
+	vshift = 8 - ((m_state.m_zeusbase[0x04] >> 6) & 3);
 
 	int xy_offset = long_fmt ? 2 : 1;
 
@@ -1187,7 +1202,7 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 		}
 	}
 
-	numverts = poly_zclip_if_less(4, &vert[0], &clipvert[0], 4, 512.0f);
+	numverts = poly->zclip_if_less(4, &vert[0], &clipvert[0], 4, 512.0f);
 	if (numverts < 3)
 		return;
 
@@ -1215,23 +1230,23 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 			clipvert[i].y += 0.0005f;
 	}
 
-	extra = (mz_poly_extra_data *)poly_get_extra_data(poly);
+    mz_poly_extra_data& extra = poly->object_data_alloc();
 
 	if (ctrl_word & 0x01000000)
 	{
 		UINT32 tex_type = (texdata >> 16) & 3;
-		extra->texwidth = 512 >> texwshift;
-		extra->voffset = ctrl_word & 0xffff;
+		extra.texwidth = 512 >> texwshift;
+		extra.voffset = ctrl_word & 0xffff;
 
-		extra->texbase = waveram0_ptr_from_texture_addr(texbase, extra->texwidth);
+		extra.texbase = waveram0_ptr_from_texture_addr(texbase, extra.texwidth);
 
 		if (tex_type == 1)
 		{
-			extra->get_texel = texdata & 0x00200000 ? get_texel_8bit : get_texel_4bit;
+			extra.get_texel = texdata & 0x00200000 ? get_texel_8bit : get_texel_4bit;
 		}
 		else if (tex_type == 2)
 		{
-			extra->get_texel = texdata & 0x00200000 ? get_texel_alt_8bit : get_texel_alt_4bit;
+			extra.get_texel = texdata & 0x00200000 ? get_texel_alt_8bit : get_texel_alt_4bit;
 		}
 		else
 		{
@@ -1240,21 +1255,29 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 		}
 	}
 
-	callback = render_poly;
+	extra.ctrl_word = ctrl_word;
+	extra.solidcolor = m_state.m_zeusbase[0x00] & 0x7fff;
+	extra.zoffset = m_state.m_zeusbase[0x7e] >> 16;
+	extra.alpha = m_state.m_zeusbase[0x4e];
+	extra.blend = m_state.m_zeusbase[0x5c];
+	extra.depth_test_enable = !(m_state.m_zeusbase[0x04] & 0x800);
+	extra.depth_write_enable = m_state.m_zeusbase[0x04] & 0x200;
+	extra.transcolor = ((ctrl_word >> 16) & 1) ? 0 : 0x100;
+	extra.palbase = waveram0_ptr_from_block_addr(zeus_palbase);
 
-	extra->ctrl_word = ctrl_word;
-	extra->solidcolor = m_zeusbase[0x00] & 0x7fff;
-	extra->zoffset = m_zeusbase[0x7e] >> 16;
-	extra->alpha = m_zeusbase[0x4e];
-	extra->blend = m_zeusbase[0x5c];
-	extra->depth_test_enable = !(m_zeusbase[0x04] & 0x800);
-	extra->depth_write_enable = m_zeusbase[0x04] & 0x200;
-	extra->transcolor = ((ctrl_word >> 16) & 1) ? 0 : 0x100;
-	extra->palbase = waveram0_ptr_from_block_addr(zeus_palbase);
-
-	poly_render_quad_fan(poly, NULL, zeus_cliprect, callback, 4, numverts, &clipvert[0]);
+    // Note: Before being upgraded to the new polygon rasterizing code, this function call was
+    //       a poly_render_quad_fan.  It appears as though the new code defaults to a fan if
+    //       the template argument is 4, but keep an eye out for missing quads.
+    poly->render_polygon<4>(zeus_cliprect,
+                            render_delegate(FUNC(midzeus_renderer::render_poly), this),
+                            4,
+                            clipvert);
 }
 
+void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_t *vert)
+{
+    poly->render_polygon<4>(rect, render_delegate(FUNC(midzeus_renderer::render_poly_solid_fixedz), this), 0, vert);
+}
 
 
 /*************************************
@@ -1263,26 +1286,25 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
  *
  *************************************/
 
-static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void midzeus_renderer::render_poly(INT32 scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid)
 {
-	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
-	INT32 curz = extent->param[0].start;
-	INT32 curu = extent->param[1].start;
-	INT32 curv = extent->param[2].start;
-	INT32 curi = extent->param[3].start;
-	INT32 dzdx = extent->param[0].dpdx;
-	INT32 dudx = extent->param[1].dpdx;
-	INT32 dvdx = extent->param[2].dpdx;
-	INT32 didx = extent->param[3].dpdx;
-	const void *texbase = extra->texbase;
-	const void *palbase = extra->palbase;
-	UINT16 transcolor = extra->transcolor;
-	UINT32 texwidth = extra->texwidth;
+	INT32 curz = extent.param[0].start;
+	INT32 curu = extent.param[1].start;
+	INT32 curv = extent.param[2].start;
+	INT32 curi = extent.param[3].start;
+	INT32 dzdx = extent.param[0].dpdx;
+	INT32 dudx = extent.param[1].dpdx;
+	INT32 dvdx = extent.param[2].dpdx;
+	INT32 didx = extent.param[3].dpdx;
+	const void *texbase = object.texbase;
+	const void *palbase = object.palbase;
+	UINT16 transcolor = object.transcolor;
+	UINT32 texwidth = object.texwidth;
 
-	for (UINT32 x = extent->startx; x < extent->stopx; x++)
+	for (UINT32 x = extent.startx; x < extent.stopx; x++)
 	{
 		UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, scanline, x);
-		INT32 depth = (curz >> 16) + extra->zoffset;
+		INT32 depth = (curz >> 16) + object.zoffset;
 
 		if (depth > 0x7fff)
 			depth = 0x7fff;
@@ -1291,7 +1313,7 @@ static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, c
 
 		bool depth_pass;
 
-		if (extra->depth_test_enable)
+		if (object.depth_test_enable)
 			depth_pass = depth >= 0 && depth <= *depthptr;
 		else
 			depth_pass = true;
@@ -1302,29 +1324,29 @@ static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, c
 
 			bool src_valid = true;
 
-			if ((extra->ctrl_word & 0x000c0000) == 0x000c0000)
+			if ((object.ctrl_word & 0x000c0000) == 0x000c0000)
 			{
-				src.set_r(pal5bit(extra->solidcolor >> 10));
-				src.set_g(pal5bit(extra->solidcolor >> 5));
-				src.set_b(pal5bit(extra->solidcolor));
+				src.set_r(pal5bit(object.solidcolor >> 10));
+				src.set_g(pal5bit(object.solidcolor >> 5));
+				src.set_b(pal5bit(object.solidcolor));
 			}
 			else
 			{
 				UINT32 u0 = curu >> 8;
-				UINT32 v0 = extra->voffset + (curv >> 8);
+				UINT32 v0 = object.voffset + (curv >> 8);
 				UINT32 u1 = u0 + 1;
 				UINT32 v1 = v0 + 1;
 
 				UINT8 texels[4];
 
-				texels[0] = extra->get_texel(texbase, v0, u0, texwidth);
-				texels[1] = extra->get_texel(texbase, v0, u1, texwidth);
-				texels[2] = extra->get_texel(texbase, v1, u0, texwidth);
-				texels[3] = extra->get_texel(texbase, v1, u1, texwidth);
+				texels[0] = object.get_texel(texbase, v0, u0, texwidth);
+				texels[1] = object.get_texel(texbase, v0, u1, texwidth);
+				texels[2] = object.get_texel(texbase, v1, u0, texwidth);
+				texels[3] = object.get_texel(texbase, v1, u1, texwidth);
 
 				if (texels[0] != transcolor)
 				{
-					rgb_t color[4];
+					rgb_t color[4] = {0, 0, 0, 0};
 
 					for (UINT32 i = 0; i < 4; ++i)
 					{
@@ -1357,11 +1379,11 @@ static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, c
 				UINT32 outg = 0;
 				UINT32 outb = 0;
 
-				UINT32 srca = extra->alpha & 0xff;
-				UINT32 dsta = (extra->alpha >> 8) & 0xff;
+				UINT32 srca = object.alpha & 0xff;
+				UINT32 dsta = (object.alpha >> 8) & 0xff;
 
 				// Destination enable?
-				if (extra->blend & 0x00800000)
+				if (object.blend & 0x00800000)
 				{
 					UINT16 dst = WAVERAM_READPIX(zeus_renderbase, scanline, x);
 
@@ -1374,7 +1396,7 @@ static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, c
 					dstb = (dstb << 3) | (dstb >> 2);
 				}
 
-				switch (extra->blend)
+				switch (object.blend)
 				{
 					case BLEND_OPAQUE1:
 					{
@@ -1459,7 +1481,7 @@ static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, c
 
 				WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, (outr << 10) | (outg << 5) | outb);
 
-				if (extra->depth_write_enable)
+				if (object.depth_write_enable)
 					*depthptr = depth;
 			}
 		}
@@ -1473,14 +1495,13 @@ static void render_poly(void *dest, INT32 scanline, const poly_extent *extent, c
 
 
 
-static void render_poly_solid_fixedz(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void midzeus_renderer::render_poly_solid_fixedz(INT32 scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid)
 {
-	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
-	UINT16 color = extra->solidcolor;
-	UINT16 depth = extra->zoffset;
+	UINT16 color = object.solidcolor;
+	UINT16 depth = object.zoffset;
 	int x;
 
-	for (x = extent->startx; x < extent->stopx; x++)
+	for (x = extent.startx; x < extent.stopx; x++)
 		waveram_plot_depth(scanline, x, color, depth);
 }
 
