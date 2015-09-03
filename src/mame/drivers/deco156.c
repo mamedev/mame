@@ -475,8 +475,7 @@ DE-0385-2  DEC-22VO
 |----------------------------------------------|
 
 Notes:
-      - CPU is unknown. It's chip DE156. The clock input is 7.000MHz on pin 90
-        It's thought to be a custom-made encrypted ARM7-based CPU.
+      - CPU DE156 is a custom encrypted ARM7-based chip. The clock input is 7.000MHz on pin 90
         The package is a Quad Flat Pack and has 100 pins.
       - OKI M6295(1) clock: 1.000MHz (28 / 28), sample rate = 1000000 / 132
       - OKI M6295(2) clock: 2.000MHz (28 / 14), sample rate = 2000000 / 132
@@ -603,8 +602,7 @@ DE-0430-2
 |----------------------------------------------|
 
 Notes:
-      - CPU is unknown. It's chip DE156. The clock input is 7.000MHz on pin 90
-        It's thought to be a custom-made encrypted ARM7-based CPU.
+      - CPU DE156 is a custom encrypted ARM7-based chip. The clock input is 7.000MHz on pin 90
         The package is a Quad Flat Pack and has 100 pins.
       - YMZ280B-F clock: 14.000MHz (28 / 2)
         SANYO LC7881 clock: 2.3333MHz (28 / 12)
