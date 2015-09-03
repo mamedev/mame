@@ -13,6 +13,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_nob_mcu_latch(*this, "nob_mcu_latch"),
 		m_nob_mcu_status(*this, "nob_mcu_status"),
+		m_paletteram(*this, "palette"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
@@ -31,6 +32,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_nob_mcu_latch;
 	optional_shared_ptr<UINT8> m_nob_mcu_status;
+	required_shared_ptr<UINT8> m_paletteram;
 
 	UINT8 *m_videoram;
 	void (system1_state::*m_videomode_custom)(UINT8 data, UINT8 prevdata);

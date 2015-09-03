@@ -315,6 +315,7 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 
 	if (m_color_prom != NULL)
 	{
+		m_paletteram[offset] = data;
 		UINT8 val;
 
 		val = m_color_prom[data + 0 * 256];
