@@ -79,7 +79,6 @@ private:
 	void zeus_register_update(offs_t offset);
 	int zeus_fifo_process(const UINT32 *data, int numwords);
 	void zeus_draw_model(UINT32 texdata, int logit);
-	void zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit);
 
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
 	void log_waveram(UINT32 length_and_base);
@@ -105,6 +104,5 @@ private:
 	int zeus2_fifo_process(const UINT32 *data, int numwords);
 	void zeus2_pointer_write(UINT8 which, UINT32 value);
 	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
-	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
 };
