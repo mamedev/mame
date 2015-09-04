@@ -63,12 +63,19 @@ public:
 
 	DECLARE_READ32_MEMBER(mcu2_r);
 	DECLARE_READ32_MEMBER(ifu2_r);
-	DECLARE_READ32_MEMBER(unk_78800004_r);
-	DECLARE_READ32_MEMBER(unk_78a00000_r);
-	DECLARE_READ32_MEMBER(unk_78e00000_r);
+	DECLARE_READ32_MEMBER(ctrl0_r);
+	DECLARE_READ32_MEMBER(ctrl1_r);
+	DECLARE_READ32_MEMBER(ctrl2_r);
+	DECLARE_READ32_MEMBER(rtc_r);
+	DECLARE_WRITE32_MEMBER(rtc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_READ32_MEMBER(sound_data_r);
+	DECLARE_WRITE32_MEMBER(sound_data_w);
 
 	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
+	INTERRUPT_GEN_MEMBER(vbl_interrupt);
+
+	UINT8 rtc_dev_r(UINT32 reg);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -94,13 +101,16 @@ READ32_MEMBER(konendev_state::mcu2_r)
 	{
 		r &= ~0x4000;       // MCU2 presence
 		r &= ~0x2000;       // IFU2 presence
-		r &= ~0x1000;       // FMU2 presence
+		r &= ~0x1000;       // FMU2 presence	
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= 0x40;          // logic door
-		r |= 0x04;          // battery 1 status
-		r |= 0x10;          // battery 2 status
+		r |= ioport("DSW")->read() & 0xff;
+
+		//r |= 0x80;			// 0 = ram clear?
+		//r |= 0x40;			// logic door
+		r |= 0x04;			// battery 1 status
+		r |= 0x10;			// battery 2 status		
 	}
 
 	return r;
@@ -118,19 +128,65 @@ READ32_MEMBER(konendev_state::ifu2_r)
 	return r;
 }
 
-READ32_MEMBER(konendev_state::unk_78800004_r)
+// This seems to be Epson RTC-72423
+UINT8 konendev_state::rtc_dev_r(UINT32 reg)
 {
-	return 0xffffffff;
+	switch (reg)
+	{
+		case 0x0:		return 9;
+		case 0x1:		return 5;
+		case 0x2:		return 3;
+		case 0x3:		return 2;
+		case 0x4:		return 1;
+		case 0x5:		return 0;
+		case 0x6:		return 7;
+		case 0x7:		return 2;
+		case 0x8:		return 2;
+		case 0x9:		return 1;
+		case 0xa:		return 5;
+		case 0xb:		return 1;
+		case 0xc:		return 3;
+	}
+
+	return 0;
 }
 
-READ32_MEMBER(konendev_state::unk_78a00000_r)
+READ32_MEMBER(konendev_state::rtc_r)
 {
-	return 0xffffffff;
+	UINT32 r = 0;
+	
+	if (ACCESSING_BITS_24_31)
+		r |= (UINT32)(rtc_dev_r(offset * 4)) << 24;
+	if (ACCESSING_BITS_16_23)
+		r |= (UINT32)(rtc_dev_r((offset * 4)+1)) << 16;
+	if (ACCESSING_BITS_8_15)
+		r |= (UINT32)(rtc_dev_r((offset * 4)+2)) << 8;
+	if (ACCESSING_BITS_0_7)
+		r |= (UINT32)(rtc_dev_r((offset * 4)+3));
+
+	return r;
 }
 
-READ32_MEMBER(konendev_state::unk_78e00000_r)
+WRITE32_MEMBER(konendev_state::rtc_w)
 {
-	return 0xffffffff;
+}
+
+READ32_MEMBER(konendev_state::ctrl0_r)
+{
+	return ((UINT32)(ioport("IN1")->read() & 0xffff) << 16) | 0xffff;
+}
+
+READ32_MEMBER(konendev_state::ctrl1_r)
+{
+	// 0x01000000 = main door optic
+	// 0x00000010 = hard meter access
+
+	return 0xfeffffef;
+}
+
+READ32_MEMBER(konendev_state::ctrl2_r)
+{
+	return ((UINT32)(ioport("IN0")->read() & 0xffff) << 16) | 0xffff;
 }
 
 WRITE32_MEMBER(konendev_state::eeprom_w)
@@ -143,17 +199,25 @@ WRITE32_MEMBER(konendev_state::eeprom_w)
 	}
 }
 
+READ32_MEMBER(konendev_state::sound_data_r)
+{
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(konendev_state::sound_data_w)
+{
+}
+
 static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x78000000, 0x78000003) AM_READ(mcu2_r)
+	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE(rtc_r, rtc_w)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x78100000, 0x78100003) AM_WRITE(eeprom_w)
 	AM_RANGE(0x78800000, 0x78800003) AM_READ(ifu2_r)
-	AM_RANGE(0x78800004, 0x78800007) AM_READ(unk_78800004_r)
-	AM_RANGE(0x78a00000, 0x78a0001f) AM_READ(unk_78a00000_r)
-	AM_RANGE(0x78e00000, 0x78e00003) AM_READ(unk_78e00000_r)
-//  AM_RANGE(0x78000000, 0x78000003) AM_READNOP
-//  AM_RANGE(0x78100000, 0x7810001b) AM_RAM
-//  AM_RANGE(0x78a00014, 0x78a00017) AM_WRITENOP
+	AM_RANGE(0x78800004, 0x78800007) AM_READ(ctrl0_r)
+	AM_RANGE(0x78a00000, 0x78a0001f) AM_READ(ctrl1_r)
+	AM_RANGE(0x78e00000, 0x78e00003) AM_READ(ctrl2_r)
 	AM_RANGE(0x79000000, 0x79000003) AM_DEVWRITE("gcu", k057714_device, fifo_w)
 	AM_RANGE(0x79800000, 0x798000ff) AM_DEVREADWRITE("gcu", k057714_device, read, write)
 	AM_RANGE(0x7a000000, 0x7a01ffff) AM_RAM AM_SHARE("nvram0")
@@ -164,20 +228,80 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( konendev )
+	PORT_START("IN0")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )		// "Take Win" button
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )		// "Gamble" button
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )			// "25 Lines" button
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 )			// "20 Lines" button
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )			// "15 Lines" button
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )			// "10 Lines" button	
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 )			// "5 Lines" button
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 )			// "1 Line" button	
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 )			// "Reserve" button
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON8 )			// "Collect" button
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON9 )			// "Bet 20" button
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON10 )			// "Bet 10" button
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON11 )			// "Bet 5" button
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON12 )			// "Bet 3" button
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON13 )			// "Bet 2" button
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON14 )			// "Bet 1" button
+
+	PORT_START("IN1")
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )					// Audit key
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON16 )			// Reset key	
+	PORT_DIPNAME( 0x0800, 0x0800, "Main door switch" )
+	PORT_DIPSETTING( 0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Cashbox door" )
+	PORT_DIPSETTING( 0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0300, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0040, 0x0040, "BNA Door" )
+	PORT_DIPSETTING( 0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "BNA Transport Exist" )
+	PORT_DIPSETTING( 0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "BNA Stacker Exist" )
+	PORT_DIPSETTING( 0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0002, 0x0002, "BNA Power" )
+	PORT_DIPSETTING( 0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x80, 0x80, "Ram Clear" )
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Logic Door" )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x40, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 WRITE_LINE_MEMBER(konendev_state::gcu_interrupt)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
 }
 
 
+INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
+{
+	device.execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
+}
 
 static MACHINE_CONFIG_START( konendev, konendev_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, 32000000) // Clock unknown
 	MCFG_CPU_PROGRAM_MAP(konendev_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", konendev_state, vbl_interrupt)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
@@ -358,9 +482,15 @@ DRIVER_INIT_MEMBER(konendev_state,konendev)
 DRIVER_INIT_MEMBER(konendev_state,enchlamp)
 {
 	UINT32 *rom = (UINT32*)memregion("program")->base();
-	rom[0x24/4] = 0x00002743;       // patch flash checksum for now
+	rom[0x24/4] = 0x00002743;		// patch flash checksum for now
+	
+	// patch sound data checksums
+	rom[0x2d924/4] = 0x00000000;
+	rom[0x2d928/4] = 0x00000000;
+	rom[0x2d934/4] = 0x00000000;
+	rom[0x2d938/4] = 0x00000000;
 
-	rom[0] = 0xd43eb930;                // new checksum for program rom
+	rom[0] = 0x5782b930;					// new checksum for program rom
 }
 
 // has a flash dump?

@@ -332,28 +332,34 @@ int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		int li = ((j+y) * fb_pitch) + x;
 		UINT32 fbaddr0 = m_frame[0].base + li;
 		UINT32 fbaddr1 = m_frame[1].base + li;
-//      UINT32 fbaddr2 = m_frame[2].base + li;
+		UINT32 fbaddr2 = m_frame[2].base + li;
 //      UINT32 fbaddr3 = m_frame[3].base + li;
 
 		for (int i=0; i < width; i++)
 		{
 			UINT16 pix0 = vram16[fbaddr0 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 			UINT16 pix1 = vram16[fbaddr1 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-//          UINT16 pix2 = vram16[fbaddr2 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+			UINT16 pix2 = vram16[fbaddr2 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 //          UINT16 pix3 = vram16[fbaddr3 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 
+			d[i] = 0;
+							
+			if (pix2 & 0x8000)
+			{
+				d[i] = pix2 & 0x7fff;
+			}
+			if (pix1 & 0x8000)
+			{
+				d[i] = pix1 & 0x7fff;
+			}
 			if (pix0 & 0x8000)
 			{
 				d[i] = pix0 & 0x7fff;
 			}
-			else
-			{
-				d[i] = pix1 & 0x7fff;
-			}
 
 			fbaddr0++;
 			fbaddr1++;
-//          fbaddr2++;
+			fbaddr2++;
 //          fbaddr3++;
 		}
 	}
@@ -472,7 +478,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 						if (sg > 0x1f) sg = 0x1f;
 						if (sb > 0x1f) sb = 0x1f;
 
-						vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = (sr << 10) | (sg << 5) | sb | 0x8000;
+						vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = (sr << 10) | (sg << 5) | sb | (pix & 0x8000);
 					}
 				}
 			}
@@ -480,7 +486,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 			{
 				if (draw)
 				{
-					vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = pix | 0x8000;
+					vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = pix;
 				}
 			}
 
@@ -559,8 +565,9 @@ void k057714_device::draw_character(UINT32 *cmd)
 	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   character data address in vram
 
 	// 0x01: -------- -------- ------xx xxxxxxxx   character x
-	// 0x01: -------- ----xxxx xxxxxx-- --------   character y
+	// 0x01: -------- xxxxxxxx xxxxxx-- --------   character y
 	// 0x01: -------x -------- -------- --------   double height
+	// 0x01: -x------ -------- -------- --------   transparency enable
 
 	// 0x02: xxxxxxxx xxxxxxxx -------- --------   color 0
 	// 0x02: -------- -------- xxxxxxxx xxxxxxxx   color 1
@@ -569,11 +576,12 @@ void k057714_device::draw_character(UINT32 *cmd)
 	// 0x03: -------- -------- xxxxxxxx xxxxxxxx   color 3
 
 	int x = cmd[1] & 0x3ff;
-	int y = (cmd[1] >> 10) & 0x3ff;
+	int y = (cmd[1] >> 10) & 0x3fff;
 	UINT32 address = cmd[0] & 0xffffff;
 	UINT16 color[4];
 	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
 	bool double_height = (cmd[1] & 0x01000000) ? true : false;
+	bool trans_enable = (cmd[1] & 0x40000000) ? true : false;
 
 	if (relative_coords)
 	{
@@ -604,7 +612,9 @@ void k057714_device::draw_character(UINT32 *cmd)
 		for (int i=0; i < 8; i++)
 		{
 			int p = (line >> ((7-i) * 2)) & 3;
-			vram16[(fbaddr+x+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[p] | 0x8000;
+			bool draw = !trans_enable || (trans_enable && (color[p] & 0x8000));
+			if (draw)
+				vram16[(fbaddr+x+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[p] | 0x8000;
 		}
 	}
 }
