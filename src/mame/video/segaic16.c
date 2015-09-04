@@ -377,9 +377,9 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_display_enable(0),
-		m_tileram(*this, ":tileram"),
-		m_textram(*this, ":textram"),
-		m_rotateram(*this, ":rotateram"),
+		m_tileram(*this, "^tileram"),
+		m_textram(*this, "^textram"),
+		m_rotateram(*this, "^rotateram"),
 		m_gfxdecode(*this)
 {
 	memset(m_rotate, 0, sizeof(m_rotate));
@@ -399,6 +399,9 @@ void segaic16_video_device::static_set_gfxdecode_tag(device_t &device, const cha
 
 void segaic16_video_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	save_item(NAME(m_display_enable));
 }
 

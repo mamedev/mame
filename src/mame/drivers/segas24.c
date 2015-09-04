@@ -1245,7 +1245,9 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas24_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -1963,6 +1965,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system24_floppy_fd1094, system24_floppy )
 	MCFG_CPU_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

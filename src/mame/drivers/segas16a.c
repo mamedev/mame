@@ -961,7 +961,9 @@ static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas16a_state )
 	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas16a_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
@@ -1946,6 +1948,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system16a_fd1094, system16a )
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 

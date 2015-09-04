@@ -45,6 +45,8 @@ public:
 	~segaic16_road_device() {}
 
 	UINT16 *segaic16_roadram_0;
+	void segaic16_road_hangon_decode(running_machine &machine, struct road_info *info);
+	void segaic16_road_outrun_decode(running_machine &machine, struct road_info *info);
 
 	struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
 	void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);

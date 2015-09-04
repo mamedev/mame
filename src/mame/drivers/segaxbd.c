@@ -901,6 +901,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("backup2")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segaxbd_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -1574,6 +1577,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( xboard_fd1094, xboard )
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

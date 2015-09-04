@@ -459,7 +459,9 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0x07c000, 0x07ffff) AM_RAM AM_SHARE("subram")
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( fd1094_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segahang_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
@@ -938,6 +940,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( shangonro, shangupb )
 	MCFG_CPU_REPLACE("subcpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(fd1094_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

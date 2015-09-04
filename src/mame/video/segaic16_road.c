@@ -73,11 +73,11 @@ void segaic16_road_device::device_reset()
 
 
 
-static void segaic16_road_hangon_decode(running_machine &machine, struct road_info *info)
+void segaic16_road_device::segaic16_road_hangon_decode(running_machine &machine, struct road_info *info)
 {
 	int x, y;
-	const UINT8 *gfx = machine.root_device().memregion("gfx3")->base();
-	int len = machine.root_device().memregion("gfx3")->bytes();
+	const UINT8 *gfx = memregion("^gfx3")->base();
+	int len = memregion("^gfx3")->bytes();
 
 	/* allocate memory for the unpacked road data */
 	info->gfx = auto_alloc_array(machine, UINT8, 256 * 512);
@@ -334,11 +334,11 @@ static void segaic16_road_hangon_draw(struct road_info *info, bitmap_ind16 &bitm
  *
  *******************************************************************************************/
 
-static void segaic16_road_outrun_decode(running_machine &machine, struct road_info *info)
+void segaic16_road_device::segaic16_road_outrun_decode(running_machine &machine, struct road_info *info)
 {
 	int x, y;
-	const UINT8 *gfx = machine.root_device().memregion("gfx3")->base();
-	int len = machine.root_device().memregion("gfx3")->bytes();
+	const UINT8 *gfx = memregion("^gfx3")->base();
+	int len = memregion("^gfx3")->bytes();
 
 	/* allocate memory for the unpacked road data */
 	info->gfx = auto_alloc_array(machine, UINT8, (256 * 2 + 1) * 512);

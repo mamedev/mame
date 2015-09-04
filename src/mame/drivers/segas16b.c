@@ -1714,6 +1714,9 @@ static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas16b_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( system16c_map, AS_PROGRAM, 16, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -3346,6 +3349,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system16b_fd1094, system16b )
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
 	MCFG_CPU_PROGRAM_MAP(system16b_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 

@@ -897,7 +897,9 @@ static ADDRESS_MAP_START( outrun_map, AS_PROGRAM, 16, segaorun_state )
 	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segaorun_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 //**************************************************************************
 //  SECOND CPU MEMORY MAP
@@ -1229,6 +1231,7 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(outrun_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
