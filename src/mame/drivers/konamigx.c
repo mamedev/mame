@@ -2622,7 +2622,7 @@ ROM_START( dragoona )
 	ROM_LOAD( "dragoona.nv", 0x0000, 0x080, CRC(7980ad2b) SHA1(dccaab02d23edbd81ae13441fbac0dbd7112c258) )
 ROM_END
 
-/* Soccer Superstars (Europe ver EAC)*/
+/* Soccer Superstars (94.12.19 - Europe ver EAC) Writes EAA to EEPROM and reports as EAA despite chip labels EAC */
 ROM_START( soccerss )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -2681,7 +2681,7 @@ ROM_START( soccerss )
 	ROM_LOAD( "soccerss.nv", 0x0000, 0x080, CRC(f222dae4) SHA1(fede48a4e1fe91cf2b17ff3f3996bca4816fc283) )
 ROM_END
 
-/* Soccer Superstars (USA ver UAC)*/
+/* Soccer Superstars (94.12.19 - U.S.A. ver UAC) Writes UAA to EEPROM and reports as UAA despite chip labels UAC */
 ROM_START( soccerssu )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -2740,7 +2740,7 @@ ROM_START( soccerssu )
 	ROM_LOAD( "soccerssu.nv", 0x0000, 0x080, CRC(812f6878) SHA1(fc4975211720a7eb413bceda8109231cb1c00834) )
 ROM_END
 
-/* Soccer Superstars (Japan ver JAC)*/
+/* Soccer Superstars (94.12.19 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
 ROM_START( soccerssj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -2787,7 +2787,7 @@ ROM_START( soccerssj )
 	ROM_LOAD( "soccerssj.nv", 0x0000, 0x080, CRC(7440255e) SHA1(af379b5b1f765f9050f18fbd41c5031c5ad4918b) )
 ROM_END
 
-/* Soccer Superstars (Japan ver JAA)*/
+/* Soccer Superstars (94.12.3 - Japan ver JAA) Writes JAA to EEPROM and reports as JAA */
 ROM_START( soccerssja )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -2834,7 +2834,7 @@ ROM_START( soccerssja )
 	ROM_LOAD( "soccerssja.nv", 0x0000, 0x080, CRC(60dba700) SHA1(087b086b29748727b41fdd4c154ff9b4bef42959) )
 ROM_END
 
-/* Soccer Superstars (Asian ver AAA) */
+/* Soccer Superstars (94.12.19 - Asia ver AAA) Writes AAA to EEPROM and reports as AAA */
 ROM_START( soccerssa )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
