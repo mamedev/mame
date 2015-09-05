@@ -2652,3 +2652,15 @@ if (MACHINES["NETLIST"]~=null) then
 		MAME_DIR .. "src/emu/machine/netlist.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/emu/machine/nsc810.h,MACHINES["NSC810"] = true
+---------------------------------------------------
+
+if (MACHINES["NSC810"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/nsc810.c",
+		MAME_DIR .. "src/emu/machine/nsc810.h",
+	}
+end

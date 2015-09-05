@@ -561,6 +561,7 @@ MACHINES["CORVUSHD"] = true
 MACHINES["WOZFDC"] = true
 MACHINES["DIABLO_HD"] = true
 MACHINES["TMS1024"] = true
+MACHINES["NSC810"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2652,8 +2653,6 @@ files {
 	MAME_DIR .. "src/mess/drivers/hpz80unk.c",
 	MAME_DIR .. "src/mess/drivers/ht68k.c",
 	MAME_DIR .. "src/mess/drivers/hunter2.c",
-	MAME_DIR .. "src/emu/machine/nsc810.c",
-	MAME_DIR .. "src/emu/machine/nsc810.h",
 	MAME_DIR .. "src/mess/drivers/i7000.c",
 	MAME_DIR .. "src/mess/drivers/ibm6580.c",
 	MAME_DIR .. "src/mess/drivers/icatel.c",
