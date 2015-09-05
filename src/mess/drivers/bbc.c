@@ -852,7 +852,9 @@ static MACHINE_CONFIG_DERIVED(bbcb1770, bbcb)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 
@@ -1108,7 +1110,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
@@ -1140,8 +1144,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 	/* sound hardware */
-  MCFG_DEVICE_REMOVE("mono")
-  MCFG_DEVICE_REMOVE("sn76489")
+	MCFG_DEVICE_REMOVE("mono")
+	MCFG_DEVICE_REMOVE("sn76489")
 
 	/* printer */
 	MCFG_DEVICE_REMOVE("centronics")
@@ -1201,7 +1205,9 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_35, "qd", bbc_state::floppy_formats_35dd)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, NULL, bbc_state::floppy_formats_35dd)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* eeprom pcd8572 */
 	//MCFG_DEVICE_REMOVE("rtc")
