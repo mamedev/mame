@@ -51,18 +51,10 @@ Model B memory handling functions
 *************************/
 
 /* the model B address all 16 of the ROM sockets */
-/* I have set bank 1 as a special case to load different DFS roms selectable from MESS's CONF settings var:bbc_DFSTypes */
 WRITE8_MEMBER(bbc_state::bbc_page_selectb_w)
 {
 	m_rombank = data & 0x0f;
-	if (m_rombank != 1)
-	{
-		m_bank4->set_entry(m_rombank);
-	}
-	else
-	{
-		m_bank4->set_entry(0x10 + m_DFSType);
-	}
+	m_bank4->set_entry(m_rombank);
 }
 
 
@@ -80,7 +72,7 @@ WRITE8_MEMBER(bbc_state::bbc_memoryb3_w)
 
 /* I have setup 3 types of sideways ram:
 0: none
-1: 128K (bank 8 to 15) Solidisc sidewaysram userport bank latch
+1: 128K (bank 8 to 15) Solidisc sideways ram userport bank latch
 2: 64K (banks 4 to 7) for Acorn sideways ram FE30 bank latch
 3: 128K (banks 8 to 15) for Acown sideways ram FE30 bank latch
 */
@@ -90,19 +82,11 @@ static const unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1}
 
 WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
 {
-	if (m_rombank == 1)
+	switch (m_SWRAMtype)
 	{
-		// special DFS case for Acorn DFS E00 Hack that can write to the DFS RAM Bank;
-		if (m_DFSType == 3) m_region_dfs->base()[((m_DFSType) << 14) + offset] = data;
-	}
-	else
-	{
-		switch (m_SWRAMtype)
-		{
-			case 1: if (bbc_SWRAMtype1[m_userport]) m_region_opt->base()[(m_userport << 14) + offset] = data;
-			case 2: if (bbc_SWRAMtype2[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
-			case 3: if (bbc_SWRAMtype3[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
-		}
+		case 1: if (bbc_SWRAMtype1[m_userport]) m_region_opt->base()[(m_userport << 14) + offset] = data;
+		case 2: if (bbc_SWRAMtype2[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
+		case 3: if (bbc_SWRAMtype3[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
 	}
 }
 
@@ -377,7 +361,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 	}
 
-	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
+	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF region */
 	/* if 0 the I/O is paged for both reads and writes */
 	/* if 1 the ROM is paged in for reads but writes still go to I/O */
 	if (m_ACCCON_TST)
@@ -538,7 +522,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
 &FE18-&FE1F uPD7002         A to D converter        A to D converter         8 ( 4 bytes x  2 )
 &FE20-&FE23 Video ULA       -                       Video system chip        4 ( 2 bytes x  2 )
 &FE24-&FE27 FDC Latch       1770 Control latch      1770 Control latch       4 ( 1 byte  x  4 )
-&FE28-&FE2F 1770 registers  1770 Disc Controller    1170 Disc Controller     8 ( 4 bytes x  2 )
+&FE28-&FE2F 1770 registers  1770 Disc Controller    1770 Disc Controller     8 ( 4 bytes x  2 )
 &FE30-&FE33 ROMSEL          -                       ROM Select               4 ( 1 byte  x  4 )
 &FE34-&3FE7 ACCCON          ACCCON select reg.      ACCCON select reg        4 ( 1 byte  x  4 )
 &FE38-&FE3F NC              -                       -
@@ -554,12 +538,6 @@ READ8_MEMBER(bbc_state::bbcm_r)
 {
 	long myo;
 
-	/* Now handled in bbcm_ACCCON_write PHS - 2008-10-11 */
-//  if ( m_ACCCON_TST )
-//  {
-//      return m_region_os->base()[offset + 0x3c00];
-//  };
-
 	if (offset<=0x0ff) /* FRED */
 	{
 		return 0xff;
@@ -573,30 +551,27 @@ READ8_MEMBER(bbc_state::bbcm_r)
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
 		myo = offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);     /* Video Controller */
-		if ((myo>=0x08) && (myo<=0x0f))
-		{
-			if ((myo - 0x08) & 1)
-				return m_acia->status_r(space,0);
-			else
-				return m_acia->data_r(space,0);
-		}
-		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;                                /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return m_upd7002->read(space, myo-0x18);    /* A to D converter */
-		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;                                /* VideoULA */
-		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24);  /* 1770 */
-		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);   /* disc control latch */
-		if ((myo>=0x30) && (myo<=0x33)) return 0xfe;                                /* page select */
-		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(space, myo-0x34);   /* ACCCON */
-		if ((myo>=0x38) && (myo<=0x3f)) return 0xfe;                                /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) return m_via6522_0->read(space, myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f)) return m_via6522_1->read(space, myo-0x60);
-		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
-		if ((myo>=0xa0) && (myo<=0xbf)) return m_adlc->read(space, myo & 0x03);
-		if ((myo>=0xc0) && (myo<=0xdf)) return 0xfe;
-		if ((myo>=0xe0) && (myo<=0xff)) return 0xfe;
+		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) return m_mc6845->status_r(space, myo-0x00);                     /* Video controller */
+		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      return m_mc6845->register_r(space, myo-0x01);
+		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) return m_acia ? m_acia->status_r(space, myo-0x08) : 0xfe;       /* Serial controller */
+		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      return m_acia ? m_acia->data_r(space, myo-0x09) : 0xfe;
+		if ((myo>=0x10) && (myo<=0x17))                   return 0xfe;                                                    /* Serial System Chip */
+		if ((myo>=0x18) && (myo<=0x1f))                   return m_upd7002 ? m_upd7002->read(space, myo-0x18) : 0xfe;     /* A to D converter */
+		if ((myo>=0x20) && (myo<=0x23))                   return 0xfe;                                                    /* VideoULA */
+		if ((myo>=0x24) && (myo<=0x27))                   return bbcm_wd177xl_read(space, myo - 0x24);                    /* 177x Control Latch */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(space, myo-0x28);                         /* 1770 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(space, myo-0x28);                         /* 1772 Controller */
+		if ((myo>=0x28) && (myo<=0x2f))                   return 0xfe;                                                    /* No Controller */
+		if ((myo>=0x30) && (myo<=0x33))                   return 0xfe;
+		if ((myo>=0x34) && (myo<=0x37))                   return bbcm_ACCCON_read(space, myo-0x34);                       /* ACCCON */
+		if ((myo>=0x38) && (myo<=0x3f))                   return 0xfe;                                                    /* NC ?? */
+		if ((myo>=0x40) && (myo<=0x5f))                   return m_via6522_0->read(space, myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(space, myo-0x60) : 0xfe;
+		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
+		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
+		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xfe;
+		if ((myo>=0xe0) && (myo<=0xff))                   return 0xfe;
 	}
-
 	return 0xfe;
 }
 
@@ -607,26 +582,24 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00, data);           /* Video Controller */
-		if ((myo>=0x08) && (myo<=0x0f))
-		{
-			if ((myo - 0x08) & 1)
-				m_acia->control_w(space, 0, data);
-			else
-				m_acia->data_w(space, 0, data);
-		}
-		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10, data);     /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) m_upd7002->write(space, myo-0x18, data);    /* A to D converter */
-		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20, data);      /* VideoULA */
-		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24, data);  /* 1770 */
-		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28, data);   /* disc control latch */
-		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30, data);     /* page select */
-		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34, data);   /* ACCCON */
-		//if ((myo>=0x38) && (myo<=0x3f))                                           /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) m_via6522_0->write(space, myo-0x40, data);
-		if ((myo>=0x60) && (myo<=0x7f)) m_via6522_1->write(space, myo-0x60, data);
+		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) m_mc6845->address_w(space, myo-0x00, data);                     /* Video Controller */
+		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      m_mc6845->register_w(space, myo-0x01, data);
+		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) if (m_acia) m_acia->control_w(space, myo-0x08, data);           /* Serial controller */
+		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      if (m_acia) m_acia->data_w(space, myo-0x09, data);
+		if ((myo>=0x10) && (myo<=0x17))                   bbc_SerialULA_w(space, myo-0x10, data);                         /* Serial System Chip */
+		if ((myo>=0x18) && (myo<=0x1f) && (m_upd7002))    m_upd7002->write(space, myo-0x18, data);                        /* A to D converter */
+		if ((myo>=0x20) && (myo<=0x23))                   bbc_videoULA_w(space, myo-0x20, data);                          /* VideoULA */
+		if ((myo>=0x24) && (myo<=0x27) && (m_wd1770))     bbcm_wd1770l_write(space, myo-0x24, data);                      /* disc control latch */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     m_wd1770->write(space, myo-0x28, data);                         /* 1770 Controller */
+		if ((myo>=0x24) && (myo<=0x27) && (m_wd1772))     bbcm_wd1772l_write(space, myo-0x24, data);                      /* disc control latch */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     m_wd1772->write(space, myo-0x28, data);                         /* 1772 Controller */
+		if ((myo>=0x30) && (myo<=0x33))                   page_selectbm_w(space, myo-0x30, data);                         /* ROMSEL */
+		if ((myo>=0x34) && (myo<=0x37))                   bbcm_ACCCON_write(space, myo-0x34, data);                       /* ACCCON */
+		//if ((myo>=0x38) && (myo<=0x3f))                                                                                 /* NC ?? */
+		if ((myo>=0x40) && (myo<=0x5f))                   m_via6522_0->write(space, myo-0x40, data);
+		if ((myo>=0x60) && (myo<=0x7f) && (m_via6522_1))  m_via6522_1->write(space, myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
-		if ((myo>=0xa0) && (myo<=0xbf)) m_adlc->write(space, myo & 0x03, data);
+		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
 		//if ((myo>=0xe0) && (myo<=0xff))
 	}
@@ -665,18 +638,23 @@ These are the inputs from the joystick FIRE buttons. They are
 normally at logic 1 with no button pressed and change to 0
 when a button is pressed.
 
-PB6 and PB7 inputs from the speech processor
---------------------------------------------
+PB6 and PB7 inputs from the speech processor (model B and B+)
+-------------------------------------------------------------
 PB6 is the speech processor 'ready' output and PB7 is from the
 speech processor 'interrupt' output.
+
+PB6 and PB7 outputs to Master CMOS RAM/RTC
+------------------------------------------
+PB6 operates the 146818 chip enable when set to '1'. PB7 operates
+the 146818 address strobe line.
 
 CA1 input
 ---------
 This is the vertical sync input from the 6845. CA1 is set up to
 interrupt the 6502 every 20ms (50Hz) as a vertical sync from
-the video circuity is detected. The operation system changes
-the flash colours on the display in this interrupt time so that
-they maintain synchronisation with the rest of the picture.
+the video circuitry is detected. The operation system changes
+the display flash colours on this interrupt so that they occur
+during the screen blanking period.
 ----------------------------------------------------------------
 This is required for a lot of time function within the machine
 and must be triggered every 20ms. (Should check at some point
@@ -830,8 +808,8 @@ void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 /* This the BBC Masters Real Time Clock and NVRAM IC */
 void bbc_state::MC146818_set(address_space &space)
 {
-	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",m_MC146818_WR,m_MC146818_DS,m_MC146818_AS,m_MC146818_CE);
-	mc146818_device *rtc = space.machine().device<mc146818_device>("rtc");
+	//logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",m_MC146818_WR,m_MC146818_DS,m_MC146818_AS,m_MC146818_CE);
+	//mc146818_device *rtc = space.machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
 	if (m_MC146818_CE)
@@ -841,12 +819,12 @@ void bbc_state::MC146818_set(address_space &space)
 		{
 			if (m_MC146818_WR)
 			{
-				m_via_system_porta=rtc->read(space, 1);
+				m_via_system_porta = m_rtc->read(space, 1);
 				//logerror("read 146818 data %d \n",m_via_system_porta);
 			}
 			else
 			{
-				rtc->write(space, 1, m_via_system_porta);
+				m_rtc->write(space, 1, m_via_system_porta);
 				//logerror("write 146818 data %d \n",m_via_system_porta);
 			}
 		}
@@ -854,7 +832,7 @@ void bbc_state::MC146818_set(address_space &space)
 		// if address select is set then set the address in the 146818
 		if (m_MC146818_AS)
 		{
-			rtc->write(space, 0, m_via_system_porta);
+			m_rtc->write(space, 0, m_via_system_porta);
 			//logerror("write 146818 address %d \n",m_via_system_porta);
 		}
 	}
@@ -869,14 +847,24 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
 	if (m_b0_sound == 0)
 	{
 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		m_sn->write(space, 0, m_via_system_porta);
+		if (m_sn) m_sn->write(space, 0, m_via_system_porta);
+	}
+	if (m_b1_speech_read == 0)
+	{
+		if (m_tms) m_via_system_porta = m_tms->status_r(space, 0);
+		//logerror("Doing an unsafe read to the speech chip %d \n",m_via_system_porta);
+	}
+	if (m_b2_speech_write == 0)
+	{
+		//logerror("Doing an unsafe write to the speech chip %d \n",data);
+		if (m_tms) m_tms->data_w(space, 0, m_via_system_porta);
 	}
 	if (m_b3_keyboard == 0)
 	{
 		//logerror("Doing an unsafe write to the keyboard %d \n",data);
 		m_via_system_porta = bbc_keyboard(space, m_via_system_porta);
 	}
-	if (m_Master) MC146818_set(space);
+	if (m_rtc) MC146818_set(space);
 }
 
 
@@ -899,14 +887,11 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			}
 			break;
 		case 1:
-			if (m_Master)
+			if (m_rtc && m_MC146818_WR == 0)
 			{
-				if (m_MC146818_WR == 0)
-				{
-					/* BBC MASTER has NVRAM Here */
-					m_MC146818_WR = 1;
-					MC146818_set(space);
-				}
+				/* BBC Master has NVRAM Here */
+				m_MC146818_WR = 1;
+				MC146818_set(space);
 			}
 			else
 			{
@@ -914,18 +899,17 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 1;
+					//logerror("Speech read select TRUE\n");
+					if (m_tms) m_tms->rsq_w(TRUE);
 				}
 			}
 			break;
 		case 2:
-			if (m_Master)
+			if (m_rtc && m_MC146818_DS == 0)
 			{
-				if (m_MC146818_DS == 0)
-				{
-					/* BBC MASTER has NVRAM Here */
-					m_MC146818_DS = 1;
-					MC146818_set(space);
-				}
+				/* BBC Master has NVRAM Here */
+				m_MC146818_DS = 1;
+				MC146818_set(space);
 			}
 			else
 			{
@@ -933,6 +917,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 1;
+					//logerror("Speech write select TRUE\n");
+					if (m_tms) m_tms->wsq_w(TRUE);
 				}
 			}
 			break;
@@ -980,18 +966,15 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			if (m_b0_sound == 1)
 			{
 				m_b0_sound = 0;
-				m_sn->write(space, 0, m_via_system_porta);
+				if (m_sn) m_sn->write(space, 0, m_via_system_porta);
 			}
 			break;
 		case 1:
-			if (m_Master)
+			if (m_rtc && m_MC146818_WR == 1)
 			{
-				if (m_MC146818_WR == 1)
-				{
-					/* BBC MASTER has NV RAM Here */
-					m_MC146818_WR = 0;
-					MC146818_set(space);
-				}
+				/* BBC Master has NVRAM Here */
+				m_MC146818_WR = 0;
+				MC146818_set(space);
 			}
 			else
 			{
@@ -999,18 +982,17 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 0;
+					//logerror("Speech read select FALSE\n");
+					if (m_tms) m_tms->rsq_w(FALSE);
 				}
 			}
 			break;
 		case 2:
-			if (m_Master)
+			if (m_rtc && m_MC146818_DS == 1)
 			{
-				if (m_MC146818_DS == 1)
-				{
-					/* BBC MASTER has NV RAM Here */
-					m_MC146818_DS = 0;
-					MC146818_set(space);
-				}
+				/* BBC Master has NVRAM Here */
+				m_MC146818_DS = 0;
+				MC146818_set(space);
 			}
 			else
 			{
@@ -1018,6 +1000,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 0;
+					//logerror("Speech write select FALSE\n");
+					if (m_tms) m_tms->wsq_w(FALSE);
 				}
 			}
 			break;
@@ -1026,7 +1010,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b3_keyboard = 0;
 				/* *** call keyboard enabled *** */
-				m_via_system_porta=bbc_keyboard(space, m_via_system_porta);
+				m_via_system_porta = bbc_keyboard(space, m_via_system_porta);
 			}
 			break;
 		case 4:
@@ -1061,7 +1045,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 	}
 
 
-	if (m_Master)
+	if (m_rtc)
 	{
 		//set the Address Select
 		if (m_MC146818_AS != ((data>>7)&1))
@@ -1086,33 +1070,18 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_porta)
 	return m_via_system_porta;
 }
 
-// D4 of portb is joystick fire button 1
-// D5 of portb is joystick fire button 2
-// D6 VSPINT
-// D7 VSPRDY
-
-/* this is the interupt and ready signal from the BBC B Speech processor */
-static const int TMSint=1;
-static const int TMSrdy=1;
-
-#ifdef UNUSED_FUNCTION
-void bbc_state::bbc_TMSint(int status)
-{
-	TMSint=(!status)&1;
-	TMSrdy=(!tms5220_readyq_r())&1;
-	via_0_portb_w(0,(0xf | ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7)));
-}
-#endif
-
 
 READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 {
-	//TMSint=(!tms5220_int_r())&1;
-	//TMSrdy=(!tms5220_readyq_r())&1;
-
-	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0") | (TMSint<<6)|(TMSrdy<<7));
-
-	return (0xf | ioport("IN0")->read() | (TMSint<<6)|(TMSrdy<<7));
+	// D4 of portb is joystick fire button 1
+	// D5 of portb is joystick fire button 2
+	// D6 VSPINT
+	// D7 VSPRDY
+	int TMSint = m_tms ? m_tms->intq_r() : 0;
+	int TMSrdy = m_tms ? m_tms->readyq_r() : 0;
+	//logerror("TMSint %d\n",TMSint);
+	//logerror("TMSrdy %d\n",TMSrdy);
+	return (0xf | ioport("IN0")->read() | (!TMSrdy << 7) | (!TMSint << 6));
 }
 
 
@@ -1129,7 +1098,7 @@ Port A output is buffered before being connected to the printer connector.
 This means that they can only be operated as output lines.
 CA1 is pulled high by a 4K7 resistor. CA1 normally acts as an acknowledge
 line when a printer is used. CA2 is buffered so that it has become an open
-collector output only. It usially acts as the printer strobe line.
+collector output only. It usually acts as the printer strobe line.
 ***********************************************************************/
 
 /* USER VIA 6522 port B is connected to the BBC user port */
@@ -1430,7 +1399,7 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 	update_acia_rxd();
 	update_acia_dcd();
 	update_acia_cts();
-	BBC_Cassette_motor(m_serproc_data & 0x80);
+	if (m_cassette) BBC_Cassette_motor(m_serproc_data & 0x80);
 
 	// Set transmit clock rate
 	m_acia_clock->set_clock_scale( (double) 1 / serial_clocks[ data & 0x07 ] );
@@ -1463,61 +1432,12 @@ WRITE_LINE_MEMBER(bbc_state::bbc_i8271_interrupt)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
 	m_previous_i8271_int_state = state;
 }
-
-
-READ8_MEMBER(bbc_state::bbc_i8271_read)
-{
-	int ret;
-	logerror("i8271 read %d  ",offset);
-	switch (offset)
-	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			/* 8271 registers */
-			ret=m_i8271->read(space, offset);
-			logerror("  %d\n",ret);
-			break;
-		case 4:
-			ret=m_i8271->data_r(space, offset);
-			logerror("  %d\n",ret);
-			break;
-		default:
-			ret=0x0ff;
-			break;
-	}
-	logerror("  void\n");
-	return ret;
-}
-
-WRITE8_MEMBER(bbc_state::bbc_i8271_write)
-{
-	logerror("i8271 write  %d  %d\n",offset,data);
-
-	switch (offset)
-	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			/* 8271 registers */
-			m_i8271->write(space, offset, data);
-			return;
-		case 4:
-			m_i8271->data_w(space, offset, data);
-			return;
-		default:
-			break;
-	}
-}
-
 
 
 /**************************************
@@ -1543,9 +1463,6 @@ WRITE8_MEMBER(bbc_state::bbc_i8271_write)
 density select
 single density is as the 8271 disc format
 double density is as the 8271 disc format but with 16 sectors per track
-
-At some point we need to check the size of the disc image to work out if it is a single or double
-density disc image
 */
 
 
@@ -1566,7 +1483,7 @@ void bbc_state::bbc_update_fdq_int(int state)
 	int bbc_state;
 
 	/* if drq or irq is set, and interrupt is enabled */
-	if ((m_wd177x_irq_state || m_wd177x_drq_state) && (m_1770_IntEnabled))
+	if ((m_wd177x_irq_state || m_wd177x_drq_state) && (m_177x_IntEnabled))
 	{
 		/* int trigger */
 		bbc_state = 1;
@@ -1576,10 +1493,9 @@ void bbc_state::bbc_update_fdq_int(int state)
 		/* do not trigger int */
 		bbc_state = 0;
 	}
-//printf("bbc_state %d prev %d\n", bbc_state, m_previous_wd177x_int_state);
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
 	Here we are checking this transition before triggering the nmi */
-	if (bbc_state!=m_previous_wd177x_int_state)
+	if (bbc_state != m_previous_wd177x_int_state)
 	{
 		if (bbc_state)
 		{
@@ -1594,7 +1510,6 @@ void bbc_state::bbc_update_fdq_int(int state)
 
 WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_intrq_w)
 {
-//printf("bbc_wd177x_intrq_w %d \n", state);
 	m_wd177x_irq_state = state;
 	bbc_update_fdq_int(state);
 }
@@ -1605,357 +1520,92 @@ WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_drq_w)
 	bbc_update_fdq_int(state);
 }
 
-WRITE8_MEMBER(bbc_state::bbc_wd177x_status_w)
+WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
 {
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	floppy_image_device *floppy0 = machine().device<floppy_connector>("wd177x:0")->get_device();
-	floppy_image_device *floppy1 = machine().device<floppy_connector>("wd177x:1")->get_device();
 	floppy_image_device *floppy = NULL;
 
 	m_drive_control = data;
+	logerror("Drive control %d \n", data);
+
+	// bit 5: reset
+	if (!BIT(data, 5)) m_wd1770->reset();
 
 	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = floppy0;
-	if (BIT(data, 1)) floppy = floppy1;
-
-	fdc->set_floppy(floppy);
+	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
+	if (BIT(data, 1)) floppy = m_wd1770->subdevice<floppy_connector>("1")->get_device();
+	m_wd1770->set_floppy(floppy);
 
 	// bit 2: side select
 	if (floppy)
 		floppy->ss_w(BIT(data, 2));
 
 	// bit 3: density
-	fdc->dden_w(BIT(data, 3));
+	m_wd1770->dden_w(BIT(data, 3));
 
 	// bit 4: interrupt enable
-	m_1770_IntEnabled = !BIT(data, 4);
+	m_177x_IntEnabled = !BIT(data, 4);
 }
-
-
-
-READ8_MEMBER(bbc_state::bbc_wd1770_read)
-{
-	int retval=0xff;
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	switch (offset)
-	{
-	case 4:
-		retval=fdc->status_r(space, 0);
-		break;
-	case 5:
-		retval=fdc->track_r(space, 0);
-		break;
-	case 6:
-		retval=fdc->sector_r(space, 0);
-		break;
-	case 7:
-		retval=fdc->data_r(space, 0);
-		break;
-	default:
-		break;
-	}
-	//logerror("wd177x read: $%02X  $%02X\n", offset,retval);
-
-	return retval;
-}
-
-WRITE8_MEMBER(bbc_state::bbc_wd1770_write)
-{
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
-	switch (offset)
-	{
-	case 0:
-		bbc_wd177x_status_w(space, 0, data);
-		break;
-	case 4:
-		fdc->cmd_w(space, 0, data);
-		break;
-	case 5:
-		fdc->track_w(space, 0, data);
-		break;
-	case 6:
-		fdc->sector_w(space, 0, data);
-		break;
-	case 7:
-		fdc->data_w(space, 0, data);
-		break;
-	default:
-		break;
-	}
-}
-
-
-/*********************************************
-OPUS CHALLENGER MEMORY MAP
-        Read                        Write
-
-&FCF8   1770 Status register        1770 command register
-&FCF9               1770 track register
-&FCFA               1770 sector register
-&FCFB               1770 data register
-&FCFC                               1770 drive control
-
-
-drive control register bits
-0   select side 0= side 0   1= side 1
-1   select drive 0
-2   select drive 1
-3   ?unused?
-4   ?Always Set
-5   Density Select 0=double, 1=single
-6   ?unused?
-7   ?unused?
-
-The RAM is accessible through JIM (page &FD). One page is visible in JIM at a time.
-The selected page is controlled by the two paging registers:
-
-&FCFE       Paging register MSB
-&FCFF       Paging register LSB
-
-256K model has 1024 pages &000 to &3ff
-512K model has 2048 pages &000 to &7ff
-
-AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write    )
-
-
-**********************************************/
-
-
-WRITE8_MEMBER(bbc_state::bbc_opus_status_w)
-{
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	floppy_image_device *floppy0 = machine().device<floppy_connector>("wd177x:0")->get_device();
-	floppy_image_device *floppy1 = machine().device<floppy_connector>("wd177x:1")->get_device();
-	floppy_image_device *floppy = NULL;
-
-	m_drive_control = data;
-
-	// bit 1, 2: drive select
-	if (BIT(data, 1)) floppy = floppy0;
-	if (BIT(data, 2)) floppy = floppy1;
-
-	fdc->set_floppy(floppy);
-
-	// bit 0: side select
-	if (floppy)
-		floppy->ss_w(BIT(data, 0));
-
-	// bit 5: density
-	fdc->dden_w(BIT(data, 5));
-
-	// bit 4: interrupt enable
-	m_1770_IntEnabled = BIT(data, 4);
-}
-
-READ8_MEMBER(bbc_state::bbc_opus_read)
-{
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	//logerror("wd177x read: $%02X\n", offset);
-
-	if (m_DFSType==6)
-	{
-		if (offset<0x100)
-		{
-			switch (offset)
-			{
-				case 0xf8:
-					return fdc->status_r(space, 0);
-				case 0xf9:
-					return fdc->track_r(space, 0);
-				case 0xfa:
-					return fdc->sector_r(space, 0);
-				case 0xfb:
-					return fdc->data_r(space, 0);
-			}
-		}
-		else
-		{
-			return memregion("disks")->base()[offset + (m_opusbank << 8)];
-		}
-	}
-	return 0xff;
-}
-
-WRITE8_MEMBER(bbc_state::bbc_opus_write)
-{
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
-
-	if (m_DFSType==6)
-	{
-		if (offset<0x100)
-		{
-			switch (offset)
-			{
-				case 0xf8:
-					fdc->cmd_w(space, 0, data);
-					break;
-				case 0xf9:
-					fdc->track_w(space, 0, data);
-					break;
-				case 0xfa:
-					fdc->sector_w(space, 0, data);
-					break;
-				case 0xfb:
-					fdc->data_w(space, 0, data);
-					break;
-				case 0xfc:
-					bbc_opus_status_w(space, 0,data);
-					break;
-				case 0xfe:
-					m_opusbank=(m_opusbank & 0xff) | (data<<8);
-					break;
-				case 0xff:
-					m_opusbank=(m_opusbank & 0xff00) | data;
-					break;
-			}
-		}
-		else
-		{
-			memregion("disks")->base()[offset + (m_opusbank << 8)] = data;
-		}
-	}
-}
-
 
 /***************************************
 BBC MASTER DISC SUPPORT
 ***************************************/
 
-
-READ8_MEMBER(bbc_state::bbcm_wd1770_read)
-{
-	int retval=0xff;
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	switch (offset)
-	{
-	case 0:
-		retval=fdc->status_r(space, 0);
-		break;
-	case 1:
-		retval=fdc->track_r(space, 0);
-		break;
-	case 2:
-		retval=fdc->sector_r(space, 0);
-		break;
-	case 3:
-		retval=fdc->data_r(space, 0);
-		break;
-	default:
-		break;
-	}
-	return retval;
-}
-
-
-WRITE8_MEMBER(bbc_state::bbcm_wd1770_write)
-{
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
-	switch (offset)
-	{
-	case 0:
-		fdc->cmd_w(space, 0, data);
-		break;
-	case 1:
-		fdc->track_w(space, 0, data);
-		break;
-	case 2:
-		fdc->sector_w(space, 0, data);
-		break;
-	case 3:
-		fdc->data_w(space, 0, data);
-		break;
-	default:
-		break;
-	}
-}
-
-
-READ8_MEMBER(bbc_state::bbcm_wd1770l_read)
+READ8_MEMBER(bbc_state::bbcm_wd177xl_read)
 {
 	return m_drive_control;
 }
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 {
-	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
-	floppy_image_device *floppy0 = machine().device<floppy_connector>("wd177x:0")->get_device();
-	floppy_image_device *floppy1 = machine().device<floppy_connector>("wd177x:1")->get_device();
 	floppy_image_device *floppy = NULL;
 
 	m_drive_control = data;
+	//logerror("Drive control %d \n", data);
 
-	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = floppy0;
-	if (BIT(data, 1)) floppy = floppy1;
+	// bit 2: reset
+	if (!BIT(data, 5)) m_wd1770->reset();
+
+	// bit 0, 1, 3: drive select
+	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
+	if (BIT(data, 1)) floppy = m_wd1770->subdevice<floppy_connector>("1")->get_device();
+	if (BIT(data, 3)) floppy = m_wd1770->subdevice<floppy_connector>("2")->get_device();
+	m_wd1770->set_floppy(floppy);
 
 	// bit 4: side select
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
 
 	// bit 5: density
-	fdc->dden_w(BIT(data, 5));
+	m_wd1770->dden_w(BIT(data, 5));
 
-//  m_1770_IntEnabled=(((data>>4) & 0x01)==0);
-	m_1770_IntEnabled=1;
+	m_177x_IntEnabled = 1;
 }
 
-
-/**************************************
-DFS Hardware mapping for different Disc Controller types
-***************************************/
-
-READ8_MEMBER(bbc_state::bbc_disc_r)
+WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
 {
-	switch (m_DFSType){
-	/* case 0 to 3 are all standard 8271 interfaces */
-	case 0: case 1: case 2: case 3:
-		return bbc_i8271_read(space, offset);
-	/* case 4 is the acorn 1770 interface */
-	case 4:
-		return bbc_wd1770_read(space, offset);
-	/* case 5 is the watford 1770 interface */
-	case 5:
-		return bbc_wd1770_read(space, offset);
-	/* case 6 is the Opus challenger interface */
-	case 6:
-		/* not connected here, opus drive is connected via the 1MHz Bus */
-		break;
-	/* case 7 in no disc controller */
-	case 7:
-		break;
-	}
-	return 0x0ff;
+	floppy_image_device *floppy = NULL;
+
+	m_drive_control = data;
+	//logerror("Drive control %d \n", data);
+
+	// bit 2: reset
+	if (!BIT(data, 5)) m_wd1772->reset();
+
+	// bit 0, 1, 3: drive select
+	if (BIT(data, 0)) floppy = m_wd1772->subdevice<floppy_connector>("0")->get_device();
+	if (BIT(data, 1)) floppy = m_wd1772->subdevice<floppy_connector>("1")->get_device();
+	if (BIT(data, 3)) floppy = m_wd1772->subdevice<floppy_connector>("2")->get_device();
+	m_wd1772->set_floppy(floppy);
+
+	// bit 4: side select
+	if (floppy)
+		floppy->ss_w(BIT(data, 4));
+
+	// bit 5: density
+	m_wd1772->dden_w(BIT(data, 5));
+
+	m_177x_IntEnabled = 1;
 }
-
-WRITE8_MEMBER(bbc_state::bbc_disc_w)
-{
-	switch (m_DFSType){
-	/* case 0 to 3 are all standard 8271 interfaces */
-	case 0: case 1: case 2: case 3:
-		bbc_i8271_write(space, offset,data);
-		break;
-	/* case 4 is the acorn 1770 interface */
-	case 4:
-		bbc_wd1770_write(space, offset,data);
-		break;
-	/* case 5 is the watford 1770 interface */
-	case 5:
-		bbc_wd1770_write(space, offset,data);
-		break;
-	/* case 6 is the Opus challenger interface */
-	case 6:
-		/* not connected here, opus drive is connected via the 1MHz Bus */
-		break;
-	/* case 7 in no disc controller */
-	case 7:
-		break;
-	}
-}
-
-
 
 /**************************************
    BBC B Rom loading functions
@@ -2023,23 +1673,6 @@ int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device
 
 DRIVER_INIT_MEMBER(bbc_state,bbc)
 {
-	m_Master=0;
-	m_rxd_cass = 0;
-	m_nr_high_tones = 0;
-	m_serproc_data = 0;
-	m_cass_out_enabled = 0;
-	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
-
-	/* vertical sync pulse from video circuit */
-	m_via6522_0->write_ca1(1);
-
-	/* light pen strobe detect (not emulated) */
-	m_via6522_0->write_cb2(1);
-}
-
-DRIVER_INIT_MEMBER(bbc_state,bbcm)
-{
-	m_Master=1;
 	m_rxd_cass = 0;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
@@ -2076,10 +1709,10 @@ void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, U
 	else
 		eprom[3] = m_region_opt->base() + 0xc000 + shift;
 
-	membank->configure_entries(0, 1,  eprom[0], size);
-	membank->configure_entries(1, 1,  eprom[1], size);
-	membank->configure_entries(2, 1,  eprom[2], size);
-	membank->configure_entries(3, 1,  eprom[3], size);
+	membank->configure_entries(0, 1, eprom[0], size);
+	membank->configure_entries(1, 1, eprom[1], size);
+	membank->configure_entries(2, 1, eprom[2], size);
+	membank->configure_entries(3, 1, eprom[3], size);
 
 	if (banks > 4)
 	{
@@ -2102,10 +1735,10 @@ void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, 
 	else
 		eprom[1] = m_region_opt->base() + 0x8000 + shift;
 
-	membank->configure_entries(0, 1,  eprom[0], size);
-	membank->configure_entries(1, 1,  eprom[0] + 0x4000, size);
-	membank->configure_entries(2, 1,  eprom[1], size);
-	membank->configure_entries(3, 1,  eprom[1] + 0x4000, size);
+	membank->configure_entries(0, 1, eprom[0], size);
+	membank->configure_entries(1, 1, eprom[0] + 0x4000, size);
+	membank->configure_entries(2, 1, eprom[1], size);
+	membank->configure_entries(3, 1, eprom[1] + 0x4000, size);
 
 	if (banks > 4)
 	{
@@ -2149,14 +1782,12 @@ MACHINE_START_MEMBER(bbc_state, bbcb)
 	m_previous_i8271_int_state=0;
 	m_previous_wd177x_int_state=1;
 	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
-	if (m_region_dfs)
-		m_bank4->configure_entries(16, 8, m_region_dfs->base(), 0x4000);    // additional bank for paged ram
 }
 
 MACHINE_RESET_MEMBER(bbc_state, bbcb)
 {
 	UINT8 *RAM = m_region_maincpu->base();
-	m_DFSType=    (ioport("BBCCONFIG")->read() >> 0) & 0x07;
+	m_Speech    = (ioport("BBCCONFIG")->read() >> 0) & 0x01;
 	m_SWRAMtype = (ioport("BBCCONFIG")->read() >> 3) & 0x03;
 	m_bank1->set_base(RAM);
 	m_bank3->set_base(RAM + 0x4000);
@@ -2166,8 +1797,6 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 	m_bank7->set_base(m_region_os->base());  /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(this);
-
-	m_opusbank = 0;
 }
 
 
@@ -2184,11 +1813,12 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 {
+	m_Speech = 1;
 	m_bank1->set_base(m_region_maincpu->base());
 	m_bank2->set_base(m_region_maincpu->base() + 0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
 	m_bank4->set_entry(0);
 	m_bank6->set_entry(0);
-	m_bank7->set_base(m_region_os->base());    /* bank 7 points at the OS rom  from c000 to ffff */
+	m_bank7->set_base(m_region_os->base());                 /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(this);
 
@@ -2217,7 +1847,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbcm)
 	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
 	m_bank4->set_entry(0);
 	m_bank5->set_entry(0);
-	m_bank7->set_base(m_region_os->base());   /* bank 6 OS rom of RAM         from c000 to dfff */
+	m_bank7->set_base(m_region_os->base());                /* bank 6 OS rom of RAM         from c000 to dfff */
 
 	bbcb_IC32_initialise(this);
 
