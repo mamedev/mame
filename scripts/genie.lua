@@ -374,6 +374,15 @@ newoption {
 	description = "List of drivers to compile.",
 }
 
+newoption {
+	trigger = "FORCE_VERSION_COMPILE",
+	description = "Force compiling of version.c file.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
 else

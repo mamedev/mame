@@ -92,6 +92,8 @@
 
 # DRIVERS = src/mame/drivers/1942.c,src/mame/drivers/cops.c
 
+# FORCE_VERSION_COMPILE = 1
+
 -include useroptions.mak
 
 ###########################################################################
@@ -628,6 +630,10 @@ endif
 
 ifdef DRIVERS
 PARAMS += --DRIVERS='$(DRIVERS)'
+endif
+
+ifdef FORCE_VERSION_COMPILE
+PARAMS += --FORCE_VERSION_COMPILE='$(FORCE_VERSION_COMPILE)'
 endif
 
 #-------------------------------------------------
