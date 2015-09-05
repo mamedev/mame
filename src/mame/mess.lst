@@ -342,12 +342,17 @@ atomeb    // 1979 Acorn Atom
 atombb    // 1979 Acorn Atom
 //prophet2
 bbca      // 1981 BBC Micro Model A
-bbcb      // 1981 BBC Micro Model B
+bbcb      // 1981 BBC Micro Model B w/8271 FDC
 bbcb_de   // 1981 BBC Micro Model B (German)
-bbcb_us   // 1981 BBC Micro Model B (US)
+bbcb_us   // 1983 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
+bbcb1770  // 1985 BBC Micro Model B w/1770 FDC
 bbcbp     // 1985 BBC Micro Model B+ 64K
 bbcbp128  // 1985 BBC Micro Model B+ 128K
+abc110    // 1985 ABC 110
+abc210    // 1985 ABC 210/Cambridge Workstation
+abc310    // 1985 ABC 310
+reutapm   // 1985 Reuters APM Board
 bbcm      // 1986 BBC Master 128
 bbcmt     // 1986 BBC Master Turbo
 bbcmaiv   // 1986 BBC Master AIV
@@ -355,7 +360,8 @@ bbcmet    // 1986 BBC Master ET
 bbcm512   // 1986 BBC Master 512
 bbcmarm   // 1986 ARM Evaluation System
 bbcmc     // 1986 BBC Master Compact
-bbcmc_ar  // 1986 BBC Master Comapact (Arabic)
+bbcmc_ar  // 1986 BBC Master Compact (Arabic)
+pro128s   // 1987 Olivetti Prodest PC 128S
 bbcbc     // 1985 BBC Bridge Companion
 a310      // 1988 Acorn Archimedes 310
 a3010     // 1988 Acorn Archimedes 3010
