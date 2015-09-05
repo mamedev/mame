@@ -1058,6 +1058,9 @@ cheat_manager::cheat_manager(running_machine &machine)
 	if (!machine.options().cheat())
 		return;
 
+	m_output.resize(UI_TARGET_FONT_ROWS*2);
+	m_justify.resize(UI_TARGET_FONT_ROWS*2);
+
 	// request a callback
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(cheat_manager::frame_update), this));
 
@@ -1224,7 +1227,7 @@ bool cheat_manager::save_all(const char *filename)
 void cheat_manager::render_text(render_container &container)
 {
 	// render any text and free it along the way
-	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
+	for (int linenum = 0; linenum < m_output.size(); linenum++)
 		if (!m_output[linenum].empty())
 		{
 			// output the text
@@ -1352,8 +1355,8 @@ void cheat_manager::frame_update()
 	// set up for accumulating output
 	m_lastline = 0;
 	m_numlines = floor(1.0f / machine().ui().get_line_height());
-	m_numlines = MIN(m_numlines, ARRAY_LENGTH(m_output));
-	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
+	m_numlines = MIN(m_numlines, m_output.size());
+	for (int linenum = 0; linenum < m_output.size(); linenum++)
 		m_output[linenum].clear();
 
 	// iterate over running cheats and execute them
@@ -1373,7 +1376,14 @@ void cheat_manager::frame_update()
 void cheat_manager::load_cheats(const char *filename)
 {
 	xml_data_node *rootnode = NULL;
-	emu_file cheatfile(machine().options().cheat_path(), OPEN_FLAG_READ);
+	std::string searchstr(machine().options().cheat_path());
+	path_iterator path(machine().options().cheat_path());
+	std::string curpath;
+	while (path.next(curpath))
+	{
+		searchstr.append(";").append(curpath).append(PATH_SEPARATOR).append("cheat");
+	}
+	emu_file cheatfile(searchstr.c_str(), OPEN_FLAG_READ);
 	try
 	{
 		// open the file with the proper name

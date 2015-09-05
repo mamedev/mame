@@ -86,7 +86,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#define LOG(x) x
+#define LOG(x) /* x */
 
 #define BAUDGEN_CLOCK XTAL_1_8432MHz
 /*
@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
 
 /*
  * 4. The USER Area (Text from the board manual)
-  The USER area contains two 28 pin sockets with JEDEC compatible pin out. 
+  The USER area contains two 28 pin sockets with JEDEC compatible pin out.
    To allow the usage of static RAM's, the access to the USER area is byte
    oriented. Table 3. lists the usable device types.
 
@@ -388,13 +388,13 @@ WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
    32Kx16 64 Kbyte 27256
    --------------------------
 */
-// Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier 
+// Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier
 // software handling. TODO: make configurable according to table above.
 static MACHINE_CONFIG_FRAGMENT( fccpu1_eprom_sockets )
         MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "fccpu1_cart")
         MCFG_GENERIC_EXTENSIONS("bin,rom")
         MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-        MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG) 
+        MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
         MCFG_GENERIC_LOAD(force68k_state, exp1_load)
 //      MCFG_SOFTWARE_LIST_ADD("cart_list", "fccpu1_cart")
 MACHINE_CONFIG_END
@@ -415,7 +415,7 @@ int force68k_state::force68k_load_cart(device_image_interface &image, generic_sl
 
         slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
         slot->common_load_rom(slot->get_rom_base(), size, "rom");
-        
+
         return IMAGE_INIT_PASS;
 }
 
@@ -427,7 +427,7 @@ static MACHINE_CONFIG_START (fccpu1, force68k_state)
 MCFG_CPU_ADD ("maincpu", M68000, XTAL_16MHz / 2)
 MCFG_CPU_PROGRAM_MAP (force68k_mem)
 
-/* P3/Host Port config  
+/* P3/Host Port config
  * LO command causes ROM monitor to expect S-records on HOST port by default
  * Implementation through nullmodem currently does not support handshakes so
  * the ROM momitor is over-run while checking for checksums etc if used with
@@ -535,7 +535,7 @@ ROM_LOAD16_BYTE ("fccpu1V1.0L.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90
  * DC <expression> <CR>                        Data Conversion
  * DF <CR>                                     Display Formatted registers
  * DU [n] <address1> <address2>[<string>] <CR> Dump memory to object file
- * GO or G [<address] <CR>                     Execute program. 
+ * GO or G [<address] <CR>                     Execute program.
  * GD [<address] <CR>                          Go Direct
  * GT <address> <CR>                           Exec prog: temporary breakpoint
  * HE<CR>                                      Help; display monitor commands

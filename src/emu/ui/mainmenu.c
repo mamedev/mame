@@ -25,7 +25,7 @@
 #include "ui/inputmap.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
-#include "ui/selgame.h"
+#include "mewui/selgame.h"
 #include "ui/sliders.h"
 #include "ui/slotopt.h"
 #include "ui/tapectrl.h"
@@ -33,6 +33,9 @@
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 #include "machine/bcreader.h"
+#include "mewui/datfile.h"
+#include "mewui/inifile.h"
+#include "mewui/datmenu.h"
 
 
 /***************************************************************************
@@ -132,9 +135,62 @@ void ui_menu_main::populate()
 	if (machine().options().cheat() && machine().cheat().first() != NULL)
 		item_append("Cheat", NULL, 0, (void *)CHEAT);
 
+	/* add history menu */
+	if (machine().options().enabled_dats())
+		item_append("History Info", NULL, 0, (void *)HISTORY);
+
+	// add software history menu
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().options().enabled_dats())
+	{
+		image_interface_iterator iter(machine().root_device());
+		for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+		{
+			const char *name = image->filename();
+			if (name != NULL)
+			{
+				item_append("Software History Info", NULL, 0, (void *)SW_HISTORY);
+				break;
+			}
+		}
+	}
+
+	/* add mameinfo / messinfo menu */
+	if (machine().options().enabled_dats())
+	{
+		if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
+			item_append("MameInfo", NULL, 0, (void *)MAMEINFO);
+		else if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0)
+			item_append("MessInfo", NULL, 0, (void *)MAMEINFO);
+	}
+
+	/* add sysinfo menu */
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().options().enabled_dats())
+		item_append("SysInfo", NULL, 0, (void *)SYSINFO);
+
+	/* add command list menu */
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().options().enabled_dats())
+		item_append("Commands Info", NULL, 0, (void *)COMMAND);
+
+	/* add story menu */
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().options().enabled_dats())
+		item_append("Mamescores", NULL, 0, (void *)STORYINFO);
+
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+
+	/* add favorite menu */
+    if (!machine().favorite().isgame_favorite())
+		item_append("Add To Favorites", NULL, 0, (void *)ADD_FAVORITE);
+	else
+		item_append("Remove From Favorites", NULL, 0, (void *)REMOVE_FAVORITE);
+
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+
+	menu_text.assign("Quit from ").append(emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), NULL, 0, (void *)QUIT_GAME);
+
 	/* add reset and exit menus */
-	strprintf(menu_text, "Select New %s", emulator_info::get_capstartgamenoun());
-	item_append(menu_text.c_str(), NULL, 0, (void *)SELECT_GAME);
+//	strprintf(menu_text, "Select New %s", emulator_info::get_capstartgamenoun());
+//	item_append(menu_text.c_str(), NULL, 0, (void *)SELECT_GAME);
 }
 
 ui_menu_main::~ui_menu_main()
@@ -224,7 +280,7 @@ void ui_menu_main::handle()
 			break;
 
 		case SELECT_GAME:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, 0)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_select_game(machine(), container, 0)));
 			break;
 
 		case BIOS_SELECTION:
@@ -233,6 +289,48 @@ void ui_menu_main::handle()
 
 		case BARCODE_READ:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_barcode_reader(machine(), container, NULL)));
+			break;
+
+		case HISTORY:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_HISTORY_LOAD)));
+			break;
+
+		case MAMEINFO:
+			if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_MAMEINFO_LOAD)));
+			else
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_MESSINFO_LOAD)));
+			break;
+
+		case SYSINFO:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_SYSINFO_LOAD)));
+			break;
+
+		case COMMAND:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_command(machine(), container)));
+			break;
+
+		case STORYINFO:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_dats(machine(), container, MEWUI_STORY_LOAD)));
+			break;
+
+		case ADD_FAVORITE:
+            machine().favorite().add_favorite_game();
+			reset(UI_MENU_RESET_REMEMBER_POSITION);
+			break;
+
+		case REMOVE_FAVORITE:
+            machine().favorite().remove_favorite_game();
+			reset(UI_MENU_RESET_REMEMBER_POSITION);
+			break;
+
+		case SW_HISTORY:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_history_sw(machine(), container)));
+			break;
+
+		case QUIT_GAME:
+			ui_menu::stack_pop(machine());
+			machine().ui().request_quit();
 			break;
 
 		default:

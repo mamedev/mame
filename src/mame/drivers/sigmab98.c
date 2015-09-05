@@ -390,7 +390,7 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		dsty  <<=   16;
 
 		// Source delta (equal for x and y)
-		int z = int( sqrt(dstdx * dstdx + dstdy * dstdy) + 0.5 );   // dest delta vector is scaled by the source delta!?
+		int z = int( sqrt((float)dstdx * dstdx + dstdy * dstdy) + 0.5 );   // dest delta vector is scaled by the source delta!?
 		if (!z)
 			z = 0x100;
 		int srcdzz = z << 8;

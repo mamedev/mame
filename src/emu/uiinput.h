@@ -27,6 +27,7 @@ enum ui_event_type
 	UI_EVENT_MOUSE_DOWN,
 	UI_EVENT_MOUSE_UP,
 	UI_EVENT_MOUSE_DOUBLE_CLICK,
+	UI_EVENT_MOUSE_SCROLL,
 	UI_EVENT_CHAR
 };
 
@@ -39,6 +40,8 @@ struct ui_event
 	INT32               mouse_y;
 	input_item_id       key;
 	unicode_char        ch;
+	short               zdelta;
+	int                 num_lines;
 };
 
 
@@ -130,6 +133,24 @@ INLINE void ui_input_push_mouse_down_event(running_machine &machine, render_targ
 	event.target = target;
 	event.mouse_x = x;
 	event.mouse_y = y;
+	ui_input_push_event(machine, event);
+}
+
+/*-------------------------------------------------
+    ui_input_push_mouse_scroll_event -
+    pushes a mouse scroll event to the specified
+    render_target
+-------------------------------------------------*/
+
+INLINE void ui_input_push_mouse_scroll_event(running_machine &machine, render_target *target, INT32 x, INT32 y, short delta, int ucNumLines)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_SCROLL;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	event.zdelta = delta;
+	event.num_lines = ucNumLines;
 	ui_input_push_event(machine, event);
 }
 

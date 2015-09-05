@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/menu.h
+	ui/menu.h
 
-    Internal MAME menus for the user interface.
+	Internal MAME menus for the user interface.
 
 ***************************************************************************/
 
@@ -14,10 +14,11 @@
 #define __UI_MENU_H__
 
 #include "render.h"
+#include "mewui/toolbar.h"
 
 
 /***************************************************************************
-    CONSTANTS
+	CONSTANTS
 ***************************************************************************/
 
 // flags for menu items
@@ -27,6 +28,11 @@
 #define MENU_FLAG_MULTILINE         (1 << 3)
 #define MENU_FLAG_REDTEXT           (1 << 4)
 #define MENU_FLAG_DISABLE           (1 << 5)
+#define MENU_FLAG_MEWUI             (1 << 6)
+#define MENU_FLAG_MEWUI_HISTORY     (1 << 7)
+#define MENU_FLAG_MEWUI_SWLIST      (1 << 8)
+#define MENU_FLAG_MEWUI_FAVORITE    (1 << 9)
+#define MENU_FLAG_MEWUI_PALETTE     (1 << 10)
 
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"
@@ -35,6 +41,9 @@
 #define UI_MENU_PROCESS_NOKEYS      1
 #define UI_MENU_PROCESS_LR_REPEAT   2
 #define UI_MENU_PROCESS_CUSTOM_ONLY 4
+#define UI_MENU_PROCESS_ONLYCHAR    8
+#define UI_MENU_PROCESS_NOINPUT     16
+#define UI_MENU_PROCESS_NOIMAGE     32
 
 // options for ui_menu_reset
 enum ui_menu_reset_options
@@ -47,32 +56,32 @@ enum ui_menu_reset_options
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
+	TYPE DEFINITIONS
 ***************************************************************************/
 
 // menu-related events
 struct ui_menu_event
 {
-	void *          itemref;            // reference for the selected item
-	int             iptkey;             // one of the IPT_* values from inptport.h
-	unicode_char    unichar;            // unicode character if iptkey == IPT_SPECIAL
+	void         *itemref;   // reference for the selected item
+	int          iptkey;     // one of the IPT_* values from inptport.h
+	unicode_char unichar;    // unicode character if iptkey == IPT_SPECIAL
 };
 
 struct ui_menu_pool
 {
-	ui_menu_pool *      next;           // chain to next one
-	UINT8 *             top;            // top of the pool
-	UINT8 *             end;            // end of the pool
+	ui_menu_pool   *next;    // chain to next one
+	UINT8          *top;     // top of the pool
+	UINT8          *end;     // end of the pool
 };
 
 
 class ui_menu_item
 {
 public:
-	const char *        text;
-	const char *        subtext;
-	UINT32              flags;
-	void *              ref;
+	const char  *text;
+	const char  *subtext;
+	UINT32      flags;
+	void        *ref;
 
 	inline bool is_selectable() const;
 };
@@ -85,26 +94,21 @@ public:
 
 	running_machine &machine() const { return m_machine; }
 
-	render_container *  container;          // render_container we render to
-	ui_menu_event       menu_event;         // the UI menu_event that occurred
-	ui_menu *           parent;             // pointer to parent menu
-	int                 resetpos;           // reset position
-	void *              resetref;           // reset reference
-	int                 selected;           // which item is selected
-	int                 hover;              // which item is being hovered over
-	int                 visitems;           // number of visible items
-	int                 numitems;           // number of items in the menu
-	int                 allocitems;         // allocated size of array
-	ui_menu_item *      item;               // pointer to array of items
-	float               customtop;          // amount of extra height to add at the top
-	float               custombottom;       // amount of extra height to add at the bottom
-	ui_menu_pool *      pool;               // list of memory pools
+	render_container            *container;   // render_container we render to
+	ui_menu_event               menu_event;   // the UI menu_event that occurred
+	ui_menu                     *parent;      // pointer to parent menu
+	int                         resetpos;     // reset position
+	void                        *resetref;    // reset reference
+	int                         selected;     // which item is selected
+	int                         hover;        // which item is being hovered over
+	int                         visitems;     // number of visible items
+	float                       customtop;    // amount of extra height to add at the top
+	float                       custombottom; // amount of extra height to add at the bottom
+	ui_menu_pool                *pool;        // list of memory pools
+	std::vector<ui_menu_item>   item;         // array of items
 
 	// free all items in the menu, and all memory allocated from the memory pool
 	void reset(ui_menu_reset_options options);
-
-	// returns true if the menu has any non-default items in it
-	bool populated();
 
 	// append a new item to the end of the menu
 	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref);
@@ -168,23 +172,29 @@ public:
 	// To be reimplemented in the menu subclass
 	virtual void handle() = 0;
 
+	// test if search is active
+	virtual bool menu_has_search_active() { return false; }
+
 private:
 	static ui_menu *menu_free;
 	static bitmap_rgb32 *hilight_bitmap;
 	static render_texture *hilight_texture, *arrow_texture;
 
 	bool m_special_main_menu;
-	running_machine &   m_machine;          // machine we are attached to
+	running_machine &m_machine;  // machine we are attached to
 
-	void draw(bool customonly);
+	void draw(bool customonly, bool noimage, bool noinput);
 	void draw_text_box();
-	void handle_events();
+	void handle_events(UINT32 flags);
 	void handle_keys(UINT32 flags);
 	void clear_free_list();
 
 	inline bool exclusive_input_pressed(int key, int repeat);
 	static void clear_free_list(running_machine &machine);
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
+
+#include "mewui/menu.h"
+
 };
 
 #endif  // __UI_MENU_H__

@@ -94,7 +94,9 @@ class ui_manager;
 class tilemap_manager;
 class debug_view_manager;
 class osd_interface;
-
+class datfile_manager;
+class inifile_manager;
+class favorite_manager;
 struct romload_private;
 struct ui_input_private;
 struct debugcpu_private;
@@ -167,6 +169,9 @@ public:
 	ioport_manager &ioport() { return m_ioport; }
 	parameters_manager &parameters() { return m_parameters; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
+	datfile_manager &datfile() const { assert(m_datfile != NULL); return *m_datfile; }
+	inifile_manager &inifile() const { assert(m_inifile != NULL); return *m_inifile; }
+	favorite_manager &favorite() const { assert(m_favorite != NULL); return *m_favorite; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
@@ -361,7 +366,10 @@ private:
 	parameters_manager      m_parameters;           // parameters manager
 	device_scheduler        m_scheduler;            // scheduler object
 	emu_timer               *m_autoboot_timer;      // autoboot timer
-};
 
+	auto_pointer<datfile_manager>   m_datfile;      // internal data from datfile.c
+	auto_pointer<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
+	auto_pointer<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
+};
 
 #endif  /* __MACHINE_H__ */

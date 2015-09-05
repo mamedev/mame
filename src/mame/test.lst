@@ -1,0 +1,1230 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+/******************************************************************************
+
+    dummy.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+******************************************************************************/
+
+// Capcom arcade
+// Capcom games
+// The following is a COMPLETE list of the Capcom games up to 1997, as shown on
+// their web site. The list is sorted by production date.
+// A comprehensive list of Capcom games with board info can be found here:
+// http://www.arcadeflyers.com/strider/capcom_list.html
+vulgus          //  5/1984 (c) 1984
+vulgusa         //  5/1984 (c) 1984
+vulgusj         //  5/1984 (c) 1984
+sonson          //  7/1984 (c) 1984
+sonsonj         //  7/1984 (c) 1984 (Japan)
+higemaru        //  9/1984 (c) 1984
+1942            // 12/1984 (c) 1984
+1942a           // 12/1984 (c) 1984
+1942abl         // bootleg
+1942b           // 12/1984 (c) 1984
+1942w           // 12/1984 (c) 1984 + Williams Electronics license (c) 1985
+1942p           // prototype
+1942h           // hack (Two Bit Score?)
+exedexes        //  2/1985 (c) 1985
+savgbees        //  2/1985 (c) 1985 + Memetron license
+commando        //  5/1985 (c) 1985 (World)
+commandou       //  5/1985 (c) 1985 + Data East license (US)
+commandou2      //  5/1985 (c) 1985 + Data East license (US)
+commandoj       //  5/1985 (c) 1985 (Japan)
+commandob       // bootleg
+commandob2      // bootleg 2
+sinvasn         // Europe original?
+sinvasnb        // bootleg
+gng             //  9/1985 (c) 1985
+gnga            //  9/1985 (c) 1985
+gngbl           // bootleg
+gngblita        // bootleg
+gngc            //  9/1985 (c) 1985
+gngprot         // Capcom/Romstar Proto
+gngt            //  9/1985 (c) 1985
+makaimur        //  9/1985 (c) 1985
+makaimurc       //  9/1985 (c) 1985
+makaimurg       //  9/1985 (c) 1985
+diamond         // (c) 1989 KH Video (NOT A CAPCOM GAME but runs on GnG hardware)
+gunsmoke        // 11/1985 (c) 1985 (World)
+gunsmokeb
+gunsmokeu       // 11/1985 (c) 1985 + Romstar (US)
+gunsmokeua      // 11/1985 (c) 1985 (US)
+gunsmokej       // 11/1985 (c) 1985 (Japan)
+sectionz        // 12/1985 (c) 1985
+sectionza       // 12/1985 (c) 1985
+trojan          //  4/1986 (c) 1986 (US)
+trojana         //  4/1986 (c) 1986 (US)
+trojanr         //  4/1986 (c) 1986 + Romstar
+trojanj         //  4/1986 (c) 1986 (Japan)
+trojanb         // bootleg
+srumbler        //  9/1986 (c) 1986
+srumbler2       //  9/1986 (c) 1986
+srumbler3       //  9/1986 (c) 1986 + Tecfri
+rushcrsh        //  9/1986 (c) 1986
+lwings          // 11/1986 (c) 1986
+lwings2         // 11/1986 (c) 1986
+lwingsj         // 11/1986 (c) 1986
+lwingsb         // 11/1986 (c) 1986 (bootleg)
+sidearms        // 12/1986 (c) 1986 (World)
+sidearmsu       // 12/1986 (c) 1986 + Romstar license (US)
+sidearmsur1     // 12/1986 (c) 1986 + Romstar license (US)
+sidearmsj       // 12/1986 (c) 1986 (Japan)
+turtship        // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipj       // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipk       // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+dyger           // (c) 1989 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+dygera          // (c) 1989 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+twinfalc        // (c) 1989 Philko (Poara Enterprises license) (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+whizz           // (c) 1989 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+avengers        //  2/1987 (c) 1987 (US)
+avengers2       //  2/1987 (c) 1987 (US)
+buraiken        //  2/1987 (c) 1987 (Japan)
+bionicc         //  3/1987 (c) 1987 (Euro)
+bionicc1        //  3/1987 (c) 1987 (US)
+bionicc2        //  3/1987 (c) 1987 (US)
+topsecrt        //  3/1987 (c) 1987 (Japan)
+supduck         // (c) Comad
+1943            //  6/1987 (c) 1987 (Euro)
+1943u           //  6/1987 (c) 1987 (US) Rev C
+1943j           //  6/1987 (c) 1987 (Japan) Rev B
+1943ja          //  6/1987 (c) 1987 (Japan)
+1943b           // bootleg
+blktiger        //  8/1987 (c) 1987 (US)
+blktigera       //  8/1987 (c) 1987 (US)
+blktigerb1      // bootleg
+blktigerb2      // bootleg
+blktigerb3          // bootleg?
+blkdrgon        //  8/1987 (c) 1987 (Japan)
+blkdrgonb       // bootleg, hacked to say Black Tiger
+sf              //  8/1987 (c) 1987 (US)
+sfua            //  8/1987 (c) 1987 (US)
+sfj             //  8/1987 (c) 1987 (Japan)
+sfan            //  8/1987 (c) 1987 (World)
+sfp             //  8/1987 (c) 1987
+tigeroad        // 11/1987 (c) 1987 (US)
+tigeroadu       // 11/1987 (c) 1987 + Romstar (US)
+toramich        // 11/1987 (c) 1987 (Japan
+tigeroadb       // bootleg
+f1dream         //  4/1988 (c) 1988 + Romstar
+f1dreamb        // bootleg
+f1dreamba       // bootleg
+1943kai         //  6/1988 (c) 1987 (Japan)
+lastduel        //  7/1988 (c) 1988 (US)
+lastduelo       //  7/1988 (c) 1988 (US)
+lastduelj       //  7/1988 (c) 1988 (Japan)
+lastduelb       // bootleg
+madgear         //  2/1989 (c) 1989 (US)
+madgearj        //  2/1989 (c) 1989 (Japan)
+ledstorm        //  1988 (c) 1988 (US)
+ledstorm2       //  1988 (c) 1988 (US)
+//  3/1989 Dokaben (baseball) - see below among "Mitchell" games
+//  8/1989 Dokaben 2 (baseball) - see below among "Mitchell" games
+// 10/1989 Capcom Baseball - see below among "Mitchell" games
+// 11/1989 Capcom World - see below among "Mitchell" games
+//  3/1990 Adventure Quiz 2 Hatena no Dai-Bouken - see below among "Mitchell" games
+//  1/1991 Quiz Tonosama no Yabou - see below among "Mitchell" games
+//  4/1991 Ashita Tenki ni Naare (golf) - see below among "Mitchell" games
+//  5/1991 Ataxx - see below among "Leland" games
+//  6/1991 Quiz Sangokushi - see below among "Mitchell" games
+// 10/1991 Block Block - see below among "Mitchell" games
+//  6/1995 Street Fighter - the Movie - see below among "Incredible Technologies" games
+
+// Capcom CPS1 games
+forgottn        //  7/1988 (c) 1988 (World)
+forgottnu       //  7/1988 (c) 1988 (USA)
+forgottnu1      //  7/1988 (c) 1988 (USA)
+forgottnua      //  7/1988 (c) 1988 (USA)
+forgottnuaa     //  7/1988 (c) 1988 (USA)
+lostwrld        //  7/1988 (c) 1988 (Japan)
+lostwrldo       //  7/1988 (c) 1988 (Japan)
+ghouls          // 12/1988 (c) 1988 (World)
+ghoulsu         // 12/1988 (c) 1988 (USA)
+daimakai        // 12/1988 (c) 1988 (Japan)
+daimakair       // 12/1988 (c) 1988 (Japan)
+strider         //  3/1989 (c) 1989 (not explicitly stated but should be USA)
+striderua       //  3/1989 (c) 1989 (not explicitly stated but should be USA)
+striderj        //  3/1989 (c) 1989 (Japan)
+striderjr       //  3/1989 (c) 1989 (Japan)
+dynwar          //  4/1989 (c) 1989 (USA)
+dynwara         //  4/1989 (c) 1989 (USA)
+dynwarj         //  4/1989 (c) 1989 (Japan)
+dynwarjr        //  4/1989 (c) 1989 (Japan)
+willow          //  6/1989 (c) 1989 (World)
+willowu         //  6/1989 (c) 1989 (USA)
+willowuo        //  6/1989 (c) 1989 (USA)
+willowj         //  6/1989 (c) 1989 (Japan)
+unsquad         //  8/1989 (c) 1989 (USA)
+area88          //  8/1989 (c) 1989 (Japan)
+area88r         //  8/1989 (c) 1989 (Japan)
+ffight          // 12/1989 (c) 1989 (World)
+ffighta         // 12/1989 (c) 1989 (World)
+ffightu         // 12/1989 (c) 1989 (USA)
+ffightu1        // 12/1989 (c) 1989 (USA)
+ffightua        // 12/01/1990 (c) 1989 (USA)
+ffightub        // 13/06/1990 (c) 1989 (USA)
+ffightj         // 12/1989 (c) 1989 (Japan)
+ffightj1        // 12/01/1990 (c) 1989 (Japan)
+ffightj2        // 05/03/1990 (c) 1989 (Japan)
+ffightj3        // 13/06/1990 (c) 1989 (Japan)
+ffightjh        // hack
+1941            // 27/02/1990 (c) 1990 (World)
+1941r1          //  2/1990 (c) 1990 (World)
+1941u           // 27/02/1990 (c) 1990 (USA)
+1941j           //  2/1990 (c) 1990 (Japan)
+mercs           // 02/03/1990 (c) 1990 (World)
+mercsu          // 08/06/1990 (c) 1990 (USA)
+mercsur1        // 02/03/1990 (c) 1990 (USA)
+mercsj          // 02/03/1990 (c) 1990 (Japan)
+mtwins          // 19/06/1990 (c) 1990 (World)
+chikij          // 19/06/1990 (c) 1990 (Japan)
+msword          // 25/07/1990 (c) 1990 (World)
+mswordr1        // 23/06/1990 (c) 1990 (World)
+mswordu         // 25/07/1990 (c) 1990 (USA)
+mswordj         // 23/06/1990 (c) 1990 (Japan)
+cawing          // 12/10/1990 (c) 1990 (World)
+cawingr1        // 09/10/1990 (c) 1990 (World)
+cawingu         // 12/10/1990 (c) 1990 (USA)
+cawingj         // 12/10/1990 (c) 1990 (Japan)
+cawingbl        // bootleg
+cawingb2        // bootleg
+nemo            // 30/11/1990 (c) 1990 (World)
+nemor1      // 09/11/1990 (c) 1990 (World)
+nemoj           // 20/11/1990 (c) 1990 (Japan)
+sf2             // 22/05/1991 (c) 1991 (World)
+sf2eb           // 14/02/1991 (c) 1991 (World)
+sf2ed           // 18/03/1991 (c) 1991 (World)
+sf2ee           // 28/02/1991 (c) 1991 (World)
+sf2ebbl         // 14/02/1991 (c) 1991 (World, bootleg)
+sf2ebbl2        // 14/02/1991 (c) 1991 (World, bootleg)
+sf2ebbl3        // 14/02/1991 (c) 1991 (World, bootleg)
+sf2stt          // bootleg
+sf2rk           // bootleg
+sf2ua           // 06/02/1991 (c) 1991 (USA)
+sf2ub           // 14/02/1991 (c) 1991 (USA)
+sf2uc           // 06/03/1991 (c) 1991 (USA)
+sf2ud           // 18/03/1991 (c) 1991 (USA)
+sf2ue           // 28/02/1991 (c) 1991 (USA)
+sf2uf           // 11/04/1991 (c) 1991 (USA)
+sf2ug           // 22/05/1991 (c) 1991 (USA, Rev. G)
+sf2ui           // 22/05/1991 (c) 1991 (USA, Rev. I)
+sf2uk           // 01/11/1991 (c) 1991 (USA)
+sf2j            // 10/12/1991 (c) 1991 (Japan)
+sf2ja           // 14/02/1991 (c) 1991 (Japan)
+sf2jc           // 06/03/1991 (c) 1991 (Japan)
+sf2jf           // 11/04/1991 (c) 1991 (Japan)
+sf2jh           // 22/05/1991 (c) 1991 (Japan)
+sf2jl           // 12/03/1992 (c) 1991 (Japan)
+sf2qp1          // hack
+sf2thndr        // hack
+3wonders        // 20/05/1991 (c) 1991 (World)
+3wondersr1      // 13/05/1991 (c) 1991 (World)
+3wondersu       // 20/05/1991 (c) 1991 (USA)
+wonder3         // 20/05/1991 (c) 1991 (Japan)
+3wondersb       // bootleg
+3wondersh       // hack
+kod             // 05/08/1991 (c) 1991 (World)
+kodr1           // 11/07/1991 (c) 1991 (World)
+kodu            // 10/09/1991 (c) 1991 (USA)
+kodj            // 05/08/1991 (c) 1991 (Japan)
+kodja           // 05/08/1991 (c) 1991 (Japan)
+kodb            // bootleg
+captcomm        // 02/12/1991 (c) 1991 (World)
+captcommr1      // 14/10/1991 (c) 1991 (World)
+captcommu       // 28/09/1991 (c) 1991 (USA)
+captcommj       // 02/12/1991 (c) 1991 (Japan)
+captcommjr1     // 28/09/1991 (c) 1991 (Japan)
+captcommb       // bootleg
+knights         // 27/11/1991 (c) 1991 (World)
+knightsu        // 27/11/1991 (c) 1991 (USA)
+knightsj        // 27/11/1991 (c) 1991 (Japan)
+knightsja       // 27/11/1991 (c) 1991 (Japan)
+knightsb        // bootleg
+sf2ce           // 13/05/1992 (c) 1992 (World)
+sf2ceea         // 13/03/1992 (c) 1992 (World)
+sf2ceua         // 13/03/1992 (c) 1992 (USA)
+sf2ceub         // 13/05/1992 (c) 1992 (USA)
+sf2ceuc         // 03/08/1992 (c) 1992 (USA)
+sf2ceja         // 22/03/1992 (c) 1992 (Japan)
+sf2cejb         // 13/05/1992 (c) 1992 (Japan)
+sf2cejc         // 03/08/1992 (c) 1992 (Japan)
+sf2bhh          // hack
+sf2rb           // hack
+sf2rb2          // hack
+sf2rb3          // hack
+sf2red          // hack
+sf2v004         // hack
+sf2acc          // hack
+sf2acca         // hack
+sf2ceblp            // hack
+sf2accp2        // hack
+sf2amf          // bootleg
+sf2amf2         // bootleg
+sf2dkot2        // hack
+sf2m1           // hack
+sf2m2           // hack
+sf2m3           // hack
+sf2m4           // hack
+sf2m5           // hack
+sf2m6           // hack
+sf2m7           // hack
+sf2m8           // bootleg
+sf2m9           // bootleg
+sf2yyc          // hack
+sf2koryu        // hack
+sf2dongb        // hack
+sf2mdt          // bootleg
+sf2mdta         // bootleg
+sf2mdtb         // bootleg
+sf2b            // bootleg
+cworld2j        // 11/06/1992 (c) 1992 (Japan)
+cworld2ja       // 11/06/1992 (c) 1992 (Japan)
+cworld2jb       // 11/06/1992 (c) 1992 (Japan)
+varth           // 14/07/1992 (c) 1992 (World)
+varthr1         // 12/06/1992 (c) 1992 (World)
+varthu          // 12/06/1992 (c) 1992 (USA)
+varthj          // 14/07/1992 (c) 1992 (Japan)
+qad             // 01/07/1992 (c) 1992 (USA)
+qadjr           // 21/09/1994 (c) 1994 (Japan)
+wof             // 31/10/1992 (c) 1992 (World) (CPS1 + QSound)
+wofr1           // 02/10/1992 (c) 1992 (World) (CPS1 + QSound)
+wofu            // 31/10/1992 (c) 1992 (USA) (CPS1 + QSound)
+wofa            // 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound)
+wofj            // 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound)
+wofhfh          // bootleg
+sgyxz           // bootleg (All-In Electronics)
+sf2hf           // 09/12/1992 (c) 1992 (World)
+sf2hfu          // 09/12/1992 (c) 1992 (USA)
+sf2hfj          // 09/12/1992 (c) 1992 (Japan)
+dino            // 01/02/1993 (c) 1993 (World) (CPS1 + QSound)
+dinou           // 01/02/1993 (c) 1993 (USA) (CPS1 + QSound)
+dinoj           // 01/02/1993 (c) 1993 (Japan) (CPS1 + QSound)
+dinopic         // bootleg
+dinopic2        // bootleg
+dinohunt        // bootleg
+punisher        // 22/04/1993 (c) 1993 (World) (CPS1 + QSound)
+punisheru       // 22/04/1993 (c) 1993 (USA) (CPS1 + QSound)
+punisherh       // 22/04/1993 (c) 1993 (Hispanic) (CPS1 + QSound)
+punisherj       // 22/04/1993 (c) 1993 (Japan) (CPS1 + QSound)
+punipic         // bootleg
+punipic2        // bootleg
+punipic3        // bootleg
+punisherbz      // bootleg
+slammast        // 13/07/1993 (c) 1993 (World) (CPS1 + QSound)
+slammastu       // 13/07/1993 (c) 1993 (USA) (CPS1 + QSound)
+slampic         // bootleg
+mbomberj        // 13/07/1993 (c) 1993 (Japan) (CPS1 + QSound)
+mbombrd         // 06/12/1993 (c) 1993 (World) (CPS1 + QSound)
+mbombrdj        // 06/12/1993 (c) 1993 (Japan) (CPS1 + QSound)
+kenseim         // 18/04/1994 (c) 1994 Togo/Sigma (Japan) not listed on Capcom's site
+pnickj          // 08/06/1994 (c) 1994 Compile + Capcom license (Japan) not listed on Capcom's site
+qtono2j         // 23/01/1995 (c) 1995 (Japan)
+pang3           // 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
+pang3r1         // 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
+pang3j          // 11/05/1995 (c) 1995 Mitchell (Japan) not listed on Capcom's site
+pang3b          // bootleg
+megaman         // 06/10/1995 (c) 1995 (USA)
+megamana        // 06/10/1995 (c) 1995 (Asia)
+rockmanj        // 22/09/1995 (c) 1995 (Japan)
+fcrash          // bootleg of Final Fight
+ffightbl        // bootleg
+ganbare         // 11/04/2000 (c) 2000 (Japan)
+
+
+// Capcom CPS2 games
+// list completed by CPS2Shock
+// http://cps2shock.retrogames.com
+ssf2            // 05/10/1993 (c) 1993 (World)
+ssf2r1          // 11/09/1993 (c) 1993 (World)
+ssf2u           // 11/09/1993 (c) 1993 (USA)
+ssf2a           // 05/10/1993 (c) 1993 (Asia)
+ssf2ar1         // 14/09/1993 (c) 1993 (Asia)
+ssf2j           // 05/10/1993 (c) 1993 (Japan)
+ssf2jr1         // 11/09/1993 (c) 1993 (Japan)
+ssf2jr2         // 10/09/1993 (c) 1993 (Japan)
+ssf2h           // 11/09/1993 (c) 1993 (Hispanic)
+ssf2tb          // 19/11/1993 (c) 1993 (World)
+ssf2tbr1        // 11/09/1993 (c) 1993 (World)
+ssf2tbj         // 11/09/1993 (c) 1993 (Japan)
+ssf2tbh         // 05/10/1993 (c) 1993 (Hispanic)
+ecofghtr        // 03/12/1993 (c) 1994 (World)
+ecofghtru       // 15/02/1994 (c) 1994 (USA)
+ecofghtru1      // 03/12/1993 (c) 1994 (USA)
+ecofghtra       // 03/12/1993 (c) 1994 (Asia)
+ecofghtrh       // 03/12/1993 (c) 1994 (Hispanic)
+uecology        // 03/12/1993 (c) 1994 (Japan)
+ddtod           // 12/04/1994 (c) 1993 (Euro)
+ddtodr1         // 13/01/1994 (c) 1993 (Euro)
+ddtodu          // 25/01/1994 (c) 1993 (USA)
+ddtodur1        // 13/01/1994 (c) 1993 (USA)
+ddtodj          // 12/04/1994 (c) 1993 (Japan)
+ddtodjr1        // 25/01/1994 (c) 1993 (Japan)
+ddtodjr2        // 13/01/1994 (c) 1993 (Japan)
+ddtoda          // 12/04/1994 (c) 1993 (Asia)
+ddtodar1        // 13/01/1994 (c) 1993 (Asia)
+ddtodh          // 12/04/1994 (c) 1993 (Hispanic)
+ddtodhr1        // 25/01/1994 (c) 1993 (Hispanic)
+ddtodhr2        // 13/01/1994 (c) 1993 (Hispanic)
+ssf2t           // 23/02/1994 (c) 1994 (World)
+ssf2tu          // 23/03/1994 (c) 1994 (USA)
+ssf2tur1        // 23/02/1994 (c) 1994 (USA)
+ssf2ta          // 23/02/1994 (c) 1994 (Asia)
+ssf2xj          // 23/02/1994 (c) 1994 (Japan)
+avsp            // 20/05/1994 (c) 1994 (Euro)
+ssf2xjr         // 23/02/1994 (c) 1994 (Japan)
+avspu           // 20/05/1994 (c) 1994 (USA)
+avspj           // 20/05/1994 (c) 1994 (Japan)
+avspa           // 20/05/1994 (c) 1994 (Asia)
+avsph           // 20/05/1994 (c) 1994 (Hispanic)
+				// 06/1994? Galum Pa! (not listed on Capcom's site)
+dstlk           // 05/07/1994 (c) 1994 (Euro)
+dstlku          // 18/08/1994 (c) 1994 (USA)
+dstlkur1        // 05/07/1994 (c) 1994 (USA)
+dstlka          // 05/07/1994 (c) 1994 (Asia)
+dstlkh          // 18/08/1994 (c) 1994 (Hispanic)
+vampj           // 05/07/1994 (c) 1994 (Japan)
+vampja          // 05/07/1994 (c) 1994 (Japan)
+vampjr1         // 30/06/1994 (c) 1994 (Japan)
+ringdest        // 02/09/1994 (c) 1994 (Euro)
+ringdesta       // 31/08/1994 (c) 1994 (Asia)
+smbomb          // 31/08/1994 (c) 1994 (Japan)
+smbombr1        // 08/08/1994 (c) 1994 (Japan)
+armwar          // 24/10/1994 (c) 1994 (Euro)
+armwarr1        // 11/10/1994 (c) 1994 (Euro)
+armwaru         // 24/10/1994 (c) 1994 (USA)
+armwaru1        // 20/09/1994 (c) 1994 (USA)
+pgear           // 24/10/1994 (c) 1994 (Japan)
+pgearr1         // 16/09/1994 (c) 1994 (Japan)
+armwara         // 24/10/1994 (c) 1994 (Asia)
+armwarar1       // 20/09/1994 (c) 1994 (Asia)
+xmcota          // 31/03/1995 (c) 1994 (Euro)
+xmcotar1        // 05/01/1995 (c) 1994 (Euro)
+xmcotau         // 05/01/1995 (c) 1994 (USA)
+xmcotah         // 31/03/1995 (c) 1994 (Hispanic)
+xmcotahr1       // 05/01/1995 (c) 1994 (Hispanic)
+xmcotaj         // 05/01/1995 (c) 1994 (Japan)
+xmcotaj1        // 22/12/1994 (c) 1994 (Japan)
+xmcotaj2        // 19/12/1994 (c) 1994 (Japan)
+xmcotaj3        // 17/12/1994 (c) 1994 (Japan)
+xmcotaa         // 05/01/1995 (c) 1994 (Asia)
+xmcotaar1       // 17/12/1994 (c) 1994 (Asia)
+xmcotajr        // 08/12/1994 (c) 1994 (Japan Rent)
+nwarr           // 16/03/1995 (c) 1995 (Euro)
+nwarru          // 06/04/1995 (c) 1995 (USA)
+nwarrh          // 03/04/1995 (c) 1995 (Hispanic)
+nwarrb          // 03/04/1995 (c) 1995 (Brazil)
+nwarra          // 02/03/1995 (c) 1995 (Asia)
+vhuntj          // 02/03/1995 (c) 1995 (Japan)
+vhuntjr1s       // 07/03/1995 (c) 1995 (Japan)
+vhuntjr1        // 07/03/1995 (c) 1995 (Japan)
+vhuntjr2        // 02/03/1995 (c) 1995 (Japan)
+cybots          // 24/04/1995 (c) 1995 (Euro)
+cybotsu         // 24/04/1995 (c) 1995 (USA)
+cybotsj         // 20/04/1995 (c) 1995 (Japan)
+sfa             // 27/07/1995 (c) 1995 (Euro)
+sfar1           // 18/07/1995 (c) 1995 (Euro)
+sfar2           // 27/06/1995 (c) 1995 (Euro)
+sfar3           // 05/06/1995 (c) 1995 (Euro)
+sfau            // 27/06/1995 (c) 1995 (USA)
+sfza            // 27/06/1995 (c) 1995 (Asia)
+sfzar1          // 05/06/1995 (c) 1995 (Asia)
+sfzj            // 27/07/1995 (c) 1995 (Japan)
+sfzjr1          // 27/06/1995 (c) 1995 (Japan)
+sfzjr2          // 05/06/1995 (c) 1995 (Japan)
+sfzh            // 18/07/1995 (c) 1995 (Hispanic)
+sfzhr1          // 27/06/1995 (c) 1995 (Hispanic)
+sfzb            // 09/11/1995 (c) 1995 (Brazil)
+sfzbr1          // 27/07/1995 (c) 1995 (Brazil)
+mmancp2u        // 06/10/1995 (c) 1995 (USA)
+mmancp2ur1      // 26/09/1995 (c) 1995 (USA)
+rmancp2j        // 22/09/1995 (c) 1995 (Japan)
+msh             // 24/10/1995 (c) 1995 (Euro)
+mshu            // 24/10/1995 (c) 1995 (USA)
+mshj            // 17/11/1995 (c) 1995 (Japan)
+mshjr1          // 24/10/1995 (c) 1995 (Japan)
+msha            // 24/10/1995 (c) 1995 (Asia)
+mshh            // 17/11/1995 (c) 1995 (Hispanic)
+mshb            // 17/11/1995 (c) 1995 (Brazil)
+19xx            // 07/12/1995 (c) 1996 (USA)
+19xxj           // 04/01/1996 (c) 1996 (Japan)
+19xxjr1         // 25/12/1995 (c) 1996 (Japan)
+19xxjr2         // 07/12/1995 (c) 1996 (Japan)
+19xxa           // 04/01/1996 (c) 1996 (Asia)
+19xxar1         // 07/12/1995 (c) 1996 (Asia)
+19xxh           // 18/12/1995 (c) 1996 (Hispanic)
+19xxb           // 18/12/1995 (c) 1996 (Brazil)
+ddsom           // 19/06/1996 (c) 1996 (Euro)
+ddsomr1         // 23/02/1996 (c) 1996 (Euro)
+ddsomr2         // 09/02/1996 (c) 1996 (Euro)
+ddsomr3         // 08/02/1996 (c) 1996 (Euro)
+ddsomu          // 19/06/1996 (c) 1996 (USA)
+ddsomur1        // 09/02/1996 (c) 1996 (USA)
+ddsomjr1        // 06/02/1996 (c) 1996 (Japan)
+ddsomj          // 19/06/1996 (c) 1996 (Japan)
+ddsoma          // 19/06/1996 (c) 1996 (Asia)
+ddsomar1        // 08/02/1996 (c) 1996 (Asia)
+ddsomh          // 23/02/1996 (c) 1996 (Hispanic)
+ddsomb          // 23/02/1996 (c) 1996 (Brazil)
+sfa2            // 06/03/1996 (c) 1996 (Euro)
+sfa2u           // 30/04/1996 (c) 1996 (USA)
+sfa2ur1         // 06/03/1996 (c) 1996 (USA)
+sfz2j           // 30/04/1996 (c) 1996 (Japan)
+sfz2jr1         // 27/02/1996 (c) 1996 (Japan)
+sfz2a           // 27/02/1996 (c) 1996 (Asia)
+sfz2b           // 31/05/1996 (c) 1996 (Brazil)
+sfz2br1         // 04/03/1996 (c) 1996 (Brazil)
+sfz2h           // 04/03/1996 (c) 1996 (Hispanic)
+sfz2n           // 29/02/1996 (c) 1996 (Oceania)
+spf2t           // 29/05/1996 (c) 1996 (Europe)
+spf2tu          // 20/06/1996 (c) 1996 (USA)
+spf2xj          // 31/05/1996 (c) 1996 (Japan)
+spf2ta          // 29/05/1996 (c) 1996 (Asia)
+spf2th          // 31/05/1996 (c) 1996 (Hispanic)
+megaman2        // 08/07/1996 (c) 1996 (USA)
+megaman2a       // 08/07/1996 (c) 1996 (Asia)
+rockman2j       // 08/07/1996 (c) 1996 (Japan)
+megaman2h       // 12/07/1996 (c) 1996 (Hispanic)
+gigaman2        // bootleg
+sfz2al          // 26/08/1996 (c) 1996 (Asia)
+sfz2alj         // 05/08/1996 (c) 1996 (Japan)
+sfz2alh         // 13/08/1996 (c) 1996 (Hispanic)
+sfz2alb         // 13/08/1996 (c) 1996 (Brazil)
+qndream         // 26/08/1996 (c) 1996 (Japan)
+xmvsf           // 04/10/1996 (c) 1996 (Euro)
+xmvsfr1         // 10/09/1996 (c) 1996 (Euro)
+xmvsfu          // 23/10/1996 (c) 1996 (USA)
+xmvsfur1        // 04/10/1996 (c) 1996 (USA)
+xmvsfj          // 04/10/1996 (c) 1996 (Japan)
+xmvsfjr1        // 10/09/1996 (c) 1996 (Japan)
+xmvsfjr2        // 09/09/1996 (c) 1996 (Japan)
+xmvsfa          // 23/10/1996 (c) 1996 (Asia)
+xmvsfar1        // 04/10/1996 (c) 1996 (Asia)
+xmvsfar2        // 19/09/1996 (c) 1996 (Asia)
+xmvsfar3        // 10/09/1996 (c) 1996 (Asia)
+xmvsfh          // 04/10/1996 (c) 1996 (Hispanic)
+xmvsfb          // 23/10/1996 (c) 1996 (Brazil)
+batcir          // 19/03/1997 (c) 1997 (Euro)
+batcirj         // 19/03/1997 (c) 1997 (Japan)
+batcira         // 19/03/1997 (c) 1997 (Asia)
+vsav            // 19/05/1997 (c) 1997 (Euro)
+vsavu           // 19/05/1997 (c) 1997 (USA)
+vsavj           // 19/05/1997 (c) 1997 (Japan)
+vsava           // 19/05/1997 (c) 1997 (Asia)
+vsavh           // 19/05/1997 (c) 1997 (Hispanic)
+mshvsf          // 25/06/1997 (c) 1997 (Euro)
+mshvsfu         // 27/08/1997 (c) 1997 (USA)
+mshvsfu1        // 25/06/1997 (c) 1997 (USA)
+mshvsfj         // 07/07/1997 (c) 1997 (Japan)
+mshvsfj1        // 02/07/1997 (c) 1997 (Japan)
+mshvsfj2        // 25/06/1997 (c) 1997 (Japan)
+mshvsfh         // 25/06/1997 (c) 1997 (Hispanic)
+mshvsfa         // 25/06/1997 (c) 1997 (Asia)
+mshvsfa1        // 20/06/1997 (c) 1997 (Asia)
+mshvsfb         // 27/08/1997 (c) 1997 (Brazil)
+mshvsfb1        // 25/06/1997 (c) 1997 (Brazil)
+csclub          // 17/10/1997 (c) 1997 (Euro)
+csclub1         // 22/07/1997 (c) 1997 (Euro)
+csclubj         // 22/07/1997 (c) 1997 (Japan)
+csclubjy        // 22/07/1997 (c) 1997 (Japan)
+cscluba         // 22/07/1997 (c) 1997 (Asia)
+csclubh         // 22/07/1997 (c) 1997 (Hispanic)
+sgemf           // 04/09/1997 (c) 1997 (USA)
+pfghtj          // 04/09/1997 (c) 1997 (Japan)
+sgemfa          // 04/09/1997 (c) 1997 (Asia)
+sgemfh          // 04/09/1997 (c) 1997 (Hispanic)
+vhunt2r1        // 13/09/1997 (c) 1997 (Japan)
+vhunt2          // 29/09/1997 (c) 1997 (Japan)
+vsav2           // 13/09/1997 (c) 1997 (Japan)
+mvsc            // 23/01/1998 (c) 1998 (Euro)
+mvscr1          // 12/01/1998 (c) 1998 (Euro)
+mvscu           // 23/01/1998 (c) 1998 (USA)
+mvscur1         // 23/01/1998 (c) 1998 (USA)
+mvscj           // 23/01/1998 (c) 1998 (Japan)
+mvscjr1         // 12/01/1998 (c) 1998 (Japan)
+mvscjsing       // 23/01/1998 (c) 1998 (Japan) - Single PCB
+mvsca           // 23/01/1998 (c) 1998 (Asia)
+mvscar1         // 12/01/1998 (c) 1998 (Asia)
+mvsch           // 23/01/1998 (c) 1998 (Hispanic)
+mvscb           // 23/01/1998 (c) 1998 (Brazil)
+sfa3            // 04/09/1998 (c) 1998 (USA)
+sfa3u           // 04/09/1998 (c) 1998 (USA)
+sfa3ur1         // 29/06/1998 (c) 1998 (USA)
+sfa3h           // 04/09/1998 (c) 1998 (Hispanic)
+sfa3hr1         // 29/06/1998 (c) 1998 (Hispanic)
+sfa3b           // 29/06/1998 (c) 1998 (Brazil)
+sfz3j           // 04/09/1998 (c) 1998 (Japan)
+sfz3jr1         // 27/07/1998 (c) 1998 (Japan)
+sfz3jr2         // 29/06/1998 (c) 1998 (Japan)
+sfz3a           // 04/09/1998 (c) 1998 (Asia)
+sfz3ar1         // 01/07/1998 (c) 1998 (Asia)
+gigawing        // 22/02/1999 (c) 1999 Takumi (USA)
+gigawingj       // 23/02/1999 (c) 1999 Takumi (Japan)
+gigawinga       // 22/02/1999 (c) 1999 Takumi (Asia)
+gigawingh       // 22/02/1999 (c) 1999 Takumi (Hispanic)
+gigawingb       // 22/02/1999 (c) 1999 Takumi (Brazil)
+jyangoku        // 27/05/1999 (c) 1999 (Japan)
+dimahoo         // 21/01/2000 (c) 2000 Eighting/Raizing (USA)
+dimahoou        // 21/01/2000 (c) 2000 Eighting/Raizing (USA)
+gmahou          // 21/01/2000 (c) 2000 Eighting/Raizing (Japan)
+mmatrix         // 12/04/2000 (c) 2000 Takumi (USA)
+mmatrixj        // 12/04/2000 (c) 2000 Takumi (Japan)
+1944            // 20/06/2000 (c) 2000 Eighting/Raizing (USA)
+1944j           // 20/06/2000 (c) 2000 Eighting/Raizing (Japan)
+mpang           // 10/10/2000 (c) 2000 Mitchell (Euro)
+mpangr1         // 25/09/2000 (c) 2000 Mitchell (Euro)
+mpangu          // 10/10/2000 (c) 2000 Mitchell (USA)
+mpangj          // 11/10/2000 (c) 2000 Mitchell (Japan)
+progear         // 17/01/2001 (c) 2001 Cave (USA)
+progearj        // 17/01/2001 (c) 2001 Cave (Japan)
+progeara        // 17/01/2001 (c) 2001 Cave (Asia)
+pzloop2         // 02/03/2001 (c) 2001 Mitchell (Euro)
+pzloop2j        // 26/02/2001 (c) 2001 Mitchell (Japan)
+pzloop2jr1      // 05/02/2001 (c) 2001 Mitchell (Japan)
+choko           // 20/08/2001 (c) 2001 Mitchell (Japan)
+hsf2            // 02/02/2004 (c) 2003, 2004 (USA)
+hsf2j           // 22/12/2003 (c) 2003, 2004 (Japan)
+hsf2a           // 02/02/2004 (c) 2003, 2004 (Asia)
+
+// Amstrad / Schneider
+cpc464  // Amstrad (Schneider in Germany) 1984
+cpc664  // Amstrad (Schneider in Germany) 1985
+cpc6128   // Amstrad (Schneider in Germany) 1985
+cpc6128s  // Amstrad (Schneider in Germany) 1985
+cpc6128f  // Amstrad (Schneider in Germany) 1985 (AZERTY)
+cpc464p   // Amstrad CPC464  Plus - 1990
+cpc6128p  // Amstrad CPC6128 Plus - 1990
+gx4000  // Amstrad GX4000 - 1990
+kccomp  // VEB KC compact
+al520ex   // Patisonic Aleste 520EX (1993)
+pcw8256   // 198? PCW8256
+pcw8512   // 198? PCW8512
+pcw9256   // 198? PCW9256
+pcw9512   // 198? PCW9512 (+)
+pcw10    // 198? PCW10
+pcw16    // 1995 PCW16
+nc100    // 1992 NC100
+dw225
+nc150    // 1992 NC150
+nc200    // 1993 NC200
+
+// Nintendo
+nes       // Nintendo Entertainment System
+nespal    // Nintendo Entertainment System PAL
+m82       // Nintendo M82 Display Unit
+famicom   // Nintendo Family Computer (a.k.a. Famicom)
+fds       // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
+famitwin  // Sharp Famicom Twin System
+drpcjr    // Bung Doctor PC Jr
+dendy     // Dendy (Classic russian famiclone)
+gchinatv  // Golden China TV Game Centre (Chinese famiclone)
+gameboy   // Nintendo Game Boy Handheld
+supergb   // Nintendo Super Game Boy SNES Cartridge
+gbpocket  // Nintendo Game Boy Pocket Handheld
+gbcolor   // Nintendo Game Boy Color Handheld
+gba       // Nintendo Game Boy Advance Handheld
+snes      // Nintendo Super Nintendo NTSC
+snespal   // Nintendo Super Nintendo PAL
+n64       // Nintendo N64
+n64dd     // Nintendo N64 (64DD Attachment)
+pokemini  // Nintendo Pokemon Mini
+
+// Nintendo games
+spacefev        // (c) 1979 Nintendo
+spacefevo       // (c) 1979 Nintendo
+spacefevo2      // (c) 1979 Nintendo
+highsplt        // (c) 1979 Nintendo
+highsplta       // (c) 1979 Nintendo
+highspltb       // (c) 1979 Nintendo
+spacelnc        // (c) 1979 Nintendo
+sheriff         // (c) 1979 Nintendo
+bandido         // (c) 1980 Exidy
+westgun2        // (c) 1980 Taito Corporation
+helifire        // (c) 1980 Nintendo
+helifirea       // (c) 1980 Nintendo
+radarscp        // (c) 1980 Nintendo
+radarscp1       // (c) 1980 Nintendo
+dkong           // (c) 1981 Nintendo of America
+dkonghrd
+dkongo          // (c) 1981 Nintendo
+dkongj          // (c) 1981 Nintendo
+dkongjo         // (c) 1981 Nintendo
+dkongjo1        // (c) 1981 Nintendo
+dkongf          // hack from Jeff's Romhack
+dkongx          // hack
+dkongx11        // hack
+dkongjr         // (c) 1982 Nintendo of America
+dkongjrj        // (c) 1982 Nintendo
+dkongjnrj       // (c) 1982 Nintendo
+dkongjre        // (c) 1982 Nintendo of America
+dkongjrpb       // bootleg
+dkongjrb        // bootleg
+jrking          // bootleg
+dkingjr         // bootleg
+dkong3          // (c) 1983 Nintendo of America
+dkong3j         // (c) 1983 Nintendo
+dkong3b         // bootleg
+mario           // (c) 1983 Nintendo of America
+marioe          // (c) 1983 Nintendo of America
+marioo          // (c) 1983 Nintendo of America
+marioj          // (c) 1983 Nintendo
+masao           // bootleg
+mariobl         // bootleg
+dkong3abl       //
+pestplce        // bootleg on donkey kong hw
+spclforc        // (c) 1985 Senko Industries (Magic Eletronics Inc. license)
+spcfrcii        // (c) 1985 Senko Industries (Magic Eletronics Inc. license)
+8ballact        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
+8ballact2       // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
+shootgal        // (c) 1984 Seatongrove Ltd (Zaccaria license)
+drakton         // (c) 1984 Epos Corporation
+drktnjr         // (c) 1984 Epos Corporation
+strtheat        // (c) 1985 Epos Corporation
+hunchbkd        // (c) 1983 Century
+sbdk            // (c) 1984 Century
+herbiedk        // (c) 1984 CVS
+herodk          // (c) 1984 Seatongrove + Crown license
+herodku         // (c) 1984 Seatongrove + Crown license
+skyskipr        // (c) 1981
+popeye          // (c) 1982
+popeyeu         // (c) 1982
+popeyef         // (c) 1982
+popeyebl        // bootleg
+punchout        // (c) 1984
+punchouta       // (c) 1984
+punchoutj       // (c) 1984 (Japan)
+punchita        // bootleg
+spnchout        // (c) 1984
+spnchouta       // (c) 1984
+spnchoutj       // (c) 1984 (Japan)
+armwrest        // (c) 1985
+
+// Neo Geo games
+// the four digits number is the game ID stored at address 0x0108 of the program ROM
+// info on prototypes taken from http://www.members.tripod.com/fresa/proto/puzzle.htm
+neogeo
+nam1975         // 0001 (c) 1990 SNK
+bstars          // 0002 (c) 1990 SNK
+bstarsh         // 0002 (c) 1990 SNK
+tpgolf          // 0003 (c) 1990 SNK
+mahretsu        // 0004 (c) 1990 SNK
+maglord         // 0005 (c) 1990 Alpha Denshi Co.
+maglordh        // 0005 (c) 1990 Alpha Denshi Co.
+ridhero         // 0006 (c) 1990 SNK
+ridheroh        // 0006 (c) 1990 SNK
+alpham2         // 0007 (c) 1991 SNK
+alpham2p        // 0007 (c) 1991 SNK (prototype)
+				// 0008 Sunshine (prototype) 1990 SNK
+ncombat         // 0009 (c) 1990 Alpha Denshi Co.
+ncombath        // 0009 (c) 1990 Alpha Denshi Co.
+cyberlip        // 0010 (c) 1990 SNK
+superspy        // 0011 (c) 1990 SNK
+				// 0012
+				// 0013
+mutnat          // 0014 (c) 1992 SNK
+				// 0015
+kotm            // 0016 (c) 1991 SNK
+kotmh           // 0016 (c) 1991 SNK
+sengoku         // 0017 (c) 1991 SNK
+sengokuh        // 0017 (c) 1991 SNK
+burningf        // 0018 (c) 1991 SNK
+burningfh       // 0018 (c) 1991 SNK
+burningfp       // 0018 (c) 1991 SNK (prototype)
+lbowling        // 0019 (c) 1990 SNK
+gpilots         // 0020 (c) 1991 SNK
+gpilotsh        // 0020 (c) 1991 SNK
+joyjoy          // 0021 (c) 1990 SNK
+bjourney        // 0022 (c) 1990 Alpha Denshi Co.
+quizdais        // 0023 (c) 1991 SNK
+quizdaisk       // 0123 (c) 1991 SNK
+lresort         // 0024 (c) 1992 SNK
+eightman        // 0025 (c) 1991 SNK / Pallas
+				// 0026 Fun Fun Brothers (prototype) 1991 Alpha
+minasan         // 0027 (c) 1990 Monolith Corp.
+				// 0028 Dunk Star (prototype) Sammy
+legendos        // 0029 (c) 1991 SNK
+2020bb          // 0030 (c) 1991 SNK / Pallas
+2020bba         // 0030 (c) 1991 SNK / Pallas
+2020bbh         // 0030 (c) 1991 SNK / Pallas
+socbrawl        // 0031 (c) 1991 SNK
+socbrawlh       // 0031 (c) 1991 SNK
+roboarmy        // 0032 (c) 1991 SNK
+fatfury1        // 0033 (c) 1991 SNK
+fbfrenzy        // 0034 (c) 1992 SNK
+				// 0035 Mystic Wand (prototype) 1991 Alpha
+bakatono        // 0036 (c) 1991 Monolith Corp.
+crsword         // 0037 (c) 1991 Alpha Denshi Co.
+trally          // 0038 (c) 1991 Alpha Denshi Co.
+kotm2           // 0039 (c) 1992 SNK
+kotm2p          // 0039 (c) 1992 SNK (prototype)
+sengoku2        // 0040 (c) 1993 SNK
+bstars2         // 0041 (c) 1992 SNK
+quizdai2        // 0042 (c) 1992 SNK
+3countb         // 0043 (c) 1993 SNK
+aof             // 0044 (c) 1992 SNK
+samsho          // 0045 (c) 1993 SNK
+samshoh         // 0045 (c) 1993 SNK
+tophuntr        // 0046 (c) 1994 SNK
+tophuntrh       // 0046 (c) 1994 SNK
+fatfury2        // 0047 (c) 1992 SNK
+janshin         // 0048 (c) 1994 Aicom
+androdun        // 0049 (c) 1992 Visco
+ncommand        // 0050 (c) 1992 Alpha Denshi Co.
+viewpoin        // 0051 (c) 1992 Sammy
+ssideki         // 0052 (c) 1992 SNK
+wh1             // 0053 (c) 1992 Alpha Denshi Co.
+wh1h            // 0053 (c) 1992 Alpha Denshi Co.
+wh1ha           // 0053 (c) 1992 Alpha Denshi Co.
+				// 0054 Crossed Swords 2  (CD only? not confirmed, MVS might exist)
+kof94           // 0055 (c) 1994 SNK
+aof2            // 0056 (c) 1994 SNK
+aof2a           // 0056 (c) 1994 SNK
+wh2             // 0057 (c) 1993 ADK
+fatfursp        // 0058 (c) 1993 SNK
+fatfurspa       // 0058 (c) 1993 SNK
+savagere        // 0059 (c) 1995 SNK
+fightfev        // 0060 (c) 1994 Viccom
+fightfeva       // 0060 (c) 1994 Viccom
+ssideki2        // 0061 (c) 1994 SNK
+spinmast        // 0062 (c) 1993 Data East Corporation
+samsho2         // 0063 (c) 1994 SNK
+samsho2k        // 0063 (c) 1994 SNK (Korean hack)
+wh2j            // 0064 (c) 1994 ADK / SNK
+wjammers        // 0065 (c) 1994 Data East Corporation
+karnovr         // 0066 (c) 1994 Data East Corporation
+gururin         // 0067 (c) 1994 Face
+pspikes2        // 0068 (c) 1994 Video System Co.
+				// Super Volley '94 was once released in Mar.1994, and recalled. Then released as Power Spikes 2 (with some tweaks).
+fatfury3        // 0069 (c) 1995 SNK
+zupapa          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
+				// 0071 Bang Bang Busters (prototype) 1994 Visco
+				// 0072 Last Odyssey Pinball Fantasia (prototype) 1995 Monolith
+panicbom        // 0073 (c) 1994 Eighting / Hudson
+aodk            // 0074 (c) 1994 ADK / SNK
+sonicwi2        // 0075 (c) 1994 Video System Co.
+zedblade        // 0076 (c) 1994 NMK
+				// 0077 The Warlocks of the Fates (prototype) 1995 Astec
+galaxyfg        // 0078 (c) 1995 Sunsoft
+strhoop         // 0079 (c) 1994 Data East Corporation
+quizkof         // 0080 (c) 1995 Saurus
+quizkofk        // 0080 (c) 1995 Saurus
+ssideki3        // 0081 (c) 1995 SNK
+doubledr        // 0082 (c) 1995 Technos
+pbobblen        // 0083 (c) 1994 Taito
+pbobblenb       // bootleg
+kof95           // 0084 (c) 1995 SNK
+kof95a          // 0084 (c) 1995 SNK, alternate board
+kof95h          // 0084 (c) 1995 SNK
+				// 0085 Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only)
+tws96           // 0086 (c) 1996 Tecmo
+samsho3         // 0087 (c) 1995 SNK
+samsho3h        // 0087 (c) 1995 SNK
+fswords         // 0187 Korean hack of samsho3
+stakwin         // 0088 (c) 1995 Saurus
+pulstar         // 0089 (c) 1995 Aicom
+whp             // 0090 (c) 1995 ADK / SNK
+				// 0091
+kabukikl        // 0092 (c) 1995 Hudson
+neobombe        // 0093 (c) 1997 Hudson
+gowcaizr        // 0094 (c) 1995 Technos
+rbff1           // 0095 (c) 1995 SNK
+rbff1a          // 0095 (c) 1995 SNK
+aof3            // 0096 (c) 1996 SNK
+aof3k           // 0196 Censored Korean release of aof3
+sonicwi3        // 0097 (c) 1995 Video System Co.
+				// 0098 Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist)
+				// 0099 Neo Pool Masters
+turfmast        // 0200 (c) 1996 Nazca
+mslug           // 0201 (c) 1996 Nazca
+puzzledp        // 0202 (c) 1995 Taito (Visco license)
+mosyougi        // 0203 (c) 1995 ADK / SNK
+				// 0204 QP (prototype)
+				// 0205 Neo-Geo CD Special (CD only)
+marukodq        // 0206 (c) 1995 Takara
+neomrdo         // 0207 (c) 1996 Visco
+sdodgeb         // 0208 (c) 1996 Technos
+goalx3          // 0209 (c) 1995 Visco
+				// 0210 Karate Ninja Sho (prototype) 1995 Yumekobo
+				// 0211 Oshidashi Zintrick (CD only? not confirmed, MVS might exist) 1996 SNK/ADK
+zintrckb        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
+overtop         // 0212 (c) 1996 ADK
+neodrift        // 0213 (c) 1996 Visco
+kof96           // 0214 (c) 1996 SNK
+kof96h          // 0214 (c) 1996 SNK
+ssideki4        // 0215 (c) 1996 SNK
+kizuna          // 0216 (c) 1996 SNK
+kizuna4p        // 0216 (c) 1996 SNK - same cartridge as kizuna, needs extension board and a compatible MVS to enable 4p mode
+ninjamas        // 0217 (c) 1996 ADK / SNK
+ragnagrd        // 0218 (c) 1996 Saurus
+pgoal           // 0219 (c) 1996 Saurus
+ironclad        // 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (protoype)
+ironclado       // 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (protoype, older)
+magdrop2        // 0221 (c) 1996 Data East Corporation
+samsho4         // 0222 (c) 1996 SNK
+samsho4k        // Censored Korean release of samsho4
+rbffspec        // 0223 (c) 1996 SNK
+rbffspeck       // 0124 (c) 1996 SNK
+twinspri        // 0224 (c) 1996 ADK
+wakuwak7        // 0225 (c) 1996 Sunsoft
+				// 0226 Pair Pair Wars (prototype) 1996 Sunsoft?
+stakwin2        // 0227 (c) 1996 Saurus
+ghostlop        // 0228 GhostLop (prototype) 1996? Data East
+				// 0229 King of Fighters '96 CD Collection (CD only)
+breakers        // 0230 (c) 1996 Visco
+miexchng        // 0231 (c) 1997 Face
+kof97           // 0232 (c) 1997 SNK
+kof97h          // 0232 (c) 1997 SNK
+kof97k          // 0232 (c) 1997 SNK
+kof97pls        // bootleg of kof97
+kof97oro        // bootleg of kof97
+kog             // bootleg of kof97
+magdrop3        // 0233 (c) 1997 Data East Corporation
+lastblad        // 0234 (c) 1997 SNK
+lastbladh       // 0234 (c) 1997 SNK
+lastsold        // 0196 Censored Korean release of lastblad
+puzzldpr        // 0235 (c) 1997 Taito (Visco license)
+irrmaze         // 0236 (c) 1997 SNK / Saurus
+popbounc        // 0237 (c) 1997 Video System Co.
+shocktro        // 0238 (c) 1997 Saurus
+shocktroa       // 0238 (c) 1997 Saurus
+blazstar        // 0239 (c) 1998 Yumekobo
+rbff2           // 0240 (c) 1998 SNK
+rbff2h          // 0240 (c) 1998 SNK
+rbff2k          // 0140 Censored Korean release of rbff2
+mslug2          // 0241 (c) 1998 SNK
+kof98           // 0242 (c) 1998 SNK
+kof98a          // 0242 (c) 1998 SNK, alternate board
+kof98k          // 0242 (c) 1998 SNK
+kof98ka         // 0242 (c) 1998 SNK
+kof98h          // 0242 (c) 1998 SNK
+lastbld2        // 0243 (c) 1998 SNK
+neocup98        // 0244 (c) 1998 SNK
+breakrev        // 0245 (c) 1998 Visco
+shocktr2        // 0246 (c) 1998 Saurus
+lans2004        // bootleg of shocktr2
+flipshot        // 0247 (c) 1998 Visco
+pbobbl2n        // 0248 (c) 1999 Taito (SNK license)
+ctomaday        // 0249 (c) 1999 Visco
+mslugx          // 0250 (c) 1999 SNK
+kof99           // 0251 (c) 1999 SNK
+kof99h          // 0251 (c) 1999 SNK
+kof99e          // 0251 (c) 1999 SNK
+kof99k          // 0152 (c) 1999 SNK
+kof99p          // 0251 (c) 1999 SNK
+ganryu          // 0252 (c) 1999 Visco
+garou           // 0253 (c) 1999 SNK
+garouh          // 0253 (c) 1999 SNK
+garoup          // 0253 (c) 1999 SNK
+garoubl         // bootleg
+s1945p          // 0254 (c) 1999 Psikyo
+preisle2        // 0255 (c) 1999 Yumekobo
+mslug3          // 0256 (c) 2000 SNK
+mslug3h         // 0256 (c) 2000 SNK
+mslug3b6        // bootleg
+kof2000         // 0257 (c) 2000 SNK
+kof2000n        // 0257 (c) 2000 SNK
+				// 0258 SNK vs. Capcom?
+bangbead        // 0259 (c) 2000 Visco
+b2b             // 0071 (c) 2000 Visco (released by NCI in 2010)
+nitd            // 0260 (c) 2000 Eleven / Gavaking
+nitdbl          // bootleg
+sengoku3        // 0261 (c) 2001 Noise Factory / SNK
+kof2001         // 0262 (c) 2001 Eolith / SNK
+kof2001h        // 0262 (c) 2001 Eolith / SNK
+cthd2003        // bootleg of kof2001
+ct2k3sp         // bootleg of kof2001
+ct2k3sa         // bootleg of kof2001
+mslug4          // 0263 (c) 2002 Mega Enterprise
+mslug4h         // 0263 (c) 2002 Mega Enterprise
+ms4plus         // bootleg
+rotd            // 0264 (c) 2002 Evoga
+kof2002         // 0265 (c) 2002 Eolith / Playmore
+kof2002b        // bootleg
+kf2k2pls        // bootleg
+kf2k2pla        // bootleg
+kf2k2mp         // bootleg
+kf2k2mp2        // bootleg
+kof10th         // bootleg of kof2002
+kf2k5uni        // bootleg of kof2002
+kf10thep        // bootleg of kof2002
+kof2k4se        // bootleg of kof2002
+matrim          // 0266 (c) 2002 Atlus
+matrimbl        // bootleg
+pnyaa           // 0267 (c) 2003 Aiky / Taito
+ms5pcb          // 0268 (c) 2003 Playmore
+mslug5          // 0268 (c) 2003 Playmore
+mslug5h         // 0268 (c) 2003 Playmore
+ms5plus         // bootleg
+svcpcb          // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
+svcpcba         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
+svc             // 0269 (c) 2003 Playmore / Capcom
+svcboot         // bootleg
+svcplus         // bootleg
+svcplusa        // bootleg
+svcsplus        // bootleg
+samsho5         // 0270 (c) 2003 Playmore
+samsho5h        // 0270 (c) 2003 Playmore
+samsho5b        // bootleg
+kf2k3pcb        // 0271 (c) 2003 Playmore - JAMMA PCB
+kof2003         // 0271 (c) 2003 Playmore
+kof2003h        // 0271 (c) 2003 Playmore
+kf2k3bl         // bootleg
+kf2k3bla        // bootleg
+kf2k3pl         // bootleg
+kf2k3upl        // bootleg
+samsh5sp        // 0272 (c) 2004 Playmore
+samsh5sph       // 0272 (c) 2004 Playmore
+samsh5spho      // 0272 (c) 2004 Playmore
+
+// IGS PGM System Games
+pgm             // Base Unit
+orlegend        // (c) 1997 Oriental Legend
+orlegende       //
+orlegendc       //
+orlegendca      //
+orlegend111c    //
+orlegend111t    //
+orlegend105k    //
+drgw2           // (c) 1997 Dragon World 2
+dw2v100x        //
+drgw2c          //
+drgw2j          //
+drgw2hk         //
+drgw3           // (c) 1998 Dragon World 3
+drgw3105        //
+drgw3103        //
+drgw3100        //
+dwex            // (c) 1998 Dragon World 3 EX
+killbld         // (c) 1998 The Killing Blade
+killbld104      //
+kov             // (c) 1999 Knights of Valor
+kov115          //
+kov100          //
+kovplus         // (c) 1999 Knights of Valor Plus (aka 10 Character version)
+kovplusa        //
+kovsgqyz        // bootleg
+kovsgqyza       // bootleg
+kovsgqyzb       // bootleg
+kovsh           // (c) 1999 Knights of Valor Superheroes
+kovsh103        //
+kovsh102        //
+kovsh101        //
+kovsh100        //
+kovqhsgs        // bootleg
+photoy2k        // (c) 1999 Photo Y2k
+photoy2k102     //
+photoy2k104     //
+puzlstar        // (c) 1999 Puzzle Star
+olds            // (c) 1999 Oriental Legend Super / Special
+olds100         //
+olds100a        //
+olds103t        //
+kov2            // (c) 2000 Knights of Valor 2
+kov2106         //
+kov2103         //
+kov2102         //
+kov2101         //
+kov2100         //
+kov2p           // (c) 2000 Knights of Valor 2 Nine Dragons
+kov2p204        //
+kov2p202        //
+ddp2            // (c) 2001 DoDonPachi 2 - Bee Storm
+ddp2101         //
+ddp2100         //
+ddp2hk          //
+ddp2101hk       //
+ddp2100hk       //
+ddp2k           //
+ddp2101k        //
+ddp2100k        //
+ddp2j           //
+ddp2101j        //
+ddp2100j        //
+ddp2t           //
+ddp2101t        //
+ddp2100t        //
+ddp2c           //
+ddp2101c        //
+ddp2100c        //
+puzzli2         // (c) 1999 Puzzli 2
+puzzli2s        // (c) 2001 Puzzli 2 Super
+martmast        // (c) 2001 Martial Masters
+martmastc       //
+martmastc102        //
+theglad         // (c) 2003 The Gladiator
+theglad100      //
+theglad101      //
+thegladpcb      //
+dw2001          // (c) 2001 Dragon World 2001
+dwpc            // (c) 2001 Dragon World Pretty Chance
+py2k2           // (c) 2001 Photo Y2K2
+pgm3in1         // (c) 2004 Photo Y2K2 3-in-1
+dmnfrnt         // (c) 2002 Demon Front
+dmnfrnta        //
+dmnfrntb        //
+dmnfrntpcb      //
+kovshp          // (c) 2004 Knights of Valor Superheroes PLUS
+kovshpa         //
+kovytzy         // (c) 1999 Knights of Valour: Yi Tong Zhong Yuan
+kovshxas        // bootleg
+kovlsqh         // bootleg
+kovlsqh2        // bootleg
+kovlsjb         // bootleg
+kovlsjba        // bootleg
+oldsplus        // (c) 2004 Oriental Legend Super Plus
+killbldp        // (c) 2004 Killing Blade Plus
+happy6          // (c) 2004 Happy 6
+happy6101       //
+svg             // (c) 2003 Spectral vs Generation
+svgtw
+svgpcb          //
+ket             // (c) 2002 Ketsui
+keta            //
+ketb            //
+ddpdoj          // (c) 2002 DoDonPachi Dai-Ou-Jou
+ddpdoja         //
+ddpdojb         //
+ddpdojblk       //
+ddpdojblka      //
+espgal          // (c) 2003 Espgaluda
+
+// Commodore
+kim1      // Commodore (MOS) KIM-1 1975
+sym1      // Synertek SYM-1
+aim65    // Rockwell AIM65
+aim65_40  // Rockwell AIM65/40
+
+pet2001
+pet20018
+pet2001n
+pet2001n16
+pet2001n32
+cbm3008
+cbm3016
+cbm3032
+pet2001b
+pet2001b16
+pet2001b32
+cbm3032b
+pet4016
+pet4032
+pet4032f
+cbm4016
+cbm4032
+cbm4032f
+pet4032b
+cbm4032b
+pet8032
+cbm8032
+cbm8032_de
+cbm8032_se
+superpet
+mmf9000
+mmf9000_se
+cbm8096
+cbm8296
+cbm8296ed
+cbm8296d
+cbm8296d_de
+cbm8296gd
+cbm8296dgv_de
+
+vic1001   // Commodore VIC-1001 (Japan)
+vic20    // Commodore VIC 20 (NTSC)
+vic20p  // Commodore VIC 20 (PAL)
+vic20_se    // Commodore VIC 20 (Swedish Expanson Kit)
+
+vic10      // Commodore Max Machine (Japan)
+c64
+c64p    // Commodore 64 (PAL)
+c64_jp  // Commodore 64 (Japan)
+c64_se  // Commodore 64 (Sweden)
+pet64    // Commodore PET 64
+edu64    // Commodore Educator 64
+//clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer - roms needed - not in driver
+sx64
+sx64p
+vip64    // Commodore VIP64 (SX64, PAL, Swedish)
+dx64    // Commodore DX-64 - Prototype
+tesa6240
+c64c
+c64cp   // Commodore 64C (PAL)
+c64c_es
+c64c_se
+c64g      // Commodore 64G (PAL)
+c64gs    // Commodore 64 Games System
+c64dtv   // Commodore 64 Direct-to-TV
+clcd      // Commodore LCD
+
+b500      // Commodore B500
+b128      // Commodore B128
+b256      // Commodore B256
+cbm610  // Commodore CBM 610
+cbm620  // Commodore CBM 620
+cbm620_hu  // Commodore CBM 620 (Hungary)
+b128hp  // Commodore B128HP
+b256hp  // Commodore B256HP
+bx256hp   // Commodore BX256HP
+cbm710  // Commodore CBM 710
+cbm720  // Commodore CBM 720
+cbm720_de
+cbm720_se  // Commodore CBM 720 (Sweden / Finland)
+cbm730
+p500      // Commodore P500 (proto, a.k.a. C128-40, PET-II)
+p500p
+
+c264
+plus4
+plus4p
+c16
+c16p
+c16_hu
+c116
+c232
+v364
+
+c128
+c128p
+c128_de
+//c128_fr
+//c128_no
+c128_se
+c128d
+c128dp
+c128cr
+c128dcr
+c128dcrp
+c128dcr_de
+//c128dcr_it
+c128dcr_se
+c128d81
+
+a1000       // Commodore Amiga 1000
+a1000n
+a2000       // Commodore Amiga 2000
+a2000n
+a500        // Commodore Amiga 500
+a500n
+cdtv        // Commodore CDTV
+cdtvn
+a3000       // Commodore Amiga 3000
+a3000n
+a500p       // Commodore Amiga 500 Plus
+a500pn
+a600        // Commodore Amiga 600
+a600n
+a1200       // Commodore Amiga 1200
+a1200n
+a4000       // Commodore Amiga 4000/040
+a4000n
+a400030     // Commodore Amiga 4000/030
+a400030n
+cd32        // Commodore Amiga CD32
+cd32n
+a4000t      // Commodore Amiga 4000T
+a4000tn
+
+c65    // 1991 C65 / C64DX (Prototype, NTSC)
+c64dx    // 1991 C65 / C64DX (Prototype, German PAL)

@@ -9,6 +9,8 @@ options {
 	"ForceCPP",
 }
 
+-- MEWUI
+dofile("mewui.lua")
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
@@ -393,6 +395,7 @@ function emuProject(_target, _subtarget)
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
+
 	if _OPTIONS["with-bundled-zlib"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/zlib",
@@ -481,6 +484,7 @@ end
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
+
 	if _OPTIONS["with-bundled-zlib"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/zlib",
