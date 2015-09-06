@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
+#include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/orao.h"
 #include "imagedev/cassette.h"
@@ -183,8 +183,8 @@ static MACHINE_CONFIG_START( orao, orao_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.00)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
