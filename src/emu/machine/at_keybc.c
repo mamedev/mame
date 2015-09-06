@@ -28,7 +28,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( at_keybc )
 	PORT_START("DSW")
 	PORT_BIT(     0xbf, 0xbf, IPT_UNUSED )
-	PORT_DIPNAME( 0x40, 0x40, "Display switch")
+	PORT_DIPNAME( 0x40, 0x00, "Display switch")
 	PORT_DIPSETTING(    0x40, "Monochrome adapter" )
 	PORT_DIPSETTING(    0x00, "Color/Graphics adapter" )
 INPUT_PORTS_END
