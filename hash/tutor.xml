@@ -373,7 +373,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="trafjam" cloneof="trafjam">
+	<software name="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
 		<description>Traffic Jam (Jpn)</description>
 		<year>1982</year>
@@ -385,7 +385,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="trafjama">
+	<software name="trafjama" cloneof="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
 		<description>Traffic Jam (USA)</description>
 		<year>1983</year>
