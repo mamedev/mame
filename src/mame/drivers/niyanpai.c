@@ -894,8 +894,8 @@ ROM_START( zokumahj )
 ROM_END
 
 
-GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai_state, niyanpai, ROT0, "Nichibutsu", "Niyanpai (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1995, musobana, 0,        musobana, musobana, niyanpai_state, niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, niyanpai_state, niyanpai, ROT0, "Sphinx / AV Japan", "Mahjong 4P Simasyo (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 199?, mhhonban, 0,        mhhonban, mhhonban, niyanpai_state, niyanpai, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 199?, zokumahj, mhhonban, zokumahj, zokumahj, niyanpai_state, niyanpai, ROT0, "Nichibutsu?", "Zoku Mahjong Housoukyoku (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai_state, niyanpai, ROT0, "Nichibutsu", "Niyanpai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, musobana, 0,        musobana, musobana, niyanpai_state, niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, niyanpai_state, niyanpai, ROT0, "Sphinx / AV Japan", "Mahjong 4P Simasyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mhhonban, 0,        mhhonban, mhhonban, niyanpai_state, niyanpai, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, zokumahj, mhhonban, zokumahj, zokumahj, niyanpai_state, niyanpai, ROT0, "Nichibutsu?", "Zoku Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )

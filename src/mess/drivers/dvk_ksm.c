@@ -408,11 +408,11 @@ ROM_START( dvk_ksm01 )
 	ROM_LOAD( "ksm_05_rom1_d33.bin", 0x0800, 0x0800, CRC(5b29bcd2) SHA1(1f4f82c2f88f1e8615ec02076559dc606497e654))
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_ERASE00)
-	ROM_LOAD("ksm_03_cg_d31.bin", 0x0000, 0x0800, CRC(98853aa7) SHA1(c7871a96f135db05c3c8d718fbdf1728e22e72b7))
+	ROM_LOAD("ksm_03_cg_d31.bin", 0x0000, 0x0800, CRC(98853aa7) SHA1(09b8e1b5b10a00c0b0ae7e36ad1328113d31230a))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
 COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM",     0)
-COMP( 198?, dvk_ksm01,0  ,    0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM-01",  0)
+COMP( 198?, dvk_ksm01,dvk_ksm,0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM-01",  0)

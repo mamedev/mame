@@ -696,8 +696,8 @@ DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 }
 
 
-GAME( 1985, rmhaihai, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, rmhaihib, rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rmhaijin, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rmhaisei, 0,        rmhaisei, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, themj,    0,        themj,    rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, rmhaihai, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib, rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaijin, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaisei, 0,        rmhaisei, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj,    0,        themj,    rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )

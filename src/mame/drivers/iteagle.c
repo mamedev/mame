@@ -7,18 +7,18 @@
     by Ted Green & R. Belmont
 
     Known games on this hardware and their security chip IDs:
+        * ITVP-1     (c) 1998     Virtual Pool
         * E2-LED0    (c) 2000     Golden Tee Fore!
         * E2-BBH0    (c) 2000     Big Buck Hunter
         * G42-US-U   (c) 2001     Golden Tee Fore! 2002
         * BB15-US    (c) 2002     Big Buck Hunter: Shooter's Challenge (AKA Big Buck Hunter v1.5)
         * BBH2-US    (c) 2002     Big Buck Hunter II: Sportsman's Paradise
-        * CK1-US     (C) 2002     Carnival King
+        * CK1-US     (c) 2002     Carnival King
         * G43-US-U   (c) 2002     Golden Tee Fore! 2003
         * G44-US-U   (c) 2003     Golden Tee Fore! 2004
         * G45-US-U   (c) 2004     Golden Tee Fore! 2005
         * CW-US-U    (c) 2005     Big Buck Hunter: Call of the Wild
         * G4C-US-U   (c) 2006     Golden Tee Complete
-        * ????????   (c) ????     Virtual Pool (not on IT's website master list but known to exist)
 
     Valid regions: US = USA, CAN = Canada, ENG = England, EUR = Euro, SWD = Sweden, AUS = Australia, NZ  = New Zealand, SA  = South Africa
 
@@ -246,7 +246,7 @@ static MACHINE_CONFIG_DERIVED( virtpool, iteagle )
 	MCFG_VOODOO_PCI_FBMEM(4)
 	MCFG_VOODOO_PCI_TMUMEM(4, 4)
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000202, 0x0c0b0d)
+	MCFG_ITEAGLE_FPGA_INIT(0x01000202, 0x080808)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0202, 0x7)
 MACHINE_CONFIG_END
@@ -555,9 +555,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 2000, iteagle,          0,  iteagle,  iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", GAME_NOT_WORKING )
-GAME( 2002, carnking,   iteagle,  carnking, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING )
+GAME( 2000, iteagle,          0,  iteagle,  iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", 0 )
+GAME( 2002, carnking,   iteagle,  carnking, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_NOT_WORKING )
 GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", 0 )
 GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", 0 )
 GAME( 2002, gtfore03,   iteagle,  gtfore03, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", 0 )
@@ -569,5 +569,5 @@ GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "I
 GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", 0 )
 GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", 0 )
 GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", 0 )
-GAME( 2002, bbhsc,      iteagle,  bbhsc,    iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", GAME_NOT_WORKING )
+GAME( 2002, bbhsc,      iteagle,  bbhsc,    iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_NOT_WORKING )
 GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbhcotw,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", 0 )

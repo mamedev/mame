@@ -68,8 +68,8 @@ UINT32 mk90_state::screen_update_mk90(screen_device &screen, bitmap_ind16 &bitma
 
 static MACHINE_CONFIG_START( mk90, mk90_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
-	MCFG_T11_INITIAL_MODE(0xf600)
+	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_4MHz)
+	MCFG_T11_INITIAL_MODE(0x8000)
 	MCFG_CPU_PROGRAM_MAP(mk90_mem)
 
 
@@ -99,4 +99,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1988, mk90,   0,      0,       mk90,      mk90, driver_device,    0,   "Elektronika", "MK-90", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, mk90,   0,      0,       mk90,      mk90, driver_device,    0,   "Elektronika", "MK-90", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

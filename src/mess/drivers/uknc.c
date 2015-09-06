@@ -58,12 +58,12 @@ UINT32 uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bitma
 
 static MACHINE_CONFIG_START( uknc, uknc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", T11, 8000000)
-	MCFG_T11_INITIAL_MODE(0x36ff)  /* initial mode word has DAL15,14,11,8 pulled low */
+	MCFG_CPU_ADD("maincpu", K1801VM2, 8000000)
+	MCFG_T11_INITIAL_MODE(0x8000)
 	MCFG_CPU_PROGRAM_MAP(uknc_mem)
 
-	MCFG_CPU_ADD("subcpu",  T11, 6000000)
-	MCFG_T11_INITIAL_MODE(0x36ff)  /* initial mode word has DAL15,14,11,8 pulled low */
+	MCFG_CPU_ADD("subcpu",  K1801VM2, 6000000)
+	MCFG_T11_INITIAL_MODE(0x8000)
 	MCFG_CPU_PROGRAM_MAP(uknc_sub_mem)
 
 
@@ -90,4 +90,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1987, uknc,   0,      0,       uknc,      uknc, driver_device,    0,    "<unknown>",  "UKNC", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, uknc,   0,      0,       uknc,      uknc, driver_device,    0,    "<unknown>",  "UKNC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

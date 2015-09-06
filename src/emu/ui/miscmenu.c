@@ -205,7 +205,7 @@ void ui_menu_bookkeeping::handle()
 
 	/* if the time has rolled over another second, regenerate */
 	curtime = machine().time();
-	if (prevtime.seconds != curtime.seconds)
+	if (prevtime.seconds() != curtime.seconds())
 	{
 		reset(UI_MENU_RESET_SELECT_FIRST);
 		prevtime = curtime;
@@ -236,10 +236,10 @@ void ui_menu_bookkeeping::populate()
 	int ctrnum;
 
 	/* show total time first */
-	if (prevtime.seconds >= 60 * 60)
-		strcatprintf(tempstring, "Uptime: %d:%02d:%02d\n\n", prevtime.seconds / (60 * 60), (prevtime.seconds / 60) % 60, prevtime.seconds % 60);
+	if (prevtime.seconds() >= 60 * 60)
+		strcatprintf(tempstring, "Uptime: %d:%02d:%02d\n\n", prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 	else
-		strcatprintf(tempstring,"Uptime: %d:%02d\n\n", (prevtime.seconds / 60) % 60, prevtime.seconds % 60);
+		strcatprintf(tempstring,"Uptime: %d:%02d\n\n", (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 
 	/* show tickets at the top */
 	if (tickets > 0)

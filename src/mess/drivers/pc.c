@@ -389,12 +389,6 @@ ROM_START( olivm15 )
 	ROM_LOAD( "oliv_m15.bin",0xfc000, 0x04000, CRC(bf2ef795) SHA1(02d497131f5ca2c78f2accd38ab0eab6813e3ebf))
 ROM_END
 
-ROM_START( olypeopl )
-	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD16_BYTE( "uo1271c0.bin", 0xfe000, 0x1000, CRC(c9187bce) SHA1(464e1f96046657b49afa4223ede1040650643d58))
-	ROM_LOAD16_BYTE( "uo1271d0.bin", 0xfe001, 0x1000, CRC(10e6437b) SHA1(0b77bb7a62f0a8240602f4cdcc3d6765e62894f4))
-ROM_END
-
 ROM_START( sx16 )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "tmm27128ad.bin",0xfc000, 0x4000, CRC(f8543362) SHA1(fef625e260ca89ba02174584bdc12db609f0780e))
@@ -456,27 +450,26 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
-COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Data General", "Data General/One" , GAME_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
+COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Data General", "Data General/One" , MACHINE_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
 COMP( 1985, bw230,      ibm5150,    0,          bondwell,   bondwell, pc_state,   bondwell,   "Bondwell Holding", "BW230 (PRO28 Series)", 0 )
-COMP( 1984, compc1,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Commodore Business Machines", "Commodore PC-1" , GAME_NOT_WORKING)
-COMP( 1987, pc10iii,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Commodore Business Machines", "Commodore PC-10 III" , GAME_NOT_WORKING)
+COMP( 1984, compc1,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Commodore Business Machines", "Commodore PC-1" , MACHINE_NOT_WORKING)
+COMP( 1987, pc10iii,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Commodore Business Machines", "Commodore PC-10 III" , MACHINE_NOT_WORKING)
 
-COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pccga, driver_device,      0,      "Schetmash", "Iskra 3104", GAME_NOT_WORKING)
-COMP( 1989, mk88,       ibm5150,    0,          mk88,       pccga, driver_device,      0,      "<unknown>", "MK-88", GAME_NOT_WORKING)
-COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga, driver_device,      0,      "<unknown>", "Poisk-2", GAME_NOT_WORKING)
-COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "<unknown>", "Elektronika MC-1702", GAME_NOT_WORKING)
+COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pccga, driver_device,      0,      "Schetmash", "Iskra 3104", MACHINE_NOT_WORKING)
+COMP( 1989, mk88,       ibm5150,    0,          mk88,       pccga, driver_device,      0,      "<unknown>", "MK-88", MACHINE_NOT_WORKING)
+COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga, driver_device,      0,      "<unknown>", "Poisk-2", MACHINE_NOT_WORKING)
+COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "<unknown>", "Elektronika MC-1702", MACHINE_NOT_WORKING)
 
 COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, driver_device,      0,      "Zenith Data Systems", "SuperSport", 0)
 
-COMP( 198?, olivm15,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND) // is this a pc clone or not?
+COMP( 198?, olivm15,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Olivetti", "M15", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // is this a pc clone or not?
 
-COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga, driver_device,      0,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
+COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga, driver_device,      0,      "International Business Machines", "IBM 5550", MACHINE_NOT_WORKING)
 
-COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sharp", "PC-7000", GAME_NOT_WORKING)
+COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sharp", "PC-7000", MACHINE_NOT_WORKING)
 
-COMP( 198?, olypeopl,   ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Olympia", "People PC", GAME_NOT_WORKING)
-COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sanyo", "SX-16", GAME_NOT_WORKING)
-COMP( 198?, mbc16,      ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sanyo", "MBC-16" , GAME_NOT_WORKING)
+COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sanyo", "SX-16", MACHINE_NOT_WORKING)
+COMP( 198?, mbc16,      ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sanyo", "MBC-16" , MACHINE_NOT_WORKING)
 
-COMP( 198?, ataripc3,   ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Atari", "PC-3" , GAME_NOT_WORKING)
-COMP( 1989, ssam88s,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Samsung", "Samtron 88S" , GAME_NOT_WORKING)
+COMP( 198?, ataripc3,   ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Atari", "PC-3" , MACHINE_NOT_WORKING)
+COMP( 1989, ssam88s,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Samsung", "Samtron 88S" , MACHINE_NOT_WORKING)

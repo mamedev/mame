@@ -215,7 +215,6 @@ void tonton_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(tonton_state::tonton_interrupt)
 {
-	m_v9938->set_resolution(0);
 	m_v9938->interrupt();
 }
 
@@ -246,7 +245,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(tonton_state,tonton_vdp0_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)

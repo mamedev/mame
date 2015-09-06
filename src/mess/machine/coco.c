@@ -183,6 +183,7 @@ void coco_state::device_reset()
 
 	/* reset state */
 	m_dac_output = 0;
+	m_analog_audio_level = 0;
 	m_hiresjoy_ca = false;
 	m_dclg_previous_bit = false;
 	m_dclg_output_h = 0;
@@ -364,7 +365,7 @@ WRITE8_MEMBER( coco_state::pia0_pb_w )
 
 WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
 {
-	update_sound();
+	update_sound();     // analog mux SEL1 is tied to PIA0 CA2
 	poll_keyboard();
 }
 
@@ -376,7 +377,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
 
 WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
 {
-	update_sound();
+	update_sound();     // analog mux SEL2 is tied to PIA0 CB2
 	poll_keyboard();
 }
 
@@ -456,6 +457,8 @@ WRITE8_MEMBER( coco_state::ff20_write )
 
 READ8_MEMBER( coco_state::pia1_pa_r )
 {
+	// Port A: we need to specify the values of all the lines, regardless of whether
+	// they are in input or output mode in the DDR
 	return (m_cassette->input() >= 0 ? 0x01 : 0x00)
 		| (dac_output() << 2);
 }
@@ -470,6 +473,8 @@ READ8_MEMBER( coco_state::pia1_pa_r )
 
 READ8_MEMBER( coco_state::pia1_pb_r )
 {
+	// Port B: lines in output mode are handled automatically by the PIA object.
+	// We only need to specify the input lines here
 	UINT32 ram_size = m_ram->size();
 
 	//  For the CoCo 1, the logic has been changed to only select 64K rams
@@ -479,7 +484,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 	//  to access 32K of ram, and also allows the cocoe driver to access
 	//  the full 64K, as this uses Color Basic 1.2, which can configure 64K rams
 	bool memory_sense = (ram_size >= 0x4000 && ram_size <= 0x7FFF)
-		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x80));
+		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x40));
 
 	// serial in (PB0)
 	bool serial_in = (m_rs232 != NULL) && (m_rs232->rxd_r() ? true : false);
@@ -497,7 +502,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 
 WRITE8_MEMBER( coco_state::pia1_pa_w )
 {
-	pia1_pa_changed();
+	pia1_pa_changed(data);
 }
 
 
@@ -508,7 +513,7 @@ WRITE8_MEMBER( coco_state::pia1_pa_w )
 
 WRITE8_MEMBER( coco_state::pia1_pb_w )
 {
-	pia1_pb_changed();
+	pia1_pb_changed(data);
 }
 
 
@@ -532,11 +537,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_ca2_w )
 
 WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
 {
-	poll_keyboard();
-
-	// Theoretically, I should be calling update_sound() here; however this seems to create
-	// a buzzing in some CoCo software (e.g. - Popcorn).  This is likely because this line
-	// drives the MC14529B MUX, and when disabled the output probably goes hi-Z.
+	update_sound();     // SOUND_ENABLE is connected to PIA1 CB2
 }
 
 
@@ -689,10 +690,25 @@ void coco_state::update_sound(void)
 	UINT8 cassette_sound = (bCassSoundEnable ? 0x40 : 0);
 	UINT8 cart_sound = (bCartSoundEnable ? 0x40 : 0);
 
-	/* determine the value to send to the DAC */
+	/* determine the value to send to the DAC (this is used by the Joystick read as well as audio out) */
 	m_dac_output = (m_pia_1->a_output() & 0xFC) >> 2;
 	UINT8 dac_sound =  (status == SOUNDMUX_ENABLE ? m_dac_output << 1 : 0);
-	m_dac->write_unsigned8(single_bit_sound + dac_sound + cassette_sound + cart_sound);
+
+	/* The CoCo uses a single DAC for both audio output and joystick axis position measurement.
+	 * To avoid introducing artifacts while reading the axis positions, some software will disable
+	 * the audio output while using the DAC to read the joystick.  On a real CoCo, there is a low-pass
+	 * filter (C57 on the CoCo 3) which will hold the audio level for very short periods of time,
+	 * preventing the introduction of artifacts while the joystick value is being read.  We are not going
+	 * to simulate the exponential decay of a capacitor here.  Instead, we will store and hold the last
+	 * used analog audio output value while the audio is disabled, to avoid introducing artifacts in
+	 * software such as Tandy's Popcorn and Sock Master's Donkey Kong.
+	 */
+	if ((status & SOUNDMUX_ENABLE) != 0)
+	{
+		m_analog_audio_level = dac_sound + cassette_sound + cart_sound;
+	}
+
+	m_dac->write_unsigned8(single_bit_sound + m_analog_audio_level);
 
 	/* determine the cassette sound status */
 	cassette_state cas_sound = bCassSoundEnable ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED;
@@ -981,12 +997,12 @@ void coco_state::update_prinout(bool prinout)
 //  pia1_pa_changed - called when PIA1 PA changes
 //-------------------------------------------------
 
-void coco_state::pia1_pa_changed(void)
+void coco_state::pia1_pa_changed(UINT8 data)
 {
-	update_sound();
+	update_sound();     // DAC is connected to PIA1 PA2-PA7
 	poll_keyboard();
 	update_cassout(dac_output());
-	update_prinout(m_pia_1->a_output() & 0x02 ? true : false);
+	update_prinout(data & 0x02 ? true : false);
 }
 
 
@@ -995,9 +1011,9 @@ void coco_state::pia1_pa_changed(void)
 //  pia1_pb_changed - called when PIA1 PB changes
 //-------------------------------------------------
 
-void coco_state::pia1_pb_changed(void)
+void coco_state::pia1_pb_changed(UINT8 data)
 {
-	update_sound();
+	update_sound();     // singe_bit_sound is connected to PIA1 PB1
 }
 
 
@@ -1163,7 +1179,7 @@ WRITE8_MEMBER( coco_state::ff60_write )
 
 READ8_MEMBER( coco_state::ff40_read )
 {
-	if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+	if (offset >= 1 && offset <= 2 && m_beckerportconfig && m_beckerportconfig->read() == 1)
 	{
 		return m_beckerport->read(space, offset-1, mem_mask);
 	}
@@ -1179,7 +1195,7 @@ READ8_MEMBER( coco_state::ff40_read )
 
 WRITE8_MEMBER( coco_state::ff40_write )
 {
-	if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+	if (offset >= 1 && offset <= 2 && m_beckerportconfig && m_beckerportconfig->read() == 1)
 	{
 		return m_beckerport->write(space, offset-1, data, mem_mask);
 	}

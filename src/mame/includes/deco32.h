@@ -116,7 +116,7 @@ public:
 
 	// nslasher
 	DECLARE_WRITE32_MEMBER(nslasher_eeprom_w);
-	
+
 	// tattass
 	DECLARE_WRITE32_MEMBER(tattass_control_w);
 
@@ -205,7 +205,7 @@ public:
 	UINT32 m_sprite_ctrl;
 	int m_lightgun_port;
 	bitmap_rgb32 m_temp_render_bitmap;
-	
+
 	DECLARE_READ32_MEMBER(lightgun_r);
 	DECLARE_WRITE32_MEMBER(lightgun_w);
 	DECLARE_WRITE32_MEMBER(sprite_control_w);

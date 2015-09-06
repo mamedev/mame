@@ -296,8 +296,8 @@ ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
-	membank("bank1")->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
-	membank("bank2")->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
+	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
+	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
 
 /* Bank Switching */
@@ -306,16 +306,14 @@ WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-	printf("%d %d\n", 1, bank);
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-	printf("%d %d\n", 2, bank);
-	membank("bank2")->set_entry(bank);
+	m_bank2->set_entry(bank);
 }
 
 
@@ -380,7 +378,7 @@ WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
 	const int bank = data & 1;
 	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 }
 
 /* Memory maps: Yes, *no* RAM */
@@ -400,7 +398,7 @@ ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
-	membank("bank1")->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
 
 	save_item(NAME(m_prot));
 }
@@ -1367,8 +1365,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest,  0,        bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", GAME_SUPPORTS_SAVE )
-GAME( 1994, sunaq,     0,        sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", GAME_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", GAME_SUPPORTS_SAVE )
-GAME( 1996, uballoon,  0,        uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", GAME_SUPPORTS_SAVE )
+GAME( 1994, bestbest,  0,        bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, sunaq,     0,        sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, uballoon,  0,        uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", MACHINE_SUPPORTS_SAVE )

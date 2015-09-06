@@ -506,16 +506,16 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map_1)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zaccaria_state, cb1_toggle, (double)XTAL_3_579545MHz/4096)
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map_2)
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
@@ -725,7 +725,7 @@ ROM_END
 
 
 
-GAME( 1983, monymony,  0,        zaccaria, monymony, driver_device, 0, ROT90, "Zaccaria", "Money Money", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, monymony,  0,        zaccaria, monymony, driver_device, 0, ROT90, "Zaccaria", "Money Money", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

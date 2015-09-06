@@ -94,6 +94,7 @@ Notes:
 DIP Locations verified from manuals for:
 - Zing Zing Zip
 - Extreme Downhill
+- Kero Kero Keroppi's Let's Play Together
 
 TODO:
 - I think the best way to correctly align tilemaps and sprites and account for
@@ -6765,55 +6766,49 @@ static INPUT_PORTS_START( keroppi )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("DSW") //2 DSWs - $600001 & 3.b
-	PORT_DIPNAME( 0x0001, 0x0001, "Unknown 2-1" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Unknown 2-2" ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "Unknown 2-3" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Unknown 2-4" ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Unknown 2-5" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Unknown 2-6" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 2-7" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 2-8" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0003, 0x0003, "Obstacle Course Payout Setting" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0000, "Highest (0, 3, 5, 7, 15 Tickets)" )
+	PORT_DIPSETTING(      0x0001, "High (0, 3, 4, 5, 10 Tickets)" )
+	PORT_DIPSETTING(      0x0002, "Low (0, 1, 2, 3, 6 Tickets)" )
+	PORT_DIPSETTING(      0x0003, "Medium (0, 2, 3, 4, 8 Tickets)" )
+	PORT_DIPNAME( 0x000c, 0x000c, "Treasure Hunt Payout Setting" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0000, "Highest (5, 10, 15 Tickets)" )
+	PORT_DIPSETTING(      0x0004, "High (5, 7, 10 Tickets)" )
+	PORT_DIPSETTING(      0x0008, "Low (1, 3, 5 Tickets)" )
+	PORT_DIPSETTING(      0x000c, "Medium (3, 5, 7 Tickets)" )
+	PORT_DIPNAME( 0x0030, 0x0030, "New Jersey Payout Setting" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x0000, "Always Payout 5 Tickets" )
+	PORT_DIPSETTING(      0x0010, "Always Payout 3 Tickets" )
+	PORT_DIPSETTING(      0x0020, "Always Payout 1 Ticket" )
+	PORT_DIPSETTING(      0x0030, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Mercy Ticket Payout Setting (Treasure Hunt Only" ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(      0x0000, "No Payout" )
+	PORT_DIPSETTING(      0x0040, "3 Tickets" )
+	PORT_DIPSETTING(      0x0080, "2 Tickets" )
+	PORT_DIPSETTING(      0x00c0, "1 Ticket" )
 
-	PORT_DIPNAME( 0x0100, 0x0100, "Unknown 1-1" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, "Unknown 1-2" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "Unknown 1-3" ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "Unknown 1-4" ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Vending Style" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0800, "Ticket" )
+	PORT_DIPSETTING(      0x0000, "No Vending" )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Unknown 1-6" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Unknown 1-7" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 1-8" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Payout Setting" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x8000, "Normal Payout" )
+	PORT_DIPSETTING(      0x0000, "No Payout" )
 
 INPUT_PORTS_END
 
@@ -7871,7 +7866,7 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 33*8)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
 	MCFG_SCREEN_PALETTE("palette")
@@ -8049,6 +8044,7 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -8086,6 +8082,7 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -11604,21 +11601,21 @@ GAME( 1989, metafox,  0,        metafox,  metafox, seta_state,   metafox,  ROT27
 
 /* 68000 */
 
-GAME( 198?, setaroul, 0,        setaroul, setaroul, driver_device, 0,        ROT270, "Visco",                  "Visco Roulette", GAME_NOT_WORKING ) // I can't see a title in the GFX roms.  Press F2 twice to boot..
+GAME( 198?, setaroul, 0,        setaroul, setaroul, driver_device, 0,        ROT270, "Visco",                  "Visco Roulette", MACHINE_NOT_WORKING ) // I can't see a title in the GFX roms.  Press F2 twice to boot..
 
 GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, driver_device, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
 
 GAME( 1989, wits,     0,        wits,     wits, driver_device,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 
 GAME( 1990, thunderl, 0,        thunderl, thunderl,   driver_device,0,       ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderlbl,driver_device,0,       ROT90,  "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderlbl,driver_device,0,       ROT90,  "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
-GAME( 1994, wiggie,   0,        wiggie,   thunderl, seta_state,    wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
-GAME( 1994, superbar, wiggie,   superbar, thunderl, seta_state,    wiggie,   ROT270, "Promat",                 "Super Bar", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
+GAME( 1994, wiggie,   0,        wiggie,   thunderl, seta_state,    wiggie,   ROT270, "Promat",                 "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
+GAME( 1994, superbar, wiggie,   superbar, thunderl, seta_state,    wiggie,   ROT270, "Promat",                 "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 
 GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  driver_device, 0,        ROT0,   "Seta (Visco license)",   "Jockey Club", 0 )
-GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, seta_state,    inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, inttootea,jockeyc,  inttoote, inttoote, seta_state,    inttootea,ROT0,   "Coinmaster",             "International Toote II (World?)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, seta_state,    inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1993, inttootea,jockeyc,  inttoote, inttoote, seta_state,    inttootea,ROT0,   "Coinmaster",             "International Toote II (World?)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 1991, rezon,    0,        rezon,    rezon,    seta_state,    rezon,    ROT0,   "Allumer",                "Rezon", 0 )
 GAME( 1992, rezont,   rezon,    rezon,    rezont,   seta_state,    rezon,    ROT0,   "Allumer (Taito license)","Rezon (Taito)", 0 )
@@ -11627,11 +11624,11 @@ GAME( 1991, stg,      0,        drgnunit, stg,      driver_device, 0,        ROT
 
 GAME( 1991, pairlove, 0,        pairlove, pairlove, driver_device, 0,        ROT270, "Athena",                 "Pairs Love", 0 )
 
-GAME( 1992, blandia,  0,        blandia,  blandia, seta_state,     blandia,  ROT0,   "Allumer",                "Blandia", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, blandiap, blandia,  blandiap, blandia, driver_device,  0,        ROT0,   "Allumer",                "Blandia (prototype)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, blandia,  0,        blandia,  blandia, seta_state,     blandia,  ROT0,   "Allumer",                "Blandia", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, blandiap, blandia,  blandiap, blandia, driver_device,  0,        ROT0,   "Allumer",                "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, blockcar, 0,        blockcar, blockcar, driver_device, 0,        ROT90,  "Visco",                  "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
-GAME( 1992, blockcarb,blockcar, blockcarb,blockcar, driver_device, 0,        ROT90,  "bootleg",                "Block Carnival / Thunder & Lightning 2 (bootleg)", GAME_NO_SOUND)
+GAME( 1992, blockcarb,blockcar, blockcarb,blockcar, driver_device, 0,        ROT90,  "bootleg",                "Block Carnival / Thunder & Lightning 2 (bootleg)", MACHINE_NO_SOUND)
 
 GAME( 1992, qzkklogy, 0,        drgnunit, qzkklogy, driver_device, 0,        ROT0,   "Tecmo",                  "Quiz Kokology", 0 )
 
@@ -11640,7 +11637,7 @@ GAME( 1992, neobattl, 0,        umanclub, neobattl, driver_device, 0,        ROT
 GAME( 1992, umanclub, 0,        umanclub, umanclub, driver_device, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
 GAME( 1992, zingzip,  0,        zingzip,  zingzip, driver_device,  0,        ROT270, "Allumer / Tecmo",        "Zing Zing Zip", 0 )
-GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip, driver_device,  0,        ROT270, "bootleg",                "Zing Zing Zip (bootleg)", GAME_NOT_WORKING )
+GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip, driver_device,  0,        ROT270, "bootleg",                "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
 
 GAME( 1993, atehate,  0,        atehate,  atehate, driver_device,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 
@@ -11649,9 +11646,9 @@ GAME( 1993, daioha,   daioh,    daioh,    daioh,    driver_device, 0,        ROT
 GAME( 1993, daiohp,   daioh,    daiohp,   daiohp,   driver_device, 0,        ROT270, "Athena",                 "Daioh (prototype)", 0 )
 GAME( 1993, daiohc,   daioh,    wrofaero, daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (93111A PCB conversion)", 0 )
 
-GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg, Blandia Conversion)", GAME_IMPERFECT_SOUND )
+GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, driver_device, 0,        ROT0,   "Banpresto / Toei",       "Masked Riders Club Battle Race", 0 )
 
@@ -11682,15 +11679,15 @@ GAME( 1994, orbs,     0,        orbs,     orbs, driver_device,     0,        ROT
 GAME( 1995, keroppi,  0,        keroppi,  keroppi, driver_device,  0,        ROT0,   "American Sammy",         "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
 GAME( 1993, keroppij, keroppi,  keroppij, keroppij,driver_device,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
 
-GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, driver_device, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, driver_device, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1995, gundhara, 0,        gundhara, gundhara, driver_device, 0,        ROT270, "Banpresto",              "Gundhara", 0 )
 GAME( 1995, gundharac, gundhara,gundhara, gundhara, driver_device, 0,        ROT270, "Banpresto",              "Gundhara (Chinese, bootleg?)", 0 )
 
-GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, driver_device, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, driver_device, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid, 0,        gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", GAME_NO_COCKTAIL )
-GAME( 1995, zombraidp,zombraid, gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", GAME_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid,gundhara, zombraid, seta_state, zombraid, ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", GAME_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid, 0,        gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp,zombraid, gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid,gundhara, zombraid, seta_state, zombraid, ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
-GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, seta_state, crazyfgt, ROT0,   "Subsino",                   "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, seta_state, crazyfgt, ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -14,7 +14,7 @@
 #ifndef __PBOX__
 #define __PBOX__
 
-#include "machine/ti99/ti99defs.h"
+#include "bus/ti99x/ti99defs.h"
 
 extern const device_type PERIBOX;
 extern const device_type PERIBOX_SLOT;

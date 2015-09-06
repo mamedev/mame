@@ -529,7 +529,7 @@ void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, con
 		start_address = (m_disp_page == 0) ? 0x400 : 0x800;
 	}
 
-	m_flash = ((machine().time() * 4).seconds & 1) ? 1 : 0;
+	m_flash = ((machine().time() * 4).seconds() & 1) ? 1 : 0;
 
 	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
 	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
@@ -1034,4 +1034,4 @@ ROM_START(las3000)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY          FULLNAME */
-COMP( 1983, las3000,  0,        0,        laser3k,     laser3k, driver_device,  0,        "Video Technology",  "Laser 3000",    GAME_NOT_WORKING )
+COMP( 1983, las3000,  0,        0,        laser3k,     laser3k, driver_device,  0,        "Video Technology",  "Laser 3000",    MACHINE_NOT_WORKING )

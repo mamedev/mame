@@ -175,7 +175,6 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_PALETTE_INIT(pv1000);
 	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
@@ -302,13 +301,6 @@ static INPUT_PORTS_START( pv1000 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
-
-
-PALETTE_INIT_MEMBER(pv1000_state, pv1000)
-{
-	for (int i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-}
 
 
 DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
@@ -462,8 +454,7 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD( "palette", 8 )
-	MCFG_PALETTE_INIT_OWNER(pv1000_state, pv1000)
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pv1000 )
 
@@ -488,4 +479,4 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY   FULLNAME    FLAGS */
-CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, driver_device,   0,   "Casio",  "PV-1000",  GAME_SUPPORTS_SAVE )
+CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, driver_device,   0,   "Casio",  "PV-1000",  MACHINE_SUPPORTS_SAVE )

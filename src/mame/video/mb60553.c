@@ -16,9 +16,17 @@ const device_type MB60553 = &device_creator<mb60553_zooming_tilemap_device>;
 
 mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB60553, "MB60553 Zooming Tilemap", tag, owner, clock, "mb60553", __FILE__),
-	m_m_gfx_region(0),
+	m_vram(NULL),
+	m_pal_base(0),
+	m_lineram(NULL),
+	m_gfx_region(0),
 	m_gfxdecode(*this)
 {
+	for (int i = 0; i < 8; i++)
+	{
+		m_regs[i] = 0;
+		m_bank[i] = 0;
+	}
 }
 
 
@@ -32,7 +40,9 @@ void mb60553_zooming_tilemap_device::device_start()
 
 	save_pointer(NAME(m_lineram), 0x1000/2);
 	save_pointer(NAME(m_vram), 0x4000/2);
-
+	save_item(NAME(m_pal_base));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_regs));
 
 	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mb60553_zooming_tilemap_device::get_tile_info),this),tilemap_mapper_delegate(FUNC(mb60553_zooming_tilemap_device::twc94_scan),this), 16,16,128,64);
 	m_tmap->set_transparent_pen(0);
@@ -46,7 +56,7 @@ void mb60553_zooming_tilemap_device::device_reset()
 void mb60553_zooming_tilemap_device::set_gfx_region(device_t &device, int gfxregion)
 {
 	mb60553_zooming_tilemap_device &dev = downcast<mb60553_zooming_tilemap_device &>(device);
-	dev.m_m_gfx_region = gfxregion;
+	dev.m_gfx_region = gfxregion;
 }
 
 void mb60553_zooming_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
@@ -115,7 +125,7 @@ TILE_GET_INFO_MEMBER(mb60553_zooming_tilemap_device::get_tile_info)
 	pal = (data >> 12) & 0xF;
 	bankno = (data >> 9) & 0x7;
 
-	SET_TILE_INFO_MEMBER(m_m_gfx_region, tileno + m_bank[bankno] * 0x200, pal + m_pal_base, 0);
+	SET_TILE_INFO_MEMBER(m_gfx_region, tileno + m_bank[bankno] * 0x200, pal + m_pal_base, 0);
 }
 
 void mb60553_zooming_tilemap_device::reg_written( int num_reg)
@@ -175,14 +185,6 @@ void mb60553_zooming_tilemap_device::set_pal_base( int pal_base)
 {
 	m_pal_base = pal_base;
 }
-
-void mb60553_zooming_tilemap_device::set_gfx_region( int gfx_region)
-{
-	m_m_gfx_region = gfx_region;
-}
-
-
-
 
 
 void mb60553_zooming_tilemap_device::draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,

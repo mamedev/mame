@@ -21,10 +21,8 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
-		m_screen(*this, "screen") { }
-
-	/* memory pointers */
-//  UINT16 *   m_paletteram;    // currently this uses generic palette handling
+		m_screen(*this, "screen"),
+		m_z80bank(*this, "z80bank") { }
 
 	/* video-related */
 	int        m_layer_colorbase[3];
@@ -41,7 +39,6 @@ public:
 	UINT16 *   m_k053247_ram;
 
 	/* misc */
-	UINT8       m_sound_curbank;
 	UINT8       m_vblank_irq_mask;
 
 	/* devices */
@@ -52,6 +49,8 @@ public:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<screen_device> m_screen;
+
+	required_memory_bank m_z80bank;
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
@@ -67,7 +66,6 @@ public:
 	UINT32 screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_xmen6p(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(xmen_scanline);
-	void sound_reset_bank();
 	K052109_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 };

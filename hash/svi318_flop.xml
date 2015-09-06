@@ -54,7 +54,7 @@ Rädda disketten (198x)(sv)
 			<dataarea name="flop" size="172032">
 				<rom name="cpmss.dsk" size="172032" crc="cb7f1edb" sha1="676b5752141acaba7f1056909ed75be53ff388ff" offset="0" />
 			</dataarea>
-		</part>	
+		</part>
 	</software>
 
 	<software name="cpm224ds">
@@ -65,7 +65,7 @@ Rädda disketten (198x)(sv)
 			<dataarea name="flop" size="346112">
 				<rom name="cpmds.dsk" size="346112" crc="f7323e1a" sha1="7bfd8c46f8361cb31e9f4f640448cddaad91c55b" offset="0" />
 			</dataarea>
-		</part>	
+		</part>
 	</software>
 
 	<software name="diskbas">
@@ -76,9 +76,9 @@ Rädda disketten (198x)(sv)
 			<dataarea name="flop" size="346112">
 				<rom name="diskbasic10.dsk" size="346112" crc="0744ac56" sha1="eef7d033263d1cc2703d019bf062b1a02b641570" offset="0" />
 			</dataarea>
-		</part>	
+		</part>
 	</software>
-	
+
 	<software name="zcpr3">
 		<description>Z-CPR3</description>
 		<year>1985?</year>
@@ -87,7 +87,7 @@ Rädda disketten (198x)(sv)
 			<dataarea name="flop" size="172032">
 				<rom name="zcpr3.dsk" size="172032" crc="a6ea5b81" sha1="c08a6743e713fe8f3b8b694cd92fc70680fc6f66" offset="0" />
 			</dataarea>
-		</part>	
+		</part>
 	</software>
 
 </softwarelist>

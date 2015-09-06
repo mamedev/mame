@@ -415,4 +415,4 @@ ROM_END
 *********************************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                   FLAGS...            LAYOUT */
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, driver_device, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", GAME_SUPPORTS_SAVE, layout_jankenmn )
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, driver_device, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )

@@ -214,14 +214,14 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_6button)
 		{
 			/* here we read B, C & the additional buttons */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						(((m_io_pad_3b[portnum]->read_safe(0) & 0x30) |
-							(m_io_pad_6b[portnum]->read_safe(0) & 0x0f)) & ~helper);
+						((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x30) |
+							((m_io_pad_6b[portnum] ? m_io_pad_6b[portnum]->read() : 0) & 0x0f)) & ~helper);
 		}
 		else
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((m_io_pad_3b[portnum]->read_safe(0) & 0x3f) & ~helper);
+						(((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x3f) & ~helper);
 		}
 	}
 	else
@@ -230,20 +230,20 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_6button)
 		{
 			/* here we read ((Start & A) >> 2) | 0x00 */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						(((m_io_pad_3b[portnum]->read_safe(0) & 0xc0) >> 2) & ~helper);
+						((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) & ~helper);
 		}
 		else if (m_io_stage[portnum]==2)
 		{
 			/* here we read ((Start & A) >> 2) | 0x0f */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((((m_io_pad_3b[portnum]->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper);
+						(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((((m_io_pad_3b[portnum]->read_safe(0) & 0xc0) >> 2) |
-							(m_io_pad_3b[portnum]->read_safe(0) & 0x03)) & ~helper);
+						(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) |
+							((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x03)) & ~helper);
 		}
 	}
 
@@ -263,14 +263,14 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_3button)
 	{
 		/* here we read B, C & the directional buttons */
 		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-					(((m_io_pad_3b[portnum]->read_safe(0) & 0x3f) | 0x40) & ~helper);
+					((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x3f) | 0x40) & ~helper);
 	}
 	else
 	{
 		/* here we read ((Start & A) >> 2) | Up and Down */
 		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-					((((m_io_pad_3b[portnum]->read_safe(0) & 0xc0) >> 2) |
-						(m_io_pad_3b[portnum]->read_safe(0) & 0x03) | 0x40) & ~helper);
+					(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) |
+						((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x03) | 0x40) & ~helper);
 	}
 
 	return retdata;
@@ -718,7 +718,7 @@ WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
 		case 0x15:
 		case 0x17:
 			// accessed by either segapsg_device or sn76496_device
-			space.machine().device<sn76496_base_device>("snsnd")->write(space, 0, data);
+			m_snsnd->write(space, 0, data);
 			break;
 
 		default:
@@ -1103,7 +1103,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 
 void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 {
-	if (m_io_reset->read_safe(0x00) & 0x01)
+	if (m_io_reset && m_io_reset->read() & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge

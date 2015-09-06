@@ -461,6 +461,22 @@ if (CPUS["T11"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- DEC PDP-8
+--@src/emu/cpu/pdp8/pdp8.h,CPUS["PDP8"] = true
+--------------------------------------------------
+
+if (CPUS["PDP8"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/pdp8/pdp8.c",
+		MAME_DIR .. "src/emu/cpu/pdp8/pdp8.h",
+	}
+end
+
+if (CPUS["PDP8"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/pdp8/pdp8dasm.c")
+end
+
+--------------------------------------------------
 -- F8
 --@src/emu/cpu/f8/f8.h,CPUS["F8"] = true
 --------------------------------------------------
@@ -1510,6 +1526,32 @@ if (CPUS["RSP"]~=null) then
 		MAME_DIR .. "src/emu/cpu/rsp/rspcp2.h",
 		MAME_DIR .. "src/emu/cpu/rsp/rspcp2d.c",
 		MAME_DIR .. "src/emu/cpu/rsp/rspcp2d.h",
+		MAME_DIR .. "src/emu/cpu/rsp/clamp.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vabs.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vadd.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vaddc.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vand.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vch.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vcl.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vcmp.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vcr.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vdivh.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vldst.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmac.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmov.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmrg.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmudh.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmul.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmulh.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmull.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmulm.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vmuln.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vor.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vrcpsq.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vrsq.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vsub.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vsubc.h",
+		MAME_DIR .. "src/emu/cpu/rsp/vxor.h",
 	}
 end
 

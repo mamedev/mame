@@ -289,4 +289,4 @@ ROM_START( kontest )
 	ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
-GAME( 1987?, kontest,  0,   kontest,  kontest, driver_device,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", GAME_SUPPORTS_SAVE ) // late 1987 or early 1988
+GAME( 1987?, kontest,  0,   kontest,  kontest, driver_device,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988

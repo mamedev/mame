@@ -39,7 +39,7 @@ public:
 	}
 
 	DECLARE_READ32_MEMBER(decathlt_prot1_r);
-	DECLARE_READ32_MEMBER(decathlt_prot2_r);;
+	DECLARE_READ32_MEMBER(decathlt_prot2_r);
 	UINT32 genericdecathlt_prot_r(UINT32 mem_mask, int channel);
 
 	void write_prot_data(UINT32 data, UINT32 mem_mask, int channel, int rev_words);

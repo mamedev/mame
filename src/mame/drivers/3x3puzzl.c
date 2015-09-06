@@ -162,7 +162,7 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrollx_w)
 {
 	m_tilemap1->set_scrollx(data);
-};
+}
 
 WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
 {
@@ -501,6 +501,6 @@ ROM_END
 
 
 
-GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", GAME_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", GAME_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "Promat",              "Casanova", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "Promat",              "Casanova", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

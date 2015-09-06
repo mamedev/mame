@@ -22,14 +22,8 @@ public:
 		m_upd7759(*this, "upd"),
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
-		m_k051960(*this, "k051960") { }
-
-	/* memory pointers */
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
-
-	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
+		m_k051960(*this, "k051960"),
+		m_rombank(*this, "rombank") { }
 
 	/* misc */
 	int        m_nmi_enable;
@@ -42,6 +36,9 @@ public:
 	required_device<k007232_device> m_k007232;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
+
+	required_memory_bank m_rombank;
+
 	DECLARE_WRITE8_MEMBER(dv_nmienable_w);
 	DECLARE_WRITE8_MEMBER(mainevt_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mainevt_coin_w);
@@ -55,8 +52,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dv_sh_bankswitch_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_VIDEO_START(mainevt);
-	DECLARE_VIDEO_START(dv);
 	UINT32 screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mainevt_interrupt);

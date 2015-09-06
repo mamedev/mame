@@ -125,7 +125,7 @@ static INPUT_PORTS_START( tx0 )
 	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 16") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 17") PORT_CODE(KEYCODE_STOP)
 
-	PORT_START("TWR0")      /* 3: typewriter codes 00-17 */
+	PORT_START("TWR.0")      /* 3: typewriter codes 00-17 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("| _") PORT_CODE(KEYCODE_SLASH)
@@ -140,7 +140,7 @@ static INPUT_PORTS_START( tx0 )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
 
-	PORT_START("TWR1")      /* 4: typewriter codes 20-37 */
+	PORT_START("TWR.1")      /* 4: typewriter codes 20-37 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". )") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
@@ -156,7 +156,7 @@ static INPUT_PORTS_START( tx0 )
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- +") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
 
-	PORT_START("TWR2")      /* 5: typewriter codes 40-57 */
+	PORT_START("TWR.2")      /* 5: typewriter codes 40-57 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( tx0 )
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
 
-	PORT_START("TWR3")      /* 6: typewriter codes 60-77 */
+	PORT_START("TWR.3")      /* 6: typewriter codes 60-77 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
@@ -1408,11 +1408,10 @@ void tx0_state::tx0_keyboard()
 
 	int typewriter_transitions;
 	int charcode, lr;
-	static const char *const twrnames[] = { "TWR0", "TWR1", "TWR2", "TWR3" };
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = ioport(twrnames[i])->read();
+		typewriter_keys[i] = m_twr[i]->read();
 	}
 
 	for (i=0; i<4; i++)
@@ -1428,7 +1427,7 @@ void tx0_state::tx0_keyboard()
 			previous LR */
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
-			machine().device("maincpu")->state().set_state_int(TX0_LR, lr);
+			m_maincpu->set_state_int(TX0_LR, lr);
 			tx0_typewriter_drawchar(charcode); /* we want to echo input */
 			break;
 		}
@@ -1451,7 +1450,7 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 
 
 	/* read new state of control keys */
-	control_keys = ioport("CSW")->read();
+	control_keys = m_csw->read();
 
 	if (control_keys & tx0_control)
 	{
@@ -1622,5 +1621,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT INIT     COMPANY                   FULLNAME */
-COMP( 1956, tx0_64kw, 0,    0,  tx0_64kw, tx0, tx0_state,   tx0,            "MIT", "TX-0 original demonstrator (64 kWords of RAM)" , GAME_NO_SOUND_HW | GAME_NOT_WORKING)
-COMP( 1962, tx0_8kw,  tx0_64kw, 0,  tx0_8kw,  tx0, tx0_state,   tx0,        "MIT", "TX-0 upgraded system (8 kWords of RAM)" , GAME_NO_SOUND_HW | GAME_NOT_WORKING)
+COMP( 1956, tx0_64kw, 0,    0,  tx0_64kw, tx0, tx0_state,   tx0,            "MIT", "TX-0 original demonstrator (64 kWords of RAM)" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1962, tx0_8kw,  tx0_64kw, 0,  tx0_8kw,  tx0, tx0_state,   tx0,        "MIT", "TX-0 upgraded system (8 kWords of RAM)" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)

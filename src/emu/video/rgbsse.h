@@ -108,42 +108,42 @@ public:
 		m_value = _mm_or_si128(_mm_and_si128(m_value, blue_mask()), _mm_set_epi32(0, 0, 0, value));
 	}
 
-	inline UINT8 get_a()
+	inline UINT8 get_a() const
 	{
 		return _mm_extract_epi16(m_value, 6);
 	}
 
-	inline UINT8 get_r()
+	inline UINT8 get_r() const
 	{
 		return _mm_extract_epi16(m_value, 4);
 	}
 
-	inline UINT8 get_g()
+	inline UINT8 get_g() const
 	{
 		return _mm_extract_epi16(m_value, 2);
 	}
 
-	inline UINT8 get_b()
+	inline UINT8 get_b() const
 	{
 		return _mm_extract_epi16(m_value, 0);
 	}
 
-	inline INT32 get_a32()
+	inline INT32 get_a32() const
 	{
 		return (_mm_extract_epi16(m_value, 7) << 16) | _mm_extract_epi16(m_value, 6);
 	}
 
-	inline INT32 get_r32()
+	inline INT32 get_r32() const
 	{
 		return (_mm_extract_epi16(m_value, 5) << 16) | _mm_extract_epi16(m_value, 4);
 	}
 
-	inline INT32 get_g32()
+	inline INT32 get_g32() const
 	{
 		return (_mm_extract_epi16(m_value, 3) << 16) | _mm_extract_epi16(m_value, 2);
 	}
 
-	inline INT32 get_b32()
+	inline INT32 get_b32() const
 	{
 		return (_mm_extract_epi16(m_value, 1) << 16) | _mm_extract_epi16(m_value, 0);
 	}
@@ -173,7 +173,19 @@ public:
 
 	inline void shl(const rgbaint_t& shift)
 	{
-		m_value = _mm_sll_epi32(m_value, shift.m_value);
+		rgbaint_t areg(*this);
+		rgbaint_t rreg(*this);
+		rgbaint_t greg(*this);
+		rgbaint_t breg(*this);
+		rgbaint_t ashift(0, 0, 0, shift.get_a32());
+		rgbaint_t rshift(0, 0, 0, shift.get_r32());
+		rgbaint_t gshift(0, 0, 0, shift.get_g32());
+		rgbaint_t bshift(0, 0, 0, shift.get_b32());
+		areg.m_value = _mm_sll_epi32(areg.m_value, ashift.m_value);
+		rreg.m_value = _mm_sll_epi32(rreg.m_value, rshift.m_value);
+		greg.m_value = _mm_sll_epi32(greg.m_value, gshift.m_value);
+		breg.m_value = _mm_sll_epi32(breg.m_value, bshift.m_value);
+		set(areg.get_a32(), rreg.get_r32(), greg.get_g32(), breg.get_b32());
 	}
 
 	inline void shl_imm(const UINT8 shift)
@@ -183,7 +195,19 @@ public:
 
 	inline void shr(const rgbaint_t& shift)
 	{
-		m_value = _mm_srl_epi32(m_value, shift.m_value);
+		rgbaint_t areg(*this);
+		rgbaint_t rreg(*this);
+		rgbaint_t greg(*this);
+		rgbaint_t breg(*this);
+		rgbaint_t ashift(0, 0, 0, shift.get_a32());
+		rgbaint_t rshift(0, 0, 0, shift.get_r32());
+		rgbaint_t gshift(0, 0, 0, shift.get_g32());
+		rgbaint_t bshift(0, 0, 0, shift.get_b32());
+		areg.m_value = _mm_srl_epi32(areg.m_value, ashift.m_value);
+		rreg.m_value = _mm_srl_epi32(rreg.m_value, rshift.m_value);
+		greg.m_value = _mm_srl_epi32(greg.m_value, gshift.m_value);
+		breg.m_value = _mm_srl_epi32(breg.m_value, bshift.m_value);
+		set(areg.get_a32(), rreg.get_r32(), greg.get_g32(), breg.get_b32());
 	}
 
 	inline void shr_imm(const UINT8 shift)
@@ -193,7 +217,19 @@ public:
 
 	inline void sra(const rgbaint_t& shift)
 	{
-		m_value = _mm_sra_epi32(m_value, shift.m_value);
+		rgbaint_t areg(*this);
+		rgbaint_t rreg(*this);
+		rgbaint_t greg(*this);
+		rgbaint_t breg(*this);
+		rgbaint_t ashift(0, 0, 0, shift.get_a32());
+		rgbaint_t rshift(0, 0, 0, shift.get_r32());
+		rgbaint_t gshift(0, 0, 0, shift.get_g32());
+		rgbaint_t bshift(0, 0, 0, shift.get_b32());
+		areg.m_value = _mm_sra_epi32(areg.m_value, ashift.m_value);
+		rreg.m_value = _mm_sra_epi32(rreg.m_value, rshift.m_value);
+		greg.m_value = _mm_sra_epi32(greg.m_value, gshift.m_value);
+		breg.m_value = _mm_sra_epi32(breg.m_value, bshift.m_value);
+		set(areg.get_a32(), rreg.get_r32(), greg.get_g32(), breg.get_b32());
 	}
 
 	inline void sra_imm(const UINT8 shift)
@@ -305,9 +341,33 @@ public:
 
 	void scale_and_clamp(const rgbaint_t& scale);
 	void scale_imm_and_clamp(const INT32 scale);
-	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
-	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
-	void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other);
+
+	inline void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
+	{
+		mul_imm(scale);
+		sra_imm(8);
+		add(other);
+		clamp_to_uint8();
+	}
+
+	inline void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
+	{
+		mul(scale);
+		sra_imm(8);
+		add(other);
+		clamp_to_uint8();
+	}
+
+	inline void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
+	{
+		rgbaint_t color2(other);
+		color2.mul(scale2);
+
+		mul(scale);
+		add(color2);
+		sra_imm(8);
+		clamp_to_uint8();
+	}
 
 	inline void cmpeq(const rgbaint_t& value)
 	{
@@ -452,10 +512,10 @@ protected:
 	struct _statics
 	{
 		__m128  dummy_for_alignment;
-		INT16   alpha_mask[8];
-		INT16   red_mask[8];
-		INT16   green_mask[8];
-		INT16   blue_mask[8];
+		UINT16   alpha_mask[8];
+		UINT16   red_mask[8];
+		UINT16   green_mask[8];
+		UINT16   blue_mask[8];
 		INT16   scale_table[256][8];
 	};
 

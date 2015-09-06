@@ -37,6 +37,7 @@ class t11_device :  public cpu_device
 public:
 	// construction/destruction
 	t11_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	t11_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_initial_mode(device_t &device, const UINT16 mode) { downcast<t11_device &>(device).c_initial_mode = mode; }
@@ -65,7 +66,7 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const { return 6; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
-private:
+protected:
 	address_space_config m_program_config;
 
 	UINT16 c_initial_mode;
@@ -1133,8 +1134,23 @@ private:
 	void sub_ixd_ixd(UINT16 op);
 };
 
+class k1801vm2_device : public t11_device
+{
+public:
+	// construction/destruction
+	k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_reset();
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, std::string &str);
+};
+
 
 extern const device_type T11;
+extern const device_type K1801VM2;
 
 
 #endif /* __T11_H__ */

@@ -108,4 +108,4 @@ ROM_START( bingpty )
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-GAME( 199?, bingpty,    0,        segam1,    segam1, driver_device,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, bingpty,    0,        segam1,    segam1, driver_device,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

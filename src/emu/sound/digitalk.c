@@ -169,7 +169,7 @@ period.
 
         - Rom organization
 
-The rom starts with a vector of 16-bits little endian values which are
+The rom starts with a vector of 16-bits big endian values which are
 the addresses of the segments table for the samples.  The segments data
 is a vector of 24-bits little-endian values organized as such:
 
@@ -385,7 +385,7 @@ void digitalker_device::digitalker_step_mode_0()
 
 void digitalker_device::digitalker_step_mode_1()
 {
-	logerror("Digitalker mode 1 unsupported");
+	logerror("Digitalker mode 1 unsupported\n");
 	m_zero_count = 1;
 	m_cur_segment = m_segments;
 }

@@ -50,7 +50,6 @@ public:
 	DECLARE_READ8_MEMBER(striv_question_r);
 	DECLARE_WRITE8_MEMBER(jack_videoram_w);
 	DECLARE_WRITE8_MEMBER(jack_colorram_w);
-	DECLARE_WRITE8_MEMBER(jack_paletteram_w);
 	DECLARE_READ8_MEMBER(jack_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_READ8_MEMBER(timer_r);

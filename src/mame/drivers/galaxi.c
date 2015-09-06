@@ -68,7 +68,6 @@ public:
 	required_shared_ptr<UINT16> m_bg3_ram;
 	required_shared_ptr<UINT16> m_bg4_ram;
 	required_shared_ptr<UINT16> m_fg_ram;
-//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 //  UINT16 *  m_nvram;        // currently this uses generic nvram handling
 
 	/* video-related */
@@ -487,5 +486,5 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY   FULLNAME                       FLAGS                   LAYOUT  */
-GAMEL( 2000, galaxi,   0,      galaxi,   galaxi, driver_device,   0,    ROT0,  "B.R.L.", "Galaxi (v2.0)",               GAME_SUPPORTS_SAVE,     layout_galaxi )
-GAMEL( 2000, magjoker, 0,      magjoker, magjoker, driver_device, 0,    ROT0,  "B.R.L.", "Magic Joker (v1.25.10.2000)", GAME_SUPPORTS_SAVE,     layout_galaxi )
+GAMEL( 2000, galaxi,   0,      galaxi,   galaxi, driver_device,   0,    ROT0,  "B.R.L.", "Galaxi (v2.0)",               MACHINE_SUPPORTS_SAVE,     layout_galaxi )
+GAMEL( 2000, magjoker, 0,      magjoker, magjoker, driver_device, 0,    ROT0,  "B.R.L.", "Magic Joker (v1.25.10.2000)", MACHINE_SUPPORTS_SAVE,     layout_galaxi )

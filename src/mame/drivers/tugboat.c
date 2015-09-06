@@ -470,6 +470,6 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat, driver_device,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, tugboat,  0, tugboat, tugboat, driver_device,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

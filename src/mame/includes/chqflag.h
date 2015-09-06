@@ -28,10 +28,6 @@ public:
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank") { }
 
-	/* video-related */
-	int        m_zoom_colorbase[2];
-	int        m_sprite_colorbase;
-
 	/* misc */
 	int        m_k051316_readroms;
 	int        m_last_vreg;
@@ -64,9 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	UINT32 screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(chqflag_scanline);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K051316_CB_MEMBER(zoom_callback_1);

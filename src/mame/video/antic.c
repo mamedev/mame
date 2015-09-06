@@ -29,6 +29,9 @@ antic_device::antic_device(const machine_config &mconfig, const char *tag, devic
 				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
 				device_video_interface(mconfig, *this),
 				m_gtia_tag(NULL),
+				m_maincpu(*this, ":maincpu"),
+				m_djoy_b(*this, ":djoy_b"),
+				m_artifacts(*this, ":artifacts"),
 				m_tv_artifacts(0),
 				m_render1(0),
 				m_render2(0),
@@ -1388,7 +1391,7 @@ void antic_device::render(address_space &space, int param1, int param2, int para
  ************************************************************************/
 UINT32 antic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 new_tv_artifacts = screen.ioport("artifacts")->read_safe(0);
+	UINT32 new_tv_artifacts = m_artifacts ? m_artifacts->read() : 0;
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 
 	if (m_tv_artifacts != new_tv_artifacts)
@@ -2081,7 +2084,7 @@ void antic_device::generic_interrupt(int button_count)
 	if( m_scanline == VBL_START )
 	{
 		/* specify buttons relevant to this Atari variant */
-		m_gtia->button_interrupt(button_count, machine().root_device().ioport("djoy_b")->read_safe(0));
+		m_gtia->button_interrupt(button_count, m_djoy_b ? m_djoy_b->read() : 0);
 
 		/* do nothing new for the rest of the frame */
 		m_modelines = m_screen->height() - VBL_START;
@@ -2095,7 +2098,7 @@ void antic_device::generic_interrupt(int button_count)
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			m_r.nmist |= VBL_NMI;
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 

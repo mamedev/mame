@@ -13,7 +13,7 @@
   This is a board game, it obviously requires game pieces and the board.
   The emulated part is the centerpiece, a black tower with a rotating card
   panel and LED digits for displaying health, amount of gold, etc. As far
-  as MESS is concerned, the game works fine.
+  as MAME is concerned, the game works fine.
 
   To start up the game, first press [MOVE], the machine now does a self-test.
   Then select level and number of players and the game will start. Read the
@@ -282,4 +282,4 @@ ROM_START( mbdtower )
 ROM_END
 
 
-CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
+CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

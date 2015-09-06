@@ -240,6 +240,8 @@ if (BUSES["C64"]~=null) then
 		MAME_DIR .. "src/emu/bus/c64/exp.h",
 		MAME_DIR .. "src/emu/bus/c64/c128_comal80.c",
 		MAME_DIR .. "src/emu/bus/c64/c128_comal80.h",
+		MAME_DIR .. "src/emu/bus/c64/c128_partner.c",
+		MAME_DIR .. "src/emu/bus/c64/c128_partner.h",
 		MAME_DIR .. "src/emu/bus/c64/comal80.c",
 		MAME_DIR .. "src/emu/bus/c64/comal80.h",
 		MAME_DIR .. "src/emu/bus/c64/cpm.c",
@@ -431,6 +433,12 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cbmiec/interpod.h",
 		MAME_DIR .. "src/emu/bus/cbmiec/serialbox.c",
 		MAME_DIR .. "src/emu/bus/cbmiec/serialbox.h",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.h",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.h",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1526.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1526.h",
 	}
 end
 
@@ -496,6 +504,8 @@ if (BUSES["COLECO"]~=null) then
 		MAME_DIR .. "src/emu/bus/coleco/exp.h",
 		MAME_DIR .. "src/emu/bus/coleco/std.c",
 		MAME_DIR .. "src/emu/bus/coleco/std.h",
+		MAME_DIR .. "src/emu/bus/coleco/xin1.h",
+		MAME_DIR .. "src/emu/bus/coleco/xin1.c",
 	}
 end
 
@@ -878,6 +888,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/emu/bus/msx_cart/dooly.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/fmpac.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/fmpac.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/fs_sr022.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/fs_sr022.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/halnote.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/halnote.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/hfox.c",
@@ -890,6 +902,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/emu/bus/msx_cart/korean.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/moonsound.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/moonsound.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio_kb.c",
@@ -1494,7 +1508,7 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/emu/bus/centronics/digiblst.c",
 		MAME_DIR .. "src/emu/bus/centronics/digiblst.h",
 	}
-	
+
 	dependency {
 		{ MAME_DIR .. "src/emu/bus/centronics/epson_ex800.c",  GEN_DIR .. "emu/layout/ex800.lh" },
 		{ MAME_DIR .. "src/emu/bus/centronics/epson_lx800.c",  GEN_DIR .. "emu/layout/lx800.lh" },
@@ -1504,7 +1518,7 @@ if (BUSES["CENTRONICS"]~=null) then
 	custombuildtask {
 		layoutbuildtask("emu/layout", "ex800"),
 		layoutbuildtask("emu/layout", "lx800"),
-	}		
+	}
 end
 
 ---------------------------------------------------
@@ -1978,6 +1992,41 @@ if (BUSES["SMS_EXP"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/emu/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
+---------------------------------------------------
+
+if (BUSES["TI99X"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/bus/ti99x/990_dk.c",
+		MAME_DIR .. "src/emu/bus/ti99x/990_dk.h",
+		MAME_DIR .. "src/emu/bus/ti99x/990_hd.c",
+		MAME_DIR .. "src/emu/bus/ti99x/990_hd.h",
+		MAME_DIR .. "src/emu/bus/ti99x/990_tap.c",
+		MAME_DIR .. "src/emu/bus/ti99x/990_tap.h",
+		MAME_DIR .. "src/emu/bus/ti99x/998board.c",
+		MAME_DIR .. "src/emu/bus/ti99x/998board.h",
+		MAME_DIR .. "src/emu/bus/ti99x/datamux.c",
+		MAME_DIR .. "src/emu/bus/ti99x/datamux.h",
+		MAME_DIR .. "src/emu/bus/ti99x/genboard.c",
+		MAME_DIR .. "src/emu/bus/ti99x/genboard.h",
+		MAME_DIR .. "src/emu/bus/ti99x/grom.c",
+		MAME_DIR .. "src/emu/bus/ti99x/grom.h",
+		MAME_DIR .. "src/emu/bus/ti99x/gromport.c",
+		MAME_DIR .. "src/emu/bus/ti99x/gromport.h",
+		MAME_DIR .. "src/emu/bus/ti99x/handset.c",
+		MAME_DIR .. "src/emu/bus/ti99x/handset.h",
+		MAME_DIR .. "src/emu/bus/ti99x/joyport.c",
+		MAME_DIR .. "src/emu/bus/ti99x/joyport.h",
+		MAME_DIR .. "src/emu/bus/ti99x/mecmouse.c",
+		MAME_DIR .. "src/emu/bus/ti99x/mecmouse.h",
+		MAME_DIR .. "src/emu/bus/ti99x/ti99defs.h",
+		MAME_DIR .. "src/emu/bus/ti99x/videowrp.c",
+		MAME_DIR .. "src/emu/bus/ti99x/videowrp.h",		
+	}
+end
+		
 ---------------------------------------------------
 --
 --@src/emu/bus/ti99_peb/peribox.h,BUSES["TI99PEB"] = true

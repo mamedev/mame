@@ -32,8 +32,6 @@ NETLIB_UPDATE(r2r_dac)
 
 NETLIB_UPDATE_PARAM(r2r_dac)
 {
-	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
-
 	update_dev();
 
 	nl_double V = m_VIN.Value() / (nl_double) (1 << m_num.Value()) * (nl_double) m_val.Value();

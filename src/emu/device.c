@@ -333,7 +333,7 @@ attotime device_t::clocks_to_attotime(UINT64 numclocks) const
 
 UINT64 device_t::attotime_to_clocks(const attotime &duration) const
 {
-	return mulu_32x32(duration.seconds, m_clock) + (UINT64)duration.attoseconds / (UINT64)m_attoseconds_per_clock;
+	return mulu_32x32(duration.seconds(), m_clock) + (UINT64)duration.attoseconds() / (UINT64)m_attoseconds_per_clock;
 }
 
 
@@ -413,7 +413,7 @@ void device_t::start()
 	if (state_registrations == 0 && (interface(exec) || interface(sound)) && type() != SPEAKER)
 	{
 		logerror("Device '%s' did not register any state to save!\n", tag());
-		if ((machine().system().flags & GAME_SUPPORTS_SAVE) != 0)
+		if ((machine().system().flags & MACHINE_SUPPORTS_SAVE) != 0)
 			fatalerror("Device '%s' did not register any state to save!\n", tag());
 	}
 

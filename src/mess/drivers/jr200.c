@@ -70,7 +70,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(jr200);
 	UINT32 screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
@@ -495,14 +494,6 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(jr200_state, jr200)
-{
-	int i;
-
-	for (i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-}
-
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
@@ -548,7 +539,6 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 
 //  MCFG_CPU_ADD("mn1544", MN1544, ?)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -559,9 +549,7 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr200)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(jr200_state, jr200)
-
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -609,5 +597,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1982, jr200,  0,       0,     jr200,  jr200, driver_device,    0,          "National",   "JR-200",        GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1982, jr200u, jr200,   0,     jr200,  jr200, driver_device,    0,          "Panasonic",   "JR-200U",      GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, jr200,  0,       0,     jr200,  jr200, driver_device,    0,          "National",   "JR-200",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, jr200u, jr200,   0,     jr200,  jr200, driver_device,    0,          "Panasonic",   "JR-200U",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -97,6 +97,24 @@ void bionicc_state::video_start()
 	m_bg_tilemap->set_transparent_pen(15);
 }
 
+PALETTE_DECODER_MEMBER( bionicc_state, RRRRGGGGBBBBIIII )
+{
+	UINT8 bright = (raw & 0x0f);
+
+	UINT8 r = ((raw >> 12) & 0x0f) * 0x11;
+	UINT8 g = ((raw >>  8) & 0x0f) * 0x11;
+	UINT8 b = ((raw >>  4) & 0x0f) * 0x11;
+
+	if ((bright & 0x08) == 0)
+	{
+		r = r * (0x07 + bright) / 0x0e;
+		g = g * (0x07 + bright) / 0x0e;
+		b = b * (0x07 + bright) / 0x0e;
+	}
+
+	return rgb_t(r, g, b);
+}
+
 
 
 /***************************************************************************
@@ -121,27 +139,6 @@ WRITE16_MEMBER(bionicc_state::bionicc_txvideoram_w)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-WRITE16_MEMBER(bionicc_state::bionicc_paletteram_w)
-{
-	int r, g, b, bright;
-	data = COMBINE_DATA(&m_paletteram[offset]);
-
-	bright = (data & 0x0f);
-
-	r = ((data >> 12) & 0x0f) * 0x11;
-	g = ((data >> 8 ) & 0x0f) * 0x11;
-	b = ((data >> 4 ) & 0x0f) * 0x11;
-
-	if ((bright & 0x08) == 0)
-	{
-		r = r * (0x07 + bright) / 0x0e;
-		g = g * (0x07 + bright) / 0x0e;
-		b = b * (0x07 + bright) / 0x0e;
-	}
-
-	m_palette->set_pen_color (offset, rgb_t(r, g, b));
 }
 
 WRITE16_MEMBER(bionicc_state::bionicc_scroll_w)

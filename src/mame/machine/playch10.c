@@ -1076,7 +1076,7 @@ WRITE8_MEMBER(playch10_state::hboard_rom_switch_w)
 			}
 	};
 	gboard_rom_switch_w(space,offset,data);
-};
+}
 
 
 DRIVER_INIT_MEMBER(playch10_state,pchboard)

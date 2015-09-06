@@ -125,4 +125,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1996, p112,   0,      0,       p112,      p112, driver_device,    0,   "Dave Brooks", "P112", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1996, p112,   0,      0,       p112,      p112, driver_device,    0,   "Dave Brooks", "P112", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

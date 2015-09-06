@@ -35,7 +35,6 @@ public:
 	optional_shared_ptr<UINT16> m_spriteram2;
 	required_shared_ptr<UINT16> m_spriteram3;
 	optional_shared_ptr<UINT16> m_tx_tilemap_ram;
-//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices referenced above */
 	optional_device<vsystem_spr_device> m_spr; // only the aerofgt parent uses this chip

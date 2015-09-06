@@ -155,7 +155,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	if (!m_reg_allowed)
 	{
 		logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		if (machine().system().flags & GAME_SUPPORTS_SAVE)
+		if (machine().system().flags & MACHINE_SUPPORTS_SAVE)
 			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		m_illegal_regs++;
 		return;

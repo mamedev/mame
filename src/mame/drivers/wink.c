@@ -447,5 +447,5 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 		ROM[i] += BITSWAP8(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
-GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1985, winka, wink, wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, winka, wink, wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

@@ -83,7 +83,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(mole);
 	UINT32 screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -93,12 +92,6 @@ public:
  *  Video emulation
  *
  *************************************/
-
-PALETTE_INIT_MEMBER(mole_state, mole)
-{
-	for (int i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
-}
 
 TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 {
@@ -340,8 +333,7 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mole)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(mole_state, mole)
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -379,4 +371,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mole, 0, mole, mole, driver_device, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", GAME_SUPPORTS_SAVE )
+GAME( 1982, mole, 0, mole, mole, driver_device, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )

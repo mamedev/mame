@@ -385,5 +385,5 @@ ROM_START(pfevr_p3)
 ROM_END
 
 
-GAME(1984,pfevr_l2, 0,        s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (L-2)", GAME_MECHANICAL)
-GAME(1984,pfevr_p3, pfevr_l2, s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (P-3)", GAME_MECHANICAL)
+GAME(1984,pfevr_l2, 0,        s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL)
+GAME(1984,pfevr_p3, pfevr_l2, s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL)

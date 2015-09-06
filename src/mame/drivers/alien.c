@@ -120,4 +120,4 @@ ROM_START( alien )
 ROM_END
 
 
-GAME( 2005, alien,  0,      alien, alien, driver_device, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2005, alien,  0,      alien, alien, driver_device, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

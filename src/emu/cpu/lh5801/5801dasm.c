@@ -85,7 +85,7 @@ enum Ins
 	OFF, // clears bf flip flop
 	RDP, SDP,// reset display flip flop
 	RPU, SPU,// flip flop pu off
-	RPV, SPV,// flip flop pv off
+	RPV, SPV // flip flop pv off
 };
 
 static const char *const InsNames[]={

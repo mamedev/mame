@@ -636,7 +636,7 @@ UINT32 v810_device::opRETI(UINT32 op)
 
 UINT32 v810_device::opHALT(UINT32 op)
 {
-	printf("V810: HALT @ %X",PC-2);
+	printf("V810: HALT @ %X\n",PC-2);
 	return clkIF;
 }
 

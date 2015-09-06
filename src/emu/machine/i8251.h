@@ -132,7 +132,8 @@ private:
 	int m_br_factor;
 
 	/* data being received */
-	UINT8 m_data;
+	UINT8 m_rx_data;
+		UINT8 m_tx_data;
 	bool m_tx_busy;
 	bool m_disable_tx_pending;
 };

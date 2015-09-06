@@ -53,7 +53,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(bmjr);
 	UINT32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -324,15 +323,6 @@ static GFXDECODE_START( bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(bmjr_state, bmjr)
-{
-	int i;
-
-	for(i=0;i<8;i++)
-		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
-}
-
-
 void bmjr_state::machine_start()
 {
 	m_beep->set_frequency(1200); //guesswork
@@ -361,8 +351,7 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(bmjr_state, bmjr)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmjr)
 
 	/* Audio */
@@ -393,4 +382,4 @@ DRIVER_INIT_MEMBER(bmjr_state,bmjr)
 }
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr, bmjr_state,    bmjr,  "Hitachi", "Basic Master Jr", GAME_NOT_WORKING)
+COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr, bmjr_state,    bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

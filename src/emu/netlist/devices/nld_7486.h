@@ -36,13 +36,13 @@
 #include "nld_truthtable.h"
 
 #define TTL_7486_XOR(_name, _A, _B)                                                 \
-		NET_REGISTER_DEV(7486, _name)                                               \
+		NET_REGISTER_DEV(TTL_7486_XOR, _name)                                               \
 		NET_CONNECT(_name, A, _A)                                                   \
 		NET_CONNECT(_name, B, _B)
 
 
 #define TTL_7486_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7486_dip, _name)
+		NET_REGISTER_DEV(TTL_7486_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

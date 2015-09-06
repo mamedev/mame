@@ -566,6 +566,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1987, pb1000 ,  0,       0,   pb1000 ,    pb1000 , driver_device,  0, "Casio",   "PB-1000",   GAME_NOT_WORKING)
-COMP( 1989, pb2000c,  0,       0,   pb2000c,    pb2000c, driver_device,  0, "Casio",   "PB-2000c",  GAME_NOT_WORKING)
-COMP( 1989, ai1000,  pb2000c,  0,   pb2000c,    pb2000c, driver_device,  0, "Casio",   "AI-1000",   GAME_NOT_WORKING)
+COMP( 1987, pb1000 ,  0,       0,   pb1000 ,    pb1000 , driver_device,  0, "Casio",   "PB-1000",   MACHINE_NOT_WORKING)
+COMP( 1989, pb2000c,  0,       0,   pb2000c,    pb2000c, driver_device,  0, "Casio",   "PB-2000c",  MACHINE_NOT_WORKING)
+COMP( 1989, ai1000,  pb2000c,  0,   pb2000c,    pb2000c, driver_device,  0, "Casio",   "AI-1000",   MACHINE_NOT_WORKING)

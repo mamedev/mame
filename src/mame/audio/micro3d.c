@@ -22,20 +22,20 @@
  *************************************/
 
 /* Borrowed from segasnd.c */
-INLINE void configure_filter(filter_state *state, double r, double c)
+INLINE void configure_filter(m3d_filter_state *state, double r, double c)
 {
 	state->capval = 0;
 	state->exponent = 1.0 - exp(-1.0 / (r * c * 2000000/8));
 }
 
 #if 0
-INLINE double step_rc_filter(filter_state *state, double input)
+INLINE double step_rc_filter(m3d_filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
 	return state->capval;
 }
 
-INLINE double step_cr_filter(filter_state *state, double input)
+INLINE double step_cr_filter(m3d_filter_state *state, double input)
 {
 	double result = (input - state->capval);
 	state->capval += (input - state->capval) * state->exponent;
@@ -144,13 +144,13 @@ void micro3d_sound_device::noise_sh_w(UINT8 data)
 
 			m_dac[data & 3] = state->m_dac_data;
 
-			if (m_vca == 255)
+			if (m_dac[VCA] == 255)
 				m_gain = 0;
 			else
-				m_gain = expf(-(float)(m_vca) / 25.0f) * 10.0f;
+				m_gain = expf(-(float)(m_dac[VCA]) / 25.0f) * 10.0f;
 
-			q = 0.75/255 * (255 - m_vcq) + 0.1;
-			fc = 4500.0/255 * (255 - m_vcf) + 100;
+			q = 0.75/255 * (255 - m_dac[VCQ]) + 0.1;
+			fc = 4500.0/255 * (255 - m_dac[VCF]) + 100;
 
 			recompute_filter(&m_filter, m_gain, q, fc);
 		}
@@ -170,16 +170,14 @@ const device_type MICRO3D = &device_creator<micro3d_sound_device>;
 micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MICRO3D, "Microprose Audio Custom", tag, owner, clock, "micro3d_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_vcf(0),
-		m_vcq(0),
-		m_vca(0),
-		m_pan(0),
 		m_gain(0),
 		m_noise_shift(0),
 		m_noise_value(0),
 		m_noise_subcount(0),
 		m_stream(NULL)
+
 {
+		memset(m_dac, 0, sizeof(UINT8)*4);
 }
 
 //-------------------------------------------------
@@ -241,8 +239,8 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	if (m_gain == 0)
 		return;
 
-	pan_l = (float)(255 - m_pan) / 255.0f;
-	pan_r = (float)(m_pan) / 255.0f;
+	pan_l = (float)(255 - m_dac[PAN]) / 255.0f;
+	pan_r = (float)(m_dac[PAN]) / 255.0f;
 
 	while (samples--)
 	{
@@ -345,7 +343,7 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 	{
 		case 0x01:
 		{
-			micro3d_sound_device *noise = machine().device<micro3d_sound_device>(data & 4 ? "noise_2" : "noise_1");
+			micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
 			noise->noise_sh_w(data);
 			break;
 		}
@@ -362,7 +360,7 @@ READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 {
 	switch (offset)
 	{
-		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | ioport("SOUND_SW")->read();
+		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | m_sound_sw->read();
 		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 		default:    return 0;
 	}

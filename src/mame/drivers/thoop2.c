@@ -231,4 +231,4 @@ ROM_START( thoop2 )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 
-GAME( 1994, thoop2,  0, thoop2, thoop2, driver_device,  0, ROT0, "Gaelco", "TH Strikes Back", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1994, thoop2,  0, thoop2, thoop2, driver_device,  0, ROT0, "Gaelco", "TH Strikes Back", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

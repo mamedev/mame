@@ -186,7 +186,7 @@ void validity_checker::check_shared_source(const game_driver &driver)
 //  check_all - check all drivers
 //-------------------------------------------------
 
-void validity_checker::check_all()
+bool validity_checker::check_all()
 {
 	// start by checking core stuff
 	validate_begin();
@@ -218,6 +218,8 @@ void validity_checker::check_all()
 
 	// cleanup
 	validate_end();
+
+	return !(m_errors > 0 || m_warnings > 0);
 }
 
 
@@ -546,7 +548,7 @@ void validity_checker::validate_driver()
 	// determine if we are a clone
 	bool is_clone = (strcmp(m_current_driver->parent, "0") != 0);
 	int clone_of = m_drivlist.clone(*m_current_driver);
-	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & GAME_IS_BIOS_ROOT))
+	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
 		is_clone = false;
 
 	// if we have at least 100 drivers, validate the clone
@@ -599,8 +601,8 @@ void validity_checker::validate_driver()
 
 	// make sure sound-less drivers are flagged
 	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & GAME_IS_BIOS_ROOT) == 0 && iter.first() == NULL && (m_current_driver->flags & GAME_NO_SOUND) == 0 && (m_current_driver->flags & GAME_NO_SOUND_HW) == 0)
-		osd_printf_error("Driver is missing GAME_NO_SOUND flag\n");
+	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && iter.first() == NULL && (m_current_driver->flags & MACHINE_NO_SOUND) == 0 && (m_current_driver->flags & MACHINE_NO_SOUND_HW) == 0)
+		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
 }
 
 

@@ -18,7 +18,9 @@
 */
 
 // Show step operation
-#define TRACE_STEP 0
+#define TRACE_STEP 1
+
+#define FLOPSND_TAG "floppysound"
 
 // device type definition
 const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
@@ -123,7 +125,8 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock, "floppy_connector", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	m_enable_sound(false)
 {
 }
 
@@ -144,7 +147,10 @@ void floppy_connector::device_config_complete()
 {
 	floppy_image_device *dev = dynamic_cast<floppy_image_device *>(get_card_device());
 	if(dev)
+	{
 		dev->set_formats(formats);
+		dev->enable_sound(m_enable_sound);
+	}
 }
 
 floppy_image_device *floppy_connector::get_device()
@@ -161,7 +167,8 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		device_image_interface(mconfig, *this),
 		device_slot_card_interface(mconfig, *this),
 		image(NULL),
-		fif_list(NULL)
+		fif_list(NULL),
+		m_make_sound(false)
 {
 	extension_list[0] = '\0';
 	m_err = IMAGE_ERROR_INVALIDIMAGE;
@@ -262,7 +269,7 @@ void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
 void floppy_image_device::commit_image()
 {
 	image_dirty = false;
-	if(!output_format)
+	if(!output_format || !output_format->supports_save())
 		return;
 	io_generic io;
 	// Do _not_ remove this cast otherwise the pointer will be incorrect when used by the ioprocs.
@@ -304,12 +311,20 @@ void floppy_image_device::device_start()
 
 	setup_characteristics();
 
+	if (m_make_sound) m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
+
 	save_item(NAME(cyl));
 	save_item(NAME(subcyl));
 }
 
 void floppy_image_device::device_reset()
 {
+	if (m_make_sound)
+	{
+		// Have we loaded all samples? Otherwise mute the floppy.
+		m_make_sound = m_sound_out->samples_loaded();
+	}
+
 	revolution_start_time = attotime::never;
 	revolution_count = 0;
 	mon = 1;
@@ -358,6 +373,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 bool floppy_image_device::call_load()
 {
 	io_generic io;
+
 	// Do _not_ remove this cast otherwise the pointer will be incorrect when used by the ioprocs.
 	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;
@@ -490,6 +506,8 @@ void floppy_image_device::mon_w(int state)
 				cur_ready_cb(this, ready);
 		}
 	}
+
+	if (m_make_sound) m_sound_out->motor(state==0);
 }
 
 attotime floppy_image_device::time_next_index()
@@ -573,7 +591,11 @@ void floppy_image_device::stp_w(int state)
 				if ( cyl < tracks-1 ) cyl++;
 			}
 			if(ocyl != cyl)
+			{
 				if (TRACE_STEP) logerror("%s: track %d\n", tag(), cyl);
+				// Do we want a stepper sound?
+				if (m_make_sound) m_sound_out->step();
+			}
 			/* Update disk detection if applicable */
 			if (exists())
 			{
@@ -1031,6 +1053,162 @@ void ui_menu_control_floppy_image::handle()
 		ui_menu_control_device_image::handle();
 	}
 }
+
+//===================================================================
+//   Floppy sound
+//
+//   In order to enable floppy sound you must add the line
+//      MCFG_FLOPPY_DRIVE_SOUND(true)
+//   after MCFG_FLOPPY_DRIVE_ADD
+//   and you must put audio samples (44100Hz, mono) with names as
+//   shown in floppy_sample_names into the directory samples/floppy
+//   Sound will be disabled when these samples are missing.
+//
+//   MZ, Aug 2015
+//===================================================================
+
+floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__)
+{
+	m_motor = false;
+	m_loaded = false;
+}
+
+void floppy_sound_device::register_for_save_states()
+{
+	save_item(NAME(m_sampleend_motor));
+	save_item(NAME(m_samplepos_motor));
+	save_item(NAME(m_motor_mintime));
+	save_item(NAME(m_motor_time));
+	save_item(NAME(m_motor));
+	save_item(NAME(m_sampleend_step));
+	save_item(NAME(m_samplestart_step));
+	save_item(NAME(m_samplepos_step));
+	save_item(NAME(m_step_mintime));
+	save_item(NAME(m_step_time));
+}
+
+void floppy_sound_device::device_start()
+{
+	// Read audio samples. The samples are stored in the list m_samples.
+	m_loaded = load_samples();
+
+	// The per-floppy stream. If we don't have all samples, don't allocate a stream.
+	if (m_loaded) m_sound = machine().sound().stream_alloc(*this, 0, 1, clock());
+
+	// Of course, we can read the length from the sample_t, but we want to
+	// be able to fine-tune it, for instance, choose different start and end points
+	m_samplestart_motor = 0;
+	m_sampleend_motor = 8820;       // 200ms
+	m_samplestart_step = 0;
+	m_sampleend_step = 2205;        // 50ms
+
+	// Mintime says how long the sound persists after the initiating signal
+	// is cleared (important for short step pulses)
+	m_motor_mintime = 8820;
+	m_step_mintime = 1500;
+
+	// Number of updates until the sample stops
+	m_motor_time = 0;
+	m_step_time = 0;
+
+	// Initialize position
+	m_samplepos_step = m_samplestart_step;
+	m_samplepos_motor = m_samplestart_motor;
+	register_for_save_states();
+}
+
+void floppy_sound_device::motor(bool state)
+{
+	m_sound->update();
+	// We do not reset the motor sample on state==true because we don't want
+	// the sound to "jump"
+	if (state==true) m_motor_time = m_motor_mintime;
+	m_motor = state;
+}
+
+/*
+    Activate the step sound.
+*/
+void floppy_sound_device::step()
+{
+	m_sound->update();  // required
+	m_step_time = m_step_mintime;
+	m_samplepos_step = m_samplestart_step;
+}
+
+//-------------------------------------------------
+//  sound_stream_update - update the sound stream
+//-------------------------------------------------
+
+void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// We are using only one stream, unlike the parent class
+	// Also, there is no need for interpolation, as we only expect
+	// one sample rate of 44100 for all samples
+
+	INT16 out = 0;
+
+	stream_sample_t *samplebuffer = outputs[0];
+	sample_t&   motor_sample = m_sample[0];
+	sample_t&   step_sample = m_sample[1];
+
+	while (samples-- > 0)
+	{
+		out = 0;
+		// Motor sound
+		if (m_motor_time > 0)
+		{
+			if (m_samplepos_motor < m_sampleend_motor)
+				// Stream value
+				out = motor_sample.data[m_samplepos_motor++];
+			else
+				m_samplepos_motor = m_samplestart_motor;
+
+			// When the motor is turned off, count down the samples
+			if (!m_motor) m_motor_time--;
+		}
+
+		// Stepper sound
+		if (m_step_time > 0)
+		{
+			if (m_samplepos_step < m_sampleend_step)
+				// Mix it into the stream value
+				out = out + step_sample.data[m_samplepos_step++];
+			else
+				m_samplepos_step = m_samplestart_step;
+
+			// Count down the samples
+			m_step_time--;
+		}
+		// Write to the stream buffer
+		*(samplebuffer++) = out;
+	}
+}
+
+static const char *const floppy_sample_names[] =
+{
+	"*floppy",
+	"floppy_35_motor",
+	"floppy_35_step",
+	0
+};
+
+#define FLOPSPK "flopsndout"
+
+MACHINE_CONFIG_FRAGMENT( floppy_img )
+	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
+	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
+	MCFG_SAMPLES_NAMES(floppy_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.75)
+MACHINE_CONFIG_END
+
+machine_config_constructor floppy_image_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( floppy_img );
+}
+
+const device_type FLOPPYSOUND = &device_creator<floppy_sound_device>;
 
 
 //**************************************************************************

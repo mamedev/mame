@@ -43,7 +43,17 @@ class mboard_state : public driver_device
 public:
 	mboard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_line(*this, "LINE"),
+		m_line10(*this, "LINE10"),
+		m_b_white(*this, "B_WHITE"),
+		m_b_black(*this, "B_BLACK"),
+		m_b_buttons(*this, "B_BUTTONS"),
+		m_mouse_x(*this, "MOUSE_X"),
+		m_mouse_y(*this, "MOUSE_Y"),
+		m_button_l(*this, "BUTTON_L"),
+		m_button_r(*this, "BUTTON_R")
+	{ }
 
 	DECLARE_READ8_MEMBER(mboard_read_board_8);
 	DECLARE_WRITE8_MEMBER(mboard_write_board_8);
@@ -96,6 +106,15 @@ private:
 	void check_board_buttons();
 public:
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<8> m_line;
+	required_ioport m_line10;
+	required_ioport m_b_white;
+	required_ioport m_b_black;
+	required_ioport m_b_buttons;
+	required_ioport m_mouse_x;
+	required_ioport m_mouse_y;
+	required_ioport m_button_l;
+	required_ioport m_button_r;
 };
 
 

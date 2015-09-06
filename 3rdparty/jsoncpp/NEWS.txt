@@ -80,7 +80,7 @@ New in SVN
     (e.g. MSVC 2008 command prompt in start menu) before running scons.
     
   - Added support for amalgamated source and header generation (a la sqlite).
-    Refer to README.txt section "Generating amalgamated source and header"
+    Refer to README.md section "Generating amalgamated source and header"
     for detail.
     
 * Value

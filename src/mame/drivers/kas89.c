@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kas89_state,kas89_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -859,4 +859,4 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 **************************************/
 
 /*     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT     COMPANY       FULLNAME     FLAGS                 LAYOUT */
-GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", GAME_IMPERFECT_SOUND, layout_kas89 )
+GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )

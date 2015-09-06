@@ -166,7 +166,10 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
 	if (window != nil)
+	{
+		[window orderOut:self];
 		[window release];
+	}
 
 	[super dealloc];
 }

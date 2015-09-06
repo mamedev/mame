@@ -847,4 +847,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME             FLAGS */
-COMP( 1984, dmv,    0,       0,         dmv,    dmv, driver_device,  0,      "NCR",   "Decision Mate V",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, dmv,    0,       0,         dmv,    dmv, driver_device,  0,      "NCR",   "Decision Mate V",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

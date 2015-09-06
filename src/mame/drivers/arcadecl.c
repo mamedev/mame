@@ -396,5 +396,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, driver_device, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, sparkz,   sparkz,   driver_device, 0, ROT0, "Atari Games", "Sparkz (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, driver_device, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, sparkz,   sparkz,   driver_device, 0, ROT0, "Atari Games", "Sparkz (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -5,12 +5,31 @@
  *
  */
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 #ifndef PCONFIG_H_
 #define PCONFIG_H_
 
 #ifndef PSTANDALONE
 	#define PSTANDALONE (0)
 #endif
+
+//#define PHAS_INT128 (0)
+
+#ifndef PHAS_INT128
+#define PHAS_INT128 (0)
+#endif
+
+#if (PHAS_INT128)
+typedef __uint128_t UINT128;
+typedef __int128_t INT128;
+#endif
+
 
 #if !(PSTANDALONE)
 #include "osdcore.h"
@@ -24,8 +43,8 @@
 
 #else
 #include <stdint.h>
-#include <cstddef>
 #endif
+#include <cstddef>
 
 
 //============================================================
@@ -33,25 +52,16 @@
 //============================================================
 
 // prevent implicit copying
-#define P_PREVENT_COPYING(_name)          		\
+#define P_PREVENT_COPYING(_name)                \
 	private:                                    \
 		_name(const _name &);                   \
 		_name &operator=(const _name &);
-
 
 //============================================================
 //  Compiling standalone
 //============================================================
 
 #if !(PSTANDALONE)
-
-#undef ATTR_COLD
-#define ATTR_COLD
-
-static inline std::size_t SIZET_PRINTF(const std::size_t &v)
-{
-	return (unsigned) v;
-}
 
 /* use MAME */
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
@@ -88,10 +98,10 @@ static inline std::size_t SIZET_PRINTF(const std::size_t &v)
 /* ATTR_HOT and ATTR_COLD cause performance degration in 5.1 */
 //#define ATTR_HOT
 //#define ATTR_COLD
-#define ATTR_HOT                __attribute__((hot))
+#define ATTR_HOT               __attribute__((hot))
 #define ATTR_COLD              __attribute__((cold))
 
-#define RESTRICT
+#define RESTRICT                __restrict__
 #define EXPECTED(x)     (x)
 #define UNEXPECTED(x)   (x)
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
@@ -130,33 +140,6 @@ typedef int64_t      INT64;
 #define U64(val) val
 #define S64(val) val
 #endif
-
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
-#if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))) || defined(_MSC_VER)
-#define I64FMT   "I64"
-#else
-#define I64FMT   "ll"
-#endif
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#if (PTR64)
-#define SIZETFMT   "I64u"
-#else
-#define SIZETFMT   "u"
-#endif
-#else
-//#define SIZETFMT   "zu"
-#if (PTR64)
-#define SIZETFMT   "lu"
-#else
-#define SIZETFMT   "u"
-#endif
-#endif
-
-static inline std::size_t SIZET_PRINTF(const std::size_t &v)
-{
-	return (unsigned) v;
-}
 
 #endif
 
@@ -223,3 +206,7 @@ private:
 #endif
 
 #endif /* PCONFIG_H_ */
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

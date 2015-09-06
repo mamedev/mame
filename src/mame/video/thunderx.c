@@ -30,10 +30,10 @@ K052109_CB_MEMBER(thunderx_state::gbusters_tile_callback)
 
 ***************************************************************************/
 
-static const int sprite_colorbase = 512 / 16;
-
 K051960_CB_MEMBER(thunderx_state::sprite_callback)
 {
+	enum { sprite_colorbase = 512 / 16 };
+
 	/* Sprite priority 1 means appear behind background, used only to mask sprites */
 	/* in the foreground */
 	/* Sprite priority 3 means don't draw (not used) */

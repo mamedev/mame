@@ -140,6 +140,7 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(mario_sh1_w) /* Mario run sample */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(mario_sh2_w) /* Luigi run sample */
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
+	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
 	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
@@ -147,7 +148,6 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(mario_z80dma_rdy_w)   /* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")    /* DSW */
-	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -831,12 +831,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioe,   mario,   mario,   mario, driver_device,   0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioo,   mario,   mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioj,   mario,   mario,   marioj, driver_device,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   masao, driver_device,   0, ROT0, "bootleg", "Masao", GAME_SUPPORTS_SAVE )
+GAME( 1983, mario,    0,       mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioe,   mario,   mario,   mario, driver_device,   0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioo,   mario,   mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioj,   mario,   mario,   marioj, driver_device,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,    mario,   masao,   masao, driver_device,   0, ROT0, "bootleg", "Masao", MACHINE_SUPPORTS_SAVE )
 
 // todo, these might have a better home than in here
-GAME( 1983, mariobl,  mario,   mariobl, mariobl,driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", GAME_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
-GAME( 1983, dkong3abl,dkong3,  dkong3abl,dkong3abl,driver_device,0, ROT90,  "bootleg", "Donkey Kong 3 (bootleg with 2xAY8910)", GAME_NOT_WORKING ) //  likewise, put here because it's similar to mariobl
+GAME( 1983, mariobl,  mario,   mariobl, mariobl,driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
+GAME( 1983, dkong3abl,dkong3,  dkong3abl,dkong3abl,driver_device,0, ROT90,  "bootleg", "Donkey Kong 3 (bootleg with 2xAY8910)", MACHINE_NOT_WORKING ) //  likewise, put here because it's similar to mariobl

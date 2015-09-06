@@ -475,5 +475,5 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1995, asmapro,  0,       0,  alphasmart, alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart Pro" , GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1997, asma2k ,  0,       0,  asma2k    , alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart 2000", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1995, asmapro,  0,       0,  alphasmart, alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k ,  0,       0,  asma2k    , alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

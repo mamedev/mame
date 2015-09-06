@@ -130,14 +130,19 @@ class pico_base_state : public md_cons_state
 public:
 	pico_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: md_cons_state(mconfig, type, tag),
-	m_upd7759(*this, "7759") { }
+		m_upd7759(*this, "7759"),
+		m_io_page(*this, "PAGE"),
+		m_io_pad(*this, "PAD"),
+		m_io_penx(*this, "PENX"),
+		m_io_peny(*this, "PENY")
+	{ }
 
 	optional_device<upd7759_device> m_upd7759;
 
-	ioport_port *m_io_page;
-	ioport_port *m_io_pad;
-	ioport_port *m_io_penx;
-	ioport_port *m_io_peny;
+	required_ioport m_io_page;
+	required_ioport m_io_pad;
+	required_ioport m_io_penx;
+	required_ioport m_io_peny;
 
 	UINT8 m_page_register;
 
@@ -171,13 +176,13 @@ UINT16 pico_base_state::pico_read_penpos(int pen)
 	switch (pen)
 	{
 		case PICO_PENX:
-			penpos = m_io_penx->read_safe(0);
+			penpos = m_io_penx->read();
 			penpos |= 0x6;
 			penpos = penpos * 320 / 255;
 			penpos += 0x3d;
 			break;
 		case PICO_PENY:
-			penpos = m_io_peny->read_safe(0);
+			penpos = m_io_peny->read();
 			penpos |= 0x6;
 			penpos = penpos * 251 / 255;
 			penpos += 0x1fc;
@@ -197,7 +202,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 			retdata = m_version_hi_nibble;
 			break;
 		case 1:
-			retdata = m_io_pad->read_safe(0);
+			retdata = m_io_pad->read();
 			break;
 
 			/*
@@ -230,7 +235,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 		   either page 5 or page 6 is often unused.
 		*/
 			{
-				UINT8 tmp = m_io_page->read_safe(0);
+				UINT8 tmp = m_io_page->read();
 				if (tmp == 2 && m_page_register != 0x3f)
 				{
 					m_page_register <<= 1;
@@ -336,11 +341,6 @@ SLOT_INTERFACE_END
 
 MACHINE_START_MEMBER(pico_state,pico)
 {
-	m_io_page = ioport("PAGE");
-	m_io_pad = ioport("PAD");
-	m_io_penx = ioport("PENX");
-	m_io_peny = ioport("PENY");
-
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
@@ -432,9 +432,9 @@ DRIVER_INIT_MEMBER(pico_base_state, picoj)
 }
 
 
-CONS( 1994, pico,       0,         0,      picopal,         pico, pico_base_state,   pico,    "Sega",   "Pico (Europe, PAL)", GAME_NOT_WORKING)
-CONS( 1994, picou,      pico,      0,      pico,            pico, pico_base_state,   picou,   "Sega",   "Pico (USA, NTSC)", GAME_NOT_WORKING)
-CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_base_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", GAME_NOT_WORKING)
+CONS( 1994, pico,       0,         0,      picopal,         pico, pico_base_state,   pico,    "Sega",   "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
+CONS( 1994, picou,      pico,      0,      pico,            pico, pico_base_state,   picou,   "Sega",   "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_base_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
 
 /*
 
@@ -547,11 +547,6 @@ SLOT_INTERFACE_END
 
 MACHINE_START_MEMBER(copera_state,copera)
 {
-	m_io_page = ioport("PAGE");
-	m_io_pad = ioport("PAD");
-	m_io_penx = ioport("PENX");
-	m_io_peny = ioport("PENY");
-
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
@@ -591,4 +586,4 @@ ROM_START( copera )
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
-CONS( 1993, copera,       0,         0,      copera,         pico, pico_base_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", GAME_NOT_WORKING)
+CONS( 1993, copera,       0,         0,      copera,         pico, pico_base_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)

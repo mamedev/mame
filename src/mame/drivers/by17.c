@@ -642,13 +642,13 @@ ROM_END
 /---------------------------------------------------------------*/
 
 
-GAME( 1976, bowarrow, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Bow & Arrow (Prototype)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, freedom,  0,        by17, by17, driver_device, 0, ROT0, "Bally", "Freedom", GAME_MECHANICAL)
-GAME( 1977, nightrdr, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Night Rider (rev. 21)", GAME_MECHANICAL)
-GAME( 1977, nightr20, nightrdr, by17, by17, driver_device, 0, ROT0, "Bally", "Night Rider (rev. 20)", GAME_MECHANICAL)
-GAME( 1978, blackjck, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Black Jack (Pinball)", GAME_MECHANICAL)
-GAME( 1977, evelknie, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Evel Knievel", GAME_MECHANICAL)
-GAME( 1978, matahari, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Mata Hari", GAME_MECHANICAL)
-GAME( 1977, eightbll, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Eight Ball", GAME_MECHANICAL)
-GAME( 1978, pwerplay, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Power Play (Pinball)", GAME_MECHANICAL)
-GAME( 1978, stk_sprs, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Strikes and Spares", GAME_MECHANICAL)
+GAME( 1976, bowarrow, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Bow & Arrow (Prototype)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1977, freedom,  0,        by17, by17, driver_device, 0, ROT0, "Bally", "Freedom", MACHINE_MECHANICAL)
+GAME( 1977, nightrdr, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Night Rider (rev. 21)", MACHINE_MECHANICAL)
+GAME( 1977, nightr20, nightrdr, by17, by17, driver_device, 0, ROT0, "Bally", "Night Rider (rev. 20)", MACHINE_MECHANICAL)
+GAME( 1978, blackjck, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Black Jack (Pinball)", MACHINE_MECHANICAL)
+GAME( 1977, evelknie, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Evel Knievel", MACHINE_MECHANICAL)
+GAME( 1978, matahari, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Mata Hari", MACHINE_MECHANICAL)
+GAME( 1977, eightbll, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Eight Ball", MACHINE_MECHANICAL)
+GAME( 1978, pwerplay, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Power Play (Pinball)", MACHINE_MECHANICAL)
+GAME( 1978, stk_sprs, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Strikes and Spares", MACHINE_MECHANICAL)

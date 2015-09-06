@@ -833,6 +833,15 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
+//  INPUT_PORTS( petb_fr )
+//-------------------------------------------------
+
+INPUT_PORTS_START( petb_fr )
+	PORT_INCLUDE( petb )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( petb_se )
 //-------------------------------------------------
 
@@ -2296,6 +2305,23 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( cbm8032_fr )
+//-------------------------------------------------
+
+ROM_START( cbm8032_fr )
+	ROM_REGION( 0x7000, M6502_TAG, 0 )
+	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "8032_editor_80c_fr_a1ab.ud7", 0x5000, 0x1000, CRC(4d3d9918) SHA1(eedac298a201a28ad86a5939b569a46f9f12c16f) )
+	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "8032_chargen_80c_fr_b9c1.ua3", 0x0000, 0x1000, CRC(d7424620) SHA1(e74c0eabb921d4a34032b57a7ee61ce61ec8a10c) )
+ROM_END
+
+
+//-------------------------------------------------
 //  ROM( cbm8032_se )
 //-------------------------------------------------
 
@@ -2557,37 +2583,38 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY                         FULLNAME        FLAGS
-COMP( 1977, pet2001,    0,          0,      pet2001,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-4",   GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1977, pet20018,   pet2001,    0,      pet20018,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-8",   GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, pet2001n,   0,          0,      pet2001n8,  pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N8",  GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, pet2001n16, pet2001n,   0,      pet2001n16, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N16", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, pet2001n32, pet2001n,   0,      pet2001n32, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N32", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, cbm3008,    pet2001n,   0,      cbm3008,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3008",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, cbm3016,    pet2001n,   0,      cbm3016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3016",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, cbm3032,    pet2001n,   0,      cbm3032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3032",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, pet2001b,   0,          0,      pet2001b8,  petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B8",  GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, pet2001b16, pet2001b,   0,      pet2001b16, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B16", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, pet2001b32, pet2001b,   0,      pet2001b32, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B32", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, cbm3032b,   pet2001b,   0,      cbm3032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 3032B",    GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1980, pet4016,    0,          0,      pet4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4016",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1980, pet4032,    pet4016,    0,      pet4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1980, pet4032f,   pet4016,    0,      pet4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     GAME_SUPPORTS_SAVE )
-COMP( 1980, cbm4016,    pet4016,    0,      cbm4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4016",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1980, cbm4032,    pet4016,    0,      cbm4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1980, cbm4032f,   pet4016,    0,      cbm4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     GAME_SUPPORTS_SAVE )
-COMP( 1980, pet4032b,   0,          0,      pet4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "PET 4032B",    GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1980, cbm4032b,   pet4032b,   0,      cbm4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 4032B",    GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1980, pet8032,    0,          0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "PET 8032",     GAME_SUPPORTS_SAVE )
-COMP( 1981, cbm8032,    pet8032,    0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8032",     GAME_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_de, pet8032,    0,      pet8032,    petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           GAME_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_se, pet8032,    0,      pet8032,    petb_se,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    GAME_SUPPORTS_SAVE )
-COMP( 1981, superpet,   pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1981, mmf9000,    pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1981, mmf9000_se, pet8032,    0,      superpet,   petb_se,    driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1981, cbm8096,    pet8032,    0,      cbm8096,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8096",                     GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296,    0,          0,      cbm8296,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296",                     GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296ed,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d,   cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D",                   GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d_de,cbm8296,    0,      cbm8296d,   petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296gd,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296GD",                   GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        GAME_SUPPORTS_SAVE )
+COMP( 1977, pet2001,    0,          0,      pet2001,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, pet20018,   pet2001,    0,      pet20018,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n,   0,          0,      pet2001n8,  pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n16, pet2001n,   0,      pet2001n16, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n32, pet2001n,   0,      pet2001n32, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3008,    pet2001n,   0,      cbm3008,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3008",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3016,    pet2001n,   0,      cbm3016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032,    pet2001n,   0,      cbm3032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b,   0,          0,      pet2001b8,  petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b16, pet2001b,   0,      pet2001b16, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b32, pet2001b,   0,      pet2001b32, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032b,   pet2001b,   0,      cbm3032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 3032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4016,    0,          0,      pet4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032,    pet4016,    0,      pet4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032f,   pet4016,    0,      pet4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, cbm4016,    pet4016,    0,      cbm4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032,    pet4016,    0,      cbm4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032f,   pet4016,    0,      cbm4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, pet4032b,   0,          0,      pet4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "PET 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032b,   pet4032b,   0,      cbm4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet8032,    0,          0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "PET 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032,    pet8032,    0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_de, pet8032,    0,      pet8032,    petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_fr, pet8032,    0,      pet8032,    petb_fr,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (France)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_se, pet8032,    0,      pet8032,    petb_se,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1981, superpet,   pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000,    pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000_se, pet8032,    0,      superpet,   petb_se,    driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8096,    pet8032,    0,      cbm8096,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8096",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296,    0,          0,      cbm8296,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296ed,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d,   cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d_de,cbm8296,    0,      cbm8296d,   petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296gd,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296GD",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        MACHINE_SUPPORTS_SAVE )

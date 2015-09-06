@@ -60,5 +60,5 @@ ROM_START( st_vulkn )
 ROM_END
 
 
-GAME(199?,  st_ohla,   0,  stellafr,  stellafr, driver_device,  0,  ROT0,  "Stella",    "Oh La La (Stella)",    GAME_IS_SKELETON_MECHANICAL )
-GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, driver_device,  0,  ROT0,  "Stella",    "Vulkan (Stella)",      GAME_IS_SKELETON_MECHANICAL )
+GAME(199?,  st_ohla,   0,  stellafr,  stellafr, driver_device,  0,  ROT0,  "Stella",    "Oh La La (Stella)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, driver_device,  0,  ROT0,  "Stella",    "Vulkan (Stella)",      MACHINE_IS_SKELETON_MECHANICAL )

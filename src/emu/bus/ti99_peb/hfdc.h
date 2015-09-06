@@ -17,9 +17,10 @@
 #define __HFDC__
 
 #include "imagedev/floppy.h"
+#include "imagedev/mfmhd.h"
+
 #include "machine/mm58274c.h"
-#include "machine/hdc9234.h"
-#include "machine/ti99_hd.h"
+#include "machine/hdc92x4.h"
 
 extern const device_type TI99_HFDC;
 
@@ -140,6 +141,9 @@ private:
 
 	// DMA in progress
 	bool m_dma_in_progress;
+
+	// Wait for HD. This was an addition in later cards.
+	bool m_wait_for_hd1;
 
 	// Device Service Routine ROM (firmware)
 	UINT8*  m_dsrrom;

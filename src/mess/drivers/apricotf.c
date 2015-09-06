@@ -429,7 +429,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1984, f1,    0,      0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1",            GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1984, f1e,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1e",           GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1984, f2,    f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F2",            GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1985, f10,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F10",           GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1984, f1,    0,      0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f1e,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1e",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f2,    f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F2",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, f10,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F10",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

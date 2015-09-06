@@ -53,7 +53,7 @@ protected:
 		ERROR_27,       /* checksum error in header block */
 		ERROR_28,       /* write error UNIMPLEMENTED */
 		ERROR_29,       /* disk ID mismatch */
-		ERROR_74,       /* disk not ready (no device 1) UNIMPLEMENTED */
+		ERROR_74        /* disk not ready (no device 1) UNIMPLEMENTED */
 	};
 
 	const format *formats;

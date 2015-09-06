@@ -290,4 +290,4 @@ ROM_START( cfx9850 )
 ROM_END
 
 
-COMP( 1996, cfx9850, 0, 0, cfx9850, cfx9850, driver_device, 0, "Casio", "CFX-9850G", GAME_NO_SOUND | GAME_NOT_WORKING )
+COMP( 1996, cfx9850, 0, 0, cfx9850, cfx9850, driver_device, 0, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

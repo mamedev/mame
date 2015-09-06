@@ -34,11 +34,11 @@
 #include "nld_truthtable.h"
 
 #define TTL_7404_INVERT(_name, _A)                                                  \
-		NET_REGISTER_DEV(7404, _name)                                               \
+		NET_REGISTER_DEV(TTL_7404_INVERT, _name)                                               \
 		NET_CONNECT(_name, A, _A)
 
 #define TTL_7404_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7404_dip, _name)
+		NET_REGISTER_DEV(TTL_7404_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

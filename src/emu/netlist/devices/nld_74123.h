@@ -49,12 +49,12 @@
 #ifndef NLD_74123_H_
 #define NLD_74123_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 #include "nld_system.h"
-#include "../analog/nld_twoterm.h"
+#include "analog/nld_twoterm.h"
 
 #define TTL_74123(_name)                                                        \
-		NET_REGISTER_DEV(74123, _name)
+		NET_REGISTER_DEV(TTL_74123, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -85,7 +85,7 @@ public:
 );
 
 #define TTL_74123_DIP(_name)                                                         \
-		NET_REGISTER_DEV(74123_dip, _name)
+		NET_REGISTER_DEV(TTL_74123_DIP, _name)
 
 NETLIB_DEVICE(74123_dip,
 
@@ -99,7 +99,7 @@ NETLIB_DEVICE(74123_dip,
  */
 
 #define TTL_9602_DIP(_name)                                                         \
-		NET_REGISTER_DEV(9602_dip, _name)
+		NET_REGISTER_DEV(TTL_9602_DIP, _name)
 
 NETLIB_DEVICE(9602_dip,
 
@@ -113,10 +113,10 @@ NETLIB_DEVICE(9602_dip,
  */
 
 #define CD4538_DIP(_name)                                                         \
-		NET_REGISTER_DEV(4538_dip, _name)
+		NET_REGISTER_DEV(CD4538_DIP, _name)
 
 NETLIB_DEVICE(4538_dip,
-	NETLIB_LOGIC_FAMILY(CD4000)
+	NETLIB_LOGIC_FAMILY(CD4XXX)
 	NETLIB_NAME(74123) m_1;
 	NETLIB_NAME(74123) m_2;
 );

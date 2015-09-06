@@ -663,6 +663,7 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(thunderx_state, sprite_callback)
 
 	/* sound hardware */
@@ -1029,12 +1030,12 @@ ROM_END
 
 /***************************************************************************/
 
-GAME( 1988, scontra,   0,        scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra", GAME_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderx,  0,        thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderxa, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderxb, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, driver_device, 0, ROT0,  "Konami", "Thunder Cross (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, gbusters,  0,        gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 1)", GAME_SUPPORTS_SAVE ) /* N02 & J03 program roms */
-GAME( 1988, gbustersa, gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 2)", GAME_SUPPORTS_SAVE ) /* unknown region program roms */
-GAME( 1988, crazycop,  gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Crazy Cop (Japan)", GAME_SUPPORTS_SAVE )    /* M02 & J03 program roms */
+GAME( 1988, scontra,   0,        scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderx,  0,        thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxa, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxb, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, driver_device, 0, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gbusters,  0,        gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 1)", MACHINE_SUPPORTS_SAVE ) /* N02 & J03 program roms */
+GAME( 1988, gbustersa, gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 2)", MACHINE_SUPPORTS_SAVE ) /* unknown region program roms */
+GAME( 1988, crazycop,  gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Crazy Cop (Japan)", MACHINE_SUPPORTS_SAVE )    /* M02 & J03 program roms */

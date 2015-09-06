@@ -24,11 +24,12 @@ The 051960 can also genenrate IRQ, FIRQ and NMI signals.
 memory map:
 000-007 is for the 051937, but also seen by the 051960
 400-7ff is 051960 only
-000     R  bit 0 = unknown, looks like a status flag or something
+000     R  bit 0 = vblank?
                    aliens waits for it to be 0 before starting to copy sprite data
                    thndrx2 needs it to pulse for the startup checks to succeed
-000     W  bit 0 = irq enable/acknowledge?
-           bit 2 = nmi enable?
+000     W  bit 0 = irq acknowledge
+           bit 1 = firq acknowledge?
+           bit 2 = nmi enable/acknowledge
            bit 3 = flip screen (applies to sprites only, not tilemaps)
            bit 4 = unknown, used by Devastators, TMNT, Aliens, Chequered Flag, maybe others
                    aliens sets it just after checking bit 0, and before copying
@@ -128,12 +129,18 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(NULL),
+	m_sprite_rom(NULL),
+	m_sprite_size(0),
+	m_screen_tag(NULL),
+	m_screen(NULL),
+	m_scanline_timer(NULL),
+	m_irq_handler(*this),
+	m_firq_handler(*this),
+	m_nmi_handler(*this),
 	m_romoffset(0),
 	m_spriteflip(0),
 	m_readroms(0),
-	m_irq_enabled(0),
-	m_nmi_enabled(0),
-	m_k051937_counter(0)
+	m_nmi_enabled(0)
 {
 }
 
@@ -161,11 +168,30 @@ void k051960_device::set_plane_order(device_t &device, int order)
 }
 
 //-------------------------------------------------
+//  set_screen_tag - set screen we are attached to
+//-------------------------------------------------
+
+void k051960_device::set_screen_tag(device_t &device, device_t *owner, const char *tag)
+{
+	k051960_device &dev = dynamic_cast<k051960_device &>(device);
+	dev.m_screen_tag = tag;
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void k051960_device::device_start()
 {
+	// make sure our screen is started
+	m_screen = m_owner->subdevice<screen_device>(m_screen_tag);
+	if (!m_screen->started())
+		throw device_missing_dependencies();
+
+	// allocate scanline timer and start at first scanline
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k051960_device::scanline_callback), this));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
+
 	m_sprite_rom = region()->base();
 	m_sprite_size = region()->bytes();
 
@@ -180,15 +206,18 @@ void k051960_device::device_start()
 	// bind callbacks
 	m_k051960_cb.bind_relative_to(*owner());
 
+	// resolve callbacks
+	m_irq_handler.resolve_safe();
+	m_firq_handler.resolve_safe();
+	m_nmi_handler.resolve_safe();
+
+	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_spriteflip));
 	save_item(NAME(m_readroms));
+	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_spriterombank));
 	save_pointer(NAME(m_ram), 0x400);
-	save_item(NAME(m_irq_enabled));
-	save_item(NAME(m_nmi_enabled));
-
-	save_item(NAME(m_k051937_counter));
 }
 
 //-------------------------------------------------
@@ -197,12 +226,9 @@ void k051960_device::device_start()
 
 void k051960_device::device_reset()
 {
-	m_k051937_counter = 0;
-
 	m_romoffset = 0;
 	m_spriteflip = 0;
 	m_readroms = 0;
-	m_irq_enabled = 0;
 	m_nmi_enabled = 0;
 
 	m_spriterombank[0] = 0;
@@ -214,6 +240,23 @@ void k051960_device::device_reset()
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
+
+TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
+{
+	// range 0..255
+	UINT8 y = m_screen->vpos();
+
+	// 32v
+	if ((y % 32 == 0) && m_nmi_enabled)
+		m_nmi_handler(ASSERT_LINE);
+
+	// vblank
+	if (y == 240)
+		m_irq_handler(ASSERT_LINE);
+
+	// wait for next line
+	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1));
+}
 
 int k051960_device::k051960_fetchromdata( int byte )
 {
@@ -259,10 +302,9 @@ READ8_MEMBER( k051960_device::k051937_r )
 	if (m_readroms && offset >= 4 && offset < 8)
 		return k051960_fetchromdata(offset & 3);
 	else if (offset == 0)
-		/* some games need bit 0 to pulse */
-		return (m_k051937_counter++) & 1;
+		return m_screen->vblank() ? 1 : 0; // vblank?
 
-	//logerror("%04x: read unknown 051937 address %x\n", device->cpu->safe_pc(), offset);
+	//logerror("%04x: read unknown 051937 address %x\n", space.device().safe_pc(), offset);
 	return 0;
 }
 
@@ -272,13 +314,13 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	{
 		//if (data & 0xc2) popmessage("051937 reg 00 = %02x",data);
 
-		/* bit 0 is IRQ enable */
-		m_irq_enabled = data & 0x01;
+		if (BIT(data, 0)) m_irq_handler(CLEAR_LINE);  // bit 0, irq ack
+		if (BIT(data, 1)) m_firq_handler(CLEAR_LINE); // bit 1, firq ack?
 
-		/* bit 1: probably FIRQ enable */
-
-		/* bit 2 is NMI enable */
-		m_nmi_enabled = data & 0x04;
+		// bit 2, nmi enable/ack
+		m_nmi_enabled = BIT(data, 2);
+		if (m_nmi_enabled)
+			m_nmi_handler(CLEAR_LINE);
 
 		/* bit 3 = flip screen */
 		m_spriteflip = data & 0x08;
@@ -287,12 +329,13 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 
 		/* bit 5 = enable gfx ROM reading */
 		m_readroms = data & 0x20;
-		//logerror("%04x: write %02x to 051937 address %x\n", machine().cpu->safe_pc(), data, offset);
+		//logerror("%04x: write %02x to 051937 address %x\n", space.device().safe_pc(), data, offset);
 	}
 	else if (offset == 1)
 	{
-//  popmessage("%04x: write %02x to 051937 address %x", machine().cpu->safe_pc(), data, offset);
-//logerror("%04x: write %02x to unknown 051937 address %x\n", machine().cpu->safe_pc(), data, offset);
+		// unknown, Devastators writes 02 here in game
+		if (0)
+			logerror("%s: %02x to 051937 address %x\n", machine().describe_context(), data, offset);
 	}
 	else if (offset >= 2 && offset < 5)
 	{
@@ -300,19 +343,9 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	}
 	else
 	{
-	//  popmessage("%04x: write %02x to 051937 address %x", machine().cpu->safe_pc(), data, offset);
-	//logerror("%04x: write %02x to unknown 051937 address %x\n", machine().cpu->safe_pc(), data, offset);
+	//  popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
+	//logerror("%04x: write %02x to unknown 051937 address %x\n", space.device().safe_pc(), data, offset);
 	}
-}
-
-int k051960_device::k051960_is_irq_enabled( )
-{
-	return m_irq_enabled;
-}
-
-int k051960_device::k051960_is_nmi_enabled( )
-{
-	return m_nmi_enabled;
 }
 
 

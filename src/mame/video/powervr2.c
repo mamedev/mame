@@ -3467,7 +3467,7 @@ UINT32 powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		pvr_drawframebuffer(bitmap, cliprect);
 
 	// update this here so we only do string lookup once per frame
-	debug_dip_status = ioport(":MAMEDEBUG")->read();
+	debug_dip_status = m_mamedebug->read();
 
 	return 0;
 }
@@ -3603,7 +3603,8 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, POWERVR2, "PowerVR 2", tag, owner, clock, "powervr2", __FILE__),
 		device_video_interface(mconfig, *this),
-		irq_cb(*this)
+		irq_cb(*this),
+		m_mamedebug(*this, ":MAMEDEBUG")
 {
 }
 

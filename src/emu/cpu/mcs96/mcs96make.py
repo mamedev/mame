@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 USAGE = """
 Usage:
 %s mcs96ops.lst mcs96.inc
@@ -7,12 +9,12 @@ Usage:
 import sys
 
 def save_full_one(f, t, name, source):
-    print >>f, "void %s_device::%s_full()" % (t, name)
-    print >>f, "{"
+    print("void %s_device::%s_full()" % (t, name), file=f)
+    print("{", file=f)
     for line in source:
-        print >>f, line
-    print >>f, "}"
-    print >>f
+        print(line, file=f)
+    print("}", file=f)
+    print("", file=f)
 
 class Opcode:
     def __init__(self, rng, name, amode, is_196, ea):
@@ -113,7 +115,7 @@ class OpcodeList:
                             self.opcode_per_id[i] = inf
 
     def save_dasm(self, f, t):
-        print >>f, "const %s_device::disasm_entry %s_device::disasm_entries[0x100] = {" % (t, t)
+        print("const %s_device::disasm_entry %s_device::disasm_entries[0x100] = {" % (t, t), file=f)
         for i in range(0, 0x100):
             if i in self.opcode_per_id:
                 opc = self.opcode_per_id[i]
@@ -126,11 +128,11 @@ class OpcodeList:
                     flags = "DASMFLAG_STEP_OUT"
                 else:
                     flags = "0"
-                print >>f, "\t{ \"%s\", %s, DASM_%s, %s }," % (opc.name, alt, opc.amode, flags)
+                print("\t{ \"%s\", %s, DASM_%s, %s }," % (opc.name, alt, opc.amode, flags), file=f)
             else:
-                print >>f, "\t{ \"???\", NULL, DASM_none, 0 },"
-        print >>f, "};"
-        print >>f
+                print("\t{ \"???\", NULL, DASM_none, 0 },", file=f)
+        print("};", file=f)
+        print("", file=f)
     
     def save_opcodes(self, f, t):
         pf = ""
@@ -146,9 +148,9 @@ class OpcodeList:
             save_full_one(f, t, "fetch_noirq", self.fetch_noirq.source)
     
     def save_exec(self, f, t):
-        print >>f, "void %s_device::do_exec_full()" % t
-        print >>f, "{"
-        print >>f, "\tswitch(inst_state) {"
+        print("void %s_device::do_exec_full()" % t, file=f)
+        print("{", file=f)
+        print("\tswitch(inst_state) {", file=f)
         for i in range(0x000, 0x200):
             opc = None
             if i >= 0x100 and i-0x100+0xfe00 in self.opcode_per_id:
@@ -159,15 +161,15 @@ class OpcodeList:
                 nm = opc.name + "_" + opc.amode
                 if opc.is_196:
                     nm += "_196"
-                print >>f, "\tcase 0x%03x: %s_full(); break;" % (i, nm)
-        print >>f, "\tcase 0x200: fetch_full(); break;"
-        print >>f, "\tcase 0x201: fetch_noirq_full(); break;"
-        print >>f, "\t}"
-        print >>f, "}"
+                print("\tcase 0x%03x: %s_full(); break;" % (i, nm), file=f)
+        print("\tcase 0x200: fetch_full(); break;", file=f)
+        print("\tcase 0x201: fetch_noirq_full(); break;", file=f)
+        print("\t}", file=f)
+        print("}", file=f)
 
 def main(argv):
     if len(argv) != 4:
-        print USAGE % argv[0]
+        print(USAGE % argv[0])
         return 1
     
     t = argv[1]

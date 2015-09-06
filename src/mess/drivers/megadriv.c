@@ -54,14 +54,14 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 			{
 				/* here we read B, C & the additional buttons */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((m_io_pad6b[0][portnum]->read_safe(0) & 0x30) |
-								(m_io_pad6b[1][portnum]->read_safe(0) & 0x0f)) & ~helper_6b);
+							((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x30) |
+								((m_io_pad6b[1][portnum] ? m_io_pad6b[1][portnum]->read() : 0) & 0x0f)) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read B, C & the directional buttons */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((m_io_pad6b[0][portnum]->read_safe(0) & 0x3f) & ~helper_6b);
+							(((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x3f) & ~helper_6b);
 			}
 		}
 		else
@@ -70,20 +70,20 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) & ~helper_6b);
+							((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) & ~helper_6b);
 			}
 			else if (m_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
+							(((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read ((Start & A) >> 2) | Up and Down */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) |
-								(m_io_pad6b[0][portnum]->read_safe(0) & 0x03)) & ~helper_6b);
+							(((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) |
+								((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x03)) & ~helper_6b);
 			}
 		}
 
@@ -107,14 +107,14 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						(((m_io_pad3b[portnum]->read_safe(0) & 0x3f) | 0x40) & ~helper_3b);
+						((((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0x3f) | 0x40) & ~helper_3b);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						((((m_io_pad3b[portnum]->read_safe(0) & 0xc0) >> 2) |
-							(m_io_pad3b[portnum]->read_safe(0) & 0x03) | 0x40) & ~helper_3b);
+						(((((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0xc0) >> 2) |
+							((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0x03) | 0x40) & ~helper_3b);
 		}
 	}
 
@@ -311,7 +311,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
 void md_cons_state::screen_eof_console(screen_device &screen, bool state)
 {
-	if (m_io_reset->read_safe(0x00) & 0x01)
+	if (m_io_reset && (m_io_reset->read() & 0x01))
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge
@@ -911,29 +911,29 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE          INPUT   INIT       COMPANY   FULLNAME */
-CONS( 1989, genesis,    0,         0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC)",  GAME_SUPPORTS_SAVE )
-CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md, md_cons_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL)", GAME_SUPPORTS_SAVE )
-CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", GAME_SUPPORTS_SAVE )
+CONS( 1989, genesis,    0,         0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md, md_cons_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
-CONS( 1994, 32x,        0,         0,      genesis_32x,     md, md_cons_state,     genesis,   "Sega",   "Genesis with 32X (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, 32xe,       32x,       0,      md_32x,          md, md_cons_state,     md_eur,    "Sega",   "Mega Drive with 32X (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32xj,       32x,       0,      mdj_32x,         md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive with 32X (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32x,        0,         0,      genesis_32x,     md, md_cons_state,     genesis,   "Sega",   "Genesis with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, 32xe,       32x,       0,      md_32x,          md, md_cons_state,     md_eur,    "Sega",   "Mega Drive with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1994, 32xj,       32x,       0,      mdj_32x,         md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
 
 // the SegaCD plugged into the expansion port..
-CONS( 1992, segacd,     0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, megacd,     segacd,    0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1991, megacdj,    segacd,    0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
-CONS( 1991, megacda,    segacd,    0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", GAME_NOT_WORKING )
-CONS( 1993, segacd2,    0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, megacd2,    segacd2,   0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1993, megacd2j,   segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, aiwamcd,    segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, laseract,   0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Pioneer","LaserActive (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, laseractj,  laseract,  0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, xeye,       0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "JVC",    "X'eye (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1992, wmega,      xeye,      0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, wmegam2,    xeye,      0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, multmega,   cdx,       0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+CONS( 1992, segacd,     0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd,     segacd,    0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1991, megacdj,    segacd,    0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", MACHINE_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
+CONS( 1991, megacda,    segacd,    0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", MACHINE_NOT_WORKING )
+CONS( 1993, segacd2,    0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd2,    segacd2,   0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd2j,   segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, aiwamcd,    segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseract,   0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Pioneer","LaserActive (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseractj,  laseract,  0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, xeye,       0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "JVC",    "X'eye (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1992, wmega,      xeye,      0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, wmegam2,    xeye,      0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, multmega,   cdx,       0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC, w/32X)", MACHINE_NOT_WORKING )

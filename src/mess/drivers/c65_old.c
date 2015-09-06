@@ -644,5 +644,5 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                         FULLNAME                                              FLAGS */
 
-COMP( 1991, c65,    0,      0,      c65,    c65, c65_state,    c65,    "Commodore Business Machines",  "Commodore 65 Development System (Prototype, NTSC)", GAME_NOT_WORKING )
-COMP( 1991, c64dx,  c65,    0,      c65pal, c65ger, c65_state, c65pal, "Commodore Business Machines",  "Commodore 64DX Development System (Prototype, PAL, German)", GAME_NOT_WORKING )
+COMP( 1991, c65,    0,      0,      c65,    c65, c65_state,    c65,    "Commodore Business Machines",  "Commodore 65 Development System (Prototype, NTSC)", MACHINE_NOT_WORKING )
+COMP( 1991, c64dx,  c65,    0,      c65pal, c65ger, c65_state, c65pal, "Commodore Business Machines",  "Commodore 64DX Development System (Prototype, PAL, German)", MACHINE_NOT_WORKING )

@@ -965,7 +965,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state, kyustrkr_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1054,7 +1054,7 @@ ROM_START( superman )
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
+	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, uPD78C11 with embedded 4K maskrom, 8k eprom, 8k RAM)  */
 	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
 ROM_END
 

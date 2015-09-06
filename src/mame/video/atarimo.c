@@ -259,12 +259,12 @@ void atari_motion_objects_device::apply_stain(bitmap_ind16 &bitmap, UINT16 *pf, 
 {
 	const UINT16 START_MARKER = ((4 << PRIORITY_SHIFT) | 2);
 	const UINT16 END_MARKER =   ((4 << PRIORITY_SHIFT) | 4);
-	int offnext = 0;
+	bool offnext = false;
 
 	for ( ; x < bitmap.width(); x++)
 	{
 		pf[x] |= 0x400;
-		if (offnext != 0 && (mo[x] & START_MARKER) != START_MARKER)
+		if (mo[x] == 0xffff || (offnext && (mo[x] & START_MARKER) != START_MARKER))
 			break;
 		offnext = ((mo[x] & END_MARKER) == END_MARKER);
 	}
@@ -541,7 +541,7 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 						continue;
 
 					// draw the sprite
-						gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
+					gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
 					mark_dirty(sx, sx + m_tilewidth - 1, sy, sy + m_tileheight - 1);
 				}
 			}
@@ -570,7 +570,7 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 						continue;
 
 					// draw the sprite
-						gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
+					gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
 					mark_dirty(sx, sx + m_tilewidth - 1, sy, sy + m_tileheight - 1);
 				}
 			}
@@ -595,8 +595,8 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 
 atari_motion_objects_device::sprite_parameter::sprite_parameter()
 	: m_word(0),
-		m_shift(0),
-		m_mask(0)
+	m_shift(0),
+	m_mask(0)
 {
 }
 

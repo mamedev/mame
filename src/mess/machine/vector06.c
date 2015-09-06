@@ -15,20 +15,20 @@
 READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 {
 	UINT8 key = 0xff;
-	if (BIT(m_keyboard_mask, 0)) key &= ioport("LINE0")->read();
-	if (BIT(m_keyboard_mask, 1)) key &= ioport("LINE1")->read();
-	if (BIT(m_keyboard_mask, 2)) key &= ioport("LINE2")->read();
-	if (BIT(m_keyboard_mask, 3)) key &= ioport("LINE3")->read();
-	if (BIT(m_keyboard_mask, 4)) key &= ioport("LINE4")->read();
-	if (BIT(m_keyboard_mask, 5)) key &= ioport("LINE5")->read();
-	if (BIT(m_keyboard_mask, 6)) key &= ioport("LINE6")->read();
-	if (BIT(m_keyboard_mask, 7)) key &= ioport("LINE7")->read();
+	if (BIT(m_keyboard_mask, 0)) key &= m_line[0]->read();
+	if (BIT(m_keyboard_mask, 1)) key &= m_line[1]->read();
+	if (BIT(m_keyboard_mask, 2)) key &= m_line[2]->read();
+	if (BIT(m_keyboard_mask, 3)) key &= m_line[3]->read();
+	if (BIT(m_keyboard_mask, 4)) key &= m_line[4]->read();
+	if (BIT(m_keyboard_mask, 5)) key &= m_line[5]->read();
+	if (BIT(m_keyboard_mask, 6)) key &= m_line[6]->read();
+	if (BIT(m_keyboard_mask, 7)) key &= m_line[7]->read();
 	return key;
 }
 
 READ8_MEMBER( vector06_state::vector06_8255_portc_r )
 {
-	UINT8 ret = ioport("LINE8")->read();
+	UINT8 ret = m_line[8]->read();
 
 	if (m_cassette->input() > 0)
 		ret |= 0x10;
@@ -44,7 +44,7 @@ WRITE8_MEMBER( vector06_state::vector06_8255_porta_w )
 void vector06_state::vector06_set_video_mode(int width)
 {
 	rectangle visarea(0, width+64-1, 0, 256+64-1);
-	machine().first_screen()->configure(width+64, 256+64, visarea, machine().first_screen()->frame_period().attoseconds);
+	machine().first_screen()->configure(width+64, 256+64, visarea, machine().first_screen()->frame_period().attoseconds());
 }
 
 WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )
@@ -121,17 +121,17 @@ IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
 
 TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 {
-	UINT8 val = ioport("RESET")->read();
+	UINT8 val = m_reset->read();
 
 	if (BIT(val, 0))
 	{
-		membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
+		m_bank1->set_base(m_region_maincpu->base() + 0x10000);
 		m_maincpu->reset();
 	}
 
 	if (BIT(val, 1))
 	{
-		membank("bank1")->set_base(m_ram->pointer() + 0x0000);
+		m_bank1->set_base(m_ram->pointer() + 0x0000);
 		m_maincpu->reset();
 	}
 }
@@ -165,15 +165,15 @@ void vector06_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.install_read_bank (0x0000, 0x7fff, "bank1");
-	space.install_write_bank(0x0000, 0x7fff, "bank2");
-	space.install_read_bank (0x8000, 0xffff, "bank3");
-	space.install_write_bank(0x8000, 0xffff, "bank4");
+	space.install_read_bank (0x0000, 0x7fff, m_bank1);
+	space.install_write_bank(0x0000, 0x7fff, m_bank2);
+	space.install_read_bank (0x8000, 0xffff, m_bank3);
+	space.install_write_bank(0x8000, 0xffff, m_bank4);
 
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
-	membank("bank2")->set_base(m_ram->pointer() + 0x0000);
-	membank("bank3")->set_base(m_ram->pointer() + 0x8000);
-	membank("bank4")->set_base(m_ram->pointer() + 0x8000);
+	m_bank1->set_base(m_region_maincpu->base() + 0x10000);
+	m_bank2->set_base(m_ram->pointer() + 0x0000);
+	m_bank3->set_base(m_ram->pointer() + 0x8000);
+	m_bank4->set_base(m_ram->pointer() + 0x8000);
 
 	m_keyboard_mask = 0;
 	m_color_index = 0;

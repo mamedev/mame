@@ -11,7 +11,7 @@
 #define MAT_CR_H_
 
 #include <algorithm>
-#include "../plib/pconfig.h"
+#include "plib/pconfig.h"
 
 template<int _storage_N>
 struct mat_cr_t
@@ -21,7 +21,8 @@ struct mat_cr_t
 	unsigned ja[_storage_N * _storage_N];
 	unsigned diag[_storage_N];       /* n */
 
-	void mult_vec(const double * RESTRICT A, const double * RESTRICT x, double * RESTRICT res)
+	template<typename T>
+	void mult_vec(const T * RESTRICT A, const T * RESTRICT x, T * RESTRICT res)
 	{
 		/*
 		 * res = A * x
@@ -41,7 +42,7 @@ struct mat_cr_t
 		}
 	}
 
-	void incomplete_LU_factorization(const double * RESTRICT A, double * RESTRICT LU)
+	void incomplete_LU_factorization(const nl_double * RESTRICT A, nl_double * RESTRICT LU)
 	{
 		/*
 		 * incomplete LU Factorization according to http://de.wikipedia.org/wiki/ILU-Zerlegung
@@ -80,7 +81,7 @@ struct mat_cr_t
 		}
 	}
 
-	void solveLUx (const double * RESTRICT LU, double * RESTRICT r)
+	void solveLUx (const nl_double * RESTRICT LU, nl_double * RESTRICT r)
 	{
 		/*
 		 * Solve a linear equation Ax = r
@@ -92,7 +93,7 @@ struct mat_cr_t
 		 *
 		 * ==> LUx = r
 		 *
-		 * ==> Ux = L⁻¹r = w
+		 * ==> Ux = L?????r = w
 		 *
 		 * ==> r = Lw
 		 *

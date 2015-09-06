@@ -227,4 +227,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT   COMPAT MACHINE  INPUT  CLASS         INIT    COMPANY      FULLNAME       FLAGS */
-COMP( 198?, czk80,  0,       0,     czk80,   czk80, czk80_state, czk80, "<unknown>",  "CZK-80", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 198?, czk80,  0,       0,     czk80,   czk80, czk80_state, czk80, "<unknown>",  "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

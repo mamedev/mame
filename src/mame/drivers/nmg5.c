@@ -252,7 +252,6 @@ public:
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_bitmap;
 	optional_device<decospr_device> m_sprgen;
-//  UINT16 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -1544,14 +1543,14 @@ DRIVER_INIT_MEMBER(nmg5_state,prot_val_40)
 	m_prot_val = 0x40;
 }
 
-GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1997, nmg5e,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 3, earlier)", GAME_SUPPORTS_SAVE )
-GAME( 1999, searchey,  0,        nmg5,     searchey,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean / Japanese / Italian)", GAME_SUPPORTS_SAVE )
-GAME( 1999, searcheya, searchey, nmg5,     searcheya, nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean)", GAME_SUPPORTS_SAVE )
-GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye Plus V2.0", GAME_SUPPORTS_SAVE )
-GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 2002, 7ordi,     0,        7ordi,    7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", GAME_SUPPORTS_SAVE )
-GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick", GAME_SUPPORTS_SAVE )
+GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, nmg5e,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 3, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searchey,  0,        nmg5,     searchey,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean / Japanese / Italian)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searcheya, searchey, nmg5,     searcheya, nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye Plus V2.0", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, 7ordi,     0,        7ordi,    7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick", MACHINE_SUPPORTS_SAVE )

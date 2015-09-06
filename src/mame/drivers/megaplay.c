@@ -941,7 +941,7 @@ Mazin Wars           171-6215A   837-9165-11       610-0297-11          MPR-1646
 didn't have original Sega part numbers it's probably a converted TWC cart
 */
 
-/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
+/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Mega Play BIOS", MACHINE_IS_BIOS_ROOT )
 /* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 )
 /* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)" , 0 )
 /* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )

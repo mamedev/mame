@@ -182,6 +182,36 @@ I/O ports
 #include "formats/pmd_cas.h"
 #include "machine/ram.h"
 
+
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+UINT32 pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 256; y++)
+	{
+		// address of current line in PMD-85 video memory
+		UINT8 *line = m_ram->pointer() + 0xc000 + 0x40 * y;
+
+		for (int x = 0; x < 288/6; x++)
+		{
+			int pen = BIT(line[x], 7) ? 1 : 2;
+
+			bitmap.pix16(y, x * 6 + 0) = BIT(line[x], 0) ? pen : 0;
+			bitmap.pix16(y, x * 6 + 1) = BIT(line[x], 1) ? pen : 0;
+			bitmap.pix16(y, x * 6 + 2) = BIT(line[x], 2) ? pen : 0;
+			bitmap.pix16(y, x * 6 + 3) = BIT(line[x], 3) ? pen : 0;
+			bitmap.pix16(y, x * 6 + 4) = BIT(line[x], 4) ? pen : 0;
+			bitmap.pix16(y, x * 6 + 5) = BIT(line[x], 5) ? pen : 0;
+		}
+
+	}
+
+	return 0;
+}
+
+
 /* I/O ports */
 
 static ADDRESS_MAP_START( pmd85_io_map, AS_IO, 8, pmd85_state )
@@ -578,8 +608,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pmd85_state, screen_update_pmd85)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", sizeof (pmd85_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(pmd85_state, pmd85)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -781,4 +810,4 @@ COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesl
 COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa, pmd85_state,  alfa,     "Didaktik Skalica", "Didaktik Alfa" , 0)
 COMP( 1985, mato,    pmd851, 0,     mato,    mato, pmd85_state,  mato,     "Statny", "Mato" , 0)
 COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717" , 0)
-COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717 (with PMD-32)" , GAME_NOT_WORKING)
+COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717 (with PMD-32)" , MACHINE_NOT_WORKING)

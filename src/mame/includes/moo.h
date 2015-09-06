@@ -37,7 +37,6 @@ public:
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_workram;
 	required_shared_ptr<UINT16> m_spriteram;
-//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int         m_sprite_colorbase;

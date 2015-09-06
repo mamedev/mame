@@ -19,11 +19,11 @@
 #ifndef NLD_MM5837_H_
 #define NLD_MM5837_H_
 
-#include "../nl_base.h"
-#include "../analog/nld_twoterm.h"
+#include "nl_base.h"
+#include "analog/nld_twoterm.h"
 
 #define MM5837_DIP(_name)                                                        \
-		NET_REGISTER_DEV(MM5837, _name)
+		NET_REGISTER_DEV(MM5837_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

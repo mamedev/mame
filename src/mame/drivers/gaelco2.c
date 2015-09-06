@@ -204,12 +204,12 @@ ROM_END
                                 BANG
   ============================================================================*/
 
-READ16_MEMBER(gaelco2_state::p1_gun_x){return (ioport("LIGHT0_X")->read() * 320 / 0x100) + 1;}
-READ16_MEMBER(gaelco2_state::p1_gun_y){return (ioport("LIGHT0_Y")->read() * 240 / 0x100) - 4;}
-READ16_MEMBER(gaelco2_state::p2_gun_x){return (ioport("LIGHT1_X")->read() * 320 / 0x100) + 1;}
-READ16_MEMBER(gaelco2_state::p2_gun_y){return (ioport("LIGHT1_Y")->read() * 240 / 0x100) - 4;}
+READ16_MEMBER(bang_state::p1_gun_x){return (m_light0_x->read() * 320 / 0x100) + 1;}
+READ16_MEMBER(bang_state::p1_gun_y){return (m_light0_y->read() * 240 / 0x100) - 4;}
+READ16_MEMBER(bang_state::p2_gun_x){return (m_light1_x->read() * 320 / 0x100) + 1;}
+READ16_MEMBER(bang_state::p2_gun_y){return (m_light1_y->read() * 240 / 0x100) - 4;}
 
-static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, gaelco2_state )
+static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, bang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
@@ -263,11 +263,11 @@ static INPUT_PORTS_START( bang )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -6.0 / 240, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bang, gaelco2_state )
+static MACHINE_CONFIG_START( bang, bang_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)         /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(bang_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gaelco2_state, bang_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
@@ -1060,7 +1060,7 @@ ROM_END
                             WORLD RALLY 2
   ============================================================================*/
 
-static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, gaelco2_state )
+static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, wrally2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
@@ -1086,7 +1086,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Acc.")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gear") PORT_TOGGLE
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco2_state,wrally2_analog_bit_r, (void *)0)   /* ADC_1 serial input */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)0)   /* ADC_1 serial input */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_DIPLOC(  0x0100, IP_ACTIVE_LOW, "SW2:1" )
 	PORT_DIPNAME( 0x0200, 0x0000, "Coin mechanism" ) PORT_DIPLOCATION("SW2:2")
@@ -1144,7 +1144,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Acc.")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Gear") PORT_TOGGLE
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco2_state,wrally2_analog_bit_r, (void *)1)   /* ADC_2 serial input */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)1)   /* ADC_2 serial input */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1167,7 +1167,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Wheel")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wrally2, gaelco2_state )
+static MACHINE_CONFIG_START( wrally2, wrally2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)         /* 13 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
@@ -1406,16 +1406,16 @@ ROM_START( grtesoro4 ) /* there are version 4.0 and version 1.0 strings in this,
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
-GAME( 1994, aligator,  0,       alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1994, aligator,  0,       alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1994, aligatorun,aligator,alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
-GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1996, maniacsq, 0,        maniacsq, maniacsq, driver_device, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
-GAME( 1996, snowboar, 0,        snowboar, snowboar, driver_device, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, bang,     0,        bang,     bang,     gaelco2_state, bang,     ROT0, "Gaelco", "Bang!", 0 )
-GAME( 1998, bangj,    bang,     bang,     bang,     gaelco2_state, bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
-GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1996, snowboar, 0,        snowboar, snowboar, driver_device, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1998, bang,     0,        bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Bang!", 0 )
+GAME( 1998, bangj,    bang,     bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

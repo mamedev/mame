@@ -787,10 +787,10 @@ ROM_END
  *************************************/
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT */
-GAMEL( 1978, atarifb,  0,       atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football (revision 2)", GAME_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football (revision 1)", GAME_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football II", GAME_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, driver_device, 0, ROT0, "Atari", "Atari Football (4 players)", GAME_SUPPORTS_SAVE, layout_atarifb4 )
-GAMEL( 1979, abaseb,   0,       abaseb,   abaseb, driver_device,   0, ROT0, "Atari", "Atari Baseball (set 1)", GAME_SUPPORTS_SAVE, layout_abaseb )
-GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb, driver_device,   0, ROT0, "Atari", "Atari Baseball (set 2)", GAME_SUPPORTS_SAVE, layout_abaseb )
-GAME ( 1980, soccer,   0,       soccer,   soccer, driver_device,   0, ROT0, "Atari", "Atari Soccer", GAME_SUPPORTS_SAVE )
+GAMEL( 1978, atarifb,  0,       atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, driver_device, 0, ROT0, "Atari", "Atari Football (4 players)", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
+GAMEL( 1979, abaseb,   0,       abaseb,   abaseb, driver_device,   0, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb, driver_device,   0, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAME ( 1980, soccer,   0,       soccer,   soccer, driver_device,   0, ROT0, "Atari", "Atari Soccer", MACHINE_SUPPORTS_SAVE )

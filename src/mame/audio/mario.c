@@ -125,7 +125,7 @@ static NETLIST_START(nl_mario_snd7)
 	NET_C(R65.2, 4K_A.FC, C44.1)
 	NET_C(C44.2, GND)
 
-	CD_4020(3H, 4K_B.Y, ttllow, V5, GND)
+	CD4020_WI(3H, 4K_B.Y, ttllow, V5, GND)
 	TTL_7404_INVERT(4J_B, 3H.Q12)
 
 	RES(R64, RES_K(20))
@@ -201,7 +201,7 @@ static NETLIST_START(nl_mario)
 	PARAM(Solver.ACCURACY, 1e-8)
 	PARAM(Solver.SOR_FACTOR, 1.0)
 	PARAM(Solver.GS_THRESHOLD, 5)
-	PARAM(Solver.GS_LOOPS, 4)
+	PARAM(Solver.GS_LOOPS, 1)
 	//PARAM(Solver.LTE,     5e-2) // Default is not enough for paddle control
 	PARAM(Solver.DYNAMIC_TS,  0)
 	ANALOG_INPUT(V5, 5)
@@ -231,14 +231,7 @@ static NETLIST_START(nl_mario)
 	NET_C(GND, R19.1) //FIXME
 	NET_C(2K_C.Q, R41.1)
 
-#if 1
-	RES(DUM, RES_K(22))
-	NET_C(R39.1, DUM.1)
-	NET_C(DUM.2, GND)
-	FRONTIER(front1, R39.1, R40.1)
-#else
 	NET_C(R39.1, R40.1)
-#endif
 
 	NET_C(R20.2, R19.2, R40.2, R41.2, C31.1)
 	NET_C(C31.2, GND)
@@ -285,6 +278,7 @@ static NETLIST_START(nl_mario)
 
 	NET_C(GND, ROUT.2)
 
+	OPTIMIZE_FRONTIER(R40.1, RES_K(22), 50)
 NETLIST_END()
 
 #else

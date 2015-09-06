@@ -5,13 +5,16 @@
  *
  */
 
-#include <cstdio>
 #include <cstdarg>
 
 #include "pparser.h"
 
-//#undef NL_VERBOSE_OUT
-//#define NL_VERBOSE_OUT(x) printf x
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
 
 // ----------------------------------------------------------------------------------------
 // A simple tokenizer
@@ -19,19 +22,13 @@
 
 pstring ptokenizer::currentline_str()
 {
-	char buf[300];
-	int bufp = 0;
-	const char *p = m_line_ptr;
-	while (*p && *p != 10)
-		buf[bufp++] = *p++;
-	buf[bufp] = 0;
-	return pstring(buf);
+	return m_cur_line;
 }
 
 
 void ptokenizer::skipeol()
 {
-	char c = getc();
+	pstring::code_t c = getc();
 	while (c)
 	{
 		if (c == 10)
@@ -46,17 +43,19 @@ void ptokenizer::skipeol()
 }
 
 
-unsigned char ptokenizer::getc()
+pstring::code_t ptokenizer::getc()
 {
-	if (*m_px == 10)
+	if (m_px >= m_cur_line.len())
 	{
-		m_line++;
-		m_line_ptr = m_px + 1;
+		if (m_strm.readline(m_cur_line))
+		{
+			m_cur_line += "\n";
+			m_px = 0;
+		}
+		else
+			return 0;
 	}
-	if (*m_px)
-		return *(m_px++);
-	else
-		return *m_px;
+	return m_cur_line.code_at(m_px++);
 }
 
 void ptokenizer::ungetc()
@@ -73,7 +72,7 @@ void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
-		error("Error: expected token <%s> got <%s>\n", m_tokens[token_num.id()].cstr(), tok.str().cstr());
+		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[token_num.id()])(tok.str()) );
 	}
 }
 
@@ -82,7 +81,7 @@ pstring ptokenizer::get_string()
 	token_t tok = get_token();
 	if (!tok.is_type(STRING))
 	{
-		error("Error: expected a string, got <%s>\n", tok.str().cstr());
+		error(pfmt("Expected a string, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -92,7 +91,7 @@ pstring ptokenizer::get_identifier()
 	token_t tok = get_token();
 	if (!tok.is_type(IDENTIFIER))
 	{
-		error("Error: expected an identifier, got <%s>\n", tok.str().cstr());
+		error(pfmt("Expected an identifier, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -102,7 +101,7 @@ pstring ptokenizer::get_identifier_or_number()
 	token_t tok = get_token();
 	if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
 	{
-		error("Error: expected an identifier, got <%s>\n", tok.str().cstr());
+		error(pfmt("Expected an identifier, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -112,12 +111,12 @@ double ptokenizer::get_number_double()
 	token_t tok = get_token();
 	if (!tok.is_type(NUMBER))
 	{
-		error("Error: expected a number, got <%s>\n", tok.str().cstr());
+		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
 	bool err = false;
 	double ret = tok.str().as_double(&err);
 	if (err)
-		error("Error: expected a number, got <%s>\n", tok.str().cstr());
+		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	return ret;
 }
 
@@ -126,12 +125,12 @@ long ptokenizer::get_number_long()
 	token_t tok = get_token();
 	if (!tok.is_type(NUMBER))
 	{
-		error("Error: expected a long int, got <%s>\n", tok.str().cstr());
+		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
 	bool err = false;
 	long ret = tok.str().as_long(&err);
 	if (err)
-		error("Error: expected a long int, got <%s>\n", tok.str().cstr());
+		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	return ret;
 }
 
@@ -158,14 +157,16 @@ ptokenizer::token_t ptokenizer::get_token()
 			skipeol();
 		}
 		else
+		{
 			return ret;
+		}
 	}
 }
 
 ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
-	char c = getc();
+	pstring::code_t c = getc();
 	while (m_whitespace.find(c)>=0)
 	{
 		c = getc();
@@ -248,16 +249,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 
 }
 
-ATTR_COLD void ptokenizer::error(const char *format, ...)
+ATTR_COLD void ptokenizer::error(const pstring &errs)
 {
-	va_list ap;
-	va_start(ap, format);
-
-	pstring errmsg1 = pstring(format).vprintf(ap);
-	va_end(ap);
-
-	verror(errmsg1, currentline_no(), currentline_str());
-
+	verror("Error: " + errs, currentline_no(), currentline_str());
 	//throw error;
 }
 
@@ -266,6 +260,7 @@ ATTR_COLD void ptokenizer::error(const char *format, ...)
 // ----------------------------------------------------------------------------------------
 
 ppreprocessor::ppreprocessor()
+: m_ifflag(0), m_level(0), m_lineno(0)
 {
 	m_expr_sep.add("!");
 	m_expr_sep.add("(");
@@ -278,12 +273,12 @@ ppreprocessor::ppreprocessor()
 	m_expr_sep.add(" ");
 	m_expr_sep.add("\t");
 
-	m_defines.add(define_t("__PLIB_PREPROCESSOR__", "1"));
+	m_defines.add("__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1"));
 }
 
 void ppreprocessor::error(const pstring &err)
 {
-	fprintf(stderr, "PREPRO ERROR: %s\n", err.cstr());
+	throw pexception("PREPRO ERROR: " + err);
 }
 
 
@@ -360,12 +355,11 @@ double ppreprocessor::expr(const pstring_list_t &sexpr, std::size_t &start, int 
 
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
-	for (std::size_t i = 0; i<m_defines.size(); i++)
-	{
-		if (m_defines[i].m_name == name)
-			return &m_defines[i];
-	}
-	return NULL;
+	int idx = m_defines.index_of(name);
+	if (idx >= 0)
+		return &m_defines.value_at(idx);
+	else
+		return NULL;
 }
 
 pstring ppreprocessor::replace_macros(const pstring &line)
@@ -380,7 +374,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 		else
 			ret.cat(elems[i]);
 	}
-	return pstring(ret.cstr());
+	return ret;
 }
 
 static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstring sep)
@@ -391,92 +385,98 @@ static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstr
 		ret.cat(elems[i]);
 		ret.cat(sep);
 	}
-	return pstring(ret.cstr());
+	return ret;
 }
 
-pstring ppreprocessor::process(const pstring &contents)
+pstring  ppreprocessor::process_line(const pstring &line)
 {
-	pstringbuffer ret = "";
-	pstring_list_t lines(contents,"\n", false);
-	UINT32 ifflag = 0; // 31 if levels
-	int level = 0;
-
-	std::size_t i=0;
-	while (i<lines.size())
+	pstring lt = line.replace("\t"," ").trim();
+	pstringbuffer ret;
+	m_lineno++;
+	// FIXME ... revise and extend macro handling
+	if (lt.startsWith("#"))
 	{
-		pstring line = lines[i];
-		pstring lt = line.replace("\t"," ").trim();
-		// FIXME ... revise and extend macro handling
-		if (lt.startsWith("#"))
+		pstring_list_t lti(lt, " ", true);
+		if (lti[0].equals("#if"))
 		{
-			pstring_list_t lti(lt, " ", true);
-			if (lti[0].equals("#if"))
+			m_level++;
+			std::size_t start = 0;
+			lt = replace_macros(lt);
+			pstring_list_t t = pstring_list_t::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
+			int val = expr(t, start, 0);
+			if (val == 0)
+				m_ifflag |= (1 << m_level);
+		}
+		else if (lti[0].equals("#ifdef"))
+		{
+			m_level++;
+			if (get_define(lti[1]) == NULL)
+				m_ifflag |= (1 << m_level);
+		}
+		else if (lti[0].equals("#ifndef"))
+		{
+			m_level++;
+			if (get_define(lti[1]) != NULL)
+				m_ifflag |= (1 << m_level);
+		}
+		else if (lti[0].equals("#else"))
+		{
+			m_ifflag ^= (1 << m_level);
+		}
+		else if (lti[0].equals("#endif"))
+		{
+			m_ifflag &= ~(1 << m_level);
+			m_level--;
+		}
+		else if (lti[0].equals("#include"))
+		{
+			// ignore
+		}
+		else if (lti[0].equals("#pragma"))
+		{
+			if (m_ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
 			{
-				level++;
-				std::size_t start = 0;
-				lt = replace_macros(lt);
-				pstring_list_t t = pstring_list_t::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
-				int val = expr(t, start, 0);
-				if (val == 0)
-					ifflag |= (1 << level);
+				if (lti[2].equals("warning"))
+					error("NETLIST: " + catremainder(lti, 3, " "));
 			}
-			else if (lti[0].equals("#ifdef"))
+		}
+		else if (lti[0].equals("#define"))
+		{
+			if (m_ifflag == 0)
 			{
-				level++;
-				if (get_define(lti[1]) == NULL)
-					ifflag |= (1 << level);
+				if (lti.size() != 3)
+					error("PREPRO: only simple defines allowed: " + line);
+				m_defines.add(lti[1], define_t(lti[1], lti[2]));
 			}
-			else if (lti[0].equals("#ifndef"))
-			{
-				level++;
-				if (get_define(lti[1]) != NULL)
-					ifflag |= (1 << level);
-			}
-			else if (lti[0].equals("#else"))
-			{
-				ifflag ^= (1 << level);
-			}
-			else if (lti[0].equals("#endif"))
-			{
-				ifflag &= ~(1 << level);
-				level--;
-			}
-			else if (lti[0].equals("#include"))
-			{
-				// ignore
-			}
-			else if (lti[0].equals("#pragma"))
-			{
-				if (ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
-				{
-					if (lti[2].equals("warning"))
-						error("NETLIST: " + catremainder(lti, 3, " "));
-				}
-			}
-			else if (lti[0].equals("#define"))
-			{
-				if (ifflag == 0)
-				{
-					if (lti.size() != 3)
-						error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
-					m_defines.add(define_t(lti[1], lti[2]));
-				}
-			}
-			else
-				error(pstring::sprintf("unknown directive on line %" SIZETFMT ": %s\n", SIZET_PRINTF(i), line.cstr()));
 		}
 		else
-		{
-			//if (ifflag == 0 && level > 0)
-			//  fprintf(stderr, "conditional: %s\n", line.cstr());
-			lt = replace_macros(lt);
-			if (ifflag == 0)
-			{
-				ret.cat(lt);
-				ret.cat("\n");
-			}
-		}
-		i++;
+			error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(line));
 	}
-	return pstring(ret.cstr());
+	else
+	{
+		lt = replace_macros(lt);
+		if (m_ifflag == 0)
+		{
+			ret.cat(lt);
+			ret.cat("\n");
+		}
+	}
+	return ret;
 }
+
+
+postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
+{
+	pstring line;
+	while (istrm.readline(line))
+	{
+		line = process_line(line);
+		ostrm.writeline(line);
+	}
+	return ostrm;
+}
+
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

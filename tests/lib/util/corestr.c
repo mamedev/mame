@@ -1,54 +1,54 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
 
-#include "UnitTest++/UnitTest++.h"
+#include "gtest/gtest.h"
 #include "corestr.h"
 
-TEST(strmakeupper) 
+TEST(corestr,strmakeupper) 
 {
    std::string value = "test";
-   CHECK_EQUAL("TEST", strmakeupper(value).c_str());
+   EXPECT_STREQ("TEST", strmakeupper(value).c_str());
 }
 
-TEST(strmakelower) 
+TEST(corestr,strmakelower) 
 {
    std::string value = "ValUE";
-   CHECK_EQUAL("value", strmakelower(value).c_str());
+   EXPECT_STREQ("value", strmakelower(value).c_str());
 }
 
-TEST(strreplace) 
+TEST(corestr,strreplace) 
 {
    std::string value = "Main string";
-   CHECK_EQUAL(1, strreplace(value,"str","aaa"));
-   CHECK_EQUAL("Main aaaing", value.c_str());
-   CHECK_EQUAL(4, strreplace(value,"a","b"));
+   EXPECT_EQ(1, strreplace(value,"str","aaa"));
+   EXPECT_STREQ("Main aaaing", value.c_str());
+   EXPECT_EQ(4, strreplace(value,"a","b"));
 }
 
-TEST(strtrimspace) 
+TEST(corestr,strtrimspace) 
 {
    std::string value = "    a value  for test  ";
-   CHECK_EQUAL("a value  for test", strtrimspace(value).c_str());
+   EXPECT_STREQ("a value  for test", strtrimspace(value).c_str());
    value = "\r\n\ta value  for test\r\n\n\r";
-   CHECK_EQUAL("a value  for test", strtrimspace(value).c_str());
+   EXPECT_STREQ("a value  for test", strtrimspace(value).c_str());
 }
 
-TEST(strreplacechr) 
+TEST(corestr,strreplacechr) 
 {
    std::string value = "String for doing replaces";
    strreplacechr(value,'a','A');
    strreplacechr(value,'e','E');
    strreplacechr(value,'i','I');
    strreplacechr(value,'o','O');
-   CHECK_EQUAL("StrIng fOr dOIng rEplAcEs", value.c_str());
+   EXPECT_STREQ("StrIng fOr dOIng rEplAcEs", value.c_str());
 }
 
-TEST(strdelchr) 
+TEST(corestr,strdelchr) 
 {
    std::string value = "String for doing deletes";
    strdelchr(value,'a');
    strdelchr(value,'e');
    strdelchr(value,'i');
    strdelchr(value,'o');
-   CHECK_EQUAL("Strng fr dng dlts", value.c_str());
+   EXPECT_STREQ("Strng fr dng dlts", value.c_str());
 }
 

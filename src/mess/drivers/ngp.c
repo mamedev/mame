@@ -118,7 +118,7 @@ enum flash_state
 	F_AUTO_PROGRAM,             /* 5555 AA 2AAA 55 5555 A0 address data */
 	F_AUTO_CHIP_ERASE,          /* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 5555 10 */
 	F_AUTO_BLOCK_ERASE,         /* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 block_address 30 */
-	F_BLOCK_PROTECT,            /* 5555 AA 2AAA 55 5555 9A 5555 AA 2AAA 55 5555 9A */
+	F_BLOCK_PROTECT             /* 5555 AA 2AAA 55 5555 9A 5555 AA 2AAA 55 5555 9A */
 };
 
 
@@ -891,5 +891,5 @@ ROM_START( ngpc )
 ROM_END
 
 
-CONS( 1998, ngp, 0, 0, ngp, ngp, driver_device, 0,  "SNK", "NeoGeo Pocket", GAME_SUPPORTS_SAVE )
-CONS( 1999, ngpc, ngp, 0, ngpc, ngp, driver_device, 0, "SNK", "NeoGeo Pocket Color", GAME_SUPPORTS_SAVE )
+CONS( 1998, ngp, 0, 0, ngp, ngp, driver_device, 0,  "SNK", "NeoGeo Pocket", MACHINE_SUPPORTS_SAVE )
+CONS( 1999, ngpc, ngp, 0, ngpc, ngp, driver_device, 0, "SNK", "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )

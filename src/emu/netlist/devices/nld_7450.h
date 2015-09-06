@@ -27,14 +27,14 @@
 #include "nld_signal.h"
 
 #define TTL_7450_ANDORINVERT(_name, _I1, _I2, _I3, _I4)                             \
-		NET_REGISTER_DEV(7450, _name)                                               \
+		NET_REGISTER_DEV(TTL_7450_ANDORINVERT, _name)                                               \
 		NET_CONNECT(_name, A, _I1)                                                  \
 		NET_CONNECT(_name, B, _I2)                                                  \
 		NET_CONNECT(_name, C, _I3)                                                  \
 		NET_CONNECT(_name, D, _I4)
 
 #define TTL_7450_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7450_dip, _name)
+		NET_REGISTER_DEV(TTL_7450_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

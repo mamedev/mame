@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="0" y="160" width="300" height="400" />
+		</screen>
+
+		<!-- best scores 1 -->
+		<bezel name="digit27" element="digit">
+			<bounds x="10" y="10"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds x="30" y="10"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit19" element="digit">
+			<bounds x="50" y="10"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="70" y="10"  width="15" height="22" />
+		</bezel>
+
+		<!-- best scores 2 -->
+		<bezel name="digit24" element="digit">
+			<bounds x="10" y="40"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds x="30" y="40"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit16" element="digit">
+			<bounds x="50" y="40"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="70" y="40"  width="15" height="22" />
+		</bezel>
+
+		<!-- best scores 3 -->
+		<bezel name="digit28" element="digit">
+			<bounds x="10" y="70"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit12" element="digit">
+			<bounds x="30" y="70"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit20" element="digit">
+			<bounds x="50" y="70"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds x="70" y="70"  width="15" height="22" />
+		</bezel>
+
+		<!-- best scores 4 -->
+		<bezel name="digit26" element="digit">
+			<bounds x="10" y="100"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds x="30" y="100"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit18" element="digit">
+			<bounds x="50" y="100"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="70" y="100"  width="15" height="22" />
+		</bezel>
+
+		<!-- best scores 5 -->
+		<bezel name="digit30" element="digit">
+			<bounds x="10" y="130"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit14" element="digit">
+			<bounds x="30" y="130"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit22" element="digit">
+			<bounds x="50" y="130"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds x="70" y="130"  width="15" height="22" />
+		</bezel>
+
+		<!-- time racing -->
+		<bezel name="digit21" element="digit">
+			<bounds x="140" y="130"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="160" y="130"  width="15" height="22" />
+		</bezel>
+
+		<!-- your score -->
+		<bezel name="digit25" element="digit">
+			<bounds x="220" y="10"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds x="240" y="10"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit17" element="digit">
+			<bounds x="260" y="10"  width="15" height="22" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="280" y="10"  width="15" height="22" />
+		</bezel>
+	</view>
+</mamelayout>

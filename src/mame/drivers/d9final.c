@@ -326,4 +326,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final, 0, d9final, d9final, driver_device, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", GAME_SUPPORTS_SAVE )
+GAME( 1992, d9final, 0, d9final, d9final, driver_device, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

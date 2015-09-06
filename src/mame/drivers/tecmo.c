@@ -1100,11 +1100,11 @@ DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 
 
 
-GAME( 1986, rygar,     0,        rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rygar2,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rygar3,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rygarj,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, gemini,    0,        gemini,   gemini, tecmo_state,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", GAME_SUPPORTS_SAVE ) /* Japan regional warning screen */
-GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", GAME_SUPPORTS_SAVE )   /* No regional "Warning, if you are playing ..." screen */
-GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", GAME_SUPPORTS_SAVE )   /* Japan regional warning screen */
-GAME( 1988, backfirt,  0,        backfirt, backfirt, tecmo_state, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rygar,     0,        rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar2,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar3,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygarj,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gemini,    0,        gemini,   gemini, tecmo_state,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", MACHINE_SUPPORTS_SAVE ) /* Japan regional warning screen */
+GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", MACHINE_SUPPORTS_SAVE )   /* No regional "Warning, if you are playing ..." screen */
+GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", MACHINE_SUPPORTS_SAVE )   /* Japan regional warning screen */
+GAME( 1988, backfirt,  0,        backfirt, backfirt, tecmo_state, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", MACHINE_SUPPORTS_SAVE )

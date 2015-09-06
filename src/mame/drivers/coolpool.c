@@ -1185,9 +1185,9 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
  *
  *************************************/
 
-GAME( 1989, amerdart,  0,        amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, amerdart2, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, amerdart3, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1989, amerdart,  0,        amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart2, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart3, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, coolpool,  0,        coolpool, coolpool, coolpool_state, coolpool, ROT0, "Catalina", "Cool Pool", 0 )
 GAME( 1993, 9ballsht,  0,        9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)", 0 )
 GAME( 1993, 9ballsht2, 9ballsht, 9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )

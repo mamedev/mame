@@ -80,7 +80,8 @@ static void video_debug(running_machine &machine, int ref, int params, const cha
 	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
 	if(params>0)
 	{
-		sscanf(param[0],"%d",&mstate->m_debug_video);
+		int temp;
+		sscanf(param[0],"%d",&temp); mstate->m_debug_video = temp;;
 	}
 	else
 	{

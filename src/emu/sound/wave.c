@@ -16,7 +16,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "imagedev/cassette.h"
 #include "wave.h"
 
 #define ALWAYS_PLAY_SOUND   0
@@ -60,6 +59,7 @@ void wave_device::device_start()
 		machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 	else
 		machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_cass = machine().device<cassette_image_device>(m_cassette_tag);
 }
 
 //-------------------------------------------------
@@ -68,8 +68,6 @@ void wave_device::device_start()
 
 void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	cassette_image_device *cass = machine().device<cassette_image_device>(m_cassette_tag);
-	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
 	double duration;
@@ -77,20 +75,20 @@ void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	stream_sample_t *right_buffer = NULL;
 	int i;
 
-	speaker_device_iterator spkiter(cass->machine().root_device());
+	speaker_device_iterator spkiter(m_cass->machine().root_device());
 	int speakers = spkiter.count();
 	if (speakers>1)
 		right_buffer = outputs[1];
 
-	state = cass->get_state();
+	state = m_cass->get_state();
 
 	state = (cassette_state)(state & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER));
 
-	if (cass->exists() && (ALWAYS_PLAY_SOUND || (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED))))
+	if (m_cass->exists() && (ALWAYS_PLAY_SOUND || (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED))))
 	{
-		cassette = cass->get_image();
-		time_index = cass->get_position();
-		duration = ((double) samples) / cass->machine().sample_rate();
+		cassette_image *cassette = m_cass->get_image();
+		time_index = m_cass->get_position();
+		duration = ((double) samples) / m_cass->machine().sample_rate();
 
 		cassette_get_samples(cassette, 0, time_index, duration, samples, 2, left_buffer, CASSETTE_WAVEFORM_16BIT);
 		if (speakers > 1)

@@ -448,6 +448,6 @@ ROM_START( a3020 )
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY  FULLNAME */
-COMP( 1988, a310, 0,      0,      a310,    a310, a310_state,  a310,   "Acorn", "Archimedes 310", GAME_NOT_WORKING)
-COMP( 1988, a3010, a310,  0,      a310,    a310, a310_state,  a310,   "Acorn", "Archimedes 3010", GAME_NOT_WORKING)
-COMP( 1988, a3020, a310,  0,      a310,    a310, a310_state,  a310,   "Acorn", "Archimedes 3020", GAME_NOT_WORKING)
+COMP( 1988, a310, 0,      0,      a310,    a310, a310_state,  a310,   "Acorn", "Archimedes 310", MACHINE_NOT_WORKING)
+COMP( 1988, a3010, a310,  0,      a310,    a310, a310_state,  a310,   "Acorn", "Archimedes 3010", MACHINE_NOT_WORKING)
+COMP( 1988, a3020, a310,  0,      a310,    a310, a310_state,  a310,   "Acorn", "Archimedes 3020", MACHINE_NOT_WORKING)

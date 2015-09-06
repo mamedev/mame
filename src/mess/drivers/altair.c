@@ -129,4 +129,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1975, al8800bt,  0,       0,  altair,     altair, driver_device,   0,   "MITS",   "Altair 8800bt", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1975, al8800bt,  0,       0,  altair,     altair, driver_device,   0,   "MITS",   "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

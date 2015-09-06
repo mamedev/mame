@@ -18,13 +18,15 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(parser_t)
 	public:
-		parser_t(setup_t &setup)
-		: ptokenizer(), m_setup(setup), m_buf(NULL) {}
+		parser_t(pistream &strm, setup_t &setup)
+		: ptokenizer(strm), m_setup(setup), m_buf(NULL) {}
 
-		bool parse(const char *buf, const pstring nlname = "");
+		bool parse(const pstring nlname = "");
 
+	protected:
 		void parse_netlist(const pstring &nlname);
 		void net_alias();
+		void dippins();
 		void netdev_param();
 		void net_c();
 		void frontier();
@@ -37,11 +39,10 @@ namespace netlist
 		void net_local_source();
 		void net_truthtable_start();
 
-	protected:
 		/* for debugging messages */
 		netlist_t &netlist() { return m_setup.netlist(); }
 
-		virtual void verror(pstring msg, int line_num, pstring line);
+		virtual void verror(const pstring &msg, int line_num, const pstring &line);
 	private:
 
 		nl_double eval_param(const token_t tok);
@@ -51,6 +52,7 @@ namespace netlist
 		token_id_t m_tok_comma;
 		token_id_t m_tok_ALIAS;
 		token_id_t m_tok_NET_C;
+		token_id_t m_tok_DIPPINS;
 		token_id_t m_tok_FRONTIER;
 		token_id_t m_tok_PARAM;
 		token_id_t m_tok_NET_MODEL;

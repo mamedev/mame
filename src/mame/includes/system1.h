@@ -13,15 +13,16 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_nob_mcu_latch(*this, "nob_mcu_latch"),
 		m_nob_mcu_status(*this, "nob_mcu_status"),
+		m_paletteram(*this, "palette"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu_region(*this, "maincpu"),
+		m_color_prom(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d") { }
@@ -31,6 +32,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_nob_mcu_latch;
 	optional_shared_ptr<UINT8> m_nob_mcu_status;
+	required_shared_ptr<UINT8> m_paletteram;
 
 	UINT8 *m_videoram;
 	void (system1_state::*m_videomode_custom)(UINT8 data, UINT8 prevdata);
@@ -115,6 +117,7 @@ public:
 	DECLARE_DRIVER_INIT(seganinj);
 	DECLARE_DRIVER_INIT(gardia);
 	DECLARE_DRIVER_INIT(spatter);
+	DECLARE_DRIVER_INIT(spattera);
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -141,9 +144,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
+	optional_region_ptr<UINT8> m_color_prom;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;

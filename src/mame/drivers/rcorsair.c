@@ -177,4 +177,4 @@ ROM_START( rcorsair )
 ROM_END
 
 
-GAME( 1984, rcorsair,  0,    rcorsair, inports, driver_device, 0, ROT90, "Nakasawa", "Red Corsair", GAME_IS_SKELETON )
+GAME( 1984, rcorsair,  0,    rcorsair, inports, driver_device, 0, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )

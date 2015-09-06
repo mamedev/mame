@@ -11,6 +11,7 @@
 #include "pconfig.h"
 #include "pstring.h"
 #include "plists.h"
+#include "pstream.h"
 
 class ptokenizer
 {
@@ -18,8 +19,8 @@ class ptokenizer
 public:
 	virtual ~ptokenizer() {}
 
-	ptokenizer()
-	: m_line(1), m_line_ptr(NULL), m_px(NULL), m_string('"')
+	ptokenizer(pistream &strm)
+	: m_strm(strm), m_lineno(1), m_px(0), m_string('"')
 	{}
 
 	enum token_type
@@ -78,7 +79,7 @@ public:
 	};
 
 
-	int currentline_no() { return m_line; }
+	int currentline_no() { return m_lineno; }
 	pstring currentline_str();
 
 	/* tokenizer stuff follows ... */
@@ -111,23 +112,24 @@ public:
 	}
 
 	token_t get_token_internal();
-	void error(const char *format, ...) ATTR_PRINTF(2,3);
-
-	void reset(const char *p) { m_px = p; m_line = 1; m_line_ptr = p; }
+	void error(const pstring &errs);
 
 protected:
-	virtual void verror(pstring msg, int line_num, pstring line) = 0;
+	virtual void verror(const pstring &msg, int line_num, const pstring &line) = 0;
 
 private:
 	void skipeol();
 
-	unsigned char getc();
+	pstring::code_t getc();
 	void ungetc();
-	bool eof() { return *m_px == 0; }
 
-	int m_line;
-	const char * m_line_ptr;
-	const char * m_px;
+	bool eof() { return m_strm.eof(); }
+
+	pistream &m_strm;
+
+	int m_lineno;
+	pstring m_cur_line;
+	unsigned m_px;
 
 	/* tokenizer stuff follows ... */
 
@@ -136,7 +138,7 @@ private:
 	pstring m_number_chars_start;
 	plist_t<pstring> m_tokens;
 	pstring m_whitespace;
-	char  m_string;
+	pstring::code_t  m_string;
 
 	token_id_t m_tok_comment_start;
 	token_id_t m_tok_comment_end;
@@ -162,9 +164,15 @@ public:
 	ppreprocessor();
 	virtual ~ppreprocessor() {}
 
-	pstring process(const pstring &contents);
+	template<class ISTR, class OSTR>
+	OSTR &process(ISTR &istrm, OSTR &ostrm)
+	{
+		return dynamic_cast<OSTR &>(process_i(istrm, ostrm));
+	}
 
 protected:
+
+	postream &process_i(pistream &istrm, postream &ostrm);
 
 	double expr(const pstring_list_t &sexpr, std::size_t &start, int prio);
 
@@ -176,8 +184,15 @@ protected:
 
 private:
 
-	plist_t<define_t> m_defines;
+	pstring process_line(const pstring &line);
+
+	phashmap_t<pstring, define_t> m_defines;
 	pstring_list_t m_expr_sep;
+
+	//pstringbuffer m_ret;
+	UINT32 m_ifflag; // 31 if levels
+	int m_level;
+	int m_lineno;
 };
 
 #endif /* PPARSER_H_ */

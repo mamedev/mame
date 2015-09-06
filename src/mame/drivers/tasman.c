@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x4b001c, 0x4b001f) AM_WRITENOP
 
@@ -590,7 +590,8 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
@@ -750,8 +751,8 @@ DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 	rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Dragon Sphere", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Ivory Tusk", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Viking Treasure", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

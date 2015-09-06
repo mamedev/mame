@@ -20,7 +20,7 @@ inline rsp_vec_t vec_vcr(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 	rsp_vec_t sign_notvt = _mm_xor_si128(vt, sign);
 
 	// Compute result:
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	rsp_vec_t diff_sel_mask = _mm_blendv_epi8(*ge, *le, sign);
 	return _mm_blendv_epi8(vs, sign_notvt, diff_sel_mask);
 #else

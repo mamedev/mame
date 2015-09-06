@@ -166,35 +166,31 @@ WRITE16_MEMBER( atarisy2_state::yscroll_w )
 
 /*************************************
  *
- *  Palette RAM write handler
+ *  Palette RAM to RGB converter
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy2_state::paletteram_w )
+PALETTE_DECODER_MEMBER( atarisy2_state, RRRRGGGGBBBBIIII )
 {
+	static const int ZB = 115, Z3 = 78, Z2 = 37, Z1 = 17, Z0 = 9;
+
 	static const int intensity_table[16] =
 	{
-		#define ZB 115
-		#define Z3 78
-		#define Z2 37
-		#define Z1 17
-		#define Z0 9
 		0, ZB+Z0, ZB+Z1, ZB+Z1+Z0, ZB+Z2, ZB+Z2+Z0, ZB+Z2+Z1, ZB+Z2+Z1+Z0,
 		ZB+Z3, ZB+Z3+Z0, ZB+Z3+Z1, ZB+Z3+Z1+Z0,ZB+ Z3+Z2, ZB+Z3+Z2+Z0, ZB+Z3+Z2+Z1, ZB+Z3+Z2+Z1+Z0
 	};
+
 	static const int color_table[16] =
-		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf, 0xf };
+	{
+		0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf, 0xf
+	};
 
-	int newword, inten, red, green, blue;
+	int i = intensity_table[raw & 15];
+	UINT8 r = (color_table[(raw >> 12) & 15] * i) >> 4;
+	UINT8 g = (color_table[(raw >> 8) & 15] * i) >> 4;
+	UINT8 b = (color_table[(raw >> 4) & 15] * i) >> 4;
 
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	newword = m_generic_paletteram_16[offset];
-
-	inten = intensity_table[newword & 15];
-	red = (color_table[(newword >> 12) & 15] * inten) >> 4;
-	green = (color_table[(newword >> 8) & 15] * inten) >> 4;
-	blue = (color_table[(newword >> 4) & 15] * inten) >> 4;
-	m_palette->set_pen_color(offset, rgb_t(red, green, blue));
+	return rgb_t(r, g, b);
 }
 
 

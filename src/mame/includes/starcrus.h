@@ -11,6 +11,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	bitmap_ind16 *m_ship1_vid;
 	bitmap_ind16 *m_ship2_vid;
 	bitmap_ind16 *m_proj1_vid;
@@ -43,27 +48,26 @@ public:
 	int m_explode_sound_playing;
 	int m_launch1_sound_playing;
 	int m_launch2_sound_playing;
-	DECLARE_WRITE8_MEMBER(starcrus_s1_x_w);
-	DECLARE_WRITE8_MEMBER(starcrus_s1_y_w);
-	DECLARE_WRITE8_MEMBER(starcrus_s2_x_w);
-	DECLARE_WRITE8_MEMBER(starcrus_s2_y_w);
-	DECLARE_WRITE8_MEMBER(starcrus_p1_x_w);
-	DECLARE_WRITE8_MEMBER(starcrus_p1_y_w);
-	DECLARE_WRITE8_MEMBER(starcrus_p2_x_w);
-	DECLARE_WRITE8_MEMBER(starcrus_p2_y_w);
-	DECLARE_WRITE8_MEMBER(starcrus_ship_parm_1_w);
-	DECLARE_WRITE8_MEMBER(starcrus_ship_parm_2_w);
-	DECLARE_WRITE8_MEMBER(starcrus_proj_parm_1_w);
-	DECLARE_WRITE8_MEMBER(starcrus_proj_parm_2_w);
-	DECLARE_READ8_MEMBER(starcrus_coll_det_r);
+
+	DECLARE_WRITE8_MEMBER(s1_x_w);
+	DECLARE_WRITE8_MEMBER(s1_y_w);
+	DECLARE_WRITE8_MEMBER(s2_x_w);
+	DECLARE_WRITE8_MEMBER(s2_y_w);
+	DECLARE_WRITE8_MEMBER(p1_x_w);
+	DECLARE_WRITE8_MEMBER(p1_y_w);
+	DECLARE_WRITE8_MEMBER(p2_x_w);
+	DECLARE_WRITE8_MEMBER(p2_y_w);
+	DECLARE_WRITE8_MEMBER(ship_parm_1_w);
+	DECLARE_WRITE8_MEMBER(ship_parm_2_w);
+	DECLARE_WRITE8_MEMBER(proj_parm_1_w);
+	DECLARE_WRITE8_MEMBER(proj_parm_2_w);
+	DECLARE_READ8_MEMBER(coll_det_r);
+
 	virtual void video_start();
-	UINT32 screen_update_starcrus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int collision_check_s1s2();
 	int collision_check_p1p2();
 	int collision_check_s1p1p2();
 	int collision_check_s2p1p2();
-	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };

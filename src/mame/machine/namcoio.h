@@ -37,7 +37,7 @@ protected:
 	enum {
 			TYPE_NAMCO56XX,
 			TYPE_NAMCO58XX,
-			TYPE_NAMCO59XX,
+			TYPE_NAMCO59XX
 	};
 
 	// internal state

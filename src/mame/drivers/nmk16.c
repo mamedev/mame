@@ -3504,6 +3504,15 @@ static INPUT_PORTS_START( firehawk )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_3C ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( firehawkv )
+	PORT_INCLUDE( firehawk )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0100, 0x0000, "Orientation" )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0100, "Vertical" )
+	PORT_DIPSETTING(      0x0000, "Horizontal" )
+INPUT_PORTS_END
+
 
 /***************************************************************************
                              Spectrum 2000
@@ -4938,7 +4947,30 @@ static ADDRESS_MAP_START( afega, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE("mainram")
 ADDRESS_MAP_END
 
+// firehawk has 0x100000 bytes of program rom (at least the switchable version) so the above can't work.
+static ADDRESS_MAP_START( firehawk_map, AS_PROGRAM, 16, nmk16_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")            // Buttons
+	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")            // P1 + P2
+	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW1")           // 2 x DSW
+	AM_RANGE(0x280012, 0x280013) AM_READ(afega_unknown_r)
+	AM_RANGE(0x280000, 0x28001d) AM_WRITEONLY               //
+	AM_RANGE(0x28001e, 0x28001f) AM_WRITE(afega_soundlatch_w)   // To Sound CPU
+/**/AM_RANGE(0x284000, 0x284003) AM_RAM_WRITE(afega_scroll0_w)  // Scroll on redhawkb (mirror or changed?..)
+/**/AM_RANGE(0x284004, 0x284007) AM_RAM_WRITE(afega_scroll1_w)  // Scroll on redhawkb (mirror or changed?..)
+	AM_RANGE(0x280020, 0x287fff) AM_WRITEONLY               //
+/**/AM_RANGE(0x288000, 0x2885ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+	AM_RANGE(0x288600, 0x28bfff) AM_WRITEONLY               //
+/**/AM_RANGE(0x28c000, 0x28c003) AM_RAM_WRITE(afega_scroll0_w) AM_SHARE("afega_scroll_0")   // Scroll
+/**/AM_RANGE(0x28c004, 0x28c007) AM_RAM_WRITE(afega_scroll1_w) AM_SHARE("afega_scroll_1")   //
+	AM_RANGE(0x28c008, 0x28ffff) AM_WRITEONLY               //
+/**/AM_RANGE(0x290000, 0x293fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")    // Layer 0                  // ?
+/**/AM_RANGE(0x29c000, 0x29c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")  // Layer 1
 
+	AM_RANGE(0x3c0000, 0x3cffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE("mainram")
+	AM_RANGE(0x3f0000, 0x3fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE("mainram")
+ADDRESS_MAP_END
 
 
 /***************************************************************************
@@ -5161,7 +5193,7 @@ static MACHINE_CONFIG_START( firehawk, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
-	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_CPU_PROGRAM_MAP(firehawk_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)
@@ -5187,6 +5219,12 @@ static MACHINE_CONFIG_START( firehawk, nmk16_state )
 	MCFG_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( spec2k, firehawk )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(afega)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( twinactn, nmk16_state )
 
@@ -7586,14 +7624,14 @@ ROM_START( firehawkv )
 	ROM_LOAD( "fhawk_s1.u38", 0x00000, 0x20000, CRC(c6609c39) SHA1(fe9b5f6c3ab42c48cb493fecb1181901efabdb58) )
 
 	ROM_REGION( 0x400000, "sprites",0 ) /* Sprites, 16x16x4 */
-	ROM_LOAD( "rom.uc1", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD( "rom.uc2", 0x200000, 0x200000, NO_DUMP )
+	ROM_LOAD( "rom.uc1", 0x000000, 0x200000, NO_DUMP ) // for vertical mode, missing
+	ROM_LOAD( "fhawk_g3.uc2", 0x200000, 0x200000, BAD_DUMP CRC(cae72ff4) SHA1(7dca7164015228ea039deffd234778d0133971ab) ) // for horizontal mode, taken from above
 
 	ROM_REGION( 0x800000, "bgtile", 0 ) /* Layer 0, 16x16x8 */
-	ROM_LOAD( "rom.uc3", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD( "rom.uc4", 0x200000, 0x200000, NO_DUMP )
-	ROM_LOAD( "rom.uc5", 0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD( "rom.uc6", 0x600000, 0x200000, NO_DUMP )
+	ROM_LOAD( "rom.uc3", 0x000000, 0x200000, NO_DUMP ) // for vertical mode, missing
+	ROM_LOAD( "rom.uc4", 0x400000, 0x200000, NO_DUMP ) // for vertical mode, missing
+	ROM_LOAD( "fhawk_g1.uc6", 0x200000, 0x200000, BAD_DUMP CRC(2ab0b06b) SHA1(25362f6a517f188c62bac28b1a7b7b49622b1518) ) // for horizontal mode, taken from above
+	ROM_LOAD( "fhawk_g2.uc5", 0x600000, 0x200000, BAD_DUMP CRC(d11bfa20) SHA1(15142004ab49f7f1e666098211dff0835c61df8d) ) // for horizontal mode, taken from above
 
 	ROM_REGION( 0x00100, "fgtile", ROMREGION_ERASEFF )    /* Layer 1, 8x8x4 */
 	// Unused
@@ -7658,7 +7696,7 @@ DRIVER_INIT_MEMBER(nmk16_state,spec2k)
 }
 
 ROM_START( spec2kh )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "yonatech5.u124", 0x00000, 0x40000, CRC(72ab5c05) SHA1(182a811982b89b8cda0677547ef0625c274f5c6b) )
 	ROM_LOAD16_BYTE( "yonatech6.u120", 0x00001, 0x40000, CRC(7e44bd9c) SHA1(da59685be14a09ec037743fcec34fb293f7d588d) )
 
@@ -7683,7 +7721,7 @@ ROM_START( spec2kh )
 ROM_END
 
 ROM_START( spec2k )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u124", 0x00000, 0x40000, CRC(dbd6f65d) SHA1(0fad9836689fcbee60904ccad59a2a5be09f3139) )
 	ROM_LOAD16_BYTE( "u120", 0x00001, 0x40000, CRC(be53e243) SHA1(38144b90a35ba144921824a0c4f133339e07f9a1) )
 
@@ -7778,7 +7816,7 @@ GAME( 1990, sbsgomo,  bioship,  bioship,  bioship, driver_device,  0,        ROT
 GAME( 1990, vandyke,    0,       vandyke,  vandyke, driver_device, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  0 )
 GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, driver_device, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)",  0 )
 GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, driver_device, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)",  0 )
-GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, nmk16_state,   vandykeb, ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND )
+GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, nmk16_state,   vandykeb, ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  MACHINE_NO_SOUND )
 
 GAME( 1991, blkheart, 0,        blkheart,  blkheart, driver_device, 0,       ROT0,   "UPL",                          "Black Heart", 0 )
 GAME( 1991, blkheartj,blkheart, blkheart,  blkheart, driver_device, 0,       ROT0,   "UPL",                          "Black Heart (Japan)", 0 )
@@ -7789,9 +7827,9 @@ GAME( 1992, strahl,   0,        strahl,   strahl, driver_device,   0,        ROT
 GAME( 1992, strahla,  strahl,   strahl,   strahl, driver_device,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", 0 )
 
 GAME( 1991, tdragon,  0,        tdragon,       tdragon,      driver_device,  0,             ROT270, "NMK (Tecmo license)","Thunder Dragon (8th Jan. 1992, unprotected)", 0 )
-GAME( 1991, tdragon1, tdragon,  tdragon_prot,  tdragon_prot, nmk16_state,    tdragon_prot,  ROT270, "NMK (Tecmo license)","Thunder Dragon (4th Jun. 1991, protected)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAME( 1991, tdragon1, tdragon,  tdragon_prot,  tdragon_prot, nmk16_state,    tdragon_prot,  ROT270, "NMK (Tecmo license)","Thunder Dragon (4th Jun. 1991, protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
 
-GAME( 1991, hachamf,    0,      hachamf_prot,  hachamf_prot, nmk16_state,    hachamf_prot,  ROT0,   "NMK",          "Hacha Mecha Fighter (19th Sep. 1991, protected)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND ) // lots of things wrong due to protection
+GAME( 1991, hachamf,    0,      hachamf_prot,  hachamf_prot, nmk16_state,    hachamf_prot,  ROT0,   "NMK",          "Hacha Mecha Fighter (19th Sep. 1991, protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
 GAME( 1991, hachamfb,   hachamf,hachamf,       hachamfb,     driver_device,  0,             ROT0,   "bootleg",      "Hacha Mecha Fighter (19th Sep. 1991, unprotected, bootleg Thunder Dragon conversion)", 0 ) // appears to be a Thunder Dragon conversion, could be bootleg?
 
 GAME( 1992, macross,  0,        macross,  macross, nmk16_state,    nmk,      ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", 0 )
@@ -7799,30 +7837,30 @@ GAME( 1992, macross,  0,        macross,  macross, nmk16_state,    nmk,      ROT
 GAME( 1993, gunnail,  0,        gunnail,  gunnail, nmk16_state,    nmk,      ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", 0 ) // Tecmo is displayed only when set to Japan
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10
 
-GAME( 1993, macross2, 0,        macross2, macross2, driver_device, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
-GAME( 1993, macross2g, macross2,macross2, macross2, driver_device, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (GAMEST review build)", GAME_NO_COCKTAIL ) // Service switch pauses game
+GAME( 1993, macross2, 0,        macross2, macross2, driver_device, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
+GAME( 1993, macross2g, macross2,macross2, macross2, driver_device, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (GAMEST review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game
 
-GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", GAME_NO_COCKTAIL )
-GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL )
-GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL )
+GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
+GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
 
 /* arcadia was a name conflict to the Emerson Arcadia 2001 in mess */
 GAME( 1994, arcadian, 0,        raphero,  raphero, driver_device,  0,        ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
 GAME( 1994, raphero,  arcadian, raphero,  raphero, driver_device,  0,        ROT270, "NMK (Media Trading license)",  "Rapid Hero", 0 )    // ^^
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
-GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
-GAME( 1992, sabotenba,sabotenb, bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", GAME_NO_COCKTAIL )
-GAME( 1992, cactus,   sabotenb, bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", GAME_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
+GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1992, sabotenba,sabotenb, bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1992, cactus,   sabotenb, bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
 
-GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 1)", GAME_NO_COCKTAIL )
-GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", GAME_NO_COCKTAIL )
-GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin, driver_device, 0,        ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures)", GAME_NO_COCKTAIL ) // Genuine NMK PCB but GFX aren't encrypted
-GAME( 1993, atombjt,  bjtwin,   atombjt,  bjtwin, driver_device, 0,        ROT270, "bootleg",                      "Atom (bootleg of Bombjack Twin)", GAME_NO_COCKTAIL | GAME_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw
+GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin, driver_device, 0,        ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures)", MACHINE_NO_COCKTAIL ) // Genuine NMK PCB but GFX aren't encrypted
+GAME( 1993, atombjt,  bjtwin,   atombjt,  bjtwin, driver_device, 0,        ROT270, "bootleg",                      "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw
 
 
-GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk16_state,   nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", GAME_NO_COCKTAIL )
-GAME( 1995, nouryokup,nouryoku, bjtwin,   nouryoku, driver_device, 0,        ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", GAME_NO_COCKTAIL ) // GFX aren't encrypted
+GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk16_state,   nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )
+GAME( 1995, nouryokup,nouryoku, bjtwin,   nouryoku, driver_device, 0,        ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", MACHINE_NO_COCKTAIL ) // GFX aren't encrypted
 
 /* Non NMK boards */
 
@@ -7832,10 +7870,10 @@ GAME( 1990, mustangb2,mustang,  mustangb, mustang, driver_device,  0,        ROT
 GAME( 1991, tdragonb, tdragon,  tdragonb, tdragonb, nmk16_state,   tdragonb, ROT270, "bootleg",                       "Thunder Dragon (bootleg)", 0 )
 
 // these are from Comad, based on the Thunder Dragon code?
-GAME( 1992, ssmissin, 0,        ssmissin, ssmissin, nmk16_state, ssmissin, ROT270, "Comad",                         "S.S. Mission", GAME_NO_COCKTAIL )
+GAME( 1992, ssmissin, 0,        ssmissin, ssmissin, nmk16_state, ssmissin, ROT270, "Comad",                         "S.S. Mission", MACHINE_NO_COCKTAIL )
 
-GAME( 1996, airattck, 0,        ssmissin, airattck, nmk16_state, ssmissin, ROT270, "Comad",                         "Air Attack (set 1)", GAME_NO_COCKTAIL )
-GAME( 1996, airattcka,airattck, ssmissin, airattck, nmk16_state, ssmissin, ROT270, "Comad",                         "Air Attack (set 2)", GAME_NO_COCKTAIL )
+GAME( 1996, airattck, 0,        ssmissin, airattck, nmk16_state, ssmissin, ROT270, "Comad",                         "Air Attack (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1996, airattcka,airattck, ssmissin, airattck, nmk16_state, ssmissin, ROT270, "Comad",                         "Air Attack (set 2)", MACHINE_NO_COCKTAIL )
 
 // afega & clones
 GAME( 1995, twinactn, 0,        twinactn, twinactn, driver_device, 0,        ROT0,   "Afega",                             "Twin Action", 0 ) // hacked from USSAF Mustang
@@ -7867,10 +7905,10 @@ GAME( 1999, popspops, 0,        popspops, popspops, nmk16_state,   grdnstrm, ROT
 GAME( 2000, mangchi,  0,        popspops, mangchi, nmk16_state,    bubl2000, ROT0,               "Afega",                             "Mang-Chi", 0 )
 
 // these two are very similar games, but the exact parent/clone relationship is unknown
-GAME( 2000, spec2k,   0,       firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", GAME_IMPERFECT_GRAPHICS ) // the ships sometimes scroll off the screen if you insert a coin during the attract demo?  verify it doesn't happen on real hw(!)
-GAME( 2000, spec2kh,  spec2k,  firehawk, spec2k, nmk16_state,     spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (horizontal, buggy) (Europe)", 0 ) // this has odd bugs even on real hardware, eg glitchy 3 step destruction sequence of some larger enemies
+GAME( 2000, spec2k,   0,       spec2k,   spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", MACHINE_IMPERFECT_GRAPHICS ) // the ships sometimes scroll off the screen if you insert a coin during the attract demo?  verify it doesn't happen on real hw(!)
+GAME( 2000, spec2kh,  spec2k,  spec2k,   spec2k, nmk16_state,     spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (horizontal, buggy) (Europe)", 0 ) // this has odd bugs even on real hardware, eg glitchy 3 step destruction sequence of some larger enemies
 GAME( 2001, firehawk, spec2k,  firehawk, firehawk, driver_device, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (horizontal)", 0 )
-GAME( 2001, firehawkv,spec2k,  firehawk, firehawk, driver_device, 0,        ROT270,             "ESD",                   "Fire Hawk (switchable orientation)", GAME_NOT_WORKING ) // incomplete dump
+GAME( 2001, firehawkv,spec2k,  firehawk, firehawkv,driver_device, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (switchable orientation)", MACHINE_NOT_WORKING ) // incomplete dump, vertical mode gfx not dumped
 
 // bee-oh board - different display / interrupt timing to others?
-GAME( 1991, manybloc, 0,        manybloc, manybloc, driver_device, 0,        ROT270,             "Bee-Oh",                "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1991, manybloc, 0,        manybloc, manybloc, driver_device, 0,        ROT270,             "Bee-Oh",                "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

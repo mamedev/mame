@@ -47,7 +47,7 @@
  */
 
 // This will be autodetected
-//#define NL_PMF_TYPE 3
+// #define NL_PMF_TYPE 2
 
 #define NL_PMF_TYPE_VIRTUAL         0
 #define NL_PMF_TYPE_GNUC_PMF        1
@@ -65,18 +65,6 @@
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
 #endif
-
-/*
- *  This increases performance in circuits with a lot of gates
- *  but is not guaranteed to be absolutely timing correct.
- *
- *  Performance increase about 10% (breakout) to 20% (pong)
- *
- */
-
-
-// moved to parameter NETLIST.USE_DEACTIVATE
-// #define USE_DEACTIVE_DEVICE     (0)
 
 #define USE_TRUTHTABLE          (1)
 
@@ -106,7 +94,6 @@
 //============================================================
 
 #define USE_MATRIX_GS (0)
-#define USE_PIVOT_SEARCH (0)
 #define USE_GABS (1)
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
@@ -117,14 +104,8 @@
 //  DEBUGGING
 //============================================================
 
-#define NL_VERBOSE                  (0)
+#define NL_DEBUG                    (false)
 #define NL_KEEP_STATISTICS          (0)
-
-#if (NL_VERBOSE)
-	#define NL_VERBOSE_OUT(x)       netlist().log x
-#else
-	#define NL_VERBOSE_OUT(x)       do { if(0) netlist().log x ; } while (0)
-#endif
 
 //============================================================
 //  General Macros

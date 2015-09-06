@@ -405,7 +405,7 @@ DRIVER_INIT_MEMBER(sbasketb_state,sbasketb)
 {
 }
 
-GAME( 1984, sbasketb, 0,        sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbasketh, sbasketb, sbasketbu, sbasketb, driver_device, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbasketg, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbaskete, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketb, 0,        sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketh, sbasketb, sbasketbu, sbasketb, driver_device, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketg, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbaskete, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)", MACHINE_SUPPORTS_SAVE )

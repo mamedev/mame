@@ -186,10 +186,12 @@ public:
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
 	palette_device *palette() { return m_palette; }
+
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
 	void reset_origin(int beamy = 0, int beamx = 0);
 	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
+	void set_brightness(UINT8 brightness) { m_brightness = brightness; }
 
 	// beam positioning and state
 	int vpos() const;
@@ -239,6 +241,7 @@ private:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_stop();
 	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -284,6 +287,8 @@ private:
 	INT32               m_last_partial_scan;        // scanline of last partial update
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
 	UINT32              m_unique_id;                // unique id for this screen_device
+	rgb_t               m_color;                    // render color
+	UINT8               m_brightness;               // global brightness
 
 	// screen timing
 	attoseconds_t       m_frame_period;             // attoseconds per frame
@@ -352,15 +357,58 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 
 #define MCFG_SCREEN_TYPE(_type) \
 	screen_device::static_set_type(*device, SCREEN_TYPE_##_type);
+
+/*!
+ @brief Configures screen parameters for the given screen.
+
+ @param _pixclock Pixel Clock frequency value
+ @param _htotal Total number of horizontal pixels, including hblank period.
+ @param _hbend Horizontal pixel position for HBlank end event, also first pixel where screen rectangle is visible.
+ @param _hbstart Horizontal pixel position for HBlank start event, also last pixel where screen rectangle is visible.
+ @param _vtotal Total number of vertical pixels, including vblank period.
+ @param _vbend Vertical pixel position for VBlank end event, also first pixel where screen rectangle is visible.
+ @param _vbstart Vertical pixel position for VBlank start event, also last pixel where screen rectangle is visible.
+ */
 #define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
 	screen_device::static_set_raw(*device, _pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
 
+/*!
+ @brief Sets the number of Frames Per Second for this screen
+
+ @param _rate FPS number
+ @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+ */
 #define MCFG_SCREEN_REFRESH_RATE(_rate) \
 	screen_device::static_set_refresh(*device, HZ_TO_ATTOSECONDS(_rate));
+
+/*!
+ @brief Sets the vblank time of the given screen
+
+ @param _time Time parameter, in attotime value\
+ @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+ */
 #define MCFG_SCREEN_VBLANK_TIME(_time) \
 	screen_device::static_set_vblank_time(*device, _time);
+
+/*!
+ @brief Sets total screen size, including H/V-Blanks
+
+ @param _width Screen horizontal size
+ @param _height Screen vertical size
+ @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+ */
 #define MCFG_SCREEN_SIZE(_width, _height) \
 	screen_device::static_set_size(*device, _width, _height);
+
+/*!
+ @brief Sets screen visible area
+
+ @param _minx Screen left border
+ @param _maxx Screen right border, must be in N-1 format
+ @param _miny Screen top border
+ @param _maxx Screen bottom border, must be in N-1 format
+ @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+ */
 #define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
 	screen_device::static_set_visarea(*device, _minx, _maxx, _miny, _maxy);
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \

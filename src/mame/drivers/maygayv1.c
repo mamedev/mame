@@ -804,14 +804,14 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(5, state, m_duart68681->get_irq_vector());
 //  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
-};
+}
 
 
 WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 {
 	m_d68681_val = state;
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
-};
+}
 
 READ8_MEMBER(maygayv1_state::data_to_i8031)
 {
@@ -1250,7 +1250,7 @@ DRIVER_INIT_MEMBER(maygayv1_state,screenpl)
 	m_p1 = m_p3 = 0xff;
 }
 
-#define GAME_FLAGS GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK
+#define GAME_FLAGS MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK
 
 GAME( 1991, screenpl, 0,        maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 4.0)",               GAME_FLAGS )
 GAME( 1991, screenp1, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 1)",               GAME_FLAGS )

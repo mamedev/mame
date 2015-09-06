@@ -657,8 +657,8 @@ ROM_START(wcup90)
 ROM_END
 
 
-GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Dakar", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 2)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Mac Attack", GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "World Cup 90", GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Dakar", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 2)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Mac Attack", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "World Cup 90", MACHINE_IS_SKELETON_MECHANICAL)

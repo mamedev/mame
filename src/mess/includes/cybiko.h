@@ -51,13 +51,14 @@ class cybiko_state : public driver_device
 public:
 	cybiko_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "hd66421"),
-	m_speaker(*this, "speaker"),
-	m_rtc(*this, "rtc"),
-	m_ram(*this, RAM_TAG),
-	m_flash1(*this, "flash1"),
-	m_nvram(*this, "nvram")
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "hd66421"),
+		m_speaker(*this, "speaker"),
+		m_rtc(*this, "rtc"),
+		m_ram(*this, RAM_TAG),
+		m_flash1(*this, "flash1"),
+		m_nvram(*this, "nvram"),
+		m_input(*this, "A")
 	{ }
 
 	DECLARE_READ16_MEMBER(serflash_r);
@@ -92,6 +93,7 @@ public:
 	required_device<ram_device> m_ram;
 	optional_device<at45db041_device> m_flash1;
 	required_device<nvram_device>   m_nvram;
+	optional_ioport_array<15> m_input;
 	DECLARE_DRIVER_INIT(cybikoxt);
 	DECLARE_DRIVER_INIT(cybiko);
 	virtual void machine_start();

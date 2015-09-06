@@ -21,13 +21,7 @@ public:
 		m_k051316(*this, "k051316"),
 		m_palette(*this, "palette") { }
 
-	/* memory pointers */
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
-
 	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-	int        m_zoom_colorbase;
 	UINT8      m_priority;
 
 	/* misc */
@@ -52,9 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(k007232_extvol_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	UINT32 screen_update_ajax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ajax_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K051316_CB_MEMBER(zoom_callback);

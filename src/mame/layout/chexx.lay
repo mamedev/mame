@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<!-- 7segs -->
+	<element name="digit">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0"/>
+	</led7seg>
+	</element>
+
+	<!-- Led -->
+	<element name="led" defstate="0">
+	<rect>
+		<bounds x="0" y="0" width="1.5" height="1.0"/>
+		<color red="1.0" green="0.96" blue="0.94"/>
+	</rect>
+	<rect state="0">
+		<bounds x="0.05" y="0.05" width="1.4" height="0.9"/>
+		<color red="0.5" green="0.0" blue="0.0"/>
+	</rect>
+	<rect state="1">
+		<bounds x="0.05" y="0.05" width="1.4" height="0.9"/>
+		<color red="1.0" green="0.0" blue="0.0"/>
+	</rect>
+	</element>
+
+	<!-- Lamp -->
+	<element name="lamp" defstate="0">
+	<disk state="0">
+		<color red="0.2" green="0.0" blue="0.0"/>
+	</disk>
+	<disk state="1">
+		<color red="1.0" green="0.0" blue="0.0"/>
+	</disk>
+	</element>
+
+	<view name="Score Board (No Artwork)">
+	<!-- P1 score -->
+	<backdrop name="digit0" element="digit">
+			<bounds x="0" y="0" width="1" height="2"/>
+		</backdrop>
+	<backdrop name="digit1" element="digit">
+		<bounds x="1" y="0" width="1" height="2"/>
+	</backdrop>
+
+	<!-- P1 goal lamp -->
+	<backdrop name="lamp0" element="lamp">
+		<bounds x="0.75" y="-0.5" width="0.5" height="0.5"/>
+	</backdrop>
+
+	<!-- Period being played -->
+	<backdrop name="led0" element="led">
+		<bounds x="3.0" y="-0.33" width="0.5" height="0.33"/>
+	</backdrop>
+	<backdrop name="led1" element="led">
+		<bounds x="3.5" y="-0.33" width="0.5" height="0.33"/>
+	</backdrop>
+	<backdrop name="led2" element="led">
+		<bounds x="4.0" y="-0.33" width="0.5" height="0.33"/>
+	</backdrop>
+
+	<!-- P2 score -->
+	<backdrop name="digit2" element="digit">
+		<bounds x="5.5" y="0" width="1" height="2"/>
+	</backdrop>
+	<backdrop name="digit3" element="digit">
+		<bounds x="6.5" y="0" width="1" height="2"/>
+	</backdrop>
+
+	<!-- P2 goal lamp -->
+	<backdrop name="lamp1" element="lamp">
+		<bounds x="6.25" y="-0.5" width="0.5" height="0.5"/>
+	</backdrop>
+	</view>
+</mamelayout>

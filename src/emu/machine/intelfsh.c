@@ -93,6 +93,7 @@ const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
 const device_type INTEL_E28F400B = &device_creator<intel_e28f400b_device>;
 const device_type MACRONIX_29L001MC = &device_creator<macronix_29l001mc_device>;
 const device_type MACRONIX_29LV160TMC = &device_creator<macronix_29lv160tmc_device>;
+const device_type TMS_29F040 = &device_creator<tms_29f040_device>;
 
 const device_type PANASONIC_MN63F805MNP = &device_creator<panasonic_mn63f805mnp_device>;
 const device_type SANYO_LE26FV10N1TS = &device_creator<sanyo_le26fv10n1ts_device>;
@@ -166,6 +167,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_type(variant),
 		m_size(0),
 		m_bits(8),
+		m_addrmask(0),
 		m_device_id(0),
 		m_maker_id(0),
 		m_sector_is_4k(false),
@@ -215,6 +217,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	case FLASH_AMD_29F080:
 		m_bits = 8;
 		m_size = 0x100000;
+		m_addrmask = 0x7ff;
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xd5;
 		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
@@ -369,6 +372,14 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0x04;
 		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
 		break;
+	case FLASH_TMS_29F040:
+		m_bits = 8;
+		m_addrmask = 0x7fff;
+		m_size = 0x80000;
+		m_maker_id = MFG_AMD;
+		m_device_id = 0xa4;
+		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
+		break;
 	}
 
 	int addrbits;
@@ -414,10 +425,10 @@ amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f080", __FILE__) { }
 
 amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F400 Flash", tag, owner, clock, FLASH_AMD_29F400T, "amd_29f400t", __FILE__) { }
+	: intelfsh8_device(mconfig, AMD_29F400T, "AMD 29F400 Flash", tag, owner, clock, FLASH_AMD_29F400T, "amd_29f400t", __FILE__) { }
 
 amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F800 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f800t", __FILE__) { }
+	: intelfsh8_device(mconfig, AMD_29F800T, "AMD 29F800 Flash", tag, owner, clock, FLASH_AMD_29F800T, "amd_29f800t", __FILE__) { }
 
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, "AMD 29LV200T Flash", tag, owner, clock, FLASH_AMD_29LV200T, "amd_29lv200t", __FILE__) { }
@@ -464,6 +475,10 @@ intel_28f320j5_device::intel_28f320j5_device(const machine_config &mconfig, cons
 
 sst_39vf400a_device::sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SST_39VF400A, "SST 39VF400A Flash", tag, owner, clock, FLASH_SST_39VF400A, "sst_39vf400a", __FILE__) { }
+
+
+tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, TMS_29F040, "Texas Instruments 29F040 Flash", tag, owner, clock, FLASH_TMS_29F040, "tms_29f040", __FILE__) { }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -761,7 +776,8 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			m_flash_mode = FM_READAMDID2;
 		}
-		else if( ( address & 0x7ff ) == 0x2aa && ( data & 0xff ) == 0x55 && m_type == FLASH_AMD_29F080 )
+		// for AMD 29F080 address bits A11-A19 don't care, for TMS 29F040 address bits A15-A18 don't care
+		else if( ( address & m_addrmask ) == ( 0xaaaa & m_addrmask ) && ( data & 0xff ) == 0x55 && m_addrmask )
 		{
 			m_flash_mode = FM_READAMDID2;
 		}
@@ -833,20 +849,20 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			m_flash_mode = FM_BANKSELECT;
 		}
 
-		// for AMD 29F080 address bits A11-A19 don't care
-		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0x80 && m_type == FLASH_AMD_29F080 )
+		// for AMD 29F080 address bits A11-A19 don't care, for TMS 29F040 address bits A15-A18 don't care
+		else if(( address & m_addrmask ) == ( 0x5555 & m_addrmask ) && ( data & 0xff ) == 0x80 && m_addrmask )
 		{
 			m_flash_mode = FM_ERASEAMD1;
 		}
-		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0x90 && m_type == FLASH_AMD_29F080 )
+		else if(( address & m_addrmask ) == ( 0x5555 & m_addrmask ) && ( data & 0xff ) == 0x90 && m_addrmask )
 		{
 			m_flash_mode = FM_READAMDID3;
 		}
-		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0xa0 && m_type == FLASH_AMD_29F080 )
+		else if(( address & m_addrmask ) == ( 0x5555 & m_addrmask ) && ( data & 0xff ) == 0xa0 && m_addrmask )
 		{
 			m_flash_mode = FM_BYTEPROGRAM;
 		}
-		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0xf0 && m_type == FLASH_AMD_29F080 )
+		else if(( address & m_addrmask ) == ( 0x5555 & m_addrmask ) && ( data & 0xff ) == 0xf0 && m_addrmask )
 		{
 			m_flash_mode = FM_NORMAL;
 		}

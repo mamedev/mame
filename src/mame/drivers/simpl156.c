@@ -1094,15 +1094,15 @@ DRIVER_INIT_MEMBER(simpl156_state,osman)
 }
 
 /* Data East games running on the DE-0409-1 or DE-0491-1 PCB */
-GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", GAME_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
-GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", GAME_SUPPORTS_SAVE )
-GAME( 1995, chainrec, 0,        chainrec,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", GAME_SUPPORTS_SAVE )
-GAME( 1995, magdrop,  chainrec, magdrop,     simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", GAME_SUPPORTS_SAVE )
-GAME( 1995, magdropp, chainrec, magdropp,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", GAME_SUPPORTS_SAVE )
+GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
+GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, chainrec, 0,        chainrec,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdrop,  chainrec, magdrop,     simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdropp, chainrec, magdropp,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
 
 /* Mitchell games running on the DEC-22VO / MT5601-0 PCB */
-GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, charlien, ROT0,  "Mitchell", "Charlie Ninja" , GAME_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1995, prtytime, 0,        mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", GAME_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1995, gangonta, prtytime, mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", GAME_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1996, osman,    0,        mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell", "Osman (World)", GAME_SUPPORTS_SAVE )
-GAME( 1996, candance, osman,    mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell (Atlus license)", "Cannon Dancer (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, prtytime, 0,        mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, gangonta, prtytime, mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1996, osman,    0,        mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell", "Osman (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, candance, osman,    mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell (Atlus license)", "Cannon Dancer (Japan)", MACHINE_SUPPORTS_SAVE )

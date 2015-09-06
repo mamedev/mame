@@ -14,10 +14,10 @@
 
 #include <algorithm>
 
-#include "../solver/mat_cr.h"
-#include "../solver/nld_ms_direct.h"
-#include "../solver/nld_solver.h"
-#include "../solver/vector_base.h"
+#include "solver/mat_cr.h"
+#include "solver/nld_ms_direct.h"
+#include "solver/nld_solver.h"
+#include "solver/vector_base.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -35,10 +35,10 @@ public:
 			unsigned mr=this->N(); /* FIXME: maximum iterations locked in here */
 
 			for (unsigned i = 0; i < mr + 1; i++)
-				m_ht[i] = new double[mr];
+				m_ht[i] = new nl_double[mr];
 
 			for (unsigned i = 0; i < this->N(); i++)
-				m_v[i] = new double[_storage_N];
+				m_v[i] = new nl_double[_storage_N];
 
 		}
 
@@ -60,7 +60,7 @@ protected:
 
 private:
 
-	int solve_ilu_gmres(double * RESTRICT x, double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, double accuracy);
+	int solve_ilu_gmres(nl_double * RESTRICT x, nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy);
 
 	plist_t<int> m_term_cr[_storage_N];
 
@@ -69,17 +69,17 @@ private:
 
 	mat_cr_t<_storage_N> mat;
 
-	double m_A[_storage_N * _storage_N];
-	double m_LU[_storage_N * _storage_N];
+	nl_double m_A[_storage_N * _storage_N];
+	nl_double m_LU[_storage_N * _storage_N];
 
-	double m_c[_storage_N + 1];  /* mr + 1 */
-	double m_g[_storage_N + 1];  /* mr + 1 */
-	double * RESTRICT m_ht[_storage_N + 1];  /* (mr + 1), mr */
-	double m_s[_storage_N];     /* mr + 1 */
-	double * RESTRICT m_v[_storage_N + 1];      /*(mr + 1), n */
+	nl_double m_c[_storage_N + 1];  /* mr + 1 */
+	nl_double m_g[_storage_N + 1];  /* mr + 1 */
+	nl_double * RESTRICT m_ht[_storage_N + 1];  /* (mr + 1), mr */
+	nl_double m_s[_storage_N];     /* mr + 1 */
+	nl_double * RESTRICT m_v[_storage_N + 1];      /*(mr + 1), n */
 	//double m_y[_storage_N];       /* mr + 1 */
 
-	double m_accuracy_mult; // FXIME: Save state
+	nl_double m_accuracy_mult; // FXIME: Save state
 };
 
 // ----------------------------------------------------------------------------------------
@@ -190,7 +190,9 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 #if 1
-	int mr = std::min((int) iN-1,(int) sqrt(iN));
+	int mr = _storage_N;
+	if (_storage_N > 3 )
+		mr = (int) sqrt(iN);
 	mr = std::min(mr, this->m_params.m_gs_loops);
 	int iter = 4;
 	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
@@ -214,11 +216,10 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 
 	if (newton_raphson)
 	{
-		double err = 0;
+		nl_double err = 0;
 		for (unsigned k = 0; k < iN; k++)
 			err = std::max(nl_math::abs(l_V[k] - new_V[k]), err);
 
-		//printf("here %s\n", this->name().cstr());
 		for (unsigned k = 0; k < iN; k++)
 			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
 		if (err > accuracy)
@@ -234,7 +235,7 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 	}
 }
 
-static inline void givens_mult( const double c, const double s, double * RESTRICT g0, double * RESTRICT g1 )
+static inline void givens_mult( const nl_double c, const nl_double s, nl_double * RESTRICT g0, nl_double * RESTRICT g1 )
 {
 	const double tg0 = c * *g0 - s * *g1;
 	const double tg1 = s * *g0 + c * *g1;
@@ -244,7 +245,7 @@ static inline void givens_mult( const double c, const double s, double * RESTRIC
 }
 
 template <unsigned m_N, unsigned _storage_N>
-int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x, double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, double accuracy)
+int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (nl_double * RESTRICT x, nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy)
 {
 	/*-------------------------------------------------------------------------
 	 * The code below was inspired by code published by John Burkardt under
@@ -289,15 +290,13 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 		 * differently: The invest doesn't pay off.
 		 * Therefore we use the approach in the else part.
 		 */
-		double t[_storage_N];
-		double Ax[_storage_N];
+		nl_double t[_storage_N];
+		nl_double Ax[_storage_N];
 		vec_set(n, accuracy, t);
 		mat.mult_vec(m_A, t, Ax);
 		mat.solveLUx(m_LU, Ax);
 
-		const double rho_to_accuracy = std::sqrt(vecmult2(n, Ax)) / accuracy;
-
-		//printf("rho/accuracy = %f\n", rho_to_accuracy);
+		const nl_double rho_to_accuracy = std::sqrt(vecmult2(n, Ax)) / accuracy;
 
 		rho_delta = accuracy * rho_to_accuracy;
 	}
@@ -307,11 +306,11 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 	for (unsigned itr = 0; itr < restart_max; itr++)
 	{
 		unsigned last_k = mr;
-		double mu;
-		double rho;
+		nl_double mu;
+		nl_double rho;
 
-		double Ax[_storage_N];
-		double residual[_storage_N];
+		nl_double Ax[_storage_N];
+		nl_double residual[_storage_N];
 
 		mat.mult_vec(m_A, x, Ax);
 
@@ -324,13 +323,13 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 
 		rho = std::sqrt(vecmult2(n, residual));
 
-		vec_mult_scalar(n, residual, 1.0 / rho, m_v[0]);
+		vec_mult_scalar(n, residual, NL_FCONST(1.0) / rho, m_v[0]);
 
-		vec_set(mr+1, 0.0, m_g);
+		vec_set(mr+1, NL_FCONST(0.0), m_g);
 		m_g[0] = rho;
 
 		for (unsigned i = 0; i < mr; i++)
-			vec_set(mr + 1, 0.0, m_ht[i]);
+			vec_set(mr + 1, NL_FCONST(0.0), m_ht[i]);
 
 		for (unsigned k = 0; k < mr; k++)
 		{
@@ -349,7 +348,7 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 			m_ht[k1][k] = std::sqrt(vecmult2(n, m_v[k1]));
 
 			if (m_ht[k1][k] != 0.0)
-				vec_scale(n, m_v[k1], 1.0 / m_ht[k1][k]);
+				vec_scale(n, m_v[k1], NL_FCONST(1.0) / m_ht[k1][k]);
 
 			for (unsigned j = 0; j < k; j++)
 				givens_mult(m_c[j], m_s[j], &m_ht[j][k], &m_ht[j+1][k]);
@@ -378,7 +377,7 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 			/* didn't converge within accuracy */
 			last_k = mr - 1;
 
-		double m_y[_storage_N + 1];
+		nl_double m_y[_storage_N + 1];
 
 		/* Solve the system H * y = g */
 		/* x += m_v[j] * m_y[j]       */

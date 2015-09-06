@@ -14,8 +14,8 @@
 
 #include <algorithm>
 
-#include "../solver/nld_ms_direct.h"
-#include "../solver/nld_solver.h"
+#include "solver/nld_ms_direct.h"
+#include "solver/nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -143,7 +143,7 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 
 	do {
 		resched = false;
-		double err = 0;
+		nl_double err = 0;
 		for (unsigned k = 0; k < iN; k++)
 		{
 			const int * RESTRICT net_other = this->m_terms[k]->net_other();

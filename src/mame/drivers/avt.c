@@ -962,7 +962,7 @@ ROM_END
 *********************************************/
 
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY                      FULLNAME            FLAGS */
-GAME( 1985, avtsym14, 0,        avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 1.4)", GAME_NOT_WORKING )
-GAME( 1985, avtsym25, avtsym14, avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 2.5)", GAME_NOT_WORKING )
-GAME( 1985, avtbingo, 0,        avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "Arrow Bingo",       GAME_NOT_WORKING )
-GAME( 1989, avtnfl,   0,        avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "NFL (ver 109)",     GAME_NOT_WORKING )
+GAME( 1985, avtsym14, 0,        avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 1.4)", MACHINE_NOT_WORKING )
+GAME( 1985, avtsym25, avtsym14, avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 2.5)", MACHINE_NOT_WORKING )
+GAME( 1985, avtbingo, 0,        avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "Arrow Bingo",       MACHINE_NOT_WORKING )
+GAME( 1989, avtnfl,   0,        avt,      symbols, driver_device,  0,    ROT0, "Advanced Video Technology", "NFL (ver 109)",     MACHINE_NOT_WORKING )

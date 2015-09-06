@@ -57,17 +57,17 @@
 #ifndef NLD_7493_H_
 #define NLD_7493_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_7493(_name, _CLKA, _CLKB, _R1, _R2)                                     \
-		NET_REGISTER_DEV(7493, _name)                                               \
+		NET_REGISTER_DEV(TTL_7493, _name)                                               \
 		NET_CONNECT(_name, CLKA, _CLKA)                                             \
 		NET_CONNECT(_name, CLKB, _CLKB)                                             \
 		NET_CONNECT(_name, R1,  _R1)                                                \
 		NET_CONNECT(_name, R2,  _R2)
 
 #define TTL_7493_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7493_dip, _name)
+		NET_REGISTER_DEV(TTL_7493_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

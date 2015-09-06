@@ -359,5 +359,5 @@ ROM_START( ddayc )
 ROM_END
 
 
-GAME( 1982, dday,  0,    dday, dday, driver_device,  0, ROT0, "Olympia", "D-Day", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1982, ddayc, dday, dday, ddayc, driver_device, 0, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, dday,  0,    dday, dday, driver_device,  0, ROT0, "Olympia", "D-Day", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, ddayc, dday, dday, ddayc, driver_device, 0, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

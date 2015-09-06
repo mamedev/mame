@@ -1144,4 +1144,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       adam,       driver_device,  0,      "Coleco",       "Adam",             GAME_SUPPORTS_SAVE )
+COMP( 1982, adam,       0,          coleco, adam,       adam,       driver_device,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )

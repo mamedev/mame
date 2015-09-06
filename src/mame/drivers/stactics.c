@@ -347,4 +347,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, stactics, 0, stactics, stactics, driver_device, 0, ORIENTATION_FLIP_X, "Sega", "Space Tactics", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_stactics )
+GAMEL( 1981, stactics, 0, stactics, stactics, driver_device, 0, ORIENTATION_FLIP_X, "Sega", "Space Tactics", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_stactics )

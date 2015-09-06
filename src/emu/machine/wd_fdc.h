@@ -179,7 +179,7 @@ public:
 	void hlt_w(bool state);
 
 	bool enp_r();
-        
+
 	void index_callback(floppy_image_device *floppy, int state);
 
 protected:
@@ -322,7 +322,7 @@ private:
 		WRITE_BYTE,
 		WRITE_BYTE_DONE,
 		WRITE_SECTOR_PRE,
-		WRITE_SECTOR_PRE_BYTE,
+		WRITE_SECTOR_PRE_BYTE
 	};
 
 	struct live_info {

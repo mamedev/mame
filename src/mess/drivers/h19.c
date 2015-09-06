@@ -449,4 +449,4 @@ ROM_END
 /* Driver (year is either 1978 or 1979) */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1978, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", GAME_NOT_WORKING )
+COMP( 1978, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", MACHINE_NOT_WORKING )

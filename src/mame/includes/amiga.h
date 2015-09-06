@@ -352,6 +352,7 @@ public:
 	m_p1_mouse_y(*this, "p1_mouse_y"),
 	m_p2_mouse_x(*this, "p2_mouse_x"),
 	m_p2_mouse_y(*this, "p2_mouse_y"),
+	m_hvpos(*this, "HVPOS"),
 	m_chip_ram_mask(0),
 	m_cia_0_irq(0),
 	m_cia_1_irq(0),
@@ -580,6 +581,7 @@ protected:
 	optional_ioport m_p1_mouse_y;
 	optional_ioport m_p2_mouse_x;
 	optional_ioport m_p2_mouse_y;
+	optional_ioport m_hvpos;
 
 	memory_array m_chip_ram;
 	UINT32 m_chip_ram_mask;
@@ -660,6 +662,8 @@ private:
 	void serial_adjust();
 	void serial_shift();
 	void rx_write(amiga_state *state, int level);
+
+	UINT32 amiga_gethvpos();
 };
 
 
@@ -675,7 +679,6 @@ extern const UINT16 amiga_expand_byte[256];
 void amiga_copper_setpc(running_machine &machine, UINT32 pc);
 int amiga_copper_execute_next(running_machine &machine, int xpos);
 
-UINT32 amiga_gethvpos(screen_device &screen);
 void amiga_set_genlock_color(running_machine &machine, UINT16 color);
 void amiga_sprite_dma_reset(running_machine &machine, int which);
 void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable);

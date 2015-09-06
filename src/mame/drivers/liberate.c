@@ -237,7 +237,7 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
  *************************************/
 
 static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8, liberate_state )
-	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
@@ -836,6 +836,7 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prosport)
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 
@@ -1293,14 +1294,14 @@ DRIVER_INIT_MEMBER(liberate_state,liberate)
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Soccer", GAME_SUPPORTS_SAVE )
-GAME( 1983, prosport,  0,        prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, prosporta, prosport, prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation (Digital Controls license)", "Pro Sports - Bowling, Tennis, and Golf (USA)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, boomrang,  0,        boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, boomranga, boomrang, boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kamikcab,  0,        boomrang,  kamikcab, liberate_state, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", GAME_SUPPORTS_SAVE )
-GAME( 1984, yellowcbj, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, yellowcbb, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1984, liberate,  0,        liberate,  liberate, liberate_state, liberate, ROT270, "Data East Corporation", "Liberation", GAME_SUPPORTS_SAVE )
-GAME( 1984, dualaslt,  liberate, liberate,  dualaslt, liberate_state, liberate, ROT270, "Data East USA",         "Dual Assault", GAME_SUPPORTS_SAVE )
-GAME( 1984, liberateb, liberate, liberatb,  liberatb, liberate_state, prosport, ROT270, "bootleg",               "Liberation (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Soccer", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosport,  0,        prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosporta, prosport, prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation (Digital Controls license)", "Pro Sports - Bowling, Tennis, and Golf (USA)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boomrang,  0,        boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boomranga, boomrang, boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kamikcab,  0,        boomrang,  kamikcab, liberate_state, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, yellowcbj, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, yellowcbb, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, liberate,  0,        liberate,  liberate, liberate_state, liberate, ROT270, "Data East Corporation", "Liberation", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dualaslt,  liberate, liberate,  dualaslt, liberate_state, liberate, ROT270, "Data East USA",         "Dual Assault", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, liberateb, liberate, liberatb,  liberatb, liberate_state, prosport, ROT270, "bootleg",               "Liberation (bootleg)", MACHINE_SUPPORTS_SAVE )

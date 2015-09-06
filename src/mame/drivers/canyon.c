@@ -318,5 +318,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, canyon,  0,      canyon, canyon, driver_device, 0, ROT0, "Atari", "Canyon Bomber", GAME_SUPPORTS_SAVE )
-GAME( 1977, canyonp, canyon, canyon, canyon, driver_device, 0, ROT0, "Atari", "Canyon Bomber (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1977, canyon,  0,      canyon, canyon, driver_device, 0, ROT0, "Atari", "Canyon Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, canyonp, canyon, canyon, canyon, driver_device, 0, ROT0, "Atari", "Canyon Bomber (prototype)", MACHINE_SUPPORTS_SAVE )

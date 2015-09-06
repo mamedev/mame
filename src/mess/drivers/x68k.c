@@ -814,7 +814,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 	{
 	case 0x00:
 		m_sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
-		// TODO: implement a decent, not slow, brightness control
+		m_screen->set_brightness(m_sysport.contrast * 0x11);
 		break;
 	case 0x01:
 		m_sysport.monitor = data & 0x08;
@@ -1848,7 +1848,7 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME        FLAGS */
-COMP( 1987, x68000, 0,      0,      x68000, x68000, x68k_state, x68000, "Sharp",    "X68000", GAME_IMPERFECT_GRAPHICS )
-COMP( 1990, x68ksupr,x68000, 0,     x68ksupr,x68000, x68k_state,x68000, "Sharp",    "X68000 Super", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68k_state, x68kxvi,"Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68k_state, x68030, "Sharp",    "X68030", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+COMP( 1987, x68000, 0,      0,      x68000, x68000, x68k_state, x68000, "Sharp",    "X68000", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, x68ksupr,x68000, 0,     x68ksupr,x68000, x68k_state,x68000, "Sharp",    "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68k_state, x68kxvi,"Sharp",    "X68000 XVI", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68k_state, x68030, "Sharp",    "X68030", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

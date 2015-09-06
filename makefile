@@ -60,6 +60,7 @@
 # USE_SYSTEM_LIB_LUA = 1
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
+# USE_SYSTEM_LIB_PORTAUDIO = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -90,6 +91,8 @@
 # QT_HOME = /usr/lib64/qt48/
 
 # DRIVERS = src/mame/drivers/1942.c,src/mame/drivers/cops.c
+
+# FORCE_VERSION_COMPILE = 1
 
 -include useroptions.mak
 
@@ -142,6 +145,10 @@ GENIEOS := darwin
 endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
+endif
+ifeq ($(firstword $(filter OS/2,$(UNAME))),OS/2)
+OS := os2
+GENIEOS := os2
 endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
@@ -239,6 +246,7 @@ endif
 endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
+ARCHITECTURE :=
 ifndef NOASM
 	NOASM := 1
 endif
@@ -295,11 +303,19 @@ ifeq ($(TARGETOS),freebsd)
 OSD := sdl
 endif
 
+ifeq ($(TARGETOS),netbsd)
+OSD := sdl
+endif
+
 ifeq ($(TARGETOS),solaris)
 OSD := sdl
 endif
 
 ifeq ($(TARGETOS),macosx)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),os2)
 OSD := sdl
 endif
 endif
@@ -334,6 +350,10 @@ endif
 
 ifndef USE_SYSTEM_LIB_PORTMIDI
 PARAMS += --with-bundled-portmidi
+endif
+
+ifndef USE_SYSTEM_LIB_PORTAUDIO
+PARAMS += --with-bundled-portaudio
 endif
 
 #-------------------------------------------------
@@ -612,6 +632,10 @@ ifdef DRIVERS
 PARAMS += --DRIVERS='$(DRIVERS)'
 endif
 
+ifdef FORCE_VERSION_COMPILE
+PARAMS += --FORCE_VERSION_COMPILE='$(FORCE_VERSION_COMPILE)'
+endif
+
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
@@ -666,6 +690,9 @@ endif
 ifeq (/bin,$(findstring /bin,$(SHELL)))
   SHELLTYPE := posix
 endif
+ifeq (/bin,$(findstring /bin,$(MAKESHELL)))
+  SHELLTYPE := posix
+endif
 
 ifeq (posix,$(SHELLTYPE))
   MKDIR = $(SILENT) mkdir -p "$(1)"
@@ -691,7 +718,7 @@ CHECK_CLANG      :=
 else
 GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
 ifneq ($(OS),solaris)
-CLANG_VERSION    := $(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
+CLANG_VERSION    := $(shell clang --version  2> /dev/null | head -n 1 | grep '[0-9]\.[0-9]' -o | tail -n 1)
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
@@ -898,12 +925,13 @@ $(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS) $(GENIE)
 linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
 
-.PHONY: linux
-linux: linux_x86
-
 .PHONY: linux_x86
 linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
+
+.PHONY: linux
+linux: generate $(PROJECTDIR)/gmake-linux/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-linux-clang
@@ -997,6 +1025,42 @@ freebsd: freebsd_x86
 .PHONY: freebsd_x86
 freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# gmake-netbsd
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-netbsd/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=netbsd --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: netbsd_x64
+netbsd_x64: generate $(PROJECTDIR)/gmake-netbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)64
+
+.PHONY: netbsd
+netbsd: netbsd_x86
+
+.PHONY: netbsd_x86
+netbsd_x86: generate $(PROJECTDIR)/gmake-netbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# gmake-os2
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-os2/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=os2 --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: os2
+os2: os2_x86
+
+.PHONY: os2_x86
+os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-os2 config=$(CONFIG)32
 
 
 #-------------------------------------------------

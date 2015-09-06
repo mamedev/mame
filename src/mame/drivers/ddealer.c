@@ -143,7 +143,6 @@ public:
 	required_shared_ptr<UINT16> m_back_vram;
 	required_shared_ptr<UINT16> m_work_ram;
 	required_shared_ptr<UINT16> m_mcu_shared_ram;
-//  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_back_tilemap;
@@ -480,7 +479,7 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("UNK")
 	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8("ymsnd", ym2203_device, write, 0x00ff) // ym ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette ram
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_SHARE("vregs") // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
@@ -697,4 +696,4 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", GAME_SUPPORTS_SAVE )
+GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE )

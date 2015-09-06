@@ -845,7 +845,7 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME                    FLAGS */
-COMP( 1987, jtc,        0,       0,     jtc,    jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr",               GAME_NOT_WORKING )
-COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", GAME_NOT_WORKING )
-COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      GAME_NOT_WORKING )
-COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      GAME_NOT_WORKING )
+COMP( 1987, jtc,        0,       0,     jtc,    jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
+COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
+COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
+COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )

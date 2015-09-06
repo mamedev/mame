@@ -595,13 +595,15 @@ bool samples_device::read_flac_sample(emu_file &file, sample_t &sample)
 //-------------------------------------------------
 //  load_samples - load all the samples in our
 //  attached interface
+//  Returns true when all samples were successfully read, else false
 //-------------------------------------------------
 
-void samples_device::load_samples()
+bool samples_device::load_samples()
 {
+	bool ok = true;
 	// if the user doesn't want to use samples, bail
 	if (!machine().options().samples())
-		return;
+		return false;
 
 	// iterate over ourself
 	const char *basename = machine().basename();
@@ -631,6 +633,10 @@ void samples_device::load_samples()
 		if (filerr == FILERR_NONE)
 			read_sample(file, m_sample[index]);
 		else if (filerr == FILERR_NOT_FOUND)
-			osd_printf_warning("Sample '%s' NOT FOUND\n", samplename);
+		{
+			logerror("%s: Sample '%s' NOT FOUND\n", tag(), samplename);
+			ok = false;
+		}
 	}
+	return ok;
 }

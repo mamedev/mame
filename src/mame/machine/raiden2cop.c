@@ -997,7 +997,7 @@ void raiden2cop_device::LEGACY_execute_130e(address_space &space, int offset, UI
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
 		if (dx < 0)
 			cop_angle += 0x80;
 	}
@@ -1020,7 +1020,7 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(address_space &space, int off
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
 		if (dx < 0)
 			cop_angle += 0x80;
 	}
@@ -1057,7 +1057,7 @@ void raiden2cop_device::execute_2288(address_space &space, int offset, UINT16 da
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = atan(double(dx) / double(dy)) * 128 / M_PI;
+		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / M_PI);
 		if (dy < 0)
 			cop_angle += 0x80;
 	}
@@ -1095,7 +1095,7 @@ void raiden2cop_device::execute_338e(address_space &space, int offset, UINT16 da
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = atan(double(dx) / double(dy)) * 128 / M_PI;
+		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / M_PI);
 		if (dy < 0)
 			cop_angle += 0x80;
 	}
@@ -1553,7 +1553,7 @@ void raiden2cop_device::LEGACY_execute_e30e(address_space &space, int offset, UI
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
 		if (dx < 0)
 			cop_angle += 0x80;
 	}

@@ -42,7 +42,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_PALETTE_INIT(lola8a);
 	virtual void machine_reset() { m_maincpu->set_pc(0x8000); }
 
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
@@ -187,20 +186,9 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 INPUT_PORTS_END
 
-
-PALETTE_INIT_MEMBER(lola8a_state, lola8a)
-{
-	int i;
-
-	for(i=0;i<8;i++) {
-		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
-	}
-}
-
 MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	for (int sx = 0; sx < x_count; sx++)
 	{
@@ -211,7 +199,7 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 		{
 			int color = BIT(code, 7-x) ? 7 : 0;
 			if (cursor_x==sx) color = 7;
-			bitmap.pix32(y, x + sx*8) = palette[color];
+			bitmap.pix32(y, x + sx*8) = m_palette->pen_color(color);
 		}
 	}
 }
@@ -285,8 +273,7 @@ static MACHINE_CONFIG_START( lola8a, lola8a_state )
 	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(lola8a_state, crtc_vsync))
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(lola8a_state, lola8a)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -305,4 +292,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, lola8a,  0,       0,    lola8a,     lola8a,  driver_device,  0,      "Institut Ivo Lola Ribar",   "Lola 8A",        GAME_NOT_WORKING)
+COMP( 1986, lola8a,  0,       0,    lola8a,     lola8a,  driver_device,  0,      "Institut Ivo Lola Ribar",   "Lola 8A",        MACHINE_NOT_WORKING)

@@ -115,7 +115,6 @@ public:
 	DECLARE_DRIVER_INIT(p7_raster);
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(pasopia7);
-	DECLARE_PALETTE_INIT(p7_raster);
 	DECLARE_PALETTE_INIT(p7_lcd);
 	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -889,14 +888,6 @@ void pasopia7_state::machine_reset()
 	m_nmi_reset |= 4;
 }
 
-PALETTE_INIT_MEMBER(pasopia7_state,p7_raster)
-{
-	int i;
-
-	for( i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-}
-
 /* TODO: palette values are mostly likely to be wrong in there */
 PALETTE_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
@@ -979,8 +970,7 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_raster)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
@@ -1072,5 +1062,5 @@ DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 
 /* Driver */
 
-COMP( 1983, pasopia7,    0,        0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", GAME_NOT_WORKING )
-COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1983, pasopia7,    0,        0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
+COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

@@ -84,7 +84,7 @@ public:
 		SPORT_TIMER_COUNTER =   0x45,
 		SPORT_TIMER_PERIOD  =   0x46,
 		SPORT_DATA_TX       =   0x48,
-		SPORT_DATA_RX       =   0x4c,
+		SPORT_DATA_RX       =   0x4c
 	};
 
 	enum irq_status
@@ -93,7 +93,7 @@ public:
 		IRQ_UART    = 2,
 		IRQ_DSP     = 4,
 		IRQ_VBLANK  = 5,
-		IRQ_SCSI    = 7,
+		IRQ_SCSI    = 7
 	};
 
 	required_device<cpu_device>     m_maincpu;
@@ -955,4 +955,4 @@ ROM_END
  *************************************/
 
 GAME( 1994, rotr, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
-GAME( 1997, fbcrazy, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM", "Football Crazy (Video Quiz)", GAME_NOT_WORKING )
+GAME( 1997, fbcrazy, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM", "Football Crazy (Video Quiz)", MACHINE_NOT_WORKING )

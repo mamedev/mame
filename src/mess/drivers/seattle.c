@@ -124,4 +124,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY            FULLNAME       FLAGS */
-COMP( 1986, seattle, 0,      0,       seattle,  seattle, driver_device,  0,  "Seattle Computer", "SCP-300F", GAME_NO_SOUND_HW)
+COMP( 1986, seattle, 0,      0,       seattle,  seattle, driver_device,  0,  "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW)

@@ -988,6 +988,12 @@ static void WRITE_EA_32(m68000_base_device *m68k, int ea, UINT32 data)
 		{
 			switch (reg)
 			{
+				case 0:     // (xxx).W
+				{
+					UINT32 ea = OPER_I_16(m68k);
+					m68ki_write_32(m68k, ea, data);
+					break;
+				}
 				case 1:     // (xxx).L
 				{
 					UINT32 d1 = OPER_I_16(m68k);

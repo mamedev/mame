@@ -480,4 +480,4 @@ DRIVER_INIT_MEMBER(mpf1_state,mpf1)
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1, mpf1_state,  mpf1, "Multitech", "Micro Professor 1", 0)
 COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B", 0)
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", GAME_NOT_WORKING)
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING)

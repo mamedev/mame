@@ -2311,6 +2311,30 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 }
 
 
+void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
+{
+	VPRINTF(("address_space::install_readwrite_bank(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
+				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+				core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
+				(rbank != NULL) ? rbank->tag() : "(none)", (wbank != NULL) ? wbank->tag() : "(none)"));
+
+	// map the read bank
+	if (rbank != NULL)
+	{
+		read().map_range(addrstart, addrend, addrmask, addrmirror, rbank->index());
+	}
+
+	// map the write bank
+	if (wbank != NULL)
+	{
+		write().map_range(addrstart, addrend, addrmask, addrmirror, wbank->index());
+	}
+
+	// update the memory dump
+	generate_memdump(machine());
+}
+
+
 //-------------------------------------------------
 //  install_ram_generic - install a simple fixed
 //  RAM region into the given address space
@@ -2639,7 +2663,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
 		std::string temptag;
 		if (tag == NULL) {
-			strprintf(temptag, "anon_%p", membank);
+			strprintf(temptag, "anon_%p", (void *) membank);
 			tag = temptag.c_str();
 		}
 		manager().m_banklist.append(tag, *membank);
@@ -2788,7 +2812,7 @@ namespace {
 		offs_t start, end;
 		subrange(offs_t _start, offs_t _end) : start(_start), end(_end) {}
 	};
-};
+}
 
 void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
 {

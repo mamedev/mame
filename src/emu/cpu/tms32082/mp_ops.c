@@ -465,6 +465,17 @@ void tms32082_mp_device::execute_short_imm()
 			break;
 		}
 
+		case 0x12:          // and.tf
+		{
+			int rd = OP_RD();
+			int rs = OP_RS();
+			UINT32 imm = OP_UIMM15();
+
+			if (rd)
+				m_reg[rd] = ~m_reg[rs] & imm;
+			break;
+		}
+
 		case 0x14:          // and.ft
 		{
 			int rd = OP_RD();
@@ -681,6 +692,19 @@ void tms32082_mp_device::execute_short_imm()
 			break;
 		}
 
+		case 0x45:          // jsr.a
+		{
+			int link = OP_LINK();
+			int base = OP_BASE();
+			INT32 offset = OP_SIMM15();
+
+			if (link)
+				m_reg[link] = m_fetchpc;
+
+			m_fetchpc = m_reg[base] + offset;
+			break;
+		}
+
 		case 0x48:          // bbz
 		{
 			int bitnum = OP_BITNUM() ^ 0x1f;
@@ -888,6 +912,38 @@ void tms32082_mp_device::execute_reg_long_imm()
 			break;
 		}
 
+		case 0x1a:          // shift.es
+		{
+			int r = (m_ir & (1 << 10));
+			int inv = (m_ir & (1 << 11));
+			int rot = m_reg[OP_ROTATE()];
+			int end = OP_ENDMASK();
+			UINT32 source = m_reg[OP_RS()];
+			int rd = OP_RD();
+
+			UINT32 endmask = end ? SHIFT_MASK[end ? end : 32] : m_reg[OP_ROTATE()+1];
+			if (inv) endmask = ~endmask;
+
+			int shift = r ? 32-rot : rot;
+			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
+			UINT32 compmask = endmask & shiftmask;
+
+			UINT32 res = 0;
+			if (r)      // right
+			{
+				res = ROTATE_R(source, rot) & compmask;
+				res = SIGN_EXTEND(res, rot);
+			}
+			else        // left
+			{
+				res = ROTATE_L(source, rot) & compmask;
+			}
+
+			if (rd)
+				m_reg[rd] = res;
+			break;
+		}
+
 		case 0x1c:          // shift.iz
 		{
 			int r = (m_ir & (1 << 10));
@@ -962,6 +1018,17 @@ void tms32082_mp_device::execute_reg_long_imm()
 
 			if (rd)
 				m_reg[rd] = m_reg[rs] | (has_imm ? imm32 : m_reg[OP_SRC1()]);
+			break;
+		}
+
+		case 0x3a:
+		case 0x3b:          // or.ft
+		{
+			int rd = OP_RD();
+			int rs = OP_RS();
+
+			if (rd)
+				m_reg[rd] = m_reg[rs] | ~(has_imm ? imm32 : m_reg[OP_SRC1()]);
 			break;
 		}
 

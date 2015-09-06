@@ -1341,11 +1341,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1988, idolmj,    0,       idolmj,   idolmj, driver_device,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mjnatsu,   0,       fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mfunclub,  0,       fromance, mfunclub, driver_device, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, daiyogen,  0,       fromance, daiyogen, driver_device, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, nmsengen,  0,       fromance, nmsengen, driver_device, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, fromance,  0,       fromance, fromance, driver_device, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, idolmj,    0,       idolmj,   idolmj, driver_device,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjnatsu,   0,       fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mfunclub,  0,       fromance, mfunclub, driver_device, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, daiyogen,  0,       fromance, daiyogen, driver_device, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, nmsengen,  0,       fromance, nmsengen, driver_device, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, fromance,  0,       fromance, fromance, driver_device, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )

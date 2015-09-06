@@ -113,7 +113,32 @@ public:
 		m_mc6846(*this, "mc6846"),
 		m_mc6843(*this, "mc6843"),
 		m_acia6850(*this, "acia6850"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_io_game_port_directions(*this, "game_port_directions"),
+		m_io_game_port_buttons(*this, "game_port_buttons"),
+		m_io_mouse_x(*this, "mouse_x"),
+		m_io_mouse_y(*this, "mouse_y"),
+		m_io_mouse_button(*this, "mouse_button"),
+		m_io_lightpen_x(*this, "lightpen_x"),
+		m_io_lightpen_y(*this, "lightpen_y"),
+		m_io_lightpen_button(*this, "lightpen_button"),
+		m_io_config(*this, "config"),
+		m_io_vconfig(*this, "vconfig"),
+		m_io_mconfig(*this, "mconfig"),
+		m_io_fconfig(*this, "fconfig"),
+		m_io_keyboard(*this, "keyboard"),
+		m_vrambank(*this, THOM_VRAM_BANK),
+		m_cartbank(*this, THOM_CART_BANK),
+		m_rambank(*this, THOM_RAM_BANK),
+		m_flopbank(*this, THOM_FLOP_BANK),
+		m_basebank(*this, THOM_BASE_BANK),
+		m_syslobank(*this, TO8_SYS_LO),
+		m_syshibank(*this, TO8_SYS_HI),
+		m_datalobank(*this, TO8_DATA_LO),
+		m_datahibank(*this, TO8_DATA_HI),
+		m_biosbank(*this, TO8_BIOS_BANK),
+		m_cartlobank(*this, MO6_CART_LO),
+		m_carthibank(*this, MO6_CART_HI)
 	{
 	}
 
@@ -347,6 +372,31 @@ protected:
 	optional_device<mc6843_device> m_mc6843;
 	optional_device<acia6850_device> m_acia6850;
 	required_device<screen_device> m_screen;
+	required_ioport m_io_game_port_directions;
+	required_ioport m_io_game_port_buttons;
+	required_ioport m_io_mouse_x;
+	required_ioport m_io_mouse_y;
+	required_ioport m_io_mouse_button;
+	required_ioport m_io_lightpen_x;
+	required_ioport m_io_lightpen_y;
+	required_ioport m_io_lightpen_button;
+	required_ioport m_io_config;
+	required_ioport m_io_vconfig;
+	optional_ioport m_io_mconfig;
+	required_ioport m_io_fconfig;
+	required_ioport_array<10> m_io_keyboard;
+	required_memory_bank m_vrambank;
+	optional_memory_bank m_cartbank;
+	optional_memory_bank m_rambank;
+	required_memory_bank m_flopbank;
+	required_memory_bank m_basebank;
+	required_memory_bank m_syslobank;
+	optional_memory_bank m_syshibank;
+	optional_memory_bank m_datalobank;
+	optional_memory_bank m_datahibank;
+	optional_memory_bank m_biosbank;
+	optional_memory_bank m_cartlobank;
+	optional_memory_bank m_carthibank;
 
 	/* bank logging and optimisations */
 	int m_old_cart_bank;

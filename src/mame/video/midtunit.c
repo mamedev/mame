@@ -296,26 +296,16 @@ READ16_MEMBER(midtunit_state::midwunit_control_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midtunit_state::midtunit_paletteram_w)
-{
-	//int newword;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	//newword = m_generic_paletteram_16[offset];
-	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
-
-
 WRITE16_MEMBER(midtunit_state::midxunit_paletteram_w)
 {
 	if (!(offset & 1))
-		midtunit_paletteram_w(space, offset / 2, data, mem_mask);
+		m_palette->write(space, offset / 2, data, mem_mask);
 }
 
 
 READ16_MEMBER(midtunit_state::midxunit_paletteram_r)
 {
-	return m_generic_paletteram_16[offset / 2];
+	return m_palette->read(space, offset / 2, mem_mask);
 }
 
 

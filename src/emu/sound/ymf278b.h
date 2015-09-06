@@ -25,11 +25,14 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	void ymf262_update_request();
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_stop();
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -131,6 +134,11 @@ private:
 	direct_read_data * m_direct;
 	const address_space_config m_space_config;
 	devcb_write_line m_irq_handler;
+	UINT8 m_last_fm_data;
+
+	// ymf262
+	void *m_ymf262;
+	sound_stream * m_stream_ymf262;
 };
 
 extern const device_type YMF278B;

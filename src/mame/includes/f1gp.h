@@ -54,7 +54,6 @@ public:
 
 
 	UINT16 *  m_zoomdata;
-//      UINT16 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t   *m_fg_tilemap;

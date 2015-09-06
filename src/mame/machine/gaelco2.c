@@ -155,7 +155,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_coin2_w)
 	coin_counter_w(machine(), offset & 0x01,  data & 0x01);
 }
 
-WRITE16_MEMBER(gaelco2_state::wrally2_coin_w)
+WRITE16_MEMBER(wrally2_state::wrally2_coin_w)
 {
 	/* coin counters */
 	coin_counter_w(machine(), (offset >> 3) & 0x01,  data & 0x01);
@@ -178,17 +178,17 @@ WRITE16_MEMBER(gaelco2_state::touchgo_coin_w)
 ***************************************************************************/
 
 
-DRIVER_INIT_MEMBER(gaelco2_state,bang)
+DRIVER_INIT_MEMBER(bang_state,bang)
 {
 	m_clr_gun_int = 0;
 }
 
-WRITE16_MEMBER(gaelco2_state::bang_clr_gun_int_w)
+WRITE16_MEMBER(bang_state::bang_clr_gun_int_w)
 {
 	m_clr_gun_int = 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(gaelco2_state::bang_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 {
 	int scanline = param;
 
@@ -218,14 +218,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco2_state::bang_irq)
 ***************************************************************************/
 
 
-CUSTOM_INPUT_MEMBER(gaelco2_state::wrally2_analog_bit_r)
+CUSTOM_INPUT_MEMBER(wrally2_state::wrally2_analog_bit_r)
 {
 	int which = (FPTR)param;
 	return (m_analog_ports[which] >> 7) & 0x01;
 }
 
 
-WRITE16_MEMBER(gaelco2_state::wrally2_adc_clk)
+WRITE16_MEMBER(wrally2_state::wrally2_adc_clk)
 {
 	/* a zero/one combo is written here to clock the next analog port bit */
 	if (ACCESSING_BITS_0_7)
@@ -241,15 +241,15 @@ WRITE16_MEMBER(gaelco2_state::wrally2_adc_clk)
 }
 
 
-WRITE16_MEMBER(gaelco2_state::wrally2_adc_cs)
+WRITE16_MEMBER(wrally2_state::wrally2_adc_cs)
 {
 	/* a zero is written here to read the analog ports, and a one is written when finished */
 	if (ACCESSING_BITS_0_7)
 	{
 		if (!(data & 0xff))
 		{
-			m_analog_ports[0] = ioport("ANALOG0")->read_safe(0);
-			m_analog_ports[1] = ioport("ANALOG1")->read_safe(0);
+			m_analog_ports[0] = m_analog0->read();
+			m_analog_ports[1] = m_analog1->read();
 		}
 	}
 	else

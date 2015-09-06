@@ -61,7 +61,9 @@ public:
 	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mboard_state(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_beep(*this, "beeper")
+	m_beep(*this, "beeper"),
+	m_line0(*this, "LINE0"),
+	m_line1(*this, "LINE1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -89,6 +91,8 @@ public:
 	DECLARE_MACHINE_START(dallas32);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
+	required_ioport m_line0;
+	required_ioport m_line1;
 };
 
 
@@ -126,10 +130,10 @@ READ16_MEMBER( glasgow_state::glasgow_keys_r )
 	/* See if any keys pressed */
 	data = 3;
 
-	if (mboard_key_select == ioport("LINE0")->read())
+	if (mboard_key_select == m_line0->read())
 		data &= 1;
 
-	if (mboard_key_select == ioport("LINE1")->read())
+	if (mboard_key_select == m_line1->read())
 		data &= 2;
 
 	return data << 8;
@@ -188,9 +192,9 @@ READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 	UINT16 data;
 
 	if (mboard_key_selector == 0)
-		data = ioport("LINE0")->read();
+		data = m_line0->read();
 	else
-		data = ioport("LINE1")->read();
+		data = m_line1->read();
 
 	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, mboard_key_selector);
 	data <<= 8;
@@ -251,10 +255,10 @@ READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 	UINT32 data;
 
 	if (mboard_key_selector == 0)
-		data = ioport("LINE0")->read();
+		data = m_line0->read();
 	else
-		data = ioport("LINE1")->read();
-	//if (mboard_key_selector == 1) data = machine.root_device().ioport("LINE0")->read(); else data = 0;
+		data = m_line1->read();
+	//if (mboard_key_selector == 1) data = m_line0->read(); else data = 0;
 	if(data)
 		logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
 	data <<= 24;
@@ -399,113 +403,16 @@ static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( board )
-	PORT_START("LINE2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-
-	PORT_START("LINE10")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)
-
-	PORT_START("B_WHITE")
-	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
-
-	PORT_START("B_BLACK")
-	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
-
-	PORT_START("B_BUTTONS")
-	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-
-INPUT_PORTS_END
+INPUT_PORTS_EXTERN( chessboard);
 
 static INPUT_PORTS_START( oldkeys )
 	PORT_INCLUDE( old_keyboard )
-	PORT_INCLUDE( board )
+	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( newkeys )
 	PORT_INCLUDE( new_keyboard )
-	PORT_INCLUDE( board )
+	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( glasgow, glasgow_state )
@@ -593,10 +500,10 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR, NAME,     PARENT,   COMPAT, MACHINE,     INPUT,          INIT, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", GAME_SUPPORTS_SAVE)
-CONS(  1984, amsterd,  0,        0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     GAME_SUPPORTS_SAVE)
-CONS(  1984, dallas,   glasgow,  0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas",        GAME_SUPPORTS_SAVE)
-CONS(  1984, roma,     amsterd,  0,      glasgow,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma",          GAME_NOT_WORKING)
-CONS(  1984, dallas32, amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", GAME_SUPPORTS_SAVE)
-CONS(  1984, roma32,   amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   GAME_SUPPORTS_SAVE)
-CONS(  1984, dallas16, amsterd,  0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", GAME_SUPPORTS_SAVE)
+CONS(  1984, glasgow,  0,        0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", MACHINE_SUPPORTS_SAVE)
+CONS(  1984, amsterd,  0,        0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE)
+CONS(  1984, dallas,   glasgow,  0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas",        MACHINE_SUPPORTS_SAVE)
+CONS(  1984, roma,     amsterd,  0,      glasgow,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma",          MACHINE_NOT_WORKING)
+CONS(  1984, dallas32, amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", MACHINE_SUPPORTS_SAVE)
+CONS(  1984, roma32,   amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   MACHINE_SUPPORTS_SAVE)
+CONS(  1984, dallas16, amsterd,  0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", MACHINE_SUPPORTS_SAVE)

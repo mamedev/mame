@@ -299,7 +299,7 @@ ROM_END
 
 
 
-GAME( 199?, c3_rtime        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", GAME_IS_SKELETON )
-GAME( 199?, c3_telly        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", GAME_IS_SKELETON )
-GAME( 199?, c3_totp         , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", GAME_IS_SKELETON )
-GAME( 199?, c3_ppays        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", GAME_IS_SKELETON )
+GAME( 199?, c3_rtime        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_telly        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_totp         , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_ppays        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )

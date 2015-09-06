@@ -334,4 +334,4 @@ ROM_START( hp49gp )
 	ROMX_LOAD( "31504.bin", 0x0000, 0x4000, CRC(9c71825e) SHA1(0a12b2b70a8573bc90ab5be06e6b2f814b8544ae), ROM_BIOS(2) )
 ROM_END
 
-COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, hp49gp, "Hewlett Packard", "HP49G+", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, hp49gp, "Hewlett Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

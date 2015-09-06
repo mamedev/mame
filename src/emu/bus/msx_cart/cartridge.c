@@ -10,12 +10,14 @@
 #include "disk.h"
 #include "dooly.h"
 #include "fmpac.h"
+#include "fs_sr022.h"
 #include "halnote.h"
 #include "hfox.h"
 #include "holy_quran.h"
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
+#include "moonsound.h"
 #include "msx_audio.h"
 #include "msxdos2.h"
 #include "nomapper.h"
@@ -38,12 +40,14 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("rtype", MSX_CART_RTYPE)
 	SLOT_INTERFACE_INTERNAL("majutsushi", MSX_CART_MAJUTSUSHI)
 	SLOT_INTERFACE_INTERNAL("fmpac", MSX_CART_FMPAC)
+	SLOT_INTERFACE_INTERNAL("fs_sr022", MSX_CART_FS_SR022)
 	SLOT_INTERFACE_INTERNAL("superloderunner", MSX_CART_SUPERLODERUNNER)
 	SLOT_INTERFACE_INTERNAL("synthesizer", MSX_CART_SYNTHESIZER)
 	SLOT_INTERFACE_INTERNAL("cross_blaim", MSX_CART_CROSSBLAIM)
 	SLOT_INTERFACE_INTERNAL("korean_80in1", MSX_CART_KOREAN_80IN1)
 	SLOT_INTERFACE_INTERNAL("korean_90in1", MSX_CART_KOREAN_90IN1)
 	SLOT_INTERFACE_INTERNAL("korean_126in1", MSX_CART_KOREAN_126IN1)
+	SLOT_INTERFACE_INTERNAL("msxwrite", MSX_CART_MSXWRITE)
 	SLOT_INTERFACE_INTERNAL("sound_snatcher", MSX_CART_SOUND_SNATCHER)
 	SLOT_INTERFACE_INTERNAL("sound_sdsnatch", MSX_CART_SOUND_SDSNATCHER)
 	SLOT_INTERFACE_INTERNAL("msxaud_hxmu900", MSX_CART_MSX_AUDIO_HXMU900)
@@ -61,6 +65,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("disk_fsfd1a", MSX_CART_FSFD1A)
 	SLOT_INTERFACE_INTERNAL("disk_fscf351", MSX_CART_FSCF351)
 	SLOT_INTERFACE("bm_012", MSX_CART_BM_012)
+	SLOT_INTERFACE("moonsound", MSX_CART_MOONSOUND)
 SLOT_INTERFACE_END
 
 

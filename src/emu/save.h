@@ -190,22 +190,22 @@ private:
 
 
 // template specializations to enumerate the fundamental atomic types you are allowed to save
-ALLOW_SAVE_TYPE_AND_ARRAY(char);
+ALLOW_SAVE_TYPE_AND_ARRAY(char)
 ALLOW_SAVE_TYPE          (bool); // std::vector<bool> may be packed internally
-ALLOW_SAVE_TYPE_AND_ARRAY(INT8);
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT8);
-ALLOW_SAVE_TYPE_AND_ARRAY(INT16);
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT16);
-ALLOW_SAVE_TYPE_AND_ARRAY(INT32);
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT32);
-ALLOW_SAVE_TYPE_AND_ARRAY(INT64);
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT64);
-ALLOW_SAVE_TYPE_AND_ARRAY(PAIR);
-ALLOW_SAVE_TYPE_AND_ARRAY(PAIR64);
-ALLOW_SAVE_TYPE_AND_ARRAY(float);
-ALLOW_SAVE_TYPE_AND_ARRAY(double);
-ALLOW_SAVE_TYPE_AND_ARRAY(endianness_t);
-ALLOW_SAVE_TYPE_AND_ARRAY(rgb_t);
+ALLOW_SAVE_TYPE_AND_ARRAY(INT8)
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT8)
+ALLOW_SAVE_TYPE_AND_ARRAY(INT16)
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT16)
+ALLOW_SAVE_TYPE_AND_ARRAY(INT32)
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT32)
+ALLOW_SAVE_TYPE_AND_ARRAY(INT64)
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT64)
+ALLOW_SAVE_TYPE_AND_ARRAY(PAIR)
+ALLOW_SAVE_TYPE_AND_ARRAY(PAIR64)
+ALLOW_SAVE_TYPE_AND_ARRAY(float)
+ALLOW_SAVE_TYPE_AND_ARRAY(double)
+ALLOW_SAVE_TYPE_AND_ARRAY(endianness_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(rgb_t)
 
 
 
@@ -250,9 +250,9 @@ template<>
 inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, attotime &value, const char *name)
 {
 	std::string tempstr = std::string(name).append(".attoseconds");
-	save_memory(device, module, tag, index, tempstr.c_str(), &value.attoseconds, sizeof(value.attoseconds));
+	save_memory(device, module, tag, index, tempstr.c_str(), &value.m_attoseconds, sizeof(value.m_attoseconds));
 	tempstr.assign(name).append(".seconds");
-	save_memory(device, module, tag, index, tempstr.c_str(), &value.seconds, sizeof(value.seconds));
+	save_memory(device, module, tag, index, tempstr.c_str(), &value.m_seconds, sizeof(value.m_seconds));
 }
 
 

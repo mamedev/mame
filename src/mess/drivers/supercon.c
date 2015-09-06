@@ -22,7 +22,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/beep.h"
-#include "supercon.lh"
 
 
 class supercon_state : public driver_device
@@ -785,13 +784,10 @@ INPUT_PORTS_END
 
 /* Machine driver */
 static MACHINE_CONFIG_START( supercon, supercon_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(supercon_mem)
-
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_supercon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -812,4 +808,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME          PARENT  COMPAT  MACHINE    INPUT       INIT      COMPANY  FULLNAME                     FLAGS */
-CONS( 1983, supercon,     0,      0,      supercon,  supercon, supercon_state,   supercon, "Novag", "SuperConstellation", GAME_SUPPORTS_SAVE)
+CONS( 1983, supercon,     0,      0,      supercon,  supercon, supercon_state,   supercon, "Novag", "SuperConstellation", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

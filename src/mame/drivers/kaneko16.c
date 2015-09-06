@@ -36,6 +36,7 @@ Year + Game                    PCB         Notes
 94  Great 1000 Miles Rally     Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
     Bonk's Adventure           Z09AF-003   TBSOP01 MCU protection (EEPROM handling, 68k code snippet, data)
     Blood Warrior              Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
+    Pack'n Bang Bang           BW-002      (prototype)
 95  Great 1000 Miles Rally 2   M201F00138  TBSOP02 MCU protection (EEPROM handling etc.)
 ----------------------------------------------------------------------------------------
 
@@ -83,6 +84,14 @@ Dip locations verified from manual for:
 [general]
 - interrupt timing/behaviour
 - replace sample bank copying with new ADDRESS MAP system for OKI and do banking like CPUs
+
+Non-Bugs (happen on real PCB)
+
+[packbang]
+ - Game crashes or gives you a corrupt stage if you attempt to continue on a bonus stage (due to buggy prototype code)
+ - Background fading appears inverted, fading to a black screen during levels, this is correct
+ - Some screens shown on the flyer (enemy select etc.) are never shown, the flyer probably shows a different version
+   of the game.  The backgrounds used can be viewed in test mode.
 
 ***************************************************************************/
 
@@ -1428,6 +1437,98 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
+                                Pack'n Bang Bang
+***************************************************************************/
+
+static INPUT_PORTS_START( packbang )
+	PORT_START("P1")        /* 680000.w */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")        /* 680002.w */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")    /* 680000.w */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("UNK")       /* ? - 680006.w */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" ) /* Listed as "Unused" */
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME(       0x04, 0x04, "Timer Speed" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x04, "Standard" )
+	PORT_DIPNAME(       0x18, 0x18, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x00, "Invalid" ) // Japanese text, Korean Kaneko logo 'Unusued' according to test mode
+	PORT_DIPSETTING(    0x08, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( World ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
+
+/***************************************************************************
                                 Shogun Warriors
 ***************************************************************************/
 
@@ -2590,6 +2691,30 @@ ROM_START( berlwallk )
 	ROM_LOAD( "bw_u47.u47", 0x000, 0x0117, NO_DUMP)
 	ROM_LOAD( "bw_u48.u48", 0x200, 0x0117, NO_DUMP)
 	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
+ROM_END
+
+ROM_START( packbang ) /* same PCB as Berlin Wall - BW-002 */
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "bbp0x3.u23", 0x000000, 0x020000, CRC(105e978a) SHA1(d2aa72a25b70726ebe4b16bfe16da149bb37cd85) ) /* hand written checksum on label - 527B */
+	ROM_LOAD16_BYTE( "bbp1x3.u39", 0x000001, 0x020000, CRC(465d36f5) SHA1(d3bc9e5d444e086652d2bc562d9adfb8a1fd0d2d) ) /* hand written checksum on label - C5C8 */
+
+	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "bb.u84",  0x000000, 0x080000, CRC(97837aaa) SHA1(303780621afea01f9e4d1386229c7421307562ec) )
+	ROM_LOAD( "pb_spr_ext_9_20_ver.u83",  0x080000, 0x040000, CRC(666a1217) SHA1(0d7b08d63b229d70b7e9e77a36516a695533c4cb) ) /* hand written label plus checksum BA63 */
+
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_LOAD( "bbbox1.u77",  0x000000, 0x080000, CRC(b2ffd081) SHA1(e4b8b60ed0c5f2e0709477cc840864e1c0a351ea) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
+	ROM_LOAD16_BYTE( "bb.u73",  0x000000, 0x080000, CRC(896d88cb) SHA1(7546e64149d8d8e3425d9112a7a63b2d2e59b8bb) )
+	ROM_LOAD16_BYTE( "bb.u65",  0x000001, 0x080000, CRC(fe17c5b5) SHA1(daea65bd87d2137526250d521f36f122f733fd9d) ) // FIXED BITS (xxxxxxx0)
+	ROM_LOAD16_BYTE( "bb.u74",  0x100000, 0x080000, CRC(b01e77b9) SHA1(73f3adaf6468f4e9c54bff63268af1765cfc5f67) )
+	ROM_LOAD16_BYTE( "bb.u66",  0x100001, 0x080000, CRC(caec5098) SHA1(9966cd643abe498f84a9e01bc32003f4654584de) ) // FIXED BITS (xxxxxxx0)
+	ROM_LOAD16_BYTE( "bb.u75",  0x200000, 0x080000, CRC(5cb4669f) SHA1(ab061f5b34435dca46f710ea8118c919a3a9f87c) )
+	ROM_LOAD16_BYTE( "bb.u67",  0x200001, 0x080000, CRC(ce5c9417) SHA1(30aca496d1f4218b44a32b3630e58889f0c54564) ) // FIXED BITS (xxxxxxx0)
+
+	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 ROM_END
 
 
@@ -3958,33 +4083,32 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 ***************************************************************************/
 
-GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", GAME_SUPPORTS_SAVE )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", GAME_SUPPORTS_SAVE )
-GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall, ROT90, "Kaneko",                 "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
+GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeon,  0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "Atlus",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Explosive Breaker", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
 
+GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmra,    gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmre,    gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmrusa,  gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", MACHINE_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
+GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", GAME_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", GAME_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", GAME_SUPPORTS_SAVE )
-GAME( 1992, blazeon,  0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "Atlus",  "Blaze On (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Explosive Breaker", GAME_SUPPORTS_SAVE )
-GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", GAME_SUPPORTS_SAVE )
-
-GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", GAME_SUPPORTS_SAVE )
-GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", GAME_SUPPORTS_SAVE )
-GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", GAME_SUPPORTS_SAVE )
-GAME( 1994, gtmra,    gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", GAME_SUPPORTS_SAVE )
-GAME( 1994, gtmre,    gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", GAME_SUPPORTS_SAVE )
-GAME( 1994, gtmrusa,  gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", GAME_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
-GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", GAME_SUPPORTS_SAVE )
-GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", GAME_SUPPORTS_SAVE )
-GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", GAME_SUPPORTS_SAVE )
-
-GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", GAME_SUPPORTS_SAVE )
-GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

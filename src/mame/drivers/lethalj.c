@@ -142,7 +142,6 @@ Pin #11(+) | | R               |
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "includes/lethalj.h"
-#include "machine/ticket.h"
 #include "sound/okim6295.h"
 
 
@@ -162,7 +161,7 @@ Pin #11(+) | | R               |
 
 CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 {
-	int value = ioport("PADDLE")->read();
+	int value = m_paddle->read();
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 
@@ -177,14 +176,14 @@ CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
 	coin_counter_w(machine(), 0, data & 1);
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 1) & 1) << 7);
+	m_ticket->write(space, 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 0) & 1) << 7);
+	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
@@ -194,7 +193,7 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 0) & 1) << 7);
+	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);
@@ -682,16 +681,16 @@ MACHINE_CONFIG_END
 
 ROM_START( lethalj )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
-	ROM_LOAD16_BYTE( "vc8",  0x000000, 0x080000, CRC(8d568e1d) SHA1(e4dd3794789f9ccd7be8374978a3336f2b79136f) )
-	ROM_LOAD16_BYTE( "vc9",  0x000001, 0x080000, CRC(8f22add4) SHA1(e773d3ae9cf512810fc266e784d21ed115c8830c) )
+	ROM_LOAD16_BYTE( "lethal_vc8_2.3.vc8",  0x000000, 0x080000, CRC(8d568e1d) SHA1(e4dd3794789f9ccd7be8374978a3336f2b79136f) ) /* Labeled as LETHAL VC8 2.3, also found labeled as VC-8 */
+	ROM_LOAD16_BYTE( "lethal_vc9_2.3.vc9",  0x000001, 0x080000, CRC(8f22add4) SHA1(e773d3ae9cf512810fc266e784d21ed115c8830c) ) /* Labeled as LETHAL VC9 2.3, also found labeled as VC-9 */
 
 	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
-	ROM_LOAD16_BYTE( "gr1",  0x000000, 0x100000, CRC(27f7b244) SHA1(628b29c066e217e1fe54553ea3ed98f86735e262) )
-	ROM_LOAD16_BYTE( "gr2",  0x000001, 0x100000, CRC(1f25d3ab) SHA1(bdb8a3c546cdee9a5630c47b9c5079a956e8a093) )
-	ROM_LOAD16_BYTE( "gr4",  0x200000, 0x100000, CRC(c5838b4c) SHA1(9ad03d0f316eb31fdf0ca6f65c02a27d3406d072) )
-	ROM_LOAD16_BYTE( "gr3",  0x200001, 0x100000, CRC(ba9fa057) SHA1(db6f11a8964870f04f94fef6f1b1a58168a942ad) )
-	ROM_LOAD16_BYTE( "gr6",  0x400000, 0x100000, CRC(51c99b85) SHA1(9a23bf21a73d2884b49c64a8f42c288534c79dc5) )
-	ROM_LOAD16_BYTE( "gr5",  0x400001, 0x100000, CRC(80dda9b5) SHA1(d8a79cad112bc7d9e4ba31a950e4807581f3bf46) )
+	ROM_LOAD16_BYTE( "gr1.gr1",             0x000000, 0x100000, CRC(27f7b244) SHA1(628b29c066e217e1fe54553ea3ed98f86735e262) ) /* These had non specific GRx labels, also found labeled as GR-x */
+	ROM_LOAD16_BYTE( "gr2.gr2",             0x000001, 0x100000, CRC(1f25d3ab) SHA1(bdb8a3c546cdee9a5630c47b9c5079a956e8a093) )
+	ROM_LOAD16_BYTE( "gr4.gr4",             0x200000, 0x100000, CRC(c5838b4c) SHA1(9ad03d0f316eb31fdf0ca6f65c02a27d3406d072) )
+	ROM_LOAD16_BYTE( "gr3.gr3",             0x200001, 0x100000, CRC(ba9fa057) SHA1(db6f11a8964870f04f94fef6f1b1a58168a942ad) )
+	ROM_LOAD16_BYTE( "lethal_gr6_2.3.gr6",  0x400000, 0x100000, CRC(51c99b85) SHA1(9a23bf21a73d2884b49c64a8f42c288534c79dc5) ) /* Labeled as LETHAL GR6 2.3, also found labeled as GR-6 */
+	ROM_LOAD16_BYTE( "lethal_gr5_2.3.gr5",  0x400001, 0x100000, CRC(80dda9b5) SHA1(d8a79cad112bc7d9e4ba31a950e4807581f3bf46) ) /* Labeled as LETHAL GR5 2.3, also found labeled as GR-5 */
 
 	ROM_REGION( 0x40000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "sound1.u20", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
@@ -1008,8 +1007,8 @@ DRIVER_INIT_MEMBER(lethalj_state,cclownz)
  *
  *************************************/
 
-GAME( 1996, lethalj,   0,        lethalj,  lethalj,   driver_device, 0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
-GAME( 1996, franticf,  0,        gameroom, franticf,  driver_device, 0,        ROT0,  "The Game Room", "Frantic Fred", GAME_NOT_WORKING )
+GAME( 1996, lethalj,   0,        lethalj,  lethalj,   driver_device, 0,        ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
+GAME( 1996, franticf,  0,        gameroom, franticf,  driver_device, 0,        ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
 GAME( 1997, eggventr,  0,        gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
 GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
 GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )

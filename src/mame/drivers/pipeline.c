@@ -445,4 +445,4 @@ ROM_START( pipeline )
 	ROM_LOAD( "82s123.u79", 0x00200, 0x00020,CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-GAME( 1990, pipeline, 0, pipeline, pipeline, driver_device, 0, ROT0, "Daehyun Electronics", "Pipeline", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1990, pipeline, 0, pipeline, pipeline, driver_device, 0, ROT0, "Daehyun Electronics", "Pipeline", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

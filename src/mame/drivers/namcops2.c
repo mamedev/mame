@@ -80,6 +80,380 @@ List of Namco System 256 Games
 List of System Super 256 Games
 * Time Crisis 4 (Namco, 2006)
 
+
+Namco System 246 readme (earliest type using standard PS2 main board)
+-----------------------
+The info below covers the first version of Namco System 246 hardware used with
+games including Ridge Racer V, Wangan Midnight, Vampire Night and Bloody Roar 3.
+It uses a standard Japanese COH-H30000 Playstation 2 main board (GH-004).
+A later model Playstation 2 main board COH-H31000 (GH-006) has also been tested and works fine.
+The PS2 main board is interfaced to the Namco MOTHER PCB via a small adapter board.
+The boot ROM is inside a MagicGate security cart and plugs into the memory cart slot.
+After the boot ROM loads, some of the game data is loaded from CDROM and stored in the
+RAM32 PCB. However, the CDROM is continually accessed as the game plays.
+The CDROM drive is a TEAC CD-540E.
+
+
+PCB Layouts
+===========
+
+Namco Interface Board (1st version)
+---------------------
+This PCB is used with Ridge Racer V and Wangan Midnight.
+
+System 246 MOTHER PCB
+8908960202 (8908970202)
+|------------------------------------------------------------------------------|
+|J1    ADM485    Ti6734                |------|                            J12 |
+|                6358N       TMP95C061 | C448 |                                |
+|      MAX232                          |      |                                |
+|J2                                    |------|                                |
+|                                      CY7C199                                 |
+|                                                                    K4S281632 |
+|                CXA2055P                                            K4S281632 |
+|                                                                          J11 |
+|J3                                             66.666MHz                      |
+|                             J13              |--------|                  J10 |
+|                           EPM3128            |ALTERA  |                      |
+|                                              |EP20K100E                      |
+|J4                         LC35256            |QC208   |                      |
+|                                              |--------|                      |
+|                                                                              |
+|                                                                              |
+|          J6                                                                  |
+|                                                                              |
+|J5            BATTERY                            PQ30RV31                     |
+|                          J7                                  J8         J9   |
+|------------------------------------------------------------------------------|
+Notes:
+       J1 - USB connector (not used)
+       J2 - Two RCA jacks for stereo audio output
+    J3/J4 - DSUB15 VGA output connectors
+       J5 - 3-pin connector (joins to V257 STR PCB to J104)
+       J6 - Multi-pin connector (PS2 interface adapter plugged in here)
+       J7 - Playstation 2 video cable connector (input)
+       J8 - 2-pin power connector (+5V input)
+       J9 - 40-pin IDE flat cable connector for CDROM drive
+      J10 - Multi-pin connector (this is the same as the J9 connector on the 2nd version, not used)
+      J11 - Multi-pin connector (RAM32 PCB plugged in here, same as J10 on 2nd version)
+      J12 - Multi-pin connector (this is the same as the J8 connector on the 2nd version, not used)
+      J13 - 6-pin connector for programming EPM3128 CPLD (not populated)
+TMP95C061 - Toshiba TMP95C061 TLCS-900-series 16-bit Microcontroller (internal RAM/ROM = none)
+     C448 - Namco Custom C448
+  EPM3128 - Altera MAX EMP3128ATC100-10 CPLD labelled 'P2AMO1'
+ CXA2055P - Sony CXA2055P Video Amplifier IC
+   Ti6734 - Texas Instruments LMH6734 Single Supply, Ultra High-Speed, Triple Selectable Gain Buffer
+    6358N - Sanyo 6358N High-Performance Dual Operational Amplifier
+ PQ30RV31 - Sharp PQ30RV31 Voltage Regulator
+  CY7C199 - Cypress CY7C199-15VC 32k x8-bit SRAM
+  LC35256 - Sanyo LC35256DM70 32k x8-bit SRAM
+ EP20K100 - Altera APEX EP20K100EQC208-2X FPGA
+K4S281632 - Samsung K4S281632B-TC1H 8M x16-bit SDRAM
+   ADM485 - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver
+   MAX232 - Maxim MAX232 dual serial to TTL logic level driver/receiver
+
+
+Namco Interface Board (2nd version)
+---------------------
+This PCB is used with Bloody Roar 3 and Vampire Night.
+
+System 246 MOTHER(A) PCB
+8908961500 (8908971500)
+|------------------------------------------------------------------------------|
+|                             |------|                   BATTERY               |
+|         J2    TMP95C061     | C448 |                                         |
+|J1                           |      |    LC35256                              |
+|                             |------|                            K4S281632    |
+|                                               66.666MHz         K4S281632    |
+|                 J11         CY7C199                                          |
+|               EPM3128                        |--------|         J10          |
+|                                              |ALTERA  |                      |
+|                                              |EP20K100E                      |
+|                                              |QC208   |         J9           |
+|                                              |--------|                      |
+|               Ti6734                                                         |
+|                                                                              |
+|    SP232EET   6358N                                                          |
+|                                                                              |
+|J3                     J4                                        J8           |
+|                                                                              |
+|               CXA2055P                                                       |
+|                            PQ30RV31                                          |
+|                                             J5    J6                 J7      |
+|------------------------------------------------------------------------------|
+Notes:
+       J1 - USB connector (not used for Bloody Roar 3)
+       J2 - I/O board connector
+       J3 - PAC PCB connector
+       J4 - Multi-pin connector (PS2 interface adapter plugged in here)
+       J5 - 2-pin power connector (+5V input)
+       J6 - Playstation 2 video cable connector (input)
+       J7 - 40-pin IDE flat cable connector for CDROM drive
+       J8 - Multi-pin connector labelled 'ROM' (not used)
+       J9 - Multi-pin connector labelled 'RAM2' (not used)
+      J10 - Multi-pin connector labelled 'RAM1' (RAM32 PCB plugged in here)
+      J11 - 6-pin connector for programming EPM3128 CPLD (not populated)
+TMP95C061 - Toshiba TMP95C061 TLCS-900-series 16-bit Microcontroller (internal RAM/ROM = none)
+     C448 - Namco Custom C448
+  EPM3128 - Altera MAX EMP3128ATC100-10 CPLD labelled 'P2AMO1'
+ CXA2055P - Sony CXA2055P Video Amplifier IC
+   Ti6734 - Texas Instruments LMH6734 Single Supply, Ultra High-Speed, Triple Selectable Gain Buffer
+    6358N - Sanyo 6358N High-Performance Dual Operational Amplifier
+ PQ30RV31 - Sharp PQ30RV31 Voltage Regulator
+  CY7C199 - Cypress CY7C199-15VC 32k x8-bit SRAM
+  LC35256 - Sanyo LC35256DM70 32k x8-bit SRAM
+ EP20K100 - Altera APEX EP20K100EQC208-2X FPGA
+K4S281632 - Samsung K4S281632B-TC1H 8M x16-bit SDRAM
+
+
+Add-on Memory Board (plugs into J10 on MOTHER(A) PCB)
+-------------------
+This PCB is used with Bloody Roar 3, Vampire Night, Ridge Racer V and Wangan Midnight.
+
+System246 RAM32 PCB
+8908960400 (8908970400)
+|--------------|
+|K4S281632     |
+|K4S281632     |
+|      J1      |
+|--------------|
+Notes:
+      K4S281632 - Samsung K4S281632B-TC1H 8M x16-bit SDRAM
+             J1 - Multi-pin connector
+
+
+PS2 Adapter Board
+-----------------
+This PCB is used with Bloody Roar 3, Vampire Night, Ridge Racer V and Wangan Midnight.
+
+System246 T004 PCB
+8908960501 (8908970501)
+|----------------|
+|     *J1        |
+|    J2          |
+|----------------|
+Notes:
+      J1 - Multi-pin connector (*located on other side of PCB, plugs into J4 on MOTHER(A) PCB)
+      J2 - Multi-pin connector (plugs into PS2 main board)
+
+
+I/O Board
+---------
+This PCB is used with Bloody Roar 3. It is bolted into the metal box and the JAMMA
+edge connector sticks out the front at 90 degrees to the front face of the metal box.
+
+System246 JAMMA PCB
+8908961601 (8908971601)
+|--------------------------------------------|
+|TLP281-4  J6          TLP281-4     LA4705   |
+|                 TLP281-4                   |
+|         EPM7064                    BA3121  |
+|     J5             TLP281-4                |
+|     TLP281-4 TLP281-4 TLP281-4             |
+|       TLP281-4 TLP281-4     VOLUME         |
+|J4                               J2       J1|
+|--|       J3 JAMMA            |-------------|
+   |---------------------------|
+Notes:
+      J1 - 4-pin connector for stereo audio output
+      J2 - 10-pin connector for extra buttons
+      J3 - JAMMA connector
+      J4 - 2-pin power connector for 5V
+      J5 - 6-pin connector for programming CPLD (not populated)
+      J6 - Multi-pin connector (located on other side of PCB, plugs into J2 on MOTHER(A) PCB)
+ EPM7064 - Altera MAX EPM7065STC100-10 CPLD labelled 'S246J01'
+  BA3121 - Rohm BA3121 Ground Isolation Amplifier IC
+TLP281-4 - Toshiba TLP281-4 Optocoupler
+  LA4705 - Sanyo LA4705 2-channel BTL Power Amplifier
+
+Connector J2 pinout       Connector J1 pinout
+1 - GND                   1 - Left +
+2 - NC                    2 - Left -
+3 - P1 Button 4           3 - Right +
+4 - P1 Button 5           4 - Right -
+5 - P1 Button 6
+6 - NC
+7 - P2 Button 4
+8 - P2 Button 5
+9 - P2 Button 6
+10- GND
+
+
+Power Input/Video Output/Audio Output Board
+-------------------------------------------
+This PCB is used with Bloody Roar 3 and Vampire Night. It is bolted to the front of the metal box.
+
+System246 PAC PCB
+8908961700 (8908971700)
+                         |----------------------------|
+                         |                  G5LE-1    |
+                         |                            |
+                         |    J6   J7               L1|
+|------------------------|                  J9   J10  |
+|           J3     J4    J5           J8            L2|
+|J1  J2              SW1                              |
+|-----------------------------------------------------|
+Notes:
+      J1/J2 - RCA jacks for stereo audio output (mono audio is also output from the JAMMA connector on the I/O board for Bloody Roar 3)
+         J3 - Multi-pin connector (located on other side of PCB, plugs into J3 on MOTHER(A) PCB)
+         J4 - 4-pin connector (not used)
+         J5 - 3-pin connector (not used)
+      J6/J7 - DSUB15 VGA output connectors
+         J8 - 10-pin power output connector for 5V/12V (located on other side of PCB, joins
+              to PS2 main board, MOTHER(A) PCB and CDROM drive)
+         J9 - 6-pin JVS power input connector
+        J10 - 4-pin power connector
+     G5LE-1 - Omron G5LE-1 single-pole 10A power relay (located on other side of PCB)
+        SW1 - 4-position DIP switch (all OFF)
+         L1 - Green LED (lights when 5 volts is present)
+         L2 - Blue LED (lights when 12 volts is present)
+
+
+Gun I/O Board
+---------------
+This PCB is used with Vampire Night.
+It is also used with Time Crisis 3 (on System 246C) and Crisis Zone (on System 23 Evolution2)
+
+V221 MIU PCB
+2512960101 (2512970101)
+additional sticker for Vampire Night says '8662969301 (JV) TMIU PCB'
+|---------------------------------------------|
+|J10      J9    29C020     LC35256  DSW(4)    |
+|    M0105          PRG.8F                LED |
+|2267     6393                            LED |
+|    T082  T082                 |------|      |
+|           |--------|          | C78  |   J8 |
+|           |ALTERA  |          |      |      |
+|J11        |MAX     |          |------|    J7|
+|   LM1881  |EPM7128 |                  3771  |
+|R305526    |--------|                        |
+|      ZUW1R51212            14.746MHz        |
+|                                 ADM485    J6|
+|                                             |
+|  J1       J2   J3          J4    J5         |
+|---------------------------------------------|
+Notes:
+      2267 - JRC2267 Current limiting diode array? (SOIC8)
+   R305526 - Some kind of mini transformer or regulator?
+   LC35256 - Sanyo LC35256 32k x8 SRAM (SOP28)
+    LM1881 - National Semiconductor LM1881 Video Sync Separator (SOIC8)
+     M0105 - Matsushita Panasonic 0105 = ? (SOIC16)
+      T082 - Texas Instruments T082 (=TL082) JFET-Input operational amplifier (SOIC8)
+      6393 - Sanyo 6393 (LA6393) High Performance Dual Comparator (SOIC8)
+    ADM485 - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+      3771 - Fujitsu MB3771 Power Supply Monitor and Master Reset IC (SOIC8)
+   EPM7128 - Altera MAX EPM7128SLC84-15 PLD labelled 'TMIU1 PLD0'
+    29C020 - location for 29C020 PLCC32 Flash/EP ROM (not populated)
+ZUW1R51212 - Cosel ZUW1R51212 DC to DC Power Supply Module (input 9-18VDC, output +-12VDC or +24VDC)
+       DSW - 4 position dipswitch block, all off
+        J1 - 6-pin power input connector
+        J2 - 12-pin connector (cabinet buttons UP/DOWN/ENTER/TEST/SERVICE/COIN etc)
+        J3 - 4 pin connector (not used)
+        J4 - 9 pin Namco female plug connector for gun (solenoid +24V/trigger/pedal/sensor)
+        J5 - 5 pin connector used for I/O --> S246 communications (connects to J1 on MOTHER(A) PCB)
+        J6 - 7-pin connector (not used)
+        J9 - 6-pin connector (not used)
+       J10 - 2-pin Namco female plug connector (not used)
+       J11 - 6-pin Namco female plug connector (video input from CCD camera)
+    PRG.8F - 27C1001 EPROM with label...
+                                        - 'TMIU1 PRG0B' (I/O program for Vampire Night)
+                                        - 'XMIU1 PRG0'  (I/O program for Time Crisis 3)
+                                        - 'CSZ1 PRG0A'  (I/O program for Crisis Zone)
+
+Note this board uses a CCD camera for the gun sensor.
+
+
+I/O Board
+---------
+This PCB is used with Ridge Racer V and Wangan Midnight.
+
+FCA PCB
+8662969102 (8662979102)
+|---------------------------------------------------|
+| J101                J106                          |
+|            4.9152MHz                              |
+|    DSW(6)                                         |
+| LED2              |-----|                         |
+|                   | MCU |                         |
+|     LEDS3-10      |     |                         |
+|  PIC16F84         |-----|                         |
+|   JP1 LED1                           ADM485       |
+|                                                   |
+|                     J102              J104        |
+|---------------------------------------------------|
+Notes:
+      J101 - 6 pin connector for power input
+      J102 - 60 pin flat cable connector
+      J104 - 5 pin connector
+      J106 - 30 pin flat cable connector
+       JP1 - 3 pin jumper, set to 'NORM'. Alt setting 'WR'
+      3771 - Fujitsu MB3771 System Reset IC (SOIC8)
+  PIC16F84 - Microchip PIC16F84 PIC with sticker 'FCAP11' (SOIC20)
+       MCU - Fujitsu MB90F574 Microcontroller with sticker 'FCAF11' (QFP120)
+    ADM485 - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
+
+
+Drive/Feedback Board
+--------------------
+This PCB is used with Ridge Racer V and Wangan Midnight.
+It controls the steering feed-back motor.
+When the driving games boot they test the feed-back motor by monitoring a potentiometer
+connected to the steering wheel mechanism. If the pot is faulty or not connected or if
+the drive/feedback board isn't connected (including the 110VAC input voltage), the
+steering check will fail after a time-out period and the game will not continue further.
+
+V194 STR PCB
+2487960103 (2487970103)
+Additional sticker for Ridge Racer V: 'V257 STR PCB 2553960100'
+Note this same PCB (with a different ROM) is also used with Mario Kart on Triforce hardware.
+|----------------------------------------------------------|
+|         SOP44.IC16            TRANSFORMER        J105    |
+| DIP42                                                    |
+|    LED  N341256                  FUSE                    |
+|    LED                           FUSE            BF150G8E|
+|         N341256                                          |
+|                                                          |
+|RESET_SW      32MHz             7815                 K2682|
+|   MB3771                                                 |
+|J101                   DSW2(4, all off)                   |
+|            MB90242A                                      |
+|                       LED  MB3773    HP3150              |
+|                       LED                           K2682|
+|                                      HP3150              |
+|            EPM7064                                       |
+|J104  MAX232                          LM393               |
+|       LED   JP1 O O=O                                    |
+|       LED                            HP3150         K2682|
+|                                                          |
+|                                      HP3150              |
+|                                                          |
+|J103                                                      |
+|                UPC358  LM393   UPC358               K2682|
+|            J102                            J106          |
+|----------------------------------------------------------|
+Notes:
+      SOP44.IC16 - Fujitsu MB29F400TC 512k x8 flash ROM labelled 'RRV3 STR-0A' (SOP44)
+         EPM7064 - Altera EPM7064 CPLD labelled 'STR-DR1' (PLCC44)
+         N341256 - NKK 32k x8 SRAM (SOP28)
+           K2682 - 2SK2682 N-Channel Silicon MOSFET
+        BF150G8E - Large power transistor(?) connected to the transformer
+          UPC358 - NEC uPC358 Dual operational amplifier (SOIC8)
+           LM393 - National LM393 Low Power Low Offset Voltage Dual Comparator (SOIC8)
+          MAX232 - Maxim MAX232 dual serial to TTL logic level driver/receiver (SOIC16)
+          HP3150 - HP 3150 Optocoupler (DIP8)
+          MB3773 - Fujitsu MB3773 Power Supply Monitor with Watch Dog Timer and Reset (SOIC8)
+          MB3771 - Fujitsu MB3771 System Reset IC (SOIC8)
+           DIP42 - Unpopulated DIP42 socket for 27C4096 EPROM
+        MB90242A - Fujitsu MB90242A 16-Bit CISC ROM-less F2MC-16F Family Microcontroller optimized for mechatronics control applications (TQFP80)
+            7815 - LM7815 15V voltage regulator
+            J101 - 8 pin connector (purpose unknown)
+            J102 - 3 pin connector input from potentiometer connected to the steering wheel mechanism
+            J103 - Power input connector (5v/GND/12v)
+            J104 - 6 pin connector joined with a cable to J5 on the System 246 MOTHER PCB.
+                   This cable provides the feed-back connection to/from the main board.
+            J105 - 110VAC power input
+            J106 - DC variable power output to feed-back motor
+
 ***************************************************************************/
 
 
@@ -715,54 +1089,54 @@ ROM_START( sbxc )
 ROM_END
 
 // System 246
-GAME(2001, sys246,          0, system246, system246, driver_device, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
-GAME(2001, vnight,     sys246, system246, system246, driver_device, 0, ROT0, "Sega / Namco", "Vampire Night (VPN3 Ver. B)", GAME_IS_SKELETON)
-GAME(2001, bldyr3b,    sys246, system246, system246, driver_device, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", GAME_IS_SKELETON)
-GAME(2001, rrvac,      sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_IS_SKELETON)
-GAME(2001, rrvac2,      rrvac, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", GAME_IS_SKELETON)
-GAME(2001, wanganmd,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, dragchrn,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, netchu02,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, scptour,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Smash Court Pro Tournament (SCP1)", GAME_IS_SKELETON)
-GAME(2002, soulclb2,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, soulcl2a, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, soulcl2b, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, soulcl2w, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC2? world version)", GAME_IS_SKELETON)
-GAME(2002, tekken4,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", GAME_IS_SKELETON)
-GAME(2002, tekken4a,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, tekken4b,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", GAME_IS_SKELETON)
-GAME(2002, tekken4c,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", GAME_IS_SKELETON)
-GAME(2003, prdgp03,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Pride GP 2003 (PR21 Ver. A)", GAME_IS_SKELETON)
-GAME(2003, timecrs3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 3 (TST1)", GAME_IS_SKELETON)
-GAME(2003, timecrs3e,timecrs3, system246, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 3 (TST2 Ver. A)", GAME_IS_SKELETON)
-GAME(2003, zgundm,     sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", GAME_IS_SKELETON)
-GAME(2004, fghtjam,    sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", GAME_IS_SKELETON)
-GAME(2004, sukuinuf,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", GAME_IS_SKELETON)
-GAME(2004, zgundmdx,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", GAME_IS_SKELETON)
-GAME(2004, zoidsinf,   sys246, system246, system246, driver_device, 0, ROT0, "Tomy / Taito", "Zoids Infinity", GAME_IS_SKELETON)
-GAME(2005, gundzaft,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", GAME_IS_SKELETON)
-GAME(2005, soulclb3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", GAME_IS_SKELETON)
-GAME(2005, soulclb3a,soulclb3, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A)", GAME_IS_SKELETON)
-GAME(2005, taiko7,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 7 (TK71-NA-A)", GAME_IS_SKELETON)
-GAME(2006, taiko8,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 8 (TK8100-1-NA-A)", GAME_IS_SKELETON)
-GAME(2006, qgundam,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", GAME_IS_SKELETON)
-GAME(2008, fateulc,    sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", GAME_IS_SKELETON)
-GAME(2008, fateulcb,  fateulc, system246, system246, driver_device, 0, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", GAME_IS_SKELETON)
-GAME(2008, sbxc,       sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", GAME_IS_SKELETON)
+GAME(2001, sys246,          0, system246, system246, driver_device, 0, ROT0, "Namco", "System 246 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2001, vnight,     sys246, system246, system246, driver_device, 0, ROT0, "Sega / Namco", "Vampire Night (VPN3 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2001, bldyr3b,    sys246, system246, system246, driver_device, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", MACHINE_IS_SKELETON)
+GAME(2001, rrvac,      sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2001, rrvac2,      rrvac, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2001, wanganmd,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, dragchrn,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, netchu02,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, scptour,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Smash Court Pro Tournament (SCP1)", MACHINE_IS_SKELETON)
+GAME(2002, soulclb2,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, soulcl2a, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, soulcl2b, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, soulcl2w, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC2? world version)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4a,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4b,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4c,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", MACHINE_IS_SKELETON)
+GAME(2003, prdgp03,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Pride GP 2003 (PR21 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2003, timecrs3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 3 (TST1)", MACHINE_IS_SKELETON)
+GAME(2003, timecrs3e,timecrs3, system246, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 3 (TST2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2003, zgundm,     sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, fghtjam,    sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, sukuinuf,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, zgundmdx,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, zoidsinf,   sys246, system246, system246, driver_device, 0, ROT0, "Tomy / Taito", "Zoids Infinity", MACHINE_IS_SKELETON)
+GAME(2005, gundzaft,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3a,soulclb3, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A)", MACHINE_IS_SKELETON)
+GAME(2005, taiko7,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 7 (TK71-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, taiko8,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, qgundam,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2008, fateulc,    sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", MACHINE_IS_SKELETON)
+GAME(2008, fateulcb,  fateulc, system246, system246, driver_device, 0, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", MACHINE_IS_SKELETON)
+GAME(2008, sbxc,       sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", MACHINE_IS_SKELETON)
 
 // System 256
-GAME(2004, sys256,          0, system256, system246, driver_device, 0, ROT0, "Namco", "System 256 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
-GAME(2005, tekken51,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_IS_SKELETON)
-GAME(2005, tekken5d,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5 Dark Resurrection (TED1 Ver. A)", GAME_IS_SKELETON)
-GAME(2005, superdbz,   sys256, system256, system246, driver_device, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", GAME_IS_SKELETON)
-GAME(2006, kinniku,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_IS_SKELETON)
-GAME(2006, taiko9,     sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_IS_SKELETON)
-GAME(2006, yuyuhaku,   sys256, system256, system246, driver_device, 0, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", GAME_IS_SKELETON)
-GAME(2006, zoidiexp,   sys246, system246, system246, driver_device, 0, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", GAME_IS_SKELETON)
-GAME(2007, kinniku2,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", GAME_IS_SKELETON)
-GAME(2007, taiko10,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_IS_SKELETON)
-GAME(2008, gdvsgd,     sys256, system256, system246, driver_device, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", GAME_IS_SKELETON)
-GAME(2009, gdvsgdnx,   sys256, system256, system246, driver_device, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", GAME_IS_SKELETON)
+GAME(2004, sys256,          0, system256, system246, driver_device, 0, ROT0, "Namco", "System 256 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2005, tekken51,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2005, tekken5d,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5 Dark Resurrection (TED1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2005, superdbz,   sys256, system256, system246, driver_device, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2006, kinniku,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2006, taiko9,     sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, yuyuhaku,   sys256, system256, system246, driver_device, 0, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", MACHINE_IS_SKELETON)
+GAME(2006, zoidiexp,   sys246, system246, system246, driver_device, 0, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", MACHINE_IS_SKELETON)
+GAME(2007, kinniku2,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2007, taiko10,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2008, gdvsgd,     sys256, system256, system246, driver_device, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2009, gdvsgdnx,   sys256, system256, system246, driver_device, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", MACHINE_IS_SKELETON)
 
 // System Super 256
-GAME(2006, timecrs4,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 4", GAME_IS_SKELETON)
+GAME(2006, timecrs4,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 4", MACHINE_IS_SKELETON)

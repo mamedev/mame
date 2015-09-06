@@ -890,11 +890,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT          COMPAT MACHINE   INPUT        INIT                COMPANY             FULLNAME                  FLAGS */
-COMP( 1997, iq128,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1997, iq128_fr,   iq128,          0,    iq128,     geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1998, iqtv512,    0,              0,    iqtv512,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ TV 512 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1999, gl8008cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
-COMP( 1999, bs9009cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "BrainStation 9009 CXL (Germany)", GAME_IS_SKELETON)
-COMP( 1998, itunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IT Unlimited (UK)", GAME_NO_SOUND)
-COMP( 19??, iqunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IQ Unlimited (Germany)", GAME_IS_SKELETON)
-COMP( 19??, glmmc,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader Master Mega Color (Germany)", GAME_IS_SKELETON)
+COMP( 1997, iq128,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, iq128_fr,   iq128,          0,    iq128,     geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, iqtv512,    0,              0,    iqtv512,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ TV 512 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1999, gl8008cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
+COMP( 1999, bs9009cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)
+COMP( 1998, itunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IT Unlimited (UK)", MACHINE_NO_SOUND)
+COMP( 19??, iqunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IQ Unlimited (Germany)", MACHINE_IS_SKELETON)
+COMP( 19??, glmmc,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader Master Mega Color (Germany)", MACHINE_IS_SKELETON)

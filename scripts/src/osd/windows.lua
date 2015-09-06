@@ -11,6 +11,9 @@ function maintargetosdoptions(_target,_subtarget)
 		linkoptions {
 			"-municode",
 		}
+		links {
+			"mingw32",
+		}
 
 	configuration { }
 

@@ -1200,7 +1200,6 @@ public:
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
-	ioport_value active_safe(ioport_value defval) const { return (this == NULL) ? defval : active(); }
 	ioport_port_live &live() const { assert(m_live != NULL); return *m_live; }
 
 	// read/write to the port
@@ -1646,7 +1645,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_unused();
 
 // analog settings
-// if this macro is not used, the minimum defaluts to 0 and maximum defaults to the mask value
+// if this macro is not used, the minimum defaults to 0 and maximum defaults to the mask value
 #define PORT_MINMAX(_min, _max) \
 	configurer.field_set_min_max(_min, _max);
 

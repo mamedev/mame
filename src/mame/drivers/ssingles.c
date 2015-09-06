@@ -1,7 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina
 /*
- 'Swinging Singles' by Ent. Ent. Ltd
+ 'Swinging Singles' US distribution by Ent. Ent. Ltd
+ Original Japan release is 'Utamaro' by 'Yachiyo' (undumped!)
  driver by Tomasz Slanina
 
 
@@ -664,5 +665,5 @@ DRIVER_INIT_MEMBER(ssingles_state,ssingles)
 	save_item(NAME(m_colorram));
 }
 
-GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, ssingles, ROT90, "Entertainment Enterprises, Ltd.", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki (Entertainment Enterprises, Ltd. license)", "Swinging Singles (US)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

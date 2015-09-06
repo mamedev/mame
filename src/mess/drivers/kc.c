@@ -314,7 +314,7 @@ ROM_START(kc85_5)
 ROM_END
 
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT     INIT  COMPANY   FULLNAME */
-COMP( 1987, kc85_2,   0,       0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", GAME_NOT_WORKING)
-COMP( 1987, kc85_3,   kc85_2,  0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/3", GAME_NOT_WORKING)
-COMP( 1989, kc85_4,   kc85_2,  0,       kc85_4,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/4", GAME_NOT_WORKING)
-COMP( 1989, kc85_5,   kc85_2,  0,       kc85_5,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/5", GAME_NOT_WORKING)
+COMP( 1987, kc85_2,   0,       0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
+COMP( 1987, kc85_3,   kc85_2,  0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/3", MACHINE_NOT_WORKING)
+COMP( 1989, kc85_4,   kc85_2,  0,       kc85_4,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/4", MACHINE_NOT_WORKING)
+COMP( 1989, kc85_5,   kc85_2,  0,       kc85_5,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/5", MACHINE_NOT_WORKING)

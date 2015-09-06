@@ -35,13 +35,13 @@
 #include "nld_signal.h"
 #include "nld_truthtable.h"
 
-#define TTL_7432_OR(_name, _I1, _I2)                                               \
-		NET_REGISTER_DEV(7432, _name)                                               \
-		NET_CONNECT(_name, A, _I1)                                                  \
+#define TTL_7432_OR(_name, _I1, _I2)                                           \
+		NET_REGISTER_DEV(TTL_7432_OR, _name)                                   \
+		NET_CONNECT(_name, A, _I1)                                             \
 		NET_CONNECT(_name, B, _I2)
 
-#define TTL_7432_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7432_dip, _name)
+#define TTL_7432_DIP(_name)                                                    \
+		NET_REGISTER_DEV(TTL_7432_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

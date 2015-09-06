@@ -5,7 +5,6 @@ class liberate_state : public driver_device
 public:
 	liberate_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
 		m_bg_vram(*this, "bg_vram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -17,7 +16,6 @@ public:
 		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
-	optional_shared_ptr<UINT8> m_paletteram;
 	optional_shared_ptr<UINT8> m_bg_vram; /* prosport */
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -59,7 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER(liberate_videoram_w);
 	DECLARE_WRITE8_MEMBER(liberate_colorram_w);
 	DECLARE_WRITE8_MEMBER(prosport_bg_vram_w);
-	DECLARE_WRITE8_MEMBER(prosport_paletteram_w);
 	DECLARE_DRIVER_INIT(yellowcb);
 	DECLARE_DRIVER_INIT(liberate);
 	DECLARE_DRIVER_INIT(prosport);

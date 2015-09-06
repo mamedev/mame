@@ -36,7 +36,23 @@
 
 
 const device_type T11 = &device_creator<t11_device>;
+const device_type K1801VM2 = &device_creator<k1801vm2_device>;
 
+
+k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: t11_device(mconfig, K1801VM2, "K1801VM2", tag, owner, clock, "k1801vm2", __FILE__)
+{
+}
+
+t11_device::t11_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
+	, c_initial_mode(0)
+{
+	m_is_octal = true;
+	memset(m_reg, 0x00, sizeof(m_reg));
+	memset(&m_psw, 0x00, sizeof(m_psw));
+}
 
 t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, T11, "T11", tag, owner, clock, "t11", __FILE__)
@@ -294,6 +310,26 @@ void t11_device::state_string_export(const device_state_entry &entry, std::strin
 	}
 }
 
+void k1801vm2_device::state_string_export(const device_state_entry &entry, std::string &str)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			strprintf(str, "%c%c%c%c%c%c%c%c%c",
+				m_psw.b.l & 0x100 ? 'H':'.',
+				m_psw.b.l & 0x80 ? 'P':'.',
+				m_psw.b.l & 0x40 ? '?':'.',
+				m_psw.b.l & 0x20 ? '?':'.',
+				m_psw.b.l & 0x10 ? 'T':'.',
+				m_psw.b.l & 0x08 ? 'N':'.',
+				m_psw.b.l & 0x04 ? 'Z':'.',
+				m_psw.b.l & 0x02 ? 'V':'.',
+				m_psw.b.l & 0x01 ? 'C':'.'
+			);
+			break;
+	}
+}
+
 
 /*************************************
  *
@@ -326,6 +362,13 @@ void t11_device::device_reset()
 	m_wait_state = 0;
 }
 
+void k1801vm2_device::device_reset()
+{
+	t11_device::device_reset();
+	
+	PC = RWORD(c_initial_mode);
+	PSW = RWORD(c_initial_mode+2);
+}
 
 
 /*************************************

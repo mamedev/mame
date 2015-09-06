@@ -277,27 +277,27 @@ WRITE16_MEMBER(atarisy2_state::bankselect_w)
 {
 	/*static const int bankoffset[64] =
 	{
-		12, 8, 4, 0,
-		13, 9, 5, 1,
-		14, 10, 6, 2,
-		15, 11, 7, 3,
-		28, 24, 20, 16,
-		29, 25, 21, 17,
-		30, 26, 22, 18,
-		31, 27, 23, 19,
-		44, 40, 36, 32,
-		45, 41, 37, 33,
-		46, 42, 38, 34,
-		47, 43, 39, 35,
-		60, 56, 52, 48,
-		61, 57, 53, 49,
-		62, 58, 54, 50,
-		63, 59, 55, 51
+	    12, 8, 4, 0,
+	    13, 9, 5, 1,
+	    14, 10, 6, 2,
+	    15, 11, 7, 3,
+	    28, 24, 20, 16,
+	    29, 25, 21, 17,
+	    30, 26, 22, 18,
+	    31, 27, 23, 19,
+	    44, 40, 36, 32,
+	    45, 41, 37, 33,
+	    46, 42, 38, 34,
+	    47, 43, 39, 35,
+	    60, 56, 52, 48,
+	    61, 57, 53, 49,
+	    62, 58, 54, 50,
+	    63, 59, 55, 51
 	};*/
 
 	int banknumber = ((data >> 10) & 0x3f) ^ 0x03;
 	banknumber = BITSWAP16(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
-	
+
 	if (offset)
 		m_rombank2->set_entry(banknumber);
 	else
@@ -751,7 +751,7 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
 /* full memory map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w)
 	AM_RANGE(0x1480, 0x1487) AM_MIRROR(0x0078) AM_WRITE(adc_strobe_w)
 	AM_RANGE(0x1580, 0x1581) AM_MIRROR(0x001e) AM_WRITE(int0_ack_w)
@@ -1203,6 +1203,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy2)
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT_CLASS(2, atarisy2_state, RRRRGGGGBBBBIIII)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarisy2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
@@ -3208,40 +3209,40 @@ DRIVER_INIT_MEMBER(atarisy2_state,apb)
  *
  *************************************/
 
-GAME( 1984, paperboy, 0,         atarisy2, paperboy, atarisy2_state, paperboy, ROT0,   "Atari Games", "Paperboy (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paperboyr2,paperboy, atarisy2, paperboy, atarisy2_state, paperboy, ROT0,   "Atari Games", "Paperboy (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paperboyr1,paperboy, atarisy2, paperboy, atarisy2_state, paperboy, ROT0,   "Atari Games", "Paperboy (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, paperboy, 0,         atarisy2, paperboy, atarisy2_state, paperboy, ROT0,   "Atari Games", "Paperboy (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paperboyr2,paperboy, atarisy2, paperboy, atarisy2_state, paperboy, ROT0,   "Atari Games", "Paperboy (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paperboyr1,paperboy, atarisy2, paperboy, atarisy2_state, paperboy, ROT0,   "Atari Games", "Paperboy (rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, 720,      0,        atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1986, 720r3,    720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1986, 720r2,    720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, 720r1,    720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, 720g,     720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, 720gr1,   720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, 720,      0,        atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720r3,    720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720r2,    720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720r1,    720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720g,     720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720gr1,   720,      atarisy2, 720, atarisy2_state,      720,      ROT0,   "Atari Games", "720 Degrees (German, rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, ssprint,  0,        sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ssprint3, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ssprint1, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ssprintg, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (German, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ssprintg1,ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (German, rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ssprintf, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (French)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ssprints, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (Spanish)", GAME_SUPPORTS_SAVE )
+GAME( 1986, ssprint,  0,        sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ssprint3, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ssprint1, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ssprintg, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (German, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ssprintg1,ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (German, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ssprintf, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ssprints, ssprint,  sprint,   ssprint, atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (Spanish)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, csprint,  0,        sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprint2, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprint1, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprintg, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (German, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprintg1,csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (German, rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprintf, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (French)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprints, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (Spanish, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprints1,csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (Spanish, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, csprint,  0,        sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, csprint2, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, csprint1, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, csprintg, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (German, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, csprintg1,csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (German, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, csprintf, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, csprints, csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (Spanish, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, csprints1,csprint,  sprint,   csprint, atarisy2_state,  csprint,  ROT0,   "Atari Games", "Championship Sprint (Spanish, rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, apb,      0,        atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 7)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apb6,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 6)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apb5,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 5)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apb4,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apb3,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apb2,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apb1,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apbg,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (German)", GAME_SUPPORTS_SAVE )
-GAME( 1987, apbf,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (French)", GAME_SUPPORTS_SAVE )
+GAME( 1987, apb,      0,        atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apb6,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apb5,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apb4,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apb3,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apb2,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apb1,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apbg,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (German)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, apbf,     apb,      atarisy2, apb, atarisy2_state,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (French)", MACHINE_SUPPORTS_SAVE )

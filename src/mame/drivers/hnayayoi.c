@@ -673,6 +673,6 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 }
 
 
-GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, driver_device, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax", "Hana Fubuki [BET] (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, driver_device, 0,        ROT0, "Dynax", "Untouchable (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, driver_device, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax", "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, driver_device, 0,        ROT0, "Dynax", "Untouchable (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -378,7 +378,7 @@ void mc1000_state::machine_reset()
   +---------*---*---o V+
   |         |   |
  +-+        |   |
- | |309K    |   |
+ | |390K    |   |
  | |R17     |8  |4
  +-+      +-------+
   |      7|       |3
@@ -390,23 +390,23 @@ void mc1000_state::machine_reset()
  | |   |  |  555  |
  +-+   |  |       |
   |    | 6|       |5
-  *----*?-|       |---+
+  *----*--|       |---+
   |       |       |   |
  ---C30   +-------+  ---C29
- ---103       |1     ---103
+ ---10n       |1     ---10n
  _|_         _|_     _|_
  ///         ///     ///
 
  Calculated properties:
 
  * 99.74489795918367 Duty Cycle Percentage
- * 368.1126130105722 Frequency in Hertz
+ * 367.3469387755102 Frequency in Hertz
  * 0.00000693 Seconds Low
- * 0.0027096299999999998 Seconds High
+ * 0.00270963 Seconds High
 
  */
 
-#define MC1000_NE555_FREQ       (368) /* Hz */
+#define MC1000_NE555_FREQ       (367) /* Hz */
 #define MC1000_NE555_DUTY_CYCLE (99.745) /* % */
 
 TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
@@ -499,4 +499,4 @@ DRIVER_INIT_MEMBER(mc1000_state,mc1000)
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME        FLAGS */
-COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state,       mc1000,     "CCE",              "MC-1000",      GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state,       mc1000,     "CCE",              "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

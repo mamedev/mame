@@ -331,4 +331,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, driver_device, 0,      "Votrax",        "Personal Speech System", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, driver_device, 0,      "Votrax",        "Personal Speech System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

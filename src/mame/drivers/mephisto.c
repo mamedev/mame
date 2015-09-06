@@ -111,5 +111,5 @@ ROM_START(mephistp1)
 ROM_END
 
 
-GAME(1986,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state,  mephisto,  ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state,  mephisto,  ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state,  mephisto,  ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state,  mephisto,  ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)

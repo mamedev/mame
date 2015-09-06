@@ -162,15 +162,18 @@ void scramble_state::sh_init()
 }
 
 
-// Harem
+// Harem (same as scorpion)
 
-WRITE8_MEMBER( scramble_state::harem_portA_w )
+READ8_MEMBER(scramble_state::harem_digitalker_intr_r)
 {
-	// Speech?
+	return m_digitalker->digitalker_0_intr_r();
 }
-WRITE8_MEMBER( scramble_state::harem_portB_w )
+
+WRITE8_MEMBER(scramble_state::harem_digitalker_control_w)
 {
-	// Speech?
+	m_digitalker->digitalker_0_cs_w (data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	m_digitalker->digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
+	m_digitalker->digitalker_0_wr_w (data & 4 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

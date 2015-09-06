@@ -34,7 +34,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 	}
 }
 
-#define GBA_ATTOTIME_NORMALIZE(a)   do { while ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
+#define GBA_ATTOTIME_NORMALIZE(a)   a.normalize()
 
 static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
@@ -2315,4 +2315,4 @@ DRIVER_INIT_MEMBER(gba_state,gbadv)
 
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */
-CONS(2001, gba, 0,     0,     gbadv,  gbadv, gba_state,  gbadv, "Nintendo", "Game Boy Advance", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+CONS(2001, gba, 0,     0,     gbadv,  gbadv, gba_state,  gbadv, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

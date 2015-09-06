@@ -5,8 +5,19 @@
  *
  */
 
+#include <cstdio>
+
 #include "pconfig.h"
 #include "palloc.h"
+//============================================================
+//  Exceptions
+//============================================================
+
+pexception::pexception(const pstring &text)
+{
+	m_text = text;
+	fprintf(stderr, "%s\n", m_text.cstr());
+}
 
 #if (PSTANDALONE)
 #include <stdlib.h>

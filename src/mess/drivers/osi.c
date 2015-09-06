@@ -388,7 +388,7 @@ WRITE8_MEMBER( c1p_state::osi630_sound_w )
     C011 ACIAIO         DISK CONTROLLER ACIA I/O PORT
 */
 
-WRITE_LINE_MEMBER(sb2m600_state::osi470_index_callback)
+void sb2m600_state::floppy_index_callback(floppy_image_device *floppy, int state)
 {
 	m_fdc_index = state;
 }
@@ -686,23 +686,17 @@ void c1p_state::machine_start()
 void c1pmf_state::machine_start()
 {
 	c1p_state::machine_start();
+
+	// drive select logic missing
+	if (m_floppy0->get_device())
+		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(sb2m600_state::floppy_index_callback), this));
 }
 
-static LEGACY_FLOPPY_OPTIONS_START(osi)
-	LEGACY_FLOPPY_OPTION(osi, "img", "OSI disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([36])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface osi_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(osi),
-	NULL
-};
+// disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
+// 10 sectors, 256 byte sector length, first sector id 0
+static SLOT_INTERFACE_START( osi_floppies )
+	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
+SLOT_INTERFACE_END
 
 /* F4 Character Displayer */
 static const gfx_layout osi_charlayout =
@@ -833,8 +827,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
 	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL_4MHz/8) // 250 kHz
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia_1", acia6850_device, write_txc))
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(sb2m600_state, osi470_index_callback))
+	MCFG_FLOPPY_DRIVE_ADD("floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, NULL,   floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -907,8 +901,8 @@ DRIVER_INIT_MEMBER(c1p_state,c1p)
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT      INIT   COMPANY            FULLNAME
-COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600, driver_device,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. B)", GAME_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600, driver_device,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. C)", GAME_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600, c1p_state,    c1p, "Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
-COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600, c1p_state,    c1p, "Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101, driver_device,     0,   "Compukit",        "UK101", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600, driver_device,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600, driver_device,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
+COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600, c1p_state,    c1p, "Ohio Scientific", "Challenger 1P Series 2", MACHINE_NOT_WORKING)
+COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600, c1p_state,    c1p, "Ohio Scientific", "Challenger 1P MF Series 2", MACHINE_NOT_WORKING)
+COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101, driver_device,     0,   "Compukit",        "UK101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

@@ -904,5 +904,5 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS
-COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000",   GAME_NOT_WORKING )
-COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000HD", GAME_NOT_WORKING )
+COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000",   MACHINE_NOT_WORKING )
+COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000HD", MACHINE_NOT_WORKING )

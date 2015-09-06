@@ -107,7 +107,8 @@ void i8251_device::device_start()
 	save_item(NAME(m_rxc_count));
 	save_item(NAME(m_txc_count));
 	save_item(NAME(m_br_factor));
-	save_item(NAME(m_data));
+	save_item(NAME(m_rx_data));
+	save_item(NAME(m_tx_data));
 	save_item(NAME(m_tx_busy));
 	save_item(NAME(m_disable_tx_pending));
 	device_serial_interface::register_save_state(machine().save(), this);
@@ -190,7 +191,7 @@ void i8251_device::transmit_clock()
 			if (is_transmit_register_empty())
 			{
 				/* set it up */
-				transmit_register_setup(m_data);
+				transmit_register_setup(m_tx_data);
 				/* i8251 transmit reg now empty */
 				m_status |=I8251_STATUS_TX_EMPTY;
 				/* ready for next transmit */
@@ -339,7 +340,8 @@ void i8251_device::device_reset()
 	m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 	m_mode_byte = 0;
 	m_command = 0;
-	m_data = 0;
+	m_rx_data = 0;
+	m_tx_data = 0;
 	m_rxc_count = m_txc_count = 0;
 	m_br_factor = 1;
 	m_tx_busy = m_disable_tx_pending = false;
@@ -688,8 +690,9 @@ READ8_MEMBER(i8251_device::status_r)
 
 WRITE8_MEMBER(i8251_device::data_w)
 {
-	m_data = data;
+	m_tx_data = data;
 
+		LOG(("data_w %02x\n" , data));
 //  printf("i8251 transmit char: %02x\n",data);
 
 	/* writing clears */
@@ -711,9 +714,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 void i8251_device::receive_character(UINT8 ch)
 {
-//  printf("i8251 receive char: %02x\n",ch);
-
-	m_data = ch;
+	m_rx_data = ch;
 
 	/* char has not been read and another has arrived! */
 	if (m_status & I8251_STATUS_RX_READY)
@@ -733,12 +734,12 @@ void i8251_device::receive_character(UINT8 ch)
 
 READ8_MEMBER(i8251_device::data_r)
 {
-	//logerror("read data: %02x, STATUS=%02x\n",m_data,m_status);
+	LOG(("read data: %02x, STATUS=%02x\n",m_rx_data,m_status));
 	/* reading clears */
 	m_status &= ~I8251_STATUS_RX_READY;
 
 	update_rx_ready();
-	return m_data;
+	return m_rx_data;
 }
 
 

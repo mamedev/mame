@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(background_w) AM_SHARE("back_data")
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(gfxbank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP
@@ -300,8 +300,9 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynduke)
-	MCFG_PALETTE_ADD("palette", 2048)
 
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
@@ -612,9 +613,9 @@ DRIVER_INIT_MEMBER(dynduke_state,dynduke)
 
 /* Game Drivers */
 
-GAME( 1989, dynduke,  0,       dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, dyndukea, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, dyndukej, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,  dynduke, dbldyn,  dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,  dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dynduke,  0,       dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,  dynduke, dbldyn,  dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,  dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", MACHINE_SUPPORTS_SAVE )

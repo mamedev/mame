@@ -62,7 +62,7 @@ public:
 	std::string             m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
 	INT32                   m_watchdog_vblank_count;    // number of VBLANKs until the watchdog kills us
 	attotime                m_watchdog_time;            // length of time until the watchdog kills us
-	bool					m_force_no_drc;				// whether or not to force DRC off
+	bool                    m_force_no_drc;             // whether or not to force DRC off
 
 	// other parameters
 	const char *            m_default_layout;           // default layout for this machine

@@ -37,7 +37,9 @@ public:
 		m_cart(*this, "cartslot"),
 		m_tia(*this, "tia_video"),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_swb(*this, "SWB")
+	{ }
 
 	required_shared_ptr<UINT8> m_riot_ram;
 	UINT16 m_current_screen_height;
@@ -66,6 +68,7 @@ protected:
 	unsigned long detect_2600controllers();
 	required_device<m6502_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_ioport m_swb;
 };
 
 
@@ -124,7 +127,7 @@ WRITE_LINE_MEMBER(a2600_state::irq_callback)
 
 READ8_MEMBER(a2600_state::riot_input_port_8_r)
 {
-	return ioport("SWB")->read();
+	return m_swb->read();
 }
 
 
@@ -545,5 +548,5 @@ ROM_END
 #define rom_a2600p rom_a2600
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,  a2600, driver_device,   0,      "Atari",    "Atari 2600 (NTSC)" , GAME_SUPPORTS_SAVE )
-CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, driver_device,   0,      "Atari",    "Atari 2600 (PAL)",   GAME_SUPPORTS_SAVE )
+CONS( 1977, a2600,  0,      0,      a2600,  a2600, driver_device,   0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, driver_device,   0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )

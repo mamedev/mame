@@ -8,6 +8,7 @@
 
 #include "osdcore.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 
 //============================================================
@@ -96,6 +97,25 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 	count = fwrite(buffer, 1, length, (FILE *)file);
 	if (actual != NULL)
 		*actual = count;
+
+	return FILERR_NONE;
+}
+
+
+//============================================================
+//  osd_truncate
+//============================================================
+
+file_error osd_truncate(osd_file *file, UINT64 offset)
+{
+	UINT32 result;
+
+	if (!file)
+		return FILERR_FAILURE;
+
+	result = ftruncate(fileno((FILE *)file), offset);
+	if (result)
+		return FILERR_FAILURE;
 
 	return FILERR_NONE;
 }

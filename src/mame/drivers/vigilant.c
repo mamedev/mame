@@ -1055,17 +1055,17 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant,   0,          vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev E)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev A)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev C)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "bootleg", "Vigilante (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilant,   0,          vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, driver_device, 0, ROT0, "Irem", "Meikyu Jima (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg", "Kickle Cubele", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, driver_device, 0, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

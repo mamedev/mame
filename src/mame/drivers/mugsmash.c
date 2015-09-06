@@ -456,4 +456,4 @@ ROM_START( mugsmash )
 	ROM_LOAD( "mugs_15.bin", 0x180000, 0x080000, CRC(82e8187c) SHA1(c7a0e1b3d90dbbe2588886a27a07a9c336447ae3) )
 ROM_END
 
-GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, driver_device, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", GAME_SUPPORTS_SAVE )
+GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, driver_device, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", MACHINE_SUPPORTS_SAVE )

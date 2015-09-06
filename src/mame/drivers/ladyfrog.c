@@ -365,7 +365,7 @@ ROM_START( toucheme )
 	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, driver_device, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", GAME_SUPPORTS_SAVE )
+GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, driver_device, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
 
 // toucheme art style is similar to ladyfrog, so it's probably the same manufacturer
-GAME( 19??, toucheme, 0, toucheme, toucheme, driver_device, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me", GAME_SUPPORTS_SAVE )
+GAME( 19??, toucheme, 0, toucheme, toucheme, driver_device, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me", MACHINE_SUPPORTS_SAVE )

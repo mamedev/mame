@@ -1321,7 +1321,7 @@ FPTR symbol_manager::get_text_section_base()
 	dynamic_bind<PIMAGE_NT_HEADERS (WINAPI *)(PVOID)> image_nt_header(TEXT("dbghelp.dll"), "ImageNtHeader");
 
 	// start with the image base
-	PVOID base = reinterpret_cast<PVOID>(GetModuleHandle(NULL));
+	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());
 	assert(base != NULL);
 
 	// make sure we have the functions we need

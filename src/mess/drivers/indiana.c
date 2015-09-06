@@ -119,4 +119,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                  FULLNAME                               FLAGS */
-COMP( 1993, indiana,  0,       0,    indiana,   indiana, indiana_state,  indiana,  "Indiana University", "Indiana University 68030 board", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1993, indiana,  0,       0,    indiana,   indiana, indiana_state,  indiana,  "Indiana University", "Indiana University 68030 board", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

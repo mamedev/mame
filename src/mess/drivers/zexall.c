@@ -168,4 +168,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 2009, zexall,   0,          0,      zexall,   zexall, zexall_state, zexall,      "Frank Cringle & MESSDEV",   "ZEXALL Z80 instruction set exerciser (modified for MESS)", GAME_NO_SOUND_HW )
+COMP( 2009, zexall,   0,          0,      zexall,   zexall, zexall_state, zexall,      "Frank Cringle & MESSDEV",   "ZEXALL Z80 instruction set exerciser (modified for MESS)", MACHINE_NO_SOUND_HW )

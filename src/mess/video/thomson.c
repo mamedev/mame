@@ -32,7 +32,7 @@
 int thomson_state::thom_update_screen_size()
 {
 	const rectangle &visarea = m_screen->visible_area();
-	UINT8 p = ioport("vconfig")->read();
+	UINT8 p = m_io_vconfig->read();
 	int new_w, new_h, changed = 0;
 
 	switch ( p & 3 )
@@ -70,7 +70,7 @@ unsigned thomson_state::thom_video_elapsed()
 {
 	unsigned u;
 	attotime elapsed = m_thom_video_timer->elapsed();
-	u = (elapsed * 1000000 ).seconds;
+	u = (elapsed * 1000000 ).seconds();
 	if ( u >= 19968 )
 		u = 19968;
 	return u;
@@ -106,8 +106,8 @@ struct thom_vsignal thomson_state::thom_get_vsignal()
 
 void thomson_state::thom_get_lightpen_pos( int*x, int* y )
 {
-	*x = ioport("lightpen_x")->read();
-	*y = ioport("lightpen_y")->read();
+	*x = m_io_lightpen_x->read();
+	*y = m_io_lightpen_y->read();
 
 	if ( *x < 0 )
 		*x = 0;
@@ -871,7 +871,7 @@ void thomson_state::thom_set_mode_point( int point )
 {
 	assert( point >= 0 && point <= 1 );
 	m_thom_mode_point = ( ! point ) * 0x2000;
-	membank( THOM_VRAM_BANK )->set_entry( ! point );
+	m_vrambank->set_entry( ! point );
 }
 
 
@@ -1153,7 +1153,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 
 	m_thom_mode_point = 0;
 	save_item(NAME(m_thom_mode_point));
-	membank( THOM_VRAM_BANK )->set_entry( 0 );
+	m_vrambank->set_entry( 0 );
 
 	m_thom_floppy_rcount = 0;
 	m_thom_floppy_wcount = 0;

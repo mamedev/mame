@@ -841,6 +841,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, driver_device, 0, ROT0, "Nichibutsu",         "Dacholer",               GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, kickboy,  0, dacholer, kickboy, driver_device,  0, ROT0, "Nichibutsu",         "Kick Boy",               GAME_SUPPORTS_SAVE )
-GAME( 1984, itaten,   0, itaten,   itaten, driver_device,   0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, driver_device, 0, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy, driver_device,  0, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, itaten,   0, itaten,   itaten, driver_device,   0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )

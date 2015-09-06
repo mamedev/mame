@@ -1528,4 +1528,4 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT    COMPAT    MACHINE   INPUT     INIT    */
-CONS( 1990, neogeo,     0,        0,        mvs,      neogeo_6slot,   neogeo_state, mvs,  "SNK", "Neo-Geo", GAME_IS_BIOS_ROOT | GAME_SUPPORTS_SAVE )
+CONS( 1990, neogeo,     0,        0,        mvs,      neogeo_6slot,   neogeo_state, mvs,  "SNK", "Neo-Geo", MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )

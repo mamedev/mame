@@ -988,27 +988,10 @@ ROM_START( attache )
 	ROM_FILL(0x0000,0x10000,0x00)
 
 	ROM_REGION(0x1000, "boot", 0)
-	ROM_LOAD("u252revg.bin",  0x0000, 0x1000, CRC(113136b7) SHA1(845afd9ed2fd2b28c39921d8f2ba99e5295e0330) )
-
-	ROM_REGION(0x1000, "video", 0)
-	ROM_LOAD("u416vid.bin",  0x0000, 0x1000, CRC(e376ec59) SHA1(7b9e9db575e77ce2f479eb9ae913528e4f0d125d) )
-
-	ROM_REGION(0x100, "attr", 0)
-	ROM_LOAD("u413.bin",  0x0000, 0x0100, CRC(5b60e622) SHA1(43450c747db1394466eabe5c26a61bf75a4f3b52) )
-
-	ROM_REGION(0x200, "iosel", 0)
-	ROM_LOAD("u110.bin",  0x0000, 0x0200, CRC(70dd255a) SHA1(36dcce07a2c14eefc069433459c422341bd47efb) )
-
-	ROM_REGION(0x100, "floppy", 0)
-	ROM_LOAD("u630.bin",  0x0000, 0x0100, CRC(f7a5c821) SHA1(fea07d9ac7e4e5f4f72aa7b2159deaedbd662ead) )
-ROM_END
-
-ROM_START( attachef )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_FILL(0x0000,0x10000,0x00)
-
-	ROM_REGION(0x1000, "boot", 0)
-	ROM_LOAD("u252revf.bin",  0x0000, 0x1000, CRC(b49eb3b2) SHA1(5b1b348301b2f76b1f250ba68bb8733fc15d18c2) )
+	ROM_SYSTEM_BIOS(0, "u252revg", "Boot Rev.G")
+	ROMX_LOAD("u252revg.bin", 0x0000, 0x1000, CRC(113136b7) SHA1(845afd9ed2fd2b28c39921d8f2ba99e5295e0330), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "u252revf", "Boot Rev.F")
+	ROMX_LOAD("u252revf.bin", 0x0000, 0x1000, CRC(b49eb3b2) SHA1(5b1b348301b2f76b1f250ba68bb8733fc15d18c2), ROM_BIOS(2))
 
 	ROM_REGION(0x1000, "video", 0)
 	ROM_LOAD("u416vid.bin",  0x0000, 0x1000, CRC(e376ec59) SHA1(7b9e9db575e77ce2f479eb9ae913528e4f0d125d) )
@@ -1024,5 +1007,4 @@ ROM_START( attachef )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev G)",    GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
-COMP( 1982, attachef,attache,0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev F)",    GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
+COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)

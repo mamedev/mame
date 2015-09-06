@@ -34,7 +34,6 @@ public:
 	required_shared_ptr<UINT16> m_spr_ctrl;
 	required_shared_ptr<UINT16> m_screen_vregs;
 	required_device<vsystem_spr_device> m_spr;
-//  UINT16 *    m_paletteram; // this currently uses generic palette handling
 
 	/* video-related */
 	tilemap_t     *m_screen_tilemap;

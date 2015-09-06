@@ -552,7 +552,9 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_FD1771_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", mycom_state, mycom_kbd, attotime::from_hz(20))
 MACHINE_CONFIG_END
@@ -580,4 +582,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY                   FULLNAME       FLAGS */
-COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state,   mycom, "Japan Electronics College", "MYCOMZ-80A", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state,   mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

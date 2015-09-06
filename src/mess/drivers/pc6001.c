@@ -1343,7 +1343,7 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_vram_bank_w)
 
 			visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
-			machine().first_screen()->configure(320, 240, visarea, machine().first_screen()->frame_period().attoseconds);
+			machine().first_screen()->configure(320, 240, visarea, machine().first_screen()->frame_period().attoseconds());
 		}
 	}
 
@@ -2469,8 +2469,8 @@ ROM_START( pc6001sr )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY  FULLNAME          FLAGS */
-COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001 (Japan)",    GAME_NOT_WORKING )
-COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001A (US)",      GAME_NOT_WORKING ) // This version is also known as the NEC Trek
-COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   GAME_NOT_WORKING )
-COMP( 1983, pc6601,   pc6001,  0,     pc6601,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6601 (Japan)",       GAME_NOT_WORKING )
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", GAME_NOT_WORKING )
+COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001 (Japan)",    MACHINE_NOT_WORKING )
+COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001A (US)",      MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
+COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
+COMP( 1983, pc6601,   pc6001,  0,     pc6601,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )

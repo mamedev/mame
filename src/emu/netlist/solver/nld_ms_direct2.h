@@ -8,8 +8,8 @@
 #ifndef NLD_MS_DIRECT2_H_
 #define NLD_MS_DIRECT2_H_
 
-#include "../solver/nld_ms_direct.h"
-#include "../solver/nld_solver.h"
+#include "solver/nld_ms_direct.h"
+#include "solver/nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -41,10 +41,10 @@ ATTR_HOT inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED cons
 	build_LE_A();
 	build_LE_RHS(m_RHS);
 
-	const nl_double a = m_A[0][0];
-	const nl_double b = m_A[0][1];
-	const nl_double c = m_A[1][0];
-	const nl_double d = m_A[1][1];
+	const nl_double a = A(0,0);
+	const nl_double b = A(0,1);
+	const nl_double c = A(1,0);
+	const nl_double d = A(1,1);
 
 	nl_double new_val[2];
 	new_val[1] = (a * m_RHS[1] - c * m_RHS[0]) / (a * d - b * c);

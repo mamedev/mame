@@ -14,6 +14,13 @@
 #include "chd.h"
 #include "sound/samples.h"
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 
 //**************************************************************************
 //  CORE FUNCTIONS
@@ -607,3 +614,7 @@ audit_record::audit_record(const char *name, media_type type)
 		m_shared_device(NULL)
 {
 }
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

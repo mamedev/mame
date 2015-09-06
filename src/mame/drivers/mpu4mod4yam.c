@@ -8,7 +8,7 @@
 MACHINE_CONFIG_EXTERN( mod4yam );
 INPUT_PORTS_EXTERN( mpu4 );
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK)
 
 #include "gamball.lh"
 
@@ -192,7 +192,7 @@ ROM_START( m4tst )
 	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
 ROM_END
 
-GAME(198?, m4tst,        0, mod4yam ,mpu4 , mpu4_state,m4default,     ROT0,"Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
+GAME(198?, m4tst,        0, mod4yam ,mpu4 , mpu4_state,m4default,     ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
 ROM_START( m4stc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -256,7 +256,7 @@ GAME_CUSTOM( 199?, m4cojok__f,  m4cojok,    "cojxy.p1",     0x0000, 0x010000, CR
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL(year, setname, parent ,mod4yam    ,mpu4 , mpu4_state,m4gambal ,ROT0,company,title,GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )
+	GAMEL(year, setname, parent ,mod4yam    ,mpu4 , mpu4_state,m4gambal ,ROT0,company,title,MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_gamball )
 
 GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4gambal__a,    m4gambal,   "gabcx.p1", 0x0000, 0x010000, CRC(52c35266) SHA1(bda49005de88094fbc84621f63b33f0e0a9c0bd3), "Barcrest","Gamball (Barcrest) (MPU4) (set 2)" )

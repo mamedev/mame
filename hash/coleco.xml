@@ -3284,4 +3284,31 @@
 		</part>
 	</software>
 
+<!-- Unofficial multicarts -->
+
+	<software name="31in1">
+		<description>31-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="xin1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="31in1-eprom-15012013-rev2.rom" size="1048576" crc="3f4ebe58" sha1="bf7fc70b25b9654c86f644474ef9e6906df82a46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="63in1">
+		<description>63-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="xin1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="eprom-flash-63in1-part1.rom" size="1048576" crc="3b21137f" sha1="a22b1a4ea96507c87269db50c0d21052e987e83f" offset="0" />
+				<rom name="eprom-flash-63in1-part2.rom" size="1048576" crc="f4d18722" sha1="e5a6d0071a0b1d813f03713133b48ba3a073c2cd" offset="1048576" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

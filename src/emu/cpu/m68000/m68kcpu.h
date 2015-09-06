@@ -619,24 +619,35 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 /* ======================================================================== */
 
 
-INLINE unsigned int m68k_read_immediate_32(m68000_base_device *m68k, unsigned int address)
-{
-	return (m68k->/*memory.*/readimm16(address) << 16) | m68k->/*memory.*/readimm16(address + 2);
-}
-
 INLINE unsigned int m68k_read_pcrelative_8(m68000_base_device *m68k, unsigned int address)
 {
-	return ((m68k->/*memory.*/readimm16(address&~1)>>(8*(1-(address & 1))))&0xff);
+	return ((m68k->readimm16(address&~1)>>(8*(1-(address & 1))))&0xff);
 }
 
 INLINE unsigned int m68k_read_pcrelative_16(m68000_base_device *m68k, unsigned int address)
 {
-	return m68k->/*memory.*/readimm16(address);
+	if(address & 1)
+		return
+			(m68k->readimm16(address-1) << 8) |
+			(m68k->readimm16(address+1) >> 8);
+
+	else
+		return
+			(m68k->readimm16(address  )      );
 }
 
 INLINE unsigned int m68k_read_pcrelative_32(m68000_base_device *m68k, unsigned int address)
 {
-	return m68k_read_immediate_32(m68k, address);
+	if(address & 1)
+		return
+			(m68k->readimm16(address-1) << 24) |
+			(m68k->readimm16(address+1) << 8)  |
+			(m68k->readimm16(address+3) >> 8);
+
+	else
+		return
+			(m68k->readimm16(address  ) << 16) |
+			(m68k->readimm16(address+2)      );
 }
 
 

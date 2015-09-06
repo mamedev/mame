@@ -1432,9 +1432,9 @@ DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 /* http://www.tatsu-mi.co.jp/game/trace/index.html */
 
 /* ** 1987  grayout    - Gray Out (not dumped yet) */
-GAME( 1988, apache3,   0,        apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, apache3a,  apache3,  apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", GAME_IMPERFECT_GRAPHICS )
-GAMEL(1989, roundup5,  0,        roundup5,  roundup5, tatsumi_state, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS, layout_roundup5 )
-GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev C)", GAME_IMPERFECT_GRAPHICS ) // Rev C & B CPU code
-GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", GAME_IMPERFECT_GRAPHICS ) // Rev B & A CPU code
-GAME( 1992, bigfight,  0,        bigfight,  bigfight, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, apache3,   0,        apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi", "Apache 3", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, apache3a,  apache3,  apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1989, roundup5,  0,        roundup5,  roundup5, tatsumi_state, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS, layout_roundup5 )
+GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev C)", MACHINE_IMPERFECT_GRAPHICS ) // Rev C & B CPU code
+GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS ) // Rev B & A CPU code
+GAME( 1992, bigfight,  0,        bigfight,  bigfight, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )

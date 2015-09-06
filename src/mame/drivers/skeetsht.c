@@ -293,5 +293,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, skeetsht, 0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Skeet Shot", GAME_NOT_WORKING )
-GAME( 1991, popshot,  0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Pop Shot (prototype)", GAME_NOT_WORKING )
+GAME( 1991, skeetsht, 0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Skeet Shot", MACHINE_NOT_WORKING )
+GAME( 1991, popshot,  0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )

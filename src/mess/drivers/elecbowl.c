@@ -14,8 +14,8 @@
   * edge connector to sensors(switches trigger when ball rolls over)
     and other inputs
 
-  lamp translation table: SN74259.u5(mux 1) goes to MESS output lamp5x,
-  SN74259.u6(mux 2) goes to MESS output lamp6x. u1-u3 are SN75492 ICs,
+  lamp translation table: SN74259.u5(mux 1) goes to MAME output lamp5x,
+  SN74259.u6(mux 2) goes to MAME output lamp6x. u1-u3 are SN75492 ICs,
   where other: u1 A2 is N/C, u3 A1 is from O2 and goes to digits seg C.
 
     u5 Q0 -> u1 A4 -> L2 (pin #2)       u6 Q0 -> u3 A4 -> L1 (pin #1)
@@ -219,4 +219,4 @@ ROM_START( elecbowl )
 ROM_END
 
 
-CONS( 1978, elecbowl, 0, 0, elecbowl, elecbowl, driver_device, 0, "Marx", "Electronic Bowling (Marx)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_MECHANICAL | GAME_NOT_WORKING )
+CONS( 1978, elecbowl, 0, 0, elecbowl, elecbowl, driver_device, 0, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

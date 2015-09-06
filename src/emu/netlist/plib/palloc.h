@@ -8,9 +8,26 @@
 #ifndef PALLOC_H_
 #define PALLOC_H_
 
-#include <cstdio>
+#include <exception>
 
 #include "pconfig.h"
+#include "pstring.h"
+
+//============================================================
+//  exception base
+//============================================================
+
+class pexception : public std::exception
+{
+public:
+	pexception(const pstring &text);
+	virtual ~pexception() throw() {}
+
+	const pstring &text() { return m_text; }
+
+private:
+	pstring m_text;
+};
 
 //============================================================
 //  Memory allocation
@@ -51,7 +68,6 @@ inline void pfree_t(T *p)
 template <typename T>
 inline T *palloc_array_t(size_t N)
 {
-	//printf("here palloc_array %d\n", (unsigned) N);
 	char *buf = reinterpret_cast<char *>(palloc_raw(N * sizeof(T) + 64*2));
 	size_t *s = reinterpret_cast<size_t *>(buf);
 	*s = N;
@@ -69,7 +85,6 @@ inline void pfree_array_t(T *p)
 	buf -= 64;
 	size_t *s = reinterpret_cast<size_t *>(buf);
 	size_t N = *s;
-	//printf("here pfree_array %d\n", (unsigned) N);
 	while (N > 0)
 	{
 			p->~T();
@@ -79,7 +94,7 @@ inline void pfree_array_t(T *p)
 	pfree_raw(s);
 }
 
-#define palloc(T)        	  new(ppool) T
+#define palloc(T)             new(ppool) T
 #define pfree(_ptr)           pfree_t(_ptr)
 
 #if 1
@@ -94,7 +109,7 @@ inline void pfree_array_t(T *p)
 
 #define ATTR_ALIGN
 
-#define palloc(T)        	  global_alloc(T)
+#define palloc(T)             global_alloc(T)
 #define pfree(_ptr)           global_free(_ptr)
 
 #define palloc_array(T, N)    global_alloc_array(T, N)

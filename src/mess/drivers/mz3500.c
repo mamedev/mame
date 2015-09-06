@@ -98,7 +98,6 @@ public:
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(mz3500);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -786,16 +785,6 @@ void mz3500_state::machine_reset()
 }
 
 
-
-PALETTE_INIT_MEMBER(mz3500_state, mz3500)
-{
-	int i;
-
-	for(i=0;i<8;i++)
-		palette.set_pen_color(i,pal1bit((i >> 1) & 1),pal1bit(i >> 2),pal1bit((i >> 0) & 1));
-
-}
-
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
@@ -854,8 +843,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz3500)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(mz3500_state, mz3500)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -882,4 +870,4 @@ ROM_START( mz3500 )
 	ROM_LOAD( "mz-3500_cg-rom_2-b_m5l2764k.bin", 0x000000, 0x002000, CRC(29f2f80a) SHA1(64b307cd9de5a3327e3ec9f3d0d6b3485706f436) )
 ROM_END
 
-COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, driver_device,  0,  "Sharp",      "MZ-3500", GAME_IS_SKELETON )
+COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, driver_device,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )

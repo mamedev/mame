@@ -39,6 +39,14 @@
 #include "wavwrite.h"
 #include "discrete.h"
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
+
 /* for_each collides with c++ standard libraries - include it here */
 #define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
 
@@ -863,7 +871,7 @@ void discrete_device::device_start()
 	//m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
 
 	const discrete_block *intf_start = m_intf;
-	char name[32];
+	char name[128];
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
 	if (this->clock())
@@ -1134,3 +1142,7 @@ WRITE8_MEMBER( discrete_device::write )
 		discrete_log("discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
 	}
 }
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

@@ -121,7 +121,14 @@ struct n64_tile_t
 	INT32 wrapped_mask_s, wrapped_mask_t;
 	bool clamp_s, clamp_t;
 	rgbaint_t mm, invmm;
-	rgbaint_t wrapped_mask, mask, lshift, rshift, sth, stl, clamp_st;
+	rgbaint_t wrapped_mask;
+	rgbaint_t mask;
+	rgbaint_t invmask;
+	rgbaint_t lshift;
+	rgbaint_t rshift;
+	rgbaint_t sth;
+	rgbaint_t stl;
+	rgbaint_t clamp_st;
 	UINT16 sl, tl, sh, th;      // 10.2 fixed-point, starting and ending texel row / column
 	INT32 num;
 };

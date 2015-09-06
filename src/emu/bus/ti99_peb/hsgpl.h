@@ -18,7 +18,7 @@
 
 #include "emu.h"
 #include "peribox.h"
-#include "machine/at29040a.h"
+#include "machine/at29x.h"
 
 extern const device_type TI99_HSGPL;
 
@@ -42,10 +42,10 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
-	at29040a_device* m_dsr_eeprom;
-	at29040a_device* m_rom6_eeprom;
-	at29040a_device* m_grom_a_eeprom;
-	at29040a_device* m_grom_b_eeprom;
+	at29c040a_device* m_dsr_eeprom;
+	at29c040a_device* m_rom6_eeprom;
+	at29c040a_device* m_grom_a_eeprom;
+	at29c040a_device* m_grom_b_eeprom;
 
 	UINT8*          m_ram6_memory;
 	UINT8*          m_gram_memory;

@@ -56,6 +56,8 @@ public:
 		MP_OUTP,
 		MP_IE,
 		MP_INTPEN,
+		MP_TCOUNT,
+		MP_TSCALE
 	};
 
 	enum
@@ -63,7 +65,7 @@ public:
 		INPUT_X1        = 1,
 		INPUT_X2        = 2,
 		INPUT_X3        = 3,
-		INPUT_X4        = 4,
+		INPUT_X4        = 4
 	};
 
 	DECLARE_READ32_MEMBER(mp_param_r);
@@ -127,6 +129,9 @@ protected:
 	UINT32 m_epc;
 	UINT32 m_eip;
 
+	UINT32 m_tcount;
+	UINT32 m_tscale;
+
 	UINT32 m_param_ram[0x800];
 
 	int m_icount;
@@ -158,7 +163,7 @@ public:
 
 	enum
 	{
-		PP_PC = 1,
+		PP_PC = 1
 	};
 
 protected:

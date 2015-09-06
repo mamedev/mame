@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( bogeyman_map, AS_PROGRAM, 8, bogeyman_state )
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x300f) AM_RAM_WRITE(paletteram_w) AM_SHARE("palette")
+	AM_RANGE(0x3000, 0x300f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE(ay8910_control_w)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE(ay8910_latch_w)
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW1")
@@ -232,7 +232,6 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_CPU_PROGRAM_MAP(bogeyman_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
 
-
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -245,7 +244,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bogeyman)
 	MCFG_PALETTE_ADD("palette", 16+256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
 
 	// sound hardware
@@ -292,4 +291,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, driver_device, 0, ROT0, "Technos Japan", "Bogey Manor", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, driver_device, 0, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

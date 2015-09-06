@@ -63,8 +63,8 @@ UINT32 mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bitma
 
 static MACHINE_CONFIG_START( mk85, mk85_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
-	MCFG_T11_INITIAL_MODE(5 << 13)         /* start from 0000 */
+	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_4MHz)
+	MCFG_T11_INITIAL_MODE(0)
 	MCFG_CPU_PROGRAM_MAP(mk85_mem)
 
 
@@ -89,4 +89,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1986, mk85,   0,      0,       mk85,      mk85, driver_device,    0,   "Elektronika", "MK-85", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, mk85,   0,      0,       mk85,      mk85, driver_device,    0,   "Elektronika", "MK-85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

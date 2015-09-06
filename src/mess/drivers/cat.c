@@ -1839,5 +1839,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, swyft,0,      0,       swyft,     swyft,   driver_device, 0,       "Information Applicance Inc", "Swyft", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1987, cat,  swyft,  0,       cat,       cat,     driver_device, 0,       "Canon",  "Cat", GAME_NOT_WORKING)
+COMP( 1985, swyft,0,      0,       swyft,     swyft,   driver_device, 0,       "Information Applicance Inc", "Swyft", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, cat,  swyft,  0,       cat,       cat,     driver_device, 0,       "Canon",  "Cat", MACHINE_NOT_WORKING)

@@ -444,7 +444,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sangho_state::sangho_interrupt)
 
 	if((scanline % 2) == 0)
 	{
-		m_v9958->set_resolution(RENDER_HIGH);
 		m_v9958->interrupt();
 	}
 }
@@ -457,7 +456,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -485,7 +484,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -554,5 +553,5 @@ DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 	ROM[0x12ca8] = 0x00;
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, driver_device, 0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )

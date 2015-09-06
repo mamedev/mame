@@ -73,8 +73,8 @@ TODO :
 
 #include "cpu/tms9900/ti990_10.h"
 #include "sound/beep.h"
-#include "machine/ti99/990_hd.h"
-#include "machine/ti99/990_tap.h"
+#include "bus/ti99x/990_hd.h"
+#include "bus/ti99x/990_tap.h"
 #include "video/911_vdt.h"
 
 
@@ -386,4 +386,4 @@ DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1975, ti990_10,   0,      0,      ti990_10,   0, ti990_10_state,   ti990_10,   "Texas Instruments",    "TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )
+COMP( 1975, ti990_10,   0,      0,      ti990_10,   0, ti990_10_state,   ti990_10,   "Texas Instruments",    "TI Model 990/10 Minicomputer System" , MACHINE_NOT_WORKING )

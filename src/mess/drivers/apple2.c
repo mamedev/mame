@@ -368,7 +368,7 @@ PALETTE_INIT_MEMBER(napple2_state, apple2)
 UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
-	m_video->m_flash = ((machine().time() * 4).seconds & 1) ? true : false;
+	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
 
 	if (m_video->m_graphics)
 	{
@@ -377,7 +377,14 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
+				if (!strcmp(machine().system().name, "ivelultr"))
+				{
+					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
+				}
+				else
+				{
+					m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
+				}
 			}
 			else
 			{
@@ -389,7 +396,14 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
+				if (!strcmp(machine().system().name, "ivelultr"))
+				{
+					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
+				}
+				else
+				{
+					m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
+				}
 			}
 			else
 			{
@@ -399,7 +413,14 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	else
 	{
-		m_video->text_update_orig(screen, bitmap, cliprect, 0, 191);
+		if (!strcmp(machine().system().name, "ivelultr"))
+		{
+			m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
+		}
+		else
+		{
+			m_video->text_update_orig(screen, bitmap, cliprect, 0, 191);
+		}
 	}
 
 	return 0;
@@ -1245,10 +1266,7 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL_14_31818MHz)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(280*2, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
+	MCFG_SCREEN_RAW_PARAMS(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(napple2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1562,20 +1580,20 @@ ROM_END
 #endif
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,   0,        "Apple Computer",    "Apple ][", GAME_SUPPORTS_SAVE )
-COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", GAME_SUPPORTS_SAVE )
-COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", GAME_SUPPORTS_SAVE )
-COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Victor do Brasil",  "Elppa II+", GAME_SUPPORTS_SAVE )
-COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Polymax",  "Maxxi", GAME_SUPPORTS_SAVE )
-COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", GAME_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
-COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletrônica", "Unitron AP II (in English)", GAME_SUPPORTS_SAVE )
-COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletrônica", "Unitron AP II (in Brazilian Portuguese)", GAME_SUPPORTS_SAVE )
-COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
+COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,   0,        "Apple Computer",    "Apple ][", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Victor do Brasil",  "Elppa II+", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Polymax",  "Maxxi", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletr??nica", "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletr??nica", "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", MACHINE_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
 // reverse font direction -\/
-COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", GAME_SUPPORTS_SAVE )
-COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-9", GAME_NOT_WORKING)
-COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 8M", GAME_SUPPORTS_SAVE )
-COMP( 1985, space84,  apple2,   0,        space84,     apple2p, driver_device,  0,        "ComputerTechnik/IBS",  "Space 84",   GAME_NOT_WORKING )
-COMP( 1985, am64,     apple2,   0,        space84,     apple2p, driver_device,  0,        "ASEM",              "AM 64", GAME_SUPPORTS_SAVE )
-//COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, driver_device,  0,        "<unknown>",         "Lab equipment Apple II Plus clone", GAME_SUPPORTS_SAVE )
+COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-9", MACHINE_NOT_WORKING)
+COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, space84,  apple2,   0,        space84,     apple2p, driver_device,  0,        "ComputerTechnik/IBS",  "Space 84",   MACHINE_NOT_WORKING )
+COMP( 1985, am64,     apple2,   0,        space84,     apple2p, driver_device,  0,        "ASEM",              "AM 64", MACHINE_SUPPORTS_SAVE )
+//COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, driver_device,  0,        "<unknown>",         "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )

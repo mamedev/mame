@@ -44,7 +44,6 @@ public:
 	UINT8  *      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
 	UINT16 *      m_spritebufferram; // buffered spriteram
-//  UINT16 *      m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t       *m_bg_tilemap;

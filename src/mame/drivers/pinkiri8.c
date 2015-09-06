@@ -181,11 +181,11 @@ void pinkiri8_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 
 void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int game_type_hack = 0;
+	int MACHINE_TYPE_hack = 0;
 	int col_bank;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
-	if (!strcmp(machine().system().name,"janshi")) game_type_hack = 1;
+	if (!strcmp(machine().system().name,"janshi")) MACHINE_TYPE_hack = 1;
 
 	//popmessage("%02x",m_janshi_crtc_regs[0x0a]);
 	col_bank = (m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
@@ -248,7 +248,7 @@ void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 		// hacks!
-		if (game_type_hack==1) // janshi
+		if (MACHINE_TYPE_hack==1) // janshi
 		{
 			if (spr_offs<0x400)
 			{
@@ -1214,6 +1214,6 @@ DRIVER_INIT_MEMBER(pinkiri8_state,ronjan)
 	m_maincpu->space(AS_IO).install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
 }
 
-GAME( 1992,  janshi,    0,   pinkiri8, janshi, driver_device,    0,      ROT0, "Eagle",         "Janshi",          GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1994,  ronjan,    0,   pinkiri8, ronjan, pinkiri8_state,    ronjan, ROT0, "Wing Co., Ltd", "Ron Jan (Super)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
-GAME( 1994,  pinkiri8,  0,   pinkiri8, pinkiri8, driver_device,  0,      ROT0, "Alta",          "Pinkiri 8",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1992,  janshi,    0,   pinkiri8, janshi, driver_device,    0,      ROT0, "Eagle",         "Janshi",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1994,  ronjan,    0,   pinkiri8, ronjan, pinkiri8_state,    ronjan, ROT0, "Wing Co., Ltd", "Ron Jan (Super)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
+GAME( 1994,  pinkiri8,  0,   pinkiri8, pinkiri8, driver_device,  0,      ROT0, "Alta",          "Pinkiri 8",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

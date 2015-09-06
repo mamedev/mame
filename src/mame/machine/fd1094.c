@@ -472,9 +472,7 @@ const UINT16 fd1094_device::s_masked_opcodes[] =
 	0xde3a,0xde7a,0xdeba,0xdefa,    0xdffa
 };
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, fd1094_device )
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK(":fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+
 
 
 //**************************************************************************
@@ -556,7 +554,7 @@ UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 
 fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m68000_device(mconfig, tag, owner, clock, "fd1094", __FILE__),
-		m_decrypted_opcodes_bank(*this, ":fd1094_decrypted_opcodes"),
+		m_decrypted_opcodes_bank(*this, "^fd1094_decrypted_opcodes"),
 		m_state(0x00),
 		m_irqmode(false),
 		m_cache(*this),
@@ -568,7 +566,7 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 	m_name.assign("FD1094");
 
 	// add the decrypted opcodes map
-	m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
+//	m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
 
 	// create the initial masked opcode table
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));
@@ -586,6 +584,8 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 
 	m_state_change = state_change_delegate(FUNC(fd1094_device::default_state_change), this);
 }
+
+
 
 
 //-------------------------------------------------

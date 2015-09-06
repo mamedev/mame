@@ -459,7 +459,9 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0x07c000, 0x07ffff) AM_RAM AM_SHARE("subram")
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( fd1094_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segahang_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
@@ -938,6 +940,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( shangonro, shangupb )
 	MCFG_CPU_REPLACE("subcpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(fd1094_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -1820,4 +1823,4 @@ GAME( 1985, sharrier1, sharrier, sharrier, sharrier,  segahang_state,sharrier,RO
 GAME( 1986, enduror,   0,        enduror,  enduror,   segahang_state,enduror, ROT0,   "Sega", "Enduro Racer (YM2151, FD1089B 317-0013A)", 0 )
 GAME( 1986, enduror1,  enduror,  enduror1, enduror,   segahang_state,enduror, ROT0,   "Sega", "Enduro Racer (YM2203, FD1089B 317-0013A)", 0 )
 GAME( 1986, endurobl,  enduror,  endurobl, enduror,   segahang_state,endurobl,ROT0,   "bootleg", "Enduro Racer (bootleg set 1)", 0 )
-GAME( 1986, endurob2,  enduror,  endurob2, enduror,   segahang_state,endurob2,ROT0,   "bootleg", "Enduro Racer (bootleg set 2)", GAME_NOT_WORKING )
+GAME( 1986, endurob2,  enduror,  endurob2, enduror,   segahang_state,endurob2,ROT0,   "bootleg", "Enduro Racer (bootleg set 2)", MACHINE_NOT_WORKING )

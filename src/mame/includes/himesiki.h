@@ -21,7 +21,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_ram;
 	required_shared_ptr<UINT8> m_spriteram;
-//  UINT8 *    paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;

@@ -209,14 +209,15 @@
 #include "machine/mm58274c.h"
 #include "sound/sn76496.h"
 
-#include "machine/ti99/genboard.h"
+#include "bus/ti99x/genboard.h"
+#include "bus/ti99x/videowrp.h"
+#include "bus/ti99x/joyport.h"
+
 #include "bus/ti99_peb/peribox.h"
-#include "machine/ti99/videowrp.h"
 
-#include "machine/ti99/joyport.h"
-
-#define VERBOSE 1
-#define LOG logerror
+#define TRACE_READY 0
+#define TRACE_LINES 0
+#define TRACE_CRU 0
 
 #define SRAM_SIZE 384*1024   // maximum SRAM expansion on-board
 #define DRAM_SIZE 512*1024
@@ -317,9 +318,11 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x01, GENEVE_098, "Boot ROM" ) PORT_CONDITION( "MODE", 0x01, EQUALS, 0x00 )
+	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 3)
 		PORT_CONFSETTING( GENEVE_098, "Version 0.98" )
 		PORT_CONFSETTING( GENEVE_100, "Version 1.00" )
+		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
+		PORT_CONFSETTING( GENEVE_PFM512A, "PFM 512A" )
 
 	PORT_START( "SRAM" )
 	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" ) PORT_CONDITION( "MODE", 0x01, EQUALS, 0x00 )
@@ -328,10 +331,10 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x02, "384 KiB" )
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 1)
+	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 2)
+	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
 
@@ -353,7 +356,7 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
 	{
 		int bit = (addroff & 0x003e)>>1;
-		if (VERBOSE>0) LOG("geneve: Single step not implemented; bit %d set to %d\n", bit, data);
+		logerror("geneve: Single step not implemented; bit %d set to %d\n", bit, data);
 		return;
 	}
 
@@ -364,47 +367,47 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 		{
 		case 5:
 			// No one really cares...
-			if (VERBOSE>8) LOG("geneve: Set PAL flag = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Set PAL flag = %02x\n", data);
 			// m_palvideo = (data!=0);
 			break;
 		case 7:
 			// m_capslock = (data!=0);
-			if (VERBOSE>8) LOG("geneve: Set capslock flag = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Set capslock flag = %02x\n", data);
 			break;
 		case 8:
-			if (VERBOSE>8) LOG("geneve: Set keyboard clock flag = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Set keyboard clock flag = %02x\n", data);
 			m_keyboard->clock_control((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 9:
-			if (VERBOSE>8) LOG("geneve: Set keyboard scan flag = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Set keyboard scan flag = %02x\n", data);
 			m_keyboard->send_scancodes((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 10:
-			if (VERBOSE>8) LOG("geneve: Geneve mode = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Geneve mode = %02x\n", data);
 			m_mapper->set_geneve_mode(data!=0);
 			break;
 		case 11:
-			if (VERBOSE>8) LOG("geneve: Direct mode = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Direct mode = %02x\n", data);
 			m_mapper->set_direct_mode(data!=0);
 			break;
 		case 12:
-			if (VERBOSE>8) LOG("geneve: Cartridge size 8K = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Cartridge size 8K = %02x\n", data);
 			m_mapper->set_cartridge_size((data!=0)? 0x2000 : 0x4000);
 			break;
 		case 13:
-			if (VERBOSE>8) LOG("geneve: Cartridge writable 6000 = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Cartridge writable 6000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x6000, (data!=0));
 			break;
 		case 14:
-			if (VERBOSE>8) LOG("geneve: Cartridge writable 7000 = %02x\n", data);
+			if (TRACE_CRU) logerror("geneve: Cartridge writable 7000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x7000, (data!=0));
 			break;
 		case 15:
-			if (VERBOSE>8) LOG("geneve: Extra wait states = %02x\n", data==0);
+			if (TRACE_CRU) logerror("geneve: Extra wait states = %02x\n", data==0);
 			m_mapper->set_extra_waitstates(data==0);  // let's use the inverse semantics
 			break;
 		default:
-			if (VERBOSE>0) LOG("geneve: set CRU address %04x=%02x ignored\n", addroff, data);
+			logerror("geneve: set CRU address %04x=%02x ignored\n", addroff, data);
 			break;
 		}
 	}
@@ -424,7 +427,7 @@ READ8_MEMBER( geneve_state::cruread )
 	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
 	{
 		int bit = (addroff & 0x003e)>>1;
-		if (VERBOSE>0) LOG("geneve: Single step not implemented; attempting to read bit %d\n", bit);
+		logerror("geneve: Single step not implemented; attempting to read bit %d\n", bit);
 		return value;
 	}
 
@@ -476,7 +479,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		if (m_intb==CLEAR_LINE) answer |= 0x10;
 		if (m_video_wait==ASSERT_LINE) answer |= 0x20;
 		// TODO: PAL pin 5
-		if (VERBOSE>8) LOG("geneve: INT15-8 = %02x\n", answer);
+		if (TRACE_LINES) logerror("geneve: INT15-8 = %02x\n", answer);
 		break;
 
 	case TMS9901_P0_P7:
@@ -504,7 +507,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 */
 WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 {
-	if (VERBOSE>0) LOG("geneve: peripheral bus reset request; not implemented yet.\n");
+	logerror("geneve: Peripheral bus reset request; not implemented yet.\n");
 }
 
 /*
@@ -512,7 +515,7 @@ WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 */
 WRITE_LINE_MEMBER( geneve_state::VDP_reset )
 {
-	if (VERBOSE>0) LOG("geneve: Video reset request; not implemented yet.\n");
+	logerror("geneve: Video reset request; not implemented yet.\n");
 }
 
 /*
@@ -528,7 +531,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
 */
 WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 {
-	if (VERBOSE>0) LOG("geneve: external bus wait states set to %d, not implemented yet.\n", state);
+	logerror("geneve: External bus wait states set to %d, not implemented yet.\n", state);
 }
 
 /*
@@ -537,7 +540,7 @@ WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 */
 WRITE_LINE_MEMBER( geneve_state::video_wait_states )
 {
-	if (VERBOSE>1) LOG("geneve: video wait states set to %d\n", state);
+	if (TRACE_LINES) logerror("geneve: Video wait states set to %d\n", state);
 	m_mapper->set_video_waitstates(state==ASSERT_LINE);
 	m_video_wait = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -553,39 +556,6 @@ WRITE8_MEMBER( geneve_state::tms9901_interrupt )
 	/* INTREQ is connected to INT1. */
 	m_cpu->set_input_line(INT_9995_INT1, data);
 }
-
-/*
-// tms9901 setup
-const tms9901_interface tms9901_wiring_geneve =
-{
-    TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,
-
-    // read handler
-    DEVCB_DRIVER_MEMBER(geneve_state, read_by_9901),
-
-    {   // write handlers
-        DEVCB_DRIVER_LINE_MEMBER(geneve_state, peripheral_bus_reset),
-        DEVCB_DRIVER_LINE_MEMBER(geneve_state, VDP_reset),
-        DEVCB_DRIVER_LINE_MEMBER(geneve_state, joystick_select),
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_DEVICE_LINE_MEMBER(GKEYBOARD_TAG, geneve_keyboard_device, reset_line),
-        DEVCB_DRIVER_LINE_MEMBER(geneve_state, extbus_wait_states),
-        DEVCB_NULL,
-        DEVCB_DRIVER_LINE_MEMBER(geneve_state, video_wait_states),
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL
-    },
-
-    // interrupt handler
-    DEVCB_DRIVER_MEMBER(geneve_state, tms9901_interrupt)
-};
-*/
 
 /*******************************************************************
     Signal lines
@@ -612,14 +582,14 @@ WRITE_LINE_MEMBER( geneve_state::intb )
 
 WRITE_LINE_MEMBER( geneve_state::ext_ready )
 {
-	if (VERBOSE>6) LOG("geneve: READY level (ext) = %02x\n", state);
+	if (TRACE_READY) logerror("geneve: READY level (ext) = %02x\n", state);
 	m_ready_line = state;
 	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 {
-	if (VERBOSE>6) LOG("geneve: READY level (mapper) = %02x\n", state);
+	if (TRACE_READY) logerror("geneve: READY level (mapper) = %02x\n", state);
 	m_ready_line1 = state;
 	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
@@ -666,8 +636,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(geneve_state::geneve_hblank_interrupt)
 WRITE8_MEMBER( geneve_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
-	if (VERBOSE>1)
-		if (offset != IDLE_OP) LOG("geneve: External operation %s not implemented on Geneve board\n", extop[offset]);
+	if (offset != IDLE_OP) logerror("geneve: External operation %s not implemented on Geneve board\n", extop[offset]);
 }
 
 /*
@@ -738,9 +707,12 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( geneve_state, peripheral_bus_reset) )
 	MCFG_TMS9901_P1_HANDLER( WRITELINE( geneve_state, VDP_reset) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( geneve_state, joystick_select) )
+	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_select_lsb) )  // new for PFM
+	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_output_enable) )  // new for PFM
 	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GKEYBOARD_TAG, geneve_keyboard_device, reset_line) )
 	MCFG_TMS9901_P7_HANDLER( WRITELINE( geneve_state, extbus_wait_states) )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( geneve_state, video_wait_states) )
+	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_select_msb) )   // new for PFM
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( geneve_state, tms9901_interrupt) )
 
 	// Mapper
@@ -767,6 +739,10 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(geneve_state, keyboard_interrupt) )
 	MCFG_GENEVE_MOUSE_ADD( GMOUSE_TAG )
 	MCFG_GENEVE_JOYPORT_ADD( JOYPORT_TAG )
+
+	// PFM expansion
+	MCFG_AT29C040_ADD( PFM512_TAG )
+	MCFG_AT29C040A_ADD( PFM512A_TAG )
 
 MACHINE_CONFIG_END
 

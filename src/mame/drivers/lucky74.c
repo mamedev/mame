@@ -1744,5 +1744,5 @@ ROM_END
        YEAR  NAME      PARENT   MACHINE  INPUT     STATS           INIT  ROT    COMPANY           FULLNAME                    FLAGS             LAYOUT  */
 GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
 GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                layout_lucky74 )
-GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
-GAME(  1989, excitbj,  0,       lucky74, excitbj,  driver_device,  0,    ROT0, "Sega",           "Exciting Black Jack",       GAME_NOT_WORKING )
+GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING, layout_lucky74 )
+GAME(  1989, excitbj,  0,       lucky74, excitbj,  driver_device,  0,    ROT0, "Sega",           "Exciting Black Jack",       MACHINE_NOT_WORKING )

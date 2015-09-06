@@ -266,7 +266,6 @@ WRITE_LINE_MEMBER(kurukuru_state::kurukuru_vdp_interrupt)
 
 TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_state::kurukuru_vdp_scanline)
 {
-	m_v9938->set_resolution(0);
 	m_v9938->interrupt();
 }
 
@@ -555,7 +554,7 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kurukuru_state,kurukuru_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)

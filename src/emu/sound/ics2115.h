@@ -49,7 +49,7 @@ struct ics2115_voice {
 			UINT8 invert     : 1;
 			UINT8 irq_pending: 1;
 			//IRQ on variable?
-		};
+		} bitflags;
 		UINT8 value;
 	} osc_conf;
 
@@ -64,7 +64,7 @@ struct ics2115_voice {
 			UINT8 invert     : 1;   //invert direction
 			UINT8 irq_pending: 1;   //(read only) IRQ pending
 			//noenvelope == (done | disable)
-		};
+		} bitflags;
 		UINT8 value;
 	} vol_ctrl;
 
@@ -74,7 +74,7 @@ struct ics2115_voice {
 		struct {
 			UINT8 on         : 1;
 			UINT8 ramp       : 7;       // 100 0000 = 0x40 maximum
-		};
+		} bitflags;
 		UINT8 value;
 	} state;
 

@@ -840,7 +840,9 @@ static MACHINE_CONFIG_DERIVED( super80r, super80v )
 	MCFG_WD2793_ADD("fdc", XTAL_2MHz)
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /**************************** ROMS *****************************************************************/
@@ -962,7 +964,7 @@ ROM_END
 /*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS           INIT      COMPANY       FULLNAME */
 COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state,  super80, "Dick Smith Electronics", "Super-80 (V1.2)" , 0)
 COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , GAME_UNOFFICIAL)
-COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with colour)" , GAME_UNOFFICIAL)
-COMP( 1981, super80r, super80, 0,   super80r, super80r, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with VDUEB)" , GAME_UNOFFICIAL)
-COMP( 1981, super80v, super80, 0,   super80v, super80v, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , GAME_UNOFFICIAL)
+COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with colour)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80r, super80, 0,   super80r, super80r, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with VDUEB)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80v, super80, 0,   super80v, super80v, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , MACHINE_UNOFFICIAL)

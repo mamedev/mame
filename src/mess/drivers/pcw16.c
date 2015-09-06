@@ -1091,4 +1091,4 @@ ROM_END
 
 
 /*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT    COMPANY          FULLNAME */
-COMP( 1995, pcw16,    0,        0,      pcw16,     pcw16, driver_device,    0,      "Amstrad plc",   "PcW16", GAME_NOT_WORKING )
+COMP( 1995, pcw16,    0,        0,      pcw16,     pcw16, driver_device,    0,      "Amstrad plc",   "PcW16", MACHINE_NOT_WORKING )

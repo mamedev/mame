@@ -364,7 +364,7 @@ UINT8 z80ctc_device::ctc_channel::read()
 	{
 		attotime period = ((m_mode & PRESCALER) == PRESCALER_16) ? m_device->m_period16 : m_device->m_period256;
 
-		VPRINTF(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds)));
+		VPRINTF(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds())));
 
 		if (m_timer != NULL)
 			return ((int)(m_timer->remaining().as_double() / period.as_double()) + 1) & 0xff;

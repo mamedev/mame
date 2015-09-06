@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_irq_handler)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
-};
+}
 
 READ8_MEMBER(dectalk_state::dectalk_duart_input)
 {
@@ -1007,4 +1007,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY     FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation",      "DECtalk DTC-01",   GAME_NOT_WORKING )
+COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation",      "DECtalk DTC-01",   MACHINE_NOT_WORKING )

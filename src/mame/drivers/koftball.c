@@ -312,4 +312,4 @@ DRIVER_INIT_MEMBER(koftball_state,koftball)
 #endif
 }
 
-GAME( 1995, koftball,    0, koftball,    koftball, koftball_state,    koftball, ROT0,  "BMC", "King of Football", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, koftball,    0, koftball,    koftball, koftball_state,    koftball, ROT0,  "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

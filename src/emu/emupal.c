@@ -816,6 +816,72 @@ void palette_device::palette_init_monochrome_yellow(palette_device &palette)
 
 
 /*-------------------------------------------------
+    3bit_rgb - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_rgb(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2)));
+}
+
+
+/*-------------------------------------------------
+    3bit_rbg - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_rbg(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1)));
+}
+
+
+/*-------------------------------------------------
+    3bit_brg - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_brg(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0)));
+}
+
+
+/*-------------------------------------------------
+    3bit_grb - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_grb(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 1), pal1bit(i >> 0), pal1bit(i >> 2)));
+}
+
+
+/*-------------------------------------------------
+    3bit_gbr - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_gbr(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1)));
+}
+
+
+/*-------------------------------------------------
+    3bit_bgr - 8-color rgb
+-------------------------------------------------*/
+
+void palette_device::palette_init_3bit_bgr(palette_device &palette)
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+}
+
+
+/*-------------------------------------------------
     RRRR_GGGG_BBBB - standard 4-4-4 palette,
     assuming the commonly used resistor values:
 
@@ -898,16 +964,6 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 
 	for (i = 0; i < 0x10000; i++)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
-}
-
-
-rgb_t raw_to_rgb_converter::BBGGRRII_decoder(UINT32 raw)
-{
-	UINT8 i = raw & 3;
-	UINT8 r = pal4bit(((raw >> 0) & 0x0c) | i);
-	UINT8 g = pal4bit(((raw >> 2) & 0x0c) | i);
-	UINT8 b = pal4bit(((raw >> 4) & 0x0c) | i);
-	return rgb_t(r, g, b);
 }
 
 rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(UINT32 raw)

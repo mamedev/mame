@@ -629,4 +629,4 @@ ROM_START( ip204415 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY   FULLNAME */
-COMP( 1993, ip204415, 0,        0,        ip204415, ip204415, ip20_state, ip204415, "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz)", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1993, ip204415, 0,        0,        ip204415, ip204415, ip20_state, ip204415, "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -2,18 +2,18 @@
 // copyright-holders: Felipe Sanches
 /***************************************************************************
 
-	icatel - Brazilian public payphone
-	manufactured by icatel http://www.icatel.com.br/
+    icatel - Brazilian public payphone
+    manufactured by icatel http://www.icatel.com.br/
 
-	Partial schematics (drawn based on PCB inspection) available at:
-	https://github.com/garoa/Icatel/blob/master/doc/icatel.pdf
+    Partial schematics (drawn based on PCB inspection) available at:
+    https://github.com/garoa/Icatel/blob/master/doc/icatel.pdf
 
-	Driver by Felipe Sanches <juca@members.fsf.org>
+    Driver by Felipe Sanches <juca@members.fsf.org>
 
-	Changelog:
+    Changelog:
 
-	2014 DEC 14 [Felipe Sanches]:
-	* Initial driver skeleton
+    2014 DEC 14 [Felipe Sanches]:
+    * Initial driver skeleton
 
 ***************************************************************************/
 
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, icatel_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(i80c31_data, AS_DATA, 8, icatel_state)
-//	AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
+//  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER( icatel_state, icatel )
@@ -98,7 +98,7 @@ void icatel_state::machine_reset()
 
 READ8_MEMBER(icatel_state::magic_string)
 {
-//	logerror("read: magic_string, offset=%04X\n", offset);
+//  logerror("read: magic_string, offset=%04X\n", offset);
 	char mstr[] = "TP-OK";
 	return mstr[offset%5];
 }
@@ -108,7 +108,7 @@ READ8_MEMBER(icatel_state::ioport_r)
 	switch (offset%4)
 	{
 		case 0: return 0xff;
-		case 1:	return 0x7f;
+		case 1: return 0x7f;
 		case 2: return 0xff;
 		case 3: return 0xff;
 	}
@@ -169,8 +169,8 @@ WRITE8_MEMBER(icatel_state::ci8_w)
 READ8_MEMBER(icatel_state::ci15_r)
 {
 	/* TODO: Implement-me! */
-//	debugger_break(machine());
-//	logerror("read: ci15\n");
+//  debugger_break(machine());
+//  logerror("read: ci15\n");
 	return (1 << 3) | (1 << 0);
 }
 
@@ -265,5 +265,5 @@ ROM_START( icatel )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 1995, icatel,   0,      0,      icatel,     0,        icatel_state, icatel, "Icatel", "TPCI (Brazilian public payphone)",    GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+COMP( 1995, icatel,   0,      0,      icatel,     0,        icatel_state, icatel, "Icatel", "TPCI (Brazilian public payphone)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 /*The hardware was clearly manufactured in 1995. There's no evindence of the actual date of the firmware.*/

@@ -222,4 +222,4 @@ DRIVER_INIT_MEMBER(pangofun_state,pangofun)
 {
 }
 
-GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

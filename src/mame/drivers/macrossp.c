@@ -9,9 +9,6 @@ Driver by David Haywood
 
 TODO:
  - what is the 'bios' rom for? it appears to be data tables and is very different between games but we don't map it anywhere
- - priorities
- - zooming is wrong
- - is alpha REALLY alpha or sprite flicker?
  - convert tilemaps to devices?
 
  68020 interrupts
@@ -293,19 +290,6 @@ Notes:
 
 /*** VARIOUS READ / WRITE HANDLERS *******************************************/
 
-WRITE32_MEMBER(macrossp_state::paletteram32_macrossp_w)
-{
-	int r,g,b;
-	COMBINE_DATA(&m_paletteram[offset]);
-
-	b = ((m_paletteram[offset] & 0x0000ff00) >>8);
-	g = ((m_paletteram[offset] & 0x00ff0000) >>16);
-	r = ((m_paletteram[offset] & 0xff000000) >>24);
-
-	m_palette->set_pen_color(offset, rgb_t(r,g,b));
-}
-
-
 READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 {
 	//  logerror("%08x read soundstatus\n", space.device().safe_pc());
@@ -338,44 +322,14 @@ READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 	return soundlatch_word_r(space, offset, mem_mask);
 }
 
-void macrossp_state::update_colors(  )
+WRITE16_MEMBER(macrossp_state::palette_fade_w)
 {
-	int i, r, g, b;
-
-	for (i = 0; i < 0x1000; i++)
+	// 0xff is written a few times on startup
+	if (data >> 8 != 0xff)
 	{
-		b = ((m_paletteram[i] & 0x0000ff00) >>  8);
-		g = ((m_paletteram[i] & 0x00ff0000) >> 16);
-		r = ((m_paletteram[i] & 0xff000000) >> 24);
-
-		if (m_fade_effect > b)
-			b = 0;
-		else
-			b -= m_fade_effect;
-
-		if (m_fade_effect > g)
-			g = 0;
-		else
-			g -= m_fade_effect;
-
-		if (m_fade_effect > r)
-			r = 0;
-		else
-			r -= m_fade_effect;
-
-		m_palette->set_pen_color(i, rgb_t(r, g, b));
-	}
-}
-
-WRITE32_MEMBER(macrossp_state::macrossp_palette_fade_w)
-{
-	m_fade_effect = ((data & 0xff00) >> 8) - 0x28; //it writes two times, first with a -0x28 then with the proper data
-	//  popmessage("%02x",fade_effect);
-
-	if (m_old_fade != m_fade_effect)
-	{
-		m_old_fade = m_fade_effect;
-		update_colors();
+		// range seems to be 40 (brightest) to 252 (darkest)
+		UINT8 fade = ((data >> 8) - 40) / 212.0 * 255.0;
+		m_screen->set_brightness(0xff - fade);
 	}
 }
 
@@ -401,13 +355,13 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x91c200, 0x91c3ff) AM_RAM AM_SHARE("text_linezoom") /* W/O? */
 	AM_RANGE(0x91d000, 0x91d00b) AM_RAM AM_SHARE("text_videoregs") /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
 	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP    // irq related?
 	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(macrossp_palette_fade_w)  // macrossp palette fade
+	AM_RANGE(0xb00010, 0xb00013) AM_WRITE16(palette_fade_w, 0x0000ffff)
 	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
 
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
@@ -574,16 +528,12 @@ void macrossp_state::machine_start()
 {
 	save_item(NAME(m_sndpending));
 	save_item(NAME(m_snd_toggle));
-	save_item(NAME(m_fade_effect));
-	save_item(NAME(m_old_fade));
 }
 
 void macrossp_state::machine_reset()
 {
 	m_sndpending = 0;
 	m_snd_toggle = 0;
-	m_fade_effect = 0;
-	m_old_fade = 0;
 }
 
 static MACHINE_CONFIG_START( macrossp, macrossp_state )
@@ -607,8 +557,9 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	MCFG_SCREEN_VBLANK_DRIVER(macrossp_state, screen_eof_macrossp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macrossp)
-	MCFG_PALETTE_ADD("palette", 0x1000)
 
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(RGBX)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -761,5 +712,5 @@ DRIVER_INIT_MEMBER(macrossp_state,quizmoon)
 #endif
 }
 
-GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

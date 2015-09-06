@@ -113,7 +113,7 @@ ROM_END
 
 
 // 4.00 JACKPOT. VERSION 1 (for revision E CPU) Written by and copyright of David John Powell - 25th February 1987
-GAME( 1987, castrev,    0,  castle_V1rvE, castrev, driver_device, 0, ROT0, "Castle","Revolution (Castle) (MACH2000 V1rvE)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1987, castrev,    0,  castle_V1rvE, castrev, driver_device, 0, ROT0, "Castle","Revolution (Castle) (MACH2000 V1rvE)",MACHINE_IS_SKELETON_MECHANICAL )
 
 // I'm *guessing* this is on MACH2000 V2rvA hardware, it contains strings saying 'MACH 2000 test' and is designed for a single CPU.
-GAME( 198?, castfpt,    0,  castle_V2rvA, castrev, driver_device, 0, ROT0, "Castle","Fortune Pot (Castle) (MACH2000 V2rvA)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 198?, castfpt,    0,  castle_V2rvA, castrev, driver_device, 0, ROT0, "Castle","Fortune Pot (Castle) (MACH2000 V2rvA)",MACHINE_IS_SKELETON_MECHANICAL )

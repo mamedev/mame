@@ -514,9 +514,9 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT ROT    COMPANY        FULLNAME        FLAGS  */
-GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Solar Games",           "Euro Jolly X5",                  GAME_IS_SKELETON )
-GAME( 200?, grandprx, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "4fun",                  "Grand Prix",                     GAME_IS_SKELETON )
-GAME( 200?, supjolly, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "<unknown>",             "Super Jolly",                    GAME_IS_SKELETON )
-GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   GAME_IS_SKELETON )
-GAME( 200?, queenotg, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "<unknown>",             "Queen of the Games",             GAME_IS_SKELETON )
-GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Solar Games",           "Euro Jolly X9",                  GAME_IS_SKELETON )
+GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
+GAME( 200?, grandprx, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
+GAME( 200?, supjolly, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
+GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
+GAME( 200?, queenotg, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
+GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )

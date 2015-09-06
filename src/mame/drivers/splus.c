@@ -40,6 +40,10 @@ public:
 		m_program_ram(*this, "program_ram"),
 		m_reel_ram(*this, "reel_ram"),
 		m_io_port(*this, "io_port"),
+		m_i10(*this, "I10"),
+		m_i20(*this, "I20"),
+		m_i30(*this, "I30"),
+		m_sensor(*this, "SENSOR"),
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem")
 	{
@@ -71,6 +75,10 @@ public:
 
 	// IO Ports
 	required_shared_ptr<UINT8> m_io_port;
+	required_ioport m_i10;
+	required_ioport m_i20;
+	required_ioport m_i30;
+	required_ioport m_sensor;
 
 	// EEPROM States
 	int m_sda_dir;
@@ -389,7 +397,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 			break;
 		case 0x01: // Bank 10
 			// Test for Coin-In
-			if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
+			if ((m_sensor->read() & 0x01) == 0x01 && m_coin_state == 0) {
 				m_coin_state = 1; // Start Coin Cycle
 				m_last_cycles = m_maincpu->total_cycles();
 #if DEBUG_OUTPUT
@@ -432,7 +440,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 			}
 
 			// Determine Door Optics
-			if ((ioport("I10")->read_safe(0x08) & 0x08) == 0x08)
+			if ((m_i10->read() & 0x08) == 0x08)
 				door_optics = 0x08;
 			else
 				door_optics = (((m_bank20 >> 4) & 1) << 3); // Use Door Optics Transmitter
@@ -477,22 +485,22 @@ READ8_MEMBER(splus_state::splus_serial_r)
 			val = val | door_optics; // Door Optics Receiver
 			val = val | coin_out; // Hopper Coin OutR
 			val = val | 0x00; // Hopper Full
-			val = val | (ioport("I10")->read_safe(0x40) & 0x40); // Handle/Spin Button
-			val = val | (ioport("I10")->read_safe(0x80) & 0x80); // Jackpot Reset Key
+			val = val | (m_i10->read() & 0x40); // Handle/Spin Button
+			val = val | (m_i10->read() & 0x80); // Jackpot Reset Key
 			break;
 		case 0x02: // Bank 20
-			val = val | (ioport("I20")->read_safe(0x01) & 0x01); // Bet One Credit
-			val = val | (ioport("I20")->read_safe(0x02) & 0x02); // Play Max Credits
-			val = val | (ioport("I20")->read_safe(0x04) & 0x04); // Cash Out
-			val = val | (ioport("I20")->read_safe(0x08) & 0x08); // Change Request
+			val = val | (m_i20->read() & 0x01); // Bet One Credit
+			val = val | (m_i20->read() & 0x02); // Play Max Credits
+			val = val | (m_i20->read() & 0x04); // Cash Out
+			val = val | (m_i20->read() & 0x08); // Change Request
 			val = val | 0x00; // Reel Mechanism
-			val = val | (ioport("I20")->read_safe(0x20) & 0x20); // Self Test Button
+			val = val | (m_i20->read() & 0x20); // Self Test Button
 			val = val | 0x40; // Card Cage
 			val = val | 0x80; // Bill Acceptor
 			break;
 		case 0x04: // Bank 30
 			// Reserved
-			val = val | (ioport("I30")->read_safe(0x02) & 0x02); // Drop Door
+			val = val | (m_i30->read() & 0x02); // Drop Door
 			// Jackpot to Credit Key
 			// Reserved
 			// Reserved
@@ -715,4 +723,4 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME        PARENT  MACHINE  INPUT   INIT     ROT    COMPANY                                  FULLNAME                       FLAGS             LAYOUT  */
-GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  GAME_NOT_WORKING, layout_splus )
+GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

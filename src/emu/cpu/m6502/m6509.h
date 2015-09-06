@@ -74,7 +74,7 @@ protected:
 enum {
 	M6509_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6509_NMI_LINE = m6502_device::NMI_LINE,
-	M6509_SET_OVERFLOW = m6502_device::V_LINE,
+	M6509_SET_OVERFLOW = m6502_device::V_LINE
 };
 
 enum {

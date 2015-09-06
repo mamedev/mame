@@ -125,7 +125,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_READ8_MEMBER(bml3_ym2203_r);
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
-	DECLARE_PALETTE_INIT(bml3);
+
 private:
 	UINT8 m_psg_latch;
 	UINT8 m_attr_latch;
@@ -760,14 +760,6 @@ INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
 	}
 }
 
-PALETTE_INIT_MEMBER(bml3_state, bml3)
-{
-	int i;
-
-	for(i=0;i<8;i++)
-		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
-}
-
 void bml3_state::machine_start()
 {
 	m_extram = auto_alloc_array(machine(),UINT8,0x10000);
@@ -982,8 +974,7 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(bml3_state, bml3)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
@@ -1118,6 +1109,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY    FULLNAME                        FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3", GAME_NOT_WORKING)
-COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,    driver_device,    0,      "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", GAME_NOT_WORKING)
-COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,    driver_device,    0,      "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", GAME_NOT_WORKING)
+COMP( 1980, bml3,   0,      0,       bml3,      bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3", MACHINE_NOT_WORKING)
+COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,    driver_device,    0,      "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
+COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,    driver_device,    0,      "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)

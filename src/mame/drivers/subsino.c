@@ -3915,4 +3915,4 @@ GAMEL( 1995, victor6b,    victor6,  sharkpy,  victor6b, subsino_state, sharkpye,
 GAMEL( 1996, smoto20,     0,        srider,   smoto20,  subsino_state, smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,               layout_smoto    )
 GAMEL( 1996, smoto16,     smoto20,  srider,   smoto16,  subsino_state, smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,               layout_smoto    )
 
-GAME ( 1996, mtrainnv,    mtrain,   mtrainnv, stisub,   subsino_state, mtrainnv, ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",       GAME_NOT_WORKING )
+GAME ( 1996, mtrainnv,    mtrain,   mtrainnv, stisub,   subsino_state, mtrainnv, ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",       MACHINE_NOT_WORKING )

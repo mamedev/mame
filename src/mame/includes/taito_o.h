@@ -18,9 +18,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	/* memory pointers */
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0080vco_device> m_tc0080vco;

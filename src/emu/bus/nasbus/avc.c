@@ -25,6 +25,8 @@ static MACHINE_CONFIG_FRAGMENT( nascom_avc )
 	MCFG_SCREEN_RAW_PARAMS(16250000, 1024, 0, 768, 320, 0, 256)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_16MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(6)
@@ -35,18 +37,6 @@ machine_config_constructor nascom_avc_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( nascom_avc );
 }
-
-const rgb_t nascom_avc_device::m_palette[] =
-{
-	rgb_t::black,
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t::white,
-};
 
 
 //**************************************************************************
@@ -61,6 +51,7 @@ nascom_avc_device::nascom_avc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, NASCOM_AVC, "Nascom Advanced Video Card", tag, owner, clock, "nascom_avc", __FILE__),
 	device_nasbus_card_interface(mconfig, *this),
 	m_crtc(*this, "mc6845"),
+	m_palette(*this, "palette"),
 	m_control(0x80)
 {
 }
@@ -130,7 +121,7 @@ MC6845_UPDATE_ROW( nascom_avc_device::crtc_update_row )
 		}
 
 		// plot the pixel
-		bitmap.pix32(y, x) = m_palette[(b << 2) | (g << 1) | (r << 0)];
+		bitmap.pix32(y, x) = m_palette->pen_color((b << 2) | (g << 1) | (r << 0));
 	}
 }
 

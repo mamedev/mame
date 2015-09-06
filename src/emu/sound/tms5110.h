@@ -7,7 +7,8 @@
 
 #include "emu.h"
 
-#define FIFO_SIZE               64 // TODO: technically the tms51xx chips don't have a fifo at all
+/* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
+#undef PERFECT_INTERPOLATION_HACK
 
 /* TMS5110 commands */
 										/* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
@@ -15,7 +16,7 @@
 #define TMS5110_CMD_RESET        (0) /*    0     0     0     x  |     1    */
 #define TMS5110_CMD_LOAD_ADDRESS (2) /*    0     0     1     x  |     2    */
 #define TMS5110_CMD_OUTPUT       (4) /*    0     1     0     x  |     3    */
-#define TMS5110_CMD_SPKSLOW      (6) /*    0     1     1     x  |     1    | Note: this command is undocumented on the datasheets, it only appears on the patents. It might not actually work properly on some of the real chips as manufactured. Acts the same as CMD_SPEAK, but makes the interpolator take two A cycles whereever it would normally only take one, effectively making speech of any given word take about twice as long as normal. */
+#define TMS5110_CMD_SPKSLOW      (6) /*    0     1     1     x  |     1    | Note: this command is undocumented on the datasheets, it only appears on the patents. It might not actually work properly on some of the real chips as manufactured. Acts the same as CMD_SPEAK, but makes the interpolator take three A cycles whereever it would normally only take one, effectively making speech of any given word take twice as long as normal. */
 #define TMS5110_CMD_READ_BIT     (8) /*    1     0     0     x  |     1    */
 #define TMS5110_CMD_SPEAK       (10) /*    1     0     1     x  |     1    */
 #define TMS5110_CMD_READ_BRANCH (12) /*    1     1     0     x  |     1    */
@@ -64,7 +65,6 @@ public:
 	 */
 	DECLARE_READ8_MEMBER( romclk_hack_r );
 
-	int ready_r();
 	void set_frequency(int frequency);
 
 	int _speech_rom_read_bit();
@@ -82,7 +82,10 @@ protected:
 
 	void set_variant(int variant);
 
-	UINT8 m_talk_status;
+	UINT8 m_SPEN;             /* set on speak command, cleared on stop command or reset command */
+	UINT8 m_TALK;             /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */
+#define TALK_STATUS (m_SPEN|m_TALKD)
+	UINT8 m_TALKD;            /* TALK(TCON) value, latched every RESETL4 */
 	sound_stream *m_stream;
 
 private:
@@ -90,26 +93,23 @@ private:
 	void new_int_write_addr(UINT8 addr);
 	UINT8 new_int_read();
 	void register_for_save_states();
-	void FIFO_data_write(int data);
 	int extract_bits(int count);
-	void request_bits(int no);
 	void perform_dummy_read();
+	INT32 lattice_filter();
 	void process(INT16 *buffer, unsigned int size);
 	void PDC_set(int data);
 	void parse_frame();
 
-	/* these contain data that describes the 64 bits FIFO */
-	UINT8 m_fifo[FIFO_SIZE];
-	UINT8 m_fifo_head;
-	UINT8 m_fifo_tail;
-	UINT8 m_fifo_count;
+	// internal state
+	/* coefficient tables */
+	int m_variant;                /* Variant of the 5110 - see tms5110.h */
+
+	/* coefficient tables */
+	const struct tms5100_coeffs *m_coeff;
 
 	/* these contain global status bits */
 	UINT8 m_PDC;
 	UINT8 m_CTL_pins;
-	UINT8 m_speaking_now;
-
-
 	UINT8 m_state;
 
 	/* Rom interface */
@@ -131,42 +131,68 @@ private:
 	devcb_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
 
 	/* these contain data describing the current and previous voice frames */
-	UINT16 m_old_energy;
-	UINT16 m_old_pitch;
-	INT32 m_old_k[10];
+#define OLD_FRAME_SILENCE_FLAG m_OLDE // 1 if E=0, 0 otherwise.
+#define OLD_FRAME_UNVOICED_FLAG m_OLDP // 1 if P=0 (unvoiced), 0 if voiced
+	UINT8 m_OLDE;
+	UINT8 m_OLDP;
 
-	UINT16 m_new_energy;
-	UINT16 m_new_pitch;
-	INT32 m_new_k[10];
+#define NEW_FRAME_STOP_FLAG (m_new_frame_energy_idx == 0xF) // 1 if this is a stop (Energy = 0xF) frame
+#define NEW_FRAME_SILENCE_FLAG (m_new_frame_energy_idx == 0) // ditto as above
+#define NEW_FRAME_UNVOICED_FLAG (m_new_frame_pitch_idx == 0) // ditto as above
+	UINT8 m_new_frame_energy_idx;
+	UINT8 m_new_frame_pitch_idx;
+	UINT8 m_new_frame_k_idx[10];
 
 
 	/* these are all used to contain the current state of the sound generation */
-	UINT16 m_current_energy;
-	UINT16 m_current_pitch;
+#ifndef PERFECT_INTERPOLATION_HACK
+	INT16 m_current_energy;
+	INT16 m_current_pitch;
+	INT16 m_current_k[10];
+#else
+	UINT8 m_old_frame_energy_idx;
+	UINT8 m_old_frame_pitch_idx;
+	UINT8 m_old_frame_k_idx[10];
+	UINT8 m_old_zpar;
+	UINT8 m_old_uv_zpar;
+
+	INT32 m_current_energy;
+	INT32 m_current_pitch;
 	INT32 m_current_k[10];
+#endif
 
-	UINT16 m_target_energy;
-	UINT16 m_target_pitch;
-	INT32 m_target_k[10];
+	UINT16 m_previous_energy; /* needed for lattice filter to match patent */
 
-	UINT8 m_interp_count;       /* number of interp periods (0-7) */
-	UINT8 m_sample_count;       /* sample number within interp (0-24) */
-	INT32 m_pitch_count;
+	UINT8 m_subcycle;         /* contains the current subcycle for a given PC: 0 is A' (only used on SPKSLOW mode on 51xx), 1 is A, 2 is B */
+	UINT8 m_subc_reload;      /* contains 1 for normal speech, 0 when SPKSLOW is active */
+	UINT8 m_PC;               /* current parameter counter (what param is being interpolated), ranges from 0 to 12 */
+	/* NOTE: the interpolation period counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
+	UINT8 m_IP;               /* the current interpolation period */
+	UINT8 m_inhibit;          /* If 1, interpolation is inhibited until the DIV1 period */
+	UINT8 m_uv_zpar;          /* If 1, zero k5 thru k10 coefficients */
+	UINT8 m_zpar;             /* If 1, zero ALL parameters. */
+	UINT8 m_pitch_zero;       /* circuit 412; pitch is forced to zero under certain circumstances */
+	UINT16 m_pitch_count;     /* pitch counter; provides chirp rom address */
 
-	INT32 m_x[11];
+	INT32 m_u[11];
+	INT32 m_x[10];
 
-	INT32 m_RNG;  /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+	UINT16 m_RNG;             /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 TODO: no it isn't */
+	INT16 m_excitation_data;
+
+	/* The TMS51xx has two different ways of providing output data: the
+	   analog speaker pins (which were usually used) and the Digital I/O pin.
+	   The internal DAC used to feed the analog pins is only 8 bits, and has the
+	   funny clipping/clamping logic, while the digital pin gives full 10 bit
+	   resolution of the output data.
+	   TODO: add a way to set/reset this other than the FORCE_DIGITAL define
+	 */
+	UINT8 m_digital_select;
 
 	INT32 m_speech_rom_bitnum;
 
 	UINT8 m_romclk_hack_timer_started;
 	UINT8 m_romclk_hack_state;
-
-	/* coefficient tables */
-	int m_variant;                /* Variant of the 5110 - see tms5110.h */
-
-	/* coefficient tables */
-	const struct tms5100_coeffs *m_coeff;
 
 	emu_timer *m_romclk_hack_timer;
 	const UINT8 *m_table;

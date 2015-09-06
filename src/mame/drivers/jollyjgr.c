@@ -116,7 +116,8 @@ public:
 		m_bulletram(*this, "bulletram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_bm_palette(*this, "bm_palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -144,13 +145,14 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(jollyjgr);
-	UINT32 screen_update_jollyjgr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_fspider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
-	void draw_bitmap( bitmap_ind16 &bitmap );
+	void draw_bitmap( bitmap_rgb32 &bitmap );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_bm_palette;
 };
 
 
@@ -415,13 +417,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
+/* tilemap / sprites palette */
 PALETTE_INIT_MEMBER(jollyjgr_state, jollyjgr)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	/* tilemap / sprites palette */
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -443,10 +444,6 @@ PALETTE_INIT_MEMBER(jollyjgr_state, jollyjgr)
 		palette.set_pen_color(i, rgb_t(r,g,b));
 		color_prom++;
 	}
-
-	/* bitmap palette */
-	for (i = 0;i < 8;i++)
-		palette.set_pen_color(32 + i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 }
 
 /* Tilemap is the same as in Galaxian */
@@ -465,7 +462,7 @@ void jollyjgr_state::video_start()
 	m_bg_tilemap->set_scroll_cols(32);
 }
 
-void jollyjgr_state::draw_bitmap( bitmap_ind16 &bitmap )
+void jollyjgr_state::draw_bitmap( bitmap_rgb32 &bitmap )
 {
 	int x, y, count;
 	int i, bit0, bit1, bit2;
@@ -486,13 +483,13 @@ void jollyjgr_state::draw_bitmap( bitmap_ind16 &bitmap )
 				if(color)
 				{
 					if(m_flip_x && m_flip_y)
-						bitmap.pix16(y, x * 8 + i) = color + 32;
+						bitmap.pix32(y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if(m_flip_x && !m_flip_y)
-						bitmap.pix16(255 - y, x * 8 + i) = color + 32;
+						bitmap.pix32(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if(!m_flip_x && m_flip_y)
-						bitmap.pix16(y, 255 - x * 8 - i) = color + 32;
+						bitmap.pix32(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 					else
-						bitmap.pix16(255 - y, 255 - x * 8 - i) = color + 32;
+						bitmap.pix32(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 				}
 			}
 
@@ -501,12 +498,12 @@ void jollyjgr_state::draw_bitmap( bitmap_ind16 &bitmap )
 	}
 }
 
-UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	bitmap.fill(32, cliprect);
+	bitmap.fill(m_bm_palette->pen_color(0), cliprect);
 
 	if(m_pri) //used in Frog & Spiders level 3
 	{
@@ -556,7 +553,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// Draw bg and sprites
 	screen_update_jollyjgr(screen, bitmap, cliprect);
@@ -569,8 +566,8 @@ UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_ind16
 		UINT8 sy=~m_bulletram[offs];
 		UINT8 sx=~m_bulletram[offs|1];
 		UINT16 bc=(offs<4)?
-			32+7: // player, white
-			32+3; // enemy, yellow
+			7: // player, white
+			3; // enemy, yellow
 
 		if (m_flip_y) sy^=0xff;
 		if (m_flip_x) sx+=8;
@@ -578,7 +575,7 @@ UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_ind16
 		if (sy>=cliprect.min_y && sy<=cliprect.max_y)
 			for (int x=sx-4;x<sx;x++)
 				if (x>=cliprect.min_x && x<=cliprect.max_x)
-					bitmap.pix16(sy, x)=bc;
+					bitmap.pix32(sy, x) = m_bm_palette->pen_color(bc);
 	}
 
 	return 0;
@@ -653,12 +650,10 @@ void jollyjgr_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)        /* 3,579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jollyjgr_state,  jollyjgr_interrupt)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -667,11 +662,11 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jollyjgr)
-	MCFG_PALETTE_ADD("palette", 32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
+	MCFG_PALETTE_ADD("palette", 32) // tilemap and sprites
 	MCFG_PALETTE_INIT_OWNER(jollyjgr_state, jollyjgr)
+	MCFG_PALETTE_ADD_3BIT_RGB("bm_palette") // bitmap
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -681,13 +676,11 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fspider, jollyjgr )
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fspider_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_fspider)
-
 MACHINE_CONFIG_END
 
 /*************************************
@@ -765,5 +758,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider,  fspider, driver_device,  0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", GAME_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
-GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, driver_device, 0, ROT90, "Taito Corporation", "Jolly Jogger", GAME_SUPPORTS_SAVE )
+GAME( 1981, fspiderb, 0, fspider,  fspider, driver_device,  0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
+GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, driver_device, 0, ROT90, "Taito Corporation", "Jolly Jogger", MACHINE_SUPPORTS_SAVE )

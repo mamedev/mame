@@ -100,7 +100,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_fg_ram;
 	required_shared_ptr<UINT8> m_sprites;
-//  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -580,5 +579,5 @@ DRIVER_INIT_MEMBER(calorie_state,calorieb)
  *************************************/
 
 /* Note: the bootleg is identical to the original once decrypted */
-GAME( 1986, calorie,  0,       calorie, calorie, calorie_state, calorie,  ROT0, "Sega",    "Calorie Kun vs Moguranian", GAME_SUPPORTS_SAVE )
-GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, calorie,  0,       calorie, calorie, calorie_state, calorie,  ROT0, "Sega",    "Calorie Kun vs Moguranian", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )

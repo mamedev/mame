@@ -867,7 +867,7 @@ WRITE8_MEMBER( iqunlim_state::video_regs_w )
 	{
 		rectangle visarea = m_screen->visible_area();
 		visarea.set(0, (data & 0x02 ? 496 : 256) - 1, 0, 224 - 1);
-		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().attoseconds);
+		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().attoseconds());
 	}
 
 	m_video_regs[offset] = data;
@@ -1578,10 +1578,10 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT       COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English NTSC, no title copyright
-COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // French Canandian NTSC, 1988 title copyright
-COMP( 1988, profweis,   socrates,   0,      socrates_pal,   socrates, socrates_state, socrates, "Video Technology/Yeno",        "Professor Weiss-Alles", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // German PAL, 1988 title copyright
+COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English NTSC, no title copyright
+COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates SAITOUT", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // French Canandian NTSC, 1988 title copyright
+COMP( 1988, profweis,   socrates,   0,      socrates_pal,   socrates, socrates_state, socrates, "Video Technology/Yeno",        "Professor Weiss-Alles", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 
-COMP( 1991, iqunlimz, 0,       0,     iqunlimz,  iqunlimz, driver_device, 0,  "Video Technology", "IQ Unlimited (Z80)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1991, iqunlimz, 0,       0,     iqunlimz,  iqunlimz, driver_device, 0,  "Video Technology", "IQ Unlimited (Z80)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

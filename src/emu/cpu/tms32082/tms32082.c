@@ -197,6 +197,9 @@ void tms32082_mp_device::device_start()
 	state_add(MP_IE, "ie", m_ie).formatstr("%08X");
 	state_add(MP_INTPEN, "intpen", m_intpen).formatstr("%08X");
 
+	state_add(MP_TCOUNT, "tcount", m_tcount).formatstr("%08X");
+	state_add(MP_TSCALE, "tscale", m_tscale).formatstr("%08X");
+
 	state_add(STATE_GENPC, "curpc", m_pc).noshow();
 
 	m_program = &space(AS_PROGRAM);
@@ -283,6 +286,55 @@ void tms32082_mp_device::processor_command(UINT32 command)
 		{
 			// simulate PP behavior for now...
 			m_program->write_dword(0x00000084, 3);
+
+			UINT32 num = m_program->read_dword(0x90);
+
+			printf("PP num %d\n", num);
+
+			/*
+			UINT32 ra = 0x1000280;
+
+			printf("FIFO push:\n");
+
+			for (int i=0; i < num; i++)
+			{
+			    printf("Entry %d:\n", i);
+			    for (int k=0; k < 6; k++)
+			    {
+			        for (int l=0; l < 4; l++)
+			        {
+			            UINT32 dd = m_program->read_dword(ra);
+			            ra += 4;
+
+			            printf("%08X(%f) ", dd, u2f(dd));
+			        }
+			        printf("\n");
+			    }
+			    printf("\n");
+			}
+			*/
+
+			UINT32 ra = 0x1000280;
+
+			int oldnum = m_program->read_dword(0x600ffffc);
+			UINT32 rb = 0x60000000 + (oldnum * 0x60);
+
+			for (int i=0; i < num; i++)
+			{
+				for (int k=0; k < 24; k++)
+				{
+					UINT32 dd = m_program->read_dword(ra);
+					ra += 4;
+
+					m_program->write_dword(rb, dd);
+					rb += 4;
+				}
+			}
+			m_program->write_dword(0x600ffffc, oldnum+num);
+
+			m_program->write_dword(0x00000090, 0);
+			m_program->write_dword(0x00000094, num);
+
 		}
 	}
 	// PP1
@@ -314,6 +366,9 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 
 		case 0xa:           // PPERROR
 			return 0xe0000;
+
+		case 0xe:           // TCOUNT
+			return m_tcount;
 
 		case 0x4000:        // IN0P
 			return m_in0p;
@@ -356,6 +411,10 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 		case 0x6:           // IE
 			m_ie = data;
 			printf("IE = %08X\n", data);
+			break;
+
+		case 0xe:           // TCOUNT
+			m_tcount = data;
 			break;
 
 		case 0x4000:        // IN0P
@@ -452,6 +511,13 @@ void tms32082_mp_device::execute_run()
 
 		m_ir = fetch();
 		execute();
+
+		m_tcount--;
+		if (m_tcount < 0)
+		{
+			// TODO: timer interrupt
+			m_tcount = m_tscale;
+		}
 
 		m_icount--;
 	};

@@ -8,6 +8,71 @@
 // Emulation for the NEC V60 (uPD70615) and V70 (uPD70632) CPUs
 //
 
+/*
+Taken from the NEC Semiconductor Selection Guide Guide Book (Oct. 1995):
+
+uPD70615 (V60)
+Features:
+- Virtual memory (paging method)
+- Level protection architecture - 4-level hierarchical protection function
+    for system multi-programming.
+- Abundant general registers - Thirty two 32-bit general registers for
+    optimizing compiler
+- Refined instruction set - 2-address method: Arbitrary addressing mode
+    can be used independently for source operand and destination operand.
+- Abundant address modes and data types - Auto increment/decrement mode
+    for string process, and memory indirect addressing for pointer operation
+- High cost-to performance chip
+- No multiprocessor system - no FRM function for increasing system
+    reliability using two or more processors.
+- No V20/V30 simulation mode
+Address bus: 24 bits
+Data bus: 16 bits
+Memory space: 4G bytes
+Operating frequency: 16 MHz
+Package: 120-pin QFP
+
+uPD70616 (V60)
+Features:
+- Virtual memory (paging method)
+- Level protection architecture - 4-level hierarchical protection function
+    for system multi-programming.
+- Abundant general registers - Thirty two 32-bit general registers for
+    optimizing compiler
+- Refined instruction set - 2-address method: Arbitrary addressing mode
+    can be used independently for source operand and destination operand.
+- Abundant address modes and data types - Auto increment/decrement mode
+    for string process, and memory indirect addressing for pointer operation
+- Multiprocessor system - FRM function for increasing system reliability
+    using two or more processors.
+- V20/V30 simulation mode
+Address bus: 24 bits
+Data bus: 16 bits
+Memory space: 4G bytes
+Operating frequency: 16 MHz
+Package: 68-pin PGA
+
+uPD70632 (V70)
+Features:
+- Virtual memory (paging method)
+- Level protection architecture - 4-level hierarchical protection function
+    for system multi-programming.
+- Abundant general registers - Thirty two 32-bit general registers for
+    optimizing compiler
+- Refined instruction set - 2-address method: Arbitrary addressing mode
+    can be used independently for source operand and destination operand.
+- Abundant address modes and data types - Auto increment/decrement mode
+    for string process, and memory indirect addressing for pointer operation
+- Multiprocessor system - FRM function for increasing system reliability
+    using two or more processors.
+- V20/V30 simulation mode
+Address bus: 32 bits
+Data bus: 32 bits
+Memory space: 4G bytes
+Operating frequency: 20 MHz
+Package: 132-pin PGA, 200-pin QFP
+*/
+
 #include "emu.h"
 #include "debugger.h"
 #include "v60.h"

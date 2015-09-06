@@ -275,6 +275,8 @@ void running_machine::start()
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debugger_init(*this);
 
+	m_render->resolve_tags();
+
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
@@ -293,7 +295,7 @@ void running_machine::start()
 		schedule_load(savegame);
 
 	// if we're in autosave mode, schedule a load
-	else if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) != 0)
+	else if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
 
 	// set up the cheat engine
@@ -501,7 +503,7 @@ void running_machine::schedule_exit()
 #endif
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
+	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
 }
 
@@ -848,7 +850,7 @@ void running_machine::base_datetime(system_time &systime)
 
 void running_machine::current_datetime(system_time &systime)
 {
-	systime.set(m_base_time + this->time().seconds);
+	systime.set(m_base_time + this->time().seconds());
 }
 
 
@@ -935,7 +937,7 @@ void running_machine::handle_saveload()
 				break;
 
 			case STATERR_NONE:
-				if (!(m_system.flags & GAME_SUPPORTS_SAVE))
+				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
 					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
 				else
 					popmessage("State successfully %s.", opnamed);

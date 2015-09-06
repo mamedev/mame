@@ -413,5 +413,5 @@ ROM_START( malzak2 )
 ROM_END
 
 
-GAME( 19??, malzak,   0,       malzak,  malzak, driver_device,  0,        ROT0, "Kitronix", "Malzak", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 19??, malzak2, malzak,   malzak2, malzak2, driver_device, 0,        ROT0, "Kitronix", "Malzak II", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 19??, malzak,   0,       malzak,  malzak, driver_device,  0,        ROT0, "Kitronix", "Malzak", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak2, malzak,   malzak2, malzak2, driver_device, 0,        ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

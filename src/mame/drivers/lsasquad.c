@@ -806,6 +806,6 @@ ROM_START( daikaiju )
 ROM_END
 
 
-GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, driver_device, 0, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1986, storming, lsasquad, storming, storming, driver_device, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, driver_device, 0, ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, driver_device, 0, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, storming, lsasquad, storming, storming, driver_device, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, driver_device, 0, ROT270, "Taito", "Daikaiju no Gyakushu", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -74,14 +74,14 @@ void dc_controller_device::fixed_status(UINT32 *dest)
 {
 	dest[0] = 0x20000000; // Controller
 	dest[1] =
-		((ioport(port_tag[2]) != NULL) ? 0x010000 : 0) |
-		((ioport(port_tag[3]) != NULL) ? 0x020000 : 0) |
-		((ioport(port_tag[4]) != NULL) ? 0x040000 : 0) |
-		((ioport(port_tag[5]) != NULL) ? 0x080000 : 0) |
-		((ioport(port_tag[6]) != NULL) ? 0x100000 : 0) |
-		((ioport(port_tag[7]) != NULL) ? 0x200000 : 0) |
-		(ioport(port_tag[0])->active_safe(0) << 8) |
-		ioport(port_tag[1])->active_safe(0); // 1st function - controller
+		((port[2] != NULL) ? 0x010000 : 0) |
+		((port[3] != NULL) ? 0x020000 : 0) |
+		((port[4] != NULL) ? 0x040000 : 0) |
+		((port[5] != NULL) ? 0x080000 : 0) |
+		((port[6] != NULL) ? 0x100000 : 0) |
+		((port[7] != NULL) ? 0x200000 : 0) |
+		((port[0] ? port[0]->active() : 0) << 8) |
+		(port[1] ? port[1]->active() : 0); // 1st function - controller
 	dest[2] = 0; // No 2nd function
 	dest[3] = 0; // No 3rd function
 	dest[4] = 0x00ff; // Every region, no expansion
@@ -99,13 +99,23 @@ void dc_controller_device::read(UINT32 *dest)
 {
 	dest[0] = 0x21000000; // Controller
 	dest[1] =
-		ioport(port_tag[0])->read_safe(0xff) |
-		(ioport(port_tag[1])->read_safe(0xff) << 8) |
-		(ioport(port_tag[2])->read_safe(0x00) << 16) |
-		(ioport(port_tag[3])->read_safe(0x00) << 24);
+		(port[0] ? port[0]->read() : 0xff) |
+		((port[1] ? port[1]->read() : 0xff) << 8) |
+		((port[2] ? port[2]->read() : 0) << 16) |
+		((port[3] ? port[3]->read() : 0) << 24);
 	dest[2] =
-		ioport(port_tag[4])->read_safe(0x80) |
-		(ioport(port_tag[5])->read_safe(0x80) << 8) |
-		(ioport(port_tag[6])->read_safe(0x80) << 16) |
-		(ioport(port_tag[7])->read_safe(0x80) << 24);
+		(port[4] ? port[4]->read() : 0x80) |
+		((port[5] ? port[5]->read() : 0x80) << 8) |
+		((port[6] ? port[6]->read() : 0x80) << 16) |
+		((port[7] ? port[7]->read() : 0x80) << 24);
+}
+
+void dc_controller_device::device_start()
+{
+	maple_device::device_start();
+
+	for (int i = 0; i < 8; i++)
+	{
+		port[i] = ioport(port_tag[i]);
+	}
 }

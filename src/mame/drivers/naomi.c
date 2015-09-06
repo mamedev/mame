@@ -889,6 +889,7 @@ Notes:
 
 837-13741
 837-13844-02 (sticker)
+837-14645
 |-----------------------------|
 |       CN8        CN9        |
 |DB9                       CN1|
@@ -924,6 +925,7 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
       IC6  - Sega 315-6146 custom IC (QFP176)
       IC7  - 27C512 EPROM with label 'EPR-22082' (DIP28)
              On plain 837-13844 (no -02) this is 'EPR-21868' (DIP28)
+             On later 837-14645 it is 'EPR-24354'
       IC8  - Sharp LH52256 32k x8 SRAM (SOP28)
       IC10 - NEC D71054GB programmable counter/timer (QFP44)
       OSC1 - 14.7456MHz
@@ -998,9 +1000,9 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
 |LED    CN4     IC4  |
 |--------------------|
 Notes:
-      This is the I/O board used for Dynamic Golf which is
-      located under the panel. It's also used for spinner
-      controls such as those used on Outtrigger.
+      This is the I/O board used in Dynamic Golf, Out Trigger, Shootout Pool,
+      Shootout Pool Prize, Kick'4'Cash, Crackin' DJ 1&2
+      for the trackballs and other rotary type game controls.
       It must be daisy-chained to the normal I/O board with a USB cable.
 
       CN1 - 24 pin connector (not used on Dynamic Golf, other use unknown)
@@ -1025,7 +1027,7 @@ Sega's I/O board has:
 - analog input
 - USB input (connect to NAOMI motherboard)
 - USB output (not used)
-- shrinked D-sub 15pin connector (connect JVS video output, the signal is routed to JAMMA connector, signal is amplified to 3Vp-p and H/V sync signal is mixed (composite))
+- D-sub 15pin VGA-compatible connector (connect JVS video output, the signal is routed to JAMMA connector, signal is amplified to 3Vp-p and H/V sync signal is mixed (composite))
 - external I/O connector (JST 12pin)
 - switch to select function of external I/O connector (extra button input or 7-seg LED(x2) output of total wins for 'Versus City' cabinet)
 - spare audio input (the signal goes to JAMMA speaker output)
@@ -1395,8 +1397,8 @@ Notes:
 
 Development ROM board:
 
-few unreleased and many prototype game versions known to exist on this ROM board,
-currently only Rumble Fish 2 prototype dumped
+There are a few unreleased and many prototype game versions known to exist on this ROM board.
+Currently only Rumble Fish 2 prototype is dumped.
 
 PC BD SYSTEMX 3MODE FLASH Rev.B
 1111-00001402
@@ -1422,7 +1424,7 @@ Notes:
       XC9536 - Xilinx XC9536XL in-system programmable CPLD (PLCC44), stamped JULIE_DEV
       XC2S30 - Xilinx XC2S30 Spartan-II FPGA (TQFP144), Rumble Fish 2 have printed sticker A08
       17S30  - Xilinx 17S30APC OTP Configuration PROM, stamped SXFLS
-   IC12-IC27 - Fujitsu MBM29DL640E 64M TSOP48 flash ROMs 
+   IC12-IC27 - Fujitsu MBM29DL640E 64M TSOP48 flash ROMs
 
 
 Network Board
@@ -1533,9 +1535,16 @@ Sushi Bar
 */
 
 #include "emu.h"
-
-
 #include "includes/naomi.h"
+
+
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 
 #define CPU_CLOCK (200000000)
 
@@ -4636,11 +4645,13 @@ ROM_START( 18wheelr )
 	ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
 	ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
+	// JVS I/O board 837-13844, external Z80 code for Sega 315-6146 "MIE" MCU
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
+	// 837-14645 JVS I/O, uses same PCB as 837-13844
+	ROM_LOAD( "epr-24354.ic7", 0x000000, 0x010000, CRC(0ce43505) SHA1(7700e3acfb756dfbf95f3ff14786d1bcb57e2f7d) )
 
 	// 18 Wheeler motor controller 838-13992, code is for a TMPZ84C015 which is Z80 compatible
 	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
@@ -5079,6 +5090,9 @@ Serial (from 2 carts): BAZE-01A0288
 ROM_START( otrigger )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
+
+		ROM_REGION( 0x10000, "io_board", 0)
+	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
 	ROM_REGION( 0xa000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD("epr-22163.ic22", 0x0000000, 0x0400000, CRC(3bdafb6a) SHA1(c4c5a4ba94d85c4353df22d70bb08be67e9c22c3) )
@@ -7496,39 +7510,11 @@ ROM_START( monkeyba )
 	ROM_LOAD("317-0307-com.pic", 0x00, 0x4000, CRC(4046de19) SHA1(8adda9f223e926148b36744bbbaa89557544a229) )
 ROM_END
 
-/*
-This is the I/O board used for Dynamic Golf which is
-located under the panel.
-It must be connected to the normal I/O board with a USB cable.
-
-PCB Layout
-----------
-
-837-13938
-|--------------------|
-|CN2      CN1        |
-|                    |
-|      |-----|       |
-|      | IC2 |       |
-| CN3  |     |       |
-|      |-----|    IC3|
-|LED    CN4     IC4  |
-|--------------------|
-Notes:
-      CN1 - 24 pin connector. not used
-      CN2 - 4 pin connector used for 5 volt power input
-      CN3 - USB connector type B
-      CN4 - 16 pin connector used for buttons and trackball
-      IC1 - HC240 logic IC (SOIC20)
-      IC2 - Sega 315-6146 custom IC (QFP176)
-      IC3 - 27C512 EPROM with label 'EPR-22084' (DIP28)
-      IC4 - HC4020 logic IC (SOIC16)
-*/
-
 ROM_START( dygolf )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
+	// 837-13938 JVS I/O
 	ROM_REGION( 0x10000, "io_board", 0)
 	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
@@ -9030,16 +9016,16 @@ ROM_END
 
 */
 
-#define GAME_FLAGS (GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING)
+#define GAME_FLAGS (MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING)
 
 /* Main board and game specific BIOS */
-/* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
-/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi House of the Dead 2 Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (deluxe) Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin) Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Airline Pilots (deluxe) Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
-/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi 2 Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
-/* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi GD-ROM Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
+/* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi House of the Dead 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Airline Pilots (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi GD-ROM Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 
 /* 834-xxxxx (Sega Naomi cart with game specific BIOS sets) */
 /* 13636-01 */ GAME( 1998, hotd2,  hod2bios, naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
@@ -9151,7 +9137,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0005 */ GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (JPN, USA, EUR, ASI, AUS) (Rev B)", GAME_FLAGS )
 /* 0006 */ GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
-/* 0007-02 */ GAME( 2000,mvsc2,  naomi, naomim1, naomi,   naomi_state, mvsc2,  ROT0,  "Marvel / Capcom", "Marvel Vs. Capcom 2 New Age of Heroes (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_FLAGS )
+/* 0007-02 */ GAME( 2000,mvsc2,  naomi, naomim1, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_FLAGS )
 /* 0008 */ GAME( 2000, pstone2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnk,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnka,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
@@ -9273,7 +9259,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0002  */ GAME( 2001, sfz3ugd, naomigd, naomigd, naomi, naomi_state,  sfz3ugd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_FLAGS )
 // 0003
 /* 0004  */ GAME( 2001, cvsgd,   naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millennium Fight 2000 Pro (GDL-0004)", GAME_FLAGS )
-/* 0005  */ GAME( 2001, starseek,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "G.Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+/* 0005  */ GAME( 2001, starseek,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "G.Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 /* 0006  */ GAME( 2001, gundmxgd,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Capcom",       "Mobile Suit Gundam: Federation Vs. Zeon DX  (GDL-0006)", GAME_FLAGS )
 // 0007  Capcom Vs. SNK 2
 /* 0007A */ GAME( 2001, cvs2gd,  naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_FLAGS )
@@ -9348,17 +9334,17 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 
 
 /* Atomiswave */
-GAME( 2001, awbios,   0,      aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Atomiswave Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
+GAME( 2001, awbios,   0,      aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Atomiswave Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 
 GAME( 2003, maxspeed, awbios, aw1c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Maximum Speed", GAME_FLAGS )
 GAME( 2003, sprtshot, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS )
-GAME( 2003, ggx15,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2003, ggx15,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2003, demofist, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS )
-GAME( 2003, dolphin,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2003, kov7sprt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2003, ggisuka,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2004, dirtypig, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2004, rumblef,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2003, dolphin,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2003, kov7sprt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2003, ggisuka,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2004, dirtypig, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2004, rumblef,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2004, rangrmsn, awbios, aw2c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Ranger Mission", GAME_FLAGS )
 GAME( 2004, salmankt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Salary Man Kintarou", GAME_FLAGS )
 GAME( 2004, ftspeed,  awbios, aw1c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Faster Than Speed", GAME_FLAGS )
@@ -9373,7 +9359,11 @@ GAME( 2005, fotns,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc 
 GAME( 2005, kofnw,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave", GAME_FLAGS )
 GAME( 2005, kofnwj,   kofnw,  aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave (Japan)", GAME_FLAGS )
 GAME( 2005, xtrmhunt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Extreme Hunting", GAME_FLAGS )
-GAME( 2006, mslug6,   awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2006, mslug6,   awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2006, xtrmhnt2, awbios, aw2c, aw2c, naomi_state, xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )
 GAME( 2008, claychal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )
 GAME( 2009, basschal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

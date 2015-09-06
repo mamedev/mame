@@ -14,4 +14,3 @@ inline rsp_vec_t vec_vadd(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t carry, rsp_vec_t
 	minimum = _mm_subs_epi16(minimum, carry);
 	return _mm_adds_epi16(minimum, maximum);
 }
-

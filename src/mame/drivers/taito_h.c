@@ -1055,10 +1055,10 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT              MONITOR  COMPANY                      FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (Japan)",         GAME_SUPPORTS_SAVE )
-GAME( 1988, syvalionp, syvalion,syvalion, syvalionp,driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",         GAME_SUPPORTS_SAVE )
-GAME( 1988, recordbr, 0,        recordbr, recordbr, driver_device, 0, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",    GAME_SUPPORTS_SAVE )
-GAME( 1988, gogold,   recordbr, recordbr, gogold,   driver_device, 0, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",  GAME_SUPPORTS_SAVE )
-GAME( 1988, tetristh, tetris,   tetristh, tetristh, driver_device, 0, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)", GAME_SUPPORTS_SAVE )
-GAME( 1990, dleague,  0,        dleague,  dleague,  driver_device, 0, ROT0,    "Taito America Corporation", "Dynamite League (US)",     GAME_SUPPORTS_SAVE )
-GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, driver_device, 0, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",  GAME_SUPPORTS_SAVE )
+GAME( 1988, syvalion, 0,        syvalion, syvalion, driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionp, syvalion,syvalion, syvalionp,driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, recordbr, 0,        recordbr, recordbr, driver_device, 0, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gogold,   recordbr, recordbr, gogold,   driver_device, 0, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetristh, tetris,   tetristh, tetristh, driver_device, 0, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleague,  0,        dleague,  dleague,  driver_device, 0, ROT0,    "Taito America Corporation", "Dynamite League (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, driver_device, 0, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",  MACHINE_SUPPORTS_SAVE )

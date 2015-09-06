@@ -355,5 +355,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", GAME_SUPPORTS_SAVE )
-GAME( 1985, yiear2, yiear, yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", GAME_SUPPORTS_SAVE )
+GAME( 1985, yiear,  0,     yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )

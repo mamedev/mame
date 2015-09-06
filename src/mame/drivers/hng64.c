@@ -1,9 +1,8 @@
 // license:LGPL-2.1+
-// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
 /* Hyper NeoGeo 64
 
 Driver by David Haywood, ElSemi, Andrew Gardner and Angelo Salese
-Rasterizing code provided in part by Andrew Zaferakis.
 
 
 Notes:
@@ -503,20 +502,6 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 	return m_com_shared[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_pal_w)
-{
-	UINT32 *paletteram = m_generic_paletteram_32;
-	int r, g, b/*, a*/;
-
-	COMBINE_DATA(&paletteram[offset]);
-
-	b = ((paletteram[offset] & 0x000000ff) >>0);
-	g = ((paletteram[offset] & 0x0000ff00) >>8);
-	r = ((paletteram[offset] & 0x00ff0000) >>16);
-	//a = ((paletteram[offset] & 0xff000000) >>24);
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
-
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
 {
 	UINT16 rtc_addr;
@@ -827,7 +812,7 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 		m_screen_dis = 0;
 
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds );
+		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds() );
 	}
 }
 
@@ -983,7 +968,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
 	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
@@ -1581,6 +1566,7 @@ static MACHINE_CONFIG_START(hng64, hng64_state)
 	MCFG_SCREEN_VBLANK_DRIVER(hng64_state, screen_eof_hng64)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_FRAGMENT_ADD( hng64_audio )
 	MCFG_FRAGMENT_ADD( hng64_network )
@@ -2022,13 +2008,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,      hng64, hng64, hng64_state,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,      hng64, hng64, hng64_state,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",        GAME_NOT_WORKING|GAME_NO_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64,  hng64, hng64, hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",         GAME_NOT_WORKING|GAME_NO_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64,  hng64, bbust2, hng64_state, hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare",            GAME_NOT_WORKING|GAME_NO_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_state,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)",          GAME_NOT_WORKING|GAME_NO_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_state,  buriki,      ROT0, "SNK", "Buriki One (rev.B)",                     GAME_NOT_WORKING|GAME_NO_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",        MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64,  hng64, hng64, hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64,  hng64, bbust2, hng64_state, hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare",            MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 004 */
+GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_state,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)",          MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_state,  buriki,      ROT0, "SNK", "Buriki One (rev.B)",                     MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 007 */

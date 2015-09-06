@@ -169,6 +169,6 @@ ROM_END
 */
 
 
-GAME( 1977, dpatrol, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", GAME_IS_SKELETON )
-//GAME( 1976, knightar, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", GAME_IS_SKELETON )
-//GAME( 1978, gametree, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Game Tree [TTL]", GAME_IS_SKELETON )
+GAME( 1977, dpatrol, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
+//GAME( 1976, knightar, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )
+//GAME( 1978, gametree, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )

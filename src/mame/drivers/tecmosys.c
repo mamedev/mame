@@ -666,6 +666,6 @@ DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero", GAME_SUPPORTS_SAVE )
-GAME( 1996, tkdensho,         0, deroon, deroon, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", GAME_SUPPORTS_SAVE )
-GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", GAME_SUPPORTS_SAVE )
+GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdensho,         0, deroon, deroon, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_SUPPORTS_SAVE )

@@ -36,12 +36,12 @@
 #include "nld_truthtable.h"
 
 #define TTL_7402_NOR(_name, _I1, _I2)                                               \
-		NET_REGISTER_DEV(7402, _name)                                               \
+		NET_REGISTER_DEV(TTL_7402_NOR, _name)                                               \
 		NET_CONNECT(_name, A, _I1)                                                  \
 		NET_CONNECT(_name, B, _I2)
 
 #define TTL_7402_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7402_dip, _name)
+		NET_REGISTER_DEV(TTL_7402_DIP, _name)
 
 
 NETLIB_NAMESPACE_DEVICES_START()

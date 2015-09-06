@@ -378,4 +378,4 @@ ROM_START( dragrace )
 ROM_END
 
 
-GAMEL(1977, dragrace, 0, dragrace, dragrace, driver_device, 0, 0, "Atari (Kee Games)", "Drag Race", GAME_SUPPORTS_SAVE, layout_dragrace )
+GAMEL(1977, dragrace, 0, dragrace, dragrace, driver_device, 0, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, layout_dragrace )

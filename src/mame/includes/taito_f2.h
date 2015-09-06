@@ -53,8 +53,6 @@ public:
 	UINT16 *        m_spriteram_buffered;
 	UINT16 *        m_spriteram_delayed;
 	optional_shared_ptr<UINT16> m_cchip2_ram;           // for megablst only
-//  UINT16 *        m_paletteram;    // currently this uses generic palette handling
-
 
 	/* video-related */
 	struct f2_tempsprite *m_spritelist;

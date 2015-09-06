@@ -2941,6 +2941,53 @@ ROM_START( midresb )
 ROM_END
 
 
+ROM_START( midresbj )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "14",         0x00000, 0x10000, CRC(6b3bc886) SHA1(998ef6ae89565148bcb8909f21acbec378ed5f4f) )
+	ROM_LOAD16_BYTE( "11",         0x00001, 0x10000, CRC(9b6faab3) SHA1(b60e41972f52df910bfa09accd5fde7d858b55bf) )
+	ROM_LOAD16_BYTE( "13",         0x20000, 0x10000, CRC(d1bb2cd6) SHA1(6d4afd8dd8c4c3e90de199358da27108286637e2) )
+	ROM_LOAD16_BYTE( "10",         0x20001, 0x10000, CRC(42ccdd0d) SHA1(ef17cc984a8d57e9c52877f4e9b78e9976f99033) )
+	ROM_LOAD16_BYTE( "12",         0x40000, 0x10000, CRC(258b10b2) SHA1(f0849801ab2c72bc6e929b230d0c6d41823f18ae) )
+	ROM_LOAD16_BYTE( "9",          0x40001, 0x10000, CRC(dd6985d5) SHA1(bd58a1da2c5152464d7660f5b931d6257cb87c4e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 sound */
+	ROM_LOAD( "15",         0x0000, 0x10000, CRC(99d47166) SHA1(a9a1adfe47be8dd3e4d6f8c783447e09be1747b2) )
+
+	ROM_REGION( 0x10000, "cpu2", ROMREGION_ERASE00 )    /* 68705 MCU */
+	//ROM_LOAD( "68705r3.bin",              0x00000, 0x1000, CRC(ad5b1c13) SHA1(3616dc5969323a54e3e171d169f76250ae4e711a) ) // unpopulated socket
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "23",             0x08000, 0x08000, CRC(d75aba06) SHA1(cb3b969db3dd8e0c5c3729482f7461cde3a961f3) )
+	ROM_CONTINUE(                   0x00000, 0x08000 )  /* the two halves are swapped */
+	ROM_LOAD( "24",             0x18000, 0x08000, CRC(8f5bbb79) SHA1(cb10f68787606111ba5e9967bf0b0cd21269a902) )
+	ROM_CONTINUE(                   0x10000, 0x08000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD( "19",             0x00000, 0x20000, CRC(fd9ba1bd) SHA1(a105a4335eeed19662c89ab0f90485f1029cf03f) )
+	ROM_LOAD( "18",             0x20000, 0x20000, CRC(a936c03c) SHA1(293e69874ce9b2dfb1d605c9f988fa736b12bbcf) )
+	ROM_LOAD( "20",             0x40000, 0x20000, CRC(4d8e3cf1) SHA1(db804a608f6ba9ce4cedfec2581bcbb00de3f2ba) )
+	ROM_LOAD( "17",             0x60000, 0x20000, CRC(b7241ab9) SHA1(3e83f9285ff4c476f1287bf73b514eace482dccc) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD( "22",             0x10000, 0x10000, CRC(35a54bb4) SHA1(1869eb77a060e9df42b761b02e7fa5ecb7c414d1) )
+	ROM_CONTINUE(0x00000,0x10000)
+	ROM_LOAD( "21",             0x30000, 0x10000, CRC(4b9227b3) SHA1(7059f2d07fffa0468a45a42b87bf561da5e9c5a4) )
+	ROM_CONTINUE(0x20000,0x10000)
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD( "4",             0x00000, 0x10000, CRC(3f499acb) SHA1(1a22cfeed0497ddc2d571114d9f246b3ae18ede9) )
+	ROM_LOAD( "8",             0x10000, 0x10000, CRC(5e7a6800) SHA1(8dd5c9005b6804a30627644053f14e4477fe0074) )
+	ROM_LOAD( "2",             0x20000, 0x10000, CRC(897ba6e4) SHA1(70fd9cba3922751cb317770d6effdc2fb94c1324) )
+	ROM_LOAD( "6",             0x30000, 0x10000, CRC(9fefb810) SHA1(863a81540261e78de5c612dea807ba29b12054d4) )
+	ROM_LOAD( "3",             0x40000, 0x10000, CRC(ebafe720) SHA1(b9f76d2f1b59f1d028e6156b831c5c8ada033641) )
+	ROM_LOAD( "7",             0x50000, 0x10000, CRC(bb8cf641) SHA1(a22e47a15d38d4f33e5a2c90f3a90a16a4231d2c) ) // slight changes, check (equivalent to 3.bin in above)
+	ROM_LOAD( "1",             0x60000, 0x10000, CRC(fd0bd8d3) SHA1(d6b19869ddc2a8ed4f38ba9d613b71853f2d13c0) )
+	ROM_LOAD( "5",             0x70000, 0x10000, CRC(fc46d5ed) SHA1(20ddf3f67f0dfb222ad8d3fd464b892ec9c9e4f5) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "16",            0x00000, 0x10000, CRC(ccf24b52) SHA1(39b2663c548b30684197284cb8e7a6ca803330c9))
+ROM_END
+
 ROM_START( bouldash )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "fw-15-2.17l",   0x00000, 0x10000, CRC(ca19a967) SHA1(b9dc2b1323f19b6239e550ed020943bf13de8db0) )
@@ -3052,40 +3099,41 @@ DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
 /******************************************************************************/
 
 //    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE/DEVICE,   INIT, MONITOR,COMPANY,                 FULLNAME,            FLAGS
-GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East USA",         "Heavy Barrel (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East Corporation", "Heavy Barrel (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, birdtry,    0,        birdtry,  birdtry,  dec0_state,  birdtry, ROT270, "Data East Corporation", "Birdie Try (Japan)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1988, robocop,    0,        robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 4)", GAME_SUPPORTS_SAVE )
-GAME( 1988, robocopw,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 3)", GAME_SUPPORTS_SAVE )
-GAME( 1988, robocopj,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, robocopu,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East USA",         "Robocop (US revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, robocopu0,  robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East USA",         "Robocop (US revision 0)", GAME_SUPPORTS_SAVE )
-GAME( 1989, hippodrm,   0,        hippodrm, hippodrm, dec0_state, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ffantasy,   hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ffantasya,  hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, secretag,   0,        slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East Corporation", "Secret Agent (World revision 3)", GAME_SUPPORTS_SAVE )
-GAME( 1989, secretagj,  secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East Corporation", "Secret Agent (Japan revision 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, slyspy,     secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East USA",         "Sly Spy (US revision 3)", GAME_SUPPORTS_SAVE )
-GAME( 1989, slyspy2,    secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East USA",         "Sly Spy (US revision 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, midres,     0,        midres,   midres,   driver_device,     0, ROT0,   "Data East Corporation", "Midnight Resistance (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, midresu,    midres,   midres,   midresu,  driver_device,     0, ROT0,   "Data East USA",         "Midnight Resistance (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, midresj,    midres,   midres,   midresu,  driver_device,     0, ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, bouldash,   0,        slyspy,   bouldash, dec0_state,   slyspy, ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state,   slyspy, ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, birdtry,    0,        birdtry,  birdtry,  dec0_state,  birdtry, ROT270, "Data East Corporation", "Birdie Try (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocop,    0,        robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopw,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopj,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu0,  robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hippodrm,   0,        hippodrm, hippodrm, dec0_state, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasy,   hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasya,  hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, secretag,   0,        slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East Corporation", "Secret Agent (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, secretagj,  secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East Corporation", "Secret Agent (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy,     secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East USA",         "Sly Spy (US revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy2,    secretag, slyspy,   slyspy,   dec0_state,   slyspy, ROT0,   "Data East USA",         "Sly Spy (US revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midres,     0,        midres,   midres,   driver_device,     0, ROT0,   "Data East Corporation", "Midnight Resistance (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midresu,    midres,   midres,   midresu,  driver_device,     0, ROT0,   "Data East USA",         "Midnight Resistance (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midresj,    midres,   midres,   midresu,  driver_device,     0, ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bouldash,   0,        slyspy,   bouldash, dec0_state,   slyspy, ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state,   slyspy, ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs
 
 // more or less just an unprotected versions of the game, everything intact
-GAME( 1988, robocopb,   robocop,  robocopb, robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Robocop (World bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1988, robocopb,   robocop,  robocopb, robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", GAME_SUPPORTS_SAVE ) // need to hook up 68705?
-GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl,   ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 68705 not dumped, might be the same as midresb
+GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
+GAME( 1989, midresbj,   midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl,   ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 68705 not dumped, might be the same as midresb
 /* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,  robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
-GAME( 1989, secretab,   secretag, secretab, slyspy, dec0_state,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1988, automat,    robocop,  automat,  robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1989, secretab,   secretag, secretab, slyspy, dec0_state,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

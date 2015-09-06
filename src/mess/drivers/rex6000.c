@@ -718,5 +718,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, driver_device,  0,   "Xircom / Intel",   "REX 6000",       GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, driver_device,  0,   "Citizen",          "DataSlim 2",     GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, driver_device,  0,   "Xircom / Intel",   "REX 6000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, driver_device,  0,   "Citizen",          "DataSlim 2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

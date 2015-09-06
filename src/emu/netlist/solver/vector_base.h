@@ -11,7 +11,7 @@
 #define VECTOR_BASE_H_
 
 #include <algorithm>
-#include "../plib/pconfig.h"
+#include "plib/pconfig.h"
 
 #if 0
 template <unsigned _storage_N>
@@ -30,38 +30,41 @@ private:
 };
 #endif
 
-#if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 4))
+#if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-inline void vec_set (const std::size_t n, const double &scalar, double * RESTRICT result)
+template<typename T>
+inline void vec_set (const std::size_t n, const T &scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] = scalar;
 }
-inline double vecmult (const std::size_t n, const double * RESTRICT a1, const double * RESTRICT a2 )
-{
 
-	double value = 0.0;
+template<typename T>
+inline T vecmult (const std::size_t n, const T * RESTRICT a1, const T * RESTRICT a2 )
+{
+	T value = 0.0;
 	for ( std::size_t i = 0; i < n; i++ )
 		value = value + a1[i] * a2[i];
 	return value;
 }
 
-
-inline double vecmult2 (const std::size_t n, const double *a1)
+template<typename T>
+inline T vecmult2 (const std::size_t n, const T *a1)
 {
-	double value = 0.0;
+	T value = 0.0;
 	for ( std::size_t i = 0; i < n; i++ )
 	{
-		const double temp = a1[i];
+		const T temp = a1[i];
 		value = value + temp * temp;
 	}
 	return value;
 }
 
-inline void vec_mult_scalar (const std::size_t n, const double * RESTRICT v, const double scalar, double * RESTRICT result)
+template<typename T>
+inline void vec_mult_scalar (const std::size_t n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 	{
@@ -69,7 +72,8 @@ inline void vec_mult_scalar (const std::size_t n, const double * RESTRICT v, con
 	}
 }
 
-inline void vec_add_mult_scalar (const std::size_t n, const double * RESTRICT v, const double scalar, double * RESTRICT result)
+template<typename T>
+inline void vec_add_mult_scalar (const std::size_t n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] += scalar * v[i];
@@ -81,13 +85,15 @@ inline void vec_add_ip(const std::size_t n, const double * RESTRICT v, double * 
 		result[i] += v[i];
 }
 
-inline void vec_sub(const std::size_t n, const double * RESTRICT v1, const double * RESTRICT v2, double * RESTRICT result)
+template<typename T>
+inline void vec_sub(const std::size_t n, const T * RESTRICT v1, const T * RESTRICT v2, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] = v1[i] - v2[i];
 }
 
-inline void vec_scale (const std::size_t n, double * RESTRICT v, const double scalar)
+template<typename T>
+inline void vec_scale (const std::size_t n, T * RESTRICT v, const T scalar)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		v[i] = scalar * v[i];
@@ -101,7 +107,7 @@ inline double vec_maxabs(const std::size_t n, const double * RESTRICT v)
 
 	return ret;
 }
-#if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 4))
+#if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
 #pragma GCC diagnostic pop
 #endif
 

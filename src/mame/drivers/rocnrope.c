@@ -344,9 +344,10 @@ ROM_START( ropeman )
 	ROM_LOAD( "pal10l8.6g",       0x0000, 0x0001, NO_DUMP )
 
 	ROM_REGION( 0x01D6, "pals_daughterbd", 0 ) /* N82S153's located on the daughterboard of the cpu/video board */
-	ROM_LOAD( "n82s153.pal1.bin", 0x0000, 0x00EB, CRC(baebe804) SHA1(c2e084b4df8a5c6d12cc34106583b532cd7a697b) ) /* Signetics N82S153 */
-	ROM_LOAD( "n82s153.pal2.bin", 0x00EB, 0x00EB, CRC(a0e1b7a0) SHA1(7c3ce1a286bef69830a5e67a85965fe71f7ee283) ) /* Signetics N82S153 */
+	ROM_LOAD( "n82s153.pal1.bin", 0x0000, 0x00eb, CRC(baebe804) SHA1(c2e084b4df8a5c6d12cc34106583b532cd7a697b) ) /* Signetics N82S153 */
+	ROM_LOAD( "n82s153.pal2.bin", 0x00eb, 0x00eb, CRC(a0e1b7a0) SHA1(7c3ce1a286bef69830a5e67a85965fe71f7ee283) ) /* Signetics N82S153 */
 ROM_END
+
 
 /*************************************
  *
@@ -356,11 +357,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
 {
-	memregion("maincpu")->base()[0x703d] = 0x98^0x88;   /* fix one instruction */
-}
-
-DRIVER_INIT_MEMBER(rocnrope_state,rocnropk)
-{
+	memregion("maincpu")->base()[0x703d] = 0x98^0x22; // HACK: fix one instruction
 }
 
 
@@ -370,6 +367,6 @@ DRIVER_INIT_MEMBER(rocnrope_state,rocnropk)
  *
  *************************************/
 
-GAME( 1983, rocnrope, 0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", GAME_SUPPORTS_SAVE )
-GAME( 1983, rocnropek,rocnrope, rocnrope, rocnrope, rocnrope_state, rocnropk, ROT270, "Konami / Kosuka", "Roc'n Rope (Kosuka)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ropeman,  rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", GAME_SUPPORTS_SAVE )
+GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, driver_device,  0,        ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )

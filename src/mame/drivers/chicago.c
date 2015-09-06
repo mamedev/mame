@@ -138,4 +138,4 @@ ROM_START( destdrby )
 ROM_END
 
 
-GAME( 1976, destdrby,  0, chicago, 0, driver_device,  0, ROT0, "Chicago Coin", "Destruction Derby [TTL]", GAME_IS_SKELETON )
+GAME( 1976, destdrby,  0, chicago, 0, driver_device,  0, ROT0, "Chicago Coin", "Destruction Derby [TTL]", MACHINE_IS_SKELETON )

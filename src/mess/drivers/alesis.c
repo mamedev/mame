@@ -27,17 +27,17 @@ READ8_MEMBER( alesis_state::kb_r )
 	UINT8 data = 0xff;
 
 	if (!(m_kb_matrix & 0x01))
-		data &= ioport("COL1")->read();
+		data &= m_col1->read();
 	if (!(m_kb_matrix & 0x02))
-		data &= ioport("COL2")->read();
+		data &= m_col2->read();
 	if (!(m_kb_matrix & 0x04))
-		data &= ioport("COL3")->read();
+		data &= m_col3->read();
 	if (!(m_kb_matrix & 0x08))
-		data &= ioport("COL4")->read();
+		data &= m_col4->read();
 	if (!(m_kb_matrix & 0x10))
-		data &= ioport("COL5")->read();
+		data &= m_col5->read();
 	if (!(m_kb_matrix & 0x20))
-		data &= ioport("COL6")->read();
+		data &= m_col6->read();
 
 	return data;
 }
@@ -479,7 +479,7 @@ DRIVER_INIT_MEMBER(alesis_state,hr16)
 
 /* Driver */
 /*    YEAR  NAME   PARENT   COMPAT   MACHINE    INPUT INIT                 COMPANY, FULLNAME, FLAGS */
-SYST( 1987, hr16,  0,       0,       hr16,      hr16, alesis_state,  hr16, "Alesis", "HR-16", GAME_NOT_WORKING | GAME_NO_SOUND)
-SYST( 1987, mmt8,  0,       0,       mmt8,      mmt8, driver_device, 0,    "Alesis", "MMT-8", GAME_NOT_WORKING | GAME_NO_SOUND)
-SYST( 1989, hr16b, hr16,    0,       hr16,      hr16, alesis_state,  hr16, "Alesis", "HR-16B", GAME_NOT_WORKING | GAME_NO_SOUND)
-SYST( 1990, sr16,  0,       0,       sr16,      sr16, driver_device, 0,    "Alesis", "SR-16 (Alesis)", GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 1987, hr16,  0,       0,       hr16,      hr16, alesis_state,  hr16, "Alesis", "HR-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1987, mmt8,  0,       0,       mmt8,      mmt8, driver_device, 0,    "Alesis", "MMT-8", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1989, hr16b, hr16,    0,       hr16,      hr16, alesis_state,  hr16, "Alesis", "HR-16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1990, sr16,  0,       0,       sr16,      sr16, driver_device, 0,    "Alesis", "SR-16 (Alesis)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -36,19 +36,23 @@
     Pocket Gal DX               MAZ     102     52,71           56              104         153
     Boogie Wings                MBD     102     52,52,71,71     141, 141        104         113,99,200
 1   Double Wings                MBE     102     52              141             104
-    Fighter's History           MBF     101     52,153          56,74           [Scratched] 200, 153, 170
-    Heavy Smash                 MBG     156     52              141                         153*3
-    Night Slashers              MBH     156     52,52,52,153,153,153    74, 141 104         99,200
-    Locked N Loaded             MBM     101     ?               74,74           146         113,186,187
+3   Fighter's History DE-0380-0 MBF     156     52              56, 74          75          153,153,200,170
+3   Fighter's History DE-0395-1 MBF     156     52              56, 74          75          113,113,200
+3   Fighter's History DE-0396-0 MBF     156     52              74, 141         75          153,153,200
+    Heavy Smash                 MBG     156     52              141                         153,153,153
+    Night Slashers DE-0397-0    MBH     156     52,52,52        74, 141         104         153,153,153,99,200
+    Night Slashers DE-0395-1    MBH     156     52,52,52        74, 141         104         113,113,153,99,200
+    Locked N Loaded             MBM     101     ?               74, 74          146         113,186,187
     Joe & Mac Return            MBN     156     52              141                         223,223
 2   Charlie Ninja               MBR     156     52              141                         223,223
     World Cup Volleyball 95     MBX     156     52              141             ?
-    Backfire!                   MBZ     156     52,52,153,153   141,141         ?           223
-2*  Ganbare Gonta               MCB     156     52              141                         223,223
+    Backfire!                   MBZ     156     52,52           141, 141        ?           153,153,223
+2*  Ganbare! Gonta!! 2          MCB     156     52              141                         223,223
     Chain Reaction/Magical Drop MCC     156     52              141                         223,223
     Dunk Dream 95               MCE     156     [MLC]           [MLC]
 2   Osman/Cannon Dancer         MCF     156     52              141                         223,223
     Avengers In Galactic Storm  MCG     SH2     [MLC]           [MLC]
+    Skull Fang                  MCH     156     [MLC]           [MLC]
     Stadium Hero 96             MCM     156     [MLC]           [MLC]           146
 
     Sotsugyo Shousho                    59      52              74              146?
@@ -57,11 +61,16 @@
 
 Note 1: Mitchell game on DECO PCB board number DEC-22V0 (S-NK-3220)
 Note 2: Mitchell games on DECO PCB board number MT5601-0
+Note 3: Fighter's History uses the 156 Encrypted ARM cpu with the encryption disabled
 Note *: Ganbare! Gonta!! 2 / Lady Killer Part 2 - Party Time
+
+Note: A version of Night Slashers runs on the DE-0395-1 using the 156 encryption, while a version
+      of Fighter's History also runs on the DE-0395-1 PCB without using the 156 encryption
 
     Custom chip 59  = 68000 cpu
     Custom chip 101 = Arm6 cpu
     Custom chip 113 = Alpha blending
+    Custom chip 153 = Alpha blending (same functions as 113, smaller PQFP package)
     Custom chip 99  = 'Ace' chip (Special alpha blending?)
     Custom chip 156 = Encrypted ARM cpu
     Custom chip 102 = Encrypted 68000 cpu

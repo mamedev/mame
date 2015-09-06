@@ -1274,7 +1274,7 @@ void floppy_image_format_t::fixup_crc_amiga(std::vector<UINT32> &buffer, const g
 		if(bit_r(buffer, crc->start + i))
 			res = res ^ (0x8000 >> ((i >> 1) & 15));
 	mfm_w(buffer, 16,   0, 1000, crc->write);
-	mfm_w(buffer, 16, res, 1000, crc->write+16);
+	mfm_w(buffer, 16, res, 1000, crc->write+32);
 }
 
 void floppy_image_format_t::fixup_crc_cbm(std::vector<UINT32> &buffer, const gen_crc_info *crc)

@@ -18,6 +18,7 @@
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
+#include "machine/msm6242.h"
 
 /* screen dimensions */
 #define SAM_BLOCK           8
@@ -56,16 +57,35 @@ public:
 			m_cassette(*this, "cassette"),
 			m_lpt1(*this, "lpt1"),
 			m_lpt2(*this, "lpt2"),
-			m_ram(*this, RAM_TAG) {
-				sam_bank_read_ptr[0] = NULL;
-				sam_bank_write_ptr[0] = NULL;
-				sam_bank_read_ptr[1] = NULL;
-				sam_bank_write_ptr[1] = NULL;
-				sam_bank_read_ptr[2] = NULL;
-				sam_bank_write_ptr[2] = NULL;
-				sam_bank_read_ptr[3] = NULL;
-				sam_bank_write_ptr[3] = NULL;
-			}
+			m_ram(*this, RAM_TAG),
+			m_rtc(*this, "sambus_clock"),
+			m_fdc(*this, "wd1772"),
+			m_wd1772_0(*this, "wd1772:0"),
+			m_wd1772_1(*this, "wd1772:1"),
+			m_region_maincpu(*this, "maincpu"),
+			m_keyboard_row_fe(*this, "keyboard_row_fe"),
+			m_keyboard_row_fd(*this, "keyboard_row_fd"),
+			m_keyboard_row_fb(*this, "keyboard_row_fb"),
+			m_keyboard_row_f7(*this, "keyboard_row_f7"),
+			m_keyboard_row_ef(*this, "keyboard_row_ef"),
+			m_keyboard_row_df(*this, "keyboard_row_df"),
+			m_keyboard_row_bf(*this, "keyboard_row_bf"),
+			m_keyboard_row_7f(*this, "keyboard_row_7f"),
+			m_keyboard_row_ff(*this, "keyboard_row_ff"),
+			m_mouse_buttons(*this, "mouse_buttons"),
+			m_io_mouse_x(*this, "mouse_x"),
+			m_io_mouse_y(*this, "mouse_y"),
+			m_config(*this, "config")
+	{
+		sam_bank_read_ptr[0] = NULL;
+		sam_bank_write_ptr[0] = NULL;
+		sam_bank_read_ptr[1] = NULL;
+		sam_bank_write_ptr[1] = NULL;
+		sam_bank_read_ptr[2] = NULL;
+		sam_bank_write_ptr[2] = NULL;
+		sam_bank_read_ptr[3] = NULL;
+		sam_bank_write_ptr[3] = NULL;
+	}
 
 	virtual void video_start();
 
@@ -141,6 +161,25 @@ public:
 	required_device<centronics_device> m_lpt1;
 	required_device<centronics_device> m_lpt2;
 	required_device<ram_device> m_ram;
+	required_device<msm6242_device> m_rtc;
+	required_device<wd1772_t> m_fdc;
+	required_device<floppy_connector> m_wd1772_0;
+	required_device<floppy_connector> m_wd1772_1;
+	required_memory_region m_region_maincpu;
+	required_ioport m_keyboard_row_fe;
+	required_ioport m_keyboard_row_fd;
+	required_ioport m_keyboard_row_fb;
+	required_ioport m_keyboard_row_f7;
+	required_ioport m_keyboard_row_ef;
+	required_ioport m_keyboard_row_df;
+	required_ioport m_keyboard_row_bf;
+	required_ioport m_keyboard_row_7f;
+	required_ioport m_keyboard_row_ff;
+	required_ioport m_mouse_buttons;
+	required_ioport m_io_mouse_x;
+	required_ioport m_io_mouse_y;
+	required_ioport m_config;
+
 	void draw_mode4_line(int y, int hpos);
 	void draw_mode3_line(int y, int hpos);
 	void draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, UINT8 mask);

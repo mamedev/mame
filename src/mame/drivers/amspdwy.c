@@ -77,7 +77,7 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
 
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_SHARE("palette")
+	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM // unused?
@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amspdwy)
 	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -379,5 +379,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy, driver_device,  0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, driver_device, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy, driver_device,  0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, driver_device, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )

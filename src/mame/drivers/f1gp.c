@@ -671,7 +671,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp, driver_device,  0, ROT90, "Video System Co.", "F-1 Grand Prix", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp, driver_device,  0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp, driver_device,  0, ROT90, "Video System Co.", "F-1 Grand Prix", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp, driver_device,  0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, driver_device, 0, ROT90, "Video System Co.", "F-1 Grand Prix Part II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, driver_device, 0, ROT90, "Video System Co.", "F-1 Grand Prix Part II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

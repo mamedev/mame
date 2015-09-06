@@ -365,6 +365,66 @@ void palette_t::entry_set_color(UINT32 index, rgb_t rgb)
 
 
 //-------------------------------------------------
+//  entry_set_red_level - set the red level for a
+//  given palette index
+//-------------------------------------------------
+
+void palette_t::entry_set_red_level(UINT32 index, UINT8 level)
+{
+	// if out of range, or unchanged, ignore
+	if (index >= m_numcolors || m_entry_color[index].r() == level)
+		return;
+
+	// set the level
+	m_entry_color[index].set_r(level);
+
+	// update across all groups
+	for (int groupnum = 0; groupnum < m_numgroups; groupnum++)
+		update_adjusted_color(groupnum, index);
+}
+
+
+//-------------------------------------------------
+//  entry_set_green_level - set the green level for a
+//  given palette index
+//-------------------------------------------------
+
+void palette_t::entry_set_green_level(UINT32 index, UINT8 level)
+{
+	// if out of range, or unchanged, ignore
+	if (index >= m_numcolors || m_entry_color[index].g() == level)
+		return;
+
+	// set the level
+	m_entry_color[index].set_g(level);
+
+	// update across all groups
+	for (int groupnum = 0; groupnum < m_numgroups; groupnum++)
+		update_adjusted_color(groupnum, index);
+}
+
+
+//-------------------------------------------------
+//  entry_set_blue_level - set the blue level for a
+//  given palette index
+//-------------------------------------------------
+
+void palette_t::entry_set_blue_level(UINT32 index, UINT8 level)
+{
+	// if out of range, or unchanged, ignore
+	if (index >= m_numcolors || m_entry_color[index].b() == level)
+		return;
+
+	// set the level
+	m_entry_color[index].set_b(level);
+
+	// update across all groups
+	for (int groupnum = 0; groupnum < m_numgroups; groupnum++)
+		update_adjusted_color(groupnum, index);
+}
+
+
+//-------------------------------------------------
 //  entry_set_contrast - set the contrast
 //  adjustment for a single palette index
 //-------------------------------------------------

@@ -203,8 +203,8 @@ void wd_fdc_t::dden_w(bool _dden)
 std::string wd_fdc_t::tts(const attotime &t)
 {
 	char buf[256];
-	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 	return buf;
 }
 

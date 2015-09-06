@@ -17,7 +17,7 @@
 
 #include "emu.h"
 #include "peribox.h"
-#include "machine/ti99/grom.h"
+#include "bus/ti99x/grom.h"
 
 extern const device_type TI99_P_CODE;
 

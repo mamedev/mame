@@ -25,9 +25,9 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="100" top="0" bottom="15" />
+		<bounds left="0" right="89" top="0" bottom="15" />
 
-	<!-- 9 digits (snspell has 8, snmath has 9) -->
+	<!-- 8 digits -->
 
 		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
 		<bezel name="lamp14" element="lamp_dp"><bounds x="9" y="13.5" width="1.5" height="1.5" /></bezel>
@@ -60,10 +60,6 @@
 		<bezel name="digit7" element="digit"><bounds x="77" y="0" width="10" height="15" /></bezel>
 		<bezel name="lamp714" element="lamp_dp"><bounds x="86" y="13.5" width="1.5" height="1.5" /></bezel>
 		<bezel name="lamp715" element="lamp_ap"><bounds x="87.5" y="0" width="0.5" height="3.5" /></bezel>
-
-		<bezel name="digit8" element="digit"><bounds x="88" y="0" width="10" height="15" /></bezel>
-		<bezel name="lamp814" element="lamp_dp"><bounds x="97" y="13.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="lamp815" element="lamp_ap"><bounds x="98.5" y="0" width="0.5" height="3.5" /></bezel>
 
 	</view>
 </mamelayout>

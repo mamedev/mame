@@ -1103,10 +1103,10 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, struct segas
 			if (!flipx)
 			{
 				srcx = cliprect.min_x + xscroll;
-				srcxstep = 1;				
+				srcxstep = 1;
 			}
 			else
-			{	
+			{
 				srcx = cliprect.max_x + xscroll;
 				srcxstep = -1;
 			}

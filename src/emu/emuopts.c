@@ -202,6 +202,10 @@ const options_entry emu_options::s_option_entries[] =
 
 emu_options::emu_options()
 : core_options()
+, m_coin_impulse(0)
+, m_joystick_contradictory(false)
+, m_sleep(true)
+, m_refresh_speed(false)
 {
 	add_entries(emu_options::s_option_entries);
 }
@@ -380,6 +384,8 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options_count());
 
+	update_cached_options();
+
 	return result;
 }
 
@@ -393,7 +399,9 @@ bool emu_options::parse_command_line(int argc, char *argv[], std::string &error_
 {
 	// parse as normal
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	return parse_slot_devices(argc, argv, error_string, NULL, NULL);
+	bool result = parse_slot_devices(argc, argv, error_string, NULL, NULL);
+	update_cached_options();
+	return result;
 }
 
 
@@ -427,13 +435,13 @@ void emu_options::parse_standard_inis(std::string &error_string)
 	else
 		parse_one_ini("horizont", OPTION_PRIORITY_ORIENTATION_INI, &error_string);
 
-	if (cursystem->flags & GAME_TYPE_ARCADE)
+	if (cursystem->flags & MACHINE_TYPE_ARCADE)
 		parse_one_ini("arcade", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	else if (cursystem->flags & GAME_TYPE_CONSOLE)
+	else if (cursystem->flags & MACHINE_TYPE_CONSOLE)
 		parse_one_ini("console", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	else if (cursystem->flags & GAME_TYPE_COMPUTER)
+	else if (cursystem->flags & MACHINE_TYPE_COMPUTER)
 		parse_one_ini("computer", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	else if (cursystem->flags & GAME_TYPE_OTHER)
+	else if (cursystem->flags & MACHINE_TYPE_OTHER)
 		parse_one_ini("othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
 
 	// parse "vector.ini" for vector games
@@ -468,6 +476,8 @@ void emu_options::parse_standard_inis(std::string &error_string)
 
 	// Re-evaluate slot options after loading ini files
 	update_slot_options();
+
+	update_cached_options();
 }
 
 
@@ -569,4 +579,19 @@ const char *emu_options::sub_value(std::string &buffer, const char *name, const 
 	else
 		buffer.clear();
 	return buffer.c_str();
+}
+
+
+//-------------------------------------------------
+//  update_cached_options - to prevent tagmap
+//    lookups keep copies of frequently requested
+//    options in member variables.
+//-------------------------------------------------
+
+void emu_options::update_cached_options()
+{
+	m_coin_impulse = int_value(OPTION_COIN_IMPULSE);
+	m_joystick_contradictory = bool_value(OPTION_JOYSTICK_CONTRADICTORY);
+	m_sleep = bool_value(OPTION_SLEEP);
+	m_refresh_speed = bool_value(OPTION_REFRESHSPEED);
 }

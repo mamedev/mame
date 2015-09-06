@@ -164,6 +164,12 @@ static INPUT_PORTS_START( cchance )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// These ports are required in tnzs_state
+	PORT_START("IN1")
+	PORT_START("IN2")
+	PORT_START("DSWA")
+	PORT_START("DSWB")
 INPUT_PORTS_END
 
 static const gfx_layout cchance_layout =
@@ -250,4 +256,4 @@ ROM_START( cchance )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1987?, cchance,  0,    cchance, cchance, driver_device,  0, ROT0, "<unknown>", "Cherry Chance", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1987?, cchance,  0,    cchance, cchance, driver_device,  0, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

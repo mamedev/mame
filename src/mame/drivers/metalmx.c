@@ -859,4 +859,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

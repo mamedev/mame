@@ -585,4 +585,4 @@ ROM_END
 *********************************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT   ROT    COMPANY          FULLNAME       FLAGS... */
-GAME( 1992, gluck2,   0,      gluck2,   gluck2,   driver_device, 0,     ROT0, "Yung Yu / CYE", "Good Luck II", GAME_SUPPORTS_SAVE )
+GAME( 1992, gluck2,   0,      gluck2,   gluck2,   driver_device, 0,     ROT0, "Yung Yu / CYE", "Good Luck II", MACHINE_SUPPORTS_SAVE )

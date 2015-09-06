@@ -377,4 +377,4 @@ COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sha
 
 // These may need a separate driver!
 COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A", 0 )
-COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80B", GAME_NOT_WORKING )
+COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80B", MACHINE_NOT_WORKING )

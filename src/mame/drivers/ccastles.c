@@ -660,11 +660,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ccastles,  0,        ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 4)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesg, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesp, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesf, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastles3, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastles2, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastles1, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj, driver_device,0, ROT0, "Atari", "Crystal Castles (joystick version)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles,  0,        ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesg, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesp, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesf, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles3, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles2, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles1, ccastles, ccastles, ccastles, driver_device, 0, ROT0, "Atari", "Crystal Castles (version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj, driver_device,0, ROT0, "Atari", "Crystal Castles (joystick version)", MACHINE_SUPPORTS_SAVE )

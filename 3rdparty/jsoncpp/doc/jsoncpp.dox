@@ -4,11 +4,21 @@
 
 <a HREF="http://www.json.org/">JSON (JavaScript Object Notation)</a>
  is a lightweight data-interchange format. 
-It can represent integer, real number, string, an ordered sequence of value, and
-a collection of name/value pairs.
 
 Here is an example of JSON data:
 \verbatim
+{
+    "encoding" : "UTF-8",
+    "plug-ins" : [
+        "python",
+        "c++",
+        "ruby"
+        ],
+    "indent" : { "length" : 3, "use_space": true }
+}
+\endverbatim
+<b>JsonCpp</b> supports comments as <i>meta-data</i>:
+\code
 // Configuration options
 {
     // Default encoding for text
@@ -17,22 +27,22 @@ Here is an example of JSON data:
     // Plug-ins loaded at start-up
     "plug-ins" : [
         "python",
-        "c++",
+        "c++",  // trailing comment
         "ruby"
         ],
         
     // Tab indent size
-    "indent" : { "length" : 3, "use_space": true }
+    // (multi-line comment)
+    "indent" : { /*embedded comment*/ "length" : 3, "use_space": true }
 }
-\endverbatim
-<code>jsoncpp</code> supports comments as <i>meta-data</i>.
+\endcode
 
 \section _features Features
 - read and write JSON document
 - attach C++ style comments to element during parsing
 - rewrite JSON document preserving original comments
 
-Notes: Comments used to be supported in JSON but where removed for 
+Notes: Comments used to be supported in JSON but were removed for
 portability (C like comments are not supported in Python). Since
 comments are useful in configuration/input file, this feature was
 preserved.
@@ -40,47 +50,77 @@ preserved.
 \section _example Code example
 
 \code
-Json::Value root;   // will contains the root value after parsing.
-Json::Reader reader;
-bool parsingSuccessful = reader.parse( config_doc, root );
-if ( !parsingSuccessful )
-{
-    // report to the user the failure and their locations in the document.
-    std::cout  << "Failed to parse configuration\n"
-               << reader.getFormattedErrorMessages();
-    return;
-}
+Json::Value root;   // 'root' will contain the root value after parsing.
+std::cin >> root;
 
-// Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
-// such member.
-std::string encoding = root.get("encoding", "UTF-8" ).asString();
-// Get the value of the member of root named 'encoding', return a 'null' value if
-// there is no such member.
-const Json::Value plugins = root["plug-ins"];
-for ( int index = 0; index < plugins.size(); ++index )  // Iterates over the sequence elements.
-   loadPlugIn( plugins[index].asString() );
-   
-setIndentLength( root["indent"].get("length", 3).asInt() );
-setIndentUseSpace( root["indent"].get("use_space", true).asBool() );
-
-// ...
-// At application shutdown to make the new configuration document:
-// Since Json::Value has implicit constructor for all value types, it is not
-// necessary to explicitly construct the Json::Value object:
-root["encoding"] = getCurrentEncoding();
-root["indent"]["length"] = getCurrentIndentLength();
-root["indent"]["use_space"] = getCurrentIndentUseSpace();
-
-Json::StyledWriter writer;
-// Make a new JSON document for the configuration. Preserve original comments.
-std::string outputConfig = writer.write( root );
-
-// You can also use streams.  This will put the contents of any JSON
-// stream at a particular sub-value, if you'd like.
+// You can also read into a particular sub-value.
 std::cin >> root["subtree"];
 
-// And you can write to a stream, using the StyledWriter automatically.
+// Get the value of the member of root named 'encoding',
+// and return 'UTF-8' if there is no such member.
+std::string encoding = root.get("encoding", "UTF-8" ).asString();
+
+// Get the value of the member of root named 'plug-ins'; return a 'null' value if
+// there is no such member.
+const Json::Value plugins = root["plug-ins"];
+
+// Iterate over the sequence elements.
+for ( int index = 0; index < plugins.size(); ++index )
+   loadPlugIn( plugins[index].asString() );
+   
+// Try other datatypes. Some are auto-convertible to others.
+foo::setIndentLength( root["indent"].get("length", 3).asInt() );
+foo::setIndentUseSpace( root["indent"].get("use_space", true).asBool() );
+
+// Since Json::Value has an implicit constructor for all value types, it is not
+// necessary to explicitly construct the Json::Value object.
+root["encoding"] = foo::getCurrentEncoding();
+root["indent"]["length"] = foo::getCurrentIndentLength();
+root["indent"]["use_space"] = foo::getCurrentIndentUseSpace();
+
+// If you like the defaults, you can insert directly into a stream.
 std::cout << root;
+// Of course, you can write to `std::ostringstream` if you prefer.
+
+// If desired, remember to add a linefeed and flush.
+std::cout << std::endl;
+\endcode
+
+\section _advanced Advanced usage
+
+Configure *builders* to create *readers* and *writers*. For
+configuration, we use our own `Json::Value` (rather than
+standard setters/getters) so that we can add
+features without losing binary-compatibility.
+
+\code
+// For convenience, use `writeString()` with a specialized builder.
+Json::StreamWriterBuilder wbuilder;
+wbuilder["indentation"] = "\t";
+std::string document = Json::writeString(wbuilder, root);
+
+// Here, using a specialized Builder, we discard comments and
+// record errors as we parse.
+Json::CharReaderBuilder rbuilder;
+rbuilder["collectComments"] = false;
+std::string errs;
+bool ok = Json::parseFromStream(rbuilder, std::cin, &root, &errs);
+\endcode
+
+Yes, compile-time configuration-checking would be helpful,
+but `Json::Value` lets you
+write and read the builder configuration, which is better! In other words,
+you can configure your JSON parser using JSON.
+
+CharReaders and StreamWriters are not thread-safe, but they are re-usable.
+\code
+Json::CharReaderBuilder rbuilder;
+cfg >> rbuilder.settings_;
+std::unique_ptr<Json::CharReader> const reader(rbuilder.newCharReader());
+reader->parse(start, stop, &value1, &errs);
+// ...
+reader->parse(start, stop, &value2, &errs);
+// etc.
 \endcode
 
 \section _pbuild Build instructions
@@ -116,4 +156,9 @@ Basically JsonCpp is licensed under MIT license, or public domain if desired
 and recognized in your jurisdiction.
 
 \author Baptiste Lepilleur <blep@users.sourceforge.net> (originator)
+\author Christopher Dunn <cdunn2001@gmail.com> (primary maintainer)
+\version \include version
+We make strong guarantees about binary-compatibility, consistent with
+<a href="http://apr.apache.org/versioning.html">the Apache versioning scheme</a>.
+\sa version.h
 */

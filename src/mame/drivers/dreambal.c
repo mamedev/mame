@@ -369,4 +369,4 @@ DRIVER_INIT_MEMBER(dreambal_state,dreambal)
 }
 
 // Ver 2.4 JPN 93.12.02
-GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", GAME_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too
+GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too

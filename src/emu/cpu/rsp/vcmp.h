@@ -39,7 +39,7 @@ inline rsp_vec_t vec_veq_vge_vlt_vne(UINT32 iw, rsp_vec_t vs, rsp_vec_t vt, rsp_
 		}
 	}
 
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	return _mm_blendv_epi8(vt, vs, *le);
 #else
 	vs = _mm_and_si128(*le, vs);

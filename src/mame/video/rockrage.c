@@ -30,7 +30,7 @@ K007342_CALLBACK_MEMBER(rockrage_state::rockrage_tile_callback)
 		*code |= ((*color & 0x40) << 2) | ((bank & 0x01) << 9);
 	else
 		*code |= ((*color & 0x40) << 2) | ((bank & 0x03) << 10) | ((m_vreg & 0x04) << 7) | ((m_vreg & 0x08) << 9);
-	*color = m_layer_colorbase[layer] + (*color & 0x0f);
+	*color = layer * 16 + (*color & 0x0f);
 }
 
 /***************************************************************************

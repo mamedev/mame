@@ -213,6 +213,7 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 
 	MCFG_FD1793_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -237,5 +238,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT      COMPANY    FULLNAME       FLAGS */
-COMP( 1982, ts802,   0,       0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802",  GAME_IS_SKELETON )
-COMP( 1982, ts802h,  ts802,   0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802H", GAME_IS_SKELETON )
+COMP( 1982, ts802,   0,       0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802",  MACHINE_IS_SKELETON )
+COMP( 1982, ts802h,  ts802,   0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802H", MACHINE_IS_SKELETON )

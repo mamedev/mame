@@ -509,7 +509,7 @@ TIMER_CALLBACK_MEMBER( itech8_state::delayed_z80_control_w )
 
 WRITE8_MEMBER(itech8_state::slikshot_z80_control_w )
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_z80_control_w),this), data);
+	synchronize(TIMER_DELAYED_Z80_CONTROL, data);
 }
 
 
@@ -543,11 +543,11 @@ UINT32 itech8_state::screen_update_slikshot(screen_device &screen, bitmap_rgb32 
 	int temp, i;
 
 	/* draw the normal video first */
-	screen_update_itech8_2page(screen, bitmap, cliprect);
+	screen_update_2page(screen, bitmap, cliprect);
 
 	/* add the current X,Y positions to the list */
-	m_xbuffer[m_ybuffer_next % YBUFFER_COUNT] = ioport("FAKEX")->read_safe(0);
-	m_ybuffer[m_ybuffer_next % YBUFFER_COUNT] = ioport("FAKEY")->read_safe(0);
+	m_xbuffer[m_ybuffer_next % YBUFFER_COUNT] = m_fakex->read();
+	m_ybuffer[m_ybuffer_next % YBUFFER_COUNT] = m_fakey->read();
 	m_ybuffer_next++;
 
 	/* determine where to draw the starting point */

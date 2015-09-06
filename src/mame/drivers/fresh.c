@@ -628,4 +628,4 @@ ROM_END
 
 
 // title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28'
-GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

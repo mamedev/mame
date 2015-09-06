@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bionicc_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(bionicc_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bionicc_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(bionicc_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xfffff7) AM_RAM /* working RAM */
 	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
 	AM_RANGE(0xfffffa, 0xffffff) AM_READWRITE(hacked_controls_r, hacked_controls_w) /* hack */
@@ -372,6 +372,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT_CLASS(2, bionicc_state, RRRRGGGGBBBBIIII)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
@@ -615,10 +616,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bionicc,  0,       bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (Euro)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bionicc1, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bionicc2, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, topsecrt, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Top Secret (Japan, old revision)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl,bionicc, bionicc, bionicc, driver_device, 0, ROT0, "bootleg", "Bionic Commandos (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, bionicc,  0,       bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (Euro)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc1, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc2, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, topsecrt, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Top Secret (Japan, old revision)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl,bionicc, bionicc, bionicc, driver_device, 0, ROT0, "bootleg", "Bionic Commandos (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes

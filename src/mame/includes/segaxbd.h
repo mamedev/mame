@@ -13,36 +13,16 @@
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
-
+#include "video/resnet.h"
 
 // ======================> segaxbd_state
 
-class segaxbd_state : public sega_16bit_common_base
+
+class segaxbd_state : public device_t
 {
 public:
 	// construction/destruction
-	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_subcpu(*this, "subcpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_soundcpu2(*this, "soundcpu2"),
-			m_mcu(*this, "mcu"),
-			m_cmptimer_1(*this, "cmptimer_main"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_segaic16road(*this, "segaic16road"),
-			m_gprider_hack(false),
-			m_road_priority(1),
-			m_scanline_timer(NULL),
-			m_timer_irq_state(0),
-			m_vblank_irq_state(0),
-			m_loffire_sync(NULL),
-			m_lastsurv_mux(0)
-	{
-		memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
-		memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
-	}
+	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// compare/timer chip callbacks
 	void timer_ack_callback();
@@ -71,17 +51,18 @@ public:
 	// sound Z80 CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
 
-	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(aburner2);
-	DECLARE_DRIVER_INIT(lastsurv);
-	DECLARE_DRIVER_INIT(loffire);
-	DECLARE_DRIVER_INIT(smgp);
-	DECLARE_DRIVER_INIT(rascot);
-	DECLARE_DRIVER_INIT(gprider);
 
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	// palette helpers
+	DECLARE_WRITE16_MEMBER( paletteram_w );
+
+	void install_aburner2(void);
+	void install_lastsurv(void);
+	void install_loffire(void);
+	void install_smgp(void);
+	void install_gprider(void);
 
 protected:
 	// internal types
@@ -97,7 +78,7 @@ protected:
 	};
 
 	// device overrides
-	virtual void machine_reset();
+//	virtual void machine_reset();
 	virtual void video_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -115,7 +96,9 @@ protected:
 	void lastsurv_iochip0_muxer_w(UINT8 data);
 
 	// devices
+public:
 	required_device<m68000_device> m_maincpu;
+protected:
 	required_device<m68000_device> m_subcpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_soundcpu2;
@@ -126,7 +109,6 @@ protected:
 	required_device<segaic16_road_device> m_segaic16road;
 
 	// configuration
-	bool            m_gprider_hack;
 	bool            m_adc_reverse[8];
 	ioread_delegate m_iochip_custom_io_r[2][8];
 	iowrite_delegate m_iochip_custom_io_w[2][8];
@@ -141,4 +123,96 @@ protected:
 	// game-specific state
 	UINT16 *        m_loffire_sync;
 	UINT8           m_lastsurv_mux;
+public: // -- stupid system16.c
+	// memory pointers
+	required_shared_ptr<UINT16> m_paletteram;
+	bool            m_gprider_hack;
+
+protected:
+	void palette_init();
+	UINT32      m_palette_entries;          // number of palette entries
+	UINT8       m_palette_normal[32];       // RGB translations for normal pixels
+	UINT8       m_palette_shadow[32];       // RGB translations for shadowed pixels
+	UINT8       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	UINT16                  m_latched_value[4];
+	UINT8                   m_latch_read[4];
+
+	UINT32 soundlatch_read(UINT8 index = 0) { m_latch_read[index] = 1; return m_latched_value[index]; };
+	void soundlatch_write(UINT8 index, UINT32 data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(segaxbd_state::soundlatch_sync_callback), this), index | (data << 8)); };
+	void soundlatch_write(UINT32 data) { soundlatch_write(0, data); }
+
+	void soundlatch_sync_callback(void *ptr, INT32 param)
+	{
+		UINT16 value = param >> 8;
+		int which = param & 0xff;
+		m_latched_value[which] = value;
+		m_latch_read[which] = 0;
+	};
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
 };
+
+
+class segaxbd_regular_state :  public segaxbd_state
+{
+public:
+	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+
+
+class segaxbd_fd1094_state :  public segaxbd_state
+{
+public:
+	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+class segaxbd_lastsurv_fd1094_state :  public segaxbd_state
+{
+public:
+	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+class segaxbd_smgp_fd1094_state :  public segaxbd_state
+{
+public:
+	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+class segaxbd_rascot_state :  public segaxbd_state
+{
+public:
+	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+

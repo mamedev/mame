@@ -423,5 +423,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK", "Joyful Road (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK", "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

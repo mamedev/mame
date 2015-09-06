@@ -10,7 +10,7 @@
 #ifndef NLD_SWITCHES_H_
 #define NLD_SWITCHES_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 #include "nld_twoterm.h"
 
 // ----------------------------------------------------------------------------------------
@@ -18,10 +18,10 @@
 // ----------------------------------------------------------------------------------------
 
 #define SWITCH(_name)                                                              \
-		NET_REGISTER_DEV(switch1, _name)
+		NET_REGISTER_DEV(SWITCH, _name)
 
 #define SWITCH2(_name)                                                              \
-		NET_REGISTER_DEV(switch2, _name)
+		NET_REGISTER_DEV(SWITCH2, _name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

@@ -356,4 +356,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY          FULLNAME        FLAGS */
-COMP( 1975, kim1,     0,        0,      kim1,     kim1, driver_device,     0,    "MOS Technologies", "KIM-1" , GAME_SUPPORTS_SAVE)
+COMP( 1975, kim1,     0,        0,      kim1,     kim1, driver_device,     0,    "MOS Technologies", "KIM-1" , MACHINE_SUPPORTS_SAVE)

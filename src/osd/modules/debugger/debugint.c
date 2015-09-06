@@ -64,7 +64,7 @@ enum
 	RECT_DVIEW_TITLE,
 	RECT_DVIEW_HSB,
 	RECT_DVIEW_VSB,
-	RECT_DVIEW_SIZE,
+	RECT_DVIEW_SIZE
 };
 
 enum
@@ -73,7 +73,7 @@ enum
 	VIEW_STATE_MOVING           = 0x02,
 	VIEW_STATE_SIZING           = 0x04,
 	VIEW_STATE_NEEDS_UPDATE     = 0x08,
-	VIEW_STATE_FOLLOW_CPU       = 0x10,
+	VIEW_STATE_FOLLOW_CPU       = 0x10
 };
 
 /***************************************************************************

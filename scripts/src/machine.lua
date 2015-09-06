@@ -188,7 +188,19 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/68561mpcc.h,MACHINES["68561MPCC"] = true
+--@src/emu/machine/68230pit.h,MACHINES["PIT68230"] = true
+---------------------------------------------------
+
+if (MACHINES["PIT68230"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/68230pit.c",
+		MAME_DIR .. "src/emu/machine/68230pit.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/68561mpcc.h,MACHINES += 68561MPCC
 ---------------------------------------------------
 
 if (MACHINES["68561MPCC"]~=null) then
@@ -441,13 +453,13 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/at29040a.h,MACHINES["AT29040"] = true
+--@src/emu/machine/at29x.h,MACHINES["AT29X"] = true
 ---------------------------------------------------
 
-if (MACHINES["AT29040"]~=null) then
+if (MACHINES["AT29X"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/at29040a.c",
-		MAME_DIR .. "src/emu/machine/at29040a.h",
+		MAME_DIR .. "src/emu/machine/at29x.c",
+		MAME_DIR .. "src/emu/machine/at29x.h",
 	}
 end
 
@@ -2538,25 +2550,13 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/hdc9234.h,MACHINES["HDC9234"] = true
+--@src/emu/machine/hdc92x4.h,MACHINES["HDC9234"] = true
 ---------------------------------------------------
 
 if (MACHINES["HDC9234"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/hdc9234.c",
-		MAME_DIR .. "src/emu/machine/hdc9234.h",
-	}
-end
-
----------------------------------------------------
---
---@src/emu/machine/ti99_hd.h,MACHINES["TI99_HD"] = true
----------------------------------------------------
-
-if (MACHINES["TI99_HD"]~=null) then
-	files {
-		MAME_DIR .. "src/emu/machine/ti99_hd.c",
-		MAME_DIR .. "src/emu/machine/ti99_hd.h",
+		MAME_DIR .. "src/emu/machine/hdc92x4.c",
+		MAME_DIR .. "src/emu/machine/hdc92x4.h",
 	}
 end
 
@@ -2650,5 +2650,17 @@ if (MACHINES["NETLIST"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/machine/netlist.c",
 		MAME_DIR .. "src/emu/machine/netlist.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/nsc810.h,MACHINES["NSC810"] = true
+---------------------------------------------------
+
+if (MACHINES["NSC810"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/nsc810.c",
+		MAME_DIR .. "src/emu/machine/nsc810.h",
 	}
 end

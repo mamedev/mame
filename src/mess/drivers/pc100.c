@@ -72,7 +72,6 @@ public:
 		m_beeper(*this, "beeper"),
 		m_rtc(*this, "rtc"),
 		m_palette(*this, "palette"),
-		m_palram(*this, "palram"),
 		m_kanji_rom(*this, "kanji"),
 		m_vram(*this, "vram"),
 		m_rtc_portc(0)
@@ -83,7 +82,6 @@ public:
 	required_device<beep_device> m_beeper;
 	required_device<msm58321_device> m_rtc;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_palram;
 	required_region_ptr<UINT16> m_kanji_rom;
 	required_region_ptr<UINT16> m_vram;
 
@@ -94,7 +92,6 @@ public:
 	DECLARE_READ8_MEMBER(pc100_key_r);
 	DECLARE_WRITE8_MEMBER(pc100_output_w);
 	DECLARE_WRITE8_MEMBER(pc100_tc_w);
-	DECLARE_WRITE16_MEMBER(pc100_paletteram_w);
 	DECLARE_READ8_MEMBER(pc100_shift_r);
 	DECLARE_WRITE8_MEMBER(pc100_shift_w);
 	DECLARE_READ8_MEMBER(pc100_vs_vreg_r);
@@ -246,26 +243,10 @@ WRITE8_MEMBER( pc100_state::pc100_tc_w )
 	machine().device<upd765a_device>("upd765")->tc_w(data & 0x40);
 }
 
-WRITE16_MEMBER( pc100_state::pc100_paletteram_w )
-{
-	COMBINE_DATA(&m_palram[offset]);
-
-	{
-		int r,g,b;
-
-		r = (m_palram[offset] >> 0) & 7;
-		g = (m_palram[offset] >> 3) & 7;
-		b = (m_palram[offset] >> 6) & 7;
-
-		m_palette->set_pen_color(offset, pal3bit(r),pal3bit(g),pal3bit(b));
-	}
-}
-
 READ8_MEMBER( pc100_state::pc100_shift_r )
 {
 	return m_crtc.shift;
 }
-
 
 WRITE8_MEMBER( pc100_state::pc100_shift_w )
 {
@@ -316,7 +297,7 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
 	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
 	AM_RANGE(0x3a, 0x3b) AM_WRITE8(pc100_crtc_data_w,0x00ff) //crtc data reg
 	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(pc100_vs_vreg_r,pc100_vs_vreg_w,0x00ff) //crtc vertical start position
-	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_SHARE("palram")
+	AM_RANGE(0x40, 0x5f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 //  AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
 	AM_RANGE(0x82, 0x83) AM_WRITENOP //kanji-related?
@@ -514,7 +495,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc100)
 	MCFG_PALETTE_ADD("palette", 16)
-//  MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_FORMAT(xxxxxxxBBBGGGRRR)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -536,4 +517,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY  FULLNAME       FLAGS */
-COMP( 198?, pc100,  0,      0,       pc100,     pc100, driver_device,   0,      "NEC",   "PC-100", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, pc100,  0,      0,       pc100,     pc100, driver_device,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

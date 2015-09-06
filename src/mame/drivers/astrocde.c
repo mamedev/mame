@@ -231,10 +231,11 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
  *
  *************************************/
 
+IOPORT_ARRAY_MEMBER(astrocde_state::trackball_inputs) { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
+
 CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
 {
-	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-	return ioport(names[m_input_select])->read();
+	return m_trackball[m_input_select]->read();
 }
 
 
@@ -261,7 +262,7 @@ READ8_MEMBER(astrocde_state::spacezap_io_r)
 {
 	coin_counter_w(machine(), 0, (offset >> 8) & 1);
 	coin_counter_w(machine(), 1, (offset >> 9) & 1);
-	return ioport("P3HANDLE")->read_safe(0xff);
+	return m_p3handle ? m_p3handle->read() : 0xff;
 }
 
 
@@ -394,49 +395,30 @@ READ8_MEMBER(astrocde_state::profpac_io_2_r)
 }
 
 
-WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
+WRITE8_MEMBER(astrocde_state::demndrgn_banksw_w)
 {
 	int bank = (data >> 5) & 3;
+	m_bank4000->set_bank(bank);
+	m_bank8000->set_entry(bank);
+}
 
-	/* this is accessed from I/O space but modifies program space, so we normalize here */
-	address_space &prog_space = space.device().memory().space(AS_PROGRAM);
 
-	/* remember the banking bits for save state support */
-	m_profpac_bank = data;
+WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
+{
+	demndrgn_banksw_w(space, 0, data);
 
-	/* set the main banking */
-	prog_space.install_read_bank(0x4000, 0xbfff, "bank1");
-	membank("bank1")->set_base(memregion("user1")->base() + 0x8000 * bank);
-
-	/* bank 0 reads video RAM in the 4000-7FFF range */
-	if (bank == 0)
-		prog_space.install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(astrocde_state::profpac_videoram_r), this));
-
-	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && memregion("user2")->base() != NULL)
+	if (data & 0x80)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
-		bank = data - 0x80;
+		int bank = data - 0x80;
 
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
-		{
-			prog_space.install_read_bank(0x4000, 0x7fff, "bank2");
-			membank("bank2")->set_base(memregion("user2")->base() + 0x4000 * bank);
-		}
+			m_bank4000->set_bank(4 + bank);
 		else
-			prog_space.unmap_read(0x4000, 0x7fff);
+			m_bank4000->set_bank(4 + 0x28);
 	}
 }
-
-
-void astrocde_state::profbank_banksw_restore()
-{
-	address_space &space = m_maincpu->space(AS_IO);
-
-	profpac_banksw_w(space, 0, m_profpac_bank);
-}
-
 
 
 /*************************************
@@ -456,10 +438,12 @@ READ8_MEMBER(astrocde_state::demndrgn_io_r)
 }
 
 
+IOPORT_ARRAY_MEMBER(astrocde_state::joystick_inputs) { "MOVEX", "MOVEY" };
+
+
 CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)
 {
-	static const char *const names[] = { "MOVEX", "MOVEY" };
-	return ioport(names[m_input_select])->read();
+	return m_joystick[m_input_select]->read();
 }
 
 
@@ -581,26 +565,35 @@ static ADDRESS_MAP_START( robby_map, AS_PROGRAM, 8, astrocde_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( profpac_map, AS_PROGRAM, 8, astrocde_state )
+static ADDRESS_MAP_START( demndrgn_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREAD("bank4000", address_map_bank_device, read8) AM_WRITE(profpac_videoram_w)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank8000")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_SHARE("protected_ram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( demndrgn_map, AS_PROGRAM, 8, astrocde_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xffff) AM_RAM
+static ADDRESS_MAP_START( profpac_map, AS_PROGRAM, 8, astrocde_state )
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_SHARE("protected_ram")
+	AM_IMPORT_FROM(demndrgn_map)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, astrocde_state )
+	AM_RANGE(0x0000, 0x3fff) AM_READ(profpac_videoram_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_REGION("banks", 0x08000)
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("banks", 0x10000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("banks", 0x18000)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( profpac_bank4000_map, AS_PROGRAM, 8, astrocde_state )
+	AM_RANGE(0x10000, 0xaffff) AM_ROM AM_REGION("epromboard", 0)
+	AM_RANGE(0xb0000, 0xb3fff) AM_READNOP
+	AM_IMPORT_FROM(bank4000_map)
 ADDRESS_MAP_END
 
 
@@ -656,7 +649,7 @@ static ADDRESS_MAP_START( port_map_16col_pattern_nosound, AS_IO, 8, astrocde_sta
 	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
 	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ(profpac_intercept_r)
 	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE(profpac_screenram_ctrl_w)
-	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(profpac_banksw_w)
+	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(demndrgn_banksw_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
 
@@ -1250,6 +1243,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1417,6 +1417,10 @@ static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(profpac_map)
 	MCFG_CPU_IO_MAP(port_map_16col_pattern)
+
+	MCFG_DEVICE_MODIFY("bank4000")
+	MCFG_DEVICE_PROGRAM_MAP(profpac_bank4000_map)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
 MACHINE_CONFIG_END
 
 
@@ -1573,7 +1577,7 @@ ROM_START( profpac )
 	ROM_LOAD( "pps2",         0x2000, 0x2000, CRC(8a9a6653) SHA1(b730b24088dcfddbe954670ff9212b7383c923f6) )
 	ROM_LOAD( "pps9",         0xc000, 0x2000, CRC(17a0b418) SHA1(8b7ed84090dbc5181deef6f55ec755c05d4c0d5e) )
 
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "banks", ROMREGION_ERASEFF )
 	ROM_LOAD( "pps3",         0x04000, 0x2000, CRC(15717fd8) SHA1(ffbb156f417d20478117b39de28a15680993b528) )
 	ROM_LOAD( "pps4",         0x06000, 0x2000, CRC(36540598) SHA1(33c797c690801afded45091d822347e1ecc72b54) )
 	ROM_LOAD( "pps5",         0x08000, 0x2000, CRC(8dc89a59) SHA1(fb4d3ba40697425d69ee19bfdcf00aea1df5fa80) )
@@ -1581,7 +1585,7 @@ ROM_START( profpac )
 	ROM_LOAD( "pps7",         0x0c000, 0x2000, CRC(f9c26aba) SHA1(201b930cca9669114ffc97978cade69587e34a0f) )
 	ROM_LOAD( "pps8",         0x0e000, 0x2000, CRC(4d201e41) SHA1(786b30cd7a7db55bdde05909d7a1a7f122b6e546) )
 
-	ROM_REGION( 0xa0000, "user2", ROMREGION_ERASEFF )
+	ROM_REGION( 0xa0000, "epromboard", ROMREGION_ERASEFF )
 	ROM_LOAD( "ppq1",         0x00000, 0x4000, CRC(dddc2ccc) SHA1(d81caaa639f63d971a0d3199b9da6359211edf3d) )
 	ROM_LOAD( "ppq2",         0x04000, 0x4000, CRC(33bbcabe) SHA1(f9455868c70f479ede0e0621f21f69da165d9b7a) )
 	ROM_LOAD( "ppq3",         0x08000, 0x4000, CRC(3534d895) SHA1(24fb14c6b31b7f27e0737605cfbf963d29dd3fc5) )
@@ -1617,7 +1621,7 @@ ROM_START( demndrgn )
 	ROM_LOAD( "dd-x2.bin",     0x2000, 0x2000, CRC(0c63b624) SHA1(3eaeb4e0820e9dda7233a13bb146acc44402addd) )
 	ROM_LOAD( "dd-x9.bin",     0xc000, 0x2000, CRC(3792d632) SHA1(da053df344f39a8f25a2c57fb1a908131c10f248) )
 
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "banks", ROMREGION_ERASEFF )
 	ROM_LOAD( "dd-x5.bin",     0x08000, 0x2000, CRC(e377e831) SHA1(f53e74b3138611f9385845d6bdeab891b5d15931) )
 	ROM_LOAD( "dd-x6.bin",     0x0a000, 0x2000, CRC(0fcb46ad) SHA1(5611135f9e341bd394d6da7912167b05fff17a93) )
 	ROM_LOAD( "dd-x7.bin",     0x0c000, 0x2000, CRC(0675e4fa) SHA1(59668e32271ff9bac0b4411cc0c541d2825ee145) )
@@ -1640,7 +1644,7 @@ ROM_START( tenpindx )
 	ROM_REGION( 0x4000, "sub", 0 )
 	ROM_LOAD( "tpd_axfd.bin",   0x0000, 0x4000, CRC(0aed11f3) SHA1(09575cceda38178a77c6753074be82825d368334) )
 
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "banks", ROMREGION_ERASEFF )
 	ROM_LOAD( "tpd_x3.bin",     0x04000, 0x2000, CRC(d4645f6d) SHA1(185bcd58f1ba69e26274475c57219de0353267e1) )
 	ROM_LOAD( "tpd_x4.bin",     0x06000, 0x2000, CRC(acf474ba) SHA1(b324dccac0991660f8ba2a70cbbdb06c9d25c361) )
 	ROM_LOAD( "tpd_x5.bin",     0x08000, 0x2000, CRC(e206913f) SHA1(bb9476516bca7bf7066df058db36e4fdd52a6ed2) )
@@ -1731,9 +1735,9 @@ DRIVER_INIT_MEMBER(astrocde_state,profpac)
 	iospace.install_read_handler(0x14, 0x14, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::profpac_io_1_r), this));
 	iospace.install_read_handler(0x15, 0x15, 0x77ff, 0xff00, read8_delegate(FUNC(astrocde_state::profpac_io_2_r), this));
 
-	/* reset banking */
-	profpac_banksw_w(iospace, 0, 0);
-	machine().save().register_postload(save_prepost_delegate(FUNC(astrocde_state::profbank_banksw_restore), this));
+	/* configure banking */
+	m_bank8000->configure_entries(0, 4, memregion("banks")->base() + 0x4000, 0x8000);
+	m_bank8000->set_entry(0);
 }
 
 
@@ -1747,9 +1751,9 @@ DRIVER_INIT_MEMBER(astrocde_state,demndrgn)
 	iospace.install_read_port(0x1d, 0x1d, 0x0000, 0xff00, "FIREY");
 	iospace.install_write_handler(0x97, 0x97, 0x0000, 0xff00, write8_delegate(FUNC(astrocde_state::demndrgn_sound_w), this));
 
-	/* reset banking */
-	profpac_banksw_w(iospace, 0, 0);
-	machine().save().register_postload(save_prepost_delegate(FUNC(astrocde_state::profbank_banksw_restore), this));
+	/* configure banking */
+	m_bank8000->configure_entries(0, 4, memregion("banks")->base() + 0x4000, 0x8000);
+	m_bank8000->set_entry(0);
 }
 
 
@@ -1768,9 +1772,9 @@ DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
 	iospace.install_write_handler(0x68, 0x68, 0x0000, 0xff00, write8_delegate(FUNC(astrocde_state::tenpindx_lights_w), this));
 	iospace.install_write_handler(0x97, 0x97, 0x0000, 0xff00, write8_delegate(FUNC(astrocde_state::tenpindx_sound_w), this));
 
-	/* reset banking */
-	profpac_banksw_w(iospace, 0, 0);
-	machine().save().register_postload(save_prepost_delegate(FUNC(astrocde_state::profbank_banksw_restore), this));
+	/* configure banking */
+	m_bank8000->configure_entries(0, 4, memregion("banks")->base() + 0x4000, 0x8000);
+	m_bank8000->set_entry(0);
 }
 
 
@@ -1782,29 +1786,29 @@ DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
  *************************************/
 
 /* 90002 CPU board + 90700 game board + 91312 "characterization card" */
-GAMEL(1978, seawolf2, 0,    seawolf2, seawolf2, astrocde_state, seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_seawolf2 )
+GAMEL(1978, seawolf2, 0,    seawolf2, seawolf2, astrocde_state, seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf2 )
 
 /* 91354 CPU board + 90700 game board + 91356 RAM board */
-GAMEL(1980, ebases,   0,    ebases,   ebases, astrocde_state,   ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", GAME_SUPPORTS_SAVE, layout_spacezap )
+GAMEL(1980, ebases,   0,    ebases,   ebases, astrocde_state,   ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
 /* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board */
-GAMEL(1980, spacezap, 0,    spacezap, spacezap, astrocde_state, spacezap, ROT0,   "Midway", "Space Zap", GAME_SUPPORTS_SAVE, layout_spacezap )
+GAMEL(1980, spacezap, 0,    spacezap, spacezap, astrocde_state, spacezap, ROT0,   "Midway", "Space Zap", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board */
-GAME( 1980, wow,      0,    wow,      wow, astrocde_state,      wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, wowg,     wow,  wow,      wowg, astrocde_state,     wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor (with German Language ROM)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, wow,      0,    wow,      wow, astrocde_state,      wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, wowg,     wow,  wow,      wowg, astrocde_state,     wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor (with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board */
-GAMEL(1981, gorf,     0,    gorf,     gorf, astrocde_state,     gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gorf  )
-GAMEL(1981, gorfpgm1, gorf, gorf,     gorf, astrocde_state,     gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gorf )
-GAMEL(1981, gorfpgm1g,gorf, gorf,     gorfpgm1g, astrocde_state,gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with German Language ROM)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gorf )
+GAMEL(1981, gorf,     0,    gorf,     gorf, astrocde_state,     gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf  )
+GAMEL(1981, gorfpgm1, gorf, gorf,     gorf, astrocde_state,     gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL(1981, gorfpgm1g,gorf, gorf,     gorfpgm1g, astrocde_state,gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board */
-GAME( 1981, robby,    0,    robby,    robby, astrocde_state,    robby,    ROT0,   "Dave Nutting Associates / Bally Midway", "The Adventures of Robby Roto!", GAME_SUPPORTS_SAVE )
+GAME( 1981, robby,    0,    robby,    robby, astrocde_state,    robby,    ROT0,   "Dave Nutting Associates / Bally Midway", "The Adventures of Robby Roto!", MACHINE_SUPPORTS_SAVE )
 
 /* 91465 CPU board + 91469 game board + 91466 RAM board + 91488 pattern board + 91467 memory board + 91846 EPROM board */
-GAME( 1983, profpac,  0,    profpac,  profpac, astrocde_state,  profpac,  ROT0,   "Dave Nutting Associates / Bally Midway", "Professor Pac-Man", GAME_SUPPORTS_SAVE )
+GAME( 1983, profpac,  0,    profpac,  profpac, astrocde_state,  profpac,  ROT0,   "Dave Nutting Associates / Bally Midway", "Professor Pac-Man", MACHINE_SUPPORTS_SAVE )
 
 /* 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board */
-GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, astrocde_state, demndrgn, ROT0,   "Dave Nutting Associates / Bally Midway", "Demons & Dragons (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx, astrocde_state, tenpindx, ROT0,   "Dave Nutting Associates / Bally Midway", "Ten Pin Deluxe", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_MECHANICAL, layout_tenpindx )
+GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, astrocde_state, demndrgn, ROT0,   "Dave Nutting Associates / Bally Midway", "Demons & Dragons (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx, astrocde_state, tenpindx, ROT0,   "Dave Nutting Associates / Bally Midway", "Ten Pin Deluxe", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_tenpindx )

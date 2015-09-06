@@ -443,7 +443,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 
 	if((scanline % 2) == 0)
 	{
-		m_v9958->set_resolution(RENDER_HIGH);
 		m_v9958->interrupt();
 	}
 }
@@ -485,7 +484,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)
@@ -739,29 +738,29 @@ ROM_START( fuudol )
 ROM_END
 
 // 1995
-GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", GAME_NOT_WORKING )
+GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
 // 1998
 // 01 : Mahjong Gal-pri - World Gal-con Grandprix : Nichibutsu/Just&Just
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
-/* 03 */ GAME( 1998, junai,     0,   csplayh5,  csplayh5, csplayh5_state,  junai,           ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", GAME_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,        ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
-/* 05 */ GAME( 1998, junai2,    0,   csplayh5,  csplayh5, csplayh5_state,  junai2,          ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", GAME_NOT_WORKING )
+/* 03 */ GAME( 1998, junai,     0,   csplayh5,  csplayh5, csplayh5_state,  junai,           ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,        ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
+/* 05 */ GAME( 1998, junai2,    0,   csplayh5,  csplayh5, csplayh5_state,  junai2,          ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
 // 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
 
 
 // 1999
-/* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5, csplayh5_state,  mjmania,         ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", GAME_NOT_WORKING )
-/* 08 */ //GAME( 1995, renaimj,   0,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", GAME_NOT_WORKING )
-/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,        ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", GAME_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5, csplayh5_state,  mjmania,         ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
+/* 08 */ //GAME( 1995, renaimj,   0,   csplayh5,  csplayh5, csplayh5_state,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,        ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cosplay Tengoku 6 - Junai hen : Nichibutsu/eic
-/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", GAME_NOT_WORKING )
-/* 12 */ //GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5, driver_device,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", GAME_NOT_WORKING )
-/* 13 */ GAME( 1999, csplayh7,  0,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", GAME_NOT_WORKING )
+/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
+/* 12 */ //GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5, driver_device,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
+/* 13 */ GAME( 1999, csplayh7,  0,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", MACHINE_NOT_WORKING )
 // 14 : Ai-mode - Pet Shiiku : Nichibutsu/eic
 
 // 2000
-/* 15 */ GAME( 2000, fuudol,    0,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/eic", "Fuudol (Japan)", GAME_NOT_WORKING )
+/* 15 */ GAME( 2000, fuudol,    0,   csplayh5,  csplayh5, csplayh5_state,  fuudol,          ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 // 16 : Nurete Mitaino... - Net Idol Hen : Nichibutsu/Love Factory
 // 17 : Tsuugakuro no Yuuwaku : Nichibutsu/Love Factory/Just&Just
 // 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend

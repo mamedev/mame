@@ -5,11 +5,11 @@
 std::string fdc_pll_t::tts(attotime t)
 {
 	char buf[256];
-	bool neg = t.seconds < 0;
+	bool neg = t.seconds() < 0;
 	if(neg)
 		t = attotime::zero - t;
-	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%c%3d.%03d,%03d,%03d", neg ? '-' : ' ', int(t.seconds), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	sprintf(buf, "%c%3d.%03d,%03d,%03d", neg ? '-' : ' ', int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 	return buf;
 }
 
@@ -80,7 +80,7 @@ int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const att
 
 	attotime delta = edge - (next - period/2);
 
-	if(delta.seconds < 0)
+	if(delta.seconds() < 0)
 		phase_adjust = attotime::zero - ((attotime::zero - delta)*65)/100;
 	else
 		phase_adjust = (delta*65)/100;

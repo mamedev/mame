@@ -22,8 +22,6 @@ public:
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_bg1videoram;
 	required_shared_ptr<UINT8> m_soundlatch2;
-//      UINT8 *  m_paletteram;    // currently this uses generic palette handling
-//      UINT8 *  m_paletteram2;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;
@@ -31,6 +29,7 @@ public:
 	tilemap_t  *m_bg2_tilemap;
 	UINT8    m_bg2_image;
 	int      m_bg2_avenger_hw;
+	int      m_spr_avenger_hw;
 	UINT8    m_scroll_x[2];
 	UINT8    m_scroll_y[2];
 
@@ -63,8 +62,10 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	DECLARE_DRIVER_INIT(avengersb);
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);
+	DECLARE_VIDEO_START(avengersb);
 	UINT32 screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lwings_interrupt);

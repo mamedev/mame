@@ -6,17 +6,6 @@
 #define __C352_H__
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-enum
-{
-	C352_DIVIDER_228 = 0,
-	C352_DIVIDER_288 = 1,
-	C352_DIVIDER_332 = 2
-};
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -80,7 +69,7 @@ private:
 		C352_FLG_FILTER     = 0x0004,   // don't apply filter
 		C352_FLG_REVLOOP    = 0x0003,   // loop backwards
 		C352_FLG_LOOP       = 0x0002,   // loop forward
-		C352_FLG_REVERSE    = 0x0001,   // play sample backwards
+		C352_FLG_REVERSE    = 0x0001    // play sample backwards
 	};
 
 	struct c352_ch_t

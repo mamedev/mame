@@ -492,6 +492,9 @@ int cbm_iec_device::get_signal(int signal)
 #include "fd2000.h"
 #include "interpod.h"
 #include "serialbox.h"
+#include "vic1515.h"
+#include "vic1520.h"
+#include "c1526.h"
 
 SLOT_INTERFACE_START( cbm_iec_devices )
 	SLOT_INTERFACE("c1540", C1540)
@@ -516,4 +519,8 @@ SLOT_INTERFACE_START( cbm_iec_devices )
 	SLOT_INTERFACE("serialbox", SERIAL_BOX)
 	SLOT_INTERFACE("diag264", DIAG264_SERIAL_LOOPBACK)
 	SLOT_INTERFACE("nl10", C64_NL10_INTERFACE)
+	SLOT_INTERFACE("vic1515", VIC1515)
+	SLOT_INTERFACE("vic1520", VIC1520)
+	SLOT_INTERFACE("c1526", C1526)
+	SLOT_INTERFACE("mps802", MPS802)
 SLOT_INTERFACE_END

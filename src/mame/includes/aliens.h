@@ -10,7 +10,6 @@
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
-#include "video/konami_helper.h"
 
 class aliens_state : public driver_device
 {
@@ -22,11 +21,8 @@ public:
 		m_bank0000(*this, "bank0000"),
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
-		m_k051960(*this, "k051960") { }
-
-	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
+		m_k051960(*this, "k051960"),
+		m_rombank(*this, "rombank") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -35,6 +31,8 @@ public:
 	required_device<k007232_device> m_k007232;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
+	required_memory_bank m_rombank;
+
 	DECLARE_WRITE8_MEMBER(aliens_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(aliens_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
@@ -42,9 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(aliens_snd_bankswitch_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	UINT32 screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(aliens_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);

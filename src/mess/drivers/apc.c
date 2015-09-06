@@ -144,7 +144,6 @@ public:
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
 	DECLARE_DRIVER_INIT(apc);
-	DECLARE_PALETTE_INIT(apc);
 
 	int m_dack;
 	UINT8 m_dma_offset[4];
@@ -908,16 +907,6 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-PALETTE_INIT_MEMBER(apc_state,apc)
-{
-	int i;
-
-	for(i=0;i<8;i++)
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	for(i=8;i<palette.entries();i++)
-		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
-}
-
 static MACHINE_CONFIG_START( apc, apc_state )
 
 	/* basic machine hardware */
@@ -964,6 +953,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_SCREEN_SIZE(640, 494)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 494-1)
 
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
@@ -973,9 +964,6 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 3579545) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(apc_state,apc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1009,4 +997,4 @@ DRIVER_INIT_MEMBER(apc_state,apc)
 	// ...
 }
 
-COMP( 1982, apc,  0,   0, apc,  apc, apc_state,  apc,      "NEC",      "APC", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, apc,  0,   0, apc,  apc, apc_state,  apc,      "NEC",      "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

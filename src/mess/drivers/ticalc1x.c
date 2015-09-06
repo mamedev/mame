@@ -11,7 +11,6 @@
 
   TODO:
   - MCU clocks are unknown where noted
-  - lilprof78 equals-sign is always on
 
 ***************************************************************************/
 
@@ -686,7 +685,7 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 		m_display_state[y] = (r >> y & 1) ? o : 0;
 
 	// 3rd digit A/G(equals sign) is from O7
-	m_display_state[3] = (m_o & 0x80) ? 0x41 : 0;
+	m_display_state[3] = (r && m_o & 0x80) ? 0x41 : 0;
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
 	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
@@ -773,6 +772,11 @@ MACHINE_CONFIG_END
   * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT. die labeled 0980B-83
   * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
   * 9-digit 7seg LED display
+
+  Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
+  a docking station to the TI-30, with an additional display made of magnetic
+  refreshable Braille cells. The TI-30 itself is slightly modified to wire
+  the original LED display to a 25-pin D-Sub connector.
 
 ***************************************************************************/
 
@@ -1168,15 +1172,15 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1975, tisr16ii,  0,        0, tisr16,    tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, tisr16ii,  0,        0, tisr16,    tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1977, wizatron,  0,        0, wizatron,  wizatron,  driver_device, 0, "Texas Instruments", "Wiz-A-Tron", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Texas Instruments", "Little Professor (1976 version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, wizatron,  0,        0, wizatron,  wizatron,  driver_device, 0, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1976, ti30,      0,        0, majestic,  ti30,      driver_device, 0, "Texas Instruments", "TI-30", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1977, tiprog,    0,        0, majestic,  tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, tibusan1,  0,        0, majestic,  tibusan1,  driver_device, 0, "Texas Instruments", "TI Business Analyst-I", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1976, ti30,      0,        0, majestic,  ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,        0, majestic,  tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, tibusan1,  0,        0, majestic,  tibusan1,  driver_device, 0, "Texas Instruments", "TI Business Analyst-I", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

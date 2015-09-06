@@ -504,8 +504,6 @@
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
-#include "machine/ticket.h"
-#include "video/tlc34076.h"
 #include "includes/itech8.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
@@ -520,13 +518,15 @@
 
 
 
+IOPORT_ARRAY_MEMBER(itech8_state::analog_inputs) { "AN_C", "AN_D", "AN_E", "AN_F" };
+
 /*************************************
  *
  *  Interrupt handling
  *
  *************************************/
 
-void itech8_state::itech8_update_interrupts(int periodic, int tms34061, int blitter)
+void itech8_state::update_interrupts(int periodic, int tms34061, int blitter)
 {
 	device_type main_cpu_type = m_maincpu->type();
 
@@ -562,21 +562,21 @@ void itech8_state::itech8_update_interrupts(int periodic, int tms34061, int blit
 
 TIMER_CALLBACK_MEMBER(itech8_state::irq_off)
 {
-	itech8_update_interrupts(0, -1, -1);
+	update_interrupts(0, -1, -1);
 }
 
 
 INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 {
 	/* signal the NMI */
-	itech8_update_interrupts(1, -1, -1);
-	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(itech8_state::irq_off),this));
+	update_interrupts(1, -1, -1);
+	m_irq_off_timer->adjust(attotime::from_usec(1));
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
 }
 
 
-WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
+WRITE8_MEMBER(itech8_state::nmi_ack_w)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
 /*  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
@@ -596,7 +596,28 @@ WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
 MACHINE_START_MEMBER(itech8_state,sstrike)
 {
 	/* we need to update behind the beam as well */
-	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), 32);
+	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);
+	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(0), 32);
+
+	itech8_state::machine_start();
+}
+
+void itech8_state::machine_start()
+{
+	if (membank("bank1"))
+		membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
+
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+	m_delayed_sound_data_timer = timer_alloc(TIMER_DELAYED_SOUND_DATA);
+	m_blitter_done_timer = timer_alloc(TIMER_BLITTER_DONE);
+
+	save_item(NAME(m_grom_bank));
+	save_item(NAME(m_blitter_int));
+	save_item(NAME(m_tms34061_int));
+	save_item(NAME(m_periodic_int));
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_pia_porta_data));
+	save_item(NAME(m_pia_portb_data));
 }
 
 void itech8_state::machine_reset()
@@ -606,7 +627,7 @@ void itech8_state::machine_reset()
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
-		membank("bank1")->set_base(&memregion("maincpu")->base()[0x4000]);
+		membank("bank1")->set_entry(0);
 		m_maincpu->reset();
 	}
 
@@ -618,6 +639,30 @@ void itech8_state::machine_reset()
 	}
 }
 
+
+void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_IRQ_OFF:
+		irq_off(ptr, param);
+		break;
+	case TIMER_BEHIND_BEAM_UPDATE:
+		behind_the_beam_update(ptr, param);
+		break;
+	case TIMER_DELAYED_SOUND_DATA:
+		delayed_sound_data_w(ptr, param);
+		break;
+	case TIMER_BLITTER_DONE:
+		blitter_done(ptr, param);
+		break;
+	case TIMER_DELAYED_Z80_CONTROL:
+		delayed_z80_control_w(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in itech8_state::device_timer");
+	}
+}
 
 
 /*************************************
@@ -639,7 +684,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	machine().scheduler().timer_set(m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), (scanline << 8) + interval);
+	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(scanline), (scanline << 8) + interval);
 }
 
 
@@ -650,21 +695,21 @@ TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::blitter_w)
+WRITE8_MEMBER(itech8_state::blitter_bank_w)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		membank("bank1")->set_base(&memregion("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		membank("bank1")->set_entry((data >> 5) & 1);
 
 	/* the rest is handled by the video hardware */
-	itech8_blitter_w(space, offset, data);
+	blitter_w(space, offset, data);
 }
 
 
 WRITE8_MEMBER(itech8_state::rimrockn_bank_w)
 {
 	/* banking is controlled here instead of by the blitter output */
-	membank("bank1")->set_base(&memregion("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
+	membank("bank1")->set_entry(data & 3);
 }
 
 
@@ -703,7 +748,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	m_pia_portb_data = data;
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x10) << 3);
+	m_ticket->write(space, 0, (data & 0x10) << 3);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -717,7 +762,7 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	m_pia_portb_data = data;
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, data & 0x80);
+	m_ticket->write(machine().driver_data()->generic_space(), 0, data & 0x80);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -738,7 +783,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::delayed_sound_data_w)
 
 WRITE8_MEMBER(itech8_state::sound_data_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_sound_data_w),this), data);
+	synchronize(TIMER_DELAYED_SOUND_DATA, data);
 }
 
 
@@ -749,7 +794,7 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 			((data & 0x5d) << 1) |
 			((data & 0x20) >> 3) |
 			((data & 0x02) << 5);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_sound_data_w),this), data);
+	synchronize(TIMER_DELAYED_SOUND_DATA, data);
 }
 
 
@@ -783,14 +828,14 @@ WRITE16_MEMBER(itech8_state::grom_bank16_w)
 WRITE16_MEMBER(itech8_state::display_page16_w)
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_page_w(space, 0, ~data >> 8);
+		page_w(space, 0, ~data >> 8);
 }
 
 
 WRITE16_MEMBER(itech8_state::palette16_w)
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_palette_w(space, offset / 8, data >> 8);
+		palette_w(space, offset / 8, data >> 8);
 }
 
 
@@ -803,15 +848,15 @@ WRITE16_MEMBER(itech8_state::palette16_w)
 
 /*------ common layout with TMS34061 at 0000 ------*/
 static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(tms34061_r, tms34061_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
 	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
-	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
+	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE(page_w)
 	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_DEVWRITE("tms34061", tms34061_device, latch_w)
-	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x11c0, 0x11df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
-	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(itech8_palette_w)
+	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0x11c0, 0x11df) AM_READ(blitter_r) AM_WRITE(blitter_bank_w)
+	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -819,15 +864,15 @@ ADDRESS_MAP_END
 
 /*------ common layout with TMS34061 at 1000 ------*/
 static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(tms34061_r, tms34061_w)
 	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
-	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
+	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE(page_w)
 	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_DEVWRITE("tms34061", tms34061_device, latch_w)
-	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x01c0, 0x01df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
-	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(itech8_palette_w)
+	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0x01c0, 0x01df) AM_READ(blitter_r) AM_WRITE(blitter_bank_w)
+	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -835,15 +880,15 @@ ADDRESS_MAP_END
 
 /*------ Golden Tee Golf II 1992 layout ------*/
 static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("40") AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
-	AM_RANGE(0x0140, 0x015f) AM_WRITE(itech8_palette_w)
+	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("40") AM_WRITE(nmi_ack_w)
+	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(page_w)
+	AM_RANGE(0x0140, 0x015f) AM_WRITE(palette_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("80")
 	AM_RANGE(0x0160, 0x0160) AM_WRITE(grom_bank_w)
-	AM_RANGE(0x0180, 0x019f) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
+	AM_RANGE(0x0180, 0x019f) AM_READ(blitter_r) AM_WRITE(blitter_bank_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_DEVWRITE("tms34061", tms34061_device, latch_w)
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(tms34061_r, tms34061_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -859,9 +904,9 @@ static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
 	AM_RANGE(0x100240, 0x100241) AM_DEVWRITE8("tms34061", tms34061_device, latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
-	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(itech8_blitter_r, itech8_blitter_w, 0xffff)
+	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(blitter_r, blitter_w, 0xffff)
 	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
-	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(itech8_tms34061_r, itech8_tms34061_w, 0xffff)
+	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(tms34061_r, tms34061_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -1586,7 +1631,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 {
-	itech8_update_interrupts(-1, state, -1);
+	update_interrupts(-1, state, -1);
 
 	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
 }
@@ -1722,7 +1767,7 @@ static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
 
 
 MACHINE_CONFIG_END
@@ -1736,7 +1781,7 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_grmatch)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_grmatch)
 
 	/* palette updater */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("palette_timer", itech8_state, grmatch_palette_update, "screen", 0, 0)
@@ -1752,7 +1797,7 @@ static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
 
 MACHINE_CONFIG_END
 
@@ -1765,7 +1810,7 @@ static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
 MACHINE_CONFIG_END
 
 
@@ -1811,7 +1856,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page)
 MACHINE_CONFIG_END
 
 
@@ -1831,7 +1876,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1843,7 +1888,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1859,7 +1904,7 @@ static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(24, 375, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1875,7 +1920,7 @@ static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1890,7 +1935,7 @@ static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
 MACHINE_CONFIG_END
 
 
@@ -2567,6 +2612,10 @@ DRIVER_INIT_MEMBER(itech8_state,grmatch)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x01e0, 0x01ff);
+
+	save_item(NAME(m_grmatch_palcontrol));
+	save_item(NAME(m_grmatch_xscroll));
+	save_item(NAME(m_grmatch_palette));
 }
 
 
@@ -2575,6 +2624,25 @@ DRIVER_INIT_MEMBER(itech8_state,slikshot)
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01cf, 0x01cf, write8_delegate(FUNC(itech8_state::slikshot_z80_control_w),this));
+
+	m_delayed_z80_control_timer = timer_alloc(TIMER_DELAYED_Z80_CONTROL);
+
+	save_item(NAME(m_z80_ctrl));
+	save_item(NAME(m_z80_port_val));
+	save_item(NAME(m_z80_clear_to_send));
+	save_item(NAME(m_sensor0));
+	save_item(NAME(m_sensor1));
+	save_item(NAME(m_sensor2));
+	save_item(NAME(m_sensor3));
+	save_item(NAME(m_curvx));
+	save_item(NAME(m_curvy));
+	save_item(NAME(m_curx));
+	save_item(NAME(m_xbuffer));
+	save_item(NAME(m_ybuffer));
+	save_item(NAME(m_ybuffer_next));
+	save_item(NAME(m_curxpos));
+	save_item(NAME(m_last_ytotal));
+	save_item(NAME(m_crosshair_vis));
 }
 
 
@@ -2620,8 +2688,9 @@ DRIVER_INIT_MEMBER(itech8_state,rimrockn)
 	m_maincpu->space(AS_PROGRAM).install_read_port (0x0165, 0x0165, "165");
 
 	/* different banking mechanism (disable the old one) */
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x4000, 0xc000);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01a0, 0x01a0, write8_delegate(FUNC(itech8_state::rimrockn_bank_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c0, 0x01df, write8_delegate(FUNC(itech8_state::itech8_blitter_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c0, 0x01df, write8_delegate(FUNC(itech8_state::blitter_w),this));
 }
 
 
@@ -2649,11 +2718,11 @@ GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t, driver_device,    0,  
 GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg, driver_device,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", GAME_MECHANICAL )
-GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", GAME_MECHANICAL )
-GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", GAME_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop, itech8_state,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", GAME_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike, itech8_state,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", GAME_MECHANICAL )
+GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop, itech8_state,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike, itech8_state,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
 GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */

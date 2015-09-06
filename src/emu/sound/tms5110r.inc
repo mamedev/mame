@@ -47,7 +47,7 @@
 	T0280B 0281A = 1979 speak & spell, also == TMS5100, uses old chirp
 	?????? ????? (no decap; likely 'T0280D 0281D') = 1980 speak & spell, 1981 speak & spell compact, changed energy table, otherwise same as above, uses old chirp
 	T0280F 2801A = 1980 speak & math, 1980 speak and read, uses old chirp
-	?????? ????? (no decap; likely 'T0280F 2802') = touch and tell, language translator; uses a unique chirp rom.
+	T0280F 2802  = touch and tell, language translator; uses a unique chirp rom.
 	?????? ????? = TMS5110
 	T0280F 5110A = TMS5110AN2L
 
@@ -70,7 +70,6 @@
 #define MAX_K                   10
 #define MAX_SCALE_BITS          6
 #define MAX_SCALE               (1<<MAX_SCALE_BITS)
-#define COEFF_ENERGY_SENTINEL   (511)
 #define MAX_CHIRP_SIZE          52
 
 struct tms5100_coeffs
@@ -92,20 +91,12 @@ struct tms5100_coeffs
 #define TI_0280_PATENT_ENERGY \
 		/* E  */\
 		{   0,  0,  1,  1,  2,  3,  5,  7, \
-			10, 15, 21, 30, 43, 61, 86, COEFF_ENERGY_SENTINEL }, // last rom value is actually really 0, but the tms5110.c code still requires the sentinel value to function correctly, until it is properly updated or merged with tms5220.c
+			10, 15, 21, 30, 43, 61, 86, 0 },
 
-#define TI_0280_LATER_ENERGY \
-		/* E  */\
-		{   0,  1,  2,  3,  4,  6,  8, 11, \
-			16, 23, 33, 47, 63, 85,114, COEFF_ENERGY_SENTINEL }, // last rom value is actually really 0, but the tms5110.c code still requires the sentinel value to function correctly, until it is properly updated or merged with tms5220.c
-
-//technically this is the same as above, but tms5220.c expects the 0 rather than needing a sentinel value
-//TODO: when tms5110.c no longer needs sentinel, get rid of this and merge with above.
-#define TI_0285_LATER_ENERGY \
+#define TI_028X_LATER_ENERGY \
 		/* E  */\
 		{   0,  1,  2,  3,  4,  6,  8, 11, \
 			16, 23, 33, 47, 63, 85,114, 0 },
-
 
 /* pitch */
 #define TI_0280_2801_PATENT_PITCH \
@@ -307,14 +298,13 @@ struct tms5100_coeffs
 		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
 		0x00, 0x00, 0x00, 0x00 },
 
-//TODO: Fix me! below is INACCURATE, no decap of 2802 yet!
 #define TI_2802_CHIRP \
 	/* Chirp table */\
-	{   0x00, 0xa3, 0xbe, 0xee, 0x38, 0x78, 0x7f, 0x3e,\
-		0xe2, 0xe0, 0x26, 0x19, 0xce, 0x06, 0x1e, 0xd0,\
-		0x12, 0xcd, 0xea, 0xde, 0xda, 0x02, 0xff, 0x06,\
-		0xfe, 0x00, 0xfe, 0xfb, 0xfd, 0xfd, 0x00, 0x00,\
-		0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00,\
+	{   0x00, 0xa5, 0xbd, 0xee, 0x34, 0x73, 0x7e, 0x3d,\
+		0xe8, 0xea, 0x34, 0x24, 0xd1, 0x01, 0x13, 0xc3,\
+		0x0c, 0xd2, 0xe7, 0xdd, 0xd9, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
 		0x00, 0x00, 0x00, 0x00 },
 
@@ -327,6 +317,11 @@ struct tms5100_coeffs
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
 		0x00, 0x00, 0x00, 0x00 },
+
+/* Interpolation Table */
+#define TI_INTERP \
+	/* interpolation shift coefficients */\
+	{ 0, 3, 3, 3, 2, 2, 1, 1 }
 
 /* TMS5100/TMC0281:
    (Die revs A, B; 1977?-1981?)
@@ -357,8 +352,7 @@ static const struct tms5100_coeffs T0280B_0281A_coeff =
 	TI_0280_PATENT_LPC
 	},
 	TI_0280_PATENT_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMS5110A/TMC0281D:
@@ -376,14 +370,13 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
 	TI_0280_PATENT_LPC
 	},
 	TI_0280_PATENT_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMC0280/CD2801:
@@ -412,14 +405,13 @@ static const struct tms5100_coeffs T0280F_2801A_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
 	TI_2801_2501E_LPC
 	},
 	TI_2801_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* Mitsubishi M58817
@@ -436,14 +428,13 @@ static const struct tms5100_coeffs M58817_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
 	TI_2801_2501E_LPC
 	},
 	TI_2801_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* CD2802:
@@ -451,6 +442,7 @@ static const struct tms5100_coeffs M58817_coeff =
    Used in Touch and Tell only (and Vocaid?), this chip has a unique pitch, LPC and chirp table.
    Has the 'alternate' interpolation behavior.
    Digitally dumped via PROMOUT by PlgDavid in 2014
+   Decapped by Sean Riddle in 2015
    */
 static const struct tms5100_coeffs T0280F_2802_coeff =
 {
@@ -460,14 +452,13 @@ static const struct tms5100_coeffs T0280F_2802_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_2802_PITCH
 	{
 	TI_2802_LPC
 	},
 	TI_2802_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMS5110A:
@@ -492,14 +483,13 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_5110_PITCH
 	{
 	TI_5110_5220_LPC
 	},
 	TI_LATER_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* The following coefficients come from US Patent 4,335,277 and 4,581,757.
@@ -518,7 +508,7 @@ static const struct tms5100_coeffs pat4335277_coeff =
 	4,
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0285_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_2501E_PITCH
 	{
 		/* K1dc  */
@@ -554,8 +544,7 @@ static const struct tms5100_coeffs pat4335277_coeff =
 		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
 	},
 	TI_0280_PATENT_CHIRP
-	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+	TI_INTERP
 };
 
 /* TMS5200/CD2501E
@@ -591,14 +580,13 @@ static const struct tms5100_coeffs T0285_2501E_coeff =
 	4,
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0285_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_2501E_PITCH
 	{
 	TI_2801_2501E_LPC
 	},
 	TI_LATER_CHIRP
-	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 1, 1 }
+	TI_INTERP
 };
 
 /* TMS5220/5220C:
@@ -620,14 +608,13 @@ static const struct tms5100_coeffs tms5220_coeff =
 	4,
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0285_LATER_ENERGY
+	TI_028X_LATER_ENERGY
 	TI_5220_PITCH
 	{
 	TI_5110_5220_LPC
 	},
 	TI_LATER_CHIRP
-	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 1, 1 }
+	TI_INTERP
 };
 
 /* The following Sanyo VLM5030 coefficients are derived from decaps of the chip

@@ -754,5 +754,5 @@ DRIVER_INIT_MEMBER(angelkds_state,spcpostn)
 }
 
 
-GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, angelkds,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, spcpostn,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , GAME_SUPPORTS_SAVE) /* encrypted */
+GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, angelkds,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     MACHINE_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
+GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, spcpostn,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , MACHINE_SUPPORTS_SAVE) /* encrypted */

@@ -403,12 +403,12 @@ ADDRESS_MAP_END
 WRITE_LINE_MEMBER(sgi_ip2_state::duarta_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
-};
+}
 
 WRITE_LINE_MEMBER(sgi_ip2_state::duartb_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
-};
+}
 
 static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
@@ -514,4 +514,4 @@ ROM_START( sgi_ip2 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT     INIT     COMPANY                   FULLNAME */
-COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2, sgi_ip2_state,  sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", GAME_NOT_WORKING )
+COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2, sgi_ip2_state,  sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )

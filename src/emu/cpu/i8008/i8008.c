@@ -42,7 +42,7 @@ i8008_device::i8008_device(const machine_config &mconfig, const char *tag, devic
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;
-};
+}
 
 //-------------------------------------------------
 //  device_start - start up the device

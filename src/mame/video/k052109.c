@@ -179,7 +179,11 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_romsubbank(0),
 	m_scrollctrl(0),
 	m_char_rom(NULL),
-	m_char_size(0)
+	m_char_size(0),
+	m_screen_tag(NULL),
+	m_irq_handler(*this),
+	m_firq_handler(*this),
+	m_nmi_handler(*this)
 {
 }
 
@@ -201,11 +205,21 @@ void k052109_device::set_ram(device_t &device, bool ram)
 
 void k052109_device::device_start()
 {
-	memory_region *ROM = region();
-	if (ROM != NULL)
+	if (m_screen_tag != NULL)
 	{
-		m_char_rom = ROM->base();
-		m_char_size = ROM->bytes();
+		// make sure our screen is started
+		screen_device *screen = m_owner->subdevice<screen_device>(m_screen_tag);
+		if (!screen->started())
+			throw device_missing_dependencies();
+
+		// and register a callback for vblank state
+		screen->register_vblank_callback(vblank_state_delegate(FUNC(k052109_device::vblank_callback), this));
+	}
+
+	if (region() != NULL)
+	{
+		m_char_rom = region()->base();
+		m_char_size = region()->bytes();
 	}
 
 	decode_gfx();
@@ -233,6 +247,11 @@ void k052109_device::device_start()
 
 	// bind callbacks
 	m_k052109_cb.bind_relative_to(*owner());
+
+	// resolve callbacks
+	m_irq_handler.resolve_safe();
+	m_firq_handler.resolve_safe();
+	m_nmi_handler.resolve_safe();
 
 	save_pointer(NAME(m_ram), 0x6000);
 	save_item(NAME(m_rmrd_line));
@@ -265,9 +284,26 @@ void k052109_device::device_reset()
 	}
 }
 
+//-------------------------------------------------
+//  set_screen_tag - set screen we are attached to
+//-------------------------------------------------
+
+void k052109_device::set_screen_tag(device_t &device, device_t *owner, const char *tag)
+{
+	k052109_device &dev = dynamic_cast<k052109_device &>(device);
+	dev.m_screen_tag = tag;
+}
+
+
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
+
+void k052109_device::vblank_callback(screen_device &screen, bool state)
+{
+	if (state)
+		m_irq_handler(ASSERT_LINE);
+}
 
 READ8_MEMBER( k052109_device::read )
 {
@@ -351,6 +387,8 @@ WRITE8_MEMBER( k052109_device::write )
 			/* bit 2 = irq enable */
 			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
 			m_irq_enabled = data & 0x04;
+			if (m_irq_enabled)
+				m_irq_handler(CLEAR_LINE);
 		}
 		else if (offset == 0x1d80)
 		{

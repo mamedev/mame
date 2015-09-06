@@ -20,6 +20,8 @@
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster
  *31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2 (have dump)
+ *37      HD38800A  1981, Entex Select-a-Game cartridge: Baseball 4 (have dump)
+ *38      HD38800A  1981, Entex Select-a-Game cartridge: Pinball (have dump)
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
  @70      HD38800A  1982, Coleco Galaxian
@@ -28,12 +30,13 @@
  @88      HD38800A  1984, Tomy Tron (THN-02)
 
  @01      HD38800B  1982, Gakken Crazy Kong
- *19      HD38800B  1982, Bandai Zaxxon
+ @19      HD38800B  1982, Bandai Zaxxon
  @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
  *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
  @43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
+ @52      HD38800B  1983, Bandai Ultra Man (PT-424)
 
  @09      HD38820A  1980, Mattel World Championship Baseball
  @13      HD38820A  1981, Entex Galaxian 2
@@ -47,26 +50,25 @@
  @45      HD38820A  1982, Coleco Donkey Kong
  @49      HD38820A  1983, Bandai Zackman
  @61      HD38820A  1983, Coleco Ms. Pac-Man
- *63      HD38820A  1983, Bandai Pengo
- *65      HD38820A  1983, Bandai Burger Time
+ @63      HD38820A  1983, Bandai Pengo
+ @65      HD38820A  1983, Bandai Burger Time (PT-389)
  @69      HD38820A  1983, Gakken Dig Dug
  @70      HD38820A  1983, Parker Brothers Q*Bert
  @85      HD38820A  1984, Bandai Machine Man (PT-438)
- *88      HD38820A  1984, Bandai Pair Match (1/2)
- *89      HD38820A  1984, Bandai Pair Match (2/2)
+ @88      HD38820A  1984, Bandai Pair Match (PT-460) (1/2)
+ @89      HD38820A  1984, Bandai Pair Match (PT-460) (2/2)
 
  *75      HD44801A  1982, Alpha 8201 protection MCU (have dump)
 
  *35      HD44801B  1983, Alpha 8302 protection MCU (have dump)
  *42      HD44801B  1984, Alpha 8303 protection MCU (have dump)
 
-  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
+  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
   TODO:
   - cdkong discrete sound (simple volume decay, simulated for now)
   - cgalaxn discrete sound (alien attacking sound effect)
-  - vinvader locks up at boot
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
     Or it could be a race condition: irq happening too late/early.
@@ -83,6 +85,9 @@
 #include "cpu/cop400/cop400.h"
 #include "sound/speaker.h"
 
+// internal artwork
+#include "pairmtch.lh"
+
 #include "hh_hmcs40_test.lh" // common test-layout - use external artwork
 
 
@@ -92,6 +97,7 @@ public:
 	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_inp_matrix(*this, "IN"),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
@@ -101,6 +107,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_ioport_array<7> m_inp_matrix; // max 7
 	optional_device<speaker_sound_device> m_speaker;
 
@@ -327,7 +334,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   * Hitachi HD38750A08 MCU
   * green VFD display Emix-106, with bezel overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -439,7 +446,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38750A07 MCU
   * cyan VFD display Emix-103, with blue or green color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -575,7 +582,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800A77 MCU
   * cyan/red/green VFD display Futaba DM-43ZK 2E
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -705,7 +712,7 @@ MACHINE_CONFIG_END
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -816,7 +823,7 @@ MACHINE_CONFIG_END
   - Japan: ?
   - USA: Star Hawk, published by Mattel
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -938,11 +945,133 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Bandai Zaxxon (manufactured in Japan, licensed from Sega)
+  * PCB label FL Zaxxon
+  * Hitachi HD38800B19 MCU
+  * cyan/red/blue VFD display NEC FIP11BM24T no. 4-8, half of it reflected
+    with a one-way mirror to give the illusion of a 3D display
+
+  NOTE!: MAME external artwork is required
+
+***************************************************************************/
+
+class bzaxxon_state : public hh_hmcs40_state
+{
+public:
+	bzaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	void update_int1();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+};
+
+// handlers
+
+WRITE8_MEMBER(bzaxxon_state::plate_w)
+{
+	// R0x-R3x(,D0-D2): vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
+	display_matrix(20, 11, plate, grid);
+}
+
+WRITE16_MEMBER(bzaxxon_state::grid_w)
+{
+	// D4: speaker out
+	m_speaker->level_w(data >> 4 & 1);
+
+	// D7-D10: input mux
+	UINT8 inp_mux = data >> 7 & 0xf;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int1();
+	}
+
+	// D5-D15: vfd matrix grid
+	m_grid = data >> 5 & 0x7ff;
+
+	// D0-D2: plate 7-9 (update display there)
+	plate_w(space, 4, data & 7);
+}
+
+void bzaxxon_state::update_int1()
+{
+	// INT1 on multiplexed inputs
+	set_interrupt(1, read_inputs(4));
+}
+
+
+// config
+
+static INPUT_PORTS_START( bzaxxon )
+	PORT_START("IN.0") // D7 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bzaxxon_state, input_changed, NULL)
+
+	PORT_START("IN.1") // D8 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, bzaxxon_state, input_changed, NULL)
+
+	PORT_START("IN.2") // D9 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bzaxxon_state, input_changed, NULL)
+
+	PORT_START("IN.3") // D10 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, bzaxxon_state, input_changed, NULL)
+
+	PORT_START("IN.4") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+
+	PORT_START("IN.5") // port D
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SELECT )
+	PORT_BIT( 0xfff7, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
+{
+	update_int1();
+}
+
+
+static MACHINE_CONFIG_START( bzaxxon, bzaxxon_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(bzaxxon_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Bandai Zackman "The Pit, FL Exploration of Space" (manufactured in Japan)
   * Hitachi QFP HD38820A49 MCU
   * cyan/red/yellow VFD display Futaba DM-53Z 3E, with color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1056,12 +1185,264 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Bandai Pengo (manufactured in Japan, licensed from Sega)
+  * PCB label FL Pengo(in katakana)
+  * Hitachi QFP HD38820A63 MCU
+  * cyan/red/blue VFD display Futaba DM-68ZK 3D DM-63
+
+  NOTE!: MAME external artwork is required
+
+***************************************************************************/
+
+class bpengo_state : public hh_hmcs40_state
+{
+public:
+	bpengo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+};
+
+// handlers
+
+void bpengo_state::prepare_display()
+{
+	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	display_matrix(25, 8, plate, grid);
+}
+
+WRITE8_MEMBER(bpengo_state::plate_w)
+{
+	// R0x-R6x: vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(bpengo_state::grid_w)
+{
+	// D10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// D12-D15: input mux
+	UINT8 inp_mux = data >> 12 & 0xf;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D0-D7: vfd matrix grid
+	m_grid = data & 0xff;
+	prepare_display();
+}
+
+void bpengo_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(4));
+}
+
+
+// config
+
+static INPUT_PORTS_START( bpengo )
+	PORT_START("IN.0") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, bpengo_state, input_changed, NULL)
+
+	PORT_START("IN.1") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, bpengo_state, input_changed, NULL)
+
+	PORT_START("IN.2") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bpengo_state, input_changed, NULL)
+
+	PORT_START("IN.3") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bpengo_state, input_changed, NULL)
+
+	PORT_START("IN.4") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
+
+	PORT_START("IN.5") // port D
+	PORT_CONFNAME( 0x0800, 0x0000, "Factory Test" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0800, DEF_STR( On ) )
+	PORT_BIT( 0xf7ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
+{
+	update_int0();
+}
+
+
+static MACHINE_CONFIG_START( bpengo, bpengo_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(bpengo_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai Burger Time (manufactured in Japan, licensed from Data East)
+  * PCB label Kaken Corp. PT-389 Burger Time
+  * Hitachi QFP HD38820A65 MCU
+  * cyan/red/green VFD display NEC FIP6AM25T no. 21-21
+
+  NOTE!: MAME external artwork is required
+
+***************************************************************************/
+
+class bbtime_state : public hh_hmcs40_state
+{
+public:
+	bbtime_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+};
+
+// handlers
+
+void bbtime_state::prepare_display()
+{
+	UINT8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
+	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
+	display_matrix(28, 6, plate, grid);
+}
+
+WRITE8_MEMBER(bbtime_state::plate_w)
+{
+	// R0x-R6x: vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(bbtime_state::grid_w)
+{
+	// D3: speaker out
+	m_speaker->level_w(data >> 3 & 1);
+
+	// D10-D14: input mux
+	UINT8 inp_mux = data >> 10 & 0x1f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D4-D9: vfd matrix grid
+	m_grid = data >> 4 & 0x3f;
+	prepare_display();
+}
+
+void bbtime_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(5));
+}
+
+
+// config
+
+static INPUT_PORTS_START( bbtime )
+	PORT_START("IN.0") // D10 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbtime_state, input_changed, NULL)
+
+	PORT_START("IN.1") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbtime_state, input_changed, NULL)
+
+	PORT_START("IN.2") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbtime_state, input_changed, NULL)
+
+	PORT_START("IN.3") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbtime_state, input_changed, NULL)
+
+	PORT_START("IN.4") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbtime_state, input_changed, NULL)
+
+	PORT_START("IN.5") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
+{
+	update_int0();
+}
+
+
+static MACHINE_CONFIG_START( bbtime, bbtime_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(bbtime_state, grid_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Bandai Dokodemo Dorayaki Doraemon (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label Kaken Corp PT-412 FL-Doreamon(in katakana)
   * Hitachi HD38800B43 MCU
   * cyan/red/blue VFD display Futaba DM-71
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1154,12 +1535,102 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Bandai Ultra Man (FL LSI Game Push Up) (manufactured in Japan)
+  * PCB label Kaken Corp. PT-424 FL Ultra Man
+  * Hitachi HD38800B52 MCU
+  * cyan/red/blue VFD display NEC FIP8BM25T no. 21-8 2
+
+  NOTE!: MAME external artwork is required
+
+***************************************************************************/
+
+class bultrman_state : public hh_hmcs40_state
+{
+public:
+	bultrman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+};
+
+// handlers
+
+WRITE8_MEMBER(bultrman_state::plate_w)
+{
+	// R0x-R3x(,D0-D2): vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,15,14,13,12,11,2,10,9,8,7,6,5,4,3,0,1);
+	display_matrix(18, 8, plate, grid);
+}
+
+WRITE16_MEMBER(bultrman_state::grid_w)
+{
+	// D7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// D8-D15: vfd matrix grid
+	m_grid = data >> 8 & 0xff;
+
+	// D0-D2: plate 15-17 (update display there)
+	plate_w(space, 4, data & 7);
+}
+
+
+// config
+
+static INPUT_PORTS_START( bultrman )
+	PORT_START("IN.0") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+
+	PORT_START("IN.1") // port D
+	PORT_CONFNAME( 0x0010, 0x0000, "Factory Test" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0010, DEF_STR( On ) )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bultrman, bultrman_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(bultrman_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Bandai Machine Man (FL Flat Type) (manufactured in Japan)
   * PCB label Kaken PT-438
   * Hitachi QFP HD38820A85 MCU
   * cyan/red/green VFD display NEC FIP5CM33T no. 4 21
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1243,6 +1714,161 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Bandai Pair Match (manufactured in Japan)
+  * PCB label Kaken Corp. PT-460
+  * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio)
+  * cyan/red VFD display
+
+  This is a memory game, the difference is instead of pictures, the player
+  needs to match sound effects. It has an extra MCU for sound. The case is
+  shaped like a glossy black pyramid. Star Trek fans will recognize it as
+  a prop used in TNG Ten Forward.
+
+  note: MAME external artwork is not needed for this game
+
+***************************************************************************/
+
+class pairmtch_state : public hh_hmcs40_state
+{
+public:
+	pairmtch_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_READ8_MEMBER(input_r);
+
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(sound2_w);
+	DECLARE_WRITE16_MEMBER(speaker_w);
+};
+
+// handlers: maincpu side
+
+WRITE8_MEMBER(pairmtch_state::plate_w)
+{
+	// R2x,R3x,R6x: vfd matrix plate
+	int shift = (offset == HMCS40_PORT_R6X) ? 8 : (offset-2) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	display_matrix(12, 6, m_plate, m_grid);
+}
+
+WRITE16_MEMBER(pairmtch_state::grid_w)
+{
+	// D7: sound reset (to audiocpu reset line)
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+
+	// D9: sound start (to audiocpu INT0)
+	m_audiocpu->set_input_line(0, (data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
+
+	// D10,D15: input mux
+	m_inp_mux = (data >> 10 & 1) | (data >> 14 & 2);
+
+	// D0-D5: vfd matrix grid
+	m_grid = data & 0x3f;
+	display_matrix(12, 6, m_plate, m_grid);
+}
+
+READ8_MEMBER(pairmtch_state::input_r)
+{
+	// R4x: multiplexed inputs
+	return read_inputs(2);
+}
+
+WRITE8_MEMBER(pairmtch_state::sound_w)
+{
+	// R5x: soundlatch (to audiocpu R2x)
+	soundlatch_byte_w(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+}
+
+
+// handlers: audiocpu side
+
+WRITE8_MEMBER(pairmtch_state::sound2_w)
+{
+	// R2x: soundlatch (to maincpu R5x)
+	soundlatch2_byte_w(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+}
+
+WRITE16_MEMBER(pairmtch_state::speaker_w)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D1: sound ack (to maincpu INT0)
+	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+// config
+
+static INPUT_PORTS_START( pairmtch )
+	PORT_START("IN.0") // D10 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.1") // D15 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+
+	PORT_START("IN.2") // port D
+	PORT_CONFNAME( 0x0040, 0x0000, "Factory Test" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0040, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_CONFNAME( 0x0800, 0x0800, "Players" )
+	PORT_CONFSETTING(      0x0800, "1" )
+	PORT_CONFSETTING(      0x0000, "2" )
+	PORT_CONFNAME( 0x3000, 0x2000, "Skill Level" )
+	PORT_CONFSETTING(      0x2000, "1" )
+	PORT_CONFSETTING(      0x1000, "2" )
+	PORT_CONFSETTING(      0x0000, "3" )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( pairmtch, pairmtch_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(pairmtch_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(4, READ8(pairmtch_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(pairmtch_state, sound_w))
+	MCFG_HMCS40_READ_R_CB(5, READ8(driver_device, soundlatch2_byte_r))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
+
+	MCFG_CPU_ADD("audiocpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, sound2_w))
+	MCFG_HMCS40_READ_R_CB(2, READ8(driver_device, soundlatch_byte_r))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, speaker_w))
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_pairmtch)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Coleco Alien Attack (manufactured in Taiwan)
   * Hitachi HD38800A25 MCU
   * cyan/red VFD display Futaba DM-19Z 1J
@@ -1250,7 +1876,7 @@ MACHINE_CONFIG_END
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
   action-oriented game.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1356,12 +1982,12 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Donkey Kong (manufactured in Taiwan)
+  Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1401,7 +2027,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 
 void cdkong_state::prepare_display()
 {
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4);
+	UINT32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
 	display_matrix(29, 11, plate, m_grid);
 }
 
@@ -1495,7 +2121,7 @@ MACHINE_CONFIG_END
   - P2 Left:  Head-to-Head Galaxian (2-player mode, short)
   - P2 Right: Head-to-Head Galaxian (2-player mode, long)
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1580,6 +2206,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 {
 	// 2-player switch directly enables plate 14
 	m_plate = (m_plate & 0x3fff) | (newval ? 0 : 0x4000);
+	prepare_display();
 }
 
 
@@ -1610,7 +2237,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Pac-Man (manufactured in Taiwan)
+  Coleco Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label Coleco 75690
   * Hitachi QFP HD38820A28/29 MCU
   * cyan/red VFD display Futaba DM-34Z 2A, with color overlay
@@ -1627,7 +2254,7 @@ MACHINE_CONFIG_END
 
   BTANB note: 1st version doesn't show the whole maze on power-on
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1731,7 +2358,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Ms. Pac-Man (manufactured in Taiwan)
+  Coleco Ms. Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label Coleco 911171
   * Hitachi QFP HD38820A61 MCU
   * cyan/red VFD display Futaba DM-60Z 3I, with color overlay
@@ -1743,7 +2370,7 @@ MACHINE_CONFIG_END
 
   BTANB note: in demo-mode, she hardly ever walks to the upper two rows
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1769,7 +2396,7 @@ WRITE8_MEMBER(cmspacmn_state::plate_w)
 
 	// update display
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
-	UINT64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16);
+	UINT64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
 	display_matrix(33, 12, plate, grid);
 }
 
@@ -1852,7 +2479,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1976,7 +2603,7 @@ MACHINE_CONFIG_END
 
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 #if 0
@@ -2034,7 +2661,7 @@ INPUT_PORTS_END
   * COP411L sub MCU, labeled COP411L-KED/N
   * cyan/red/green VFD display NEC FIP15BM32T
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2063,7 +2690,7 @@ protected:
 	virtual void machine_start();
 };
 
-// handlers (maincpu side first)
+// handlers: maincpu side
 
 void eturtles_state::prepare_display()
 {
@@ -2108,7 +2735,7 @@ void eturtles_state::update_int()
 }
 
 
-// COP side
+// handlers: COP side
 
 WRITE_LINE_MEMBER(eturtles_state::speaker_w)
 {
@@ -2227,7 +2854,7 @@ MACHINE_CONFIG_END
   * COP411L sub MCU, labeled ~/B8236 COP411L-KEC/N
   * cyan/red/green VFD display NEC FIP15AM32T (EL628-003) no. 2-421, with partial color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2242,7 +2869,7 @@ public:
 	DECLARE_READ8_MEMBER(cop_data_r);
 };
 
-// handlers (most of it is handled in eturtles_state above)
+// handlers (most of it is in eturtles_state above)
 
 void estargte_state::prepare_display()
 {
@@ -2337,7 +2964,7 @@ MACHINE_CONFIG_END
   - Japan: Heiankyo Alien
   - USA: Earth Invaders, published by CGL
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2453,7 +3080,7 @@ MACHINE_CONFIG_END
   - Japan: Crazy Kong
   - USA: Super Kong, published by CGL
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2481,7 +3108,7 @@ WRITE8_MEMBER(gckong_state::plate_w)
 
 	// update display
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
 	display_matrix(32, 11, plate, grid);
 }
 
@@ -2576,7 +3203,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A69 MCU
   * cyan/red/green VFD display Futaba DM-69Z 3F, with color overlay
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2701,7 +3328,7 @@ MACHINE_CONFIG_END
   turn the game on while holding the 1-key and use the visitor's side keypad
   to play offsense.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2859,7 +3486,7 @@ MACHINE_CONFIG_END
   * Hitachi QFP HD38820A70 MCU
   * cyan/red/green/darkgreen VFD display Itron CP5137
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2883,7 +3510,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23);
+	UINT32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
 	display_matrix(30, 8, plate, m_grid);
 }
 
@@ -2947,7 +3574,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3068,7 +3695,7 @@ MACHINE_CONFIG_END
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD display NEC FIP10AM24T no. 2-8 1
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3193,7 +3820,7 @@ MACHINE_CONFIG_END
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -3317,9 +3944,30 @@ ROM_START( msthawk )
 ROM_END
 
 
+ROM_START( bzaxxon )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b19", 0x0000, 0x1000, CRC(4fecb80d) SHA1(7adf079480ffd3825ad5ae1eaa4d892eecbcc42d) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( zackman )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38820a49", 0x0000, 0x1000, CRC(b97f5ef6) SHA1(7fe20e8107361caf9ea657e504be1f8b10b8b03f) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( bpengo )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a63", 0x0000, 0x1000, CRC(ebd6bc64) SHA1(0a322c47b9553a2739a85908ce64b9650cf93d49) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( bbtime )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a65", 0x0000, 0x1000, CRC(33611faf) SHA1(29b6a30ed543688d31ec2aa18f7938fa4eef30b0) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 ROM_END
 
@@ -3331,9 +3979,27 @@ ROM_START( bdoramon )
 ROM_END
 
 
+ROM_START( bultrman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b52", 0x0000, 0x1000, CRC(88d372dc) SHA1(f2ac3b89be8afe6fb65914ccebe1a56316b9472a) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( machiman )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38820a85", 0x0000, 0x1000, CRC(894b4954) SHA1(cab49638a326b031aa548301beb16f818759ef62) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( pairmtch )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a88", 0x0000, 0x1000, CRC(ffa35730) SHA1(5a80b9025aaad2ac0ab0b1436a1355ae8cd3f868) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a89", 0x0000, 0x1000, CRC(3533ec56) SHA1(556d69e78a0ee1bf766fce16ed58992d7272d57f) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 ROM_END
 
@@ -3464,44 +4130,49 @@ ROM_END
 
 ROM_START( vinvader )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hd38750a45", 0x0000, 0x0800, CRC(e02d94d9) SHA1(d4679abbb9c6778e5e853aa6c2b90dee1d21c9dd) )
+	ROM_LOAD( "hd38750a45", 0x0000, 0x0800, CRC(32de6056) SHA1(70238c6c40c3d513f8eced1cb81bdd4dbe12f16c) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 ROM_END
 
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Dribble Away Basketball", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, driver_device, 0, "Bambino", "Knock-Em Out Boxing", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, driver_device, 0, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Bandai", "Frisky Tom (Bandai)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  driver_device, 0, "Bandai (Mattel license)", "Star Hawk (Mattel)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  driver_device, 0, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  driver_device, 0, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   driver_device, 0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultra Man (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND )
-CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1981, epacman2,  0,        0, egalaxn2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, estargte,  0,        0, estargte, estargte, driver_device, 0, "Entex", "Stargate (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, eturtles,  0,        0, eturtles, eturtles, driver_device, 0, "Entex", "Turtles (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, epacman2,  0,        0, egalaxn2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, estargte,  0,        0, estargte, estargte, driver_device, 0, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, eturtles,  0,        0, eturtles, eturtles, driver_device, 0, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  driver_device, 0, "Gakken", "Heiankyo Alien (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, gckong,    0,        0, gckong,   gckong,   driver_device, 0, "Gakken", "Crazy Kong (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  driver_device, 0, "Gakken", "Dig Dug (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  driver_device, 0, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gckong,    0,        0, gckong,   gckong,   driver_device, 0, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  driver_device, 0, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, driver_device, 0, "Mattel", "World Championship Baseball", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, driver_device, 0, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1981, vinvader,  0,        0, vinvader, vinvader, driver_device, 0, "VTech", "Invaders (VTech)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1981, vinvader,  0,        0, vinvader, vinvader, driver_device, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

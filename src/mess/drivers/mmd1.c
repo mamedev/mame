@@ -527,5 +527,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1976, mmd1,    0,       0,     mmd1,      mmd1, driver_device,     0,   "E&L Instruments Inc", "MMD-1", GAME_NO_SOUND_HW)
-COMP( 1976, mmd2,    mmd1,    0,     mmd2,      mmd2, mmd1_state,    mmd2, "E&L Instruments Inc", "MMD-2", GAME_NO_SOUND_HW)
+COMP( 1976, mmd1,    0,       0,     mmd1,      mmd1, driver_device,     0,   "E&L Instruments Inc", "MMD-1", MACHINE_NO_SOUND_HW)
+COMP( 1976, mmd2,    mmd1,    0,     mmd2,      mmd2, mmd1_state,    mmd2, "E&L Instruments Inc", "MMD-2", MACHINE_NO_SOUND_HW)

@@ -5,13 +5,20 @@
 #include "mie.h"
 #include "maple-dc.h"
 
-// MIE aka sega 315-6146, MAPLE-JVS bridge Z80-based MCU
+// MIE aka Sega 315-6146, MAPLE-JVS bridge Z80-based MCU
 //
 // Todos:
-// - In reality, there are two rs422/rs486 ports, one at 10-15 and one
-//   at 20-25.  Perhaps they're a standard design?
+// - ports 00-0f is identical to Sega 315-5338A/315-5649 I/O ICs
+//   (used in Sega H1, Model 2, etc). devicefication needed.
 //
-// - There's also a different port at 0x09-0x0d, supposedly used for cards.
+// - ports 10-15 and 20-25 is standard 8250/16xxx UARTs.
+//
+// - ports a0-af - external I/O 1, in JVS I/Os connected to NEC uPD71053 counter/timer
+//
+// - ports c0-cf - external I/O 2, not used
+//   in JVS I/Os can be connected to (unpopulated) 315-5296 I/O IC, if enabled by DIP switch
+//
+// - both memory and I/O address spaces can be directly accessed by host system (used in Hikaru)
 //
 // - Speed is all wrong
 
@@ -100,6 +107,11 @@ void mie_device::device_start()
 	cpu = subdevice<z80_device>("mie");
 	timer = timer_alloc(0);
 	jvs = machine().device<mie_jvs_device>(jvs_name);
+
+	for (int i = 0; i < ARRAY_LENGTH(gpio_name); i++)
+	{
+		gpio_port[i] = gpio_name[i] ? ioport(gpio_name[i]) : NULL;
+	}
 
 	save_item(NAME(gpiodir));
 	save_item(NAME(gpio_val));
@@ -208,7 +220,7 @@ READ8_MEMBER(mie_device::read_78xx)
 READ8_MEMBER(mie_device::gpio_r)
 {
 	if(gpiodir & (1 << offset))
-		return gpio_name[offset] ? ioport(gpio_name[offset])->read() : 0xff;
+		return gpio_port[offset] ? gpio_port[offset]->read() : 0xff;
 	else
 		return gpio_val[offset];
 }
@@ -216,8 +228,8 @@ READ8_MEMBER(mie_device::gpio_r)
 WRITE8_MEMBER(mie_device::gpio_w)
 {
 	gpio_val[offset] = data;
-	if(!(gpiodir & (1 << offset)) && gpio_name[offset])
-		ioport(gpio_name[offset])->write(data, 0xff);
+	if(!(gpiodir & (1 << offset)) && gpio_port[offset])
+		gpio_port[offset]->write(data, 0xff);
 }
 
 READ8_MEMBER(mie_device::gpiodir_r)

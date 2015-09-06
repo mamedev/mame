@@ -174,7 +174,9 @@ bits(7:4) and bit(24)), X, and Y:
 
 #define MODIFY_PIXEL(VV)
 
-
+// Need to turn off cycle eating when debugging MIPS drc
+// otherwise timer interrupts won't match nodrc debug mode.
+#define EAT_CYCLES          (1)
 
 
 /*************************************
@@ -2093,8 +2095,8 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 			v->pci.op_end_time = v->device->machine().time() + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				v->device->machine().time().seconds, (UINT32)(v->device->machine().time().attoseconds >> 32), (UINT32)v->device->machine().time().attoseconds,
-				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
+				v->device->machine().time().seconds(), (UINT32)(v->device->machine().time().attoseconds() >> 32), (UINT32)v->device->machine().time().attoseconds(),
+				v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 		}
 	}
 }
@@ -2583,7 +2585,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 				if (v->reg[hSync].u != 0 && v->reg[vSync].u != 0 && v->reg[videoDimensions].u != 0)
 				{
 					int hvis, vvis, htotal, vtotal, hbp, vbp;
-					attoseconds_t refresh = v->screen->frame_period().attoseconds;
+					attoseconds_t refresh = v->screen->frame_period().attoseconds();
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
@@ -3567,8 +3569,8 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 	if (!v->pci.op_pending) fatalerror("flush_fifos called with no pending operation\n");
 
 	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos start -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
-		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
-		current_time.seconds, (UINT32)(current_time.attoseconds >> 32), (UINT32)current_time.attoseconds);
+		v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds(),
+		current_time.seconds(), (UINT32)(current_time.attoseconds() >> 32), (UINT32)current_time.attoseconds());
 
 	/* loop while we still have cycles to burn */
 	while (v->pci.op_end_time <= current_time)
@@ -3665,12 +3667,12 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 		v->pci.op_end_time += attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:update -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
-			v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
-			current_time.seconds, (UINT32)(current_time.attoseconds >> 32), (UINT32)current_time.attoseconds);
+			v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds(),
+			current_time.seconds(), (UINT32)(current_time.attoseconds() >> 32), (UINT32)current_time.attoseconds());
 	}
 
 	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos end -- pending command complete at %d.%08X%08X\n", v->index,
-		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
+		v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 
 	in_flush = FALSE;
 }
@@ -3780,8 +3782,8 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 			v->pci.op_end_time = machine().time() + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				machine().time().seconds, (UINT32)(machine().time().attoseconds >> 32), (UINT32)machine().time().attoseconds,
-				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
+				machine().time().seconds(), (UINT32)(machine().time().attoseconds() >> 32), (UINT32)machine().time().attoseconds(),
+				v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 		}
 		g_profiler.stop();
 		return;
@@ -3951,7 +3953,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3964,7 +3966,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 		case vRetrace:
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(10);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(10);
 			result = v->screen->vpos();
 			break;
 
@@ -3979,7 +3981,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			result = v->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(1000);
 			break;
 
 		case cmdFifoAMin:
@@ -5717,7 +5719,7 @@ static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 
 	if (LOG_RASTERIZERS)
 		printf("Adding rasterizer @ %p : cp=%08X am=%08X %08X fbzM=%08X tm0=%08X tm1=%08X (hash=%d)\n",
-				info->callback,
+				(void *)info->callback,
 				info->eff_color_path, info->eff_alpha_mode, info->eff_fog_mode, info->eff_fbz_mode,
 				info->eff_tex_mode_0, info->eff_tex_mode_1, hash);
 
@@ -6511,5 +6513,25 @@ RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x
 RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD ) /* * 66       74       3951 */
 RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x00000ACD, 0x04221AC9 ) /*   70      374       3691 */
 RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD ) /* * 20      350       7928 */
+/* virtpool ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1        hash */
+RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B0739, 0x0C261A0F, 0x042210C0 ) /* * 78  2182388   74854175 */
+RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B07F9, 0x0C261A0F, 0x042210C0 ) /* * 46   114830    6776826 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045110, 0x00000000, 0x000B0739, 0x0C261A0F, 0x042210C0 ) /* * 58  1273673    4513463 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045110, 0x00000000, 0x000B0739, 0x0C261A09, 0x042210C0 ) /* * 46   634995    2275612 */
+RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B073B, 0x0C261A0F, 0x042210C0 ) /* * 46    26651    1883507 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045110, 0x00000000, 0x000B073B, 0x0C261A0F, 0x042210C0 ) /* * 26   220644     751241 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00445110, 0x00000000, 0x000B073B, 0x0C261A09, 0x042210C0 ) /* * 79    14846    3499120 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B0739, 0x0C261A09, 0x042210C0 ) /* * 66    26665    1583363 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B073B, 0x0C26100F, 0x042210C0 ) /* * 78    33096     957935 */
+//RASTERIZER_ENTRY( 0x00002425, 0x00445110, 0x00000000, 0x000B07F9, 0x0C261A0F, 0x042210C0 ) /* * 38    12494     678029 */
+//RASTERIZER_ENTRY( 0x00800000, 0x00000000, 0x00000000, 0x00000200, 0x00000000, 0x00000000 ) /* * 28    25348     316181 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B0739, 0x0C26100F, 0x042210C0 ) /* * 13    11344     267903 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B073B, 0x0C261A09, 0x042210C0 ) /* * 34     1548     112168 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B07FB, 0x0C26100F, 0x042210C0 ) /* * 35      664      25222 */
+//RASTERIZER_ENTRY( 0x00000002, 0x00000000, 0x00000000, 0x00000300, 0xFFFFFFFF, 0xFFFFFFFF ) /* * 33      512      18393 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B07FB, 0x0C261A0F, 0x042210C0 ) /* * 14      216      16842 */
+//RASTERIZER_ENTRY( 0x00000001, 0x00000000, 0x00000000, 0x00000300, 0x00000800, 0x00000800 ) /* * 87        2         72 */
+//RASTERIZER_ENTRY( 0x00000001, 0x00000000, 0x00000000, 0x00000200, 0x08241A00, 0x08241A00 ) /* * 92        2          8 */
+//RASTERIZER_ENTRY( 0x00000001, 0x00000000, 0x00000000, 0x00000200, 0x00000000, 0x08241A00 ) /* * 93        2          8 */
 
 #endif

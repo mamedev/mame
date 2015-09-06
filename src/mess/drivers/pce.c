@@ -69,7 +69,7 @@ Super System Card:
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )
 
-	PORT_START("JOY_P1")
+	PORT_START("JOY_P.0")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button I") PORT_PLAYER(1)    PORT_CONDITION("JOY_TYPE", 0x0003, EQUALS, 0x0000)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button II") PORT_PLAYER(1)   PORT_CONDITION("JOY_TYPE", 0x0003, EQUALS, 0x0000)
@@ -80,7 +80,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)                       PORT_CONDITION("JOY_TYPE", 0x0003, EQUALS, 0x0000)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)                      PORT_CONDITION("JOY_TYPE", 0x0003, EQUALS, 0x0000)
 
-	PORT_START("JOY_P2")
+	PORT_START("JOY_P.1")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button I") PORT_PLAYER(2)    PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Button II") PORT_PLAYER(2)   PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
@@ -91,7 +91,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)                       PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)                      PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
 
-	PORT_START("JOY_P3")
+	PORT_START("JOY_P.2")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P3 Button I") PORT_PLAYER(3)    PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0000)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P3 Button II") PORT_PLAYER(3)   PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0000)
@@ -102,7 +102,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)                       PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0000)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)                      PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0000)
 
-	PORT_START("JOY_P4")
+	PORT_START("JOY_P.3")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P4 Button I") PORT_PLAYER(4)    PORT_CONDITION("JOY_TYPE", 0x00c0, EQUALS, 0x0000)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P4 Button II") PORT_PLAYER(4)   PORT_CONDITION("JOY_TYPE", 0x00c0, EQUALS, 0x0000)
@@ -113,7 +113,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)                       PORT_CONDITION("JOY_TYPE", 0x00c0, EQUALS, 0x0000)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)                      PORT_CONDITION("JOY_TYPE", 0x00c0, EQUALS, 0x0000)
 
-	PORT_START("JOY_P5")
+	PORT_START("JOY_P.4")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P5 Button I") PORT_PLAYER(5)    PORT_CONDITION("JOY_TYPE", 0x0300, EQUALS, 0x0000)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P5 Button II") PORT_PLAYER(5)   PORT_CONDITION("JOY_TYPE", 0x0300, EQUALS, 0x0000)
@@ -124,7 +124,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(5)                       PORT_CONDITION("JOY_TYPE", 0x0300, EQUALS, 0x0000)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(5)                      PORT_CONDITION("JOY_TYPE", 0x0300, EQUALS, 0x0000)
 
-	PORT_START("JOY6B_P1")
+	PORT_START("JOY6B_P.0")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button I") PORT_PLAYER(1)  PORT_CONDITION("JOY_TYPE", 0x0003, EQUALS, 0x0002)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button II") PORT_PLAYER(1) PORT_CONDITION("JOY_TYPE", 0x0003, EQUALS, 0x0002)
@@ -140,7 +140,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Button VI") PORT_PLAYER(1) PORT_CONDITION("JOY_TYPE", 0x0003, EQUALS, 0x0002)
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH,IPT_UNUSED ) //6-button pad header
 
-	PORT_START("JOY6B_P2")  /* Player 2 controls */
+	PORT_START("JOY6B_P.1")  /* Player 2 controls */
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button I") PORT_PLAYER(2)  PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0008)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Button II") PORT_PLAYER(2) PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0008)
@@ -156,7 +156,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Button VI") PORT_PLAYER(2) PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0008)
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH,IPT_UNUSED ) //6-button pad header
 
-	PORT_START("JOY6B_P3")  /* Player 3 controls */
+	PORT_START("JOY6B_P.2")  /* Player 3 controls */
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P3 Button I") PORT_PLAYER(3)  PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0020)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P3 Button II") PORT_PLAYER(3) PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0020)
@@ -172,7 +172,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P3 Button VI") PORT_PLAYER(3) PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0020)
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH,IPT_UNUSED ) //6-button pad header
 
-	PORT_START("JOY6B_P4")  /* Player 4 controls */
+	PORT_START("JOY6B_P.3")  /* Player 4 controls */
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P4 Button I") PORT_PLAYER(4)  PORT_CONDITION("JOY_TYPE", 0x00c0, EQUALS, 0x0080)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P4 Button II") PORT_PLAYER(4) PORT_CONDITION("JOY_TYPE", 0x00c0, EQUALS, 0x0080)
@@ -188,7 +188,7 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P3 Button VI") PORT_PLAYER(4) PORT_CONDITION("JOY_TYPE", 0x00c0, EQUALS, 0x0080)
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH,IPT_UNUSED ) //6-button pad header
 
-	PORT_START("JOY6B_P5")  /* Player 5 controls */
+	PORT_START("JOY6B_P.4")  /* Player 5 controls */
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P5 Button I") PORT_PLAYER(5)  PORT_CONDITION("JOY_TYPE", 0x0300, EQUALS, 0x0200)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P5 Button II") PORT_PLAYER(5) PORT_CONDITION("JOY_TYPE", 0x0300, EQUALS, 0x0200)
@@ -424,6 +424,6 @@ ROM_END
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
 
-CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
-CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
+CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", MACHINE_IMPERFECT_SOUND)
+CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "Nippon Electronic Company", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND)
+CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "Nippon Electronic Company", "SuperGrafx", MACHINE_IMPERFECT_SOUND)

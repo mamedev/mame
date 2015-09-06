@@ -219,7 +219,7 @@ private:
 	float                   m_prim_height;                // used by quads
 };
 
-}; // d3d
+} // d3d
 
 /* vertex describes a single vertex */
 struct vertex

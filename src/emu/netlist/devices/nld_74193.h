@@ -26,13 +26,13 @@
 #ifndef NLD_74193_H_
 #define NLD_74193_H_
 
-#include "../nl_base.h"
+#include "nl_base.h"
 
 #define TTL_74193(_name)                                              \
-		NET_REGISTER_DEV(74193, _name)
+		NET_REGISTER_DEV(TTL_74193, _name)
 
 #define TTL_74193_DIP(_name)                                                         \
-		NET_REGISTER_DEV(74193_dip, _name)
+		NET_REGISTER_DEV(TTL_74193_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

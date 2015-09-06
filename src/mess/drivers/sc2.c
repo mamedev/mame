@@ -193,7 +193,7 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 	}
 	else
 		m_kp_matrix = data;
-};
+}
 
 static MACHINE_CONFIG_START( sc2, sc2_state )
 	/* basic machine hardware */
@@ -235,4 +235,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                        FULLNAME       FLAGS */
-COMP( 1981, sc2,    0,      0,       sc2,       sc2, driver_device,     0,  "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", GAME_SUPPORTS_SAVE)
+COMP( 1981, sc2,    0,      0,       sc2,       sc2, driver_device,     0,  "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE)

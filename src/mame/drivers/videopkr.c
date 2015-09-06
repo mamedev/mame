@@ -1549,4 +1549,4 @@ GAMEL( 1987, videodad, videopkr, videodad, videodad, driver_device, 0,    ROT0, 
 GAMEL( 1987, videocba, videopkr, videodad, videocba, driver_device, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                layout_videocba )
 GAMEL( 1987, babypkr , videopkr, babypkr,  babypkr, driver_device,  0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                layout_babypkr  )
 GAMEL( 1987, babydad , videopkr, babypkr,  babydad, driver_device,  0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                layout_babydad  )
-GAMEL( 198?, bpoker ,  videopkr, babypkr,  babypkr, driver_device,  0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                GAME_NOT_WORKING, layout_babypkr  )
+GAMEL( 198?, bpoker ,  videopkr, babypkr,  babypkr, driver_device,  0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )

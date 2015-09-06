@@ -51,7 +51,7 @@ INTERRUPT_GEN_MEMBER(mainevt_state::dv_interrupt)
 WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
 {
 	/* bit 0-1 ROM bank select */
-	membank("bank1")->set_entry(data & 0x03);
+	m_rombank->set_entry(data & 0x03);
 
 	/* TODO: bit 5 = select work RAM or palette? */
 	//palette_selected = data & 0x20;
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -380,9 +380,7 @@ WRITE8_MEMBER(mainevt_state::volume_callback)
 
 void mainevt_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_nmi_enable));
 }
@@ -428,14 +426,13 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(mainevt_state,mainevt)
-
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(mainevt_state, mainevt_tile_callback)
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
 
 	/* sound hardware */
@@ -475,14 +472,13 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(mainevt_state,dv)
-
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(mainevt_state, dv_tile_callback)
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(mainevt_state, dv_sprite_callback)
 
 	MCFG_K051733_ADD("k051733")
@@ -510,11 +506,10 @@ MACHINE_CONFIG_END
 
 
 ROM_START( mainevt )    /* 4 players - English title screen - No "Warning" message in the ROM */
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "799y02.k11",   0x10000, 0x08000, CRC(e2e7dbd5) SHA1(80314cd42a9f47f7bb82a2160fb5ef2ddc6dff30) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "799y02.k11",   0x00000, 0x10000, CRC(e2e7dbd5) SHA1(80314cd42a9f47f7bb82a2160fb5ef2ddc6dff30) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
@@ -538,11 +533,10 @@ ROM_START( mainevt )    /* 4 players - English title screen - No "Warning" messa
 ROM_END
 
 ROM_START( mainevto )   /* 4 players - English title screen - No "Warning" message in the ROM */
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "799f02.k11",   0x10000, 0x08000, CRC(c143596b) SHA1(5da7efaf0f7c7a493cc242eae115f278bc9c134b) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "799f02.k11",   0x00000, 0x10000, CRC(c143596b) SHA1(5da7efaf0f7c7a493cc242eae115f278bc9c134b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
@@ -566,11 +560,10 @@ ROM_START( mainevto )   /* 4 players - English title screen - No "Warning" messa
 ROM_END
 
 ROM_START( mainevt2p )  /* 2 players - English title screen - "Warning" message in the ROM (not displayed) */
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "799x02.k11",   0x10000, 0x08000, CRC(42cfc650) SHA1(2d1918ebc0d93a2356ad995a6854dbde7c3b8daf) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "799x02.k11",   0x00000, 0x10000, CRC(42cfc650) SHA1(2d1918ebc0d93a2356ad995a6854dbde7c3b8daf) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
@@ -594,11 +587,10 @@ ROM_START( mainevt2p )  /* 2 players - English title screen - "Warning" message 
 ROM_END
 
 ROM_START( ringohja )   /* 2 players - Japan title screen - "Warning" message in the ROM (displayed) */
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "799n02.k11",   0x10000, 0x08000, CRC(f9305dd0) SHA1(7135053be9d46ac9c09ab63eca1eb71825a71a13) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "799n02.k11",   0x00000, 0x10000, CRC(f9305dd0) SHA1(7135053be9d46ac9c09ab63eca1eb71825a71a13) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
@@ -623,11 +615,10 @@ ROM_END
 
 
 ROM_START( devstors )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "890z02.k11",  0x10000, 0x08000, CRC(ebeb306f) SHA1(838fcfe95dfedd61f21f34301d48e337db765ab2) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "890z02.k11",  0x00000, 0x10000, CRC(ebeb306f) SHA1(838fcfe95dfedd61f21f34301d48e337db765ab2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "k052109", 0 )    /* tiles */
@@ -648,11 +639,10 @@ ROM_START( devstors )
 ROM_END
 
 ROM_START( devstors2 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "890x02.k11",  0x10000, 0x08000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "890x02.k11",  0x00000, 0x10000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "k052109", 0 )    /* tiles */
@@ -673,11 +663,10 @@ ROM_START( devstors2 )
 ROM_END
 
 ROM_START( devstors3 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "890v02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "890v02.k11",   0x00000, 0x10000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "k052109", 0 )    /* tiles */
@@ -698,11 +687,10 @@ ROM_START( devstors3 )
 ROM_END
 
 ROM_START( garuka )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "890w02.k11",   0x10000, 0x08000, CRC(b2f6f538) SHA1(95dad3258a2e4c5648d0fc22c06fa3e2da3b5ed1) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "890w02.k11",   0x00000, 0x10000, CRC(b2f6f538) SHA1(95dad3258a2e4c5648d0fc22c06fa3e2da3b5ed1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "k052109", 0 )    /* tiles */
@@ -724,11 +712,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,  0,        mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mainevto, mainevt,  mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. F)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. Z)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Devastators (ver. X)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. V)", GAME_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Garuka (Japan ver. W)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. F)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. Z)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Devastators (ver. X)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. V)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Garuka (Japan ver. W)", MACHINE_SUPPORTS_SAVE )

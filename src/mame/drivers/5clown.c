@@ -1224,6 +1224,6 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE INPUT   INIT    ROT    COMPANY  FULLNAME                      FLAGS... */
-GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

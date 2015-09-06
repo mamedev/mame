@@ -729,7 +729,7 @@ void mz2500_state::mz2500_reconfigure_screen()
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	machine().first_screen()->configure(720, 480, visarea, machine().first_screen()->frame_period().attoseconds);
+	machine().first_screen()->configure(720, 480, visarea, machine().first_screen()->frame_period().attoseconds());
 
 	/* calculate CG window parameters here */
 	m_cg_vs = (m_cg_reg[0x08]) | ((m_cg_reg[0x09]<<8) & 1);
@@ -2197,5 +2197,5 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,             0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2500", GAME_IMPERFECT_GRAPHICS )
-COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2520", GAME_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+COMP( 1985, mz2500,   0,             0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface

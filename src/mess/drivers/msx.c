@@ -22,7 +22,8 @@
 **
 **
 ** Todo/known issues:
-** - piopx7/piopx7uk/piopxv60: Laserdisc integration doesn't exist
+** - piopx7/piopx7uk/piopxv60: Pioneer System Remote (home entertainment/Laserdisc control) not implemented
+** - piopx7: Dump is from a PAL (EU/AU) machine, we have no known good dumps from JP or US NTSC machines
 ** - spc800: Haven't been able to test operation of the han rom yet
 ** - svi728: Expansion slot not emulated
 ** - svi738: v9938 not emulated
@@ -79,6 +80,13 @@
 ** - cpg120: Remove ports
 ** - cpg120: Add V9958
 **
+** TODO:
+** - Add T6950 support. T6950 is selectable between pal and ntsc by a pin.
+**
+** Possibly missing machines:
+** - Sanyo MPC-1 (T6950)
+** - Toshibo HX-51i (T7937)
+** - Sony HB-101 (TMS9118)
 ************************************************************************
 
 This following list is probably incomplete. Corrections are welcome.
@@ -627,10 +635,6 @@ static INPUT_PORTS_START( msx_dips )
 	PORT_DIPNAME( 0x40, 0, "Swap game port 1 and 2")
 	PORT_DIPSETTING( 0, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME ( 0x03, 0, "Render resolution")
-	PORT_DIPSETTING( 0, DEF_STR( High ))
-	PORT_DIPSETTING( 1, DEF_STR( Low ))
-	PORT_DIPSETTING( 2, "Auto" )
 
 	PORT_START("MOUSE0")
 	PORT_BIT( 0xff00, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
@@ -1395,7 +1399,77 @@ static MACHINE_CONFIG_DERIVED( msx_ntsc, msx )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( msx_tms9118, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9118, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9128, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9918, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9918, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9918a, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9928, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( msx_pal, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9129, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9929, msx )
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1426,7 +1500,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V9938_ADD("v9938", "screen", 0x20000, XTAL_21_4772MHz)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1491,7 +1565,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1592,6 +1666,7 @@ static MACHINE_CONFIG_DERIVED( ax170, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T7937 (in ax170mk2)
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("arab", 1, 0, 1, 2, "maincpu", 0x8000)
@@ -1650,7 +1725,7 @@ ROM_START (canonv20)
 	ROM_LOAD ("v20bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( canonv20, msx_pal )
+static MACHINE_CONFIG_DERIVED( canonv20, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1698,9 +1773,10 @@ ROM_START (mx10)
 	ROM_LOAD( "mx10bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( mx10, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( mx10, msx_tms9118 )
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
+	// Z80: uPD780C-1
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 3, 1) // 16KB RAM
@@ -1720,6 +1796,7 @@ ROM_END
 static MACHINE_CONFIG_DERIVED( mx15, msx_ntsc )
 	// FDC: None, 0 drives
 	// 3 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 3, 1) // 16KB RAM
@@ -1756,13 +1833,14 @@ ROM_START (pv7)
 	ROM_LOAD("pv7bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( pv7, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( pv7, msx_tms9118 )
 	// AY8910?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot + expansion slot, or 2 cartridge slots?
 	// By adding a Casio KB-7 2 additional cartridge slots become available and 8KB extra RAM?
 	// No cassette port
 	// No printer port
+	// Z80: uPD780C-1
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 3, 1)   /* 8KB RAM */
@@ -1780,7 +1858,7 @@ ROM_START (pv16)
 	ROM_LOAD("pv16.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( pv16, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( pv16, msx_tms9118 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -1868,7 +1946,7 @@ ROM_START (dpc200)
 	ROM_LOAD ("200han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( dpc200, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( dpc200, msx_tms9918 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1909,7 +1987,7 @@ ROM_START (cpc50a)
 	ROM_LOAD ("50abios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cpc50a, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cpc50a, msx_tms9918 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1932,7 +2010,7 @@ ROM_START (cpc50b)
 	ROM_LOAD ("50bbios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cpc50b, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cpc50b, msx_tms9118 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1954,7 +2032,7 @@ ROM_START (cpc51)
 	ROM_LOAD ("51bios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cpc51, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cpc51, msx_tms9118 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -2016,10 +2094,11 @@ ROM_START (fspc800)
 	ROM_LOAD ("spc800bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( fspc800, msx_pal )
+static MACHINE_CONFIG_DERIVED( fspc800, msx_tms9929 )
 	// AY8910?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// Z80: GSS Z8400APS
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 1, 0, 0, 4)  /* 64KB RAM */
@@ -2101,7 +2180,7 @@ ROM_START (gsfc200)
 	ROM_LOAD ("fc200bios.rom.u5b", 0x4000, 0x4000, CRC(1a99b1a1) SHA1(e18f72271b64693a2a2bc226e1b9ebd0448e07c0))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( gsfc200, msx_pal )
+static MACHINE_CONFIG_DERIVED( gsfc200, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2165,7 +2244,7 @@ ROM_START (expert10)
 	ROM_LOAD ("expbios.rom", 0x0000, 0x8000, CRC(07610d77) SHA1(ef3e010eb57e4476700a3bbff9d2119ab3acdf62))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( expert10, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( expert10, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2184,7 +2263,7 @@ ROM_START (expert11)
 	ROM_LOAD ("expbios11.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( expert11, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( expert11, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2227,7 +2306,7 @@ static MACHINE_CONFIG_DERIVED( expertdp, msx_ntsc )
 	// AY8910/YM2149?
 	// FDC: mb8877a, 1 3.5" DSDD drive
 	// 2 Cartridge slots
-	// MSX Engine T7937A
+	// MSX Engine T7937A (also VDP)
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -2319,6 +2398,7 @@ static MACHINE_CONFIG_DERIVED( mbh50, msx_ntsc )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("rom", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -2457,7 +2537,7 @@ ROM_START (cf1200)
 	ROM_LOAD ("1200bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cf1200, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cf1200, msx_tms9918a )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2586,7 +2666,7 @@ ROM_START (fs4000)
 	ROM_LOAD ("4000kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( fs4000, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( fs4000, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2613,7 +2693,7 @@ ROM_START (fs4000a)
 	ROM_LOAD ("4000kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( fs4000a, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( fs4000a, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2675,7 +2755,7 @@ ROM_START (cf2700g)
 	ROM_LOAD ("cf2700g.rom", 0x0000, 0x8000, CRC(4aa194f4) SHA1(69bf27b610e11437dad1f7a1c37a63179a293d12))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cf2700g, msx_pal )
+static MACHINE_CONFIG_DERIVED( cf2700g, msx_tms9929 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2734,7 +2814,7 @@ ROM_START (vg8000)
 	ROM_LOAD ("8000bios.rom", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg8000, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg8000, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2755,7 +2835,7 @@ ROM_START (vg8010)
 	ROM_LOAD ("8010bios.rom", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg8010, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg8010, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2776,7 +2856,7 @@ ROM_START (vg8010f)
 	ROM_LOAD ("8010fbios.rom", 0x0000, 0x8000, CRC(df57c9ca) SHA1(898630ad1497dc9a329580c682ee55c4bcb9c30c))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg8010f, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg8010f, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2797,7 +2877,7 @@ ROM_START (vg802000)
 	ROM_LOAD ("8020-00bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg802000, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg802000, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2817,7 +2897,7 @@ ROM_START (vg802020)
 	ROM_LOAD ("8020-20bios.rom", 0x0000, 0x8000, CRC(a317e6b4) SHA1(e998f0c441f4f1800ef44e42cd1659150206cf79))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg802020, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg802020, msx_tms9129 )
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2862,9 +2942,29 @@ ROM_START (piopx7)
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( piopx7, msx_pal )
-	// AY8910/YM2149?
+	// TMS9129NL VDP with sync/overlay interface
+	// AY-3-8910 PSG
+	// Pioneer System Remote (SR) system control interface
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+
+	// Line-level stereo audio input can be mixed with sound output, balance controlled with slider on front panel
+	// Front-panel switch allows audio input to be passed through bypassing the mixing circuit
+	// Line input can be muted under software control, e.g. when loading data from Laserdisc
+	// Right channel of line input is additionally routed via some signal processing to the cassette input for loading data from Laserdisc
+
+	// PSG port B bits 0-5 can be used to drive controller pins 1-6, 1-7, 2-6, 2-7, 1-8 and 2-8 low if 0 is written
+
+	// Slot #2 7FFE is the SR control register LCON
+	// Bit 7 R = /ACK (significant with acknowledge 1->0 with respect to remote control signal transmission)
+	// Bit 0 R = RMCLK (clock produced by dividing CLK1/CLK2 frequency by 128)
+	// Bit 0 W = /REM (high output with bit serial data output generated in synchronisation with RMCLK)
+
+	// Slot #2 7FFF is the video overlay control register VCON
+	// Bit 7 R = /EXTV (low when external video input available; high when not available)
+	// Bit 7 W = Mute (line input signal muting)
+	// Bit 0 R = INTEXV (interrupt available when external video signal OFF, reset on read)
+	// Bit 0 W = /OVERLAY (0 = superimpose, 1 = non-superimpose)
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 2, 2)   /* 32KB RAM */
@@ -2885,7 +2985,7 @@ ROM_START (piopx7uk)
 	ROM_LOAD ("videoart.rom",    0xc000, 0x8000, CRC(0ba148dc) SHA1(b7b4e4cd40a856bb071976e6cf0f5e546fc86a78))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( piopx7uk, msx_pal )
+static MACHINE_CONFIG_DERIVED( piopx7uk, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2908,7 +3008,7 @@ ROM_START (piopxv60)
 	ROM_FILL( 0xa000, 0x2000, 0x6E )
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( piopxv60, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( piopxv60, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2995,6 +3095,8 @@ static MACHINE_CONFIG_DERIVED( mpc200, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
+	// T6950
+	// T7775 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -3031,7 +3133,7 @@ ROM_START (phc28l)
 	ROM_LOAD ("28lbios.rom", 0x0000, 0x8000, CRC(d2110d66) SHA1(d3af963e2529662eae63f04a2530454685a1989f))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( phc28l, msx_pal )
+static MACHINE_CONFIG_DERIVED( phc28l, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3051,7 +3153,7 @@ ROM_START (phc28s)
 	ROM_LOAD ("28sbios.rom", 0x0000, 0x8000, CRC(e5cf6b3c) SHA1(b1cce60ef61c058f5e42ef7ac635018d1a431168))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( phc28s, msx_pal )
+static MACHINE_CONFIG_DERIVED( phc28s, msx_tms9929 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3091,7 +3193,7 @@ ROM_START (hotbit11)
 	ROM_LOAD ("hotbit11.rom", 0x0000, 0x8000, CRC(b6942694) SHA1(663f8c512d04d213fa616b0db5eefe3774012a4b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hotbit11, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hotbit11, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3111,7 +3213,7 @@ ROM_START (hotbit12)
 	ROM_LOAD ("hotbit12.rom", 0x0000, 0x8000, CRC(f59a4a0c) SHA1(9425815446d468058705bae545ffa13646744a87))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hotbit12, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hotbit12, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3198,6 +3300,7 @@ static MACHINE_CONFIG_DERIVED( hb10p, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -3218,6 +3321,7 @@ static MACHINE_CONFIG_DERIVED( hb20p, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -3390,7 +3494,7 @@ ROM_START (hb75p)
 	ROM_LOAD ("75pnote.ic44", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hb75p, msx_pal )
+static MACHINE_CONFIG_DERIVED( hb75p, msx_tms9929 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3434,7 +3538,7 @@ ROM_START (hb701fd)
 	ROM_LOAD ("hb701fddisk.rom", 0x8000, 0x4000, CRC(71961d9d) SHA1(2144036d6573d666143e890e5413956bfe8f66c5))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hb701fd, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hb701fd, msx_tms9928 )
 	// YM2149 (in S-1985)
 	// FDC: WD2793?, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3461,7 +3565,7 @@ ROM_START (svi728)
 //  ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( svi728, msx_pal )
+static MACHINE_CONFIG_DERIVED( svi728, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slots, 1 Expansion slot (eg for SVI-707)
@@ -3670,7 +3774,7 @@ ROM_START (tadpc200)
 	ROM_LOAD ("dpc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( tadpc200, msx_pal )
+static MACHINE_CONFIG_DERIVED( tadpc200, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3852,11 +3956,11 @@ ROM_START (hx20)
 	ROM_LOAD ("hx20word.rom", 0x8000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx20, msx_pal )
+static MACHINE_CONFIG_DERIVED( hx20, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-	// T6950 VDP instead of TMS9928A
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram1", 0, 0, 2, 2)   /* 32KB RAM */
@@ -3876,7 +3980,7 @@ ROM_START (hx20i)
 	ROM_LOAD ("hx20iword.rom", 0x8000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx20i, msx_pal )
+static MACHINE_CONFIG_DERIVED( hx20i, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3903,7 +4007,7 @@ ROM_START (hx21)
 	ROM_LOAD ("hx21kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx21, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hx21, msx_tms9928 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3974,11 +4078,12 @@ ROM_START (hx22i)
 	ROM_LOAD ("hx22iword.rom", 0x8000, 0x8000, CRC(f9e29c66) SHA1(3289336b2c12161fd926a7e5ce865770ae7038af))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx22i, msx_pal )
+static MACHINE_CONFIG_DERIVED( hx22i, msx_tms9929 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// RS232C builtin?
+	// Z80: LH0080A
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram1", 0, 0, 2, 2)   /* 32KB RAM */
@@ -4101,7 +4206,7 @@ ROM_START (cx5m)
 	ROM_LOAD ("cx5mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cx5m, msx_pal )
+static MACHINE_CONFIG_DERIVED( cx5m, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -8160,8 +8265,8 @@ MACHINE_CONFIG_END
 
 /*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT     INIT              COMPANY       FULLNAME */
 /* MSX1 */
-COMP(1986, ax150,      0,        0, ax150,      msx,      driver_device, 0, "Al Alamiah", "AX-150 (MSX1)", 0)
-COMP(1986, ax170,      0,        0, ax170,      msx,      driver_device, 0, "Al Alamiah", "AX-170 (MSX1)", 0)
+COMP(1986, ax150,      0,        0, ax150,      msx,      driver_device, 0, "Al Alamiah", "AX-150 (Arabic) (MSX1)", 0)
+COMP(1986, ax170,      0,        0, ax170,      msx,      driver_device, 0, "Al Alamiah", "AX-170 (Arabic) (MSX1)", 0)
 COMP(1983, canonv8,    0,        0, canonv8,    msx,      driver_device, 0, "Canon", "V-8 (MSX1)", 0)
 COMP(1983, canonv10,   canonv20, 0, canonv10,   msx,      driver_device, 0, "Canon", "V-10 (MSX1)", 0)
 COMP(1983, canonv20,   0,        0, canonv20,   msx,      driver_device, 0, "Canon", "V-20 (MSX1)", 0)
@@ -8216,7 +8321,7 @@ COMP(1985, fs4000a,    fs4000,   0, fs4000a,    msxjp,    driver_device, 0, "Nat
 COMP(1983, phc2,       0,        0, phc2,       msx,      driver_device, 0, "Olympia", "PHC-2 (MSX1)" , 0)
 COMP(19??, phc28,      0,        0, phc28,      msx,      driver_device, 0, "Olympia", "PHC-28 (MSX1)", 0)
 COMP(1984, cf2700g,    0,        0, cf2700g,    msx,      driver_device, 0, "Panasonic", "CF-2700G (Germany) (MSX1)", 0)
-COMP(198?, perfect1,   0,        0, perfect1,   msx,      driver_device, 0, "Perfect", "Perfect1 (MSX1)", GAME_NOT_WORKING)
+COMP(198?, perfect1,   0,        0, perfect1,   msx,      driver_device, 0, "Perfect", "Perfect1 (MSX1)", MACHINE_NOT_WORKING)
 COMP(1983, nms801,     0,        0, nms801,     msx,      driver_device, 0, "Philips", "NMS-801 (MSX1)", 0)
 COMP(1984, vg8000,     vg8010,   0, vg8000,     msx,      driver_device, 0, "Philips", "VG-8000 (MSX1)", 0)
 COMP(1984, vg8010,     0,        0, vg8010,     msx,      driver_device, 0, "Philips", "VG-8010 (MSX1)", 0)
@@ -8270,9 +8375,9 @@ COMP(1984, hx10s,      hx10,     0, hx10s,      msx,      driver_device, 0, "Tos
 COMP(1984, hx10sa,     hx10,     0, hx10sa,     msxjp,    driver_device, 0, "Toshiba", "HX-10SA (MSX1)", 0)
 COMP(1984, hx20,       0,        0, hx20,       msx,      driver_device, 0, "Toshiba", "HX-20 (MSX1)", 0)
 COMP(1984, hx20i,      hx20,     0, hx20i,      msx,      driver_device, 0, "Toshiba", "HX-20I (MSX1)", 0)
-COMP(1984, hx21,       0,        0, hx21,       msxjp,    driver_device, 0, "Toshiba", "HX-21 (MSX1)", GAME_NOT_WORKING) // Does not go into firmware
+COMP(1984, hx21,       0,        0, hx21,       msxjp,    driver_device, 0, "Toshiba", "HX-21 (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware
 COMP(1984, hx21i,      hx21,     0, hx21i,      msx,      driver_device, 0, "Toshiba", "HX-21I (MSX1)", 0)
-COMP(1984, hx22,       0,        0, hx22,       msxjp,    driver_device, 0, "Toshiba", "HX-22 (MSX1)", GAME_NOT_WORKING) // Does not go into firmware
+COMP(1984, hx22,       0,        0, hx22,       msxjp,    driver_device, 0, "Toshiba", "HX-22 (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware
 COMP(1984, hx22i,      hx22,     0, hx22i,      msx,      driver_device, 0, "Toshiba", "HX-22I (MSX1)", 0)
 COMP(198?, hc5,        hc7,      0, hc5,        msxjp,    driver_device, 0, "Victor", "HC-5 (MSX1)", 0)
 COMP(198?, hc6,        hc7,      0, hc6,        msxjp,    driver_device, 0, "Victor", "HC-6 (MSX1)", 0)
@@ -8293,8 +8398,8 @@ COMP(1984, yc64,       0,        0, yc64,       msx,      driver_device, 0, "Yas
 COMP(1984, mx64,       0,        0, mx64,       msxkr,    driver_device, 0, "Yeno", "MX64 (MSX1)", 0)
 
 /* MSX2 */
-COMP(1986, ax350,      0,        0, ax350,      msx2,     driver_device, 0, "Al Alamiah", "AX-350 (MSX2)", 0)
-COMP(1986, ax370,      0,        0, ax370,      msx2,     driver_device, 0, "Al Alamiah", "AX-370 (MSX2)", 0)
+COMP(1986, ax350,      0,        0, ax350,      msx2,     driver_device, 0, "Al Alamiah", "AX-350 (Arabic) (MSX2)", 0)
+COMP(1986, ax370,      0,        0, ax370,      msx2,     driver_device, 0, "Al Alamiah", "AX-370 (Arabic) (MSX2)", 0)
 COMP(1985, canonv25,   0,        0, canonv25,   msx2,     driver_device, 0, "Canon", "V-25 (MSX2)", 0)
 COMP(1985, canonv30,   0,        0, canonv30,   msx2,     driver_device, 0, "Canon", "V-30 (MSX2)", 0)
 COMP(1985, canonv30f,  canonv30, 0, canonv30f,  msx2,     driver_device, 0, "Canon", "V-30F (MSX2)", 0)
@@ -8304,10 +8409,10 @@ COMP(1985, cpc330k,    0,        0, cpc330k,    msx2kr,   driver_device, 0, "Dae
 COMP(1988, cpc400,     0,        0, cpc400,     msx2kr,   driver_device, 0, "Daewoo", "X-II CPC-400 (Korea) (MSX2)", 0)
 COMP(1988, cpc400s,    0,        0, cpc400s,    msx2kr,   driver_device, 0, "Daewoo", "X-II CPC-400S (Korea) (MSX2)", 0)
 COMP(1990, cpc61,      0,        0, cpc61,      msx2kr,   driver_device, 0, "Daewoo", "Zemmix CPC-61 (Korea) (MSX2)", 0)
-COMP(1991, cpg120,     0,        0, cpg120,     msx2kr,   driver_device, 0, "Daewoo", "Zemmix CPG-120 Normal (Korea) (MSX2)", GAME_NOT_WORKING) // v9958 not added
+COMP(1991, cpg120,     0,        0, cpg120,     msx2kr,   driver_device, 0, "Daewoo", "Zemmix CPG-120 Normal (Korea) (MSX2)", MACHINE_NOT_WORKING) // v9958 not added
 COMP(198?, fpc900,     0,        0, fpc900,     msx2,     driver_device, 0, "Fenner", "FPC-900 (MSX2)", 0)
 COMP(1986, expert20,   0,        0, expert20,   msx2,     driver_device, 0, "Gradiente", "Expert 2.0 (Brazil) (MSX2)", 0)
-COMP(198?, mbh70,      0,        0, mbh70,      msx2jp,   driver_device, 0, "Hitachi", "MB-H70 (MSX2)", GAME_NOT_WORKING) // Firmware not working
+COMP(198?, mbh70,      0,        0, mbh70,      msx2jp,   driver_device, 0, "Hitachi", "MB-H70 (MSX2)", MACHINE_NOT_WORKING) // Firmware not working
 COMP(1987, kmc5000,    0,        0, kmc5000,    msx2jp,   driver_device, 0, "Kawai", "KMC-5000 (MSX2)", 0)
 COMP(1985, mlg1,       0,        0, mlg1,       msx2,     driver_device, 0, "Mitsubishi", "ML-G1 (MSX2)", 0)
 COMP(198?, mlg3,       0,        0, mlg3,       msx2,     driver_device, 0, "Mitsubishi", "ML-G3 (MSX2)", 0)
@@ -8327,7 +8432,7 @@ COMP(1987, fsa1fm,     0,        0, fsa1fm,     msx2jp,   driver_device, 0, "Pan
 COMP(1986, nms8220,    nms8220a, 0, nms8220,    msx2,     driver_device, 0, "Philips", "NMS-8220 (12-jun-1986) (MSX2)", 0)
 COMP(1986, nms8220a,   0,        0, nms8220a,   msx2,     driver_device, 0, "Philips", "NMS-8220 (13-aug-1986) (MSX2)", 0)
 COMP(1986, vg8230,     0,        0, vg8230,     msx2,     driver_device, 0, "Philips", "VG-8230 (MSX2)", 0)
-COMP(19??, vg8230j,    vg8230,   0, vg8230j,    msx2jp,   driver_device, 0, "Philips", "VG-8230J (MSX2)", GAME_NOT_WORKING) // Screen flashes a few times before going into basic
+COMP(19??, vg8230j,    vg8230,   0, vg8230j,    msx2jp,   driver_device, 0, "Philips", "VG-8230J (MSX2)", MACHINE_NOT_WORKING) // Screen flashes a few times before going into basic
 COMP(1986, vg8235,     0,        0, vg8235,     msx2,     driver_device, 0, "Philips", "VG-8235 (MSX2)", 0)
 COMP(1986, vg8235f,    vg8235,   0, vg8235f,    msx2,     driver_device, 0, "Philips", "VG-8235F (MSX2)", 0)
 COMP(1986, vg8240,     0,        0, vg8240,     msx2,     driver_device, 0, "Philips", "VG-8240 (MSX2)", 0)
@@ -8338,24 +8443,24 @@ COMP(1986, nms8250f,   nms8255,  0, nms8250f,   msx2,     driver_device, 0, "Phi
 COMP(19??, nms8250j,   nms8255,  0, nms8250j,   msx2jp,   driver_device, 0, "Philips", "NMS-8250J (MSX2)", 0)
 COMP(1986, nms8255,    0,        0, nms8255,    msx2,     driver_device, 0, "Philips", "NMS-8255 (MSX2)", 0)
 COMP(1986, nms8255f,   nms8255,  0, nms8255f,   msx2,     driver_device, 0, "Philips", "NMS-8255F (MSX2)", 0) // French keyboard
-COMP(1986, nms8260,    0,        0, nms8260,    msx2,     driver_device, 0, "Philips", "NMS-8260 (Prototype) (MSX2)", GAME_NOT_WORKING)
+COMP(1986, nms8260,    0,        0, nms8260,    msx2,     driver_device, 0, "Philips", "NMS-8260 (Prototype) (MSX2)", MACHINE_NOT_WORKING)
 COMP(1986, nms8280,    0,        0, nms8280,    msx2,     driver_device, 0, "Philips", "NMS-8280 (MSX2)", 0)
 COMP(1986, nms8280f,   nms8280,  0, nms8280f,   msx2,     driver_device, 0, "Philips", "NMS-8280F (MSX2)", 0) // French keyboard
 COMP(1986, nms8280g,   nms8280,  0, nms8280g,   msx2,     driver_device, 0, "Philips", "NMS-8280G (MSX2)", 0)
-COMP(19??, mpc2300,    0,        0, mpc2300,    msx2,     driver_device, 0, "Sanyo", "MPC-2300 (MSX2)", GAME_NOT_WORKING) // Keyboard responds differently
-COMP(198?, mpc2500f,   0,        0, mpc2500f,   msx2,     driver_device, 0, "Sanyo", "MPC-2500FD (MSX2)", GAME_NOT_WORKING) // Russian keyboard?
+COMP(19??, mpc2300,    0,        0, mpc2300,    msx2,     driver_device, 0, "Sanyo", "MPC-2300 (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
+COMP(198?, mpc2500f,   0,        0, mpc2500f,   msx2,     driver_device, 0, "Sanyo", "MPC-2500FD (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard?
 COMP(19??, mpc25fd,    0,        0, mpc25fd,    msx2,     driver_device, 0, "Sanyo", "Wavy MPC-25FD (MSX2)", 0)
-COMP(198?, mpc27,      0,        0, mpc27,      msx2jp,   driver_device, 0, "Sanyo", "Wavy MPC-27 (MSX2)", GAME_NOT_WORKING) // Light pen not emulated
+COMP(198?, mpc27,      0,        0, mpc27,      msx2jp,   driver_device, 0, "Sanyo", "Wavy MPC-27 (MSX2)", MACHINE_NOT_WORKING) // Light pen not emulated
 COMP(1988, phc23,      0,        0, phc23,      msx2jp,   driver_device, 0, "Sanyo", "Wavy PHC-23 (Japan) (MSX2)", 0)
 COMP(198?, phc55fd2,   0,        0, phc55fd2,   msx2jp,   driver_device, 0, "Sanyo", "Wavy PHC-55FD2 (MSX2)", 0)
-COMP(198?, phc77,      0,        0, phc77,      msx2jp,   driver_device, 0, "Sanyo", "Wavy PHC-77 (MSX2)", GAME_NOT_WORKING) // Firmware not emulated
-COMP(1986, hbf1,       0,        0, hbf1,       msx2jp,   driver_device, 0, "Sony", "HB-F1 (Japan) (MSX2)", GAME_NOT_WORKING ) // Screen stays a single color after a while
-COMP(1987, hbf12,      0,        0, hbf12,      msx2jp,   driver_device, 0, "Sony", "HB-F1II (Japan) (MSX2)", GAME_NOT_WORKING ) // Screen stays a single color after a while
+COMP(198?, phc77,      0,        0, phc77,      msx2jp,   driver_device, 0, "Sanyo", "Wavy PHC-77 (MSX2)", MACHINE_NOT_WORKING) // Firmware not emulated
+COMP(1986, hbf1,       0,        0, hbf1,       msx2jp,   driver_device, 0, "Sony", "HB-F1 (Japan) (MSX2)", MACHINE_NOT_WORKING ) // Screen stays a single color after a while
+COMP(1987, hbf12,      0,        0, hbf12,      msx2jp,   driver_device, 0, "Sony", "HB-F1II (Japan) (MSX2)", MACHINE_NOT_WORKING ) // Screen stays a single color after a while
 COMP(1987, hbf1xd,     0,        0, hbf1xd,     msx2jp,   driver_device, 0, "Sony", "HB-F1XD (Japan) (MSX2)", 0)
 COMP(1988, hbf1xdm2,   0,        0, hbf1xdm2,   msx2jp,   driver_device, 0, "Sony", "HB-F1XDMK2 (Japan) (MSX2)", 0)
 COMP(19??, hbf5,       0,        0, hbf5,       msx2,     driver_device, 0, "Sony", "HB-F5 (MSX2)", 0)
 COMP(1985, hbf9p,      0,        0, hbf9p,      msx2,     driver_device, 0, "Sony", "HB-F9P (MSX2)", 0)
-COMP(19??, hbf9pr,     hbf9p,    0, hbf9pr,     msx2,     driver_device, 0, "Sony", "HB-F9P Russion (MSX2)", GAME_NOT_WORKING) // Keyboard responds differently
+COMP(19??, hbf9pr,     hbf9p,    0, hbf9pr,     msx2,     driver_device, 0, "Sony", "HB-F9P Russion (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
 COMP(1985, hbf9s,      hbf9p,    0, hbf9s,      msx2,     driver_device, 0, "Sony", "HB-F9S (MSX2)", 0)
 COMP(1986, hbf500,     hbf500p,  0, hbf500,     msx2jp,   driver_device, 0, "Sony", "HB-F500 (Japan) (MSX2)", 0)
 COMP(198?, hbf500f,    hbf500p,  0, hbf500f,    msx2,     driver_device, 0, "Sony", "HB-F500F (MSX2)", 0) // French keyboard?
@@ -8379,25 +8484,25 @@ COMP(1985, hx33,       0,        0, hx33,       msx2jp,   driver_device, 0, "Tos
 COMP(1985, hx34,       hx34i,    0, hx34,       msx2jp,   driver_device, 0, "Toshiba", "HX-34 (MSX2)", 0)
 COMP(1985, hx34i,      0,        0, hx34i,      msx,      driver_device, 0, "Toshiba", "HX-34I (MSX2)", 0)
 COMP(1985, fstm1,      0,        0, fstm1,      msx,      driver_device, 0, "Toshiba", "FS-TM1 (MSX2)", 0)
-COMP(198?, victhc90,   victhc95, 0, victhc90,   msxjp,    driver_device, 0, "Victor", "HC-90 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(1986, victhc95,   0,        0, victhc95,   msxjp,    driver_device, 0, "Victor", "HC-95 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(1986, victhc95a,  victhc95, 0, victhc95a,  msxjp,    driver_device, 0, "Victor", "HC-95A (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(198?, victhc90,   victhc95, 0, victhc90,   msxjp,    driver_device, 0, "Victor", "HC-90 (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95,   0,        0, victhc95,   msxjp,    driver_device, 0, "Victor", "HC-95 (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95a,  victhc95, 0, victhc95a,  msxjp,    driver_device, 0, "Victor", "HC-95A (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(1986, cx7m,       cx7m128,  0, cx7m,       msx2,     driver_device, 0, "Yamaha", "CX7M (MSX2)", 0)
 COMP(1986, cx7m128,    0,        0, cx7m128,    msx2,     driver_device, 0, "Yamaha", "CX7M/128 (MSX2)", 0)
-COMP(198?, y503iiir,   0,        0, y503iiir,   msx2,     driver_device, 0, "Yamaha", "YIS-503 III R (Russian) (MSX2)", GAME_NOT_WORKING) // Russian keyboard, floppy support broken
-COMP(198?, y503iiire,  y503iiir, 0, y503iiire,  msx2,     driver_device, 0, "Yamaha", "YIS-503 III R (Estonian) (MSX2)", GAME_NOT_WORKING) // Russian/Estonian keyboard, floppy support broken
+COMP(198?, y503iiir,   0,        0, y503iiir,   msx2,     driver_device, 0, "Yamaha", "YIS-503 III R (Russian) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard, floppy support broken
+COMP(198?, y503iiire,  y503iiir, 0, y503iiire,  msx2,     driver_device, 0, "Yamaha", "YIS-503 III R (Estonian) (MSX2)", MACHINE_NOT_WORKING) // Russian/Estonian keyboard, floppy support broken
 COMP(1985, yis60464,   yis604,   0, yis60464,   msx2jp,   driver_device, 0, "Yamaha", "YIS604 (64KB) (MSX2)", 0)
 COMP(1985, yis604,     0,        0, yis604,     msx2jp,   driver_device, 0, "Yamaha", "YIS604 (128KB) (MSX2)", 0)
-COMP(198?, y805128,    y805256,  0, y805128,    msx2jp,   driver_device, 0, "Yamaha", "YIS805/128 (Russian) (MSX2)", GAME_NOT_WORKING) // Floppy support broken
-COMP(198?, y805128r2,  y805256,  0, y805128r2,  msx2jp,   driver_device, 0, "Yamaha", "YIS805R2/128 (Russian) (MSX2)", GAME_NOT_WORKING) // Floppy support broken
-COMP(198?, y805128r2e, y805256,  0, y805128r2e, msx2jp,   driver_device, 0, "Yamaha", "YIS805R2/128 (Estonian) (MSX2)", GAME_NOT_WORKING) // Floppy support broken
-COMP(198?, y805256,    0,        0, y805256,    msx2jp,   driver_device, 0, "Yamaha", "YIS805/256 (Russian) (MSX2)", GAME_NOT_WORKING) // Floppy support broken
+COMP(198?, y805128,    y805256,  0, y805128,    msx2jp,   driver_device, 0, "Yamaha", "YIS805/128 (Russian) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
+COMP(198?, y805128r2,  y805256,  0, y805128r2,  msx2jp,   driver_device, 0, "Yamaha", "YIS805R2/128 (Russian) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
+COMP(198?, y805128r2e, y805256,  0, y805128r2e, msx2jp,   driver_device, 0, "Yamaha", "YIS805R2/128 (Estonian) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
+COMP(198?, y805256,    0,        0, y805256,    msx2jp,   driver_device, 0, "Yamaha", "YIS805/256 (Russian) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
 
 /* MSX2+ */
-COMP(19??, expert3i,   0,        0, expert3i,   msx2,     driver_device, 0, "Ciel", "Expert 3 IDE (MSX2+)", GAME_NOT_WORKING ) // Some hardware not emulated
-COMP(1996, expert3t,   0,        0, expert3t,   msx2,     driver_device, 0, "Ciel", "Expert 3 Turbo (MSX2+)", GAME_NOT_WORKING ) // Some hardware not emulated
-COMP(19??, expertac,   0,        0, expertac,   msx2,     driver_device, 0, "Gradiente", "Expert AC88+ (MSX2+)", GAME_NOT_WORKING ) // Some hardware not emulated
-COMP(19??, expertdx,   0,        0, expertdx,   msx2,     driver_device, 0, "Gradiente", "Expert DDX+ (MSX2+)", GAME_NOT_WORKING ) // Some hardware not emulated
+COMP(19??, expert3i,   0,        0, expert3i,   msx2,     driver_device, 0, "Ciel", "Expert 3 IDE (MSX2+)", MACHINE_NOT_WORKING ) // Some hardware not emulated
+COMP(1996, expert3t,   0,        0, expert3t,   msx2,     driver_device, 0, "Ciel", "Expert 3 Turbo (MSX2+)", MACHINE_NOT_WORKING ) // Some hardware not emulated
+COMP(19??, expertac,   0,        0, expertac,   msx2,     driver_device, 0, "Gradiente", "Expert AC88+ (MSX2+)", MACHINE_NOT_WORKING ) // Some hardware not emulated
+COMP(19??, expertdx,   0,        0, expertdx,   msx2,     driver_device, 0, "Gradiente", "Expert DDX+ (MSX2+)", MACHINE_NOT_WORKING ) // Some hardware not emulated
 COMP(1988, fsa1fx,     0,        0, fsa1fx,     msx2jp,   driver_device, 0, "Panasonic / Matsushita", "FS-A1FX (Japan) (MSX2+)", 0 )
 COMP(1988, fsa1wx,     fsa1wxa,  0, fsa1wx,     msx2jp,   driver_device, 0, "Panasonic / Matsushita", "FS-A1WX / 1st released version (Japan) (MSX2+)", 0 )
 COMP(1988, fsa1wxa,    0,        0, fsa1wxa,    msx2jp,   driver_device, 0, "Panasonic / Matsushita", "FS-A1WX / 2nd released version (Japan) (MSX2+)", 0 )
@@ -8411,5 +8516,5 @@ COMP(19??, hbf9sp,     0,        0, hbf9sp,     msx2jp,   driver_device, 0, "Son
 
 /* MSX Turbo-R */
 /* Temporary placeholders, Turbo-R hardware is not supported yet */
-COMP(19??, fsa1gt,     0,        0, fsa1gt,     msx2jp,   driver_device, 0, "Panasonic", "FS-A1GT (MSX Turbo-R)", GAME_NOT_WORKING)
-COMP(19??, fsa1st,     0,        0, fsa1st,     msx2jp,   driver_device, 0, "Panasonic", "FS-A1ST (MSX Turbo-R)", GAME_NOT_WORKING)
+COMP(19??, fsa1gt,     0,        0, fsa1gt,     msx2jp,   driver_device, 0, "Panasonic", "FS-A1GT (MSX Turbo-R)", MACHINE_NOT_WORKING)
+COMP(19??, fsa1st,     0,        0, fsa1st,     msx2jp,   driver_device, 0, "Panasonic", "FS-A1ST (MSX Turbo-R)", MACHINE_NOT_WORKING)

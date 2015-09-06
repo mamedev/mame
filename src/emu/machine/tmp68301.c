@@ -82,17 +82,20 @@ READ16_MEMBER(tmp68301_device::pdir_r)
 
 WRITE16_MEMBER(tmp68301_device::pdir_w)
 {
-	m_pdir = data;
+	COMBINE_DATA(&m_pdir);
 }
 
 READ16_MEMBER(tmp68301_device::pdr_r)
 {
-	return m_in_parallel_cb(0) & ~m_pdir;
+	return (m_in_parallel_cb(0) & ~m_pdir) | (m_pdr & m_pdir);
 }
 
 WRITE16_MEMBER(tmp68301_device::pdr_w)
 {
-	m_out_parallel_cb(0, data & m_pdir, mem_mask);
+	UINT16 old = m_pdr;
+	COMBINE_DATA(&m_pdr);
+	m_pdr = (old & ~m_pdir) | (m_pdr & m_pdir);
+	m_out_parallel_cb(0, m_pdr, mem_mask);
 }
 
 
@@ -105,6 +108,7 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 		m_iisr(0),
 		m_scr(0),
 		m_pdir(0),
+		m_pdr(0),
 		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, NULL, *ADDRESS_MAP_NAME(tmp68301_regs))
 {
 	memset(m_regs, 0, sizeof(m_regs));
@@ -133,6 +137,7 @@ void tmp68301_device::device_start()
 	save_item(NAME(m_iisr));
 	save_item(NAME(m_scr));
 	save_item(NAME(m_pdir));
+	save_item(NAME(m_pdr));
 }
 
 //-------------------------------------------------

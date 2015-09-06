@@ -1003,7 +1003,7 @@ void n64_periphs::vi_recalculate_resolution()
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
 
 	rectangle visarea = m_screen->visible_area();
-	attoseconds_t period = m_screen->frame_period().attoseconds;
+	attoseconds_t period = m_screen->frame_period().attoseconds();
 
 	if (width == 0 || height == 0)
 	{

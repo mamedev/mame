@@ -265,4 +265,4 @@ ROM_START(xforce)
 	// 5 x 27256 roms are undumped
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", MACHINE_IS_SKELETON_MECHANICAL)

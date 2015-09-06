@@ -49,4 +49,4 @@ ROM_START( hg_frd )
 ROM_END
 
 
-GAME( 198?,  hg_frd,  0,  haze,  haze, driver_device,  0,  ROT0,  "Hazel Grove",    "Fruit Deuce (Hazel Grove)",     GAME_IS_SKELETON_MECHANICAL)
+GAME( 198?,  hg_frd,  0,  haze,  haze, driver_device,  0,  ROT0,  "Hazel Grove",    "Fruit Deuce (Hazel Grove)",     MACHINE_IS_SKELETON_MECHANICAL)

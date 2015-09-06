@@ -364,7 +364,7 @@ MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
 --MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
-MACHINES["AT29040"] = true
+MACHINES["AT29X"] = true
 MACHINES["AT45DBXX"] = true
 MACHINES["ATAFLASH"] = true
 MACHINES["AY31015"] = true
@@ -764,17 +764,18 @@ function createMAMEProjects(_target, _subtarget, _name)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
-	
+
 	options {
 		"ForceCPP",
 	}
-	
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
+	MAME_DIR .. "src/emu/netlist",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
 	}
@@ -785,7 +786,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 		}
 end
 end
-	
+
 function createProjects_mame_arcade(_target, _subtarget)
 --------------------------------------------------
 -- the following files are general components and
@@ -1490,6 +1491,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/glass.c",
 	MAME_DIR .. "src/mame/video/glass.c",
 	MAME_DIR .. "src/mame/drivers/mastboy.c",
+	MAME_DIR .. "src/mame/drivers/rollext.c",
 	MAME_DIR .. "src/mame/drivers/splash.c",
 	MAME_DIR .. "src/mame/video/splash.c",
 	MAME_DIR .. "src/mame/drivers/targeth.c",
@@ -1736,7 +1738,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/bladestl.c",
 	MAME_DIR .. "src/mame/video/bladestl.c",
 	MAME_DIR .. "src/mame/drivers/blockhl.c",
-	MAME_DIR .. "src/mame/video/blockhl.c",
 	MAME_DIR .. "src/mame/drivers/bottom9.c",
 	MAME_DIR .. "src/mame/video/bottom9.c",
 	MAME_DIR .. "src/mame/drivers/chqflag.c",
@@ -1920,6 +1921,7 @@ files {
 	MAME_DIR .. "src/mame/video/k001006.c",
 	MAME_DIR .. "src/mame/video/k001005.c",
 	MAME_DIR .. "src/mame/video/k001604.c",
+	MAME_DIR .. "src/mame/video/k057714.c",
 }
 
 createMAMEProjects(_target, _subtarget, "matic")
@@ -2085,6 +2087,7 @@ files {
 	MAME_DIR .. "src/mame/machine/namcos1.c",
 	MAME_DIR .. "src/mame/video/namcos1.c",
 	MAME_DIR .. "src/mame/drivers/namcos10.c",
+	MAME_DIR .. "src/mame/machine/ns10crypt.c",
 	MAME_DIR .. "src/mame/drivers/namcos11.c",
 	MAME_DIR .. "src/mame/machine/ns11prot.c",
 	MAME_DIR .. "src/mame/drivers/namcos12.c",
@@ -2213,6 +2216,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mario.c",
 	MAME_DIR .. "src/mame/audio/mario.c",
 	MAME_DIR .. "src/mame/video/mario.c",
+	MAME_DIR .. "src/mame/drivers/mmagic.c",
 	MAME_DIR .. "src/mame/drivers/multigam.c",
 	MAME_DIR .. "src/mame/drivers/n8080.c",
 	MAME_DIR .. "src/mame/audio/n8080.c",
@@ -2408,7 +2412,7 @@ files {
 	MAME_DIR .. "src/mame/video/blockade.c",
 	MAME_DIR .. "src/mame/drivers/calorie.c",
 	MAME_DIR .. "src/mame/drivers/chihiro.c",
-	MAME_DIR .. "src/mame/video/chihiro.c", 
+	MAME_DIR .. "src/mame/video/chihiro.c",
 	MAME_DIR .. "src/mame/drivers/coolridr.c",
 	MAME_DIR .. "src/mame/drivers/deniam.c",
 	MAME_DIR .. "src/mame/video/deniam.c",
@@ -2529,6 +2533,7 @@ files {
 	MAME_DIR .. "src/mame/video/sega16sp.c",
 	MAME_DIR .. "src/mame/video/segaic24.c",
 	MAME_DIR .. "src/mame/machine/gdrom.c",
+	MAME_DIR .. "src/mame/machine/xbox.c",
 }
 
 createMAMEProjects(_target, _subtarget, "seibu")
@@ -2606,6 +2611,7 @@ files {
 	MAME_DIR .. "src/mame/machine/st0016.c",
 	MAME_DIR .. "src/mame/drivers/simple_st0016.c",
 	MAME_DIR .. "src/mame/video/seta001.c",
+	MAME_DIR .. "src/mame/drivers/thedealr.c",
 }
 
 createMAMEProjects(_target, _subtarget, "sigma")
@@ -3326,6 +3332,7 @@ files {
 	MAME_DIR .. "src/mame/machine/cdicdic.c",
 	MAME_DIR .. "src/mame/drivers/cesclass.c",
 	MAME_DIR .. "src/mame/drivers/chance32.c",
+	MAME_DIR .. "src/mame/drivers/chexx.c",
 	MAME_DIR .. "src/mame/drivers/chicago.c",
 	MAME_DIR .. "src/mame/drivers/chsuper.c",
 	MAME_DIR .. "src/mame/drivers/cidelsa.c",
@@ -3424,6 +3431,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jankenmn.c",
 	MAME_DIR .. "src/mame/drivers/jokrwild.c",
 	MAME_DIR .. "src/mame/drivers/jongkyo.c",
+	MAME_DIR .. "src/mame/drivers/joystand.c",
 	MAME_DIR .. "src/mame/drivers/jubilee.c",
 	MAME_DIR .. "src/mame/drivers/kas89.c",
 	MAME_DIR .. "src/mame/drivers/kingpin.c",

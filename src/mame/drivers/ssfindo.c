@@ -922,6 +922,6 @@ DRIVER_INIT_MEMBER(ssfindo_state,tetfight)
 	m_iocr_hack=1;
 }
 
-GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo, ssfindo_state,  ssfindo,  ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1999, ppcar,   0,        ppcar,    ppcar, ssfindo_state,    ppcar,    ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo, ssfindo_state,  ssfindo,  ROT0, "Icarus", "See See Find Out", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ppcar,   0,        ppcar,    ppcar, ssfindo_state,    ppcar,    ROT0, "Icarus", "Pang Pang Car", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state,  tetfight,ROT0, "Sego", "Tetris Fighters", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

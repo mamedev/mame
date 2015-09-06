@@ -36,7 +36,7 @@ enum {
 	f2_ksec_xfrdat      = f2_task_13,           //!< f2 13: branches NEXT[9] on !SEEKONLY
 	f2_ksec_swrnrdy     = f2_task_14,           //!< f2 14: branches NEXT[9] on !SWRDY
 	f2_ksec_nfer        = f2_task_15,           //!< f2 15: branches NEXT[9] on !KFER
-	f2_ksec_strobon     = f2_task_16,           //!< f2 16: branches NEXT[9] on STROBE
+	f2_ksec_strobon     = f2_task_16            //!< f2 16: branches NEXT[9] on STROBE
 												//!< f2 17: undefined
 };
 

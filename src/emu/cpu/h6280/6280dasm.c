@@ -18,6 +18,11 @@
 
 ******************************************************************************/
 
+#ifdef __OS2__
+/* To avoid name clash of _brk */
+#define __STRICT_ANSI__
+#endif
+
 #include "emu.h"
 
 #define RDOP(addr)   (oprom[addr - pc])

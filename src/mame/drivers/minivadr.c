@@ -10,6 +10,28 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/19 -
 This is a test board sold together with the cabinet (as required by law in
 Japan). It has no sound.
 
+PCB Layout
+----------
+
+K11X0622A
+MINI VADERS
+|-------------------------|
+|MB3771 24MHz             |
+|LS32   74F74             |
+|LS139                    |
+|D26_01.IC7 LS244        J|
+|Z80        LS244        A|
+|LS86  LS08 LS373        M|
+|LS157 LS157 LS161 LS161 M|
+|LS157 LS157 LS161 LS161 A|
+|6116        LS157 LS08   |
+|LS74  LS74  LS74  LS157  |
+|-------------------------|
+Notes: (all ICs shown)
+       Z80  - Clock 4MHz [24/6]
+       6116 - 2Kbx8 SRAM
+ D26_01.IC7 - 27C64 8Kbx8 EPROM
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -113,4 +135,4 @@ ROM_START( minivadr )
 ROM_END
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, driver_device, 0, ROT0, "Taito Corporation", "Mini Vaders", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+GAME( 1990, minivadr, 0, minivadr, minivadr, driver_device, 0, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

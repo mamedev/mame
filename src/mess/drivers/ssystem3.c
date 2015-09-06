@@ -38,7 +38,6 @@ backup of playfield rom and picture/description of its board
 #include "emu.h"
 
 #include "includes/ssystem3.h"
-#include "machine/6522via.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 
@@ -60,7 +59,7 @@ void ssystem3_state::ssystem3_playfield_reset()
 {
 	memset(&m_playfield, 0, sizeof(m_playfield));
 	m_playfield.signal=FALSE;
-	//  m_playfield.on=TRUE; //ioport("Configuration")->read()&1;
+	//  m_playfield.on=TRUE; //m_configuration->read()&1;
 }
 
 void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
@@ -91,7 +90,7 @@ void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
 		if (d) m_playfield.data|=1<<(m_playfield.bit^7);
 		m_playfield.bit++;
 		if (m_playfield.bit==8) {
-	logerror("%.4x playfield wrote %d %02x\n", (int)machine().device("maincpu")->safe_pc(), m_playfield.count, m_playfield.data);
+	logerror("%.4x playfield wrote %d %02x\n", (int)m_maincpu->pc(), m_playfield.count, m_playfield.data);
 	m_playfield.u.data[m_playfield.count]=m_playfield.data;
 	m_playfield.bit=0;
 	m_playfield.count=(m_playfield.count+1)%ARRAY_LENGTH(m_playfield.u.data);
@@ -110,7 +109,7 @@ void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
 
 void ssystem3_state::ssystem3_playfield_read(int *on, int *ready)
 {
-	*on=!(ioport("Configuration")->read()&1);
+	*on = !(m_configuration->read() & 1);
 	//  *on=!m_playfield.on;
 	*ready=FALSE;
 }
@@ -125,39 +124,39 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
 {
 	UINT8 data=0xff;
 #if 1 // time switch
-	if (!(m_porta&0x10)) data&=ioport("matrix1")->read()|0xf1;
-	if (!(m_porta&0x20)) data&=ioport("matrix2")->read()|0xf1;
-	if (!(m_porta&0x40)) data&=ioport("matrix3")->read()|0xf1;
-	if (!(m_porta&0x80)) data&=ioport("matrix4")->read()|0xf1;
+	if (!(m_porta&0x10)) data&=m_matrix[0]->read()|0xf1;
+	if (!(m_porta&0x20)) data&=m_matrix[1]->read()|0xf1;
+	if (!(m_porta&0x40)) data&=m_matrix[2]->read()|0xf1;
+	if (!(m_porta&0x80)) data&=m_matrix[3]->read()|0xf1;
 #else
-	if (!(m_porta&0x10)) data&=ioport("matrix1")->read()|0xf0;
-	if (!(m_porta&0x20)) data&=ioport("matrix2")->read()|0xf0;
-	if (!(m_porta&0x40)) data&=ioport("matrix3")->read()|0xf0;
-	if (!(m_porta&0x80)) data&=ioport("matrix4")->read()|0xf0;
+	if (!(m_porta&0x10)) data&=m_matrix[0]->read()|0xf0;
+	if (!(m_porta&0x20)) data&=m_matrix[1]->read()|0xf0;
+	if (!(m_porta&0x40)) data&=m_matrix[2]->read()|0xf0;
+	if (!(m_porta&0x80)) data&=m_matrix[3]->read()|0xf0;
 #endif
 	if (!(m_porta&1)) {
-	if (!(ioport("matrix1")->read()&1)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&1)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&1)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&1)) data&=~0x80;
+	if (!(m_matrix[0]->read()&1)) data&=~0x10;
+	if (!(m_matrix[1]->read()&1)) data&=~0x20;
+	if (!(m_matrix[2]->read()&1)) data&=~0x40;
+	if (!(m_matrix[3]->read()&1)) data&=~0x80;
 	}
 	if (!(m_porta&2)) {
-	if (!(ioport("matrix1")->read()&2)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&2)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&2)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&2)) data&=~0x80;
+	if (!(m_matrix[0]->read()&2)) data&=~0x10;
+	if (!(m_matrix[1]->read()&2)) data&=~0x20;
+	if (!(m_matrix[2]->read()&2)) data&=~0x40;
+	if (!(m_matrix[3]->read()&2)) data&=~0x80;
 	}
 	if (!(m_porta&4)) {
-	if (!(ioport("matrix1")->read()&4)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&4)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&4)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&4)) data&=~0x80;
+	if (!(m_matrix[0]->read()&4)) data&=~0x10;
+	if (!(m_matrix[1]->read()&4)) data&=~0x20;
+	if (!(m_matrix[2]->read()&4)) data&=~0x40;
+	if (!(m_matrix[3]->read()&4)) data&=~0x80;
 	}
 	if (!(m_porta&8)) {
-	if (!(ioport("matrix1")->read()&8)) data&=~0x10;
-	if (!(ioport("matrix2")->read()&8)) data&=~0x20;
-	if (!(ioport("matrix3")->read()&8)) data&=~0x40;
-	if (!(ioport("matrix4")->read()&8)) data&=~0x80;
+	if (!(m_matrix[0]->read()&8)) data&=~0x10;
+	if (!(m_matrix[1]->read()&8)) data&=~0x20;
+	if (!(m_matrix[2]->read()&8)) data&=~0x40;
+	if (!(m_matrix[3]->read()&8)) data&=~0x80;
 	}
 	//  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
 	return data;
@@ -197,22 +196,21 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_b)
 
 WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 {
-	ssystem3_playfield_write(data&1, data&8);
-	ssystem3_lcd_write(data&4, data&2);
+	ssystem3_playfield_write(data & 1, data & 8);
+	ssystem3_lcd_write(data & 4, data & 2);
 
 	// TODO: figure out what this is trying to achieve
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	UINT8 d=ssystem3_via_read_b(space, 0, mem_mask)&~0x40;
-	if (data&0x80) d|=0x40;
+	UINT8 d = ssystem3_via_read_b(space, 0, mem_mask) & ~0x40;
+	if (data & 0x80) d |= 0x40;
 	//  d&=~0x8f;
-	via_0->write_pb0((d>>0)&1);
-	via_0->write_pb1((d>>1)&1);
-	via_0->write_pb2((d>>2)&1);
-	via_0->write_pb3((d>>3)&1);
-	via_0->write_pb4((d>>4)&1);
-	via_0->write_pb5((d>>5)&1);
-	via_0->write_pb6((d>>6)&1);
-	via_0->write_pb7((d>>7)&1);
+	m_via6522_0->write_pb0((d >> 0) & 1);
+	m_via6522_0->write_pb1((d >> 1) & 1);
+	m_via6522_0->write_pb2((d >> 2) & 1);
+	m_via6522_0->write_pb3((d >> 3) & 1);
+	m_via6522_0->write_pb4((d >> 4) & 1);
+	m_via6522_0->write_pb5((d >> 5) & 1);
+	m_via6522_0->write_pb6((d >> 6) & 1);
+	m_via6522_0->write_pb7((d >> 7) & 1);
 }
 
 DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
@@ -252,22 +250,22 @@ static INPUT_PORTS_START( ssystem3 )
 //PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seems to be direct wired to reset
 //  PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?CLEAR") PORT_CODE(KEYCODE_F1)
 //  PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?ENTER") PORT_CODE(KEYCODE_ENTER)
-	PORT_START( "matrix1" )
+	PORT_START( "matrix.0" )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?1") PORT_CODE(KEYCODE_1_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   C SQ     EP") PORT_CODE(KEYCODE_9)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER?") PORT_CODE(KEYCODE_ENTER)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   C BOARD  MD") PORT_CODE(KEYCODE_0)
-	PORT_START( "matrix2" )
+	PORT_START( "matrix.1" )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?2") PORT_CODE(KEYCODE_2_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 F springer zeitvorgabe") PORT_CODE(KEYCODE_6)  PORT_CODE(KEYCODE_F)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 E laeufer ruecknahme") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CE  interrupt") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_START( "matrix3" )
+	PORT_START( "matrix.2" )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?3") PORT_CODE(KEYCODE_3_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 G bauer zugvorschlaege") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_G)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 D turm #") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 A white") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
-	PORT_START( "matrix4" )
+	PORT_START( "matrix.3" )
 		PORT_DIPNAME( 0x01, 0, "Time") PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_DIPSETTING( 0, DEF_STR(Off) ) PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 H black") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 C dame #50") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)
@@ -335,5 +333,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
-CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "NOVAG Industries Ltd",  "Chess Champion Super System III", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "NOVAG Industries Ltd",  "Chess Champion Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 //chess champion MK III in germany

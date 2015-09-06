@@ -380,5 +380,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS          INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1983, phc25,  0,      0,      pal,    phc25,  driver_device,  0,     "Sanyo",  "PHC-25 (Europe)",  GAME_NO_SOUND )
-COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,     "Sanyo",  "PHC-25 (Japan)",   GAME_NO_SOUND )
+COMP( 1983, phc25,  0,      0,      pal,    phc25,  driver_device,  0,     "Sanyo",  "PHC-25 (Europe)",  MACHINE_NO_SOUND )
+COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,     "Sanyo",  "PHC-25 (Japan)",   MACHINE_NO_SOUND )

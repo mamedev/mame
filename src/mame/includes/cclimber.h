@@ -22,7 +22,7 @@ public:
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
 		m_toprollr_bg_coloram(*this, "bg_coloram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-		
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;

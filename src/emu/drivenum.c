@@ -360,7 +360,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 		if (m_included[index])
 		{
 			// skip things that can't run
-			if ((s_drivers_sorted[index]->flags & GAME_NO_STANDALONE) != 0)
+			if ((s_drivers_sorted[index]->flags & MACHINE_NO_STANDALONE) != 0)
 				continue;
 
 			// pick the best match between driver name and description

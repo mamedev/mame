@@ -42,7 +42,7 @@ void sm510_base_device::do_branch(UINT8 pu, UINT8 pm, UINT8 pl)
 	m_pc = ((pu << 10 & 0xc00) | (pm << 6 & 0x3c0) | (pl & 0x03f)) & m_prgmask;
 }
 
-inline UINT8 sm510_base_device::bitmask(UINT8 param)
+inline UINT8 sm510_base_device::bitmask(UINT16 param)
 {
 	// bitmask from immediate opcode param
 	return 1 << (param & 3);
@@ -57,7 +57,22 @@ inline UINT8 sm510_base_device::bitmask(UINT8 param)
 void sm510_base_device::op_lb()
 {
 	// LB x: load BM/BL with 4-bit immediate value (partial)
-	op_illegal();
+
+	// SM510 WIP..
+	// bm and bl(low) are probably ok!
+	m_bm = (m_bm & 4) | (m_op & 3);
+	m_bl = (m_op >> 2 & 3);
+
+	// bl(high) is still unclear, official doc is confusing
+	UINT8 hi = 0;
+	switch (m_bl)
+	{
+		case 0: hi = 3; break;
+		case 1: hi = 0; break;
+		case 2: hi = 0; break;
+		case 3: hi = 3; break;
+	}
+	m_bl |= (hi << 2 & 0xc);
 }
 
 void sm510_base_device::op_lbl()
@@ -160,8 +175,8 @@ void sm510_base_device::op_exc()
 
 void sm510_base_device::op_bdc()
 {
-	// BDC: x
-	op_illegal();
+	// BDC: enable LCD bleeder current with C
+	m_bc = (m_c != 0);
 }
 
 void sm510_base_device::op_exci()
@@ -192,18 +207,24 @@ void sm510_base_device::op_lax()
 		m_acc = m_op & 0xf;
 }
 
+void sm510_base_device::op_ptw()
+{
+	// PTW: output W latch
+	m_write_s(0, m_w, 0xff);
+}
+
 void sm510_base_device::op_wr()
 {
 	// WR: shift 0 into W
 	m_w = m_w << 1 | 0;
-	m_write_s(0, m_w, 0xff);
+	update_w_latch();
 }
 
 void sm510_base_device::op_ws()
 {
 	// WR: shift 1 into W
 	m_w = m_w << 1 | 1;
-	m_write_s(0, m_w, 0xff);
+	update_w_latch();
 }
 
 
@@ -212,31 +233,41 @@ void sm510_base_device::op_ws()
 void sm510_base_device::op_kta()
 {
 	// KTA: input K to ACC
-	m_acc = m_read_k(0, 0xff);
+	m_acc = m_read_k(0, 0xff) & 0xf;
 }
 
 void sm510_base_device::op_atbp()
 {
-	// ATBP: output ACC to BP
-	op_illegal();
+	// ATBP: output ACC to BP(internal LCD backplate signal)
+	m_bp = ((m_acc & 1) != 0);
+}
+
+void sm510_base_device::op_atx()
+{
+	// ATX: output ACC to X
+	m_x = m_acc;
 }
 
 void sm510_base_device::op_atl()
 {
-	// ATL: input L to ACC
-	op_illegal();
+	// ATL: output ACC to L
+	m_l = m_acc;
 }
 
 void sm510_base_device::op_atfc()
 {
-	// ATFC: input Y to ACC
-	op_illegal();
+	// ATFC: output ACC to Y
+	m_y = m_acc;
 }
 
 void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
-	op_illegal();
+	if (m_r != (m_acc & 3))
+	{
+		m_r = m_acc & 3;
+		m_write_r(0, m_r, 0xff);
+	}
 }
 
 
@@ -296,8 +327,8 @@ void sm510_base_device::op_sc()
 
 void sm510_base_device::op_tb()
 {
-	// TB: x
-	op_illegal();
+	// TB: skip next if B(beta) pin is set
+	m_skip = (m_read_b() != 0);
 }
 
 void sm510_base_device::op_tc()
@@ -326,32 +357,33 @@ void sm510_base_device::op_ta0()
 
 void sm510_base_device::op_tabl()
 {
-	// TABL: skip next of ACC equals BL
+	// TABL: skip next if ACC equals BL
 	m_skip = (m_acc == m_bl);
 }
 
 void sm510_base_device::op_tis()
 {
-	// TIS: x
-	op_illegal();
+	// TIS: skip next if 1S(gamma flag) is clear, reset it after
+	m_skip = !m_1s;
+	m_1s = false;
 }
 
 void sm510_base_device::op_tal()
 {
-	// TAL: x
-	op_illegal();
+	// TAL: skip next if BA pin is set
+	m_skip = (m_read_ba() != 0);
 }
 
 void sm510_base_device::op_tf1()
 {
-	// TF1: x
-	op_illegal();
+	// TF1: skip next if divider F1(d14) is set
+	m_skip = ((m_div & 0x4000) != 0);
 }
 
 void sm510_base_device::op_tf4()
 {
-	// TF4: x
-	op_illegal();
+	// TF4: skip next if divider F4(d11) is set
+	m_skip = ((m_div & 0x0800) != 0);
 }
 
 
@@ -370,6 +402,35 @@ void sm510_base_device::op_sm()
 }
 
 
+// Melody control instructions
+
+void sm510_base_device::op_pre()
+{
+	// PRE x: melody ROM pointer preset
+	m_melody_address = m_param;
+	m_melody_step_count = 0;
+}
+
+void sm510_base_device::op_sme()
+{
+	// SME: set melody enable
+	m_melody_rd |= 1;
+}
+
+void sm510_base_device::op_rme()
+{
+	// RME: reset melody enable
+	m_melody_rd &= ~1;
+}
+
+void sm510_base_device::op_tmel()
+{
+	// TMEL: skip next if rest signal is set, reset it
+	m_skip = ((m_melody_rd & 2) != 0);
+	m_melody_rd &= ~2;
+}
+
+
 // Special instructions
 
 void sm510_base_device::op_skip()
@@ -379,17 +440,17 @@ void sm510_base_device::op_skip()
 
 void sm510_base_device::op_cend()
 {
-	// CEND: stop clock
-	op_illegal();
+	// CEND: stop clock (halt the cpu and go into low-power mode)
+	m_halt = true;
 }
 
 void sm510_base_device::op_idiv()
 {
 	// IDIV: reset divider
-	op_illegal();
+	m_div = 0;
 }
 
 void sm510_base_device::op_illegal()
 {
-	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_prev_pc);
 }

@@ -204,5 +204,5 @@ ROM_START( tourtab2 )
 ROM_END
 
 
-GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )

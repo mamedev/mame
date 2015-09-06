@@ -12,9 +12,12 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, EICALL, JMP, CALL
+      Unimplemented opcodes: SPM, SPM Z+, SLEEP, BREAK, WDR, EICALL, JMP, CALL
 
     - Changelist -
+      05 Jul. 2015 [Felipe Sanches]
+      - Implemented EIJMP instruction
+
       29 Dec. 2013 [Felipe Sanches]
       - Added crude boilerplate code for Timer/Counter #4
 
@@ -92,7 +95,7 @@ enum
 	AVR8_SREG_S,
 	AVR8_SREG_H,
 	AVR8_SREG_T,
-	AVR8_SREG_I,
+	AVR8_SREG_I
 };
 
 // I/O Enums
@@ -621,7 +624,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: avr8_device(mconfig, "ATMEGA2560", tag, owner, clock, ATMEGA2560, 0x3ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560, "atmega2560", __FILE__)
+	: avr8_device(mconfig, "ATMEGA2560", tag, owner, clock, ATMEGA2560, 0x1ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560, "atmega2560", __FILE__)
 {
 }
 
@@ -1174,11 +1177,11 @@ void avr8_device::timer0_tick()
 	switch(AVR8_WGM0)
 	{
 		case WGM02_NORMAL:
-		printf("WGM02_NORMAL: Unimplemented timer#0 waveform generation mode\n");
+		//printf("WGM02_NORMAL: Unimplemented timer#0 waveform generation mode\n");
 		break;
 
 		case WGM02_PWM_PC:
-		printf("WGM02_PWM_PC: Unimplemented timer#0 waveform generation mode\n");
+		//printf("WGM02_PWM_PC: Unimplemented timer#0 waveform generation mode\n");
 		break;
 
 		case WGM02_CTC_CMP:
@@ -3538,8 +3541,8 @@ void avr8_device::execute_run()
 										opcycles = 2;
 										break;
 									case 0x0010:    // EIJMP
-										//output += sprintf( output, "EIJMP" );
-										unimplemented_opcode(op);
+										m_pc = (m_r[AVR8_REGIDX_EIND] << 16 | ZREG) - 1;
+										opcycles = 2;
 										break;
 									default:
 										//output += sprintf( output, "Undefined (%04x)", op );

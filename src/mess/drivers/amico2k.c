@@ -238,4 +238,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT MACHINE     INPUT       INIT     COMPANY   FULLNAME         FLAGS */
-COMP( 1978, amico2k,  0,      0,     amico2k,    amico2k, driver_device,    0,     "A.S.E.L.", "Amico 2000", GAME_NO_SOUND_HW)
+COMP( 1978, amico2k,  0,      0,     amico2k,    amico2k, driver_device,    0,     "A.S.E.L.", "Amico 2000", MACHINE_NO_SOUND_HW)

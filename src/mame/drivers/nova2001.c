@@ -647,8 +647,8 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nova2001)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
@@ -692,8 +692,8 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakun)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
@@ -728,8 +728,8 @@ static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkunwar)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
@@ -771,8 +771,8 @@ static MACHINE_CONFIG_START( raiders5, nova2001_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiders5)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 
@@ -996,10 +996,10 @@ DRIVER_INIT_MEMBER(nova2001_state,raiders5)
  *************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, driver_device, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, driver_device, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", GAME_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, driver_device, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", GAME_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL", "Raiders5", GAME_SUPPORTS_SAVE )
-GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, nova2001,  0,        nova2001, nova2001, driver_device, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001, driver_device, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, driver_device, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )

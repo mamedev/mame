@@ -1760,19 +1760,19 @@ DRIVER_INIT_MEMBER(rohga_state,schmeisr)
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
-GAME( 1991, rohga,     0,        rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rohga1,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rohga2,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rohgah,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rohgau,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", GAME_SUPPORTS_SAVE )
-GAME( 1991, wolffang,  rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rohga,     0,        rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga1,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga2,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgah,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgau,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wolffang,  rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", GAME_SUPPORTS_SAVE )
-GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", GAME_SUPPORTS_SAVE )
-GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", GAME_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
-GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", MACHINE_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
+GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", MACHINE_SUPPORTS_SAVE )

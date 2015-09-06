@@ -543,7 +543,7 @@ void apple2_state::apple2_video_start(const UINT8 *vram, const UINT8 *aux_vram, 
 		|| !strcmp(machine().system().name, "apple2p")
 		|| !strcmp(machine().system().name, "prav82")
 		|| !strcmp(machine().system().name, "prav8m")
-		|| !strcmp(machine().system().name, "ace100")
+		|| !strcmp(machine().system().name, "ivelultr")
 		|| !strcmp(machine().system().name, "apple2jp"))
 	{
 		int len = memregion("gfx1")->bytes();
@@ -615,7 +615,7 @@ UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &b
 	UINT32 new_a2;
 
 	/* calculate the m_flash value */
-	m_flash = ((machine().time() * 4).seconds & 1) ? 1 : 0;
+	m_flash = ((machine().time() * 4).seconds() & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
 	new_a2 = effective_a2();
@@ -840,6 +840,40 @@ void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, i
 			for (i = 0; i < xscale; i++)
 			{
 				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+			}
+		}
+	}
+}
+
+void a2_video_device::plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
+	const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg)
+{
+	int x, y, i;
+	const UINT8 *chardata;
+	UINT16 color;
+
+	if ((code >= 0x40) && (code <= 0x7f))
+	{
+		if (m_flash)
+		{
+			i = fg;
+			fg = bg;
+			bg = i;
+		}
+	}
+
+	/* look up the character data */
+	chardata = &textgfx_data[(code * 8)];
+
+	for (y = 0; y < 8; y++)
+	{
+		for (x = 1; x < 8; x++)
+		{
+			color = (chardata[y] & (1 << x)) ? fg : bg;
+
+			for (i = 0; i < xscale; i++)
+			{
+				bitmap.pix16(ypos + y, xpos + ((x-1) * xscale) + i) = color;
 			}
 		}
 	}
@@ -1155,6 +1189,37 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 			/* calculate address */
 			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 			plot_text_character_orig(bitmap, col * 14, row, 2, m_ram_ptr[address],
+				m_char_ptr, m_char_size, fg, bg);
+		}
+	}
+}
+
+void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	int row, col;
+	UINT32 start_address = m_page2 ? 0x800 : 0x400;
+	UINT32 address;
+	int fg = 0;
+	int bg = 0;
+
+	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+
+	switch (m_sysconfig & 0x03)
+	{
+		case 0: fg = WHITE; break;
+		case 1: fg = WHITE; break;
+		case 2: fg = GREEN; break;
+		case 3: fg = ORANGE; break;
+	}
+
+	for (row = beginrow; row <= endrow; row += 8)
+	{
+		for (col = 0; col < 40; col++)
+		{
+			/* calculate address */
+			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+			plot_text_character_ultr(bitmap, col * 14, row, 2, m_ram_ptr[address],
 				m_char_ptr, m_char_size, fg, bg);
 		}
 	}

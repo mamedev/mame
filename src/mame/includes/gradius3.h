@@ -16,6 +16,7 @@ public:
 	gradius3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_gfxram(*this, "k052109"),
+		m_gfxrom(*this, "k051960"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -25,10 +26,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_gfxram;
-
-	/* video-related */
-	int         m_layer_colorbase[3];
-	int         m_sprite_colorbase;
+	required_region_ptr<UINT8> m_gfxrom;
 
 	/* misc */
 	int         m_priority;

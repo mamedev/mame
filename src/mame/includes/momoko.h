@@ -24,7 +24,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_bg_scrolly;
 	required_shared_ptr<UINT8> m_bg_scrollx;
-//  UINT8 *        paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	UINT8          m_fg_scrollx;

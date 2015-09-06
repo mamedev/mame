@@ -192,6 +192,7 @@ public:
 	DECLARE_READ16_MEMBER(e90_prot_r);
 	DECLARE_WRITE16_MEMBER(e90_prot_w);
 	UINT32 screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 private:
 	UINT32 m_dip_read_offset;
 };
@@ -856,6 +857,7 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_SCREEN_SIZE(640, 525)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_n64)
+	MCFG_SCREEN_VBLANK_DRIVER(aleck64_state, screen_eof_n64)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
@@ -1158,16 +1160,16 @@ ROM_END
 
 
 // BIOS
-GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Nintendo / Seta", "Aleck64 PIF BIOS", GAME_IS_BIOS_ROOT)
+GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Nintendo / Seta", "Aleck64 PIF BIOS", MACHINE_IS_BIOS_ROOT)
 
 // games
-GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING ) // crashes at kick off / during attract with DRC
-GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta", "Star Soldier: Vanishing Earth", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, vivdolls, aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, srmvs,    aleck64,  aleck64, srmvs, aleck64_state,    aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64_state, aleck64, ROT0, "Aruze", "Tower & Shaft", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 2003, hipai,    aleck64,  aleck64, hipai, aleck64_state,    aleck64, ROT0, "Aruze / Seta", "Hi Pai Paradise", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64_state, aleck64, ROT0, "Aruze", "Hanabi de Doon! - Don-chan Puzzle", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 2003, kurufev,  aleck64,  aleck64, kurufev, aleck64_state,  aleck64, ROT0, "Aruze / Takumi", "Kurukuru Fever", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", MACHINE_NOT_WORKING ) // crashes at kick off / during attract with DRC
+GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta", "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, vivdolls, aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, srmvs,    aleck64,  aleck64, srmvs, aleck64_state,    aleck64, ROT0, "Seta", "Super Real Mahjong VS", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64_state, aleck64, ROT0, "Aruze", "Tower & Shaft", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, hipai,    aleck64,  aleck64, hipai, aleck64_state,    aleck64, ROT0, "Aruze / Seta", "Hi Pai Paradise", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64_state, aleck64, ROT0, "Aruze", "Hanabi de Doon! - Don-chan Puzzle", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, kurufev,  aleck64,  aleck64, kurufev, aleck64_state,  aleck64, ROT0, "Aruze / Takumi", "Kurukuru Fever", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

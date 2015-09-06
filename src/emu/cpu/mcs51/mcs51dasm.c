@@ -34,7 +34,7 @@ enum
 	FEATURE_CMOS            = 0x02,
 	FEATURE_I80C52          = 0x04,
 	FEATURE_DS5002FP        = 0x08,
-	FEATURE_I83C751         = 0x08,
+	FEATURE_I83C751         = 0x08
 };
 
 

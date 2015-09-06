@@ -418,4 +418,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY     FULLNAME   FLAGS */
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k, vg5k_state,  vg5k, "Philips",  "VG-5000", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k, vg5k_state,  vg5k, "Philips",  "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

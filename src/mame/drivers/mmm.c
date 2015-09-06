@@ -51,4 +51,4 @@ ROM_START( mmm_ldip )
 ROM_END
 
 
-GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, driver_device,  0,  ROT0,  "Maygay",    "Lucky Dip (Maygay)",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, driver_device,  0,  ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_IS_SKELETON_MECHANICAL)

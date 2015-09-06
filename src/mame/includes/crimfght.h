@@ -5,11 +5,10 @@
     Crime Fighters
 
 *************************************************************************/
-#include "cpu/m6809/konami.h"
+#include "machine/bankdev.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
-#include "video/konami_helper.h"
 
 class crimfght_state : public driver_device
 {
@@ -18,37 +17,39 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_bank0000(*this, "bank0000"),
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
-		m_palette(*this, "palette") { }
-
-	/* memory pointers */
-	std::vector<UINT8> m_paletteram;
-
-	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
+		m_palette(*this, "palette"),
+		m_rombank(*this, "rombank") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<address_map_bank_device> m_bank0000;
 	required_device<k007232_device> m_k007232;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_device<palette_device> m_palette;
+	required_memory_bank m_rombank;
 
 	DECLARE_WRITE8_MEMBER(crimfght_coin_w);
-	DECLARE_WRITE8_MEMBER(crimfght_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
-	DECLARE_WRITE8_MEMBER(crimfght_snd_bankswitch_w);
+	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
+	DECLARE_WRITE8_MEMBER(ym2151_ct_w);
 	virtual void machine_start();
-	virtual void video_start();
 	UINT32 screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(crimfght_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
+	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
+
+private:
+	int m_woco;
+	int m_rmrd;
+	int m_init;
 };

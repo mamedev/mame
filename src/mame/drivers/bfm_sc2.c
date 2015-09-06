@@ -7474,29 +7474,29 @@ ROM_END
 
 /* Video Based (Adder 2) */
 
-#define GAME_FLAGS GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL
+#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL
 
-GAMEL( 1993, quintoon, 0,         scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-206)",          GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
-GAMEL( 1993, quintond, quintoon,  scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-751-206, Datapak)",GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING,layout_quintoon ) //Current samples need verification
-GAMEL( 1993, quintono, quintoon,  scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-203)",          GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
+GAMEL( 1993, quintoon, 0,         scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-206)",          MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
+GAMEL( 1993, quintond, quintoon,  scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-751-206, Datapak)",MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING,layout_quintoon ) //Current samples need verification
+GAMEL( 1993, quintono, quintoon,  scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-203)",          MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
 
-GAMEL( 1993, qntoond,  0,         scorpion2_vid, qntoond, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-243)",       GAME_SUPPORTS_SAVE,layout_quintoon )
-GAMEL( 1993, qntoondo, qntoond,   scorpion2_vid, qntoond, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-136)",       GAME_SUPPORTS_SAVE,layout_quintoon )
+GAMEL( 1993, qntoond,  0,         scorpion2_vid, qntoond, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-243)",       MACHINE_SUPPORTS_SAVE,layout_quintoon )
+GAMEL( 1993, qntoondo, qntoond,   scorpion2_vid, qntoond, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-136)",       MACHINE_SUPPORTS_SAVE,layout_quintoon )
 
-GAMEL( 1994, pokio,    0,         scorpion2_vid, pokio, bfm_sc2_state,     adder_dutch,0,       "BFM/ELAM", "Pokio (Dutch, Game Card 95-750-278)",          GAME_SUPPORTS_SAVE,layout_pokio )
+GAMEL( 1994, pokio,    0,         scorpion2_vid, pokio, bfm_sc2_state,     adder_dutch,0,       "BFM/ELAM", "Pokio (Dutch, Game Card 95-750-278)",          MACHINE_SUPPORTS_SAVE,layout_pokio )
 
-GAMEL( 1995, paradice, 0,         scorpion2_vid, paradice, bfm_sc2_state,  adder_dutch,0,       "BFM/ELAM", "Paradice (Dutch, Game Card 95-750-615)",       GAME_SUPPORTS_SAVE,layout_paradice )
+GAMEL( 1995, paradice, 0,         scorpion2_vid, paradice, bfm_sc2_state,  adder_dutch,0,       "BFM/ELAM", "Paradice (Dutch, Game Card 95-750-615)",       MACHINE_SUPPORTS_SAVE,layout_paradice )
 
-GAMEL( 1996, pyramid,  0,         scorpion2_vid, pyramid, bfm_sc2_state,   pyramid, 0,          "BFM/ELAM", "Pyramid (Dutch, Game Card 95-750-898)",       GAME_SUPPORTS_SAVE,layout_pyramid )
+GAMEL( 1996, pyramid,  0,         scorpion2_vid, pyramid, bfm_sc2_state,   pyramid, 0,          "BFM/ELAM", "Pyramid (Dutch, Game Card 95-750-898)",       MACHINE_SUPPORTS_SAVE,layout_pyramid )
 
-GAMEL( 1995, slotsnl,  0,         scorpion2_vid, slotsnl, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",          GAME_SUPPORTS_SAVE,layout_slots )
+GAMEL( 1995, slotsnl,  0,         scorpion2_vid, slotsnl, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",          MACHINE_SUPPORTS_SAVE,layout_slots )
 
-GAMEL( 1996, sltblgtk, 0,         scorpion2_vid, sltblgtk, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-943)",  GAME_SUPPORTS_SAVE,layout_sltblgtk )
+GAMEL( 1996, sltblgtk, 0,         scorpion2_vid, sltblgtk, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-943)",  MACHINE_SUPPORTS_SAVE,layout_sltblgtk )
 
-GAMEL( 1996, sltblgpo, 0,         scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",   GAME_SUPPORTS_SAVE,layout_sltblgpo )
-GAMEL( 1996, sltblgp1, sltblgpo,  scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   GAME_SUPPORTS_SAVE,layout_sltblgpo )
+GAMEL( 1996, sltblgpo, 0,         scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )
+GAMEL( 1996, sltblgp1, sltblgpo,  scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )
 
-GAMEL( 1997, gldncrwn, 0,         scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown (Dutch, Game Card 95-752-011)",   GAME_SUPPORTS_SAVE,layout_gldncrwn )
+GAMEL( 1997, gldncrwn, 0,         scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown (Dutch, Game Card 95-752-011)",   MACHINE_SUPPORTS_SAVE,layout_gldncrwn )
 
 /* Non-Video */
 
@@ -7510,38 +7510,38 @@ GAMEL( 1997, gldncrwn, 0,         scorpion2_vid, gldncrwn, bfm_sc2_state,  gldnc
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER 6305  DR WHO TIMELORD - 28-SEP-1994 11:14:58
-GAMEL( 1994, sc2drwho   , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-288
-GAMEL( 1994, sc2drwhou  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwhon     , 0,         "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3) (not encrypted)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) //  GAME No 95-750-288 (unencrypted bootleg?)
-GAMEL( 1994, sc2drwhop  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-288
+GAMEL( 1994, sc2drwho   , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-288
+GAMEL( 1994, sc2drwhou  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwhon     , 0,         "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3) (not encrypted)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) //  GAME No 95-750-288 (unencrypted bootleg?)
+GAMEL( 1994, sc2drwhop  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-288
 // PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH   - 28-SEP-1994 11:20:17
-GAMEL( 1994, sc2drwho1  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 2, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-290
-GAMEL( 1994, sc2drwho1p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 2, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-290
+GAMEL( 1994, sc2drwho1  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 2, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-290
+GAMEL( 1994, sc2drwho1p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 2, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-290
 // PROJECT NUMBER 6305  DR WHO TIMELORD NO JP SPIN - 17-NOV-1994 09:34:50
-GAMEL( 1994, sc2drwho2  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 3, UK, no Jackpot spin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-309
-GAMEL( 1994, sc2drwho2p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 3, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-309
+GAMEL( 1994, sc2drwho2  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 3, UK, no Jackpot spin) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-309
+GAMEL( 1994, sc2drwho2p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 3, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-309
 // PROJECT NUMBER 6305  DR WHO TIMELORD ARCADE - 24-OCT-1995 16:12:44
-GAMEL( 1994, sc2drwho3  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 4, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-536
-GAMEL( 1994, sc2drwho3p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 4, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-536
+GAMEL( 1994, sc2drwho3  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 4, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-536
+GAMEL( 1994, sc2drwho3p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 4, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-536
 // PROJECT NUMBER 6305  DR WHO TIMELORD 4/8 - 24-OCT-1995 16:14:30
-GAMEL( 1994, sc2drwho4  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 5, UK) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-535
-GAMEL( 1994, sc2drwho4p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 5, UK, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-535
+GAMEL( 1994, sc2drwho4  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 5, UK) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-535
+GAMEL( 1994, sc2drwho4p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 5, UK, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-535
 // PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH 4/8 - 25-OCT-1995 09:50:12
-GAMEL( 1994, sc2drwho5  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-531
-GAMEL( 1994, sc2drwho5p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-531
+GAMEL( 1994, sc2drwho5  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-531
+GAMEL( 1994, sc2drwho5p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-531
 // PROJECT NUMBER 6305  TIMELORD ARCADE 10P PLAY 4/8 - 25-OCT-1995 09:53:06
-GAMEL( 1994, sc2drwho6  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 7, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-533
-GAMEL( 1994, sc2drwho6p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 7, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-533
+GAMEL( 1994, sc2drwho6  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 7, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-533
+GAMEL( 1994, sc2drwho6p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 7, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-533
 // PROJECT NUMBER 6305  DR WHO TIMELORD 10 POUNDS - 28-MAR-1996 13:21:58
-GAMEL( 1994, sc2drwho7  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-661
-GAMEL( 1994, sc2drwho7p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-661
+GAMEL( 1994, sc2drwho7  , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-661
+GAMEL( 1994, sc2drwho7p , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-661
 // PROJECT NUMBER 6419  DR WHO TIMELORD DELUXE - 8-MAR-1995 15:37:53
-GAMEL( 1994, sc2drwhodx , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord Deluxe (set 1) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-370
+GAMEL( 1994, sc2drwhodx , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord Deluxe (set 1) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-370
 // PROJECT NUMBER 6419  TIMELORD DELUXE MULTI-SITE ALL CASH - 4-DEC-1995 10:48:34
-GAMEL( 1994, sc2drwhodx1, sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord Deluxe (set 2) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-572
+GAMEL( 1994, sc2drwhodx1, sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Dr.Who The Timelord Deluxe (set 2) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-572
 // PROJECT NUMBER 6999  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:02:47
-GAMEL( 1994, sc2drwhomz , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM/Mazooma",      "Dr.Who The Timelord (Mazooma) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_N, error 99
+GAMEL( 1994, sc2drwhomz , sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM/Mazooma",      "Dr.Who The Timelord (Mazooma) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_N, error 99
 // PROJECT NUMBER TLP12  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:03:49
-GAMEL( 1994, sc2drwhomzp, sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM/Mazooma",      "Dr.Who The Timelord (Mazooma, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_P,  error 99
+GAMEL( 1994, sc2drwhomzp, sc2drwho  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM/Mazooma",      "Dr.Who The Timelord (Mazooma, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_P,  error 99
 
 /********************************************************************************************************************************************************************************************************************
  The Big Breakfast
@@ -7810,11 +7810,11 @@ GAME( 199?, sc2downt3p  , sc2downt  ,  scorpion2        , drwho     , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER PR6591  CLUB GRAND SLAM - 7-AUG-1996 12:32:05
-GAME( 1996, sc2gslam1   , sc2gslam  ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 1) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-750-843
-GAME( 1996, sc2gslam1p  , sc2gslam  ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 1, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-843
+GAME( 1996, sc2gslam1   , sc2gslam  ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 1) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-750-843
+GAME( 1996, sc2gslam1p  , sc2gslam  ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 1, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-843
 // PROJECT NUMBER PR6591  CLUB GRAND SLAM - 29-OCT-2001 14:48:47
-GAME( 1996, sc2gslam    , 0         ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 2) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-752-056
-GAME( 1996, sc2gslamp   , sc2gslam  ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 2, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-753-056
+GAME( 1996, sc2gslam    , 0         ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 2) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-752-056
+GAME( 1996, sc2gslamp   , sc2gslam  ,  scorpion2        , bfmcgslm  , bfm_sc2_state, bfmcgslm   , 0,         "BFM",      "Club Grand Slam (UK, set 2, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-753-056
 
 /********************************************************************************************************************************************************************************************************************
  Make A Million
@@ -8252,7 +8252,7 @@ GAME( 199?, sc2maina    , 0         ,  scorpion2        , drwho     , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER 6346  FOCUS   - 23-JAN-1995 15:31:32
-GAME( 1995, sc2focus    , 0         ,  scorpion3        , scorpion3 , bfm_sc2_state, focus      , 0,         "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-750-347
+GAME( 1995, sc2focus    , 0         ,  scorpion3        , scorpion3 , bfm_sc2_state, focus      , 0,         "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-750-347
 
 /********************************************************************************************************************************************************************************************************************
  Public Enemy No.1 (German)
@@ -8344,19 +8344,19 @@ GAME( 198?, sc2cexplb       , sc2cexpl  , scorpion2         , drwho , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY GALA S+P 95 - 30-JAN-1996 11:12:00
-GAME( 1996, sc2luvv6p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 1, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-621
+GAME( 1996, sc2luvv6p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 1, UK, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-621
 // PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE S+P 95 - 30-JAN-1996 11:14:05
-GAME( 1996, sc2luvv2    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 2, UK, Multisite) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-622
-GAME( 1996, sc2luvv2p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 2, UK, Multisite, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-622
+GAME( 1996, sc2luvv2    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 2, UK, Multisite) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-622
+GAME( 1996, sc2luvv2p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 2, UK, Multisite, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-622
 // PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE #10/25P - 2-JUL-1996 16:32:17
-GAME( 1996, sc2luvv     , 0         ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/25p) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-808
-GAME( 1996, sc2luvvp    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/25p, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-808
+GAME( 1996, sc2luvv     , 0         ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/25p) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-808
+GAME( 1996, sc2luvvp    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/25p, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-808
 // PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE #4/5P PLAY - 4-JUL-1996 10:56:24
-GAME( 1996, sc2luvv4    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 4, UK, Multisite 4GBP/5p) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-810
-GAME( 1996, sc2luvv4p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 4, UK, Multisite 4GBP/5p, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-810
+GAME( 1996, sc2luvv4    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 4, UK, Multisite 4GBP/5p) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-810
+GAME( 1996, sc2luvv4p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 4, UK, Multisite 4GBP/5p, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-810
 // PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE #10/20P - 12-SEP-1996 14:07:57
-GAME( 1996, sc2luvv1    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/20p) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-866
-GAME( 1996, sc2luvv1p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/20p, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-866
+GAME( 1996, sc2luvv1    , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/20p) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-866
+GAME( 1996, sc2luvv1p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_state, luvjub , 0,         "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/20p, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-866
 
 
 /********************************************************************************************************************************************************************************************************************
@@ -8365,20 +8365,20 @@ GAME( 1996, sc2luvv1p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER PR6331  PUBLIC ENEMY NO.1 - 26-JUL-1994 09:24:19
-GAME( 1996, sc2cpe3     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-257
-GAME( 1996, sc2cpe3p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-257
+GAME( 1996, sc2cpe3     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-257
+GAME( 1996, sc2cpe3p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-257
 // PROJECT NUMBER PR6331  PUBLIC ENEMY NO.1 FIXED 65% - 10-AUG-1994 11:26:30
-GAME( 1996, sc2cpe4     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-273
-GAME( 1996, sc2cpe4p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-273
+GAME( 1996, sc2cpe4     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-273
+GAME( 1996, sc2cpe4p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-273
 // PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 STENA SEALINK - 3-JAN-1996 12:17:33
-GAME( 1996, sc2cpe2     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-597
-GAME( 1996, sc2cpe2p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-597
+GAME( 1996, sc2cpe2     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-597
+GAME( 1996, sc2cpe2p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-597
 // PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 FIXED 65% - 3-JAN-1996 12:19:01
-GAME( 1996, sc2cpe1     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-598
-GAME( 1996, sc2cpe1p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-598
+GAME( 1996, sc2cpe1     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-598
+GAME( 1996, sc2cpe1p    , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-598
 // PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 - 20-AUG-1996 10:05:21
-GAME( 1996, sc2cpe      , 0         ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)           // GAME No 95-750-846
-GAME( 1996, sc2cpep     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-846
+GAME( 1996, sc2cpe      , 0         ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)           // GAME No 95-750-846
+GAME( 1996, sc2cpep     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK, Protocol) (Scorpion 2/3)", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL) // GAME No 95-751-846
 
 /********************************************************************************************************************************************************************************************************************
  Cops 'n' Robbers

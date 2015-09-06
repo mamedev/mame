@@ -10,9 +10,13 @@
 
 #include <algorithm>
 
-#include "../solver/nld_solver.h"
+#include "solver/nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
+
+//#define nl_ext_double __float128 // slow, very slow
+//#define nl_ext_double long double // slightly slower
+#define nl_ext_double double
 
 template <unsigned m_N, unsigned _storage_N>
 class matrix_solver_direct_t: public matrix_solver_t
@@ -41,6 +45,11 @@ protected:
 	ATTR_HOT void build_LE_RHS(nl_double * RESTRICT rhs);
 	ATTR_HOT void LE_solve();
 	ATTR_HOT void LE_back_subst(nl_double * RESTRICT x);
+
+	/* Full LU back substitution, not used currently, in for future use */
+
+	ATTR_HOT void LE_back_subst_full(nl_double * RESTRICT x);
+
 	ATTR_HOT nl_double delta(const nl_double * RESTRICT V);
 	ATTR_HOT void store(const nl_double * RESTRICT V);
 
@@ -50,7 +59,9 @@ protected:
 	 */
 	ATTR_HOT nl_double compute_next_timestep();
 
-	ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	template <typename T1, typename T2>
+	inline nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
+
 	ATTR_ALIGN nl_double m_RHS[_storage_N];
 	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
 	ATTR_ALIGN nl_double m_last_V[_storage_N];
@@ -59,9 +70,9 @@ protected:
 	terms_t *m_rails_temp;
 
 private:
+	ATTR_ALIGN nl_ext_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
 
 	const unsigned m_dim;
-	nl_double m_lp_fact;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -131,13 +142,12 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal
 		if (ot>=0)
 		{
 			m_terms[k]->add(term, ot, true);
-			SOLVER_VERBOSE_OUT(("Net %d Term %s %f %f\n", k, terms[i]->name().cstr(), terms[i]->m_gt, terms[i]->m_go));
 		}
 		/* Should this be allowed ? */
 		else // if (ot<0)
 		{
 			m_rails_temp[k].add(term, ot, true);
-			netlist().error("found term with missing othernet %s\n", term->name().cstr());
+			log().fatal("found term with missing othernet {1}\n", term->name());
 		}
 	}
 }
@@ -147,7 +157,7 @@ template <unsigned m_N, unsigned _storage_N>
 ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
-		netlist().error("Dimension %d less than %" SIZETFMT, m_dim, SIZET_PRINTF(nets.size()));
+		log().fatal("Dimension {1} less than {2}", m_dim, nets.size());
 
 	for (unsigned k = 0; k < N(); k++)
 	{
@@ -254,13 +264,40 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		psort_list(t->m_nz);
 	}
 
-	if(0)
+	/* create a list of non zero elements below diagonal k
+	 * This should reduce cache misses ...
+	 */
+
+	bool touched[_storage_N][_storage_N] = { { false } };
+	for (unsigned k = 0; k < N(); k++)
+	{
+		m_terms[k]->m_nzbd.clear();
+		for (unsigned j = 0; j < m_terms[k]->m_nz.size(); j++)
+			touched[k][m_terms[k]->m_nz[j]] = true;
+	}
+
+	for (unsigned k = 0; k < N(); k++)
+	{
+		for (unsigned row = k + 1; row < N(); row++)
+		{
+			if (touched[row][k])
+			{
+				if (!m_terms[k]->m_nzbd.contains(row))
+					m_terms[k]->m_nzbd.add(row);
+				for (unsigned col = k; col < N(); col++)
+					if (touched[k][col])
+						touched[row][col] = true;
+			}
+		}
+	}
+
+	if (0)
 		for (unsigned k = 0; k < N(); k++)
 		{
-			netlist().log("%3d: ", k);
+			pstring line = pfmt("{1}")(k, "3");
 			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				netlist().log(" %3d", m_terms[k]->m_nzrd[j]);
-			netlist().log("\n");
+				line += pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
+			log().verbose("{1}", line);
 		}
 
 	/*
@@ -272,7 +309,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		pstring num = pstring::sprintf("%d", k);
+		pstring num = pfmt("{1}")(k);
 
 		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
 		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
@@ -289,22 +326,25 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 	for (unsigned k = 0; k < iN; k++)
 	{
 		for (unsigned i=0; i < iN; i++)
-			m_A[k][i] = 0.0;
+			A(k,i) = 0.0;
 
-		nl_double akk  = 0.0;
 		const unsigned terms_count = m_terms[k]->count();
 		const unsigned railstart =  m_terms[k]->m_railstart;
 		const nl_double * RESTRICT gt = m_terms[k]->gt();
+
+		{
+			nl_double akk  = 0.0;
+			for (unsigned i = 0; i < terms_count; i++)
+				akk += gt[i];
+
+			A(k,k) = akk;
+		}
+
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const int * RESTRICT net_other = m_terms[k]->net_other();
 
-		for (unsigned i = 0; i < terms_count; i++)
-			akk = akk + gt[i];
-
-		m_A[k][k] += akk;
-
 		for (unsigned i = 0; i < railstart; i++)
-			m_A[k][net_other[i]] -= go[i];
+			A(k,net_other[i]) -= go[i];
 	}
 }
 
@@ -336,74 +376,64 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * 
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 {
-#if 0
-	for (int i = 0; i < N(); i++)
-	{
-		for (int k = 0; k < N(); k++)
-			printf("%f ", m_A[i][k]);
-		printf("| %f = %f \n", x[i], m_RHS[i]);
-	}
-	printf("\n");
-#endif
-
 	const unsigned kN = N();
 
 	for (unsigned i = 0; i < kN; i++) {
-		// FIXME: use a parameter to enable pivoting?
-		if (USE_PIVOT_SEARCH)
+		// FIXME: use a parameter to enable pivoting? m_pivot
+		if (m_params.m_pivot)
 		{
 			/* Find the row with the largest first value */
 			unsigned maxrow = i;
 			for (unsigned j = i + 1; j < kN; j++)
 			{
-				if (nl_math::abs(m_A[j][i]) > nl_math::abs(m_A[maxrow][i]))
+				//if (std::abs(m_A[j][i]) > std::abs(m_A[maxrow][i]))
+				if (A(j,i) * A(j,i) > A(maxrow,i) * A(maxrow,i))
 					maxrow = j;
 			}
 
 			if (maxrow != i)
 			{
 				/* Swap the maxrow and ith row */
-				for (unsigned k = i; k < kN; k++) {
-					std::swap(m_A[i][k], m_A[maxrow][k]);
+				for (unsigned k = 0; k < kN; k++) {
+					std::swap(A(i,k), A(maxrow,k));
 				}
 				std::swap(m_RHS[i], m_RHS[maxrow]);
 			}
-		}
+			/* FIXME: Singular matrix? */
+			const nl_double f = 1.0 / A(i,i);
 
-		/* FIXME: Singular matrix? */
-		const nl_double f = 1.0 / m_A[i][i];
-		const double * RESTRICT s = &m_A[i][0];
-		const unsigned *p = m_terms[i]->m_nzrd.data();
-		const unsigned e = m_terms[i]->m_nzrd.size();
+			/* Eliminate column i from row j */
 
-		/* Eliminate column i from row j */
-
-		for (unsigned j = i + 1; j < kN; j++)
-		{
-			double * RESTRICT d = &m_A[j][0];
-			const nl_double f1 = - d[i] * f;
-			if (f1 != NL_FCONST(0.0))
+			for (unsigned j = i + 1; j < kN; j++)
 			{
-#if 0
-				/*  The code below is 30% faster than the original
-				 *  implementation which is given here for reference.
-				 *
-				 *  for (unsigned k = i + 1; k < kN; k++)
-				 *      m_A[j][k] = m_A[j][k] + m_A[i][k] * f1;
-				 */
-				double * RESTRICT d = &m_A[j][i+1];
-				const double * RESTRICT s = &m_A[i][i+1];
-				const int e = kN - i - 1;
+				const nl_double f1 = - A(j,i) * f;
+				if (f1 != NL_FCONST(0.0))
+				{
+					for (unsigned k = i+1; k < kN; k++)
+						A(j,k) += A(i,k) * f1;
+					m_RHS[j] += m_RHS[i] * f1;
+				}
+			}
+		}
+		else
+		{
+			/* FIXME: Singular matrix? */
+			const nl_double f = 1.0 / A(i,i);
+			const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
+			const unsigned e = m_terms[i]->m_nzrd.size();
 
-				for (int k = 0; k < e; k++)
-					d[k] = d[k] + s[k] * f1;
-#else
+			/* Eliminate column i from row j */
+
+			const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
+			const unsigned eb = m_terms[i]->m_nzbd.size();
+			for (unsigned jb = 0; jb < eb; jb++)
+			{
+				const unsigned j = pb[jb];
+				const nl_double f1 = - A(j,i) * f;
 				for (unsigned k = 0; k < e; k++)
 				{
-					const unsigned pk = p[k];
-					d[pk] += s[pk] * f1;
+					A(j,p[k]) += A(i,p[k]) * f1;
 				}
-#endif
 				m_RHS[j] += m_RHS[i] * f1;
 			}
 		}
@@ -417,44 +447,66 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 	const unsigned kN = N();
 
 	/* back substitution */
-	for (int j = kN - 1; j >= 0; j--)
+	if (m_params.m_pivot)
 	{
-		nl_double tmp = 0;
-
-#if 1
-#if 0
-		const double * RESTRICT A = &m_A[j][j+1];
-		const double * RESTRICT xp = &x[j+1];
-		const int e = kN - j - 1;
-		for (int k = 0; k < e; k++)
-			tmp += A[k] * xp[k];
-#else
-		const double * RESTRICT A = &m_A[j][0];
-		const unsigned *p = m_terms[j]->m_nzrd.data();
-		const unsigned e = m_terms[j]->m_nzrd.size();
-
-		for (unsigned k = 0; k < e; k++)
+		for (int j = kN - 1; j >= 0; j--)
 		{
-			const unsigned pk = p[k];
-			tmp += A[pk] * x[pk];
+			nl_double tmp = 0;
+			for (unsigned k = j+1; k < kN; k++)
+				tmp += A(j,k) * x[k];
+			x[j] = (m_RHS[j] - tmp) / A(j,j);
 		}
-#endif
-#else
-		for (unsigned k = j + 1; k < kN; k++)
-			tmp += m_A[j][k] * x[k];
-#endif
-		x[j] = (m_RHS[j] - tmp) / m_A[j][j];
 	}
-#if 0
-	printf("Solution:\n");
-	for (unsigned i = 0; i < N(); i++)
+	else
 	{
-		for (unsigned k = 0; k < N(); k++)
-			printf("%f ", m_A[i][k]);
-		printf("| %f = %f \n", x[i], m_RHS[i]);
+		for (int j = kN - 1; j >= 0; j--)
+		{
+			nl_double tmp = 0;
+
+			const unsigned *p = m_terms[j]->m_nzrd.data();
+			const unsigned e = m_terms[j]->m_nzrd.size();
+
+			for (unsigned k = 0; k < e; k++)
+			{
+				const unsigned pk = p[k];
+				tmp += A(j,pk) * x[pk];
+			}
+			x[j] = (m_RHS[j] - tmp) / A(j,j);
+		}
 	}
-	printf("\n");
-#endif
+}
+
+template <unsigned m_N, unsigned _storage_N>
+ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst_full(
+		nl_double * RESTRICT x)
+{
+	const unsigned kN = N();
+
+	/* back substitution */
+
+	// int ip;
+	// ii=-1
+
+	//for (int i=0; i < kN; i++)
+	//  x[i] = m_RHS[i];
+
+	for (int i=0; i < kN; i++)
+	{
+		//ip=indx[i]; USE_PIVOT_SEARCH
+		//sum=b[ip];
+		//b[ip]=b[i];
+		double sum=m_RHS[i];//x[i];
+		for (int j=0; j < i; j++)
+			sum -= A(i,j) * x[j];
+		x[i]=sum;
+	}
+	for (int i=kN-1; i >= 0; i--)
+	{
+		double sum=x[i];
+		for (int j = i+1; j < kN; j++)
+			sum -= A(i,j)*x[j];
+		x[i] = sum / A(i,i);
+	}
 
 }
 
@@ -495,21 +547,21 @@ ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
-	nl_double new_v[_storage_N]; // = { 0.0 };
+	nl_double new_V[_storage_N]; // = { 0.0 };
 
-	this->LE_back_subst(new_v);
+	this->LE_back_subst(new_V);
 
 	if (newton_raphson)
 	{
-		nl_double err = delta(new_v);
+		nl_double err = delta(new_V);
 
-		store(new_v);
+		store(new_V);
 
 		return (err > this->m_params.m_accuracy) ? 2 : 1;
 	}
 	else
 	{
-		store(new_v);
+		store(new_V);
 		return 1;
 	}
 }
@@ -532,7 +584,6 @@ template <unsigned m_N, unsigned _storage_N>
 matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const int size)
 : matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
-, m_lp_fact(0)
 {
 	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());
@@ -549,7 +600,6 @@ template <unsigned m_N, unsigned _storage_N>
 matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size)
 : matrix_solver_t(type, params)
 , m_dim(size)
-, m_lp_fact(0)
 {
 	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());

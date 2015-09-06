@@ -69,7 +69,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(multi8);
 	UINT32 screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width);
@@ -560,14 +559,6 @@ static GFXDECODE_START( multi8 )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(multi8_state, multi8)
-{
-	UINT8 i;
-
-	for(i=0; i<8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
-}
-
 READ8_MEMBER( multi8_state::porta_r )
 {
 	int vsync = (ioport("VBLANK")->read() & 0x1) << 5;
@@ -638,8 +629,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(multi8_state, screen_update_multi8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(multi8_state, multi8)
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multi8)
 
 	/* Audio */
@@ -688,4 +678,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1983, multi8, 0,      0,       multi8,    multi8, driver_device,  0,     "Mitsubishi", "Multi 8", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, multi8, 0,      0,       multi8,    multi8, driver_device,  0,     "Mitsubishi", "Multi 8", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

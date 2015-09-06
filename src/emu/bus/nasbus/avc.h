@@ -41,14 +41,13 @@ protected:
 
 private:
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 
 	std::vector<UINT8> m_r_ram;
 	std::vector<UINT8> m_g_ram;
 	std::vector<UINT8> m_b_ram;
 
 	UINT8 m_control;
-
-	static const rgb_t m_palette[];
 };
 
 // device type definition

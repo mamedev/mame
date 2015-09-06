@@ -140,4 +140,4 @@ ROM_START( slicer )
 	ROM_LOAD("epbios.bin", 0x0000, 0x8001, CRC(96fe9dd4) SHA1(5fc43454fe7d51f2ae97aef822155dcd28eb7f23))
 ROM_END
 
-COMP( 1983, slicer, 0, 0, slicer, 0, driver_device, 0, "Slicer Computers", "Slicer", GAME_NO_SOUND)
+COMP( 1983, slicer, 0, 0, slicer, 0, driver_device, 0, "Slicer Computers", "Slicer", MACHINE_NO_SOUND)

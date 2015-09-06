@@ -283,7 +283,7 @@ void gtia_device::device_reset()
 
 int gtia_device::is_ntsc()
 {
-	return ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds) > 55;
+	return ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) > 55;
 }
 
 void gtia_device::button_interrupt(int button_count, UINT8 button_port)

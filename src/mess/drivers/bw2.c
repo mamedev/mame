@@ -675,4 +675,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY             FULLNAME            FLAGS
-COMP( 1985, bw2,    0,      0,      bw2,        bw2,    driver_device,      0,      "Bondwell Holding", "Bondwell Model 2", GAME_NO_SOUND_HW )
+COMP( 1985, bw2,    0,      0,      bw2,        bw2,    driver_device,      0,      "Bondwell Holding", "Bondwell Model 2", MACHINE_NO_SOUND_HW )

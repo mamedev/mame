@@ -307,5 +307,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1984, llc1,   0,      0,      llc1,       llc1, llc_state,       llc1,    "SCCH",    "LLC-1", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1984, llc1,   0,      0,      llc1,       llc1, llc_state,       llc1,    "SCCH",    "LLC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
 COMP( 1984, llc2,   llc1,   0,      llc2,       llc2, llc_state,       llc2,    "SCCH",    "LLC-2", 0 )

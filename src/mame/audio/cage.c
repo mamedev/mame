@@ -337,7 +337,7 @@ void atari_cage_device::update_serial()
 	m_serial_period_per_word = bit_clock_period * (8 * (((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
 
 	/* compute the step value to stretch this to the sample_rate */
-	freq = ATTOSECONDS_TO_HZ(m_serial_period_per_word.attoseconds) / DAC_BUFFER_CHANNELS;
+	freq = ATTOSECONDS_TO_HZ(m_serial_period_per_word.attoseconds()) / DAC_BUFFER_CHANNELS;
 	if (freq > 0 && freq < 100000)
 	{
 		dmadac_set_frequency(&m_dmadac[0], DAC_BUFFER_CHANNELS, freq);
@@ -409,7 +409,7 @@ WRITE32_MEMBER( atari_cage_device::tms32031_io_w )
 
 		case SPORT_DATA_TX:
 #if (DAC_BUFFER_CHANNELS == 4)
-			if ((int)ATTOSECONDS_TO_HZ(m_serial_period_per_word.attoseconds) == 22050*4 && (tms32031_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
+			if ((int)ATTOSECONDS_TO_HZ(m_serial_period_per_word.attoseconds()) == 22050*4 && (tms32031_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
 				tms32031_io_regs[SPORT_RX_CTL] ^= 0x800;
 #endif
 			break;

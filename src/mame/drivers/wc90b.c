@@ -512,6 +512,6 @@ ROM_START( wc90ba )
 ROM_END
 
 
-GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Temco World Cup '90 - alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Temco World Cup '90 - alt version)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

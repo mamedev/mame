@@ -8,8 +8,8 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include "../nl_setup.h"
-#include "../nl_base.h"
+#include "nl_setup.h"
+#include "nl_base.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
@@ -22,7 +22,7 @@
 // ----------------------------------------------------------------------------------------
 
 #define SOLVER(_name, _freq)                                                 \
-		NET_REGISTER_DEV(solver, _name)                                      \
+		NET_REGISTER_DEV(SOLVER, _name)                                      \
 		PARAM(_name.FREQ, _freq)
 
 // ----------------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ class NETLIB_NAME(solver);
 
 struct solver_parameters_t
 {
+	int m_pivot;
 	nl_double m_accuracy;
 	nl_double m_lte;
 	nl_double m_min_timestep;
@@ -83,8 +84,9 @@ class terms_t
 
 	unsigned m_railstart;
 
-	plist_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination */
 	plist_t<unsigned> m_nz;   /* all non zero for multiplication */
+	plist_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination */
+	plist_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 private:
 	plist_t<terminal_t *> m_term;
 	plist_t<int> m_net_other;
@@ -133,26 +135,9 @@ public:
 	ATTR_COLD int get_net_idx(net_t *net);
 
 	inline eSolverType type() const { return m_type; }
+	plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
-	virtual void log_stats()
-	{
-		if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
-		{
-			this->netlist().log("==============================================");
-			this->netlist().log("Solver %s", this->name().cstr());
-			this->netlist().log("       ==> %d nets", (unsigned) this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-			this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
-			this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
-			this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-			this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
-					this->m_stat_calculations,
-					this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
-					this->m_iterative_fail,
-					100.0 * (double) this->m_iterative_fail / (double) this->m_stat_calculations,
-					(double) this->m_iterative_total / (double) this->m_stat_calculations);
-		}
-	}
-
+	virtual void log_stats();
 
 protected:
 
@@ -217,6 +202,7 @@ protected:
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
 
+	param_logic_t  m_pivot;
 	param_double_t m_freq;
 	param_double_t m_sync_delay;
 	param_double_t m_accuracy;

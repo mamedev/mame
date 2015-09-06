@@ -635,6 +635,6 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 
 
 
-GAME( 1987, cshootere, cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1987, airraid,   cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu", "Air Raid (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1987, cshootere, cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1987, airraid,   cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu", "Air Raid (encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 // There's also an undumped International Games version

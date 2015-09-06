@@ -8,8 +8,8 @@
 #ifndef NLD_CMOS_H_
 #define NLD_CMOS_H_
 
-#include "../nl_base.h"
-#include "../analog/nld_twoterm.h"
+#include "nl_base.h"
+#include "analog/nld_twoterm.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -27,8 +27,8 @@ class nld_vdd_vss : public device_t
 		ATTR_HOT void update() {};
 		ATTR_HOT void start()
 		{
-			register_input("VDD,", m_vdd);
-			register_input("VSS,", m_vss);
+			register_input("VDD", m_vdd);
+			register_input("VSS", m_vss);
 		};
 		ATTR_HOT void reset()  {};
 

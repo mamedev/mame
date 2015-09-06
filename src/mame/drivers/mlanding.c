@@ -1032,4 +1032,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding, 0, mlanding, mlanding, driver_device, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", GAME_SUPPORTS_SAVE )
+GAME( 1987, mlanding, 0, mlanding, mlanding, driver_device, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )

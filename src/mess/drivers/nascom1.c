@@ -234,7 +234,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 
 	while (image.fread( &line, sizeof(line)) == sizeof(line))
 	{
-		int addr, b0, b1, b2, b3, b4, b5, b6, b7, dummy;
+		unsigned int addr, b0, b1, b2, b3, b4, b5, b6, b7, dummy;
 
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
@@ -771,6 +771,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT     COMPANY                  FULLNAME           FLAGS */
-COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom_state,  nascom,  "Nascom Microcomputers", "Nascom 1",        GAME_NO_SOUND_HW )
-COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom2,  "Nascom Microcomputers", "Nascom 2",        GAME_NO_SOUND_HW )
-COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", GAME_NO_SOUND_HW )
+COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom_state,  nascom,  "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
+COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )

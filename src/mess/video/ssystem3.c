@@ -18,7 +18,7 @@ void ssystem3_state::ssystem3_lcd_write(int clock, int data)
 		m_lcd.data[m_lcd.count/8]&=~(1<<(m_lcd.count&7));
 		if (data) m_lcd.data[m_lcd.count/8]|=1<<(m_lcd.count&7);
 		if (m_lcd.count+1==40) {
-			logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)machine().device("maincpu")->safe_pc(),
+			logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)m_maincpu->pc(),
 				m_lcd.data[0], m_lcd.data[1], m_lcd.data[2], m_lcd.data[3], m_lcd.data[4]);
 		}
 		m_lcd.count=(m_lcd.count+1)%40;
@@ -204,7 +204,7 @@ UINT32 ssystem3_state::screen_update_ssystem3(screen_device &screen, bitmap_ind1
 	ssystem3_draw_led(bitmap, m_lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
 	ssystem3_draw_led(bitmap, m_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
-	if (ioport("Configuration")->read()&1) { // playfield(optional device)
+	if (m_configuration->read() & 1) { // playfield(optional device)
 		static const int lcd_signs_on[]={
 			0, // empty
 			1, // bauer

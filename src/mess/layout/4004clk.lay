@@ -1,18 +1,47 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+
+<!-- define elements -->
+
+	<element name="digit" defstate="10">
+		<rect><color red="0.1" green="0.06" blue="0.02" /></rect>
+		<text state="0" string="0"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="1" string="1"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="2" string="2"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="3" string="3"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="4" string="4"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="5" string="5"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="6" string="6"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="7" string="7"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="8" string="8"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="9" string="9"><color red="1.0" green="0.6" blue="0.2" /></text>
+		<text state="10" string=" "><color red="1.0" green="0.6" blue="0.2" /></text>
 	</element>
-	<element name="warning"><text string="Mandatory Artwork '4004clk.zip' is missing from 'Artwork' folder."><color red="1.0" green="0.5" blue="0.5" /></text></element>
-	<view name="artwork_missing">
-		<bezel element="background">
-			<bounds left="0" top="0" right="580" bottom="150" />
-		</bezel>
-		<bezel name="warning_txt" element="warning">
-			<bounds left="50" right="530" top="50" bottom="65" />
-		</bezel>
+
+	<element name="dot" defstate="0">
+		<disk state="0"><color red="0.1" green="0.06" blue="0.02" /></disk>
+		<disk state="1"><color red="1.0" green="0.6" blue="0.2" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1" right="67.9" top="-1" bottom="16" />
+
+	<!-- 3*2 neon digits, separated by colons -->
+
+		<bezel name="nixie0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
+		<bezel name="nixie1" element="digit"><bounds x="10.3" y="0" width="10" height="15" /></bezel>
+		<bezel name="nixie2" element="digit"><bounds x="23.3" y="0" width="10" height="15" /></bezel>
+		<bezel name="nixie3" element="digit"><bounds x="33.6" y="0" width="10" height="15" /></bezel>
+		<bezel name="nixie4" element="digit"><bounds x="46.6" y="0" width="10" height="15" /></bezel>
+		<bezel name="nixie5" element="digit"><bounds x="56.9" y="0" width="10" height="15" /></bezel>
+
+		<bezel name="neon1" element="dot"><bounds x="21.05" y="4.35" width="1.5" height="1.5" /></bezel>
+		<bezel name="neon0" element="dot"><bounds x="21.05" y="9.15" width="1.5" height="1.5" /></bezel>
+		<bezel name="neon2" element="dot"><bounds x="44.35" y="4.35" width="1.5" height="1.5" /></bezel>
+		<bezel name="neon3" element="dot"><bounds x="44.35" y="9.15" width="1.5" height="1.5" /></bezel>
+
 	</view>
 </mamelayout>

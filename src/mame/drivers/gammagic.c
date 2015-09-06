@@ -183,5 +183,5 @@ ROM_END
 *************************/
 
 /*     YEAR NAME       PARENT    MACHINE   INPUT                     INIT       ROT   COMPANY             FULLNAME              FLAGS           */
-GAME( 1999, gammagic,  0,        gammagic, gammagic, driver_device,  0,         ROT0, "Bally Gaming Co.", "Game Magic",         GAME_IS_SKELETON )
-GAME( 1999, 99bottles, gammagic, gammagic, gammagic, driver_device,  0,         ROT0, "Bally Gaming Co.", "99 Bottles of Beer", GAME_IS_SKELETON )
+GAME( 1999, gammagic,  0,        gammagic, gammagic, driver_device,  0,         ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
+GAME( 1999, 99bottles, gammagic, gammagic, gammagic, driver_device,  0,         ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )

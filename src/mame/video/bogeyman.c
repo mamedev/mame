@@ -62,12 +62,6 @@ WRITE8_MEMBER(bogeyman_state::colorram2_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::paletteram_w)
-{
-	/* RGB output is inverted */
-	m_palette->write(space, offset, UINT8(~data));
-}
-
 TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)
 {
 	int attr = m_colorram[tile_index];

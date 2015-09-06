@@ -340,6 +340,6 @@ ROM_END
 
 
 
-GAME( 1990, mosaic,  0,      mosaic, mosaic, driver_device, 0, ROT0, "Space", "Mosaic", GAME_SUPPORTS_SAVE )
-GAME( 1990, mosaica, mosaic, mosaic, mosaic, driver_device, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", GAME_SUPPORTS_SAVE )
-GAME( 1992, gfire2,  0,      gfire2, gfire2, driver_device, 0, ROT0, "Topis Corp", "Golden Fire II", GAME_SUPPORTS_SAVE )
+GAME( 1990, mosaic,  0,      mosaic, mosaic, driver_device, 0, ROT0, "Space", "Mosaic", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mosaica, mosaic, mosaic, mosaic, driver_device, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gfire2,  0,      gfire2, gfire2, driver_device, 0, ROT0, "Topis Corp", "Golden Fire II", MACHINE_SUPPORTS_SAVE )

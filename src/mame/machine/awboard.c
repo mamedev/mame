@@ -99,9 +99,9 @@ ROM board internal layouts:
  00000000 - 00800000 FMEM1 flash ROM
  00800000 - 01000000 FMEM2 flash ROM
  01000000 - 02000000 unk, probably mirror of above
- 02000000 - 04000000 MROM1 MROM4 MROM7 MROM10 \               
+ 02000000 - 04000000 MROM1 MROM4 MROM7 MROM10 \
  04000000 - 06000000 MROM2 MROM5 MROM8 MROM11   banked mask ROMs
- 06000000 - 08000000 MROM3 MROM6 MROM9 MROM12 /                
+ 06000000 - 08000000 MROM3 MROM6 MROM9 MROM12 /
 
  Type 3:
 
@@ -116,11 +116,11 @@ ROM board internal layouts:
 
  Development:
 
- 00000000 - 00800000 IC12 \          
+ 00000000 - 00800000 IC12 \
         .....               flash ROMs
- 07800000 - 08000000 IC27 /          
+ 07800000 - 08000000 IC27 /
 
- 
+
  In short:
 
      EPR-ROM

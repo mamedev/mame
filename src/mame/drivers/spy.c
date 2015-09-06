@@ -519,6 +519,7 @@ static MACHINE_CONFIG_START( spy, spy_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(spy_state, sprite_callback)
 
 	/* sound hardware */
@@ -601,5 +602,5 @@ ROM_START( spyu )
 ROM_END
 
 
-GAME( 1989, spy,  0,   spy, spy, driver_device, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", GAME_SUPPORTS_SAVE )
-GAME( 1989, spyu, spy, spy, spy, driver_device, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", GAME_SUPPORTS_SAVE )
+GAME( 1989, spy,  0,   spy, spy, driver_device, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spyu, spy, spy, spy, driver_device, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )

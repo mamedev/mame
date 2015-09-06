@@ -37,8 +37,6 @@ public:
 	optional_shared_ptr<UINT16> m_pf1_rowscroll;
 	optional_shared_ptr<UINT16> m_pf2_rowscroll;
 	optional_shared_ptr<UINT16> m_spriteram;
-//  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
-
 	optional_shared_ptr<UINT16> m_pktgaldb_fgram;
 	optional_shared_ptr<UINT16> m_pktgaldb_sprites;
 	optional_device<decospr_device> m_sprgen;

@@ -283,4 +283,4 @@ DRIVER_INIT_MEMBER(mirage_state,mirage)
 	m_via->write_pb7(0);
 }
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, mirage_state, mirage, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )
+CONS( 1984, enmirage, 0, 0, mirage, mirage, mirage_state, mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )

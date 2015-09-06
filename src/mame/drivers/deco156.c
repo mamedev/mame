@@ -475,8 +475,7 @@ DE-0385-2  DEC-22VO
 |----------------------------------------------|
 
 Notes:
-      - CPU is unknown. It's chip DE156. The clock input is 7.000MHz on pin 90
-        It's thought to be a custom-made encrypted ARM7-based CPU.
+      - CPU DE156 is a custom encrypted ARM7-based chip. The clock input is 7.000MHz on pin 90
         The package is a Quad Flat Pack and has 100 pins.
       - OKI M6295(1) clock: 1.000MHz (28 / 28), sample rate = 1000000 / 132
       - OKI M6295(2) clock: 2.000MHz (28 / 14), sample rate = 2000000 / 132
@@ -603,8 +602,7 @@ DE-0430-2
 |----------------------------------------------|
 
 Notes:
-      - CPU is unknown. It's chip DE156. The clock input is 7.000MHz on pin 90
-        It's thought to be a custom-made encrypted ARM7-based CPU.
+      - CPU DE156 is a custom encrypted ARM7-based chip. The clock input is 7.000MHz on pin 90
         The package is a Quad Flat Pack and has 100 pins.
       - YMZ280B-F clock: 14.000MHz (28 / 2)
         SANYO LC7881 clock: 2.3333MHz (28 / 12)
@@ -675,7 +673,7 @@ DRIVER_INIT_MEMBER(deco156_state,wcvol95)
 
 /**********************************************************************************/
 
-GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", GAME_SUPPORTS_SAVE )
-GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", GAME_SUPPORTS_SAVE )
-GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", GAME_SUPPORTS_SAVE )
-GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", GAME_SUPPORTS_SAVE )
+GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )

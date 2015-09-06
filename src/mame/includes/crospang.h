@@ -25,7 +25,6 @@ public:
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_device<decospr_device> m_sprgen;
-//  UINT16 *  m_paletteram;       // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t   *m_bg_layer;

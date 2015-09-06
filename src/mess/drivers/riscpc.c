@@ -186,7 +186,7 @@ void riscpc_state::vidc20_dynamic_screen_change()
 			visarea.min_y = (m_vidc20_vert_reg[VBSR] & 0x1fff);
 			visarea.max_y = (m_vidc20_vert_reg[VBER] & 0x1fff)-1;
 
-			machine().first_screen()->configure(hblank_period, vblank_period, visarea, machine().first_screen()->frame_period().attoseconds );
+			machine().first_screen()->configure(hblank_period, vblank_period, visarea, machine().first_screen()->frame_period().attoseconds() );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
 						(m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]),(m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]),
 						(m_vidc20_horz_reg[HBER]-m_vidc20_horz_reg[HBSR]),(m_vidc20_vert_reg[VBER]-m_vidc20_vert_reg[VBSR]),
@@ -946,9 +946,9 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, driver_device,   0,      "Acorn",  "Risc PC 600",        GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, driver_device,   0,      "Acorn",  "Risc PC 700",        GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, driver_device,   0,      "Acorn",  "Archimedes A7000",   GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, driver_device,   0,      "Acorn",  "Archimedes A7000+",  GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, driver_device,   0,      "Acorn",  "StrongARM Risc PC",  GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, driver_device,   0,      "Acorn",  "J233 StrongARM Risc PC",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, driver_device,   0,      "Acorn",  "Risc PC 600",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, driver_device,   0,      "Acorn",  "Risc PC 700",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, driver_device,   0,      "Acorn",  "Archimedes A7000",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, driver_device,   0,      "Acorn",  "Archimedes A7000+",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, driver_device,   0,      "Acorn",  "StrongARM Risc PC",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, driver_device,   0,      "Acorn",  "J233 StrongARM Risc PC",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -23,16 +23,6 @@
 #include "chqflag.lh"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(chqflag_state::chqflag_scanline)
-{
-	int scanline = param;
-
-	if(scanline == 240 && m_k051960->k051960_is_irq_enabled()) // vblank irq
-		m_maincpu->set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && (m_k051960->k051960_is_nmi_enabled())) // timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 /* these trampolines are less confusing than nested address_map_bank_devices */
 READ8_MEMBER(chqflag_state::k051316_1_ramrom_r)
 {
@@ -297,9 +287,8 @@ void chqflag_state::machine_reset()
 static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)    /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(chqflag_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", chqflag_state, chqflag_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chqflag_sound_map)
@@ -314,12 +303,10 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	//TODO: Vsync 59.17hz Hsync 15.13 / 15.19khz
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
+//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
+//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -329,7 +316,10 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(chqflag_state, sprite_callback)
+	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
+	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -424,5 +414,5 @@ ROM_END
 
 
 //     YEAR, NAME,     PARENT,  MACHINE, INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag, driver_device,  0,   ROT90,  "Konami", "Chequered Flag", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, driver_device, 0,   ROT90,  "Konami", "Chequered Flag (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag, driver_device,  0,   ROT90,  "Konami", "Chequered Flag", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, driver_device, 0,   ROT90,  "Konami", "Chequered Flag (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )

@@ -11,7 +11,7 @@
 
 #define MCFG_S32COMM_ADD(_tag ) \
 	MCFG_DEVICE_ADD(_tag, S32COMM, 0)
-	
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -45,7 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(fg_r);
 	DECLARE_WRITE8_MEMBER(fg_w);
 
-  // IRQ logic - 5 = VINT, 7 = DLC
+	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
 #ifdef __S32COMM_SIMULATION__
 	void set_linktype(UINT16 linktype);
@@ -58,16 +58,16 @@ protected:
 
 private:
 	UINT8 m_shared[0x800];  // 2k shared memory
-	UINT8	m_zfg;						// z80 flip gate? purpose unknown, bit0 is stored
-	UINT8	m_cn;							// bit0 is used to enable/disable the comm board
-	UINT8	m_fg;							// flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
-	
+	UINT8   m_zfg;                      // z80 flip gate? purpose unknown, bit0 is stored
+	UINT8   m_cn;                           // bit0 is used to enable/disable the comm board
+	UINT8   m_fg;                           // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
+
 	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
 	emu_file m_line_tx;    // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
 	UINT8 m_buffer[0x800];
-	
+
 #ifdef __S32COMM_SIMULATION__
 	UINT8 m_linkenable;
 	UINT16 m_linktimer;
@@ -76,9 +76,9 @@ private:
 	UINT8 m_linkcount;
 
 	UINT16 m_linktype;
-	
+
 	void comm_tick();
-	
+
 	void comm_tick_14084();
 	void comm_tick_15033();
 	void comm_tick_15612();

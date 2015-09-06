@@ -162,4 +162,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME       FLAGS */
-COMP( 1987, tim011, 0,      0,       tim011,    tim011, driver_device,  0, "Mihajlo Pupin Institute", "TIM-011", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, tim011, 0,      0,       tim011,    tim011, driver_device,  0, "Mihajlo Pupin Institute", "TIM-011", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

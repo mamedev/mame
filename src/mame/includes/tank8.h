@@ -35,55 +35,62 @@ public:
 
 	tank8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
-		m_pos_h_ram(*this, "pos_h_ram"),
-		m_pos_v_ram(*this, "pos_v_ram"),
-		m_pos_d_ram(*this, "pos_d_ram"),
-		m_team(*this, "team"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram"),
+		m_pos_h_ram(*this, "pos_h_ram"),
+		m_pos_v_ram(*this, "pos_v_ram"),
+		m_pos_d_ram(*this, "pos_d_ram"),
+		m_team(*this, "team") { }
 
-	int m_collision_index;
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_pos_h_ram;
-	required_shared_ptr<UINT8> m_pos_v_ram;
-	required_shared_ptr<UINT8> m_pos_d_ram;
-	required_shared_ptr<UINT8> m_team;
-	tilemap_t *m_tilemap;
-	bitmap_ind16 m_helper1;
-	bitmap_ind16 m_helper2;
-	bitmap_ind16 m_helper3;
-	DECLARE_READ8_MEMBER(tank8_collision_r);
-	DECLARE_WRITE8_MEMBER(tank8_lockout_w);
-	DECLARE_WRITE8_MEMBER(tank8_int_reset_w);
-	DECLARE_WRITE8_MEMBER(tank8_video_ram_w);
-	DECLARE_WRITE8_MEMBER(tank8_crash_w);
-	DECLARE_WRITE8_MEMBER(tank8_explosion_w);
-	DECLARE_WRITE8_MEMBER(tank8_bugle_w);
-	DECLARE_WRITE8_MEMBER(tank8_bug_w);
-	DECLARE_WRITE8_MEMBER(tank8_attract_w);
-	DECLARE_WRITE8_MEMBER(tank8_motor_w);
-	DECLARE_DRIVER_INIT(decode);
-	TILE_GET_INFO_MEMBER(tank8_get_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(tank8);
-	UINT32 screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_tank8(screen_device &screen, bool state);
-	void set_pens();
-	inline int get_x_pos(int n);
-	inline int get_y_pos(int n);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tank8_set_collision(int index);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_pos_h_ram;
+	required_shared_ptr<UINT8> m_pos_v_ram;
+	required_shared_ptr<UINT8> m_pos_d_ram;
+	required_shared_ptr<UINT8> m_team;
+
+	int m_collision_index;
+	tilemap_t *m_tilemap;
+	bitmap_ind16 m_helper1;
+	bitmap_ind16 m_helper2;
+	bitmap_ind16 m_helper3;
+	emu_timer *m_collision_timer;
+
+	DECLARE_READ8_MEMBER(collision_r);
+	DECLARE_WRITE8_MEMBER(lockout_w);
+	DECLARE_WRITE8_MEMBER(int_reset_w);
+	DECLARE_WRITE8_MEMBER(video_ram_w);
+	DECLARE_WRITE8_MEMBER(crash_w);
+	DECLARE_WRITE8_MEMBER(explosion_w);
+	DECLARE_WRITE8_MEMBER(bugle_w);
+	DECLARE_WRITE8_MEMBER(bug_w);
+	DECLARE_WRITE8_MEMBER(attract_w);
+	DECLARE_WRITE8_MEMBER(motor_w);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	DECLARE_DRIVER_INIT(decode);
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_PALETTE_INIT(tank8);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
+	void set_pens();
+	inline int get_x_pos(int n);
+	inline int get_y_pos(int n);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_collision(int index);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

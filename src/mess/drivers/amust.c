@@ -192,7 +192,8 @@ static ADDRESS_MAP_START(amust_io, AS_IO, 8, amust_state)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START( amust_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 /* Input ports */
@@ -409,8 +410,10 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(amust_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	//MCFG_DEVICE_ADD("uart1", I8251, 0)
 	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -461,4 +464,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust", "Amust Executive 816", GAME_NOT_WORKING )
+COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust", "Amust Executive 816", MACHINE_NOT_WORKING )
