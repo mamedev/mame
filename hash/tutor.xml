@@ -15,18 +15,18 @@ Japanese Releases - Pyuuta
 005E Frogger ~ フロッガー    [dumped]
 006E Scramble ~ スクランブル  [dumped]
 007E NightFlight ~ ナイトフライト  [dumped]
-008E Marine Adventure ~ マリン アドベンチャー    [dumped]
+008E Marine Adventure ~ マリン アドベンチーャ    [dumped]
 009E Mission Attack ~ ミッション アタック    [dumped]
-010E Traffic Jam ~ トラフィック ジャム
-011E Mystery Gold ~ ミステリー ゴールド
+010E Traffic Jam ~ トラフィック ジャム    [dumped]
+011E Mystery Gold ~ ミステリー ゴールド    [dumped]
 012E DonPan ~ ドンバン [dumped]
 013E Mickey Athletic Land ~ ミッキー アスレチックランド [dumped]
 014E Pooyan ~ プーヤン
 015E Jungler ~ ジャングラー
 016E Guttang Gottong ~ ガッタンゴットン
-017E Maze Patrol ~ メイズ パトロール
+017E Maze Patrol ~ メイズ パトロール    [dumped]
 018E Tron ~ トロン
-019E Mr. Do! ~ Mr.DO!
+019E Mr. Do! ~ Mr.DO!    [dumped]
 020E Bermuda Triangle ~ バミューダ・ トライアングル
 021E 4-nin Mahjan ~ 四人麻雀
 022E Triplecommand ~ トリプルコマンド
@@ -218,6 +218,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="mazeptrl">
+		<description>Maze Patrol (Jpn)</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="メイズ パトロール"/>
+		<info name="serial" value="017E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tomy 36.7.u1" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="athland">
 		<description>Mickey Athletic Land (Jpn)</description>
@@ -254,6 +267,32 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="mnstrinn.bin" size="8192" crc="2af704f8" sha1="457acdeb308f2874021741f13fc8f74d52c361af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mysteryg">
+		<description>Mystery Gold (Jpn)</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ミステリー ゴールド"/>
+		<info name="serial" value="011E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mysteryg.bin" size="8192" crc="2c4f30b8" sha1="8d1fcb8e86f4e2d5557a7c39e7859811311a966a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mrdo">
+		<description>Mr. Do! (Jpn)</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="Mr.DO!"/>
+		<info name="serial" value="019E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tomy 3l1.ic1.bin" size="8192" crc="1dfa3f4b" sha1="93d1c17c5edd44f27c28cde88a68f609b77feb0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -336,24 +375,24 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 	<software name="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
-		<description>Traffic Jam</description>
-		<year>1983</year>
+		<description>Traffic Jam (Jpn)</description>
+		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="trafjam.bin" size="8192" crc="c0c78141" sha1="2ba074955a1507ca9f6cde8987695f495e81aeab" offset="0" />
+				<rom name="tomy 33.5.ic1" size="8192" crc="c970f2c3" sha1="086825470d349f3bbd598bbb8b8c9e13aa2458b6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="trafjama" cloneof="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
-		<description>Traffic Jam (Alt)</description>
-		<year>1982</year>
+		<description>Traffic Jam (USA)</description>
+		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="trafjama.bin" size="8192" crc="c970f2c3" sha1="086825470d349f3bbd598bbb8b8c9e13aa2458b6" offset="0" />
+				<rom name="trafjama.bin" size="8192" crc="c0c78141" sha1="2ba074955a1507ca9f6cde8987695f495e81aeab" offset="0" />
 			</dataarea>
 		</part>
 	</software>

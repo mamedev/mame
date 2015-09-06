@@ -1,7 +1,6 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
 #include "emu.h"
-#include "drawgfxm.h"
 #include "includes/hng64.h"
 
 #define BLEND_TEST 0

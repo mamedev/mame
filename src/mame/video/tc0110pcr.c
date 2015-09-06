@@ -13,7 +13,6 @@ The data bus is 16 bits wide.
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "tc0110pcr.h"
 
 #define TC0110PCR_RAM_SIZE 0x2000

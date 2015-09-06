@@ -60,7 +60,6 @@ Taito pc090oj
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "pc090oj.h"
 
 #define PC090OJ_RAM_SIZE 0x4000

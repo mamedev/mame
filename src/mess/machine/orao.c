@@ -74,6 +74,7 @@ WRITE8_MEMBER(orao_state::orao_io_w)
 {
 	if (offset == 0x0800)
 	{
-		m_dac->write_unsigned8(data); //beeper
+		m_speaker->level_w(m_beep);
+		m_beep ^= 1;
 	}
 }
