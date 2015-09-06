@@ -2266,9 +2266,11 @@ void n64_periphs::dd_update_bm()
 	}
 	else // dd read, BM Mode 1
 	{
-		if(((dd_track_reg & 0xFFF) == 6) && (dd_start_block == 0))
+		if(((dd_track_reg & 0xFFF) == 6) && (dd_start_block == 0) && ((machine().root_device().ioport("input")->read() & 0x0100) == 0x0000))
 		{
+			//only fail read LBA 12 if retail disk drive
 			dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
+			dd_buf_status_reg |= DD_BMST_MICRO_STATUS;
 		}
 		else if(dd_current_reg < SECTORS_PER_BLOCK)
 		{
@@ -2336,11 +2338,11 @@ void n64_periphs::dd_read_sector()
 	sector = (UINT8*)machine().root_device().memregion("disk")->base();
 	sector += dd_track_offset;
 	sector += dd_start_block * SECTORS_PER_BLOCK * ddZoneSecSize[dd_zone];
-	sector += (dd_current_reg) * ddZoneSecSize[dd_zone];
+	sector += (dd_current_reg) * (dd_sector_size + 1);
 
 	//logerror("Read Block %d, Sector %d\n", dd_start_block, dd_current_reg);
 
-	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
+	for(int i = 0; i < (dd_sector_size + 1)/4; i++)
 	{
 		dd_sector_data[i] = sector[(i*4 + 0)] << 24 | sector[(i*4 + 1)] << 16 |
 							sector[(i*4 + 2)] << 8  | sector[(i*4 + 3)];
@@ -2421,7 +2423,10 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 			ret = dd_seq_ctrl_reg;
 			break;
 		case 0x40/4: // ASIC ID
-			ret = 0x00030000; // Japan Retail Drive
+			if ((machine().root_device().ioport("input")->read() & 0x0100) == 0x0000)
+				ret = 0x00030000; // Japan Retail Drive
+			else
+				ret = 0x00040000; // Development Drive
 			break;
 	}
 
