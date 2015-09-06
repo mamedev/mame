@@ -141,7 +141,6 @@ the wide tilemap mode)
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "tc0100scn.h"
 
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */

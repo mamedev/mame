@@ -21,7 +21,6 @@ control registers:
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "tc0280grd.h"
 
 #define TC0280GRD_RAM_SIZE 0x2000

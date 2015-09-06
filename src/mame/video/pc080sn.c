@@ -42,7 +42,6 @@ Control registers
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "pc080sn.h"
 #include "video/taito_helper.h"
 

@@ -142,7 +142,6 @@ Control registers
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "tc0480scp.h"
 #include "video/taito_helper.h"
 
