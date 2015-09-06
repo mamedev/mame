@@ -371,26 +371,52 @@ public:
 		: segaxbd_new_state(mconfig, type, tag),
 		m_subpcb(*this, "subpcb")
 	{
-		for (int i = 0; i < 0x10; i++)
+		for (int i = 0; i < 0x800; i++)
 		{
-			shareram1[i] = 0x00;
-			shareram2[i] = 0x00;
+			shareram[i] = 0x0000;
 		}
+		rampage1 = 0x0000;
+		rampage2 = 0x0000;
 	}
-
 
 	required_device<segaxbd_state> m_subpcb;
 
-	DECLARE_READ16_MEMBER(shareram1_r) { return shareram1[offset]; }
-	DECLARE_WRITE16_MEMBER(shareram1_w) { COMBINE_DATA(&shareram1[offset]); }
-	DECLARE_READ16_MEMBER(shareram2_r) { return shareram2[offset]; }
-	DECLARE_WRITE16_MEMBER(shareram2_w) {COMBINE_DATA(&shareram2[offset]); }
+	DECLARE_READ16_MEMBER(shareram1_r) {
+		if (offset < 0x10) {
+			int address = (rampage1 << 4) + offset;
+			return shareram[address];
+		}
+		return 0xffff;
+	}
+	DECLARE_WRITE16_MEMBER(shareram1_w) {
+		if (offset < 0x10) {
+			int address = (rampage1 << 4) + offset;
+			COMBINE_DATA(&shareram[address]);
+		} else if (offset == 0x10) {
+			rampage1 = data & 0x00FF;
+		}
+	}
+	DECLARE_READ16_MEMBER(shareram2_r) {
+		if (offset < 0x10) {
+			int address = (rampage2 << 4) + offset;
+			return shareram[address];
+		}
+		return 0xffff;
+	}
+	DECLARE_WRITE16_MEMBER(shareram2_w) {
+		if (offset < 0x10) {
+			int address = (rampage2 << 4) + offset;
+			COMBINE_DATA(&shareram[address]);
+		} else if (offset == 0x10) {
+			rampage2 = data & 0x007F;
+		}
+	}
 
 	DECLARE_DRIVER_INIT(gprider_double);
 
-
-	UINT16 shareram1[0x20];
-	UINT16 shareram2[0x20];
+	UINT16 shareram[0x800];
+	UINT16 rampage1;
+	UINT16 rampage2;
 };
 
 //**************************************************************************
@@ -3750,8 +3776,8 @@ DRIVER_INIT_MEMBER(segaxbd_new_state_double,gprider_double)
 	m_mainpcb->install_gprider();
 	m_subpcb->install_gprider();
 
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(FUNC(segaxbd_new_state_double::shareram2_r), this), write16_delegate(FUNC(segaxbd_new_state_double::shareram1_w), this));
-	m_subpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(FUNC(segaxbd_new_state_double::shareram1_r), this), write16_delegate(FUNC(segaxbd_new_state_double::shareram2_w), this));
+	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(FUNC(segaxbd_new_state_double::shareram1_r), this), write16_delegate(FUNC(segaxbd_new_state_double::shareram1_w), this));
+	m_subpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(FUNC(segaxbd_new_state_double::shareram2_r), this), write16_delegate(FUNC(segaxbd_new_state_double::shareram2_w), this));
 }
 
 
