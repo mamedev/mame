@@ -3117,7 +3117,8 @@ void sdl_info_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 			GL_CHECK_ERROR_NORMAL();
 			glViewport(0.0, 0.0, (GLsizei)texture->rawwidth, (GLsizei)texture->rawheight);
 		}
-		else if ( shaderIdx==m_glsl_program_mb2sc )
+
+		if ( shaderIdx==m_glsl_program_mb2sc )
 		{
 			assert ( m_glsl_program_mb2sc < m_glsl_program_num-1 );
 			glPopAttrib(); // glViewport(0.0, 0.0, (GLsizei)window().width, (GLsizei)window().height)
