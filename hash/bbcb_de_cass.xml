@@ -16,7 +16,7 @@
 
 	<!-- Games -->
 
-	<software name="hopperg">
+	<software name="hopper">
 		<description>Hopper (Ger)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
@@ -27,7 +27,7 @@
 		</part>
 	</software>
 
-	<software name="meteorsg">
+	<software name="meteors">
 		<description>Meteors (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
@@ -38,7 +38,7 @@
 		</part>
 	</software>
 
-	<software name="monstersg">
+	<software name="monsters">
 		<description>Monsters (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
@@ -49,7 +49,7 @@
 		</part>
 	</software>
 
-	<software name="planetoidg">
+	<software name="planetoid">
 		<description>Planetoid (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
@@ -60,7 +60,7 @@
 		</part>
 	</software>
 
-	<software name="rocketrag">
+	<software name="rocketra">
 		<description>Rocket Raid (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
@@ -71,7 +71,7 @@
 		</part>
 	</software>
 
-	<software name="snapperg">
+	<software name="snapper">
 		<description>Snapper (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
@@ -82,7 +82,7 @@
 		</part>
 	</software>
 
-	<software name="superinvg">
+	<software name="superinv">
 		<description>Super Invaders (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
@@ -93,7 +93,7 @@
 		</part>
 	</software>
 
-	<software name="welcomeg">
+	<software name="welcome">
 		<description>Welcome (Ger)</description>
 		<year>1981</year>
 		<publisher>BBC Soft</publisher>
@@ -106,7 +106,7 @@
 
 	<!-- Business -->
 
-	<software name="dskdiaryg">
+	<software name="dskdiary">
 		<description>Desk Diary (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -119,7 +119,7 @@
 
 	<!-- Educational -->
 
-	<software name="numberbag">
+	<software name="numberba">
 		<description>Number Balance (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft/ESM</publisher>
@@ -130,7 +130,7 @@
 		</part>
 	</software>
 
-	<software name="sentseqg">
+	<software name="sentseq">
 		<description>Sentence Sequencing (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -141,7 +141,7 @@
 		</part>
 	</software>
 
-	<software name="treeknowg">
+	<software name="treeknow">
 		<description>Tree Of Knowledge (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
