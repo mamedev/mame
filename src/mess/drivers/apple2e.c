@@ -2121,7 +2121,7 @@ UINT8 apple2e_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = m_video->m_hires ? 1 : 0;
+	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
 	Mixed    = m_video->m_mix ? 1 : 0;
 	Page2    = m_page2 ? 1 : 0;
 	_80Store = m_80store ? 1 : 0;
