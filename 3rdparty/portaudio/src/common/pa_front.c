@@ -123,11 +123,11 @@ const char* Pa_GetVersionText( void )
 }
 
 static PaVersionInfo versionInfo_ = {
-    .versionMajor = paVersionMajor,
-    .versionMinor = paVersionMinor,
-    .versionSubMinor = paVersionSubMinor,
-    .versionControlRevision = TOSTRING(PA_SVN_REVISION),
-    .versionText = PA_VERSION_TEXT_
+    paVersionMajor,
+    paVersionMinor,
+    paVersionSubMinor,
+    TOSTRING(PA_SVN_REVISION),
+    PA_VERSION_TEXT_
 };
 
 const PaVersionInfo* Pa_GetVersionInfo()

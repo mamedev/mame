@@ -32,21 +32,26 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "video/pc_vga.h"
+#include "bus/isa/trident.h"
 
 
 class queen_state : public pcat_base_state
 {
 public:
 	queen_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
+		: pcat_base_state(mconfig, type, tag),
+		m_vga(*this, "vga")
 	{
 	}
 
 	UINT32 *m_bios_ram;
 	UINT32 *m_bios_ext_ram;
+
+	required_device<trident_vga_device> m_vga;
+
 	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
+	UINT8 m_pci_vga_reg[256];
 
 	DECLARE_WRITE32_MEMBER( bios_ext_ram_w );
 
@@ -54,6 +59,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	void intel82439tx_init();
+	void pci_vga_init();
 };
 
 
@@ -70,7 +76,7 @@ static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, 
 static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	queen_state *state = busdevice->machine().driver_data<queen_state>();
-	printf("MTXC: write %d, %02X, %02X\n",  function, reg, data);
+//  osd_printf_debug("MXTC: write %d, %02X, %02X\n",  function, reg, data);
 
 	/*
 	memory banking with North Bridge:
@@ -99,6 +105,12 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 
 void queen_state::intel82439tx_init()
 {
+	m_mtxc_config_reg[0] = 0x86;
+	m_mtxc_config_reg[1] = 0x80; // Vendor ID, Intel
+	m_mtxc_config_reg[3] = 0x70; // Device ID, MXTC
+
+	m_mtxc_config_reg[0x0b] = 0x06; // PCI Class Bridge
+
 	m_mtxc_config_reg[0x60] = 0x02;
 	m_mtxc_config_reg[0x61] = 0x02;
 	m_mtxc_config_reg[0x62] = 0x02;
@@ -212,6 +224,78 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 	}
 }
 
+void queen_state::pci_vga_init()
+{
+	m_pci_vga_reg[0x00] = 0x23;
+	m_pci_vga_reg[0x01] = 0x10;
+	m_pci_vga_reg[0x02] = 0x50;
+	m_pci_vga_reg[0x03] = 0x97; // Trident 3DImage 9750 (seems must be that or the Blade 3D)
+	m_pci_vga_reg[0x04] = 0x01; // PCI_CMD_IO_ENABLE
+	m_pci_vga_reg[0x0b] = 0x03; // PCI class display
+}
+
+static UINT8 pci_vga_config_r(device_t *busdevice, device_t *device, int function, int reg)
+{
+	queen_state *state = busdevice->machine().driver_data<queen_state>();
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+	return state->m_pci_vga_reg[reg];
+}
+
+static UINT32 pci_vga_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+{
+	UINT32 r = 0;
+	if (ACCESSING_BITS_24_31)
+	{
+		r |= pci_vga_config_r(busdevice, device, function, reg + 3) << 24;
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		r |= pci_vga_config_r(busdevice, device, function, reg + 2) << 16;
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		r |= pci_vga_config_r(busdevice, device, function, reg + 1) << 8;
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		r |= pci_vga_config_r(busdevice, device, function, reg + 0) << 0;
+	}
+	return r;
+}
+
+
+static void pci_vga_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+{
+	queen_state *state = busdevice->machine().driver_data<queen_state>();
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+	state->m_pci_vga_reg[reg] = data;
+}
+
+static void pci_vga_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+osd_printf_warning("PCI write: %x %x\n", reg, data);
+	if (ACCESSING_BITS_24_31)
+	{
+		pci_vga_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		pci_vga_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		pci_vga_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		if (reg == 4)
+		{
+			data |= 1; // PCI_CMD_IO_ENABLE
+		}
+
+		pci_vga_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+	}
+}
 
 WRITE32_MEMBER(queen_state::bios_ext_ram_w)
 {
@@ -233,9 +317,10 @@ WRITE32_MEMBER(queen_state::bios_ram_w)
 static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32, queen_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000effff) AM_ROMBANK("bios_ext") AM_WRITE(bios_ext_ram_w)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
+	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 128MB RAM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
@@ -260,6 +345,7 @@ void queen_state::machine_start()
 	m_bios_ext_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 
 	intel82439tx_init();
+	pci_vga_init();
 }
 
 void queen_state::machine_reset()
@@ -281,6 +367,7 @@ static MACHINE_CONFIG_START( queen, queen_state )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(9, NULL, pci_vga_r, pci_vga_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -289,7 +376,7 @@ static MACHINE_CONFIG_START( queen, queen_state )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
 MACHINE_CONFIG_END
 
 
@@ -299,9 +386,9 @@ ROM_START( queen )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "bios-original.bin", 0x00000, 0x40000, CRC(feb542d4) SHA1(3cc5d8aeb0e3b7d9ed33248a4f3dc507d29debd9) )
 
-	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
-//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "pqiidediskonmodule", 0,SHA1(a56efcc711b1c5a2e63160b3088001a8c4fb56c2) )

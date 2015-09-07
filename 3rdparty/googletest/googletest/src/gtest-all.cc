@@ -1,4 +1,5 @@
-// Copyright 2008, Google Inc.
+#define _VARIADIC_MAX 10
+    // Copyright 2008, Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
