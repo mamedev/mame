@@ -743,7 +743,7 @@ UINT8 napple2_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = m_video->m_hires ? 1 : 0;
+	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
 	Mixed    = m_video->m_mix ? 1 : 0;
 	Page2    = m_page2 ? 1 : 0;
 	_80Store = 0;
