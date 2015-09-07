@@ -22,6 +22,7 @@
 #include "machine/i8271.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd7002.h"
+#include "machine/mc146818.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
 #include "sound/sn76496.h"
@@ -52,7 +53,10 @@ public:
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
+		m_rtc(*this, "rtc"),
 		m_i8271(*this, "i8271"),
+		m_wd1770(*this, "wd1770"),
+		m_wd1772(*this, "wd1772"),
 		m_exp1(*this, "exp_rom1"),
 		m_exp2(*this, "exp_rom2"),
 		m_exp3(*this, "exp_rom3"),
@@ -64,7 +68,6 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_region_os(*this, "os"),
 		m_region_opt(*this, "option"),
-		m_region_dfs(*this, "dfs"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -80,7 +83,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	DECLARE_FLOPPY_FORMATS(floppy_formats_525sd);
+	DECLARE_FLOPPY_FORMATS(floppy_formats_525dd);
+	DECLARE_FLOPPY_FORMATS(floppy_formats_35dd);
 
 	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
@@ -104,40 +109,34 @@ public:
 	DECLARE_READ8_MEMBER(bbcm_r);
 	DECLARE_WRITE8_MEMBER(bbcm_w);
 	DECLARE_WRITE8_MEMBER(bbc_SerialULA_w);
-	DECLARE_READ8_MEMBER(bbc_i8271_read);
-	DECLARE_WRITE8_MEMBER(bbc_i8271_write);
-	DECLARE_WRITE8_MEMBER(bbc_wd177x_status_w);
-	DECLARE_READ8_MEMBER(bbc_wd1770_read);
-	DECLARE_WRITE8_MEMBER(bbc_wd1770_write);
-	DECLARE_WRITE8_MEMBER(bbc_opus_status_w);
-	DECLARE_READ8_MEMBER(bbc_opus_read);
-	DECLARE_WRITE8_MEMBER(bbc_opus_write);
-	DECLARE_READ8_MEMBER(bbcm_wd1770_read);
-	DECLARE_WRITE8_MEMBER(bbcm_wd1770_write);
-	DECLARE_READ8_MEMBER(bbcm_wd1770l_read);
+
+	DECLARE_WRITE8_MEMBER(bbc_wd1770_status_w);
+	DECLARE_READ8_MEMBER(bbcm_wd177xl_read);
 	DECLARE_WRITE8_MEMBER(bbcm_wd1770l_write);
-	DECLARE_READ8_MEMBER(bbc_disc_r);
-	DECLARE_WRITE8_MEMBER(bbc_disc_w);
+	DECLARE_WRITE8_MEMBER(bbcm_wd1772l_write);
 	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
-	DECLARE_WRITE8_MEMBER(bbc_6845_w);
-	DECLARE_READ8_MEMBER(bbc_6845_r);
 	DECLARE_READ8_MEMBER(bbc_fe_r);
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
+
 	DECLARE_DRIVER_INIT(bbc);
-	DECLARE_DRIVER_INIT(bbcm);
+
 	DECLARE_MACHINE_START(bbca);
 	DECLARE_MACHINE_RESET(bbca);
 	DECLARE_VIDEO_START(bbca);
+
 	DECLARE_MACHINE_START(bbcb);
 	DECLARE_MACHINE_RESET(bbcb);
 	DECLARE_VIDEO_START(bbcb);
+
 	DECLARE_MACHINE_START(bbcbp);
 	DECLARE_MACHINE_RESET(bbcbp);
 	DECLARE_VIDEO_START(bbcbp);
+
 	DECLARE_MACHINE_START(bbcm);
 	DECLARE_MACHINE_RESET(bbcm);
 	DECLARE_VIDEO_START(bbcm);
+
 	DECLARE_PALETTE_INIT(bbc);
 	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
@@ -197,13 +196,16 @@ public: // HACK FOR MC6845
 	optional_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;
 	optional_device<cassette_image_device> m_cassette;
-	required_device<acia6850_device> m_acia;
-	required_device<clock_device> m_acia_clock;
+	optional_device<acia6850_device> m_acia;
+	optional_device<clock_device> m_acia_clock;
 	optional_device<rs232_port_device> m_rs232;
 	required_device<via6522_device> m_via6522_0;
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
+	optional_device<mc146818_device> m_rtc;
 	optional_device<i8271_device> m_i8271;
+	optional_device<wd1770_t> m_wd1770;
+	optional_device<wd1772_t> m_wd1772;
 	required_device<generic_slot_device> m_exp1;
 	required_device<generic_slot_device> m_exp2;
 	optional_device<generic_slot_device> m_exp3;
@@ -213,7 +215,6 @@ public: // HACK FOR MC6845
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_os;
 	required_memory_region m_region_opt;
-	optional_memory_region m_region_dfs;
 	required_memory_bank m_bank1; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank3; // bbca bbcb
@@ -225,11 +226,8 @@ public: // HACK FOR MC6845
 
 	void check_interrupts();
 
-	int m_DFSType;          // this stores the DIP switch setting for the DFS type being used
 	int m_SWRAMtype;        // this stores the DIP switch setting for the SWRAM type being used
 	int m_Speech;           // this stores the CONF setting for Speech enabled/disabled
-	int m_Master;           // if 0 then we are emulating a BBC B style machine
-							// if 1 then we are emulating a BBC Master style machine
 
 	int m_ACCCON_IRR;       // IRQ inputs
 
@@ -347,7 +345,7 @@ public: // HACK FOR MC6845
 							   i8271 disc control
 							***************************************/
 
-	int m_previous_i8271_int_state; // 8271 interupt status
+	int m_previous_i8271_int_state; // 8271 interrupt status
 
 							/**************************************
 							   WD1770 disc control
@@ -357,13 +355,7 @@ public: // HACK FOR MC6845
 	int m_wd177x_irq_state;
 	int m_wd177x_drq_state;
 	int m_previous_wd177x_int_state;
-	int m_1770_IntEnabled;
-
-							/**************************************
-							   Opus Challenger Disc control
-							***************************************/
-
-	int m_opusbank;
+	int m_177x_IntEnabled;
 
 							/**************************************
 							   Video Code

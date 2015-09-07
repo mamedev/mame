@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pro128_cart" description="Prodest PC 128 cartridges">
+
+
+	<software name="agenda">
+		<description>Agenda</description>
+		<year>1984</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="mo5_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="agenda (1984)(answare)(fr).m5" size="16384" crc="a4460761" sha1="5a77e3709b90f430c0b4c2c282916095e60ee22b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clrpaint">
+		<description>Colorpaint</description>
+		<year>1985</year>
+		<publisher>Thomson</publisher>
+
+		<part name="cart" interface="mo5_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="colorpaint (1985)(thomson)(it).m5" size="32768" crc="8fa1493b" sha1="d27c6db21adb29dc76df33d7a3855f8532d8cc57" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logo">
+		<description>LOGO v1.0</description>
+		<year>1984</year>
+		<publisher>Soli</publisher>
+
+		<part name="cart" interface="mo5_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="logo v1.0 (1984)(soli)(fr).m5" size="16384" crc="6e997494" sha1="039f460f00973da9e192691061b37b493028bc35" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scriptor">
+		<description>Scriptor</description>
+		<year>1986</year>
+		<publisher>To Tek</publisher>
+
+		<part name="cart" interface="mo5_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="scriptor (1986)(to tek)(it).m5" size="16384" crc="3bb553c9" sha1="b8b4b7618684e0c9331e8759fe13b07d22340fbe" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

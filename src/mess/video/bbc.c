@@ -99,8 +99,7 @@ static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
    this is used by the palette lookup in the video ULA */
 void bbc_state::set_pixel_lookup()
 {
-	int i;
-	for (i=0; i<256; i++)
+	for (int i=0; i<256; i++)
 	{
 		m_pixel_bits[i] = (((i>>7)&1)<<3) | (((i>>5)&1)<<2) | (((i>>3)&1)<<1) | (((i>>1)&1)<<0);
 	}
@@ -254,37 +253,6 @@ WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 	m_trom->dew_w(state);
 }
 
-/************************************************************************
- * memory interface to BBC's 6845
- ************************************************************************/
-
-WRITE8_MEMBER(bbc_state::bbc_6845_w)
-{
-	switch(offset & 1)
-	{
-		case 0 :
-			m_mc6845->address_w(space,0,data);
-			break;
-		case 1 :
-			m_mc6845->register_w(space,0,data);
-			break;
-	}
-	return;
-}
-
-READ8_MEMBER(bbc_state::bbc_6845_r)
-{
-	switch (offset&1)
-	{
-		case 0: return m_mc6845->status_r(space,0);
-		case 1: return m_mc6845->register_r(space,0);
-	}
-	return 0;
-}
-
-
-
-
 
 /**** BBC B+ Shadow Ram change ****/
 
@@ -319,7 +287,7 @@ void bbc_state::common_init(int memorySize)
 
 VIDEO_START_MEMBER(bbc_state,bbca)
 {
-	common_init(16);
+	common_init(m_ram->size()/1024);
 }
 
 VIDEO_START_MEMBER(bbc_state,bbcb)
