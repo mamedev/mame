@@ -1448,7 +1448,7 @@ ROM_START(uniap2en)
 	ROM_LOAD ( "unitron.f0"   , 0x3000, 0x1000, CRC(8e047c4a) SHA1(78c57c0e00dfce7fdec9437fe2b4c25def447e5d))
 ROM_END
 
-ROM_START(uniap2ti)
+ROM_START(uniap2ti) /* "Teclado Inteligente" means "smart keyboard" in brazilian portuguese */
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "unitron.chr", 0x0000, 0x1000, CRC(7fdd1af6) SHA1(2f4f90d90f2f3a8c1fbea304e1072780fb22e698))
 
@@ -1458,7 +1458,7 @@ ROM_START(uniap2ti)
 	ROM_LOAD ( "unitron.f0"   , 0x3000, 0x1000, CRC(8e047c4a) SHA1(78c57c0e00dfce7fdec9437fe2b4c25def447e5d))
 
 	ROM_REGION(0x4000,"keyboard",0)
-	ROM_LOAD ( "unitron_apii_keyboard.ic3", 0x1000, 0x1000, CRC(311beae6) SHA1(f6379aba9ac982850edc314c93a393844a3349ef))
+	ROM_LOAD ( "unitron_apii+_keyboard.ic3", 0x0800, 0x0800, CRC(edc43205) SHA1(220cc21d86f1ab63a301ae7a9c5ff0f3f6cddb70))
 ROM_END
 
 
@@ -1603,7 +1603,7 @@ COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  
 COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, uniap2ti, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II+", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, uniap2ti, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", MACHINE_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
 // reverse font direction -\/
 COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
