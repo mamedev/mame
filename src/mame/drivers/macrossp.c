@@ -625,6 +625,11 @@ ROM_START( macrossp )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 )
 	ROM_COPY( "ensoniq.0", 0x400000, 0x000000, 0x400000 )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "u8.u8",     0x0000, 0x0117, CRC(99bd3cc1) SHA1(b0d3ac93cb5d2857cf9c184c7a2b4afa0211d588) ) /* unprotected GAL16V8B */
+	ROM_LOAD( "u9.u9",     0x0200, 0x0117, CRC(480f4860) SHA1(7ff3723122cbdda5c0dcea5167508e9a7437f551) ) /* unprotected GAL16V8B */
+	ROM_LOAD( "u200.u200", 0x0400, 0x0117, CRC(9343ad76) SHA1(a2adf2510011078ee9fae65acdd2daa0ffab48f6) ) /* unprotected GAL16V8B */
 ROM_END
 
 ROM_START( quizmoon )
