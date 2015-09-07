@@ -292,7 +292,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="019E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="tomy 3l1.ic1.bin" size="8192" crc="1dfa3f4b" sha1="93d1c17c5edd44f27c28cde88a68f609b77feb0c" offset="0" />
+				<rom name="tomy 3l1.ic1.bin" size="16384" crc="1dfa3f4b" sha1="93d1c17c5edd44f27c28cde88a68f609b77feb0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
