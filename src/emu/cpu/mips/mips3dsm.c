@@ -30,6 +30,13 @@ static const char *const reg[32] =
 };
 #endif
 
+static const char *const cacheop[32] =
+{
+	"I_Invd", "D_WBInvd", "Unknown 2", "Unknown 3", "I_IndexLoadTag", "D_IndexLoadTag", "Unknown 6", "Unknown 7",
+	"I_IndexStoreTag", "D_IndexStoreTag", "Unknown 10", "Unknown 11", "Unknown 12", "D_CreateDirtyExcl", "Unknown 14", "Unknown 15",
+	"I_HitInvalid", "D_HitInvalid", "Unknown 18", "Unknown 19", "I_Fill", "D_HitWBInvalid", "Unknown 22", "Unknown 23",
+	"I_HitWB", "D_HitWB", "Unknown 26", "Unknown 27", "Unknown 28", "Unknown 29", "Unknown 30", "Unknown 31"
+};
 
 
 static const char *const cpreg[4][32] =
@@ -503,7 +510,7 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 		case 0x2c:  sprintf(buffer, "sdl    %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x2d:  sprintf(buffer, "sdr    %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x2e:  sprintf(buffer, "swr    %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-		case 0x2f:  sprintf(buffer, "cache  %s(%s)", reg[rs], signed_16bit(op));                    break;
+		case 0x2f:  sprintf(buffer, "cache  %s,%s(%s)", cacheop[rt], reg[rs], signed_16bit(op));                    break;
 		case 0x30:  sprintf(buffer, "ll     %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x31:  sprintf(buffer, "lwc1   %s,%s(%s)", cpreg[1][rt], signed_16bit(op), reg[rs]);   break;
 		case 0x32:  sprintf(buffer, "lwc2   %s,%s(%s)", cpreg[2][rt], signed_16bit(op), reg[rs]);   break;
