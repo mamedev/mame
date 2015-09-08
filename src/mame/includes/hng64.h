@@ -4,6 +4,7 @@
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
+#include "video/poly.h"
 
 enum
 {
@@ -21,7 +22,6 @@ enum hng64trans_t
 	HNG64_TILEMAP_ALPHA
 };
 
-
 struct blit_parameters
 {
 	bitmap_rgb32 *          bitmap;
@@ -35,9 +35,10 @@ struct blit_parameters
 
 #define HNG64_MASTER_CLOCK 50000000
 
-///////////////
-// 3d Engine //
-///////////////
+
+/////////////////
+/// 3d Engine ///
+/////////////////
 
 struct polyVert
 {
@@ -72,12 +73,26 @@ struct polygon
 };
 
 
+/////////////////////////
+/// polygon rendering ///
+/////////////////////////
 
-///////////////////////
-// polygon rendering //
-///////////////////////
+// Refer to the clipping planes as numbers
+#define HNG64_LEFT   0
+#define HNG64_RIGHT  1
+#define HNG64_TOP    2
+#define HNG64_BOTTOM 3
+#define HNG64_NEAR   4
+#define HNG64_FAR    5
 
-struct polygonRasterOptions
+
+////////////////////////////////////
+/// Polygon rasterizer interface ///
+////////////////////////////////////
+
+const int HNG64_MAX_POLYGONS = 10000;
+
+struct hng64_poly_data
 {
 	UINT8 texType;
 	UINT8 texIndex;
@@ -89,13 +104,27 @@ struct polygonRasterOptions
 	int debugColor;
 };
 
-// Refer to the clipping planes as numbers
-#define HNG64_LEFT   0
-#define HNG64_RIGHT  1
-#define HNG64_TOP    2
-#define HNG64_BOTTOM 3
-#define HNG64_NEAR   4
-#define HNG64_FAR    5
+class hng64_state;
+
+class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>
+{
+public:
+    hng64_poly_renderer(hng64_state& state);
+    
+    void drawShaded(struct polygon *p);
+    void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+
+    hng64_state& state() { return m_state; }
+    bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
+    float* depthBuffer3d() { return m_depthBuffer3d; }
+    
+private:
+    hng64_state& m_state;
+    
+    // (Temporarily class members - someday they will live in the memory map)
+    bitmap_rgb32 m_colorBuffer3d;
+    float* m_depthBuffer3d;
+};
 
 
 
@@ -143,7 +172,8 @@ public:
 	required_shared_ptr<UINT32> m_videoram;
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
-	/* 3D stuff */
+
+    /* 3D stuff */
 	UINT16* m_dl;
 
 	required_shared_ptr<UINT32> m_3dregs;
@@ -193,11 +223,6 @@ public:
 	hng64_tilemap m_tilemap[4];
 
 	UINT8 m_additive_tilemap_debug;
-
-	// 3d display buffers
-	// (Temporarily global - someday they will live with the proper bit-depth in the memory map)
-	float *m_depthBuffer3d;
-	UINT32 *m_colorBuffer3d;
 
 	UINT32 m_old_animmask;
 	UINT32 m_old_animbits;
@@ -299,19 +324,15 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
-	void clear3d();
-	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
 
-	void FillSmoothTexPCHorizontalLine(
-		const polygonRasterOptions& prOptions,
-		int x_start, int x_end, int y, float z_start, float z_delta,
-		float w_start, float w_delta, float r_start, float r_delta,
-		float g_start, float g_delta, float b_start, float b_delta,
-		float s_start, float s_delta, float t_start, float t_delta);
+    hng64_poly_renderer* m_poly_renderer;
+    
+    void clear3d();
+	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
 
 	void hng64_command3d(const UINT16* packet);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void transition_control( bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
 	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
@@ -330,14 +351,6 @@ public:
 	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat);
-
-	void RasterizeTriangle_SMOOTH_TEX_PC(
-		float A[4], float B[4], float C[4],
-		float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
-		float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-		const polygonRasterOptions& prOptions);
-
-	void drawShaded( struct polygon *p);
 
 	void printPacket(const UINT16* packet, int hex);
 	void matmul4(float *product, const float *a, const float *b);
