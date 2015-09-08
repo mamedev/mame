@@ -2845,11 +2845,23 @@ void mips3_device::execute_run()
 			case 0x2e:  /* SWR */       (this->*m_swr)(op);                                                       break;
 			case 0x2f:  /* CACHE */     /* effective no-op */                                                   break;
 			case 0x30:  /* LL */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (UINT32)temp; m_ll_value = RTVAL32;       break;
-			case 0x31:  /* LWC1 */      if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop1_reg32(RTREG, temp);         break;
+			case 0x31:  /* LWC1 */      
+				if (!(SR & SR_COP1))
+				{
+					m_badcop_value = 1;
+					generate_exception(EXCEPTION_BADCOP, 1);
+				}
+				if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop1_reg32(RTREG, temp);         break;
 			case 0x32:  /* LWC2 */      if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop2_reg(RTREG, temp);           break;
 			case 0x33:  /* PREF */      /* effective no-op */                                                   break;
 			case 0x34:  /* LLD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64; m_lld_value = temp64;     break;
-			case 0x35:  /* LDC1 */      if (RDOUBLE(SIMMVAL+RSVAL32, &temp64)) set_cop1_reg64(RTREG, temp64);       break;
+			case 0x35:  /* LDC1 */      
+			if (!(SR & SR_COP1))
+			{
+				m_badcop_value = 1;
+				generate_exception(EXCEPTION_BADCOP, 1);
+			}
+			if (RDOUBLE(SIMMVAL+RSVAL32, &temp64)) set_cop1_reg64(RTREG, temp64);       break;
 			case 0x36:  /* LDC2 */      if (RDOUBLE(SIMMVAL+RSVAL32, &temp64)) set_cop2_reg(RTREG, temp64);     break;
 			case 0x37:  /* LD */        if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64;       break;
 			case 0x38:  /* SC */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG)
@@ -2865,7 +2877,13 @@ void mips3_device::execute_run()
 				}
 			}
 			break;
-			case 0x39:  /* SWC1 */      WWORD(SIMMVAL+RSVAL32, get_cop1_reg32(RTREG));                          break;
+			case 0x39:  /* SWC1 */      
+				if (!(SR & SR_COP1))
+				{
+					m_badcop_value = 1;
+					generate_exception(EXCEPTION_BADCOP, 1);
+				}
+				WWORD(SIMMVAL+RSVAL32, get_cop1_reg32(RTREG));                          break;
 			case 0x3a:  /* SWC2 */      WWORD(SIMMVAL+RSVAL32, get_cop2_reg(RTREG));                            break;
 			case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
 			case 0x3c:  /* SCD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG)
@@ -2881,7 +2899,13 @@ void mips3_device::execute_run()
 				}
 			}
 			break;
-			case 0x3d:  /* SDC1 */      WDOUBLE(SIMMVAL+RSVAL32, get_cop1_reg64(RTREG));                            break;
+			case 0x3d:  /* SDC1 */
+				if (!(SR & SR_COP1))
+				{
+					m_badcop_value = 1;
+					generate_exception(EXCEPTION_BADCOP, 1);
+				}
+				WDOUBLE(SIMMVAL+RSVAL32, get_cop1_reg64(RTREG));                            break;
 			case 0x3e:  /* SDC2 */      WDOUBLE(SIMMVAL+RSVAL32, get_cop2_reg(RTREG));                          break;
 			case 0x3f:  /* SD */        WDOUBLE(SIMMVAL+RSVAL32, RTVAL64);                                      break;
 			default:    /* ??? */       invalid_instruction(op);                                                break;
