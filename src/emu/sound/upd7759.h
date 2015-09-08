@@ -5,6 +5,23 @@
 #ifndef __UPD7759_H__
 #define __UPD7759_H__
 
+/* chip states */
+enum
+{
+	STATE_IDLE,
+	STATE_DROP_DRQ,
+	STATE_START,
+	STATE_FIRST_REQ,
+	STATE_LAST_SAMPLE,
+	STATE_DUMMY1,
+	STATE_ADDR_MSB,
+	STATE_ADDR_LSB,
+	STATE_DUMMY2,
+	STATE_BLOCK_HEADER,
+	STATE_NIBBLE_COUNT,
+	STATE_NIBBLE_MSN,
+	STATE_NIBBLE_LSN
+};
 
 /* NEC uPD7759/55/56/P56/57/58 ADPCM Speech Processor */
 
@@ -29,7 +46,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	virtual DECLARE_WRITE8_MEMBER( port_w );
 	void postload();
 
 protected:
@@ -86,13 +103,14 @@ protected:
 	devcb_write_line m_drqcallback;
 
 	void update_adpcm(int data);
-	void advance_state();
+	virtual void advance_state();
 };
 
 class upd7759_device : public upd775x_device
 {
 public:
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	enum
 	{

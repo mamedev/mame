@@ -627,6 +627,8 @@ if (SOUNDS["UPD7759"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/upd7759.c",
 		MAME_DIR .. "src/emu/sound/upd7759.h",
+		MAME_DIR .. "src/emu/sound/315-5641.c",
+		MAME_DIR .. "src/emu/sound/315-5641.h",
 	}
 end
 

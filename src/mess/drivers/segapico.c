@@ -119,7 +119,7 @@ C = MB3514 / 9325 M36
 
 #include "emu.h"
 #include "includes/md_cons.h"
-#include "sound/upd7759.h"
+#include "sound/315-5641.h"
 
 
 #define PICO_PENX   1
@@ -130,14 +130,14 @@ class pico_base_state : public md_cons_state
 public:
 	pico_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: md_cons_state(mconfig, type, tag),
-		m_upd7759(*this, "7759"),
+		m_sega_315_5641_pcm(*this, "315_5641"),
 		m_io_page(*this, "PAGE"),
 		m_io_pad(*this, "PAD"),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY")
 	{ }
 
-	optional_device<upd7759_device> m_upd7759;
+	optional_device<sega_315_5641_pcm_device> m_sega_315_5641_pcm;
 
 	required_ioport m_io_page;
 	required_ioport m_io_pad;
@@ -251,14 +251,18 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 
 		case 8: // toy story 2 checks this for 0x3f (is that 'empty'?)
 			/* Returns free bytes left in the PCM FIFO buffer */
-			retdata = 0x3f;
+			retdata = m_sega_315_5641_pcm->get_fifo_space();
 			break;
 		case 9:
 		/*
 		   For reads, if bit 15 is cleared, it means PCM is 'busy' or
 		   something like that, as games sometimes wait for it to become 1.
 		*/
-			return (m_upd7759->busy_r()^1) << 15;
+			//	return (m_upd7759->busy_r()^1) << 15;
+			// The BUSY bit stays 1 as long as some PCM sound is playing.
+			// SMPS drivers check 800012 [byte] and clear the "prevent music PCM" byte when the READY bit gets set.
+			// If this is done incorrectly, the voices in Sonic Gameworld (J) are muted by the music's PCM drums.
+			return m_sega_315_5641_pcm->busy_r() << 15;
 
 
 		case 7:
@@ -279,7 +283,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 WRITE_LINE_MEMBER(pico_base_state::sound_cause_irq)
 {
 //  printf("sound irq\n");
-	/* upd7759 callback */
+	/* sega_315_5641_pcm callback */
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
@@ -289,14 +293,44 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 
 	switch (offset)
 	{
-		case 0x12/2: // guess
-			m_upd7759->reset_w(0);
-			m_upd7759->start_w(0);
-			m_upd7759->reset_w(1);
-			m_upd7759->start_w(1);
+		case 0x10/2:
+			if (mem_mask & 0xFF00)
+				m_sega_315_5641_pcm->port_w(space, 0, (data >> 8) & 0xFF);
+			if (mem_mask & 0x00FF)
+				m_sega_315_5641_pcm->port_w(space, 0, (data >> 0) & 0xFF);
+			break;
+ 		case 0x12/2: // guess
+			// Note about uPD7759 lines:
+			//	reset line: 1 - normal, 1->0 - reset chip, 0 - playback disabled
+			//	start line: 0->1 - start playback
+			if (mem_mask & 0xFF00)
+			{
+				// I assume that:
+				// value 8000 resets the FIFO? (always used with low reset line)
+				// value 0800 maps to the uPD7759's reset line (0 = reset, 1 = normal)
+				// value 4000 maps to the uPD7759's start line (0->1 = start)
+				m_sega_315_5641_pcm->reset_w((data >> 8) & 0x08);
+				m_sega_315_5641_pcm->start_w((data >> 8) & 0x40);
+				if (data & 0x4000)
+				{
+					// Somewhere between "Reset Off" and the first sample data,
+					// we need to send a few commands to make the sample stream work.
+					// Doing that when rising the "start" line seems to work fine.
+					m_sega_315_5641_pcm->port_w(space, 0, 0xFF);	// "Last Sample" value (must be >= 0x10)
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);	// Dummy 1
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);	// Addr MSB
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);	// Addr LSB
+				}
+			}
+			
+		
+			/*m_sega_315_5641_pcm->reset_w(0);
+			m_sega_315_5641_pcm->start_w(0);
+			m_sega_315_5641_pcm->reset_w(1);
+			m_sega_315_5641_pcm->start_w(1);
 
-			if (mem_mask&0x00ff) m_upd7759->port_w(space,0,data&0xff);
-			if (mem_mask&0xff00) m_upd7759->port_w(space,0,(data>>8)&0xff);
+			if (mem_mask&0x00ff) m_sega_315_5641_pcm->port_w(space,0,data&0xff);
+			if (mem_mask&0xff00) m_sega_315_5641_pcm->port_w(space,0,(data>>8)&0xff);*/
 
 			break;
 	}
@@ -356,6 +390,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
@@ -363,10 +398,10 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( picopal, pico_state )
@@ -376,6 +411,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
@@ -383,10 +419,10 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
 
 
@@ -552,10 +588,10 @@ MACHINE_START_MEMBER(copera_state,copera)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
 
-	m_upd7759->reset_w(0);
-	m_upd7759->start_w(0);
-	m_upd7759->reset_w(1);
-	m_upd7759->start_w(1);
+	m_sega_315_5641_pcm->reset_w(0);
+	m_sega_315_5641_pcm->start_w(0);
+	m_sega_315_5641_pcm->reset_w(1);
+	m_sega_315_5641_pcm->start_w(1);
 
 }
 
@@ -566,6 +602,7 @@ static MACHINE_CONFIG_START( copera, copera_state )
 	MCFG_CPU_PROGRAM_MAP(copera_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
@@ -573,10 +610,10 @@ static MACHINE_CONFIG_START( copera, copera_state )
 	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
-	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(copera_state,sound_cause_irq))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
 
 
