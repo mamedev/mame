@@ -143,23 +143,6 @@
 #define FRAC_ONE        (1 << FRAC_BITS)
 #define FRAC_MASK       (FRAC_ONE - 1)
 
-/* chip states */
-enum
-{
-	STATE_IDLE,
-	STATE_DROP_DRQ,
-	STATE_START,
-	STATE_FIRST_REQ,
-	STATE_LAST_SAMPLE,
-	STATE_DUMMY1,
-	STATE_ADDR_MSB,
-	STATE_ADDR_LSB,
-	STATE_DUMMY2,
-	STATE_BLOCK_HEADER,
-	STATE_NIBBLE_COUNT,
-	STATE_NIBBLE_MSN,
-	STATE_NIBBLE_LSN
-};
 
 upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -203,6 +186,14 @@ upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, d
 		m_timer(NULL)
 {
 }
+
+
+upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: upd775x_device(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_timer(NULL)
+{
+}
+
 
 const device_type UPD7756 = &device_creator<upd7756_device>;
 
