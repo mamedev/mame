@@ -109,6 +109,7 @@ void n64_periphs::device_start()
 {
 	ai_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::ai_timer_callback),this));
 	pi_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::pi_dma_callback),this));
+	si_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::si_dma_callback),this));
 	vi_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::vi_scanline_callback),this));
 	reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::reset_timer_callback),this));
 }
@@ -202,8 +203,9 @@ void n64_periphs::device_reset()
 	si_dram_addr = 0;
 	si_pif_addr = 0;
 	si_status = 0;
+	si_dma_timer->adjust(attotime::never);
 
-	memset(m_save_data.eeprom, 0, 2048);
+	//memset(m_save_data.eeprom, 0, 2048);
 
 	dp_clock = 0;
 
@@ -225,7 +227,7 @@ void n64_periphs::device_reset()
 	pif_ram[0x26] = 0x3f;
 	pif_ram[0x27] = 0x3f;
 	cic_type=2;
-	mem_map->write_dword(0x00000318, 0x800000);
+	mem_map->write_dword(0x00000318, 0x800000); /* RDRAM Size */
 
 	if (boot_checksum == U64(0x00000000001ff230))
 	{
@@ -993,7 +995,7 @@ void n64_periphs::vi_scanline_tick()
 // Video Interface
 void n64_periphs::vi_recalculate_resolution()
 {
-	n64_state *state = machine().driver_data<n64_state>();
+	//n64_state *state = machine().driver_data<n64_state>();
 
 	int x_start = (vi_hstart & 0x03ff0000) >> 16;
 	int x_end = vi_hstart & 0x000003ff;
@@ -1025,7 +1027,12 @@ void n64_periphs::vi_recalculate_resolution()
 	if (height > 480)
 		height = 480;
 
-	state->m_rdp->m_misc_state.m_fb_height = height;
+	if(vi_control & 0x40) /* Interlace */
+	{
+		height *= 2;
+	}
+
+	//state->m_rdp->m_misc_state.m_fb_height = height;
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
@@ -1054,7 +1061,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = m_screen->vpos() << 1;
+			ret = (m_screen->vpos() << 1) + 1;
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1103,7 +1110,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 
 WRITE32_MEMBER( n64_periphs::vi_reg_w )
 {
-	n64_state *state = machine().driver_data<n64_state>();
+	//n64_state *state = machine().driver_data<n64_state>();
 
 	switch (offset)
 	{
@@ -1122,7 +1129,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 				vi_recalculate_resolution();
 			}
 			vi_width = data;
-			state->m_rdp->m_misc_state.m_fb_width = data;
+			//state->m_rdp->m_misc_state.m_fb_width = data;
 			break;
 
 		case 0x0c/4:        // VI_INTR_REG
@@ -1214,7 +1221,7 @@ void n64_periphs::ai_fifo_push(UINT32 address, UINT32 length)
 
 	if (! (ai_status & 0x40000000))
 	{
-		signal_rcp_interrupt(AI_INTERRUPT);
+		//signal_rcp_interrupt(AI_INTERRUPT);
 		ai_dma();
 	}
 }
@@ -1237,7 +1244,7 @@ void n64_periphs::ai_fifo_pop()
 	if (ai_fifo_num < AUDIO_DMA_DEPTH)
 	{
 		ai_status &= ~0x80000001;   // FIFO not full
-		signal_rcp_interrupt(AI_INTERRUPT);
+		//signal_rcp_interrupt(AI_INTERRUPT);
 	}
 }
 
@@ -1277,7 +1284,7 @@ void n64_periphs::ai_dma()
 	ai_status |= 0x40000000;
 
 	// adjust the timer
-	period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 4));
+	period = attotime::from_hz(DACRATE_NTSC) * (ai_dacrate + 1) * (current->length / 4);
 	ai_timer->adjust(period);
 }
 
@@ -1289,12 +1296,12 @@ TIMER_CALLBACK_MEMBER(n64_periphs::ai_timer_callback)
 void n64_periphs::ai_timer_tick()
 {
 	ai_fifo_pop();
+	signal_rcp_interrupt(AI_INTERRUPT);
 
 	// keep playing if there's another DMA queued
 	if (ai_fifo_get_top() != NULL)
 	{
 		ai_dma();
-		signal_rcp_interrupt(AI_INTERRUPT);
 	}
 	else
 	{
@@ -1325,7 +1332,9 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 			}
 			break;
 		}
-
+		case 0x08/4:
+			ret = ai_control;
+			break;
 		case 0x0c/4:        // AI_STATUS_REG
 			ret = ai_status;
 			break;
@@ -1425,9 +1434,9 @@ void n64_periphs::pi_dma_tick()
 	{
 		UINT32 dma_length = pi_wr_len + 1;
 		//logerror("PI Write, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_wr_len);
-		if (dma_length & 7)
+		if (dma_length & 1)
 		{
-			dma_length = (dma_length + 7) & ~7;
+			dma_length = (dma_length + 1) & ~1;
 		}
 
 		if (pi_dram_addr != 0xffffffff)
@@ -1445,9 +1454,9 @@ void n64_periphs::pi_dma_tick()
 	{
 		UINT32 dma_length = pi_rd_len + 1;
 		//logerror("PI Read, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_rd_len);
-		if (dma_length & 7)
+		if (dma_length & 1)
 		{
-			dma_length = (dma_length + 7) & ~7;
+			dma_length = (dma_length + 1) & ~1;
 		}
 
 		if (pi_dram_addr != 0xffffffff)
@@ -2076,6 +2085,18 @@ void n64_periphs::handle_pif()
 	}*/
 }
 
+TIMER_CALLBACK_MEMBER(n64_periphs::si_dma_callback)
+{
+	machine().device<n64_periphs>("rcp")->si_dma_tick();
+}
+
+void n64_periphs::si_dma_tick()
+{
+	si_dma_timer->adjust(attotime::never);
+	si_status |= 0x1000;
+	signal_rcp_interrupt(SI_INTERRUPT);
+}
+
 void n64_periphs::pif_dma(int direction)
 {
 	if (si_dram_addr & 0x3)
@@ -2116,8 +2137,9 @@ void n64_periphs::pif_dma(int direction)
 		}
 	}
 
-	si_status |= 0x1000;
-	signal_rcp_interrupt(SI_INTERRUPT);
+	si_dma_timer->adjust(attotime::from_hz(500));
+	//si_status |= 0x1000;
+	//signal_rcp_interrupt(SI_INTERRUPT);
 }
 
 READ32_MEMBER( n64_periphs::si_reg_r )
