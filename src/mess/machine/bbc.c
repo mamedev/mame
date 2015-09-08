@@ -1563,7 +1563,7 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 	//logerror("Drive control %d \n", data);
 
 	// bit 2: reset
-	if (!BIT(data, 5)) m_wd1770->reset();
+	if (!BIT(data, 2)) m_wd1770->reset();
 
 	// bit 0, 1, 3: drive select
 	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
@@ -1589,7 +1589,7 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
 	//logerror("Drive control %d \n", data);
 
 	// bit 2: reset
-	if (!BIT(data, 5)) m_wd1772->reset();
+	if (!BIT(data, 2)) m_wd1772->reset();
 
 	// bit 0, 1, 3: drive select
 	if (BIT(data, 0)) floppy = m_wd1772->subdevice<floppy_connector>("0")->get_device();
