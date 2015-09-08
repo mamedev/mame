@@ -60,12 +60,6 @@ public:
 	DECLARE_READ32_MEMBER(r9751_mmio_fff8_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_fff8_w);
 
-	DECLARE_READ8_MEMBER( r9751_output_ack_r );
-	DECLARE_READ8_MEMBER( r9751_output_req_r );
-	DECLARE_READ8_MEMBER( r9751_output_data_r );
-	DECLARE_WRITE8_MEMBER( r9751_output_ack_w );
-	DECLARE_WRITE8_MEMBER( r9751_output_req_w );
-	DECLARE_WRITE8_MEMBER( r9751_output_data_w );
 	DECLARE_DRIVER_INIT(r9751);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -223,7 +217,12 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		for(int i = 0; i < 8; i++)
 			logerror("%02X ", c_fdd_scsi_command[i]);
 		logerror("\n");
+		
+		scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
+		logerror("FDD SCSI LBA: %i\n", scsi_lba);
 
+		m_pdc->p38_w(space,0,0x2); // Set bit 1 on port 38 register
+/*
 		switch(c_fdd_scsi_command[0])
 		{
 			case 8:
@@ -250,6 +249,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 				logerror("FDD: Unknown SCSI command\n");
 				break;
 		}
+*/
 	}	
 	else
 		logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);

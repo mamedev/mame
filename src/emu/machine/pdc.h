@@ -63,6 +63,11 @@ public:
 	DECLARE_READ8_MEMBER(i8237_fdc_dma_r);
 	DECLARE_WRITE8_MEMBER(i8237_fdc_dma_w);
 
+	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
+
+	DECLARE_WRITE8_MEMBER(p38_w);
+	DECLARE_READ8_MEMBER(p38_r);
+
         DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
@@ -104,6 +109,7 @@ protected:
         // interrupts
 //        int m_via0_irq;                         // VIA #0 interrupt request
 //        int m_via1_irq;                         // VIA #1 interrupt request
+	UINT8 reg_p38;
 };
 
 

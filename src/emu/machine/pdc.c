@@ -66,6 +66,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
+	AM_RANGE(0x38, 0x38) AM_READ(p38_r) // Possibly UPD765 interrupt
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE(HDC_TAG, hdc9224_device,read,write) AM_MIRROR(0xFF00)
 	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
 	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE(FDCDMA_TAG,am9517a_device,read,write) AM_MIRROR(0xFF00)
@@ -135,7 +136,7 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 //	MCFG_UPD765A_ADD("upd765a", true, false)
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 //	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	//MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(FDCDMA_TAG, am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
 
 	// Floppy disk drive
@@ -232,7 +233,7 @@ void pdc_device::device_reset()
 //	UINT8 *rom = memregion("rom")->base();
 //	UINT8 *ram = m_pdc_ram;
 //	memcpy(ram, rom, 0x4000);
-
+	reg_p38 = 0;
         m_pdccpu->reset();
 
 //        m_via0->reset();
@@ -291,3 +292,22 @@ WRITE8_MEMBER(pdc_device::i8237_fdc_dma_w)
 	m_fdc->dma_w(data);
 }
 
+WRITE_LINE_MEMBER(pdc_device::hdd_irq)
+{
+	m_pdccpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+}
+
+WRITE8_MEMBER(pdc_device::p38_w)
+{
+	logerror("PDC: Port 0x38 set bit %i.\n", data);
+	reg_p38 |= data;
+}
+READ8_MEMBER(pdc_device::p38_r)
+{
+	UINT8 retn;
+	logerror("PDC read port 38: %02X\n", reg_p38);
+	retn = reg_p38;
+	reg_p38 &= ~2; // Clear bit 1
+
+	return retn;
+}
