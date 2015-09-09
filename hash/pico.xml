@@ -3414,7 +3414,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="peterpan10th" cloneof="peterpan">
-	<description>Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Jpn)</description>
+		<description>Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Jpn)</description>
 		<year>2002</year>
 		<publisher>Sega Toys</publisher>
 		<info name="serial" value="HPC-6214"/>

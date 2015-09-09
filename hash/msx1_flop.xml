@@ -216,7 +216,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Eurosoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="astro blaster (1988)(eurosoft)(nl).dsk" size="737280" crc="b0fa7831" sha1="789ca057a3a9f2c4dd9db874fc2de33e936c3ad3" offset="0" />
 			</dataarea>
@@ -723,13 +723,13 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="konami_game_collection_vol.1_(1988)_(konami)_(j)_(disk_1_of_2).dsk" size="737280" crc="bfab140f" sha1="37cfed5a5886637ca1dd866ea4e2e1ac23ab4841" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="konami_game_collection_vol.1_(1988)_(konami)_(j)_(disk_2_of_2).dsk" size="737280" crc="5f947098" sha1="d7ff2ec76ab2d198fdfe9bcbd9743c1e78939605" offset="0" />
 			</dataarea>
@@ -5232,13 +5232,13 @@ The following floppies came with the machines.
 		<year>19??</year>
 		<publisher>&lt;cart2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="black onyx, the (1985)(ascii)(jp)(jp).dsk" size="737280" crc="3438f8b6" sha1="e1758f98d1a89e36bee6654bd8c1774a123ef391" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1, Alt"/>
+			<feature name="part_id" value="Disk 1, Alt"/>
 			<dataarea name="flop" size="737280">
 				<rom name="black onyx, the (1985)(ascii)(jp)[a].dsk" size="737280" crc="ac1495b3" sha1="5508fc5c758567f5ccf427ab7327137f2faec4ad" offset="0" />
 			</dataarea>
