@@ -3206,9 +3206,7 @@ ROM_START( dmnfrnt )
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	/* one of these is probably a bad dump, it should be obvious once progress is made because the external rom is checksummed by the internal one */
-	ROM_LOAD( "v105_32m.u26",     0x000000, 0x400000,  CRC(d200ee63) SHA1(3128c27c5f5a4361d31e7b4bb006de631b3a228c) )
-	ROM_LOAD( "chinese-v105.u62", 0x000000, 0x400000,  CRC(c798c2ef) SHA1(91e364c33b935293fa765ca521cdb67ac45ec70f) )
+	ROM_LOAD( "v105_32m.u26", 0x000000, 0x400000,  CRC(c798c2ef) SHA1(91e364c33b935293fa765ca521cdb67ac45ec70f) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
