@@ -27,4 +27,15 @@
 	</part>
 	</software>
 
+	<software name="flycab" supported="no">
+	<description>Fly Cab</description>
+	<year>200?</year>
+	<publisher>TimeTop</publisher>
+	<part name="cart" interface="gameking_cart">
+		<dataarea name="rom" size="524288">
+		<rom name="fly_cab.gk3" size="524288" crc="da314211" sha1="ea901fe7a7aea203afe6fe0d33e374163cec0262" offset="0x00000" />
+		</dataarea>
+	</part>
+	</software>
+
 </softwarelist>
