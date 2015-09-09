@@ -224,8 +224,10 @@ public:
 		dilate_rendertarget = 0;
 		antialiasing_rendertarget = 0;
 		type_rendertarget = nv2a_renderer::LINEAR;
-		depth_rendertarget = nv2a_renderer::NV2A_RT_DEPTH_FORMAT_Z24S8;
-		color_rendertarget = nv2a_renderer::NV2A_COLOR_FORMAT_A8R8G8B8;
+		depthformat_rendertarget = nv2a_renderer::NV2A_RT_DEPTH_FORMAT_Z24S8;
+		colorformat_rendertarget = nv2a_renderer::NV2A_COLOR_FORMAT_A8R8G8B8;
+		bytespixel_rendertarget = 4;
+		antialias_control = 0;
 		rendertarget = NULL;
 		depthbuffer = NULL;
 		displayedtarget = NULL;
@@ -254,6 +256,7 @@ public:
 	void geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT32 &size);
 	int geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
 	UINT32 texture_get_texel(int number, int x, int y);
+	UINT8 *read_pixel(int x, int y, UINT32 c[4]);
 	void write_pixel(int x, int y, UINT32 color, UINT32 depth);
 	void combiner_initialize_registers(UINT32 argb8[6]);
 	void combiner_initialize_stage(int stage_number);
@@ -293,6 +296,7 @@ public:
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	void clear_depth_buffer(int what, UINT32 value);
 	inline UINT8 *direct_access_ptr(offs_t address);
 	TIMER_CALLBACK_MEMBER(puller_timer_work);
 
@@ -321,8 +325,10 @@ public:
 	int dilate_rendertarget;
 	int antialiasing_rendertarget;
 	int type_rendertarget;
-	int depth_rendertarget;
-	int color_rendertarget;
+	int depthformat_rendertarget;
+	int colorformat_rendertarget;
+	int bytespixel_rendertarget;
+	UINT32 antialias_control;
 	UINT32 *rendertarget;
 	UINT32 *depthbuffer;
 	UINT32 *displayedtarget;
