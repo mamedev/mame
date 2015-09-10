@@ -3939,7 +3939,6 @@ DRIVER_INIT_MEMBER(segaxbd_new_state,smgp)
 
 DRIVER_INIT_MEMBER(segaxbd_new_state,rascot)
 {
-#if 0
 	// patch out bootup link test
 	UINT16 *rom = reinterpret_cast<UINT16 *>(memregion("mainpcb:subcpu")->base());
 	rom[0xb78/2] = 0x601e; // subrom checksum test
@@ -3948,8 +3947,7 @@ DRIVER_INIT_MEMBER(segaxbd_new_state,rascot)
 	rom[0x606/2] = 0x4e71;
 
 	// map /EXCS space
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0f0000, 0x0f3fff, read16_delegate(FUNC(segaxbd_state::rascot_excs_r), this), write16_delegate(FUNC(segaxbd_state::rascot_excs_w), this));
-#endif
+	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0f0000, 0x0f3fff, read16_delegate(FUNC(segaxbd_state::rascot_excs_r), (segaxbd_state*)m_mainpcb), write16_delegate(FUNC(segaxbd_state::rascot_excs_w), (segaxbd_state*)m_mainpcb));
 }
 
 void segaxbd_state::install_gprider(void)
