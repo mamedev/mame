@@ -38,6 +38,8 @@ void scn2674_device::device_start()
 	save_item(NAME(m_linecounter));
 	save_item(NAME(m_screen2_l));
 	save_item(NAME(m_screen2_h));
+	save_item(NAME(m_cursor_l));
+	save_item(NAME(m_cursor_h));
 }
 
 void scn2674_device::device_reset()
@@ -94,10 +96,12 @@ void scn2674_device::device_reset()
 	m_spl1= 0;
 	m_spl2= 0;
 	m_dbl1= 0;
+	m_buffer= 0;
 	m_linecounter= 0;
 	m_irq_state= 0;
 	m_IR_pointer = 0;
 	m_address = 0;
+	m_start1change = 0;
 	m_hpixels_per_column = m_text_hpixels_per_column;
 }
 
@@ -246,8 +250,7 @@ void scn2674_device::write_init_regs(UINT8 data)
 			break;
 
 	}
-	if(m_display_enabled)
-		recompute_parameters();
+	recompute_parameters();
 
 	m_IR_pointer++;
 	if (m_IR_pointer>14)m_IR_pointer=14;
@@ -291,8 +294,7 @@ void scn2674_device::write_command(UINT8 data)
 		/* Disable GFX */
 		LOG2674(("disable GFX %02x\n",data));
 		m_gfx_enabled = 0;
-		if(m_display_enabled)
-			recompute_parameters();
+		recompute_parameters();
 	}
 
 	if ((data&0xe3)==0x23)
@@ -300,8 +302,7 @@ void scn2674_device::write_command(UINT8 data)
 		/* Enable GFX */
 		LOG2674(("enable GFX %02x\n",data));
 		m_gfx_enabled = 1;
-		if(m_display_enabled)
-			recompute_parameters();
+		recompute_parameters();
 	}
 
 	if ((data&0xe9)==0x28)
@@ -410,59 +411,70 @@ void scn2674_device::write_command(UINT8 data)
 
 	/* Delayed Commands */
 	/* These set 0x20 in status register when done */
-
-	if (data == 0xa4)
+	// These use the pointer address according to the datasheet but the pcx expects the screen start 2 address instead
+	switch(data)
 	{
-		/* read at pointer address */
-		LOG2674(("DELAYED read at pointer address %02x\n",data));
-	}
+		case 0xa4:
+			/* read at pointer address */
+			m_buffer = space().read_byte(m_screen2_l | (m_screen2_h << 8));
+			LOG2674(("DELAYED read at pointer address %02x\n",data));
+			break;
 
-	if (data == 0xa2)
-	{
-		/* write at pointer address */
-		LOG2674(("DELAYED write at pointer address %02x\n",data));
-	}
+		case 0xa2:
+			/* write at pointer address */
+			space().write_byte(m_screen2_l | (m_screen2_h << 8), m_buffer);
+			LOG2674(("DELAYED write at pointer address %02x\n",data));
+			break;
 
-	if (data == 0xa9)
-	{
-		/* increase cursor address */
-		LOG2674(("DELAYED increase cursor address %02x\n",data));
-	}
+		case 0xa9:
+			/* increment cursor address */
+			if(!(++m_cursor_l))
+				m_cursor_h++;
+			LOG2674(("DELAYED increase cursor address %02x\n",data));
+			break;
 
-	if (data == 0xac)
-	{
-		/* read at cursor address */
-		LOG2674(("DELAYED read at cursor address %02x\n",data));
-	}
+		case 0xac:
+			/* read at cursor address */
+			m_buffer = space().read_byte(m_cursor_l | (m_cursor_h << 8));
+			LOG2674(("DELAYED read at cursor address %02x\n",data));
+			break;
 
-	if (data == 0xaa)
-	{
-		/* write at cursor address */
-		LOG2674(("DELAYED write at cursor address %02x\n",data));
-	}
+		case 0xaa:
+			/* write at cursor address */
+			space().write_byte(m_cursor_l | (m_cursor_h << 8), m_buffer);
+			LOG2674(("DELAYED write at cursor address %02x\n",data));
+			break;
 
-	if (data == 0xad)
-	{
-		/* read at cursor address + increment */
-		LOG2674(("DELAYED read at cursor address+increment %02x\n",data));
-	}
+		case 0xad:
+			/* read at cursor address + increment */
+			m_buffer = space().read_byte(m_cursor_l | (m_cursor_h << 8));
+			if(!(++m_cursor_l))
+				m_cursor_h++;
+			LOG2674(("DELAYED read at cursor address+increment %02x\n",data));
+			break;
 
-	if (data == 0xab)
-	{
-		/* write at cursor address + increment */
-		LOG2674(("DELAYED write at cursor address+increment %02x\n",data));
-	}
+		case 0xab:
+			/* write at cursor address + increment */
+			space().write_byte(m_cursor_l | (m_cursor_h << 8), m_buffer);
+			if(!(++m_cursor_l))
+				m_cursor_h++;
+			LOG2674(("DELAYED write at cursor address+increment %02x\n",data));
+			break;
 
-	if (data == 0xbb)
-	{
-		/* write from cursor address to pointer address */
-		LOG2674(("DELAYED write from cursor address to pointer address %02x\n",data));
-	}
+		case 0xbb:
+			/* write from cursor address to pointer address TODO: transfer only during blank*/
+			for(i = m_cursor_l | (m_cursor_h << 8); i != (m_screen2_l | (m_screen2_h << 8)); i = ((i + 1) & 0xffff))
+				space().write_byte(i, m_buffer);
+			space().write_byte(i, m_buffer); // get the last
+			m_cursor_l = m_screen2_l;
+			m_cursor_h = m_screen2_h;
+			LOG2674(("DELAYED write from cursor address to pointer address %02x\n",data));
+			break;
 
-	if (data == 0xbd)
-	{
-		/* read from cursor address to pointer address */
-		LOG2674(("DELAYED read from cursor address to pointer address %02x\n",data));
+		case 0xbd:
+			/* read from cursor address to pointer address */
+			LOG2674(("DELAYED read from cursor address to pointer address %02x\n",data));
+			break;
 	}
 }
 
@@ -540,7 +552,11 @@ WRITE8_MEMBER( scn2674_device::write )
 			write_command(data);
 			break;
 
-		case 2: m_screen1_l = data; break;
+		case 2:
+			m_screen1_l = data;
+			if(!m_screen->vblank())
+				m_start1change = (m_linecounter / m_IR0_scanline_per_char_row) + 1;
+			break;
 		case 3:
 			m_screen1_h = data;
 			m_dbl1=(data & 0xc0)>>6;
@@ -550,6 +566,8 @@ WRITE8_MEMBER( scn2674_device::write )
 				m_screen1_h &= 0x3f;
 				LOG2674(("IR14 - Double 1 overridden %02x\n",m_IR14_double_1));
 			}
+			if(!m_screen->vblank())
+				m_start1change = (m_linecounter / m_IR0_scanline_per_char_row) + 1;
 			break;
 
 		case 4: m_cursor_l  = data; break;
@@ -571,6 +589,12 @@ void scn2674_device::recompute_parameters()
 	attoseconds_t refresh = m_screen->frame_period().attoseconds();
 	int max_visible_x = (m_IR5_character_per_row * m_hpixels_per_column) - 1;
 	int max_visible_y = (m_IR4_rows_per_screen * m_IR0_scanline_per_char_row) - 1;
+
+	if(!horiz_pix_total || !vert_pix_total)
+	{
+		m_scanline_timer->adjust(attotime::never);
+		return;
+	}
 
 	LOG2674(("width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh)));
 
@@ -594,22 +618,11 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_display_enabled_scanline = 0;
 				m_display_enabled_field = 0;
 			}
-			else if(!m_display_enabled)
-				break;
 			else
 				m_linecounter++;
 
-			// should be triggered at the start of each ROW (line zero for that row)
 			if(m_linecounter >= m_screen->height())
 			{
-				m_status_register |= 0x08;
-				if (m_irq_mask & 0x08)
-				{
-					LOG2674(("SCN2674 Line Zero\n"));
-					m_irq_state = 1;
-					m_irq_register |= 0x08;
-					m_irq_cb(1);
-				}
 				m_linecounter = 0;
 				m_address = (m_screen1_h << 8) | m_screen1_l;
 			}
@@ -628,6 +641,22 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			if(m_linecounter >= (m_IR4_rows_per_screen * m_IR0_scanline_per_char_row))
 				break;
+
+			int charrow = m_linecounter % m_IR0_scanline_per_char_row;
+			int tilerow = charrow;
+
+			// should be triggered at the start of each ROW (line zero for that row)
+			if(!charrow)
+			{
+				m_status_register |= 0x08;
+				if (m_irq_mask & 0x08)
+				{
+					LOG2674(("SCN2674 Line Zero\n"));
+					m_irq_state = 1;
+					m_irq_register |= 0x08;
+					m_irq_cb(1);
+				}
+			}
 
 			if((m_linecounter == (m_IR12_split_register_1 * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
 			{
@@ -661,8 +690,8 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					dw = m_IR14_double_2;
 			}
 
-			int charrow = m_linecounter % m_IR0_scanline_per_char_row;
-			int tilerow = charrow;
+			if(!m_display_enabled)
+				break;
 
 			if(m_IR2_row_table)
 			{
@@ -684,7 +713,11 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					m_screen2_h = (addr >> 8) & 0x3f;
 					m_screen2_l = addr & 0xff;
 				}
-
+			}
+			else if(m_start1change && (m_start1change == (m_linecounter / m_IR0_scanline_per_char_row)))
+			{
+				m_address = (m_screen1_h << 8) | m_screen1_l;
+				m_start1change = 0;
 			}
 
 			if(dw == 2)

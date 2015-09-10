@@ -2212,6 +2212,7 @@ createMESSProjects(_target, _subtarget, "siemens")
 files {
 	MAME_DIR .. "src/mess/drivers/pcd.c",
 	MAME_DIR .. "src/mess/machine/pcd_kbd.c",
+	MAME_DIR .. "src/mess/video/pcd.c",
 }
 
 createMESSProjects(_target, _subtarget, "slicer")

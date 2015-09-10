@@ -7,6 +7,8 @@ const device_type PCD_KEYBOARD = &device_creator<pcd_keyboard_device>;
 ROM_START( pcd_keyboard )
 	ROM_REGION(0x1000, "mcu", 0)
 	ROM_LOAD("pcd_keyboard.bin", 0x0000, 0x1000, CRC(d227d6cb) SHA1(3d6140764d3d043428c941826370ebf1597c63bd))
+	ROM_FILL(0x526,1,0x03) // make the PCX video happy, TODO: figure out what's really happening
+	ROM_FILL(0x1e1,1,0x50) // fix csum
 ROM_END
 
 

@@ -37,6 +37,8 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( buffer_r ) { return m_buffer; }
+	DECLARE_WRITE8_MEMBER( buffer_w ) { m_buffer = data; }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
@@ -105,8 +107,10 @@ private:
 	UINT8 m_spl1;
 	UINT8 m_spl2;
 	UINT8 m_dbl1;
+	UINT8 m_buffer;
 	int m_linecounter;
 	UINT16 m_address;
+	int m_start1change;
 
 	UINT8 m_irq_state;
 
