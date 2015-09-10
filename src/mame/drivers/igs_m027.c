@@ -68,6 +68,7 @@ public:
 	DECLARE_DRIVER_INIT(fearless);
 	DECLARE_DRIVER_INIT(slqz3);
 	DECLARE_DRIVER_INIT(fruitpar);
+	DECLARE_DRIVER_INIT(amazonia);
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
 	virtual void video_start();
@@ -537,6 +538,37 @@ ROM_START( fruitpar )
 ROM_END
 
 
+
+/***************************************************************************
+
+Amazonia King
+IGS
+
+IGS PCB-0367-00-FG-1
+
+  - IGS 027A
+  - IGS 031
+  - IGS A2107
+  - IGS T2105
+  - K668 (qfp44) == OKI6225
+  - 82C55
+
+***************************************************************************/
+
+ROM_START( amazonia )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A type G ARM based MCU */
+	ROM_LOAD( "amazonia_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "amazonia_v-104br.u23", 0x00000, 0x80000, CRC(c203f875) SHA1(e8465ac74b873cc4d372a656bb50994bffed8406) )
+
+	ROM_REGION( 0x480000, "gfx1", 0 )
+	ROM_LOAD( "amazonia_cg.u11", 0x000000, 0x80000, CRC(2ac2cfd1) SHA1(f8750a4727ddabf1415dab6eaa4a72e60e86e7f1) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102.u28", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+ROM_END
 
 
 ROM_START( sdwx )
@@ -1064,6 +1096,13 @@ DRIVER_INIT_MEMBER(igs_m027_state,fruitpar)
 	pgm_create_dummy_internal_arm_region();
 }
 
+DRIVER_INIT_MEMBER(igs_m027_state,amazonia)
+{
+	amazonia_decrypt(machine());
+	//sdwx_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 /***************************************************************************
 
     Game Drivers
@@ -1071,6 +1110,7 @@ DRIVER_INIT_MEMBER(igs_m027_state,fruitpar)
 ***************************************************************************/
 
 GAME( 1999,  slqz3,     0, igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
+GAME( 1999,  amazonia,  0, igs_majhong, sdwx, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
 GAME( 200?,  fruitpar,  0, igs_majhong, sdwx, igs_m027_state, fruitpar,    ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
 GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line?
 GAME( 200?,  sddz,      0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
