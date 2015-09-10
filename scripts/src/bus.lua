@@ -2185,6 +2185,8 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cpc/hd20.h",
 		MAME_DIR .. "src/emu/bus/cpc/ddi1.c",
 		MAME_DIR .. "src/emu/bus/cpc/ddi1.h",
+		MAME_DIR .. "src/emu/bus/cpc/magicsound.c",
+		MAME_DIR .. "src/emu/bus/cpc/magicsound.h",
 	}
 end
 
