@@ -407,7 +407,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				 * Old frame was unvoiced, new is voiced (note this is the case on the patent but may not be correct on the real final chip)
 				 */
 				if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
-					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0)) /* this line needs further investigation, starwars tie fighters may sound better without it */
+					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
 					|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
 					m_inhibit = 1;
 				else // normal frame, normal interpolation
@@ -415,7 +415,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 
 #ifdef DEBUG_GENERATION
 				/* Debug info for current parsed frame */
-				fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
+				fprintf(stderr, "OLDE=0: %d; OLDP=0: %d; E=0: %d; P=0: %d; ", m_OLDE, m_OLDP, (m_new_frame_energy_idx==0), (m_new_frame_pitch_idx==0));
 				fprintf(stderr,"Processing new frame: ");
 				if (m_inhibit == 0)
 					fprintf(stderr, "Normal Frame\n");
@@ -1004,9 +1004,6 @@ void tms5110_device::parse_frame()
 		fprintf(stderr," ");
 #endif
 	}
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
 #ifdef VERBOSE
 		logerror("Parsed a frame successfully in ROM\n");
 #endif
