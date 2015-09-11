@@ -630,7 +630,6 @@ int tms5220_device::extract_bits(int count)
 		if (m_speechrom)
 			val = m_speechrom->read(count);
 	}
-
 	return val;
 }
 
@@ -649,13 +648,11 @@ int tms5220_device::status_read()
 	}
 	else
 	{   /* read status */
-
 		/* clear the interrupt pin on status read */
 		set_interrupt_state(0);
 #ifdef DEBUG_PIN_READS
 		fprintf(stderr,"Status read: TS=%d BL=%d BE=%d\n", TALK_STATUS, m_buffer_low, m_buffer_empty);
 #endif
-
 		return (TALK_STATUS << 7) | (m_buffer_low << 6) | (m_buffer_empty << 5);
 	}
 }
