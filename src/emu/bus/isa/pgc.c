@@ -259,8 +259,6 @@ void isa8_pgc_device::device_start()
 
 void isa8_pgc_device::device_reset()
 {
-	address_space &space = m_cpu->space( AS_PROGRAM );
-
 	memset(m_stateparam, 0, sizeof(m_stateparam));
 	memset(m_lut, 0, sizeof(m_lut));
 
@@ -270,6 +268,8 @@ void isa8_pgc_device::device_reset()
 	else
 		m_isa->install_bank(0xc6000, 0xc63ff, 0, 0, "commarea", m_commarea);
 #if 0	
+	address_space &space = m_cpu->space( AS_PROGRAM );
+
 	space.unmap_readwrite(0xf8000, 0xfffff);
 	space.install_rom(0xf8000, 0xfffff,
 		space.machine().root_device().memregion("maincpu")->base() + 0x8000);
