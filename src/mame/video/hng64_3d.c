@@ -1029,10 +1029,10 @@ void hng64_state::matmul4(float *product, const float *a, const float *b)
 /* vector by 4x4 matrix multiply */
 void hng64_state::vecmatmul4(float *product, const float *a, const float *b)
 {
-	const float bi0 = b[0];
-	const float bi1 = b[1];
-	const float bi2 = b[2];
-	const float bi3 = b[3];
+	const float& bi0 = b[0];
+	const float& bi1 = b[1];
+	const float& bi2 = b[2];
+	const float& bi3 = b[3];
 
 	product[0] = bi0 * a[0] + bi1 * a[4] + bi2 * a[8 ] + bi3 * a[12];
 	product[1] = bi0 * a[1] + bi1 * a[5] + bi2 * a[9 ] + bi3 * a[13];
@@ -1247,9 +1247,6 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
     {
         if (z < *depthBuffer)
         {
-            // Translucency currently isn't an issue, so soldier on
-            *depthBuffer = z;
-
             // Multiply back through by w for everything that was interpolated perspective-correctly
             const float sCorrect = s / w;
             const float tCorrect = t / w;
@@ -1336,6 +1333,7 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
 					color = rgb_t(255, (UINT8)red, (UINT8)green, (UINT8)blue);
 
 					*colorBuffer = color;
+                    *depthBuffer = z;
 				}
 			}
         }
