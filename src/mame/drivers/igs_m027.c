@@ -562,7 +562,7 @@ ROM_START( amazonia )
 	ROM_LOAD( "amazonia_igs027a", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "amazonia_v-104br.u23", 0x00000, 0x80000, CRC(c203f875) SHA1(e8465ac74b873cc4d372a656bb50994bffed8406) )
+	ROM_LOAD( "amazonia_v-104br.u23", 0x00000, 0x80000, CRC(103d465e) SHA1(68d088f24171e27c0a9b0660f81d3334f730637a) )
 
 	ROM_REGION( 0x480000, "gfx1", 0 )
 	ROM_LOAD( "amazonia_cg.u11", 0x000000, 0x80000, CRC(2ac2cfd1) SHA1(f8750a4727ddabf1415dab6eaa4a72e60e86e7f1) )
