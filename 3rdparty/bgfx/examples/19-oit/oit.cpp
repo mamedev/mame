@@ -193,9 +193,9 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(mem);
 
 	// Create texture sampler uniforms.
-	bgfx::UniformHandle u_texColor0 = bgfx::createUniform("u_texColor0", bgfx::UniformType::Uniform1iv);
-	bgfx::UniformHandle u_texColor1 = bgfx::createUniform("u_texColor1", bgfx::UniformType::Uniform1iv);
-	bgfx::UniformHandle u_color     = bgfx::createUniform("u_color",     bgfx::UniformType::Uniform4fv);
+	bgfx::UniformHandle s_texColor0 = bgfx::createUniform("s_texColor0", bgfx::UniformType::Int1);
+	bgfx::UniformHandle s_texColor1 = bgfx::createUniform("s_texColor1", bgfx::UniformType::Int1);
+	bgfx::UniformHandle u_color     = bgfx::createUniform("u_color",     bgfx::UniformType::Vec4);
 
 	bgfx::ProgramHandle blend          = loadProgram("vs_oit",      "fs_oit"                  );
 	bgfx::ProgramHandle wbSeparatePass = loadProgram("vs_oit",      "fs_oit_wb_separate"      );
@@ -242,9 +242,10 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 		imguiBeginFrame(mouseState.m_mx
 			, mouseState.m_my
-			, (mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT  : 0)
-			| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT : 0)
-			, 0
+			, (mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
+			| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
+			| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
+			, mouseState.m_mz
 			, width
 			, height
 			);
@@ -380,11 +381,12 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 						| BGFX_STATE_MSAA
 						;
 
+					bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
 					switch (mode)
 					{
 						case 0:
 							// Set vertex and fragment shaders.
-							bgfx::setProgram(blend);
+							program = blend;
 
 							// Set render states.
 							bgfx::setState(state
@@ -394,7 +396,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 						case 1:
 							// Set vertex and fragment shaders.
-							bgfx::setProgram(wbSeparatePass);
+							program = wbSeparatePass;
 
 							// Set render states.
 							bgfx::setState(state
@@ -404,7 +406,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 						default:
 							// Set vertex and fragment shaders.
-							bgfx::setProgram(wbPass);
+							program = wbPass;
 
 							// Set render states.
 							bgfx::setState(state
@@ -417,22 +419,23 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 					}
 
 					// Submit primitive for rendering to view 0.
-					bgfx::submit(0);
+					bgfx::submit(0, program);
 				}
 			}
 		}
 
 		if (0 != mode)
 		{
-			bgfx::setTexture(0, u_texColor0, fbtextures[0]);
-			bgfx::setTexture(1, u_texColor1, fbtextures[1]);
-			bgfx::setProgram(1 == mode ? wbSeparateBlit : wbBlit);
+			bgfx::setTexture(0, s_texColor0, fbtextures[0]);
+			bgfx::setTexture(1, s_texColor1, fbtextures[1]);
 			bgfx::setState(0
 				| BGFX_STATE_RGB_WRITE
 				| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_INV_SRC_ALPHA, BGFX_STATE_BLEND_SRC_ALPHA)
 				);
 			screenSpaceQuad( (float)width, (float)height, s_flipV);
-			bgfx::submit(1);
+			bgfx::submit(1
+				, 1 == mode ? wbSeparateBlit : wbBlit
+				);
 		}
 
 		// Advance to next frame. Rendering thread will be kicked to
@@ -451,8 +454,8 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	bgfx::destroyProgram(wbSeparateBlit);
 	bgfx::destroyProgram(wbPass);
 	bgfx::destroyProgram(wbBlit);
-	bgfx::destroyUniform(u_texColor0);
-	bgfx::destroyUniform(u_texColor1);
+	bgfx::destroyUniform(s_texColor0);
+	bgfx::destroyUniform(s_texColor1);
 	bgfx::destroyUniform(u_color);
 
 	// Shutdown bgfx.

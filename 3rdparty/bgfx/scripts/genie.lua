@@ -24,6 +24,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-scintilla",
+	description = "Enable building with Scintilla editor.",
+}
+
+newoption {
 	trigger = "with-shared-lib",
 	description = "Enable building shared library.",
 }
@@ -300,9 +305,6 @@ function exampleProject(_name)
 		}
 
 	configuration { "osx" }
-		files {
-			path.join(BGFX_DIR, "examples/common/**.mm"),
-		}
 		links {
 			"Cocoa.framework",
 			"OpenGL.framework",
@@ -310,9 +312,6 @@ function exampleProject(_name)
 
 	configuration { "ios*" }
 		kind "ConsoleApp"
-		files {
-			path.join(BGFX_DIR, "examples/common/**.mm"),
-		}
 		linkoptions {
 			"-framework CoreFoundation",
 			"-framework Foundation",

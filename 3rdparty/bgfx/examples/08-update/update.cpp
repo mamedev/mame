@@ -138,10 +138,10 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 	bgfx::TextureHandle textures[] =
 	{
-		loadTexture("texture_compression_bc1.dds", BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP),
-		loadTexture("texture_compression_bc2.dds", BGFX_TEXTURE_U_CLAMP),
-		loadTexture("texture_compression_bc3.dds", BGFX_TEXTURE_V_CLAMP),
-		loadTexture("texture_compression_etc1.ktx"),
+		loadTexture("texture_compression_bc1.dds",  BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP),
+		loadTexture("texture_compression_bc2.dds",  BGFX_TEXTURE_U_CLAMP),
+		loadTexture("texture_compression_bc3.dds",  BGFX_TEXTURE_V_CLAMP),
+		loadTexture("texture_compression_etc1.ktx", BGFX_TEXTURE_U_BORDER|BGFX_TEXTURE_V_BORDER),
 		loadTexture("texture_compression_etc2.ktx"),
 		loadTexture("texture_compression_ptc12.pvr"),
 		loadTexture("texture_compression_ptc14.pvr"),
@@ -198,10 +198,10 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) ) );
 
 	// Create texture sampler uniforms.
-	bgfx::UniformHandle u_texCube  = bgfx::createUniform("u_texCube",  bgfx::UniformType::Uniform1iv);
-	bgfx::UniformHandle u_texColor = bgfx::createUniform("u_texColor", bgfx::UniformType::Uniform1iv);
+	bgfx::UniformHandle s_texCube  = bgfx::createUniform("s_texCube",  bgfx::UniformType::Int1);
+	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 
-	bgfx::UniformHandle u_time = bgfx::createUniform("u_time", bgfx::UniformType::Uniform1f);
+	bgfx::UniformHandle u_time = bgfx::createUniform("u_time", bgfx::UniformType::Vec4);
 
 	bgfx::ProgramHandle program     = loadProgram("vs_update", "fs_update");
 	bgfx::ProgramHandle programCmp  = loadProgram("vs_update", "fs_update_cmp");
@@ -249,7 +249,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 		// This dummy draw call is here to make sure that view 0 is cleared
 		// if no other draw calls are submitted to view 0.
-		bgfx::submit(0);
+		bgfx::touch(0);
 
 		int64_t now = bx::getHPCounter();
 		static int64_t last = now;
@@ -348,123 +348,108 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		// Set model matrix for rendering.
 		bgfx::setTransform(mtx);
 
-		// Set vertex and fragment shaders.
-		bgfx::setProgram(program);
-
 		// Set vertex and index buffer.
 		bgfx::setVertexBuffer(vbh);
 		bgfx::setIndexBuffer(ibh);
 
 		// Bind texture.
-		bgfx::setTexture(0, u_texCube, textureCube);
+		bgfx::setTexture(0, s_texCube, textureCube);
 
 		// Set render states.
 		bgfx::setState(BGFX_STATE_DEFAULT);
 
 		// Submit primitive for rendering to view 0.
-		bgfx::submit(0);
+		bgfx::submit(0, program);
 
 
 		// Set view and projection matrix for view 1.
 		const float aspectRatio = float(height)/float(width);
-		const float size = 10.0f;
+		const float size = 11.0f;
 		bx::mtxOrtho(proj, -size, size, size*aspectRatio, -size*aspectRatio, 0.0f, 1000.0f);
 		bgfx::setViewTransform(1, NULL, proj);
 
 
-		bx::mtxTranslate(mtx, -8.0f - BX_COUNTOF(textures)*0.1f*0.5f, 1.9f, 0.0f);
+		bx::mtxTranslate(mtx, -size+2.0f - BX_COUNTOF(textures)*0.1f*0.5f, 1.9f, 0.0f);
 
 		// Set model matrix for rendering.
 		bgfx::setTransform(mtx);
-
-		// Set vertex and fragment shaders.
-		bgfx::setProgram(programCmp);
 
 		// Set vertex and index buffer.
 		bgfx::setVertexBuffer(vbh);
 		bgfx::setIndexBuffer(ibh);
 
 		// Bind texture.
-		bgfx::setTexture(0, u_texColor, texture2d);
+		bgfx::setTexture(0, s_texColor, texture2d);
 
 		// Set render states.
 		bgfx::setState(BGFX_STATE_DEFAULT);
 
 		// Submit primitive for rendering to view 1.
-		bgfx::submit(1);
+		bgfx::submit(1, programCmp);
 
-		const float xpos = -8.0f - BX_COUNTOF(textures)*0.1f*0.5f;
+		const float xpos = -size+2.0f - BX_COUNTOF(textures)*0.1f*0.5f;
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(textures); ++ii)
 		{
-			bx::mtxTranslate(mtx, xpos + ii*2.1f, 4.0f, 0.0f);
+			bx::mtxTranslate(mtx, xpos + ii*2.1f, size-6.5f, 0.0f);
 
 			// Set model matrix for rendering.
 			bgfx::setTransform(mtx);
-
-			// Set vertex and fragment shaders.
-			bgfx::setProgram(programCmp);
 
 			// Set vertex and index buffer.
 			bgfx::setVertexBuffer(vbh);
 			bgfx::setIndexBuffer(ibh, 0, 6);
 
 			// Bind texture.
-			bgfx::setTexture(0, u_texColor, textures[ii]);
+			bgfx::setTexture(0, s_texColor, textures[ii]);
 
 			// Set render states.
 			bgfx::setState(BGFX_STATE_DEFAULT);
 
 			// Submit primitive for rendering to view 1.
-			bgfx::submit(1);
+			bgfx::submit(1, programCmp);
 		}
 
 		for (uint32_t ii = 0; ii < numTextures3d; ++ii)
 		{
-			bx::mtxTranslate(mtx, xpos + ii*2.1f, -4.0f, 0.0f);
+			bx::mtxTranslate(mtx, xpos + ii*2.1f, -size+6.5f, 0.0f);
 
 			// Set model matrix for rendering.
 			bgfx::setTransform(mtx);
-
-			// Set vertex and fragment shaders.
-			bgfx::setProgram(program3d);
 
 			// Set vertex and index buffer.
 			bgfx::setVertexBuffer(vbh);
 			bgfx::setIndexBuffer(ibh, 0, 6);
 
 			// Bind texture.
-			bgfx::setTexture(0, u_texColor, textures3d[ii]);
+			bgfx::setTexture(0, s_texColor, textures3d[ii]);
 
 			// Set render states.
 			bgfx::setState(BGFX_STATE_DEFAULT);
 
 			// Submit primitive for rendering to view 1.
-			bgfx::submit(1);
+			bgfx::submit(1, program3d);
 		}
 
-		for (uint32_t ii = 0; ii < 3; ++ii)
+		for (uint32_t ii = 0; ii < 4; ++ii)
 		{
-			bx::mtxTranslate(mtx, xpos + 8*2.1f, -4.0f + ii*2.1f, 0.0f);
+			bx::mtxTranslate(mtx, xpos + (size-2.0f)*2.1f, -size+6.5f + ii*2.1f, 0.0f);
 
 			// Set model matrix for rendering.
 			bgfx::setTransform(mtx);
-
-			// Set vertex and fragment shaders.
-			bgfx::setProgram(programCmp);
 
 			// Set vertex and index buffer.
 			bgfx::setVertexBuffer(vbh, 24, 4);
 			bgfx::setIndexBuffer(ibh, 0, 6);
 
 			// Bind texture.
-			bgfx::setTexture(0, u_texColor, textures[ii]);
+			bgfx::setTexture(0, s_texColor, textures[ii]);
 
 			// Set render states.
 			bgfx::setState(BGFX_STATE_DEFAULT);
 
 			// Submit primitive for rendering to view 1.
-			bgfx::submit(1);
+			bgfx::submit(1, programCmp);
 		}
 
 		// Advance to next frame. Rendering thread will be kicked to
@@ -501,8 +486,8 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	bgfx::destroyProgram(programCmp);
 	bgfx::destroyProgram(program);
 	bgfx::destroyUniform(u_time);
-	bgfx::destroyUniform(u_texColor);
-	bgfx::destroyUniform(u_texCube);
+	bgfx::destroyUniform(s_texColor);
+	bgfx::destroyUniform(s_texCube);
 
 	// Shutdown bgfx.
 	bgfx::shutdown();
