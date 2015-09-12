@@ -6,17 +6,12 @@
     NEC uPD7201 Multiprotocol Serial Communications Controller emulation
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
     Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
-    Z80-SCC Serial Communications Controller emulation (experimental)
 
     The z80dart/z80sio itself is based on an older intel serial chip, the i8274 MPSC
     (see http://doc.chipfind.ru/pdf/intel/8274.pdf), which also has almost identical
     behavior, except lacks the interrupt daisy chaining and has its own interrupt/dma
     scheme which uses write register 2 on channel A, that register which is unused on
     the z80dart and z80sio.
-
-    The z80scc is an updated version of the z80sio, with additional support for CRC
-    checks and a number of data link layer protocols such as HDLC, SDLC and BiSync.
-    (See https://en.wikipedia.org/wiki/Zilog_SCC). 
 
 ***************************************************************************/
 
@@ -30,9 +25,8 @@
     - wait/ready
     - 1.5 stop bits
     - synchronous mode (Z80-SIO/1,2)
-    - SDLC mode (Z80-SIO/1,2/SCC)
-    - HDLC, BiSync support (Z80-SCC)
-    - CRC support (Z80-SCC)
+    - SDLC mode (Z80-SIO/1,2)
+
 */
 
 #include "z80dart.h"
@@ -66,7 +60,6 @@ const device_type Z80SIO3 = &device_creator<z80sio3_device>;
 const device_type Z80SIO4 = &device_creator<z80sio4_device>;
 const device_type I8274 = &device_creator<i8274_device>;
 const device_type UPD7201 = &device_creator<upd7201_device>;
-const device_type Z80SCC  = &device_creator<scc8530_device>;
 
 
 //-------------------------------------------------
@@ -185,11 +178,6 @@ i8274_device::i8274_device(const machine_config &mconfig, const char *tag, devic
 
 upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: z80dart_device(mconfig, UPD7201, "uPD7201", tag, owner, clock, TYPE_UPD7201, "upd7201", __FILE__)
-{
-}
-
-scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80dart_device(mconfig, Z80SCC, "Z80 SCC", tag, owner, clock, TYPE_Z80SCC, "z80scc", __FILE__)
 {
 }
 
@@ -450,10 +438,6 @@ READ8_MEMBER( z80dart_device::cd_ba_r )
 	int cd = BIT(offset, 1);
 	z80dart_channel *channel = ba ? m_chanB : m_chanA;
 
-        cd = (m_variant == TYPE_Z80SCC) ? !cd : cd; // Inverted logic on SCC
-
-        //        LOG(("z80dart_device::cd_ba_r ba:%02x cd:%02x\n", ba, cd));
-
 	return cd ? channel->control_read() : channel->data_read();
 }
 
@@ -467,10 +451,6 @@ WRITE8_MEMBER( z80dart_device::cd_ba_w )
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
 	z80dart_channel *channel = ba ? m_chanB : m_chanA;
-
-        cd = (m_variant == TYPE_Z80SCC) ? !cd : cd; // Inverted logic on SCC
-
-        //        LOG(("z80dart_device::cd_ba_w ba:%02x cd:%02x\n", ba, cd));
 
 	if (cd)
 		channel->control_write(data);
@@ -489,10 +469,6 @@ READ8_MEMBER( z80dart_device::ba_cd_r )
 	int cd = BIT(offset, 0);
 	z80dart_channel *channel = ba ? m_chanB : m_chanA;
 
-        cd = (m_variant == TYPE_Z80SCC) ? !cd : cd; // Inverted logic on SCC
-
-        //        LOG(("z80dart_device::ba_cd_r ba:%02x cd:%02x\n", ba, cd));
-
 	return cd ? channel->control_read() : channel->data_read();
 }
 
@@ -507,15 +483,13 @@ WRITE8_MEMBER( z80dart_device::ba_cd_w )
 	int cd = BIT(offset, 0);
 	z80dart_channel *channel = ba ? m_chanB : m_chanA;
 
-        cd = (m_variant == TYPE_Z80SCC) ? !cd : cd; // Inverted logic on SCC
-
-        LOG(("z80dart_device::ba_cd_w ba:%02x cd:%02x\n", ba, cd));
-
 	if (cd)
 		channel->control_write(data);
 	else
 		channel->data_write(data);
 }
+
+
 
 //**************************************************************************
 //  DART CHANNEL
@@ -544,10 +518,10 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 		m_rts(0),
 		m_sync(0)
 {
-	for (int i = 0; i < sizeof(m_rr); i++)
+	for (int i = 0; i < 3; i++)
 		m_rr[i] = 0;
 
-	for (int i = 0; i < sizeof(m_wr); i++)
+	for (int i = 0; i < 6; i++)
 		m_wr[i] = 0;
 
 	for (int i = 0; i < 3; i++)
@@ -566,7 +540,6 @@ void z80dart_channel::device_start()
 {
 	m_uart = downcast<z80dart_device *>(owner());
 	m_index = m_uart->get_channel_index(this);
-        m_ph = 0;
 
 	// state saving
 	save_item(NAME(m_rr));
@@ -587,7 +560,6 @@ void z80dart_channel::device_start()
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
 	save_item(NAME(m_sync));
-	save_item(NAME(m_ph));
 	device_serial_interface::register_save_state(machine().save(), this);
 }
 
@@ -815,17 +787,13 @@ int z80dart_channel::get_tx_word_length()
 UINT8 z80dart_channel::control_read()
 {
 	UINT8 data = 0;
-        int reg = m_wr[0];
-        int regmask = (WR0_REGISTER_MASK | m_ph);
 
-	m_ph = 0; // The "Point High" command is only valid for one access
-
-        reg &= regmask;
+	int reg = m_wr[0] & WR0_REGISTER_MASK;
 
 	if (reg != 0)
 	{
 		// mask out register index
-		m_wr[0] &= ~regmask;
+		m_wr[0] &= ~WR0_REGISTER_MASK;
 	}
 
 	switch (reg)
@@ -840,33 +808,9 @@ UINT8 z80dart_channel::control_read()
 		if (m_index == z80dart_device::CHANNEL_B)
 			data = m_rr[reg];
 		break;
-        /* registers 4-7 are specific to SCC. TODO: Check variant and log/stop misuse */
-        case 4: /* (ESCC and 85C30 Only) */
-                /*On the ESCC, Read Register 4 reflects the contents of Write Register 4 provided the Extended
-                  Read option is enabled. Otherwise, this register returns an image of RR0. On the NMOS/CMOS version, 
-                  a read to this location returns an image of RR0.*/
-        case 5: /* (ESCC and 85C30 Only) */
-                /*On the ESCC, Read Register 5 reflects the contents of Write Register 5 provided the Extended
-                  Read option is enabled. Otherwise, this register returns an image of RR1. On the NMOS/CMOS version, 
-                  a read to this register returns an image of RR1.*/
-                data = BIT(m_wr[7], 6) ? m_wr[reg] : m_rr[reg - 4];
-                break;
-        /* registers 8-15 are specific to SCC and misuse captured by test around Point High command in control_write() */
-        case 8:
-                data = data_read();
-                break;
-        case 10:
-                data = 0;
-                LOG(("Z80DART Read Register 10 Misc Status Bits, SDLC related, not implemented yet.\n"));
-                break;
-        case 13:
-                data = m_wr[13];
-                break;
-	default:
-	  logerror("Z80DART \"%s\" Channel %c : Unsupported RRx register:%02x\n", m_owner->tag(), 'A' + m_index, reg);
 	}
 
-	//LOG(("Z80DART \"%s\" Channel %c : Register R%d read '%02x'\n", m_owner->tag(), 'A' + m_index, reg, data));
+	//LOG(("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
 	return data;
 }
@@ -878,13 +822,9 @@ UINT8 z80dart_channel::control_read()
 
 void z80dart_channel::control_write(UINT8 data)
 {
-        int reg = m_wr[0];
-        int regmask = (WR0_REGISTER_MASK | m_ph);
+	int reg = m_wr[0] & WR0_REGISTER_MASK;
 
-	m_ph = 0; // The "Point High" command is only valid for one access
-
-        reg &= regmask;
-
+	LOG(("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
 	// write data to selected register
 	if (reg < 6)
@@ -893,10 +833,8 @@ void z80dart_channel::control_write(UINT8 data)
 	if (reg != 0)
 	{
 		// mask out register index
-		m_wr[0] &= ~regmask;
+		m_wr[0] &= ~WR0_REGISTER_MASK;
 	}
-
-	LOG(("reg %02x, regmask %02x, WR0 %02x, data %02x\n", reg, regmask, m_wr[0], data));
 
 	switch (reg)
 	{
@@ -907,21 +845,9 @@ void z80dart_channel::control_write(UINT8 data)
 			LOG(("Z80DART \"%s\" Channel %c : Null\n", m_owner->tag(), 'A' + m_index));
 			break;
 
-                //case WR0_POINT_HIGH: // Same value so doesn't compile...
 		case WR0_SEND_ABORT:
-                        if (((z80dart_device *)m_owner)->m_variant == z80dart_device::TYPE_Z80SCC) 
-                        {
-                                /* This is the Point High command for SCC, it will latch access to the high 
-                                   registers for the next read or write to the control registers */
-                                LOG(("Z80DART \"%s\" Channel %c : Point High\n", m_owner->tag(), 'A' + m_index));
-                                m_ph = 8;
-                        }
-                        else 
-                        {
-                                /* Send Abort is only valid for the original Z80 SIO, not the DART or SCC */
-                                LOG(("Z80DART \"%s\" Channel %c : Send Abort\n", m_owner->tag(), 'A' + m_index));
-                                logerror("Z80DART \"%s\" Channel %c : unsupported command: Send Abort\n", m_owner->tag(), 'A' + m_index);
-                        }
+			LOG(("Z80DART \"%s\" Channel %c : Send Abort\n", m_owner->tag(), 'A' + m_index));
+			logerror("Z80DART \"%s\" Channel %c : unsupported command: Send Abort\n", m_owner->tag(), 'A' + m_index);
 			break;
 
 		case WR0_RESET_EXT_STATUS:
@@ -966,8 +892,6 @@ void z80dart_channel::control_write(UINT8 data)
 			LOG(("Z80DART \"%s\" Channel %c : Return from Interrupt\n", m_owner->tag(), 'A' + m_index));
 			m_uart->z80daisy_irq_reti();
 			break;
-                default:
-		  logerror("Z80DART \"%s\" Channel %c : Unsupported WR0 command:%02x\n", m_owner->tag(), 'A' + m_index, data & WR0_COMMAND_MASK);
 		}
 		break;
 
@@ -1065,70 +989,6 @@ void z80dart_channel::control_write(UINT8 data)
 		LOG(("Z80DART \"%s\" Channel %c : Receive Sync %02x\n", m_owner->tag(), 'A' + m_index, data));
 		m_sync = (data << 8) | (m_sync & 0xff);
 		break;
-        /* registers 8-15 are specific to SCC and misuse captured by test around Point High command above */
-        case 8: 
-		LOG(("Z80DART \"%s\" Channel %c : Transmit Buffer read %02x\n", m_owner->tag(), 'A' + m_index, data));
-                data_write(data);
-                break;
-        case 9:
-                switch (data & WR9_CMD_MASK)
-                {
-                case WR9_CMD_NORESET:
-                        LOG(("Z80DART \"%s\" Channel %c : Master Interrupt Control - No reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
-                        break;
-                case WR9_CMD_CHNB_RESET:
-                        LOG(("Z80DART \"%s\" Channel %c : Master Interrupt Control - Channel B reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
-                        m_uart->m_chanB->reset();
-                        break;
-                case WR9_CMD_CHNA_RESET:
-                        LOG(("Z80DART \"%s\" Channel %c : Master Interrupt Control - Channel A reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
-                        m_uart->m_chanA->reset();
-                        break;
-                case WR9_CMD_HW_RESET:
-                        LOG(("Z80DART \"%s\" Channel %c : Master Interrupt Control - Device reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
-                        /*"The effects of this command are identical to those of a hardware reset, except that the Shift Right/Shift Left bit is 
-                          not changed and the MIE, Status High/Status Low and DLC bits take the programmed values that accompany this command."
-                          The Shift Right/Shift Left bits of the WR0 is only valid on SCC8030 device hence not implemented yet, just the SCC8530 */
-                        if (data & (WR9_BIT_MIE | WR9_BIT_IACK | WR9_BIT_SHSL | WR9_BIT_DLC | WR9_BIT_NV))
-                                logerror("Z80DART: SCC Interrupt system not yet implemented, please be patient!\n");
-                        m_uart->device_reset();
-                        break;
-                default:
-                        logerror("Z80DART Code is broken in WR9, please report!\n");
-                }
-                break;
-        case 10:
-		LOG(("Z80DART \"%s\" Channel %c : unsupported command: Misc Tx/Rx Control %02x\n", m_owner->tag(), 'A' + m_index, data));
-                break;
-        case 11:
-		LOG(("Z80DART \"%s\" Channel %c : incomplete command: Clock Mode Control %02x\n", m_owner->tag(), 'A' + m_index, data));
-                m_wr[11] = data;
-                break;
-        case 12:
-		LOG(("Z80DART \"%s\" Channel %c : incomplete command: Low Byte of Baudrate Generator Time Constant %02x\n", m_owner->tag(), 'A' + m_index, data));
-                m_wr[12] = data;
-                break;
-        case 13:
-		LOG(("Z80DART \"%s\" Channel %c : incomplete command: High Byte of Baudrate Generator Time Constant %02x\n", m_owner->tag(), 'A' + m_index, data));
-                m_wr[13] = data;
-                break;
-        case 14:
-                switch (data & WR14_DPLL_CMD_MASK)
-                {
-                case WR14_CMD_NULL:
-                        LOG(("Z80DART \"%s\" Channel %c : Misc Control Bits: DPLL Null Command %02x\n", m_owner->tag(), 'A' + m_index, data));
-                        break;
-                default:
-                        logerror("Z80DART \"%s\" Channel %c : incomplete command: Misc Control Bits %02x\n", m_owner->tag(), 'A' + m_index, data);
-                }
-                // TODO: Add support for clock source to Baudrate generator
-                m_wr[14] = data;
-                break;
-        case 15:
-		LOG(("Z80DART \"%s\" Channel %c : unsupported command: External/Status Control Bits %02x\n", m_owner->tag(), 'A' + m_index, data));
-                break;
-	default:
-	  logerror("Z80DART \"%s\" Channel %c : Unsupported WRx register:%02x\n", m_owner->tag(), 'A' + m_index, reg);
 	}
 }
 
