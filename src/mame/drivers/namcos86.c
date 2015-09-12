@@ -1349,7 +1349,7 @@ ROM_START( genpeitd )
 	/* m3 empty */
 ROM_END
 
-ROM_START( rthunder )
+ROM_START( rthunder ) // program and mcu updated to rt3
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
 	ROM_LOAD( "rt3_1b.9c",    0x8000, 0x8000, CRC(7d252a1b) SHA1(cb92709e94eb273b3ce44c55cd252170ad1017f4) )
@@ -1400,7 +1400,7 @@ ROM_START( rthunder )
 	/* m3 empty */
 ROM_END
 
-ROM_START( rthunder2 )
+ROM_START( rthunder2 ) // program updated to rt2, 19/20 banked CPU code updated to rt3
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
 	ROM_LOAD( "rt2_1.9c",    0x8000, 0x8000, CRC(7eaa9fdf) SHA1(aecc338b025eb5cd48c26ffb2c658d03478361c8) )
@@ -1451,14 +1451,15 @@ ROM_START( rthunder2 )
 	/* m3 empty */
 ROM_END
 
-ROM_START( rthunder1 )
+
+ROM_START( rthunder1 ) // some roms (mcu + samples) and maybe r19 updated to rt2
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
-	ROM_LOAD( "r1",           0x8000, 0x8000, CRC(6f8c1252) SHA1(586f2e33dd16f31131e4ae9423d639fdc6555c9c) )
+	ROM_LOAD( "rt1_1b.9c",           0x8000, 0x8000, CRC(6f8c1252) SHA1(586f2e33dd16f31131e4ae9423d639fdc6555c9c) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "r3",           0x00000, 0x8000, CRC(aaa82885) SHA1(fc2bec3cf7e2de5f90174a2ed3bacfa94b6819f4) )
-	ROM_LOAD( "r2",           0x08000, 0x8000, CRC(f22a03d8) SHA1(5b81fc82813978d5cb69402be72b9ccc585fa1d0) )
+	ROM_LOAD( "rt1_3.12d",           0x00000, 0x8000, CRC(aaa82885) SHA1(fc2bec3cf7e2de5f90174a2ed3bacfa94b6819f4) )
+	ROM_LOAD( "rt1_2b.12c",          0x08000, 0x8000, CRC(f22a03d8) SHA1(5b81fc82813978d5cb69402be72b9ccc585fa1d0) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rt1_7.7r",     0x00000, 0x10000, CRC(a85efa39) SHA1(1ed63b421a93960668cb4558c1ca1b3c86b1f6be) )  /* plane 1,2 */
@@ -1486,14 +1487,14 @@ ROM_START( rthunder1 )
 	ROM_LOAD( "rt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )    /* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "r4",             0x4000, 0x8000, CRC(0387464f) SHA1(ce7f521bc2ecc6525880da2551daf595a394a275) )  /* subprogram for the MCU */
+	ROM_LOAD( "rt2_4.6b",       0x4000, 0x8000, CRC(0387464f) SHA1(ce7f521bc2ecc6525880da2551daf595a394a275) )  /* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  /* MCU internal code */
 
 	ROM_REGION( 0x40000, "user1", 0 ) /* bank switched data for CPU1 */
 	ROM_LOAD( "rt1_17.f1",    0x00000, 0x10000, CRC(766af455) SHA1(8c71772795e783d6c4b88af9a311d55e363c298a) )
 	ROM_LOAD( "rt1_18.h1",    0x10000, 0x10000, CRC(3f9f2f5d) SHA1(541b8f80800cb55e4b81ac48771d00fe10c90743) )
-	ROM_LOAD( "r19",          0x20000, 0x10000, CRC(fe9343b0) SHA1(ae8e5ee11eaf7dc1e8f814b0a0beef97731f042b) )
-	ROM_LOAD( "r20",          0x30000, 0x10000, CRC(f8518d4f) SHA1(3a8551d46ffdf82844b2eb1b2c01cf2d8423a49e) )
+	ROM_LOAD( "r19",          0x20000, 0x10000, CRC(fe9343b0) SHA1(ae8e5ee11eaf7dc1e8f814b0a0beef97731f042b) ) // probably rt2
+	ROM_LOAD( "rt1_20.m1",    0x30000, 0x10000, CRC(f8518d4f) SHA1(3a8551d46ffdf82844b2eb1b2c01cf2d8423a49e) ) // maybe labeled rt2? content is the same as rt1 tho, we have no rt2 rom for this position otherwise tho, only rt1 and rt3, strange.
 
 	ROM_REGION( 0x80000, "namco2", 0 ) /* PCM samples for Hitachi CPU */
 	ROM_LOAD( "rt1_21.f3",    0x00000, 0x10000, CRC(454968f3) SHA1(e0a679353491190b6d4f0355324456a1bd7c8a7a) )
@@ -1501,6 +1502,59 @@ ROM_START( rthunder1 )
 	/* k3 empty */
 	/* m3 empty */
 ROM_END
+
+
+ROM_START( rthunder0 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	/* 9d empty */
+	ROM_LOAD( "rt1_1b.9c",           0x8000, 0x8000, CRC(6f8c1252) SHA1(586f2e33dd16f31131e4ae9423d639fdc6555c9c) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "rt1_3.12d",           0x00000, 0x8000, CRC(aaa82885) SHA1(fc2bec3cf7e2de5f90174a2ed3bacfa94b6819f4) )
+	ROM_LOAD( "rt1_2b.12c",          0x08000, 0x8000, CRC(f22a03d8) SHA1(5b81fc82813978d5cb69402be72b9ccc585fa1d0) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rt1_7.7r",     0x00000, 0x10000, CRC(a85efa39) SHA1(1ed63b421a93960668cb4558c1ca1b3c86b1f6be) )  /* plane 1,2 */
+	ROM_LOAD( "rt1_8.7s",     0x10000, 0x08000, CRC(f7a95820) SHA1(82fe0adf6c5b3abef19031646e1eca1585dcc481) )  /* plane 3 */
+
+	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_LOAD( "rt1_5.4r",     0x00000, 0x08000, CRC(d0fc470b) SHA1(70f7f1e29527044eae405f58af08bad3097990bd) )  /* plane 1,2 */
+	ROM_LOAD( "rt1_6.4s",     0x08000, 0x04000, CRC(6b57edb2) SHA1(4a8f1e024e5be4d76f2c99d506ae7da86af3d1f5) )  /* plane 3 */
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "rt1_9.12h",    0x00000, 0x10000, CRC(8e070561) SHA1(483b4de79f2429236f45c32ec56b97a9a90574a3) )
+	ROM_LOAD( "rt1_10.12k",   0x10000, 0x10000, CRC(cb8fb607) SHA1(ba9400fb19d29a285897cc3a2d4d739ce845f897) )
+	ROM_LOAD( "rt1_11.12l",   0x20000, 0x10000, CRC(2bdf5ed9) SHA1(a771e922ad868ca1e008d08a8ff5fdf28aa315fc) )
+	ROM_LOAD( "rt1_12.12m",   0x30000, 0x10000, CRC(e6c6c7dc) SHA1(ead143c2730a77911839a25734550188533c7b96) )
+	ROM_LOAD( "rt1_13.12p",   0x40000, 0x10000, CRC(489686d7) SHA1(a04b57424acbf2584f736b55740d613a1aae2b8b) )
+	ROM_LOAD( "rt1_14.12r",   0x50000, 0x10000, CRC(689e56a8) SHA1(b4d6de4eec47856a62f396f55d531fbf345cf12a) )
+	ROM_LOAD( "rt1_15.12t",   0x60000, 0x10000, CRC(1d8bf2ca) SHA1(949ae8b00b94bfa5bc2d07888aafbaaaea559b06) )
+	ROM_LOAD( "rt1_16.12u",   0x70000, 0x10000, CRC(1bbcf37b) SHA1(8d27c49b36d5e23dd446c150ada3853eec75e4c1) )
+
+	ROM_REGION( 0x1420, "proms", 0 )
+	ROM_LOAD( "rt1-1.3r",     0x0000, 0x0200, CRC(8ef3bb9d) SHA1(4636d6b8ba7611b11d4863fab02475dc4a619eaf) )    /* red & green components */
+	ROM_LOAD( "rt1-2.3s",     0x0200, 0x0200, CRC(6510a8f2) SHA1(935f140bfa7e6f8cebafa7f1b0de99dd319273d4) )    /* blue component */
+	ROM_LOAD( "rt1-3.4v",     0x0400, 0x0800, CRC(95c7d944) SHA1(ca5fea028674882a61507ac7c89ada96f5b2674d) )    /* tiles color table */
+	ROM_LOAD( "rt1-4.5v",     0x0c00, 0x0800, CRC(1391fec9) SHA1(8ca94e22110b20d2ecdf03610bcc89ff4245920f) )    /* sprites color table */
+	ROM_LOAD( "rt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )    /* tile address decoder (used at runtime) */
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "rt1_4.6b",             0x4000, 0x8000, CRC(3f795094) SHA1(390eef98e3dec690bf942c35617e2fa004c96e5c) )  /* subprogram for the MCU */
+	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  /* MCU internal code */
+
+	ROM_REGION( 0x40000, "user1", 0 ) /* bank switched data for CPU1 */
+	ROM_LOAD( "rt1_17.f1",    0x00000, 0x10000, CRC(766af455) SHA1(8c71772795e783d6c4b88af9a311d55e363c298a) )
+	ROM_LOAD( "rt1_18.h1",    0x10000, 0x10000, CRC(3f9f2f5d) SHA1(541b8f80800cb55e4b81ac48771d00fe10c90743) )
+	ROM_LOAD( "rt1_19.k1",    0x20000, 0x10000, CRC(1273a048) SHA1(b8a0a6f5d9f9d351a622252afb409a111431c5ca) )
+	ROM_LOAD( "rt1_20.m1",    0x30000, 0x10000, CRC(f8518d4f) SHA1(3a8551d46ffdf82844b2eb1b2c01cf2d8423a49e) )
+
+	ROM_REGION( 0x80000, "namco2", 0 ) /* PCM samples for Hitachi CPU */
+	ROM_LOAD( "rt1_21.f3",    0x00000, 0x10000, CRC(454968f3) SHA1(e0a679353491190b6d4f0355324456a1bd7c8a7a) )
+	ROM_LOAD( "rt1_22.h3",    0x20000, 0x10000, CRC(842a2fd4) SHA1(5aee47d680621ab5a33b13433f37bd74e977c3f6) )
+	/* k3 empty */
+	/* m3 empty */
+ROM_END
+
 
 ROM_START( wndrmomo )
 	ROM_REGION( 0x10000, "cpu1", 0 )
@@ -1613,10 +1667,16 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 
 GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, namco86, ROT0,   "Namco", "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, namco86, ROT0,   "Namco", "The Return of Ishtar", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, namco86, ROT0,   "Namco", "Genpei ToumaDen", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder0,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (oldest)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, namco86, ROT0,   "Namco", "Wonder Momo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
