@@ -44,6 +44,14 @@ namespace bx
 		Ty tmp = _a; _a = _b; _b = tmp;
 	}
 
+	/// Check if pointer is aligned. _align must be power of two.
+	inline bool isPtrAligned(const void* _ptr, size_t _align)
+	{
+		union { const void* ptr; size_t addr; } un;
+		un.ptr = _ptr;
+		return 0 == (un.addr & (_align-1) );
+	}
+
 } // namespace bx
 
 // Annoying C++0x stuff..

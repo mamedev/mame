@@ -29,6 +29,7 @@ function toolchain(_buildDir, _libDir)
 			{ "nacl-arm",      "Native Client - ARM"    },
 			{ "osx",           "OSX"                    },
 			{ "pnacl",         "Native Client - PNaCl"  },
+			{ "ps4",           "PS4"                    },
 			{ "qnx-arm",       "QNX/Blackberry - ARM"   },
 			{ "rpi",           "RaspberryPi"            },
 		},
@@ -39,15 +40,15 @@ function toolchain(_buildDir, _libDir)
 		value = "toolset",
 		description = "Choose VS toolset",
 		allowed = {
-			{ "vs2012-clang",  "Clang 3.6"         },
-			{ "vs2013-clang",  "Clang 3.6"         },
+			{ "vs2012-clang",  "Clang 3.6"                       },
+			{ "vs2013-clang",  "Clang 3.6"                       },
 			{ "vs2012-xp",     "Visual Studio 2012 targeting XP" },
 			{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 			{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
-			{ "winphone8",     "Windows Phone 8.0" },
-			{ "winphone81",    "Windows Phone 8.1" },
-			{ "winstore81",    "Windows Store 8.1" },
-			{ "winstore82",    "Universal Windows App" }
+			{ "winphone8",     "Windows Phone 8.0"               },
+			{ "winphone81",    "Windows Phone 8.1"               },
+			{ "winstore81",    "Windows Store 8.1"               },
+			{ "winstore82",    "Universal Windows App"           },
 		},
 	}
 
@@ -256,6 +257,19 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = naclToolchain .. "clang++"
 			premake.gcc.ar  = naclToolchain .. "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-pnacl"))
+
+		elseif "ps4" == _OPTIONS["gcc"] then
+
+			if not os.getenv("PS4_SDK_ROOT") then
+				print("Set PS4_SDK_ROOT enviroment variables.")
+			end
+
+			ps4Toolchain = "$(PS4_SDK_ROOT)/host_tools/bin/orbis-"
+
+			premake.gcc.cc  = ps4Toolchain .. "clang"
+			premake.gcc.cxx = ps4Toolchain .. "clang++"
+			premake.gcc.ar  = ps4Toolchain .. "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-ps4"))
 
 		elseif "qnx-arm" == _OPTIONS["gcc"] then
 
@@ -799,6 +813,10 @@ function toolchain(_buildDir, _libDir)
 			"-m64",
 		}
 
+	configuration { "osx", "Universal" }
+		targetdir (path.join(_buildDir, "osx_universal/bin"))
+		objdir (path.join(_buildDir, "osx_universal/bin"))
+
 	configuration { "osx" }
 		buildoptions {
 			"-Wfatal-errors",
@@ -853,6 +871,23 @@ function toolchain(_buildDir, _libDir)
 			"-mios-simulator-version-min=7.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+		}
+
+	configuration { "ps4" }
+		targetdir (path.join(_buildDir, "ps4/bin"))
+		objdir (path.join(_buildDir, "ps4/obj"))
+		libdirs { path.join(_libDir, "lib/ps4") }
+		includedirs {
+			path.join(bxDir, "include/compat/freebsd"),
+			"$(PS4_SDK_ROOT)/target/include",
+			"$(PS4_SDK_ROOT)/target/include_common",
+		}
+		buildoptions {
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
+		}
+		linkoptions {
 		}
 
 	configuration { "qnx-arm" }
@@ -951,8 +986,14 @@ function strip()
 	configuration { "asmjs" }
 		postbuildcommands {
 			"$(SILENT) echo Running asmjs finalize.",
-			"$(SILENT) $(EMSCRIPTEN)/emcc -O2 -s TOTAL_MEMORY=268435456 \"$(TARGET)\" -o \"$(TARGET)\".html"
-			-- ALLOW_MEMORY_GROWTH
+			"$(SILENT) $(EMSCRIPTEN)/emcc -O2 "
+--				.. "-s EMTERPRETIFY=1 "
+--				.. "-s EMTERPRETIFY_ASYNC=1 "
+				.. "-s TOTAL_MEMORY=268435456 "
+--				.. "-s ALLOW_MEMORY_GROWTH=1 "
+				.. "--memory-init-file 1 "
+				.. "\"$(TARGET)\" -o \"$(TARGET)\".html "
+--				.. "--preload-file ../../../examples/runtime@/"
 		}
 
 	configuration {} -- reset configuration
