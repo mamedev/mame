@@ -151,7 +151,7 @@ def parse_file(root, srcfile, folder):
                fullname = file_exists(root, name, folder,include_dirs)
                if fullname in files_included:
                    continue
-               if "src/emu/netlist/" in fullname:
+               if "src/lib/netlist/" in fullname:
                    continue
                if fullname!='':
                    if fullname in mappings.keys():

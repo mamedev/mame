@@ -379,7 +379,7 @@ function emuProject(_target, _subtarget)
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
-    MAME_DIR .. "src/emu/netlist",
+		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/mame", -- used for sound amiga
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -426,7 +426,7 @@ if (_OPTIONS["DRIVERS"] == nil) then
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
-    MAME_DIR .. "src/emu/netlist",
+		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
