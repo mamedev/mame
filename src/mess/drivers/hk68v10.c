@@ -165,7 +165,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/z80dart.h"
+#include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
@@ -329,10 +329,10 @@ MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
 MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
 
 /* Terminal Port config */
-MCFG_Z80SCC_ADD("scc", XTAL_4MHz, 0, 0, 0, 0 )
-MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
-MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
-MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
+MCFG_SCC8530_ADD("scc", XTAL_4MHz, 0, 0, 0, 0 )
+MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
+MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
+MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
 
 MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
 MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
