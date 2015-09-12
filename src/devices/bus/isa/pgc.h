@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER( lut_w );
 	DECLARE_READ8_MEMBER( init_r );
 
+	void reset_common();
+
 protected:
 	// device-level overrides
 	virtual void device_start();
