@@ -241,7 +241,7 @@ int renderer_bgfx::draw(int update)
 #endif
 	// This dummy draw call is here to make sure that view 0 is cleared
 	// if no other draw calls are submitted to view 0.
-	bgfx::submit(0);
+	bgfx::touch(0);
 
 	window().m_primlist->acquire_lock();
 

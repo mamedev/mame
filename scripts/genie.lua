@@ -1269,16 +1269,6 @@ configuration { "vs2010" }
 			"/wd4481", -- warning C4481: nonstandard extension used: override specifier 'override'
 		}
 
-configuration { "x32", "vs*" }
-		libdirs {
-			MAME_DIR .. "3rdparty/dxsdk/lib/x86",
-		}
-
-configuration { "x64", "vs*" }
-		libdirs {
-			MAME_DIR .. "3rdparty/dxsdk/lib/x64",
-		}
-
 configuration { "winphone8* or winstore8*" }
 	removelinks {
 		"DelayImp",
