@@ -376,7 +376,7 @@ pstr_t *pstring_t<F>::salloc(int n)
 		stk = palloc_array(pstack_t<pstr_t *>, 17);
 	pstr_t *p;
 	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
-	unsigned size = sizeof(pstr_t) + (1<<(sn * 2)) + 1;
+	unsigned size = sizeof(pstr_t) + (1ULL<<(sn * 2)) + 1;
 	if (stk[sn].empty())
 		p = (pstr_t *) palloc_array(char, size);
 	else
