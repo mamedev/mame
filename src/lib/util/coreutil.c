@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "coreutil.h"
+#include <zlib.h>
 
 
 /***************************************************************************
@@ -114,4 +115,10 @@ void rand_memory(void *memory, size_t length)
 		seed = seed * 214013 + 2531011;
 		bytes[i] = (UINT8) (seed >> 16);
 	}
+}
+
+
+UINT32 core_crc32(UINT32 crc, const UINT8 *buf, UINT32 len)
+{
+	return crc32(crc, buf, len);
 }

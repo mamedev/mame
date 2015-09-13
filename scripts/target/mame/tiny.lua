@@ -95,11 +95,6 @@ function createProjects_mame_tiny(_target, _subtarget)
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
 	}
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 
 	files{
 		MAME_DIR .. "src/mame/machine/ticket.c",

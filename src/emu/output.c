@@ -8,9 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <zlib.h>
-
-
+#include "coreutil.h"
 
 /***************************************************************************
     CONSTANTS
@@ -82,7 +80,7 @@ static void output_exit(running_machine &machine);
 
 INLINE UINT32 get_hash(const char *string)
 {
-	return crc32(0, (UINT8 *)string, (UINT32)strlen(string));
+	return core_crc32(0, (UINT8 *)string, (UINT32)strlen(string));
 }
 
 

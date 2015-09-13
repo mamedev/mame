@@ -71,11 +71,6 @@ function createProjects_ldplayer_ldplayer(_target, _subtarget)
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
 	}
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 
 	files{
 		MAME_DIR .. "src/emu/drivers/emudummy.c",

@@ -34,11 +34,6 @@ function devicesProject(_target, _subtarget)
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 	if _OPTIONS["with-bundled-lua"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/lua/src",
@@ -81,11 +76,6 @@ if (_OPTIONS["DRIVERS"] == nil) then
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 	if _OPTIONS["with-bundled-lua"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/lua/src",
@@ -117,11 +107,6 @@ end
 	if _OPTIONS["with-bundled-expat"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
 		}
 	end
 	if _OPTIONS["with-bundled-lua"] then

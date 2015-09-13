@@ -101,12 +101,6 @@ function createProjects_mame_nl(_target, _subtarget)
 		GEN_DIR  .. "mame/layout",
 	}
 
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
-
 	files{
 		MAME_DIR .. "src/mame/drivers/pong.c",
 		MAME_DIR .. "src/mame/drivers/nl_pong.c",

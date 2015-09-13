@@ -24,11 +24,6 @@ if _OPTIONS["with-bundled-expat"] then
 		MAME_DIR .. "3rdparty/expat/lib",
 	}
 end
-if _OPTIONS["with-bundled-zlib"] then
-	includedirs {
-		MAME_DIR .. "3rdparty/zlib",
-	}
-end
 if _OPTIONS["with-bundled-lua"] then
 	includedirs {
 		MAME_DIR .. "3rdparty/lua/src",

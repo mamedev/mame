@@ -893,11 +893,6 @@ function createMESSProjects(_target, _subtarget, _name)
 		GEN_DIR  .. "mame/layout",
 		MAME_DIR .. "src/devices/cpu/m68000",
 	}
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 end
 
 function createProjects_mame_mess(_target, _subtarget)
