@@ -439,7 +439,7 @@ static const struct tms5100_coeffs M58817_coeff =
 
 /* CD2802:
    (1984 era?)
-   Used in Touch and Tell only (and Vocaid?), this chip has a unique pitch, LPC and chirp table.
+   Used in Touch and Tell only (and Vocaid), this chip has a unique pitch, LPC and chirp table.
    Has the 'alternate' interpolation behavior.
    Digitally dumped via PROMOUT by PlgDavid in 2014
    Decapped by Sean Riddle in 2015
@@ -468,8 +468,8 @@ static const struct tms5100_coeffs T0280F_2802_coeff =
    by PlgDavid.
    NullMoogleCable decapped a TMS5110AN2L in 2015: http://wtfmoogle.com/wp-content/uploads/2015/03/0317_1.jpg
    which was used to verify the chirp table.
-   The slightly older but otherwise identical TMS5111NLL was decapped and imaged by digshadow in April, 2013.
-   The die is marked "TMS5110AJ"
+   The slightly older but otherwise identical TMS5111NLL was decapped and imaged by digshadow in April, 2013,
+   its die is marked "TMS5110AJ"
    The LPC table is verified from decap to match the values from Jarek and PlgDavid's PROMOUT dumps of the TMS5110.
    The LPC table matches that of the TMS5220.
    It uses the 'newer' 5200-style chirp table.
@@ -568,8 +568,8 @@ NOTE FROM DECAP: immediately to the left of each of the K1,2,3,4,5,and 6
  patent 4,335,277. They are likely related to the multiplicative interpolator
  described in us patent 4,419,540; whether the 5200/2501E and the 5220 or 5220C
  actually implement this interpolator or not is unclear. This interpolator
- seems intended for chips with variable frame rate, so it may only exist
- on the TMS/TSP5220C and CD2501ECD.
+ seems intended for chips with variable frame rate, so if it exists at all, 
+ it may only exist on the TMS/TSP5220C and CD2501ECD.
 */
 
 static const struct tms5100_coeffs T0285_2501E_coeff =
@@ -629,7 +629,7 @@ K1A holds odd values of K1, K1B holds even values.
 K2 holds values for K2 only
 K3 and K4 are actually the table index values <<6
 K5 thru K10 are actually the table index values <<7
-The concept of only having non-binary weighted reflection coefficients for the
+This concept of only having non-binary weighted reflection coefficients for the
 first two k stages is mentioned in Markel & Gray "Linear Prediction of Speech"
 and in Thomas Parsons' "Voice and Speech Processing"
  */
@@ -669,13 +669,9 @@ static const struct tms5100_coeffs vlm5030_coeff =
 				0,-510,-502,-490,-473,-452,-426,-396, /* entry 16(0x10) either has some special function, purpose unknown, or is a manufacturing error and should have been -512 */
 			-362,-325,-284,-241,-196,-149,-100, -50 },
 		/* K3  */
-		/*{    0, 100, 196, 284, 362, 426, 473, 502,
-		  -510,-490,-452,-396,-325,-241,-149, -50 },*/
 		{    0, 64, 128, 192, 256, 320, 384, 448,
 			-512,-448,-384,-320,-256,-192,-128, -64 },
 		/* K4  */
-		/*{    0, 100, 196, 284, 362, 426, 473, 502,
-		  -510,-490,-452,-396,-325,-241,-149, -50 },*/
 		{    0, 64, 128, 192, 256, 320, 384, 448,
 			-512,-448,-384,-320,-256,-192,-128, -64 },
 		/* K5  */
@@ -689,7 +685,6 @@ static const struct tms5100_coeffs vlm5030_coeff =
 		/* K9  */
 		{    0, 128, 256, 384,-512,-384,-256,-128 },
 		/* K10 */
-		/*{    0, 196, 362, 473,-510,-452,-325,-149 },*/
 		{    0, 128, 256, 384,-512,-384,-256,-128 },
 	},
 	/* Chirp table */
