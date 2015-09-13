@@ -47,10 +47,7 @@ Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lower
 TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
 TODO:
-    * Ever since the big rewrite, there are glitches on certain frame transitions
-      for example in the word 'rid' during the eprom attract mode,
-      I (LN) am not entirely sure why the real chip doesn't have these as well.
-      Needs more real hardware testing/dumps for comparison.
+    * Samples repeat over and over in the 'eprom' test mode. Needs investigation.
     * Implement a ready callback for pc interfaces
     - this will be quite a challenge since for it to be really accurate
       the whole emulation has to run in sync (lots of timers) with the
@@ -578,7 +575,7 @@ void tms5220_device::update_fifo_status_and_ints()
 		if (!m_buffer_empty)
 			set_interrupt_state(1);
 		m_buffer_empty = 1;
-		m_TALK = m_SPEN = 0; // /BE being active clears the TALK(TCON) status which in turn clears SPEN
+		m_TALK = m_SPEN = 0; // /BE being active clears the TALK status via TCON, which in turn clears SPEN
 	}
 	else
 		m_buffer_empty = 0;
@@ -776,24 +773,11 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 				parse_frame();
 
-				// if the new frame is unvoiced (or silenced via ZPAR), be sure to zero out the k5-k10 parameters
-				// NOTE: this is probably the bug the tms5100/tmc0280 has, pre-rev D, I think.
-				// GUESS: Pre-rev D versions start zeroing k5-k10 immediately upon new frame load regardless of interpolation inhibit
-				// I.e. ZPAR = /TALKD || (PC>5&&P=0)
-				// GUESS: D and later versions only start or stop zeroing k5-k10 at the IP7->IP0 transition AFTER the frame
-				// I.e. ZPAR = /TALKD || (PC>5&&OLDP)
-#ifdef PERFECT_INTERPOLATION_HACK
-				m_old_uv_zpar = m_uv_zpar;
-				m_old_zpar = m_zpar; // unset old zpar on new frame
-#endif
-				m_zpar = 0;
-				//m_uv_zpar = (OLD_FRAME_UNVOICED_FLAG||m_zpar); // GUESS: fixed version in tmc0280d/tms5100a/cd280x/tms5110
-				m_uv_zpar = (NEW_FRAME_UNVOICED_FLAG||m_zpar); // GUESS: buggy version in tmc0280/tms5100
-
 				/* if the new frame is a stop frame, unset both TALK and SPEN (via TCON). TALKD remains active while the energy is ramping to 0. */
 				if (NEW_FRAME_STOP_FLAG == 1)
 				{
 					m_TALK = m_SPEN = 0;
+					update_fifo_status_and_ints(); // probably not necessary...
 				}
 
 				/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
@@ -813,7 +797,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 
 #ifdef DEBUG_GENERATION
 				/* Debug info for current parsed frame */
-				fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
+				fprintf(stderr, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG, NEW_FRAME_SILENCE_FLAG, OLD_FRAME_UNVOICED_FLAG, NEW_FRAME_UNVOICED_FLAG);
 				fprintf(stderr,"Processing new frame: ");
 				if (m_inhibit == 0)
 					fprintf(stderr, "Normal Frame\n");
@@ -860,6 +844,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				}
 				else // we're done, play this frame for 1/8 frame.
 				{
+					if (m_subcycle == 2) m_pitch_zero = 0; // this reset happens around the second subcycle during IP=0
 					m_current_energy = (m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar));
 					m_current_pitch = (m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar));
 					for (i = 0; i < m_coeff->num_k; i++)
@@ -872,6 +857,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 					switch(m_PC)
 					{
 						case 0: /* PC = 0, B cycle, write updated energy */
+						if (m_IP==0) m_pitch_zero = 0; // this reset happens around the second subcycle during IP=0
 						m_current_energy = (m_current_energy + (((m_coeff->energytable[m_new_frame_energy_idx] - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT))*(1-m_zpar);
 						break;
 						case 1: /* PC = 1, B cycle, write updated pitch */
@@ -968,11 +954,11 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				* The exact time this occurs is betwen IP=7, PC=12 sub=0, T=t12
 				* and m_IP = 0, PC=0 sub=0, T=t12, a period of exactly 20 cycles,
 				* which overlaps the time OLDE and OLDP are updated at IP=7 PC=12 T17
-				* (and hence INHIBIT itself 2 t-cycles later). We do it here because it is
-				* convenient and should make no difference in output.
+				* (and hence INHIBIT itself 2 t-cycles later).
+				* According to testing the pitch zeroing lasts approximately 2 samples.
+				* We set the zeroing latch here, and unset it on PC=1 in the generator.
 				*/
 				if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_zero = 1;
-				if ((m_IP == 0)&&(m_pitch_zero==1)) m_pitch_zero = 0;
 				if (m_IP == 7) // RESETL4
 				{
 					// Latch OLDE and OLDP
@@ -983,12 +969,12 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 					fprintf(stderr,"RESETL4, about to update status: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 #endif
 #ifdef DEBUG_GENERATION
-					if (m_TALK == 0)
+					if ((!m_TALK) && (!m_SPEN))
 						fprintf(stderr,"tms5220_process: processing frame: TALKD = 0 caused by stop frame or buffer empty, halting speech.\n");
 #endif
 					m_TALKD = m_TALK; // TALKD is latched from TALK
-					update_fifo_status_and_ints(); // to trigger an interrupt if TALK_STATUS is now inactive
-					m_TALK = m_SPEN; // TALK is latched from SPEN
+					update_fifo_status_and_ints(); // to trigger an interrupt if TALK_STATUS has changed
+					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 #ifdef DEBUG_GENERATION
 					fprintf(stderr,"RESETL4, status updated: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 #endif
@@ -1015,7 +1001,8 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				if (m_IP == 7) // RESETL4
 				{
 					m_TALKD = m_TALK; // TALKD is latched from TALK
-					m_TALK = m_SPEN; // TALK is latched from SPEN
+					update_fifo_status_and_ints(); // probably not necessary
+					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 				}
 				m_subcycle = m_subc_reload;
 				m_PC = 0;
@@ -1304,6 +1291,13 @@ void tms5220_device::process_command(unsigned char cmd)
 void tms5220_device::parse_frame()
 {
 	int i, rep_flag;
+#ifdef PERFECT_INTERPOLATION_HACK
+	m_old_uv_zpar = m_uv_zpar;
+	m_old_zpar = m_zpar;
+#endif
+	// since we're parsing a frame, we must be talking, so clear zpar here
+	// before we start parsing a frame, the P=0 and E=0 latches were both reset by RESETL4, so clear m_uv_zpar here
+	m_uv_zpar = m_zpar = 0;
 
 	// We actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
 
@@ -1350,6 +1344,8 @@ void tms5220_device::parse_frame()
 	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
 	fprintf(stderr," ");
 #endif
+	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
+	m_uv_zpar = NEW_FRAME_UNVOICED_FLAG;
 	update_fifo_status_and_ints();
 	if (m_DDIS && m_buffer_empty) goto ranout;
 	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
