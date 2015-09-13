@@ -86,6 +86,7 @@ public:
 	TIMER_CALLBACK_MEMBER(vi_scanline_callback);
 	TIMER_CALLBACK_MEMBER(ai_timer_callback);
 	TIMER_CALLBACK_MEMBER(pi_dma_callback);
+	TIMER_CALLBACK_MEMBER(si_dma_callback);
 	DECLARE_READ32_MEMBER( dp_reg_r );
 	DECLARE_WRITE32_MEMBER( dp_reg_w );
 	DECLARE_READ32_MEMBER( sp_reg_r );
@@ -96,6 +97,7 @@ public:
 
 	void ai_timer_tick();
 	void pi_dma_tick();
+	void si_dma_tick();
 	void vi_scanline_tick();
 	void reset_tick();
 
@@ -242,6 +244,7 @@ private:
 	UINT32 pi_dma_dir;
 
 	// Serial Interface (SI) registers and functions
+	emu_timer *si_dma_timer;
 	void pif_dma(int direction);
 	void handle_pif();
 	int pif_channel_handle_command(int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata);

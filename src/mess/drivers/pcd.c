@@ -17,9 +17,8 @@
 #include "machine/wd_fdc.h"
 #include "machine/mc146818.h"
 #include "machine/pcd_kbd.h"
-#include "machine/terminal.h"
+#include "video/pcd.h"
 #include "sound/speaker.h"
-#include "video/scn2674.h"
 #include "formats/pc_dsk.h"
 #include "bus/scsi/omti5100.h"
 #include "bus/rs232/rs232.h"
@@ -39,16 +38,10 @@ public:
 	m_speaker(*this, "speaker"),
 	m_fdc(*this, "fdc"),
 	m_rtc(*this, "rtc"),
-	m_crtc(*this, "crtc"),
-	m_palette(*this, "palette"),
-	m_gfxdecode(*this, "gfxdecode"),
 	m_scsi(*this, "scsi"),
 	m_scsi_data_out(*this, "scsi_data_out"),
 	m_scsi_data_in(*this, "scsi_data_in"),
-	m_terminal(*this, "terminal"),
-	m_ram(*this, "ram"),
-	m_vram(*this, "vram"),
-	m_charram(8*1024)
+	m_ram(*this, "ram")
 	{ }
 
 	DECLARE_READ8_MEMBER( irq_callback );
@@ -63,24 +56,16 @@ public:
 	DECLARE_WRITE8_MEMBER( stat_w );
 	DECLARE_READ8_MEMBER( led_r );
 	DECLARE_WRITE8_MEMBER( led_w );
-	DECLARE_READ8_MEMBER( detect_r );
-	DECLARE_WRITE8_MEMBER( detect_w );
 	DECLARE_READ16_MEMBER( dskctl_r );
 	DECLARE_WRITE16_MEMBER( dskctl_w );
-	DECLARE_READ8_MEMBER( mcu_r );
-	DECLARE_WRITE8_MEMBER( mcu_w );
+
 	DECLARE_READ8_MEMBER( scsi_r );
 	DECLARE_WRITE8_MEMBER( scsi_w );
-	DECLARE_WRITE8_MEMBER( vram_sw_w );
-	DECLARE_WRITE16_MEMBER( vram_w );
 	DECLARE_READ16_MEMBER( mmu_r );
 	DECLARE_WRITE16_MEMBER( mmu_w );
 	DECLARE_READ16_MEMBER( mem_r );
 	DECLARE_WRITE16_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( exp_r );
-	DECLARE_WRITE8_MEMBER( exp_w );
-	DECLARE_WRITE8_MEMBER( term_key_w );
-	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
@@ -101,17 +86,11 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<wd2793_t> m_fdc;
 	required_device<mc146818_device> m_rtc;
-	required_device<scn2674_device> m_crtc;
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<SCSI_PORT_DEVICE> m_scsi;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
-	optional_device<generic_terminal_device> m_terminal;
 	required_device<ram_device> m_ram;
-	required_shared_ptr<UINT16> m_vram;
-	dynamic_buffer m_charram;
-	UINT8 m_stat, m_led, m_vram_sw, m_term_key;
+	UINT8 m_stat, m_led;
 	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
 	emu_timer *m_req_hack;
 	UINT16 m_dskctl;
@@ -128,19 +107,6 @@ private:
 //  MACHINE EMULATION
 //**************************************************************************
 
-static const gfx_layout pcd_charlayout =
-{
-	8, 14,                   /* 8 x 14 characters */
-	512,                    /* 512 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8 },
-	8*16
-};
-
 void pcd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// TODO: remove this hack
@@ -150,7 +116,6 @@ void pcd_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 void pcd_state::machine_start()
 {
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), pcd_charlayout, &m_charram[0], 0, 1, 0)));
 	m_req_hack = timer_alloc();
 	save_item(NAME(m_mmu.ctl));
 	save_item(NAME(m_mmu.regs));
@@ -161,12 +126,13 @@ void pcd_state::machine_reset()
 	m_stat = 0;
 	m_led = 0;
 	m_dskctl = 0;
-	m_vram_sw = 1;
 	m_rst = 0;
 	m_mmu.ctl = 0;
 	m_mmu.sc = false;
-	m_mmu.type = ioport("mmu")->read();
-	m_term_key = 0;
+	if(ioport("mmu"))
+		m_mmu.type = ioport("mmu")->read();
+	else
+		m_mmu.type = 0;
 }
 
 READ8_MEMBER( pcd_state::irq_callback )
@@ -183,22 +149,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( pcd_state::timer0_tick )
 WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 {
 	m_speaker->level_w(state);
-}
-
-WRITE16_MEMBER( pcd_state::vram_w )
-{
-	if(m_vram_sw)
-		COMBINE_DATA(&m_vram[offset]);
-	else if(mem_mask & 0xff)
-	{
-		m_charram[offset & 0x1fff] = data;
-		m_gfxdecode->gfx(0)->mark_dirty(offset/16);
-	}
-}
-
-WRITE8_MEMBER( pcd_state::vram_sw_w )
-{
-	m_vram_sw = data & 1;
 }
 
 READ8_MEMBER( pcd_state::nmi_io_r )
@@ -240,24 +190,6 @@ READ8_MEMBER( pcd_state::stat_r )
 WRITE8_MEMBER( pcd_state::stat_w )
 {
 	m_stat &= ~data;
-}
-
-READ8_MEMBER( pcd_state::detect_r )
-{
-	return 0;
-}
-
-WRITE8_MEMBER( pcd_state::detect_w )
-{
-}
-
-READ8_MEMBER( pcd_state::mcu_r )
-{
-	return 0x20;
-}
-
-WRITE8_MEMBER( pcd_state::mcu_w )
-{
 }
 
 READ16_MEMBER( pcd_state::dskctl_r )
@@ -334,25 +266,6 @@ WRITE16_MEMBER( pcd_state::mmu_w )
 	{
 		m_mmu.sc = true;
 		m_pic1->ir0_w(ASSERT_LINE);
-	}
-}
-
-SCN2674_DRAW_CHARACTER_MEMBER(pcd_state::display_pixels)
-{
-	if(lg)
-	{
-		UINT16 data = m_vram[address];
-		data = (data >> 8) | (data << 8);
-		for(int i = 0; i < 16; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (15 - i))) ? 1 : 0);
-	}
-	else
-	{
-		UINT8 data = m_charram[(m_vram[address] & 0xff) * 16 + linecount];
-		if(cursor && blink)
-			data = 0xff;
-		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
 	}
 }
 
@@ -495,63 +408,18 @@ READ16_MEMBER(pcd_state::mem_r)
 	return ram[offset];
 }
 
-// The PC-X treats the graphics board as a serial port.  Maybe the 8031 (instead of 8047) can
-// write directly to the video ram and there's a char ROM instead of RAM?
-READ8_MEMBER(pcd_state::exp_r)
-{
-	if(m_dskctl & 0x40)
-	{
-		if(!offset)
-		{
-			UINT8 data = m_term_key;
-			m_term_key = 0;
-			return data;
-		}
-		else
-		{
-			m_pic2->ir0_w(CLEAR_LINE);
-			return (m_term_key ? 1 : 0);
-		}
-	}
-	else if(offset & 1)
-		return m_crtc->read(space, offset/2);
-	return 0xff;
-}
-
-WRITE8_MEMBER(pcd_state::exp_w)
-{
-	if(m_dskctl & 0x40)
-	{
-		if(!offset)
-		{
-			m_pic2->ir0_w(ASSERT_LINE);
-			m_terminal->write(space, 0, data);
-		}
-	}
-	else if(!(offset & 1))
-		return m_crtc->write(space, offset/2, data);
-}
-
-WRITE8_MEMBER(pcd_state::term_key_w)
-{
-	m_pic2->ir0_w(ASSERT_LINE);
-	m_term_key = data;
-}
-
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( pcd_map, AS_PROGRAM, 16, pcd_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(mem_r, mem_w)
-	AM_RANGE(0xf0000, 0xf7fff) AM_READONLY AM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(mmu_r, mmu_w)
 	AM_RANGE(0x0000, 0xefff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xffff)
@@ -562,21 +430,18 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xf900, 0xf903) AM_DEVREADWRITE8("fdc", wd2793_t, read, write, 0xffff)
 	AM_RANGE(0xf904, 0xf905) AM_READWRITE(dskctl_r, dskctl_w)
 	AM_RANGE(0xf940, 0xf943) AM_READWRITE8(scsi_r, scsi_w, 0xffff)
-	AM_RANGE(0xf980, 0xf98f) AM_DEVWRITE8("crtc", scn2674_device, write, 0x00ff)
-	AM_RANGE(0xf980, 0xf98f) AM_DEVREAD8("crtc", scn2674_device, read, 0xff00)
-	AM_RANGE(0xf9a0, 0xf9a1) AM_WRITE8(vram_sw_w, 0x00ff)
-	AM_RANGE(0xf9b0, 0xf9b3) AM_READWRITE8(mcu_r, mcu_w, 0x00ff) // 8741 comms
+	AM_RANGE(0xf980, 0xf98f) AM_DEVICE("video", pcdx_video_device, map)
 	AM_RANGE(0xf9c0, 0xf9c3) AM_DEVREADWRITE8("usart1",mc2661_device,read,write,0xffff)  // UARTs
 	AM_RANGE(0xf9d0, 0xf9d3) AM_DEVREADWRITE8("usart2",mc2661_device,read,write,0xffff)
 	AM_RANGE(0xf9e0, 0xf9e3) AM_DEVREADWRITE8("usart3",mc2661_device,read,write,0xffff)
 //  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
-	AM_RANGE(0xfb00, 0xfb01) AM_READWRITE8(detect_r, detect_w, 0xff00) // expansion card detection?
 	AM_RANGE(0xfb00, 0xffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcx_io, AS_IO, 16, pcd_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf980, 0xf98f) AM_READWRITE8(exp_r, exp_w, 0xffff)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(mmu_r, mmu_w)
+	AM_RANGE(0xfb00, 0xfb01) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xff00)
 	AM_IMPORT_FROM(pcd_io)
 ADDRESS_MAP_END
 
@@ -593,7 +458,7 @@ FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static INPUT_PORTS_START(pcd)
+static INPUT_PORTS_START(pcx)
 	PORT_START("mmu")
 	PORT_CONFNAME(0x03, 0x00, "MMU Type")
 	PORT_CONFSETTING(0x00, "None")
@@ -608,13 +473,12 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(pcd_state, i186_timer1_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(pcd_state, irq_callback))
 
-	MCFG_CPU_ADD("graphics", I8741, XTAL_16MHz/2)
-	MCFG_DEVICE_DISABLE()
-
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL_16MHz / 24)) // adjusted to pass post
 
 	MCFG_PIC8259_ADD("pic1", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NULL)
 	MCFG_PIC8259_ADD("pic2", DEVWRITELINE("maincpu", i80186_cpu_device, int1_w), VCC, NULL)
+
+	MCFG_DEVICE_ADD("video", PCD_VIDEO, 0)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
@@ -656,22 +520,6 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(640, 350)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 349)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
-
-	MCFG_SCN2674_VIDEO_ADD("crtc", 0, NULL);
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_GFX_CHARACTER_WIDTH(16)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcd_state, display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen")
-
 	// rtc
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir7_w))
@@ -696,11 +544,14 @@ MACHINE_CONFIG_DERIVED(pcx, pcd)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pcx_io)
 
-	// FIXME: temporary workaround
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pcd_state, term_key_w))
+	MCFG_DEVICE_REPLACE("video", PCX_VIDEO, 0)
+	MCFG_PCX_VIDEO_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
 
-	MCFG_DEVICE_REMOVE("graphics")
+	MCFG_DEVICE_MODIFY("keyboard")
+	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE("video", pcx_video_device, rx_w))
+
+	MCFG_DEVICE_MODIFY("usart2")
+	MCFG_MC2661_TXD_HANDLER(NULL)
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -715,10 +566,6 @@ ROM_START( pcd )
 	ROM_SYSTEM_BIOS(1, "v3", "V3 GS4") // from mainboard SYBAC S26361-D359 V3 GS4
 	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(2))
-
-	// gfx card (scn2674 with 8741), to be moved
-	ROM_REGION(0x400, "graphics", 0)
-	ROM_LOAD("s36361-d321-v1.bin", 0x000, 0x400, CRC(69baeb2a) SHA1(98b9cd0f38c51b4988a3aed0efcf004bedd115ff))
 ROM_END
 
 ROM_START( pcx )
@@ -735,5 +582,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1984, pcd, 0, 0, pcd, pcd, driver_device, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
-COMP( 1984, pcx, pcd, 0, pcx, pcd, driver_device, 0, "Siemens", "PC-X", MACHINE_NOT_WORKING )
+COMP( 1984, pcd, 0, 0, pcd, 0, driver_device, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
+COMP( 1984, pcx, pcd, 0, pcx, pcx, driver_device, 0, "Siemens", "PC-X", MACHINE_NOT_WORKING )

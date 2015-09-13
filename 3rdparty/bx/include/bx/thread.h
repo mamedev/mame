@@ -31,8 +31,9 @@ namespace bx
 
 	public:
 		Thread()
-#if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360|BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
 			: m_handle(INVALID_HANDLE_VALUE)
+			, m_threadId(UINT32_MAX)
 #elif BX_PLATFORM_POSIX
 			: m_handle(0)
 #endif // BX_PLATFORM_
@@ -52,7 +53,7 @@ namespace bx
 			}
 		}
 
-		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 0)
+		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 0, const char* _name = NULL)
 		{
 			BX_CHECK(!m_running, "Already running!");
 
@@ -61,7 +62,7 @@ namespace bx
 			m_stackSize = _stackSize;
 			m_running = true;
 
-#if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 			m_handle = CreateThread(NULL
 				, m_stackSize
 				, threadFunc
@@ -102,12 +103,17 @@ namespace bx
 #endif // BX_PLATFORM_
 
 			m_sem.wait();
+
+			if (NULL != _name)
+			{
+				setThreadName(_name);
+			}
 		}
 
 		void shutdown()
 		{
 			BX_CHECK(m_running, "Not running!");
-#if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 			WaitForSingleObject(m_handle, INFINITE);
 			GetExitCodeThread(m_handle, (DWORD*)&m_exitCode);
 			CloseHandle(m_handle);
@@ -139,14 +145,56 @@ namespace bx
 			return m_exitCode;
 		}
 
+		void setThreadName(const char* _name)
+		{
+#if BX_PLATFORM_OSX || BX_PLATFORM_IOS
+			pthread_setname_np(_name);
+#elif BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
+			pthread_setname_np(m_handle, _name);
+#elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
+#	pragma pack(push, 8)
+			struct ThreadName
+			{
+				DWORD  type;
+				LPCSTR name;
+				DWORD  id;
+				DWORD  flags;
+			};
+#	pragma pack(pop)
+			ThreadName tn;
+			tn.type  = 0x1000;
+			tn.name  = _name;
+			tn.id    = m_threadId;
+			tn.flags = 0;
+
+			__try
+			{
+				RaiseException(0x406d1388
+					, 0
+					, sizeof(tn)/4
+					, reinterpret_cast<ULONG_PTR*>(&tn)
+					);
+			}
+			__except(EXCEPTION_EXECUTE_HANDLER)
+			{
+			}
+#else
+			BX_UNUSED(_name);
+#endif // BX_PLATFORM_
+		}
+
 	private:
 		int32_t entry()
 		{
+#if BX_PLATFORM_WINDOWS
+			m_threadId = ::GetCurrentThreadId();
+#endif // BX_PLATFORM_WINDOWS
+
 			m_sem.post();
 			return m_fn(m_userData);
 		}
 
-#if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360|BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
 		static DWORD WINAPI threadFunc(LPVOID _arg)
 		{
 			Thread* thread = (Thread*)_arg;
@@ -167,18 +215,19 @@ namespace bx
 		}
 #endif // BX_PLATFORM_
 
-#if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360|BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
 		HANDLE m_handle;
+		DWORD  m_threadId;
 #elif BX_PLATFORM_POSIX
 		pthread_t m_handle;
 #endif // BX_PLATFORM_
 
-		ThreadFn m_fn;
-		void* m_userData;
+		ThreadFn  m_fn;
+		void*     m_userData;
 		Semaphore m_sem;
-		uint32_t m_stackSize;
-		int32_t m_exitCode;
-		bool m_running;
+		uint32_t  m_stackSize;
+		int32_t   m_exitCode;
+		bool      m_running;
 	};
 
 #if BX_PLATFORM_WINDOWS

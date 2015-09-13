@@ -20,11 +20,9 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * おえかきピコ <タブレットのみ> - Oekaki Pico ~Tablet no Mi~ (Sega - ???? - HPC-????)
 * いっしょにうたおう! ドラえもん わくわくカラオケ - Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega Toys - 1999xxxx - HPC-6073)
 * クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
-* スージーちゃんとマービー おてつだい だ～いすき! - Susie-chan to Mabi - Otetsudai Daisuki! (Sega Toys - 200010xx - HPC-6089)
 * パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
 * トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
 * 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
-* ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
 * McDonald's マクドナルドであそぼ!<10th> - McDonald's - McDonald de Asobo! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6125) [reprint HPC-6079]
 * ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
 * トイストーリー2 ウッディ そうさく だいさくせん!!<10th> - Toy Story 2 - Woody Sousaku Daisakusen!! ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6127) [reprint HPC-6090]
@@ -50,10 +48,8 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
-* ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090)
 * くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
 * 左脳開発シリーズ2 数量・計算 - Sanou Kaihatsu Series 2 Suuryou - Keisan (Imagineer - 19951002 - T-150230)
-* 左脳開発シリーズ5 迷路・記憶 (CD付き) - Sanou Kaihatsu Series 5 Meiro - Kioku (CD Tsuki) (Imagineer - 19951208 - T-150240)
 * 平成教育委員会Jr. めざせ優等生 - Heisei Kyouikuiinkai Jr. Mezase Yuutousei (Imagineer - 19951201 - T-150270)
 * 左脳開発シリーズ 探索・感性・記憶 - Sanou Kaihatsu Series Tansaku-Kansei-Kioku (Imagineer - Existence unconfirmed!)
 
@@ -1001,6 +997,22 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="MPR-20221 J50" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-20221 j50.ic1" size="1048576" crc="7d9ebcee" sha1="cf626fe6f25435e42ce0c4cdfc8a4d335f64fe76" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraeiu10th" cloneof="doraeiu">
+		<description>Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Jpn)</description>
+		<year>2003</year>
+		<publisher>Shogakukan</publisher>
+		<info name="serial" value="T-226090"/>
+		<!-- * ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090) -->
+		<info name="alt_title" value="ドラえもん えんそく･いもほり･うんどうかい"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="unknown" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Doraemon Ensoku-Imohori-Undoukai (10th Anniversary) (Japan).ic1" size="2097152" crc="5adcb456" sha1="9609c98dd34e6d5e5d0389d019c3017b9f244aff" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3401,6 +3413,24 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="peterpan10th" cloneof="peterpan">
+		<description>Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6214"/>
+		<info name="release" value="200306xx"/>
+		<!-- * ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
+           malformed token?  Used normal Peter Pan alt_title for now -->
+		<info name="alt_title" value="ピーターパン ネバーランドへ いこう!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="unknown" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Peter Pan - Neverland e Ikou! (10th Anniversary) (Japan).bin.ic1" size="2097152" crc="e0ea39c0" sha1="ae35761b41632dfbe4f1a6f3065a5db2514d5558" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="psoccer">
 		<description>Pico Soccer - Mezase Soccer Senshu (Jpn)</description>
 		<year>1995</year>
@@ -3747,6 +3777,24 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18457A-U" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18457a-u.ic1" size="524288" crc="2a34282a" sha1="aa0b7e4c9dac198214fcc25d3ee185b63bd1813d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanouk5">
+		<description>Sanou Kaihatsu Series 5 Meiro - Kioku (CD Tsuki) (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150240"/>
+		<!---This also contains a complement CD which will be dumped -->
+		<!-- * 左脳開発シリーズ5 迷路・記憶 (CD付き) (malformed token? - using sanouk4 above to fill field for now) -->
+		<info name="release" value="19951208"/>
+		<info name="alt_title" value="左脳開発シリーズ4 推理・構成"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18458-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18458-t.ic1" size="524288" crc="6340c18a" sha1="101d5652ffd704788f1f44b671be843e3430e58a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4291,6 +4339,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-20984-S" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-20984-s.ic1" size="1048576" crc="e77f3c70" sha1="2dce1d752a922fc94d9f580a605714ffdcfbd042" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="susiechn">
+		<description>Susie-chan to Marvy o-Tetsudai Da~isuki! (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6089"/>
+		<info name="release" value="200010xx"/>
+		<info name="alt_title" value="スージーちゃんとマービー おてつだい だ～いすき!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9KO-0027-MX" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9ko-0027-mx.ic1" size="2097152" crc="178fd129" sha1="87c129ae9c253df476a4b588fdaa8afc0e4ecf67" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

@@ -59,13 +59,13 @@ To verify:
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="52193">
 				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)(side a)[run'cas-'].cas" size="52193" crc="fced9743" sha1="eeb226eab09670fd11f3d797ce667a11133cfd7c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="msx_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="120071">
 				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)(side b)[run'cas-'].cas" size="120071" crc="e3bd39b3" sha1="bb8b304ff3f8a527648fb765da2ff9284f5c9f4c" offset="0" />
 			</dataarea>

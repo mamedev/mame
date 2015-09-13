@@ -772,19 +772,14 @@ function createMAMEProjects(_target, _subtarget, _name)
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices",
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "src/emu/netlist",
+		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
 	}
-
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-end
 end
 
 function createProjects_mame_arcade(_target, _subtarget)

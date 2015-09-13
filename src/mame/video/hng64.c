@@ -166,44 +166,45 @@ void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
 // pppppppp ff--atttt tttttttt tttttttt
 #define HNG64_GET_TILE_INFO                                                    \
 {                                                                              \
-	UINT16 tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                 \
+	UINT16 tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                     \
 	int tileno,pal, flip;                                                      \
-																				\
-	tileno = m_videoram[tile_index+(offset/4)];                            \
-																				\
+																			   \
+	tileno = m_videoram[tile_index+(offset/4)];                                \
+																			   \
 	pal = (tileno&0xff000000)>>24;                                             \
 	flip =(tileno&0x00c00000)>>22;                                             \
-																				\
+																			   \
 	if (tileno&0x200000)                                                       \
 	{                                                                          \
-		tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];     \
+		tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];             \
 	}                                                                          \
-																				\
+																			   \
 	tileno &= 0x1fffff;                                                        \
-																				\
+																			   \
 	if (size==0)                                                               \
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));               \
+			SET_TILE_INFO_MEMBER(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));        \
 		}                                                                      \
 		else                                                                   \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(0,tileno, pal,TILE_FLIPYX(flip));                    \
+			SET_TILE_INFO_MEMBER(0,tileno, pal,TILE_FLIPYX(flip));             \
 		}                                                                      \
 	}                                                                          \
 	else                                                                       \
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));               \
+			SET_TILE_INFO_MEMBER(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));        \
 		}                                                                      \
 		else                                                                   \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(2,tileno>>2, pal,TILE_FLIPYX(flip));                 \
+			SET_TILE_INFO_MEMBER(2,tileno>>2, pal,TILE_FLIPYX(flip));          \
 		}                                                                      \
 	}                                                                          \
 }
+
 TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_8x8_info)
 {
 	int offset = 0x00000;
@@ -384,13 +385,13 @@ INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
 -------------------------------------------------*/
 
 #define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)                                                 \
-do {                                                                                \
-	if (blit->drawformat == HNG64_TILEMAP_NORMAL)                                   \
-		*(UINT32 *)dest = clut[INPUT_VAL];                                          \
-	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)                            \
+do {                                                                                    \
+	if (blit->drawformat == HNG64_TILEMAP_NORMAL)                                       \
+		*(UINT32 *)dest = clut[INPUT_VAL];                                              \
+	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)                                \
 		*(UINT32 *)dest = alpha_additive_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);  \
-	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)                               \
-		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha); \
+	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)                                   \
+		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);     \
 } while (0)
 
 void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
@@ -1122,7 +1123,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *src = &m_colorBuffer3d[y * cliprect.max_x];
+			UINT32 *src = &m_poly_renderer->colorBuffer3d().pix32(y, cliprect.min_x);
 			UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
 
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -1234,8 +1235,6 @@ void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 
 void hng64_state::video_start()
 {
-	const rectangle &visarea = m_screen->visible_area();
-
 	m_old_animmask = -1;
 	m_old_animbits = -1;
 	m_old_tileflags[0] = -1;
@@ -1269,11 +1268,10 @@ void hng64_state::video_start()
 	// Debug switch, turn on / off additive blending on a per-tilemap basis
 	m_additive_tilemap_debug = 0;
 
-	// 3d Buffer Allocation
-	m_depthBuffer3d = auto_alloc_array(machine(), float,  (visarea.max_x + 1)*(visarea.max_y + 1));
-	m_colorBuffer3d = auto_alloc_array(machine(), UINT32, (visarea.max_x + 1)*(visarea.max_y + 1));
+	// Rasterizer creation
+    m_poly_renderer = auto_alloc(machine(), hng64_poly_renderer(*this));
 
-
+    // 3d information
 	m_dl = auto_alloc_array(machine(), UINT16, 0x200/2);
 	polys.resize(1024*5);
 

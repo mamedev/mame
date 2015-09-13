@@ -23711,7 +23711,33 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- Li Cheng games -->
+	<software name="magiclmp" supported="no">
+		<description>Magic Lamp (Tw)</description>
+		<year>2000</year>
+		<publisher>GOWIN</publisher>
+		<info name="serial" value="GS-??"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="magic lamp.bin" size="524288" crc="15256d76" sha1="6286135ce3ad3fc5c6daaecff3d735fc8fb3ff2f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="binmnst2" supported="no">
+		<description>Binary Monster 2 - Adventure of Hell(TW)</description>
+		<year>2000</year>
+		<publisher>GOWIN</publisher>
+		<info name="serial" value="GS-??"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="binary monster 2.bin" size="262144" crc="9bb8d5a8" sha1="9f2268a1ea438b8b739b22f7b3d2470b99716dfd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Li Cheng games -->
 
 <!--
 

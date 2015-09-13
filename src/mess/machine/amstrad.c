@@ -1694,8 +1694,8 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
 WRITE8_MEMBER(amstrad_state::aleste_msx_mapper)
 {
 	int page = (offset & 0x0300) >> 8;
-	int ramptr = (data & 0x1f) * 0x4000;
-	int rampage = data & 0x1f;
+	int ramptr = (data & 0x3f) * 0x4000;
+	int rampage = data & 0x3f;
 	int function = (data & 0xc0) >> 6;
 	UINT8 *ram = m_ram->pointer();
 

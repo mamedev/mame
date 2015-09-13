@@ -43,19 +43,19 @@ Known undumped:
 		<info name="alt_title" value="F1スピリット3Dスペシャル" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Opening Disk"/>
+			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Game Disk A"/>
+			<feature name="part_id" value="Game Disk A"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a).dsk" size="737280" crc="96811cc3" sha1="9877150e691d41b615683684cf0b78fc84649d37" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="part_id" value="Game Disk B"/>
+			<feature name="part_id" value="Game Disk B"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019" offset="0" />
 			</dataarea>
@@ -69,19 +69,19 @@ Known undumped:
 		<info name="alt_title" value="F1スピリット3Dスペシャル" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Opening Disk"/>
+			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Game Disk A"/>
+			<feature name="part_id" value="Game Disk A"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a].dsk" size="737280" crc="b05f67a2" sha1="3fd1c3dacd8fc3b4fc4902ac35296ce30991ac9b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="part_id" value="Game Disk B"/>
+			<feature name="part_id" value="Game Disk B"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b)[a].dsk" size="737280" crc="94fc3831" sha1="a645c37119c59eab0d42f0a2cfbc47dc9678bc3c" offset="0" />
 			</dataarea>
@@ -95,19 +95,19 @@ Known undumped:
 		<info name="alt_title" value="F1スピリット3Dスペシャル" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Opening Disk"/>
+			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Game Disk A"/>
+			<feature name="part_id" value="Game Disk A"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a2].dsk" size="737280" crc="eb1d19a3" sha1="f3b1dafa72bdc5affaf49bac3481ad5276a51375" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="part_id" value="Game Disk B"/>
+			<feature name="part_id" value="Game Disk B"/>
 			<dataarea name="flop" size="737280">
 				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019" offset="0" />
 			</dataarea>
@@ -147,19 +147,19 @@ Known undumped:
 		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[mouse].dsk" size="737280" crc="b3454990" sha1="6a6e5caaf72d3f9285bf5adc11e90ab7242f22c7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[mouse].dsk" size="737280" crc="1eb4c4d6" sha1="c2bf5d6aff3b5b676fccdd010eedd67a4a2523ff" offset="0" />
 			</dataarea>
@@ -173,19 +173,19 @@ Known undumped:
 		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[a][mouse].dsk" size="737280" crc="952b3db8" sha1="319333dc9f37342802199fe576da759fef66501d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[a][mouse].dsk" size="737280" crc="4915e99b" sha1="c4f00d065f61f893a075e26b879dde68d2a493d5" offset="0" />
 			</dataarea>
@@ -248,13 +248,13 @@ Known undumped:
 		<info name="alt_title" value="レイドック2ラストアタック" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 1 of 2).dsk" size="737280" crc="02c2949e" sha1="c4217c7f0371e9c6f830d8a76f731123548c9719" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 2 of 2).dsk" size="737280" crc="cd89e9d3" sha1="63daaadce6ef18938788f3d1e4b08deff15fe5da" offset="0" />
 			</dataarea>
@@ -268,13 +268,13 @@ Known undumped:
 		<info name="alt_title" value="レイドック2ラストアタック" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 1 of 2)[a].dsk" size="737280" crc="1b68b1a9" sha1="db7cf4672f46017b69b02eb175b4a446a948c601" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 2 of 2)[a].dsk" size="737280" crc="25777c4e" sha1="bbbc09ed823847b567caa1f321f578cbaf3a356f" offset="0" />
 			</dataarea>
@@ -288,37 +288,37 @@ Known undumped:
 		<info name="alt_title" value="ミッドガルツ" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 1 of 6).dsk" size="737280" crc="90559e83" sha1="c78e099022ae77c47b95a45fca869324fecb4cb5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 2 of 6).dsk" size="737280" crc="24183de3" sha1="53d6aa633a841878a3c67a3024f7c3ed3e1b4508" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 3 of 6).dsk" size="737280" crc="5611fda7" sha1="b30746e7fe256ddef2d2f1cad8a57aea86a4c478" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 4 of 6).dsk" size="737280" crc="7a28644e" sha1="33e94dac0f9cb73f4a15265bb0166e48183bdb35" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 5 of 6).dsk" size="737280" crc="64acdb49" sha1="47b9228b014d9e953dad956bb04aabedfa4db8a9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 6 of 6).dsk" size="737280" crc="b920cf5b" sha1="2863537cbf930701a81540948f7e037359ba8ec3" offset="0" />
 			</dataarea>
@@ -331,13 +331,13 @@ Known undumped:
 		<publisher>Panasoft</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="pana amusement collection 1 (1988)(panasoft)(jp).dsk" size="737280" crc="4dee2cff" sha1="e4bc138daedac129c39923cbe4a07bf79a880f8b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="pana amusement collection 2 (1988)(panasoft)(jp).dsk" size="737280" crc="83f786e1" sha1="94c2cde50db86b91ad7d73cf6354a240c97ab3ea" offset="0" />
 			</dataarea>
@@ -350,13 +350,13 @@ Known undumped:
 		<publisher>Panasoft</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="340292e7" sha1="f86f628e6cef41b777796c4797b9153b5c722710" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="3ecc097d" sha1="552da3bf49e85911acc8f7a5c744ca86105bd081" offset="0" />
 			</dataarea>
@@ -369,13 +369,13 @@ Known undumped:
 		<publisher>Panasoft</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="441d35a8" sha1="fe949aa959949e478a22c93b67b2247a1cf3d7f9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="4bf555e3" sha1="5eeb6b2b85a19664ef9b21c130fe9b995c4b4784" offset="0" />
 			</dataarea>
@@ -636,13 +636,13 @@ Known undumped:
 		<info name="developer" value="First Class Software" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Opening Disk"/>
+			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="megadoom (1992)(first class software)(nl)(disk 1 of 2)(opening disk).dsk" size="737280" crc="70a3494d" sha1="fa83f00dd2feb4a30d71616578ce553466d4d14e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Game Disk"/>
+			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="megadoom (1992)(first class software)(nl)(disk 2 of 2)(game disk).dsk" size="737280" crc="1d7716de" sha1="6c48f8dedd8494c3aabeea3af997363ed861ac0f" offset="0" />
 			</dataarea>
@@ -656,13 +656,13 @@ Known undumped:
 		<info name="developer" value="First Class Software" />
 
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="megadoom (demo) (1992)(first class software)(nl).dsk" size="737280" crc="72aa680e" sha1="196f0e8d263d69215cfc634e0518e7206136468d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2?"/>
+			<feature name="part_id" value="Disk 2?"/>
 			<dataarea name="flop" size="737280">
 				<rom name="megadoom (demo) (1992)(first class software)(nl)[2 disks].dsk" size="737280" crc="f8554ee4" sha1="70d62bfb6505ae91b1afde000d7b5fb771a8b38d" offset="0" />
 			</dataarea>

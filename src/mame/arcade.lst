@@ -844,6 +844,7 @@ genpeitd        // (c) 1986
 rthunder        // (c) 1986
 rthunder2       // (c) 1986
 rthunder1       // (c) 1986
+rthunder0		// (c) 1986
 wndrmomo        // (c) 1987
 
 // Thunder Ceptor HW
@@ -5382,6 +5383,8 @@ alpiltdx        // 1999.?? Airline Pilots Deluxe (Rev B)
 				// 1999.?? Pocket Shooting
 sambap          // 1999.?? Samba de Amigo (prototype)
 spawn           // 1999.?? Spawn In the Demon's Hand
+				// 1999.?? Tokio Bus Guide
+				// 1999.?? Tokio Bus Guide (Rev A)
 vtennisg        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
 18wheelr        // 2000.01 18 Wheeler Deluxe (Rev A)
 18wheels        // 2000.01 18 Wheeler (Standard)
@@ -5471,8 +5474,8 @@ luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
 cleoftp         // 2002.05 Cleopatra Fortune Plus
 ggxx            // 2002.05 Guilty Gear XX
 chocomk         // 2002.06 Musapey's Choco Marker (Rev A)
-mazan           // 2002.07 Mazan : Flash of the Blade (MAZ2 Ver. A)
-mazana          // 2002.07 Mazan : Flash of the Blade (MAZ3 Ver. A)
+mazan           // 2002.07 Mazan: Flash of the Blade (MAZ2 Ver. A)
+mazana          // 2002.07 Mazan: Flash of the Blade (MAZ3 Ver. A)
 				// 2002.09 Yonin Uchi Mahjong MJ
 azumanga        // 2002.12 Azumanga Daiou Puzzle Bobble
 moeru           // 2002.12 Moeru Casinyo
@@ -5493,7 +5496,7 @@ psyvar2         // 2003.11 Psyvariar 2 - The Will To Fabricate
 puyofev         // 2003.11 Puyo Puyo Fever
 starhrsp        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
 				// 2003.?? Dragon Treasure
-puyofevp        // 2003.?? Puyo Puyo Fever (prototype)
+puyofevp        // 2003.?? Puyo Puyo Fever (prototype ver 0.01)
 shootpl         // 2003.?? Shootout Pool The Medal / Shootout Pool Prize (Rev A)
 cfield          // 2004.06 Chaos Field
 tetkiwam        // 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom)
@@ -6288,6 +6291,7 @@ wc90t           // (c) 1989 Tecmo
 wc90b1          // bootleg
 wc90b2          // bootleg
 wc90ba          // bootleg
+pac90			// bootleg
 spbactn         // 9002 - (c) 1991 Tecmo
 spbactnj        // 9002 - (c) 1991 Tecmo
 spbactnp        // prototype
@@ -9152,6 +9156,7 @@ zingzip         // UY   (c) 1992 Allumer + Tecmo
 zingzipbl       // bootleg
 atehate         // (C) 1993 Athena
 jjsquawk        // (c) 1993 Athena / Able
+jjsquawko       // (c) 1993 Athena / Able
 jjsquawkb       // bootleg
 jjsquawkb2      // bootleg
 kamenrid        // (c) 1993 Toei / Banpresto
@@ -9912,9 +9917,11 @@ starzan         // (c) 2000?
 
 // IGS027A Cpu Games
 slqz3           // (c) 1999
+amazonia        // (c) 1999
 fruitpar        // (c) 200?
 zhongguo        // (c) 2000
 sdwx            // (c) 2002
+amazoni2		// (c) 2002
 sddz            // (c) 200?
 lhzb3           // (c) 200?
 lhzb4           // (c) 200?
@@ -9941,6 +9948,7 @@ orlegendc       //
 orlegendca      //
 orlegend111c    //
 orlegend111t    //
+orlegend111k    //
 orlegend105k    //
 drgw2           // (c) 1997 Dragon World 2
 dw2v100x        //

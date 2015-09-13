@@ -12,6 +12,7 @@ options {
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
+	MAME_DIR .. "src/devices", -- till deps are fixed
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
@@ -21,11 +22,6 @@ includedirs {
 if _OPTIONS["with-bundled-expat"] then
 	includedirs {
 		MAME_DIR .. "3rdparty/expat/lib",
-	}
-end
-if _OPTIONS["with-bundled-zlib"] then
-	includedirs {
-		MAME_DIR .. "3rdparty/zlib",
 	}
 end
 if _OPTIONS["with-bundled-lua"] then
@@ -249,63 +245,63 @@ files {
 	MAME_DIR .. "src/emu/webengine.h",
 	MAME_DIR .. "src/emu/sound/filter.c",
 	MAME_DIR .. "src/emu/sound/filter.h",
-	MAME_DIR .. "src/emu/sound/flt_vol.c",
-	MAME_DIR .. "src/emu/sound/flt_vol.h",
-	MAME_DIR .. "src/emu/sound/flt_rc.c",
-	MAME_DIR .. "src/emu/sound/flt_rc.h",
+	MAME_DIR .. "src/devices/sound/flt_vol.c",
+	MAME_DIR .. "src/devices/sound/flt_vol.h",
+	MAME_DIR .. "src/devices/sound/flt_rc.c",
+	MAME_DIR .. "src/devices/sound/flt_rc.h",
 	MAME_DIR .. "src/emu/sound/wavwrite.c",
 	MAME_DIR .. "src/emu/sound/wavwrite.h",
-	MAME_DIR .. "src/emu/sound/samples.c",
-	MAME_DIR .. "src/emu/sound/samples.h",
+	MAME_DIR .. "src/devices/sound/samples.c",
+	MAME_DIR .. "src/devices/sound/samples.h",
 	MAME_DIR .. "src/emu/drivers/empty.c",
 	MAME_DIR .. "src/emu/drivers/testcpu.c",
 	MAME_DIR .. "src/emu/drivers/xtal.h",
-	MAME_DIR .. "src/emu/machine/bcreader.c",
-	MAME_DIR .. "src/emu/machine/bcreader.h",
-	MAME_DIR .. "src/emu/machine/buffer.c",
-	MAME_DIR .. "src/emu/machine/buffer.h",
-	MAME_DIR .. "src/emu/machine/clock.c",
-	MAME_DIR .. "src/emu/machine/clock.h",
+	MAME_DIR .. "src/devices/machine/bcreader.c",
+	MAME_DIR .. "src/devices/machine/bcreader.h",
+	MAME_DIR .. "src/devices/machine/buffer.c",
+	MAME_DIR .. "src/devices/machine/buffer.h",
+	MAME_DIR .. "src/devices/machine/clock.c",
+	MAME_DIR .. "src/devices/machine/clock.h",
 	MAME_DIR .. "src/emu/machine/generic.c",
 	MAME_DIR .. "src/emu/machine/generic.h",
-	MAME_DIR .. "src/emu/machine/keyboard.c",
-	MAME_DIR .. "src/emu/machine/keyboard.h",
-	MAME_DIR .. "src/emu/machine/laserdsc.c",
-	MAME_DIR .. "src/emu/machine/laserdsc.h",
-	MAME_DIR .. "src/emu/machine/latch.c",
-	MAME_DIR .. "src/emu/machine/latch.h",
-	MAME_DIR .. "src/emu/machine/nvram.c",
-	MAME_DIR .. "src/emu/machine/nvram.h",
-	MAME_DIR .. "src/emu/machine/ram.c",
-	MAME_DIR .. "src/emu/machine/ram.h",
-	MAME_DIR .. "src/emu/machine/legscsi.c",
-	MAME_DIR .. "src/emu/machine/legscsi.h",
-	MAME_DIR .. "src/emu/machine/terminal.c",
-	MAME_DIR .. "src/emu/machine/terminal.h",
-	MAME_DIR .. "src/emu/imagedev/bitbngr.c",
-	MAME_DIR .. "src/emu/imagedev/bitbngr.h",
-	MAME_DIR .. "src/emu/imagedev/cassette.c",
-	MAME_DIR .. "src/emu/imagedev/cassette.h",
-	MAME_DIR .. "src/emu/imagedev/chd_cd.c",
-	MAME_DIR .. "src/emu/imagedev/chd_cd.h",
-	MAME_DIR .. "src/emu/imagedev/diablo.c",
-	MAME_DIR .. "src/emu/imagedev/diablo.h",
-	MAME_DIR .. "src/emu/imagedev/flopdrv.c",
-	MAME_DIR .. "src/emu/imagedev/flopdrv.h",
-	MAME_DIR .. "src/emu/imagedev/floppy.c",
-	MAME_DIR .. "src/emu/imagedev/floppy.h",
-	MAME_DIR .. "src/emu/imagedev/harddriv.c",
-	MAME_DIR .. "src/emu/imagedev/harddriv.h",
-	MAME_DIR .. "src/emu/imagedev/mfmhd.c",
-	MAME_DIR .. "src/emu/imagedev/mfmhd.h",
-	MAME_DIR .. "src/emu/imagedev/midiin.c",
-	MAME_DIR .. "src/emu/imagedev/midiin.h",
-	MAME_DIR .. "src/emu/imagedev/midiout.c",
-	MAME_DIR .. "src/emu/imagedev/midiout.h",
-	MAME_DIR .. "src/emu/imagedev/printer.c",
-	MAME_DIR .. "src/emu/imagedev/printer.h",
-	MAME_DIR .. "src/emu/imagedev/snapquik.c",
-	MAME_DIR .. "src/emu/imagedev/snapquik.h",
+	MAME_DIR .. "src/devices/machine/keyboard.c",
+	MAME_DIR .. "src/devices/machine/keyboard.h",
+	MAME_DIR .. "src/devices/machine/laserdsc.c",
+	MAME_DIR .. "src/devices/machine/laserdsc.h",
+	MAME_DIR .. "src/devices/machine/latch.c",
+	MAME_DIR .. "src/devices/machine/latch.h",
+	MAME_DIR .. "src/devices/machine/nvram.c",
+	MAME_DIR .. "src/devices/machine/nvram.h",
+	MAME_DIR .. "src/devices/machine/ram.c",
+	MAME_DIR .. "src/devices/machine/ram.h",
+	MAME_DIR .. "src/devices/machine/legscsi.c",
+	MAME_DIR .. "src/devices/machine/legscsi.h",
+	MAME_DIR .. "src/devices/machine/terminal.c",
+	MAME_DIR .. "src/devices/machine/terminal.h",
+	MAME_DIR .. "src/devices/imagedev/bitbngr.c",
+	MAME_DIR .. "src/devices/imagedev/bitbngr.h",
+	MAME_DIR .. "src/devices/imagedev/cassette.c",
+	MAME_DIR .. "src/devices/imagedev/cassette.h",
+	MAME_DIR .. "src/devices/imagedev/chd_cd.c",
+	MAME_DIR .. "src/devices/imagedev/chd_cd.h",
+	MAME_DIR .. "src/devices/imagedev/diablo.c",
+	MAME_DIR .. "src/devices/imagedev/diablo.h",
+	MAME_DIR .. "src/devices/imagedev/flopdrv.c",
+	MAME_DIR .. "src/devices/imagedev/flopdrv.h",
+	MAME_DIR .. "src/devices/imagedev/floppy.c",
+	MAME_DIR .. "src/devices/imagedev/floppy.h",
+	MAME_DIR .. "src/devices/imagedev/harddriv.c",
+	MAME_DIR .. "src/devices/imagedev/harddriv.h",
+	MAME_DIR .. "src/devices/imagedev/mfmhd.c",
+	MAME_DIR .. "src/devices/imagedev/mfmhd.h",
+	MAME_DIR .. "src/devices/imagedev/midiin.c",
+	MAME_DIR .. "src/devices/imagedev/midiin.h",
+	MAME_DIR .. "src/devices/imagedev/midiout.c",
+	MAME_DIR .. "src/devices/imagedev/midiout.h",
+	MAME_DIR .. "src/devices/imagedev/printer.c",
+	MAME_DIR .. "src/devices/imagedev/printer.h",
+	MAME_DIR .. "src/devices/imagedev/snapquik.c",
+	MAME_DIR .. "src/devices/imagedev/snapquik.h",
 	MAME_DIR .. "src/emu/video/generic.c",
 	MAME_DIR .. "src/emu/video/generic.h",
 	MAME_DIR .. "src/emu/video/resnet.c",
@@ -319,7 +315,7 @@ files {
 	MAME_DIR .. "src/emu/video/rgbvmx.h",
 	MAME_DIR .. "src/emu/video/vector.c",
 	MAME_DIR .. "src/emu/video/vector.h",
-	MAME_DIR .. "src/emu/video/poly.h",
+	MAME_DIR .. "src/devices/video/poly.h",
 }
 
 dependency {
@@ -360,151 +356,3 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "noscreens"),
 	layoutbuildtask("emu/layout", "snap"),
 }
-
-function emuProject(_target, _subtarget)
-
-	disasm_files = { }
-	disasm_dependency = { }
-	disasm_custombuildtask = { }
-
-	project ("optional")
-	uuid (os.uuid("optional-" .. _target .."_" .. _subtarget))
-	kind (LIBTYPE)
-	targetsubdir(_target .."_" .. _subtarget)
-	options {
-		"ForceCPP",
-		"ArchiveSplit",
-	}
-
-	includedirs {
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/emu",
-    MAME_DIR .. "src/emu/netlist",
-		MAME_DIR .. "src/mame", -- used for sound amiga
-		MAME_DIR .. "src/lib",
-		MAME_DIR .. "src/lib/util",
-		MAME_DIR .. "3rdparty",
-		GEN_DIR  .. "emu",
-		GEN_DIR  .. "emu/layout",
-		MAME_DIR .. "src/emu/cpu/m68000",
-	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
-
-	dofile(path.join("src", "cpu.lua"))
-
-	dofile(path.join("src", "sound.lua"))
-
-
-	dofile(path.join("src", "video.lua"))
-
-	dofile(path.join("src", "machine.lua"))
-
-if (_OPTIONS["DRIVERS"] == nil) then
-	project ("bus")
-	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
-	kind (LIBTYPE)
-	targetsubdir(_target .."_" .. _subtarget)
-	options {
-		"ForceCPP",
-		"ArchiveSplit",
-	}
-
-	includedirs {
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/emu",
-    MAME_DIR .. "src/emu/netlist",
-		MAME_DIR .. "src/lib",
-		MAME_DIR .. "src/lib/util",
-		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "src/mess", -- some mess bus devices need this
-		MAME_DIR .. "src/mame", -- used for nes bus devices
-		GEN_DIR  .. "emu",
-		GEN_DIR  .. "emu/layout",
-	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
-
-	dofile(path.join("src", "bus.lua"))
-else
-	dofile(path.join("src", "bus.lua"))
-end
-
-	--  netlist now defines a project
-	dofile(path.join("src", "netlist.lua"))
-
-
-	project ("dasm")
-	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
-	kind (LIBTYPE)
-	targetsubdir(_target .."_" .. _subtarget)
-	options {
-		"ForceCPP",
-	}
-
-	includedirs {
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/emu",
-		MAME_DIR .. "src/lib",
-		MAME_DIR .. "src/lib/util",
-		MAME_DIR .. "3rdparty",
-		GEN_DIR  .. "emu",
-	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
-
-	files {
-		disasm_files
-	}
-
-	if #disasm_dependency > 0 then
-		dependency {
-			disasm_dependency[1]
-		}
-	end
-
-	if #disasm_custombuildtask > 0 then
-		custombuildtask {
-			disasm_custombuildtask[1]
-		}
-	end
-end

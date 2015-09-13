@@ -38,6 +38,20 @@ namespace bgfx
 		const uint8_t* m_data;
 	};
 
+	struct EncodingType
+	{
+		enum Enum
+		{
+			Unorm,
+			Int,
+			Uint,
+			Float,
+			Snorm,
+
+			Count
+		};
+	};
+
 	struct ImageBlockInfo
 	{
 		uint8_t bitsPerPixel;
@@ -48,6 +62,7 @@ namespace bgfx
 		uint8_t minBlockY;
 		uint8_t depthBits;
 		uint8_t stencilBits;
+		uint8_t encoding;
 	};
 
 	///
@@ -79,6 +94,9 @@ namespace bgfx
 
 	///
 	void imageSwizzleBgra8(uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src, void* _dst);
+
+	///
+	void imageCopy(uint32_t _height, uint32_t _srcPitch, const void* _src, uint32_t _dstPitch, void* _dst);
 
 	///
 	void imageCopy(uint32_t _width, uint32_t _height, uint32_t _bpp, uint32_t _srcPitch, const void* _src, void* _dst);

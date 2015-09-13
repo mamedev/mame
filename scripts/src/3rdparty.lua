@@ -500,7 +500,6 @@ project "portmidi"
 	kind "StaticLib"
 
 	includedirs {
-		MAME_DIR .. "src/osd",
 		MAME_DIR .. "3rdparty/portmidi/pm_common",
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
@@ -576,16 +575,19 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
 	}
 
 	configuration { "vs*" }
 		includedirs {
-			MAME_DIR .. "3rdparty/dxsdk/Include",
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
 		}
 	configuration { "mingw*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
+		}
+		defines {
+			"nullptr=NULL" -- not used but needed for C++11 code
 		}
 
 	configuration { "osx*" }
@@ -631,6 +633,9 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_null.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderdoc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.cpp",
@@ -648,7 +653,7 @@ project "bgfx"
 		files {
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
-			
+			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
 	end
 	if (_OPTIONS["SHADOW_CHECK"]=="1") then

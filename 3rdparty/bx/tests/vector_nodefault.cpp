@@ -1,5 +1,5 @@
 /*-
- * Copyright 2012 Matthew Endsley
+ * Copyright 2012-1015 Matthew Endsley
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,14 +33,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#if !BX_COMPILER_MSVC
-#	define _strdup strdup
-#endif // !BX_COMPILER_MSVC
-
 struct nodefault {
-	nodefault(const char* s) { data = _strdup(s); }
+	nodefault(const char* s) { data = strdup(s); }
 	~nodefault() { free(data); }
-	nodefault(const nodefault& other) { data = 0; if (other.data) data = _strdup(other.data); }
+	nodefault(const nodefault& other) { data = 0; if (other.data) data = strdup(other.data); }
 	nodefault& operator=(const nodefault& other) { nodefault(other).swap(*this); return *this; }
 	void swap(nodefault& other) { std::swap(data, other.data); }
 

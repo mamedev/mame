@@ -420,3 +420,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/itt3030_dsk.h",
 	}
 
+--  netlist now defines a project
+dofile("netlist.lua")
+

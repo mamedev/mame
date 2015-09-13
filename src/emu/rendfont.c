@@ -12,7 +12,7 @@
 #include "rendfont.h"
 #include "rendutil.h"
 #include "emuopts.h"
-#include <zlib.h>
+#include "coreutil.h"
 
 #include "osdepend.h"
 #include "uismall.fh"
@@ -389,7 +389,7 @@ bool render_font::load_cached_bdf(const char *filename)
 		return false;
 
 	// has the chunk
-	UINT32 hash = crc32(0, (const UINT8 *)&m_rawdata[0], bytes) ^ (UINT32)m_rawsize;
+	UINT32 hash = core_crc32(0, (const UINT8 *)&m_rawdata[0], bytes) ^ (UINT32)m_rawsize;
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
 	std::string cachedname(filename);

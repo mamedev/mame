@@ -307,6 +307,7 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	includedirs {
 		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices", -- accessing imagedev from debugger
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",

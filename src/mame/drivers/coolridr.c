@@ -7,6 +7,8 @@
     Driver by David Haywood, Angelo Salese and Tomasz Slanina
     special thanks to Guru for references and HW advices
 
+    Games on this system include Cool Riders and Aqua Stage.
+    
     This system is interesting in that it makes use of an RLE compression scheme, which
     is not something common for Sega hardware, there is a patent for it ( 6,141,122 )
     http://www.google.com/patents/US6141122
@@ -18,11 +20,6 @@
     - i8237 purpose is unknown (missing ROM for comms?).
     - verify zooming etc. our current algorithm is a bit ugly for text
 
-    Also known to exist on this hardware is Aqua Stage (Coin pusher):
-     833-12000 AQUA STAGE
-      Program roms EPR-18279 through EPR-18282
-      12 MASK roms (MPR numbers unknown)
-      SUB CPU program rom EPR-18278
 =======================================================================================================
 
 Cool Riders
@@ -3821,6 +3818,10 @@ ROM_START( coolridr )
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
+/*
+Aqua Stage (Coin pusher)
+PCB: 833-12000 AQUA STAGE
+*/
 
 ROM_START( aquastge )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */

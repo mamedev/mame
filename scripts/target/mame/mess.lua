@@ -882,21 +882,16 @@ function createMESSProjects(_target, _subtarget, _name)
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices",
 		MAME_DIR .. "src/mess",
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "src/emu/netlist",
+		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
-		MAME_DIR .. "src/emu/cpu/m68000",
 	}
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 end
 
 function createProjects_mame_mess(_target, _subtarget)
@@ -2212,6 +2207,7 @@ createMESSProjects(_target, _subtarget, "siemens")
 files {
 	MAME_DIR .. "src/mess/drivers/pcd.c",
 	MAME_DIR .. "src/mess/machine/pcd_kbd.c",
+	MAME_DIR .. "src/mess/video/pcd.c",
 }
 
 createMESSProjects(_target, _subtarget, "slicer")

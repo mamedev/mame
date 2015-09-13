@@ -208,6 +208,7 @@
 #include "cmaster.lh"
 #include "cmasterb.lh"
 #include "cmasterc.lh"
+#include "cmezspin.lh"
 #include "cmpacman.lh"
 #include "cmv4.lh"
 #include "crazybon.lh"
@@ -1240,7 +1241,7 @@ static INPUT_PORTS_START( cmv4_dsw1 )
 	PORT_DIPNAME( 0x20, 0x00, "Double Up Game" )            PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )                   PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, "Bet Max" )                   PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x40, "16" )
 	PORT_DIPSETTING(    0x80, "32" )
@@ -1662,6 +1663,76 @@ static INPUT_PORTS_START( cmasterb )
 	/* Display of Doll On Demo only affects payout table screen */
 	/* Coin In Limit OK */
 	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not checked */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cmezspin )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All / Take")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+
+	PORT_INCLUDE( cmv4_coins )
+
+	PORT_INCLUDE( cmv4_service )
+
+	PORT_INCLUDE( cmv4_dsw1 )
+	PORT_MODIFY("DSW1")
+	/* Hold Pair OK */
+	/* Hopper Out Switch not checked */
+	/* Payout Mode not checked */
+	PORT_DIPNAME( 0x08, 0x00, "'7' In Double Up Game" )     PORT_DIPLOCATION("DSW1:4")      /* OK */
+	PORT_DIPSETTING(    0x00, "Win" )
+	PORT_DIPSETTING(    0x08, "Even" )
+	PORT_DIPNAME( 0x10, 0x00, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:5")      /* OK */
+	PORT_DIPSETTING(    0x00, "70%" )
+	PORT_DIPSETTING(    0x10, "80%" )
+	/* Double Up Game OK */
+	PORT_DIPNAME( 0xc0, 0x00, "Bet Max" )                   PORT_DIPLOCATION("DSW1:7,8")    /* OK */
+	PORT_DIPSETTING(    0x00, "16" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x80, "64" )
+	PORT_DIPSETTING(    0xc0, "96" )
+
+	PORT_INCLUDE( cmv4_dsw2 )
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:1,2")    /* OK */
+	PORT_DIPSETTING(    0x03, "55%" )
+	PORT_DIPSETTING(    0x02, "60%" )
+	PORT_DIPSETTING(    0x01, "65%" )
+	PORT_DIPSETTING(    0x00, "70%" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* Hopper Limit not checked */
+	/* 100+ Odds Sound not checked */
+	/* Key In Type OK */
+	/* Center Super 7 Bet Limit related with Min. Bet For Bonus Play (DSW4-6) - not checked */
+
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
+
+	PORT_INCLUDE( cmv4_dsw4 )
+	PORT_MODIFY("DSW4")
+	/* Credit Limit not checked */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* Type Of Coin D OK */
+	/* Min. Bet For Bonus Play OK */
+	/* Reel Speed OK */
+	/* Hopper Out By Coin A OK */
+
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition for 3 Kind Of Bonus OK */
 	/* Display Of Doll At All Fr. Bonus not checked */
 	/* DSW5-7 listed as unused */
 	/* Test Mode For Disp. Of Doll not checked */
@@ -13198,7 +13269,7 @@ GAMEL( 199?, cmwm,      cmv4,     cm,       cmv4,     cmaster_state,  cmv4,     
 GAMEL( 1995, cmfun,     cmv4,     cm,       cmv4,     cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
 GAMEL( 1991, cmaster,   0,        cm,       cmaster,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
 GAMEL( 1991, cmasterb,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmezspin,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                 layout_cmasterb ) // CM Fruit Bonus 55 ver.2 bootleg/hack
+GAMEL( 1991, cmezspin,  cmaster,  cm,       cmezspin, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                 layout_cmezspin ) // CM Fruit Bonus 55 ver.2 bootleg/hack
 GAMEL( 1991, cmasterc,  cmaster,  cmasterc, cmasterc, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           0,                 layout_cmasterc )
 GAMEL( 1991, cmasterbv, cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 4, with Blitz Poker ROM?)", MACHINE_NOT_WORKING, layout_cmasterb ) // Cherry Master works, but no idea how to use the Blitz ROM
 GAMEL( 1991, cmasterd,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 5)",           0,                 layout_cmasterb )

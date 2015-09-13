@@ -39,5 +39,6 @@ int gregorian_days_in_month(int month, int year);
 
 void rand_memory(void *memory, size_t length);
 
+UINT32 core_crc32(UINT32 crc, const UINT8 *buf, UINT32 len);
 
 #endif /* __COREUTIL_H__ */

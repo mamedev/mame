@@ -125,6 +125,8 @@ private:
 static void netdev_pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes) {
 	struct netdev_pcap_context *ctx = (struct netdev_pcap_context*)user;
 
+	if(!ctx->p) return;
+
 	if(OSAtomicCompareAndSwapInt((ctx->head+1) & 0x1F, ctx->tail, &ctx->tail)) {
 		printf("buffer full, dropping packet\n");
 		return;
@@ -137,7 +139,7 @@ static void netdev_pcap_handler(u_char *user, const struct pcap_pkthdr *h, const
 static void *netdev_pcap_blocker(void *arg) {
 	struct netdev_pcap_context *ctx = (struct netdev_pcap_context*)arg;
 
-	while(1) {
+	while(ctx && ctx->p) {
 		pcap_dispatch_dl(ctx->p, 1, netdev_pcap_handler, (u_char*)ctx);
 	}
 
@@ -232,6 +234,11 @@ int netdev_pcap::recv_dev(UINT8 **buf)
 
 netdev_pcap::~netdev_pcap()
 {
+#ifdef SDLMAME_MACOSX
+	m_ctx.p = NULL;
+	pthread_cancel(m_thread);
+	pthread_join(m_thread, NULL);
+#endif
 	if(m_p) pcap_close_dl(m_p);
 	m_p = NULL;
 }
