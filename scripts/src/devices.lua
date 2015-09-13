@@ -27,7 +27,6 @@ function devicesProject(_target, _subtarget)
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
-		MAME_DIR .. "src/emu/cpu/m68000",
 	}
 	if _OPTIONS["with-bundled-expat"] then
 		includedirs {

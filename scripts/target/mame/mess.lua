@@ -891,7 +891,6 @@ function createMESSProjects(_target, _subtarget, _name)
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
-		MAME_DIR .. "src/devices/cpu/m68000",
 	}
 end
 
