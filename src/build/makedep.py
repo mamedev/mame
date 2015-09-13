@@ -244,72 +244,72 @@ for filename in deps_files_included:
 for filename in sys.argv[2].rsplit(',') :
     parse_file_for_drivers(root,filename)
 
-	
+
 # display output
 if sys.argv[3]=='drivers':
-	# add a reference to the ___empty driver
-	drivers.append("___empty")
+    # add a reference to the ___empty driver
+    drivers.append("___empty")
 
-	# start with a header
-	print('#include "emu.h"\n')
-	print('#include "drivenum.h"\n')
+    # start with a header
+    print('#include "emu.h"\n')
+    print('#include "drivenum.h"\n')
 
-	#output the list of externs first
-	for drv in sorted(drivers):
-		print("GAME_EXTERN(%s);" % drv)
-	print("")
+    #output the list of externs first
+    for drv in sorted(drivers):
+        print("GAME_EXTERN(%s);" % drv)
+    print("")
 
-	# then output the array
-	print("const game_driver * const driver_list::s_drivers_sorted[%d] =" % len(drivers))
-	print("{")
-	for drv in sorted(drivers):
-		print("\t&GAME_NAME(%s)," % drv)
-	print("};")
-	print("")
+    # then output the array
+    print("const game_driver * const driver_list::s_drivers_sorted[%d] =" % len(drivers))
+    print("{")
+    for drv in sorted(drivers):
+        print("\t&GAME_NAME(%s)," % drv)
+    print("};")
+    print("")
 
-	# also output a global count
-	print("int driver_list::s_driver_count = %d;\n" % len(drivers))
+    # also output a global count
+    print("int driver_list::s_driver_count = %d;\n" % len(drivers))
 
 if sys.argv[3]=='target':
     for line in components:
-        sys.stdout.write("%s\n" % line)	
+        sys.stdout.write("%s\n" % line)    
     sys.stdout.write('\n')
     sys.stdout.write('function createProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4])
-    sys.stdout.write('	project ("mame_%s")\n' % sys.argv[4])
-    sys.stdout.write('	targetsubdir(_target .."_" .. _subtarget)\n')
-    sys.stdout.write('	kind (LIBTYPE)\n')
-    sys.stdout.write('	uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4])
-    sys.stdout.write('	\n')
-    sys.stdout.write('	options {\n')
-    sys.stdout.write('		"ForceCPP",\n')
-    sys.stdout.write('	}\n')
-    sys.stdout.write('	\n')
-    sys.stdout.write('	includedirs {\n')
-    sys.stdout.write('		MAME_DIR .. "src/osd",\n')
-    sys.stdout.write('		MAME_DIR .. "src/emu",\n')
-	sys.stdout.write('		MAME_DIR .. "src/devices",\n')
-    sys.stdout.write('		MAME_DIR .. "src/mame",\n')
-    sys.stdout.write('		MAME_DIR .. "src/mess",\n')
-    sys.stdout.write('		MAME_DIR .. "src/lib",\n')
-    sys.stdout.write('		MAME_DIR .. "src/lib/util",\n')
-    sys.stdout.write('		MAME_DIR .. "3rdparty",\n')
-    sys.stdout.write('		GEN_DIR  .. "mame/layout",\n')
-    sys.stdout.write('		GEN_DIR  .. "mess/layout",\n')
-    sys.stdout.write('	}\n')
-    sys.stdout.write('	if _OPTIONS["with-bundled-zlib"] then\n')
-    sys.stdout.write('		includedirs {\n')
-    sys.stdout.write('			MAME_DIR .. "3rdparty/zlib",\n')
-    sys.stdout.write('		}\n')
-    sys.stdout.write('	end\n')
+    sys.stdout.write('    project ("mame_%s")\n' % sys.argv[4])
+    sys.stdout.write('    targetsubdir(_target .."_" .. _subtarget)\n')
+    sys.stdout.write('    kind (LIBTYPE)\n')
+    sys.stdout.write('    uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4])
+    sys.stdout.write('    \n')
+    sys.stdout.write('    options {\n')
+    sys.stdout.write('        "ForceCPP",\n')
+    sys.stdout.write('    }\n')
+    sys.stdout.write('    \n')
+    sys.stdout.write('    includedirs {\n')
+    sys.stdout.write('        MAME_DIR .. "src/osd",\n')
+    sys.stdout.write('        MAME_DIR .. "src/emu",\n')
+    sys.stdout.write('        MAME_DIR .. "src/devices",\n')
+    sys.stdout.write('        MAME_DIR .. "src/mame",\n')
+    sys.stdout.write('        MAME_DIR .. "src/mess",\n')
+    sys.stdout.write('        MAME_DIR .. "src/lib",\n')
+    sys.stdout.write('        MAME_DIR .. "src/lib/util",\n')
+    sys.stdout.write('        MAME_DIR .. "3rdparty",\n')
+    sys.stdout.write('        GEN_DIR  .. "mame/layout",\n')
+    sys.stdout.write('        GEN_DIR  .. "mess/layout",\n')
+    sys.stdout.write('    }\n')
+    sys.stdout.write('    if _OPTIONS["with-bundled-zlib"] then\n')
+    sys.stdout.write('        includedirs {\n')
+    sys.stdout.write('            MAME_DIR .. "3rdparty/zlib",\n')
+    sys.stdout.write('        }\n')
+    sys.stdout.write('    end\n')
     sys.stdout.write('\n')
-    sys.stdout.write('	files{\n')
+    sys.stdout.write('    files{\n')
     for line in deps_files_included:
-        sys.stdout.write('		MAME_DIR .. "%s",\n' % line)
-    sys.stdout.write('	}\n')
+        sys.stdout.write('        MAME_DIR .. "%s",\n' % line)
+    sys.stdout.write('    }\n')
     sys.stdout.write('end\n')
     sys.stdout.write('\n')
     sys.stdout.write('function linkProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4])
-    sys.stdout.write('	links {\n')
-    sys.stdout.write('		"mame_%s",\n' % sys.argv[4])
-    sys.stdout.write('	}\n')
+    sys.stdout.write('    links {\n')
+    sys.stdout.write('        "mame_%s",\n' % sys.argv[4])
+    sys.stdout.write('    }\n')
     sys.stdout.write('end\n')
