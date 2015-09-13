@@ -1302,7 +1302,10 @@ dofile(path.join("src", "3rdparty.lua"))
 group "core"
 
 dofile(path.join("src", "emu.lua"))
-emuProject(_OPTIONS["target"],_OPTIONS["subtarget"])
+
+group "devices"
+dofile(path.join("src", "devices.lua"))
+devicesProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
 group "drivers"
 findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
