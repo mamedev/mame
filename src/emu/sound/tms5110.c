@@ -481,7 +481,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 						break;
 						case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11:
 						/* PC = 2 through 11, B cycle, write updated K1 through K10 */
-						m_current_k[m_PC-2] = (m_current_k[m_PC-2] + (((m_coeff->ktable[m_PC-2][m_new_frame_k_idx[m_PC-2]] - m_current_k[m_PC-2])*(1-inhibit_state)) INTERP_SHIFT))*(((m_PC-2)>4)?(1-m_uv_zpar):(1-m_zpar));
+						m_current_k[m_PC-2] = (m_current_k[m_PC-2] + (((m_coeff->ktable[m_PC-2][m_new_frame_k_idx[m_PC-2]] - m_current_k[m_PC-2])*(1-inhibit_state)) INTERP_SHIFT))*(1-(((m_PC-2)<4)?m_zpar:m_uv_zpar));
 						break;
 						case 12: /* PC = 12 */
 						/* we should NEVER reach this point, PC=12 doesn't have a subcycle 2 */
