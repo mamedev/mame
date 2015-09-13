@@ -561,7 +561,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
         m_rr0 = m_rr1 = m_rr2 =
                 m_rr3  = m_rr4  = m_rr5  = m_rr6  = m_rr7  = m_rr8  = m_rr9 = 
                 m_rr10 = m_rr11 = m_rr12 = m_rr13 = m_rr14 = m_rr15 = 0;
-        m_rr0 = m_rr1 = m_rr2 = m_rr3  = m_rr4  = m_rr5  = m_rr6  = m_rr7 =        
+        m_wr0 = m_wr1 = m_wr2 = m_wr3  = m_wr4  = m_wr5  = m_wr6  = m_wr7 =        
                 m_wr8  = m_wr9  = m_wr10 = m_wr11 = m_wr12 = m_wr13 = m_wr14 = m_wr15;
 
 	for (int i = 0; i < 3; i++) // TODO adapt to SCC fifos
