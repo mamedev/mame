@@ -36,7 +36,7 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "wavwrite.h"
+#include "sound/wavwrite.h"
 #include "discrete.h"
 
 // for now, make buggy GCC/Mingw STFU about I64FMT

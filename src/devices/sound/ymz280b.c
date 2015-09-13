@@ -44,7 +44,7 @@
 #define INTERNAL_SAMPLE_RATE    (m_master_clock * 2.0)
 
 #if MAKE_WAVS
-#include "wavwrite.h"
+#include "sound/wavwrite.h"
 #endif
 
 

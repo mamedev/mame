@@ -37,7 +37,7 @@ Registers per channel:
 
 #include "emu.h"
 #include "gaelco.h"
-#include "wavwrite.h"
+#include "sound/wavwrite.h"
 
 #define VERBOSE_SOUND 0
 #define VERBOSE_READ_WRITES 0

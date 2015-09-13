@@ -92,6 +92,7 @@ function createProjects_mame_nl(_target, _subtarget)
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices",
 		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",

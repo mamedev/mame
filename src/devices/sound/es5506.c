@@ -96,7 +96,7 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 #define RAINE_CHECK             0
 
 #if MAKE_WAVS
-#include "wavwrite.h"
+#include "sound/wavwrite.h"
 #endif
 
 

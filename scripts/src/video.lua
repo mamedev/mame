@@ -11,798 +11,798 @@
 
 --------------------------------------------------
 --
---@src/emu/video/315_5124.h,VIDEOS["SEGA315_5124"] = true
+--@src/devices/video/315_5124.h,VIDEOS["SEGA315_5124"] = true
 --------------------------------------------------
 
 if (VIDEOS["SEGA315_5124"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/315_5124.c",
-		MAME_DIR .. "src/emu/video/315_5124.h",
+		MAME_DIR .. "src/devices/video/315_5124.c",
+		MAME_DIR .. "src/devices/video/315_5124.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/315_5313.h,VIDEOS["SEGA315_5313"] = true
+--@src/devices/video/315_5313.h,VIDEOS["SEGA315_5313"] = true
 --------------------------------------------------
 
 if (VIDEOS["SEGA315_5313"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/315_5313.c",
-		MAME_DIR .. "src/emu/video/315_5313.h",
+		MAME_DIR .. "src/devices/video/315_5313.c",
+		MAME_DIR .. "src/devices/video/315_5313.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/bufsprite.h,VIDEOS["BUFSPRITE"] = true
+--@src/devices/video/bufsprite.h,VIDEOS["BUFSPRITE"] = true
 --------------------------------------------------
 
 if (VIDEOS["BUFSPRITE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/bufsprite.c",
-		MAME_DIR .. "src/emu/video/bufsprite.h",
+		MAME_DIR .. "src/devices/video/bufsprite.c",
+		MAME_DIR .. "src/devices/video/bufsprite.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/cdp1861.h,VIDEOS["CDP1861"] = true
+--@src/devices/video/cdp1861.h,VIDEOS["CDP1861"] = true
 --------------------------------------------------
 
 if (VIDEOS["CDP1861"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/cdp1861.c",
-		MAME_DIR .. "src/emu/video/cdp1861.h",
+		MAME_DIR .. "src/devices/video/cdp1861.c",
+		MAME_DIR .. "src/devices/video/cdp1861.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/cdp1862.h,VIDEOS["CDP1862"] = true
+--@src/devices/video/cdp1862.h,VIDEOS["CDP1862"] = true
 --------------------------------------------------
 
 if (VIDEOS["CDP1862"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/cdp1862.c",
-		MAME_DIR .. "src/emu/video/cdp1862.h",
+		MAME_DIR .. "src/devices/video/cdp1862.c",
+		MAME_DIR .. "src/devices/video/cdp1862.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/crt9007.h,VIDEOS["CRT9007"] = true
+--@src/devices/video/crt9007.h,VIDEOS["CRT9007"] = true
 --------------------------------------------------
 
 if (VIDEOS["CRT9007"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/crt9007.c",
-		MAME_DIR .. "src/emu/video/crt9007.h",
+		MAME_DIR .. "src/devices/video/crt9007.c",
+		MAME_DIR .. "src/devices/video/crt9007.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/crt9021.h,VIDEOS["CRT9021"] = true
+--@src/devices/video/crt9021.h,VIDEOS["CRT9021"] = true
 --------------------------------------------------
 
 if (VIDEOS["CRT9021"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/crt9021.c",
-		MAME_DIR .. "src/emu/video/crt9021.h",
+		MAME_DIR .. "src/devices/video/crt9021.c",
+		MAME_DIR .. "src/devices/video/crt9021.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/crt9212.h,VIDEOS["CRT9212"] = true
+--@src/devices/video/crt9212.h,VIDEOS["CRT9212"] = true
 --------------------------------------------------
 
 if (VIDEOS["CRT9212"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/crt9212.c",
-		MAME_DIR .. "src/emu/video/crt9212.h",
+		MAME_DIR .. "src/devices/video/crt9212.c",
+		MAME_DIR .. "src/devices/video/crt9212.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/dl1416.h,VIDEOS["DL1416"] = true
+--@src/devices/video/dl1416.h,VIDEOS["DL1416"] = true
 --------------------------------------------------
 
 if (VIDEOS["DL1416"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/dl1416.c",
-		MAME_DIR .. "src/emu/video/dl1416.h",
+		MAME_DIR .. "src/devices/video/dl1416.c",
+		MAME_DIR .. "src/devices/video/dl1416.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/dm9368.h,VIDEOS["DM9368"] = true
+--@src/devices/video/dm9368.h,VIDEOS["DM9368"] = true
 --------------------------------------------------
 
 if (VIDEOS["DM9368"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/dm9368.c",
-		MAME_DIR .. "src/emu/video/dm9368.h",
+		MAME_DIR .. "src/devices/video/dm9368.c",
+		MAME_DIR .. "src/devices/video/dm9368.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/ef9340_1.h,VIDEOS["EF9340_1"] = true
+--@src/devices/video/ef9340_1.h,VIDEOS["EF9340_1"] = true
 --------------------------------------------------
 
 if (VIDEOS["EF9340_1"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/ef9340_1.c",
-		MAME_DIR .. "src/emu/video/ef9340_1.h",
-		MAME_DIR .. "src/emu/video/ef9341_chargen.h",
+		MAME_DIR .. "src/devices/video/ef9340_1.c",
+		MAME_DIR .. "src/devices/video/ef9340_1.h",
+		MAME_DIR .. "src/devices/video/ef9341_chargen.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/ef9345.h,VIDEOS["EF9345"] = true
+--@src/devices/video/ef9345.h,VIDEOS["EF9345"] = true
 --------------------------------------------------
 
 if (VIDEOS["EF9345"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/ef9345.c",
-		MAME_DIR .. "src/emu/video/ef9345.h",
+		MAME_DIR .. "src/devices/video/ef9345.c",
+		MAME_DIR .. "src/devices/video/ef9345.h",
 	}
 end
 
 --------------------------------------------------
---@src/emu/video/epic12.h,VIDEOS["EPIC12"] = true
+--@src/devices/video/epic12.h,VIDEOS["EPIC12"] = true
 --------------------------------------------------
 
 if (VIDEOS["EPIC12"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/epic12.c",
-		MAME_DIR .. "src/emu/video/epic12.h",
-		MAME_DIR .. "src/emu/video/epic12_blit0.c",
-		MAME_DIR .. "src/emu/video/epic12_blit1.c",
-		MAME_DIR .. "src/emu/video/epic12_blit2.c",
-		MAME_DIR .. "src/emu/video/epic12_blit3.c",
-		MAME_DIR .. "src/emu/video/epic12_blit4.c",
-		MAME_DIR .. "src/emu/video/epic12_blit5.c",
-		MAME_DIR .. "src/emu/video/epic12_blit6.c",
-		MAME_DIR .. "src/emu/video/epic12_blit7.c",
-		MAME_DIR .. "src/emu/video/epic12_blit8.c",
-		MAME_DIR .. "src/emu/video/epic12in.inc",
-		MAME_DIR .. "src/emu/video/epic12pixel.inc",
+		MAME_DIR .. "src/devices/video/epic12.c",
+		MAME_DIR .. "src/devices/video/epic12.h",
+		MAME_DIR .. "src/devices/video/epic12_blit0.c",
+		MAME_DIR .. "src/devices/video/epic12_blit1.c",
+		MAME_DIR .. "src/devices/video/epic12_blit2.c",
+		MAME_DIR .. "src/devices/video/epic12_blit3.c",
+		MAME_DIR .. "src/devices/video/epic12_blit4.c",
+		MAME_DIR .. "src/devices/video/epic12_blit5.c",
+		MAME_DIR .. "src/devices/video/epic12_blit6.c",
+		MAME_DIR .. "src/devices/video/epic12_blit7.c",
+		MAME_DIR .. "src/devices/video/epic12_blit8.c",
+		MAME_DIR .. "src/devices/video/epic12in.inc",
+		MAME_DIR .. "src/devices/video/epic12pixel.inc",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/fixfreq.h,VIDEOS["FIXFREQ"] = true
+--@src/devices/video/fixfreq.h,VIDEOS["FIXFREQ"] = true
 --------------------------------------------------
 
 if (VIDEOS["FIXFREQ"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/fixfreq.c",
-		MAME_DIR .. "src/emu/video/fixfreq.h",
+		MAME_DIR .. "src/devices/video/fixfreq.c",
+		MAME_DIR .. "src/devices/video/fixfreq.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/gf4500.h,VIDEOS["GF4500"] = true
+--@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 
 if (VIDEOS["GF4500"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/gf4500.c",
-		MAME_DIR .. "src/emu/video/gf4500.h",
+		MAME_DIR .. "src/devices/video/gf4500.c",
+		MAME_DIR .. "src/devices/video/gf4500.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/gf7600gs.h,VIDEOS["GF7600GS"] = true
+--@src/devices/video/gf7600gs.h,VIDEOS["GF7600GS"] = true
 --------------------------------------------------
 
 if (VIDEOS["GF7600GS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/gf7600gs.c",
-		MAME_DIR .. "src/emu/video/gf7600gs.h",
+		MAME_DIR .. "src/devices/video/gf7600gs.c",
+		MAME_DIR .. "src/devices/video/gf7600gs.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/h63484.h,VIDEOS["H63484"] = true
+--@src/devices/video/h63484.h,VIDEOS["H63484"] = true
 --------------------------------------------------
 
 if (VIDEOS["H63484"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/h63484.c",
-		MAME_DIR .. "src/emu/video/h63484.h",
+		MAME_DIR .. "src/devices/video/h63484.c",
+		MAME_DIR .. "src/devices/video/h63484.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/hd44102.h,VIDEOS["HD44102"] = true
+--@src/devices/video/hd44102.h,VIDEOS["HD44102"] = true
 --------------------------------------------------
 
 if (VIDEOS["HD44102"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/hd44102.c",
-		MAME_DIR .. "src/emu/video/hd44102.h",
+		MAME_DIR .. "src/devices/video/hd44102.c",
+		MAME_DIR .. "src/devices/video/hd44102.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/hd44352.h,VIDEOS["HD44352"] = true
+--@src/devices/video/hd44352.h,VIDEOS["HD44352"] = true
 --------------------------------------------------
 
 if (VIDEOS["HD44352"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/hd44352.c",
-		MAME_DIR .. "src/emu/video/hd44352.h",
+		MAME_DIR .. "src/devices/video/hd44352.c",
+		MAME_DIR .. "src/devices/video/hd44352.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/hd44780.h,VIDEOS["HD44780"] = true
+--@src/devices/video/hd44780.h,VIDEOS["HD44780"] = true
 --------------------------------------------------
 
 if (VIDEOS["HD44780"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/hd44780.c",
-		MAME_DIR .. "src/emu/video/hd44780.h",
+		MAME_DIR .. "src/devices/video/hd44780.c",
+		MAME_DIR .. "src/devices/video/hd44780.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/hd61830.h,VIDEOS["HD61830"] = true
+--@src/devices/video/hd61830.h,VIDEOS["HD61830"] = true
 --------------------------------------------------
 
 if (VIDEOS["HD61830"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/hd61830.c",
-		MAME_DIR .. "src/emu/video/hd61830.h",
+		MAME_DIR .. "src/devices/video/hd61830.c",
+		MAME_DIR .. "src/devices/video/hd61830.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/hd63484.h,VIDEOS["HD63484"] = true
+--@src/devices/video/hd63484.h,VIDEOS["HD63484"] = true
 --------------------------------------------------
 
 if (VIDEOS["HD63484"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/hd63484.c",
-		MAME_DIR .. "src/emu/video/hd63484.h",
+		MAME_DIR .. "src/devices/video/hd63484.c",
+		MAME_DIR .. "src/devices/video/hd63484.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/hd66421.h,VIDEOS["HD66421"] = true
+--@src/devices/video/hd66421.h,VIDEOS["HD66421"] = true
 --------------------------------------------------
 
 if (VIDEOS["HD66421"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/hd66421.c",
-		MAME_DIR .. "src/emu/video/hd66421.h",
+		MAME_DIR .. "src/devices/video/hd66421.c",
+		MAME_DIR .. "src/devices/video/hd66421.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/huc6202.h,VIDEOS["HUC6202"] = true
+--@src/devices/video/huc6202.h,VIDEOS["HUC6202"] = true
 --------------------------------------------------
 
 if (VIDEOS["HUC6202"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/huc6202.c",
-		MAME_DIR .. "src/emu/video/huc6202.h",
+		MAME_DIR .. "src/devices/video/huc6202.c",
+		MAME_DIR .. "src/devices/video/huc6202.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/huc6260.h,VIDEOS["HUC6260"] = true
+--@src/devices/video/huc6260.h,VIDEOS["HUC6260"] = true
 --------------------------------------------------
 
 if (VIDEOS["HUC6260"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/huc6260.c",
-		MAME_DIR .. "src/emu/video/huc6260.h",
+		MAME_DIR .. "src/devices/video/huc6260.c",
+		MAME_DIR .. "src/devices/video/huc6260.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/huc6261.h,VIDEOS["HUC6261"] = true
+--@src/devices/video/huc6261.h,VIDEOS["HUC6261"] = true
 --------------------------------------------------
 
 if (VIDEOS["HUC6261"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/huc6261.c",
-		MAME_DIR .. "src/emu/video/huc6261.h",
+		MAME_DIR .. "src/devices/video/huc6261.c",
+		MAME_DIR .. "src/devices/video/huc6261.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/huc6270.h,VIDEOS["HUC6270"] = true
+--@src/devices/video/huc6270.h,VIDEOS["HUC6270"] = true
 --------------------------------------------------
 
 if (VIDEOS["HUC6270"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/huc6270.c",
-		MAME_DIR .. "src/emu/video/huc6270.h",
+		MAME_DIR .. "src/devices/video/huc6270.c",
+		MAME_DIR .. "src/devices/video/huc6270.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/huc6272.h,VIDEOS["HUC6272"] = true
+--@src/devices/video/huc6272.h,VIDEOS["HUC6272"] = true
 --------------------------------------------------
 
 if (VIDEOS["HUC6272"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/huc6272.c",
-		MAME_DIR .. "src/emu/video/huc6272.h",
+		MAME_DIR .. "src/devices/video/huc6272.c",
+		MAME_DIR .. "src/devices/video/huc6272.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/i8244.h,VIDEOS["I8244"] = true
+--@src/devices/video/i8244.h,VIDEOS["I8244"] = true
 --------------------------------------------------
 
 if (VIDEOS["I8244"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/i8244.c",
-		MAME_DIR .. "src/emu/video/i8244.h",
+		MAME_DIR .. "src/devices/video/i8244.c",
+		MAME_DIR .. "src/devices/video/i8244.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/i82730.h,VIDEOS["I82730"] = true
+--@src/devices/video/i82730.h,VIDEOS["I82730"] = true
 --------------------------------------------------
 
 if (VIDEOS["I82730"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/i82730.c",
-		MAME_DIR .. "src/emu/video/i82730.h",
+		MAME_DIR .. "src/devices/video/i82730.c",
+		MAME_DIR .. "src/devices/video/i82730.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/i8275.h,VIDEOS["I8275"] = true
+--@src/devices/video/i8275.h,VIDEOS["I8275"] = true
 --------------------------------------------------
 
 if (VIDEOS["I8275"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/i8275.c",
-		MAME_DIR .. "src/emu/video/i8275.h",
+		MAME_DIR .. "src/devices/video/i8275.c",
+		MAME_DIR .. "src/devices/video/i8275.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/m50458.h,VIDEOS["M50458"] = true
+--@src/devices/video/m50458.h,VIDEOS["M50458"] = true
 --------------------------------------------------
 
 if (VIDEOS["M50458"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/m50458.c",
-		MAME_DIR .. "src/emu/video/m50458.h",
+		MAME_DIR .. "src/devices/video/m50458.c",
+		MAME_DIR .. "src/devices/video/m50458.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/mb90082.h,VIDEOS["MB90082"] = true
+--@src/devices/video/mb90082.h,VIDEOS["MB90082"] = true
 --------------------------------------------------
 
 if (VIDEOS["MB90082"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/mb90082.c",
-		MAME_DIR .. "src/emu/video/mb90082.h",
+		MAME_DIR .. "src/devices/video/mb90082.c",
+		MAME_DIR .. "src/devices/video/mb90082.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/mb_vcu.h,VIDEOS["MB_VCU"] = true
+--@src/devices/video/mb_vcu.h,VIDEOS["MB_VCU"] = true
 --------------------------------------------------
 
 if (VIDEOS["MB_VCU"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/mb_vcu.c",
-		MAME_DIR .. "src/emu/video/mb_vcu.h",
+		MAME_DIR .. "src/devices/video/mb_vcu.c",
+		MAME_DIR .. "src/devices/video/mb_vcu.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/mc6845.h,VIDEOS["MC6845"] = true
+--@src/devices/video/mc6845.h,VIDEOS["MC6845"] = true
 --------------------------------------------------
 
 if (VIDEOS["MC6845"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/mc6845.c",
-		MAME_DIR .. "src/emu/video/mc6845.h",
+		MAME_DIR .. "src/devices/video/mc6845.c",
+		MAME_DIR .. "src/devices/video/mc6845.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/mc6847.h,VIDEOS["MC6847"] = true
+--@src/devices/video/mc6847.h,VIDEOS["MC6847"] = true
 --------------------------------------------------
 
 if (VIDEOS["MC6847"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/mc6847.c",
-		MAME_DIR .. "src/emu/video/mc6847.h",
+		MAME_DIR .. "src/devices/video/mc6847.c",
+		MAME_DIR .. "src/devices/video/mc6847.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/msm6222b.h,VIDEOS["MSM6222B"] = true
+--@src/devices/video/msm6222b.h,VIDEOS["MSM6222B"] = true
 --------------------------------------------------
 
 if (VIDEOS["MSM6222B"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/msm6222b.c",
-		MAME_DIR .. "src/emu/video/msm6222b.h",
+		MAME_DIR .. "src/devices/video/msm6222b.c",
+		MAME_DIR .. "src/devices/video/msm6222b.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/msm6255.h,VIDEOS["MSM6255"] = true
+--@src/devices/video/msm6255.h,VIDEOS["MSM6255"] = true
 --------------------------------------------------
 
 if (VIDEOS["MSM6255"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/msm6255.c",
-		MAME_DIR .. "src/emu/video/msm6255.h",
+		MAME_DIR .. "src/devices/video/msm6255.c",
+		MAME_DIR .. "src/devices/video/msm6255.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/mos6566.h,VIDEOS["MOS6566"] = true
+--@src/devices/video/mos6566.h,VIDEOS["MOS6566"] = true
 --------------------------------------------------
 
 if (VIDEOS["MOS6566"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/mos6566.c",
-		MAME_DIR .. "src/emu/video/mos6566.h",
+		MAME_DIR .. "src/devices/video/mos6566.c",
+		MAME_DIR .. "src/devices/video/mos6566.h",
 	}
 end
 
 
 files {	
-	MAME_DIR .. "src/emu/video/cgapal.c",
-	MAME_DIR .. "src/emu/video/cgapal.h",	
+	MAME_DIR .. "src/devices/video/cgapal.c",
+	MAME_DIR .. "src/devices/video/cgapal.h",	
 }
 
 --------------------------------------------------
 --
---@src/emu/video/pc_vga.h,VIDEOS["PC_VGA"] = true
+--@src/devices/video/pc_vga.h,VIDEOS["PC_VGA"] = true
 --------------------------------------------------
 
 if (VIDEOS["PC_VGA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/pc_vga.c",
-		MAME_DIR .. "src/emu/video/pc_vga.h",
-		MAME_DIR .. "src/emu/bus/isa/trident.c",
-		MAME_DIR .. "src/emu/bus/isa/trident.h",
-		MAME_DIR .. "src/emu/video/clgd542x.c",
-		MAME_DIR .. "src/emu/video/blgd542x.h",
+		MAME_DIR .. "src/devices/video/pc_vga.c",
+		MAME_DIR .. "src/devices/video/pc_vga.h",
+		MAME_DIR .. "src/devices/bus/isa/trident.c",
+		MAME_DIR .. "src/devices/bus/isa/trident.h",
+		MAME_DIR .. "src/devices/video/clgd542x.c",
+		MAME_DIR .. "src/devices/video/blgd542x.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/polylgcy.h,VIDEOS["POLY"] = true
+--@src/devices/video/polylgcy.h,VIDEOS["POLY"] = true
 --------------------------------------------------
 
 if (VIDEOS["POLY"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/polylgcy.c",
-		MAME_DIR .. "src/emu/video/polylgcy.h",
+		MAME_DIR .. "src/devices/video/polylgcy.c",
+		MAME_DIR .. "src/devices/video/polylgcy.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/psx.h,VIDEOS["PSX"] = true
+--@src/devices/video/psx.h,VIDEOS["PSX"] = true
 --------------------------------------------------
 
 if (VIDEOS["PSX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/psx.c",
-		MAME_DIR .. "src/emu/video/psx.h",
+		MAME_DIR .. "src/devices/video/psx.c",
+		MAME_DIR .. "src/devices/video/psx.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/ramdac.h,VIDEOS["RAMDAC"] = true
+--@src/devices/video/ramdac.h,VIDEOS["RAMDAC"] = true
 --------------------------------------------------
 
 if (VIDEOS["RAMDAC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/ramdac.c",
-		MAME_DIR .. "src/emu/video/ramdac.h",
+		MAME_DIR .. "src/devices/video/ramdac.c",
+		MAME_DIR .. "src/devices/video/ramdac.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/saa5050.h,VIDEOS["SAA5050"] = true
+--@src/devices/video/saa5050.h,VIDEOS["SAA5050"] = true
 --------------------------------------------------
 
 if (VIDEOS["SAA5050"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/saa5050.c",
-		MAME_DIR .. "src/emu/video/saa5050.h",
+		MAME_DIR .. "src/devices/video/saa5050.c",
+		MAME_DIR .. "src/devices/video/saa5050.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/sed1200.h,VIDEOS["SED1200"] = true
+--@src/devices/video/sed1200.h,VIDEOS["SED1200"] = true
 --------------------------------------------------
 if (VIDEOS["SED1200"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/sed1200.c",
-		MAME_DIR .. "src/emu/video/sed1200.h",
+		MAME_DIR .. "src/devices/video/sed1200.c",
+		MAME_DIR .. "src/devices/video/sed1200.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/sed1330.h,VIDEOS["SED1330"] = true
+--@src/devices/video/sed1330.h,VIDEOS["SED1330"] = true
 --------------------------------------------------
 if (VIDEOS["SED1330"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/sed1330.c",
-		MAME_DIR .. "src/emu/video/sed1330.h",
+		MAME_DIR .. "src/devices/video/sed1330.c",
+		MAME_DIR .. "src/devices/video/sed1330.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/sed1520.h,VIDEOS["SED1520"] = true
+--@src/devices/video/sed1520.h,VIDEOS["SED1520"] = true
 --------------------------------------------------
 if (VIDEOS["SED1520"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/sed1520.c",
-		MAME_DIR .. "src/emu/video/sed1520.h",
+		MAME_DIR .. "src/devices/video/sed1520.c",
+		MAME_DIR .. "src/devices/video/sed1520.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/scn2674.h,VIDEOS["SCN2674"] = true
+--@src/devices/video/scn2674.h,VIDEOS["SCN2674"] = true
 --------------------------------------------------
 if (VIDEOS["SCN2674"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/scn2674.c",
-		MAME_DIR .. "src/emu/video/scn2674.h",
+		MAME_DIR .. "src/devices/video/scn2674.c",
+		MAME_DIR .. "src/devices/video/scn2674.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/snes_ppu.h,VIDEOS["SNES_PPU"] = true
+--@src/devices/video/snes_ppu.h,VIDEOS["SNES_PPU"] = true
 --------------------------------------------------
 if (VIDEOS["SNES_PPU"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/snes_ppu.c",
-		MAME_DIR .. "src/emu/video/snes_ppu.h",
+		MAME_DIR .. "src/devices/video/snes_ppu.c",
+		MAME_DIR .. "src/devices/video/snes_ppu.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/stvvdp1.h,VIDEOS["STVVDP"] = true
---@src/emu/video/stvvdp2.h,VIDEOS["STVVDP"] = true
+--@src/devices/video/stvvdp1.h,VIDEOS["STVVDP"] = true
+--@src/devices/video/stvvdp2.h,VIDEOS["STVVDP"] = true
 --------------------------------------------------
 
 if (VIDEOS["STVVDP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/stvvdp1.c",
-		MAME_DIR .. "src/emu/video/stvvdp2.c",
+		MAME_DIR .. "src/devices/video/stvvdp1.c",
+		MAME_DIR .. "src/devices/video/stvvdp2.c",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/t6a04.h,VIDEOS["T6A04"] = true
+--@src/devices/video/t6a04.h,VIDEOS["T6A04"] = true
 --------------------------------------------------
 
 if (VIDEOS["T6A04"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/t6a04.c",
-		MAME_DIR .. "src/emu/video/t6a04.h",
+		MAME_DIR .. "src/devices/video/t6a04.c",
+		MAME_DIR .. "src/devices/video/t6a04.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/tea1002.h,VIDEOS["TEA1002"] = true
+--@src/devices/video/tea1002.h,VIDEOS["TEA1002"] = true
 --------------------------------------------------
 
 if (VIDEOS["TEA1002"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/tea1002.c",
-		MAME_DIR .. "src/emu/video/tea1002.h",
+		MAME_DIR .. "src/devices/video/tea1002.c",
+		MAME_DIR .. "src/devices/video/tea1002.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/tlc34076.h,VIDEOS["TLC34076"] = true
+--@src/devices/video/tlc34076.h,VIDEOS["TLC34076"] = true
 --------------------------------------------------
 
 if (VIDEOS["TLC34076"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/tlc34076.c",
-		MAME_DIR .. "src/emu/video/tlc34076.h",
+		MAME_DIR .. "src/devices/video/tlc34076.c",
+		MAME_DIR .. "src/devices/video/tlc34076.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/tms34061.h,VIDEOS["TMS34061"] = true
+--@src/devices/video/tms34061.h,VIDEOS["TMS34061"] = true
 --------------------------------------------------
 
 if (VIDEOS["TMS34061"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/tms34061.c",
-		MAME_DIR .. "src/emu/video/tms34061.h",
+		MAME_DIR .. "src/devices/video/tms34061.c",
+		MAME_DIR .. "src/devices/video/tms34061.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/tms3556.h,VIDEOS["TMS3556"] = true
+--@src/devices/video/tms3556.h,VIDEOS["TMS3556"] = true
 --------------------------------------------------
 
 if (VIDEOS["TMS3556"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/tms3556.c",
-		MAME_DIR .. "src/emu/video/tms3556.h",
+		MAME_DIR .. "src/devices/video/tms3556.c",
+		MAME_DIR .. "src/devices/video/tms3556.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/tms9927.h,VIDEOS["TMS9927"] = true
+--@src/devices/video/tms9927.h,VIDEOS["TMS9927"] = true
 --------------------------------------------------
 
 if (VIDEOS["TMS9927"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/tms9927.c",
-		MAME_DIR .. "src/emu/video/tms9927.h",
+		MAME_DIR .. "src/devices/video/tms9927.c",
+		MAME_DIR .. "src/devices/video/tms9927.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/tms9928a.h,VIDEOS["TMS9928A"] = true
+--@src/devices/video/tms9928a.h,VIDEOS["TMS9928A"] = true
 --------------------------------------------------
 
 if (VIDEOS["TMS9928A"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/tms9928a.c",
-		MAME_DIR .. "src/emu/video/tms9928a.h",
+		MAME_DIR .. "src/devices/video/tms9928a.c",
+		MAME_DIR .. "src/devices/video/tms9928a.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/upd3301.h,VIDEOS["UPD3301"] = true
+--@src/devices/video/upd3301.h,VIDEOS["UPD3301"] = true
 --------------------------------------------------
 
 if (VIDEOS["UPD3301"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/upd3301.c",
-		MAME_DIR .. "src/emu/video/upd3301.h",
+		MAME_DIR .. "src/devices/video/upd3301.c",
+		MAME_DIR .. "src/devices/video/upd3301.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/upd7220.h,VIDEOS["UPD7220"] = true
+--@src/devices/video/upd7220.h,VIDEOS["UPD7220"] = true
 --------------------------------------------------
 
 if (VIDEOS["UPD7220"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/upd7220.c",
-		MAME_DIR .. "src/emu/video/upd7220.h",
+		MAME_DIR .. "src/devices/video/upd7220.c",
+		MAME_DIR .. "src/devices/video/upd7220.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/upd7227.h,VIDEOS["UPD7227"] = true
+--@src/devices/video/upd7227.h,VIDEOS["UPD7227"] = true
 --------------------------------------------------
 
 if (VIDEOS["UPD7227"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/upd7227.c",
-		MAME_DIR .. "src/emu/video/upd7227.h",
+		MAME_DIR .. "src/devices/video/upd7227.c",
+		MAME_DIR .. "src/devices/video/upd7227.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/vic4567.h,VIDEOS["VIC4567"] = true
+--@src/devices/video/vic4567.h,VIDEOS["VIC4567"] = true
 --------------------------------------------------
 
 if (VIDEOS["VIC4567"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/vic4567.c",
-		MAME_DIR .. "src/emu/video/vic4567.h",
+		MAME_DIR .. "src/devices/video/vic4567.c",
+		MAME_DIR .. "src/devices/video/vic4567.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/v9938.h,VIDEOS["V9938"] = true
+--@src/devices/video/v9938.h,VIDEOS["V9938"] = true
 --------------------------------------------------
 
 if (VIDEOS["V9938"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/v9938.c",
-		MAME_DIR .. "src/emu/video/v9938.h",
+		MAME_DIR .. "src/devices/video/v9938.c",
+		MAME_DIR .. "src/devices/video/v9938.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/voodoo.h,VIDEOS["VOODOO"] = true
+--@src/devices/video/voodoo.h,VIDEOS["VOODOO"] = true
 --------------------------------------------------
 
 if (VIDEOS["VOODOO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/voodoo.c",
-		MAME_DIR .. "src/emu/video/voodoo.h",
-		MAME_DIR .. "src/emu/video/vooddefs.h",
+		MAME_DIR .. "src/devices/video/voodoo.c",
+		MAME_DIR .. "src/devices/video/voodoo.h",
+		MAME_DIR .. "src/devices/video/vooddefs.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/voodoo_pci.h,VIDEOS["VOODOO_PCI"] = true
+--@src/devices/video/voodoo_pci.h,VIDEOS["VOODOO_PCI"] = true
 --------------------------------------------------
 
 if (VIDEOS["VOODOO_PCI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/voodoo_pci.c",
-		MAME_DIR .. "src/emu/video/voodoo_pci.h",
+		MAME_DIR .. "src/devices/video/voodoo_pci.c",
+		MAME_DIR .. "src/devices/video/voodoo_pci.h",
 	}
 end
 
 --------------------------------------------------
 --
---@src/emu/video/crtc_ega.h,VIDEOS["CRTC_EGA"] = true
+--@src/devices/video/crtc_ega.h,VIDEOS["CRTC_EGA"] = true
 --------------------------------------------------
 
 if (VIDEOS["CRTC_EGA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/video/crtc_ega.c",
-		MAME_DIR .. "src/emu/video/crtc_ega.h",
+		MAME_DIR .. "src/devices/video/crtc_ega.c",
+		MAME_DIR .. "src/devices/video/crtc_ega.h",
 	}
 end

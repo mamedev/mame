@@ -25,6 +25,7 @@ function createProjects_mame_dummy(_target, _subtarget)
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices",
 		MAME_DIR .. "src/mess",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",

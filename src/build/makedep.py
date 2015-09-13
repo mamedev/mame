@@ -10,7 +10,7 @@ import sys
 
 files_included = ['src/emu/emu.h']
 
-include_dirs = ['src/emu/', 'src/mame/', 'src/mess/']
+include_dirs = ['src/emu/', 'src/devices/', 'src/mame/', 'src/mess/']
 
 mappings = dict()
 
@@ -287,6 +287,7 @@ if sys.argv[3]=='target':
     sys.stdout.write('	includedirs {\n')
     sys.stdout.write('		MAME_DIR .. "src/osd",\n')
     sys.stdout.write('		MAME_DIR .. "src/emu",\n')
+	sys.stdout.write('		MAME_DIR .. "src/devices",\n')
     sys.stdout.write('		MAME_DIR .. "src/mame",\n')
     sys.stdout.write('		MAME_DIR .. "src/mess",\n')
     sys.stdout.write('		MAME_DIR .. "src/lib",\n')
