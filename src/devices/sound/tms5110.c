@@ -574,7 +574,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 						fprintf(stderr,"tms5110_process: processing frame: TALKD = 0 caused by stop frame, halting speech.\n");
 #endif
 					m_TALKD = m_TALK; // TALKD is latched from TALK
-					((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
+					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 				}
 				m_subcycle = m_subc_reload;
 				m_PC = 0;
@@ -598,7 +598,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				if (m_IP == 7) // RESETL4
 				{
 					m_TALKD = m_TALK; // TALKD is latched from TALK
-					((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
+					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 				}
 				m_subcycle = m_subc_reload;
 				m_PC = 0;
