@@ -96,7 +96,7 @@ const device_type Z80SCC_CHANNEL = &device_creator<z80scc_channel>;
 const device_type SCC8030  = &device_creator<scc8030_device>;
 const device_type SCC80C30 = &device_creator<scc80C30_device>;
 const device_type SCC80230 = &device_creator<scc80230_device>;
-const device_type SCC8530  = &device_creator<scc8530_device>;
+const device_type SCC8530N = &device_creator<scc8530_device>;  // remove trailing N when 8530scc.c is fully replaced and removed
 const device_type SCC85C30 = &device_creator<scc85C30_device>;
 const device_type SCC85230 = &device_creator<scc85230_device>;
 const device_type SCC85233 = &device_creator<scc85233_device>;
@@ -184,16 +184,16 @@ z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, dev
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80scc_device(mconfig, SCC8530, "SCC 8030", tag, owner, clock, TYPE_SCC8030, "scc8030", __FILE__){ }
+	: z80scc_device(mconfig, SCC8030, "SCC 8030", tag, owner, clock, TYPE_SCC8030, "scc8030", __FILE__){ }
 
 scc80C30_device::scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80scc_device(mconfig, SCC85C30, "SCC 80C30", tag, owner, clock, TYPE_SCC80C30, "scc80C30", __FILE__){ }
+	: z80scc_device(mconfig, SCC80C30, "SCC 80C30", tag, owner, clock, TYPE_SCC80C30, "scc80C30", __FILE__){ }
 
 scc80230_device::scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80scc_device(mconfig, SCC85230, "SCC 80230", tag, owner, clock, TYPE_SCC80230, "scc80230", __FILE__){ }
+	: z80scc_device(mconfig, SCC80230, "SCC 80230", tag, owner, clock, TYPE_SCC80230, "scc80230", __FILE__){ }
 
 scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80scc_device(mconfig, SCC8530, "SCC 8530", tag, owner, clock, TYPE_SCC8530, "scc8530", __FILE__){ }
+	: z80scc_device(mconfig, SCC8530N, "SCC 8530", tag, owner, clock, TYPE_SCC8530, "scc8530", __FILE__){ }
 
 scc85C30_device::scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: z80scc_device(mconfig, SCC85C30, "SCC 85C30", tag, owner, clock, TYPE_SCC85C30, "scc85C30", __FILE__){ }

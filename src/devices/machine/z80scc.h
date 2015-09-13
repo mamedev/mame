@@ -46,7 +46,7 @@
 	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
 
 #define MCFG_SCC8530_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, SCC8530, _clock) \
+	MCFG_DEVICE_ADD(_tag, SCC8530N, _clock) \
 	MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb)
 
 #define MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb) \
@@ -729,7 +729,7 @@ extern const device_type Z80SCC_CHANNEL;
 extern const device_type SCC8030;
 extern const device_type SCC80C30;
 extern const device_type SCC80230;
-extern const device_type SCC8530;
+extern const device_type SCC8530N; // remove trailing N when 8530scc.c is fully replaced and removed
 extern const device_type SCC85C30;
 extern const device_type SCC85230;
 extern const device_type SCC85233;
