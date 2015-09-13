@@ -500,7 +500,6 @@ project "portmidi"
 	kind "StaticLib"
 
 	includedirs {
-		MAME_DIR .. "src/osd",
 		MAME_DIR .. "3rdparty/portmidi/pm_common",
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
