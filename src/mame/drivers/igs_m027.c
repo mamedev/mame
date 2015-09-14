@@ -315,6 +315,79 @@ void igs_m027_state::sdwx_gfx_decrypt()
 static INPUT_PORTS_START( sdwx )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( amazonia )
+	PORT_START("DSW1")
+// Credits proportion
+	PORT_DIPNAME( 0x03, 0x03, "Proporcao Credito" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x03, "10" )
+// (Oponent's ?) credits proportion
+	PORT_DIPNAME( 0x0c, 0x0c, "Proporcao Credito Ele" ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x0c, "10" )
+// Game Percentage
+	PORT_DIPNAME( 0x70, 0x70, "Porcentagem Jogo" ) PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(    0x00, "55%" )
+	PORT_DIPSETTING(    0x40, "60%" )
+	PORT_DIPSETTING(    0x20, "65%" )
+	PORT_DIPSETTING(    0x60, "70%" )
+	PORT_DIPSETTING(    0x10, "75%" )
+	PORT_DIPSETTING(    0x50, "80%" )
+	PORT_DIPSETTING(    0x30, "85%" )
+	PORT_DIPSETTING(    0x70, "90%" )
+// Payment System
+	PORT_DIPNAME( 0x80, 0x80, "Sistema de Pagamento" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPSETTING(    0x80, "Auto" )
+
+
+	PORT_START("DSW2")
+// Demo Song
+	PORT_DIPNAME( 0x01, 0x01, "Demonstracao Musica" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+// End of Game
+	PORT_DIPNAME( 0x02, 0x02, "Fim do Sistema" ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, "10000" )
+// Background color
+	PORT_DIPNAME( 0x04, 0x04, "Cor do Fundo" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "Preto" ) // Black
+	PORT_DIPSETTING(    0x04, "Cor" ) // Coloured
+// Double Percentage
+	PORT_DIPNAME( 0x18, 0x18, "Porcentagem Dobrar" ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x00, "70%" )
+	PORT_DIPSETTING(    0x08, "90%" )
+	PORT_DIPSETTING(    0x10, "80%" )
+	PORT_DIPSETTING(    0x18, "90%" )
+// Language
+	PORT_DIPNAME( 0x20, 0x20, "Idioma" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, "Espanhol" ) // Spanish
+	PORT_DIPSETTING(    0x20, "Portugues" ) // Portuguese
+// Credit Mode
+	PORT_DIPNAME( 0x40, 0x40, "Credit Mode" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, "COIN" )
+	PORT_DIPSETTING(    0x40, "KEYIN" )
+// Panel Mode
+	PORT_DIPNAME( 0x80, 0x80, "Panel Mode" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, "36+10" )
+	PORT_DIPSETTING(    0x80, "28" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
 
 /***************************************************************************
 
@@ -1150,7 +1223,7 @@ DRIVER_INIT_MEMBER(igs_m027_state,amazoni2)
 ***************************************************************************/
 
 GAME( 1999,  slqz3,     0, igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
-GAME( 1999,  amazonia,  0, igs_majhong, sdwx, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
+GAME( 1999,  amazonia,  0, igs_majhong, amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
 GAME( 200?,  fruitpar,  0, igs_majhong, sdwx, igs_m027_state, fruitpar,    ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
 GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 2002,  amazoni2,  0, igs_majhong, sdwx, igs_m027_state, amazoni2,    ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
