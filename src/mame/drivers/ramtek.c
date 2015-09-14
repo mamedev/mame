@@ -135,6 +135,47 @@ MACHINE_CONFIG_END
  ***************************************************************************/
 
 
+ROM_START( vollyrmt )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "ramtek2.e0",     0x0000, 0x0020, CRC(205bf9a1) SHA1(3014d226d8afebc6a52e5adb84f1846dd1c0b01c) )
+ROM_END
+
+ROM_START( hockyrmt )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "ramtek5.g9",     0x0000, 0x0020, CRC(205bf9a1) SHA1(3014d226d8afebc6a52e5adb84f1846dd1c0b01c) )
+ROM_END
+
+ROM_START( soccrrmt )    // maybe Soccer?
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "ramtek3.g8",     0x0000, 0x0020, CRC(f14416f8) SHA1(413f051c73f05c3c5c2ec1dd8620e03c43835e10) )
+ROM_END
+
+ROM_START( wipeormt )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "ramtek6.a4",     0x0000, 0x0020, CRC(205bf9a1) SHA1(3014d226d8afebc6a52e5adb84f1846dd1c0b01c) )
+	ROM_LOAD( "ramtek6.g7",     0x0000, 0x0020, CRC(215437e1) SHA1(635f98d8a890b3ddb72a2f764ef007b5f40fcd7f) )
+ROM_END
+
+// The board number for Clean Sweep is 501082, and the letter to the right would be the revision letter (A, B, C, D).
+// Ramtek had revisions A, B, C, D, noted with a sticker that shows the letter for each specific revision.
+// Revisions A,B,C have been dumped and rom content is the same (only diff is the location of some chips on the rev B pcb)
+ROM_START( cleanswp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "501075.c6",     0x0000, 0x0020, CRC(be02b5f5) SHA1(f1c616a73c6c2915ea3d0252543b0806704ab2e9) )   // shape of paddle
+	ROM_LOAD( "501076.d7",     0x0000, 0x0020, CRC(be40b153) SHA1(07fb64ea8caee601e3e3bd6c69beea619dd0489d) )   // ball control memory
+	ROM_LOAD( "501074.k3",     0x0000, 0x0020, CRC(515a34ba) SHA1(471ca9d99851591ff11a87d18b88871edd7fd268) )   // number character generation
+ROM_END
+
 ROM_START( bballrmt )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -151,19 +192,6 @@ ROM_START( bballrmt )
 	ROM_LOAD( "ramtek.j10",    0x0000, 0x0020, CRC(9e825d0c) SHA1(20c18d152d0b9135cd1fefd62b8bf58d03023529) )
 ROM_END
 
-
-// The board number for Clean Sweep is 501082, and the letter to the right would be the revision letter (A, B, C, D).
-// Ramtek had revisions A, B, C, D, noted with a sticker that shows the letter for each specific revision.
-// Revisions A,B,C have been dumped and rom content is the same (only diff is the location of some chips on the rev B pcb)
-ROM_START( cleanswp )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "501075.c6",     0x0000, 0x0020, CRC(be02b5f5) SHA1(f1c616a73c6c2915ea3d0252543b0806704ab2e9) )   // shape of paddle
-	ROM_LOAD( "501076.d7",     0x0000, 0x0020, CRC(be40b153) SHA1(07fb64ea8caee601e3e3bd6c69beea619dd0489d) )   // ball control memory
-	ROM_LOAD( "501074.k3",     0x0000, 0x0020, CRC(515a34ba) SHA1(471ca9d99851591ff11a87d18b88871edd7fd268) )   // number character generation
-ROM_END
-
 // Knockout - believed to be Knockout - XTAL is 10.733 MHz
 /* contains 4 proms (soldered in) labelled :
 5H - 55030604
@@ -171,32 +199,6 @@ ROM_END
 4B - 550306-02
 3B - 550306-03
 2B - 550306-01 */
-
-ROM_START( ramtek3 )    // maybe Hockey?
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "ramtek3.g8",     0x0000, 0x0020, CRC(f14416f8) SHA1(413f051c73f05c3c5c2ec1dd8620e03c43835e10) )
-ROM_END
-
-
-ROM_START( vollyrmt )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "ramtek2.e0",     0x0000, 0x0020, CRC(205bf9a1) SHA1(3014d226d8afebc6a52e5adb84f1846dd1c0b01c) )
-	// an alt dump exists for this rom labeled as ramtek5.g9 ... was it used on two different PCBs?
-ROM_END
-
-
-ROM_START( wipeormt )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "ramtek6.a4",     0x0000, 0x0020, CRC(205bf9a1) SHA1(3014d226d8afebc6a52e5adb84f1846dd1c0b01c) )
-	ROM_LOAD( "ramtek6.g7",     0x0000, 0x0020, CRC(215437e1) SHA1(635f98d8a890b3ddb72a2f764ef007b5f40fcd7f) )
-ROM_END
-
 
 /***************************************************************************
 
@@ -239,12 +241,10 @@ ROM_START( trivia )
 	ROM_LOAD( "550548.e3",      0x0000, 0x0020, CRC(2b7c6a5e) SHA1(943cc3901c651bfe5bf11a40c27801952731b6de) )
 ROM_END
 
-
-
 GAME( 1973, vollyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1973, hockyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Hockey (Ramtek) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1973, soccrrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Soccer (Ramtek) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1974, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1974, bballrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1974, cleanswp,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Clean Sweep [TTL]", MACHINE_IS_SKELETON )
+GAME( 1974, bballrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1975, trivia,    0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Trivia (Rev B) [TTL]", MACHINE_IS_SKELETON )
-
-GAME( 197?, ramtek3,   0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "unknown Ramtek Game (Maybe Hockey?) [TTL]", MACHINE_IS_SKELETON )
