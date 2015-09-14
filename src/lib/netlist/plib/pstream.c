@@ -14,12 +14,62 @@
 #include "palloc.h"
 
 // -----------------------------------------------------------------------------
+// pistream: input stream
+// -----------------------------------------------------------------------------
+
+bool pistream::readline(pstring &line)
+{
+	UINT8 c = 0;
+	pstringbuffer buf;
+	if (!this->read(c))
+	{
+		line = "";
+		return false;
+	}
+	while (true)
+	{
+		if (c == 10)
+			break;
+		else if (c != 13) /* ignore CR */
+			buf += c;
+		if (!this->read(c))
+			break;
+	}
+	line = buf;
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+// postream: output stream
+// -----------------------------------------------------------------------------
+
+void postream::write(pistream &strm)
+{
+	char buf[1024];
+	unsigned r;
+	while ( !bad() && ((r=strm.read(buf, 1024)) > 0))
+		write(buf, r);
+}
+
+// -----------------------------------------------------------------------------
 // Input file stream
 // -----------------------------------------------------------------------------
 
-pifilestream::pifilestream(const pstring &fname) : pistream(0), m_pos(0)
+pifilestream::pifilestream(const pstring &fname)
+: pistream(0), m_pos(0), m_actually_close(true)
 {
-	m_file = fopen(fname.cstr(), "rb");
+	init(fopen(fname.cstr(), "rb"));
+}
+
+pifilestream::pifilestream(void *file, const bool do_close)
+: pistream(0), m_pos(0), m_actually_close(do_close)
+{
+	init(file);
+}
+
+void pifilestream::init(void *file)
+{
+	m_file = file;
 	if (m_file == NULL)
 	{
 		set_flag(FLAG_ERROR);
@@ -44,8 +94,11 @@ pifilestream::~pifilestream()
 
 void pifilestream::close()
 {
-	fclose((FILE *) m_file);
-	set_flag(FLAG_CLOSED);
+	if (m_actually_close)
+	{
+		fclose((FILE *) m_file);
+		set_flag(FLAG_CLOSED);
+	}
 }
 
 unsigned pifilestream::vread(void *buf, unsigned n)
@@ -89,12 +142,34 @@ pifilestream::pos_type pifilestream::vtell()
 }
 
 // -----------------------------------------------------------------------------
+// pstdin: reads from stdin
+// -----------------------------------------------------------------------------
+
+pstdin::pstdin()
+: pifilestream(stdin, false)
+{
+	/* nothing to do */
+}
+
+// -----------------------------------------------------------------------------
 // Output file stream
 // -----------------------------------------------------------------------------
 
-pofilestream::pofilestream(const pstring &fname) : postream(0), m_pos(0)
+pofilestream::pofilestream(const pstring &fname)
+: postream(0), m_pos(0), m_actually_close(true)
 {
-	m_file = fopen(fname.cstr(), "wb");
+	init(fopen(fname.cstr(), "wb"));
+}
+
+pofilestream::pofilestream(void *file, const bool do_close)
+: postream(0), m_pos(0), m_actually_close(do_close)
+{
+	init(file);
+}
+
+void pofilestream::init(void *file)
+{
+	m_file = file;
 	if (m_file == NULL)
 	{
 		set_flag(FLAG_ERROR);
@@ -118,8 +193,11 @@ pofilestream::~pofilestream()
 
 void pofilestream::close()
 {
-	fclose((FILE *) m_file);
-	set_flag(FLAG_CLOSED);
+	if (m_actually_close)
+	{
+		fclose((FILE *) m_file);
+		set_flag(FLAG_CLOSED);
+	}
 }
 
 void pofilestream::vwrite(const void *buf, unsigned n)
@@ -146,7 +224,7 @@ void pofilestream::vseek(pos_type n)
 	}
 }
 
-pifilestream::pos_type pofilestream::vtell()
+pstream::pos_type pofilestream::vtell()
 {
 	long ret = ftell((FILE *) m_file);
 	if (ret < 0)
@@ -155,6 +233,24 @@ pifilestream::pos_type pofilestream::vtell()
 	}
 	else
 		return ret;
+}
+
+// -----------------------------------------------------------------------------
+// pstderr: write to stderr
+// -----------------------------------------------------------------------------
+
+pstderr::pstderr()
+: pofilestream(stderr, false)
+{
+}
+
+// -----------------------------------------------------------------------------
+// pstdout: write to stdout
+// -----------------------------------------------------------------------------
+
+pstdout::pstdout()
+: pofilestream(stdout, false)
+{
 }
 
 // -----------------------------------------------------------------------------

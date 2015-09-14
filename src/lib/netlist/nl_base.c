@@ -271,7 +271,6 @@ ATTR_COLD net_t *netlist_t::find_net(const pstring &name)
 
 ATTR_COLD void netlist_t::rebuild_lists()
 {
-	//printf("Rebuild Lists\n");
 	for (std::size_t i = 0; i < m_nets.size(); i++)
 		m_nets[i]->rebuild_list();
 }

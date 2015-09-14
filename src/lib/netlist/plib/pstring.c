@@ -376,12 +376,11 @@ pstr_t *pstring_t<F>::salloc(int n)
 		stk = palloc_array(pstack_t<pstr_t *>, 17);
 	pstr_t *p;
 	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
-	unsigned size = sizeof(pstr_t) + (1ULL<<(sn * 2)) + 1;
+	unsigned size = sizeof(pstr_t) + (1<<(sn * 2)) + 1;
 	if (stk[sn].empty())
 		p = (pstr_t *) palloc_array(char, size);
 	else
 	{
-		//printf("%u %u\n", sn, (unsigned) stk[sn].count());
 		p = stk[sn].pop();
 	}
 
@@ -438,25 +437,6 @@ void pstring_t<F>::resetmem()
 // ----------------------------------------------------------------------------------------
 // pstring ...
 // ----------------------------------------------------------------------------------------
-
-const pstring::type_t pstring::vprintf(va_list args) const
-{
-	// sprintf into the temporary buffer
-	char tempbuf[4096];
-	std::vsprintf(tempbuf, cstr(), args);
-
-	return type_t(tempbuf);
-}
-
-
-const pstring::type_t pstring::sprintf(const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	type_t ret = pstring(format).vprintf(ap);
-	va_end(ap);
-	return ret;
-}
 
 template<typename F>
 int pstring_t<F>::find(const pstring_t &search, unsigned start) const
@@ -615,91 +595,6 @@ void pstringbuffer::pcat(const pstring &s)
 	m_len += slen;
 	m_ptr[m_len] = 0;
 }
-
-pfmt::pfmt(const pstring &fmt)
-: m_arg(0)
-{
-	memcpy(m_str, fmt.cstr(), fmt.blen() + 1);
-}
-
-pfmt::pfmt(const char *fmt)
-: m_arg(0)
-{
-	strncpy(m_str, fmt, sizeof(m_str) - 1);
-	m_str[sizeof(m_str) - 1] = 0;
-}
-
-#if 0
-void pformat::format_element(const char *f, const char *l, const char *fmt_spec,  ...)
-{
-	va_list ap;
-	va_start(ap, fmt_spec);
-	char fmt[30] = "%";
-	char search[10] = "";
-	char buf[1024];
-	strcat(fmt, f);
-	strcat(fmt, l);
-	strcat(fmt, fmt_spec);
-	int nl = vsprintf(buf, fmt, ap);
-	m_arg++;
-	int sl = sprintf(search, "%%%d", m_arg);
-	char *p = strstr(m_str, search);
-	if (p != NULL)
-	{
-		// Make room
-		memmove(p+nl, p+sl, strlen(p) + 1 - sl);
-		memcpy(p, buf, nl);
-	}
-	va_end(ap);
-}
-#else
-void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  ...)
-{
-	va_list ap;
-	va_start(ap, fmt_spec);
-	char fmt[30] = "%";
-	char search[10] = "";
-	char buf[1024];
-	m_arg++;
-	int sl = sprintf(search, "{%d:", m_arg);
-	char *p = strstr(m_str, search);
-	if (p == NULL)
-	{
-		sl = sprintf(search, "{%d}", m_arg);
-		p = strstr(m_str, search);
-		if (p == NULL)
-		{
-			sl = 2;
-			p = strstr(m_str, "{}");
-		}
-		strcat(fmt, f);
-	}
-	else
-	{
-		char *p1 = strstr(p, "}");
-		if (p1 != NULL)
-		{
-			sl = p1 - p + 1;
-			if (m_arg>=10)
-				strncat(fmt, p+4, p1 - p - 4);
-			else
-				strncat(fmt, p+3, p1 - p - 3);
-		}
-		else
-			strcat(fmt, f);
-	}
-	strcat(fmt, l);
-	strcat(fmt, fmt_spec);
-	int nl = vsprintf(buf, fmt, ap);
-	if (p != NULL)
-	{
-		// Make room
-		memmove(p+nl, p+sl, strlen(p) + 1 - sl);
-		memcpy(p, buf, nl);
-	}
-	va_end(ap);
-}
-#endif
 
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;

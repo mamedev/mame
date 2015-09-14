@@ -425,7 +425,6 @@ nl_double parser_t::eval_param(const token_t tok)
 	nl_double ret;
 	pstring val;
 
-	//printf("param {1}\n", tok.m_token);
 	for (i=1; i<6;i++)
 		if (tok.str().equals(macs[i]))
 			f = i;

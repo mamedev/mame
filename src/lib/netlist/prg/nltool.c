@@ -19,6 +19,7 @@
 #include "plib/poptions.h"
 #include "plib/pstring.h"
 #include "plib/plists.h"
+#include "plib/ptypes.h"
 #include "nl_setup.h"
 #include "nl_factory.h"
 #include "nl_parser.h"
@@ -122,8 +123,11 @@ public:
 	poption_bool   opt_help;
 };
 
-//Alternative
-//static poption *optlist[] = { &opt_ttr, &opt_logs, &opt_file, &opt_cmd, &opt_verb, &opt_help, NULL };
+pstdout pout_strm;
+pstderr perr_strm;
+
+pstream_fmt_writer_t pout(pout_strm);
+pstream_fmt_writer_t perr(perr_strm);
 
 NETLIST_START(dummy)
 	/* Standard stuff */
@@ -136,39 +140,6 @@ NETLIST_END()
 /***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
-
-pstring filetobuf(pstring fname)
-{
-	pstring pbuf = "";
-
-	if (fname == "-")
-	{
-		char lbuf[1024];
-		while (!feof(stdin))
-		{
-			fgets(lbuf, 1024, stdin);
-			pbuf += lbuf;
-		}
-		printf("%d\n",*(pbuf.right(1).cstr()+1));
-		return pbuf;
-	}
-	else
-	{
-		FILE *f;
-		f = fopen(fname.cstr(), "rb");
-		fseek(f, 0, SEEK_END);
-		long fsize = ftell(f);
-		fseek(f, 0, SEEK_SET);
-
-		char *buf = (char *) malloc(fsize + 1);
-		fread(buf, fsize, 1, f);
-		buf[fsize] = 0;
-		fclose(f);
-		pbuf = buf;
-		free(buf);
-		return pbuf;
-	}
-}
 
 class netlist_tool_t : public netlist::netlist_t
 {
@@ -225,30 +196,9 @@ protected:
 
 	void vlog(const plog_level &l, const pstring &ls) const
 	{
-		switch (l)
-		{
-			case DEBUG:
-			case INFO:
-				break;
-			case VERBOSE:
-				if (m_opts ? m_opts->opt_verb() : false)
-				{
-					printf("%s\n", ls.cstr());
-				}
-				break;
-			case WARNING:
-				if (!(m_opts ? m_opts->opt_quiet() : false))
-				{
-					printf("%s\n", ls.cstr());
-				}
-				break;
-			case ERROR:
-				printf("%s\n", ls.cstr());
-				break;
-			case FATAL:
-				printf("%s\n", ls.cstr());
-				throw;
-		}
+		pout("{}: {}\n", l.name().cstr(), ls.cstr());
+		if (l == plog_level::FATAL)
+			throw;
 	}
 
 private:
@@ -258,14 +208,14 @@ private:
 
 void usage(tool_options_t &opts)
 {
-	fprintf(stderr,
+	perr("{}",
 		"Usage:\n"
 		"  nltool -help\n"
 		"  nltool [options]\n"
 		"\n"
 		"Where:\n"
 	);
-	fprintf(stderr, "%s\n", opts.help().cstr());
+	perr("{}\n", opts.help().cstr());
 }
 
 struct input_t
@@ -336,14 +286,20 @@ static void run(tool_options_t &opts)
 
 	nt.m_opts = &opts;
 	nt.init();
+
+	if (!opts.opt_verb())
+		nt.log().verbose.set_enabled(false);
+	if (opts.opt_quiet())
+		nt.log().warning.set_enabled(false);
+
 	nt.read_netlist(opts.opt_file(), opts.opt_name());
 
 	plist_t<input_t> *inps = read_input(&nt, opts.opt_inp());
 
 	double ttr = opts.opt_ttr();
 
-	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
-	printf("runnning ...\n");
+	pout("startup time ==> {1:5.3f}\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
+	pout("runnning ...\n");
 	t = osd_ticks();
 
 	unsigned pos = 0;
@@ -361,7 +317,7 @@ static void run(tool_options_t &opts)
 	pfree(inps);
 
 	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
-	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
+	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
 }
 
 /*-------------------------------------------------
@@ -446,11 +402,11 @@ int main(int argc, char *argv[])
 	tool_options_t opts;
 	int ret;
 
-	fprintf(stderr, "%s", "WARNING: This is Work In Progress! - It may fail anytime\n");
-	fprintf(stderr, "Update dispatching using method %s\n", pmf_verbose[NL_PMF_TYPE]);
+	perr("{}", "WARNING: This is Work In Progress! - It may fail anytime\n");
+	perr("Update dispatching using method {}\n", pmf_verbose[NL_PMF_TYPE]);
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
-		fprintf(stderr, "Error parsing %s\n", argv[ret]);
+		perr("Error parsing {}\n", argv[ret]);
 		usage(opts);
 		return 1;
 	}
@@ -468,23 +424,44 @@ int main(int argc, char *argv[])
 		run(opts);
 	else if (cmd == "convert")
 	{
-		pstring contents = filetobuf(opts.opt_file());
-		nl_convert_base_t *converter = NULL;
-		if (opts.opt_type().equals("spice"))
-			converter = palloc(nl_convert_spice_t);
+		pstring contents;
+		postringstream ostrm;
+		if (opts.opt_file() == "-")
+		{
+			pstdin f;
+			ostrm.write(f);
+		}
 		else
-			converter = palloc(nl_convert_eagle_t);
-		converter->convert(contents);
+		{
+			pifilestream f(opts.opt_file());
+			ostrm.write(f);
+		}
+		contents = ostrm.str();
+
+		pstring result;
+		if (opts.opt_type().equals("spice"))
+		{
+			nl_convert_spice_t c;
+			c.convert(contents);
+			result = c.result();
+		}
+		else
+		{
+			nl_convert_eagle_t c;
+			c.convert(contents);
+			result = c.result();
+		}
 		/* present result */
-		printf("%s\n", converter->result().cstr());
-		pfree(converter);
+		pout_strm.write(result.cstr());
 	}
 	else
 	{
-		fprintf(stderr, "Unknown command %s\n", cmd.cstr());
+		perr("Unknown command {}\n", cmd.cstr());
 		usage(opts);
 		return 1;
 	}
+
+	pstring::resetmem();
 #if (!PSTANDALONE)
 	}
 	dump_unfreed_mem();

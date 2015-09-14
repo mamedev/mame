@@ -14,9 +14,6 @@
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
 
-#define SOLVER_VERBOSE_OUT(x) do {} while (0)
-//#define SOLVER_VERBOSE_OUT(x) printf x
-
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------

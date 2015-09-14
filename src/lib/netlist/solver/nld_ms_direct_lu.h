@@ -237,7 +237,7 @@ template <unsigned m_N, unsigned _storage_N>
 ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
-		netlist().error("Dimension {1} less than {2}", m_dim, SIZET_PRINTF(nets.size()));
+		netlist().error("Dimension {1} less than {2}", m_dim,nets.size());
 
 	for (unsigned k = 0; k < N(); k++)
 	{

@@ -14,6 +14,7 @@
 #include "pconfig.h"
 #include "pstring.h"
 #include "palloc.h"
+#include "pfmtlog.h"
 
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
@@ -28,7 +29,7 @@ public:
 
 	static const pos_type SEEK_EOF = (pos_type) -1;
 
-	pstream(unsigned flags) : m_flags(flags)
+	pstream(const unsigned flags) : m_flags(flags)
 	{
 	}
 	virtual ~pstream()
@@ -38,7 +39,7 @@ public:
 	bool bad() const { return ((m_flags & FLAG_ERROR) != 0); }
 	bool seekable() const { return ((m_flags & FLAG_SEEKABLE) != 0); }
 
-	void seek(pos_type n)
+	void seek(const pos_type n)
 	{
 		check_seekable();
 		return vseek(n);
@@ -50,7 +51,7 @@ public:
 	}
 
 protected:
-	virtual void vseek(pos_type n) = 0;
+	virtual void vseek(const pos_type n) = 0;
 	virtual pos_type vtell() = 0;
 
 	static const unsigned FLAG_EOF = 0x01;
@@ -60,11 +61,11 @@ protected:
 
 	bool closed() { return ((m_flags & FLAG_CLOSED) != 0); }
 
-	void set_flag(unsigned flag)
+	void set_flag(const unsigned flag)
 	{
 		m_flags |= flag;
 	}
-	void clear_flag(unsigned flag)
+	void clear_flag(const unsigned flag)
 	{
 		m_flags &= ~flag;
 	}
@@ -96,48 +97,28 @@ class pistream : public pstream
 	P_PREVENT_COPYING(pistream)
 public:
 
-	pistream(unsigned flags) : pstream(flags) {}
+	pistream(const unsigned flags) : pstream(flags) {}
 	virtual ~pistream() {}
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0) || bad(); }
 
 	/* this digests linux & dos/windows text files */
 
-	bool readline(pstring &line)
-	{
-		UINT8 c = 0;
-		pstringbuffer buf;
-		if (!this->read(c))
-		{
-			line = "";
-			return false;
-		}
-		while (true)
-		{
-			if (c == 10)
-				break;
-			else if (c != 13) /* ignore CR */
-				buf += c;
-			if (!this->read(c))
-				break;
-		}
-		line = buf;
-		return true;
-	}
+	bool readline(pstring &line);
 
 	bool read(UINT8 &c)
 	{
 		return (read(&c, 1) == 1);
 	}
 
-	unsigned read(void *buf, unsigned n)
+	unsigned read(void *buf, const unsigned n)
 	{
 		return vread(buf, n);
 	}
 
 protected:
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, unsigned n) = 0;
+	virtual unsigned vread(void *buf, const unsigned n) = 0;
 
 private:
 };
@@ -172,14 +153,16 @@ public:
 		write(&c, 1);
 	}
 
-	void write(const void *buf, unsigned n)
+	void write(const void *buf, const unsigned n)
 	{
 		vwrite(buf, n);
 	}
 
+	void write(pistream &strm);
+
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, unsigned n) = 0;
+	virtual void vwrite(const void *buf, const unsigned n) = 0;
 
 private:
 };
@@ -201,8 +184,8 @@ public:
 
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, unsigned n);
-	virtual void vseek(pos_type n);
+	virtual void vwrite(const void *buf, const unsigned n);
+	virtual void vseek(const pos_type n);
 	virtual pos_type vtell();
 
 private:
@@ -225,11 +208,11 @@ public:
 
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, unsigned n)
+	virtual void vwrite(const void *buf, const unsigned n)
 	{
 		m_buf.cat(buf, n);
 	}
-	virtual void vseek(pos_type n) { }
+	virtual void vseek(const pos_type n) { }
 	virtual pos_type vtell() { return m_buf.len(); }
 
 private:
@@ -251,14 +234,40 @@ public:
 	void close();
 
 protected:
+	pofilestream(void *file, const bool do_close);
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, unsigned n);
-	virtual void vseek(pos_type n);
+	virtual void vwrite(const void *buf, const unsigned n);
+	virtual void vseek(const pos_type n);
 	virtual pos_type vtell();
 
 private:
 	void *m_file;
 	pos_type m_pos;
+	bool m_actually_close;
+
+	void init(void *file);
+};
+
+// -----------------------------------------------------------------------------
+// pstderr: write to stderr
+// -----------------------------------------------------------------------------
+
+class pstderr : public pofilestream
+{
+	P_PREVENT_COPYING(pstderr)
+public:
+	pstderr();
+};
+
+// -----------------------------------------------------------------------------
+// pstdout: write to stdout
+// -----------------------------------------------------------------------------
+
+class pstdout : public pofilestream
+{
+	P_PREVENT_COPYING(pstdout)
+public:
+	pstdout();
 };
 
 // -----------------------------------------------------------------------------
@@ -276,6 +285,8 @@ public:
 	void close();
 
 protected:
+	pifilestream(void *file, const bool do_close);
+
 	/* read up to n bytes from stream */
 	virtual unsigned vread(void *buf, unsigned n);
 	virtual void vseek(pos_type n);
@@ -284,6 +295,21 @@ protected:
 private:
 	void *m_file;
 	pos_type m_pos;
+	bool m_actually_close;
+
+	void init(void *file);
+};
+
+// -----------------------------------------------------------------------------
+// pstdin: reads from stdin
+// -----------------------------------------------------------------------------
+
+class pstdin : public pifilestream
+{
+	P_PREVENT_COPYING(pstdin)
+public:
+
+	pstdin();
 };
 
 // -----------------------------------------------------------------------------
