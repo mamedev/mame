@@ -18,11 +18,13 @@ public:
 
 	virtual void ExecCommand();
 	virtual void ReadData( UINT8 *data, int dataLength );
+	virtual void WriteData( UINT8 *data, int dataLength );
 	void device_start();
 
 private:
 	required_device<harddisk_image_device> m_image0;
 	required_device<harddisk_image_device> m_image1;
+	hard_disk_info m_param[2];
 };
 
 extern const device_type OMTI5100;

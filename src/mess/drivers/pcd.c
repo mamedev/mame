@@ -4,7 +4,7 @@
 
     Siemens PC-D
 
-    Skeleton driver
+    For PC-X HDD should have 306,4,9 chs at 1024Bps or 17 at 512Bps
 
 ***************************************************************************/
 
@@ -41,7 +41,8 @@ public:
 	m_scsi(*this, "scsi"),
 	m_scsi_data_out(*this, "scsi_data_out"),
 	m_scsi_data_in(*this, "scsi_data_in"),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram"),
+	m_req_hack(NULL)
 	{ }
 
 	DECLARE_READ8_MEMBER( irq_callback );
@@ -94,12 +95,15 @@ private:
 	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
 	emu_timer *m_req_hack;
 	UINT16 m_dskctl;
+	bool m_sound;
 	struct {
 		UINT16 ctl;
 		UINT16 regs[1024];
 		int type;
 		bool sc;
 	} m_mmu;
+
+	void check_scsi_irq();
 };
 
 
@@ -148,7 +152,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( pcd_state::timer0_tick )
 
 WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 {
-	m_speaker->level_w(state);
+	if(m_dskctl & 0x20)
+		m_speaker->level_w(state);
 }
 
 READ8_MEMBER( pcd_state::nmi_io_r )
@@ -242,7 +247,7 @@ WRITE8_MEMBER( pcd_state::led_w )
 READ16_MEMBER( pcd_state::mmu_r )
 {
 	UINT16 data = m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)];
-	logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
+	//logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
 		return m_mmu.ctl;
 	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
@@ -257,7 +262,7 @@ READ16_MEMBER( pcd_state::mmu_r )
 
 WRITE16_MEMBER( pcd_state::mmu_w )
 {
-	logerror("%s: mmu write %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
+	//logerror("%s: mmu write %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
 		m_mmu.ctl = data;
 	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
@@ -298,11 +303,7 @@ WRITE8_MEMBER(pcd_state::scsi_w)
 		case 0:
 			m_scsi_data_out->write(data);
 			m_scsi->write_ack(1);
-			if(m_cd)
-			{
-				m_maincpu->drq0_w(0);
-				m_req_hack->adjust(attotime::never);
-			}
+			m_maincpu->drq0_w(0);
 			break;
 		case 1:
 			if(data & 4)
@@ -327,6 +328,11 @@ WRITE8_MEMBER(pcd_state::scsi_w)
 	}
 }
 
+void pcd_state::check_scsi_irq()
+{
+	m_pic1->ir5_w(m_io && m_cd && m_req);
+}
+
 WRITE_LINE_MEMBER(pcd_state::write_scsi_bsy)
 {
 	m_bsy = state ? 1 : 0;
@@ -335,10 +341,14 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_bsy)
 WRITE_LINE_MEMBER(pcd_state::write_scsi_cd)
 {
 	m_cd = state ? 1 : 0;
+	check_scsi_irq();
 }
 WRITE_LINE_MEMBER(pcd_state::write_scsi_io)
 {
 	m_io = state ? 1 : 0;
+	if(state)
+		m_scsi_data_out->write(0);
+	check_scsi_irq();
 }
 WRITE_LINE_MEMBER(pcd_state::write_scsi_msg)
 {
@@ -362,7 +372,12 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 		}
 	}
 	else
+	{
+		if(m_req_hack) // this might be called before machine_start
+			m_req_hack->adjust(attotime::never);
 		m_scsi->write_ack(0);
+	}
+	check_scsi_irq();
 }
 
 WRITE16_MEMBER(pcd_state::mem_w)
@@ -430,7 +445,7 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xf900, 0xf903) AM_DEVREADWRITE8("fdc", wd2793_t, read, write, 0xffff)
 	AM_RANGE(0xf904, 0xf905) AM_READWRITE(dskctl_r, dskctl_w)
 	AM_RANGE(0xf940, 0xf943) AM_READWRITE8(scsi_r, scsi_w, 0xffff)
-	AM_RANGE(0xf980, 0xf98f) AM_DEVICE("video", pcdx_video_device, map)
+	AM_RANGE(0xf980, 0xf9bf) AM_DEVICE("video", pcdx_video_device, map)
 	AM_RANGE(0xf9c0, 0xf9c3) AM_DEVREADWRITE8("usart1",mc2661_device,read,write,0xffff)  // UARTs
 	AM_RANGE(0xf9d0, 0xf9d3) AM_DEVREADWRITE8("usart2",mc2661_device,read,write,0xffff)
 	AM_RANGE(0xf9e0, 0xf9e3) AM_DEVREADWRITE8("usart3",mc2661_device,read,write,0xffff)

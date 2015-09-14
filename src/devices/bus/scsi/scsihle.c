@@ -183,6 +183,10 @@ void scsihle_device::scsibus_read_data()
 
 void scsihle_device::scsibus_write_data()
 {
+	data_last = (bytes_left >= m_sector_bytes) ? m_sector_bytes : bytes_left;
+
+	LOG(2,"SCSIBUS:scsibus_write_data bytes_left=%04X, data_last=%04X\n",bytes_left,data_last);
+
 	if (data_last > 0)
 	{
 		WriteData(buffer, data_last);
