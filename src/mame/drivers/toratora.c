@@ -439,6 +439,36 @@ ROM_START( toratora )
 	ROM_LOAD( "tora.u11", 0xf800, 0x0800, CRC(55135d6f) SHA1(c48f180a9d6e894aafe87b2daf74e9a082f4600e) )
 ROM_END
 
+/* Tora Tora? Game Plan?
+Etched in copper on top of board		20-00047C
+						20-10051A
+
+Etched in copper on back of daughter board	20-00048C
+						20-10052A
+
+ROM text showed		TORA TOR*		* was A with bit 7 set
+			1980 GAME PLAN,INC
+
+and  war stuff (PLANE, BOMB, SQUAD, etc)
+
+.u2	2716	handwritten sticker	U-2
+.u9	2716	handwritten sticker	U-9
+.u10	2716	handwritten sticker	U-10
+.u11	2716	handwritten sticker	U-11
+
+open 24 pin socket @ U1 and U3
+open 40 pin socket @ U42
+
+Main board
+crystal with 5 185 on the top
+5280	x8
+socketed	ds8833	x2
+socketed	ds8t28	x2
+
+Daughter board
+open 40 pin socket @ U3 @ U2
+76477	X2 */
+
 ROM_START( toratorab )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1027.u1",  0x1000, 0x0800, BAD_DUMP CRC(413c743a) SHA1(a887dfaaee557327a1699bb424488b934dab8612) ) /* rom u1 is missing in this set, using the toratora one */
