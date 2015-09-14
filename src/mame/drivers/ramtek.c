@@ -149,11 +149,12 @@ ROM_START( hockyrmt )
 	ROM_LOAD( "ramtek5.g9",     0x0000, 0x0020, CRC(205bf9a1) SHA1(3014d226d8afebc6a52e5adb84f1846dd1c0b01c) )
 ROM_END
 
-ROM_START( soccrrmt )    // maybe Soccer?
+ROM_START( soccrrmt )    // Soccer, missing a ROM
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
 	ROM_LOAD( "ramtek3.g8",     0x0000, 0x0020, CRC(f14416f8) SHA1(413f051c73f05c3c5c2ec1dd8620e03c43835e10) )
+	ROM_LOAD( "ramtek3.b3",     0x0000, 0x0020, NO_DUMP)
 ROM_END
 
 ROM_START( wipeormt )
