@@ -2215,7 +2215,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 16, pc9801_state )
-	AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
+//	AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x0da000, 0x0dbfff) AM_RAM // ide ram
 	AM_RANGE(0xee0000, 0xefffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
@@ -2421,7 +2421,7 @@ static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffffffff)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE16(grcg_gvram_r, grcg_gvram_w, 0xffffffff)
 	AM_RANGE(0x000cc000, 0x000cdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
-	AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
+//	AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x000da000, 0x000dbfff) AM_RAM // ide ram
 	AM_RANGE(0x000e0000, 0x000e7fff) AM_READWRITE16(grcg_gvram0_r,grcg_gvram0_w, 0xffffffff)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_READ8(pc9801rs_ipl_r, 0xffffffff)
@@ -2689,6 +2689,9 @@ static INPUT_PORTS_START( pc9801rs )
 
 	PORT_MODIFY("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x04, 0x04, "Load IDE BIOS" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 
 //  PORT_START("SOUND_CONFIG")
 //  PORT_CONFNAME( 0x01, 0x00, "Sound Type" )
@@ -3121,6 +3124,11 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
 //  m_has_opna = ioport("SOUND_CONFIG")->read() & 1;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
+
+	if(!(ioport("ROM_LOAD")->read() & 4))
+		m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
+	else
+		m_maincpu->space(AS_PROGRAM).unmap_read(0xd8000, 0xd9fff);
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
@@ -3437,7 +3445,6 @@ MACHINE_CONFIG_END
 	ROM_IGNORE( 0x2000 ) \
 	ROM_IGNORE( 0x2000 ) \
 	ROM_IGNORE( 0x2000 ) \
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
 
 // all of these are half size :/
 #define LOAD_KANJI_ROMS \

@@ -71,6 +71,7 @@ public:
 	DECLARE_READ8_MEMBER(vram_latch_r);
 	DECLARE_WRITE8_MEMBER(vram_latch_w);
 	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_WRITE8_MEMBER(p1_w);
 
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -86,7 +87,7 @@ private:
 	required_region_ptr<UINT8> m_charrom;
 	required_device<pic8259_device> m_pic2;
 	devcb_write_line m_txd_handler;
-	UINT8 m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2];
+	UINT8 m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2], m_p1;
 };
 
 extern const device_type PCD_VIDEO;

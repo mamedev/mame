@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( pcx_vid_io, AS_IO, 8, pcx_video_device )
 	AM_RANGE(0xa000, 0xa001) AM_READWRITE(vram_latch_r, vram_latch_w)
 	AM_RANGE(0xa002, 0xa003) AM_READWRITE(term_mcu_r, term_mcu_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP // revisit this
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcx_vram, AS_0, 8, pcx_video_device )
@@ -174,6 +174,8 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	data = m_charrom[m_vram[address] * 16 + linecount + (m_vram[address + 1] & 0x20 ? 4096 : 0)];
 	if(cursor && blink)
 		data = 0xff;
+	if(m_p1 & 0x20)
+		data = ~data;
 	for(int i = 0; i < 8; i++)
 		bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
 }
@@ -297,6 +299,11 @@ WRITE8_MEMBER(pcdx_video_device::detect_w)
 READ8_MEMBER(pcx_video_device::unk_r)
 {
 	return 0x80;
+}
+
+WRITE8_MEMBER(pcx_video_device::p1_w)
+{
+	m_p1 = data;
 }
 
 void pcd_video_device::device_start()

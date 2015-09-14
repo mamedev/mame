@@ -95,7 +95,6 @@ private:
 	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
 	emu_timer *m_req_hack;
 	UINT16 m_dskctl;
-	//bool m_sound;
 	struct {
 		UINT16 ctl;
 		UINT16 regs[1024];
