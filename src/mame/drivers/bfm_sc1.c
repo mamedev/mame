@@ -3108,7 +3108,7 @@ GAME( 1988, sc1lotusa       , sc1lotus  , scorpion1         , scorpion1 , bfm_sc
 GAME( 1988, sc1roul         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, rou029         , 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
 
 // PROJECT NUMBER 6045       ARMADA          GAME No 39-370-729  - 28-AUG-1992 14:37:00
-GAME( 198?, sc1armad        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Armada (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1armad        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Armada (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 6043       CALYPSO         GAME No 39-370-754  - 08-DEC-1992 13:20:00
 GAME( 198?, sc1calyp        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Calypso (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
@@ -3147,7 +3147,7 @@ GAME( 198?, sc1copdd        , 0         , scorpion1         , scorpion1 , bfm_sc
 GAME( 198?, sc1disc         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Discovey (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 5956  FLASH      GAME No 95-750-771 - 17-JUN-1996 09:30:53
-GAME( 198?, sc1flash        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Flash (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1flash        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Flash (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 5391  FRUIT LINES  GAME No 39-370-653 - 30-JUL-1992 09:31:10
 GAME( 198?, sc1fruit        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
