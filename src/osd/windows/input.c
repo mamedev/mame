@@ -179,6 +179,7 @@ static get_rawinput_device_list_ptr     get_rawinput_device_list;
 static get_rawinput_data_ptr            get_rawinput_data;
 static get_rawinput_device_info_ptr     get_rawinput_device_info;
 static register_rawinput_devices_ptr    register_rawinput_devices;
+static bool                             global_inputs_enabled;
 
 // keyboard states
 static bool                 keyboard_win32_reported_key_down;
@@ -529,8 +530,6 @@ void windows_osd_interface::input_exit()
 
 void wininput_poll(running_machine &machine)
 {
-	bool hasfocus = winwindow_has_focus() && input_enabled;
-
 	// ignore if not enabled
 	if (input_enabled)
 	{
@@ -545,9 +544,11 @@ void wininput_poll(running_machine &machine)
 		mouse_enabled = machine.input().device_class(DEVICE_CLASS_MOUSE).enabled();
 		lightgun_enabled = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).enabled();
 	}
-
+	
+	bool polldevices = input_enabled && (global_inputs_enabled || winwindow_has_focus());
+	
 	// poll all of the devices
-	if (hasfocus)
+	if (polldevices)
 	{
 		device_list_poll_devices(keyboard_list);
 		device_list_poll_devices(mouse_list);
@@ -1744,13 +1745,28 @@ static void rawinput_init(running_machine &machine)
 			rawinput_mouse_enum(machine, device);
 	}
 
+	// don't enable global inputs when testing direct input or debugging
+	if (!FORCE_DIRECTINPUT && !machine.options().debug())
+	{
+		global_inputs_enabled = downcast<windows_options &>(machine.options()).global_inputs();
+	}
+	
 	// finally, register to receive raw input WM_INPUT messages
 	regcount = 0;
 	if (keyboard_list != NULL)
 	{
 		reglist[regcount].usUsagePage = 0x01;
 		reglist[regcount].usUsage = 0x06;
-		reglist[regcount].dwFlags = RIDEV_INPUTSINK;
+		
+		if (global_inputs_enabled)
+		{
+			reglist[regcount].dwFlags = 0x00000100;
+		}
+		else
+		{
+			reglist[regcount].dwFlags = 0;
+		}
+		
 		reglist[regcount].hwndTarget = win_window_list->m_hwnd;
 		regcount++;
 	}
@@ -1758,7 +1774,16 @@ static void rawinput_init(running_machine &machine)
 	{
 		reglist[regcount].usUsagePage = 0x01;
 		reglist[regcount].usUsage = 0x02;
-		reglist[regcount].dwFlags = 0;
+		
+		if (global_inputs_enabled)
+		{
+			reglist[regcount].dwFlags = 0x00000100;
+		}
+		else
+		{
+			reglist[regcount].dwFlags = 0;
+		}
+		
 		reglist[regcount].hwndTarget = win_window_list->m_hwnd;
 		regcount++;
 	}
