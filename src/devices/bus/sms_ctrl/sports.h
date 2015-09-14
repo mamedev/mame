@@ -53,8 +53,13 @@ private:
 
 	UINT8 m_read_state;
 	UINT8 m_last_data;
+	UINT8 m_x_axis_reset_value;
+	UINT8 m_y_axis_reset_value;
 	const attotime m_interval;
-	attotime m_last_time;
+	emu_timer *m_sportspad_timer;
+	static const device_timer_id TIMER_SPORTSPAD = 0;
+
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

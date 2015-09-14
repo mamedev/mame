@@ -131,7 +131,7 @@ protected:
 	int              m_pending_reg_write;
 	int              m_pending_sprcol_x;
 	UINT8            m_buffer;
-	bool             m_sega315_5124_compatibility_mode;    /* Shrunk SMS screen on GG lcd mode flag */
+	bool             m_sega315_5124_compatibility_mode;    /* when true, GG VDP behaves as SMS VDP */
 	int              m_irq_state;                /* The status of the IRQ line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */

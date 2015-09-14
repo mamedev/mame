@@ -17,12 +17,13 @@
  - SIO interface for Game Gear (needs netplay, I guess)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
    that has homebrew software support
- - Rapid button of Japanese Master System
- - Verify if disabling of the SN76489 PSG chip is possible on sms1krfm console
- - Keyboard support for Sega Mark III (sg1000m3 driver)
+ - Sega SK-1100 keyboard support for Sega Mark III (sg1000m3 driver)
  - Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon
- - Mark III expansion slot, used by keyboard and FM module
+ - Mark III expansion slot, used by keyboard and FM Sound Unit
+ - Verify if the SN76489 chip can be disabled on sg1000m3 and sms1krfm consoles
+ - Rapid button of smsj, sms1krfm and sms1kr consoles
  - Software compatibility flags, by region and/or BIOS
+ - Samsung modem for Gam*Boy Securities Information Service System
  - Sega Demo Unit II (kiosk expansion device)
  - SMS 8 slot game changer (kiosk expansion device)
  - SMS Disk System (floppy disk drive expansion device) - unreleased

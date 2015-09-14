@@ -36,6 +36,12 @@ A scanline contains the following sections:
   - right blanking      8  87-8B
   - horizontal sync    17  8B-93   => HSYNC low
 
+  Although the processing done for a section happens when HCount is in the
+  specified range (e.g. 00-7F for active display), probably there is a delay
+  until its signal is shown on screen, as happens on the TMS9918 chip
+  according to this timing diagram:
+      http://www.smspower.org/Development/TMS9918MasterTimingDiagram
+
 
 NTSC frame timing
                        256x192         256x224        256x240 (doesn't work on real hardware)
@@ -911,7 +917,7 @@ void sega315_5124_device::select_sprites( int line )
 
 			if (sprite_y >= 240)
 			{
-				sprite_y -= 256;
+				sprite_y -= 256; /* wrap from top if y position is >= 240 */
 			}
 
 			if (m_sprite_zoom > 1)
@@ -927,15 +933,9 @@ void sega315_5124_device::select_sprites( int line )
 					int sprite_tile_selected = space().read_byte( m_sprite_base + sprite_index + 2 );
 					UINT8 flags = space().read_byte( m_sprite_base + sprite_index + 3 );
 
-					if (flags & 0x80)
-						sprite_x -= 32;
-
 					int sprite_line = parse_line - sprite_y;
 
-					if (m_reg[0x01] & 0x01)
-						sprite_line >>= 1;
-
-					if (m_reg[0x01] & 0x02)
+					if (m_sprite_height == 16)
 					{
 						sprite_tile_selected &= 0xfc;
 
@@ -971,7 +971,7 @@ void sega315_5124_device::select_sprites( int line )
 
 			if (sprite_y >= 240)
 			{
-				sprite_y -= 256; /* wrap from top if y position is > 240 */
+				sprite_y -= 256; /* wrap from top if y position is >= 240 */
 			}
 
 			if (m_sprite_zoom > 1)
@@ -996,7 +996,7 @@ void sega315_5124_device::select_sprites( int line )
 						sprite_tile_selected += 256; /* pattern table select */
 					}
 
-					if (m_reg[0x01] & 0x02)
+					if (m_sprite_height == 16)
 					{
 						sprite_tile_selected &= 0x01fe; /* force even index */
 					}
@@ -1148,11 +1148,13 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 	for (int sprite_buffer_index = m_sprite_count - 1; sprite_buffer_index >= 0; sprite_buffer_index--)
 	{
 		int sprite_x = m_sprite_x[sprite_buffer_index];
+		int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
+		UINT16 sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
 		UINT8 flags = m_sprite_flags[sprite_buffer_index];
 		int pen_selected = m_palette_offset + ( flags & 0x0f );
 
-		int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
-		UINT16 sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
+		if (flags & 0x80)
+			sprite_x -= 32;
 
 		for (int height = 8; height <= m_sprite_height; height += 8)
 		{

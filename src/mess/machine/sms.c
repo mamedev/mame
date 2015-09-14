@@ -1352,18 +1352,20 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 	const int sms_min_y = visarea_ycenter - sms_offset_min_y;
 
 	int sms_y = sms_min_y;
-	int plot_y_group = plot_y_first_group;
+	int y_min_i = plot_min_y - plot_y_first_group;
 
 	/* Auxiliary variable for vertical scaling */
 	int sms_y2 = sms_y - 1;
 
-	for (int plot_y = plot_min_y; plot_y <= plot_max_y;)
+	for (int plot_y_group = plot_y_first_group; plot_y_group <= plot_max_y; plot_y_group += 2)
 	{
-		for (int i = (plot_y - plot_y_group); i <= MIN(1, plot_max_y - plot_y_group); i++)
+		const int y_max_i = MIN(1, plot_max_y - plot_y_group);
+
+		for (int y_i = y_min_i; y_i <= y_max_i; y_i++)
 		{
 			/* Include additional lines that have influence over what appears on the LCD */
-			const int sms_min_y2 = sms_y + i - 1;
-			const int sms_max_y2 = sms_y + i + 2;
+			const int sms_min_y2 = sms_y + y_i - 1;
+			const int sms_max_y2 = sms_y + y_i + 2;
 
 			/* Process lines, but skip those already processed before */
 			for (sms_y2 = MAX(sms_min_y2, sms_y2); sms_y2 <= sms_max_y2; sms_y2++)
@@ -1375,39 +1377,37 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 					UINT32 *vdp_buffer =  &vdp_bitmap.pix32(sms_y2);
 
 					int sms_x = sms_min_x;
-					int plot_x_group = plot_x_first_group;
+					int x_min_i = plot_min_x - plot_x_first_group;
 
 					/* Do horizontal scaling */
-					for (int plot_x = plot_min_x; plot_x <= plot_max_x;)
+					for (int plot_x_group = plot_x_first_group; plot_x_group <= plot_max_x; plot_x_group += 2)
 					{
-						for (int j = (plot_x - plot_x_group); j <= MIN(1, plot_max_x - plot_x_group); j++)
-						{
-							if (sms_x + j >= vdp_bitmap.cliprect().min_x && sms_x + j + 1 <= vdp_bitmap.cliprect().max_x)
-							{
-								int combined;
+						const int x_max_i = MIN(1, plot_max_x - plot_x_group);
 
-								switch (j)
+						for (int x_i = x_min_i; x_i <= x_max_i; x_i++)
+						{
+							int combined = 0;
+
+							if (sms_x + x_i >= vdp_bitmap.cliprect().min_x && sms_x + x_i + 1 <= vdp_bitmap.cliprect().max_x)
+							{
+								switch (x_i)
 								{
 								case 0:
 									/* Take red and green from first pixel, and blue from second pixel */
 									combined = (vdp_buffer[sms_x] & 0x00ffff00) | (vdp_buffer[sms_x + 1] & 0x000000ff);
-									combineline_buffer[plot_x] = combined;
 									break;
 								case 1:
 									/* Take red from second pixel, and green and blue from third pixel */
 									combined = (vdp_buffer[sms_x + 1] & 0x00ff0000) | (vdp_buffer[sms_x + 2] & 0x0000ffff);
-									combineline_buffer[plot_x + 1] = combined;
 									break;
 								}
 							}
-							else
-							{
-								combineline_buffer[plot_x + j] = 0;
-							}
+
+							combineline_buffer[plot_x_group + x_i] = combined;
 						}
+
 						sms_x += 3;
-						plot_x += 2 - (plot_x - plot_x_group);
-						plot_x_group = plot_x;
+						x_min_i = 0;
 					}
 				}
 				else
@@ -1432,29 +1432,31 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 				int *line1, *line2, *line3, *line4;
 
 				/* Setup our source lines */
-				line1 = m_line_buffer + ((sms_y + i - 1) & 0x03) * 160;
-				line2 = m_line_buffer + ((sms_y + i - 0) & 0x03) * 160;
-				line3 = m_line_buffer + ((sms_y + i + 1) & 0x03) * 160;
-				line4 = m_line_buffer + ((sms_y + i + 2) & 0x03) * 160;
+				line1 = m_line_buffer + ((sms_y + y_i - 1) & 0x03) * 160;
+				line2 = m_line_buffer + ((sms_y + y_i - 0) & 0x03) * 160;
+				line3 = m_line_buffer + ((sms_y + y_i + 1) & 0x03) * 160;
+				line4 = m_line_buffer + ((sms_y + y_i + 2) & 0x03) * 160;
 
-				UINT32 *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y + i, visarea.min_x);
+				UINT32 *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y_group + y_i, visarea.min_x);
 
 				for (int plot_x = plot_min_x; plot_x <= plot_max_x; plot_x++)
 				{
-					rgb_t   c1 = line1[plot_x];
-					rgb_t   c2 = line2[plot_x];
-					rgb_t   c3 = line3[plot_x];
-					rgb_t   c4 = line4[plot_x];
+					rgb_t c1 = line1[plot_x];
+					rgb_t c2 = line2[plot_x];
+					rgb_t c3 = line3[plot_x];
+					rgb_t c4 = line4[plot_x];
 					p_bitmap[plot_x] =
-						rgb_t( ( c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
-								( c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
-								( c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 ) );
+						rgb_t(
+							( c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
+							( c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
+							( c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 )
+						);
 				}
 			}
 		}
+
 		sms_y += 3;
-		plot_y += 2 - (plot_y - plot_y_group);
-		plot_y_group = plot_y;
+		y_min_i = 0;
 	}
 }
 
