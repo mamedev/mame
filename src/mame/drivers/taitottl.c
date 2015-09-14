@@ -7,14 +7,14 @@
 
  Game Name(s)                                                      Part #'s       Data      PROM/ROM Chip Numbers
  ----------------------------------------------------------------+--------------+---------+---------------------------------------
- Astro Race (11/1973) (clone of Atari's Space Race)                               UNKNOWN
  Anti-Aircraft (1975) (clone of Atari's Anti-Aircraft)                            YES
+ Astro Race (11/1973) (clone of Atari's Space Race)                               UNKNOWN
  Attack (09/1976)                                                                 UNKNOWN
  Attack UFO (08/1974)                                                             UNKNOWN
  Avenger (??/1976) (clone of Electra's Avenger)                                   YES
- Ball Park/TT Ball Park (??/1974)  (clone of Midway's Ball Park)                  YES
+ Ball Park/TT Ball Park (??/1974) (clone of Midway's Ball Park)                  YES
  Basketball (04/1974) (clone of Midway's TV Basketball)                           YES
- Bombs Away (??/1977)  (clone of Meadows' Bombs Away)                             YES
+ Bombs Away (??/1977) (clone of Meadows' Bombs Away)                             YES
  Cisco/Fisco 400 (04/1977)                                                        UNKNOWN
  Clean Sweep (??/1976) (clone of Ramtek's Clean Sweep)                            YES
  Clean Sweep II (??/1976) (clone of Ramtek's Clean Sweep)                         YES
