@@ -2366,6 +2366,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/z80sio.h,MACHINES["Z80SIO"] = true
+---------------------------------------------------
+
+if (MACHINES["Z80SIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/z80sio.c",
+		MAME_DIR .. "src/devices/machine/z80sio.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/z80scc.h,MACHINES["Z80SCC"] = true
+---------------------------------------------------
+
+if (MACHINES["Z80SCC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/z80scc.c",
+		MAME_DIR .. "src/devices/machine/z80scc.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/z80dma.h,MACHINES["Z80DMA"] = true
 ---------------------------------------------------
 
