@@ -45,13 +45,11 @@
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 {
-	const char *tag = (const char *)param;
-	UINT32 ipt = 0;
-
-	ipt = ((ioport(tag)->read() & 0xf)<<12) | ((ioport(tag)->read() & 0xff0)>>4);
-
-	return ipt;
+	int num = (FPTR)param;
+	int data = m_dial[num]->read();
+	return ((data & 0xf)<<12) | ((data & 0xff0)>>4);
 }
+
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
 {
@@ -61,12 +59,10 @@ CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
 
 READ32_MEMBER(taito_f3_state::f3_control_r)
 {
-	static const char *const iptnames[] = { "IN0", "IN1", "AN0", "AN1", "IN2", "IN3" };
-
-	if (offset < 6)
-		return ioport(iptnames[offset])->read();
-
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", space.device().safe_pc(), offset);
+	if (offset<6)
+		return m_input[offset]->read();
+	else logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", space.device().safe_pc(), offset);
+	
 	return 0xffffffff;
 }
 
@@ -212,9 +208,15 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+CUSTOM_INPUT_MEMBER( taito_f3_state::eeprom_read )
+{
+	return m_eepromin->read();
+}
+
+
 static INPUT_PORTS_START( f3 )
 	/* MSW: Test switch, coins, eeprom access, LSW: Player Buttons, Start, Tilt, Service */
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -231,11 +233,11 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "EEPROMIN")
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "EEPROMIN")
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, (void *)0)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, (void *)0)
 
 	/* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -248,7 +250,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)0)
 
 	/* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
-	PORT_START("IN2")
+	PORT_START("IN.4")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
@@ -261,7 +263,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Player 3 & 4 joysticks (Player 1 top fire buttons in Kaiser Knuckle) */
-	PORT_START("IN3")
+	PORT_START("IN.5")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -274,13 +276,13 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)1)
 
 	/* Analog control 1 */
-	PORT_START("AN0")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, "DIAL1")
+	PORT_START("IN.2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void*)0)
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Analog control 2 */
-	PORT_START("AN1")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, "DIAL2")
+	PORT_START("IN.3")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void *)1)
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* These are not read directly, but through PORT_CUSTOMs above */
@@ -294,10 +296,10 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
 
-	PORT_START("DIAL1")
+	PORT_START("DIAL.0")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 
-	PORT_START("DIAL2")
+	PORT_START("DIAL.1")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 
 	PORT_START( "EEPROMOUT" )
@@ -309,17 +311,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( kn )
 	PORT_INCLUDE( f3 )
 
-	PORT_MODIFY("IN0")
+	PORT_MODIFY("IN.0")
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("IN2")
+	PORT_MODIFY("IN.4")
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0000f800, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("IN3")
+	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
