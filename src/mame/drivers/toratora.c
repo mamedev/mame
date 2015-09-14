@@ -439,6 +439,14 @@ ROM_START( toratora )
 	ROM_LOAD( "tora.u11", 0xf800, 0x0800, CRC(55135d6f) SHA1(c48f180a9d6e894aafe87b2daf74e9a082f4600e) )
 ROM_END
 
+ROM_START( toratorab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1027.u1",  0x1000, 0x0800, BAD_DUMP CRC(413c743a) SHA1(a887dfaaee557327a1699bb424488b934dab8612) ) /* rom u1 is missing in this set, using the toratora one */
+	ROM_LOAD( "1027.u10", 0x1800, 0x0800, CRC(6a906292) SHA1(4ceff91b7dcd398e57cd19a91d2199c09cb37c39) )
+	ROM_LOAD( "1027.u2",  0x2000, 0x0800, CRC(c1331648) SHA1(379101c6c1b8dab3e043ece01579cc96f6bb18a9) )
+	ROM_LOAD( "1027.u9",  0x2800, 0x0800, CRC(59b021b5) SHA1(ea5a0c1f58c0e08231969ad161b79af6e1ae4431) )
+	ROM_LOAD( "1027.u11", 0xf800, 0x0800, CRC(336f6659) SHA1(ea1151db54b68316908874da6983d6de5c94c29e) )
+ROM_END
 
 
 /*************************************
@@ -447,4 +455,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0,        toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratorab,toratora, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
