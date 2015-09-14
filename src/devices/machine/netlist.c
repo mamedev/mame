@@ -232,22 +232,22 @@ void netlist_mame_t::vlog(const plog_level &l, const pstring &ls) const
 
 	switch (l)
 	{
-		case DEBUG:
+		case plog_level::DEBUG:
 			logerror("netlist DEBUG: %s\n", errstr.cstr());
 			break;
-		case INFO:
+		case plog_level::INFO:
 			logerror("netlist INFO: %s\n", errstr.cstr());
 			break;
-		case VERBOSE:
+		case plog_level::VERBOSE:
 			logerror("netlist VERBOSE: %s\n", errstr.cstr());
 			break;
-		case WARNING:
+		case plog_level::WARNING:
 			logerror("netlist WARNING: %s\n", errstr.cstr());
 			break;
-		case ERROR:
+		case plog_level::ERROR:
 			logerror("netlist ERROR: %s\n", errstr.cstr());
 			break;
-		case FATAL:
+		case plog_level::FATAL:
 			emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());
 			throw error;
 	}
