@@ -2696,11 +2696,11 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
+	MCFG_SOUND_ADD("fm", YM3438, 16000000 / 2) // actual clock speed unknown
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(towns_state, towns_fm_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_RF5C68_ADD("pcm", 53693100 / 7)  // actual clock speed unknown
+	MCFG_RF5C68_ADD("pcm", 16000000 / 2)  // actual clock speed unknown
 	MCFG_RF5C68_SAMPLE_END_CB(towns_state, towns_pcm_irq)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 	MCFG_SOUND_ADD("cdda",CDDA,0)

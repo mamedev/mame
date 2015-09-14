@@ -171,8 +171,11 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   // 10 MHz
 	MCFG_CPU_PROGRAM_MAP(xorworld_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xorworld_state, irq6_line_assert) // irq 4 or 6
-	MCFG_CPU_PERIODIC_INT_DRIVER(xorworld_state, irq2_line_assert, 3*60) //timed irq, unknown timing
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", xorworld_state, irq6_line_assert) // irq 4 or 6
+	//MCFG_CPU_PERIODIC_INT_DRIVER(xorworld_state, irq2_line_assert, 3*60) //timed irq, unknown timing
+	// Simple fix - but this sounds good!! -Valley Bell
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", xorworld_state, irq2_line_assert) // irq 4 or 6
+	MCFG_CPU_PERIODIC_INT_DRIVER(xorworld_state, irq6_line_assert, 3*60) //timed irq, unknown timing
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

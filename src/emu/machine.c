@@ -341,7 +341,7 @@ int running_machine::run(bool firstrun)
 		m_current_phase = MACHINE_PHASE_INIT;
 
 		// if we have a logfile, set up the callback
-		if (options().log())
+		if (options().log() && &system() != &GAME_NAME(___empty))
 		{
 			m_logfile.reset(global_alloc(emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)));
 			file_error filerr = m_logfile->open("error.log");
