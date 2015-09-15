@@ -31,6 +31,8 @@ omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag,
 
 void omti5100_device::device_start()
 {
+	if(!m_image0->get_hard_disk_file())
+		m_image = m_image1;
 	m_image = m_image0;
 	scsihle_device::device_start();
 }
@@ -38,16 +40,19 @@ void omti5100_device::device_start()
 void omti5100_device::ExecCommand()
 {
 	int drive = (command[1] >> 5) & 1;
-	harddisk_image_device *image = drive ? m_image1 : m_image0;
+	hard_disk_file *image = (drive ? m_image1 : m_image0)->get_hard_disk_file();
 	if(!image)
 	{
+		if(command[0] == T10SPC_CMD_REQUEST_SENSE)
+			return scsihd_device::ExecCommand();
+
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
 		m_sense_asc = OMTI_STATUS_NOT_READY;
 		m_transfer_length = 0;
 		return;
 	}
-	hard_disk_info *info = hard_disk_get_info(image->get_hard_disk_file());
+	hard_disk_info *info = hard_disk_get_info(image);
 	switch(command[0])
 	{
 		case OMTI_READ_DATA_BUFFER:
@@ -74,7 +79,7 @@ void omti5100_device::ExecCommand()
 			}
 			else
 			{
-				SetDevice(image->get_hard_disk_file());
+				SetDevice(image);
 				scsihd_device::ExecCommand();
 			}
 			break;
@@ -90,7 +95,7 @@ void omti5100_device::ExecCommand()
 				m_status_code = SCSI_STATUS_CODE_GOOD;
 				m_transfer_length = 0;
 				for(int i = 0; i < info->sectors; i++)
-					hard_disk_write(image->get_hard_disk_file(), track * info->sectors + i, &sector[0]);
+					hard_disk_write(image, track * info->sectors + i, &sector[0]);
 			}
 			else
 			{
@@ -102,7 +107,7 @@ void omti5100_device::ExecCommand()
 			break;
 		}
 		default:
-			SetDevice(image->get_hard_disk_file());
+			SetDevice(image);
 			scsihd_device::ExecCommand();
 			break;
 	}
@@ -132,11 +137,12 @@ void omti5100_device::WriteData( UINT8 *data, int dataLength )
 		case OMTI_ASSIGN_DISK_PARAM:
 		{
 			int drive = ((command[1] >> 5) & 1);
+			hard_disk_file *image = (drive ? m_image1 : m_image0)->get_hard_disk_file();
 			m_param[drive].heads = data[3] + 1;
 			m_param[drive].cylinders = ((data[4] << 8) | data[5]) + 1;
-			if(!data[8] && (drive ? m_image1 : m_image0))
+			if(!data[8] && image)
 			{
-				switch(hard_disk_get_info((drive ? m_image1 : m_image0)->get_hard_disk_file())->sectorbytes)
+				switch(hard_disk_get_info(image)->sectorbytes)
 				{
 					case 128:
 						m_param[drive].sectors = 53;
