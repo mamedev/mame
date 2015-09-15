@@ -330,7 +330,9 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 				code = ( spriteram[offs+2] ) + ( spriteram[offs+3] << 8 );
 
 				int xpos = spriteram[offs + 8] + ( (spriteram[offs + 9] & 3 ) << 8 );
-				int ypos = spriteram[offs + 6] + ( (spriteram[offs + 7] & 1 ) << 8 ) + m_yoffset;
+				int ypos = spriteram[offs + 6] + m_yoffset;
+				ypos &= 0xff; // sprite wrap right on edge (top @ ROT0) of pac90
+				ypos = ypos - ((spriteram[offs + 7] & 1) << 8); // sprite wrap on top of wc90
 
 				if (xpos >= 0x0300) xpos -= 0x0400;
 
