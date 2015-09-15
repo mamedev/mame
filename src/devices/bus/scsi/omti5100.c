@@ -39,6 +39,14 @@ void omti5100_device::ExecCommand()
 {
 	int drive = (command[1] >> 5) & 1;
 	harddisk_image_device *image = drive ? m_image1 : m_image0;
+	if(!image)
+	{
+		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+		m_sense_asc = OMTI_STATUS_NOT_READY;
+		m_transfer_length = 0;
+		return;
+	}
 	hard_disk_info *info = hard_disk_get_info(image->get_hard_disk_file());
 	switch(command[0])
 	{
@@ -72,41 +80,30 @@ void omti5100_device::ExecCommand()
 			break;
 		}
 		case OMTI_FORMAT_TRACK:
-			if(image)
+		{
+			int track = ((command[1]&0x1f)<<16 | command[2]<<8 | command[3]) / m_param[drive].sectors;
+			if(((track % m_param[drive].heads) <= info->heads) && (track < (info->cylinders * m_param[drive].heads)))
 			{
-				int track = ((command[1]&0x1f)<<16 | command[2]<<8 | command[3]) / m_param[drive].sectors;
-				if(((track % m_param[drive].heads) <= info->heads) && (track < (info->cylinders * m_param[drive].heads)))
-				{
-					dynamic_buffer sector(info->sectorbytes);
-					memset(&sector[0], 0xe5, info->sectorbytes);
-					m_phase = SCSI_PHASE_STATUS;
-					m_status_code = SCSI_STATUS_CODE_GOOD;
-					m_transfer_length = 0;
-					for(int i = 0; i < info->sectors; i++)
-						hard_disk_write(image->get_hard_disk_file(), track * info->sectors + i, &sector[0]);
-				}
-				else
-				{
-					m_phase = SCSI_PHASE_STATUS;
-					m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
-					m_sense_asc = OMTI_STATUS_SEEK_FAIL;
-					m_transfer_length = 0;
-				}
-				break;
-			}
-		default:
-			if(!image)
-			{
+				dynamic_buffer sector(info->sectorbytes);
+				memset(&sector[0], 0xe5, info->sectorbytes);
 				m_phase = SCSI_PHASE_STATUS;
-				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
-				m_sense_asc = OMTI_STATUS_NOT_READY;
+				m_status_code = SCSI_STATUS_CODE_GOOD;
 				m_transfer_length = 0;
+				for(int i = 0; i < info->sectors; i++)
+					hard_disk_write(image->get_hard_disk_file(), track * info->sectors + i, &sector[0]);
 			}
 			else
 			{
-				SetDevice(image->get_hard_disk_file());
-				scsihd_device::ExecCommand();
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_sense_asc = OMTI_STATUS_SEEK_FAIL;
+				m_transfer_length = 0;
 			}
+			break;
+		}
+		default:
+			SetDevice(image->get_hard_disk_file());
+			scsihd_device::ExecCommand();
 			break;
 	}
 }
@@ -137,7 +134,7 @@ void omti5100_device::WriteData( UINT8 *data, int dataLength )
 			int drive = ((command[1] >> 5) & 1);
 			m_param[drive].heads = data[3] + 1;
 			m_param[drive].cylinders = ((data[4] << 8) | data[5]) + 1;
-			if(!data[8])
+			if(!data[8] && (drive ? m_image1 : m_image0))
 			{
 				switch(hard_disk_get_info((drive ? m_image1 : m_image0)->get_hard_disk_file())->sectorbytes)
 				{
@@ -148,7 +145,7 @@ void omti5100_device::WriteData( UINT8 *data, int dataLength )
 						m_param[drive].sectors = 32;
 						break;
 					case 512:
-						m_param[drive].sectors = 17;
+						m_param[drive].sectors = 18; // XXX: check this!
 						break;
 					case 1024:
 						m_param[drive].sectors = 9;
