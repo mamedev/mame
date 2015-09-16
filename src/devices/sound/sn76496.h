@@ -24,7 +24,7 @@ class sn76496_base_device : public device_t, public device_sound_interface
 {
 public:
 	sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag,
-		int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int freq0,
+		int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
 		device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
@@ -56,7 +56,7 @@ private:
 	const bool      m_negate;           // output negate flag
 	const bool      m_stereo;           // whether we're dealing with stereo or not
 	const INT32     m_clock_divider;    // clock divider
-	const bool      m_freq0_is_max;     // flag for if frequency zero acts as if it is one more than max (0x3ff+1) or if it acts like 0
+	const bool      m_sega_style_psg;   // flag for if frequency zero acts as if it is one more than max (0x3ff+1) or if it acts like 0; AND if the initial register is pointing to 0x3 instead of 0x0 AND if the volume reg is preloaded with 0xF instead of 0x0
 
 	INT32           m_vol_table[16];    // volume table (for 4-bit to db conversion)
 	INT32           m_register[8];      // registers

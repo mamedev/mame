@@ -109,6 +109,11 @@
 
   27/06/2012: Michael Zapf
   Converted to modern device, legacy devices were gradually removed afterwards.
+  
+  16/09/2015: Lord Nightmare
+  Fix PSG chips to have volume reg inited on reset to 0x0 based on tests by
+  ValleyBell. Made Sega PSG chips start up with register 0x3 selected (volume
+  for channel 2) based on hardware tests by Nemesis.
 
   TODO: * Implement the TMS9919 - any difference to sn94624?
         * Implement the T6W28; has registers in a weird order, needs writes
@@ -126,7 +131,7 @@
 
 
 sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name,
-	const char *tag, int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int freq0,
+	const char *tag, int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
 	device_t *owner, UINT32 clock, const char *shortname, const char *source)
 
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -138,7 +143,7 @@ sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_t
 	m_negate(negate),
 	m_stereo(stereo),
 	m_clock_divider(clockdivider),
-	m_freq0_is_max(freq0)
+	m_sega_style_psg(sega)
 {
 }
 
@@ -187,11 +192,11 @@ void sn76496_base_device::device_start()
 
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 
-	m_last_register = 0;
+	m_last_register = m_sega_style_psg?3:0; // Sega VDP PSG defaults to selected period reg for 2nd channel
 	for (i = 0; i < 8; i+=2)
 	{
 		m_register[i] = 0;
-		m_register[i + 1] = 0x0f;   // volume = 0
+		m_register[i + 1] = 0x0;   // volume = 0x0 (max volume) on reset; this needs testing on chips other than SN76489A and Sega VDP PSG
 	}
 
 	for (i = 0; i < 4; i++)
@@ -270,7 +275,7 @@ void sn76496_base_device::write(UINT8 data)
 		case 2: // tone 1: frequency
 		case 4: // tone 2: frequency
 			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x0f) | ((data & 0x3f) << 4);
-			if ((m_register[r] != 0) || (!m_freq0_is_max)) m_period[c] = m_register[r];
+			if ((m_register[r] != 0) || (!m_sega_style_psg)) m_period[c] = m_register[r];
 			else m_period[c] = 0x400;
 
 			if (r == 4)
@@ -426,7 +431,7 @@ void sn76496_base_device::register_for_save_states()
 	save_item(NAME(m_count));
 	save_item(NAME(m_output));
 	save_item(NAME(m_cycles_to_ready));
-//  save_item(NAME(m_freq0_is_max));
+//  save_item(NAME(m_sega_style_psg));
 }
 
 const device_type SN76496 = &device_creator<sn76496_device>;
