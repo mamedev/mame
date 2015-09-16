@@ -417,7 +417,7 @@ static const gfx_layout gfxlayout_8x8x4 =
 	4,
 	//{ STEP4(0,8) },
 	{ 24,8,16,0 },
-		{ STEP8(7,-1) },
+	{ STEP8(7,-1) },
 	{ STEP8(0,4*8) },
 	8*8*4
 };
@@ -623,7 +623,7 @@ IGS PCB-0367-00-FG-1
   - IGS 027A
   - IGS 031
   - IGS A2107
-  - IGS T2105
+  - IGS T2105: Character Generator ROM
   - K668 (qfp44) == OKI6225
   - 82C55
 
@@ -638,10 +638,10 @@ ROM_START( amazonia )
 	ROM_LOAD( "amazonia_v-104br.u23", 0x00000, 0x80000, CRC(103d465e) SHA1(68d088f24171e27c0a9b0660f81d3334f730637a) )
 
 	ROM_REGION( 0x480000, "gfx1", 0 )
-	ROM_LOAD( "amazonia_cg.u11", 0x000000, 0x80000, CRC(2ac2cfd1) SHA1(f8750a4727ddabf1415dab6eaa4a72e60e86e7f1) )
+	ROM_LOAD( "igs_t2105_cg_v110.u12", 0x000000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
 
 	ROM_REGION( 0x480000, "gfx2", 0 )
-	ROM_LOAD( "igs_t2105_cg_v110.u12", 0x000000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+	ROM_LOAD( "amazonia_cg.u11", 0x000000, 0x80000, CRC(2ac2cfd1) SHA1(f8750a4727ddabf1415dab6eaa4a72e60e86e7f1) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_s2102.u28", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
