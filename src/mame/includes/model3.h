@@ -34,17 +34,7 @@ struct m3_vertex
 	float nz;
 };
 
-struct m3_clip_vertex
-{
-	float x;
-	float y;
-	float z;
-	float w;
-	float u;
-	float v;
-	float i;
-	float s;
-};
+typedef frustum_clip_vertex<float, 4> m3_clip_vertex;
 
 struct m3_triangle
 {
