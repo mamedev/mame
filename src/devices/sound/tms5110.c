@@ -387,14 +387,17 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				}
 
 				/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
-				   Interpolation inhibit cases:
+				 * Interpolation inhibit cases:
 				 * Old frame was voiced, new is unvoiced
-				 * Old frame was silence/zero energy, new has nonzero energy
-				 * Old frame was unvoiced, new is voiced (note this is the case on the patent but may not be correct on the real final chip)
+				 * Old frame was silence/zero energy, new has non-zero energy
+				 * Old frame was unvoiced, new is voiced
+				 * Old frame was unvoiced, new frame is silence/zero energy (non-existent on tms51xx rev D and F (present and working on tms52xx, present but buggy on tms51xx rev A and B))
 				 */
 				if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
 					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
 					|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
+					//|| ((m_inhibit == 1) && (OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) ) //TMS51xx INTERP BUG1
+					//|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) )
 					m_inhibit = 1;
 				else // normal frame, normal interpolation
 					m_inhibit = 0;
@@ -558,14 +561,15 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				 * The exact time this occurs is betwen IP=7, PC=12 sub=0, T=t12
 				 * and m_IP = 0, PC=0 sub=0, T=t12, a period of exactly 20 cycles,
 				 * which overlaps the time OLDE and OLDP are updated at IP=7 PC=12 T17
-				* (and hence INHIBIT itself 2 t-cycles later).
-				* According to testing the pitch zeroing lasts approximately 2 samples.
-				* We set the zeroing latch here, and unset it on PC=1 in the generator.
-				*/
+				 * (and hence INHIBIT itself 2 t-cycles later).
+				 * According to testing the pitch zeroing lasts approximately 2 samples.
+				 * We set the zeroing latch here, and unset it on PC=1 in the generator.
+				 */
 				if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_zero = 1;
 				if (m_IP == 7) // RESETL4
 				{
 					// Latch OLDE and OLDP
+					//if (OLD_FRAME_SILENCE_FLAG) m_uv_zpar = 0; // TMS51xx INTERP BUG2
 					OLD_FRAME_SILENCE_FLAG = NEW_FRAME_SILENCE_FLAG; // m_OLDE
 					OLD_FRAME_UNVOICED_FLAG = NEW_FRAME_UNVOICED_FLAG; // m_OLDP
 					/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
