@@ -4,6 +4,7 @@
 
 #define OMTI_STATUS_SEEK_FAIL 0x02
 #define OMTI_STATUS_NOT_READY 0x04
+#define OMTI_CHECK_TRACK_FORMAT 0x05
 #define OMTI_FORMAT_TRACK 0x06
 #define OMTI_READ_DATA_BUFFER 0xec
 #define OMTI_ASSIGN_DISK_PARAM 0xc2
@@ -64,6 +65,11 @@ void omti5100_device::ExecCommand()
 			m_phase = SCSI_PHASE_DATAOUT;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 10;
+			break;
+		case OMTI_CHECK_TRACK_FORMAT:
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = 0;
 			break;
 
 		case T10SBC_CMD_READ_6:
