@@ -27,7 +27,8 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 		int compl_in = rvv;
 		int hlt_in = hlgt;
 
-		int color = hlt_in ? 2 : (video_in ^ compl_in);
+		// color 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
+		int color = (hlt_in ? 1 : 2)*(video_in ^ compl_in);
 
 		bitmap.pix32(y, x + i) = m_palette->pen(color);
 	}
