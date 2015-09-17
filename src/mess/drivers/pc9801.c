@@ -3128,7 +3128,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	if(!(ioport("ROM_LOAD")->read() & 4))
 		m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
 	else
-		m_maincpu->space(AS_PROGRAM).unmap_read(0xd8000, 0xd9fff);
+		m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
@@ -3440,11 +3440,11 @@ MACHINE_CONFIG_END
 
 /* took from "raw" memory dump, uncomment ROM_FILL if you want to play with it */
 #define LOAD_IDE_ROM \
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) ) \
 	ROM_LOAD( "d8000.rom", 0x0000, 0x2000, BAD_DUMP CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) ) \
 	ROM_IGNORE( 0x2000 ) \
 	ROM_IGNORE( 0x2000 ) \
-	ROM_IGNORE( 0x2000 ) \
+	ROM_IGNORE( 0x2000 )
 
 // all of these are half size :/
 #define LOAD_KANJI_ROMS \
