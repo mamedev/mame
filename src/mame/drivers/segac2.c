@@ -922,9 +922,9 @@ static INPUT_PORTS_START( soniccar )
 	PORT_DIPNAME( 0x08, 0x08, "Light" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Not Translated" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, "100-400(Not Translated)" )
-	PORT_DIPSETTING(    0x00, "Not Translated" )
+	PORT_DIPNAME( 0x10, 0x10, "Screen Display" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "Insert 100-400 Yen" )
+	PORT_DIPSETTING(    0x00, "Insert Money" )
 	//"SW2:6" unused
 	//"SW2:7" unused
 	//"SW2:7" unused
