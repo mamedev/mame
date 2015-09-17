@@ -129,6 +129,7 @@ netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mco
 void netlist_mame_logic_input_t::static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift)
 {
 	netlist_mame_logic_input_t &netlist = downcast<netlist_mame_logic_input_t &>(device);
+	LOG_DEV_CALLS(("static_set_params %s\n", device.tag()));
 	netlist.m_param_name = param_name;
 	netlist.m_shift = shift;
 	netlist.m_mask = mask;
