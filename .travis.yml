@@ -5,13 +5,20 @@ compiler:
 os:
   - linux
   - osx
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
 env:
   - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
   - SUBTARGET=mess   MAME=mess64
 script:
-  - if [ $CC == 'clang' ];
+  - if [ $TRAVIS_OS_NAME == 'linux' ] && [ $CC == 'clang' ];
     then make -j2 linux_x64_clang && ./$MAME -validate;
     else make -j2 OPTIMIZE=0      && ./$MAME -validate;
+    fi
+  - if [ $TRAVIS_OS_NAME == 'osx' ];
+    then make -j2 OPTIMIZE=0 MACOSX_USE_LIBSDL=1 && ./$MAME -validate;
     fi
 sudo: required
 before_install:
