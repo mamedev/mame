@@ -5398,9 +5398,9 @@ virnbao         // 2000.02 Virtua NBA (original)
 virnbap         // 2000.02 Virtua NBA (prototype)
 mvsc2           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Rev A)
 smarinef        // 2000.03 Sega Marine Fishing
-wldkicks        // 2000.03 World Kicks (WK2 Ver. A)
-wldkicksa       // 2000.03 World Kicks (WK3 Ver. A)
-wldkicksb       // 2000.03 World Kicks PCB (WKC1 Ver. A)
+wldkicksa       // 2000.03 World Kicks (Asia, WK2 Ver.A)
+wldkicks        // 2000.03 World Kicks (US, WK3 Ver.A)
+wldkicksj       // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
 pstone2         // 2000.04 Power Stone 2
 toukon4         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)
 qmegamis        // 2000.05 Quiz Ah Megamisama
@@ -5420,10 +5420,10 @@ cspike          // 2000.10 Gun Spike / Cannon Spike
 sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A, set 1)
 sstrkfgta       // 2000.10 Sega Strike Fighter (Rev A, set 2)
 confmiss        // 2000.10.11 Confidential Mission         // First GD-ROM game?
-ninjaslt1       // 2000.11 Ninja Assault (NJA1 Ver. A)
-ninjaslt2       // 2000.11 Ninja Assault (NJA2 Ver. A)
-ninjaslt        // 2000.11 Ninja Assault (NJA3 Ver. A)
-ninjaslt4       // 2000.11 Ninja Assault (NJA4 Ver. A)
+ninjasltj       // 2000.11 Ninja Assault (Japan, NJA1 Ver.A)
+ninjaslta       // 2000.11 Ninja Assault (Asia, NJA2 Ver.A)
+ninjasltu       // 2000.11 Ninja Assault (US, NJA3 Ver.A)
+ninjaslt        // 2000.11 Ninja Assault (World, NJA4 Ver.A)
 wwfroyal        // 2000.11 WWF Royal Rumble
 sprtjam         // 2000.11.13 Sports Jam
 starhrcl        // 2000.11.28 Star Horse (satellite)
@@ -5450,8 +5450,8 @@ crakndj2        // 2001.06 Crackin' DJ Part 2
 hmgeo           // 2001.06 Heavy Metal Geomatrix (Rev B)
 wsbbgd          // 2001.06 Super Major League / World Series Baseball
 starseek        // 2001.07 Dokidoki Idol Star Seeker
-gunsur2         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF1)
-gunsur2e        // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF2 Ver. E)
+gunsur2j        // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)
+gunsur2         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)
 spkrbtl         // 2001.07 Spikers Battle
 cvs2gd          // 2001.07.05 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
 wrungp          // 2001.08 Wave Runner GP
@@ -5475,8 +5475,8 @@ luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
 cleoftp         // 2002.05 Cleopatra Fortune Plus
 ggxx            // 2002.05 Guilty Gear XX
 chocomk         // 2002.06 Musapey's Choco Marker (Rev A)
-mazan           // 2002.07 Mazan: Flash of the Blade (MAZ2 Ver. A)
-mazana          // 2002.07 Mazan: Flash of the Blade (MAZ3 Ver. A)
+mazana          // 2002.07 Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)
+mazan           // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
 				// 2002.09 Yonin Uchi Mahjong MJ
 azumanga        // 2002.12 Azumanga Daiou Puzzle Bobble
 moeru           // 2002.12 Moeru Casinyo
