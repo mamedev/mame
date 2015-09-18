@@ -141,7 +141,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* gate array */
@@ -296,7 +296,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
-	m_speaker(*this, "speaker"),
+	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
@@ -316,7 +316,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
-	m_speaker(*this, "speaker"),
+	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
@@ -352,7 +352,7 @@ void epson_lx810l_t::device_start()
 
 void epson_lx810l_t::device_reset()
 {
-	m_speaker->level_w(0);
+	m_dac->write_unsigned8(0);
 }
 
 
@@ -578,7 +578,7 @@ WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
 
 WRITE_LINE_MEMBER( epson_lx810l_t::co1_w )
 {
-	m_speaker->level_w(state);
+	m_dac->write_unsigned8(0 - !state);
 }
 
 

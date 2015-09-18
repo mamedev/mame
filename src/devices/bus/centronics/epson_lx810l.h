@@ -16,7 +16,7 @@
 #include "machine/e05a30.h"
 #include "machine/eepromser.h"
 #include "machine/steppers.h"
-#include "sound/speaker.h"
+#include "sound/dac.h"
 
 
 //**************************************************************************
@@ -102,7 +102,7 @@ private:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_device> m_dac;
 	required_device<e05a30_device> m_e05a30;
 
 	int m_93c06_clk;
