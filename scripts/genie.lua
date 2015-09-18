@@ -1000,6 +1000,11 @@ end
 					"-Wno-extern-c-compat",
 				}
 			end
+      if (version >= 70000) then
+        buildoptions {
+          "-Wno-tautological-undefined-compare",
+        }
+      end
 		else
 			if (version == 40201) then
 				buildoptions {
