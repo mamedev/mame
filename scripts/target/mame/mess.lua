@@ -2671,6 +2671,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/konin.c",
 	MAME_DIR .. "src/mess/drivers/leapster.c",
 	MAME_DIR .. "src/mess/drivers/lft.c",
+	MAME_DIR .. "src/mess/drivers/lg-dvd.c",
 	MAME_DIR .. "src/mess/drivers/lola8a.c",
 	MAME_DIR .. "src/mess/drivers/m79152pc.c",
 	MAME_DIR .. "src/mess/drivers/mccpm.c",
