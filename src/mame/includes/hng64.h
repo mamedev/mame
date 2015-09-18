@@ -127,7 +127,6 @@ private:
 };
 
 
-
 class hng64_state : public driver_device
 {
 public:
@@ -173,9 +172,7 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 
-    /* 3D stuff */
 	UINT16* m_dl;
-
 	required_shared_ptr<UINT32> m_3dregs;
 	required_shared_ptr<UINT32> m_3d_1;
 	required_shared_ptr<UINT32> m_3d_2;
@@ -193,8 +190,8 @@ public:
 	UINT16 *m_soundram2;
 
 	/* Communications stuff */
-	UINT8  *m_com_op_base;
-	UINT8  *m_com_virtual_mem;
+	UINT8 *m_com_op_base;
+	UINT8 *m_com_virtual_mem;
 	UINT8 m_com_shared[8];
 
 	INT32 m_dma_start;
@@ -319,6 +316,22 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
 	void do_dma(address_space &space);
 
+    void hng64_mark_all_tiles_dirty(int tilemap);
+	void hng64_mark_tile_dirty(int tilemap, int tile_index);
+    void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
+
+    void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
+        UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
+
+    void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat);
+
+	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat);
+
+    
 
 	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
@@ -327,44 +340,34 @@ public:
 
     hng64_poly_renderer* m_poly_renderer;
     
-    void clear3d();
-	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
+    TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
 
+    UINT8 *m_texturerom;
+	UINT16* m_vertsrom;
+	int m_vertsrom_size;
+    std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
+    
+    void clear3d();
 	void hng64_command3d(const UINT16* packet);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
-	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
 	void setCameraTransformation(const UINT16* packet);
 	void setLighting(const UINT16* packet);
 	void set3dFlags(const UINT16* packet);
 	void setCameraProjectionMatrix(const UINT16* packet);
-	void recoverPolygonBlock(const UINT16* packet, int* numPolys);
-	void hng64_mark_all_tiles_dirty(int tilemap);
-	void hng64_mark_tile_dirty(int tilemap, int tile_index);
-
-	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat);
-
-	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat);
-
+	void recoverPolygonBlock(const UINT16* packet, int& numPolys);
 	void printPacket(const UINT16* packet, int hex);
+    float uToF(UINT16 input);
 	void matmul4(float *product, const float *a, const float *b);
 	void vecmatmul4(float *product, const float *a, const float *b);
 	float vecDotProduct(const float *a, const float *b);
 	void setIdentity(float *matrix);
-	float uToF(UINT16 input);
 	void normalize(float* x);
-	int Inside(struct polyVert *v, int plane);
-	void Intersect(struct polyVert *input0, struct polyVert *input1, struct polyVert *output, int plane);
-	void performFrustumClip(struct polygon *p);
-	UINT8 *m_texturerom;
-	UINT16* m_vertsrom;
-	int m_vertsrom_size;
+	int Inside(polyVert *v, int plane);
+	void Intersect(polyVert *input0, polyVert *input1, polyVert *output, int plane);
+	void performFrustumClip(polygon *p);
+
+    
 	void reset_sound();
 	void reset_net();
 
@@ -397,7 +400,6 @@ public:
 	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
-	UINT16 main_latch[2],sound_latch[2];
-
-	std::vector<polygon> polys;//(1024*5);
+	UINT16 main_latch[2];
+    UINT16 sound_latch[2];
 };

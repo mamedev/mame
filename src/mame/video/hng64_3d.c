@@ -56,7 +56,7 @@ WRITE16_MEMBER(hng64_state::dl_w)
 
 
 
-/* TODO: different param for both Samurai games, less FIFO to process? */
+// TODO: different param for both Samurai games, less FIFO to process?
 WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
 	// this is written after the game uploads 16 packets, each 32 bytes long (2x 16 words?)
@@ -80,7 +80,7 @@ TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 }
 
 
-/* Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown */
+// Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown
 WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 {
 //  printf("dl_control_w %08x %08x\n", data, mem_mask);
@@ -299,7 +299,7 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 
 // Operation 0100
 // Polygon rasterization.
-void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
+void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -372,7 +372,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 	float ndCoords[4];      // Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
 	float windowCoords[4];  // Mapped ndCoordinates to screen space
 	float cullRay[4];
-	struct polygon lastPoly = { 0 };
+    polygon lastPoly = { 0 };
 	const rectangle &visarea = m_screen->visible_area();
 
 
@@ -442,11 +442,10 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 
 	size[2]    = threeDPointer[9];
 	size[3]    = threeDPointer[10];
-	/*           ????         [11]; Used. */
-
-	/*           ????         [12]; Used. */
-	/*           ????         [13]; Used. */
-	/*           ????         [14]; Used. */
+	//           ????         [11]; Used.
+	//           ????         [12]; Used.
+	//           ????         [13]; Used.
+	//           ????         [14]; Used.
 
 	if (threeDPointer[15] != 0x0000) printf("ZOMG!  3dPointer[15] is non-zero!\n");
 	if (threeDPointer[16] != 0x0000) printf("ZOMG!  3dPointer[16] is non-zero!\n");
@@ -456,7 +455,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 	if (threeDPointer[19] != 0x0000) printf("ZOMG!  3dPointer[19] is non-zero!\n");
 	if (threeDPointer[20] != 0x0000) printf("ZOMG!  3dPointer[20] is non-zero!\n");
 
-	/* Concatenate the megaOffset with the addresses */
+	// Concatenate the megaOffset with the addresses
 	address[0] |= (megaOffset << 16);
 	address[1] |= (megaOffset << 16);
 	address[2] |= (megaOffset << 16);
@@ -468,7 +467,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 	//if (threeDPointer[14] & 0x0001) tdColor |= 0x0000ff00;
 	//if (threeDPointer[14] & 0x0000) tdColor |= 0x000000ff;
 
-	/* For all 4 polygon chunks */
+	// For all 4 polygon chunks
 	for (int k = 0; k < 4; k++)
 	{
 		UINT16* chunkOffset = &threeDRoms[address[k] * 3];
@@ -502,37 +501,40 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 				continue;
 			}
 
+            // Syntactical simplification
+            polygon& currentPoly = m_polys[numPolys];
+            
 			// Debug - Colors polygons with certain flags bright blue! ajg
-			polys[*numPolys].debugColor = 0;
-			//polys[*numPolys].debugColor = tdColor;
+			currentPoly.debugColor = 0;
+			//currentPoly.debugColor = tdColor;
 
 			// Debug - ajg
 			//printf("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
 
 			// TEXTURE
-			/* There may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
-			if (chunkOffset[1] & 0x1000) polys[*numPolys].texType = 0x1;
-			else                         polys[*numPolys].texType = 0x0;
+			// There may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
+			if (chunkOffset[1] & 0x1000) currentPoly.texType = 0x1;
+			else                         currentPoly.texType = 0x0;
 
-			polys[*numPolys].texPageSmall       = (chunkOffset[2] & 0xc000)>>14;  // Just a guess.
-			polys[*numPolys].texPageHorizOffset = (chunkOffset[2] & 0x3800) >> 11;
-			polys[*numPolys].texPageVertOffset  = (chunkOffset[2] & 0x0070) >> 4;
+			currentPoly.texPageSmall       = (chunkOffset[2] & 0xc000)>>14;  // Just a guess.
+			currentPoly.texPageHorizOffset = (chunkOffset[2] & 0x3800) >> 11;
+			currentPoly.texPageVertOffset  = (chunkOffset[2] & 0x0070) >> 4;
 
-			polys[*numPolys].texIndex = chunkOffset[1] & 0x000f;
+			currentPoly.texIndex = chunkOffset[1] & 0x000f;
 
 
 			// PALETTE
-			polys[*numPolys].palOffset = 0;
-			polys[*numPolys].palPageSize = 0x100;
+			currentPoly.palOffset = 0;
+			currentPoly.palPageSize = 0x100;
 
-			/* FIXME: This isn't correct.
-			          Buriki & Xrally need this line.  Roads Edge needs it removed.
-			          So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
+			// FIXME: This isn't correct.
+			//        Buriki & Xrally need this line.  Roads Edge needs it removed.
+			//        So instead we're looking for a bit that is on for XRally & Buriki, but noone else.
 			if (m_3dregs[0x00/4] & 0x2000)
 			{
 				if (strcmp(machine().basename(), "roadedge"))
-					polys[*numPolys].palOffset += 0x800;
+					currentPoly.palOffset += 0x800;
 			}
 
 			//UINT16 explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
@@ -540,7 +542,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 			UINT16 explicitPaletteValue2 = ((chunkOffset[1] & 0x00f0) >> 4) * 0x008;
 
 			// The presence of 0x00f0 *probably* sets 0x10-sized palette addressing.
-			if (explicitPaletteValue2) polys[*numPolys].palPageSize = 0x10;
+			if (explicitPaletteValue2) currentPoly.palPageSize = 0x10;
 
 			// Apply the dynamic palette offset if its flag is set, otherwise stick with the fixed one
 			if ((packet[1] & 0x0100))
@@ -549,7 +551,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 				explicitPaletteValue2 = 0;      // This is probably hiding somewhere in operation 0011
 			}
 
-			polys[*numPolys].palOffset += (explicitPaletteValue1 + explicitPaletteValue2);
+			currentPoly.palOffset += (explicitPaletteValue1 + explicitPaletteValue2);
 
 
 #if 0
@@ -557,7 +559,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 			{
 			//  if (chunkOffset[2] == 0xd870)
 				{
-					polys[*numPolys].debugColor = 0xffff0000;
+					currentPoly.debugColor = 0xffff0000;
 					printf("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 				}
 			}
@@ -583,29 +585,29 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 			case 0x0f:  // 0000 1111
 				for (int m = 0; m < 3; m++)
 				{
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(chunkOffset[4 + (9*m)]);
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(chunkOffset[5 + (9*m)]);
-					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
-					polys[*numPolys].n = 3;
+					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
+					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (9*m)]);
+					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (9*m)]);
+					currentPoly.vert[m].worldCoords[3] = 1.0f;
+					currentPoly.n = 3;
 
 					// chunkOffset[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					polys[*numPolys].vert[m].texCoords[0] = uToF(chunkOffset[7 + (9*m)]);
-					polys[*numPolys].vert[m].texCoords[1] = uToF(chunkOffset[8 + (9*m)]);
-					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
-					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
+					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (9*m)]);
+					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (9*m)]);
+					currentPoly.vert[m].texCoords[2] = 0.0f;
+					currentPoly.vert[m].texCoords[3] = 1.0f;
 
-					polys[*numPolys].vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
-					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
-					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
-					polys[*numPolys].vert[m].normal[3] = 0.0f;
+					currentPoly.vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
+					currentPoly.vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
+					currentPoly.vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
+					currentPoly.vert[m].normal[3] = 0.0f;
 				}
 
 				// Redundantly called, but it works...
-				polys[*numPolys].faceNormal[0] = uToF(chunkOffset[30]);
-				polys[*numPolys].faceNormal[1] = uToF(chunkOffset[31]);
-				polys[*numPolys].faceNormal[2] = uToF(chunkOffset[32]);
-				polys[*numPolys].faceNormal[3] = 0.0f;
+				currentPoly.faceNormal[0] = uToF(chunkOffset[30]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[31]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[32]);
+				currentPoly.faceNormal[3] = 0.0f;
 
 				chunkLength = 33;
 				break;
@@ -618,29 +620,29 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 			case 0x2e:  // 0010 1110
 				for (int m = 0; m < 3; m++)
 				{
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(chunkOffset[4 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(chunkOffset[5 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
-					polys[*numPolys].n = 3;
+					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
+					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (6*m)]);
+					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (6*m)]);
+					currentPoly.vert[m].worldCoords[3] = 1.0f;
+					currentPoly.n = 3;
 
 					// chunkOffset[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					polys[*numPolys].vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
-					polys[*numPolys].vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
-					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
-					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
+					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
+					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
+					currentPoly.vert[m].texCoords[2] = 0.0f;
+					currentPoly.vert[m].texCoords[3] = 1.0f;
 
-					polys[*numPolys].vert[m].normal[0] = uToF(chunkOffset[21]);
-					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[22]);
-					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[23]);
-					polys[*numPolys].vert[m].normal[3] = 0.0f;
+					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
+					currentPoly.vert[m].normal[1] = uToF(chunkOffset[22]);
+					currentPoly.vert[m].normal[2] = uToF(chunkOffset[23]);
+					currentPoly.vert[m].normal[3] = 0.0f;
 				}
 
 				// Redundantly called, but it works...
-				polys[*numPolys].faceNormal[0] = polys[*numPolys].vert[2].normal[0];
-				polys[*numPolys].faceNormal[1] = polys[*numPolys].vert[2].normal[1];
-				polys[*numPolys].faceNormal[2] = polys[*numPolys].vert[2].normal[2];
-				polys[*numPolys].faceNormal[3] = 0.0f;
+				currentPoly.faceNormal[0] = currentPoly.vert[2].normal[0];
+				currentPoly.faceNormal[1] = currentPoly.vert[2].normal[1];
+				currentPoly.faceNormal[2] = currentPoly.vert[2].normal[2];
+				currentPoly.faceNormal[3] = 0.0f;
 
 				chunkLength = 24;
 				break;
@@ -652,31 +654,31 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 			case 0xd7:  // 1101 0111
 			case 0xc7:  // 1100 0111
 				// Copy over the proper vertices from the previous triangle...
-				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
-				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
+				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
+				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
 				// Fill in the appropriate data...
-				polys[*numPolys].vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				polys[*numPolys].vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				polys[*numPolys].vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
-				polys[*numPolys].n = 3;
+				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
+				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
+				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
+				currentPoly.vert[0].worldCoords[3] = 1.0f;
+				currentPoly.n = 3;
 
 				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				polys[*numPolys].vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				polys[*numPolys].vert[0].texCoords[1] = uToF(chunkOffset[8]);
-				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
-				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
+				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
+				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
+				currentPoly.vert[0].texCoords[2] = 0.0f;
+				currentPoly.vert[0].texCoords[3] = 1.0f;
 
-				polys[*numPolys].vert[0].normal[0] = uToF(chunkOffset[9]);
-				polys[*numPolys].vert[0].normal[1] = uToF(chunkOffset[10]);
-				polys[*numPolys].vert[0].normal[2] = uToF(chunkOffset[11]);
-				polys[*numPolys].vert[0].normal[3] = 0.0f;
+				currentPoly.vert[0].normal[0] = uToF(chunkOffset[9]);
+				currentPoly.vert[0].normal[1] = uToF(chunkOffset[10]);
+				currentPoly.vert[0].normal[2] = uToF(chunkOffset[11]);
+				currentPoly.vert[0].normal[3] = 0.0f;
 
-				polys[*numPolys].faceNormal[0] = uToF(chunkOffset[12]);
-				polys[*numPolys].faceNormal[1] = uToF(chunkOffset[13]);
-				polys[*numPolys].faceNormal[2] = uToF(chunkOffset[14]);
-				polys[*numPolys].faceNormal[3] = 0.0f;
+				currentPoly.faceNormal[0] = uToF(chunkOffset[12]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[13]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[14]);
+				currentPoly.faceNormal[3] = 0.0f;
 
 				chunkLength = 15;
 				break;
@@ -689,33 +691,33 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 			case 0xc6:  // 1100 0110
 			case 0xd6:  // 1101 0110
 				// Copy over the proper vertices from the previous triangle...
-				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
-				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
+				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
+				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				polys[*numPolys].vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				polys[*numPolys].vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				polys[*numPolys].vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
-				polys[*numPolys].n = 3;
+				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
+				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
+				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
+				currentPoly.vert[0].worldCoords[3] = 1.0f;
+				currentPoly.n = 3;
 
 				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				polys[*numPolys].vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				polys[*numPolys].vert[0].texCoords[1] = uToF(chunkOffset[8]);
-				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
-				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
+				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
+				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
+				currentPoly.vert[0].texCoords[2] = 0.0f;
+				currentPoly.vert[0].texCoords[3] = 1.0f;
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
-				polys[*numPolys].vert[0].normal[0] = lastPoly.faceNormal[0];
-				polys[*numPolys].vert[0].normal[1] = lastPoly.faceNormal[1];
-				polys[*numPolys].vert[0].normal[2] = lastPoly.faceNormal[2];
-				polys[*numPolys].vert[0].normal[3] = lastPoly.faceNormal[3];
+				currentPoly.vert[0].normal[0] = lastPoly.faceNormal[0];
+				currentPoly.vert[0].normal[1] = lastPoly.faceNormal[1];
+				currentPoly.vert[0].normal[2] = lastPoly.faceNormal[2];
+				currentPoly.vert[0].normal[3] = lastPoly.faceNormal[3];
 
-				polys[*numPolys].faceNormal[0] = lastPoly.faceNormal[0];
-				polys[*numPolys].faceNormal[1] = lastPoly.faceNormal[1];
-				polys[*numPolys].faceNormal[2] = lastPoly.faceNormal[2];
-				polys[*numPolys].faceNormal[3] = lastPoly.faceNormal[3];
+				currentPoly.faceNormal[0] = lastPoly.faceNormal[0];
+				currentPoly.faceNormal[1] = lastPoly.faceNormal[1];
+				currentPoly.faceNormal[2] = lastPoly.faceNormal[2];
+				currentPoly.faceNormal[3] = lastPoly.faceNormal[3];
 
-				// TODO: I'm not reading 3 necessary words here (maybe face normal) !!!
+				// TODO: I'm not reading 3 necessary words here (maybe face normal)
 
 #if 0
 				// DEBUG
@@ -738,17 +740,17 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 				break;
 			}
 
-			polys[*numPolys].visible = 1;
+			currentPoly.visible = 1;
 
 			// Backup the last polygon (for triangle fans [strips?])
-			memcpy(&lastPoly, &polys[*numPolys], sizeof(struct polygon));
+			memcpy(&lastPoly, &currentPoly, sizeof(polygon));
 
 
 			////////////////////////////////////
 			// Project and clip               //
 			////////////////////////////////////
 			// Perform the world transformations...
-			// !! Can eliminate this step with a matrix stack (maybe necessary?) !!
+			// TODO: We can eliminate this step with a matrix stack (maybe necessary?)
 			setIdentity(m_modelViewMatrix);
 			if (m_mcu_type != SAMSHO_MCU)
 			{
@@ -767,7 +769,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 				for (int v = 0; v < 3; v++)
 				{
 					float transformedNormal[4];
-					vecmatmul4(transformedNormal, objectMatrix, polys[*numPolys].vert[v].normal);
+					vecmatmul4(transformedNormal, objectMatrix, currentPoly.vert[v].normal);
 					normalize(transformedNormal);
 					normalize(m_lightVector);
 
@@ -777,9 +779,9 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 					intensity *= 128.0;                     // Maps intensity to the range [0.0, 2.0]
 					if (intensity >= 255.0f) intensity = 255.0f;
 
-					polys[*numPolys].vert[v].light[0] = intensity;
-					polys[*numPolys].vert[v].light[1] = intensity;
-					polys[*numPolys].vert[v].light[2] = intensity;
+					currentPoly.vert[v].light[0] = intensity;
+					currentPoly.vert[v].light[1] = intensity;
+					currentPoly.vert[v].light[2] = intensity;
 				}
 			}
 			else
@@ -787,77 +789,78 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 				// Just clear out the light values
 				for (int v = 0; v < 3; v++)
 				{
-					polys[*numPolys].vert[v].light[0] = 0;
-					polys[*numPolys].vert[v].light[1] = 0;
-					polys[*numPolys].vert[v].light[2] = 0;
+					currentPoly.vert[v].light[0] = 0;
+					currentPoly.vert[v].light[1] = 0;
+					currentPoly.vert[v].light[2] = 0;
 				}
 			}
 
 
 			// BACKFACE CULL //
-			// EMPIRICAL EVIDENCE SEEMS TO SHOW THE HNG64 HARDWARE DOES NOT BACKFACE CULL //
+			// (empirical evidence seems to show the hng64 hardware does not backface cull) //
 #if 0
 			float cullRay[4];
 			float cullNorm[4];
 
 			// Cast a ray out of the camera towards the polygon's point in eyespace.
-			vecmatmul4(cullRay, modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
+			vecmatmul4(cullRay, modelViewMatrix, currentPoly.vert[0].worldCoords);
 			normalize(cullRay);
+            
 			// Dot product that with the normal to see if you're negative...
-			vecmatmul4(cullNorm, modelViewMatrix, polys[*numPolys].faceNormal);
-
-			float result = vecDotProduct(cullRay, cullNorm);
-
-			if (result < 0.0f)
-				polys[*numPolys].visible = 1;
+			vecmatmul4(cullNorm, modelViewMatrix, currentPoly.faceNormal);
+			
+            const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
+			if (backfaceCullResult < 0.0f)
+				currentPoly.visible = 1;
 			else
-				polys[*numPolys].visible = 0;
+				currentPoly.visible = 0;
 #endif
 
 
 			// BEHIND-THE-CAMERA CULL //
-			vecmatmul4(cullRay, m_modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
+			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
 			if (cullRay[2] > 0.0f)              // Camera is pointing down -Z
 			{
-				polys[*numPolys].visible = 0;
+				currentPoly.visible = 0;
 			}
 
 
 			// TRANSFORM THE TRIANGLE INTO HOMOGENEOUS SCREEN SPACE //
-			if (polys[*numPolys].visible)
+			if (currentPoly.visible)
 			{
-				for (int m = 0; m < polys[*numPolys].n; m++)
+				for (int m = 0; m < currentPoly.n; m++)
 				{
 					// Transform and project the vertex into pre-divided homogeneous coordinates...
-					vecmatmul4(eyeCoords, m_modelViewMatrix, polys[*numPolys].vert[m].worldCoords);
-					vecmatmul4(polys[*numPolys].vert[m].clipCoords, m_projectionMatrix, eyeCoords);
+					vecmatmul4(eyeCoords, m_modelViewMatrix, currentPoly.vert[m].worldCoords);
+					vecmatmul4(currentPoly.vert[m].clipCoords, m_projectionMatrix, eyeCoords);
 				}
 
-				if (polys[*numPolys].visible)
+				if (currentPoly.visible)
 				{
 					// Clip the triangles to the view frustum...
-					performFrustumClip(&polys[*numPolys]);
+					performFrustumClip(&currentPoly);
 
-					for (int m = 0; m < polys[*numPolys].n; m++)
+					for (int m = 0; m < currentPoly.n; m++)
 					{
 						// Convert into normalized device coordinates...
-						ndCoords[0] = polys[*numPolys].vert[m].clipCoords[0] / polys[*numPolys].vert[m].clipCoords[3];
-						ndCoords[1] = polys[*numPolys].vert[m].clipCoords[1] / polys[*numPolys].vert[m].clipCoords[3];
-						ndCoords[2] = polys[*numPolys].vert[m].clipCoords[2] / polys[*numPolys].vert[m].clipCoords[3];
-						ndCoords[3] = polys[*numPolys].vert[m].clipCoords[3];
+						ndCoords[0] = currentPoly.vert[m].clipCoords[0] / currentPoly.vert[m].clipCoords[3];
+						ndCoords[1] = currentPoly.vert[m].clipCoords[1] / currentPoly.vert[m].clipCoords[3];
+						ndCoords[2] = currentPoly.vert[m].clipCoords[2] / currentPoly.vert[m].clipCoords[3];
+						ndCoords[3] = currentPoly.vert[m].clipCoords[3];
 
 						// Final pixel values are garnered here :
 						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea.max_x) / 2.0f) + 0.0f;
 						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea.max_y) / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
 
-						windowCoords[1] = (float)visarea.max_y - windowCoords[1];       // Flip Y
+                        // Flip Y
+						windowCoords[1] = (float)visarea.max_y - windowCoords[1];
 
 						// Store the points in a list for later use...
-						polys[*numPolys].vert[m].clipCoords[0] = windowCoords[0];
-						polys[*numPolys].vert[m].clipCoords[1] = windowCoords[1];
-						polys[*numPolys].vert[m].clipCoords[2] = windowCoords[2];
-						polys[*numPolys].vert[m].clipCoords[3] = ndCoords[3];
+						currentPoly.vert[m].clipCoords[0] = windowCoords[0];
+						currentPoly.vert[m].clipCoords[1] = windowCoords[1];
+						currentPoly.vert[m].clipCoords[2] = windowCoords[2];
+						currentPoly.vert[m].clipCoords[3] = ndCoords[3];
 					}
 				}
 			}
@@ -865,15 +868,16 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 			// Advance to the next polygon chunk...
 			chunkOffset += chunkLength;
 
-			(*numPolys)++;
+			numPolys++;
 		}
 	}
 }
 
 // note 0x0102 packets are only 8 words, it appears they can be in either the upper or lower half of the 16 word packet.
-// We currently only draw 0x0102 packets where both halves contain 0x0102 (2 calls), but this causes graphics to vanish in xrally because in some cases the 0x0102 packet only exists in the upper or lower half
-// with another value (often 0x0000 - NOP) in the other.
-// If we also treat (0x0000 - NOP) as 8 word  instead of 16 so that we can access a 0x0102 in the 2nd half of the 16 word packet then we end up with other invalid packets in the 2nd half which should be ignored.
+// We currently only draw 0x0102 packets where both halves contain 0x0102 (2 calls), but this causes graphics to vanish in 
+// xrally because in some cases the 0x0102 packet only exists in the upper or lower half with another value (often 0x0000 - NOP) in the other.
+// If we also treat (0x0000 - NOP) as 8 word  instead of 16 so that we can access a 0x0102 in the 2nd half of the 16 word packet 
+// then we end up with other invalid packets in the 2nd half which should be ignored.
 // This would suggest our processing if flawed in other ways, or there is something else to indicate packet length.
 
 void hng64_state::hng64_command3d(const UINT16* packet)
@@ -912,7 +916,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && m_mcu_type == SHOOT_MCU)
 			break;
 
-		recoverPolygonBlock(packet, &numPolys);
+		recoverPolygonBlock(packet, numPolys);
 		break;
 
 	case 0x0102:    // Geometry with only translation
@@ -932,7 +936,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock(miniPacket, &numPolys);
+		recoverPolygonBlock(miniPacket, numPolys);
 
 		memset(miniPacket, 0, sizeof(UINT16)*16);
 		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
@@ -940,7 +944,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock(miniPacket, &numPolys);
+		recoverPolygonBlock(miniPacket, numPolys);
 		break;
 
 	case 0x1000:    // Unknown: Some sort of global flags?
@@ -956,12 +960,12 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		break;
 	}
 
-	/* If there are polygons, rasterize them into the display buffer */
+	// If there are polygons, rasterize them into the display buffer
 	for (int i = 0; i < numPolys; i++)
 	{
-		if (polys[i].visible)
+		if (m_polys[i].visible)
 		{
-			m_poly_renderer->drawShaded(&polys[i]);
+			m_poly_renderer->drawShaded(&m_polys[i]);
 		}
 	}
     m_poly_renderer->wait();
@@ -1004,11 +1008,12 @@ void hng64_state::clear3d()
  *
  */
 
+
 /////////////////////
 // 3D UTILITY CODE //
 /////////////////////
 
-/* 4x4 matrix multiplication */
+// 4x4 matrix multiplication
 void hng64_state::matmul4(float *product, const float *a, const float *b)
 {
 	int i;
@@ -1026,7 +1031,7 @@ void hng64_state::matmul4(float *product, const float *a, const float *b)
 	}
 }
 
-/* vector by 4x4 matrix multiply */
+// vector by 4x4 matrix multiply
 void hng64_state::vecmatmul4(float *product, const float *a, const float *b)
 {
 	const float& bi0 = b[0];
@@ -1082,12 +1087,11 @@ void hng64_state::normalize(float* x)
 }
 
 
-
 ///////////////////////////
 // POLYGON CLIPPING CODE //
 ///////////////////////////
 
-int hng64_state::Inside(struct polyVert *v, int plane)
+int hng64_state::Inside(polyVert *v, int plane)
 {
 	switch(plane)
 	{
@@ -1110,7 +1114,7 @@ int hng64_state::Inside(struct polyVert *v, int plane)
 	return 0;
 }
 
-void hng64_state::Intersect(struct polyVert *input0, struct polyVert *input1, struct polyVert *output, int plane)
+void hng64_state::Intersect(polyVert *input0, polyVert *input1, polyVert *output, int plane)
 {
 	float t = 0.0f;
 
@@ -1163,12 +1167,9 @@ void hng64_state::Intersect(struct polyVert *input0, struct polyVert *input1, st
 	Ol[2] = Il0[2] + (Il1[2] - Il0[2]) * t;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Clip against the volumes defined by the homogeneous clip coordinates //
-//////////////////////////////////////////////////////////////////////////
-
-void hng64_state::performFrustumClip(struct polygon *p)
+void hng64_state::performFrustumClip(polygon *p)
 {
+    // Clip against the volumes defined by the homogeneous clip coordinates
     polyVert *v0;
 	polyVert *v1;
 	polyVert *tv;
@@ -1190,7 +1191,7 @@ void hng64_state::performFrustumClip(struct polygon *p)
 
 			if (Inside(v0, j) && Inside(v1, j))                         // Edge is completely inside the volume...
 			{
-				memcpy(tv, v1, sizeof(struct polyVert));
+				memcpy(tv, v1, sizeof(polyVert));
 				temp.n++;
 			}
 			else if (Inside(v0, j) && !Inside(v1, j))                   // Edge goes from in to out...
@@ -1201,7 +1202,7 @@ void hng64_state::performFrustumClip(struct polygon *p)
 			else if (!Inside(v0, j) && Inside(v1, j))                   // Edge goes from out to in...
 			{
 				Intersect(v0, v1, tv, j);
-				memcpy(&temp.vert[temp.n+1], v1, sizeof(struct polyVert));
+				memcpy(&temp.vert[temp.n+1], v1, sizeof(polyVert));
 				temp.n+=2;
 			}
 		}
@@ -1210,12 +1211,17 @@ void hng64_state::performFrustumClip(struct polygon *p)
 
 		for (int i = 0; i < temp.n; i++)
 		{
-			memcpy(&p->vert[i], &temp.vert[i], sizeof(struct polyVert));
+			memcpy(&p->vert[i], &temp.vert[i], sizeof(polyVert));
 		}
 
 		temp.n = 0;
 	}
 }
+
+
+////////////////////////////////
+// POLYGON RASTERIZATION CODE //
+////////////////////////////////
 
 void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
@@ -1351,7 +1357,7 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
     }
 }
 
-void hng64_poly_renderer::drawShaded(struct polygon *p)
+void hng64_poly_renderer::drawShaded(polygon *p)
 {
     // Polygon information for the rasterizer
     hng64_poly_data rOptions;
