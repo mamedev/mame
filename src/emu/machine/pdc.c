@@ -299,13 +299,13 @@ WRITE_LINE_MEMBER(pdc_device::hdd_irq)
 
 WRITE8_MEMBER(pdc_device::p38_w)
 {
-	logerror("PDC: Port 0x38 set bit %i.\n", data);
+	logerror("PDC: Port 0x38 set bit: %i\n", data);
 	reg_p38 |= data;
 }
 READ8_MEMBER(pdc_device::p38_r)
 {
 	UINT8 retn;
-	logerror("PDC read port 38: %02X\n", reg_p38);
+	logerror("PDC: Port 0x38 READ: %02X\n", reg_p38);
 	retn = reg_p38;
 	reg_p38 &= ~2; // Clear bit 1
 

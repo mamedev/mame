@@ -75,6 +75,7 @@ private:
 	UINT32 reg_ff050320; // Counter?
 	UINT32 reg_fff80040;
 	UINT32 fdd_dest_address; // 5FF080B0
+	UINT32 fdd_cmd_complete;
 	UINT32 smioc_out_addr;
 	// End registers
 
@@ -121,6 +122,7 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	reg_fff80040 = 0;
 	fdd_dest_address = 0;
 //	fdd_scsi_command = 0;
+	fdd_cmd_complete = 1;
 	smioc_out_addr = 0;
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
@@ -147,16 +149,19 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 		data = 0x40;
         else if(address == 0x5FF008B0)
                 data = 0x10; // HDD Command result code
-	else if(address == 0x5FF03024)
+	else if(address == 0x5FF03024) // HDD Command status
 	{
 		data = 0x1; // HDD SCSI command completed successfully
 		logerror("SCSI HDD command completed - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 		return data;
 	}
-	else if(address == 0x5FF030B0)
+	else if(address == 0x5FF030B0) // FDD Command status
 	{
-		data = 0x1; // FDD SCSI command completed successfully
-		logerror("SCSI FDD command completed - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		//data = 0x1; // FDD SCSI command completed successfully
+		logerror("--- SCSI FDD command completed - Read: %08X, From: %08X, Register: %08X\n", fdd_cmd_complete, space.machine().firstcpu->pc(), address);
+		data = fdd_cmd_complete;
+		fdd_cmd_complete = 0;
+
 		return data;
 	}
 	else
@@ -169,7 +174,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 {
 	UINT32 address = offset * 4 + 0x5FF00000;
 	if(address == 0x5FF00224) // HDD SCSI read command
-		logerror("HDD Read Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 	else if(address == 0x5FF04098) // Serial DMA Command
 	{
 		if(data == 0x4100) // Send byte to serial
@@ -179,31 +184,40 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		}
 	}
 	else if(address == 0x5FF08024) // HDD SCSI read command
-		logerror("HDD Read Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 	else if(address == 0x5FF0C024) // HDD SCSI read command
-		logerror("HDD Read Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 
 	else if(address == 0x5FF001B0) // FDD SCSI read command
-		logerror("FDD Read Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+	{
+		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		//fdd_cmd_complete = 1;
+	}
 	else if(address == 0x5FF002B0) // FDD SCSI read command
-		logerror("FDD Read Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+	{
+		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		fdd_cmd_complete = 1;
+	}
 	else if(address == 0x5FF008B0) // FDD SCSI read command
-		logerror("FDD Read Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-
+	{
+		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		fdd_cmd_complete = 1;
+	}
 	else if(address == 0x5FF080B0) // fdd_dest_address register
 	{
 		fdd_dest_address = data << 1;
-		logerror("FDD Address: %08X\n", fdd_dest_address);
+		logerror("FDD destination address: %08X\n", fdd_dest_address);
+		fdd_cmd_complete = 1;
 	}
         else if(address == 0x5FF0C098) // Serial DMA output address
                 smioc_out_addr = data * 2;
-	else if((address == 0x5FF0C0B0) || (address == 0x5FF0C1B0)) // Do something with ffd_dest_address
+	else if((address == 0x5FF0C0B0) || (address == 0x5FF0C1B0)) // FDD Command address written to this memory location
 	{
 		UINT32 fdd_scsi_command;
 		UINT32 fdd_scsi_command2;
-		unsigned char c_fdd_scsi_command[8];
+		unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
 		//unsigned char fdd_buffer[512];
-		int scsi_lba;
+		int scsi_lba; // FDD LBA location here, extracted from command
 		
 	//	fdd_scsi_command = swap_uint32(m_mem->read_dword(fdd_dest_address));
 	//	fdd_scsi_command2 = swap_uint32(m_mem->read_dword(fdd_dest_address+4));
@@ -221,7 +235,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
 		logerror("FDD SCSI LBA: %i\n", scsi_lba);
 
-		m_pdc->p38_w(space,0,0x2); // Set bit 1 on port 38 register
+		m_pdc->p38_w(space,0,0x2); // Set bit 1 on port 38 register.  PDC polls register at this location looking for command
 /*
 		switch(c_fdd_scsi_command[0])
 		{
@@ -289,7 +303,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 		reg_ff050004 = data;
 	else if(address == 0xFF05000C) // LED hex display indicator
 	{
-		logerror("LED: %02x, Instruction: %08x\n", data, space.machine().firstcpu->pc());
+		logerror("\n*** LED: %02x, Instruction: %08x ***\n\n", data, space.machine().firstcpu->pc());
 /*		char buf[10];
 		char *buf2;
 		sprintf(buf,"%02X",data);
