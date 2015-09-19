@@ -2708,7 +2708,7 @@ end
 
 if (MACHINES["PDC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pdc.c",
-		MAME_DIR .. "src/emu/machine/pdc.h",
+		MAME_DIR .. "src/devices/machine/pdc.c",
+		MAME_DIR .. "src/devices/machine/pdc.h",
 	}
 end
