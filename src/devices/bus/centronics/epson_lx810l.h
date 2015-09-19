@@ -16,8 +16,18 @@
 #include "machine/e05a30.h"
 #include "machine/eepromser.h"
 #include "machine/steppers.h"
-#include "sound/speaker.h"
+#include "sound/dac.h"
 
+
+/* The printer starts printing at x offset 44 and stops printing at x
+ * offset 1009, giving a total of 965 printable pixels. Supposedly, the
+ * border at the far right would be at x offset 1053. I've chosen the
+ * width for the paper as 1024, since it's a nicer number than 1053, so
+ * an offset must be used to centralize the pixels.
+ */
+#define CR_OFFSET    (-14)
+#define PAPER_WIDTH  1024
+#define PAPER_HEIGHT 576
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -91,6 +101,11 @@ public:
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
 
+	/* Video hardware (simulates paper) */
+	UINT32 screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+#define uabs(x) ((x) > 0 ? (x) : -(x))
+	unsigned int bitmap_line(int i) { return ((uabs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -102,8 +117,9 @@ private:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_device> m_dac;
 	required_device<e05a30_device> m_e05a30;
+	required_device<screen_device> m_screen;
 
 	int m_93c06_clk;
 	int m_93c06_cs;
@@ -114,6 +130,7 @@ private:
 	int m_real_cr_steps;
 	int m_real_cr_dir; /* 1 is going right, -1 is going left */
 	UINT8 m_fakemem;
+	bitmap_rgb32 m_bitmap;
 
 	enum {
 		TIMER_CR
