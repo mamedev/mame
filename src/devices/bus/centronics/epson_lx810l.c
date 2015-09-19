@@ -160,19 +160,12 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_EEPROM_SERIAL_93C06_ADD("eeprom")
 
 	/* steppers */
-	//should this have MCFG_STEPPER_MAX_STEPS(200*2) ? code shows 200 steps...
 	MCFG_STEPPER_ADD("pf_stepper")
 	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
-	MCFG_STEPPER_START_INDEX(16)
-	MCFG_STEPPER_END_INDEX(24)
-	MCFG_STEPPER_INDEX_PATTERN(0x00)
-	MCFG_STEPPER_INIT_PHASE(0)
+	MCFG_STEPPER_INIT_PHASE(4)
 
 	MCFG_STEPPER_ADD("cr_stepper")
 	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
-	MCFG_STEPPER_START_INDEX(16)
-	MCFG_STEPPER_END_INDEX(24)
-	MCFG_STEPPER_INDEX_PATTERN(0x00)
 	MCFG_STEPPER_INIT_PHASE(2)
 
 MACHINE_CONFIG_END
@@ -301,9 +294,9 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
-	m_pf_pos_abs(200),
-	m_cr_pos_abs(200),
-	m_real_cr_pos(200),
+	m_pf_pos_abs(1),
+	m_cr_pos_abs(1),
+	m_real_cr_pos(1),
 	m_real_cr_steps(0),
 	m_real_cr_dir(0)
 {
@@ -321,9 +314,9 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
-	m_pf_pos_abs(200),
-	m_cr_pos_abs(200),
-	m_real_cr_pos(200),
+	m_pf_pos_abs(1),
+	m_cr_pos_abs(1),
+	m_real_cr_pos(1),
 	m_real_cr_steps(0),
 	m_real_cr_dir(0)
 {
@@ -518,7 +511,7 @@ WRITE16_MEMBER( epson_lx810l_t::printhead )
 WRITE8_MEMBER( epson_lx810l_t::pf_stepper )
 {
 	m_pf_stepper->update(data);
-	m_pf_pos_abs = 200 - m_pf_stepper->get_absolute_position();
+	m_pf_pos_abs = -m_pf_stepper->get_absolute_position();
 
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_pf_pos_abs);
 }
@@ -528,7 +521,7 @@ WRITE8_MEMBER( epson_lx810l_t::cr_stepper )
 	int m_cr_pos_abs_prev = m_cr_pos_abs;
 
 	m_cr_stepper->update(data);
-	m_cr_pos_abs = 200 - m_cr_stepper->get_absolute_position();
+	m_cr_pos_abs = -m_cr_stepper->get_absolute_position();
 
 	if (m_cr_pos_abs > m_cr_pos_abs_prev) {
 		/* going right */
