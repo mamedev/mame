@@ -12,9 +12,7 @@
  *   uPC494C (pulse width modulation control)
  *
  * Devices boot and enter main input loop. Data is received through the
- * centronics bus and printed as expected. The actual paper output is
- * still not implemented, though. Look at the output from the fire signal
- * (epson_lx810l_t::co0_w()) to see what's actually being printed.
+ * centronics bus and printed as expected in a separate screen.
  *
  * It is possible to run the printers' self test with this procedure:
  * - Turn on device;
@@ -26,8 +24,7 @@
  *
  * The printer's carriage will seek home, it will pull in paper for a while,
  * and it will start printing some test data. The Online LED will blink at
- * each line. Look at the output from the fire signal to see what's actually
- * being printed (epson_lx810l_t::co0_w()).
+ * each line.
  */
 
 #include "epson_lx810l.h"
@@ -138,6 +135,14 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_UPD7810_CO1(WRITELINE(epson_lx810l_t, co1_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_lx800)
+
+	/* video hardware (simulates paper) */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(PAPER_WIDTH, PAPER_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, PAPER_WIDTH-1, 0, PAPER_HEIGHT-1)
+	MCFG_SCREEN_UPDATE_DRIVER(epson_lx810l_t, screen_update_lx810l)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -291,6 +296,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	m_eeprom(*this, "eeprom"),
 	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
+	m_screen(*this, "screen"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
@@ -311,6 +317,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	m_eeprom(*this, "eeprom"),
 	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
+	m_screen(*this, "screen"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
@@ -336,6 +343,8 @@ epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, d
 
 void epson_lx810l_t::device_start()
 {
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_bitmap.fill(0xffffff); /* Start with a clean white piece of paper */
 }
 
 
@@ -510,8 +519,14 @@ WRITE16_MEMBER( epson_lx810l_t::printhead )
 
 WRITE8_MEMBER( epson_lx810l_t::pf_stepper )
 {
-	m_pf_stepper->update(data);
+	int changed = m_pf_stepper->update(data);
 	m_pf_pos_abs = -m_pf_stepper->get_absolute_position();
+
+	/* clear last line of paper */
+	if (changed > 0) {
+		void *line = m_bitmap.raw_pixptr(bitmap_line(9), 0);
+		memset(line, 0xff, m_bitmap.width() * 4);
+	}
 
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_pf_pos_abs);
 }
@@ -545,13 +560,27 @@ WRITE_LINE_MEMBER( epson_lx810l_t::e05a30_ready )
 
 
 /***************************************************************************
+    Video hardware (simulates paper)
+***************************************************************************/
+
+UINT32 epson_lx810l_t::screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int scrolly = -bitmap_line(9);
+	copyscrollbitmap(bitmap, m_bitmap, 0, NULL, 1, &scrolly, cliprect);
+
+	/* draw "printhead" */
+	bitmap.plot_box(m_real_cr_pos + CR_OFFSET - 10, PAPER_HEIGHT - 36, 20, 36, 0x888888);
+
+	return 0;
+}
+
+
+/***************************************************************************
     Extended Timer Output
 ***************************************************************************/
 
 WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
 {
-	/* TODO Draw the dots on the paper using this information. */
-
 	/* Printhead is being fired on !state. */
 	if (!state) {
 		/* The firmware expects a 300 microseconds delay between the fire
@@ -565,7 +594,13 @@ WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
 		 * lines which are being printed in different directions is
 		 * noticeably off in the 20+ years old printer used for testing =).
 		 */
-		LX810LLOG("FIRE0 %d %d %04x\n", m_pf_pos_abs, m_real_cr_pos, m_printhead);
+		if (m_real_cr_pos < m_bitmap.width()) {
+			for (int i = 0; i < 9; i++) {
+				unsigned int y = bitmap_line(i);
+				if ((m_printhead & (1<<(8-i))) != 0)
+					m_bitmap.pix32(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
+			}
+		}
 	}
 }
 
