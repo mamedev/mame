@@ -506,11 +506,11 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 		if (!m_snd_control.on)
 		{
 			sound_w_internal(NR10, 0x80);
-			sound_w_internal(NR11, 0x3F);
-			sound_w_internal(NR12, 0x00);
-			sound_w_internal(NR13, 0xFE);
+			sound_w_internal(NR11, 0xBF);
+			sound_w_internal(NR12, 0xF3);
+			sound_w_internal(NR13, 0xFF);
 			sound_w_internal(NR14, 0xBF);
-//          sound_w_internal(NR20, 0xFF);
+			//sound_w_internal(NR20, 0xFF);
 			sound_w_internal(NR21, 0x3F);
 			sound_w_internal(NR22, 0x00);
 			sound_w_internal(NR23, 0xFF);
@@ -520,13 +520,13 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 			sound_w_internal(NR32, 0x9F);
 			sound_w_internal(NR33, 0xFF);
 			sound_w_internal(NR34, 0xBF);
-//          sound_w_internal(NR40, 0xFF);
+			//sound_w_internal(NR40, 0xFF);
 			sound_w_internal(NR41, 0xFF);
 			sound_w_internal(NR42, 0x00);
 			sound_w_internal(NR43, 0x00);
 			sound_w_internal(NR44, 0xBF);
-			sound_w_internal(NR50, 0x00);
-			sound_w_internal(NR51, 0x00);
+			sound_w_internal(NR50, 0x77);
+			sound_w_internal(NR51, 0xF3);
 			m_snd_1.on = 0;
 			m_snd_2.on = 0;
 			m_snd_3.on = 0;
