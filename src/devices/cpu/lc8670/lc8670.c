@@ -105,9 +105,9 @@ const device_type LC8670 = &device_creator<lc8670_cpu_device>;
 #define     GET_AC      BIT(REG_PSW,6)
 #define     GET_OV      BIT(REG_PSW,2)
 #define     GET_P       BIT(REG_PSW,0)
-#define     SET_CY(v)   { if (v) REG_PSW |= FLAG_CY; else REG_PSW &= ~FLAG_CY; } while(0)
-#define     SET_AC(v)   { if (v) REG_PSW |= FLAG_AC; else REG_PSW &= ~FLAG_AC; } while(0)
-#define     SET_OV(v)   { if (v) REG_PSW |= FLAG_OV; else REG_PSW &= ~FLAG_OV; } while(0)
+#define     SET_CY(v)   do { if (v) REG_PSW |= FLAG_CY; else REG_PSW &= ~FLAG_CY; } while(0)
+#define     SET_AC(v)   do { if (v) REG_PSW |= FLAG_AC; else REG_PSW &= ~FLAG_AC; } while(0)
+#define     SET_OV(v)   do { if (v) REG_PSW |= FLAG_OV; else REG_PSW &= ~FLAG_OV; } while(0)
 #define     CHECK_P()   check_p_flag()
 
 // CPU state
