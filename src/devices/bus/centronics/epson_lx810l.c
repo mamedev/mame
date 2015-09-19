@@ -2,7 +2,7 @@
 // copyright-holders:Ramiro Polla, Felipe Sanches
 /*
  * Epson LX-810L dot matrix printer emulation
-
+ *
  * IC list:
  *   uPD7810HG (cpu)
  *   E05A30 (gate array)
@@ -20,11 +20,9 @@
  * - Reset device;
  * - Toggle Line Feed button again;
  * - Press Online button (press 'O');
- * - Press Online button again;
  *
- * The printer's carriage will seek home, it will pull in paper for a while,
- * and it will start printing some test data. The Online LED will blink at
- * each line.
+ * The printer's carriage will seek home and it will start printing
+ * some test data. The Online LED will blink at each line.
  */
 
 #include "epson_lx810l.h"
