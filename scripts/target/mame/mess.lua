@@ -1386,6 +1386,7 @@ createMESSProjects(_target, _subtarget, "dec")
 files {
 	MAME_DIR .. "src/mess/drivers/dct11em.c",
 	MAME_DIR .. "src/mess/drivers/dectalk.c",
+	MAME_DIR .. "src/mess/drivers/decwritr.c",
 	MAME_DIR .. "src/mess/drivers/pdp11.c",
 	MAME_DIR .. "src/mess/drivers/vax11.c",
 	MAME_DIR .. "src/mess/drivers/rainbow.c",
