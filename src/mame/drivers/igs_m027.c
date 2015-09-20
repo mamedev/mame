@@ -636,25 +636,6 @@ ROM_START( amazonia )
 	ROM_LOAD( "igs_s2102.u28", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
 ROM_END
 
-
-ROM_START( sdwx )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
-	ROM_LOAD( "sdwx_igs027a", 0x00000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "prg.u16", 0x000000, 0x80000, CRC(c94ef6a8) SHA1(69f2f356e05206b0866a9020253d9a112b56316c) )
-
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "text.u24", 0x000000, 0x80000, CRC(60b415ac) SHA1(b4475b0ba1e70504cac9ac05078873df0b16495b) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "cg.u25", 0x000000, 0x200000, CRC(709b9a42) SHA1(18c4b8e159b29c168f5cafb437fe6eb123672471) )
-
-	ROM_REGION( 0x80000, "oki", 0 ) // m6295 samples
-	ROM_LOAD( "sp.u2", 0x00000, 0x80000, CRC(216b5418) SHA1(b7bc24ced0ccb5476c974420aa506c13b971fc9f) )
-ROM_END
-
 /*
 Amazonia King II by IGS 2004 ( International Game System )
 Patented by EAGO.
@@ -677,18 +658,64 @@ ROM_START( amazoni2 )
 	ROM_LOAD( "sdwx_igs027a", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "U23_27c4096_AKII_V-202br.bin", 0x000000, 0x80000, CRC(7147b43c) SHA1(29a4a20867595650918c4ab892ddb71440bd3f4b) )
+	ROM_LOAD( "27c4096_akii_b-202br.u23", 0x000000, 0x80000, CRC(7147b43c) SHA1(29a4a20867595650918c4ab892ddb71440bd3f4b) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "akii_text.u24", 0x000000, 0x80000, CRC(60b415ac) SHA1(b4475b0ba1e70504cac9ac05078873df0b16495b) )
+	ROM_LOAD( "akii_text.u12", 0x000000, 0x80000, CRC(60b415ac) SHA1(b4475b0ba1e70504cac9ac05078873df0b16495b) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "U13_27c160_AKII_CG.bin", 0x000000, 0x200000, CRC(254bd84f) SHA1(091ecda792c4c4a7bb039b2c708788ef87fdaf86) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "U13_27c160_akii_cg.u13", 0x000000, 0x200000, CRC(254bd84f) SHA1(091ecda792c4c4a7bb039b2c708788ef87fdaf86) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x80000, "oki", 0 )  // m6295 samples
 	ROM_LOAD( "akii_sp.u28", 0x00000, 0x80000, CRC(216b5418) SHA1(b7bc24ced0ccb5476c974420aa506c13b971fc9f) )
 ROM_END
 
+
+// Games with prg at u16
+// text at u24
+// cg at u25
+// samples at u2
+
+ROM_START( sdwx )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A ARM based MCU */
+	ROM_LOAD( "sdwx_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "prg.u16", 0x000000, 0x80000, CRC(c94ef6a8) SHA1(69f2f356e05206b0866a9020253d9a112b56316c) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "text.u24", 0x000000, 0x80000, CRC(60b415ac) SHA1(b4475b0ba1e70504cac9ac05078873df0b16495b) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "cg.u25", 0x000000, 0x200000, CRC(709b9a42) SHA1(18c4b8e159b29c168f5cafb437fe6eb123672471) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // m6295 samples
+	ROM_LOAD( "sp.u2", 0x00000, 0x80000, CRC(216b5418) SHA1(b7bc24ced0ccb5476c974420aa506c13b971fc9f) )
+ROM_END
+
+ROM_START( klxyj )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A ARM based MCU */
+	ROM_LOAD( "klxyj_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "klxyj_104.u16", 0x000000, 0x80000, CRC(8cb9bdc2) SHA1(5a13d0ff6488a938617a9ea89e7cf607539a1f49) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "klxyj_text.u24", 0x000000, 0x80000, CRC(22dcebd0) SHA1(0383f017135230d020d12c8c6cc3aeb136fe9106) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD( "a4202.u25", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) )
+
+	ROM_REGION( 0x200000, "unknown", 0 )
+	ROM_LOAD( "w4201.u2", 0x00000, 0x100000, CRC(464f11ab) SHA1(56e45bd31f667fc30387fcd4c940a94819b7ef0f) )
+ROM_END
+
+// Games with prg at u17
+// text at u27
+// cg at u28
+// samples at u4 (or u5?)
 
 ROM_START( sddz )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -707,27 +734,6 @@ ROM_START( sddz )
 	ROM_REGION( 0x200000, "unknown", 0 )
 	ROM_LOAD( "ddz_sp.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
-
-
-
-ROM_START( lhzb3 )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
-	ROM_LOAD( "lhzb3_igs027a", 0x00000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "lhzb3_104.u9", 0x000000, 0x80000, CRC(70d61846) SHA1(662b59702ef6f26129de6b16346786df92f99097) )
-
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "lhzb3_text.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
-
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
-
-	ROM_REGION( 0x200000, "unknown", 0 )
-	ROM_LOAD( "s2402.u14", 0x00000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
-ROM_END
-
 
 ROM_START( lhzb4 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -749,42 +755,32 @@ ROM_END
 
 
 
-ROM_START( klxyj )
+// Games with prg at u9
+// text at u17
+// cg at u18
+// samples at u14
+
+
+ROM_START( lhzb3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
-	ROM_LOAD( "klxyj_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "lhzb3_igs027a", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "klxyj_104.u16", 0x000000, 0x80000, CRC(8cb9bdc2) SHA1(5a13d0ff6488a938617a9ea89e7cf607539a1f49) )
+	ROM_LOAD( "lhzb3_104.u9", 0x000000, 0x80000, CRC(70d61846) SHA1(662b59702ef6f26129de6b16346786df92f99097) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "klxyj_text.u24", 0x000000, 0x80000, CRC(22dcebd0) SHA1(0383f017135230d020d12c8c6cc3aeb136fe9106) )
+	ROM_LOAD( "lhzb3_text.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD( "a4202.u25", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) )
+	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
 
 	ROM_REGION( 0x200000, "unknown", 0 )
-	ROM_LOAD( "w4201.u2", 0x00000, 0x100000, CRC(464f11ab) SHA1(56e45bd31f667fc30387fcd4c940a94819b7ef0f) )
+	ROM_LOAD( "s2402.u14", 0x00000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
 ROM_END
 
 
-ROM_START( mgfx )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
-	ROM_LOAD( "mgfx_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "mgfx_101.u10", 0x000000, 0x80000, CRC(897c88a1) SHA1(0f7a7808b9503ff28ad32c0b8e071cb24cff59b1) )
-
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "mgfx_text.u9", 0x000000, 0x80000, CRC(e41e7768) SHA1(3d0add7c75c23533309e799fd8853c815e6f811c) )
-
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD( "mgfx_ani.u17", 0x000000, 0x400000, CRC(9fc75f4d) SHA1(acb600739dcf252a5210e28ec96d749573061b27) )
-
-	ROM_REGION( 0x200000, "unknown", 0 )
-	ROM_LOAD( "mgfx_sp.u14", 0x00000, 0x100000, CRC(9bb28fc8) SHA1(6368753c29607f2d212d68c5cca3f10aa069649b) )
-ROM_END
 
 
 /*
@@ -850,6 +846,27 @@ ROM_START( zhongguo )
 	ROM_REGION( 0x200000, "unknown", 0 )
 	ROM_LOAD( "s2602.u14", 0x00000, 0x100000, CRC(f137028c) SHA1(0e4114222820bca2f7026fa653e2b96a489a0183) )
 ROM_END
+
+
+
+ROM_START( mgfx )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A ARM based MCU */
+	ROM_LOAD( "mgfx_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "mgfx_101.u10", 0x000000, 0x80000, CRC(897c88a1) SHA1(0f7a7808b9503ff28ad32c0b8e071cb24cff59b1) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "mgfx_text.u9", 0x000000, 0x80000, CRC(e41e7768) SHA1(3d0add7c75c23533309e799fd8853c815e6f811c) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD( "mgfx_ani.u17", 0x000000, 0x400000, CRC(9fc75f4d) SHA1(acb600739dcf252a5210e28ec96d749573061b27) )
+
+	ROM_REGION( 0x200000, "unknown", 0 )
+	ROM_LOAD( "mgfx_sp.u14", 0x00000, 0x100000, CRC(9bb28fc8) SHA1(6368753c29607f2d212d68c5cca3f10aa069649b) )
+ROM_END
+
 
 /*
 
@@ -1016,7 +1033,10 @@ ROM_END
 
 
 
-
+// prg at u34
+// text at u15
+// cg at u32 / u12
+// samples at u3
 
 ROM_START( haunthig )
 	ROM_REGION( 0x04000, "maincpu", 0 )
