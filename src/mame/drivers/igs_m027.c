@@ -1054,14 +1054,15 @@ ROM_START( haunthig )
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD( "haunted-h_cg.u32", 0x000000, 0x400000, CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) )
+	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_REGION( 0x400000, "gfx3", 0 )
-	ROM_LOAD( "haunted-h_ext.u12", 0x000000, 0x400000, CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) )
+	ROM_LOAD( "haunted-h_ext.u12", 0x000000, 0x400000, CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000,  CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) )
 ROM_END
+
 
 
 
