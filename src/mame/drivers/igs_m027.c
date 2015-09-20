@@ -440,6 +440,12 @@ static GFXDECODE_START( igs_m027 )
 	// GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_16x16x16, 0, 16  )
 GFXDECODE_END
 
+static GFXDECODE_START( amazonia )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x4,   0, 16  )
+	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_8x8x4,   0, 16  )
+	GFXDECODE_ENTRY( "gfx3", 0, gfxlayout_8x8x4,   0, 16  )
+GFXDECODE_END
+
 
 INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
 {
@@ -506,7 +512,31 @@ static MACHINE_CONFIG_START( fearless, igs_m027_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( amazonia, igs_m027_state )
+	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
+	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
+
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
+	//MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amazonia)
+
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+
+	/* sound hardware */
+
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -640,8 +670,11 @@ ROM_START( amazonia )
 	ROM_REGION( 0x480000, "gfx1", 0 )
 	ROM_LOAD( "igs_t2105_cg_v110.u12", 0x000000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
 
-	ROM_REGION( 0x480000, "gfx2", 0 )
-	ROM_LOAD( "amazonia_cg.u11", 0x000000, 0x80000, CRC(2ac2cfd1) SHA1(f8750a4727ddabf1415dab6eaa4a72e60e86e7f1) )
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "amazonia_cg.u11", 0x000000, 0x80000, CRC(2ac2cfd1) SHA1(f8750a4727ddabf1415dab6eaa4a72e60e86e7f1) )       // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x400000, "gfx3", 0 )
+	ROM_LOAD( "igs_a2107_cg_v110.u13", 0x000000, 0x400000,CRC(d8dadfd7) SHA1(b40a46d56ff46d91e3377be8616c3eed321f7db4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_s2102.u28", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
@@ -1226,7 +1259,7 @@ DRIVER_INIT_MEMBER(igs_m027_state,amazoni2)
 ***************************************************************************/
 
 GAME( 1999,  slqz3,     0, igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
-GAME( 1999,  amazonia,  0, igs_majhong, amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
+GAME( 1999,  amazonia,  0, amazonia,amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
 GAME( 200?,  fruitpar,  0, igs_majhong, sdwx, igs_m027_state, fruitpar,    ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
 GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 2002,  amazoni2,  0, igs_majhong, sdwx, igs_m027_state, amazoni2,    ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
