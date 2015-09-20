@@ -11,16 +11,16 @@
     Centipede, Millipede, Dig Dug CTRL port wiring:
     7 6 5 4 3 2 1 0
     x x x x | | | \-- EAROM CLK (directly connected)
-    x x x x | | \---- /EAROM C1 (note this is inverted! the value written here is inverted, then connected to EAROM C1 AND to the /OE of the 'input latch' which drive the earom bus when writing)
+    x x x x | | \---- /EAROM C1 (note this is inverted! the value written here is inverted, then connected to EAROM C1 AND to the /OE of the 'input latch' which drive the EAROM bus when writing)
     x x x x | \------ EAROM C2 (directly connected)
-    x x x x \-------- EAROM CS1 (postive enable, directly connected)
+    x x x x \-------- EAROM CS1 (positive enable, directly connected)
   
     Gravitar, Red Baron, Black Widow, Tempest, Liberator, Asteroids Deluxe, Runaway CTRL port wiring:
     7 6 5 4 3 2 1 0
     x x x x | | | \-- EAROM CLK (directly connected)
     x x x x | | \---- EAROM C2 (directly connected)
-    x x x x | \------ /EAROM C1 (note this is inverted! the value written here is inverted, then connected to EAROM C1 AND to the /OE of the 'input latch' which drive the earom bus when writing)
-    x x x x \-------- EAROM CS1 (postive enable, directly connected)
+    x x x x | \------ /EAROM C1 (note this is inverted! the value written here is inverted, then connected to EAROM C1 AND to the /OE of the 'input latch' which drive the EAROM bus when writing)
+    x x x x \-------- EAROM CS1 (positive enable, directly connected)
 
 ***************************************************************************/
 
@@ -80,10 +80,10 @@ WRITE8_MEMBER( atari_vg_earom_device::ctrl_w )
 			else if (m_state!=ER2055_READ_DRIVING_BUS) // if we're already driving the bus, stay driving it. otherwise we're still waiting.
 				m_state = ER2055_READ_WAITING_FOR_CLOCK;
 			break;
-		case 0xA: // C1 = 0, C2 = 0: Write (set gate 0 if the bit is a 0, set gate 1 if the bit is a 1)
+		case 0xA: // C1 = 0, C2 = 0: Write (set gate 0 if the bit is a 0, set gate 1 if the bit is a 1) HACK: we treat this as WRITE always to handle both wiring variants
 			m_state = ER2055_WRITING_BITS;
 			break;
-		case 0xC: // C1 = 1, C2 = 1: Invalid
+		case 0xC: // C1 = 1, C2 = 1: Invalid // HACK: we treat this as WRITE always to handle both wiring variants
 			logerror("INVALID CTRL STATE!");
 			m_state = ER2055_WRITING_BITS;
 			break;
