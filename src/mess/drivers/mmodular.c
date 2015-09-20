@@ -652,7 +652,7 @@ READ8_MEMBER(polgar_state::milano_read_board)
 {
 	int line;
 	static const char *const board_lines[8] =
-			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+			{ "LINE.0", "LINE.1", "LINE.2", "LINE.3", "LINE.4", "LINE.5", "LINE.6", "LINE.7" };
 
 	UINT8 data = 0x00;
 	UINT8 tmp; // = 0xff;
@@ -703,7 +703,7 @@ READ32_MEMBER(polgar_state::read_keys_BPL32)
 	UINT32 data = 0;
 	UINT8 tmp = 0xff, line = 0;
 	static const char *const board_lines[8] =
-			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+			{ "LINE.0", "LINE.1", "LINE.2", "LINE.3", "LINE.4", "LINE.5", "LINE.6", "LINE.7" };
 
 	if (BPL32latch_data == 0xff) {
 		tmp = ioport("BUTTONS_BPL")->read();
@@ -784,7 +784,7 @@ READ8_MEMBER(polgar_state::read_keys_board_academy)
 	UINT8 data = 0;
 //  UINT8 tmp = 0xff, line = 0;
 //  static const char *const board_lines[8] =
-//          { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+//          { "LINE.0", "LINE.1", "LINE.2", "LINE.3", "LINE.4", "LINE.5", "LINE.6", "LINE.7" };
 
 	if (latch_data == 0xff) {
 		data = ioport("BUTTONS_ACAD")->read();
