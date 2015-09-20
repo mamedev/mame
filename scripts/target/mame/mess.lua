@@ -1269,6 +1269,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/vic10.c",
 	MAME_DIR .. "src/mess/drivers/vic20.c",
 	MAME_DIR .. "src/mess/machine/cbm_snqk.c",
+	MAME_DIR .. "src/mess/drivers/mps1230.c",
 }
 
 createMESSProjects(_target, _subtarget, "cccp")
