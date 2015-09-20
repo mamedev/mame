@@ -3716,7 +3716,16 @@ void hdc92x4_device::checkpoint()
 bool hdc92x4_device::read_from_mfmhd(const attotime &limit)
 {
 	UINT16 data = 0;
-	bool offlimit = m_harddisk->read(m_live_state.time, limit, data);
+	bool offlimit = false;
+
+	if (m_harddisk != NULL)
+	{
+		offlimit = m_harddisk->read(m_live_state.time, limit, data);
+	}
+	else
+	{
+		data = 0;
+	}
 
 	// We have reached the time limit
 	if (offlimit) return true;
@@ -3785,7 +3794,7 @@ bool hdc92x4_device::write_to_mfmhd(const attotime &limit)
 {
 	UINT16 data = 0;
 	int count;
-	bool offlimit;
+	bool offlimit = false;
 
 	if (m_hd_encoding == MFM_BITS)
 	{
@@ -3798,7 +3807,12 @@ bool hdc92x4_device::write_to_mfmhd(const attotime &limit)
 		data = m_live_state.shift_reg;
 		count = 16;
 	}
-	offlimit = m_harddisk->write(m_live_state.time, limit, data, m_precompensation != 0, m_reduced_write_current);
+
+	if (m_harddisk != NULL)
+	{
+		offlimit = m_harddisk->write(m_live_state.time, limit, data, m_precompensation != 0, m_reduced_write_current);
+	}
+
 	if (offlimit) return true;
 
 	m_live_state.bit_counter -= count;
@@ -4417,6 +4431,8 @@ void hdc92x4_device::device_reset()
 	m_executing = false;
 	m_event_line = UNDEF;
 	m_first_sector_found = false;
+	m_floppy = NULL;
+	m_harddisk = NULL;
 	m_initialized = true;
 	m_line_level = CLEAR_LINE;
 	m_live_state.state = IDLE;
