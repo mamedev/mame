@@ -354,6 +354,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 
 	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_REVERSE_TEXT_BITS
 
 	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
 
@@ -388,6 +389,7 @@ static MACHINE_CONFIG_START( amazonia, igs_m027_state )
 	
 	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_REVERSE_TEXT_BITS
 
 	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
 

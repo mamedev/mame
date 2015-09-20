@@ -89,6 +89,7 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 		m_palette(*this, "^palette")
 {
 	m_palette_scramble_cb =  igs017_igs031_palette_scramble_delegate(FUNC(igs017_igs031_device::palette_callback_straight), this);
+	m_revbits = 0;
 }
 
 const address_space_config *igs017_igs031_device::memory_space_config(address_spacenum spacenum) const
@@ -133,6 +134,19 @@ void igs017_igs031_device::video_start()
 {
 	// make sure thie happens AFTER driver init, or things won't work
 	expand_sprites();
+
+	if (m_revbits)
+	{
+		UINT8 *rom  =   memregion("^tilemaps")->base();
+		int size    =   memregion("^tilemaps")->bytes();
+		int i;
+
+		for (i = 0; i < size ; i++)
+		{
+			rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+//			rom[i^1] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+		}
+	}
 }
 
 

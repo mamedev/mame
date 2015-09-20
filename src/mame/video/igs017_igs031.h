@@ -8,6 +8,8 @@ typedef device_delegate<UINT16 (UINT16)> igs017_igs031_palette_scramble_delegate
 #define MCFG_PALETTE_SCRAMBLE_CB( _class, _method) \
 	igs017_igs031_device::set_palette_scramble_cb(*device, igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 
+#define MCFG_REVERSE_TEXT_BITS \
+	igs017_igs031_device::static_set_text_reverse_bits(*device);
 
 class igs017_igs031_device : public device_t,
 							public device_gfx_interface,
@@ -23,6 +25,11 @@ public:
 
 	static void set_palette_scramble_cb(device_t &device,igs017_igs031_palette_scramble_delegate newtilecb);
 
+	static void static_set_text_reverse_bits(device_t &device)
+	{
+		igs017_igs031_device &dev = downcast<igs017_igs031_device &>(device);
+		dev.m_revbits = 1;
+	}
 
 	UINT16 palette_callback_straight(UINT16 bgr);
 
@@ -33,6 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
+	// the gfx roms were often hooked up with the bits backwards, allow us to handle it here to save doing it in every driver.
+	int m_revbits;
 
 	int m_toggle;
 	int m_debug_addr;
