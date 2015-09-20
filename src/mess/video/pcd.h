@@ -19,6 +19,8 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 16) = 0;
 	DECLARE_READ8_MEMBER(detect_r);
 	DECLARE_WRITE8_MEMBER(detect_w);
+	DECLARE_PALETTE_INIT(pcdx);
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;

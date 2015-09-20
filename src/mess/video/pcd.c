@@ -88,7 +88,8 @@ static MACHINE_CONFIG_FRAGMENT( pcd_video )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
 
 	MCFG_SCN2674_VIDEO_ADD("crtc", 0, NULL);
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
@@ -158,12 +159,20 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 	}
 	else
 	{
-		UINT8 data;
+		UINT8 data, attr;
+		int bgnd = 0;
 		data = m_charram[m_vram[address] * 16 + linecount];
+		attr = m_vram[address + 1];
 		if(cursor && blink)
 			data = 0xff;
+		if((linecount > 11) && (attr & 0x20))
+			data = 0xff;
+		if(attr & 8)
+			bgnd = 2;
+		if(attr & 0x10)
+			data = ~data;
 		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
+			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : bgnd);
 	}
 }
 
@@ -178,6 +187,13 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 		data = ~data;
 	for(int i = 0; i < 8; i++)
 		bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
+}
+
+PALETTE_INIT_MEMBER(pcdx_video_device, pcdx)
+{
+	palette.set_pen_color(0,rgb_t::black);
+	palette.set_pen_color(1,rgb_t::white);
+	palette.set_pen_color(2,rgb_t(128,128,128));
 }
 
 WRITE8_MEMBER(pcd_video_device::vram_w)

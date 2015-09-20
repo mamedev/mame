@@ -34,6 +34,12 @@
 #define MCFG_MC146818_UTC(_utc) \
 	downcast<mc146818_device *>(device)->set_use_utc(_utc);
 
+#define MCFG_MC146818_BINARY(_bin) \
+	downcast<mc146818_device *>(device)->set_binary(_bin);
+
+#define MCFG_MC146818_EPOCH(_epoch) \
+	downcast<mc146818_device *>(device)->set_epoch(_epoch);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -52,6 +58,8 @@ public:
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
 	void set_century_index(int century_index) { m_century_index = century_index; }
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
+	void set_binary(bool binary) { m_binary = binary; }
+	void set_epoch(int epoch) { m_epoch = epoch; }
 
 	// read/write access
 	DECLARE_READ8_MEMBER( read );
@@ -165,8 +173,8 @@ private:
 	emu_timer *m_periodic_timer;
 
 	devcb_write_line m_write_irq;
-	int m_century_index;
-	bool m_use_utc;
+	int m_century_index, m_epoch;
+	bool m_use_utc, m_binary;
 };
 
 
