@@ -1554,6 +1554,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/igs009.c",
 	MAME_DIR .. "src/mame/drivers/igs011.c",
 	MAME_DIR .. "src/mame/drivers/igs017.c",
+	MAME_DIR .. "src/mame/drivers/igs_fear.c",
 	MAME_DIR .. "src/mame/drivers/igs_m027.c",
 	MAME_DIR .. "src/mame/drivers/igs_m036.c",
 	MAME_DIR .. "src/mame/drivers/iqblock.c",
