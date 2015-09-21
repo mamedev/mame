@@ -4,7 +4,7 @@
 
     Siemens PC-D
 
-    For PC-X HDD should have 306,4,9 chs at 1024Bps or 17 at 512Bps
+    For PC-X HDD should have 306,4,9 chs at 1024Bps or 18 at 512Bps
 
 ***************************************************************************/
 
