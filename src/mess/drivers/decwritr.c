@@ -14,6 +14,8 @@
 #include "machine/i8251.h"
 #include "sound/beep.h"
 
+#define KBD_VERBOSE 1
+#define LED_VERBOSE 1
 
 //**************************************************************************
 //  DRIVER STATE
@@ -39,8 +41,8 @@ public:
 		bitmap.fill(rgb_t::black);
 		return 0;
 	}
-	DECLARE_READ8_MEMBER(la120_KBD_LED_r);
-	DECLARE_WRITE8_MEMBER(la120_KBD_LED_w);
+	DECLARE_READ8_MEMBER(la120_KBD_r);
+	DECLARE_WRITE8_MEMBER(la120_LED_w);
 	DECLARE_READ8_MEMBER(la120_NVR_r);
 	DECLARE_WRITE8_MEMBER(la120_NVR_w);
 	DECLARE_READ8_MEMBER(la120_DC305_r);
@@ -49,9 +51,12 @@ private:
 	virtual void machine_start();
 	//virtual void machine_reset();
 	ioport_port* m_col_array[16];
+	UINT8 m_led_array;
+	UINT8 m_led_7seg_counter;
+	UINT8 m_led_7seg[4];
 };
 
-READ8_MEMBER( decwriter_state::la120_KBD_LED_r )
+READ8_MEMBER( decwriter_state::la120_KBD_r )
 {
 	/* for reading the keyboard array, addr bits 5-11 are ignored.
 	 * a15 a14 a13 a12 a11 a10  a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
@@ -60,6 +65,9 @@ READ8_MEMBER( decwriter_state::la120_KBD_LED_r )
 	 *                                               |   \--------------- kbd_banksel0
 	 *                                               \------------------- kbd_banksel1
 	 *      if both banks are selected, the resulting row read is a binary OR of both (LA120-TM1, page 4-5)
+	 *
+	 * d7 d6 d5 d4 d3 d2 d1 d0
+	 *  \--\--\--\--\--\--\--\-- read from rows
 	 */
 	UINT8 code = 0;
 	if (offset&0x8) code |= m_col_array[offset&0x7]->read();
@@ -69,13 +77,56 @@ READ8_MEMBER( decwriter_state::la120_KBD_LED_r )
 #endif
 	return code;
 }
-WRITE8_MEMBER( decwriter_state::la120_KBD_LED_w )
+
+WRITE8_MEMBER( decwriter_state::la120_LED_w )
 {
+	/* for writing the keyboard array, addr bits 5-11 are ignored.
+	 * a15 a14 a13 a12 a11 a10  a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
+	 *   0   0   1   1   x   x   x   x   x   x   x   0   *   *   *   0    turn OFF LED # <a3:a1> and clear 7seg counter
+	 *   0   0   1   1   x   x   x   x   x   x   x   0   *   *   *   1    turn ON LED # <a3:a1> and clear 7seg counter
+	 *   0   0   1   1   x   x   x   x   x   x   x   1   *   *   *   *    display a digit <a3:a0> in the digit pointed to by 7seg counter and increment counter
+	 * data bus is UNUSED.
+	 */
+	if (!(offset&0x10)) // we're updating an led state
+	{
+#ifdef LED_VERBOSE
+		logerror("Updated LED status array: LED #%d is now %d\n", ((offset&0xe)>>1), (offset&1));
+#endif
+		m_led_array &= ((1<<((offset&0xe)>>1))^0xFF); // mask out the old bit
+		m_led_array |= ((offset&1)<<((offset&0xe)>>1)); // OR in the new bit
+		m_led_7seg_counter = 0;
+	}
+	else // we're updating the 7segment display
+	{
+		m_led_7seg_counter++;
+		m_led_7seg_counter &= 0xF;
+#ifdef LED_VERBOSE
+		logerror("Updated 7seg display: displaying a digit of %d in position %d\n", (offset&0xF)^0xF, m_led_7seg_counter-1);
+#endif
+		if ((m_led_7seg_counter >= 1) && (m_led_7seg_counter <= 4))
+		{
+			m_led_7seg[m_led_7seg_counter-1] = (offset&0xF)^0xF;
+		}
+	}
+#ifdef LED_VERBOSE
+	logerror("LEDs: %c %c %c %c : %s  %s  %s  %s  %s  %s  %s  %s\n",
+	m_led_7seg[3]+0x30, m_led_7seg[2]+0x30, m_led_7seg[1]+0x30, m_led_7seg[0]+0x30,
+	(m_led_array&0x80)?"ON LINE":"-------",
+	(m_led_array&0x40)?"LOCAL":"-----",
+	(m_led_array&0x20)?"ALT CHR SET":"-----------",
+	(m_led_array&0x10)?"<LED4>":"-----",
+	(m_led_array&0x8)?"CTS":"---",
+	(m_led_array&0x4)?"DSR":"---",
+	(m_led_array&0x2)?"SET-UP":"------",
+	(m_led_array&0x1)?"PAPER OUT":"---------" );
+#endif
 }
+
 READ8_MEMBER( decwriter_state::la120_NVR_r )
 {
 	return 0xFF;
 }
+
 WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 {
 }
@@ -90,7 +141,7 @@ WRITE8_MEMBER( decwriter_state::la120_DC305_w )
 static ADDRESS_MAP_START(la120_mem, AS_PROGRAM, 8, decwriter_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x2fff ) AM_ROM
-	AM_RANGE( 0x3000, 0x3fff ) AM_READWRITE(la120_KBD_LED_r, la120_KBD_LED_w) // keyboard drive/readback and status/7seg LEDS
+	AM_RANGE( 0x3000, 0x3fff ) AM_READWRITE(la120_KBD_r, la120_LED_w) // keyboard read, write to status and 7seg LEDS
 	AM_RANGE( 0x4000, 0x43ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'low ram'
 	AM_RANGE( 0x5000, 0x53ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'high ram'
 	AM_RANGE( 0x6000, 0x6fff ) AM_MIRROR(0x08fe) AM_READWRITE(la120_NVR_r, la120_NVR_w) // ER1400 EAROM
@@ -259,8 +310,16 @@ void decwriter_state::machine_start()
 		sprintf(kbdcol,"COL%X", i);
 		m_col_array[i] = ioport(kbdcol);
 	}
+	m_led_array = 0;
+	m_led_7seg_counter = 0;
+	m_led_7seg[0] = m_led_7seg[1] = m_led_7seg[2] = m_led_7seg[3] = 0xF;
 }
 
+/*
+void decwriter_state::machine_reset()
+{
+}
+*/
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -313,7 +372,7 @@ MACHINE_CONFIG_END
 ROM_START( la120 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	// later romset, with 23-003e2.e6, 23-004e2.e8, 23-005e2.e12, 23-006e2.e17 replaced by one rom, 23-038e4.e6
-	ROM_LOAD( "23-038e4-00.e6", 0x0000, 0x2000, CRC(12b80c00) SHA1(35875a85c5037454ac4a82ee19ea9f0337ad0dbe))
+	ROM_LOAD( "23-038e4-00.e6", 0x0000, 0x2000, BAD_DUMP CRC(12b80c00) SHA1(35875a85c5037454ac4a82ee19ea9f0337ad0dbe))
 	ROM_LOAD( "23-007e2-00.e4", 0x2000, 0x0800, CRC(41eaebf1) SHA1(c7d05417b24b853280d1636776d399a0aea34720)) // used by both earlier and later romset
 	// there is an optional 3 roms, european and APL (and BOTH) rom which goes from 2000-2fff in e4, all undumped.
 	// there is another romset used on the Bell Teleprinter 1000 (Model LAS12) which I believe is 23-004e4.e6 and 23-086e2.e4
