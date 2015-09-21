@@ -197,7 +197,13 @@ public:
 			m_microtouch(*this, "microtouch") ,
 			m_uart(*this, "ns16550"),
 			m_maincpu(*this, "maincpu"),
-			m_palette(*this, "v9938_0:palette") { }
+			m_palette(*this, "v9938_0:palette"),
+			m_bank1(*this, "bank1"),
+			m_bank2(*this, "bank2"),
+			m_bank3(*this, "bank3"),
+			m_region_maincpu(*this, "maincpu"),
+			m_region_extra(*this, "extra")
+	{ }
 
 	UINT8* m_ram;
 	required_device<z80pio_device> m_z80pio_0;
@@ -240,7 +246,6 @@ public:
 	DECLARE_MACHINE_START(meritm_crt260);
 	DECLARE_MACHINE_START(merit_common);
 	UINT32 screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(meritm_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
 	void meritm_crt250_switch_banks(  );
@@ -251,6 +256,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
+	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_extra;
 };
 
 
@@ -294,17 +304,6 @@ int meritm_state::meritm_touch_coord_transform(int *touch_x, int *touch_y)
  *
  *************************************/
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::meritm_interrupt)
-{
-	int scanline = param;
-
-	if((scanline % 2) == 0)
-	{
-		m_v9938_0->interrupt();
-		m_v9938_1->interrupt();
-	}
-}
 
 WRITE_LINE_MEMBER(meritm_state::meritm_vdp0_interrupt)
 {
@@ -368,7 +367,7 @@ void meritm_state::meritm_crt250_switch_banks(  )
 	int rombank = (m_bank & 0x07) ^ 0x07;
 
 	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, m_bank );
-	membank("bank1")->set_entry(rombank );
+	m_bank1->set_entry(rombank );
 }
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_bank_w)
@@ -385,9 +384,9 @@ void meritm_state::meritm_switch_banks(  )
 				(m_psd_a15 & 0x1);
 
 	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, m_bank, rambank);
-	membank("bank1")->set_entry(rombank );
-	membank("bank2")->set_entry(rombank | 0x01);
-	membank("bank3")->set_entry(rambank);
+	m_bank1->set_entry(rombank );
+	m_bank2->set_entry(rombank | 0x01);
+	m_bank3->set_entry(rambank);
 }
 
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
@@ -461,7 +460,7 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
 		logerror( "Reading question byte at %06X\n", questions_address | m_questions_loword_address);
-		*dst = memregion("extra")->base()[questions_address | m_questions_loword_address];
+		*dst = m_region_extra->base()[questions_address | m_questions_loword_address];
 	}
 }
 
@@ -1032,7 +1031,7 @@ MACHINE_START_MEMBER(meritm_state,merit_common)
 
 void meritm_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x10000);
+	m_bank1->configure_entries(0, 8, m_region_maincpu->base(), 0x10000);
 	m_bank = 0xff;
 	meritm_crt250_switch_banks();
 	MACHINE_START_CALL_MEMBER(merit_common);
@@ -1056,9 +1055,9 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	m_ram = auto_alloc_array(machine(), UINT8,  0x8000 );
 	machine().device<nvram_device>("nvram")->set_base(m_ram, 0x8000);
 	memset(m_ram, 0x00, 0x8000);
-	membank("bank1")->configure_entries(0, 128, memregion("maincpu")->base(), 0x8000);
-	membank("bank2")->configure_entries(0, 128, memregion("maincpu")->base(), 0x8000);
-	membank("bank3")->configure_entries(0, 4, m_ram, 0x2000);
+	m_bank1->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);
+	m_bank2->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);
+	m_bank3->configure_entries(0, 4, m_ram, 0x2000);
 	m_bank = 0xff;
 	m_psd_a15 = 0;
 	meritm_switch_banks();
@@ -1067,14 +1066,6 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	save_item(NAME(m_psd_a15));
 	save_pointer(NAME(m_ram), 0x8000);
 }
-
-// from MSX2 driver, may be not accurate for merit games
-#define MSX2_XBORDER_PIXELS     16
-#define MSX2_YBORDER_PIXELS     28
-#define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS      212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
 TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
 {
@@ -1095,7 +1086,6 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
 	MCFG_CPU_CONFIG(meritm_daisy_chain)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meritm_state, meritm_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
@@ -1128,15 +1118,8 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_V9938_ADD("v9938_1", "screen", 0x20000, SYSTEM_CLK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp1_interrupt))
 
-	MCFG_SCREEN_ADD("screen",RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
-	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938_0", SYSTEM_CLK)
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
-	MCFG_SCREEN_PALETTE("v9938_0:palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

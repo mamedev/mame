@@ -200,8 +200,6 @@ public:
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);
 	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
 	void msx_memory_init();
 	void post_load();

@@ -5,6 +5,25 @@
 
 v9938 / v9958 emulation
 
+Vertical display parameters from Yamaha V9938 Technical Data Book.
+NTSC: page 146, Table 7-2
+PAL: page 147, Table 7-3
+
+Vertical timing:
+                                       PAL                 NTSC
+                                       192(LN=0) 212(LN=1) 192(LN=0) 212(LN=1)
+                                       ------------------- --------------------
+1. Top erase (top blanking)                13        13        13        13
+2. Top border                              53        43        26        16
+3. Active display                         192       212       192       212
+4. Bottom border                           49        39        25        15
+5. Bottom erase (bottom blanking)           3         3         3         3
+6. Vertical sync (bottom blanking)          3         3         3         3
+7. Total                                  313       313       262       262
+
+   Refresh rate                           50.158974           59.922743
+
+
 ***************************************************************************/
 
 /*
@@ -59,14 +78,15 @@ Similar to the TMS9928, the V9938 has an own address space. It can handle
 at most 192 KiB RAM (128 KiB base, 64 KiB expansion).
 */
 static ADDRESS_MAP_START(memmap, AS_DATA, 8, v99x8_device)
-ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
-AM_RANGE(0x00000, 0x2ffff) AM_RAM
+	ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
+	AM_RANGE(0x00000, 0x2ffff) AM_RAM
 ADDRESS_MAP_END
 
 
 // devices
 const device_type V9938 = &device_creator<v9938_device>;
 const device_type V9958 = &device_creator<v9958_device>;
+
 
 v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
 :   device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
@@ -96,7 +116,8 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_button_state(0),
 	m_vdp_ops_count(0),
 	m_vdp_engine(NULL),
-	m_palette(*this, "palette")
+	m_palette(*this, "palette"),
+	m_pal_ntsc(0)
 {
 	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
@@ -114,58 +135,104 @@ v9958_device::v9958_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-int v99x8_device::interrupt ()
+void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int scanline, max, pal, scanline_start;
+	int scanline = (m_scanline - (m_scanline_start + m_offset_y));
 
 	update_command ();
 
-	pal = m_cont_reg[9] & 2;
-	if (pal) scanline_start = 53; else scanline_start = 22;
-
 	// set flags
-	if (m_scanline == (m_offset_y + scanline_start) )
+	if (m_scanline == (m_scanline_start + m_offset_y))
 	{
 		m_stat_reg[2] &= ~0x40;
 	}
-	else if (m_scanline == (m_offset_y + m_visible_y + scanline_start) )
+	else if (m_scanline == (m_scanline_start + m_offset_y + m_visible_y))
 	{
 		m_stat_reg[2] |= 0x40;
 		m_stat_reg[0] |= 0x80;
 	}
 
-	max = (pal) ? 255 : (m_cont_reg[9] & 0x80) ? 234 : 244;
-	scanline = (m_scanline - scanline_start - m_offset_y);
-	if ( (scanline >= 0) && (scanline <= max) &&
-		( ( (scanline + m_cont_reg[23]) & 255) == m_cont_reg[19]) )
+	if ( (scanline >= 0) && (scanline <= m_scanline_max) &&
+		(((scanline + m_cont_reg[23]) & 255) == m_cont_reg[19]) )
 	{
 		m_stat_reg[1] |= 1;
 		LOG(("V9938: scanline interrupt (%d)\n", scanline));
 	}
-	else
-		if ( !(m_cont_reg[0] & 0x10) ) m_stat_reg[1] &= 0xfe;
-
-	check_int ();
-
-	// check for start of vblank
-	if ((pal && (m_scanline == 310)) ||
-		(!pal && (m_scanline == 259)))
-	interrupt_start_vblank ();
-
-	// render the current line
-	if ((m_scanline >= scanline_start) && (m_scanline < (212 + 28 + scanline_start)))
+	else if (!(m_cont_reg[0] & 0x10))
 	{
-		scanline = (m_scanline - scanline_start) & 255;
-
-		refresh_line (scanline);
+		m_stat_reg[1] &= 0xfe;
 	}
 
-	max = (m_cont_reg[9] & 2) ? 313 : 262;
-	if (++m_scanline >= max)
-		m_scanline = 0;
+	check_int();
 
-	return m_int_state;
+	// check for start of vblank
+	if (m_scanline == m_vblank_start)
+	{
+		interrupt_start_vblank();
+	}
+
+	// render the current line
+	if (m_scanline < m_vblank_start)
+	{
+		refresh_line(scanline);
+	}
+
+	if (++m_scanline >= m_height)
+	{
+		m_scanline = 0;
+		// PAL/NTSC changed?
+		int pal = m_cont_reg[9] & 2;
+		if (m_pal_ntsc != pal)
+		{
+			m_pal_ntsc = pal;
+			configure_pal_ntsc();
+		}
+		//m_screen->reset_origin();
+		m_offset_y = position_offset(m_cont_reg[18] >> 4);
+		set_screen_parameters();
+	}
 }
+
+
+void v99x8_device::set_screen_parameters()
+{
+	if (m_pal_ntsc)
+	{
+		// PAL
+		m_scanline_start = (m_cont_reg[9] & 0x80) ? 43 : 53;
+		m_scanline_max = 255;
+	}
+	else
+	{
+		// NYSC
+		m_scanline_start = (m_cont_reg[9] & 0x80) ? 16 : 26;
+		m_scanline_max = (m_cont_reg[9] & 0x80) ? 234 : 244;
+	}
+	m_visible_y = (m_cont_reg[9] & 0x80) ? 212 : 192;
+}
+
+
+void v99x8_device::configure_pal_ntsc()
+{
+	if (m_pal_ntsc)
+	{
+		// PAL
+		m_height = VTOTAL_PAL;
+		rectangle visible;
+		visible.set(0, HVISIBLE - 1, VERTICAL_ADJUST * 2, VVISIBLE_PAL * 2 - 1 - VERTICAL_ADJUST * 2);
+		m_screen->configure(HTOTAL, VTOTAL_PAL * 2, visible, HZ_TO_ATTOSECONDS(50.158974));
+	}
+	else
+	{
+		// NTSC
+		m_height = VTOTAL_NTSC;
+		rectangle visible;
+		visible.set(0, HVISIBLE - 1, VERTICAL_ADJUST * 2, VVISIBLE_NTSC * 2 - 1 - VERTICAL_ADJUST * 2);
+		m_screen->configure(HTOTAL, VTOTAL_NTSC * 2, visible, HZ_TO_ATTOSECONDS(59.922743));
+	}
+	m_vblank_start = m_height - VERTICAL_SYNC - TOP_ERASE; /* Sync + top erase */
+}
+
 
 /*
     Not really right... won't work with sprites in graphics 7
@@ -570,6 +637,8 @@ void v99x8_device::device_start()
 		for (int addr = m_vram_size; addr < 0x30000; addr++) m_vram_space->write_byte(addr, 0xff);
 	}
 
+	m_line_timer = timer_alloc(TIMER_LINE);
+
 	save_item(NAME(m_offset_x));
 	save_item(NAME(m_offset_y));
 	save_item(NAME(m_visible_y));
@@ -612,6 +681,11 @@ void v99x8_device::device_start()
 	save_item(NAME(m_mmc.MXS));
 	save_item(NAME(m_mmc.MXD));
 	save_item(NAME(m_vdp_ops_count));
+	save_item(NAME(m_pal_ntsc));
+	save_item(NAME(m_scanline_start));
+	save_item(NAME(m_vblank_start));
+	save_item(NAME(m_scanline_max));
+	save_item(NAME(m_height));
 }
 
 void v99x8_device::device_reset()
@@ -620,7 +694,7 @@ void v99x8_device::device_reset()
 
 	// offset reset
 	m_offset_x = 8;
-	m_offset_y = 8 + 16;
+	m_offset_y = 0;
 	m_visible_y = 192;
 	// register reset
 	reset_palette (); // palette registers
@@ -644,10 +718,16 @@ void v99x8_device::device_reset()
 	// TODO: SR3-S6 do not yet store the information about the sprite collision
 	m_stat_reg[4] = 0xfe;
 	m_stat_reg[6] = 0xfc;
+
+	// Start the timer
+	m_line_timer->adjust(attotime::from_ticks(HTOTAL*2, m_clock), 0, attotime::from_ticks(HTOTAL*2, m_clock));
+
+	configure_pal_ntsc();
+	set_screen_parameters();
 }
 
 
-void v99x8_device::reset_palette ()
+void v99x8_device::reset_palette()
 {
 	// taken from V9938 Technical Data book, page 148. it's in G-R-B format
 	static const UINT8 pal16[16*3] = {
@@ -795,17 +875,8 @@ void v99x8_device::register_write (int reg, int data)
 	case 9:
 		m_cont_reg[reg] = data;
 		// recalc offset
-		m_offset_x = (( (~m_cont_reg[18] - 8) & 0x0f) + 1);
-		m_offset_y = ((~(m_cont_reg[18]>>4) - 8) & 0x0f) + 7;
-		if (m_cont_reg[9] & 0x80)
-		{
-			m_visible_y = 212;
-		}
-		else
-		{
-			m_visible_y = 192;
-			m_offset_y += 10;
-		}
+		m_offset_x = 8 + position_offset(m_cont_reg[18] & 0x0f);
+		// Y offset is only applied once per frame?
 		break;
 
 	case 15:
@@ -1789,32 +1860,31 @@ void v99x8_device::refresh_16(int line)
 
 	if (m_cont_reg[9] & 0x08)
 	{
-		ln = &m_bitmap.pix16(line*2+((m_stat_reg[2]>>1)&1));
+		ln = &m_bitmap.pix16(m_scanline*2+((m_stat_reg[2]>>1)&1));
 	}
 	else
 	{
-		ln = &m_bitmap.pix16(line*2);
-		ln2 = &m_bitmap.pix16(line*2+1);
+		ln = &m_bitmap.pix16(m_scanline*2);
+		ln2 = &m_bitmap.pix16(m_scanline*2+1);
 		double_lines = true;
 	}
 
 	if ( !(m_cont_reg[1] & 0x40) || (m_stat_reg[2] & 0x40) )
 	{
-		(this->*s_modes[m_mode].border_16) (pens, ln);
+		(this->*s_modes[m_mode].border_16)(pens, ln);
 	}
 	else
 	{
-		int i = (line - m_offset_y) & 255;
-		(this->*s_modes[m_mode].visible_16) (pens, ln, i);
+		(this->*s_modes[m_mode].visible_16)(pens, ln, line);
 		if (s_modes[m_mode].sprites)
 		{
-			(this->*s_modes[m_mode].sprites) (i, col);
-			(this->*s_modes[m_mode].draw_sprite_16) (pens, ln, col);
+			(this->*s_modes[m_mode].sprites)(line, col);
+			(this->*s_modes[m_mode].draw_sprite_16)(pens, ln, col);
 		}
 	}
 
 	if (double_lines)
-		memcpy (ln2, ln, (512 + 32) * 2);
+		memcpy(ln2, ln, (512 + 32) * 2);
 }
 
 void v99x8_device::refresh_line(int line)

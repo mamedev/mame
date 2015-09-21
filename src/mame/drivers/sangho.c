@@ -55,15 +55,37 @@ class sangho_state : public driver_device
 {
 public:
 	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_v9958(*this, "v9958") ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_v9958(*this, "v9958")
+		, m_maincpu(*this, "maincpu")
+		, m_region_user1(*this, "user1")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank7(*this, "bank7")
+		, m_bank8(*this, "bank8")
+	{ }
 
 	UINT8* m_ram;
 	UINT8 m_sexyboom_bank[8];
 	UINT8 m_pzlestar_mem_bank;
 	UINT8 m_pzlestar_rom_bank;
 	required_device<v9958_device> m_v9958;
+	required_device<cpu_device> m_maincpu;
+	required_memory_region m_region_user1;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_memory_bank m_bank5;
+	required_memory_bank m_bank6;
+	required_memory_bank m_bank7;
+	required_memory_bank m_bank8;
+	UINT8 m_sec_slot[4];
+
 	DECLARE_WRITE8_MEMBER(pzlestar_bank_w);
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
@@ -72,12 +94,9 @@ public:
 	virtual void machine_start();
 	DECLARE_MACHINE_RESET(pzlestar);
 	DECLARE_MACHINE_RESET(sexyboom);
-	TIMER_DEVICE_CALLBACK_MEMBER(sangho_interrupt);
 	void pzlestar_map_banks();
 	void sexyboom_map_bank(int bank);
 	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
-	required_device<cpu_device> m_maincpu;
-	UINT8 m_sec_slot[4];
 	DECLARE_READ8_MEMBER(sec_slot_r);
 	DECLARE_WRITE8_MEMBER(sec_slot_w);
 };
@@ -97,15 +116,15 @@ void sangho_state::pzlestar_map_banks()
 	switch(slot_select)
 	{
 		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, "bank5");
-			membank("bank1")->set_base(m_ram);
-			membank("bank5")->set_base(m_ram);
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1);
+			m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, m_bank5);
+			m_bank1->set_base(m_ram);
+			m_bank5->set_base(m_ram);
 			break;
 		case 2:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1);
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x3fff);
-			membank("bank1")->set_base(memregion("user1")->base()+ 0x10000);
+			m_bank1->set_base(m_region_user1->base()+ 0x10000);
 			break;
 		case 1:
 		case 3:
@@ -119,20 +138,20 @@ void sangho_state::pzlestar_map_banks()
 	switch(slot_select)
 	{
 		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank2");
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0x4000, 0x7fff, "bank6");
-			membank("bank2")->set_base(m_ram + 0x4000);
-			membank("bank6")->set_base(m_ram + 0x4000);
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
+			m_maincpu->space(AS_PROGRAM).install_write_bank(0x4000, 0x7fff, m_bank6);
+			m_bank2->set_base(m_ram + 0x4000);
+			m_bank6->set_base(m_ram + 0x4000);
 			break;
 		case 2:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank2");
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
-			membank("bank2")->set_base(memregion("user1")->base()+ 0x18000);
+			m_bank2->set_base(m_region_user1->base()+ 0x18000);
 			break;
 		case 3:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank2");
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
-			membank("bank2")->set_base(memregion("user1")->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000) + 0x4000);
+			m_bank2->set_base(m_region_user1->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000) + 0x4000);
 			break;
 		case 1:
 			m_maincpu->space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
@@ -145,15 +164,15 @@ void sangho_state::pzlestar_map_banks()
 	switch(slot_select)
 	{
 		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, "bank3");
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0x8000, 0xbfff, "bank7");
-			membank("bank3")->set_base(m_ram + 0x8000);
-			membank("bank7")->set_base(m_ram + 0x8000);
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_bank3);
+			m_maincpu->space(AS_PROGRAM).install_write_bank(0x8000, 0xbfff, m_bank7);
+			m_bank3->set_base(m_ram + 0x8000);
+			m_bank7->set_base(m_ram + 0x8000);
 			break;
 		case 3:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, "bank3");
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_bank3);
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-			membank("bank3")->set_base(memregion("user1")->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000));
+			m_bank3->set_base(m_region_user1->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000));
 			break;
 		case 1:
 		case 2:
@@ -167,10 +186,10 @@ void sangho_state::pzlestar_map_banks()
 	switch(slot_select)
 	{
 		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, "bank4");
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0xc000, 0xffff, "bank8");
-			membank("bank4")->set_base(m_ram + 0xc000);
-			membank("bank8")->set_base(m_ram + 0xc000);
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, m_bank4);
+			m_maincpu->space(AS_PROGRAM).install_write_bank(0xc000, 0xffff, m_bank8);
+			m_bank4->set_base(m_ram + 0xc000);
+			m_bank8->set_base(m_ram + 0xc000);
 			break;
 		case 1:
 		case 2:
@@ -204,38 +223,36 @@ READ8_MEMBER(sangho_state::pzlestar_mem_bank_r)
 
 void sangho_state::sexyboom_map_bank(int bank)
 {
-	UINT8 banknum, banktype;
-	char read_bank_name[6], write_bank_name[6];
+	memory_bank *read_bank[4] = { m_bank1, m_bank2, m_bank3, m_bank4 };
+	memory_bank *write_bank[4] = { m_bank5, m_bank6, m_bank7, m_bank8 };
 
-	banknum = m_sexyboom_bank[bank*2];
-	banktype = m_sexyboom_bank[bank*2 + 1];
-	sprintf(read_bank_name, "bank%d", bank+1);
-	sprintf(write_bank_name, "bank%d", bank+1+4);
+	UINT8 banknum = m_sexyboom_bank[bank*2];
+	UINT8 banktype = m_sexyboom_bank[bank*2 + 1];
 
 	if (banktype == 0)
 	{
 		if (banknum & 0x80)
 		{
 			// ram
-			membank(read_bank_name)->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
-			m_maincpu->space(AS_PROGRAM).install_write_bank(bank*0x4000, (bank+1)*0x4000 - 1, write_bank_name );
-			membank(write_bank_name)->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
+			read_bank[bank]->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
+			m_maincpu->space(AS_PROGRAM).install_write_bank(bank*0x4000, (bank+1)*0x4000 - 1, write_bank[bank] );
+			write_bank[bank]->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
 		}
 		else
 		{
 			// rom 0
-			membank(read_bank_name)->set_base(memregion("user1")->base()+0x4000*banknum);
+			read_bank[bank]->set_base(m_region_user1->base()+0x4000*banknum);
 			m_maincpu->space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 		}
 	}
 	else if (banktype == 0x82)
 	{
-		membank(read_bank_name)->set_base(memregion("user1")->base()+0x20000+banknum*0x4000);
+		read_bank[bank]->set_base(m_region_user1->base()+0x20000+banknum*0x4000);
 		m_maincpu->space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else if (banktype == 0x80)
 	{
-		membank(read_bank_name)->set_base(memregion("user1")->base()+0x120000+banknum*0x4000);
+		read_bank[bank]->set_base(m_region_user1->base()+0x120000+banknum*0x4000);
 		m_maincpu->space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else
@@ -438,35 +455,16 @@ WRITE_LINE_MEMBER(sangho_state::msx_vdp_interrupt)
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sangho_state::sangho_interrupt)
-{
-	int scanline = param;
-
-	if((scanline % 2) == 0)
-	{
-		m_v9958->interrupt();
-	}
-}
-
 
 static MACHINE_CONFIG_START( pzlestar, sangho_state )
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
-	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
-	MCFG_SCREEN_PALETTE("v9958:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
@@ -482,19 +480,10 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
-	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
-	MCFG_SCREEN_PALETTE("v9958:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
 
@@ -546,7 +535,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 {
-	UINT8 *ROM = memregion("user1")->base();
+	UINT8 *ROM = m_region_user1->base();
 
 	/* patch nasty looping check, related to sound? */
 	ROM[0x12ca7] = 0x00;

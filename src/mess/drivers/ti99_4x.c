@@ -122,7 +122,6 @@ public:
 
 	// Interrupt triggers
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
-	TIMER_DEVICE_CALLBACK_MEMBER(ti99_4ev_hblank_interrupt);
 
 private:
 	void    set_keyboard_column(int number, int data);
@@ -1044,11 +1043,6 @@ MACHINE_CONFIG_END
     replacing the console video processor.
 *************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(ti99_4x_state::ti99_4ev_hblank_interrupt)
-{
-	machine().device<v9938_device>(VDP_TAG)->interrupt();
-}
-
 static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	/* CPU */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
@@ -1066,7 +1060,6 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
 	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, ti99_4x_state, video_interrupt_in)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ti99_4x_state, ti99_4ev_hblank_interrupt, SCREEN_TAG, 0, 1)
 
 	/* Main board */
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)

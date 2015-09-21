@@ -619,8 +619,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(geneve_state::geneve_hblank_interrupt)
 {
 	int scanline = param;
 
-	machine().device<v9938_device>(VDP_TAG)->interrupt();
-
 	if (scanline == 0) // was 262
 	{
 		// TODO

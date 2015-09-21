@@ -26,6 +26,30 @@
 	MCFG_VIDEO_SET_SCREEN(_screen) \
 	v9938_device::static_set_vram_size(*device, _vramsize);
 
+#define MCFG_V99X8_SCREEN_ADD_NTSC(_screen_tag, _v9938_tag, _clock) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, \
+		v99x8_device::HTOTAL, \
+		0, \
+		v99x8_device::HVISIBLE - 1, \
+		v99x8_device::VTOTAL_NTSC * 2, \
+		v99x8_device::VERTICAL_ADJUST * 2, \
+		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
+	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
+	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+
+#define MCFG_V99X8_SCREEN_ADD_PAL(_screen_tag, _v9938_tag, _clock) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, \
+		v99x8_device::HTOTAL, \
+		0, \
+		v99x8_device::HVISIBLE - 1, \
+		v99x8_device::VTOTAL_PAL * 2, \
+		v99x8_device::VERTICAL_ADJUST * 2, \
+		v99x8_device::VVISIBLE_PAL * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
+	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
+	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
 	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
 
@@ -58,7 +82,6 @@ public:
 	template<class _irq> void set_interrupt_callback(_irq irq) {
 		m_int_callback.set_callback(irq);
 	}
-	int interrupt ();
 	int get_transpen();
 	bitmap_ind16 &get_bitmap() { return m_bitmap; }
 	void update_mouse_state(int mx_delta, int my_delta, int button_state);
@@ -80,7 +103,22 @@ public:
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
+	static const int HTOTAL = 684;
+	static const int HVISIBLE = 544;
+	static const int VTOTAL_NTSC = 262;
+	static const int VTOTAL_PAL = 312;
+	static const int VVISIBLE_NTSC = 26 + 192 + 25;
+	static const int VVISIBLE_PAL = 53 + 192 + 49;
+	// Looking at some youtube videos of real units on real monitors
+	// there appear to be small vertical timing differences. Some (LCD)
+	// monitors show the full borders, other CRT monitors seem to
+	// display ~5 lines less at the top and bottom of the screen.
+	static const int VERTICAL_ADJUST = 5;
+	static const int TOP_ERASE = 13;
+	static const int VERTICAL_SYNC = 3;
+
 protected:
+	static const device_timer_id TIMER_LINE = 0;
 	const address_space_config      m_space_config;
 	address_space*                  m_vram_space;
 
@@ -89,12 +127,17 @@ protected:
 	// device overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const { return (spacenum == AS_DATA) ? &m_space_config : NULL; }
 
+	void configure_pal_ntsc();
+	void set_screen_parameters();
+
 private:
 	// internal helpers
+	inline int position_offset(UINT8 value) { value &= 0x0f; return (value < 8) ? -value : 16 - value; }
 	void reset_palette();
 	void vram_write(int offset, int data);
 	int vram_read(int offset);
@@ -220,6 +263,12 @@ private:
 	} ;
 	static const v99x8_mode s_modes[];
 	required_device<palette_device> m_palette;
+	emu_timer *m_line_timer;
+	UINT8 m_pal_ntsc;
+	int m_scanline_start;
+	int m_vblank_start;
+	int m_scanline_max;
+	int m_height;
 protected:
 	static UINT16 s_pal_indYJK[0x20000];
 };

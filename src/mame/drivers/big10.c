@@ -69,18 +69,24 @@ class big10_state : public driver_device
 {
 public:
 	big10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_v9938(*this, "v9938") ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_v9938(*this, "v9938")
+		, m_maincpu(*this, "maincpu")
+		, m_in1(*this, "IN1")
+		, m_in2(*this, "IN2")
+		, m_in3(*this, "IN3")
+	{ }
 
 	required_device<v9938_device> m_v9938;
 	UINT8 m_mux_data;
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	virtual void machine_reset();
-	TIMER_DEVICE_CALLBACK_MEMBER(big10_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(big10_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_ioport m_in1;
+	required_ioport m_in2;
+	required_ioport m_in3;
 };
 
 
@@ -96,10 +102,6 @@ WRITE_LINE_MEMBER(big10_state::big10_vdp_interrupt)
 	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(big10_state::big10_interrupt)
-{
-	m_v9938->interrupt();
-}
 
 
 /*************************************
@@ -125,9 +127,9 @@ READ8_MEMBER(big10_state::mux_r)
 {
 	switch(m_mux_data)
 	{
-		case 1: return ioport("IN1")->read();
-		case 2: return ioport("IN2")->read();
-		case 4: return ioport("IN3")->read();
+		case 1: return m_in1->read();
+		case 2: return m_in2->read();
+		case 4: return m_in3->read();
 	}
 
 	return m_mux_data;
@@ -238,22 +240,13 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", big10_state, big10_interrupt, "screen", 0, 1)
-
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(big10_state, big10_vdp_interrupt))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
-	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
-	MCFG_SCREEN_PALETTE("v9938:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
