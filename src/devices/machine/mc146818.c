@@ -39,7 +39,8 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 		m_century_index(-1),
 		m_epoch(0),
 		m_use_utc(false),
-		m_binary(false)
+		m_binary(false),
+		m_hour(false)
 {
 }
 
@@ -52,7 +53,8 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		m_century_index(-1),
 		m_epoch(0),
 		m_use_utc(false),
-		m_binary(false)
+		m_binary(false),
+		m_hour(false)
 {
 }
 
@@ -205,6 +207,8 @@ void mc146818_device::nvram_default()
 
 	if(m_binary)
 		m_data[0x0b] |= REG_B_DM;
+	if(m_hour)
+		m_data[0x0b] |= REG_B_24_12;
 
 	set_base_datetime();
 	update_timer();

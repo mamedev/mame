@@ -37,6 +37,9 @@
 #define MCFG_MC146818_BINARY(_bin) \
 	downcast<mc146818_device *>(device)->set_binary(_bin);
 
+#define MCFG_MC146818_24_12(_hour) \
+	downcast<mc146818_device *>(device)->set_hour(_hour);
+
 #define MCFG_MC146818_EPOCH(_epoch) \
 	downcast<mc146818_device *>(device)->set_epoch(_epoch);
 
@@ -59,6 +62,7 @@ public:
 	void set_century_index(int century_index) { m_century_index = century_index; }
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
 	void set_binary(bool binary) { m_binary = binary; }
+	void set_hour(bool hour) { m_hour = hour; }
 	void set_epoch(int epoch) { m_epoch = epoch; }
 
 	// read/write access
@@ -174,7 +178,7 @@ private:
 
 	devcb_write_line m_write_irq;
 	int m_century_index, m_epoch;
-	bool m_use_utc, m_binary;
+	bool m_use_utc, m_binary, m_hour;
 };
 
 
