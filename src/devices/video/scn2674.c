@@ -60,7 +60,7 @@ void scn2674_device::device_reset()
 	m_display_enabled_scanline= 0;
 	m_cursor_enabled= 0;
 	m_IR0_double_ht_wd= 0;
-	m_IR0_scanline_per_char_row= 0;
+	m_IR0_scanline_per_char_row= 1;
 	m_IR0_sync_select= 0;
 	m_IR0_buffer_mode_select= 0;
 	m_IR1_interlace_enable= 0;
