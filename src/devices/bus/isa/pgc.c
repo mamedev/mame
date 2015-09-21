@@ -16,9 +16,9 @@
     http://www.seasip.info/VintagePC/pgc.html
 
   To do:
-  - memory map (restore ROM mapping on reset, ...)
+  - decode memory map
   - various VRAM write modes
-  - what's up with irq 3 (= vblank irq)?
+  - what's up with irq 3 (= vblank irq)? (causes soft reset)
   - "test pin of the microprocessor samples the hsync pulse"
   - CGA emulator
   - bus state handling?
@@ -27,8 +27,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-
-//nclude "machine/ram.h"
 
 #include "pgc.h"
 
@@ -223,10 +221,6 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void isa8_pgc_device::device_start()
 {
 	address_space &space = m_cpu->space( AS_PROGRAM );
@@ -251,11 +245,17 @@ void isa8_pgc_device::device_start()
 	membank("vram")->set_base(m_vram);
 
 	m_eram = auto_alloc_array(machine(), UINT8, 0x8000);
+
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(isa8_pgc_device::reset_common), this));
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
+void isa8_pgc_device::reset_common()
+{
+	address_space &space = m_cpu->space( AS_PROGRAM );
+
+	space.unmap_readwrite(0xf8000, 0xfffff);
+	space.install_rom(0xf8000, 0xfffff, memregion("maincpu")->base() + 0x8000);
+}
 
 void isa8_pgc_device::device_reset()
 {
@@ -267,13 +267,6 @@ void isa8_pgc_device::device_reset()
 		m_isa->install_bank(0xc6400, 0xc67ff, 0, 0, "commarea", m_commarea);
 	else
 		m_isa->install_bank(0xc6000, 0xc63ff, 0, 0, "commarea", m_commarea);
-#if 0	
-	address_space &space = m_cpu->space( AS_PROGRAM );
-
-	space.unmap_readwrite(0xf8000, 0xfffff);
-	space.install_rom(0xf8000, 0xfffff,
-		space.machine().root_device().memregion("maincpu")->base() + 0x8000);
-#endif
 }
 
 //
