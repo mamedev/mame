@@ -91,7 +91,6 @@ M68KMAKE_PROTOTYPE_HEADER
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 M68KMAKE_PROTOTYPE_FOOTER
 
-
 /* Build the opcode handler table */
 void m68ki_build_opcode_table(void);
 
@@ -2490,7 +2489,7 @@ M68KMAKE_OP(bfchg, 32, ., .)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte ^ mask_byte);
@@ -2581,7 +2580,7 @@ M68KMAKE_OP(bfclr, 32, ., .)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte & ~mask_byte);
@@ -2959,7 +2958,7 @@ M68KMAKE_OP(bfins, 32, ., .)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
@@ -3022,7 +3021,6 @@ M68KMAKE_OP(bfset, 32, ., .)
 		UINT32 mask_byte = 0;
 		UINT32 ea = M68KMAKE_GET_EA_AY_8;
 
-
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D(mc68kcpu)[offset&7]);
 		if(BIT_5(word2))
@@ -3038,7 +3036,6 @@ M68KMAKE_OP(bfset, 32, ., .)
 		}
 		width = ((width-1) & 31) + 1;
 
-
 		mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 		mask_long = mask_base >> offset;
 
@@ -3052,7 +3049,7 @@ M68KMAKE_OP(bfset, 32, ., .)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte | mask_byte);
@@ -3139,7 +3136,7 @@ M68KMAKE_OP(bftst, 32, ., .)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
