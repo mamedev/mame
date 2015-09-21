@@ -53,6 +53,7 @@ Notes:
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/ticket.h"
+#include "video/igs017_igs031.h"
 
 class igs017_state : public driver_device
 {
@@ -61,54 +62,38 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_input_addr(-1),
 		m_maincpu(*this, "maincpu"),
-		m_spriteram(*this, "spriteram", 0),
-		m_fg_videoram(*this, "fg_videoram", 0),
-		m_bg_videoram(*this, "bg_videoram", 0),
 		m_oki(*this, "oki"),
 		m_hopperdev(*this, "hopper"),
 		m_igs025(*this,"igs025"),
 		m_igs022(*this,"igs022"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram_16(*this, "paletteram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
 	int m_input_addr;
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_fg_videoram;
-	optional_shared_ptr<UINT8> m_bg_videoram;
+
 	required_device<okim6295_device> m_oki;
 	optional_device<ticket_dispenser_device> m_hopperdev;
 	optional_device<igs025_device> m_igs025; // Mj Shuang Long Qiang Zhu 2
 	optional_device<igs022_device> m_igs022; // Mj Shuang Long Qiang Zhu 2
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_generic_paletteram_8;
-	optional_shared_ptr<UINT16> m_generic_paletteram_16;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_device<igs017_igs031_device> m_igs017_igs031;
+
 
 	void igs025_to_igs022_callback( void );
 
-	int m_toggle;
-	int m_debug_addr;
-	int m_debug_width;
-	UINT8 m_video_disable;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	UINT8 *m_sprites_gfx;
-	int m_sprites_gfx_size;
-	int m_nmi_enable;
-	int m_irq_enable;
+
+
 	UINT8 m_input_select;
 	UINT8 m_hopper;
 	UINT16 m_igs_magic[2];
 	UINT8 m_scramble_data;
-	int m_irq1_enable;
+
 	UINT8 m_dsw_select;
 
 	// lhzb2a protection:
@@ -122,38 +107,28 @@ public:
 	// IGS029 protection (mgcs)
 	UINT32 m_igs029_mgcs_long;
 
-	int m_irq2_enable;
-	DECLARE_WRITE8_MEMBER(video_disable_w);
-	DECLARE_WRITE16_MEMBER(video_disable_lsb_w);
-	DECLARE_WRITE8_MEMBER(fg_w);
-	DECLARE_WRITE8_MEMBER(bg_w);
-	DECLARE_READ16_MEMBER(fg_lsb_r);
-	DECLARE_WRITE16_MEMBER(fg_lsb_w);
-	DECLARE_READ16_MEMBER(bg_lsb_r);
-	DECLARE_WRITE16_MEMBER(bg_lsb_w);
-	DECLARE_READ16_MEMBER(spriteram_lsb_r);
-	DECLARE_WRITE16_MEMBER(spriteram_lsb_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
+
 	DECLARE_WRITE8_MEMBER(input_select_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
 	DECLARE_READ16_MEMBER(mgcs_magic_r);
-	DECLARE_WRITE16_MEMBER(irq1_enable_w);
-	DECLARE_WRITE16_MEMBER(irq2_enable_w);
-	DECLARE_WRITE16_MEMBER(mgcs_paletteram_w);
-	DECLARE_WRITE16_MEMBER(sdmg2_paletteram_w);
+
+	UINT16 mgcs_palette_bitswap(UINT16 bgr);
+	UINT16 lhzb2a_palette_bitswap(UINT16 bgr);
+	UINT16 tjsb_palette_bitswap(UINT16 bgr);
+	UINT16 slqz2_palette_bitswap(UINT16 bgr);
+
 	DECLARE_READ8_MEMBER(sdmg2_keys_r);
 	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
 	DECLARE_READ16_MEMBER(sdmg2_magic_r);
 	DECLARE_READ8_MEMBER(mgdh_keys_r);
 	DECLARE_WRITE16_MEMBER(mgdha_magic_w);
 	DECLARE_READ16_MEMBER(mgdha_magic_r);
-	DECLARE_WRITE8_MEMBER(tjsb_paletteram_w);
+
 	DECLARE_WRITE8_MEMBER(tjsb_output_w);
 	DECLARE_READ8_MEMBER(tjsb_input_r);
 	DECLARE_READ8_MEMBER(spkrform_input_r);
-	DECLARE_WRITE16_MEMBER(lhzb2a_paletteram_w);
+
 	DECLARE_READ16_MEMBER(lhzb2a_input_r);
 	DECLARE_WRITE16_MEMBER(lhzb2a_input_addr_w);
 	DECLARE_WRITE16_MEMBER(lhzb2a_input_select_w);
@@ -168,7 +143,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(lhzb2_magic_w);
 	DECLARE_READ16_MEMBER(lhzb2_magic_r);
-	DECLARE_WRITE16_MEMBER(slqz2_paletteram_w);
+
 	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
 	DECLARE_READ16_MEMBER(slqz2_magic_r);
 	DECLARE_READ8_MEMBER(mgcs_keys_r);
@@ -186,8 +161,7 @@ public:
 	DECLARE_DRIVER_INIT(tarzana);
 	DECLARE_DRIVER_INIT(lhzb2a);
 	DECLARE_DRIVER_INIT(mgdha);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
 	virtual void video_start();
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(iqblocka);
@@ -197,10 +171,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
-	void expand_sprites();
-	void draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	int debug_viewer(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
+
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0);
 	void iqblocka_patch_rom();
 	void tjsb_decrypt_sprites();
@@ -220,7 +192,6 @@ public:
 
 void igs017_state::machine_reset()
 {
-	m_video_disable = 0;
 	m_igs029_send_len = m_igs029_recv_len = 0;
 }
 
@@ -228,274 +199,45 @@ void igs017_state::machine_reset()
                                 Video Hardware
 ***************************************************************************/
 
-WRITE8_MEMBER(igs017_state::video_disable_w)
-{
-	m_video_disable = data & 1;
-	if (data & (~1))
-		logerror("%s: unknown bits of video_disable written = %02x\n", machine().describe_context(), data);
-//  popmessage("VIDEO %02X",data);
-}
-WRITE16_MEMBER(igs017_state::video_disable_lsb_w)
-{
-	if (ACCESSING_BITS_0_7)
-		video_disable_w(space,offset,data);
-}
-
-
-#define COLOR(_X)   (((_X)>>2)&7)
-
-TILE_GET_INFO_MEMBER(igs017_state::get_fg_tile_info)
-{
-	int code = m_fg_videoram[tile_index*4+0] + (m_fg_videoram[tile_index*4+1] << 8);
-	int attr = m_fg_videoram[tile_index*4+2] + (m_fg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
-}
-TILE_GET_INFO_MEMBER(igs017_state::get_bg_tile_info)
-{
-	int code = m_bg_videoram[tile_index*4+0] + (m_bg_videoram[tile_index*4+1] << 8);
-	int attr = m_bg_videoram[tile_index*4+2] + (m_bg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
-}
-
-WRITE8_MEMBER(igs017_state::fg_w)
-{
-	m_fg_videoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset/4);
-}
-
-WRITE8_MEMBER(igs017_state::bg_w)
-{
-	m_bg_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset/4);
-}
-
-// 16-bit handlers for an 8-bit chip
-
-READ16_MEMBER(igs017_state::fg_lsb_r)
-{
-	return m_fg_videoram[offset];
-}
-WRITE16_MEMBER(igs017_state::fg_lsb_w)
-{
-	if (ACCESSING_BITS_0_7)
-		fg_w(space,offset,data);
-}
-
-READ16_MEMBER(igs017_state::bg_lsb_r)
-{
-	return m_bg_videoram[offset];
-}
-WRITE16_MEMBER(igs017_state::bg_lsb_w)
-{
-	if (ACCESSING_BITS_0_7)
-		bg_w(space,offset,data);
-}
-
-READ16_MEMBER(igs017_state::spriteram_lsb_r)
-{
-	return m_spriteram[offset];
-}
-WRITE16_MEMBER(igs017_state::spriteram_lsb_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_spriteram[offset] = data;
-}
-
-
-
-// Eeach 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000 (little endian!).
-// This routine expands each word into three bytes.
-void igs017_state::expand_sprites()
-{
-	UINT8 *rom  =   memregion("sprites")->base();
-	int size    =   memregion("sprites")->bytes();
-	int i;
-
-	m_sprites_gfx_size   =   size / 2 * 3;
-	m_sprites_gfx        =   auto_alloc_array(machine(), UINT8, m_sprites_gfx_size);
-
-	for (i = 0; i < size / 2 ; i++)
-	{
-		UINT16 pens = (rom[i*2+1] << 8) | rom[i*2];
-
-		m_sprites_gfx[i * 3 + 0] = (pens >>  0) & 0x1f;
-		m_sprites_gfx[i * 3 + 1] = (pens >>  5) & 0x1f;
-		m_sprites_gfx[i * 3 + 2] = (pens >> 10) & 0x1f;
-	}
-}
 
 void igs017_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs017_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs017_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-
-	m_fg_tilemap->set_transparent_pen(0xf);
-	m_bg_tilemap->set_transparent_pen(0xf);
-
-	m_toggle = 0;
-	m_debug_addr = 0;
-	m_debug_width = 512;
-
-	expand_sprites();
-}
-
-/***************************************************************************
-                              Sprites Format
-
-    Offset:         Bits:               Value:
-
-        0.b                             Y (low)
-
-        1.b         7654 32--           Size Y (low)
-                    ---- --10           Y (high)
-
-        2.b         7654 3---           X (low)
-                    ---- -210           Size Y (high)
-
-        3.b         76-- ----           Size X (low)
-                    --5- ----
-                    ---4 3210           X (high)
-
-        4.b         76-- ----           Code (low)
-                    --54 3210           Size X (high)
-
-        5.b                             Code (mid low)
-
-        6.b                             Code (mid high)
-
-        7.b         765- ----           Color
-                    ---4 ----           Flip X
-                    ---- 3---
-                    ---- -210           Code (high)
-
-    Code = ROM Address / 2 = Pixel / 3
-
-***************************************************************************/
-
-void igs017_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
-{
-	// prepare GfxElement on the fly
-
-	// Bounds checking
-	if ( addr + dimx * dimy >= m_sprites_gfx_size )
-		return;
-
-	gfx_element gfx(m_palette, m_sprites_gfx + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
-
-	gfx.transpen(bitmap,cliprect,
-				0, color,
-				flipx, flipy,
-				sx, sy, 0x1f    );
-}
-
-void igs017_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-	UINT8 *s    =   m_spriteram;
-	UINT8 *end  =   m_spriteram + 0x800;
-
-	for ( ; s < end; s += 8 )
-	{
-		int x,y, sx,sy, dimx,dimy, flipx,flipy, addr,color;
-
-		y       =   s[0] + (s[1] << 8);
-		x       =   s[2] + (s[3] << 8);
-		addr    =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x07) << 18);
-		addr    *=  3;
-
-		flipx   =   s[7] & 0x10;
-		flipy   =   0;
-
-		dimx    =   ((((s[4] & 0x3f)<<2) | ((s[3] & 0xc0)>>6))+1) * 3;
-		dimy    =   ((y >> 10) | ((x & 0x03)<<6))+1;
-
-		x       >>= 3;
-		sx      =   (x & 0x1ff) - (x & 0x200);
-		sy      =   (y & 0x1ff) - (y & 0x200);
-
-		// sprites list stop (used by mgdh & sdmg2 during don den)
-		if (sy == -0x200)
-			break;
-
-		color = (s[7] & 0xe0) >> 5;
-
-		draw_sprite(bitmap, cliprect, sx, sy, dimx, dimy, flipx, flipy, color, addr);
-	}
-}
-
-// A simple gfx viewer (toggle with T)
-int igs017_state::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed_once(KEYCODE_T))   m_toggle = 1-m_toggle;
-	if (m_toggle)    {
-		int h = 256, w = m_debug_width, a = m_debug_addr;
-
-		if (machine().input().code_pressed(KEYCODE_O))        w += 1;
-		if (machine().input().code_pressed(KEYCODE_I))        w -= 1;
-
-		if (machine().input().code_pressed(KEYCODE_U))        w += 8;
-		if (machine().input().code_pressed(KEYCODE_Y))        w -= 8;
-
-		if (machine().input().code_pressed(KEYCODE_RIGHT))    a += 1;
-		if (machine().input().code_pressed(KEYCODE_LEFT))     a -= 1;
-
-		if (machine().input().code_pressed(KEYCODE_DOWN))     a += w;
-		if (machine().input().code_pressed(KEYCODE_UP))       a -= w;
-
-		if (machine().input().code_pressed(KEYCODE_PGDN))     a += w * h;
-		if (machine().input().code_pressed(KEYCODE_PGUP))     a -= w * h;
-
-		if (a < 0)      a = 0;
-		if (a > m_sprites_gfx_size)  a = m_sprites_gfx_size;
-
-		if (w <= 0)     w = 0;
-		if (w > 1024)   w = 1024;
-
-		bitmap.fill(0, cliprect);
-
-		draw_sprite(bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
-
-		popmessage("a: %08X w: %03X p: %02x-%02x-%02x",a,w,m_sprites_gfx[a/3*3+0],m_sprites_gfx[a/3*3+1],m_sprites_gfx[a/3*3+2]);
-		m_debug_addr = a;
-		m_debug_width = w;
-		osd_sleep(200000);
-		return 1;
-	}
-#endif
-	return 0;
+	m_igs017_igs031->video_start();
 }
 
 UINT32 igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-		if (machine().input().code_pressed(KEYCODE_A))  mask |= 4;
-		if (mask != 0) layers_ctrl &= mask;
-	}
-#endif
-
-	if (debug_viewer(bitmap,cliprect))
-		return 0;
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	if (m_video_disable)
-		return 0;
-
-	if (layers_ctrl & 1)    m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-
-	if (layers_ctrl & 4)    draw_sprites(bitmap, cliprect);
-
-	if (layers_ctrl & 2)    m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
+	m_igs017_igs031->screen_update_igs017(screen, bitmap, cliprect);
 	return 0;
 }
+
+// palette bitswap callbacks
+UINT16 igs017_state::mgcs_palette_bitswap(UINT16 bgr)
+{
+	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
+
+	return BITSWAP16(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
+}
+
+UINT16 igs017_state::lhzb2a_palette_bitswap(UINT16 bgr)
+{
+//	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
+	return BITSWAP16(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
+}
+
+UINT16 igs017_state::tjsb_palette_bitswap(UINT16 bgr)
+{
+	// bitswap
+	return BITSWAP16(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
+}
+
+UINT16 igs017_state::slqz2_palette_bitswap(UINT16 bgr)
+{
+	return BITSWAP16(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
+}
+
+
+
 
 /***************************************************************************
                                 Decryption
@@ -697,7 +439,7 @@ void igs017_state::mgcs_decrypt_tiles()
 	for (i = 0;i < length;i++)
 	{
 		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
-		rom[i] = tmp[addr];
+		rom[i^1] = BITSWAP8(tmp[addr],0,1,2,3,4,5,6,7);
 	}
 }
 
@@ -1353,19 +1095,7 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, igs017
 	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(igs017_state::nmi_enable_w)
-{
-	m_nmi_enable = data & 1;
-	if (data & (~1))
-		logerror("%s: nmi_enable = %02x\n", machine().describe_context(), data);
-}
 
-WRITE8_MEMBER(igs017_state::irq_enable_w)
-{
-	m_irq_enable = data & 1;
-	if (data & (~1))
-		logerror("%s: irq_enable = %02x\n", machine().describe_context(), data);
-}
 
 WRITE8_MEMBER(igs017_state::input_select_w)
 {
@@ -1413,20 +1143,7 @@ READ8_MEMBER(igs017_state::input_r)
 static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
-
-//  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
-
-	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
-
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
-
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_SHARE("fg_videoram")
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_SHARE("bg_videoram")
+	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE(input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ(input_r )
@@ -1694,64 +1411,21 @@ READ8_MEMBER(igs017_state::mgcs_keys_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::irq1_enable_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_irq1_enable = data & 1;
 
-	if (data != 0 && data != 1 && data != 0xff)
-		logerror("%s: irq1_enable = %04x\n", machine().describe_context(), data);
-}
-
-WRITE16_MEMBER(igs017_state::irq2_enable_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_irq2_enable = data & 1;
-
-	if (data != 0 && data != 1 && data != 0xff)
-		logerror("%s: irq2_enable = %04x\n", machine().describe_context(), data);
-}
-
-WRITE16_MEMBER(igs017_state::mgcs_paletteram_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	int bgr = ((m_generic_paletteram_16[offset/2*2+0] & 0xff) << 8) | (m_generic_paletteram_16[offset/2*2+1] & 0xff);
-
-	// bitswap
-	bgr = BITSWAP16(bgr, 7,8,9,2,14,3,13,15,12,11,10,0,1,4,5,6);
-
-	m_palette->set_pen_color(offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
-}
 
 static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
 	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w ) AM_READ(mgcs_magic_r )
-	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
-	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE(mgcs_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
-	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE(video_disable_lsb_w )
-	AM_RANGE( 0xa04028, 0xa04029 ) AM_RAM_WRITE(irq2_enable_w )
-	AM_RANGE( 0xa0402a, 0xa0402b ) AM_RAM_WRITE(irq1_enable_w )
-	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE(fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
-	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE(bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
+
+	AM_RANGE( 0xa00000, 0xa0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+
 	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	// oki banking through protection (code at $1a350)?
 ADDRESS_MAP_END
 
 
 // sdmg2
-
-
-WRITE16_MEMBER(igs017_state::sdmg2_paletteram_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	int bgr = ((m_generic_paletteram_16[offset/2*2+1] & 0xff) << 8) | (m_generic_paletteram_16[offset/2*2+0] & 0xff);
-
-	m_palette->set_pen_color(offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
-}
 
 READ8_MEMBER(igs017_state::sdmg2_keys_r)
 {
@@ -1824,14 +1498,9 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-	AM_RANGE(0x202000, 0x202fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
-	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
-	AM_RANGE(0x204024, 0x204025) AM_WRITE(video_disable_lsb_w )
-	AM_RANGE(0x204028, 0x204029) AM_WRITE(irq2_enable_w )
-	AM_RANGE(0x20402a, 0x20402b) AM_WRITE(irq1_enable_w )
-	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE(fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
-	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE(bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
+
+	AM_RANGE(0x200000, 0x20ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+
 	AM_RANGE(0x210000, 0x210001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(sdmg2_magic_w )
 	AM_RANGE(0x300002, 0x300003) AM_READ(sdmg2_magic_r )
@@ -1944,32 +1613,15 @@ static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x876000, 0x876003) AM_WRITE(mgdha_magic_w )
 	AM_RANGE(0x876002, 0x876003) AM_READ(mgdha_magic_r )
-	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
-	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
-//  AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
-	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
-	AM_RANGE(0xa04024, 0xa04025) AM_WRITE(video_disable_lsb_w )
-	AM_RANGE(0xa04028, 0xa04029) AM_WRITE(irq2_enable_w )
-	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE(irq1_enable_w )
-	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE(fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
-	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE(bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
+
+	AM_RANGE(0xa00000, 0xa0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+
 	AM_RANGE(0xa10000, 0xa10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
 
 // tjsb
 
-
-WRITE8_MEMBER(igs017_state::tjsb_paletteram_w)
-{
-	m_generic_paletteram_8[offset] = data;
-	int bgr = (m_generic_paletteram_8[offset/2*2+1] << 8) | m_generic_paletteram_8[offset/2*2+0];
-
-	// bitswap
-	bgr = BITSWAP16(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
-
-	m_palette->set_pen_color(offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
-}
 
 WRITE8_MEMBER(igs017_state::tjsb_output_w)
 {
@@ -2033,20 +1685,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(tjsb_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
+	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
-//  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
-
-	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
-
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
-
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_SHARE("fg_videoram")
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_SHARE("bg_videoram")
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -2086,18 +1726,7 @@ READ8_MEMBER(igs017_state::spkrform_input_r)
 static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
-
-	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
-
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
-
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_SHARE("fg_videoram")
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_SHARE("bg_videoram")
+	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -2177,14 +1806,9 @@ static ADDRESS_MAP_START( lhzb2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 	AM_RANGE(0x910000, 0x910003) AM_WRITE( lhzb2_magic_w )
 	AM_RANGE(0x910002, 0x910003) AM_READ( lhzb2_magic_r )
-	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
-	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0xb04020, 0xb04027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
-	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )
-	AM_RANGE(0xb04028, 0xb04029) AM_WRITE( irq2_enable_w )
-	AM_RANGE(0xb0402a, 0xb0402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
+
+	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
@@ -2422,18 +2046,6 @@ READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
 
 
 
-WRITE16_MEMBER(igs017_state::lhzb2a_paletteram_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	int bgr = ((m_generic_paletteram_16[offset/2*2+1] & 0xff) << 8) | (m_generic_paletteram_16[offset/2*2+0] & 0xff);
-
-	// bitswap
-	bgr = BITSWAP16(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
-
-	m_palette->set_pen_color(offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
-}
-
 READ16_MEMBER(igs017_state::lhzb2a_input_r)
 {
 	switch (offset*2)
@@ -2511,13 +2123,9 @@ static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 //  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
-	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
-	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )
-	AM_RANGE(0xb04028, 0xb04029) AM_WRITE( irq2_enable_w )
-	AM_RANGE(0xb0402a, 0xb0402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
+
+	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0xb12000, 0xb12001) AM_WRITE( lhzb2a_input_select_w )
 //  Inputs dynamically mapped at xx8000, protection at xx4000 (xx = f0 initially). xx written to xxc000
@@ -2526,18 +2134,6 @@ ADDRESS_MAP_END
 
 // slqz2
 
-
-WRITE16_MEMBER(igs017_state::slqz2_paletteram_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	int bgr = ((m_generic_paletteram_16[offset/2*2+1] & 0xff) << 8) | (m_generic_paletteram_16[offset/2*2+0] & 0xff);
-
-	// bitswap
-	bgr = BITSWAP16(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
-
-	m_palette->set_pen_color(offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
-}
 
 WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 {
@@ -2591,14 +2187,10 @@ static ADDRESS_MAP_START( slqz2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x602000, 0x602003) AM_WRITE( slqz2_magic_w )
 	AM_RANGE(0x602002, 0x602003) AM_READ( slqz2_magic_r )
-	AM_RANGE(0x902000, 0x902fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
-	AM_RANGE(0x903000, 0x9037ff) AM_RAM_WRITE( slqz2_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x904020, 0x904027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
-	AM_RANGE(0x904024, 0x904025) AM_WRITE( video_disable_lsb_w )
-	AM_RANGE(0x904028, 0x904029) AM_WRITE( irq2_enable_w )
-	AM_RANGE(0x90402a, 0x90402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0x908000, 0x90bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
-	AM_RANGE(0x90c000, 0x90ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
+
+	AM_RANGE(0x900000, 0x90ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+
+
 	AM_RANGE(0x910000, 0x910001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
@@ -3601,55 +3193,6 @@ static INPUT_PORTS_START( spkrform )
 INPUT_PORTS_END
 
 
-/***************************************************************************
-                                Graphics Layout
-***************************************************************************/
-
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8*3,8*2,8*1,8*0 },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*4) },
-	8*8*4
-};
-
-static const gfx_layout layout_8x8x4_swapped =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8*2,8*3,8*0,8*1 },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*4) },
-	8*8*4
-};
-
-static const gfx_layout layout_8x8x4_flipped =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8*2,8*3,8*0,8*1 },
-	{ STEP8(7, -1) },
-	{ STEP8(0, 8*4) },
-	8*8*4
-};
-
-static GFXDECODE_START( igs017 )
-	GFXDECODE_ENTRY( "tilemaps", 0, layout_8x8x4, 0, 16 )
-GFXDECODE_END
-
-static GFXDECODE_START( igs017_swapped )
-	GFXDECODE_ENTRY( "tilemaps", 0, layout_8x8x4_swapped, 0, 16 )
-GFXDECODE_END
-
-static GFXDECODE_START( igs017_flipped )
-	GFXDECODE_ENTRY( "tilemaps", 0, layout_8x8x4_flipped, 0, 16 )
-GFXDECODE_END
-
 
 /***************************************************************************
                                 Machine Drivers
@@ -3659,18 +3202,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_irq_enable)
+	if(scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
-	if(scanline == 0 && m_nmi_enable)
+	if(scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 {
-	m_nmi_enable = 0;
-	m_irq_enable = 0;
 	m_input_select = 0;
 }
 
@@ -3696,10 +3237,12 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3722,18 +3265,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_irq1_enable)
+	if(scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 0 && m_irq2_enable)
+	if(scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 MACHINE_RESET_MEMBER(igs017_state,mgcs)
 {
 	MACHINE_RESET_CALL_MEMBER( iqblocka );
-	m_irq1_enable = 0;
-	m_irq2_enable = 0;
+
 	m_scramble_data = 0;
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
 }
@@ -3760,10 +3302,12 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_flipped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_PALETTE_SCRAMBLE_CB( igs017_state, mgcs_palette_bitswap )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3796,9 +3340,13 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_swapped)
+
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
 
 	// protection
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
@@ -3841,7 +3389,11 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_swapped)
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
+
+
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3877,9 +3429,12 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_PALETTE_SCRAMBLE_CB( igs017_state, slqz2_palette_bitswap )
 
 	// protection
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
@@ -3917,7 +3472,10 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
+
+
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3935,10 +3493,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_irq1_enable)
+	if(scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 0 && m_irq2_enable)
+	if(scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
@@ -3961,7 +3519,10 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_swapped)
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
+
+
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3997,7 +3558,11 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_PALETTE_SCRAMBLE_CB( igs017_state, tjsb_palette_bitswap )
+
+
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -4036,9 +3601,11 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_GFX_PALETTE("palette")
 
 
 	/* sound hardware */
@@ -4360,7 +3927,7 @@ ROM_START( lhzb2 )
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
 	ROM_REGION( 0x80000, "tilemaps", 0 )    // adddress scrambling
-	ROM_LOAD( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
@@ -4376,7 +3943,7 @@ ROM_START( lhzb2a )
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
 	ROM_REGION( 0x80000, "tilemaps", 0 )    // adddress scrambling
-	ROM_LOAD( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
@@ -4489,7 +4056,7 @@ ROM_START( mgdha )
 	ROM_LOAD( "m1001.u4", 0x000000, 0x400000, CRC(0cfb60d6) SHA1(e099aca730e7fd91a72915c27e569ad3d21f0d8f) )    // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x20000, "tilemaps", 0 )
-	ROM_LOAD( "text.u6", 0x00000, 0x20000, CRC(db50f8fc) SHA1(e2ce4a42f5bdc0b4b7988ad9e8d14661f17c3d51) )
+	ROM_LOAD16_WORD_SWAP( "text.u6", 0x00000, 0x20000, CRC(db50f8fc) SHA1(e2ce4a42f5bdc0b4b7988ad9e8d14661f17c3d51) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1002.u22", 0x00000, 0x80000, CRC(ac6b55f2) SHA1(7ff91fd1107272ad6bce071dc9ae2f374ebf5e3e) )

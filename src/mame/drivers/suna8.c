@@ -2284,6 +2284,72 @@ ROM_START( hardheadb )
 	ROM_LOAD( "p14", 0x0000, 0x8000, CRC(41314ac1) SHA1(1ac9213b0ac4ce9fe6256e93875672e128a5d069) )
 ROM_END
 
+/***************************************************************************
+
+Roms for Hard Head from Suna Electronics '88
+
+The Main Board --->
+
+2 x Z80
+1 x AY-3-8910A
+1 x Yamaha YM3812
+1 x Xtal 24.000 Mhz
+
+One of the Z80 is attached in a daughter board... with discrete circuits
+and 3 pals...
+
+Look at the daughter board:
+
+|-------------------------------------------------------------------|
+| |--------|                                    |---------------|   |
+| | 74LS74 |                                    | PAL 16L8A-2CN |   |
+| |--------|                                    |------Green----|   |
+|             |---------|                                           |
+| |--------|  | 74LS244 |                       |---------------|   |
+| | 74LS74 |  |---------| |-------------------| | PAL 16L8A-2CN |   |
+| |--------|              |    Zilog Z80      | |------Blue-----|   |
+|                         |-------------------|                     |
+| |--------|  |---------|                       |---------------|   |
+| | 74LS74 |  | 74LS244 |                       | PAL 16L8A-2CN |   |
+| |--------|  |---------|                       |------Red------|   |
+|                                                                   |
+| |--------|                                    |--------|          |
+| | 74LS00 |                                    | 74LS08 |          |
+| |--------|                                    |--------|          |
+|                                                                   |
+|-------------------------------------------------------------------|
+
+***************************************************************************/
+
+ROM_START( hardheadb2 )
+	ROM_REGION( 0x48000+0x8000, "maincpu", 0 ) /* Main Z80 Code */
+	ROM_LOAD( "9_1.6l",  0x00000, 0x8000, CRC(750e6aee) SHA1(ec8f61a1a3d95ef0e3748968f6da73e972763493) ) // = 1_27512.l6 [1/2] (hardheadb) 1988,9,14 (already decrypted)
+	ROM_RELOAD(          0x48000, 0x8000 ) // remove protection patches at 83a, 85c, 881 (79 c9 -> b9 c8) to pass rom test
+	ROM_LOAD( "10_2.6k", 0x10000, 0x8000, CRC(8fcc1248) SHA1(5da0b7dc63f7bc00e81e9e5bac02ee6b0076ffaa) ) // = 2_27256.k6 (pop_hh)
+	ROM_LOAD( "11_3.6j", 0x18000, 0x8000, CRC(42c3264a) SHA1(cdad7953a2da1eccbe5abd55b7a8898c25f39f56) )
+	ROM_LOAD( "12_4.6h", 0x20000, 0x8000, CRC(acf85bcf) SHA1(70e8e4682ff738b0881bbcf84decb2a04946f675) )
+	ROM_LOAD( "3_7.7l",  0x28000, 0x8000, CRC(ee0ae9cc) SHA1(e188fb19e600f646a741685ba811309827f0f331) ) // ~ p7 77.603149%
+	ROM_LOAD( "4_8.7k",  0x30000, 0x8000, CRC(177ed8cd) SHA1(ac2c7c6fe84f892d60e6ed17b93a3b95c2b561e2) ) // ~ 8_27256.k8 (pop_hh) 97.894287%
+	ROM_LOAD( "5_9.7j",  0x38000, 0x8000, CRC(e4eea730) SHA1(be0a05cc31c55aa84f393024fe08a7cae1554db7) )
+	ROM_LOAD( "6_10.7h", 0x40000, 0x8000, CRC(84fc6574) SHA1(ab33e6c656f25e65bb08d0a2689693df83cab43d) ) // = 10_27256.i8 (pop_hh)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_LOAD( "2_13.9h", 0x00000, 0x8000, CRC(1b20e5ec) SHA1(b943a9666536b357434f3e7140df959d3c78908b) ) // ~ p13 79.528809%
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_LOAD( "13_5.6d", 0x00000, 0x8000, CRC(e9aa6fba) SHA1(f286727541f08b136a7d45e13975652bdc8fd663) ) // = p5
+	ROM_RELOAD(          0x08000, 0x8000 )
+	ROM_LOAD( "14_6.6a", 0x10000, 0x8000, CRC(ae24b92a) SHA1(8f7b1180b8762548853ca0c53d7913cfe17acc48) )
+	ROM_RELOAD(          0x18000, 0x8000 )
+	ROM_LOAD( "7_11.7d", 0x20000, 0x8000, CRC(3751b99d) SHA1(dc4082e481a79f0389e59b4b38698df8f7b94053) ) // = 11_27256.d8 (pop_hh)
+	ROM_RELOAD(          0x28000, 0x8000 )
+	ROM_LOAD( "8_12.7a", 0x30000, 0x8000, CRC(9582e6db) SHA1(a2b34d740e07bd35a3184365e7f3ab7476075d70) ) // = p12
+	ROM_RELOAD(          0x38000, 0x8000 )
+
+	ROM_REGION( 0x8000, "samples", 0 )  /* Samples */
+	ROM_LOAD( "1_14.11m", 0x00000, 0x8000, CRC(41314ac1) SHA1(1ac9213b0ac4ce9fe6256e93875672e128a5d069) ) // = p14
+ROM_END
+
 ROM_START( pop_hh )
 	ROM_REGION( 0x48000+0x8000, "maincpu", 0 ) /* Main Z80 Code */
 	ROM_LOAD( "1_27512.l6",  0x48000, 0x8000, CRC(bb4aa9ac) SHA1(da6310a1034cf610139d74fc30dd13e5fbd1d8dd) ) // 1988,9,14 (already decrypted)
@@ -2932,7 +2998,8 @@ GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT
 GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",      MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
-GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg)",         0 )
+GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",  0 )
+GAME( 1988, hardheadb2,hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 2)",  MACHINE_NOT_WORKING )
 GAME( 1988, pop_hh,    hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
 
 GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 1)",     0 )

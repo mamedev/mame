@@ -97,11 +97,11 @@ void e05a30_device::device_reset()
 void e05a30_device::update_printhead(int pos, UINT8 data)
 {
 	if (pos == 0) {
-		m_printhead &= 0x00ff;
-		m_printhead |= (UINT16) !!data << 8;
+		m_printhead &= 0x01fe;
+		m_printhead |= (data >> 7);
 	} else {
-		m_printhead &= 0xff00;
-		m_printhead |= data;
+		m_printhead &= 0x0001;
+		m_printhead |= (UINT16) (data << 1);
 	}
 	m_write_printhead(m_printhead);
 }

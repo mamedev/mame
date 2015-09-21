@@ -728,6 +728,8 @@ a4000tn
 c65    // 1991 C65 / C64DX (Prototype, NTSC)
 c64dx    // 1991 C65 / C64DX (Prototype, German PAL)
 
+mps1230	// 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
+
 // Epson
 px4    // 1985 Epson PX-4
 px4p      // 1985 Epson PX-4+
@@ -1606,6 +1608,7 @@ mekd2    // 1977 Motorola Evaluation Kit
 
 // DEC
 pdp1      // 1961 DEC PDP1
+la120 // 1978 Digital Equipment Corporation
 vt100 // 1978 Digital Equipment Corporation
 //vt100wp // 1978 Digital Equipment Corporation
 //vt100stp // 1978 Digital Equipment Corporation

@@ -998,8 +998,23 @@ void galaxian_state::jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectang
 	/* blue background - 390 ohm resistor */
 	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, cliprect);
 
-	/* render stars same as scramble but nothing in the status area */
-	scramble_draw_stars(bitmap, cliprect, 240);
+	/* render stars same as galaxian but nothing in the status area */
+	
+	/* update the star origin to the current frame */
+	stars_update_origin();
+
+	/* render stars if enabled */
+	if (m_stars_enabled)
+	{
+		int y;
+
+		/* iterate over scanlines */
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			UINT32 star_offs = m_star_rng_origin + y * 512;
+			stars_draw_row(bitmap, 240, y, star_offs, 0xff);
+		}
+	}
 }
 
 

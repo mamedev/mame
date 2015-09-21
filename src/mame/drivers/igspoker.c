@@ -122,6 +122,7 @@ public:
 	DECLARE_DRIVER_INIT(cpoker);
 	DECLARE_DRIVER_INIT(igs_ncs2);
 	DECLARE_DRIVER_INIT(cpokerpk);
+	DECLARE_DRIVER_INIT(kungfu);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset();
@@ -2425,6 +2426,20 @@ ROM_START( citalcup )
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 ROM_END
 
+
+ROM_START( pktet346 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v-346i.bin",  0x00000, 0x10000, CRC(8015ef13) SHA1(62841daff380d40c14ddb9c1b3fccdbb287e0b0d) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "346i-1.bin",  0x40000, 0x20000, CRC(1f8ae481) SHA1(259808422ae1c89f08deb982387b342a68afad7f) )
+	ROM_LOAD( "346i-2.bin",  0x20000, 0x20000, CRC(f198a24f) SHA1(a4bc5936f8729b00dc3c5034ce5689e4d16284bf) )
+	ROM_LOAD( "346i-3.bin",  0x00000, 0x20000, CRC(cfc4954d) SHA1(c68edbe0a7ce6a95d978756d2c1c8c5935786bcc) )
+
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+
+ROM_END
+
 DRIVER_INIT_MEMBER(igspoker_state,pktet346)
 {
 	int A;
@@ -2445,37 +2460,96 @@ DRIVER_INIT_MEMBER(igspoker_state,pktet346)
 	rom[0xbb0c] = 0xc3;
 }
 
-ROM_START( pktet346 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v-346i.bin",  0x00000, 0x10000, CRC(8015ef13) SHA1(62841daff380d40c14ddb9c1b3fccdbb287e0b0d) )
+
+/*
+
+Cherry master looking board
+
+Big chip with no markings at U80 stickered	KUNG FU
+                                            V1.0
+                                            1992
+
+Board silkscreend on top                    PCB NO.0013-B
+
+.45	27010	stickered	6
+.44	27010	stickered	5
+.43	27010	stickered	4
+.42	27128	stickered	3
+.41	27128	stickered	2
+.40	27128	stickered	1
+.98	27256	stickered	7	couldn't read chip, but board was silkscreened 27c256
+.97	27512	stickered	?	looked like japanese writing
+.38	74s287
+.46	18cv8				<--- same checksum as .48
+.47	pal16l8a			<--- checksum was 0
+.48	18cv8				<--- same checksum as .46
+
+unknown 24 pin chip @ u29
+open 24 pin socket @ u54
+12 MHz crystal
+
+5 x DSW8
+3 x NEC D8255AC
+
+*/
+
+ROM_START( kungfu )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	// u97 contains leftover x86 code at 0-3fff (compiled with Borland Turbo-C).
+	// You can rename the rom to kungfu.exe and run it (DOS MZ executable)!
+	// The rest is Z80 code, so the CPU at u80 is probably a variant with internal ROM.
+	ROM_LOAD( "kungfu-internal.u80", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "kungfu.u97",          0x00000, 0x10000, CRC(5c8e16de) SHA1(4af3795753d6e08f528b861d3a771c782e173556) )
+	ROM_LOAD( "kungfu-7.u98",        0x10000, 0x08000, CRC(1d3f0c79) SHA1(0a33798b69fbdc0fb7c47c51f5759e42acd2c608) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
-	ROM_LOAD( "346i-1.bin",  0x40000, 0x20000, CRC(1f8ae481) SHA1(259808422ae1c89f08deb982387b342a68afad7f) )
-	ROM_LOAD( "346i-2.bin",  0x20000, 0x20000, CRC(f198a24f) SHA1(a4bc5936f8729b00dc3c5034ce5689e4d16284bf) )
-	ROM_LOAD( "346i-3.bin",  0x00000, 0x20000, CRC(cfc4954d) SHA1(c68edbe0a7ce6a95d978756d2c1c8c5935786bcc) )
+	ROM_LOAD( "kungfu-4.u43", 0x00000, 0x20000, CRC(df4afedb) SHA1(56ab18c46a199653c284417a8e9edc9f32374318) )
+	ROM_LOAD( "kungfu-5.u44", 0x20000, 0x20000, CRC(25c9c98e) SHA1(2d3a399d8d53ee5cb8106d2b35d1ab1778439f81) )
+	ROM_LOAD( "kungfu-6.u45", 0x40000, 0x20000, CRC(f1ec5f0d) SHA1(0aa888e13312ed5d98953c81f03a61c6175c7fec) )
 
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "kungfu-1.u40", 0x00000, 0x4000, CRC(abaada6b) SHA1(a6b910db7451e8ca737f43f32dfc8fc5ecf865f4) )
+	ROM_LOAD( "kungfu-2.u41", 0x10000, 0x4000, CRC(927b3060) SHA1(a780ea5aaee04287cc9533c2d258dc18f8426530) )
+	ROM_LOAD( "kungfu-3.u42", 0x20000, 0x4000, CRC(bbf78e03) SHA1(06fee093e75e2611d00c076c2e0a681938fa8b74) )
 
+	ROM_REGION( 0x1000, "plds", 0 )
+	ROM_LOAD( "kungfu.u38", 0x000, 0x100, CRC(2074f729) SHA1(eb9a60dec57a029ae6d3fc53aa7bc78e8ac34392) )
+	ROM_LOAD( "kungfu.u46", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
+	ROM_LOAD( "kungfu.u47", 0x000, 0xaee, CRC(5c7e25b5) SHA1(7d37e4abfe1256bd9cb168e0f02e651118dfb304) )
+	ROM_LOAD( "kungfu.u48", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
 ROM_END
 
+DRIVER_INIT_MEMBER(igspoker_state,kungfu)
+{
+	int A;
+	UINT8 *rom = memregion("maincpu")->base();
+
+	for (A = 0x4000;A < 0x10000;A++)
+	{
+		rom[A] = rom[A] ^ 0x01;
+	}
+	memset( &rom[0xf000], 0, 0x1000);
+}
 
 
-GAMEL( 1993?,cpoker,    0,        igspoker, cpoker, igspoker_state,   cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                     0, layout_igspoker )
-GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker, igspoker_state,   cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                     0, layout_igspoker )
-GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx, igspoker_state,  cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                      0, layout_igspoker )
+GAMEL( 1993?,cpoker,    0,        igspoker, cpoker,   igspoker_state, cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                     0, layout_igspoker )
+GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                     0, layout_igspoker )
+GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx,  igspoker_state, cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                      0, layout_igspoker )
 GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (Poker)",                    0, layout_igspoker )
 GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (Lattine)",                  0, layout_igspoker )
-GAMEL( 198?, csk227it,  0,        csk227it, csk227, igspoker_state,   cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",              0, layout_igspoker ) /* SU 062 */
-GAMEL( 198?, csk234it,  csk227it, csk234it, csk234, igspoker_state,   cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",  0, layout_igspoker ) /* SU 062 */
+GAMEL( 198?, csk227it,  0,        csk227it, csk227,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",              0, layout_igspoker ) /* SU 062 */
+GAMEL( 198?, csk234it,  csk227it, csk234it, csk234,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",  0, layout_igspoker ) /* SU 062 */
 GAMEL( 2000, number10,  0,        number10, number10, igspoker_state, number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                       0, layout_igspoker )
 GAMEL( 2000, numbr10l,  number10, number10, number10, igspoker_state, number10, ROT0, "PlayMark SRL",         "Number Dieci (Lattine)",                     0, layout_igspoker )
-GAMEL( 198?, igs_ncs,   0,        igs_ncs,  igs_ncs, igspoker_state,  igs_ncs,  ROT0, "IGS",                  "New Champion Skill (v100n)",                 0, layout_igspoker ) /* SU 062 */
+GAMEL( 198?, igs_ncs,   0,        igs_ncs,  igs_ncs,  igspoker_state, igs_ncs,  ROT0, "IGS",                  "New Champion Skill (v100n)",                 0, layout_igspoker ) /* SU 062 */
 GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, blue board)",  0, layout_igspoker )
 GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, green board)", 0, layout_igspoker )
 GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian Cup (bootleg V220IT)",      0, layout_igspoker )
 
-GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igspoker_state,  igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",            MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
+GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs,  igspoker_state, igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",            MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
 
-GAMEL( 1998, stellecu,  0,        number10, number10, driver_device, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                      MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 1998, stellecu,  0,        number10, number10, driver_device,  0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                      MACHINE_NOT_WORKING, layout_igspoker )
 
 GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                          0, layout_igspoker )
+
+GAMEL( 1992, kungfu,    0,        igspoker, cpoker,   igspoker_state, kungfu,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                        MACHINE_NOT_WORKING, layout_igspoker )
