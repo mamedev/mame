@@ -67,11 +67,38 @@
  * ||||--||                                                            
  * ||
  *
- * History of Motorola VME division
+ * History of Motorola VME division (https://en.wikipedia.org/wiki/VMEbus)
  *---------------------------------
- * TBD
+ * When Motorola released the 68000 processor 1979 the ambition of the deisgners
+ * was also to standardize a versatile CPU bus to be able to build computer 
+ * systems without constructing PCB:s from scratch. This become VersaBus but the
+ * boards was really too big and the computer world already saw the systems shrink
+ * in size. Motorola's design center in Munich proposed to use the smaller and
+ * already used Euroboard form factor and call it Versabus-E. This later became
+ * VME which was standardized in the VITA organization 1981 
  *
- * Misc links about Motorola VME division and this board: TBD
+ * Misc links about Motorola VME division and this board: 
+ * http://bitsavers.trailing-edge.com/pdf/motorola/_dataBooks/1987_Microcomputer_Systems_and_Components.pdf
+ * 
+ * Description
+ * ------------
+ * Streaming Tape Controller released 1984 with the following feature set
+ *
+ *      -  Double High (6U) VMEmodule
+ *      -  QIC-02 Streaming Tape Interface
+ *      -  Supports One 01C-02 compatible 1/4-inch Streaming Tape Drive
+ *      -  Standard VMEbus Interface
+ *      -  Supports 24- or 32-bit DMA Addressing/16-bit Data
+ *      -  Generates Seven Levels of VMEbus Interrupts with Programmable Interrupt Vector
+ *      -  10 MHz MC68010 Microprocessor
+ *      -  90Kb/s Continuous Transfer Rate for QIC-02 Interface, 200Kb/s Burst rate
+ *      -  Controls Tape Cartridges Offering 20Mb, 45Mb and 60Mb of Formatted Data Storage
+ *      -  MC68230 PIT-based Timer
+ *      -  16Kb of Static RAM Provides Buffer Storage and CPU Workspace
+ *      -  Multitasking Kernel-based Firmware Package
+ *      -  Buffered Pipe Communication Protocol Allows Multiple Hosts to Oueue Commands Without Interlock
+ *      -  High Level Command/Status Packets offer efficient Operating System Support
+ *      -  Permits Chaining of Host Command
  *
  * Address Map 
  * --------------------------------------------------------------------------
@@ -104,7 +131,7 @@
  *
  *  TODO:
  *  - Dump the ROMs (DONE)
- *  - Setup a working address map
+ *  - Setup a working address map (STARTED)
  *  - Get documentation for VME interface
  *  - Add VME bus driver
  *  - Hook up a CPU board that supports boot from tape (ie MVME-162, MVME 147)
@@ -215,13 +242,16 @@ ROM_LOAD16_BYTE ("mvme350U47v2.3.bin", 0x0001, 0x4000, CRC (582ce095) SHA1 (d092
  *
  * The ROMs known commands from different sources:
  *
- *  NONE
+ *  It communicates with the master through data buffers in shared memory and VME bus interrupts
+ * as desribed in 
+ * http://bitsavers.trailing-edge.com/pdf/motorola/_dataBooks/1987_Microcomputer_Systems_and_Components.pdf
  * 
- *  This is controller board which sets up the board and then executes a STOP instruction
- * awaiting a CPU on the VME bus to request its services.
+ * The board is pretty boring as stand alone, it initializes everything and then executes a STOP instruction
+ * awaiting a CPU on the VME bus to request its services. However, it enables boot from tape devices, we just 
+ * need a MVME-131 and a dump of a VersaDOS or Motorola UNIX System V system tape and some work.
  */
 ROM_END
 
 /* Driver */
 /*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1985, mvme350,      0,      0,       mvme350,        mvme350, driver_device, 0,   "Motorola",   "MVME-350", MACHINE_IS_SKELETON )
+COMP (1984, mvme350,      0,      0,       mvme350,        mvme350, driver_device, 0,   "Motorola",   "MVME-350", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
