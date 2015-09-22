@@ -618,8 +618,8 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_display_enabled_scanline = 0;
 				m_display_enabled_field = 0;
 			}
-			else
-				m_linecounter++;
+
+			m_linecounter++;
 
 			if(m_linecounter >= m_screen->height())
 			{
