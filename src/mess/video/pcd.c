@@ -165,7 +165,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 		attr = m_vram[address + 1];
 		if(cursor && blink)
 			data = 0xff;
-		if((linecount > 11) && (attr & 0x20))
+		if(ul && (attr & 0x20))
 			data = 0xff;
 		if(attr & 8)
 			bgnd = 2;
