@@ -244,19 +244,13 @@ static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0c80, 0x17ff) AM_RAM
 
 
-	AM_RANGE(0x2200, 0x35ff) AM_ROM // ok
+	AM_RANGE(0x2200, 0x3aff) AM_ROM // ok
+	AM_RANGE(0x3B00, 0x41ff) AM_ROM // ok
 
-	AM_RANGE(0x3B00, 0x3cff) AM_ROM // ok
-
-//	AM_RANGE(0x3600, 0x37ff) AM_ROM // ok?
-//	AM_RANGE(0x5800, 0x7fff) AM_ROM // wrong
 	AM_RANGE(0x8a00, 0x8eff) AM_ROM // 8a-8f ok?
 
-	AM_RANGE(0x5800, 0x5800) AM_ROM // ? (just put a ret here for now)
-
+	AM_RANGE(0x5800, 0x5dff) AM_ROM
 	AM_RANGE(0x5e00, 0x5fff) AM_ROM //
-
-
 	AM_RANGE(0x6000, 0x68ff) AM_ROM // ok
 
 	AM_RANGE(0x4200, 0x45ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") // ok
@@ -1177,17 +1171,18 @@ Both are missing the top sound PCB.
 ROM_START( minefldfe )
 	ROM_REGION( 0x10000, "subboard", 0 )
 	ROM_LOAD( "sub-1.bin",        0x0000, 0x2000, CRC(0511df9f) SHA1(e4b93e70a070a8f42442c8329478b98cba387971) ) // all used
-	ROM_LOAD( "sub-2.bin",        0x2000, 0x2000, CRC(00205e04) SHA1(f8e8399a1aaa548ae2448ebc96fb3e68625f9260) ) // 2500 - 2700 used 3000 - 3b00 used
+	ROM_LOAD( "sub-2.bin",        0x2000, 0x2000, CRC(00205e04) SHA1(f8e8399a1aaa548ae2448ebc96fb3e68625f9260) ) // 2500 - 3b00 used
 	ROM_LOAD( "sub-3.bin",        0x4000, 0x0800, CRC(98c05d8d) SHA1(9c89504421df754bb0228ca08c7bfae5f6dc3e91) ) // all used
 
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_COPY( "subboard", 0x0000, 0x0000, 0x0c00 ) // definitely OK
 	ROM_COPY( "subboard", 0x0c00, 0x2200, 0x1400 ) // definitely OK
-	ROM_COPY( "subboard", 0x2500, 0x3b00, 0x0200 ) // ok
-	ROM_COPY( "subboard", 0x3000, 0x5e00, 0x0b00 ) // ok
+	ROM_COPY( "subboard", 0x2500, 0x3b00, 0x0500 ) // ok
+	ROM_COPY( "subboard", 0x2a00, 0x5800, 0x0600 ) // ok
+	ROM_COPY( "subboard", 0x3000, 0x5e00, 0x1000 ) // ok
 	ROM_COPY( "subboard", 0x4000, 0x8a00, 0x0800 ) // some of this is ok at least
 
-	ROM_FILL( 0x5800, 0x01, 0xc9 )
+	// check jump to 3E33
 
 	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "snd.2l",        0x0000, 0x0800, CRC(8bef736b) SHA1(c5c7ce9c40e6fe60a4914b6bbd646ba6853c9043) )
