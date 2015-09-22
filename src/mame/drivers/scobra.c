@@ -1061,6 +1061,64 @@ ROM_START( minefld )
 	ROM_LOAD( "minefld.clr",  0x0000, 0x0020, CRC(1877368e) SHA1(5850e03debe572f72abd91c756c0f8613018a962) )
 ROM_END
 
+/*
+
+This is a bootleg by Free Enterprise Games.
+The host board is common Scramble hardware.
+There is a small sub-board containing a Z80, the 3 'sub' eproms, a 2kx8 SRAM and an unknown
+DIP24 chip by AMD(C)1979. I'm sure there is some obfuscation going on with this sub board.
+There's a taunt in one of the EPROMs telling people they won't be able to copy it and get
+it working ;-)
+There are 2 GFX ROMs on the main board and 2 program ROMs and a color PROM.
+There's also another small sub board plugged in at position 5L and 5M replacing 2 logic chips
+with 8 logic chips and it's also wired to various logic chips on the main board.
+The games are possibly Minefield and Scramble together on one board although both boards could
+be running different games.
+One board is missing the 2 GFX ROMs (possibly on purpose, don't know)
+Both are missing the top sound PCB.
+
+*/
+
+
+// in both cases we don't really seem to have enough program code, maybe something is the wrong size
+// or some code was put into (long dead) battery backed RAM?
+
+ROM_START( minefldfe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sub-1.bin",        0x0000, 0x2000, CRC(0511df9f) SHA1(e4b93e70a070a8f42442c8329478b98cba387971) )
+	ROM_LOAD( "sub-2.bin",        0x2000, 0x2000, CRC(00205e04) SHA1(f8e8399a1aaa548ae2448ebc96fb3e68625f9260) )
+	ROM_LOAD( "sub-3.bin",        0x4000, 0x0800, CRC(98c05d8d) SHA1(9c89504421df754bb0228ca08c7bfae5f6dc3e91) ) // strange size
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF ) // why is the audio CPU code marked 'gfx' ?! (identical to regular version)
+	ROM_LOAD( "gfx.2l",        0x0000, 0x0800, CRC(8bef736b) SHA1(c5c7ce9c40e6fe60a4914b6bbd646ba6853c9043) )
+	ROM_LOAD( "gfx.2m",        0x0800, 0x0800, CRC(f67b3f97) SHA1(bb15f95eab6594508b5c02af60ed9fff3abd23ee) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "prg.5f",        0x0000, 0x0800, CRC(8b5e187a) SHA1(3afd348a2ade9fc01fd1fc6a5ce9b148e0a1ead1) )
+	ROM_LOAD( "prg.5h",        0x0800, 0x0800, CRC(4b7e1fbc) SHA1(334c09f380a3750874c4bef8e987112e7a50fdbd) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6e",  0x0000, 0x0020, CRC(1877368e) SHA1(5850e03debe572f72abd91c756c0f8613018a962) )
+ROM_END
+
+ROM_START( rescuefe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sub-1.bin",        0x0000, 0x2000, CRC(7a6e813e) SHA1(5f9fff576f6a8d8e09f11404ca49b1011d17fa36) )
+	ROM_LOAD( "sub-2.bin",        0x2000, 0x2000, CRC(28fcec83) SHA1(f2b2b2c8f65450b627587cf5f16620b95d7fe4e2) )
+	ROM_LOAD( "sub-3.bin",        0x4000, 0x0800, CRC(6fbeb239) SHA1(cb81719e8bb6b99ad4e46d9404c61c09db8475c3) ) // strange size, contains nothing except a taunt message which seems to be cut off at the start??
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF ) // audio CPU code was missing, assuming the same as regular Rescue due to sound code on the minefield bootleg matching.
+	ROM_LOAD( "rb15csnd.bin", 0x0000, 0x0800, CRC(8b24bf17) SHA1(cc49fef3c629c12f1a7eb9886fdc2df4b08f4b37) )
+	ROM_LOAD( "rb15dsnd.bin", 0x0800, 0x0800, CRC(d96e4fb3) SHA1(8bb023c7c668f93d2333d648fc3cefdbd66f92db) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "prg.5f",        0x0000, 0x0800, CRC(60f49e88) SHA1(92ea21715b2d4d28a0509a31b35b43354be7b75f) )
+	ROM_LOAD( "prg.5h",        0x0800, 0x0800, CRC(9486e09e) SHA1(a8c2b48a3a2633c2eae19bb40299c4da1499c15c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6e",  0x0000, 0x0020, CRC(40c6bcbd) SHA1(cb0c058eadc37eba4b1a99be095da81a14099d8d) )
+ROM_END
+
 ROM_START( hustler )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hustler.1",    0x0000, 0x1000, CRC(94479a3e) SHA1(ea3a1a3f6bee3d35a6a0fb0ba689a25f6b919e5d) )
@@ -1243,8 +1301,10 @@ GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scramble_state,  tazmani2
 GAME( 1982, rescue,    0,        rescue,    rescue,    scramble_state,  rescue,       ROT90,  "Stern Electronics",                  "Rescue", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, rescueb,   rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg (Videl Games)",              "Rescue (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, aponow,    rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg",                            "Apocaljpse Now (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rescuefe,  rescue,   rescue,    rescue,    driver_device,   0,            ROT90,  "bootleg (Free Enterprise Games)",    "Rescue (Free Enterprise Games, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, minefld,   0,        minefld,   minefld,   scramble_state,  minefld,      ROT90,  "Stern Electronics",                  "Minefield", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, minefldfe, minefld,  minefld,   minefld,   driver_device,   0,            ROT90,  "bootleg (Free Enterprise Games)",    "Minefield (Free Enterprise Games, bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 1981, hustler,   0,        hustler,   hustler,   scramble_state,  hustler,      ROT90,  "Konami",                             "Video Hustler", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerd,  hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)", MACHINE_SUPPORTS_SAVE )
