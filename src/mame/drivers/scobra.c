@@ -203,32 +203,37 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rescuefe_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x05ff) AM_ROM
 	AM_RANGE(0x0600, 0x0fff) AM_RAM // sets stack here
-	
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1400, 0x143f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x1440, 0x145f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x1460, 0x147f) AM_RAM AM_SHARE("bulletsram")
+	AM_RANGE(0x1480, 0x14ff) AM_RAM
+
+
 	AM_RANGE(0x4400, 0x5dff) AM_ROM
 	AM_RANGE(0x5e00, 0x6bff) AM_ROM // some right?
 	
 	AM_RANGE(0x8200, 0x93ff) AM_ROM // wrong? (maybe some correct?)
 
-	AM_RANGE(0xa000, 0xa7ff) AM_ROM // wrong (taunt string) jumps to around a600 so something must map in this area?
+	AM_RANGE(0xa600, 0xa6ff) AM_ROM // wrong (taunt string) jumps to around a600 so something must map in this area?
 
+	AM_RANGE(0xEA01, 0xEA01) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0xEA93, 0xEA93) AM_WRITE(scrambold_background_enable_w)
+	AM_RANGE(0xEA86, 0xEA86) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0xEA87, 0xEA87) AM_WRITE(galaxold_flip_screen_y_w)
+
+	// does it have a real ppi8255?
+	AM_RANGE(0xC190, 0xC193) AM_DEVREAD("ppi8255_0", i8255_device, read) // ?
+	AM_RANGE(0xC160, 0xC163) AM_DEVREAD("ppi8255_0", i8255_device, read) // ?
+
+	AM_RANGE(0xC4Ac, 0xC4AF) AM_DEVREAD("ppi8255_1", i8255_device, read) // ?
+	
+	AM_RANGE(0xc180, 0xc183) AM_DEVWRITE("ppi8255_0", i8255_device, write) // correct based on main set?
+	AM_RANGE(0xc220, 0xc223) AM_DEVWRITE("ppi8255_1", i8255_device, write) // ^	
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(galaxold_videoram_w)  /* mirror */
-	AM_RANGE(0xfc00, 0xffff) AM_READ(galaxold_videoram_r)   /* mirror */
-	AM_RANGE(0xf000, 0xf03f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0xf040, 0xf05f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf060, 0xf07f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0xf080, 0xf0ff) AM_RAM
-	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xf804, 0xf804) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
+//	AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
+//	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 
