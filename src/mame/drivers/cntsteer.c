@@ -68,6 +68,7 @@ public:
 
 	/* misc */
 	int      m_nmimask; // zerotrgt only
+	bool	 m_sub_nmimask; // counter steer only
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -81,6 +82,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_attr_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_background_w);
+	DECLARE_READ8_MEMBER(cntsteer_background_mirror_r);
 	DECLARE_WRITE8_MEMBER(gekitsui_sub_irq_ack);
 	DECLARE_WRITE8_MEMBER(cntsteer_sound_w);
 	DECLARE_WRITE8_MEMBER(zerotrgt_ctrl_w);
@@ -102,6 +104,7 @@ public:
 	DECLARE_PALETTE_INIT(zerotrgt);
 	UINT32 screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(subcpu_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -438,6 +441,9 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 		case 1: m_scrollx = data; break;
 		case 2: m_bg_bank = (data & 0x01) << 8;
 				m_bg_color_bank = (data & 6) >> 1;
+				// TODO: of course this just inibits bus request for master.
+				m_maincpu->set_input_line(INPUT_LINE_HALT, data & 4 ? CLEAR_LINE : ASSERT_LINE);
+
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3: m_rotation_sign = (data & 7);
@@ -465,6 +471,12 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+/* checks area 0x2000-0x2fff with this address config. */
+READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
+{
+	return m_videoram2[BITSWAP16(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
 /*************************************
@@ -585,7 +597,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2")
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(cntsteer_background_mirror_r,cntsteer_background_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
@@ -603,6 +615,13 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cntsteer_state::nmimask_w)
 {
 	m_nmimask = data & 0x80;
+}
+
+INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
+{
+	//popmessage("%02x",m_disable_roz);
+	//if (m_disable_roz == 8)
+	//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
@@ -879,7 +898,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MCFG_DEVICE_DISABLE()
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  subcpu_vblank_irq) /* ? */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
