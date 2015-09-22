@@ -238,7 +238,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM // ok
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM // ok? stack
+	AM_RANGE(0x0c00, 0x0c3f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram") // ok
+	AM_RANGE(0x0c40, 0x0c5f) AM_RAM AM_SHARE("spriteram") // ok
+	AM_RANGE(0x0c60, 0x0c7f) AM_RAM AM_SHARE("bulletsram") // ok
+	AM_RANGE(0x0c80, 0x17ff) AM_RAM
+
 
 	AM_RANGE(0x2200, 0x35ff) AM_ROM // ok
 
@@ -257,27 +261,24 @@ static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
 
 	AM_RANGE(0x4200, 0x45ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") // ok
 
-	// wrong?
-	AM_RANGE(0x1000, 0x103f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x1040, 0x105f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1060, 0x107f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x1080, 0x17ff) AM_RAM
 
-	AM_RANGE(0x7621, 0x7621) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0x7621, 0x7621) AM_WRITE(galaxold_nmi_enable_w) // a801
+	AM_RANGE(0x7673, 0x7673) AM_WRITE(scrambold_background_enable_w) // a083
+	AM_RANGE(0x7704, 0x7704) AM_WRITE(galaxold_stars_enable_w) // a804
+	AM_RANGE(0x7616, 0x7616) AM_WRITE(galaxold_flip_screen_x_w) // a806
+	AM_RANGE(0x7617, 0x7617) AM_WRITE(galaxold_flip_screen_y_w) // a807
 
+	AM_RANGE(0x4C00, 0x4C03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) 
+	AM_RANGE(0x4B00, 0x4B03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) 
 
+	
+	 
 
+	AM_RANGE(0x1D98, 0x1D98) AM_READ(watchdog_reset_r) // 0xb000
 
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
-	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xf804, 0xf804) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 
