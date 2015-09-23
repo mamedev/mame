@@ -106,7 +106,7 @@ public:
 	static const int HTOTAL = 684;
 	static const int HVISIBLE = 544;
 	static const int VTOTAL_NTSC = 262;
-	static const int VTOTAL_PAL = 312;
+	static const int VTOTAL_PAL = 313;
 	static const int VVISIBLE_NTSC = 26 + 192 + 25;
 	static const int VVISIBLE_PAL = 53 + 192 + 49;
 	// Looking at some youtube videos of real units on real monitors
