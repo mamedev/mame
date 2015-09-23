@@ -4005,7 +4005,8 @@ ROM_END
 //*************************************************************************************************************************
 //  Aurail, Sega System 16B
 //  CPU: 68000
-//  ROM Board type: 171-????
+//  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-7702-06 AURAIL(ROM BD)
 //
 ROM_START( aurail )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -4048,7 +4049,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Aurail, Sega System 16B
 //  CPU: FD1089B (317-0168)
-//  ROM Board type: 171-????
+//  ROM Board type: 171-5704
 //
 ROM_START( aurail1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
