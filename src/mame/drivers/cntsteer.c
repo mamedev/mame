@@ -442,6 +442,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 		case 2: m_bg_bank = (data & 0x01) << 8;
 				m_bg_color_bank = (data & 6) >> 1;
 				// TODO: of course this just inibits bus request for master.
+				// TODO: after further investigation, this isn't right, it disables once that player insert a coin.
 				m_maincpu->set_input_line(INPUT_LINE_HALT, data & 4 ? CLEAR_LINE : ASSERT_LINE);
 
 				m_bg_tilemap->mark_all_dirty();
