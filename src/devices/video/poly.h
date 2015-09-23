@@ -1304,13 +1304,13 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 template<typename _BaseType, int _MaxParams>
 int frustum_clip_all(frustum_clip_vertex<_BaseType, _MaxParams>* clip_vert, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
 {
-    num_vertices = frustum_clip_w<float, 4>(clip_vert, num_vertices, clip_vert);
-    num_vertices = frustum_clip<float, 4>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
-    num_vertices = frustum_clip<float, 4>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
-    num_vertices = frustum_clip<float, 4>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
-    num_vertices = frustum_clip<float, 4>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
-    num_vertices = frustum_clip<float, 4>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
-    num_vertices = frustum_clip<float, 4>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+    num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
     out = clip_vert;
     return num_vertices;
 }

@@ -251,12 +251,12 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
 	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
 	// [3]  - ???? ... ? Contains a value
-	// [4]  - xxxx ... Camera projection near scale
-	// [5]  - xxxx ... Camera projection near height(?)
-	// [6]  - xxxx ... Camera projection near width(?)
-	// [7]  - xxxx ... Camera projection far scale
-	// [8]  - xxxx ... Camera projection far height(?)
-	// [9]  - xxxx ... Camera projection far width(?)
+	// [4]  - xxxx ... Camera projection near (?)
+	// [5]  - xxxx ... Camera projection near (?)
+	// [6]  - xxxx ... Camera projection near (?)
+	// [7]  - xxxx ... Camera projection far (?)
+	// [8]  - xxxx ... Camera projection far (?)
+	// [9]  - xxxx ... Camera projection far (?)
 	// [10] - xxxx ... Camera projection right
 	// [11] - xxxx ... Camera projection left
 	// [12] - xxxx ... Camera projection top
@@ -272,9 +272,10 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 	right   = uToF(packet[10]);
 	top     = uToF(packet[12]);
 	bottom  = uToF(packet[13]);
-	near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
-	far_    = uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
-	// (note are likely not 100% correct - I'm not using one of the parameters)
+
+    // Note: The near and far clipping planes are totally guesses.
+    near_   = uToF(packet[6]);  // + (uToF(packet[6]) * uToF(packet[4]));
+	far_    = 0.9f;             // uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
 
 	projectionMatrix[0]  = (2.0f*near_)/(right-left);
 	projectionMatrix[1]  = 0.0f;
@@ -367,11 +368,6 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	UINT32 size[4];
 	UINT32 address[4];
 	UINT32 megaOffset;
-	float eyeCoords[4];     // ObjectCoords transformed by the modelViewMatrix
-//  float clipCoords[4];    // EyeCoords transformed by the projectionMatrix
-	float ndCoords[4];      // Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
-	float windowCoords[4];  // Mapped ndCoordinates to screen space
-	float cullRay[4];
     polygon lastPoly = { 0 };
 	const rectangle &visarea = m_screen->visible_area();
 
@@ -751,6 +747,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			////////////////////////////////////
 			// Perform the world transformations...
 			// TODO: We can eliminate this step with a matrix stack (maybe necessary?)
+            // Note: fatfurwa's helicopter tracking in scene 3 of its intro shows one of these matrices isn't quite correct
 			setIdentity(m_modelViewMatrix);
 			if (m_mcu_type != SAMSHO_MCU)
 			{
@@ -818,6 +815,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 
 
 			// BEHIND-THE-CAMERA CULL //
+            float cullRay[4];
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
 			if (cullRay[2] > 0.0f)              // Camera is pointing down -Z
 			{
@@ -828,27 +826,57 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			// TRANSFORM THE TRIANGLE INTO HOMOGENEOUS SCREEN SPACE //
 			if (currentPoly.visible)
 			{
+                hng64_clip_vertex clipVerts[10];
+                
+                // Transform and project each vertex into pre-divided homogeneous coordinates
 				for (int m = 0; m < currentPoly.n; m++)
 				{
-					// Transform and project the vertex into pre-divided homogeneous coordinates...
+                    float eyeCoords[4];     // World coordinates transformed by the modelViewMatrix
 					vecmatmul4(eyeCoords, m_modelViewMatrix, currentPoly.vert[m].worldCoords);
 					vecmatmul4(currentPoly.vert[m].clipCoords, m_projectionMatrix, eyeCoords);
+                    
+                    clipVerts[m].x = currentPoly.vert[m].clipCoords[0];
+                    clipVerts[m].y = currentPoly.vert[m].clipCoords[1];
+                    clipVerts[m].z = currentPoly.vert[m].clipCoords[2];
+                    clipVerts[m].w = currentPoly.vert[m].clipCoords[3];
+                    clipVerts[m].p[0] = currentPoly.vert[m].texCoords[0];
+                    clipVerts[m].p[1] = currentPoly.vert[m].texCoords[1];
+                    clipVerts[m].p[2] = currentPoly.vert[m].light[0];
+                    clipVerts[m].p[3] = currentPoly.vert[m].light[1];
+                    clipVerts[m].p[4] = currentPoly.vert[m].light[2];
 				}
 
 				if (currentPoly.visible)
 				{
-					// Clip the triangles to the view frustum...
-					performFrustumClip(&currentPoly);
+                    // Clip against all edges of the view frustum
+                    int num_vertices = frustum_clip_all<float, 5>(clipVerts, currentPoly.n, clipVerts);
+
+                    // Copy the results of 
+                    currentPoly.n = num_vertices;
+                    for (int m = 0; m < num_vertices; m++)
+                    {
+                        currentPoly.vert[m].clipCoords[0] = clipVerts[m].x;
+                        currentPoly.vert[m].clipCoords[1] = clipVerts[m].y;
+                        currentPoly.vert[m].clipCoords[2] = clipVerts[m].z;
+                        currentPoly.vert[m].clipCoords[3] = clipVerts[m].w;
+                        currentPoly.vert[m].texCoords[0] = clipVerts[m].p[0];
+                        currentPoly.vert[m].texCoords[1] = clipVerts[m].p[1];
+                        currentPoly.vert[m].light[0] = clipVerts[m].p[2];
+                        currentPoly.vert[m].light[1] = clipVerts[m].p[3];
+                        currentPoly.vert[m].light[2] = clipVerts[m].p[4];
+                    }
 
 					for (int m = 0; m < currentPoly.n; m++)
 					{
 						// Convert into normalized device coordinates...
+                        float ndCoords[4];      // Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
 						ndCoords[0] = currentPoly.vert[m].clipCoords[0] / currentPoly.vert[m].clipCoords[3];
 						ndCoords[1] = currentPoly.vert[m].clipCoords[1] / currentPoly.vert[m].clipCoords[3];
 						ndCoords[2] = currentPoly.vert[m].clipCoords[2] / currentPoly.vert[m].clipCoords[3];
 						ndCoords[3] = currentPoly.vert[m].clipCoords[3];
 
 						// Final pixel values are garnered here :
+                        float windowCoords[4];  // Mapped ndCoordinates to screen space
 						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea.max_x) / 2.0f) + 0.0f;
 						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea.max_y) / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
@@ -1087,138 +1115,6 @@ void hng64_state::normalize(float* x)
 }
 
 
-///////////////////////////
-// POLYGON CLIPPING CODE //
-///////////////////////////
-
-int hng64_state::Inside(polyVert *v, int plane)
-{
-	switch(plane)
-	{
-	case HNG64_LEFT:
-		return (v->clipCoords[0] >= -v->clipCoords[3]) ? 1 : 0;
-	case HNG64_RIGHT:
-		return (v->clipCoords[0] <=  v->clipCoords[3]) ? 1 : 0;
-
-	case HNG64_TOP:
-		return (v->clipCoords[1] <=  v->clipCoords[3]) ? 1 : 0;
-	case HNG64_BOTTOM:
-		return (v->clipCoords[1] >= -v->clipCoords[3]) ? 1 : 0;
-
-	case HNG64_NEAR:
-		return (v->clipCoords[2] <=  v->clipCoords[3]) ? 1 : 0;
-	case HNG64_FAR:
-		return (v->clipCoords[2] >= -v->clipCoords[3]) ? 1 : 0;
-	}
-
-	return 0;
-}
-
-void hng64_state::Intersect(polyVert *input0, polyVert *input1, polyVert *output, int plane)
-{
-	float t = 0.0f;
-
-	float *Iv0 = input0->clipCoords;
-	float *Iv1 = input1->clipCoords;
-	float *Ov  = output->clipCoords;
-
-	float *It0 = input0->texCoords;
-	float *It1 = input1->texCoords;
-	float *Ot  = output->texCoords;
-
-	float *Il0 = input0->light;
-	float *Il1 = input1->light;
-	float *Ol  = output->light;
-
-	switch(plane)
-	{
-	case HNG64_LEFT:
-		t = (Iv0[0]+Iv0[3]) / (-Iv1[3]+Iv0[3]-Iv1[0]+Iv0[0]);
-		break;
-	case HNG64_RIGHT:
-		t = (Iv0[0]-Iv0[3]) / (Iv1[3]-Iv0[3]-Iv1[0]+Iv0[0]);
-		break;
-	case HNG64_TOP:
-		t = (Iv0[1]-Iv0[3]) / (Iv1[3]-Iv0[3]-Iv1[1]+Iv0[1]);
-		break;
-	case HNG64_BOTTOM:
-		t = (Iv0[1]+Iv0[3]) / (-Iv1[3]+Iv0[3]-Iv1[1]+Iv0[1]);
-		break;
-	case HNG64_NEAR:
-		t = (Iv0[2]-Iv0[3]) / (Iv1[3]-Iv0[3]-Iv1[2]+Iv0[2]);
-		break;
-	case HNG64_FAR:
-		t = (Iv0[2]+Iv0[3]) / (-Iv1[3]+Iv0[3]-Iv1[2]+Iv0[2]);
-		break;
-	}
-
-	Ov[0] = Iv0[0] + (Iv1[0] - Iv0[0]) * t;
-	Ov[1] = Iv0[1] + (Iv1[1] - Iv0[1]) * t;
-	Ov[2] = Iv0[2] + (Iv1[2] - Iv0[2]) * t;
-	Ov[3] = Iv0[3] + (Iv1[3] - Iv0[3]) * t;
-
-	Ot[0] = It0[0] + (It1[0] - It0[0]) * t;
-	Ot[1] = It0[1] + (It1[1] - It0[1]) * t;
-	Ot[2] = It0[2] + (It1[2] - It0[2]) * t;
-	Ot[3] = It0[3] + (It1[3] - It0[3]) * t;
-
-	Ol[0] = Il0[0] + (Il1[0] - Il0[0]) * t;
-	Ol[1] = Il0[1] + (Il1[1] - Il0[1]) * t;
-	Ol[2] = Il0[2] + (Il1[2] - Il0[2]) * t;
-}
-
-void hng64_state::performFrustumClip(polygon *p)
-{
-    // Clip against the volumes defined by the homogeneous clip coordinates
-    polyVert *v0;
-	polyVert *v1;
-	polyVert *tv;
-
-    polygon temp;
-	temp.n = 0;
-
-	// Skip near and far clipping planes ?
-	for (int j = 0; j <= HNG64_BOTTOM; j++)
-	{
-		for (int i = 0; i < p->n; i++)
-		{
-			int k = (i+1) % p->n; // Index of next vertex
-
-			v0 = &p->vert[i];
-			v1 = &p->vert[k];
-
-			tv = &temp.vert[temp.n];
-
-			if (Inside(v0, j) && Inside(v1, j))                         // Edge is completely inside the volume...
-			{
-				memcpy(tv, v1, sizeof(polyVert));
-				temp.n++;
-			}
-			else if (Inside(v0, j) && !Inside(v1, j))                   // Edge goes from in to out...
-			{
-				Intersect(v0, v1, tv, j);
-				temp.n++;
-			}
-			else if (!Inside(v0, j) && Inside(v1, j))                   // Edge goes from out to in...
-			{
-				Intersect(v0, v1, tv, j);
-				memcpy(&temp.vert[temp.n+1], v1, sizeof(polyVert));
-				temp.n+=2;
-			}
-		}
-
-		p->n = temp.n;
-
-		for (int i = 0; i < temp.n; i++)
-		{
-			memcpy(&p->vert[i], &temp.vert[i], sizeof(polyVert));
-		}
-
-		temp.n = 0;
-	}
-}
-
-
 ////////////////////////////////
 // POLYGON RASTERIZATION CODE //
 ////////////////////////////////
@@ -1371,7 +1267,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texPageVertOffset = p->texPageVertOffset;
     
 	// The perspective-correct texture divide...
-	// NOTE: There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping - explore
+	// Note: There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping - explore
 	for (int j = 0; j < p->n; j++)
 	{
 		p->vert[j].clipCoords[3] = 1.0f / p->vert[j].clipCoords[3];

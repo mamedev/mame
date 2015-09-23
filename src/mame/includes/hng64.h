@@ -24,7 +24,7 @@ enum hng64trans_t
 
 struct blit_parameters
 {
-	bitmap_rgb32 *          bitmap;
+	bitmap_rgb32 *      bitmap;
 	rectangle           cliprect;
 	UINT32              tilemap_priority_code;
 	UINT8               mask;
@@ -55,7 +55,7 @@ struct polyVert
 struct polygon
 {
 	int n;                      // Number of sides
-	struct polyVert vert[10];   // Vertices (maximum number per polygon is 10 -> 3+6)
+	polyVert vert[10];          // Vertices (maximum number per polygon is 10 -> 3+6)
 
 	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
 	int visible;                // Polygon visibility in scene
@@ -92,6 +92,8 @@ struct polygon
 
 const int HNG64_MAX_POLYGONS = 10000;
 
+typedef frustum_clip_vertex<float, 5> hng64_clip_vertex;
+
 struct hng64_poly_data
 {
 	UINT8 texType;
@@ -111,7 +113,7 @@ class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7, HNG64
 public:
     hng64_poly_renderer(hng64_state& state);
     
-    void drawShaded(struct polygon *p);
+    void drawShaded(polygon *p);
     void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
     hng64_state& state() { return m_state; }
@@ -363,10 +365,6 @@ public:
 	float vecDotProduct(const float *a, const float *b);
 	void setIdentity(float *matrix);
 	void normalize(float* x);
-	int Inside(polyVert *v, int plane);
-	void Intersect(polyVert *input0, polyVert *input1, polyVert *output, int plane);
-	void performFrustumClip(polygon *p);
-
     
 	void reset_sound();
 	void reset_net();
