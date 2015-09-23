@@ -443,7 +443,6 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 				m_bg_color_bank = (data & 6) >> 1;
 				// TODO: of course this just inibits bus request for master.
 				// TODO: after further investigation, this isn't right, it disables once that player insert a coin.
-				m_maincpu->set_input_line(INPUT_LINE_HALT, data & 4 ? CLEAR_LINE : ASSERT_LINE);
 
 				m_bg_tilemap->mark_all_dirty();
 				break;
@@ -620,9 +619,12 @@ WRITE8_MEMBER(cntsteer_state::nmimask_w)
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
 {
-	//popmessage("%02x",m_disable_roz);
-	//if (m_disable_roz == 8)
-	//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed. 
+	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write 
+	//       between these operations brings us to this.
+	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
+	UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
