@@ -1517,7 +1517,7 @@ void mips3_device::handle_cop0(UINT32 op)
 					break;
 
 				case 0x10:  /* RFE */   invalid_instruction(op);                            break;
-				case 0x18:  /* ERET */  logerror("ERET\n"); m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_lld_value ^= 0xffffffff; m_ll_value ^= 0xffffffff;  break;
+				case 0x18:  /* ERET   logerror("ERET\n"); */ m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_lld_value ^= 0xffffffff; m_ll_value ^= 0xffffffff;  break;
 				case 0x20:  /* WAIT */                                                      break;
 				default:    invalid_instruction(op);                                        break;
 			}

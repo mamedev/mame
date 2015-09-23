@@ -2114,7 +2114,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	{
 		render_spans(yh >> 2, yl >> 2, tilenum, flip ? true : false, spans, rect, object);
 	}
-
+	m_aux_buf_ptr = 0;  // Spans can be reused once render completes
 	//wait("draw_triangle");
 }
 
@@ -3142,14 +3142,9 @@ void n64_state::video_start()
 	}
 }
 
-void screen_eof_n64(screen_device &screen, bool state)
-{
-}
-
 UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	n64_periphs* n64 = machine().device<n64_periphs>("rcp");
-	m_rdp->m_visarea = screen.visible_area();
 
 	//UINT16* frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
 	//UINT8* cvg_buffer = &m_rdp.m_hidden_bits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
@@ -3189,12 +3184,9 @@ UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 	*/
 
-	m_rdp->wait();
-	m_rdp->m_aux_buf_ptr = 0;
-
 	if (n64->vi_blank)
 	{
-		bitmap.fill(0, m_rdp->m_visarea);
+		bitmap.fill(0, screen.visible_area());
 		return 0;
 	}
 
@@ -3205,14 +3197,14 @@ UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void n64_state::screen_eof_n64(screen_device &screen, bool state)
 {
-	m_rdp->wait();
-	m_rdp->m_aux_buf_ptr = 0;
 }
 
 void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object)
 {
 	const INT32 clipy1 = m_scissor.m_yh;
 	const INT32 clipy2 = m_scissor.m_yl;
+	const rectangle clip(m_scissor.m_xh, m_scissor.m_xl, m_scissor.m_yh, m_scissor.m_yl);
+
 	INT32 offset = 0;
 
 	if (clipy2 <= 0)
@@ -3253,22 +3245,22 @@ void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, ext
 	switch(m_other_modes.cycle_type)
 	{
 		case CYCLE_TYPE_1:
-			render_triangle_custom(m_visarea, render_delegate(FUNC(n64_rdp::span_draw_1cycle), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_1cycle), this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_2:
-			render_triangle_custom(m_visarea, render_delegate(FUNC(n64_rdp::span_draw_2cycle), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_2cycle), this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_COPY:
-			render_triangle_custom(m_visarea, render_delegate(FUNC(n64_rdp::span_draw_copy), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_copy), this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_FILL:
-			render_triangle_custom(m_visarea, render_delegate(FUNC(n64_rdp::span_draw_fill), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_fill), this), start, (end - start) + 1, spans + offset);
 			break;
 	}
-	//wait();
+	wait("render spans");
 }
 
 void n64_rdp::rgbaz_clip(INT32 sr, INT32 sg, INT32 sb, INT32 sa, INT32* sz, rdp_span_aux* userdata)

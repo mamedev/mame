@@ -1434,10 +1434,6 @@ void n64_periphs::pi_dma_tick()
 	{
 		UINT32 dma_length = pi_wr_len + 1;
 		//logerror("PI Write, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_wr_len);
-		if (dma_length & 1)
-		{
-			dma_length = (dma_length + 1) & ~1;
-		}
 
 		if (pi_dram_addr != 0xffffffff)
 		{
@@ -1454,10 +1450,6 @@ void n64_periphs::pi_dma_tick()
 	{
 		UINT32 dma_length = pi_rd_len + 1;
 		//logerror("PI Read, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_rd_len);
-		if (dma_length & 1)
-		{
-			dma_length = (dma_length + 1) & ~1;
-		}
 
 		if (pi_dram_addr != 0xffffffff)
 		{
@@ -2093,6 +2085,7 @@ TIMER_CALLBACK_MEMBER(n64_periphs::si_dma_callback)
 void n64_periphs::si_dma_tick()
 {
 	si_dma_timer->adjust(attotime::never);
+	si_status = 0;
 	si_status |= 0x1000;
 	signal_rcp_interrupt(SI_INTERRUPT);
 }
@@ -2136,8 +2129,8 @@ void n64_periphs::pif_dma(int direction)
 			*dst++ = d;
 		}
 	}
-
-	si_dma_timer->adjust(attotime::from_hz(500));
+	si_status |= 1;
+	si_dma_timer->adjust(attotime::from_hz(1000));
 	//si_status |= 0x1000;
 	//signal_rcp_interrupt(SI_INTERRUPT);
 }
@@ -2180,7 +2173,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 			break;
 
 		case 0x18/4:        // SI_STATUS_REG
-			si_status &= ~0x1000;
+			si_status = 0;
 			clear_rcp_interrupt(SI_INTERRUPT);
 			break;
 
