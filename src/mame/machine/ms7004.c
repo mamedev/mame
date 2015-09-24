@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 /*
-    Electronika MS 7004 keyboard (DEC LK-201 workalike with extra keys
+    Elektronika MS 7004 keyboard (DEC LK-201 workalike with extra keys
     for Cyrillic characters).
 
     To do:
-    - debug keymap
     - receive data from host (not used by KSM but used by other boards)
     - connect LEDs and speaker
 */
@@ -163,13 +162,13 @@ nothing sends '@' or '`'
 2/@ sends 2/"
 6/^ sends 6/&
 7/& sends 7/'
-8/ *    sends 8/(
+8 * sends 8/(
 9/( sends 9/)
 0/) sends 0/0
 -/_ sends _/_
 +/= sends -/=
 ;/: sends ;/+
-'/" sends :/ *
+'/" sends : *
 
 F10 sends ^C
 F11 sends ESC
@@ -183,7 +182,7 @@ INPUT_PORTS_START( ms7004 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";") PORT_CODE(KEYCODE_COLON) // '+'
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) // what
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift Lock") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LShift") PORT_CODE(KEYCODE_LSHIFT)
 
 	PORT_START("KBD13") // vertical row 2
@@ -357,7 +356,6 @@ ioport_constructor ms7004_device::device_input_ports() const
 
 ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MS7004, "MS7004 keyboard", tag, owner, clock, "ms7004", __FILE__),
-//  device_serial_interface(mconfig, *this),
 	m_maincpu(*this, MS7004_CPU_TAG),
 	m_speaker(*this, MS7004_SPK_TAG),
 	m_i8243(*this, "i8243"),
@@ -418,7 +416,7 @@ WRITE8_MEMBER( ms7004_device::p1_w )
 	    6
 	    7       Serial TX
 	*/
-	DBG_LOG(1,0,( "%s: p1_w %02x = send %d\n", tag(), data, BIT(data, 7)));
+	DBG_LOG(2,0,( "%s: p1_w %02x = send %d\n", tag(), data, BIT(data, 7)));
 
 	m_p1 = data;
 	m_tx_handler(BIT(data, 7));
@@ -481,7 +479,8 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 			case 0x38: sense = m_kbd15->read(); break;
 		}
 		m_keylatch = BIT(sense, (m_p1 & 7));
-		DBG_LOG(2,0,( "%s: row %d col %02x t1 %d\n",
+		if (m_keylatch)
+		DBG_LOG(1,0,( "%s: row %d col %02x t1 %d\n",
 			tag(), (m_p1 & 7), (offset << 4 | data), m_keylatch));
 	}
 }
