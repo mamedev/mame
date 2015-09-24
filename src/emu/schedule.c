@@ -434,7 +434,7 @@ void device_scheduler::timeslice()
 	while (m_basetime < m_timer_list->m_expire)
 	{
 		// by default, assume our target is the end of the next quantum
-		attotime target = m_basetime + attotime(0, m_quantum_list.first()->m_actual);
+		attotime target(m_basetime + attotime(0, m_quantum_list.first()->m_actual));
 
 		// however, if the next timer is going to fire before then, override
 		if (m_timer_list->m_expire < target)
