@@ -50,7 +50,7 @@
 #include "machine/atarifdc.h"
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
-#include "bus/a8sio/a8sio.h"
+#include "bus/a800/a8sio.h"
 
 
 /******************************************************************************

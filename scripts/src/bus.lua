@@ -38,6 +38,10 @@ end
 
 if (BUSES["A800"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/a800/a8sio.c",
+		MAME_DIR .. "src/devices/bus/a800/a8sio.h",
+		MAME_DIR .. "src/devices/bus/a800/cassette.c",
+		MAME_DIR .. "src/devices/bus/a800/cassette.h",
 		MAME_DIR .. "src/devices/bus/a800/a800_slot.c",
 		MAME_DIR .. "src/devices/bus/a800/a800_slot.h",
 		MAME_DIR .. "src/devices/bus/a800/a800_carts.h",
@@ -47,21 +51,6 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/oss.h",
 		MAME_DIR .. "src/devices/bus/a800/sparta.c",
 		MAME_DIR .. "src/devices/bus/a800/sparta.h",
-	}
-end
-
-
----------------------------------------------------
---
---@src/devices/bus/a8sio/a8sio.h,BUSES["A8SIO"] = true
----------------------------------------------------
-
-if (BUSES["A8SIO"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/a8sio/a8sio.c",
-		MAME_DIR .. "src/devices/bus/a8sio/a8sio.h",
-		MAME_DIR .. "src/devices/bus/a8sio/cassette.c",
-		MAME_DIR .. "src/devices/bus/a8sio/cassette.h",
 	}
 end
 

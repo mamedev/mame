@@ -574,7 +574,6 @@ BUSES["A1BUS"] = true
 BUSES["A2BUS"] = true
 BUSES["A7800"] = true
 BUSES["A800"] = true
-BUSES["A8SIO"] = true
 BUSES["ABCBUS"] = true
 BUSES["ABCKB"] = true
 BUSES["ADAM"] = true
