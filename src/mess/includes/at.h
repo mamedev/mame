@@ -18,10 +18,13 @@
 
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
+#include "machine/ds128x.h"
 #include "machine/pic8259.h"
 #include "bus/lpci/i82371ab.h"
 #include "bus/lpci/i82371sb.h"
 #include "bus/lpci/i82439tx.h"
+#include "bus/lpci/vt82c505.h"
+#include "machine/vt82c496.h"
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
 #include "machine/wd7600.h"

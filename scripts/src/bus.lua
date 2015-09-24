@@ -1588,6 +1588,8 @@ if (BUSES["LPCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/lpci/southbridge.h",
 		MAME_DIR .. "src/devices/bus/lpci/mpc105.c",
 		MAME_DIR .. "src/devices/bus/lpci/mpc105.h",
+		MAME_DIR .. "src/devices/bus/lpci/vt82c505.c",
+		MAME_DIR .. "src/devices/bus/lpci/vt82c505.h",
 	}
 end
 

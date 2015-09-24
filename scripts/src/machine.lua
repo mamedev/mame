@@ -2688,3 +2688,16 @@ if (MACHINES["NSC810"]~=null) then
 		MAME_DIR .. "src/devices/machine/nsc810.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vt82c496.h,MACHINES["VT82C496"] = true
+---------------------------------------------------
+
+if (MACHINES["VT82C496"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/vt82c496.c",
+		MAME_DIR .. "src/devices/machine/vt82c496.h",
+	}
+end
+
