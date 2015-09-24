@@ -40,6 +40,7 @@ dendy     // Dendy (Classic russian famiclone)
 gchinatv  // Golden China TV Game Centre (Chinese famiclone)
 gameboy   // Nintendo Game Boy Handheld
 supergb   // Nintendo Super Game Boy SNES Cartridge
+supergb2
 gbpocket  // Nintendo Game Boy Pocket Handheld
 gbcolor   // Nintendo Game Boy Color Handheld
 gba       // Nintendo Game Boy Advance Handheld

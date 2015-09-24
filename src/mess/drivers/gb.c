@@ -813,6 +813,33 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_GB_LCD_SGB_ADD("lcd")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( supergb2, gameboy )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sgb_map)
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
+	MCFG_LR35902_HALT_BUG
+
+	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
+
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(32*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(32768)
+	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
+
+	MCFG_DEVICE_REMOVE("lcd")
+	MCFG_GB_LCD_SGB_ADD("lcd")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 
 	/* video hardware */
@@ -925,6 +952,11 @@ ROM_START( supergb )
 	ROM_LOAD( "sgb_boot.bin", 0x0000, 0x0100, CRC(ec8a83b9) SHA1(aa2f50a77dfb4823da96ba99309085a3c6278515) )
 ROM_END
 
+ROM_START( supergb2 )
+	ROM_REGION( 0x0100, "maincpu", 0 )
+	ROM_LOAD( "sgb2_boot.bin", 0x0000, 0x0100, CRC(53d0dd63) SHA1(93407ea10d2f30ab96a314d8eca44fe160aea734) )
+ROM_END
+
 ROM_START( gbpocket )
 	ROM_REGION( 0x0100, "maincpu", 0 )
 	ROM_LOAD( "mgb_boot.bin", 0x0000, 0x0100, CRC(e6920754) SHA1(4e68f9da03c310e84c523654b9026e51f26ce7f0) )
@@ -944,6 +976,7 @@ ROM_END
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  COMPANY     FULLNAME */
 CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", MACHINE_SUPPORTS_SAVE )
 CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", MACHINE_SUPPORTS_SAVE )
+CONS( 1998, supergb2, gameboy, 0,       supergb2, gameboy, driver_device, 0,    "Nintendo", "Super Game Boy 2", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", MACHINE_SUPPORTS_SAVE )
 CONS( 1998, gbcolor,  0,       0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
