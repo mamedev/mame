@@ -3496,6 +3496,7 @@ files {
 	MAME_DIR .. "src/mame/video/pass.c",
 	MAME_DIR .. "src/mame/drivers/peplus.c",
 	MAME_DIR .. "src/mame/drivers/photon.c",
+	MAME_DIR .. "src/mame/drivers/piggypas.c",
 	MAME_DIR .. "src/mame/video/pk8000.c",
 	MAME_DIR .. "src/mame/drivers/photon2.c",
 	MAME_DIR .. "src/mame/drivers/photoply.c",
