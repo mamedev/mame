@@ -278,7 +278,6 @@ ckongis         //
 porter          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
 tdpgal          // 1983 Design Labs / Thomas Automatics
 guttangt
-spcwarp         // 1983 Century Electronics UK LTD
 
 // Has some similarities with Moon Cresta but Board is very different
 rockclim        // (c)1981 Taito
@@ -1623,6 +1622,9 @@ huncholy        // (c) 1984 Seatongrove (c) CVS
 // Zaccaria Hardware (similar to CVS)
 quasar          // (c) 1980 Zelco Games Italy
 quasara         // (c) 1980 Zelco Games Italy
+
+// Unknown Century Electronics hardware (CVS?)
+spcwarp         // 1983 Century Electronics UK LTD
 
 // Midway "Astrocade" games
 seawolf2        // (c) 1978
