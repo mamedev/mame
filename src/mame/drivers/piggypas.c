@@ -140,6 +140,17 @@ ROM_START( dumpump )
 	ROM_LOAD( "dump-ump.u14", 0x00000, 0x20000, CRC(08bc7bb5) SHA1(2355783ec614d8f4e1dca3cb415a97a28411157b))
 ROM_END
 
+// bad dump of program rom
+ROM_START( 3lilpigs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3-pigs.u6", 0x00000, 0x10000, BAD_DUMP CRC(1db9d754) SHA1(9b1db9c9bb155ebb5509970476b20b9dda6d3021) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "3-pigs.u14", 0x00000, 0x40000, CRC(62eb76e2) SHA1(c4cad241dedf2c290f9bf80038415fe39b3ce17d) )
+ROM_END
+
+
+
 
 
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40
@@ -154,3 +165,5 @@ GAME( 1995, fidlstix,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Quick
 GAME( 199?, jackbean,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
 GAME( 199?, dumpump,   0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
+// bad dump, so version unknown
+GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )
