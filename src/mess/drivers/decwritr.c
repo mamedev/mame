@@ -371,8 +371,8 @@ MACHINE_CONFIG_END
 
 ROM_START( la120 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	// later romset, with 23-003e2.e6, 23-004e2.e8, 23-005e2.e12, 23-006e2.e17 replaced by one rom, 23-038e4.e6
-	ROM_LOAD( "23-038e4-00.e6", 0x0000, 0x2000, BAD_DUMP CRC(12b80c00) SHA1(35875a85c5037454ac4a82ee19ea9f0337ad0dbe))
+	// later romset, with 23-003e2.e6, 23-004e2.e8, 23-005e2.e12, 23-006e2.e17 replaced by one rom, 23-038e4.e6 which may be a concatenation of the old roms, unclear.
+	ROM_LOAD( "23-038e4-00.e6", 0x0000, 0x2000, CRC(cad4eb09) SHA1(d5db117da363d36817476F906251ea4ee1cb14b8))
 	ROM_LOAD( "23-007e2-00.e4", 0x2000, 0x0800, CRC(41eaebf1) SHA1(c7d05417b24b853280d1636776d399a0aea34720)) // used by both earlier and later romset
 	// there is an optional 3 roms, european and APL (and BOTH) rom which goes from 2000-2fff in e4, all undumped.
 	// there is another romset used on the Bell Teleprinter 1000 (Model LAS12) which I believe is 23-004e4.e6 and 23-086e2.e4
