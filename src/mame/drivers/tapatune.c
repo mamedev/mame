@@ -584,6 +584,42 @@ ROM_START( srockbwl )
 ROM_END
 
 
+/*
+
+Smart Toss 'Em
+
+romset was marked "Smart Toss 'em"
+
+one of the roms contains the string
+
+SMART INDUSTRIES SMARTBALL   V2.0
+
+a reference to Smart Toss 'em can be found at
+http://www.museumofplay.org/online-collections/22/67/109.17072
+
+also contains
+
+"Creative Electronics Software"
+
+*/
+
+
+ROM_START( smartoss )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "s-tossem.u8", 0x0000, 0x10000,CRC(ce07c837) SHA1(5a474cc9d3163385a3dac6da935bc77af67ac85a) )
+
+	ROM_REGION( 0x1000000, "bsmt", 0 )
+	ROM_LOAD( "s-tossem.u16",  0x000000, 0x20000, CRC(633222dc) SHA1(f95713902920737c9d20aafbdeb975daf98c7078) )
+	ROM_CONTINUE(           0x040000, 0x20000 )
+	ROM_CONTINUE(           0x080000, 0x20000 )
+	ROM_CONTINUE(           0x0c0000, 0x20000 )
+	// U21 is not populated?
+
+	// for a different sub-board maybe? or banked CPU data?
+	ROM_REGION( 0x40000, "unkdata", 0 )
+	ROM_LOAD( "s-tossem.u27", 0x0000, 0x40000, CRC(703d19b7) SHA1(75641d885885a67bd66afa38577c7907fa505b0b) )
+ROM_END
+
 /*************************************
  *
  *  Game driver(s)
@@ -591,4 +627,7 @@ ROM_END
  *************************************/
 
 GAME(1994, tapatune, 0, tapatune,      tapatune, driver_device, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", MACHINE_SUPPORTS_SAVE )
-GAME(1994, srockbwl, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Bromley", "Super Rock and Bowl (V1.1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+// below appear to be mechanical games with the same Z80 board as the above
+GAME(1994, srockbwl, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Bromley",                                                        "Super Rock and Bowl (V1.1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(199?, smartoss, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Smart Industries / Creative Electronics and Software",           "Smart Toss 'em / Smartball (Ver 2.0)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
