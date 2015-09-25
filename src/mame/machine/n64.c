@@ -27,7 +27,18 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, dd_present(false)
 	, disk_present(false)
 	, cart_present(false)
-{
+{	
+	for (INT32 i = 0; i < 256; i++)
+	{
+		m_gamma_table[i] = sqrt((float)(i << 6));
+		m_gamma_table[i] <<= 1;
+	}
+
+	for (INT32 i = 0; i < 0x4000; i++)
+	{
+		m_gamma_dither_table[i] = sqrt((float)i);
+		m_gamma_dither_table[i] <<= 1;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(n64_periphs::reset_timer_callback)
@@ -1029,14 +1040,13 @@ void n64_periphs::vi_recalculate_resolution()
 
 	if(vi_control & 0x40) /* Interlace */
 	{
-		height *= 2;
 	}
 
 	//state->m_rdp->m_misc_state.m_fb_height = height;
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
-	m_screen->configure(width, 525, visarea, period);
+	m_screen->configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
 }
 
 READ32_MEMBER( n64_periphs::vi_reg_r )

@@ -100,6 +100,7 @@ public:
 	void si_dma_tick();
 	void vi_scanline_tick();
 	void reset_tick();
+	void video_update(bitmap_rgb32 &bitmap);
 
 	// Video Interface (VI) registers
 	UINT32 vi_width;
@@ -263,6 +264,14 @@ private:
 
 	// Video Interface (VI) functions
 	void vi_recalculate_resolution();
+	void video_update16(bitmap_rgb32 &bitmap);
+	void video_update32(bitmap_rgb32 &bitmap);
+	UINT8 random_seed;        // %HACK%, adds 19 each time it's read and is more or less random
+	UINT8 get_random() { return random_seed += 0x13; }
+
+	INT32 m_gamma_table[256];
+	INT32 m_gamma_dither_table[0x4000];
+
 };
 
 // device type definition
