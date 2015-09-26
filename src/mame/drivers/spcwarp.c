@@ -5,6 +5,12 @@ Space Warp(?)
 it's completely unknown if this is actually Space Warp but it contains Galaxian-like GFX
 ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin
 gfx is like cosmos according to hap(cvs.c)
+
+9/25/2015 - Initial commit of skeleton driver
+
+TODO:
+-merge with cvs_state
+
 */
 
 #include "emu.h"
@@ -23,41 +29,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
-//INTERRUPT_GEN_MEMBER(spcwarp_state::spcwarp_main_cpu_interrupt)
-//{
-//	device.execute().set_input_line_vector(0, 0x03);
-//}
-
 static ADDRESS_MAP_START( spcwarp_map, AS_PROGRAM, 8, spcwarp_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spcwarp )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	//PORT_START("SENSE")
+	//PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 void spcwarp_state::machine_start()
@@ -76,13 +54,17 @@ static MACHINE_CONFIG_START( spcwarp, spcwarp_state )
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", spcwarp_state, spcwarp_main_cpu_interrupt) // ???
 	//MCFG_S2650_FLAG_HANDLER(WRITELINE(spcwarp_state, write_s2650_flag)) // ???
 
-	/* video hardware */
-	/* todo: this */
+	/* TODO video hardware */
+	/* copypaste from cvs.c */
+	//MCFG_SCREEN_ADD("screen", RASTER)
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	//MCFG_SCREEN_REFRESH_RATE(50)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	//MCFG_SCREEN_SIZE(256, 256)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
 
-	/* audio hardware */
+	/* TODO audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	/* todo: this */
-
 MACHINE_CONFIG_END
 
 ROM_START( spcwarp )
