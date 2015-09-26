@@ -854,6 +854,16 @@ ROM_START( gl6600cx )
 	ROM_LOAD( "54-06400-00.u1", 0x000000, 0x200000, CRC(b05cd075) SHA1(b1d9eb02ca56350eb9e89518db89c0a2a845ebd8))
 ROM_END
 
+ROM_START( gkidabc )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD("27-5730-00.bin", 0x00000, 0x20000, CRC(64664708) SHA1(74212c2dec1caa41dbc933b50f857904a8ac623b))
+ROM_END
+
+ROM_START( cars2lap )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD("n25s16.u6", 0x00000, 0x200000, CRC(ec1ba96e) SHA1(51b8844ae77adf20f74f268d380d268c9ce19785))
+ROM_END
+
 
 /* Driver */
 
@@ -869,11 +879,13 @@ COMP( 1999, gwnf,      0,       0,  prestige,   prestige, driver_device,     0, 
 
 // these systems need to be moved into a separate driver
 COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 4000 (Germany)", MACHINE_IS_SKELETON)
+COMP( 1996, gkidabc,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius KID ABC Fan (Germany)", MACHINE_IS_SKELETON)
 COMP( 1993, gjmovie,   0,       0,  gjmovie,    prestige, driver_device,     0,  "VTech",   "Genius Junior Movie (Germany)", MACHINE_IS_SKELETON)
 COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", MACHINE_IS_SKELETON)
 COMP( 1996, gjrstar2,  gjrstar, 0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON)
 COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON)
 COMP( 1998, gj5000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 5000 (Germany)", MACHINE_IS_SKELETON)
+COMP( 2012, cars2lap,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "CARS 2 Laptop (Germany)", MACHINE_IS_SKELETON)
 
 
 // gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
