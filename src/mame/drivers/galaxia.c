@@ -54,6 +54,9 @@ Manual and Schematic for Galaxia can be found at:
 http://www.zzzaccaria.com/manuals/SuperGalaxiansTechnicalManual.zip
 http://www.zzzaccaria.com/manuals/GalaxiaSchematics.zip
 
+The manual for Astro Wars can also be found at:
+http://www.opdenkelder.com/Astrowars_manual.zip
+
 HW has many similarities with quasar.c / cvs.c / zac2650.c
 ---
 
