@@ -118,7 +118,7 @@ X  : Tested Not Working
 -  : Not Tested
 %  : 1 and 2; For testing purposes these games need a DVD drive. Using this hardware to play the actual game is normally impossible due to requiring controls/IO boards that can't be connected to this hardware version.
 #  : 5 and 6; Working only in S246+ mode.
-@  : Multiple different DVD's ans/or dongles are available and are compatible in any combination.
+@  : Multiple different DVD's and/or dongles are available and are compatible in any combination.
 
 For 'Tested Working', working is defined as "boots to the attract mode".
 Some games need specific controls and are unplayable even though the game loads (eg. most games on earliest rev 246 or the driving or gun games on
@@ -557,7 +557,7 @@ When the driving games boot they test the feed-back motor by monitoring a potent
 connected to the steering wheel mechanism. On Ridge Racer V, if the pot is faulty or not connected 
 or if the drive/feedback board isn't connected (including the 110VAC input voltage), the
 steering check will fail after a time-out period and the game will not continue further.
-Wangan Midnight doesn't test the pototentiometer and will boot without it connected, but it does
+Wangan Midnight doesn't test the potentiometer and will boot without it connected, but it does
 test for the presence of the feedback PCB.
 Note this same PCB (with a different ROM) is also used with Mario Kart on Triforce hardware.
 
