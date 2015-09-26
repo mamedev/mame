@@ -17,68 +17,125 @@
       with 2 MB of wave RAM, a 48 kHz sample rate (vs. 44.1 on PS1), and 2
       stereo DMADACs.
 
-List of Namco System 246 games:
-* Battle Gear 3 (Taito, 2002)
-* Battle Gear 3 Tuned (Taito, 2003)
-* Bloody Roar 3 (Namco / 8ing / Raizing, 2000)
-* Capcom Fighting Jam (Capcom, 2004)
-* Cobra: The Arcade (Namco, 2004)
-* Dragon Chronicles (Namco, 2002)
-* Fate/Unlimited Codes (Capcom / Type-Moon / Cavia / 8ing, 2008)
-* Getchu Play! Tottoko Hamutaro (Banpresto, 2007)
-* Mobile Suit Gundam SEED: Federation Vs. Z.A.F.T. (Capcom / Banpresto, 2005)
-* Mobile Suit Gundam SEED Destiny: Federation Vs. Z.A.F.T. II (Banpresto, 2006)
-* Mobile Suit Gundam Z: AEUG Vs. Titans (Capcom / Banpresto, 2003)
-* Mobile Suit Gundam Z: AEUG Vs. Titans DX (Capcom / Banpresto, 2004)
-* Minnade Kitaeru Zennou Training (Namco, 2006)
-* Netchuu Pro Yakyuu 2002 (Namco, 2002)
-* Pride GP 2003 (Capcom, 2003)
-* Quiz and Variety Sukusuku Inufuku 2 (Namco / AMI / Hamster, 2007)
-* Quiz Mobile Suit Gundam: Tou. Senshi (Banpresto, 2006)
-* Ridge Racer V: Arcade Battle (Namco, 2000)
-* Sengoku Basara X Cross (Capcom / ARC System Works, 2008)
-* Smash Court Pro Tournament (Namco, 2001)
-* Soul Calibur II (Namco, 2002)
-* Soul Calibur II Ver.D (Namco, 2003)
-* Soul Calibur III Arcade Edition (Namco, 2006)
-* Taiko No Tatsujin 7 (Namco, 2005)
-* Taiko No Tatsujin 8 (Namco, 2006)
-* Technic Beat (Arika, 2002)
-* Tekken 4 (Namco, 2001)
-* Time Crisis 3 (Namco, 2002)
-* Vampire Night (Namco / Sega / WOW Entertainment, 2000)
-* Wangan Midnight (Namco, 2001)
-* Wangan Midnight R (Namco, 2002)
-* Zoids Infinity (Taito, 2004)
 
-List of Namco System 256 Games
-* Chou Dragon Ball Z (Banpresto, 2005)
-* Druaga Online - The Story of Aon (Namco, 2005)
-* Kinnikuman Muscle Grand Prix (Banpresto, 2006)
-* Kinnikuman Muscle Grand Prix 2 (Banpresto, 2007)
-* Kinnikuman Muscle Grand Prix 2 Tokumori (Banpresto, 2008)
-* Mobile Suit Gundam SEED Destiny: Federation Vs. Z.A.F.T. II (Banpresto, 2006)
-* Mobile Suit Gundam: Gundam Vs. Gundam (Banpresto, 2008)
-* Mobile Suit Gundam: Gundam Vs. Gundam Next (Banpresto, 2009)
-* Quiz and Variety Sukusuku Inufuku 2 (Namco / AMI / Hamster, 2007)
-* Sengoku Basara X Cross (Capcom / ARC System Works, 2008)
-* Taiko No Tatsujin 9 (Namco, 2006)
-* Taiko No Tatsujin 10 (Namco, 2007)
-* Taiko No Tatsujin 11 (Namco, 2008)
-* Taiko No Tatsujin 12 (Namco, 2008)
-* Taiko No Tatsujin 12 Don! (Namco, 2009)
-* Taiko No Tatsujin 13 (Namco, 2009)
-* Taiko No Tatsujin 14 (Namco, 2010)
-* Tekken 5 (Namco, 2004)
-* Tekken 5.1 (Namco, 2005)
-* Tekken 5 Dark Resurrection (Namco, 2005)
-* The Battle of YuYu Hakusho (Banpresto, 2006)
-* THE iDOLM@STER (Namco, 2005)
-* Zoids Infinity EX (Taito, 2005)
-* Zoids Infinity EX Plus (Taito, 2006)
+Namco System 246, 256 & Super System 256 Hardware Overview
+Namco 2001-2010
 
-List of System Super 256 Games
-* Time Crisis 4 (Namco, 2006)
+Games on System 246/256/S256 include.....
+(Note this list is not complete and other versions or games may exist)
+                                                                               Media Type             Game ID &
+Name from title screen                           System   Media ID            (HDD/CD/DVD)  Cart ID   Revision               Company/Year                  Notes
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB
+Battle Gear 3 (Export).......................... XX34XXX *?                    HDD          NM00010  *?                      Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A
+Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     |
+Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  Test mode shows 2.00E with same HDD 2.03J; HDD: Maxtor Fireball 3 30GB 2F030L0
+Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
+Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
+Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires 'FCA2 PCB' for IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
+Dragon Chronicles (satellite)................... ------X *DCO31-TS CD0         CD           NM00020   DC001 Ver.A            Namco 2002                    \
+Dragon Chronicles Legend of the Master Ark (sat) ------X *?                   *?           *NM00014  *DGC11 Ver.A1           Namco 200?                    | server is a custom PC
+Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    |
+   "                                      ...... XXXX56X  DOL150-1-ST-DVD0-G   DVD          NM00028  *?                      Namco 2004                    |
+   "                                      ...... XXXX56X  DOL140-1-ST-DVD0-F   DVD          NM00028  *?                      Namco 2004                    |
+   "                                      ...... XXXX56X  DOL120-1-ST-DVD0-D   DVD          NM00028  *?                      Namco 2004                    |
+   "                                      ...... XXXX56X  DOL110-1-ST-DVD0-C   DVD          NM00028  *?                      Namco 2004                    /
+Fate / Unlimited Codes.......................... X23456X  FUD-HDD0-A           HDD (80GB)   NM00048   FUD1 Ver.A             Capcom/Type-Moon/Cavia/8ing 2008 HDD: Western Digital WD800BB
+Getchu Play! Tottoko Hamutaro................... ------X *?                   *?           *?        *?                      Banpresto 2007
+Gundam vs Gundam Next........................... XXXX56X  GNX100-1-NA-HDD0-A   HDD (80GB)   NM00052   GNX1001-NA-A           Bandai/Capcom 2009            HDD: Western Digital WD800BB
+Idol Master..................................... ------X *IDM1-HA             *HDD         *NM00022  *IDMS1 Ver.A            Namco 2004
+Kinnikuman Muscle Grand Prix.................... XXXX56X  KN1-B                DVD          NM00029   KN1 Ver.A              Banpresto 2006                #
+Kinnikuman Muscle Grand Prix 2.................. XXXX56X  KN2                  DVD          NM00040   KN2 Ver.A              Banpresto 2007                #
+Kinnikuman Muscle Grand Prix 2 Tokumori......... ------X *?                   *?           *?        *?                      Banpresto 2008
+Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0     DVD         *NM00036  *ZNT100-1-ST-A          Namco 2006
+Mobile Suit Gundam - Gundam vs Gundam........... XXXX56X  GVS1 DVD0B           DVD          NM00043   GVS1 Ver.A             Bandai/Capcom 2008
+Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 12X456X  SED1 DVD0            DVD          NM00024   SED1 Ver.A             Banpresto 2005                % #
+M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 12X456X  GSD1 DVD0            DVD         ^NM00034   GSD1 Ver.A             Banpresto 2006                % #
+Mobile Suit Z Gundam A.E.U.G. vs Titans......... 12X456X  ZGA1 DVD0            DVD          NM00013   ZGA1 Ver.A             Capcom/Banpresto 2003         %
+Mobile Suit Z Gundam DX A.E.U.G. vs Titans...... 12X456X  ZDX1 DVD0            DVD          NM00017   ZDX1 Ver.A             Capcom/Banpresto 2003         %
+Netchuu Pro Yakyuu 2002......................... X23XXXX  NPY1 CD0B            CD           NM00009   NPY Ver.B              Namco 2002
+Pride GP 2003................................... 123456X  PR21 DVD0            DVD          NM00011   PR21 Ver.A             Capcom 2003                   %
+Quiz Mobile Suit Gundam Tou Senshi.............. 123456X  QG1                  DVD          NM00030   QG1 Ver.A              Banpresto 2006                %
+Ridge Racer V Arcade Battle..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV1 Ver.A             Namco 2001
+   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV2 Ver.A             Namco 2001
+   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001  *RRV2 Ver.B             Namco 2001
+   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV3 Ver.A             Namco 2001
+Sengoku Basara X Cross.......................... 12X456X  BAX1 DVD0            DVD          NM00042   BAX1 VER.A             Capcom/ARC System Works 2007  % #
+Smash Court Pro Tournament...................... ------X  SCP1 CD0             CD           NM00006   SCP1 Ver.A             Namco 2001
+Soul Calibur II................................. 12X456X *SC21 DVD0            DVD          NM00007   SC21 Ver.A             Namco 2002                    \
+   "            Rev. B.......................... 12X456X  SC21 DVD0B           DVD          NM00007   SC23 Ver.A             Namco 2002                    | # @ rev B DVD needs campaign memory card
+Soul Calibur II Rev. D.......................... 12X456X  SC21 DVD0D           DVD          NM00007   SC22 Ver.D             Namco 2002                    /     rev D will allow skipping it if not available
+Soul Calibur III Arcade Edition................. 12X456X  SC31001-NA-DVD0-A    DVD          NM00031   SC31001-NA-A           Namco 2005                    \
+   "                           ................. 12X456X  SC31001-NA-DVD0-B    DVD          NM00031   SC31001-NA-A           Namco 2005                    / # % @
+Sukusuku Inufuku 2 / The Dog Luck 2............. 12X456X  HM-IN2               CD           NM00037   IN2 Ver.A              Hampster/Video System 2007
+Super Dragonball Z / Chou Dragonball Z.......... XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
+Taiko no Tatsujin 7............................. ------X  TK71 DVD0            DVD          NM00023   TK71 Ver.A             Namco 2005
+Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
+Taiko No Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
+Taiko No Tatsujin 10............................ XXXX56X  TK10100-1-NA-DVD0-A  DVD          NM00041   TK101001-NA-A          Namco 2007
+Taiko No Tatsujin 11............................ ------X *TK11100-1-NA-DVD0-A  DVD          NM00044  *TK111001-NA-A          Namco 2008
+Taiko No Tatsujin 12............................ ------X *TK12-HA              HDD          NM00051  *TK121001-NA-A          Namco 2008
+Taiko No Tatsujin 12 More....................... ------X *TK12200-1-NA-HDD-A   HDD          NM00051  *TK121001-NA-A          Namco 2008
+Taiko No Tatsujin 13............................ ------X *TK1301-NA-HDD0-A1    HDD          NM00056  *TK1301-NA-A            Namco 2009
+Taiko No Tatsujin 14............................ ------X *TK11100-1-NA-DVD0-A  DVD          NM00044  *TK111001-NA-A          Namco 2010
+Taiko No Tatsujin 14 More....................... ------X *TK11100-1-NA-DVD0-A  DVD          NM00044  *TK111001-NA-A          Namco 2010
+Technic Beat.................................... ------X *TNB1 DVD0            DVD         *NM000??  *TNB1 Ver.A             Arika 2002
+Tekken 4........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.A             Namco 2001                    \
+   "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.C             Namco 2001                    |
+   "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.D             Namco 2001                    | %
+   "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF2 Ver.A             Namco 2001                    |
+   "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF3 Ver.A             Namco 2001                    |
+   "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF3 Ver.C             Namco 2001                    /
+Tekken 5........................................ XXXX56X  TE51 DVD0            DVD          NM00019  *TE51 Ver.A             Namco 2004                    \
+   "    ........................................ XXXX56X  TE51 DVD0B           DVD          NM00019   TE51 Ver.B             Namco 2004                    | @
+Tekken 5.1...................................... XXXX56X *TE52 DVD0            DVD          NM00019  *TE52 Ver.A             Namco 2005                    |
+   "      ...................................... XXXX56X  TE52 DVD0B           DVD          NM00019   TE52 Ver.B             Namco 2005                    |
+   "      ...................................... XXXX56X  TE52 DVD0B           DVD          NM00019   TE53 Ver.B             Namco 2005                    /
+Tekken 5 Dark Resurrection...................... XXXX56X  TED1 DVD0            DVD          NM00034   TED1 VER.A             Namco 2005
+   "                      ...................... XXXX56X  TED1 DVD0B           DVD          NM00034  *TED2 VER.A             Namco 2005
+The Battle of Yu Yu Hakusho Dark Tournament..... ------X  YH1                  DVD          NM00035   YH1 Ver.A              Banpresto 2006
+Time Crisis 3................................... 1234XXX  TST1 DVD0            DVD          NM00012   TST1 Ver.A             Namco 2002                    \ Uses 'V185 I/O PCB' for light guns
+   "         ................................... 1234XXX  TST1 DVD0            DVD          NM00012   TST2 Ver.A             Namco 2002                    | or 'V221 MIU PCB' for CCD camera guns
+   "         ................................... 1234XXX  TST1 DVD0            DVD          NM00012  *TST3 Ver.A             Namco 2002                    / %
+Time Crisis 4................................... XXXXXX7  TSF1-HA              HDD (40GB)   NM00032   TSF1002-NA-A           Namco 2005                      Uses 'V329 NA-JV PCB' for guns
+Vampire Night................................... 1234XXX  VPN1 CD0             CD           NM00003   VPN3 Ver.B             Namco/Sega/WOW Entertainment 2000
+Wangan Midnight................................. 1XXXXXX  WMN2-A               CD           NM00008   WMN1 Ver.A             Namco 2001
+   "           ................................. 1XXXXXX  WMN2-A               CD           NM00008  *WMN2 Ver.A             Namco 2001
+   "           ................................. 1XXXXXX  WMN2-A               CD           NM00008  *WMN2 Ver.B             Namco 2001
+Wangan Midnight R............................... 1XXXXXX *?                   *CD           NM000??  *WMR1 Ver.A             Namco 2002
+Zoids Infinity.................................. ------X  M9006212A Ver.2.02J  HDD (40GB)   NM00016   B3900076A              Taito 2004                    HDD: Maxtor Fireball 3 40GB 2F040L0
+Zoids Infinity Ex............................... ------X *?                   *HDD          NM00025  *B3900098B              Taito 2005
+Zoids Infinity Ex Plus.......................... ------X  M9006907A Ver.2.10J  HDD (20GB)   NM00025   B3900107A              Taito 2006                    HDD: Seagate ST320014A
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+* - denotes these items are NOT dumped
+^ - uses same NM cart number as Tekken 5 Dark Resurrection
+? - unknown info
+
+Note about System:
+This is a general guideline flag showing compatibility between the different revisions of System 246 hardware.
+1-7: Tested Working
+X  : Tested Not Working
+-  : Not Tested
+%  : 1 and 2; For testing purposes these games need a DVD drive. Using this hardware to play the actual game is normally impossible due to requiring controls/IO boards that can't be connected to this hardware version.
+#  : 5 and 6; Working only in S246+ mode.
+@  : Multiple different DVD's ans/or dongles are available and are compatible in any combination.
+
+For 'Tested Working', working is defined as "boots to the attract mode".
+Some games need specific controls and are unplayable even though the game loads (eg. most games on earliest rev 246 or the driving or gun games on
+non-factory-provided hardware). Some games will start to boot but either get stuck somewhere in the boot process or nothing loads after the initial
+booting.
+The DVD drive used for these tests was a Toshiba/Samsung SD-M1802. In the case where the original drive didn't work (i.e. factory drive was a CDROM
+and the disc was a DVD), this drive was substituted.
+Finally, all games were tested with the SD-M1802 and worked, therefore no game requires a specific model of optical drive.
+Different security cart revisions of the same game are filled in with the same status even if they are not dumped as long as at least one revision is tested.
+
+1 = 246  1st generation using COH-H30000 or COH-H31000 Playstation 2 main board (GH-004/GH-006 with PS2 power supply) and custom Namco interface board 'System 246 MOTHER PCB' and Teac CD-540E CD drive
+2 = 246A 2nd generation using COH-H30000 or COH-H31000 Playstation 2 main board (GH-004/GH-006 with PS2 power supply) and custom Namco interface board 'System 246 MOTHER(A) PCB' and Teac CD-540E CD drive
+3 = 246B 3rd generation using COH-H31000 Playstation 2 main board (GH-006 without PS2 power supply) and custom Namco interface board 'System 246 PMOTHER PCB'
+4 = 246C 4th generation using integrated single main board 'System 246 Main PCB'
+5 = 256  5th generation using integrated single main board 'System 256 Main PCB'. Note some games requiring S246 will work in S246+ mode.
+6 = 256B 6th generation using integrated single main board 'System 256 Main(B) PCB'. Note some games requiring S246 will work in S246+ mode.
+7 = S256 7th generation using integrated single main board 'Super System 256 Main PCB'. All other games are X because this system only runs Time Crisis 4.
 
 
 Namco System 246 readme (earliest type using standard PS2 main board)
@@ -309,10 +366,42 @@ Notes:
          L2 - Blue LED (lights when 12 volts is present)
 
 
-Gun I/O Board
----------------
-This PCB is used with Vampire Night.
-It is also used with Time Crisis 3 (on System 246C) and Crisis Zone (on System 23 Evolution2)
+Gun I/O Boards
+--------------
+
+V185 I/O PCB
+2479961102 (2479971102)
+|-----------------------------------------|
+|   J601      LED1 LED2         |-------| |
+|   DSW(4)JP1 |-------|         |TSSIO  | |
+|     |-----| | C78   |14.746MHz|PLD    | |
+|     |TSSIO| |       |PST592   |-------| |
+|     |PROG | |-------|                   |
+|     |-----|                             |
+|                                         |
+|     62256                               |
+|ADM485                                   |
+|J1               SLA4060               J5|
+|                          J3       J4    |
+|-----------------------------------------|
+Notes:
+      TSSIOPROG - Atmel AT29C020 EEPROM stamped 'TSSIOP8' (PLCC32)
+      C78       - Namco Custom C78, actually a rebadged Hitachi HD643334 MCU, clock input 14.746MHz (PLCC84)
+      TSSIOPLD  - Altera MAX EPM7128ELC84 CPLD with label 'TSSIOPLD' (PLCC84)
+      SLA4060   - Sanken Electric SLA4060 NPN general purpose darlington transistor (used to drive the kick-back solenoid in the gun)
+      PST592    - System Reset IC (SOIC4)
+      J1        - 12 pin connector for power and I/O communication joined to main board
+      J3        - 12 pin connector for cabinet buttons UP/DOWN/ENTER/TEST/SERVICE/COIN etc
+      J4        - 4-pin connector for pedal
+      J5        - 6 position connector for gun trigger/optical signal/power/gnd)
+      J601      - not used?
+      JP1       - jumper set to 1-2 (lower position), labelled 'WR'
+      DSW       - 4 position dipswitch block, all off
+      
+This board is used with Time Crisis 3 (System 246B/C twin CRT-screen version)
+It's also used with Time Crisis II (on System 23)
+Note this board requires a standard light gun.
+
 
 V221 MIU PCB
 2512960101 (2512970101)
@@ -360,12 +449,13 @@ ZUW1R51212 - Cosel ZUW1R51212 DC to DC Power Supply Module (input 9-18VDC, outpu
                                         - 'XMIU1 PRG0'  (I/O program for Time Crisis 3)
                                         - 'CSZ1 PRG0A'  (I/O program for Crisis Zone)
 
-Note this board uses a CCD camera for the gun sensor.
+This PCB is used with Vampire Night and Time Crisis 3 (DX projector-screen version on System 246B/C)
+It's also used with Crisis Zone (on System 23 Evolution2)
+Note this board requires a CCD camera gun sensor.
 
 
-I/O Board
----------
-This PCB is used with Ridge Racer V and Wangan Midnight.
+Digital & Analog I/O boards
+---------------------------
 
 FCA PCB
 8662969102 (8662979102)
@@ -392,20 +482,28 @@ Notes:
        MCU - Fujitsu MB90F574 Microcontroller with sticker 'FCAF11' (QFP120)
     ADM485 - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
 
+This PCB is used with Ridge Racer V and Wangan Midnight and will also work with most of the 
+System 246 games when wired to suit those games.
 
+FCA2 PCB 
+--------
+[to-do]
+
+FCB PCB
+-------
+[to-do]
+
+System246 JAMMA(B) PCB
+----------------------
+[to-do]
+
+ 
 Drive/Feedback Board
 --------------------
-This PCB is used with Ridge Racer V and Wangan Midnight.
-It controls the steering feed-back motor.
-When the driving games boot they test the feed-back motor by monitoring a potentiometer
-connected to the steering wheel mechanism. If the pot is faulty or not connected or if
-the drive/feedback board isn't connected (including the 110VAC input voltage), the
-steering check will fail after a time-out period and the game will not continue further.
 
 V194 STR PCB
 2487960103 (2487970103)
 Additional sticker for Ridge Racer V: 'V257 STR PCB 2553960100'
-Note this same PCB (with a different ROM) is also used with Mario Kart on Triforce hardware.
 |----------------------------------------------------------|
 |         SOP44.IC16            TRANSFORMER        J105    |
 | DIP42                                                    |
@@ -454,6 +552,91 @@ Notes:
             J105 - 110VAC power input
             J106 - DC variable power output to feed-back motor
 
+This PCB is used with Ridge Racer V and Wangan Midnight and controls the steering feed-back motor.
+When the driving games boot they test the feed-back motor by monitoring a potentiometer
+connected to the steering wheel mechanism. On Ridge Racer V, if the pot is faulty or not connected 
+or if the drive/feedback board isn't connected (including the 110VAC input voltage), the
+steering check will fail after a time-out period and the game will not continue further.
+Wangan Midnight doesn't test the pototentiometer and will boot without it connected, but it does
+test for the presence of the feedback PCB.
+Note this same PCB (with a different ROM) is also used with Mario Kart on Triforce hardware.
+
+
+System 246B Main Board Layout
+-----------------------------
+[to-do]
+
+System 246C Main Board Layout
+-----------------------------
+[to-do]
+
+System 256 Main Board Layout
+----------------------------
+[to-do]
+
+
+For Super System 256, the main board is identical to the regular System 256 except the mode jumper
+is not shorted. The regular System 256 games won't load, only displaying an error message about
+the wrong mode being set. If the mode jumper is changed the board either doesn't boot at all or just
+displays the same error message.
+
+Info for Time Crisis 4
+----------------------
+Main Board sticker: Super System 256 Main PCB 8692960100
+Graphics Chip 'EE+GS CXD9833GB'
+
+
+Super System 256 I/O boards
+---------------------------
+
+8682960602 (8682970602)
+NA-JV PCB
+Sticker for Time Crisis 4 - 26169605 V329 NA-JV PCB
+|-------------------------------------|
+|CN4      CN3           CN2       CN1 |
+|                                     |
+|                                     |
+|             LED2  |----|        CN7 |
+|             LED3  |3062| 14.7456MHz |
+|             LED4  |----|        CN6 |
+|     CN5     LED5               LED1 |
+|-------------------------------------|
+Notes:
+      3062 - Hitachi F3062F25V H8/3062 microcontroller stamped 'TSF1APRA' (QFP100)
+      CN1  - 4 pin power input connector
+      CN2  - 32 pin connector for controls (Gun Position)
+      CN3  - 40 pin connector for controls (Buttons: Trigger/Pedal/Select/Test/Service/Coin/Up/Down etc)
+      CN4  - 8 pin connector for I/O link to main board USB connector (uses a special cable)
+      CN5  - Not populated, possibly for a standard USB connector
+      CN6  - 5 pin connector (not used for Time Crisis 4)
+
+
+Extra Sound board (used on Super System 256 for Time Crisis 4)
+-----------------
+Note the game works without this PCB.
+
+V329 EXSOUND PCB
+2616961002
+(2616971002)
+|---------------------|
+|        CN3          |-----------|
+|                              CN2|
+|                                 |-|
+| EPM3128             CS42516     |-|
+|                                 |
+|               *                 |
+|                                 |
+|                                 |
+| CN7                      CN6    |
+|---------------------------------|
+Notes:
+      EPM3128 - Altera Max EPM3128ATC-100 CPLD stamped 'TSF' (TQFP100)
+      CS42516 - Cirrus Logic CS42516-CQZ 114 dB, 192-kHz 6-Ch CODEC with S/PDIF Receiver (QFP48)
+            * - unpopulated position for H8/3062 MCU
+          CN2 - RCA Sound output connector
+          CN3 - 40 pin connector with perpendicular adapter board plugged into main board to connector J11
+          CN6 - 2 pin connector joined with a small cable to the board where the dongle plugs in
+          CN7 - 6 pin connector (unused)
 ***************************************************************************/
 
 
