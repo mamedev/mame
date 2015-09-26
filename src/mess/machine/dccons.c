@@ -161,7 +161,30 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 		atapi_xferlen = data;
 		break;
 
-	// The following is required to unlock the GD-ROM. The original Japanese BIOS doesn't need it
+/*
+	The following register is involved in BIOS checksum protection system.
+	current understanding of its functioning based on several hardware tests:
+
+	after power on system is in "protected state":
+	- access to G1 ATA register area (5F70XX) is locked, ie GD-ROM in Dreamcast or cartridge/DIMM in arcade systems is not accessible;
+	- *any* data readed via G1 data bus (ie BIOS) is summed internally by chipset;
+	- write to GD_UNLOCK (5F74E4) register set "last address" of checksummed area;
+
+	then readed address matches with "last address" - calculated summ compared with some hardcoded value
+	if values match - system becomes in "unlocked state":
+	- G1 ATA registers unlocked;
+	- by write to GD_UNLOCK register system can be switched back to "protected state"
+
+	if values doesn't match - system switch to "locked state":
+	- similar to protected, but data summing seems not performed anymore,
+	at least write to GD_UNLOCK and "pumping" through G1 bus data chunk with valid checksumm have no effect;
+	- the only exit from this state - power off/on or reset;
+
+	actual checksum algorithm is unknown, but its supposed to be simple and weak,
+	known few modded BIOSes which succesfully passes this CRC check, because of good luck
+
+	all described above works the same way in all HOLLY/CLX2-based systems - Dreamcast, Naomi 1/2, Atomiswave, SystemSP
+*/
 	case GD_UNLOCK:
 		if (data==0 || data==0x001fffff || data==0x42fe)
 		{
