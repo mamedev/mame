@@ -169,6 +169,13 @@ const device_type TMS1670 = &device_creator<tms1670_cpu_device>; // high voltage
 // - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
 
+// TMS1980 is a TMS0980 with a TMS1x00 style opla
+// - RAM, ROM, and main instructions PLA is exactly the same as TMS0980
+// - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
+// - 32-term output PLA above the RAM, 7 bits!
+const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 9 R pins, high voltage
+// TMS0260 is same?
+
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
 // - RAM and ROM is exactly the same as TMS1000
 // - main instructions PLA at the top half, to the right of the midline
@@ -184,7 +191,6 @@ const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, 
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
 // newer TMS0270 chips (eg. Speak & Math) have 42 pins
-// TMS0260 is similar? except opla is 32 instead of 48 terms
 
 
 // internal memory maps
@@ -309,6 +315,10 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 	: tms0970_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
 { }
 
+tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 9, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 6, ADDRESS_MAP_NAME(data_64x9_as4), "tms1980", __FILE__)
+{ }
+
 
 tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16, 16, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms0270", __FILE__)
@@ -387,6 +397,23 @@ machine_config_constructor tms0980_cpu_device::device_mconfig_additions() const
 }
 
 
+static MACHINE_CONFIG_FRAGMENT(tms1980)
+
+	// main opcodes PLA, microinstructions PLA, output PLA
+	MCFG_PLA_ADD("ipla", 9, 22, 24)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_ADD("mpla", 6, 21, 64)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_ADD("opla", 5, 7, 32)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+MACHINE_CONFIG_END
+
+machine_config_constructor tms1980_cpu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(tms1980);
+}
+
+
 static MACHINE_CONFIG_FRAGMENT(tms0270)
 
 	// main opcodes PLA, microinstructions PLA, output PLA
@@ -441,8 +468,8 @@ void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, st
 
 enum
 {
-	TMS0980_PC=1, TMS0980_SR, TMS0980_PA, TMS0980_PB,
-	TMS0980_A, TMS0980_X, TMS0980_Y, TMS0980_STATUS
+	TMS1XXX_PC=1, TMS1XXX_SR, TMS1XXX_PA, TMS1XXX_PB,
+	TMS1XXX_A, TMS1XXX_X, TMS1XXX_Y, TMS1XXX_STATUS
 };
 
 void tms1xxx_cpu_device::device_start()
@@ -538,14 +565,14 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_subcycle));
 
 	// register state for debugger
-	state_add(TMS0980_PC,     "PC",     m_pc    ).formatstr("%02X");
-	state_add(TMS0980_SR,     "SR",     m_sr    ).formatstr("%01X");
-	state_add(TMS0980_PA,     "PA",     m_pa    ).formatstr("%01X");
-	state_add(TMS0980_PB,     "PB",     m_pb    ).formatstr("%01X");
-	state_add(TMS0980_A,      "A",      m_a     ).formatstr("%01X");
-	state_add(TMS0980_X,      "X",      m_x     ).formatstr("%01X");
-	state_add(TMS0980_Y,      "Y",      m_y     ).formatstr("%01X");
-	state_add(TMS0980_STATUS, "STATUS", m_status).formatstr("%01X");
+	state_add(TMS1XXX_PC,     "PC",     m_pc    ).formatstr("%02X");
+	state_add(TMS1XXX_SR,     "SR",     m_sr    ).formatstr("%01X");
+	state_add(TMS1XXX_PA,     "PA",     m_pa    ).formatstr("%01X");
+	state_add(TMS1XXX_PB,     "PB",     m_pb    ).formatstr("%01X");
+	state_add(TMS1XXX_A,      "A",      m_a     ).formatstr("%01X");
+	state_add(TMS1XXX_X,      "X",      m_x     ).formatstr("%01X");
+	state_add(TMS1XXX_Y,      "Y",      m_y     ).formatstr("%01X");
+	state_add(TMS1XXX_STATUS, "STATUS", m_status).formatstr("%01X");
 
 	state_add(STATE_GENPC, "curpc", m_rom_address).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
@@ -735,7 +762,7 @@ UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 	UINT32 mask = m_mpla->read(sel);
 	mask ^= 0x43fc3; // invert active-negative
 
-	// M_RSTR is specific to TMS02x0, it redirects to F_RSTR
+	// M_RSTR is specific to TMS02x0/TMS1980, it redirects to F_RSTR
 	// M_UNK1 is specific to TMS0270, unknown yet
 	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
 	const UINT32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
@@ -844,16 +871,11 @@ void tms0980_cpu_device::read_opcode()
 	else
 		m_micro = m_micro_decode[m_opcode];
 
-	next_pc();
-}
-
-void tms0270_cpu_device::read_opcode()
-{
-	tms0980_cpu_device::read_opcode();
-
-	// RSTR is on the mpla
+	// TMS02x0/TMS1980: RSTR is on the mpla
 	if (m_micro & M_RSTR)
 		m_fixed |= F_RSTR;
+
+	next_pc();
 }
 
 

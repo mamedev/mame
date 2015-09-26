@@ -405,6 +405,23 @@ protected:
 	UINT32 decode_micro(UINT8 sel);
 };
 
+class tms1980_cpu_device : public tms0980_cpu_device
+{
+public:
+	tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	virtual void write_o_output(UINT8 index) { tms1xxx_cpu_device::write_o_output(index); }
+	virtual UINT8 read_k_input() { return tms1xxx_cpu_device::read_k_input(); }
+
+	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); }
+	virtual void op_rstr() { tms1xxx_cpu_device::op_rstr(); }
+	virtual void op_tdo() { tms1xxx_cpu_device::op_tdo(); }
+};
+
 
 class tms0270_cpu_device : public tms0980_cpu_device
 {
@@ -426,7 +443,6 @@ protected:
 	virtual void write_o_output(UINT8 index) { tms1xxx_cpu_device::write_o_output(index); }
 	virtual UINT8 read_k_input();
 	virtual void dynamic_output();
-	virtual void read_opcode();
 
 	virtual void op_setr();
 	virtual void op_rstr();
@@ -466,6 +482,7 @@ extern const device_type TMS1670;
 extern const device_type TMS0970;
 extern const device_type TMS1990;
 extern const device_type TMS0980;
+extern const device_type TMS1980;
 extern const device_type TMS0270;
 
 
