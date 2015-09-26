@@ -2757,26 +2757,30 @@ cache_target::~cache_target()
 
 bool cache_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
 {
-	int bloom_size = (width < height) ? width : height;
 	int bloom_index = 0;
+	int bloom_size = (width < height) ? width : height;
 	int bloom_width = width;
 	int bloom_height = height;
 	for (; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
 	{
 		bloom_width >>= 1;
 		bloom_height >>= 1;
+
 		HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), bloom_width, bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
 		if (result != D3D_OK)
 		{
 			return false;
 		}
 		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);
+
 		bloom_index++;
 	}
 
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture);
 	if (result != D3D_OK)
+	{
 		return false;
+	}
 	(*d3dintf->texture.get_surface_level)(last_texture, 0, &last_target);
 
 	target_width = width * prescale_x;
@@ -2804,8 +2808,8 @@ render_target::~render_target()
 			(*d3dintf->surface.release)(bloom_target[index]);
 			bloom_target[index] = NULL;
 		}
-	}	
-	
+	}
+
 	for (int index = 0; index < 2; index++)
 	{
 		if (native_texture[index] != NULL)
@@ -2837,34 +2841,42 @@ render_target::~render_target()
 //============================================================
 
 bool render_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
-{	
+{
 	HRESULT result;
-	
+
 	for (int index = 0; index < 2; index++)
 	{
 		result = (*d3dintf->device.create_texture)(d3d->get_device(), width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &native_texture[index]);
 		if (result != D3D_OK)
+		{
 			return false;
+		}
 		(*d3dintf->texture.get_surface_level)(native_texture[index], 0, &native_target[index]);
 
 		result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescale_texture[index]);
 		if (result != D3D_OK)
+		{
 			return false;
+		}
 		(*d3dintf->texture.get_surface_level)(prescale_texture[index], 0, &prescale_target[index]);
 	}
 
-	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	int bloom_index = 0;
+	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	float bloom_width = d3d->get_width();
 	float bloom_height = d3d->get_height();
 	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
 		bloom_width *= 0.5f;
 		bloom_height *= 0.5f;
+
 		result = (*d3dintf->device.create_texture)(d3d->get_device(), (int)bloom_width, (int)bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
 		if (result != D3D_OK)
+		{
 			return false;
+		}
 		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);
+
 		bloom_index++;
 	}
 

@@ -48,15 +48,15 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-uniform float2 TargetSize;
+uniform float2 TargetDims;
 
-uniform float2 Prescale = float2(1.0f, 1.0f);
+uniform bool PrepareVector;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 TargetTexelSize = 1.0f / TargetSize;
+	float2 TargetTexelDims = 1.0f / TargetDims;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
@@ -67,11 +67,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 
 	float2 TexCoord = Input.Position.xy / ScreenDims;
+	TexCoord += PrepareVector
+		? 0.5f / TargetDims // half texel offset correction (DX9)
+		: 0.0f;
 
-	Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelSize * Prescale;
-	Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelSize * Prescale;
-	Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelSize * Prescale;
-	Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelSize * Prescale;	
+	Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelDims;
+	Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelDims;
+	Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelDims;
+	Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelDims;
 
 	return Output;
 }

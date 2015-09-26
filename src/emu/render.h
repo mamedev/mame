@@ -605,6 +605,7 @@ public:
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
 	render_layer_config layer_config() const { return m_layerconfig; }
+	layout_view *current_view() const { return m_curview; }
 	int view() const { return view_index(*m_curview); }
 	bool hidden() const { return ((m_flags & RENDER_CREATE_HIDDEN) != 0); }
 	bool is_ui_target() const;

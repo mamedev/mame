@@ -989,6 +989,7 @@ int shaders::create_resources(bool reset)
 
 	default_effect = new effect(this, d3d->get_device(), "primary.fx", fx_dir);
 	post_effect = new effect(this, d3d->get_device(), "post.fx", fx_dir);
+	distortion_effect = new effect(this, d3d->get_device(), "distortion.fx", fx_dir);
 	prescale_effect = new effect(this, d3d->get_device(), "prescale.fx", fx_dir);
 	phosphor_effect = new effect(this, d3d->get_device(), "phosphor.fx", fx_dir);
 	focus_effect = new effect(this, d3d->get_device(), "focus.fx", fx_dir);
@@ -1002,6 +1003,7 @@ int shaders::create_resources(bool reset)
 
 	if (!default_effect->is_valid() ||
 		!post_effect->is_valid() ||
+		!distortion_effect->is_valid() ||
 		!prescale_effect->is_valid() ||
 		!phosphor_effect->is_valid() ||
 		!focus_effect->is_valid() ||
@@ -1076,15 +1078,11 @@ int shaders::create_resources(bool reset)
 	downsample_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
 	bloom_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	bloom_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 
 	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
 	post_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-
-	post_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
-	post_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
-	post_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
-	post_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
+	post_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 
 	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
@@ -1100,9 +1098,19 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 
+	distortion_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	distortion_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+	distortion_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
+
+	distortion_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
+	distortion_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
+	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
+	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
+
 	vector_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
 	default_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	default_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 
 	initialized = true;
 
@@ -1125,6 +1133,7 @@ void shaders::begin_draw()
 
 	default_effect->set_technique("TestTechnique");
 	post_effect->set_technique("ScanMaskTechnique");
+	distortion_effect->set_technique("DistortionTechnique");
 	phosphor_effect->set_technique("TestTechnique");
 	focus_effect->set_technique("TestTechnique");
 	deconverge_effect->set_technique("DeconvergeTechnique");
@@ -1187,14 +1196,14 @@ void shaders::blit(
 	for (UINT pass = 0; pass < num_passes; pass++)
 	{
 		curr_effect->begin_pass(pass);
-		
+
 		// add the primitives
 		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), prim_type, prim_index, prim_count);
-		if (result != D3D_OK) 
+		if (result != D3D_OK)
 		{
 			osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 		}
-		
+
 		curr_effect->end_pass();
 	}
 
@@ -1311,7 +1320,7 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	// Convert our signal into YIQ
 	curr_effect = yiq_encode_effect;
 	curr_effect->update_uniforms();
-	
+
 	// initial "Diffuse"  texture is set in shaders::set_texture()
 
 	next_index = rt->next_index(next_index);
@@ -1325,7 +1334,7 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 
 	next_index = rt->next_index(next_index);
 	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
-	
+
 	color_effect->set_texture("Diffuse", rt->native_texture[next_index]);
 
 	return next_index;
@@ -1337,7 +1346,7 @@ int shaders::color_convolution_pass(render_target *rt, int source_index, poly_in
 
 	curr_effect = color_effect;
 	curr_effect->update_uniforms();
-	
+
 	// initial "Diffuse" texture is set in shaders::set_texture() or the result of shaders::ntsc_pass()
 
 	next_index = rt->next_index(next_index);
@@ -1380,9 +1389,9 @@ int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, 
 
 	float defocus_x = options->defocus[0];
 	float defocus_y = options->defocus[1];
-	bool focus_enable = defocus_x != 0.0f || defocus_y != 0.0f;
 
-	if (!focus_enable)
+	// skip defocus if no influencing settings
+	if (defocus_x == 0.0f && defocus_y == 0.0f)
 	{
 		return next_index;
 	}
@@ -1409,7 +1418,7 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 
 	next_index = rt->next_index(next_index);
 	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
-	
+
 	// Pass along our phosphor'd screen
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
@@ -1428,53 +1437,26 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 
 	texture_info *texture = poly->get_texture();
 
-	bool prepare_vector = 
+	bool prepare_vector =
 		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
-	float prescale[2] = {
-		prepare_vector ? 1.0f : (float)hlsl_prescale_x,
-		prepare_vector ? 1.0f : (float)hlsl_prescale_y };
-	float target_dims[2] = {
-		poly->get_prim_width(),
-		poly->get_prim_height() };
 	bool orientation_swap_xy =
 		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 	bool rotation_swap_xy =
 		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
 		(d3d->window().target()->orientation() & ROT270) == ROT270;
-	
+
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
-	curr_effect->set_vector("Prescale", 2, prescale);
-	curr_effect->set_vector("TargetDims", 2, target_dims);
 	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
 	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
 
-	if (prepare_vector)
-	{
-		int texture_width = 0;
-		int texture_height = 0;
-
-		texture_info::compute_size_subroutine(d3d->get_texture_manager(), (int)target_dims[0], (int)target_dims[1], &texture_width, &texture_height);
-
-		float source_dims[2] = { (float)texture_width, (float)texture_height };
-		float source_rect[2] = { target_dims[0] / texture_width , target_dims[1] / texture_height };
-
-		// override uniforms
-		curr_effect->set_vector("SourceDims", 2, source_dims);
-		curr_effect->set_vector("SourceRect", 2, source_rect);
-	}
-
-	d3d->set_wrap(D3DTADDRESS_MIRROR);
-
 	next_index = rt->next_index(next_index);
 	blit(prepare_bloom ? rt->native_target[next_index] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
-	
-	d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 
 	return next_index;
 }
@@ -1483,35 +1465,45 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
-	bool prepare_vector = 
+	bool prepare_vector =
 		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
-	float prescale[2] = {
-		prepare_vector ? 1.0f : (float)hlsl_prescale_x,   // no prescale for vector
-		prepare_vector ? 1.0f : (float)hlsl_prescale_y }; // full prescale for raster
+	float bloom_rescale = prepare_vector
+		? options->vector_bloom_scale
+		: options->raster_bloom_scale;
+
+	// skip downsample if no influencing settings
+	if (bloom_rescale == 0.0f)
+	{
+		return next_index;
+	}
 
 	curr_effect = downsample_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_vector("Prescale", 2, prescale);
+	curr_effect->set_bool("PrepareVector", prepare_vector);
 
-	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	int bloom_index = 0;
-	float bloom_width = rt->target_width;
-	float bloom_height = rt->target_height;
+	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
+	float bloom_width = prepare_vector ? rt->target_width : rt->target_width / hlsl_prescale_x;
+	float bloom_height = prepare_vector ? rt->target_height : rt->target_height / hlsl_prescale_y;
 	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
-		bloom_dims[bloom_index][0] = bloom_width;
-		bloom_dims[bloom_index][1] = bloom_height;
+		bloom_dims[bloom_index][0] = (float)(int)bloom_width;
+		bloom_dims[bloom_index][1] = (float)(int)bloom_height;
 
-		curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
-		curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->native_texture[next_index] : rt->bloom_texture[bloom_index - 1]);
+		curr_effect->set_vector("TargetDims", 2, bloom_dims[bloom_index]);
+		curr_effect->set_texture("DiffuseTexture",
+			bloom_index == 0
+				? rt->native_texture[next_index]
+				: rt->bloom_texture[bloom_index - 1]);
 
 		blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
 
-		bloom_index++;
 		bloom_width *= 0.5f;
 		bloom_height *= 0.5f;
+
+		bloom_index++;
 	}
-	
+
 	bloom_count = bloom_index;
 
 	return next_index;
@@ -1521,17 +1513,20 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 {
 	int next_index = source_index;
 
-	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
-	float prescale[2] = {
-		prepare_vector ? 1.0f : (float)hlsl_prescale_x / 2.0f,   // no prescale for vector
-		prepare_vector ? 1.0f : (float)hlsl_prescale_y / 2.0f }; // half prescale for raster
+	bool prepare_vector =
+		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
 	float bloom_rescale = prepare_vector
-		? options->vector_bloom_scale 
+		? options->vector_bloom_scale
 		: options->raster_bloom_scale;
+
+	// skip bloom if no influencing settings
+	if (bloom_rescale == 0.0f)
+	{
+		return next_index;
+	}
 
 	curr_effect = bloom_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_vector("Prescale", 2, prescale);
 
 	float weight0123[4] = {
 		options->bloom_level0_weight,
@@ -1545,7 +1540,7 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 		options->bloom_level6_weight * bloom_rescale,
 		options->bloom_level7_weight * bloom_rescale
 	};
-	float weight89A[3]  = { 
+	float weight89A[3]  = {
 		options->bloom_level8_weight * bloom_rescale,
 		options->bloom_level9_weight * bloom_rescale,
 		options->bloom_level10_weight * bloom_rescale
@@ -1580,8 +1575,102 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	return next_index;
 }
 
+int shaders::distortion_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+{
+	int next_index = source_index;
+
+	int screen_count = d3d->window().target()->current_view()->screens().count();
+
+	// todo: currently only one screen is supported
+	if (screen_count > 1)
+	{
+		return next_index;
+	}
+
+	render_bounds bounds = d3d->window().target()->current_view()->bounds();
+	render_bounds screen_bounds = d3d->window().target()->current_view()->screen_bounds();
+
+	// todo: cuccently artworks are not supported
+	if (bounds.x0 != screen_bounds.x0 ||
+		bounds.y0 != screen_bounds.y0 ||
+		bounds.x1 != screen_bounds.x1 ||
+		bounds.y1 != screen_bounds.y1)
+	{
+		return next_index;
+	}
+
+	// skip distortion if no influencing settings
+	if (options->reflection == 0 &&
+		options->vignetting == 0 &&
+		options->curvature == 0 &&
+		options->round_corner == 0)
+	{
+		return next_index;
+	}
+
+	bool orientation_swap_xy =
+		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+	bool rotation_swap_xy =
+		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
+		(d3d->window().target()->orientation() & ROT270) == ROT270;
+	int rotation_type =
+		(d3d->window().target()->orientation() & ROT90) == ROT90
+			? 1
+			: (d3d->window().target()->orientation() & ROT180) == ROT180
+				? 2
+				: (d3d->window().target()->orientation() & ROT270) == ROT270
+					? 3
+					: 0;
+
+	curr_effect = distortion_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
+	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
+	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
+	curr_effect->set_int("RotationType", rotation_type);
+
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+
+	return next_index;
+}
+
+int shaders::vector_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+{
+	int next_index = source_index;
+
+	float time_params[2] = { 0.0f, 0.0f };
+	float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
+
+	curr_effect = vector_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_vector("TimeParams", 2, time_params);
+	curr_effect->set_vector("LengthParams", 3, length_params);
+
+	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+
+	return next_index;
+}
+
+int shaders::vector_buffer_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+{
+	int next_index = source_index;
+
+	curr_effect = default_effect;
+	curr_effect->update_uniforms();
+
+	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_bool("PostPass", true);
+	curr_effect->set_float("Brighten", 1.0f);
+
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+
+	return next_index;
+}
+
 int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
-{	
+{
 	int next_index = source_index;
 
 	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
@@ -1611,6 +1700,16 @@ int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, i
 	return next_index;
 }
 
+void shaders::menu_pass(poly_info *poly, int vertnum)
+{
+	curr_effect = default_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_bool("PostPass", false);
+	curr_effect->set_float("Brighten", 0.0f);
+
+	blit(NULL, false, poly->get_type(), vertnum, poly->get_count());
+}
+
 
 //============================================================
 //  shaders::render_quad
@@ -1624,6 +1723,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	}
 
 	curr_texture = poly->get_texture();
+	curr_poly = poly;
 
 	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
 	{
@@ -1657,8 +1757,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
 
+		next_index = distortion_pass(rt, next_index, poly, vertnum);
+
 		// render on screen
+		d3d->set_wrap(D3DTADDRESS_MIRROR);
 		next_index = screen_pass(rt, next_index, poly, vertnum);
+		d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
@@ -1679,15 +1783,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		int next_index = 0;
 
-		float time_params[2] = { 0.0f, 0.0f };
-		float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
-		
-		curr_effect = vector_effect;
-		curr_effect->update_uniforms();
-		curr_effect->set_vector("TimeParams", 2, time_params);
-		curr_effect->set_vector("LengthParams", 3, length_params);
-
-		blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+		next_index = vector_pass(rt, next_index, poly, vertnum);
 
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
 		if (result != D3D_OK)
@@ -1704,21 +1800,13 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		{
 			return;
 		}
-		
+
 		cache_target *ct = find_cache_target(rt->screen_index, rt->width, rt->height);
 
 		int next_index = 0;
 
-		curr_effect = default_effect;
-		curr_effect->update_uniforms();
-
-		curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
-		curr_effect->set_bool("PostPass", true);
-		curr_effect->set_float("Brighten", 1.0f);
-
-		next_index = rt->next_index(next_index);
-		blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
-
+		next_index = vector_buffer_pass(rt, next_index, poly, vertnum);
+		next_index = defocus_pass(rt, next_index, poly, vertnum);
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
 
 		// create bloom textures
@@ -1730,6 +1818,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = phosphor_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
+
+		next_index = distortion_pass(rt, next_index, poly, vertnum);
 
 		// render on screen
 		next_index = screen_pass(rt, next_index, poly, vertnum);
@@ -1744,16 +1834,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	}
 	else
 	{
-		curr_effect = default_effect;
-		curr_effect->update_uniforms();
-		curr_effect->set_bool("PostPass", false);
-		curr_effect->set_float("Brighten", 0.0f);
-
-		blit(NULL, false, poly->get_type(), vertnum, poly->get_count());
+		menu_pass(poly, vertnum);
 	}
 
 	curr_render_target = NULL;
 	curr_texture = NULL;
+	curr_poly = NULL;
 }
 
 
@@ -2040,6 +2126,11 @@ void shaders::delete_resources(bool reset)
 		delete post_effect;
 		post_effect = NULL;
 	}
+	if (distortion_effect != NULL)
+	{
+		delete distortion_effect;
+		distortion_effect = NULL;
+	}
 	if (prescale_effect != NULL)
 	{
 		delete prescale_effect;
@@ -2151,9 +2242,9 @@ static void get_vector(const char *data, int count, float *out, int report_error
 
 
 /*-------------------------------------------------
-    slider_alloc - allocate a new slider entry
-    currently duplicated from ui.c, this could
-    be done in a more ideal way.
+	slider_alloc - allocate a new slider entry
+	currently duplicated from ui.c, this could
+	be done in a more ideal way.
 -------------------------------------------------*/
 
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
@@ -2187,7 +2278,7 @@ static INT32 slider_set(float *option, float scale, const char *fmt, std::string
 	{
 		strprintf(*str, fmt, *option);
 	}
-	
+
 	return floor(*option / scale + 0.5f);
 }
 
@@ -2202,13 +2293,13 @@ static INT32 slider_shadow_mask_x_count(running_machine &machine, void *arg, std
 	if (newval != SLIDER_NOCHANGE)
 	{
 		options->shadow_mask_count_x = newval;
-	}	
+	}
 	if (str != NULL)
 	{
 		strprintf(*str, "%d", options->shadow_mask_count_x);
 	}
 	options->params_dirty = true;
-	
+
 	return options->shadow_mask_count_x;
 }
 
@@ -2224,7 +2315,7 @@ static INT32 slider_shadow_mask_y_count(running_machine &machine, void *arg, std
 		strprintf(*str, "%d", options->shadow_mask_count_y);
 	}
 	options->params_dirty = true;
-	
+
 	return options->shadow_mask_count_y;
 }
 
@@ -2643,77 +2734,77 @@ static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::
 
 shaders::slider_desc shaders::s_sliders[] =
 {
-	{ "Shadow Mask Darkness",                0,     0,   100, 1, slider_shadow_mask_alpha },
-	{ "Shadow Mask X Count",                 1,     6,  1024, 1, slider_shadow_mask_x_count },
-	{ "Shadow Mask Y Count",                 1,     6,  1024, 1, slider_shadow_mask_y_count },
-	{ "Shadow Mask Pixel Count X",           1,     6,    64, 1, slider_shadow_mask_usize },
-	{ "Shadow Mask Pixel Count Y",           1,     6,    64, 1, slider_shadow_mask_vsize },
-	{ "Shadow Mask Offset X",             -100,     0,   100, 1, slider_shadow_mask_uoffset },
-	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, slider_shadow_mask_voffset },
-	{ "Screen Curvature",                    0,     3,   100, 1, slider_curvature },
-	{ "Screen Round Corner",                 0,     3,   100, 1, slider_round_corner },
-	{ "Screen Reflection",                   0,     3,   100, 1, slider_reflection },
-	{ "Image Vignetting",                    0,     3,   100, 1, slider_vignetting },
-	{ "Scanline Darkness",                   0,   100,   100, 1, slider_scanline_alpha },
-	{ "Scanline Screen Height",              1,    20,    80, 1, slider_scanline_scale },
-	{ "Scanline Indiv. Height",              1,    20,    80, 1, slider_scanline_height },
-	{ "Scanline Brightness",                 0,    20,    40, 1, slider_scanline_bright_scale },
-	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, slider_scanline_bright_offset },
-	{ "Scanline Jitter",                     0,     0,    40, 1, slider_scanline_offset },
-	{ "Defocus X",                           0,     0,    64, 1, slider_defocus_x },
-	{ "Defocus Y",                           0,     0,    64, 1, slider_defocus_y },
-	{ "Red Position Offset X",           -1500,     3,  1500, 1, slider_red_converge_x },
-	{ "Red Position Offset Y",           -1500,     0,  1500, 1, slider_red_converge_y },
-	{ "Green Position Offset X",         -1500,     0,  1500, 1, slider_green_converge_x },
-	{ "Green Position Offset Y",         -1500,     3,  1500, 1, slider_green_converge_y },
-	{ "Blue Position Offset X",          -1500,     3,  1500, 1, slider_blue_converge_x },
-	{ "Blue Position Offset Y",          -1500,     3,  1500, 1, slider_blue_converge_y },
-	{ "Red Convergence X",               -1500,     0,  1500, 1, slider_red_radial_converge_x },
-	{ "Red Convergence Y",               -1500,     0,  1500, 1, slider_red_radial_converge_y },
-	{ "Green Convergence X",             -1500,     0,  1500, 1, slider_green_radial_converge_x },
-	{ "Green Convergence Y",             -1500,     0,  1500, 1, slider_green_radial_converge_y },
-	{ "Blue Convergence X",              -1500,     0,  1500, 1, slider_blue_radial_converge_x },
-	{ "Blue Convergence Y",              -1500,     0,  1500, 1, slider_blue_radial_converge_y },
-	{ "Red Output from Red Input",        -400,     0,   400, 5, slider_red_from_r },
-	{ "Red Output from Green Input",      -400,     0,   400, 5, slider_red_from_g },
-	{ "Red Output from Blue Input",       -400,     0,   400, 5, slider_red_from_b },
-	{ "Green Output from Red Input",      -400,     0,   400, 5, slider_green_from_r },
-	{ "Green Output from Green Input",    -400,     0,   400, 5, slider_green_from_g },
-	{ "Green Output from Blue Input",     -400,     0,   400, 5, slider_green_from_b },
-	{ "Blue Output from Red Input",       -400,     0,   400, 5, slider_blue_from_r },
-	{ "Blue Output from Green Input",     -400,     0,   400, 5, slider_blue_from_g },
-	{ "Blue Output from Blue Input",      -400,     0,   400, 5, slider_blue_from_b },
-	{ "Saturation",                          0,   140,   400, 1, slider_saturation },
-	{ "Red DC Offset",                    -100,     0,   100, 1, slider_red_offset },
-	{ "Green DC Offset",                  -100,     0,   100, 1, slider_green_offset },
-	{ "Blue DC Offset",                   -100,     0,   100, 1, slider_blue_offset },
-	{ "Red Scale",                        -200,    95,   200, 1, slider_red_scale },
-	{ "Green Scale",                      -200,    95,   200, 1, slider_green_scale },
-	{ "Blue Scale",                       -200,    95,   200, 1, slider_blue_scale },
-	{ "Red Gamma",                         -80,    16,    80, 1, slider_red_power },
-	{ "Green Gamma",                       -80,    16,    80, 1, slider_green_power },
-	{ "Blue Gamma",                        -80,    16,    80, 1, slider_blue_power },
-	{ "Red Floor",                           0,     5,   100, 1, slider_red_floor },
-	{ "Green Floor",                         0,     5,   100, 1, slider_green_floor },
-	{ "Blue Floor",                          0,     5,   100, 1, slider_blue_floor },
-	{ "Red Phosphor Life",                   0,    40,   100, 1, slider_red_phosphor_life },
-	{ "Green Phosphor Life",                 0,    40,   100, 1, slider_green_phosphor_life },
-	{ "Blue Phosphor Life",                  0,    40,   100, 1, slider_blue_phosphor_life },
-	{ "Vector Length Attenuation",           0,    80,   100, 1, slider_vector_attenuation },
-	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, slider_vector_length_max },
-	{ "Vector Bloom Scale",                  0,   300,  1000, 5, slider_vector_bloom_scale },
-	{ "Raster Bloom Scale",                  0,   225,  1000, 5, slider_raster_bloom_scale },
-	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, slider_bloom_lvl0_scale },
-	{ "Bloom Level 1 Scale",                 0,    21,   100, 1, slider_bloom_lvl1_scale },
-	{ "Bloom Level 2 Scale",                 0,    19,   100, 1, slider_bloom_lvl2_scale },
-	{ "Bloom Level 3 Scale",                 0,    17,   100, 1, slider_bloom_lvl3_scale },
-	{ "Bloom Level 4 Scale",                 0,    15,   100, 1, slider_bloom_lvl4_scale },
-	{ "Bloom Level 5 Scale",                 0,    14,   100, 1, slider_bloom_lvl5_scale },
-	{ "Bloom Level 6 Scale",                 0,    13,   100, 1, slider_bloom_lvl6_scale },
-	{ "Bloom Level 7 Scale",                 0,    12,   100, 1, slider_bloom_lvl7_scale },
-	{ "Bloom Level 8 Scale",                 0,    11,   100, 1, slider_bloom_lvl8_scale },
-	{ "Bloom Level 9 Scale",                 0,    10,   100, 1, slider_bloom_lvl9_scale },
-	{ "Bloom Level 10 Scale",                0,     9,   100, 1, slider_bloom_lvl10_scale },
+	{ "Shadow Mask Darkness",				0,	 0,   100, 1, slider_shadow_mask_alpha },
+	{ "Shadow Mask X Count",				 1,	 6,  1024, 1, slider_shadow_mask_x_count },
+	{ "Shadow Mask Y Count",				 1,	 6,  1024, 1, slider_shadow_mask_y_count },
+	{ "Shadow Mask Pixel Count X",		   1,	 6,	64, 1, slider_shadow_mask_usize },
+	{ "Shadow Mask Pixel Count Y",		   1,	 6,	64, 1, slider_shadow_mask_vsize },
+	{ "Shadow Mask Offset X",			 -100,	 0,   100, 1, slider_shadow_mask_uoffset },
+	{ "Shadow Mask Offset Y",			 -100,	 0,   100, 1, slider_shadow_mask_voffset },
+	{ "Screen Curvature",					0,	 3,   100, 1, slider_curvature },
+	{ "Screen Round Corner",				 0,	 3,   100, 1, slider_round_corner },
+	{ "Screen Reflection",				   0,	 3,   100, 1, slider_reflection },
+	{ "Image Vignetting",					0,	 3,   100, 1, slider_vignetting },
+	{ "Scanline Darkness",				   0,   100,   100, 1, slider_scanline_alpha },
+	{ "Scanline Screen Height",			  1,	20,	80, 1, slider_scanline_scale },
+	{ "Scanline Indiv. Height",			  1,	20,	80, 1, slider_scanline_height },
+	{ "Scanline Brightness",				 0,	20,	40, 1, slider_scanline_bright_scale },
+	{ "Scanline Brightness Overdrive",	   0,	 0,	20, 1, slider_scanline_bright_offset },
+	{ "Scanline Jitter",					 0,	 0,	40, 1, slider_scanline_offset },
+	{ "Defocus X",						   0,	 0,	64, 1, slider_defocus_x },
+	{ "Defocus Y",						   0,	 0,	64, 1, slider_defocus_y },
+	{ "Red Position Offset X",		   -1500,	 3,  1500, 1, slider_red_converge_x },
+	{ "Red Position Offset Y",		   -1500,	 0,  1500, 1, slider_red_converge_y },
+	{ "Green Position Offset X",		 -1500,	 0,  1500, 1, slider_green_converge_x },
+	{ "Green Position Offset Y",		 -1500,	 3,  1500, 1, slider_green_converge_y },
+	{ "Blue Position Offset X",		  -1500,	 3,  1500, 1, slider_blue_converge_x },
+	{ "Blue Position Offset Y",		  -1500,	 3,  1500, 1, slider_blue_converge_y },
+	{ "Red Convergence X",			   -1500,	 0,  1500, 1, slider_red_radial_converge_x },
+	{ "Red Convergence Y",			   -1500,	 0,  1500, 1, slider_red_radial_converge_y },
+	{ "Green Convergence X",			 -1500,	 0,  1500, 1, slider_green_radial_converge_x },
+	{ "Green Convergence Y",			 -1500,	 0,  1500, 1, slider_green_radial_converge_y },
+	{ "Blue Convergence X",			  -1500,	 0,  1500, 1, slider_blue_radial_converge_x },
+	{ "Blue Convergence Y",			  -1500,	 0,  1500, 1, slider_blue_radial_converge_y },
+	{ "Red Output from Red Input",		-400,	 0,   400, 5, slider_red_from_r },
+	{ "Red Output from Green Input",	  -400,	 0,   400, 5, slider_red_from_g },
+	{ "Red Output from Blue Input",	   -400,	 0,   400, 5, slider_red_from_b },
+	{ "Green Output from Red Input",	  -400,	 0,   400, 5, slider_green_from_r },
+	{ "Green Output from Green Input",	-400,	 0,   400, 5, slider_green_from_g },
+	{ "Green Output from Blue Input",	 -400,	 0,   400, 5, slider_green_from_b },
+	{ "Blue Output from Red Input",	   -400,	 0,   400, 5, slider_blue_from_r },
+	{ "Blue Output from Green Input",	 -400,	 0,   400, 5, slider_blue_from_g },
+	{ "Blue Output from Blue Input",	  -400,	 0,   400, 5, slider_blue_from_b },
+	{ "Saturation",						  0,   140,   400, 1, slider_saturation },
+	{ "Red DC Offset",					-100,	 0,   100, 1, slider_red_offset },
+	{ "Green DC Offset",				  -100,	 0,   100, 1, slider_green_offset },
+	{ "Blue DC Offset",				   -100,	 0,   100, 1, slider_blue_offset },
+	{ "Red Scale",						-200,	95,   200, 1, slider_red_scale },
+	{ "Green Scale",					  -200,	95,   200, 1, slider_green_scale },
+	{ "Blue Scale",					   -200,	95,   200, 1, slider_blue_scale },
+	{ "Red Gamma",						 -80,	16,	80, 1, slider_red_power },
+	{ "Green Gamma",					   -80,	16,	80, 1, slider_green_power },
+	{ "Blue Gamma",						-80,	16,	80, 1, slider_blue_power },
+	{ "Red Floor",						   0,	 5,   100, 1, slider_red_floor },
+	{ "Green Floor",						 0,	 5,   100, 1, slider_green_floor },
+	{ "Blue Floor",						  0,	 5,   100, 1, slider_blue_floor },
+	{ "Red Phosphor Life",				   0,	40,   100, 1, slider_red_phosphor_life },
+	{ "Green Phosphor Life",				 0,	40,   100, 1, slider_green_phosphor_life },
+	{ "Blue Phosphor Life",				  0,	40,   100, 1, slider_blue_phosphor_life },
+	{ "Vector Length Attenuation",		   0,	80,   100, 1, slider_vector_attenuation },
+	{ "Vector Attenuation Length Limit",	 1,   500,  1000, 1, slider_vector_length_max },
+	{ "Vector Bloom Scale",				  0,   300,  1000, 5, slider_vector_bloom_scale },
+	{ "Raster Bloom Scale",				  0,   225,  1000, 5, slider_raster_bloom_scale },
+	{ "Bloom Level 0 Scale",				 0,   100,   100, 1, slider_bloom_lvl0_scale },
+	{ "Bloom Level 1 Scale",				 0,	21,   100, 1, slider_bloom_lvl1_scale },
+	{ "Bloom Level 2 Scale",				 0,	19,   100, 1, slider_bloom_lvl2_scale },
+	{ "Bloom Level 3 Scale",				 0,	17,   100, 1, slider_bloom_lvl3_scale },
+	{ "Bloom Level 4 Scale",				 0,	15,   100, 1, slider_bloom_lvl4_scale },
+	{ "Bloom Level 5 Scale",				 0,	14,   100, 1, slider_bloom_lvl5_scale },
+	{ "Bloom Level 6 Scale",				 0,	13,   100, 1, slider_bloom_lvl6_scale },
+	{ "Bloom Level 7 Scale",				 0,	12,   100, 1, slider_bloom_lvl7_scale },
+	{ "Bloom Level 8 Scale",				 0,	11,   100, 1, slider_bloom_lvl8_scale },
+	{ "Bloom Level 9 Scale",				 0,	10,   100, 1, slider_bloom_lvl9_scale },
+	{ "Bloom Level 10 Scale",				0,	 9,   100, 1, slider_bloom_lvl10_scale },
 	{ NULL, 0, 0, 0, 0, NULL },
 };
 
@@ -2816,8 +2907,22 @@ void uniform::update()
 		}
 		case CU_TARGET_DIMS:
 		{
-			float rtsize[2] = { shadersys->curr_render_target->target_width, shadersys->curr_render_target->target_height };
-			m_shader->set_vector("TargetDims", 2, rtsize);
+			if (shadersys->curr_render_target == NULL)
+			{
+				float targetdims[2] = { 0.0f, 0.0f };
+				m_shader->set_vector("TargetDims", 2, targetdims);
+			}
+			else
+			{
+				float targetdims[2] = { shadersys->curr_render_target->target_width, shadersys->curr_render_target->target_height };
+				m_shader->set_vector("TargetDims", 2, targetdims);
+			}
+			break;
+		}
+		case CU_QUAD_DIMS:
+		{
+			float quaddims[2] = { shadersys->curr_poly->get_prim_width(), shadersys->curr_poly->get_prim_height() };
+			m_shader->set_vector("QuadDims", 2, quaddims);
 			break;
 		}
 

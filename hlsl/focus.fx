@@ -83,8 +83,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y = 1.0f - Output.Position.y; // flip y
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
-	
-	float2 TexCoord = Input.TexCoord + 0.5f / TargetDims;
+
+	float2 TexCoord = Input.TexCoord;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord0 = TexCoord;
 	Output.TexCoord1 = TexCoord + Coord1Offset * TargetTexelDims * Defocus;
@@ -117,7 +118,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	float3 blurred = (d0.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7) / 8.0f;
 	blurred = lerp(d0.rgb, blurred, 1.0f);
-	
+
 	return float4(blurred, d0.a);
 }
 

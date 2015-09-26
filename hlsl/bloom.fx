@@ -172,12 +172,32 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
+// Constants
+//-----------------------------------------------------------------------------
+
+static const float E = 2.7182817f;
+static const float Gelfond = 23.140692f; // e^pi (Gelfond constant)
+static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneider constant)
+
+//-----------------------------------------------------------------------------
+// Funcions
+//-----------------------------------------------------------------------------
+
+// www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
+float random(float2 seed)
+{
+	// irrationals for pseudo randomness
+	float2 i = float2(Gelfond, GelfondSchneider);
+
+	return frac(cos(dot(seed, i)) * 123456.0f);
+}
+
+//-----------------------------------------------------------------------------
 // Bloom Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-
-uniform float2 Prescale = float2(1.0f, 1.0f);
+uniform float2 TargetDims;
 
 uniform float4 Level01Size;
 uniform float4 Level23Size;
@@ -199,15 +219,16 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 
 	float2 TexCoord = Input.Position.xy / ScreenDims;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord01.xy = TexCoord.xy;
-	Output.TexCoord01.zw = TexCoord.xy + Prescale.xy / Level01Size.zw;
-	Output.TexCoord23 = TexCoord.xyxy + Prescale.xyxy / Level23Size;
-	Output.TexCoord45 = TexCoord.xyxy + Prescale.xyxy / Level45Size;
-	Output.TexCoord67 = TexCoord.xyxy + Prescale.xyxy / Level67Size;
-	Output.TexCoord89 = TexCoord.xyxy + Prescale.xyxy / Level89Size;
-	Output.TexCoordA = TexCoord.xy + Prescale.xy / LevelASize;
-	
+	Output.TexCoord01.zw = TexCoord.xy + 0.5f / Level01Size.zw;
+	Output.TexCoord23 = TexCoord.xyxy + 0.5f / Level23Size;
+	Output.TexCoord45 = TexCoord.xyxy + 0.5f / Level45Size;
+	Output.TexCoord67 = TexCoord.xyxy + 0.5f / Level67Size;
+	Output.TexCoord89 = TexCoord.xyxy + 0.5f / Level89Size;
+	Output.TexCoordA = TexCoord.xy + 0.5f / LevelASize;
+
 	return Output;
 }
 
@@ -218,6 +239,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 uniform float4 Level0123Weight;
 uniform float4 Level4567Weight;
 uniform float3 Level89AWeight;
+
+float3 GetNoiseFactor(float3 n, float random)
+{
+	// smaller n become more noisy
+	return 1.0f + random * max(0.0f, 0.25f * pow(E, -8 * n));
+}
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
@@ -245,19 +272,22 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	texel9 = texel9 * Level89AWeight.y;
 	texelA = texelA * Level89AWeight.z;
 
-	float4 sum = float4(
-		texel0 + 
-		texel1 + 
-		texel2 + 
-		texel3 + 
+	float3 bloom = float3(
+		texel1 +
+		texel2 +
+		texel3 +
 		texel4 +
-		texel5 + 
-		texel6 + 
-		texel7 + 
-		texel8 + 
-		texel9 + 
-		texelA, 1.0f);
-	return sum;
+		texel5 +
+		texel6 +
+		texel7 +
+		texel8 +
+		texel9 +
+		texelA);
+
+	float2 NoiseCoord = Input.TexCoord01.xy;
+	float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
+	
+	return float4(texel0 + bloom * NoiseFactor, 1.0f);
 }
 
 //-----------------------------------------------------------------------------

@@ -45,6 +45,7 @@ public:
 		CU_SOURCE_DIMS,
 		CU_SOURCE_RECT,
 		CU_TARGET_DIMS,
+		CU_QUAD_DIMS,
 
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
@@ -337,7 +338,11 @@ private:
 	int                     post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
 	int                     downsample_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     distortion_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     vector_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     vector_buffer_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	void                    menu_pass(poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 
@@ -400,6 +405,7 @@ private:
 	effect *                default_effect;             // pointer to the primary-effect object
 	effect *                prescale_effect;            // pointer to the prescale-effect object
 	effect *                post_effect;                // pointer to the post-effect object
+	effect *                distortion_effect;          // pointer to the distortion-effect object
 	effect *                focus_effect;               // pointer to the focus-effect object
 	effect *                phosphor_effect;            // pointer to the phosphor-effect object
 	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
@@ -413,6 +419,7 @@ private:
 
 	texture_info *          curr_texture;
 	render_target *         curr_render_target;
+	poly_info *             curr_poly;
 
 public:
 	render_target *         targethead;
