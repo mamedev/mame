@@ -171,7 +171,7 @@ READ8_MEMBER(a2600_state::a2600_get_databus_contents)
 	UINT8   last_byte, prev_byte;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	last_address = m_maincpu->pc() - 1;
+	last_address = m_maincpu->pc() + 1;
 	if ( ! ( last_address & 0x1080 ) )
 	{
 		return offset;
