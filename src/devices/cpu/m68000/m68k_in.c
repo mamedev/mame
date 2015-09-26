@@ -8171,7 +8171,7 @@ M68KMAKE_OP(pack, 16, mm, ax7)
 		ea_src = EA_AY_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -8188,7 +8188,7 @@ M68KMAKE_OP(pack, 16, mm, ay7)
 		ea_src = EA_A7_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -8204,7 +8204,7 @@ M68KMAKE_OP(pack, 16, mm, axy7)
 		ea_src = EA_A7_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -8221,7 +8221,7 @@ M68KMAKE_OP(pack, 16, mm, .)
 		ea_src = EA_AY_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10443,9 +10443,9 @@ M68KMAKE_OP(unpk, 16, mm, ax7)
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_A7_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_A7_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_A7_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10462,9 +10462,9 @@ M68KMAKE_OP(unpk, 16, mm, ay7)
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_AX_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_AX_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_AX_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10480,9 +10480,9 @@ M68KMAKE_OP(unpk, 16, mm, axy7)
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_A7_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_A7_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_A7_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10499,9 +10499,9 @@ M68KMAKE_OP(unpk, 16, mm, .)
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_AX_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_AX_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_AX_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);

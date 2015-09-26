@@ -26391,7 +26391,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm_ax7(m68000_base_device* mc68kcpu
 		ea_src = EA_AY_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -26408,7 +26408,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm_ay7(m68000_base_device* mc68kcpu
 		ea_src = EA_A7_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -26424,7 +26424,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm_axy7(m68000_base_device* mc68kcp
 		ea_src = EA_A7_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -26441,7 +26441,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm(m68000_base_device* mc68kcpu)
 		ea_src = EA_AY_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32656,9 +32656,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm_ax7(m68000_base_device* mc68kcpu
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_A7_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_A7_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_A7_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32675,9 +32675,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm_ay7(m68000_base_device* mc68kcpu
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_AX_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_AX_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_AX_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32693,9 +32693,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm_axy7(m68000_base_device* mc68kcp
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_A7_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_A7_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_A7_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32712,9 +32712,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm(m68000_base_device* mc68kcpu)
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_AX_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_AX_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_AX_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
