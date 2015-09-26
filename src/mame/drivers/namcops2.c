@@ -822,12 +822,13 @@ ROM_START( soulcl2w )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
 
+	// Guru says this disc works with any SC2x key
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-	ROM_LOAD( "scxx.ic002", 0x000000, 0x800000, NO_DUMP )   // no idea which dongle(s) this goes with, the SC2 sets are a huge mess now
-	ROM_LOAD( "scxx_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+	ROM_LOAD( "sc23vera.ic002", 0x000000, 0x800000, CRC(5c537182) SHA1(ff4213db24b1200b494e6c3bd3eb7b75789e4032) )
+	ROM_LOAD( "sc23vera_spr.ic002", 0x800000, 0x040000, CRC(8f548cbc) SHA1(81b844dc5873bb397cd4cd5aca101d7486d60385) )
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "sc21-dvd0b", 0, SHA1(883170f759b4d53c4031e00ff29bcd1a4d3fea97) )
+	DISK_IMAGE_READONLY( "sc21-dvd0b", 0, SHA1(2403a0dc6d21103957676ab2df410994c12588a3) )
 ROM_END
 
 ROM_START( soulclb3 )
@@ -851,6 +852,18 @@ ROM_START( soulclb3a )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "sc31001-na-dvd0-b", 0, SHA1(b46ee35083f8fcc091ce562951c55fbdbb929e4b) )
+ROM_END
+
+ROM_START( soulclb3b )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "sc31001-na-a.ic002", 0x000000, 0x800000, CRC(ddbe9774) SHA1(6bb2d31cb669336345b5508bcca56936ea97c04a) )
+	ROM_LOAD( "sc31001-na-a_spr.ic002", 0x800000, 0x040000, CRC(18c6f56d) SHA1(13bc6a3688985c0cd9900b063824a4af691a1b31) )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "sc31001-na-dvd0-a", 0, SHA1(2bb8669d094d470ddf99feecd4d2026bfd54f487) )
 ROM_END
 
 ROM_START( sukuinuf )
@@ -1009,6 +1022,19 @@ ROM_START( tekken51 )
 	DISK_IMAGE_READONLY( "te51-dvd0", 0, SHA1(2a0ac3723725572c1810b0ef4bcfa7aa114062f8) )
 ROM_END
 
+ROM_START( tekken51b )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+	// this key should work with Tekken 5 or 5.1 discs, according to Guru
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "te53verb.ic002", 0x000000, 0x800000, CRC(4d605636) SHA1(417b02d6c69f883920cd43a7278d0af183583c55) ) 
+	ROM_LOAD( "te53verb_spr.ic002", 0x800000, 0x040000, CRC(b7094978) SHA1(1e4903cd5f594c13dad2fd74666ba35c62550044) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "te51-dvd0", 0, SHA1(2a0ac3723725572c1810b0ef4bcfa7aa114062f8) )
+ROM_END
+
 ROM_START( tekken5d )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM256_BIOS
@@ -1093,6 +1119,18 @@ ROM_START( gundzaft )
 	DISK_IMAGE_READONLY( "sed1dvd0", 0, SHA1(0e6db61d94f66a4ddd7d4a3013983a838d256c5d) )
 ROM_END
 
+ROM_START( cobrata )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "cbr1verb.ic002", 0x000000, 0x800000, CRC(aecda462) SHA1(97c8e98c44d66231ee3f2527756d92dbc947b76d) ) 
+	ROM_LOAD( "cbr1verb_spr.ic002", 0x800000, 0x040000, CRC(65aaadcf) SHA1(5cc642f71bef3b5e44db5e999e8abccca7fdaa4c) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "cbr1-ha", 0, SHA1(a20d4ace91a2f2caab0804ebdf62c87ab267239b) )
+ROM_END
+
 ROM_START( rrvac )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
@@ -1126,6 +1164,24 @@ ROM_START( rrvac2 )
 	ROM_LOAD( "rrv3_str-0a.ic16", 0x000000, 0x080000, CRC(df8b6cac) SHA1(d45e150678218084925673e1d77edefc04135035) )
 
 	// is this the same disc as rrvac?
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "rrv1-a", 0, SHA1(77bb70407511cbb12ab999410e797dcaf0779229) )
+ROM_END
+
+ROM_START( rrvac1 )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "rrv1vera.ic002", 0x000000, 0x800000, CRC(e28bb0be) SHA1(9683ddc228e9aedd338cf2eb4d4373faeaea5b75) ) 
+	ROM_LOAD( "rrv1vera_spr.ic002", 0x800000, 0x040000, CRC(81c370b7) SHA1(7693c03b544c79fa3b6e536abb32ad34cf14dfbf) ) 
+
+	ROM_REGION(0x4010, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
+	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+
+	ROM_REGION(0x80000, "steering", 0)  // Steering I/O board MB90242A code (see namcos23.c for steering board details)
+	ROM_LOAD( "rrv3_str-0a.ic16", 0x000000, 0x080000, CRC(df8b6cac) SHA1(d45e150678218084925673e1d77edefc04135035) )
+
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "rrv1-a", 0, SHA1(77bb70407511cbb12ab999410e797dcaf0779229) )
 ROM_END
@@ -1277,6 +1333,7 @@ GAME(2001, vnight,     sys246, system246, system246, driver_device, 0, ROT0, "Se
 GAME(2001, bldyr3b,    sys246, system246, system246, driver_device, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", MACHINE_IS_SKELETON)
 GAME(2001, rrvac,      sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2001, rrvac2,      rrvac, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2001, rrvac1,      rrvac, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2001, wanganmd,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, dragchrn,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, netchu02,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", MACHINE_IS_SKELETON)
@@ -1284,7 +1341,7 @@ GAME(2002, scptour,    sys246, system246, system246, driver_device, 0, ROT0, "Na
 GAME(2002, soulclb2,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, soulcl2a, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, soulcl2b, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, soulcl2w, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC2? world version)", MACHINE_IS_SKELETON)
+GAME(2002, soulcl2w, soulclb2, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur II (SC23 world version)", MACHINE_IS_SKELETON)
 GAME(2002, tekken4,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", MACHINE_IS_SKELETON)
 GAME(2002, tekken4a,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, tekken4b,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", MACHINE_IS_SKELETON)
@@ -1297,9 +1354,11 @@ GAME(2004, fghtjam,    sys246, system246, system246, driver_device, 0, ROT0, "Ca
 GAME(2004, sukuinuf,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2004, zgundmdx,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2004, zoidsinf,   sys246, system246, system246, driver_device, 0, ROT0, "Tomy / Taito", "Zoids Infinity", MACHINE_IS_SKELETON)
+GAME(2005, cobrata,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Cobra: The Arcade (CBR1 Ver. B)", MACHINE_IS_SKELETON)
 GAME(2005, gundzaft,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2005, soulclb3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", MACHINE_IS_SKELETON)
-GAME(2005, soulclb3a,soulclb3, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3a,soulclb3, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3b,soulclb3, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-A disc)", MACHINE_IS_SKELETON)
 GAME(2005, taiko7,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 7 (TK71-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, taiko8,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, qgundam,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
@@ -1310,6 +1369,7 @@ GAME(2008, sbxc,       sys246, system246, system246, driver_device, 0, ROT0, "Ca
 // System 256
 GAME(2004, sys256,          0, system256, system246, driver_device, 0, ROT0, "Namco", "System 256 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
 GAME(2005, tekken51,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2005, tekken51b,tekken51, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5.1 (TE53 Ver. B)", MACHINE_IS_SKELETON)
 GAME(2005, tekken5d,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5 Dark Resurrection (TED1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2005, superdbz,   sys256, system256, system246, driver_device, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", MACHINE_IS_SKELETON)
 GAME(2006, kinniku,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", MACHINE_IS_SKELETON)
