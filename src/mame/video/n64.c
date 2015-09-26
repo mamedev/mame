@@ -212,11 +212,11 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 		return;
 	}
 
-	if (hres > 640) // Needed by Top Gear Overdrive (E)
-	{
-		invisiblewidth += (hres - 640);
-		hres = 640;
-	}
+	//if (hres > 640) // Needed by Top Gear Overdrive (E)
+	//{
+	//	invisiblewidth += (hres - 640);
+	//	hres = 640;
+	//}
 
 	if (vres > bitmap.height()) // makes Perfect Dark boot w/o crashing
 	{
@@ -241,7 +241,7 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 				d[i] = (r << 16) | (g << 8) | b;
 				pixels++;
 			}
-			pixels +=invisiblewidth;
+			pixels += invisiblewidth;
 		}
 	}
 }
@@ -268,11 +268,11 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 		return;
 	}
 
-	if (hres > 640) // Needed by Top Gear Overdrive (E)
-	{
-		invisiblewidth += (hres - 640);
-		hres = 640;
-	}
+	//if (hres > 640) // Needed by Top Gear Overdrive (E)
+	//{
+	//	invisiblewidth += (hres - 640);
+	//	hres = 640;
+	//}
 
 	if (frame_buffer32)
 	{

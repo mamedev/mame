@@ -1006,17 +1006,16 @@ void n64_periphs::vi_scanline_tick()
 // Video Interface
 void n64_periphs::vi_recalculate_resolution()
 {
-	//n64_state *state = machine().driver_data<n64_state>();
-
 	int x_start = (vi_hstart & 0x03ff0000) >> 16;
 	int x_end = vi_hstart & 0x000003ff;
-	int y_start = ((vi_vstart & 0x03ff0000) >> 16) / 2;
-	int y_end = (vi_vstart & 0x000003ff) / 2;
+	int y_start = ((vi_vstart & 0x03ff0000) >> 16) >> 1;
+	int y_end = (vi_vstart & 0x000003ff) >> 1;
 	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
 
 	rectangle visarea = m_screen->visible_area();
-	attoseconds_t period = m_screen->frame_period().attoseconds();
+	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
+	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC);
 
 	if (width == 0 || height == 0)
 	{
@@ -1041,8 +1040,6 @@ void n64_periphs::vi_recalculate_resolution()
 	if(vi_control & 0x40) /* Interlace */
 	{
 	}
-
-	//state->m_rdp->m_misc_state.m_fb_height = height;
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
@@ -1071,7 +1068,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = (m_screen->vpos() << 1) + 1;
+			ret = (m_screen->vpos() & 0x3FE); // << 1);
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1144,7 +1141,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
+			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr)); // >> 1));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
@@ -1157,10 +1154,12 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x18/4:        // VI_V_SYNC_REG
 			vi_vsync = data;
+			vi_recalculate_resolution();
 			break;
 
 		case 0x1c/4:        // VI_H_SYNC_REG
 			vi_hsync = data;
+			vi_recalculate_resolution();
 			break;
 
 		case 0x20/4:        // VI_LEAP_REG
