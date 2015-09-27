@@ -27,13 +27,13 @@ Games on System 246/256/S256 include.....
 Name from title screen                           System   Media ID            (HDD/CD/DVD)  Cart ID   Revision               Company/Year                  Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB
-Battle Gear 3 (Export).......................... XX34XXX *?                    HDD          NM00010  *?                      Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A
+Battle Gear 3 (Export).......................... XX34XXX *?                   *HDD          NM00010  *?                      Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A
 Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     |
 Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  Test mode shows 2.00E with same HDD 2.03J; HDD: Maxtor Fireball 3 30GB 2F030L0
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
 Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires 'FCA2 PCB' for IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
-Dragon Chronicles (satellite)................... ------X *DCO31-TS CD0         CD           NM00020   DC001 Ver.A            Namco 2002                    \
+Dragon Chronicles (satellite)................... ------X *DCO31-TS CD0        *CD           NM00020   DC001 Ver.A            Namco 2002                    \
 Dragon Chronicles Legend of the Master Ark (sat) ------X *DGC11 CD0           *CD          *NM00014  *DGC11 Ver.A1           Namco 200?                    | server is a custom PC
 Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    |
    "                                      ...... XXXX56X  DOL150-1-ST-DVD0-G   DVD          NM00028  *?                      Namco 2004                    |
@@ -45,10 +45,10 @@ Gundam vs Gundam Next........................... XXXX56X  GNX100-1-NA-HDD0-A   H
 Idol Master..................................... ------X *IDM1-HA             *HDD         *NM00022  *IDMS1 Ver.A            Namco 2004
 Kinnikuman Muscle Grand Prix.................... XXXX56X  KN1-B                DVD          NM00029   KN1 Ver.A              Banpresto 2006                #
 Kinnikuman Muscle Grand Prix 2.................. XXXX56X  KN2                  DVD          NM00040   KN2 Ver.A              Banpresto 2007                #
-Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0     DVD         *NM00036  *ZNT100-1-ST-A          Namco 2006
+Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0    *DVD         *NM00036  *ZNT100-1-ST-A          Namco 2006
 Mobile Suit Gundam - Gundam vs Gundam........... XXXX56X  GVS1 DVD0B           DVD          NM00043   GVS1 Ver.A             Bandai/Capcom 2008
 Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 12X456X  SED1 DVD0            DVD          NM00024   SED1 Ver.A             Banpresto 2005                % #
-M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 12X456X  GSD1 DVD0            DVD         ^NM00034   GSD1 Ver.A             Banpresto 2006                % #
+M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 12X456X  GSD1 DVD0            DVD          NM00034   GSD1 Ver.A             Banpresto 2006                % #
 Mobile Suit Z Gundam A.E.U.G. vs Titans......... 12X456X  ZGA1 DVD0            DVD          NM00013   ZGA1 Ver.A             Capcom/Banpresto 2003         %
 Mobile Suit Z Gundam DX A.E.U.G. vs Titans...... 12X456X  ZDX1 DVD0            DVD          NM00017   ZDX1 Ver.A             Capcom/Banpresto 2003         %
 Netchuu Pro Yakyuu 2002......................... X23XXXX  NPY1 CD0B            CD           NM00009   NPY Ver.B              Namco 2002
@@ -60,7 +60,7 @@ Ridge Racer V Arcade Battle..................... 1XXXXXX  RRV1-A               C
    "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV3 Ver.A             Namco 2001
 Sengoku Basara X Cross.......................... 12X456X  BAX1 DVD0            DVD          NM00042   BAX1 VER.A             Capcom/ARC System Works 2007  % #
 Smash Court Pro Tournament...................... ------X  SCP1 CD0             CD           NM00006   SCP1 Ver.A             Namco 2001
-Soul Calibur II................................. 12X456X *SC21 DVD0            DVD          NM00007   SC21 Ver.A             Namco 2002                    \
+Soul Calibur II................................. 12X456X *SC21 DVD0           *DVD          NM00007   SC21 Ver.A             Namco 2002                    \
    "            Rev. B.......................... 12X456X  SC21 DVD0B           DVD          NM00007   SC23 Ver.A             Namco 2002                    | # @ rev B DVD needs campaign memory card
    "            Rev. D.......................... 12X456X  SC21 DVD0D           DVD          NM00007   SC22 Ver.D             Namco 2002                    /     rev D will allow skipping it if not available
 Soul Calibur III Arcade Edition................. 12X456X  SC31001-NA-DVD0-A    DVD          NM00031   SC31001-NA-A           Namco 2005                    \
@@ -71,13 +71,13 @@ Taiko no Tatsujin 7............................. ------X  TK71 DVD0            D
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
 Taiko No Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
 Taiko No Tatsujin 10............................ XXXX56X  TK10100-1-NA-DVD0-A  DVD          NM00041   TK101001-NA-A          Namco 2007
-Taiko No Tatsujin 11............................ ------X *TK11100-1-NA-DVD0-A  DVD          NM00044  *TK111001-NA-A          Namco 2008
-Taiko No Tatsujin 12............................ ------X *TK12-HA              HDD          NM00051  *TK121001-NA-A          Namco 2008
-Taiko No Tatsujin 12 More....................... ------X *TK12200-1-NA-HDD-A   HDD          NM00051  *TK121001-NA-A          Namco 2008
-Taiko No Tatsujin 13............................ ------X *TK1301-NA-HDD0-A1    HDD          NM00056  *TK1301-NA-A            Namco 2009
-Taiko No Tatsujin 14............................ ------X *TK11100-1-NA-DVD0-A  DVD          NM00044  *TK111001-NA-A          Namco 2010
-Taiko No Tatsujin 14 More....................... ------X *TK11100-1-NA-DVD0-A  DVD          NM00044  *TK111001-NA-A          Namco 2010
-Technic Beat.................................... ------X *TNB1 DVD0            DVD         *NM000??  *TNB1 Ver.A             Arika 2002
+Taiko No Tatsujin 11............................ ------X *TK11100-1-NA-DVD0-A *DVD         *NM00044  *TK111001-NA-A          Namco 2008
+Taiko No Tatsujin 12............................ ------X *TK12-HA             *HDD         *NM00051  *TK121001-NA-A          Namco 2008
+Taiko No Tatsujin 12 More....................... ------X *TK12200-1-NA-HDD-A  *HDD         *NM00051  *TK121001-NA-A          Namco 2008
+Taiko No Tatsujin 13............................ ------X *TK1301-NA-HDD0-A1   *HDD         *NM00056  *TK1301-NA-A            Namco 2009
+Taiko No Tatsujin 14............................ ------X *T141001-NA-HDD0-A   *HDD         *NM00057  *TK141001-NA-A          Namco 2010
+Taiko No Tatsujin 14 More....................... ------X *T141002-NA-HDD0-A   *HDD         *NM00057  *TK141002-NA-A          Namco 2010
+Technic Beat.................................... ------X *TNB1 DVD0           *DVD         *NM000??  *TNB1 Ver.A             Arika 2002
 Tekken 4........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.A             Namco 2001                    \
    "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.C             Namco 2001                    |
    "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.D             Namco 2001                    | %
@@ -86,11 +86,11 @@ Tekken 4........................................ 1234XXX  TEF1 DVD0            D
    "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF3 Ver.C             Namco 2001                    /
 Tekken 5........................................ XXXX56X  TE51 DVD0            DVD          NM00019  *TE51 Ver.A             Namco 2004                    \
    "    ........................................ XXXX56X  TE51 DVD0B           DVD          NM00019   TE51 Ver.B             Namco 2004                    | @
-Tekken 5.1...................................... XXXX56X *TE52 DVD0            DVD          NM00019  *TE52 Ver.A             Namco 2005                    |
+Tekken 5.1...................................... XXXX56X *TE52 DVD0           *DVD          NM00019  *TE52 Ver.A             Namco 2005                    |
    "      ...................................... XXXX56X  TE52 DVD0B           DVD          NM00019   TE52 Ver.B             Namco 2005                    |
    "      ...................................... XXXX56X  TE52 DVD0B           DVD          NM00019   TE53 Ver.B             Namco 2005                    /
-Tekken 5 Dark Resurrection...................... XXXX56X  TED1 DVD0            DVD          NM00034   TED1 VER.A             Namco 2005
-   "                      ...................... XXXX56X  TED1 DVD0B           DVD          NM00034  *TED2 VER.A             Namco 2005
+Tekken 5 Dark Resurrection...................... XXXX56X  TED1 DVD0            DVD          NM00026   TED1 VER.A             Namco 2005
+   "                      ...................... XXXX56X  TED1 DVD0B           DVD          NM00026  *TED2 VER.A             Namco 2005
 The Battle of Yu Yu Hakusho Dark Tournament..... ------X  YH1                  DVD          NM00035   YH1 Ver.A              Banpresto 2006
 Time Crisis 3................................... 1234XXX  TST1 DVD0            DVD          NM00012   TST1 Ver.A             Namco 2002                    \ Uses 'V185 I/O PCB' for light guns
    "         ................................... 1234XXX  TST1 DVD0            DVD          NM00012   TST2 Ver.A             Namco 2002                    | or 'V221 MIU PCB' for CCD camera guns
@@ -100,14 +100,25 @@ Vampire Night................................... 1234XXX  VPN1 CD0             C
 Wangan Midnight................................. 1XXXXXX  WMN1-A               CD           NM00008   WMN1 Ver.A             Namco 2001
    "           ................................. 1XXXXXX  WMN1-A               CD           NM00008  *WMN2 Ver.A             Namco 2001
    "           ................................. 1XXXXXX  WMN1-A               CD           NM00008  *WMN2 Ver.B             Namco 2001
-Wangan Midnight R............................... 1XXXXXX  WMR1-A               CD           NM000??   WMR1 Ver.A             Namco 2002
+Wangan Midnight R............................... 1XXXXXX  WMR1-A               CD           NM00005   WMR1 Ver.A             Namco 2002
 Zoids Infinity.................................. ------X  M9006212A Ver.2.02J  HDD (40GB)   NM00016   B3900076A              Taito 2004                    HDD: Maxtor Fireball 3 40GB 2F040L0
 Zoids Infinity Ex............................... ------X *?                   *HDD          NM00025  *B3900098B              Taito 2005
 Zoids Infinity Ex Plus.......................... ------X  M9006907A Ver.2.10J  HDD (20GB)   NM00025   B3900107A              Taito 2006                    HDD: Seagate ST320014A
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 * - denotes these items are NOT dumped
-^ - uses same NM cart number as Tekken 5 Dark Resurrection
 ? - unknown info
+
+Unused NM000xx numbers:
+NM00039 ?
+NM00045 ?
+NM00046 ?
+NM00047 ?
+NM00049 ?
+NM00050 ?
+NM00052 ?
+NM00053 ?
+NM00054 ?
+NM00055 ?
 
 Note about System:
 This is a general guideline flag showing compatibility between the different revisions of System 246 hardware.
@@ -126,7 +137,7 @@ somewhere in the boot process or nothing loads after the initial booting.
 The DVD drive used for these tests was a Toshiba/Samsung SD-M1802. In the case where the original drive didn't work 
 (i.e. factory drive was a CDROM and the disc was a DVD), this drive was substituted.
 Finally, all games were tested with the SD-M1802 and worked, therefore no game requires a specific make and model of 
-optical drive. But of course not all drive models will work.
+optical drive to BOOT. But of course not all drive models will work or work for extended periods. YMMV.
 These makes and models have been tested and worked.....
 H-L Data Storage LG GSA-4164B Super Multi DVD Drive (September 2005)
 H-L Data Storage LG GSA-4082B Super Multi DVD Drive (February 2004)
