@@ -693,6 +693,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"bnpo",
 		"bondwell",
 		"booth",
+		"BYTE",
 		"camputers",
 		"canon",
 		"cantab",
@@ -1224,6 +1225,11 @@ files {
 createMESSProjects(_target, _subtarget, "booth")
 files {
 	MAME_DIR .. "src/mess/drivers/apexc.c",
+}
+
+createMESSProjects(_target, _subtarget, "BYTE")
+files {
+	MAME_DIR .. "src/mess/drivers/zapcomputer.c",
 }
 
 createMESSProjects(_target, _subtarget, "camputers")
