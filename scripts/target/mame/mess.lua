@@ -2733,6 +2733,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/xor100.c",
 	MAME_DIR .. "src/mess/drivers/xavix.c",
 	MAME_DIR .. "src/mess/drivers/zorba.c",
+	MAME_DIR .. "src/mess/drivers/squale.c",
 }
 
 end
