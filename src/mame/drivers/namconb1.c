@@ -1209,8 +1209,9 @@ ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's 
 	ROM_LOAD32_WORD( "nr3_spr0.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) ) // == gn2_mprlb.15b
 	ROM_LOAD32_WORD( "nr2_spr0.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) ) // == gn2_mprub.12b
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) */
-	ROM_LOAD( "nr1_spr0.5b", 0, 0x80000, CRC(a0bde3fb) SHA1(b5fac1d0339b1df6b8880fcd7aa2725a774765a4) ) /* same data as gn1_spr0.5b (CRC32 = 0x6836ba38) repeated 4 time */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
+//  ROM_LOAD( "nr1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_LOAD( "nr1_spr0.5b", 0, 0x80000, CRC(a0bde3fb) SHA1(b5fac1d0339b1df6b8880fcd7aa2725a774765a4) ) /* 4Megabit, same data at 0x00000-0x1ffff repeated 4 time */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "nr4_spr0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) ) // == gn1-voi0.5j
@@ -1963,7 +1964,7 @@ ROM_END
 GAME( 1994, nebulray, 0,        namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_IMPERFECT_SOUND )
 GAME( 1994, nebulrayj,nebulray, namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_IMPERFECT_SOUND )
 GAME( 1994, ptblank,  0,        namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, ptblanka,  0,       namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1994, ptblanka, ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_IMPERFECT_SOUND )
 GAME( 1994, gunbuletj,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_IMPERFECT_SOUND )
 GAME( 1994, gunbuletw,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, gslugrsj, 0,        namconb1, nbsports, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_IMPERFECT_SOUND )
