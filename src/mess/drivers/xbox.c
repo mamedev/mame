@@ -16,6 +16,7 @@
 #include "machine/pit8253.h"
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
+#include "machine/atapicdr.h"
 #include "video/poly.h"
 #include "bitmap.h"
 #include "debug/debugcon.h"
@@ -123,7 +124,9 @@ INPUT_PORTS_END
 void xbox_state::hack_eeprom()
 {
 	// 8004e5da,4e5da=0xc3
-	m_maincpu->space(0).write_byte(0x4e5da, 0xc3);
+	m_maincpu->space(0).write_byte(0x4e5da, 0xc3); // remove audio wait
+	// 8006e654,6e654=0
+	m_maincpu->space(0).write_byte(0x6e654, 0); // disable boot animation
 }
 
 /*static const struct {
@@ -172,12 +175,35 @@ void xbox_state::machine_start()
 
 void xbox_state::machine_reset()
 {
+	ata_mass_storage_device *devh;
+	atapi_cdrom_device *devc;
+	UINT16 *id;
+
+	// set some neede parameters
+	devh = machine().device<ata_mass_storage_device>("ide:0:hdd");
+	id = devh->identify_device_buffer();
+	id[88] |= (1 << 2); // ultra dma mode 2 supported
+	id[128] |= 2; // bits 2-1=01 drive already unlocked
+	devc = machine().device<atapi_cdrom_device>("ide:1:cdrom");
+	id = devc->identify_device_buffer();
+	id[64] |= (1 << 1);
+	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
+
+SLOT_INTERFACE_START(xbox_ata_devices)
+SLOT_INTERFACE("hdd", IDE_HARDDISK)
+SLOT_INTERFACE("cdrom", ATAPI_CDROM)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
+
+	MCFG_DEVICE_MODIFY("ide:0")
+	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
+	MCFG_DEVICE_MODIFY("ide:1")
+	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
