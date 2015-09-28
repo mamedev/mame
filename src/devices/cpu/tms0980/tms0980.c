@@ -1300,6 +1300,15 @@ void tms1xxx_cpu_device::op_sbl()
 }
 
 
+// TMS1980-specific
+
+void tms1980_cpu_device::op_tdo()
+{
+	// TDO: transfer accumulator and status(not status_latch!) to O-output
+	write_o_output(m_status << 4 | m_a);
+}
+
+
 // TMS0270-specific
 
 void tms0270_cpu_device::op_setr()

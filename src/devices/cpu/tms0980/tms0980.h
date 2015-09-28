@@ -418,8 +418,7 @@ protected:
 	virtual UINT8 read_k_input() { return tms1xxx_cpu_device::read_k_input(); }
 
 	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); }
-	virtual void op_rstr() { tms1xxx_cpu_device::op_rstr(); }
-	virtual void op_tdo() { tms1xxx_cpu_device::op_tdo(); }
+	virtual void op_tdo();
 };
 
 
