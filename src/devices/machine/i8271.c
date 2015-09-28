@@ -6,7 +6,7 @@
 const device_type I8271 = &device_creator<i8271_device>;
 
 i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271n", __FILE__),
+	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__),
 	intrq_cb(*this),
 	drq_cb(*this),
 	hdl_cb(*this),
@@ -474,7 +474,7 @@ void i8271_device::live_run(attotime limit)
 				}
 				if(cur_live.data_reg != 0xff)
 				{
-					switch(command[4] & 0xc0) {
+					switch(command[4] >> 6) {
 					case 0:
 						if(cur_live.data_reg != data)
 							scan_match = false;
