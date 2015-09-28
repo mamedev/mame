@@ -1458,7 +1458,7 @@ static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
+	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrkougar, scramble )

@@ -42,7 +42,8 @@ public:
 			m_attributesram(*this,"attributesram"),
 			m_bulletsram(*this,"bulletsram"),
 			m_rockclim_videoram(*this,"rockclim_vram"),
-			m_racknrol_tiles_bank(*this,"racknrol_tbank")
+			m_racknrol_tiles_bank(*this,"racknrol_tbank"),
+			m_leftclip(2)
 	{
 	}
 
@@ -75,6 +76,7 @@ public:
 	UINT8 m_color_mask;
 	tilemap_t *m_dambustr_tilemap2;
 	UINT8 *m_dambustr_videoram2;
+	int m_leftclip;
 
 	void (galaxold_state::*m_modify_charcode)(UINT16 *code, UINT8 x);     /* function to call to do character banking */
 	void (galaxold_state::*m_modify_spritecode)(UINT8 *spriteram, int*, int*, int*, int); /* function to call to do sprite banking */
@@ -189,6 +191,7 @@ public:
 	DECLARE_VIDEO_START(batman2);
 	DECLARE_VIDEO_START(mooncrst);
 	DECLARE_VIDEO_START(scrambold);
+	DECLARE_VIDEO_START(newsin7);
 	DECLARE_VIDEO_START(pisces);
 	DECLARE_VIDEO_START(dkongjrm);
 	DECLARE_VIDEO_START(rockclim);
