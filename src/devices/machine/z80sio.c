@@ -60,6 +60,14 @@
 #define logerror printf
 #endif
 
+#ifdef _MSC_VER
+#define LLFORMAT "%I64%"
+#define FUNCNAME __func__
+#else
+#define LLFORMAT "%lld"
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
 
@@ -161,6 +169,7 @@ z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, dev
 
 void z80sio_device::device_start()
 {
+        LOG(("%s\n", FUNCNAME));
 	// resolve callbacks
 	m_out_txda_cb.resolve_safe();
 	m_out_dtra_cb.resolve_safe();
@@ -197,7 +206,7 @@ void z80sio_device::device_start()
 
 void z80sio_device::device_reset()
 {
-	LOG(("Z80SIO \"%s\" Reset\n", tag()));
+	LOG(("%s \"%s\" \n", FUNCNAME, tag()));
 
 	m_chanA->reset();
 	m_chanB->reset();
@@ -429,7 +438,7 @@ WRITE8_MEMBER( z80sio_device::cd_ba_w )
 	int cd = BIT(offset, 1);
 	z80sio_channel *channel = ba ? m_chanB : m_chanA;
 
-        //        LOG(("z80sio_device::cd_ba_w ba:%02x cd:%02x\n", ba, cd));
+        LOG(("z80sio_device::cd_ba_w ba:%02x cd:%02x\n", ba, cd));
 
 	if (cd)
 		channel->control_write(data);
@@ -517,8 +526,8 @@ z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, d
 
 void z80sio_channel::device_start()
 {
+        LOG(("%s\n",FUNCNAME));
 	m_uart = downcast<z80sio_device *>(owner());
-        LOG(("Z80SIO device_start m_uart:%p\n", m_uart));
 	m_index = m_uart->get_channel_index(this);
 
 	// state saving
@@ -559,6 +568,7 @@ void z80sio_channel::device_start()
 
 void z80sio_channel::device_reset()
 {
+        LOG(("%s\n", FUNCNAME));
 	receive_register_reset();
 	transmit_register_reset();
 
@@ -881,7 +891,7 @@ void z80sio_channel::do_sioreg_wr0_resets(UINT8 data)
                 LOG(("Z80SIO \"%s\" Channel %c : CRC_RESET_TX_UNDERRUN - not implemented\n", m_owner->tag(), 'A' + m_index));
                 break;
         default: /* Will not happen unless someone messes with the mask */
-                logerror("Z80SIO \"%s\" Channel %c : %s Wrong CRC reset/init command:%02x\n", m_owner->tag(), 'A' + m_index, __func__, data & WR0_CRC_RESET_CODE_MASK);
+                logerror("Z80SIO \"%s\" Channel %c : %s Wrong CRC reset/init command:%02x\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data & WR0_CRC_RESET_CODE_MASK);
         }
 }
 void z80sio_channel::do_sioreg_wr0(UINT8 data)
