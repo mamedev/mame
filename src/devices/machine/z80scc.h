@@ -169,6 +169,8 @@ public:
 	void data_write(UINT8 data);
 
 	void receive_data(UINT8 data);
+	void m_rx_fifo_rp_step();
+        UINT8 m_rx_fifo_rp_data();
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
@@ -227,9 +229,9 @@ protected:
 	enum
 	{
 		INT_TRANSMIT = 0,
-		INT_EXTERNAL,
-		INT_RECEIVE,
-		INT_SPECIAL
+		INT_EXTERNAL = 1,
+		INT_RECEIVE  = 2,
+                INT_SPECIAL  = 3
 	};
 
         // Read registers
@@ -339,7 +341,7 @@ protected:
 		WR0_Z_COMMAND_MASK          = 0x38, // COMMANDS
 		WR0_Z_NULL_1                = 0x00, // 0 0 0
 		WR0_Z_NULL_2                = 0x08, // 0 0 1 
-                WR0_Z_RESET_EXT_STATUS      = 0x10, // 0 1 0
+                WR0_Z_RESET_EXT_STATUS      = 0x10, // 0 1 0 
 		WR0_Z_SEND_ABORT            = 0x18, // 0 1 1
 		WR0_Z_ENABLE_INT_NEXT_RX    = 0x20, // 1 0 0
 		WR0_Z_RESET_TX_INT          = 0x28, // 1 0 1
@@ -354,7 +356,7 @@ protected:
 	{
 		WR1_EXT_INT_ENABLE        = 0x01,
 		WR1_TX_INT_ENABLE         = 0x02,
-		WR1_STATUS_VECTOR         = 0x04,
+		WR1_PARITY_IS_SPEC_COND   = 0x04,
 		WR1_RX_INT_MODE_MASK      = 0x18,
 		WR1_RX_INT_DISABLE        = 0x00,
 		WR1_RX_INT_FIRST          = 0x08,
@@ -363,23 +365,6 @@ protected:
 		WR1_WRDY_ON_RX_TX         = 0x20, // not supported
 		WR1_WRDY_FUNCTION         = 0x40, // not supported
 		WR1_WRDY_ENABLE           = 0x80  // not supported
-	};
-
-	enum
-	{
-		WR2_DATA_XFER_INT         = 0x00, // not supported
-		WR2_DATA_XFER_DMA_INT     = 0x01, // not supported
-		WR2_DATA_XFER_DMA         = 0x02, // not supported
-		WR2_DATA_XFER_ILLEGAL     = 0x03, // not supported
-		WR2_DATA_XFER_MASK        = 0x03, // not supported
-		WR2_PRIORITY              = 0x04, // not supported
-		WR2_MODE_8085_1           = 0x00, // not supported
-		WR2_MODE_8085_2           = 0x08, // not supported
-		WR2_MODE_8086_8088        = 0x10, // not supported
-		WR2_MODE_ILLEGAL          = 0x18, // not supported
-		WR2_MODE_MASK             = 0x18, // not supported
-		WR2_VECTORED_INT          = 0x20, // not supported
-		WR2_PIN10_SYNDETB_RTSB    = 0x80  // not supported
 	};
 
 	enum
@@ -493,10 +478,13 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	UINT8 m_rx_data_fifo[3];    // receive data FIFO
-	UINT8 m_rx_error_fifo[3];   // receive error FIFO
+	UINT8 m_rx_data_fifo[8];    // receive data FIFO
+	UINT8 m_rx_error_fifo[8];   // receive error FIFO
 	UINT8 m_rx_error;           // current receive error
-	int m_rx_fifo;              // receive FIFO pointer
+	//int m_rx_fifo             // receive FIFO pointer
+        int m_rx_fifo_rp;           // receive FIFO read pointer
+	int m_rx_fifo_wp;           // receive FIFO write pointer
+	int m_rx_fifo_sz;           // receive FIFO size
 
 	int m_rx_clock;             // receive clock pulse count
 	int m_rx_first;             // first character received
@@ -612,6 +600,7 @@ protected:
 	// internal interrupt management
 	void check_interrupts();
 	void reset_interrupts();
+	UINT8 modify_vector(UINT8 vect, int i, UINT8 src);
 	void trigger_interrupt(int index, int state);
 	int get_channel_index(z80scc_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
@@ -670,7 +659,7 @@ protected:
 	devcb_write_line    m_out_rxdrqb_cb;
 	devcb_write_line    m_out_txdrqb_cb;
 
-	int m_int_state[8];     // interrupt state
+	int m_int_state[6];     // interrupt state
 
 	int m_variant;
 };

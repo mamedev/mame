@@ -45,7 +45,7 @@
  *   \==|||     |     | |    | |    |  |74|     4 x       | 3 PALs   |145|  
  *      |||     |SCC  | |    | |    |  |804     74245     |  CS3-00  |___|  
  * FPI   ||     |seria| |U12 | |U23 |  |  |               |  CS2-00  |   |  
- * paralell     |Z8530| |HBUG| |HBUG|  |  |               |  CS1-00  |   |___
+ * paralell     |Z8530A |HBUG| |HBUG|  |  |               |  CS1-00  |   |___
  * port  ||     |     | |    | |    |  ---_---------------|__________|  _|   |
  *       ||     |     | |    | |    | |MTTLDL|MDLDM| 2 x |___________  | |   |
  *      |||     |     | |____|_|____|_|____40|TTL75|74280|          |  | |   |
@@ -80,6 +80,11 @@
  * http://www.nytimes.com/1992/01/07/business/company-news-briefs.html
  * http://bitsavers.informatik.uni-stuttgart.de/pdf/heurikon/brochures/HK68_V10_Brochure.pdf
  * http://bitsavers.informatik.uni-stuttgart.de/pdf/heurikon/Heurikon_UNIX_System_V_and_V.2_Reference_Guide_Apr87.pdf
+ * From http://www.iri.tudelft.nl/~sfwww/manuals/OS9/PDF/9OM_30.pdf:
+ * "In most cases, you will only need to change the device base address.  Some hardware implementations of the MC68451
+ *  (specifically the Heurikon M10/V10 CPU's) use the DMA portion of the Address Space Table (AST) instead of the MPU
+ *  section which is normally used.  You should change the offsets for the AST registers to match your hardware.   The
+ *  ssmdefs.a file has conditional directives to accommodate either the standard or Heurikon style implementations."
  *
  * Address Map from the UNIX Ref Guide
  * --------------------------------------------------------------------------
@@ -156,6 +161,7 @@
  *  - ADD SCSI controller device
  *  - dump PALs and describe descrete logic
  *  - Setup BAUD generation correctly, (eg find that x32 divider)
+ *     it is a multilayer PCB so very hard to trace.
  *  - Add LED:s
  *  - Add Jumpers and strap areas
  *  - Find and Boot Heurikon Unix from a SCSI device
@@ -169,13 +175,27 @@
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
-#define LOG(x) /* x */
+#define VERBOSE 0
+
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+#if VERBOSE == 2
+#define logerror printf
+#endif
+
+#ifdef _MSC_VER
+#define LLFORMAT "%I64%"
+#define FUNCNAME __func__
+#else
+#define LLFORMAT "%lld"
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
 /*
  */
-#define SCC_CLOCK (BAUDGEN_CLOCK / 128) /* This will give prompt */
-//#define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* This is correct */
+#define SCC_CLOCK (BAUDGEN_CLOCK / 128) /* This gives prompt at the RS232 terminal device (9600) */
+//#define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* This is correct giving 4.9152MHz as documentation says */
 class hk68v10_state : public driver_device
 {
 public:
@@ -231,7 +251,7 @@ INPUT_PORTS_END
 /* Start it up */
 void hk68v10_state::machine_start ()
 {
-        LOG (logerror ("machine_start\n"));
+        LOG ((LLFORMAT " %s\n", m_maincpu->total_cycles(), FUNCNAME));
 
         /* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
@@ -245,7 +265,7 @@ void hk68v10_state::machine_start ()
 */
 void hk68v10_state::machine_reset ()
 {
-        LOG (logerror ("machine_reset\n"));
+        LOG ((LLFORMAT " %s\n", m_maincpu->total_cycles(), FUNCNAME));
 
         /* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
         if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
@@ -260,12 +280,12 @@ void hk68v10_state::machine_reset ()
   FC002E: move.l  #$0, $4.l # There is for sure some hardware mapping going in here
 */
 READ16_MEMBER (hk68v10_state::bootvect_r){
-        //LOG (logerror ("bootvect_r %s\n", m_sysrom != &m_sysram[0] ? "as reset" : "as swapped"));
-        return m_sysrom [offset];
+        //LOG (("bootvect_r %s\n", m_sysrom != &m_sysram[0] ? "as reset" : "as swapped"));
+        return m_sysrom[offset];
 }
 
 WRITE16_MEMBER (hk68v10_state::bootvect_w){
-        LOG (logerror("bootvect_w offset %08x, mask %08x, data %04x\n", offset, mem_mask, data));
+        LOG (("bootvect_w offset %08x, mask %08x, data %04x\n", offset, mem_mask, data));
         m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
         m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
         m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset. 
@@ -274,21 +294,21 @@ WRITE16_MEMBER (hk68v10_state::bootvect_w){
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (hk68v10_state::vme_a24_r){
-        LOG (logerror ("vme_a24_r\n"));
+        LOG (("vme_a24_r\n"));
         return (UINT16) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a24_w){
-        LOG (logerror ("vme_a24_w\n"));
+        LOG (("vme_a24_w\n"));
 }
 
 READ16_MEMBER (hk68v10_state::vme_a16_r){
-        LOG (logerror ("vme_16_r\n"));
+        LOG (("vme_16_r\n"));
         return (UINT16) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a16_w){
-        LOG (logerror ("vme_a16_w\n"));
+        LOG (("vme_a16_w\n"));
 }
 #endif
 

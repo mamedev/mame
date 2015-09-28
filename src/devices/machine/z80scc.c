@@ -84,6 +84,14 @@ TODO:
 #define logerror printf
 #endif
 
+#ifdef _MSC_VER
+#define LLFORMAT "%I64%"
+#define FUNCNAME __func__
+#else
+#define LLFORMAT "%lld"
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
 
@@ -149,7 +157,7 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 		m_out_txdrqb_cb(*this),
 		m_variant(variant)
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 6; i++)
 		m_int_state[i] = 0;
 }
 
@@ -179,7 +187,7 @@ z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, dev
         m_out_txdrqb_cb(*this),
         m_variant(TYPE_Z80SCC)
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 6; i++)
 		m_int_state[i] = 0;
 }
 
@@ -213,6 +221,7 @@ scc8523L_device::scc8523L_device(const machine_config &mconfig, const char *tag,
 
 void z80scc_device::device_start()
 {
+        LOG(("%s\n", FUNCNAME));
 	// resolve callbacks
 	m_out_txda_cb.resolve_safe();
 	m_out_dtra_cb.resolve_safe();
@@ -249,12 +258,17 @@ void z80scc_device::device_start()
 
 void z80scc_device::device_reset()
 {
-	LOG(("Z80SCC \"%s\" Reset\n", tag()));
+        LOG(("%s %s \n",FUNCNAME, tag()));
 
 	m_chanA->reset();
 	m_chanB->reset();
 }
 
+/* 
+ * Interrupts
+Each of the SCC’s two channels contain three sources of interrupts, making a total of six interrupt
+sources. These three sources of interrupts are: 1) Receiver, 2) Transmitter, and 3) External/Status
+conditions. In addition, there are several conditions that may cause these interrupts.*/
 //-------------------------------------------------
 //  z80daisy_irq_state - get interrupt status
 //-------------------------------------------------
@@ -269,7 +283,7 @@ int z80scc_device::z80daisy_irq_state()
              m_int_state[4], m_int_state[5], m_int_state[6], m_int_state[7]));
 
 	// loop over all interrupt sources
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 6; i++)
 	{
 		// if we're servicing a request, don't indicate more interrupts
 		if (m_int_state[i] & Z80_DAISY_IEO)
@@ -297,7 +311,7 @@ int z80scc_device::z80daisy_irq_ack()
 	LOG(("Z80SCC \"%s\" Interrupt Acknowledge\n", tag()));
 
 	// loop over all interrupt sources
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 6; i++)
 	{
 		// find the first channel with an interrupt requested
 		if (m_int_state[i] & Z80_DAISY_INT)
@@ -330,7 +344,7 @@ void z80scc_device::z80daisy_irq_reti()
 	LOG(("Z80SCC \"%s\" Return from Interrupt\n", tag()));
 
 	// loop over all interrupt sources
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 6; i++)
 	{
 		// find the first channel with an IEO pending
 		if (m_int_state[i] & Z80_DAISY_IEO)
@@ -352,8 +366,8 @@ void z80scc_device::z80daisy_irq_reti()
 
 void z80scc_device::check_interrupts()
 {
-        LOG(("Z80SCC \"%s\" : check_interrupts\n", m_owner->tag()));
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
+        LOG(("Z80SCC \"%s\" : %s() state = %d\n", m_owner->tag(), __func__, state));
 	m_out_int_cb(state);
 }
 
@@ -364,85 +378,135 @@ void z80scc_device::check_interrupts()
 
 void z80scc_device::reset_interrupts()
 {
-	for (int i = 0; i < 8; i++)
+        // reset internal interrupi sources
+	for (int i = 0; i < 6; i++)
 	{
 		m_int_state[i] = 0;
 	}
 
+        // check external interrupt sources
 	check_interrupts();
+}
+
+UINT8 z80scc_device::modify_vector(UINT8 vec, int i, UINT8 src)
+{
+        /*
+          Interrupt Vector Modification
+          V3 V2 V1 Status High/Status Low =0
+          V4 V5 V6 Status High/Status Low =1
+          0  0  0 Ch B Transmit Buffer Empty
+          0  0  1 Ch B External/Status Change
+          0  1  0 Ch B Receive Char. Available
+          0  1  1 Ch B Special Receive Condition
+          1  0  0 Ch A Transmit Buffer Empty
+          1  0  1 Ch A External/Status Change
+          1  1  0 Ch A Receive Char. Available
+          1  1  1 Ch A Special Receive Condition
+        */
+        // Add channel offset according to table above
+        src |= (i == CHANNEL_A  ? 0x04 : 0x00 );
+        
+        // Modify vector according to Hi/lo bit of WR9
+        if (m_chanA->m_wr9 & z80scc_channel::WR9_BIT_SHSL) // Affect V4-V6
+        {
+                vec |= src << 4;
+        }
+        else                      // Affect V1-V3
+        {
+                vec |= src << 1;
+        }
+        return vec;
 }
 
 
 //-------------------------------------------------
 //  trigger_interrupt -
 //-------------------------------------------------
-
 void z80scc_device::trigger_interrupt(int index, int state)
 {
-#if 0 // TODO: SIO code Needs to be adapted for SCC
 	UINT8 vector = m_chanB->m_wr2;
+        UINT8 source = 0;
 	int priority;
+ 
+        int prio_level = 0;
 
-	if((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
-	{
-		int prio_level = 0;
-		switch(state)
-		{
-			case z80scc_channel::INT_TRANSMIT:
-				prio_level = 1;
-				break;
-			case z80scc_channel::INT_RECEIVE:
-			case z80scc_channel::INT_SPECIAL:
-				prio_level = 0;
-				break;
-			case z80scc_channel::INT_EXTERNAL:
-				prio_level = 2;
-				break;
-		}
+        /* The Master Interrupt Enable (MIE) bit, WR9 D3, must be set to enable the SCC to generate interrupts.*/
+        if (!(m_chanA->m_wr9 & z80scc_channel::WR9_BIT_MIE))
+        {
+                LOG(("Master Interrupt Enable is not set, blocking attempt to interrupt\n"));
+                return;
+        }
 
-		if(m_chanA->m_wr2 & z80scc_channel::WR2_PRIORITY)
-		{
-			priority = (prio_level * 2) + index;
-		}
-		else
-		{
-			priority = (prio_level == 2) ? index + 4 : ((index * 2) + prio_level);
-		}
-		if (m_chanB->m_wr1 & z80scc_channel::WR1_STATUS_VECTOR)
-		{
-			vector = (!index << 2) | state;
-			if((m_chanA->m_wr1 & 0x18) == z80scc_channel::WR2_MODE_8086_8088)
-			{
-				vector = (m_chanB->m_wr2 & 0xf8) | vector;
-			}
-			else
-			{
-				vector = (m_chanB->m_wr2 & 0xe3) | (vector << 2);
-			}
-		}
-	}
-	else
+        switch(state)
 	{
-		priority = (index << 2) | state;
-		if (m_chanB->m_wr1 & z80scc_channel::WR1_STATUS_VECTOR)
-		{
-			// status affects vector
-			vector = (m_chanB->m_wr2 & 0xf1) | (!index << 3) | (state << 1);
-		}
-//	}
+        case z80scc_channel::INT_RECEIVE:
+                /*The sources of receive interrupts consist of Receive Character Available and Special Receive Condition.
+                  The Special Receive Condition can be subdivided into Receive Overrun, Framing Error (Asynchronous) or 
+                  End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming*/
+                source = 2;
+                prio_level = 2;
+                break;
+        case z80scc_channel::INT_TRANSMIT:
+                /*The NMOS/CMOS version of the SCC only has a one byte deep transmit buffer. The status of the
+                  transmit buffer can be determined through TBE bit in RR0, bit D2, which shows whether the
+                  transmit buffer is empty or not. After a hardware reset (including a hardware reset by software), or
+                  a channel reset, this bit is set to 1.
+                  While transmit interrupts are enabled, the NMOS/CMOS version sets the Transmit Interrupt Pending
+                  (TxIP) bit whenever the transmit buffer becomes empty. This means that the transmit buffer
+                  must be full before the TxIP can be set. Thus, when transmit interrupts are first enabled, the TxIP
+                  will not be set until after the first character is written to the NMOS/CMOS.*/
+                source = 0;
+                prio_level = 1;
+                break;
+        case z80scc_channel::INT_SPECIAL:
+                /*This mode allows the receiver to interrupt only on
+                  characters with a special receive condition. When an interrupt occurs, the data containing the error
+                  is held in the Receive FIFO until an Error Reset command is issued. When using this mode in conjunction
+                  with a DMA, the DMA is initialized and enabled before any characters have been
+                  received by the ESCC. This eliminates the time-critical section of code required in the Receive
+                  Interrupt on First Character or Special Condition mode. Hence, all data can be transferred via the
+                  DMA so that the CPU need not handle the first received character as a special case. In SDLC
+                  mode, if the SDLC Frame Status FIFO is enabled and an EOF is received, an interrupt with vector
+                  for receive data available is generated and the Receive FIFO is not locked.*/
+                source = 3;
+                prio_level = 0;
+                break;
+        default:
+                logerror("Attempt to trigger interrupt of unknown origin blocked: %02x on channel %c\n", state, 'A' + index);
+                return;
+        }
+
+        // Vector modification requested?
+        if (m_chanA->m_wr9 & z80scc_channel::WR9_BIT_VIS)
+        {
+                vector = modify_vector(vector, index, source);
+        }
 
 	LOG(("Z80SCC \"%s\" Channel %c : Interrupt Request %u\n", tag(), 'A' + index, state));
 
-	// update vector register
-	m_chanB->m_rr2 = vector;
+	// update vector register // TODO: What if interrupts are nested? May we loose the modified vector or even get the wrong one?
+	m_chanB->m_wr2 = vector;
+        
+        /* Check the interrupt source and build the vector modification */
+        /*Interrupt Source Priority order
+          Channel A Receive 
+          Channel A Transmit
+          Channel A External/Status
+          Channel B Receive
+          Channel B Transmit
+          Channel B External/Status 
+        */
+        // Add channel offset to priority according to table above
+        priority = prio_level + (index == CHANNEL_A ? 3 : 0 );
 
 	// trigger interrupt
 	m_int_state[priority] |= Z80_DAISY_INT;
-	m_chanA->m_rr0 |= z80scc_channel::RR0_INTERRUPT_PENDING;
 
+        // Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
+	m_chanA->m_rr3 |= (prio_level << (index == CHANNEL_A ? 3 : 0 )); 
+        
 	// check for interrupt
 	check_interrupts();
-#endif
 }
 
 
@@ -562,7 +626,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
                 m_rr3  = m_rr4  = m_rr5  = m_rr6  = m_rr7  = m_rr8  = m_rr9 = 
                 m_rr10 = m_rr11 = m_rr12 = m_rr13 = m_rr14 = m_rr15 = 0;
         m_wr0 = m_wr1 = m_wr2 = m_wr3  = m_wr4  = m_wr5  = m_wr6  = m_wr7 =        
-                m_wr8  = m_wr9  = m_wr10 = m_wr11 = m_wr12 = m_wr13 = m_wr14 = m_wr15;
+                m_wr8  = m_wr9  = m_wr10 = m_wr11 = m_wr12 = m_wr13 = m_wr14 = m_wr15 = 0;
 
 	for (int i = 0; i < 3; i++) // TODO adapt to SCC fifos
 	{
@@ -579,10 +643,13 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 void z80scc_channel::device_start()
 {
 	m_uart = downcast<z80scc_device *>(owner());
-        LOG(("Z80SCC device_start m_uart:%p\n", m_uart));
+        LOG(("%s\n", FUNCNAME));
 	m_index = m_uart->get_channel_index(this);
         m_ph = 0;
         m_variant = ((z80scc_device *)m_owner)->m_variant;
+
+        m_rx_fifo_sz = (m_variant & SET_ESCC) ? 8 : 3;
+        m_rx_fifo_wp = m_rx_fifo_rp = 0;
 
 	// state saving
         //  m_rr0-m_rr2 is handled by the z80sio_channel driver, our base class
@@ -621,8 +688,9 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_wr15));
 	save_item(NAME(m_rx_data_fifo));
 	save_item(NAME(m_rx_error_fifo));
-	save_item(NAME(m_rx_error));
-	save_item(NAME(m_rx_fifo));
+	save_item(NAME(m_rx_fifo_rp));
+	save_item(NAME(m_rx_fifo_wp));
+	save_item(NAME(m_rx_fifo_sz));
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_first));
 	save_item(NAME(m_rx_break));
@@ -646,21 +714,42 @@ void z80scc_channel::device_start()
 
 void z80scc_channel::device_reset()
 {
-        LOG(("Z80SCC \"%s\" Channel %c : %s\n", m_owner->tag(), 'A' + m_index, __func__));
+        LOG(("Z80SCC \"%s\" Channel %c : %s\n", m_owner->tag(), 'A' + m_index, FUNCNAME));
 
+        // Reset RS232 emulation
 	receive_register_reset();
 	transmit_register_reset();
 
-        // TODO SIO code, check SCC compliance
-	// disable receiver
-	m_wr3 &= ~WR3_RX_ENABLE;
+        // Soft/Channel Reset values according to SCC users manual
+        m_wr0   = 0x00;
+        m_wr1  &= 0x24;
+        m_wr3  &= 0x01;
+        m_wr4  |= 0x04;
+        m_wr5  &= 0x61;
+        if (m_variant & (z80scc_device::TYPE_SCC85C30 | SET_ESCC))
+                m_wr7 = 0x20;
+        m_wr9  &= 0xdf; //  WR9 has a different hard reset value
+        m_wr10 &= 0x60; // WR10 has a different hard reset value
+        m_wr11 &= 0xff; // WR11 has a different hard reset value
+        m_wr14 &= 0xc3; // WR14 has a different hard reset value
+        m_wr14 |= 0x20;
+        m_wr15  = 0xf8;
+        m_rr0  &= 0xfc;
+        m_rr0  |= 0x44;
+        m_rr1  &= 0x07;
+        m_rr1  |= 0x06;
+        m_rr3   = 0x00;
+        m_rr10 &= 0x40;
 
+#if 0 // old reset code
 	// disable transmitter
 	m_wr5 &= ~WR5_TX_ENABLE;
 	m_rr0 |= RR0_TX_BUFFER_EMPTY;
-	m_rr1 |= RR1_ALL_SENT;
+#endif
+        // TODO: check dependencies on RR1_ALL_SENT and (re)move this setting
+	m_rr1 |= RR1_ALL_SENT; // It is a don't care in the SCC user manual
 
-	// reset external lines
+	// reset external lines TODO: check relation to control bits and reset
 	set_rts(1);
 	set_dtr(1);
 
@@ -685,6 +774,8 @@ void z80scc_channel::tra_callback()
 {
 	if (!(m_wr5 & WR5_TX_ENABLE))
 	{
+
+                LOG((LLFORMAT " %s() \"%s \"Channel %c transmit mark 1 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
 		// transmit mark
 		if (m_index == z80scc_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(1);
@@ -693,6 +784,7 @@ void z80scc_channel::tra_callback()
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
+                LOG((LLFORMAT " %s() \"%s \"Channel %c send break 1 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
 		// transmit break
 		if (m_index == z80scc_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(0);
@@ -701,12 +793,20 @@ void z80scc_channel::tra_callback()
 	}
 	else if (!is_transmit_register_empty())
 	{
+                int db = transmit_register_get_data_bit();
+
+                LOG((LLFORMAT " %s() \"%s \"Channel %c transmit data bit %d m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, db, m_wr5));
 		// transmit data
 		if (m_index == z80scc_device::CHANNEL_A)
-			m_uart->m_out_txda_cb(transmit_register_get_data_bit());
+			m_uart->m_out_txda_cb(db);
 		else
-			m_uart->m_out_txdb_cb(transmit_register_get_data_bit());
+			m_uart->m_out_txdb_cb(db);
 	}
+        else
+        {
+                LOG((LLFORMAT " %s() \"%s \"Channel %c Failed to transmit m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
+                logerror("%s \"%s \"Channel %c Failed to transmit\n", FUNCNAME, m_owner->tag(), 'A' + m_index);
+        }
 }
 
 
@@ -718,7 +818,7 @@ void z80scc_channel::tra_complete()
 {
 	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK) && !(m_rr0 & RR0_TX_BUFFER_EMPTY))
 	{
-		LOG(("Z80SCC \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data));
+                LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_tx_data, m_wr5));
 
 		transmit_register_setup(m_tx_data);
 
@@ -730,6 +830,7 @@ void z80scc_channel::tra_complete()
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
+                LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit Break 0 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
 		// transmit break
 		if (m_index == z80scc_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(0);
@@ -738,6 +839,7 @@ void z80scc_channel::tra_complete()
 	}
 	else
 	{
+                LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit Mark 1 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
 		// transmit mark
 		if (m_index == z80scc_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(1);
@@ -748,6 +850,7 @@ void z80scc_channel::tra_complete()
 	// if transmit buffer is empty
 	if (m_rr0 & RR0_TX_BUFFER_EMPTY)
 	{
+                LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit buffer empty m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
 		// then all characters have been sent
 		m_rr1 |= RR1_ALL_SENT;
 
@@ -766,8 +869,14 @@ void z80scc_channel::rcv_callback()
 {
 	if (m_wr3 & WR3_RX_ENABLE)
 	{
+                LOG((LLFORMAT " %s() \"%s \"Channel %c Received Data Bit %d\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_rxd));
 		receive_register_update_bit(m_rxd);
 	}
+        else
+        {
+                LOG((LLFORMAT " %s() \"%s \"Channel %c Received Data Bit but receiver is disabled\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index));
+                logerror("Z80SCC %s() \"%s \"Channel %c Received data dit but receiver is disabled\n", __func__, m_owner->tag(), 'A' + m_index);
+        }
 }
 
 
@@ -777,8 +886,12 @@ void z80scc_channel::rcv_callback()
 
 void z80scc_channel::rcv_complete()
 {
+        UINT8 data;
+
 	receive_register_extract();
-	receive_data(get_received_char());
+        data = get_received_char();
+        LOG((LLFORMAT " %s() \"%s \"Channel %c Received Data %c\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, data));
+	receive_data(data);
 }
 
 
@@ -905,7 +1018,25 @@ in WR9."*/
 UINT8 z80scc_channel::do_sccreg_rr2()
 {
         LOG(("Z80SCC %s()\n", __func__));
-        return m_rr2; // TODO Check that the value is maintained according to the section above for respective channel
+
+        // Assume the unmodified in polled mode
+        m_rr2 = m_uart->m_chanA->m_wr2; 
+
+        // If we are chan B we have to modify the vector regardless of the VIS bit
+	if (m_index == z80scc_device::CHANNEL_B)
+        {
+                // loop over all interrupt sources
+                for (int i = 0; i < 6; i++)
+                {
+                        // find the first channel with an interrupt requested
+                        if (m_uart->m_int_state[i] & Z80_DAISY_INT)
+                        {
+                                m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, i & 3);
+                                break;
+                        }
+                }
+        }
+        return m_rr2;
 }
 
 /* From Zilog SCC/ESCC USers manual, UM010902-0609:
@@ -1104,7 +1235,7 @@ UINT8 z80scc_channel::control_read()
         case REG_RR14_WR7_OR_R10:    data = do_sccreg_rr14(); break;
         case REG_RR15_WR15_EXT_STAT: data = do_sccreg_rr15(); break;
 	default:
-	  logerror("Z80SCC \"%s\" Channel %c : Unsupported RRx register:%02x\n", m_owner->tag(), 'A' + m_index, reg);
+                logerror("Z80SCC \"%s\" %s Channel %c : Unsupported RRx register:%02x\n", m_owner->tag(), __func__, 'A' + m_index, reg);
 	}
 
 	//LOG(("Z80SCC \"%s\" Channel %c : Register R%d read '%02x'\n", m_owner->tag(), 'A' + m_index, reg, data));
@@ -1130,11 +1261,11 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
                   addressing*/
                 if (m_variant & SET_Z85X3X)
                 {
-                        LOG(("Z80SCC \"%s\" Channel %c : %s - Point High command\n", m_owner->tag(), 'A' + m_index, __func__));
+                        LOG(("Z80SCC \"%s\" %s Channel %c : %s - Point High command\n", m_owner->tag(), __func__, 'A' + m_index, __func__));
                         m_ph = 8;
                 }
                 else
-                        LOG(("Z80SCC \"%s\" Channel %c : %s - NULL command 2\n", m_owner->tag(), 'A' + m_index, __func__));
+                        LOG(("Z80SCC \"%s\" %s Channel %c : %s - NULL command 2\n", m_owner->tag(), __func__, 'A' + m_index, __func__));
                 break;
         case WR0_RESET_EXT_STATUS: // TODO: Take care of the Zero Count flag and the 2 slot fifo 
                 /*After an External/Status interrupt (a change on a modem line or a break condition, 
@@ -1149,15 +1280,28 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
                   (there are two transitions), another interrupt is not generated. Exceptions to this 
                   rule are detailed in the RR0 description.*/
                 do_sioreg_wr0(data);
-                if (!m_zc) m_rr0 |= RR0_ZC;
-                LOG(("Z80SCC \"%s\" Channel %c : %s - Reset External/Status Interrupt\n", m_owner->tag(), 'A' + m_index, __func__));
+                if (!m_zc) 
+                {
+                        m_rr0 |= RR0_ZC;
+                }
+                LOG(("Z80SCC \"%s\" %s Channel %c : %s - Reset External/Status Interrupt\n", m_owner->tag(), __func__, 'A' + m_index, __func__));
                 break;
         case WR0_RESET_HIGHEST_IUS:
                 /* This command resets the highest priority Interrupt Under Service (IUS) bit, allowing lower 
                    priority conditions to request interrupts. This command allows the use of the internal 
                    daisy chain (even in systems without an external daisy chain) and is the last operation in
                    an interrupt service routine.TODO: Implement internal Daisychain */
-                LOG(("Z80SCC \"%s\" Channel %c : Reset Highest IUS\n", m_owner->tag(), 'A' + m_index));
+                LOG(("Z80SCC \"%s\" %s Channel %c : Reset Highest IUS\n", m_owner->tag(), __func__, 'A' + m_index));
+                break;
+        case WR0_ERROR_RESET:
+                /*Error Reset Command (110). This command resets the error bits in RR1. If interrupt on first Rx
+                  Character or Interrupt on Special Condition modes is selected and a special condition exists, the
+                  data with the special condition is held in the Receive FIFO until this command is issued. If either
+                  of these modes is selected and this command is issued before the data has been read from the
+                  Receive FIFO, the data is lost */
+                LOG(("Z80SCC \"%s\" %s Channel %c : WR0_ERROR_RESET\n", m_owner->tag(), __func__, 'A' + m_index));
+                do_sioreg_wr0(data); // reset status registers
+                m_rx_fifo_rp_step(); // Reset error state in fifo and unlock it. unlock == step to next slot in fifo. 
                 break;
         case WR0_SEND_ABORT:
                 data &= 0xef; // convert SCC SEND_ABORT command to a SIO SEND_ABORT command and fall through 
@@ -1165,7 +1309,6 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
         case WR0_NULL:
         case WR0_ENABLE_INT_NEXT_RX:
         case WR0_RESET_TX_INT:
-        case WR0_ERROR_RESET:
         default:
                 do_sioreg_wr0(data);
         }
@@ -1244,9 +1387,18 @@ void z80scc_channel::do_sccreg_wr8(UINT8 data)
 
 /*WR9 is the Master Interrupt Control register and contains the Reset command bits. Only one WR9
 exists in the SCC and is accessed from either channel. The Interrupt control bits are programmed
-at the same time as the Reset command, because these bits are only reset by a hardware reset */
+at the same time as the Reset command, because these bits are only reset by a hardware reset 
+note that the Z80X30 contains only one WR2 and WR9; these registers may be written from either channel.*/
 void z80scc_channel::do_sccreg_wr9(UINT8 data)
 {
+        if (m_variant & SET_Z80X30)
+        {
+                m_uart->m_chanA->m_wr9 = data;
+                m_uart->m_chanB->m_wr9 = data;
+        }
+        else
+                m_wr9 = data;
+  
         switch (data & WR9_CMD_MASK)
         {
         case WR9_CMD_NORESET:
@@ -1483,9 +1635,23 @@ void z80scc_channel::control_write(UINT8 data)
 	case REG_WR0_COMMAND_REGPT:   do_sccreg_wr0(data); break;
 	case REG_WR1_INT_DMA_ENABLE:  do_sccreg_wr1(data); m_uart->check_interrupts(); break;
 	case REG_WR2_INT_VECTOR:      do_sccreg_wr2(data); break;
-	case REG_WR3_RX_CONTROL:      do_sioreg_wr3(data); update_serial(); break;
-	case REG_WR4_RX_TX_MODES:     do_sioreg_wr4(data); update_serial(); break;
-	case REG_WR5_TX_CONTROL:      do_sioreg_wr5(data); update_serial(); update_rts(); break;
+	case REG_WR3_RX_CONTROL:      
+                do_sioreg_wr3(data); 
+                update_serial(); 
+                receive_register_reset(); 
+                break;
+	case REG_WR4_RX_TX_MODES:     
+                do_sioreg_wr4(data); 
+                update_serial(); 	
+                transmit_register_reset(); 
+                receive_register_reset(); 
+                break;
+	case REG_WR5_TX_CONTROL:      
+                do_sioreg_wr5(data); 
+                update_serial(); 
+                transmit_register_reset(); 
+                update_rts(); 
+                break;
 	case REG_WR6_SYNC_OR_SDLC_A:  do_sioreg_wr6(data); break;
 	case REG_WR7_SYNC_OR_SDLC_F:  do_sioreg_wr7(data); break;
 	case REG_WR8_TRANSMIT_DATA:   do_sccreg_wr8(data); break;
@@ -1505,36 +1671,97 @@ void z80scc_channel::control_write(UINT8 data)
 
 
 //-------------------------------------------------
-//  data_read - read data register
+//  data_read - read data register from fifo
 //-------------------------------------------------
 
 UINT8 z80scc_channel::data_read()
 {
 	UINT8 data = 0;
 
-	if (m_rx_fifo >= 0)
+        if (m_rx_fifo_wp != m_rx_fifo_rp)
 	{
+              /* Special Receive Condition interrupts are generated after the character is read from
+                 the FIFO, not when the special condition is first detected. This is done so that when
+                 using receive interrupt on first or Special Condition or Special Condition Only, data is
+                 directly read out of the data FIFO without checking the status first. If a special condi-
+                 tion interrupted the CPU when first detected, it would be necessary to read RR1
+                 before each byte in the FIFO to determine which byte had the special condition.
+                 Therefore, by not generating the interrupt until after the byte has been read and then
+                 locking the FIFO, only one status read is necessary. A DMA can be used to do all data
+                 transfers (otherwise, it would be necessary to disable the DMA to allow the CPU to
+                 read the status on each byte). Consequently, since the special condition locks the
+                 FIFO to preserve the status, it is necessary to issue the Error Reset command to
+                 unlock it. Only the exit location of the FIFO is locked allowing more data to be
+                 received into the other bytes of the Receive FIFO.*/		
+
 		// load data from the FIFO
-		data = m_rx_data_fifo[m_rx_fifo];
+		data = m_rx_fifo_rp_data();
 
-		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo];
+                // load error status from the FIFO
+		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
 
-		// decrease FIFO pointer
-		m_rx_fifo--;
+                // trigger interrup and lock the fifo if an error is present
+                if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR))
+                {
+                        switch (m_wr1 & WR1_RX_INT_MODE_MASK)
+                        {
+                        case WR1_RX_INT_FIRST:
+                                if (!m_rx_first)
+                                {
+                                        m_uart->trigger_interrupt(m_index, INT_SPECIAL);
+                                }
+                                break;
 
-		if (m_rx_fifo < 0)
-		{
-			// no more characters available in the FIFO
-			m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
-		}
+                        case WR1_RX_INT_ALL_PARITY:
+                        case WR1_RX_INT_ALL:
+                                m_uart->trigger_interrupt(m_index, INT_SPECIAL);
+                                break;
+                        }
+                }
+                else
+                {
+                        // decrease FIFO pointer
+                        m_rx_fifo_rp_step();                        
+                }
 	}
+        else
+        {
+                logerror("data_read: Attempt to read out character from empty FIFO\n");
+        }
 
 	LOG(("Z80SCC \"%s\" Channel %c : Data Register Read '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
 	return data;
 }
 
+/* Get data from top of fifo data but restore read pointer in case of exit latch lock */
+UINT8 z80scc_channel::m_rx_fifo_rp_data()
+{
+        UINT8 data;
+        UINT8 old_rp = m_rx_fifo_rp;
+        m_rx_fifo_rp_step();
+        data = m_rx_data_fifo[m_rx_fifo_rp];
+        m_rx_fifo_rp = old_rp;
+
+        return data;
+}
+
+/* Step read pointer */
+void z80scc_channel::m_rx_fifo_rp_step()
+{
+        m_rx_fifo_rp++;
+        if (m_rx_fifo_rp >= m_rx_fifo_sz)
+        {
+                m_rx_fifo_rp = 0;
+        }
+        
+        // check if FIFO is empty
+        if (m_rx_fifo_rp == m_rx_fifo_wp)
+        {
+                // no more characters available in the FIFO
+                m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
+        }
+}
 
 //-------------------------------------------------
 //  data_write - write data register
@@ -1544,7 +1771,7 @@ void z80scc_channel::data_write(UINT8 data)
 {
 	m_tx_data = data;
 
-	if ((m_wr5 & WR5_TX_ENABLE) && is_transmit_register_empty())
+        if ((m_wr5 & WR5_TX_ENABLE) && is_transmit_register_empty())
 	{
 		LOG(("Z80SCC \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data));
 
@@ -1554,7 +1781,9 @@ void z80scc_channel::data_write(UINT8 data)
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
 
 		if (m_wr1 & WR1_TX_INT_ENABLE)
+                {
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+                }
 	}
 	else
 	{
@@ -1568,44 +1797,35 @@ void z80scc_channel::data_write(UINT8 data)
 
 
 //-------------------------------------------------
-//  receive_data - receive data word
+//  receive_data - receive data word into fifo
 //-------------------------------------------------
 
 void z80scc_channel::receive_data(UINT8 data)
 {
 	LOG(("Z80SCC \"%s\" Channel %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
-	if (m_rx_fifo == 2)
+        if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || 
+            ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
 		// receive overrun error detected
-		m_rx_error |= RR1_RX_OVERRUN_ERROR;
+                m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR; // = m_rx_error;
+        }
+        else
+        {
+                m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR; // = m_rx_error;
+                m_rx_fifo_wp++;
+                if (m_rx_fifo_wp >= m_rx_fifo_sz)
+                {
+                        m_rx_fifo_wp = 0;
+                }
+        }
 
-		switch (m_wr1 & WR1_RX_INT_MODE_MASK)
-		{
-		case WR1_RX_INT_FIRST:
-			if (!m_rx_first)
-			{
-				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			}
-			break;
-
-		case WR1_RX_INT_ALL_PARITY:
-		case WR1_RX_INT_ALL:
-			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			break;
-		}
-	}
-	else
-	{
-		m_rx_fifo++;
-	}
-
-	// store received character and error status into FIFO
-	m_rx_data_fifo[m_rx_fifo] = data;
-	m_rx_error_fifo[m_rx_fifo] = m_rx_error;
+	// store received character
+	m_rx_data_fifo[m_rx_fifo_wp] = data;
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
 
+#if 0 // interrupt on exit from fifo
 	// receive interrupt
 	switch (m_wr1 & WR1_RX_INT_MODE_MASK)
 	{
@@ -1623,6 +1843,7 @@ void z80scc_channel::receive_data(UINT8 data)
 		m_uart->trigger_interrupt(m_index, INT_RECEIVE);
 		break;
 	}
+#endif
 }
 
 
@@ -1632,7 +1853,7 @@ void z80scc_channel::receive_data(UINT8 data)
 
 WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 {
-	LOG(("Z80SCC \"%s\" Channel %c : CTS %u\n", m_owner->tag(), 'A' + m_index, state));
+	LOG(("Z80SCC \"%s\" %s Channel %c : CTS %u\n", m_owner->tag(), __func__, 'A' + m_index, state));
 
 	if (m_cts != state)
 	{
@@ -1662,6 +1883,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 			}
 		}
 	}
+        //        m_rr0 &= ~RR0_CTS; // Remove, just to test 
 }
 
 
@@ -1792,8 +2014,6 @@ void z80scc_channel::update_serial()
 	stop_bits_t stop_bits = get_stop_bits();
 	parity_t parity;
 
-        LOG(("Z80SCC update serial\n"));
-
 	if (m_wr4 & WR4_PARITY_ENABLE)
 	{
 		if (m_wr4 & WR4_PARITY_EVEN)
@@ -1804,6 +2024,8 @@ void z80scc_channel::update_serial()
 	else
 		parity = PARITY_NONE;
 
+        LOG((LLFORMAT " %s() \"%s \"Channel %c setting data frame %d+%d%c%d\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, 1,
+             data_bit_count, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O', (stop_bits + 1) / 2));
 	set_data_frame(1, data_bit_count, parity, stop_bits);
 
 	int clocks = get_clock_mode();
@@ -1811,13 +2033,14 @@ void z80scc_channel::update_serial()
 	if (m_rxc > 0)
 	{
 		set_rcv_rate(m_rxc / clocks);
+                LOG(("       - Receiver clock: %d mode: %d rate: %d/%xh\n", m_rxc, clocks, m_rxc / clocks, m_rxc / clocks));
 	}
 
 	if (m_txc > 0)
 	{
 		set_tra_rate(m_txc / clocks);
+                LOG(("       - Transmit clock: %d mode: %d rate: %d/%xh\n", m_rxc, clocks, m_rxc / clocks, m_rxc / clocks));
 	}
-	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset
 }
 
 //-------------------------------------------------
