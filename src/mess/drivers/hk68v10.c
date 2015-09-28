@@ -184,10 +184,8 @@
 #endif
 
 #ifdef _MSC_VER
-#define LLFORMAT "%I64%"
 #define FUNCNAME __func__
 #else
-#define LLFORMAT "%lld"
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
@@ -251,7 +249,7 @@ INPUT_PORTS_END
 /* Start it up */
 void hk68v10_state::machine_start ()
 {
-        LOG ((LLFORMAT " %s\n", m_maincpu->total_cycles(), FUNCNAME));
+        LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
 
         /* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
@@ -265,7 +263,7 @@ void hk68v10_state::machine_start ()
 */
 void hk68v10_state::machine_reset ()
 {
-        LOG ((LLFORMAT " %s\n", m_maincpu->total_cycles(), FUNCNAME));
+        LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
 
         /* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
         if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
