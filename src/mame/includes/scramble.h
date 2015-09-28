@@ -72,6 +72,7 @@ public:
 	DECLARE_DRIVER_INIT(devilfsh);
 	DECLARE_DRIVER_INIT(mrkougar);
 	DECLARE_DRIVER_INIT(harem);
+	DECLARE_DRIVER_INIT(newsin7a);
 
 	DECLARE_DRIVER_INIT(scobra);
 	DECLARE_DRIVER_INIT(stratgyx);
