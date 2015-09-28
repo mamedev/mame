@@ -918,6 +918,7 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 {
 	n64_state *state = space.machine().driver_data<n64_state>();
 	UINT32 ret = 0;
+
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
@@ -957,20 +958,39 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 WRITE32_MEMBER( n64_periphs::dp_reg_w )
 {
 	n64_state *state = space.machine().driver_data<n64_state>();
+	UINT32 status = state->m_rdp->get_status();
 
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			state->m_rdp->set_start(data);
-			state->m_rdp->set_current(state->m_rdp->get_start());
+			if(status & DP_STATUS_START_VALID)
+				break;
+			else
+			{
+				state->m_rdp->set_status(status | DP_STATUS_START_VALID);
+				state->m_rdp->set_start(data & ~7);
+			}
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			state->m_rdp->set_end(data);
-			g_profiler.start(PROFILER_USER1);
-			state->m_rdp->process_command_list();
-			g_profiler.stop();
-			break;
+			if(status & DP_STATUS_START_VALID)
+			{
+				state->m_rdp->set_status(status & ~DP_STATUS_START_VALID);
+				state->m_rdp->set_current(state->m_rdp->get_start());	
+				state->m_rdp->set_end(data & ~ 7);
+				g_profiler.start(PROFILER_USER1);
+				state->m_rdp->process_command_list();
+				g_profiler.stop();
+				break;
+			}
+			else
+			{
+				state->m_rdp->set_end(data & ~ 7);
+				g_profiler.start(PROFILER_USER1);
+				state->m_rdp->process_command_list();
+				g_profiler.stop();
+				break;				
+			}
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
@@ -1015,7 +1035,7 @@ void n64_periphs::vi_recalculate_resolution()
 
 	rectangle visarea = m_screen->visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
-	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC);
+	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
 
 	if (width == 0 || height == 0)
 	{
