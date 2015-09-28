@@ -1,24 +1,23 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Thacker
-/*****************************************************************************
- *
- * machine/i8271.h
- *
- ****************************************************************************/
+// copyright-holders:Carl,Olivier Galibert
+#ifndef I8271N_H_
+#define I8271N_H_
 
-#ifndef I8271_H_
-#define I8271_H_
-
-#include "imagedev/flopdrv.h"
+#include "emu.h"
+#include "imagedev/floppy.h"
+#include "fdc_pll.h"
 
 #define MCFG_I8271_IRQ_CALLBACK(_write) \
-	devcb = &i8271_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &i8271_device::set_intrq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8271_DRQ_CALLBACK(_write) \
 	devcb = &i8271_device::set_drq_wr_callback(*device, DEVCB_##_write);
 
-#define MCFG_I8271_FLOPPIES(_tag1, _tag2) \
-	i8271_device::set_floppy_tags(*device, _tag1, _tag2);
+#define MCFG_I8271_HDL_CALLBACK(_write) \
+	devcb = &i8271_device::set_hdl_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_I8271_OPT_CALLBACK(_write) \
+	devcb = &i8271_device::set_opt_wr_callback(*device, DEVCB_##_write);
 
 /***************************************************************************
     MACROS
@@ -30,136 +29,268 @@ public:
 	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~i8271_device() {}
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_drq.set_callback(object); }
+	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).intrq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_hdl_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).hdl_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_opt_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).opt_cb.set_callback(object); }
 
-	static void set_floppy_tags(device_t &device, const char *tag1, const char *tag2)
-	{
-		i8271_device &dev = downcast<i8271_device &>(device);
-		dev.m_floppy_tag1 = tag1;
-		dev.m_floppy_tag2 = tag2;
-	}
-
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-
-	DECLARE_READ8_MEMBER(dack_r);
-	DECLARE_WRITE8_MEMBER(dack_w);
-
-	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_READ8_MEMBER (sr_r);
+	DECLARE_READ8_MEMBER (rr_r);
+	DECLARE_WRITE8_MEMBER(reset_w) { if(data == 1) soft_reset(); }
+	DECLARE_WRITE8_MEMBER(cmd_w);
+	DECLARE_WRITE8_MEMBER(param_w);
+	DECLARE_READ8_MEMBER (data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
+	DECLARE_ADDRESS_MAP(map, 8);
+
+	void ready_w(bool val);
+
+	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
+
+	void set_ready_line_connected(bool ready);
+	void set_select_lines_connected(bool select);
+	void set_floppy(floppy_image_device *image);
+	void soft_reset();
 
 protected:
-	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	// internal state
-	enum
-	{
-		TIMER_DATA_CALLBACK,
-		TIMER_TIMED_COMMAND_COMPLETE
+	enum {
+		PHASE_IDLE, PHASE_CMD, PHASE_EXEC, PHASE_RESULT
 	};
 
-	devcb_write_line m_write_irq;
-	devcb_write_line m_write_drq;
+	enum {
+		RR_DEL = 0x20,
+		RR_CT  = 0x18,
+		RR_CC  = 0x06,
 
-	const char *m_floppy_tag1, *m_floppy_tag2;
-	legacy_floppy_image_device *m_floppy[2];
+		SR_BSY = 0x80,
+		SR_CF  = 0x40,
+		SR_PF  = 0x20,
+		SR_RF  = 0x10,
+		SR_IRQ = 0x08,
+		SR_DRQ = 0x04
+	};
 
-	int m_flags;
-	int m_state;
-	unsigned char m_Command;
-	unsigned char m_StatusRegister;
-	unsigned char m_CommandRegister;
-	unsigned char m_ResultRegister;
-	unsigned char m_ParameterRegister;
-	unsigned char m_ResetRegister;
-	unsigned char m_data;
+	enum {
+		ERR_NONE = 0x00,
+		ERR_SMEQ = 0x02,
+		ERR_SMNE = 0x04,
+		ERR_CLK  = 0x08,
+		ERR_DMA  = 0x0a,
+		ERR_ICRC = 0x0c,
+		ERR_DCRC = 0x0e,
+		ERR_NR   = 0x10,
+		ERR_WP   = 0x12,
+		ERR_T0NF = 0x14,
+		ERR_WF   = 0x16,
+		ERR_NF   = 0x18
+	};
 
-	/* number of parameters required after command is specified */
-	unsigned long m_ParameterCount;
-	/* number of parameters written so far */
-	unsigned long m_ParameterCountWritten;
+	enum {
+		// General "doing nothing" state
+		IDLE,
 
-	unsigned char m_CommandParameters[8];
+		// Main states
+		RECALIBRATE,
+		SEEK,
+		READ_DATA,
+		WRITE_DATA,
+		FORMAT_TRACK,
+		READ_ID,
+		SCAN_DATA,
+		VERIFY_DATA,
 
-	/* current track for each drive */
-	unsigned long   m_CurrentTrack[2];
+		// Sub-states
+		COMMAND_DONE,
 
-	/* 2 bad tracks for drive 0, followed by 2 bad tracks for drive 1 */
-	unsigned long   m_BadTracks[4];
+		SEEK_MOVE,
+		SEEK_WAIT_STEP_SIGNAL_TIME,
+		SEEK_WAIT_STEP_SIGNAL_TIME_DONE,
+		SEEK_WAIT_STEP_TIME,
+		SEEK_WAIT_STEP_TIME_DONE,
+		SEEK_DONE,
 
-	/* mode special register */
-	unsigned long m_Mode;
+		HEAD_LOAD_DONE,
 
+		WAIT_INDEX,
+		WAIT_INDEX_DONE,
 
-	/* drive outputs */
-	int m_drive;
-	int m_side;
+		SCAN_ID,
+		SCAN_ID_FAILED,
 
-	/* drive control output special register */
-	int m_drive_control_output;
-	/* drive control input special register */
-	int m_drive_control_input;
+		SECTOR_READ,
+		SECTOR_WRITTEN,
+		TC_DONE,
 
-	unsigned long m_StepRate;
-	unsigned long m_HeadSettlingTime;
-	unsigned long m_IndexCountBeforeHeadUnload;
-	unsigned long m_HeadLoadTime;
+		TRACK_DONE,
 
-	/* id on disc to find */
-	//int m_ID_C;
-	//int m_ID_H;
-	int m_ID_R;
-	int m_ID_N;
+		// Live states
+		SEARCH_ADDRESS_MARK_HEADER,
+		READ_ID_BLOCK,
+		SEARCH_ADDRESS_MARK_DATA,
+		SEARCH_ADDRESS_MARK_DATA_FAILED,
+		READ_SECTOR_DATA,
+		READ_SECTOR_DATA_BYTE,
+		SCAN_SECTOR_DATA_BYTE,
+		VERIFY_SECTOR_DATA_BYTE,
 
-	/* id of data for read/write */
-	int m_data_id;
+		WRITE_SECTOR_SKIP_GAP2,
+		WRITE_SECTOR_SKIP_GAP2_BYTE,
+		WRITE_SECTOR_DATA,
+		WRITE_SECTOR_DATA_BYTE,
 
-	int m_ExecutionPhaseTransferCount;
-	char *m_pExecutionPhaseData;
-	int m_ExecutionPhaseCount;
+		WRITE_TRACK_PRE_SECTORS,
+		WRITE_TRACK_PRE_SECTORS_BYTE,
 
-	/* sector counter and id counter */
-	int m_Counter;
+		WRITE_TRACK_SECTOR,
+		WRITE_TRACK_SECTOR_BYTE,
 
-	/* ==0, to cpu, !=0 =from cpu */
-	//int m_data_direction;
+		WRITE_TRACK_POST_SECTORS,
+		WRITE_TRACK_POST_SECTORS_BYTE
+	};
 
-	emu_timer *m_data_timer;
-	emu_timer *m_command_complete_timer;
+	struct pll_t {
+		attotime ctime, period, min_period, max_period, period_adjust_base, phase_adjust;
 
-	void seek_to_track(int track);
-	void load_bad_tracks(int surface);
-	void write_bad_track(int surface, int track, int data);
-	void write_current_track(int surface, int track);
-	int read_current_track(int surface);
-	int read_bad_track(int surface, int track);
-	void get_drive();
-	void check_all_parameters_written();
-	void update_state();
-	void initialise_execution_phase_read(int transfer_size);
-	void initialise_execution_phase_write(int transfer_size);
-	void command_execute();
-	void command_continue();
-	void command_complete(int result, int int_rq);
-	void timed_command_complete();
-	void data_request();
-	void clear_data_request();
-	void timed_data_request();
-	/* locate sector for read/write operation */
-	int find_sector();
-	/* do a read operation */
-	void do_read();
-	void do_write();
-	void do_read_id();
-	void set_irq_state(int);
-	void set_dma_drq();
+		attotime write_start_time;
+		attotime write_buffer[32];
+		int write_position;
+		int freq_hist;
+
+		void set_clock(const attotime &period);
+		void reset(const attotime &when);
+		int get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
+		void start_writing(const attotime &tm);
+		void commit(floppy_image_device *floppy, const attotime &tm);
+		void stop_writing(floppy_image_device *floppy, const attotime &tm);
+	};
+
+	struct floppy_info {
+		enum { IRQ_NONE, IRQ_POLLED, IRQ_SEEK, IRQ_DONE };
+		emu_timer *tm;
+		floppy_image_device *dev;
+		int id;
+		int main_state, sub_state;
+		int dir, counter;
+		UINT8 pcn, badtrack[2];
+		bool live, index, ready;
+	};
+
+	struct live_info {
+		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };
+
+		attotime tm;
+		int state, next_state;
+		floppy_info *fi;
+		UINT16 shift_reg;
+		UINT16 crc;
+		int bit_counter, byte_counter, previous_type;
+		bool data_separator_phase, data_bit_context;
+		UINT8 data_reg;
+		UINT8 idbuf[6];
+		fdc_pll_t pll;
+	};
+
+	bool ready_connected, select_connected;
+
+	bool external_ready;
+
+	int mode;
+	int main_phase;
+
+	live_info cur_live, checkpoint_live;
+	devcb_write_line intrq_cb, drq_cb, hdl_cb, opt_cb;
+	bool irq, drq, scan_done, scan_match;
+	floppy_info flopi[2];
+
+	int command_pos, sectors_read, scan_len;
+	UINT8 command[6], dma_data;
+	UINT8 rr, scan_sec, moder;
+	UINT8 precomp, perpmode, scan_cnt[2];
+	UINT8 srate, hset, icnt, hload;
+	int sector_size;
+	int cur_rate;
+
+	static std::string tts(attotime t);
+	std::string ttsn();
+
+	enum {
+		C_FORMAT_TRACK,
+		C_READ_DATA_SINGLE,
+		C_READ_DATA_MULTI,
+		C_VERIFY_DATA_SINGLE,
+		C_VERIFY_DATA_MULTI,
+		C_WRITE_DATA_SINGLE,
+		C_WRITE_DATA_MULTI,
+		C_READ_ID,
+		C_SEEK,
+		C_READ_DRIVE_STATUS,
+		C_SPECIFY,
+		C_SCAN,
+		C_WRITE_SPECIAL_REGISTER,
+		C_READ_SPECIAL_REGISTER,
+
+		C_INVALID,
+		C_INCOMPLETE
+	};
+
+	void delay_cycles(emu_timer *tm, int cycles);
+	void set_drq(bool state);
+	void set_irq(bool state);
+	bool get_ready(int fid);
+
+	void enable_transfer();
+	void disable_transfer();
+	int calc_sector_size(UINT8 size);
+
+	int check_command();
+	void start_command(int cmd);
+	void command_end(floppy_info &fi, bool data_completion);
+
+	void recalibrate_start(floppy_info &fi);
+	void seek_start(floppy_info &fi);
+	void seek_continue(floppy_info &fi);
+
+	void read_data_start(floppy_info &fi);
+	void read_data_continue(floppy_info &fi);
+
+	void write_data_start(floppy_info &fi);
+	void write_data_continue(floppy_info &fi);
+
+	void format_track_start(floppy_info &fi);
+	void format_track_continue(floppy_info &fi);
+
+	void read_id_start(floppy_info &fi);
+	void read_id_continue(floppy_info &fi);
+
+	void scan_start(floppy_info &fi);
+	void verify_data_start(floppy_info &fi);
+
+	void general_continue(floppy_info &fi);
+	void index_callback(floppy_image_device *floppy, int state);
+	bool sector_matches() const;
+
+	void live_start(floppy_info &fi, int live_state);
+	void live_abort();
+	void checkpoint();
+	void rollback();
+	void live_delay(int state);
+	void live_sync();
+	void live_run(attotime limit = attotime::never);
+	void live_write_raw(UINT16 raw);
+	void live_write_fm(UINT8 fm);
+
+	bool read_one_bit(const attotime &limit);
+	bool write_one_bit(const attotime &limit);
+	bool set_output(UINT8 data);
+	bool get_input(UINT8 *data);
 };
 
 extern const device_type I8271;
 
-#endif /* I8271_H_ */
+#endif

@@ -194,8 +194,8 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
 	                                                                                            /* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe80, 0xfe83) AM_DEVREADWRITE("i8271", i8271_device, read, write)                /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
-	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, dack_r, dack_w)             /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe80, 0xfe83) AM_DEVICE("i8271" , i8271_device, map)                             /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, data_r, data_w)             /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -635,13 +635,6 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 }
 
 
-static const floppy_interface bbc_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(bbc),
-	"floppy_5_25"
-};
-
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_525sd )
 	FLOPPY_BBC_SSD_525_FORMAT,
 	FLOPPY_BBC_DSD_525_FORMAT
@@ -824,11 +817,11 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* fdc */
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
+	MCFG_DEVICE_ADD("i8271" , I8271 , 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
-	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
+	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_state, motor_w))
+	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_525sd)
+	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_525sd)
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cass_ls_a")
@@ -844,8 +837,6 @@ static MACHINE_CONFIG_DERIVED(bbcb1770, bbcb)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("i8271")
-	MCFG_DEVICE_REMOVE(FLOPPY_0)
-	MCFG_DEVICE_REMOVE(FLOPPY_1)
 
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))

@@ -13,7 +13,7 @@
 #include "machine/ram.h"
 #include "imagedev/snapquik.h"
 #include "formats/atom_tap.h"
-#include "formats/basicdsk.h"
+#include "formats/atom_dsk.h"
 #include "formats/uef_cas.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/6522via.h"
@@ -46,6 +46,7 @@ public:
 			m_maincpu(*this, SY6502_TAG),
 			m_vdg(*this, MC6847_TAG),
 			m_cassette(*this, "cassette"),
+			m_fdc(*this, I8271_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, "speaker"),
 			m_cart(*this, "cartslot"),
@@ -67,6 +68,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cassette;
+	optional_device<i8271_device> m_fdc;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<generic_slot_device> m_cart;
@@ -95,6 +97,7 @@ public:
 	DECLARE_READ8_MEMBER( vdg_videoram_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
+	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 	/* video state */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -109,6 +112,7 @@ public:
 
 	/* devices */
 	int m_previous_i8271_int_state;
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_output_tick);
 
 	int load_cart(device_image_interface &image, generic_slot_device *slot);

@@ -167,6 +167,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(motor_w);
 
 	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
 	UPD7002_EOC(BBC_uPD7002_EOC);

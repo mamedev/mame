@@ -247,7 +247,7 @@ READ8_MEMBER( atomeb_state::dos_r )
 
 static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVICE(I8271_TAG, i8271_device, map)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, data_r, data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
@@ -583,30 +583,11 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 	m_previous_i8271_int_state = state;
 }
 
-/*-------------------------------------------------
-    LEGACY_FLOPPY_OPTIONS( atom )
--------------------------------------------------*/
-
-static LEGACY_FLOPPY_OPTIONS_START( atom )
-	LEGACY_FLOPPY_OPTION(atom, "dsk,40t", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-LEGACY_FLOPPY_OPTIONS_END
-
-/*-------------------------------------------------
-    floppy_interface atom_floppy_interface
--------------------------------------------------*/
-
-static const floppy_interface atom_floppy_interface =
+WRITE_LINE_MEMBER( atom_state::motor_w )
 {
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(atom),
-	"floppy_5_25"
-};
-
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!state);
+	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(!state);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
 {
@@ -687,6 +668,13 @@ int atom_state::load_cart(device_image_interface &image, generic_slot_device *sl
 	return IMAGE_INIT_PASS;
 }
 
+static SLOT_INTERFACE_START(atom_floppies)
+	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
+SLOT_INTERFACE_END
+
+FLOPPY_FORMATS_MEMBER(atom_state::floppy_formats)
+	FLOPPY_ATOM_FORMAT
+FLOPPY_FORMATS_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atom )
@@ -722,10 +710,11 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8271_TAG, I8271, 0)
+	MCFG_DEVICE_ADD(I8271_TAG, I8271 , 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(atom_state, atom_8271_interrupt_callback))
-	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
+	MCFG_I8271_HDL_CALLBACK(WRITELINE(atom_state, motor_w))
+	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))

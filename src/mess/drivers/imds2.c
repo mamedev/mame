@@ -140,7 +140,7 @@ static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(0x90 , 0x9f) AM_READ(imds2_kb_read)
 	AM_RANGE(0xa0 , 0xaf) AM_READ(imds2_ioc_status_r)
 	AM_RANGE(0xb0 , 0xbf) AM_READ(imds2_ioc_dbbin_r)
-	AM_RANGE(0xc0 , 0xcf) AM_DEVREADWRITE("iocfdc" , i8271_device , read , write)
+	AM_RANGE(0xc0 , 0xcf) AM_DEVICE("iocfdc" , i8271_device, map)
 	AM_RANGE(0xd0 , 0xdf) AM_DEVREADWRITE("ioccrtc" , i8275_device , read , write)
 	AM_RANGE(0xe0 , 0xef) AM_DEVREADWRITE("ioctimer" , pit8253_device , read , write);
 // DMA controller range doesn't extend to 0xff because register 0xfd needs to be read as 0xff
@@ -171,11 +171,12 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_iocbeep(*this , "iocbeep"),
 	m_ioctimer(*this , "ioctimer"),
 	m_iocfdc(*this , "iocfdc"),
+	m_flop0(*this, "iocfdc:0"),
+	m_flop1(*this, "iocfdc:1"),
 	m_iocpio(*this , "iocpio"),
 	m_kbcpu(*this , "kbcpu"),
 	m_palette(*this , "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
-	m_floppy0(*this , FLOPPY_0),
 	m_centronics(*this , "centronics"),
 	m_io_key0(*this , "KEY0"),
 	m_io_key1(*this , "KEY1"),
@@ -551,6 +552,17 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 	}
 }
 
+int imds2_state::floppy_load(floppy_image_device *dev)
+{
+	dev->mon_w(0);
+	return IMAGE_INIT_PASS;
+}
+
+void imds2_state::floppy_unload(floppy_image_device *dev)
+{
+	dev->mon_w(1);
+}
+
 void imds2_state::driver_start()
 {
 	// Allocate 64k for IPC RAM
@@ -566,8 +578,11 @@ void imds2_state::driver_start()
 
 void imds2_state::machine_start()
 {
-	m_floppy0->floppy_mon_w(0);
-	m_floppy0->floppy_drive_set_ready_state(1 , 0);
+	// As far as I can tell from the schmatic, there's no software motor control
+	m_flop0->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(imds2_state::floppy_load), this));
+	m_flop0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(imds2_state::floppy_unload), this));
+	m_flop1->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(imds2_state::floppy_load), this));
+	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(imds2_state::floppy_unload), this));
 }
 
 void imds2_state::video_start()
@@ -580,6 +595,10 @@ void imds2_state::machine_reset()
 	m_iocbeep->set_frequency(IOC_BEEP_FREQ);
 	m_ipc_control = 0x00;
 	m_ipc_ioc_status = 0x0f;
+	m_flop0->get_device()->mon_w(!m_flop0->get_device()->exists());
+	m_flop1->get_device()->mon_w(!m_flop1->get_device()->exists());
+
+	m_iocfdc->set_rate(500000); // The IMD images show a rate of 500kbps
 }
 
 bool imds2_state::imds2_in_ipc_rom(offs_t offset) const
@@ -737,15 +756,9 @@ static GFXDECODE_START(imds2)
 	GFXDECODE_ENTRY("gfx1" , 0x0000 , imds2_charlayout , 0 , 1)
 GFXDECODE_END
 
-static LEGACY_FLOPPY_OPTIONS_START(imds2)
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface imds2_floppy_interface =
-{
-	FLOPPY_STANDARD_8_SSSD,
-	LEGACY_FLOPPY_OPTIONS_NAME(imds2),
-	"floppy_8"
-};
+static SLOT_INTERFACE_START( imds2_floppies )
+	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_CPU_ADD("ipccpu" , I8085A , IPC_XTAL_Y2 / 2)  // 4 MHz
@@ -805,8 +818,8 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_I8257_OUT_HRQ_CB(WRITELINE(imds2_state, imds2_hrq_w))
 		MCFG_I8257_IN_MEMR_CB(READ8(imds2_state , imds2_ioc_mem_r))
 		MCFG_I8257_OUT_MEMW_CB(WRITE8(imds2_state , imds2_ioc_mem_w))
-		MCFG_I8257_IN_IOR_1_CB(DEVREAD8("iocfdc" , i8271_device , dack_r))
-		MCFG_I8257_OUT_IOW_1_CB(DEVWRITE8("iocfdc" , i8271_device , dack_w))
+		MCFG_I8257_IN_IOR_1_CB(DEVREAD8("iocfdc" , i8271_device , data_r))
+		MCFG_I8257_OUT_IOW_1_CB(DEVWRITE8("iocfdc" , i8271_device , data_w))
 		MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("ioccrtc" , i8275_device , dack_w))
 
 		MCFG_DEVICE_ADD("ioctimer" , PIT8253 , 0)
@@ -816,9 +829,8 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 
 		MCFG_DEVICE_ADD("iocfdc" , I8271 , IOC_XTAL_Y1 / 2)
 		MCFG_I8271_DRQ_CALLBACK(DEVWRITELINE("iocdma" , i8257_device , dreq1_w))
-		MCFG_I8271_FLOPPIES(FLOPPY_0 , FLOPPY_1)
-
-		MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, imds2_floppy_interface)
+		MCFG_FLOPPY_DRIVE_ADD("iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
+		MCFG_FLOPPY_DRIVE_ADD("iocfdc:1", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 
 		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
 		MCFG_CPU_IO_MAP(pio_io_map)

@@ -1439,6 +1439,12 @@ WRITE_LINE_MEMBER(bbc_state::bbc_i8271_interrupt)
 	m_previous_i8271_int_state = state;
 }
 
+WRITE_LINE_MEMBER(bbc_state::motor_w)
+{
+	m_i8271->subdevice<floppy_connector>("0")->get_device()->mon_w(!state);
+	m_i8271->subdevice<floppy_connector>("1")->get_device()->mon_w(!state);
+}
+
 
 /**************************************
    WD1770 disc control function
