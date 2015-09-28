@@ -311,6 +311,7 @@ extern const device_type N64PERIPH;
 #define DP_STATUS_XBUS_DMA      0x01
 #define DP_STATUS_FREEZE        0x02
 #define DP_STATUS_FLUSH         0x04
+#define DP_STATUS_START_VALID	0x400
 
 #define DD_ASIC_STATUS_DISK_CHANGE   0x00010000
 #define DD_ASIC_STATUS_MECHA_ERR     0x00020000
