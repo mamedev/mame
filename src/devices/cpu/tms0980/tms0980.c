@@ -172,8 +172,8 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // TMS1980 is a TMS0980 with a TMS1x00 style opla
 // - RAM, ROM, and main instructions PLA is exactly the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
-// - 32-term output PLA above the RAM, 7 bits!
-const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 9 R pins, high voltage
+// - 32-term output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
+const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, ? R pins, high voltage
 // TMS0260 is same?
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
@@ -316,7 +316,7 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 { }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 9, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 6, ADDRESS_MAP_NAME(data_64x9_as4), "tms1980", __FILE__)
+	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 11, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms1980", __FILE__)
 { }
 
 
