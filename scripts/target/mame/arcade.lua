@@ -3591,6 +3591,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vroulet.c",
 	MAME_DIR .. "src/mame/drivers/wildpkr.c",
 	MAME_DIR .. "src/mame/drivers/wms.c",
+	MAME_DIR .. "src/mame/drivers/wacky_gator.c",
 	MAME_DIR .. "src/mame/drivers/xtom3d.c",
 	MAME_DIR .. "src/mame/drivers/xyonix.c",
 	MAME_DIR .. "src/mame/video/xyonix.c",
