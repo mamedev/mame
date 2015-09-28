@@ -23,6 +23,8 @@ public:
 	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
+	UINT16 *identify_device_buffer() { return m_identify_buffer; }
+
 protected:
 	// device-level overrides
 	virtual void device_start();
