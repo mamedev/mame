@@ -1494,6 +1494,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx800.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.c",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
+		MAME_DIR .. "src/devices/bus/centronics/nec_p72.c",
+		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
 		MAME_DIR .. "src/devices/bus/centronics/printer.c",
 		MAME_DIR .. "src/devices/bus/centronics/printer.h",
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.c",
