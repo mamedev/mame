@@ -3024,9 +3024,21 @@ ROM_START( hyprdriv )
 	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, BAD_DUMP CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
 	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
+	ROM_SYSTEM_BIOS( 1, "update",       "Unknown Update" )
+	ROMX_LOAD( "hyperdrive1.2.u33", 0x000000, 0x100000, CRC(fcc922fb) SHA1(7bfa4f0614f561ba77ad2dc7d776af2c3e84b7e7), ROM_BIOS(2) )
+	/*  it's either an update to 1.40, or an older version, either way we can't use it with the drive we have, it reports the following
+		
+		'Valid Update Rom Detected'
+		'Processing Rom'
+		'Rom is Wrong Revision Level'
+		'Operation Failure'
+	
+	*/
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 9. */
-	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
+	ROM_LOAD( "hyperdrive1.1.u32", 0x000000, 0x80000, CRC(3120991e) SHA1(8e47888a5a23c9d3c0d0c64497e1cfb4e46c2cd6) )  /* Boot Rom Version 2. */ // doesn't work, maybe for older drive?
+	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  /* Boot Rom Version 9. */
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Version 1.40  Oct 23 1998  15:16:00 */
 	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
