@@ -265,30 +265,35 @@ READ8_MEMBER( at_state::ps2_portb_r )
  *
  **********************************************************/
 
-void at_state::init_at_common()
+void at_state::init_at_common(int xmsbase)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
 	/* MESS managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
-	if (m_ram->size() > 0x100000)
+	if (m_ram->size() > xmsbase)
 	{
-		offs_t ram_limit = 0x100000 + m_ram->size() - 0x100000;
+		offs_t ram_limit = 0x100000 + m_ram->size() - xmsbase;
 		space.install_read_bank(0x100000,  ram_limit - 1, "bank1");
 		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
-		membank("bank1")->set_base(m_ram->pointer() + 0x100000);
+		membank("bank1")->set_base(m_ram->pointer() + xmsbase);
 	}
 }
 
 DRIVER_INIT_MEMBER(at_state,atcga)
 {
-	init_at_common();
+	init_at_common(0xa0000);
 }
 
 DRIVER_INIT_MEMBER(at_state,atvga)
 {
-	init_at_common();
+	init_at_common(0xa0000);
+}
+
+DRIVER_INIT_MEMBER(at_state,atpci)
+{
+	init_at_common(0x100000);
 }
 
 DRIVER_INIT_MEMBER(at586_state,at586)

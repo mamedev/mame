@@ -243,7 +243,7 @@ DRIVER_INIT_MEMBER(at_state, megapcpla)
 {
 	UINT8* ROM = memregion("maincpu")->base();
 
-	init_at_common();
+	init_at_common(0xa0000);
 
 	ROM[0xf3c2a] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0xfaf37] = 0x45;
@@ -1702,7 +1702,7 @@ COMP ( 1993, apxena1,  ibm5170, 0,       at486,     atvga, at_state,      atvga,
 COMP ( 1993, apxenp2,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
 COMP ( 1990, c386sx16, ibm5170, 0,       at386sx,   atvga, at_state,      atvga,  "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
 COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,  "Commodore Business Machines",  "PC 30 III", MACHINE_NOT_WORKING )
-COMP ( 1995, ficpio2,  ibm5170, 0,       ficpio2,   atvga, at_state,      atvga,  "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
+COMP ( 1995, ficpio2,  ibm5170, 0,       ficpio2,   atvga, at_state,      atpci,  "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga, driver_device,      0,      "FIC", "VT-503", MACHINE_NOT_WORKING )
 COMP ( 1985, k286i,    ibm5170, 0,       k286i,     atcga, at_state,      atcga,  "Kaypro",   "286i", MACHINE_NOT_WORKING )
 COMP ( 1991, t2000sx,  ibm5170, 0,       at386sx,   atvga, at_state,      atvga,  "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )

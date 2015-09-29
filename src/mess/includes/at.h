@@ -161,10 +161,11 @@ public:
 	DECLARE_DRIVER_INIT(atcga);
 	DECLARE_DRIVER_INIT(atvga);
 	DECLARE_DRIVER_INIT(megapcpla);
+	DECLARE_DRIVER_INIT(atpci);
 	DECLARE_MACHINE_START(at);
 	DECLARE_MACHINE_RESET(at);
 	void pc_set_dma_channel(int channel, int state);
-	void init_at_common();
+	void init_at_common(int xmsbase);
 	UINT32 at_286_a20(bool state);
 };
 
