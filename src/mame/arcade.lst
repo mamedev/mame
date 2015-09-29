@@ -4700,6 +4700,26 @@ fantzn2xp       // (c) 2008 Sega / M2
 atomicp         // (c) 1990 Philko - korean clone board
 snapper         // (c) 1990 Philko - korean clone board
 
+// S16 decrypted bootlegs
+cottonjd
+sonicbomd
+ryukyud
+mvpjd
+exctleagd
+fpointd
+bulletd
+eswatj1d
+passshtjd
+tetris2d
+wb34d
+dduxjd
+goldnaxejd
+hwchampjd
+altbeastj3d
+aurailjd
+bayroutejd
+wrestwar1d
+
 // S16 Bootlegs
 bayrouteb1      // (c) 1989 (protected) (bootleg)
 bayrouteb2      // (c) 1989 (protected) (bootleg)
@@ -4757,6 +4777,16 @@ desertbrj       // 1992.10 Desert Breaker (Japan, FD1094)
 pontoon
 hamaway         // prototype
 
+ddcrewjd
+cltchitrjd
+desertbrjd
+lghostud
+astormjd
+bloxeedd
+mwalkjd
+wwallyjd
+wwallyjad
+
 // System18 Bootlegs
 astormbl        // BOOTLEG
 astormb2        // BOOTLEG
@@ -4790,6 +4820,10 @@ toutrun3        // 1987 (FD1094)
 toutrun2        // 1987 (FD1094)
 toutrun1        // 1987 (FD1094)
 toutrunj1       // 1987 (FD1094)
+toutrund		// bootleg
+toutrunjd		// bootleg
+toutrun3d		// bootleg
+toutrunj1d		// bootleg
 
 // X Board
 aburner         // 1987.07 After Burner (Japan)
@@ -4820,6 +4854,11 @@ gprider	    	// as above
 gpriderus       // 1990.12 GP Rider (US, FD1094)
 gprideru	 	// as above
 rascot          // 1991.?? Royal Ascot (Japan)
+
+// decrypted X-Board bootlegs
+racherod
+smgpjd
+abcopjd
 
 
 // Y-Board

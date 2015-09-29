@@ -1997,6 +1997,48 @@ MACHINE_CONFIG_END
 
 
 
+static MACHINE_CONFIG_FRAGMENT( smgp )
+	MCFG_FRAGMENT_ADD( xboard )
+
+	// basic machine hardware
+	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
+	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
+
+	MCFG_CPU_ADD("commcpu", Z80, XTAL_16MHz/2) // Z80E
+	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
+	MCFG_CPU_IO_MAP(smgp_comm_portmap)
+
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
+	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
+	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+
+	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_SEGAPCM_BANK(BANK_512)
+	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
+	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
+MACHINE_CONFIG_END
+
+const device_type SEGA_XBD_SMGP_DEVICE = &device_creator<segaxbd_smgp_state>;
+
+segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: segaxbd_state(mconfig, tag, owner, clock)
+{
+}
+
+machine_config_constructor segaxbd_smgp_state::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( smgp );
+}
+
+static MACHINE_CONFIG_START( sega_smgp, segaxbd_new_state )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_DEVICE, 0)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_FRAGMENT( rascot  )
 	MCFG_FRAGMENT_ADD( xboard )
 
@@ -2609,6 +2651,51 @@ ROM_START( rachero )
 	ROM_LOAD( "epr-12878.ic13",    0x40000, 0x20000, CRC(7c212c15) SHA1(360b332d2fb32d88949ff8b357a863ffaaca39c2) )
 ROM_END
 
+ROM_START( racherod )
+	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-13129.ic58", 0x00000, 0x20000, CRC(82ee7312) SHA1(4d011529b538885bbc3bb1cb23048b785d3be318) )
+	ROM_LOAD16_BYTE( "bootleg_epr-13130.ic63", 0x00001, 0x20000, CRC(53fb8649) SHA1(8b66d6e2018f92c7c992944ed5d4a685d9f13a6d) )
+	ROM_LOAD16_BYTE( "epr-12855.ic57", 0x40000, 0x20000,CRC(cecf1e73) SHA1(3f8631379f32dbfda7720ef345276f9be23ada06) )
+	ROM_LOAD16_BYTE( "epr-12856.ic62", 0x40001, 0x20000,CRC(da900ebb) SHA1(595ed65248185ddf8666b3f30ad6329162116448) )
+
+	ROM_REGION( 0x80000, "mainpcb:subcpu", 0 ) // 2nd 68000 code
+	ROM_LOAD16_BYTE( "epr-12857.ic20", 0x00000, 0x20000, CRC(8a2328cc) SHA1(c34498428ddfb3eeb986f4153a6165a685d8fc8a) )
+	ROM_LOAD16_BYTE( "epr-12858.ic29", 0x00001, 0x20000, CRC(38a248b7) SHA1(a17672123665403c1c56fedab6c8abf44b1131f9) )
+
+	ROM_REGION( 0x30000, "mainpcb:gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-12879.ic154", 0x00000, 0x10000, CRC(c1a9de7a) SHA1(2425456a9d4ba92e1f2da6c2f164a6d5a5dee7c7) )
+	ROM_LOAD( "epr-12880.ic153", 0x10000, 0x10000, CRC(27ff04a5) SHA1(b554a6e060f4803100be8efa52977b503eb0f31d) )
+	ROM_LOAD( "epr-12881.ic152", 0x20000, 0x10000, CRC(72f14491) SHA1(b7a6cbd08470a5edda77cdd0337abd502c4905fd) )
+
+	ROM_REGION32_LE( 0x200000, "mainpcb:sprites", 0 ) // sprites
+	ROM_LOAD32_BYTE( "epr-12872.ic90",  0x000000, 0x20000, CRC(68d56139) SHA1(b5f32edbda10c31d52f90defea2bae226676069f) )
+	ROM_LOAD32_BYTE( "epr-12873.ic94",  0x000001, 0x20000, CRC(3d3ec450) SHA1(ac96ad8c7b365478bd1e5826a073e242f1208247) )
+	ROM_LOAD32_BYTE( "epr-12874.ic98",  0x000002, 0x20000, CRC(7d6bde23) SHA1(88b12ec6386cdad60b0028b72033a0037a0cdbdb) )
+	ROM_LOAD32_BYTE( "epr-12875.ic102", 0x000003, 0x20000, CRC(e33092bf) SHA1(31e211e25adac0a98befb459093f23c905fbc1e6) )
+	ROM_LOAD32_BYTE( "epr-12868.ic91",  0x080000, 0x20000, CRC(96289583) SHA1(4d37e67860bc0e6ef69f0a0775c28f6f2fd6875e) )
+	ROM_LOAD32_BYTE( "epr-12869.ic95",  0x080001, 0x20000, CRC(2ef0de02) SHA1(11ee3d77df2cddd3156da52e50565505f95f4cd4) )
+	ROM_LOAD32_BYTE( "epr-12870.ic99",  0x080002, 0x20000, CRC(c76630e1) SHA1(7b76e4819990e147639d6b930b17b6fa10df191c) )
+	ROM_LOAD32_BYTE( "epr-12871.ic103", 0x080003, 0x20000, CRC(23401b1a) SHA1(eaf465ffda84bdb83cc85daf781275bada396aab) )
+	ROM_LOAD32_BYTE( "epr-12864.ic92",  0x100000, 0x20000, CRC(77d6cff4) SHA1(1e625204801d03369311844efb26d22216253ac4) )
+	ROM_LOAD32_BYTE( "epr-12865.ic96",  0x100001, 0x20000, CRC(1e7e685b) SHA1(532fe361357383aa9dada833cbe31716c58001e5) )
+	ROM_LOAD32_BYTE( "epr-12866.ic100", 0x100002, 0x20000, CRC(fdf31329) SHA1(9c229a0f9d8b8114acfe4f17b45a9b8640560b3e) )
+	ROM_LOAD32_BYTE( "epr-12867.ic104", 0x100003, 0x20000, CRC(b25e37fd) SHA1(fef5bfe4690b3203b83fd565d883b2c63f439633) )
+	ROM_LOAD32_BYTE( "epr-12860.ic93",  0x180000, 0x20000, CRC(86b64119) SHA1(d39aedad0f05e500e33af888126bd2fc22539141) )
+	ROM_LOAD32_BYTE( "epr-12861.ic97",  0x180001, 0x20000, CRC(bccff19b) SHA1(32c3f7802a12be02a114b78cd898c46fcb1c0a61) )
+	ROM_LOAD32_BYTE( "epr-12862.ic101", 0x180002, 0x20000, CRC(7d4c3b05) SHA1(4e25a077b403549c681c5047912d0e28f4c07720) )
+	ROM_LOAD32_BYTE( "epr-12863.ic105", 0x180003, 0x20000, CRC(85095053) SHA1(f93194ecc0300956280cc0515b3e3ba2c9f71364) )
+
+	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	// none
+
+	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-12859.ic17",    0x00000, 0x10000, CRC(d57881da) SHA1(75b7f331ea8c2e33d6236e0c8fc8dabe5eef8160) )
+
+	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	ROM_LOAD( "epr-12876.ic11",    0x00000, 0x20000, CRC(f72a34a0) SHA1(28f7d077c24352557da3a91a7e49b0c5b79f2a2e) )
+	ROM_LOAD( "epr-12877.ic12",    0x20000, 0x20000, CRC(18c1b6d2) SHA1(860cbb96999ab76c40ce96996bba70c42d845abc) )
+	ROM_LOAD( "epr-12878.ic13",    0x40000, 0x20000, CRC(7c212c15) SHA1(360b332d2fb32d88949ff8b357a863ffaaca39c2) )
+ROM_END
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -3205,6 +3292,66 @@ ROM_START( smgpj )
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
+
+ROM_START( smgpjd )
+	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-12432b.58", 0x00000, 0x20000, CRC(1c46c4de) SHA1(32711dfb8209317c6c2fc0fbb8f04b907123a4dc) )
+	ROM_LOAD16_BYTE( "bootleg_epr-12433b.63", 0x00001, 0x20000, CRC(ae8a4942) SHA1(53f52e6431353d611ac6a3520af053f955b79b37))
+
+	ROM_REGION( 0x80000, "mainpcb:subcpu", 0 ) // 2nd 68000 code
+	ROM_LOAD16_BYTE( "epr-12441a.20", 0x00000, 0x20000, CRC(2c9599c1) SHA1(79206f38c2976bd9299ed37bf62ac26dd3fba801) )
+	ROM_LOAD16_BYTE( "epr-12442a.29", 0x00001, 0x20000, CRC(77a5ec16) SHA1(b8cf6a3f12689d89bbdd9fb39d1cb7d1a3c10602) )
+
+	ROM_REGION( 0x30000, "mainpcb:gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
+	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
+	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
+
+	ROM_REGION32_LE( 0x200000, "mainpcb:sprites", 0 ) // sprites
+	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
+	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
+	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
+	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
+	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
+	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
+	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
+	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
+	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
+	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
+	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
+	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
+	ROM_LOAD32_BYTE( "epr-12413.93",  0x180000, 0x20000, CRC(2f1693df) SHA1(ba1e654a1b5fae661b0dae4a8ed04ff50fb546a2) )
+	ROM_LOAD32_BYTE( "epr-12414.97",  0x180001, 0x20000, CRC(c78f3d45) SHA1(665750907ed11c89c2ea5c410eac2808445131ae) )
+	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
+	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
+
+	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	// none??
+
+	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
+
+	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+
+	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
+
+	ROM_REGION( 0x10000, "mainpcb:motorcpu", 0 ) // z80 on air board
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
+ROM_END
+
+
 //*************************************************************************************************************************
 //  Super Monaco GP, Sega X-board
 //  CPU: FD1094 (317-0124a)
@@ -3339,6 +3486,52 @@ ROM_START( abcopj )
 
 	ROM_REGION( 0x2000, "mainpcb:maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0169b.key", 0x0000, 0x2000, CRC(058da36e) SHA1(ab3f68a90725063c68fc5d0f8dbece1f8940dc7d) )
+
+	ROM_REGION( 0x80000, "mainpcb:subcpu", 0 ) // 2nd 68000 code
+	ROM_LOAD16_BYTE( "epr-13566.ic20", 0x00000, 0x20000, CRC(22e52f32) SHA1(c67a4ccb88becc58dddcbfea0a1ac2017f7b2929) )
+	ROM_LOAD16_BYTE( "epr-13565.ic29", 0x00001, 0x20000, CRC(a21784bd) SHA1(b40ba0ef65bbfe514625253f6aeec14bf4bcf08c) )
+
+	ROM_REGION( 0x30000, "mainpcb:gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-13553.ic154", 0x00000, 0x10000, CRC(8c418837) SHA1(e325db39fae768865e20d2cd1ee2b91a9b0165f5) )
+	ROM_LOAD( "opr-13554.ic153", 0x10000, 0x10000, CRC(4e3df9f0) SHA1(8b481c2cd25c58612ac8ac3ffb7eeae9ca247d2e) )
+	ROM_LOAD( "opr-13555.ic152", 0x20000, 0x10000, CRC(6c4a1d42) SHA1(6c37b045b21173f1e2f7bd19d01c00979b8107fb) )
+
+	ROM_REGION32_LE( 0x200000, "mainpcb:sprites", 0 ) // sprites
+	ROM_LOAD32_BYTE( "opr-13552.ic90",  0x000000, 0x20000, CRC(cc2cf706) SHA1(ad39c22e652ebcd90ffb5e17ae35985645f93c71) )
+	ROM_LOAD32_BYTE( "opr-13551.ic94",  0x000001, 0x20000, CRC(d6f276c1) SHA1(9ec68157ea460e09ef4b69aa8ea17687dc47ea59) )
+	ROM_LOAD32_BYTE( "opr-13550.ic98",  0x000002, 0x20000, CRC(f16518dd) SHA1(a5f1785cd28f03069cb238ac92c6afb5a26cbd37) )
+	ROM_LOAD32_BYTE( "opr-13549.ic102", 0x000003, 0x20000, CRC(cba407a7) SHA1(e7684d3b40baa6d832b887fd85ad67fbad8aa7de) )
+	ROM_LOAD32_BYTE( "opr-13548.ic91",  0x080000, 0x20000, CRC(080fd805) SHA1(e729565815a3a37462cfee460b7392d2f08e96e5) )
+	ROM_LOAD32_BYTE( "opr-13547.ic95",  0x080001, 0x20000, CRC(42d4dd68) SHA1(6ae1f3585ebb20fd2908456d6fa41a893261277e) )
+	ROM_LOAD32_BYTE( "opr-13546.ic99",  0x080002, 0x20000, CRC(ca6fbf3d) SHA1(49c3516d87f1546fa7efe785fc5c064d90b1cb8e) )
+	ROM_LOAD32_BYTE( "opr-13545.ic103", 0x080003, 0x20000, CRC(c9e58dd2) SHA1(ace2e1630d8df2454183ffdbe26d8cb6d199e940) )
+	ROM_LOAD32_BYTE( "opr-13544.ic92",  0x100000, 0x20000, CRC(9c1436d9) SHA1(5156e1b5c7461f6dc0d449b86b6b72153b290a4c) )
+	ROM_LOAD32_BYTE( "opr-13543.ic96",  0x100001, 0x20000, CRC(2c1c8f0e) SHA1(19c9fd4272a3db18381f435ed6cd01f994c655e7) )
+	ROM_LOAD32_BYTE( "opr-13542.ic100", 0x100002, 0x20000, CRC(01fd52b8) SHA1(b4ab13c7b2b2ffcfdab37d8e4855d5ef8823f1cc) )
+	ROM_LOAD32_BYTE( "opr-13541.ic104", 0x100003, 0x20000, CRC(a45c547b) SHA1(d93aaa850d14a7699a1b0411e823088a9bce7553) )
+	ROM_LOAD32_BYTE( "opr-13540.ic93",  0x180000, 0x20000, CRC(84b42ab0) SHA1(d24ba7fe23463fc5813ef26e0395951559d6d162) )
+	ROM_LOAD32_BYTE( "opr-13539.ic97",  0x180001, 0x20000, CRC(cd6e524f) SHA1(e6df2552a84b2da95301486379c78679b0297634) )
+	ROM_LOAD32_BYTE( "opr-13538.ic101", 0x180002, 0x20000, CRC(bf9a4586) SHA1(6013dee83375d72d262c8c04c2e668afea2e216c) )
+	ROM_LOAD32_BYTE( "opr-13537.ic105", 0x180003, 0x20000, CRC(fa14ed3e) SHA1(d684496ade2517696a56c1423dd4686d283c133f) )
+
+	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	ROM_LOAD( "opr-13564.ic40",  0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
+
+	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
+
+	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	ROM_LOAD( "opr-13563.ic11",    0x00000, 0x20000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
+	ROM_LOAD( "opr-13562.ic12",    0x20000, 0x20000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
+	ROM_LOAD( "opr-13561.ic13",    0x40000, 0x20000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
+ROM_END
+
+ROM_START( abcopjd )
+	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-13557b.ic58", 0x00000, 0x20000, CRC(91f5d930) SHA1(8e3a4645b64b71cafa43bba3fd167dea494d7748) )
+	ROM_LOAD16_BYTE( "bootleg_epr-13556b.ic63", 0x00001, 0x20000, CRC(1078246e) SHA1(3490f46c1f52d41f96fb449bdcee5fbec871aaca) )
+	ROM_LOAD16_BYTE( "epr-13559.ic57",  0x40000, 0x20000, CRC(4588bf19) SHA1(6a8b3d4450ac0bc41b46e6a4e1b44d82112fcd64) )
+	ROM_LOAD16_BYTE( "epr-13558.ic62",  0x40001, 0x20000, CRC(11259ed4) SHA1(e7de174a0bdb1d1111e5e419f1d501ab5be1d32d) )
 
 	ROM_REGION( 0x80000, "mainpcb:subcpu", 0 ) // 2nd 68000 code
 	ROM_LOAD16_BYTE( "epr-13566.ic20", 0x00000, 0x20000, CRC(22e52f32) SHA1(c67a4ccb88becc58dddcbfea0a1ac2017f7b2929) )
@@ -3979,24 +4172,32 @@ DRIVER_INIT_MEMBER(segaxbd_new_state_double,gprider_double)
 //    YEAR, NAME,     PARENT,   MACHINE,        INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1987, aburner2, 0,        sega_xboard,         aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II", 0 )
 GAME( 1987, aburner2g,aburner2, sega_xboard,         aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II (German)", 0 )
+
 GAME( 1987, aburner,  aburner2, sega_xboard,         aburner,  segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner", 0 )
+
 GAME( 1987, thndrbld, 0,        sega_xboard_fd1094,  thndrbld, driver_device,     0,  ROT0,   "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1,thndrbld, sega_xboard,         thndrbd1, driver_device,     0,  ROT0,   "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
-GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, lastsurv, ROT0,   "Sega", "Last Survivor (Japan, FD1094 317-0083)", 0 )
-GAME( 1989, loffire,  0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )
-GAME( 1989, loffireu, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
-GAME( 1989, loffirej, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )
+
+GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, lastsurv, ROT0,   "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
+
+GAME( 1989, loffire,  0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World) (FD1094 317-0136)", 0 )
+GAME( 1989, loffireu, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US) (FD1094 317-0135)", 0 )
+GAME( 1989, loffirej, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan) (FD1094 317-0134)", 0 )
+
 GAME( 1989, rachero,  0,        sega_xboard_fd1094,  rachero,  driver_device,     0,  ROT0,   "Sega", "Racing Hero (FD1094 317-0144)", 0 )
-GAME( 1989, smgp,     0,        sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World, Rev B, FD1094 317-0126a)", 0 )
-GAME( 1989, smgp6,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World, Rev A, FD1094 317-0126a)", 0 )
-GAME( 1989, smgp5,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World, FD1094 317-0126)", 0 )
-GAME( 1989, smgpu,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (US, Rev C, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpu1,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (US, Rev B, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpu2,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (US, Rev A, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpj,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (Japan, Rev B, FD1094 317-0124a)", 0 )
-GAME( 1989, smgpja,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (Japan, Rev A, FD1094 317-0124a)", 0 )
-GAME( 1990, abcop,    0,        sega_xboard_fd1094,  abcop,    driver_device,     0,  ROT0,   "Sega", "A.B. Cop (World, FD1094 317-0169b)", 0 )
-GAME( 1990, abcopj,   abcop,    sega_xboard_fd1094,  abcop,    driver_device,     0,  ROT0,   "Sega", "A.B. Cop (Japan, FD1094 317-0169b)", 0 )
+
+GAME( 1989, smgp,     0,        sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World, Rev B) (FD1094 317-0126a)", 0 )
+GAME( 1989, smgp6,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World, Rev A) (FD1094 317-0126a)", 0 )
+GAME( 1989, smgp5,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World) (FD1094 317-0126)", 0 )
+GAME( 1989, smgpu,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (US, Rev C) (FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu1,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (US, Rev B) (FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu2,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (US, Rev A) (FD1094 317-0125a)", 0 )
+GAME( 1989, smgpj,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (Japan, Rev B) (FD1094 317-0124a)", 0 )
+GAME( 1989, smgpja,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (Japan, Rev A) (FD1094 317-0124a)", 0 )
+
+GAME( 1990, abcop,    0,        sega_xboard_fd1094,  abcop,    driver_device,     0,  ROT0,   "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
+GAME( 1990, abcopj,   abcop,    sega_xboard_fd1094,  abcop,    driver_device,     0,  ROT0,   "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
+
 // wasn't officially available as a single PCB setup, but runs anyway albeit with messages suggesting you can compete against a rival that doesn't exist?
 GAME( 1990, gpriders, gprider,  sega_xboard_fd1094,  gprider, segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
 GAME( 1990, gpriderus,gprider,  sega_xboard_fd1094,  gprider, segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
@@ -4009,3 +4210,9 @@ GAME( 1990, gpriderj,gprider,  sega_xboard_fd1094_double, gprider_double,  segax
 
 // X-Board + other boards?
 GAME( 1991, rascot,   0,        sega_rascot,         rascot,   segaxbd_new_state, rascot,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// decrypted bootlegs
+GAME( 1989, racherod, rachero,  sega_xboard,  rachero,  driver_device,     0,   ROT0,   "bootleg", "Racing Hero (bootleg of FD1094 317-0144 set)", 0 )
+GAME( 1989, smgpjd,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp,ROT0,   "bootleg", "Super Monaco GP (Japan, Rev B) (bootleg of FD1094 317-0124a set)", 0 )
+GAME( 1990, abcopjd,  abcop,    sega_xboard,  abcop,    driver_device,     0,  ROT0,    "bootleg", "A.B. Cop (Japan) (bootleg of FD1094 317-0169b set)", 0 )
+
