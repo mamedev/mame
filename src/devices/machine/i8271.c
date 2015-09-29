@@ -467,7 +467,7 @@ void i8271_device::live_run(attotime limit)
 		case SCAN_SECTOR_DATA_BYTE:
 			if(!scan_done)
 			{
-				UINT8 data;
+				UINT8 data = 0;
 				if(!get_input(&data)) {
 					live_delay(IDLE);
 					return;
@@ -542,7 +542,7 @@ void i8271_device::live_run(attotime limit)
 				cur_live.crc = 0xffff;
 				live_write_raw(BIT(command[0], 2) ? 0xf56a : 0xf56f);
 			} else if(cur_live.byte_counter < 7+sector_size) {
-				UINT8 data;
+				UINT8 data = 0;
 				if(!get_input(&data)) {
 					live_delay(IDLE);
 					return;
@@ -599,7 +599,7 @@ void i8271_device::live_run(attotime limit)
 				cur_live.crc = 0xffff;
 				live_write_raw(0xf57e);
 			} else if(cur_live.byte_counter < 11) {
-				UINT8 data;
+				UINT8 data = 0;
 				if(!get_input(&data)) {
 					live_delay(IDLE);
 					return;
