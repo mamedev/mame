@@ -4570,6 +4570,8 @@ enduror         // (c) 1985 (FD1089B)
 enduror1        // (c) 1985 (FD1089B)
 endurob2        // (c) 1985 (Beta bootleg)
 endurobl        // (c) 1985 (Herb bootleg)
+endurord		// bootleg
+enduror1d		// bootleg
 hangon          // (c) 1985 (Rev A)
 hangon1         // (c) 1985
 hangon2         // (c) 1985
@@ -4898,10 +4900,21 @@ gprideru	 	// as above
 rascot          // 1991.?? Royal Ascot (Japan)
 
 // decrypted X-Board bootlegs
+thndrbldd
 racherod
+smgpd
+smgp6d
+smgp5d
+smgpud
+smgpu1d
+smgpu2d
 smgpjd
+abcopd
 abcopjd
-
+lastsurvd
+loffired
+loffireud
+loffirejd
 
 // Y-Board
 				// 1988.05 Galaxy Force (Japan)

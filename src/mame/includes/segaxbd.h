@@ -193,6 +193,18 @@ protected:
 //  virtual void device_reset();
 };
 
+class segaxbd_lastsurv_state :  public segaxbd_state
+{
+public:
+	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+
 class segaxbd_smgp_fd1094_state :  public segaxbd_state
 {
 public:
