@@ -469,7 +469,7 @@ READ8_MEMBER(a78_rom_act_device::read_40xx)
 
 WRITE8_MEMBER(a78_rom_act_device::write_40xx)
 {
-	if (offset >= 0xbf80 && offset <= 0xbf87)
+	if (offset >= 0xbf80 && offset <= 0xbf8f)
 		m_bank = offset & 7;
 }
 
