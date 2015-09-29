@@ -322,6 +322,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<software name="rescue3d">
+		<description>Rescue Copter [3D] (Jpn)</description>
+		<year>1984</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="レスキュー コプター"/>
+		<info name="serial" value="024E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="rescue.bin" size="32768" crc="b28307dc" sha1="137c8d3cdc10a9ecb6270ee61c7a0979a26b3064" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="saurus">
 		<description>Saurusland (Jpn)</description>
 		<year>1983</year>
@@ -393,6 +406,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="trafjama.bin" size="8192" crc="c0c78141" sha1="2ba074955a1507ca9f6cde8987695f495e81aeab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tripcomm">
+		<description>Triple Command (Jpn)</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="トリプルコマンド"/>
+		<info name="serial" value="022E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tripl.bin" size="8192" crc="d2bc85cc" sha1="a7c59c6c6c673f3706decfed4b5df46ed1e6cf88" offset="0" />
 			</dataarea>
 		</part>
 	</software>
