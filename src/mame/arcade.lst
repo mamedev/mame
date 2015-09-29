@@ -4612,6 +4612,13 @@ wb31            // (c) 1988 Sega / Westone (FD1094)
 wb35            // (c) 1988 Sega / Westone (FD1089A)
 passsht16a      // (c) 1988 (FD1094)
 
+// System 16A decrypted bootlegs
+wb31d
+wb35d
+shinobi1d
+tetrisd
+tetris3d
+
 // System 16B
 aceattac        // (c) 1988 (FD1094)
 aliensyn        // (c) 1987 (Unprotected)
@@ -4858,6 +4865,7 @@ toutrund		// bootleg
 toutrunjd		// bootleg
 toutrun3d		// bootleg
 toutrunj1d		// bootleg
+shangon3d		// bootleg
 
 // X Board
 aburner         // 1987.07 After Burner (Japan)

@@ -1871,6 +1871,58 @@ ROM_START( shangon3 )
 	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
 ROM_END
 
+ROM_START( shangon3d )
+	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-10789.133",  0x000000, 0x10000, CRC(9ec9b552) SHA1(0806acfdd1bc7711c90d608dd1383cc06902bfd5) )
+	ROM_LOAD16_BYTE( "bootleg_epr-10788.118",  0x000001, 0x10000, CRC(693821c4) SHA1(be020570480670fefb29cc4ec57497f4c6c9d425) )
+	ROM_LOAD16_BYTE( "bootleg_epr-10637a.132", 0x020000, 0x10000, CRC(a67a65b5) SHA1(b36503ea45aa852dd72f30461e009056e766f555) )
+	ROM_LOAD16_BYTE( "bootleg_epr-10635a.117", 0x020001, 0x10000, CRC(689961b9) SHA1(3f7cb83abd93f68be4168d2115d4dcab0487d1ef) )
+
+	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
+	ROM_LOAD16_BYTE( "epr-10792.76", 0x00000, 0x10000, CRC(16299d25) SHA1(b14d5feef3e6889320d51ffca36801f4c9c4d5f8) )
+	ROM_LOAD16_BYTE( "epr-10790.58", 0x00001, 0x10000, CRC(2246cbc1) SHA1(c192b1ddf4c848adb564c7c87d5413d62ed650d7) )
+	ROM_LOAD16_BYTE( "epr-10793.75", 0x20000, 0x10000, CRC(d9525427) SHA1(cdb24db9f7a293f20fd8becc4afe84fd6abd678a) )
+	ROM_LOAD16_BYTE( "epr-10791.57", 0x20001, 0x10000, CRC(5faf4cbe) SHA1(41659a961e6469d9233849c3c587cd5a0a141344) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10652.54", 0x00000, 0x08000, CRC(260286f9) SHA1(dc7c8d2c6ef924a937328685eed19bda1c8b1819) )
+	ROM_LOAD( "epr-10651.55", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
+	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
+
+	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10675.8",  0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
+	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
+	ROM_LOAD16_BYTE( "epr-10676.7",  0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
+	ROM_LOAD16_BYTE( "epr-10683.15", 0x020000, 0x010000, CRC(6365d2e9) SHA1(688e2ba194e859f86cd3486c2575ebae257e975a) )
+	ROM_LOAD16_BYTE( "epr-10677.6",  0x040001, 0x010000, CRC(8a57b8d6) SHA1(df1a31559dd2d1e7c2c9d800bf97526bdf3e84e6) )
+	ROM_LOAD16_BYTE( "epr-10684.14", 0x040000, 0x010000, CRC(3aff8910) SHA1(4b41a49a7f02363424e814b37edce9a7a44a112e) )
+	ROM_LOAD16_BYTE( "epr-10678.5",  0x060001, 0x010000, CRC(af473098) SHA1(a2afaba1cbf672949dc50e407b46d7e9ae183774) )
+	ROM_LOAD16_BYTE( "epr-10685.13", 0x060000, 0x010000, CRC(80bafeef) SHA1(f01bcf65485e60f34e533295a896fca0b92e5b14) )
+	ROM_LOAD16_BYTE( "epr-10679.4",  0x080001, 0x010000, CRC(03bc4878) SHA1(548fc58bcc620204e30fa12fa4c4f0a3f6a1e4c0) )
+	ROM_LOAD16_BYTE( "epr-10686.12", 0x080000, 0x010000, CRC(274b734e) SHA1(906fa528659bc17c9b4744cec52f7096711adce8) )
+	ROM_LOAD16_BYTE( "epr-10680.3",  0x0a0001, 0x010000, CRC(9f0677ed) SHA1(5964642b70bfad418da44f2d91476f887b021f74) )
+	ROM_LOAD16_BYTE( "epr-10687.11", 0x0a0000, 0x010000, CRC(508a4701) SHA1(d17aea2aadc2e2cd65d81bf91feb3ef6923d5c0b) )
+	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
+	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
+	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
+	// socket IC11 not populated
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10649a.88", 0x0000, 0x08000, CRC(bf38330f) SHA1(3d825bb02ef5a9f5c4fcaa71b3735e7f8e47f178) )
+
+	ROM_REGION( 0x40000, "pcm", ROMREGION_ERASEFF ) // sound PCM data
+	ROM_LOAD( "epr-10643.66", 0x00000, 0x08000, CRC(06f55364) SHA1(fd685795e12541e3d0059d383fab293b3980d247) )
+	ROM_RELOAD(               0x08000, 0x08000 )
+	ROM_LOAD( "epr-10644.67", 0x10000, 0x08000, CRC(b41d541d) SHA1(28bbfa5edaa4a5901c74074354ba6f14d8f42ff6) )
+	ROM_RELOAD(               0x18000, 0x08000 )
+	ROM_LOAD( "epr-10645.68", 0x20000, 0x08000, CRC(a60dabff) SHA1(bbef0fb0d7837cc7efc866226bfa2bd7fab06459) )
+	ROM_RELOAD(               0x28000, 0x08000 )
+	ROM_LOAD( "epr-10646.69", 0x30000, 0x08000, CRC(473cc411) SHA1(04ca2d047eb59581cd5d76e0ac6eca8b19eef497) )
+	ROM_RELOAD(               0x38000, 0x08000 )
+ROM_END
+
 //*************************************************************************************************************************
 //  Super Hangon
 //  CPU: FD1089B (317-0034)
@@ -2751,7 +2803,10 @@ GAMEL(1989, toutrun2,  toutrun, outrun_fd1094,   toutrunct,segaorun_state,outrun
 GAMEL(1989, toutrun1,  toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (deluxe cockpit) (FD1094 317-0109)", 0,         layout_outrun )
 GAMEL(1989, toutrunj1, toutrun, outrun_fd1094,   toutrunct,segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, cockpit) (FD1094 317-0101)", 0,         layout_outrun )
 
+// decrypted bootlegs
 GAMEL(1989, toutrund,  toutrun, outrun,   toutrun,  segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (Out Run upgrade) (bootleg of FD1094 317-0118 set)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
 GAMEL(1989, toutrunjd, toutrun, outrun,   toutrun,  segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, Out Run upgrade) (bootleg of FD1094 317-0117 set)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
 GAMEL(1989, toutrun3d, toutrun, outrun,   toutrunc, segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (cockpit) (bootleg of FD1094 317-0107 set)", 0,                layout_outrun )
 GAMEL(1989, toutrunj1d,toutrun, outrun,   toutrunct,segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, cockpit) (bootleg of FD1094 317-0101 set)", 0,         layout_outrun )
+
+GAME( 1987, shangon3d, shangon, shangon,  shangon,  segaorun_state,shangon, ROT0,   "bootleg",    "Super Hang-On (sitdown/upright) (bootleg of FD1089B 317-0034 set)", 0 )

@@ -3128,6 +3128,46 @@ ROM_START( shinobi1 )
 	ROM_LOAD( "epr-11268.1",  0x0000, 0x8000, CRC(6d7966da) SHA1(90f55a99f784c21d7c135e630f4e8b1d4d043d66) )
 ROM_END
 
+ROM_START( shinobi1d )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-11262.42", 0x000000, 0x10000, CRC(9a54a498) SHA1(34413767d09178f715be4147dfe48e3b1ef95021) )
+	ROM_LOAD16_BYTE( "bootleg_epr-11260.27", 0x000001, 0x10000, CRC(8f571c5f) SHA1(6264fad35ca7e6ae38a0a4c49a7aba16ddb8a0e2) )
+	ROM_LOAD16_BYTE( "epr-11263.43", 0x020000, 0x10000, CRC(a2a620bd) SHA1(f8b135ce14d6c5eac5e40ddfd5ad2f1e6f2bc7a6) )
+	ROM_LOAD16_BYTE( "epr-11261.25", 0x020001, 0x10000, CRC(a3ceda52) SHA1(97a1c52a162fb1d43b3f8f16613b70ce582a8d26) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-11264.95", 0x00000, 0x10000, CRC(46627e7d) SHA1(66bb5b22a2100e7b9df303007a837bc2d52cf7ba) )
+	ROM_LOAD( "epr-11265.94", 0x10000, 0x10000, CRC(87d0f321) SHA1(885b38eaff2dcaeab4eeaa20cc8a2885d520abd6) )
+	ROM_LOAD( "epr-11266.93", 0x20000, 0x10000, CRC(efb4af87) SHA1(0b8a905023e1bc808fd2b1c3cfa3778cde79e659) )
+
+	ROM_REGION16_BE( 0x080000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-11290.10", 0x00001, 0x08000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
+	ROM_CONTINUE(                    0x40001, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-11294.11", 0x00000, 0x08000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
+	ROM_CONTINUE(                    0x40000, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-11291.17", 0x10001, 0x08000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
+	ROM_CONTINUE(                    0x50001, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-11295.18", 0x10000, 0x08000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
+	ROM_CONTINUE(                    0x50000, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-11292.23", 0x20001, 0x08000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
+	ROM_CONTINUE(                    0x60001, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-11296.24", 0x20000, 0x08000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
+	ROM_CONTINUE(                    0x60000, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-11293.29", 0x30001, 0x08000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
+	ROM_CONTINUE(                    0x70001, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-11297.30", 0x30000, 0x08000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
+	ROM_CONTINUE(                    0x70000, 0x08000 )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11267.12", 0x0000, 0x8000, CRC(dd50b745) SHA1(52e1977569d3713ad864d607170c9a61cd059a65) )
+
+	ROM_REGION( 0x1000, "n7751", 0 )      // 4k for 7751 onboard ROM
+	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) // 7751 - U34
+
+	ROM_REGION( 0x08000, "n7751data", 0 ) // 7751 sound data
+	ROM_LOAD( "epr-11268.1",  0x0000, 0x8000, CRC(6d7966da) SHA1(90f55a99f784c21d7c135e630f4e8b1d4d043d66) )
+ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -3249,6 +3289,25 @@ ROM_START( tetris )
 	ROM_LOAD( "epr-12205.rom", 0x0000, 0x8000, CRC(6695dc99) SHA1(08123aa24c302bc9243329384bd9c2545a4d50c3) )
 ROM_END
 
+ROM_START( tetrisd )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-12201.rom", 0x000000, 0x8000, CRC(0b694740) SHA1(c480e14c36f063851732d0a5985a6c744fa96062) )
+	ROM_LOAD16_BYTE( "bootleg_epr-12200.rom", 0x000001, 0x8000, CRC(343c0670) SHA1(cc0b7eeea411d533e973e71fe3121285e24869b0) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-12202.rom", 0x00000, 0x10000, CRC(2f7da741) SHA1(51a685673b4a57a13818eca65d122230f20bd9a0) )
+	ROM_LOAD( "epr-12203.rom", 0x10000, 0x10000, CRC(a6e58ec5) SHA1(5a6c43c989768270e0ab61cfaa5ef86d4607fe20) )
+	ROM_LOAD( "epr-12204.rom", 0x20000, 0x10000, CRC(0ae98e23) SHA1(f067b81b85f9e03a6373c7c53ff52d5395b8a985) )
+
+	ROM_REGION16_BE( 0x10000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-12169.b1",  0x00001, 0x8000, CRC(dacc6165) SHA1(87b1a7643e3630ff73b2b117752496e1ea5da23d) )
+	ROM_LOAD16_BYTE( "epr-12170.b5",  0x00000, 0x8000, CRC(87354e42) SHA1(e7fd55aee59b51d82cb9b619fbb815ad6839560c) )
+
+	ROM_REGION( 0x40000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-12205.rom", 0x0000, 0x8000, CRC(6695dc99) SHA1(08123aa24c302bc9243329384bd9c2545a4d50c3) )
+ROM_END
+
+
 //*************************************************************************************************************************
 //  Tetris, Sega System 16A
 //  CPU: FD1094 (317-0093a)
@@ -3274,6 +3333,23 @@ ROM_START( tetris3 )
 	ROM_LOAD( "epr-12205.rom", 0x0000, 0x8000, CRC(6695dc99) SHA1(08123aa24c302bc9243329384bd9c2545a4d50c3) )
 ROM_END
 
+ROM_START( tetris3d )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-12201a.43", 0x000000, 0x8000, CRC(1d88bd84) SHA1(ddb05a131dea2df70abe197675175c231eb35b03) )
+	ROM_LOAD16_BYTE( "bootleg_epr-12200a.26", 0x000001, 0x8000, CRC(1ba35f78) SHA1(2405597ad169d1cd0ef06e9c2c28e63e18e1f1b7) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-12202.rom", 0x00000, 0x10000, CRC(2f7da741) SHA1(51a685673b4a57a13818eca65d122230f20bd9a0) )
+	ROM_LOAD( "epr-12203.rom", 0x10000, 0x10000, CRC(a6e58ec5) SHA1(5a6c43c989768270e0ab61cfaa5ef86d4607fe20) )
+	ROM_LOAD( "epr-12204.rom", 0x20000, 0x10000, CRC(0ae98e23) SHA1(f067b81b85f9e03a6373c7c53ff52d5395b8a985) )
+
+	ROM_REGION16_BE( 0x10000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-12169.b1",  0x00001, 0x8000, CRC(dacc6165) SHA1(87b1a7643e3630ff73b2b117752496e1ea5da23d) )
+	ROM_LOAD16_BYTE( "epr-12170.b5",  0x00000, 0x8000, CRC(87354e42) SHA1(e7fd55aee59b51d82cb9b619fbb815ad6839560c) )
+
+	ROM_REGION( 0x40000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-12205.rom", 0x0000, 0x8000, CRC(6695dc99) SHA1(08123aa24c302bc9243329384bd9c2545a4d50c3) )
+ROM_END
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -3406,6 +3482,40 @@ ROM_START( wb31 )
 	ROM_LOAD( "epr-12089.bin", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
 ROM_END
 
+ROM_START( wb31d )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr12084.bin", 0x000000, 0x10000, CRC(0cfe1b00) SHA1(b4e50bb0d677647a71c1d3adac9f955774e3fa0e) )
+	ROM_LOAD16_BYTE( "bootleg_epr12082.bin", 0x000001, 0x10000, CRC(9e324162) SHA1(49cbec212bec832722b4816e2186e6cb1c204b0e) )
+	ROM_LOAD16_BYTE( "epr-12085.bin", 0x020000, 0x10000, CRC(0962098b) SHA1(150fc439dd5e773bef706f058abdb4d2ec44e355) )
+	ROM_LOAD16_BYTE( "epr-12083.bin", 0x020001, 0x10000, CRC(3d631a8e) SHA1(4940ff6cf380fb914876ade39ea37f42b79bf11d) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-12086.bin", 0x00000, 0x10000, CRC(45b949df) SHA1(84390d16da00b775988e5f6c20950cb2304b1a74) )
+	ROM_LOAD( "epr-12087.bin", 0x10000, 0x10000, CRC(6f0396b7) SHA1(0a340f2b58e5ecfe504197a8fd2111181e868a3e) )
+	ROM_LOAD( "epr-12088.bin", 0x20000, 0x10000, CRC(ba8c0749) SHA1(7d996c7a1ad249c06ef7ec9c87a83710c98005d3) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-12090.b1", 0x00001, 0x008000, CRC(aeeecfca) SHA1(496124b170a725ad863c741d4e021ab947511e4c) )
+	ROM_CONTINUE(                    0x40001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12094.b5", 0x00000, 0x008000, CRC(615e4927) SHA1(d23f164973afa770714e284a77ddf10f18cc596b) )
+	ROM_CONTINUE(                    0x40000, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12091.b2", 0x10001, 0x008000, CRC(8409a243) SHA1(bcbb9510a6499d8147543d6befa5a49f4ac055d9) )
+	ROM_CONTINUE(                    0x50001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12095.b6", 0x10000, 0x008000, CRC(e774ec2c) SHA1(a4aa15ec7be5539a740ad02ff720458018dbc536) )
+	ROM_CONTINUE(                    0x50000, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12092.b3", 0x20001, 0x008000, CRC(5c2f0d90) SHA1(e0fbc0f841e4607ad232931368b16e81440a75c4) )
+	ROM_CONTINUE(                    0x60001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12096.b7", 0x20000, 0x008000, CRC(0cd59d6e) SHA1(caf754a461feffafcfe7bfc6e89da76c4db257c5) )
+	ROM_CONTINUE(                    0x60000, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12093.b4", 0x30001, 0x008000, CRC(4891e7bb) SHA1(1be04fcabe9bfa8cf746263a5bcca67902a021a0) )
+	ROM_CONTINUE(                    0x70001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12097.b8", 0x30000, 0x008000, CRC(e645902c) SHA1(497cfcf6c25cc2e042e16dbcb1963d2223def15a) )
+	ROM_CONTINUE(                    0x70000, 0x008000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-12089.bin", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
+ROM_END
+
 //*************************************************************************************************************************
 //  Wonder Boy III, Sega System 16A
 //  CPU: FD1089A (317-0086)
@@ -3447,6 +3557,39 @@ ROM_START( wb35 )
 	ROM_LOAD( "317-0086.key", 0x0000, 0x2000, BAD_DUMP CRC(ec480b80) SHA1(f0b1244ba290a59aa95f2f0262802487a505755c) )
 ROM_END
 
+ROM_START( wb35d )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bootleg_epr-12120.43", 0x000000, 0x10000, CRC(47e62031) SHA1(842e7aac5d2ed2b38c68e70b65494b6511900ee0) )
+	ROM_LOAD16_BYTE( "bootleg_epr-12118.26", 0x000001, 0x10000, CRC(d2f74be8) SHA1(83414365b921b617406535f387e6722c14ad8e09) )
+	ROM_LOAD16_BYTE( "bootleg_epr-12121.42", 0x020000, 0x10000, CRC(0962098b) SHA1(150fc439dd5e773bef706f058abdb4d2ec44e355) )
+	ROM_LOAD16_BYTE( "bootleg_epr-12119.25", 0x020001, 0x10000, CRC(3d631a8e) SHA1(4940ff6cf380fb914876ade39ea37f42b79bf11d) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-12086.95", 0x00000, 0x10000, CRC(45b949df) SHA1(84390d16da00b775988e5f6c20950cb2304b1a74) )
+	ROM_LOAD( "epr-12087.94", 0x10000, 0x10000, CRC(6f0396b7) SHA1(0a340f2b58e5ecfe504197a8fd2111181e868a3e) )
+	ROM_LOAD( "epr-12088.83", 0x20000, 0x10000, CRC(ba8c0749) SHA1(7d996c7a1ad249c06ef7ec9c87a83710c98005d3) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-12090.10", 0x00001, 0x008000, CRC(aeeecfca) SHA1(496124b170a725ad863c741d4e021ab947511e4c) )
+	ROM_CONTINUE(                    0x40001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12094.11", 0x00000, 0x008000, CRC(615e4927) SHA1(d23f164973afa770714e284a77ddf10f18cc596b) )
+	ROM_CONTINUE(                    0x40000, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12091.17", 0x10001, 0x008000, CRC(8409a243) SHA1(bcbb9510a6499d8147543d6befa5a49f4ac055d9) )
+	ROM_CONTINUE(                    0x50001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12095.18", 0x10000, 0x008000, CRC(e774ec2c) SHA1(a4aa15ec7be5539a740ad02ff720458018dbc536) )
+	ROM_CONTINUE(                    0x50000, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12092.23", 0x20001, 0x008000, CRC(5c2f0d90) SHA1(e0fbc0f841e4607ad232931368b16e81440a75c4) )
+	ROM_CONTINUE(                    0x60001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12096.24", 0x20000, 0x008000, CRC(0cd59d6e) SHA1(caf754a461feffafcfe7bfc6e89da76c4db257c5) )
+	ROM_CONTINUE(                    0x60000, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12093.29", 0x30001, 0x008000, CRC(4891e7bb) SHA1(1be04fcabe9bfa8cf746263a5bcca67902a021a0) )
+	ROM_CONTINUE(                    0x70001, 0x008000 )
+	ROM_LOAD16_BYTE( "epr-12097.30", 0x30000, 0x008000, CRC(e645902c) SHA1(497cfcf6c25cc2e042e16dbcb1963d2223def15a) )
+	ROM_CONTINUE(                    0x70000, 0x008000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-12089.12", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
+ROM_END
 
 
 //**************************************************************************
@@ -3593,8 +3736,11 @@ DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
 // "Pre-System 16"
 GAME( 1986, bodyslam,   0,        system16a_i8751,          bodyslam,   segas16a_state,generic,     ROT0,   "Sega", "Body Slam (8751 317-0015)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dumpmtmt,   bodyslam, system16a_i8751,          bodyslam,   segas16a_state,dumpmtmt,    ROT0,   "Sega", "Dump Matsumoto (Japan, 8751 317-0011a)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+
 GAME( 1985, mjleague,   0,        system16a,                mjleague,   segas16a_state,mjleague,    ROT270, "Sega", "Major League", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, quartet,    0,        system16a_i8751,          quartet,    segas16a_state,quartet,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,    segas16a_state,quartet,     ROT0,   "Sega", "Quartet (8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, quartet2,   quartet,  system16a_i8751,          quart2,     segas16a_state,generic,     ROT0,   "Sega", "Quartet 2 (8751 317-0010)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, quartet2a,  quartet,  system16a,                quart2,     segas16a_state,generic,     ROT0,   "Sega", "Quartet 2 (unprotected)", MACHINE_SUPPORTS_SAVE )
@@ -3603,24 +3749,42 @@ GAME( 1986, quartet2a,  quartet,  system16a,                quart2,     segas16a
 GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, aceattaca,  aceattac, system16a_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,   segas16a_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,   segas16a_state,fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx roms
-GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A) (FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, newer, System 16A, FD1089B 317-0027)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, sdia,     sdi,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, shinobi,    0,        system16a,                shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, shinobi1,   shinobi,  system16a_fd1094,         shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 1, System 16A, FD1094 317-0050)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1987, shinobi,    0,        system16a,                shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A) (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shinobi1,   shinobi,  system16a_fd1094,         shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 1, System 16A) (FD1094 317-0050)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, shinobls,   shinobi,  system16a,                shinobi,    segas16a_state,generic,     ROT0,   "bootleg (Star)", "Shinobi (Star bootleg, System 16A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, shinoblb,   shinobi,  system16a,                shinobi,    segas16a_state,generic,     ROT0,   "bootleg (Beta)", "Shinobi (Beta bootleg)", MACHINE_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
+
 GAME( 1987, sjryuko1,   sjryuko,  system16a_fd1089b,        sjryuko,    segas16a_state,sjryukoa,    ROT0,   "White Board", "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetris,     0,        system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetris3,    tetris,   system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1988, tetris,     0,        system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 4, Japan, System 16A) (FD1094 317-0093)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetris3,    tetris,   system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 3, Japan, System 16A) (FD1094 317-0093a)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1987, timescan1,  timescan, system16a_fd1089b,        timescan,   segas16a_state,generic,     ROT270, "Sega", "Time Scanner (set 1, System 16A, FD1089B 317-0024)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A, FD1094 317-0084)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A, FD1089A 317-0086)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (FD1094 317-0084)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (FD1089A 317-0086)", MACHINE_SUPPORTS_SAVE )
+
+
+GAME( 1988, wb31d,     wb3,      system16a_no7751,  wb3,        segas16a_state,generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (bootleg of FD1094 317-0084 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wb35d,     wb3,      system16a_no7751,  wb3,        segas16a_state,generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (bootleg of FD1089A 317-0086 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shinobi1d, shinobi,  system16a,         shinobi,    segas16a_state,generic,     ROT0,   "bootleg", "Shinobi (set 1, System 16A) (bootleg of FD1094 317-0050 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrisd,   tetris,   system16a_no7751,  tetris,     segas16a_state,generic,     ROT0,   "bootleg", "Tetris (set 4, Japan, System 16A) (bootleg of FD1094 317-0093 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetris3d,  tetris,   system16a_no7751,  tetris,     segas16a_state,generic,     ROT0,   "bootleg", "Tetris (set 3, Japan, System 16A) (bootleg of FD1094 317-0093a set)", MACHINE_SUPPORTS_SAVE )
