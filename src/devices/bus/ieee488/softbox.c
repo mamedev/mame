@@ -10,7 +10,7 @@
     This is an emulation of the SoftBox as a PET/CBM peripheral, where
     the PET is used as a terminal over IEEE-488.  For the standalone
     mode where an RS-232 terminal is used, and also information on
-    how to set up the Corvus drive, see: src/mess/drivers/softbox.c.
+    how to set up the Corvus drive, see: src/mame/drivers/softbox.c.
 */
 
 

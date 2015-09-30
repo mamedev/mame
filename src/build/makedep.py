@@ -10,13 +10,13 @@ import sys
 
 files_included = ['src/emu/emu.h']
 
-include_dirs = ['src/emu/', 'src/devices/', 'src/mame/', 'src/mess/']
+include_dirs = ['src/emu/', 'src/devices/', 'src/mame/']
 
 mappings = dict()
 
 deps_files_included = [ ]
 
-deps_include_dirs = ['src/mame/', 'src/mess/']
+deps_include_dirs = ['src/mame/']
 
 components = [ ]
 
@@ -289,7 +289,6 @@ if sys.argv[3]=='target':
     sys.stdout.write('        MAME_DIR .. "src/emu",\n')
     sys.stdout.write('        MAME_DIR .. "src/devices",\n')
     sys.stdout.write('        MAME_DIR .. "src/mame",\n')
-    sys.stdout.write('        MAME_DIR .. "src/mess",\n')
     sys.stdout.write('        MAME_DIR .. "src/lib",\n')
     sys.stdout.write('        MAME_DIR .. "src/lib/util",\n')
     sys.stdout.write('        MAME_DIR .. "3rdparty",\n')

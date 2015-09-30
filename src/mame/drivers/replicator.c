@@ -448,7 +448,7 @@ WRITE8_MEMBER(replicator_state::port_w)
 
 			if(changed & BUZZ){
 		/* FIX-ME: What is the largest sample value allowed?
-		 I'm using 0x3F based on what I see in src/mess/drivers/craft.c
+		 I'm using 0x3F based on what I see in src/mame/drivers/craft.c
 		 But as the method is called "write_unsigned8", I guess we could have samples with values up to 0xFF, right?
 		 Anyway... With the 0x3F value we'll get a sound that is not so loud, which may be less annoying... :-)
 		*/

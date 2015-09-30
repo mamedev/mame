@@ -1159,7 +1159,6 @@ CPPCHECK_PARAMS += -Isrc/emu
 CPPCHECK_PARAMS += -Isrc/lib
 CPPCHECK_PARAMS += -Isrc/lib/util
 CPPCHECK_PARAMS += -Isrc/mame
-CPPCHECK_PARAMS += -Isrc/mess 
 CPPCHECK_PARAMS += -Isrc/osd/modules/render
 CPPCHECK_PARAMS += -Isrc/osd/windows
 CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
@@ -1174,7 +1173,6 @@ CPPCHECK_PARAMS += -I3rdparty/bgfx/include
 CPPCHECK_PARAMS += -I3rdparty/bx/include
 CPPCHECK_PARAMS += -Ibuild/generated/emu 
 CPPCHECK_PARAMS += -Ibuild/generated/emu/layout
-CPPCHECK_PARAMS += -Ibuild/generated/mess/layout
 CPPCHECK_PARAMS += -Ibuild/generated/mame/layout 
 CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
 CPPCHECK_PARAMS += -DPTR64=1
