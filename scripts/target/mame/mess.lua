@@ -1184,7 +1184,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "bally")
 files {
-	MAME_DIR .. "src/mess/drivers/astrocde.c",
+	MAME_DIR .. "src/mess/drivers/astrohome.c",
 }
 
 createMESSProjects(_target, _subtarget, "banctec")
@@ -1246,7 +1246,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "cantab")
 files {
-	MAME_DIR .. "src/mess/drivers/ace.c",
+	MAME_DIR .. "src/mess/drivers/jupace.c",
 }
 
 createMESSProjects(_target, _subtarget, "casio")
@@ -1472,7 +1472,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/esqasr.c",
 	MAME_DIR .. "src/mess/drivers/esqkt.c",
 	MAME_DIR .. "src/mess/drivers/esqmr.c",
-	MAME_DIR .. "src/mess/drivers/mirage.c",
+	MAME_DIR .. "src/mess/drivers/enmirage.c",
 	MAME_DIR .. "src/mess/machine/esqpanel.c",
 	MAME_DIR .. "src/mess/machine/esqvfd.c",
 }
@@ -2719,7 +2719,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/rvoice.c",
 	MAME_DIR .. "src/mess/drivers/sacstate.c",
 	MAME_DIR .. "src/mess/drivers/sbrain.c",
-	MAME_DIR .. "src/mess/drivers/seattle.c",
+	MAME_DIR .. "src/mess/drivers/seattlecmp.c",
 	MAME_DIR .. "src/mess/drivers/sh4robot.c",
 	MAME_DIR .. "src/mess/drivers/softbox.c",
 	MAME_DIR .. "src/mess/drivers/swtpc.c",
