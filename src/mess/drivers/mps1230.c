@@ -5,9 +5,9 @@
     mps1230.c - Commodore MPS-1230 dot-matrix printer
 
     Skeleton made September, 2015 by R. Belmont
- 
-------------------------------------- 
- 
+
+-------------------------------------
+
 Commodore MPS-1230 Dot Matrix Printer
 Commodore 1988/89
 
@@ -74,7 +74,7 @@ Notes: (all IC's shown)
       J899     - 15-pin connector for ribbon cable for console buttons and leds (feed, online etc)
       J369     - 36-pin centronics parallel connector
       J02G     - 6-pin Commodore serial bus connector
- 
+
 ************************************************************************/
 
 #include "emu.h"
@@ -121,7 +121,7 @@ void mps1230_state::machine_reset()
 
 static ADDRESS_MAP_START( mps1230_map, AS_PROGRAM, 8, mps1230_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("mps1230", 0)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM	// as per the service manual
+	AM_RANGE(0xc000, 0xdfff) AM_RAM // as per the service manual
 	AM_RANGE(0xff00, 0xffff) AM_RAM // tested at PC=77, then used for the 7810's stack
 ADDRESS_MAP_END
 

@@ -10,12 +10,12 @@
 
 // Polygon rasterizer interface
 hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
-    : poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>(state.machine())
-    , m_state(state)
-    , m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
+	: poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>(state.machine())
+	, m_state(state)
+	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
 {
-    const INT32 bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
-    m_depthBuffer3d = auto_alloc_array(state.machine(), float, bufferSize);
+	const INT32 bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
+	m_depthBuffer3d = auto_alloc_array(state.machine(), float, bufferSize);
 }
 
 
@@ -964,7 +964,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 			m_poly_renderer->drawShaded(&polys[i]);
 		}
 	}
-    m_poly_renderer->wait();
+	m_poly_renderer->wait();
 }
 
 void hng64_state::clear3d()
@@ -976,11 +976,11 @@ void hng64_state::clear3d()
 	// Reset the buffers...
 	for (i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
-        m_poly_renderer->depthBuffer3d()[i] = 100.0f;
+		m_poly_renderer->depthBuffer3d()[i] = 100.0f;
 	}
-    
-    // Clear the 3d rasterizer buffer
-    m_poly_renderer->colorBuffer3d().fill(0x00000000, m_screen->visible_area());    
+
+	// Clear the 3d rasterizer buffer
+	m_poly_renderer->colorBuffer3d().fill(0x00000000, m_screen->visible_area());
 
 	// Set some matrices to the identity...
 	setIdentity(m_projectionMatrix);
@@ -1169,11 +1169,11 @@ void hng64_state::Intersect(struct polyVert *input0, struct polyVert *input1, st
 
 void hng64_state::performFrustumClip(struct polygon *p)
 {
-    polyVert *v0;
+	polyVert *v0;
 	polyVert *v1;
 	polyVert *tv;
 
-    polygon temp;
+	polygon temp;
 	temp.n = 0;
 
 	// Skip near and far clipping planes ?
@@ -1219,42 +1219,42 @@ void hng64_state::performFrustumClip(struct polygon *p)
 
 void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
-    // Pull the parameters out of the extent structure
-    float z = extent.param[0].start;
-    float w = extent.param[1].start;
+	// Pull the parameters out of the extent structure
+	float z = extent.param[0].start;
+	float w = extent.param[1].start;
 	float lightR = extent.param[2].start;
 	float lightG = extent.param[3].start;
 	float lightB = extent.param[4].start;
 	float s = extent.param[5].start;
-    float t = extent.param[6].start;
-    
-    const float dz = extent.param[0].dpdx;
-    const float dw = extent.param[1].dpdx;
+	float t = extent.param[6].start;
+
+	const float dz = extent.param[0].dpdx;
+	const float dw = extent.param[1].dpdx;
 	const float dlightR = extent.param[2].dpdx;
 	const float dlightG = extent.param[3].dpdx;
 	const float dlightB = extent.param[4].dpdx;
 	const float ds = extent.param[5].dpdx;
-    const float dt = extent.param[6].dpdx;
-	
-    // Pointers to the pixel buffers
-    UINT32* colorBuffer = &m_colorBuffer3d.pix32(scanline, extent.startx);
-    float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+	const float dt = extent.param[6].dpdx;
 
-    const UINT8 *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
-    
-    // Step over each pixel in the horizontal span
-    for(int x = extent.startx; x < extent.stopx; x++) 
-    {
-        if (z < *depthBuffer)
-        {
-            // Multiply back through by w for everything that was interpolated perspective-correctly
-            const float sCorrect = s / w;
-            const float tCorrect = t / w;
-            const float rCorrect = lightR / w;
-            const float gCorrect = lightG / w;
-            const float bCorrect = lightB / w;
-            
-            if ((renderData.debugColor & 0xff000000) == 0x01000000)
+	// Pointers to the pixel buffers
+	UINT32* colorBuffer = &m_colorBuffer3d.pix32(scanline, extent.startx);
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+
+	const UINT8 *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
+
+	// Step over each pixel in the horizontal span
+	for(int x = extent.startx; x < extent.stopx; x++)
+	{
+		if (z < *depthBuffer)
+		{
+			// Multiply back through by w for everything that was interpolated perspective-correctly
+			const float sCorrect = s / w;
+			const float tCorrect = t / w;
+			const float rCorrect = lightR / w;
+			const float gCorrect = lightG / w;
+			const float bCorrect = lightB / w;
+
+			if ((renderData.debugColor & 0xff000000) == 0x01000000)
 			{
 				// ST color mode
 				*colorBuffer = rgb_t(255, (UINT8)(sCorrect*255.0f), (UINT8)(tCorrect*255.0f), (UINT8)(0));
@@ -1333,29 +1333,29 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
 					color = rgb_t(255, (UINT8)red, (UINT8)green, (UINT8)blue);
 
 					*colorBuffer = color;
-                    *depthBuffer = z;
+					*depthBuffer = z;
 				}
 			}
-        }
+		}
 
-        z += dz;
-        w += dw;
-        lightR += dlightR;
+		z += dz;
+		w += dw;
+		lightR += dlightR;
 		lightG += dlightG;
 		lightB += dlightB;
 		s += ds;
-        t += dt;
-        
-        colorBuffer++;
-        depthBuffer++;
-    }
+		t += dt;
+
+		colorBuffer++;
+		depthBuffer++;
+	}
 }
 
 void hng64_poly_renderer::drawShaded(struct polygon *p)
 {
-    // Polygon information for the rasterizer
-    hng64_poly_data rOptions;
-    rOptions.texType = p->texType;
+	// Polygon information for the rasterizer
+	hng64_poly_data rOptions;
+	rOptions.texType = p->texType;
 	rOptions.texIndex = p->texIndex;
 	rOptions.palOffset = p->palOffset;
 	rOptions.palPageSize = p->palPageSize;
@@ -1363,7 +1363,7 @@ void hng64_poly_renderer::drawShaded(struct polygon *p)
 	rOptions.texPageSmall = p->texPageSmall;
 	rOptions.texPageHorizOffset = p->texPageHorizOffset;
 	rOptions.texPageVertOffset = p->texPageVertOffset;
-    
+
 	// The perspective-correct texture divide...
 	// NOTE: There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping - explore
 	for (int j = 0; j < p->n; j++)
@@ -1376,50 +1376,50 @@ void hng64_poly_renderer::drawShaded(struct polygon *p)
 		p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
 	}
 
-    // Rasterize the triangles
+	// Rasterize the triangles
 	for (int j = 1; j < p->n-1; j++)
 	{
-        // Build some MAME rasterizer vertices from the hng64 vertices
-        vertex_t pVert[3];
+		// Build some MAME rasterizer vertices from the hng64 vertices
+		vertex_t pVert[3];
 
-        const polyVert& pv0 = p->vert[0];
-        pVert[0].x = pv0.clipCoords[0];
-        pVert[0].y = pv0.clipCoords[1];
-        pVert[0].p[0] = pv0.clipCoords[2];
-        pVert[0].p[1] = pv0.clipCoords[3];
-        pVert[0].p[2] = pv0.light[0];
-        pVert[0].p[3] = pv0.light[1];
-        pVert[0].p[4] = pv0.light[2];
-        pVert[0].p[5] = pv0.texCoords[0];
-        pVert[0].p[6] = pv0.texCoords[1];
-        
-        const polyVert& pvj = p->vert[j];
-        pVert[1].x = pvj.clipCoords[0];
-        pVert[1].y = pvj.clipCoords[1];
-        pVert[1].p[0] = pvj.clipCoords[2];
-        pVert[1].p[1] = pvj.clipCoords[3];
-        pVert[1].p[2] = pvj.light[0];
-        pVert[1].p[3] = pvj.light[1];
-        pVert[1].p[4] = pvj.light[2];
-        pVert[1].p[5] = pvj.texCoords[0];
-        pVert[1].p[6] = pvj.texCoords[1];
+		const polyVert& pv0 = p->vert[0];
+		pVert[0].x = pv0.clipCoords[0];
+		pVert[0].y = pv0.clipCoords[1];
+		pVert[0].p[0] = pv0.clipCoords[2];
+		pVert[0].p[1] = pv0.clipCoords[3];
+		pVert[0].p[2] = pv0.light[0];
+		pVert[0].p[3] = pv0.light[1];
+		pVert[0].p[4] = pv0.light[2];
+		pVert[0].p[5] = pv0.texCoords[0];
+		pVert[0].p[6] = pv0.texCoords[1];
 
-        const polyVert& pvjp1 = p->vert[j+1];
-        pVert[2].x = pvjp1.clipCoords[0];
-        pVert[2].y = pvjp1.clipCoords[1];
-        pVert[2].p[0] = pvjp1.clipCoords[2];
-        pVert[2].p[1] = pvjp1.clipCoords[3];
-        pVert[2].p[2] = pvjp1.light[0];
-        pVert[2].p[3] = pvjp1.light[1];
-        pVert[2].p[4] = pvjp1.light[2];
-        pVert[2].p[5] = pvjp1.texCoords[0];
-        pVert[2].p[6] = pvjp1.texCoords[1];
+		const polyVert& pvj = p->vert[j];
+		pVert[1].x = pvj.clipCoords[0];
+		pVert[1].y = pvj.clipCoords[1];
+		pVert[1].p[0] = pvj.clipCoords[2];
+		pVert[1].p[1] = pvj.clipCoords[3];
+		pVert[1].p[2] = pvj.light[0];
+		pVert[1].p[3] = pvj.light[1];
+		pVert[1].p[4] = pvj.light[2];
+		pVert[1].p[5] = pvj.texCoords[0];
+		pVert[1].p[6] = pvj.texCoords[1];
 
-        // Pass the render data into the rasterizer
-        hng64_poly_data& renderData = object_data_alloc();
-        renderData = rOptions;
-        
-        const rectangle& visibleArea = m_state.m_screen->visible_area();
-        render_triangle(visibleArea, render_delegate(FUNC(hng64_poly_renderer::render_scanline), this), 7, pVert[0], pVert[1], pVert[2]);
+		const polyVert& pvjp1 = p->vert[j+1];
+		pVert[2].x = pvjp1.clipCoords[0];
+		pVert[2].y = pvjp1.clipCoords[1];
+		pVert[2].p[0] = pvjp1.clipCoords[2];
+		pVert[2].p[1] = pvjp1.clipCoords[3];
+		pVert[2].p[2] = pvjp1.light[0];
+		pVert[2].p[3] = pvjp1.light[1];
+		pVert[2].p[4] = pvjp1.light[2];
+		pVert[2].p[5] = pvjp1.texCoords[0];
+		pVert[2].p[6] = pvjp1.texCoords[1];
+
+		// Pass the render data into the rasterizer
+		hng64_poly_data& renderData = object_data_alloc();
+		renderData = rOptions;
+
+		const rectangle& visibleArea = m_state.m_screen->visible_area();
+		render_triangle(visibleArea, render_delegate(FUNC(hng64_poly_renderer::render_scanline), this), 7, pVert[0], pVert[1], pVert[2]);
 	}
 }

@@ -25,7 +25,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blckonyx" supported="no">
 		<description>The Black Onyx</description>
 		<year>1985</year>
@@ -90,7 +90,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cball">
 		<description>Cannon Ball</description>
 		<year>1983</year>
@@ -322,7 +322,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="machgjoe">
 		<description>Ginkou Goutou - Machinegun Joe vs. the Mafia</description>
 		<year>1983</year>

@@ -76,7 +76,7 @@ static MACHINE_CONFIG_START( piggypas, piggypas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000) // wrong CPU? (not valid Z80 code)
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -157,9 +157,9 @@ ROM_END
 GAME( 1992, piggypas,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 05.22
 GAME( 1992, hoopshot,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
-// Quick $ilver   Development Co.    10/08/96      ROUND  REV 6 
+// Quick $ilver   Development Co.    10/08/96      ROUND  REV 6
 GAME( 1996, rndrndqs,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
-//  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T   
+//  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
 GAME( 1995, fidlstix,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
 GAME( 199?, jackbean,  0,    piggypas, piggypas, driver_device,  0, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )

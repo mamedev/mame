@@ -221,7 +221,7 @@ UINT16 igs017_state::mgcs_palette_bitswap(UINT16 bgr)
 
 UINT16 igs017_state::lhzb2a_palette_bitswap(UINT16 bgr)
 {
-//	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
+//  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 	return BITSWAP16(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 

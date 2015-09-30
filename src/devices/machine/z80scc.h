@@ -126,41 +126,41 @@ public:
 	virtual void rcv_callback();
 	virtual void rcv_complete();
 
-        // read register handlers
-        UINT8 do_sccreg_rr0();
-        UINT8 do_sccreg_rr1();
-        UINT8 do_sccreg_rr2();
-        UINT8 do_sccreg_rr3();
-        UINT8 do_sccreg_rr4();
-        UINT8 do_sccreg_rr5();
-        UINT8 do_sccreg_rr6();
-        UINT8 do_sccreg_rr7();
-        UINT8 do_sccreg_rr8();
-        UINT8 do_sccreg_rr9();
-        UINT8 do_sccreg_rr10();
-        UINT8 do_sccreg_rr11();
-        UINT8 do_sccreg_rr12();
-        UINT8 do_sccreg_rr13();
-        UINT8 do_sccreg_rr14();
-        UINT8 do_sccreg_rr15();
+		// read register handlers
+		UINT8 do_sccreg_rr0();
+		UINT8 do_sccreg_rr1();
+		UINT8 do_sccreg_rr2();
+		UINT8 do_sccreg_rr3();
+		UINT8 do_sccreg_rr4();
+		UINT8 do_sccreg_rr5();
+		UINT8 do_sccreg_rr6();
+		UINT8 do_sccreg_rr7();
+		UINT8 do_sccreg_rr8();
+		UINT8 do_sccreg_rr9();
+		UINT8 do_sccreg_rr10();
+		UINT8 do_sccreg_rr11();
+		UINT8 do_sccreg_rr12();
+		UINT8 do_sccreg_rr13();
+		UINT8 do_sccreg_rr14();
+		UINT8 do_sccreg_rr15();
 
-        // write register handlers
-        void do_sccreg_wr0(UINT8 data);
-        void do_sccreg_wr1(UINT8 data);
-        void do_sccreg_wr2(UINT8 data);
-        void do_sccreg_wr3(UINT8 data);
-        void do_sccreg_wr4(UINT8 data);
-        void do_sccreg_wr5(UINT8 data);
-        void do_sccreg_wr6(UINT8 data);
-        void do_sccreg_wr7(UINT8 data);
-        void do_sccreg_wr8(UINT8 data);
-        void do_sccreg_wr9(UINT8 data);
-        void do_sccreg_wr10(UINT8 data);
-        void do_sccreg_wr11(UINT8 data);
-        void do_sccreg_wr12(UINT8 data);
-        void do_sccreg_wr13(UINT8 data);
-        void do_sccreg_wr14(UINT8 data);
-        void do_sccreg_wr15(UINT8 data);
+		// write register handlers
+		void do_sccreg_wr0(UINT8 data);
+		void do_sccreg_wr1(UINT8 data);
+		void do_sccreg_wr2(UINT8 data);
+		void do_sccreg_wr3(UINT8 data);
+		void do_sccreg_wr4(UINT8 data);
+		void do_sccreg_wr5(UINT8 data);
+		void do_sccreg_wr6(UINT8 data);
+		void do_sccreg_wr7(UINT8 data);
+		void do_sccreg_wr8(UINT8 data);
+		void do_sccreg_wr9(UINT8 data);
+		void do_sccreg_wr10(UINT8 data);
+		void do_sccreg_wr11(UINT8 data);
+		void do_sccreg_wr12(UINT8 data);
+		void do_sccreg_wr13(UINT8 data);
+		void do_sccreg_wr14(UINT8 data);
+		void do_sccreg_wr15(UINT8 data);
 
 	UINT8 control_read();
 	void control_write(UINT8 data);
@@ -170,7 +170,7 @@ public:
 
 	void receive_data(UINT8 data);
 	void m_rx_fifo_rp_step();
-        UINT8 m_rx_fifo_rp_data();
+		UINT8 m_rx_fifo_rp_data();
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
@@ -184,9 +184,9 @@ public:
 	int m_txc;
 
 	// Register state
-        // read registers     enum
+		// read registers     enum
 #if 0 //defined by z80sio.h
-	UINT8 m_rr0; // REG_RR0_STATUS     
+	UINT8 m_rr0; // REG_RR0_STATUS
 	UINT8 m_rr1; // REG_RR1_SPEC_RCV_COND
 	UINT8 m_rr2; // REG_RR2_INTERRUPT_VECT
 #endif
@@ -204,18 +204,18 @@ public:
 	UINT8 m_rr14; // REG_RR14_WR7_OR_R10
 	UINT8 m_rr15; // REG_RR15_WR15_EXT_STAT
 
-        // write registers    enum
+		// write registers    enum
 #if 0 //defined by z80sio.h
 	UINT8 m_wr0; // REG_WR0_COMMAND_REGPT
-	UINT8 m_wr1; // REG_WR1_INT_DMA_ENABLE 
-	UINT8 m_wr2; // REG_WR2_INT_VECTOR     
-	UINT8 m_wr3; // REG_WR3_RX_CONTROL     
-	UINT8 m_wr4; // REG_WR4_RX_TX_MODES    
-	UINT8 m_wr5; // REG_WR5_TX_CONTROL      
-	UINT8 m_wr6; // REG_WR6_SYNC_OR_SDLC_A 
-	UINT8 m_wr7; // REG_WR7_SYNC_OR_SDLC_F 
+	UINT8 m_wr1; // REG_WR1_INT_DMA_ENABLE
+	UINT8 m_wr2; // REG_WR2_INT_VECTOR
+	UINT8 m_wr3; // REG_WR3_RX_CONTROL
+	UINT8 m_wr4; // REG_WR4_RX_TX_MODES
+	UINT8 m_wr5; // REG_WR5_TX_CONTROL
+	UINT8 m_wr6; // REG_WR6_SYNC_OR_SDLC_A
+	UINT8 m_wr7; // REG_WR7_SYNC_OR_SDLC_F
 #endif
-	UINT8 m_wr8;  // REG_WR8_TRANSMIT_DATA 
+	UINT8 m_wr8;  // REG_WR8_TRANSMIT_DATA
 	UINT8 m_wr9;  // REG_WR9_MASTER_INT_CTRL
 	UINT8 m_wr10; // REG_WR10_MSC_RX_TX_CTRL
 	UINT8 m_wr11; // REG_WR11_CLOCK_MODES
@@ -223,7 +223,7 @@ public:
 	UINT8 m_wr13; // REG_WR13_HI_BAUD_GEN
 	UINT8 m_wr14; // REG_WR14_MISC_CTRL
 	UINT8 m_wr15; // REG_WR15_EXT_ST_INT_CTRL
-                
+
 
 protected:
 	enum
@@ -231,50 +231,50 @@ protected:
 		INT_TRANSMIT = 0,
 		INT_EXTERNAL = 1,
 		INT_RECEIVE  = 2,
-                INT_SPECIAL  = 3
+				INT_SPECIAL  = 3
 	};
 
-        // Read registers
-        enum
-        {
-                REG_RR0_STATUS          = 0, // SIO
-                REG_RR1_SPEC_RCV_COND   = 1, // SIO
-                REG_RR2_INTERRUPT_VECT  = 2, // SIO
-                REG_RR3_INTERUPPT_PEND  = 3,
-                REG_RR4_WR4_OR_RR0      = 4,
-                REG_RR5_WR5_OR_RR0      = 5,
-                REG_RR6_LSB_OR_RR2      = 6,
-                REG_RR7_MSB_OR_RR3      = 7,
-                REG_RR8_RECEIVE_DATA    = 8,
-                REG_RR9_WR3_OR_RR13     = 9,
-                REG_RR10_MISC_STATUS    = 10,
-                REG_RR11_WR10_OR_RR15   = 11,
-                REG_RR12_LO_TIME_CONST  = 12,
-                REG_RR13_HI_TIME_CONST  = 13,
-                REG_RR14_WR7_OR_R10     = 14,
-                REG_RR15_WR15_EXT_STAT  = 15
-        };
+		// Read registers
+		enum
+		{
+				REG_RR0_STATUS          = 0, // SIO
+				REG_RR1_SPEC_RCV_COND   = 1, // SIO
+				REG_RR2_INTERRUPT_VECT  = 2, // SIO
+				REG_RR3_INTERUPPT_PEND  = 3,
+				REG_RR4_WR4_OR_RR0      = 4,
+				REG_RR5_WR5_OR_RR0      = 5,
+				REG_RR6_LSB_OR_RR2      = 6,
+				REG_RR7_MSB_OR_RR3      = 7,
+				REG_RR8_RECEIVE_DATA    = 8,
+				REG_RR9_WR3_OR_RR13     = 9,
+				REG_RR10_MISC_STATUS    = 10,
+				REG_RR11_WR10_OR_RR15   = 11,
+				REG_RR12_LO_TIME_CONST  = 12,
+				REG_RR13_HI_TIME_CONST  = 13,
+				REG_RR14_WR7_OR_R10     = 14,
+				REG_RR15_WR15_EXT_STAT  = 15
+		};
 
-        // Write registers
-        enum
-        {
-                REG_WR0_COMMAND_REGPT   = 0, // SIO
-                REG_WR1_INT_DMA_ENABLE  = 1, // SIO
-                REG_WR2_INT_VECTOR      = 2, // SIO
-                REG_WR3_RX_CONTROL      = 3, // SIO
-                REG_WR4_RX_TX_MODES     = 4, // SIO
-                REG_WR5_TX_CONTROL      = 5, // SIO
-                REG_WR6_SYNC_OR_SDLC_A  = 6, // SIO
-                REG_WR7_SYNC_OR_SDLC_F  = 7, // SIO
-                REG_WR8_TRANSMIT_DATA   = 8,
-                REG_WR9_MASTER_INT_CTRL = 9,
-                REG_WR10_MSC_RX_TX_CTRL = 10,
-                REG_WR11_CLOCK_MODES    = 11,
-                REG_WR12_LO_BAUD_GEN    = 12,
-                REG_WR13_HI_BAUD_GEN    = 13,
-                REG_WR14_MISC_CTRL      = 14,
-                REG_WR15_EXT_ST_INT_CTRL= 15
-        };
+		// Write registers
+		enum
+		{
+				REG_WR0_COMMAND_REGPT   = 0, // SIO
+				REG_WR1_INT_DMA_ENABLE  = 1, // SIO
+				REG_WR2_INT_VECTOR      = 2, // SIO
+				REG_WR3_RX_CONTROL      = 3, // SIO
+				REG_WR4_RX_TX_MODES     = 4, // SIO
+				REG_WR5_TX_CONTROL      = 5, // SIO
+				REG_WR6_SYNC_OR_SDLC_A  = 6, // SIO
+				REG_WR7_SYNC_OR_SDLC_F  = 7, // SIO
+				REG_WR8_TRANSMIT_DATA   = 8,
+				REG_WR9_MASTER_INT_CTRL = 9,
+				REG_WR10_MSC_RX_TX_CTRL = 10,
+				REG_WR11_CLOCK_MODES    = 11,
+				REG_WR12_LO_BAUD_GEN    = 12,
+				REG_WR13_HI_BAUD_GEN    = 13,
+				REG_WR14_MISC_CTRL      = 14,
+				REG_WR15_EXT_ST_INT_CTRL= 15
+		};
 
 	enum
 	{
@@ -282,7 +282,7 @@ protected:
 		RR0_ZC                    = 0x02, // SCC bit
 		RR0_TX_BUFFER_EMPTY       = 0x04, // SIO
 		RR0_DCD                   = 0x08, // SIO
-                RR0_RI                    = 0x10, // DART bit?  TODO: investigate function and remove
+				RR0_RI                    = 0x10, // DART bit?  TODO: investigate function and remove
 		RR0_SYNC_HUNT             = 0x10, // SIO bit, not supported
 		RR0_CTS                   = 0x20, // SIO bit
 		RR0_TX_UNDERRUN           = 0x40, // SIO bit, not supported
@@ -299,30 +299,30 @@ protected:
 		RR1_END_OF_FRAME          = 0x80  // SIO/SCC bits, not supported
 	};
 
-        enum
-        {                                         // TODO: overload SIO functionality
-                RR2_INT_VECTOR_MASK       = 0xff, // SCC channel A, SIO channel B (special case)
-                RR2_INT_VECTOR_V1         = 0x02, // SIO (special case) /SCC Channel B
-                RR2_INT_VECTOR_V2         = 0x04, // SIO (special case) /SCC Channel B
-                RR2_INT_VECTOR_V3         = 0x08  // SIO (special case) /SCC Channel B
-        };
+		enum
+		{                                         // TODO: overload SIO functionality
+				RR2_INT_VECTOR_MASK       = 0xff, // SCC channel A, SIO channel B (special case)
+				RR2_INT_VECTOR_V1         = 0x02, // SIO (special case) /SCC Channel B
+				RR2_INT_VECTOR_V2         = 0x04, // SIO (special case) /SCC Channel B
+				RR2_INT_VECTOR_V3         = 0x08  // SIO (special case) /SCC Channel B
+		};
 
-        enum
-        {
-                RR3_CHANB_EXT_IP          = 0x01, // SCC IP pending registers
-                RR3_CHANB_TX_IP           = 0x02, //  only read in Channel A (for both channels)
-                RR3_CHANB_RX_IP           = 0x04, //  channel B return all zero
-                RR3_CHANA_EXT_IP          = 0x08,
-                RR3_CHANA_TX_IP           = 0x10,
-                RR3_CHANA_RX_IP           = 0x20
-        };
+		enum
+		{
+				RR3_CHANB_EXT_IP          = 0x01, // SCC IP pending registers
+				RR3_CHANB_TX_IP           = 0x02, //  only read in Channel A (for both channels)
+				RR3_CHANB_RX_IP           = 0x04, //  channel B return all zero
+				RR3_CHANA_EXT_IP          = 0x08,
+				RR3_CHANA_TX_IP           = 0x10,
+				RR3_CHANA_RX_IP           = 0x20
+		};
 
 	enum // Universal Bus WR0 commands for 85X30
 	{
 		WR0_REGISTER_MASK         = 0x07,
 		WR0_COMMAND_MASK          = 0x38, // COMMANDS
 		WR0_NULL                  = 0x00, // 0 0 0
-                WR0_POINT_HIGH            = 0x08, // 0 0 1
+				WR0_POINT_HIGH            = 0x08, // 0 0 1
 		WR0_RESET_EXT_STATUS      = 0x10, // 0 1 0
 		WR0_SEND_ABORT            = 0x18, // 0 1 1
 		WR0_ENABLE_INT_NEXT_RX    = 0x20, // 1 0 0
@@ -340,17 +340,17 @@ protected:
 	{
 		WR0_Z_COMMAND_MASK          = 0x38, // COMMANDS
 		WR0_Z_NULL_1                = 0x00, // 0 0 0
-		WR0_Z_NULL_2                = 0x08, // 0 0 1 
-                WR0_Z_RESET_EXT_STATUS      = 0x10, // 0 1 0 
+		WR0_Z_NULL_2                = 0x08, // 0 0 1
+				WR0_Z_RESET_EXT_STATUS      = 0x10, // 0 1 0
 		WR0_Z_SEND_ABORT            = 0x18, // 0 1 1
 		WR0_Z_ENABLE_INT_NEXT_RX    = 0x20, // 1 0 0
 		WR0_Z_RESET_TX_INT          = 0x28, // 1 0 1
 		WR0_Z_ERROR_RESET           = 0x30, // 1 1 0
 		WR0_Z_RESET_HIGHEST_IUS     = 0x38, // 1 1 1
-                WR0_Z_SHIFT_MASK            = 0x03, // SHIFT mode SDLC chan B
-                WR0_Z_SEL_SHFT_LEFT         = 0x02, // 1 0
-                WR0_Z_SEL_SHFT_RIGHT        = 0x03  // 1 1
-        };
+				WR0_Z_SHIFT_MASK            = 0x03, // SHIFT mode SDLC chan B
+				WR0_Z_SEL_SHFT_LEFT         = 0x02, // 1 0
+				WR0_Z_SEL_SHFT_RIGHT        = 0x03  // 1 1
+		};
 
 	enum
 	{
@@ -417,62 +417,62 @@ protected:
 		WR5_DTR                   = 0x80
 	};
 
-        /* SCC specifics */
-        enum
-        {
-                WR9_CMD_MASK          = 0xC0,
-                WR9_CMD_NORESET       = 0x00,
-                WR9_CMD_CHNB_RESET    = 0x40,
-                WR9_CMD_CHNA_RESET    = 0x80,
-                WR9_CMD_HW_RESET      = 0xC0,
-                WR9_BIT_VIS           = 0x01,
-                WR9_BIT_NV            = 0x02,
-                WR9_BIT_DLC           = 0x04,
-                WR9_BIT_MIE           = 0x08,
-                WR9_BIT_SHSL          = 0x10,
-                WR9_BIT_IACK          = 0x20
-        };
+		/* SCC specifics */
+		enum
+		{
+				WR9_CMD_MASK          = 0xC0,
+				WR9_CMD_NORESET       = 0x00,
+				WR9_CMD_CHNB_RESET    = 0x40,
+				WR9_CMD_CHNA_RESET    = 0x80,
+				WR9_CMD_HW_RESET      = 0xC0,
+				WR9_BIT_VIS           = 0x01,
+				WR9_BIT_NV            = 0x02,
+				WR9_BIT_DLC           = 0x04,
+				WR9_BIT_MIE           = 0x08,
+				WR9_BIT_SHSL          = 0x10,
+				WR9_BIT_IACK          = 0x20
+		};
 
-        enum
-        {
-                WR11_RCVCLK_TYPE      = 0x80,
-                WR11_RCVCLK_SRC_MASK  = 0x60, // RCV CLOCK
-                WR11_RCVCLK_SRC_RTXC  = 0x00, //  0 0
-                WR11_RCVCLK_SRC_TRXC  = 0x20, //  0 1
-                WR11_RCVCLK_SRC_BR    = 0x40, //  1 0
-                WR11_RCVCLK_SRC_DPLL  = 0x60, //  1 1
-                WR11_TRACLK_SRC_MASK  = 0x18, // TRA CLOCK
-                WR11_TRACLK_SRC_RTXC  = 0x00, //  0 0
-                WR11_TRACLK_SRC_TRXC  = 0x08, //  0 1
-                WR11_TRACLK_SRC_BR    = 0x10, //  1 0
-                WR11_TRACLK_SRC_DPLL  = 0x18, //  1 1
-                WR11_TRXC_DIRECTION   = 0x04, 
-                WR11_TRXSRC_SRC_MASK  = 0x03, // TRXX CLOCK 
-                WR11_TRXSRC_SRC_XTAL  = 0x00, //  0 0 
-                WR11_TRXSRC_SRC_TRA   = 0x01, //  0 1 
-                WR11_TRXSRC_SRC_BR    = 0x02, //  1 0 
-                WR11_TRXSRC_SRC_DPLL  = 0x03, //  1 1 
-        };
+		enum
+		{
+				WR11_RCVCLK_TYPE      = 0x80,
+				WR11_RCVCLK_SRC_MASK  = 0x60, // RCV CLOCK
+				WR11_RCVCLK_SRC_RTXC  = 0x00, //  0 0
+				WR11_RCVCLK_SRC_TRXC  = 0x20, //  0 1
+				WR11_RCVCLK_SRC_BR    = 0x40, //  1 0
+				WR11_RCVCLK_SRC_DPLL  = 0x60, //  1 1
+				WR11_TRACLK_SRC_MASK  = 0x18, // TRA CLOCK
+				WR11_TRACLK_SRC_RTXC  = 0x00, //  0 0
+				WR11_TRACLK_SRC_TRXC  = 0x08, //  0 1
+				WR11_TRACLK_SRC_BR    = 0x10, //  1 0
+				WR11_TRACLK_SRC_DPLL  = 0x18, //  1 1
+				WR11_TRXC_DIRECTION   = 0x04,
+				WR11_TRXSRC_SRC_MASK  = 0x03, // TRXX CLOCK
+				WR11_TRXSRC_SRC_XTAL  = 0x00, //  0 0
+				WR11_TRXSRC_SRC_TRA   = 0x01, //  0 1
+				WR11_TRXSRC_SRC_BR    = 0x02, //  1 0
+				WR11_TRXSRC_SRC_DPLL  = 0x03, //  1 1
+		};
 
-        enum
-        {
-                WR14_DPLL_CMD_MASK    = 0xe0, // Command
-                WR14_CMD_NULL         = 0x00, // 0 0 0
-                WR14_CMD_ESM          = 0x20, // 0 0 1
-                WR14_CMD_RMC          = 0x40, // 0 1 0
-                WR14_CMD_DISABLE_DPLL = 0x60, // 0 1 1
-                WR14_CMD_SS_BGR       = 0x80, // 1 0 0
-                WR14_CMD_SS_RTXC      = 0xa0, // 1 0 1
-                WR14_CMD_SET_FM       = 0xc0, // 1 1 0
-                WR14_CMD_SET_NRZI     = 0xe0  // 1 1 1
-        };
+		enum
+		{
+				WR14_DPLL_CMD_MASK    = 0xe0, // Command
+				WR14_CMD_NULL         = 0x00, // 0 0 0
+				WR14_CMD_ESM          = 0x20, // 0 0 1
+				WR14_CMD_RMC          = 0x40, // 0 1 0
+				WR14_CMD_DISABLE_DPLL = 0x60, // 0 1 1
+				WR14_CMD_SS_BGR       = 0x80, // 1 0 0
+				WR14_CMD_SS_RTXC      = 0xa0, // 1 0 1
+				WR14_CMD_SET_FM       = 0xc0, // 1 1 0
+				WR14_CMD_SET_NRZI     = 0xe0  // 1 1 1
+		};
 
 	void update_serial();
 	void set_dtr(int state);
 	void set_rts(int state);
 
 	int get_clock_mode();
-        void update_rts();
+		void update_rts();
 	stop_bits_t get_stop_bits();
 	int get_rx_word_length();
 	int get_tx_word_length();
@@ -482,7 +482,7 @@ protected:
 	UINT8 m_rx_error_fifo[8];   // receive error FIFO
 	UINT8 m_rx_error;           // current receive error
 	//int m_rx_fifo             // receive FIFO pointer
-        int m_rx_fifo_rp;           // receive FIFO read pointer
+		int m_rx_fifo_rp;           // receive FIFO read pointer
 	int m_rx_fifo_wp;           // receive FIFO write pointer
 	int m_rx_fifo_sz;           // receive FIFO size
 
@@ -506,19 +506,19 @@ protected:
 	// synchronous state
 	UINT16 m_sync;              // sync character
 
-        //	int m_index;
+		//  int m_index;
 	z80scc_device *m_uart;
 
 	// SCC specifics
 	int m_ph;                   // Point high command to access regs 08-0f
-        UINT8 m_zc;
+		UINT8 m_zc;
 };
 
 
 // ======================> z80scc_device
 
 class z80scc_device :  public device_t
-        ,public device_z80daisy_interface
+		,public device_z80daisy_interface
 {
 	friend class z80scc_channel;
 
@@ -604,7 +604,7 @@ protected:
 	void trigger_interrupt(int index, int state);
 	int get_channel_index(z80scc_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
-        // Variants in the SCC family
+		// Variants in the SCC family
 	enum
 	{
 		TYPE_Z80SCC   = 0x001,
@@ -615,7 +615,7 @@ protected:
 		TYPE_SCC85C30 = 0x020,
 		TYPE_SCC85230 = 0x040,
 		TYPE_SCC85233 = 0x080,
-                TYPE_SCC8523L = 0x100
+				TYPE_SCC8523L = 0x100
 	};
 
 #define SET_NMOS   ( z80scc_device::TYPE_SCC8030  | z80scc_device::TYPE_SCC8530 )
@@ -624,7 +624,7 @@ protected:
 #define SET_EMSCC    z80scc_device::TYPE_SCC85233
 #define SET_Z80X30 ( z80scc_device::TYPE_SCC8030  | z80scc_device::TYPE_SCC80C30 | z80scc_device::TYPE_SCC80230 )
 #define SET_Z85X3X ( z80scc_device::TYPE_SCC8530  | z80scc_device::TYPE_SCC85C30 | z80scc_device::TYPE_SCC85230 \
-                   | z80scc_device::TYPE_SCC8523L | z80scc_device::TYPE_SCC85233 )
+					| z80scc_device::TYPE_SCC8523L | z80scc_device::TYPE_SCC85233 )
 
 	enum
 	{

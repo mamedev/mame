@@ -14,7 +14,7 @@
     x x x x | | \---- /EAROM C1 (note this is inverted! the value written here is inverted, then connected to EAROM C1 AND to the /OE of the 'input latch' which drive the EAROM bus when writing)
     x x x x | \------ EAROM C2 (directly connected)
     x x x x \-------- EAROM CS1 (positive enable, directly connected)
-  
+
     Gravitar, Red Baron, Black Widow, Tempest, Liberator, Asteroids Deluxe, Runaway CTRL port wiring:
     7 6 5 4 3 2 1 0
     x x x x | | | \-- EAROM CLK (directly connected)
@@ -165,8 +165,8 @@ void atari_vg_earom_device::device_start()
 void atari_vg_earom_device::device_reset()
 {
 	m_state = ER2055_READ_WAITING_FOR_CLOCK; // start in read mode
-	m_old_ctrl = 0; 
+	m_old_ctrl = 0;
 	m_in_offset = 0;
 	m_in_data = 0;
-	m_out_data = 0xFF; // the value driven to the bus by the resistors if EAROM is open bus 
+	m_out_data = 0xFF; // the value driven to the bus by the resistors if EAROM is open bus
 }

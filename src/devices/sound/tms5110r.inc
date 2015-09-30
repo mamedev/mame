@@ -568,7 +568,7 @@ NOTE FROM DECAP: immediately to the left of each of the K1,2,3,4,5,and 6
  patent 4,335,277. They are likely related to the multiplicative interpolator
  described in us patent 4,419,540; whether the 5200/2501E and the 5220 or 5220C
  actually implement this interpolator or not is unclear. This interpolator
- seems intended for chips with variable frame rate, so if it exists at all, 
+ seems intended for chips with variable frame rate, so if it exists at all,
  it may only exist on the TMS/TSP5220C and CD2501ECD.
 */
 

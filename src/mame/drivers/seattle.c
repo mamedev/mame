@@ -3028,12 +3028,12 @@ ROM_START( hyprdriv )
 	ROM_SYSTEM_BIOS( 1, "update",       "Unknown Update" )
 	ROMX_LOAD( "hyperdrive1.2.u33", 0x000000, 0x100000, CRC(fcc922fb) SHA1(7bfa4f0614f561ba77ad2dc7d776af2c3e84b7e7), ROM_BIOS(2) )
 	/*  it's either an update to 1.40, or an older version, either way we can't use it with the drive we have, it reports the following
-		
-		'Valid Update Rom Detected'
-		'Processing Rom'
-		'Rom is Wrong Revision Level'
-		'Operation Failure'
-	
+
+	    'Valid Update Rom Detected'
+	    'Processing Rom'
+	    'Rom is Wrong Revision Level'
+	    'Operation Failure'
+
 	*/
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 )

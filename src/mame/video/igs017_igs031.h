@@ -59,7 +59,7 @@ public:
 	int m_nmi_enable;
 	int m_irq_enable;
 
-	
+
 	DECLARE_WRITE8_MEMBER(palram_w);
 	DECLARE_READ8_MEMBER(i8255_r);
 

@@ -36,7 +36,7 @@ public:
 		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_igs017_igs031(*this, "igs017_igs031")
- { }
+	{ }
 
 	optional_shared_ptr<UINT32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
-//	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -385,8 +385,8 @@ static MACHINE_CONFIG_START( amazonia, igs_m027_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
-//	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	
+//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+
 	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_REVERSE_TEXT_BITS

@@ -591,7 +591,7 @@ void debugwin_info::register_window_class()
 		wc.style            = 0;
 		wc.cbClsExtra       = 0;
 		wc.cbWndExtra       = 0;
-		
+
 		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't

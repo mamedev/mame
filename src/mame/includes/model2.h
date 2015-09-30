@@ -280,91 +280,90 @@ struct triangle;
 
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 4000>
 {
-    
 public:
-    typedef void (model2_renderer::*scanline_render_func)(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
-    
-public:
-    model2_renderer(model2_state& state)
-        : poly_manager<float, m2_poly_extra_data, 4, 4000>(state.machine())
-        , m_state(state)
-        , m_destmap(state.m_screen->width(), state.m_screen->height())
-    {
-        m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
-        m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;
-        m_renderfuncs[2] = &model2_renderer::model2_3d_render_2;
-        m_renderfuncs[3] = &model2_renderer::model2_3d_render_3;
-        m_renderfuncs[4] = &model2_renderer::model2_3d_render_4;
-        m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
-        m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
-        m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
-    }
-    
-    bitmap_rgb32& destmap() { return m_destmap; }
-    
-    void model2_3d_render(triangle *tri, const rectangle &cliprect);
-    
-    /* checker = 0, textured = 0, transparent = 0 */
-    #define MODEL2_FUNC 0
-    #define MODEL2_FUNC_NAME    model2_3d_render_0
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 0, textured = 0, translucent = 1 */
-    #define MODEL2_FUNC 1
-    #define MODEL2_FUNC_NAME    model2_3d_render_1
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 0, textured = 1, translucent = 0 */
-    #define MODEL2_FUNC 2
-    #define MODEL2_FUNC_NAME    model2_3d_render_2
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 0, textured = 1, translucent = 1 */
-    #define MODEL2_FUNC 3
-    #define MODEL2_FUNC_NAME    model2_3d_render_3
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 0, translucent = 0 */
-    #define MODEL2_FUNC 4
-    #define MODEL2_FUNC_NAME    model2_3d_render_4
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 0, translucent = 1 */
-    #define MODEL2_FUNC 5
-    #define MODEL2_FUNC_NAME    model2_3d_render_5
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 1, translucent = 0 */
-    #define MODEL2_FUNC 6
-    #define MODEL2_FUNC_NAME    model2_3d_render_6
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 1, translucent = 1 */
-    #define MODEL2_FUNC 7
-    #define MODEL2_FUNC_NAME    model2_3d_render_7
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
+	typedef void (model2_renderer::*scanline_render_func)(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
-    scanline_render_func m_renderfuncs[8];
-    
+public:
+	model2_renderer(model2_state& state)
+		: poly_manager<float, m2_poly_extra_data, 4, 4000>(state.machine())
+		, m_state(state)
+		, m_destmap(state.m_screen->width(), state.m_screen->height())
+	{
+		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
+		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;
+		m_renderfuncs[2] = &model2_renderer::model2_3d_render_2;
+		m_renderfuncs[3] = &model2_renderer::model2_3d_render_3;
+		m_renderfuncs[4] = &model2_renderer::model2_3d_render_4;
+		m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
+		m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
+		m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
+	}
+
+	bitmap_rgb32& destmap() { return m_destmap; }
+
+	void model2_3d_render(triangle *tri, const rectangle &cliprect);
+
+	/* checker = 0, textured = 0, transparent = 0 */
+	#define MODEL2_FUNC 0
+	#define MODEL2_FUNC_NAME    model2_3d_render_0
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 0, textured = 0, translucent = 1 */
+	#define MODEL2_FUNC 1
+	#define MODEL2_FUNC_NAME    model2_3d_render_1
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 0, textured = 1, translucent = 0 */
+	#define MODEL2_FUNC 2
+	#define MODEL2_FUNC_NAME    model2_3d_render_2
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 0, textured = 1, translucent = 1 */
+	#define MODEL2_FUNC 3
+	#define MODEL2_FUNC_NAME    model2_3d_render_3
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 0, translucent = 0 */
+	#define MODEL2_FUNC 4
+	#define MODEL2_FUNC_NAME    model2_3d_render_4
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 0, translucent = 1 */
+	#define MODEL2_FUNC 5
+	#define MODEL2_FUNC_NAME    model2_3d_render_5
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 1, translucent = 0 */
+	#define MODEL2_FUNC 6
+	#define MODEL2_FUNC_NAME    model2_3d_render_6
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 1, translucent = 1 */
+	#define MODEL2_FUNC 7
+	#define MODEL2_FUNC_NAME    model2_3d_render_7
+	#include "video/model2rd.inc"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	scanline_render_func m_renderfuncs[8];
+
 private:
-    model2_state& m_state;
-    bitmap_rgb32 m_destmap;
+	model2_state& m_state;
+	bitmap_rgb32 m_destmap;
 };
 
 typedef model2_renderer::vertex_t poly_vertex;

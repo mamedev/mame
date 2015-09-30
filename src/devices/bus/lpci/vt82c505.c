@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	VIA VT82C505 ISA/VL PCI bridge
+    VIA VT82C505 ISA/VL PCI bridge
 
 */
 
@@ -27,7 +27,7 @@ vt82c505_device::vt82c505_device(const machine_config &mconfig, const char *tag,
 UINT32 vt82c505_device::pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
-	
+
 	if (function != 0)
 		return result;
 
@@ -94,4 +94,3 @@ void vt82c505_device::device_start()
 void vt82c505_device::device_reset()
 {
 }
-

@@ -32,8 +32,8 @@ public:
 
 
 static ADDRESS_MAP_START(canons80_map, AS_PROGRAM, 8, canons80_state )
-    AM_RANGE(0x0000, 0x7fff) AM_RAM
-    AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( canons80, canons80_state )

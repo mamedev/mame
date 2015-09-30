@@ -27,7 +27,7 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, dd_present(false)
 	, disk_present(false)
 	, cart_present(false)
-{	
+{
 	for (INT32 i = 0; i < 256; i++)
 	{
 		m_gamma_table[i] = sqrt((float)(i << 6));
@@ -976,7 +976,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			if(status & DP_STATUS_START_VALID)
 			{
 				state->m_rdp->set_status(status & ~DP_STATUS_START_VALID);
-				state->m_rdp->set_current(state->m_rdp->get_start());	
+				state->m_rdp->set_current(state->m_rdp->get_start());
 				state->m_rdp->set_end(data & ~ 7);
 				g_profiler.start(PROFILER_USER1);
 				state->m_rdp->process_command_list();
@@ -989,7 +989,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 				g_profiler.start(PROFILER_USER1);
 				state->m_rdp->process_command_list();
 				g_profiler.stop();
-				break;				
+				break;
 			}
 
 		case 0x0c/4:        // DP_STATUS_REG

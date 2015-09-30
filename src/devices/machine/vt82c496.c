@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	VIA VT82C496G "Green PC" system chipset
+    VIA VT82C496G "Green PC" system chipset
 
 */
 
@@ -30,9 +30,9 @@ void vt82c496_device::device_start()
 
 	/* get rom region */
 	m_rom = machine().root_device().memregion(m_region_tag)->base();
-	
+
 	save_pointer(m_reg,"Registers",0x100);
-	
+
 	m_ram = machine().device<ram_device>(RAM_TAG);
 }
 
@@ -106,7 +106,7 @@ void vt82c496_device::update_mem_c0(UINT8 data)
 	}
 	else
 		m_space->nop_write(0xcc000,0xcffff,0,0);
-		
+
 	if(data & 0x20)
 		machine().root_device().membank("bios_c8_r")->set_base(m_ram->pointer()+0xc8000);
 	else
@@ -118,7 +118,7 @@ void vt82c496_device::update_mem_c0(UINT8 data)
 	}
 	else
 		m_space->nop_write(0xc8000,0xcbfff,0,0);
-		
+
 	if(data & 0x08)
 		machine().root_device().membank("bios_c4_r")->set_base(m_ram->pointer()+0xc4000);
 	else
@@ -130,7 +130,7 @@ void vt82c496_device::update_mem_c0(UINT8 data)
 	}
 	else
 		m_space->nop_write(0xc4000,0xc7fff,0,0);
-		
+
 	if(data & 0x02)
 		machine().root_device().membank("bios_c0_r")->set_base(m_ram->pointer()+0xc0000);
 	else
@@ -157,7 +157,7 @@ void vt82c496_device::update_mem_d0(UINT8 data)
 	}
 	else
 		m_space->nop_write(0xdc000,0xdffff,0,0);
-		
+
 	if(data & 0x20)
 		machine().root_device().membank("bios_d8_r")->set_base(m_ram->pointer()+0xd8000);
 	else
@@ -169,7 +169,7 @@ void vt82c496_device::update_mem_d0(UINT8 data)
 	}
 	else
 		m_space->nop_write(0xd8000,0xdbfff,0,0);
-		
+
 	if(data & 0x08)
 		machine().root_device().membank("bios_d4_r")->set_base(m_ram->pointer()+0xd4000);
 	else
@@ -181,7 +181,7 @@ void vt82c496_device::update_mem_d0(UINT8 data)
 	}
 	else
 		m_space->nop_write(0xd4000,0xd7fff,0,0);
-		
+
 	if(data & 0x02)
 		machine().root_device().membank("bios_d0_r")->set_base(m_ram->pointer()+0xd0000);
 	else
@@ -214,7 +214,7 @@ void vt82c496_device::update_mem_e0(UINT8 data)
 		machine().root_device().membank("bios_f0_r")->set_base(m_ram->pointer()+0xf0000);
 	else
 		machine().root_device().membank("bios_f0_r")->set_base(m_rom+0x30000);
-	
+
 	if(data & 0x10)
 	{
 		m_space->install_write_bank(0xf0000,0xfffff,0,0,"bios_f0_w");
@@ -223,4 +223,3 @@ void vt82c496_device::update_mem_e0(UINT8 data)
 	else
 		m_space->nop_write(0xf0000,0xfffff,0,0);
 }
-

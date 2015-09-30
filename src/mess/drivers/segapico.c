@@ -258,7 +258,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 		   For reads, if bit 15 is cleared, it means PCM is 'busy' or
 		   something like that, as games sometimes wait for it to become 1.
 		*/
-			//	return (m_upd7759->busy_r()^1) << 15;
+			//  return (m_upd7759->busy_r()^1) << 15;
 			// The BUSY bit stays 1 as long as some PCM sound is playing.
 			// SMPS drivers check 800012 [byte] and clear the "prevent music PCM" byte when the READY bit gets set.
 			// If this is done incorrectly, the voices in Sonic Gameworld (J) are muted by the music's PCM drums.
@@ -299,10 +299,10 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 			if (mem_mask & 0x00FF)
 				m_sega_315_5641_pcm->port_w(space, 0, (data >> 0) & 0xFF);
 			break;
- 		case 0x12/2: // guess
+		case 0x12/2: // guess
 			// Note about uPD7759 lines:
-			//	reset line: 1 - normal, 1->0 - reset chip, 0 - playback disabled
-			//	start line: 0->1 - start playback
+			//  reset line: 1 - normal, 1->0 - reset chip, 0 - playback disabled
+			//  start line: 0->1 - start playback
 			if (mem_mask & 0xFF00)
 			{
 				// I assume that:
@@ -316,14 +316,14 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 					// Somewhere between "Reset Off" and the first sample data,
 					// we need to send a few commands to make the sample stream work.
 					// Doing that when rising the "start" line seems to work fine.
-					m_sega_315_5641_pcm->port_w(space, 0, 0xFF);	// "Last Sample" value (must be >= 0x10)
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);	// Dummy 1
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);	// Addr MSB
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);	// Addr LSB
+					m_sega_315_5641_pcm->port_w(space, 0, 0xFF);    // "Last Sample" value (must be >= 0x10)
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Dummy 1
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr MSB
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr LSB
 				}
 			}
-			
-		
+
+
 			/*m_sega_315_5641_pcm->reset_w(0);
 			m_sega_315_5641_pcm->start_w(0);
 			m_sega_315_5641_pcm->reset_w(1);

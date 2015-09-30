@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( rescuefe_map, AS_PROGRAM, 8, scobra_state )
 
 	AM_RANGE(0x4400, 0x5dff) AM_ROM
 	AM_RANGE(0x5e00, 0x6bff) AM_ROM // some right?
-	
+
 	AM_RANGE(0x8200, 0x93ff) AM_ROM // wrong? (maybe some correct?)
 
 	AM_RANGE(0xa600, 0xa6ff) AM_ROM // wrong (taunt string) jumps to around a600 so something must map in this area?
@@ -226,13 +226,13 @@ static ADDRESS_MAP_START( rescuefe_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xC160, 0xC163) AM_DEVREAD("ppi8255_0", i8255_device, read) // ?
 
 	AM_RANGE(0xC4Ac, 0xC4AF) AM_DEVREAD("ppi8255_1", i8255_device, read) // ?
-	
+
 	AM_RANGE(0xc180, 0xc183) AM_DEVWRITE("ppi8255_0", i8255_device, write) // correct based on main set?
-	AM_RANGE(0xc220, 0xc223) AM_DEVWRITE("ppi8255_1", i8255_device, write) // ^	
+	AM_RANGE(0xc220, 0xc223) AM_DEVWRITE("ppi8255_1", i8255_device, write) // ^
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
-//	AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
-//	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
+//  AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
+//  AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
@@ -254,11 +254,11 @@ static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x7616, 0x7616) AM_WRITE(galaxold_flip_screen_x_w) // a806
 	AM_RANGE(0x7617, 0x7617) AM_WRITE(galaxold_flip_screen_y_w) // a807
 
-	AM_RANGE(0x4C00, 0x4C03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) 
-	AM_RANGE(0x4B00, 0x4B03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) 
+	AM_RANGE(0x4C00, 0x4C03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x4B00, 0x4B03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 
-	
-	 
+
+
 
 	AM_RANGE(0x1D98, 0x1D98) AM_READ(watchdog_reset_r) // 0xb000
 
@@ -836,8 +836,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rescuefe, rescue )
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")  
-	MCFG_CPU_PROGRAM_MAP(rescuefe_map)	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rescuefe_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rescueb, rescue )
@@ -860,8 +860,8 @@ static MACHINE_CONFIG_DERIVED( minefld, type1 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( minefldfe, minefld )
-	MCFG_CPU_MODIFY("maincpu")  
-	MCFG_CPU_PROGRAM_MAP(minefldfe_map)	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(minefldfe_map)
 MACHINE_CONFIG_END
 
 
@@ -1221,13 +1221,13 @@ Both are missing the top sound PCB.
 /* the 'Minefield' shop shows a Logicshop copyright, and a phone number with a Great Yarmouth area code
    which seems to indicate the following manufacturer / operator.
 
-	The Logicshop (Great Yarmouth)
-	Caesar's Arcade
-	Beach Rd
-	Hemsby
-	Great Yarmouth
-	Norfolk
-	NR29 4HS
+    The Logicshop (Great Yarmouth)
+    Caesar's Arcade
+    Beach Rd
+    Hemsby
+    Great Yarmouth
+    Norfolk
+    NR29 4HS
 
 */
 

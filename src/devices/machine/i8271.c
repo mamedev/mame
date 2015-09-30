@@ -501,7 +501,7 @@ void i8271_device::live_run(attotime limit)
 						scan_cnt[1] = slot >> 9;
 						scan_done = true;
 						rr = command[4] & 0xc0 ? ERR_SMNE : ERR_SMEQ;
- 					}
+					}
 					else
 					{
 						scan_match = true;
@@ -753,7 +753,7 @@ void i8271_device::start_command(int cmd)
 	{
 		floppy_info &fi = flopi[BIT(command[0], 7)];
 		rr = (get_ready(1) ? 0x40 : 0) | (fi.dev->idx_r() ? 0x10 : 0) | (fi.dev->wpt_r() ? 0 : 8) |
-			 (get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
+				(get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
 		flopi[0].ready = true;
 		flopi[1].ready = true;
 		main_phase = PHASE_IDLE;
@@ -819,7 +819,7 @@ void i8271_device::start_command(int cmd)
 		case 0x22: {
 			floppy_info &fi = flopi[BIT(command[0], 7)];
 			rr = (get_ready(1) ? 0x40 : 0) | (fi.dev->idx_r() ? 0x10 : 0) | (fi.dev->wpt_r() ? 0 : 8) |
-				 (get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
+					(get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
 			break;
 		}
 		case 0x23:

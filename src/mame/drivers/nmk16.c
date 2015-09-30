@@ -6216,7 +6216,7 @@ Notes:
       VSync - 56.205Hz
 
       NMK CUSTOM IC'S
-          - NMK004 marked "NMK004 0840-1324". Actually a TLCS90-based Toshiba TMP90C840AF 
+          - NMK004 marked "NMK004 0840-1324". Actually a TLCS90-based Toshiba TMP90C840AF
             Microcontroller with 256 bytes RAM & 8Kb ROM, running at 8.000MHz [16/2] (QFP64)
           - NMK005 (x1, Square QFP64)
           - NMK008 (x1, Square QFP84)

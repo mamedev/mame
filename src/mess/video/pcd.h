@@ -55,7 +55,7 @@ private:
 };
 
 class pcx_video_device : public pcdx_video_device,
-						 public device_serial_interface
+							public device_serial_interface
 {
 public:
 	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

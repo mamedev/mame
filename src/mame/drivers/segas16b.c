@@ -8214,7 +8214,7 @@ GAME( 1989, fpoint1d,   fpoint,   system16b,    fpoint,   segas16b_state,generic
 GAME( 1988, tetris2d,   tetris,   system16b,    tetris,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Tetris (set 2, Japan, System 16B) (bootleg of FD1094 317-0092 set)", 0 )
 GAME( 1988, tetris1d,   tetris,   system16b,    tetris,   segas16b_state,generic_5358_small, ROT0,   "bootleg", "Tetris (set 1, Japan, System 16B) (bootleg of FD1094 317-0091 set)", 0 )
 
-GAME( 1988, dduxd,		ddux,     system16b,    ddux,     segas16b_state,generic_5521,       ROT0,   "bootleg", "Dynamite Dux (set 3, World) (bootleg of FD1094 317-0096 set)", 0 )
+GAME( 1988, dduxd,      ddux,     system16b,    ddux,     segas16b_state,generic_5521,       ROT0,   "bootleg", "Dynamite Dux (set 3, World) (bootleg of FD1094 317-0096 set)", 0 )
 GAME( 1988, dduxjd,     ddux,     system16b,    ddux,     segas16b_state,generic_5521,       ROT0,   "bootleg", "Dynamite Dux (set 2, Japan) (bootleg of FD1094 317-0094 set)", 0 )
 
 GAME( 1988, altbeast5d, altbeast, system16b,    altbeast, segas16b_state,generic_5521,       ROT0,   "bootleg", "Altered Beast (set 5) (bootleg of FD1094 317-0069 set)", 0 )

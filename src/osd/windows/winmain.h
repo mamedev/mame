@@ -105,7 +105,7 @@
 #define WINOPTION_FULLSCREENGAMMA       "full_screen_gamma"
 
 // input options
-#define WINOPTION_GLOBAL_INPUTS			"global_inputs"
+#define WINOPTION_GLOBAL_INPUTS         "global_inputs"
 #define WINOPTION_DUAL_LIGHTGUN         "dual_lightgun"
 
 

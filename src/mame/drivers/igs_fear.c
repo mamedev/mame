@@ -49,7 +49,7 @@ ADDRESS_MAP_END
 // debugging only, not tile based
 static const gfx_layout fearlayout =
 {
-	16,16, 
+	16,16,
 	RGN_FRAC(1,1),
 	7,              /* 7 bits per pixel - bit 0 unused in the roms we have*/
 	{ 1,2,3,4,5,6,7 },
@@ -77,7 +77,7 @@ static MACHINE_CONFIG_START( igs_fear, igs_fear_state )
 	MCFG_CPU_ADD("maincpu",ARM7, 50000000/2)
 	MCFG_CPU_PROGRAM_MAP(igs_igs_fear_map)
 
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_fear_state,  igs_majhong_interrupt)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_fear_state,  igs_majhong_interrupt)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -114,7 +114,7 @@ ROM_START( fearless )
 	ROM_LOAD( "fearlessp_07.u33", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) ) // MX10EXAQC (80C51 XA based MCU) marked 07, not read protected?
 
 	// these all report FIXED BITS (0xxxxxxx), hopefully just 7-bit colour data, non-tile based sprites
-	ROM_REGION( 0x1000000, "gfx3", 0 ) 
+	ROM_REGION( 0x1000000, "gfx3", 0 )
 	ROM_LOAD16_BYTE( "fearlessp_u6_cg-0h.u6",   0x000001, 0x800000, CRC(02d8bbbf) SHA1(7cf36c909a5d76096a725ffe0a697bcbafbcf985) )
 	ROM_LOAD16_BYTE( "fearlessp_u7_cg-0l.u7",   0x000000, 0x800000, CRC(ca254db4) SHA1(f5670c2ff0720c84c9aff3cea95b118b6044e469) )
 	ROM_REGION( 0x1000000, "gfx2", 0 )

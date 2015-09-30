@@ -86,8 +86,8 @@ int gregorian_days_in_month(int month, int year)
 	assert(month >= 1 && month <= 12);
 
 	int days[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
-    days[1] += gregorian_is_leap_year(year) ? 1 : 0;
-    return days[month-1];
+	days[1] += gregorian_is_leap_year(year) ? 1 : 0;
+	return days[month-1];
 }
 
 

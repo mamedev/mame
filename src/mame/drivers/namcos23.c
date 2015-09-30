@@ -1248,7 +1248,7 @@ Notes:
 #define H8CLOCK     (16737350)      /* from 2061 */
 #define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
 #define C352CLOCK   (25992000)  /* measured at 25.992MHz from 2061 pin 9  */
-#define C352DIV		(296)
+#define C352DIV     (296)
 #define VSYNC1      (59.8824)
 #define VSYNC2      (59.915)
 #define HSYNC       (16666150)
@@ -1294,14 +1294,14 @@ class namcos23_state;
 class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
 {
 public:
-    namcos23_renderer(namcos23_state &state);
-    
-    void render_flush(bitmap_rgb32& bitmap);
-    void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
-    
+	namcos23_renderer(namcos23_state &state);
+
+	void render_flush(bitmap_rgb32& bitmap);
+	void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
+
 private:
-    namcos23_state& m_state;
-    bitmap_rgb32 m_bitmap;
+	namcos23_state& m_state;
+	bitmap_rgb32 m_bitmap;
 };
 
 typedef namcos23_renderer::vertex_t poly_vertex;
@@ -1361,7 +1361,7 @@ struct c404_t
 
 struct render_t
 {
-    namcos23_renderer *polymgr;
+	namcos23_renderer *polymgr;
 	int cur;
 	int poly_count;
 	int count[2];
@@ -1584,9 +1584,9 @@ UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
 ***************************************************************************/
 
 namcos23_renderer::namcos23_renderer(namcos23_state &state)
-    : poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
-      m_state(state),
-      m_bitmap(state.m_screen->width(), state.m_screen->height())
+	: poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
+		m_state(state),
+		m_bitmap(state.m_screen->width(), state.m_screen->height())
 {}
 
 // 3D hardware, to throw at least in part in video/namcos23.c
@@ -2084,19 +2084,19 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 
 	for(int i=0; i<render.poly_count; i++) {
 		const namcos23_poly_entry *p = render.poly_order[i];
-        namcos23_render_data& extra = render.polymgr->object_data_alloc();
-        extra = p->rd;
-        
-        if (p->vertex_count == 3)
-            render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv[0], p->pv[1], p->pv[2]);
-        else if (p->vertex_count == 4)
-            render_polygon<4>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
-        else if (p->vertex_count == 5)
-            render_polygon<5>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+		namcos23_render_data& extra = render.polymgr->object_data_alloc();
+		extra = p->rd;
+
+		if (p->vertex_count == 3)
+			render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv[0], p->pv[1], p->pv[2]);
+		else if (p->vertex_count == 4)
+			render_polygon<4>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+		else if (p->vertex_count == 5)
+			render_polygon<5>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
 	}
 	render.poly_count = 0;
-    
-    copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, scissor);
+
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, scissor);
 }
 
 void namcos23_state::render_run(bitmap_rgb32 &bitmap)
@@ -2117,7 +2117,7 @@ void namcos23_state::render_run(bitmap_rgb32 &bitmap)
 		re++;
 	}
 	render.polymgr->render_flush(bitmap);
-    render.polymgr->wait();
+	render.polymgr->wait();
 }
 
 
@@ -2189,7 +2189,7 @@ VIDEO_START_MEMBER(namcos23_state,s23)
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
-    m_render.polymgr = auto_alloc(machine(), namcos23_renderer(*this));
+	m_render.polymgr = auto_alloc(machine(), namcos23_renderer(*this));
 }
 
 

@@ -13,10 +13,10 @@
     Supports 8-bit linear and 8-bit muLaw samples
     Output: digital, 16 bit, 4 channels
     Output sample rate is the input clock / (288 * 2).
-	
+
     superctr: The clock divider appears to be configurable for each system.
     Below is a list of the divider values followed by the systems that use it.
-	
+
     * 228: System 11.
     * 288: System 22, Super 22, NB-1/2, ND-1, FL.
     * 296: System 23, Super 23.

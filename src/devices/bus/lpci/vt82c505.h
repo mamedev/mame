@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	VIA VT82C505 PCI bridge
+    VIA VT82C505 PCI bridge
 
 */
 

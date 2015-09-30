@@ -6,7 +6,7 @@
  *  Magic Sound Board for the Aleste 520EX
  *
  */
- 
+
 #include "emu.h"
 #include "magicsound.h"
 #include "includes/amstrad.h"
@@ -22,7 +22,7 @@ const device_type AL_MAGICSOUND = &device_creator<al_magicsound_device>;
 static MACHINE_CONFIG_FRAGMENT( al_magicsound )
 	MCFG_DEVICE_ADD( "dmac", AM9517A, XTAL_4MHz )  // CLK from expansion port
 	// According to the schematics, the TC pin (EOP on western chips) is connected to NMI on the expansion port.
-	// NMIs seem to occur too quickly when this is active, so either EOP is not triggered at the correct time, or 
+	// NMIs seem to occur too quickly when this is active, so either EOP is not triggered at the correct time, or
 	// the K1810WT37 is different to the i8237/AM9517A
 	//MCFG_I8237_OUT_EOP_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w)) // MCFG_DEVCB_INVERT
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dmac", am9517a_device, hack_w))
@@ -56,7 +56,7 @@ static MACHINE_CONFIG_FRAGMENT( al_magicsound )
 	MCFG_PIT8253_CLK2(XTAL_4MHz)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac1")	
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	// no pass-through(?)
 MACHINE_CONFIG_END
@@ -94,9 +94,9 @@ void al_magicsound_device::device_start()
 	space.install_write_handler(0xf9d0,0xf9df,0,0,write8_delegate(FUNC(al_magicsound_device::timer_w),this));
 	space.install_write_handler(0xfad0,0xfadf,0,0,write8_delegate(FUNC(al_magicsound_device::volume_w),this));
 	space.install_write_handler(0xfbd0,0xfbdf,0,0,write8_delegate(FUNC(al_magicsound_device::mapper_w),this));
-	
+
 	m_ramptr = machine().device<ram_device>(":" RAM_TAG);
-	
+
 	for(int x=0;x<4;x++)
 	{
 		save_item(NAME(m_output[x]),x);
@@ -167,7 +167,7 @@ READ8_MEMBER(al_magicsound_device::dma_read_byte)
 {
 	UINT8 ret = 0xff;
 	UINT8 page = (offset & 0xc000) >> 14;
-	
+
 	if(m_current_channel != -1)
 		ret = m_ramptr->read(m_page[m_current_channel][page] + (offset & 0x3fff));
 	return ret;
@@ -187,4 +187,3 @@ void al_magicsound_device::set_timer_gate(bool state)
 	m_timer2->write_gate1(state);
 	m_timer2->write_gate2(state);
 }
-

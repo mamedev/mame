@@ -1,5 +1,5 @@
-﻿// license:BSD-3-Clause
-// copyright-holders:Joakim Larsson Edstr??m
+// license:BSD-3-Clause
+// copyright-holders:Joakim Larsson Edstrom
 /***************************************************************************
  *
  *  Force SYS68K CPU-1/CPU-6 VME SBC drivers, initially based on the 68ksbc.c
@@ -125,19 +125,19 @@ class force68k_state : public driver_device
 {
 public:
 force68k_state(const machine_config &mconfig, device_type type, const char *tag) :
-        driver_device (mconfig, type, tag),
-        m_maincpu (*this, "maincpu"),
-        m_rtc (*this, "rtc"),
-        m_pit (*this, "pit"),
-        m_aciahost (*this, "aciahost"),
-        m_aciaterm (*this, "aciaterm"),
-        m_aciaremt (*this, "aciaremt"),
-        m_centronics (*this, "centronics")
-        , m_centronics_ack (0)
-        , m_centronics_busy (0)
-        , m_centronics_perror (0)
-        , m_centronics_select (0)
-        ,m_cart(*this, "exp_rom1")
+		driver_device (mconfig, type, tag),
+		m_maincpu (*this, "maincpu"),
+		m_rtc (*this, "rtc"),
+		m_pit (*this, "pit"),
+		m_aciahost (*this, "aciahost"),
+		m_aciaterm (*this, "aciaterm"),
+		m_aciaremt (*this, "aciaremt"),
+		m_centronics (*this, "centronics")
+		, m_centronics_ack (0)
+		, m_centronics_busy (0)
+		, m_centronics_perror (0)
+		, m_centronics_select (0)
+		,m_cart(*this, "exp_rom1")
 {
 }
 
@@ -253,8 +253,8 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
 {
 //      LOG (logerror ("centronics_ack_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
-        m_centronics_ack = state;
-        m_pit->h1_set (state);
+		m_centronics_ack = state;
+		m_pit->h1_set (state);
 }
 
 /* Centronics BUSY handler
@@ -262,7 +262,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
  */
 WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
 //      LOG (logerror ("centronics_busy_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
-        m_centronics_busy = state;
+		m_centronics_busy = state;
 }
 
 /* Centronics PERROR handler
@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
  */
 WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
 //      LOG (logerror ("centronics_perror_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
-        m_centronics_perror = state;
+		m_centronics_perror = state;
 }
 
 /* Centronics SELECT handler
@@ -278,44 +278,44 @@ WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
  */
 WRITE_LINE_MEMBER (force68k_state::centronics_select_w){
 //      LOG (logerror ("centronics_select_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
-        m_centronics_select = state;
-        m_pit->portb_setbit (0, state);
+		m_centronics_select = state;
+		m_pit->portb_setbit (0, state);
 }
 
 /* Start it up */
 void force68k_state::machine_start ()
 {
-        LOG (logerror ("machine_start\n"));
+		LOG (logerror ("machine_start\n"));
 
-        save_item (NAME (m_centronics_busy));
-        save_item (NAME (m_centronics_ack));
-        save_item (NAME (m_centronics_select));
-        save_item (NAME (m_centronics_perror));
+		save_item (NAME (m_centronics_busy));
+		save_item (NAME (m_centronics_ack));
+		save_item (NAME (m_centronics_select));
+		save_item (NAME (m_centronics_perror));
 
-        /* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-        m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x080000);
+		/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
+		m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x080000);
 
-        /* Map user ROM/RAM socket(s) */
-        if (m_cart->exists())
-        {
-                m_usrrom = (UINT16*)m_cart->get_rom_base();
+		/* Map user ROM/RAM socket(s) */
+		if (m_cart->exists())
+		{
+				m_usrrom = (UINT16*)m_cart->get_rom_base();
 #if 0 // This should be the correct way but produces odd and even bytes swapped
-                m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
 #else // So we installs a custom very ineffecient handler for now until we understand hwp to solve the problem better
-                m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(force68k_state::read16_rom), this));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(force68k_state::read16_rom), this));
 #endif
-        }
+		}
 }
 
 /* A very ineffecient User cart emulation of two 8 bit sockets (odd and even) */
 READ16_MEMBER (force68k_state::read16_rom){
-  offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
-  return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
+	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
+	return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
 READ16_MEMBER (force68k_state::bootvect_r){
-        return m_sysrom [offset];
+		return m_sysrom [offset];
 }
 
 /* 10. The VMEbus (text from board documentation)
@@ -326,7 +326,7 @@ READ16_MEMBER (force68k_state::bootvect_r){
  * systems. In addition to the bus arbiter, a separate slave bus
  * arbitration allows selection of the arbitration level (0-3).
  *
- * The address modifier range .,Short 110 Access« can be selected
+ * The address modifier range .,Short 110 Access can be selected
  * via a jumper for variable system generation. The 7 interrupt
  * request levels of the VMEbus are fully supported from the
  * SYS68K1CPU-1 B/D. For multi-processing, each IRQ signal can be
@@ -338,44 +338,44 @@ READ16_MEMBER (force68k_state::bootvect_r){
 
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (force68k_state::vme_a24_r){
-        LOG (logerror ("vme_a24_r\n"));
-        return (UINT16) 0;
+		LOG (logerror ("vme_a24_r\n"));
+		return (UINT16) 0;
 }
 
 WRITE16_MEMBER (force68k_state::vme_a24_w){
-        LOG (logerror ("vme_a24_w\n"));
+		LOG (logerror ("vme_a24_w\n"));
 }
 
 READ16_MEMBER (force68k_state::vme_a16_r){
-        LOG (logerror ("vme_16_r\n"));
-        return (UINT16) 0;
+		LOG (logerror ("vme_16_r\n"));
+		return (UINT16) 0;
 }
 
 WRITE16_MEMBER (force68k_state::vme_a16_w){
-        LOG (logerror ("vme_a16_w\n"));
+		LOG (logerror ("vme_a16_w\n"));
 }
 
 /*
  * Serial port clock sources can all be driven by different outputs of the 14411
  */
 WRITE_LINE_MEMBER (force68k_state::write_aciahost_clock){
-        m_aciahost->write_txc (state);
-        m_aciahost->write_rxc (state);
+		m_aciahost->write_txc (state);
+		m_aciahost->write_rxc (state);
 }
 
 WRITE_LINE_MEMBER (force68k_state::write_aciaterm_clock){
-        m_aciaterm->write_txc (state);
-        m_aciaterm->write_rxc (state);
+		m_aciaterm->write_txc (state);
+		m_aciaterm->write_rxc (state);
 }
 
 WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
-        m_aciaremt->write_txc (state);
-        m_aciaremt->write_rxc (state);
+		m_aciaremt->write_txc (state);
+		m_aciaremt->write_rxc (state);
 }
 
 /*
  * 4. The USER Area (Text from the board manual)
-  The USER area contains two 28 pin sockets with JEDEC compatible pin out. 
+  The USER area contains two 28 pin sockets with JEDEC compatible pin out.
    To allow the usage of static RAM's, the access to the USER area is byte
    oriented. Table 3. lists the usable device types.
 
@@ -388,14 +388,14 @@ WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
    32Kx16 64 Kbyte 27256
    --------------------------
 */
-// Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier 
+// Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier
 // software handling. TODO: make configurable according to table above.
 static MACHINE_CONFIG_FRAGMENT( fccpu1_eprom_sockets )
-        MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "fccpu1_cart")
-        MCFG_GENERIC_EXTENSIONS("bin,rom")
-        MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-        MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG) 
-        MCFG_GENERIC_LOAD(force68k_state, exp1_load)
+		MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "fccpu1_cart")
+		MCFG_GENERIC_EXTENSIONS("bin,rom")
+		MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+		MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
+		MCFG_GENERIC_LOAD(force68k_state, exp1_load)
 //      MCFG_SOFTWARE_LIST_ADD("cart_list", "fccpu1_cart")
 MACHINE_CONFIG_END
 
@@ -404,19 +404,19 @@ MACHINE_CONFIG_END
 ****************************/
 int force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-        UINT32 size = slot->common_get_size("rom");
+		UINT32 size = slot->common_get_size("rom");
 
-        if (size > 0x20000) // Max 128Kb
-        {
-                LOG( printf("Cartridge size exceeding max size (128Kb): %d\n", size) );
-                image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge size exceeding max size (128Kb)");
-                return IMAGE_INIT_FAIL;
-        }
+		if (size > 0x20000) // Max 128Kb
+		{
+				LOG( printf("Cartridge size exceeding max size (128Kb): %d\n", size) );
+				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge size exceeding max size (128Kb)");
+				return IMAGE_INIT_FAIL;
+		}
 
-        slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
-        slot->common_load_rom(slot->get_rom_base(), size, "rom");
-        
-        return IMAGE_INIT_PASS;
+		slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+		return IMAGE_INIT_PASS;
 }
 
 /*
@@ -427,7 +427,7 @@ static MACHINE_CONFIG_START (fccpu1, force68k_state)
 MCFG_CPU_ADD ("maincpu", M68000, XTAL_16MHz / 2)
 MCFG_CPU_PROGRAM_MAP (force68k_mem)
 
-/* P3/Host Port config  
+/* P3/Host Port config
  * LO command causes ROM monitor to expect S-records on HOST port by default
  * Implementation through nullmodem currently does not support handshakes so
  * the ROM momitor is over-run while checking for checksums etc if used with
@@ -535,7 +535,7 @@ ROM_LOAD16_BYTE ("fccpu1V1.0L.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90
  * DC <expression> <CR>                        Data Conversion
  * DF <CR>                                     Display Formatted registers
  * DU [n] <address1> <address2>[<string>] <CR> Dump memory to object file
- * GO or G [<address] <CR>                     Execute program. 
+ * GO or G [<address] <CR>                     Execute program.
  * GD [<address] <CR>                          Go Direct
  * GT <address> <CR>                           Exec prog: temporary breakpoint
  * HE<CR>                                      Help; display monitor commands

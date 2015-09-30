@@ -109,21 +109,21 @@ class hng64_state;
 class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>
 {
 public:
-    hng64_poly_renderer(hng64_state& state);
-    
-    void drawShaded(struct polygon *p);
-    void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	hng64_poly_renderer(hng64_state& state);
 
-    hng64_state& state() { return m_state; }
-    bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
-    float* depthBuffer3d() { return m_depthBuffer3d; }
-    
+	void drawShaded(struct polygon *p);
+	void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+
+	hng64_state& state() { return m_state; }
+	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
+	float* depthBuffer3d() { return m_depthBuffer3d; }
+
 private:
-    hng64_state& m_state;
-    
-    // (Temporarily class members - someday they will live in the memory map)
-    bitmap_rgb32 m_colorBuffer3d;
-    float* m_depthBuffer3d;
+	hng64_state& m_state;
+
+	// (Temporarily class members - someday they will live in the memory map)
+	bitmap_rgb32 m_colorBuffer3d;
+	float* m_depthBuffer3d;
 };
 
 
@@ -173,7 +173,7 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 
-    /* 3D stuff */
+	/* 3D stuff */
 	UINT16* m_dl;
 
 	required_shared_ptr<UINT32> m_3dregs;
@@ -325,9 +325,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 
-    hng64_poly_renderer* m_poly_renderer;
-    
-    void clear3d();
+	hng64_poly_renderer* m_poly_renderer;
+
+	void clear3d();
 	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
 
 	void hng64_command3d(const UINT16* packet);

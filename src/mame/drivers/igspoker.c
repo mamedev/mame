@@ -2465,24 +2465,24 @@ DRIVER_INIT_MEMBER(igspoker_state,pktet346)
 
 Cherry master looking board
 
-Big chip with no markings at U80 stickered	KUNG FU
+Big chip with no markings at U80 stickered  KUNG FU
                                             V1.0
                                             1992
 
 Board silkscreend on top                    PCB NO.0013-B
 
-.45	27010	stickered	6
-.44	27010	stickered	5
-.43	27010	stickered	4
-.42	27128	stickered	3
-.41	27128	stickered	2
-.40	27128	stickered	1
-.98	27256	stickered	7	couldn't read chip, but board was silkscreened 27c256
-.97	27512	stickered	?	looked like japanese writing
-.38	74s287
-.46	18cv8				<--- same checksum as .48
-.47	pal16l8a			<--- checksum was 0
-.48	18cv8				<--- same checksum as .46
+.45 27010   stickered   6
+.44 27010   stickered   5
+.43 27010   stickered   4
+.42 27128   stickered   3
+.41 27128   stickered   2
+.40 27128   stickered   1
+.98 27256   stickered   7   couldn't read chip, but board was silkscreened 27c256
+.97 27512   stickered   ?   looked like japanese writing
+.38 74s287
+.46 18cv8               <--- same checksum as .48
+.47 pal16l8a            <--- checksum was 0
+.48 18cv8               <--- same checksum as .46
 
 unknown 24 pin chip @ u29
 open 24 pin socket @ u54

@@ -2845,7 +2845,7 @@ void mips3_device::execute_run()
 			case 0x2e:  /* SWR */       (this->*m_swr)(op);                                                       break;
 			case 0x2f:  /* CACHE */     /* effective no-op */                                                   break;
 			case 0x30:  /* LL */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (UINT32)temp; m_ll_value = RTVAL32;       break;
-			case 0x31:  /* LWC1 */      
+			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
 				{
 					m_badcop_value = 1;
@@ -2855,7 +2855,7 @@ void mips3_device::execute_run()
 			case 0x32:  /* LWC2 */      if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop2_reg(RTREG, temp);           break;
 			case 0x33:  /* PREF */      /* effective no-op */                                                   break;
 			case 0x34:  /* LLD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64; m_lld_value = temp64;     break;
-			case 0x35:  /* LDC1 */      
+			case 0x35:  /* LDC1 */
 			if (!(SR & SR_COP1))
 			{
 				m_badcop_value = 1;
@@ -2877,7 +2877,7 @@ void mips3_device::execute_run()
 				}
 			}
 			break;
-			case 0x39:  /* SWC1 */      
+			case 0x39:  /* SWC1 */
 				if (!(SR & SR_COP1))
 				{
 					m_badcop_value = 1;

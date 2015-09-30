@@ -68,7 +68,7 @@ public:
 
 	/* misc */
 	int      m_nmimask; // zerotrgt only
-	bool	 m_sub_nmimask; // counter steer only
+	bool     m_sub_nmimask; // counter steer only
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -619,8 +619,8 @@ WRITE8_MEMBER(cntsteer_state::nmimask_w)
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
 {
-	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed. 
-	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write 
+	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed.
+	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
 	//       between these operations brings us to this.
 	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
 	UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);

@@ -302,7 +302,7 @@ public:
 
 	UINT16 m_dzpix_normalize[0x10000];
 
-	rectangle_t    	m_scissor;
+	rectangle_t     m_scissor;
 	span_base_t     m_span_base;
 
 	void            draw_triangle(bool shade, bool texture, bool zbuffer, bool rect);

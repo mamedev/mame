@@ -2,22 +2,22 @@
 // copyright-holders:Joakim Larsson Edstrom
 /***************************************************************************
  *
- *  Motorola MVME-350 6U Intelligent Tape Controller driver, initially derived 
+ *  Motorola MVME-350 6U Intelligent Tape Controller driver, initially derived
  *  from hk68v10.c
  *
  *  31/08/2015
  *
  * I baught this board from http://www.retrotechnology.com without documentation.
- * It has a Motorola 68010 CPU @ 10MHz, 128 Mb RAM and two 2764 EPROMS with 
+ * It has a Motorola 68010 CPU @ 10MHz, 128 Mb RAM and two 2764 EPROMS with
  * QIC-02 tape controller firmware. The board also populates a 68230 PIT and loads
  * of descrete TTL components.
  *
- *                                                                                   
- *       ||                                                                          
- * ||    ||                                                                          
- * ||||--||                                                                          
- * ||||--||                                                                          
- * ||    ||__________________________________________________________    ___ 
+ *
+ *       ||
+ * ||    ||
+ * ||||--||
+ * ||||--||
+ * ||    ||__________________________________________________________    ___
  *       ||_______________________________________________________   |_|   |
  *       ||      |74F74 | xxxxx  |  xxxxx  | 74LS245   | 74ALS645|   | |   |
  *       ||      |______|________|_________|___________| ________|   | |   |
@@ -35,14 +35,14 @@
  *       |||   | |______|    __|_______________________|---------|   | |   |
  *       |||   | |74LS74|   |25LS251  | |    RAM       |74S244   |   |_|   |
  *       ||+---+ ---------- |---------- | HM6264P-12   |---------|     |___|
- *       ||      | PAL    | | 74245   | |______________|74S244   |     |  
- *       ||      +--------- |_________| | U40 27128    |---------|     |  
- *       ||     | 74F32 |   |          || System ROM   |74LS682  |     |  
- * Red   ||     +--------   | CPU      ||              |-+-------|     |  
- *  FAIL ||LED  | 74F138|   | MC68010  |+--------------+ |DIPSW__|     |  
- * Red   ||     +--------   |          ||    RAM       | |74S38  |     |  
- *  HALT ||LED  | 74F32 |   |__________|| HM6264P-12   | |______ |     |  
- * Green ||     +-------+   |74245     |+--------------+ |74F08  |     |  
+ *       ||      | PAL    | | 74245   | |______________|74S244   |     |
+ *       ||      +--------- |_________| | U40 27128    |---------|     |
+ *       ||     | 74F32 |   |          || System ROM   |74LS682  |     |
+ * Red   ||     +--------   | CPU      ||              |-+-------|     |
+ *  FAIL ||LED  | 74F138|   | MC68010  |+--------------+ |DIPSW__|     |
+ * Red   ||     +--------   |          ||    RAM       | |74S38  |     |
+ *  HALT ||LED  | 74F32 |   |__________|| HM6264P-12   | |______ |     |
+ * Green ||     +-------+   |74245     |+--------------+ |74F08  |     |
  *  RUN  ||LED  |XTAL   |   |__________|| U47 27128    | |______ |     |___
  *       ||+---+|20MHz  |   |74244     || System ROM   | |74F00  |    _|   |
  *       |||CON|--------+___|__________|+--------------+_|_______|   | |   |
@@ -62,24 +62,24 @@
  *       ||    +------------------------------------------+------|   | |   |
  *       ||    |DM2353  |74F10   |74F32 | 74LS32| 74F08   |DM2353|   |_|   |
  *       ||    +------------------------------------------+------+-+   |___|
- * ||    ||------------------------------------------------------------+-+             
- * ||||--||                                                            
- * ||||--||                                                            
+ * ||    ||------------------------------------------------------------+-+
+ * ||||--||
+ * ||||--||
  * ||
  *
  * History of Motorola VME division (https://en.wikipedia.org/wiki/VMEbus)
  *---------------------------------
  * When Motorola released the 68000 processor 1979 the ambition of the deisgners
- * was also to standardize a versatile CPU bus to be able to build computer 
+ * was also to standardize a versatile CPU bus to be able to build computer
  * systems without constructing PCB:s from scratch. This become VersaBus but the
  * boards was really too big and the computer world already saw the systems shrink
  * in size. Motorola's design center in Munich proposed to use the smaller and
  * already used Euroboard form factor and call it Versabus-E. This later became
- * VME which was standardized in the VITA organization 1981 
+ * VME which was standardized in the VITA organization 1981
  *
- * Misc links about Motorola VME division and this board: 
+ * Misc links about Motorola VME division and this board:
  * http://bitsavers.trailing-edge.com/pdf/motorola/_dataBooks/1987_Microcomputer_Systems_and_Components.pdf
- * 
+ *
  * Description
  * ------------
  * Streaming Tape Controller released 1984 with the following feature set
@@ -100,7 +100,7 @@
  *      -  High Level Command/Status Packets offer efficient Operating System Support
  *      -  Permits Chaining of Host Command
  *
- * Address Map 
+ * Address Map
  * --------------------------------------------------------------------------
  * Local     to VME       Decscription
  * --------------------------------------------------------------------------
@@ -117,8 +117,8 @@
  * Description                  Device  Lvl  IRQ    VME board
  *                           /Board      Vector  Address
  * ----------------------------------------------------------
- * On board Sources                     
- *  
+ * On board Sources
+ *
  * Off board Sources (other VME boards)
  *
  * ----------------------------------------------------------
@@ -149,9 +149,9 @@ class mvme350_state : public driver_device
 {
 public:
 mvme350_state(const machine_config &mconfig, device_type type, const char *tag) :
-        driver_device (mconfig, type, tag),
-                m_maincpu (*this, "maincpu"),
-                m_pit(*this, "pit")
+		driver_device (mconfig, type, tag),
+				m_maincpu (*this, "maincpu"),
+				m_pit(*this, "pit")
 {
 }
 
@@ -164,19 +164,19 @@ virtual void machine_reset ();
 protected:
 
 private:
-        required_device<cpu_device> m_maincpu;
+		required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit;
 
 };
 
 static ADDRESS_MAP_START (mvme350_mem, AS_PROGRAM, 16, mvme350_state)
 ADDRESS_MAP_UNMAP_HIGH
-        AM_RANGE (0x000000, 0x01ffff) AM_ROM /* 128 Mb ROM */
-        AM_RANGE (0x020000, 0x03ffff) AM_RAM /* 128 Mb RAM */
+		AM_RANGE (0x000000, 0x01ffff) AM_ROM /* 128 Mb ROM */
+		AM_RANGE (0x020000, 0x03ffff) AM_RAM /* 128 Mb RAM */
 #if 1
-        AM_RANGE(0x040000,  0x040035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
-        AM_RANGE(0x060000,  0x06001f) AM_RAM /* Area is cleared on start */
-        AM_RANGE(0x080000,  0x080035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
+		AM_RANGE(0x040000,  0x040035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
+		AM_RANGE(0x060000,  0x06001f) AM_RAM /* Area is cleared on start */
+		AM_RANGE(0x080000,  0x080035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
 #endif
 //AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 //AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
@@ -189,32 +189,32 @@ INPUT_PORTS_END
 /* Start it up */
 void mvme350_state::machine_start ()
 {
-        LOG (logerror ("machine_start\n"));
+		LOG (logerror ("machine_start\n"));
 }
 
 void mvme350_state::machine_reset ()
 {
-        LOG (logerror ("machine_reset\n"));
+		LOG (logerror ("machine_reset\n"));
 }
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (mvme350_state::vme_a24_r){
-        LOG (logerror ("vme_a24_r\n"));
-        return (UINT16) 0;
+		LOG (logerror ("vme_a24_r\n"));
+		return (UINT16) 0;
 }
 
 WRITE16_MEMBER (mvme350_state::vme_a24_w){
-        LOG (logerror ("vme_a24_w\n"));
+		LOG (logerror ("vme_a24_w\n"));
 }
 
 READ16_MEMBER (mvme350_state::vme_a16_r){
-        LOG (logerror ("vme_16_r\n"));
-        return (UINT16) 0;
+		LOG (logerror ("vme_16_r\n"));
+		return (UINT16) 0;
 }
 
 WRITE16_MEMBER (mvme350_state::vme_a16_w){
-        LOG (logerror ("vme_a16_w\n"));
+		LOG (logerror ("vme_a16_w\n"));
 }
 #endif
 
@@ -222,10 +222,10 @@ WRITE16_MEMBER (mvme350_state::vme_a16_w){
  * Machine configuration
  */
 static MACHINE_CONFIG_START (mvme350, mvme350_state)
-        /* basic machine hardware */
-        MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
-        MCFG_CPU_PROGRAM_MAP (mvme350_mem)
-        /* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
+		/* basic machine hardware */
+		MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
+		MCFG_CPU_PROGRAM_MAP (mvme350_mem)
+		/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
 
 MACHINE_CONFIG_END
@@ -243,11 +243,11 @@ ROM_LOAD16_BYTE ("mvme350U47v2.3.bin", 0x0001, 0x4000, CRC (582ce095) SHA1 (d092
  * The ROMs known commands from different sources:
  *
  *  It communicates with the master through data buffers in shared memory and VME bus interrupts
- * as desribed in 
+ * as desribed in
  * http://bitsavers.trailing-edge.com/pdf/motorola/_dataBooks/1987_Microcomputer_Systems_and_Components.pdf
- * 
+ *
  * The board is pretty boring as stand alone, it initializes everything and then executes a STOP instruction
- * awaiting a CPU on the VME bus to request its services. However, it enables boot from tape devices, we just 
+ * awaiting a CPU on the VME bus to request its services. However, it enables boot from tape devices, we just
  * need a MVME-131 and a dump of a VersaDOS or Motorola UNIX System V system tape and some work.
  */
 ROM_END

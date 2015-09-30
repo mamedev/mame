@@ -365,7 +365,7 @@ void t11_device::device_reset()
 void k1801vm2_device::device_reset()
 {
 	t11_device::device_reset();
-	
+
 	PC = RWORD(c_initial_mode);
 	PSW = RWORD(c_initial_mode+2);
 }

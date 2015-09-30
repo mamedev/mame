@@ -686,9 +686,9 @@ DRIVER_INIT_MEMBER(scramble_state,newsin7a)
 {
 	DRIVER_INIT_CALL(devilfsh); // decrypt
 
-//	UINT8 *ROM = memregion("maincpu")->base();
-//	ROM[0x0067] ^= 0x22;          /* rst $00         - should be push hl - the NMI routine is corrupt in this set, but the IRQ routine bypasses it? intentional? */
-	
+//  UINT8 *ROM = memregion("maincpu")->base();
+//  ROM[0x0067] ^= 0x22;          /* rst $00         - should be push hl - the NMI routine is corrupt in this set, but the IRQ routine bypasses it? intentional? */
+
 	// attempts to access port at c20x instead of 820x in one location, mirror or bitrot?
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc200, 0xc20f, read8_delegate(FUNC(scramble_state::mars_ppi8255_1_r),this), write8_delegate(FUNC(scramble_state::mars_ppi8255_1_w),this));
 

@@ -330,7 +330,6 @@ void segaxbd_state::device_start()
 
 void segaxbd_state::device_reset()
 {
-
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
@@ -348,7 +347,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_mainpcb(*this, "mainpcb")
 	{
-
 	}
 
 	required_device<segaxbd_state> m_mainpcb;

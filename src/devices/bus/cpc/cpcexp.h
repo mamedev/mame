@@ -33,7 +33,7 @@
  *      GND  49  50  CLOCK
  *
  *  Aleste 520EX expansion port is 62-pin.  Same as the CPC above, except that pin 40 is not connected, plus the following:
- *  
+ *
  *    MAP14  A26  B26  MAP15
  *    MAP16  A27  B27  MAP17
  *    MAP18  A28  B28  MAPBLK

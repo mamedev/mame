@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                                              /*    c000-fbff                 OS ROM                          */
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP                                                                             /*    fc00-fdff                 FRED & JIM Pages                */
-	                                                                                                            /*    fe00-feff                 SHEILA Address Page             */
+																												/*    fe00-feff                 SHEILA Address Page             */
 	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)  /*    fe08-fe0F  6850 ACIA      Serial controller               */
@@ -151,9 +151,9 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP                                                                             /*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                                           /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
-	                                                                                                            /* W: fe20-fe2f  Video ULA      Video system chip               */
+																												/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selecta_w)                                         /* R: fe30-fe3f  NC             Not Connected                   */
-	                                                                                                            /* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																												/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
 	AM_RANGE(0xfe60, 0xfe7f) AM_NOP                                                                             /*    fe60-fe7f  6522 VIA       # USER VIA                      */
 	AM_RANGE(0xfe80, 0xfe9f) AM_NOP                                                                             /*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                                              /*    c000-fbff                 OS ROM                          */
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP                                                                             /*    fc00-fdff                 FRED & JIM Pages                */
-	                                                                                                            /*    fe00-feff                 SHEILA Address Page             */
+																												/*    fe00-feff                 SHEILA Address Page             */
 	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)  /*    fe08-fe0F  6850 ACIA      Serial controller               */
@@ -177,10 +177,10 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_READ_PORT("S11")                                                                /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                                           /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
-	                                                                                                            /* W: fe20-fe2f  Video ULA      Video system chip               */
+																												/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)                          /*    fe60-fe7f  6522 VIA       USER VIA                        */
-	                                                                                                            /*    fe80-fe9f  FDC            Floppy disc controller          */
+																												/*    fe80-fe9f  FDC            Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)                            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
-	                                                                                            /* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_DEVICE("i8271" , i8271_device, map)                             /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, data_r, data_w)             /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START(bbcb1770_mem, AS_PROGRAM, 8, bbc_state)
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
-	                                                                                            /* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6")                                              /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
-	                                                                                            /* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_128_w)                /*    8000-afff                 Paged ROM or 12K of SWRAM       */
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(bbc_memorybp6_128_w)                /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
-	                                                                                            /* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6")                                              /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
-	                                                                                            /* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_NOP                                                             /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_NOP                                                             /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -490,7 +490,7 @@ static INPUT_PORTS_START(bbc_dipswitch)
 	PORT_DIPNAME(0x01, 0x01, "Screen Mode") PORT_DIPLOCATION("KBD:6")
 	PORT_DIPSETTING(   0x00, "+0" )
 	PORT_DIPSETTING(   0x01, "+4" )
-	
+
 	PORT_MODIFY("COL8")
 	PORT_DIPNAME(0x01, 0x01, "Screen Mode") PORT_DIPLOCATION("KBD:7")
 	PORT_DIPSETTING(   0x00, "+0" )
@@ -506,57 +506,57 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(bbc_links)
 	PORT_START("S11")
 	PORT_DIPNAME(0xff, 0xfe, "Econet ID") PORT_DIPLOCATION("S11:1,2,3,4,5,6,7,8")
-	PORT_DIPSETTING(   0x00,   "0" )	PORT_DIPSETTING(   0x01,   "1" )	PORT_DIPSETTING(   0x02,   "2" )	PORT_DIPSETTING(   0x03,   "3" )	PORT_DIPSETTING(   0x04,   "4" )
-	PORT_DIPSETTING(   0x05,   "5" )	PORT_DIPSETTING(   0x06,   "6" )	PORT_DIPSETTING(   0x07,   "7" )	PORT_DIPSETTING(   0x08,   "8" )	PORT_DIPSETTING(   0x09,   "9" )
-	PORT_DIPSETTING(   0x0a,  "10" )	PORT_DIPSETTING(   0x0b,  "11" )	PORT_DIPSETTING(   0x0c,  "12" )	PORT_DIPSETTING(   0x0d,  "13" )	PORT_DIPSETTING(   0x0e,  "14" )
-	PORT_DIPSETTING(   0x0f,  "15" )	PORT_DIPSETTING(   0x10,  "16" )	PORT_DIPSETTING(   0x11,  "17" )	PORT_DIPSETTING(   0x12,  "18" )	PORT_DIPSETTING(   0x13,  "19" )
-	PORT_DIPSETTING(   0x14,  "20" )	PORT_DIPSETTING(   0x15,  "21" )	PORT_DIPSETTING(   0x16,  "22" )	PORT_DIPSETTING(   0x17,  "23" )	PORT_DIPSETTING(   0x18,  "24" )
-	PORT_DIPSETTING(   0x19,  "25" )	PORT_DIPSETTING(   0x1a,  "26" )	PORT_DIPSETTING(   0x1b,  "27" )	PORT_DIPSETTING(   0x1c,  "28" )	PORT_DIPSETTING(   0x1d,  "29" )
-	PORT_DIPSETTING(   0x1e,  "30" )	PORT_DIPSETTING(   0x1f,  "31" )	PORT_DIPSETTING(   0x20,  "32" )	PORT_DIPSETTING(   0x21,  "33" )	PORT_DIPSETTING(   0x22,  "34" )
-	PORT_DIPSETTING(   0x23,  "35" )	PORT_DIPSETTING(   0x24,  "36" )	PORT_DIPSETTING(   0x25,  "37" )	PORT_DIPSETTING(   0x26,  "38" )	PORT_DIPSETTING(   0x27,  "39" )
-	PORT_DIPSETTING(   0x28,  "40" )	PORT_DIPSETTING(   0x29,  "41" )	PORT_DIPSETTING(   0x2a,  "42" )	PORT_DIPSETTING(   0x2b,  "43" )	PORT_DIPSETTING(   0x2c,  "44" )
-	PORT_DIPSETTING(   0x2d,  "45" )	PORT_DIPSETTING(   0x2e,  "46" )	PORT_DIPSETTING(   0x2f,  "47" )	PORT_DIPSETTING(   0x30,  "48" )	PORT_DIPSETTING(   0x31,  "49" )
-	PORT_DIPSETTING(   0x32,  "50" )	PORT_DIPSETTING(   0x33,  "51" )	PORT_DIPSETTING(   0x34,  "52" )	PORT_DIPSETTING(   0x35,  "53" )	PORT_DIPSETTING(   0x36,  "54" )
-	PORT_DIPSETTING(   0x37,  "15" )	PORT_DIPSETTING(   0x38,  "56" )	PORT_DIPSETTING(   0x39,  "57" )	PORT_DIPSETTING(   0x3a,  "58" )	PORT_DIPSETTING(   0x3b,  "59" )
-	PORT_DIPSETTING(   0x3c,  "60" )	PORT_DIPSETTING(   0x3d,  "61" )	PORT_DIPSETTING(   0x3e,  "62" )	PORT_DIPSETTING(   0x3f,  "63" )	PORT_DIPSETTING(   0x40,  "64" )
-	PORT_DIPSETTING(   0x41,  "65" )	PORT_DIPSETTING(   0x42,  "66" )	PORT_DIPSETTING(   0x43,  "67" )	PORT_DIPSETTING(   0x44,  "68" )	PORT_DIPSETTING(   0x45,  "69" )
-	PORT_DIPSETTING(   0x46,  "70" )	PORT_DIPSETTING(   0x47,  "71" )	PORT_DIPSETTING(   0x48,  "72" )	PORT_DIPSETTING(   0x49,  "73" )	PORT_DIPSETTING(   0x4a,  "74" )
-	PORT_DIPSETTING(   0x4b,  "75" )	PORT_DIPSETTING(   0x4c,  "76" )	PORT_DIPSETTING(   0x4d,  "77" )	PORT_DIPSETTING(   0x4e,  "78" )	PORT_DIPSETTING(   0x4f,  "79" )
-	PORT_DIPSETTING(   0x50,  "80" )	PORT_DIPSETTING(   0x51,  "81" )	PORT_DIPSETTING(   0x52,  "82" )	PORT_DIPSETTING(   0x53,  "83" )	PORT_DIPSETTING(   0x54,  "84" )
-	PORT_DIPSETTING(   0x55,  "85" )	PORT_DIPSETTING(   0x56,  "86" )	PORT_DIPSETTING(   0x57,  "87" )	PORT_DIPSETTING(   0x58,  "88" )	PORT_DIPSETTING(   0x59,  "89" )
-	PORT_DIPSETTING(   0x5a,  "90" )	PORT_DIPSETTING(   0x5b,  "91" )	PORT_DIPSETTING(   0x5c,  "92" )	PORT_DIPSETTING(   0x5d,  "93" )	PORT_DIPSETTING(   0x5e,  "94" )
-	PORT_DIPSETTING(   0x5f,  "95" )	PORT_DIPSETTING(   0x60,  "96" )	PORT_DIPSETTING(   0x61,  "97" )	PORT_DIPSETTING(   0x62,  "98" )	PORT_DIPSETTING(   0x63,  "99" )
-	PORT_DIPSETTING(   0x64, "100" )	PORT_DIPSETTING(   0x65, "101" )	PORT_DIPSETTING(   0x66, "102" )	PORT_DIPSETTING(   0x67, "103" )	PORT_DIPSETTING(   0x68, "104" )
-	PORT_DIPSETTING(   0x69, "105" )	PORT_DIPSETTING(   0x6a, "106" )	PORT_DIPSETTING(   0x6b, "107" )	PORT_DIPSETTING(   0x6c, "108" )	PORT_DIPSETTING(   0x6d, "109" )
-	PORT_DIPSETTING(   0x6e, "110" )	PORT_DIPSETTING(   0x6f, "111" )	PORT_DIPSETTING(   0x70, "112" )	PORT_DIPSETTING(   0x71, "113" )	PORT_DIPSETTING(   0x72, "114" )
-	PORT_DIPSETTING(   0x73, "115" )	PORT_DIPSETTING(   0x74, "116" )	PORT_DIPSETTING(   0x75, "117" )	PORT_DIPSETTING(   0x76, "118" )	PORT_DIPSETTING(   0x77, "119" )
-	PORT_DIPSETTING(   0x78, "120" )	PORT_DIPSETTING(   0x79, "121" )	PORT_DIPSETTING(   0x7a, "122" )	PORT_DIPSETTING(   0x7b, "123" )	PORT_DIPSETTING(   0x7c, "124" )
-	PORT_DIPSETTING(   0x7d, "125" )	PORT_DIPSETTING(   0x7e, "126" )	PORT_DIPSETTING(   0x7f, "127" )	PORT_DIPSETTING(   0x80, "128" )	PORT_DIPSETTING(   0x81, "129" )
-	PORT_DIPSETTING(   0x82, "130" )	PORT_DIPSETTING(   0x83, "131" )	PORT_DIPSETTING(   0x84, "132" )	PORT_DIPSETTING(   0x85, "133" )	PORT_DIPSETTING(   0x86, "134" )
-	PORT_DIPSETTING(   0x87, "135" )	PORT_DIPSETTING(   0x88, "136" )	PORT_DIPSETTING(   0x89, "137" )	PORT_DIPSETTING(   0x8a, "138" )	PORT_DIPSETTING(   0x8b, "139" )
-	PORT_DIPSETTING(   0x8c, "140" )	PORT_DIPSETTING(   0x8d, "141" )	PORT_DIPSETTING(   0x8e, "142" )	PORT_DIPSETTING(   0x8f, "143" )	PORT_DIPSETTING(   0x90, "144" )
-	PORT_DIPSETTING(   0x91, "145" )	PORT_DIPSETTING(   0x92, "146" )	PORT_DIPSETTING(   0x93, "147" )	PORT_DIPSETTING(   0x94, "148" )	PORT_DIPSETTING(   0x95, "149" )
-	PORT_DIPSETTING(   0x96, "150" )	PORT_DIPSETTING(   0x97, "151" )	PORT_DIPSETTING(   0x98, "152" )	PORT_DIPSETTING(   0x99, "153" )	PORT_DIPSETTING(   0x9a, "154" )
-	PORT_DIPSETTING(   0x9b, "155" )	PORT_DIPSETTING(   0x9c, "156" )	PORT_DIPSETTING(   0x9d, "157" )	PORT_DIPSETTING(   0x9e, "158" )	PORT_DIPSETTING(   0x9f, "159" )
-	PORT_DIPSETTING(   0xa0, "160" )	PORT_DIPSETTING(   0xa1, "161" )	PORT_DIPSETTING(   0xa2, "162" )	PORT_DIPSETTING(   0xa3, "163" )	PORT_DIPSETTING(   0xa4, "164" )
-	PORT_DIPSETTING(   0xa5, "165" )	PORT_DIPSETTING(   0xa6, "166" )	PORT_DIPSETTING(   0xa7, "167" )	PORT_DIPSETTING(   0xa8, "168" )	PORT_DIPSETTING(   0xa9, "169" )
-	PORT_DIPSETTING(   0xaa, "170" )	PORT_DIPSETTING(   0xab, "171" )	PORT_DIPSETTING(   0xac, "172" )	PORT_DIPSETTING(   0xad, "173" )	PORT_DIPSETTING(   0xae, "174" )
-	PORT_DIPSETTING(   0xaf, "175" )	PORT_DIPSETTING(   0xb0, "176" )	PORT_DIPSETTING(   0xb1, "177" )	PORT_DIPSETTING(   0xb2, "178" )	PORT_DIPSETTING(   0xb3, "179" )
-	PORT_DIPSETTING(   0xb4, "180" )	PORT_DIPSETTING(   0xb5, "181" )	PORT_DIPSETTING(   0xb6, "182" )	PORT_DIPSETTING(   0xb7, "183" )	PORT_DIPSETTING(   0xb8, "184" )
-	PORT_DIPSETTING(   0xb9, "185" )	PORT_DIPSETTING(   0xba, "186" )	PORT_DIPSETTING(   0xbb, "187" )	PORT_DIPSETTING(   0xbc, "188" )	PORT_DIPSETTING(   0xbd, "189" )
-	PORT_DIPSETTING(   0xbe, "190" )	PORT_DIPSETTING(   0xbf, "191" )	PORT_DIPSETTING(   0xc0, "192" )	PORT_DIPSETTING(   0xc1, "193" )	PORT_DIPSETTING(   0xc2, "194" )
-	PORT_DIPSETTING(   0xc3, "195" )	PORT_DIPSETTING(   0xc4, "196" )	PORT_DIPSETTING(   0xc5, "197" )	PORT_DIPSETTING(   0xc6, "198" )	PORT_DIPSETTING(   0xc7, "199" )
-	PORT_DIPSETTING(   0xc8, "200" )	PORT_DIPSETTING(   0xc9, "201" )	PORT_DIPSETTING(   0xca, "202" )	PORT_DIPSETTING(   0xcb, "203" )	PORT_DIPSETTING(   0xcc, "204" )
-	PORT_DIPSETTING(   0xcd, "205" )	PORT_DIPSETTING(   0xce, "206" )	PORT_DIPSETTING(   0xcf, "207" )	PORT_DIPSETTING(   0xd0, "208" )	PORT_DIPSETTING(   0xd1, "209" )
-	PORT_DIPSETTING(   0xd2, "210" )	PORT_DIPSETTING(   0xd3, "211" )	PORT_DIPSETTING(   0xd4, "212" )	PORT_DIPSETTING(   0xd5, "213" )	PORT_DIPSETTING(   0xd6, "214" )
-	PORT_DIPSETTING(   0xd7, "215" )	PORT_DIPSETTING(   0xd8, "216" )	PORT_DIPSETTING(   0xd9, "217" )	PORT_DIPSETTING(   0xda, "218" )	PORT_DIPSETTING(   0xdb, "219" )
-	PORT_DIPSETTING(   0xdc, "220" )	PORT_DIPSETTING(   0xdd, "221" )	PORT_DIPSETTING(   0xde, "222" )	PORT_DIPSETTING(   0xdf, "223" )	PORT_DIPSETTING(   0xe0, "224" )
-	PORT_DIPSETTING(   0xe1, "225" )	PORT_DIPSETTING(   0xe2, "226" )	PORT_DIPSETTING(   0xe3, "227" )	PORT_DIPSETTING(   0xe4, "228" )	PORT_DIPSETTING(   0xe5, "229" )
-	PORT_DIPSETTING(   0xe6, "230" )	PORT_DIPSETTING(   0xe7, "231" )	PORT_DIPSETTING(   0xe8, "232" )	PORT_DIPSETTING(   0xe9, "233" )	PORT_DIPSETTING(   0xea, "234" )
-	PORT_DIPSETTING(   0xeb, "235" )	PORT_DIPSETTING(   0xec, "236" )	PORT_DIPSETTING(   0xed, "237" )	PORT_DIPSETTING(   0xee, "238" )	PORT_DIPSETTING(   0xef, "239" )
-	PORT_DIPSETTING(   0xf0, "240" )	PORT_DIPSETTING(   0xf1, "241" )	PORT_DIPSETTING(   0xf2, "242" )	PORT_DIPSETTING(   0xf3, "243" )	PORT_DIPSETTING(   0xf4, "244" )
-	PORT_DIPSETTING(   0xf5, "245" )	PORT_DIPSETTING(   0xf6, "246" )	PORT_DIPSETTING(   0xf7, "247" )	PORT_DIPSETTING(   0xf8, "248" )	PORT_DIPSETTING(   0xf9, "249" )
-	PORT_DIPSETTING(   0xfa, "250" )	PORT_DIPSETTING(   0xfb, "251" )	PORT_DIPSETTING(   0xfc, "252" )	PORT_DIPSETTING(   0xfd, "253" )	PORT_DIPSETTING(   0xfe, "254" )
+	PORT_DIPSETTING(   0x00,   "0" )    PORT_DIPSETTING(   0x01,   "1" )    PORT_DIPSETTING(   0x02,   "2" )    PORT_DIPSETTING(   0x03,   "3" )    PORT_DIPSETTING(   0x04,   "4" )
+	PORT_DIPSETTING(   0x05,   "5" )    PORT_DIPSETTING(   0x06,   "6" )    PORT_DIPSETTING(   0x07,   "7" )    PORT_DIPSETTING(   0x08,   "8" )    PORT_DIPSETTING(   0x09,   "9" )
+	PORT_DIPSETTING(   0x0a,  "10" )    PORT_DIPSETTING(   0x0b,  "11" )    PORT_DIPSETTING(   0x0c,  "12" )    PORT_DIPSETTING(   0x0d,  "13" )    PORT_DIPSETTING(   0x0e,  "14" )
+	PORT_DIPSETTING(   0x0f,  "15" )    PORT_DIPSETTING(   0x10,  "16" )    PORT_DIPSETTING(   0x11,  "17" )    PORT_DIPSETTING(   0x12,  "18" )    PORT_DIPSETTING(   0x13,  "19" )
+	PORT_DIPSETTING(   0x14,  "20" )    PORT_DIPSETTING(   0x15,  "21" )    PORT_DIPSETTING(   0x16,  "22" )    PORT_DIPSETTING(   0x17,  "23" )    PORT_DIPSETTING(   0x18,  "24" )
+	PORT_DIPSETTING(   0x19,  "25" )    PORT_DIPSETTING(   0x1a,  "26" )    PORT_DIPSETTING(   0x1b,  "27" )    PORT_DIPSETTING(   0x1c,  "28" )    PORT_DIPSETTING(   0x1d,  "29" )
+	PORT_DIPSETTING(   0x1e,  "30" )    PORT_DIPSETTING(   0x1f,  "31" )    PORT_DIPSETTING(   0x20,  "32" )    PORT_DIPSETTING(   0x21,  "33" )    PORT_DIPSETTING(   0x22,  "34" )
+	PORT_DIPSETTING(   0x23,  "35" )    PORT_DIPSETTING(   0x24,  "36" )    PORT_DIPSETTING(   0x25,  "37" )    PORT_DIPSETTING(   0x26,  "38" )    PORT_DIPSETTING(   0x27,  "39" )
+	PORT_DIPSETTING(   0x28,  "40" )    PORT_DIPSETTING(   0x29,  "41" )    PORT_DIPSETTING(   0x2a,  "42" )    PORT_DIPSETTING(   0x2b,  "43" )    PORT_DIPSETTING(   0x2c,  "44" )
+	PORT_DIPSETTING(   0x2d,  "45" )    PORT_DIPSETTING(   0x2e,  "46" )    PORT_DIPSETTING(   0x2f,  "47" )    PORT_DIPSETTING(   0x30,  "48" )    PORT_DIPSETTING(   0x31,  "49" )
+	PORT_DIPSETTING(   0x32,  "50" )    PORT_DIPSETTING(   0x33,  "51" )    PORT_DIPSETTING(   0x34,  "52" )    PORT_DIPSETTING(   0x35,  "53" )    PORT_DIPSETTING(   0x36,  "54" )
+	PORT_DIPSETTING(   0x37,  "15" )    PORT_DIPSETTING(   0x38,  "56" )    PORT_DIPSETTING(   0x39,  "57" )    PORT_DIPSETTING(   0x3a,  "58" )    PORT_DIPSETTING(   0x3b,  "59" )
+	PORT_DIPSETTING(   0x3c,  "60" )    PORT_DIPSETTING(   0x3d,  "61" )    PORT_DIPSETTING(   0x3e,  "62" )    PORT_DIPSETTING(   0x3f,  "63" )    PORT_DIPSETTING(   0x40,  "64" )
+	PORT_DIPSETTING(   0x41,  "65" )    PORT_DIPSETTING(   0x42,  "66" )    PORT_DIPSETTING(   0x43,  "67" )    PORT_DIPSETTING(   0x44,  "68" )    PORT_DIPSETTING(   0x45,  "69" )
+	PORT_DIPSETTING(   0x46,  "70" )    PORT_DIPSETTING(   0x47,  "71" )    PORT_DIPSETTING(   0x48,  "72" )    PORT_DIPSETTING(   0x49,  "73" )    PORT_DIPSETTING(   0x4a,  "74" )
+	PORT_DIPSETTING(   0x4b,  "75" )    PORT_DIPSETTING(   0x4c,  "76" )    PORT_DIPSETTING(   0x4d,  "77" )    PORT_DIPSETTING(   0x4e,  "78" )    PORT_DIPSETTING(   0x4f,  "79" )
+	PORT_DIPSETTING(   0x50,  "80" )    PORT_DIPSETTING(   0x51,  "81" )    PORT_DIPSETTING(   0x52,  "82" )    PORT_DIPSETTING(   0x53,  "83" )    PORT_DIPSETTING(   0x54,  "84" )
+	PORT_DIPSETTING(   0x55,  "85" )    PORT_DIPSETTING(   0x56,  "86" )    PORT_DIPSETTING(   0x57,  "87" )    PORT_DIPSETTING(   0x58,  "88" )    PORT_DIPSETTING(   0x59,  "89" )
+	PORT_DIPSETTING(   0x5a,  "90" )    PORT_DIPSETTING(   0x5b,  "91" )    PORT_DIPSETTING(   0x5c,  "92" )    PORT_DIPSETTING(   0x5d,  "93" )    PORT_DIPSETTING(   0x5e,  "94" )
+	PORT_DIPSETTING(   0x5f,  "95" )    PORT_DIPSETTING(   0x60,  "96" )    PORT_DIPSETTING(   0x61,  "97" )    PORT_DIPSETTING(   0x62,  "98" )    PORT_DIPSETTING(   0x63,  "99" )
+	PORT_DIPSETTING(   0x64, "100" )    PORT_DIPSETTING(   0x65, "101" )    PORT_DIPSETTING(   0x66, "102" )    PORT_DIPSETTING(   0x67, "103" )    PORT_DIPSETTING(   0x68, "104" )
+	PORT_DIPSETTING(   0x69, "105" )    PORT_DIPSETTING(   0x6a, "106" )    PORT_DIPSETTING(   0x6b, "107" )    PORT_DIPSETTING(   0x6c, "108" )    PORT_DIPSETTING(   0x6d, "109" )
+	PORT_DIPSETTING(   0x6e, "110" )    PORT_DIPSETTING(   0x6f, "111" )    PORT_DIPSETTING(   0x70, "112" )    PORT_DIPSETTING(   0x71, "113" )    PORT_DIPSETTING(   0x72, "114" )
+	PORT_DIPSETTING(   0x73, "115" )    PORT_DIPSETTING(   0x74, "116" )    PORT_DIPSETTING(   0x75, "117" )    PORT_DIPSETTING(   0x76, "118" )    PORT_DIPSETTING(   0x77, "119" )
+	PORT_DIPSETTING(   0x78, "120" )    PORT_DIPSETTING(   0x79, "121" )    PORT_DIPSETTING(   0x7a, "122" )    PORT_DIPSETTING(   0x7b, "123" )    PORT_DIPSETTING(   0x7c, "124" )
+	PORT_DIPSETTING(   0x7d, "125" )    PORT_DIPSETTING(   0x7e, "126" )    PORT_DIPSETTING(   0x7f, "127" )    PORT_DIPSETTING(   0x80, "128" )    PORT_DIPSETTING(   0x81, "129" )
+	PORT_DIPSETTING(   0x82, "130" )    PORT_DIPSETTING(   0x83, "131" )    PORT_DIPSETTING(   0x84, "132" )    PORT_DIPSETTING(   0x85, "133" )    PORT_DIPSETTING(   0x86, "134" )
+	PORT_DIPSETTING(   0x87, "135" )    PORT_DIPSETTING(   0x88, "136" )    PORT_DIPSETTING(   0x89, "137" )    PORT_DIPSETTING(   0x8a, "138" )    PORT_DIPSETTING(   0x8b, "139" )
+	PORT_DIPSETTING(   0x8c, "140" )    PORT_DIPSETTING(   0x8d, "141" )    PORT_DIPSETTING(   0x8e, "142" )    PORT_DIPSETTING(   0x8f, "143" )    PORT_DIPSETTING(   0x90, "144" )
+	PORT_DIPSETTING(   0x91, "145" )    PORT_DIPSETTING(   0x92, "146" )    PORT_DIPSETTING(   0x93, "147" )    PORT_DIPSETTING(   0x94, "148" )    PORT_DIPSETTING(   0x95, "149" )
+	PORT_DIPSETTING(   0x96, "150" )    PORT_DIPSETTING(   0x97, "151" )    PORT_DIPSETTING(   0x98, "152" )    PORT_DIPSETTING(   0x99, "153" )    PORT_DIPSETTING(   0x9a, "154" )
+	PORT_DIPSETTING(   0x9b, "155" )    PORT_DIPSETTING(   0x9c, "156" )    PORT_DIPSETTING(   0x9d, "157" )    PORT_DIPSETTING(   0x9e, "158" )    PORT_DIPSETTING(   0x9f, "159" )
+	PORT_DIPSETTING(   0xa0, "160" )    PORT_DIPSETTING(   0xa1, "161" )    PORT_DIPSETTING(   0xa2, "162" )    PORT_DIPSETTING(   0xa3, "163" )    PORT_DIPSETTING(   0xa4, "164" )
+	PORT_DIPSETTING(   0xa5, "165" )    PORT_DIPSETTING(   0xa6, "166" )    PORT_DIPSETTING(   0xa7, "167" )    PORT_DIPSETTING(   0xa8, "168" )    PORT_DIPSETTING(   0xa9, "169" )
+	PORT_DIPSETTING(   0xaa, "170" )    PORT_DIPSETTING(   0xab, "171" )    PORT_DIPSETTING(   0xac, "172" )    PORT_DIPSETTING(   0xad, "173" )    PORT_DIPSETTING(   0xae, "174" )
+	PORT_DIPSETTING(   0xaf, "175" )    PORT_DIPSETTING(   0xb0, "176" )    PORT_DIPSETTING(   0xb1, "177" )    PORT_DIPSETTING(   0xb2, "178" )    PORT_DIPSETTING(   0xb3, "179" )
+	PORT_DIPSETTING(   0xb4, "180" )    PORT_DIPSETTING(   0xb5, "181" )    PORT_DIPSETTING(   0xb6, "182" )    PORT_DIPSETTING(   0xb7, "183" )    PORT_DIPSETTING(   0xb8, "184" )
+	PORT_DIPSETTING(   0xb9, "185" )    PORT_DIPSETTING(   0xba, "186" )    PORT_DIPSETTING(   0xbb, "187" )    PORT_DIPSETTING(   0xbc, "188" )    PORT_DIPSETTING(   0xbd, "189" )
+	PORT_DIPSETTING(   0xbe, "190" )    PORT_DIPSETTING(   0xbf, "191" )    PORT_DIPSETTING(   0xc0, "192" )    PORT_DIPSETTING(   0xc1, "193" )    PORT_DIPSETTING(   0xc2, "194" )
+	PORT_DIPSETTING(   0xc3, "195" )    PORT_DIPSETTING(   0xc4, "196" )    PORT_DIPSETTING(   0xc5, "197" )    PORT_DIPSETTING(   0xc6, "198" )    PORT_DIPSETTING(   0xc7, "199" )
+	PORT_DIPSETTING(   0xc8, "200" )    PORT_DIPSETTING(   0xc9, "201" )    PORT_DIPSETTING(   0xca, "202" )    PORT_DIPSETTING(   0xcb, "203" )    PORT_DIPSETTING(   0xcc, "204" )
+	PORT_DIPSETTING(   0xcd, "205" )    PORT_DIPSETTING(   0xce, "206" )    PORT_DIPSETTING(   0xcf, "207" )    PORT_DIPSETTING(   0xd0, "208" )    PORT_DIPSETTING(   0xd1, "209" )
+	PORT_DIPSETTING(   0xd2, "210" )    PORT_DIPSETTING(   0xd3, "211" )    PORT_DIPSETTING(   0xd4, "212" )    PORT_DIPSETTING(   0xd5, "213" )    PORT_DIPSETTING(   0xd6, "214" )
+	PORT_DIPSETTING(   0xd7, "215" )    PORT_DIPSETTING(   0xd8, "216" )    PORT_DIPSETTING(   0xd9, "217" )    PORT_DIPSETTING(   0xda, "218" )    PORT_DIPSETTING(   0xdb, "219" )
+	PORT_DIPSETTING(   0xdc, "220" )    PORT_DIPSETTING(   0xdd, "221" )    PORT_DIPSETTING(   0xde, "222" )    PORT_DIPSETTING(   0xdf, "223" )    PORT_DIPSETTING(   0xe0, "224" )
+	PORT_DIPSETTING(   0xe1, "225" )    PORT_DIPSETTING(   0xe2, "226" )    PORT_DIPSETTING(   0xe3, "227" )    PORT_DIPSETTING(   0xe4, "228" )    PORT_DIPSETTING(   0xe5, "229" )
+	PORT_DIPSETTING(   0xe6, "230" )    PORT_DIPSETTING(   0xe7, "231" )    PORT_DIPSETTING(   0xe8, "232" )    PORT_DIPSETTING(   0xe9, "233" )    PORT_DIPSETTING(   0xea, "234" )
+	PORT_DIPSETTING(   0xeb, "235" )    PORT_DIPSETTING(   0xec, "236" )    PORT_DIPSETTING(   0xed, "237" )    PORT_DIPSETTING(   0xee, "238" )    PORT_DIPSETTING(   0xef, "239" )
+	PORT_DIPSETTING(   0xf0, "240" )    PORT_DIPSETTING(   0xf1, "241" )    PORT_DIPSETTING(   0xf2, "242" )    PORT_DIPSETTING(   0xf3, "243" )    PORT_DIPSETTING(   0xf4, "244" )
+	PORT_DIPSETTING(   0xf5, "245" )    PORT_DIPSETTING(   0xf6, "246" )    PORT_DIPSETTING(   0xf7, "247" )    PORT_DIPSETTING(   0xf8, "248" )    PORT_DIPSETTING(   0xf9, "249" )
+	PORT_DIPSETTING(   0xfa, "250" )    PORT_DIPSETTING(   0xfb, "251" )    PORT_DIPSETTING(   0xfc, "252" )    PORT_DIPSETTING(   0xfd, "253" )    PORT_DIPSETTING(   0xfe, "254" )
 	PORT_DIPSETTING(   0xff, "255" )
 INPUT_PORTS_END
 
@@ -965,7 +965,7 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
-  MCFG_DEVICE_REMOVE("sn76489")
+	MCFG_DEVICE_REMOVE("sn76489")
 	MCFG_DEVICE_REMOVE("vsm")
 	MCFG_DEVICE_REMOVE("tms5220")
 

@@ -109,7 +109,7 @@
 
   27/06/2012: Michael Zapf
   Converted to modern device, legacy devices were gradually removed afterwards.
-  
+
   16/09/2015: Lord Nightmare
   Fix PSG chips to have volume reg inited on reset to 0x0 based on tests by
   ValleyBell. Made Sega PSG chips start up with register 0x3 selected (volume

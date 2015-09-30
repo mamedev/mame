@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	VIA VT82C496G "Green PC" system chipset
+    VIA VT82C496G "Green PC" system chipset
 
 */
 
@@ -40,14 +40,14 @@ protected:
 private:
 	const char* m_cpu_tag;
 	const char* m_region_tag;
-//	cpu_device* m_maincpu;
+//  cpu_device* m_maincpu;
 	address_space* m_space;
 	ram_device* m_ram;
 	UINT8* m_rom;
-	
+
 	UINT8 m_reg[0x100];
 	UINT8 m_reg_select;
-	
+
 	void update_mem_c0(UINT8 data);
 	void update_mem_d0(UINT8 data);
 	void update_mem_e0(UINT8 data);
@@ -58,4 +58,3 @@ extern const device_type VT82C496;
 
 
 #endif /* __VT82C496_H__ */
-

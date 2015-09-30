@@ -2215,7 +2215,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 16, pc9801_state )
-//	AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
+//  AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x0da000, 0x0dbfff) AM_RAM // ide ram
 	AM_RANGE(0xee0000, 0xefffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
@@ -2421,7 +2421,7 @@ static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffffffff)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE16(grcg_gvram_r, grcg_gvram_w, 0xffffffff)
 	AM_RANGE(0x000cc000, 0x000cdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
-//	AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
+//  AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x000da000, 0x000dbfff) AM_RAM // ide ram
 	AM_RANGE(0x000e0000, 0x000e7fff) AM_READWRITE16(grcg_gvram0_r,grcg_gvram0_w, 0xffffffff)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_READ8(pc9801rs_ipl_r, 0xffffffff)

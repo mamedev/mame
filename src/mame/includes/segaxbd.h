@@ -54,7 +54,7 @@ public:
 
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
 
@@ -78,7 +78,7 @@ protected:
 	};
 
 	// device overrides
-//	virtual void machine_reset();
+//  virtual void machine_reset();
 	virtual void video_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -239,5 +239,3 @@ protected:
 //  virtual void device_start();
 //  virtual void device_reset();
 };
-
-

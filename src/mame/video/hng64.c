@@ -168,19 +168,19 @@ void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
 {                                                                              \
 	UINT16 tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                     \
 	int tileno,pal, flip;                                                      \
-																			   \
+																				\
 	tileno = m_videoram[tile_index+(offset/4)];                                \
-																			   \
+																				\
 	pal = (tileno&0xff000000)>>24;                                             \
 	flip =(tileno&0x00c00000)>>22;                                             \
-																			   \
+																				\
 	if (tileno&0x200000)                                                       \
 	{                                                                          \
 		tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];             \
 	}                                                                          \
-																			   \
+																				\
 	tileno &= 0x1fffff;                                                        \
-																			   \
+																				\
 	if (size==0)                                                               \
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
@@ -1269,9 +1269,9 @@ void hng64_state::video_start()
 	m_additive_tilemap_debug = 0;
 
 	// Rasterizer creation
-    m_poly_renderer = auto_alloc(machine(), hng64_poly_renderer(*this));
+	m_poly_renderer = auto_alloc(machine(), hng64_poly_renderer(*this));
 
-    // 3d information
+	// 3d information
 	m_dl = auto_alloc_array(machine(), UINT16, 0x200/2);
 	polys.resize(1024*5);
 

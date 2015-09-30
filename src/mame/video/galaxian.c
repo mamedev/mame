@@ -999,7 +999,7 @@ void galaxian_state::jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectang
 	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, cliprect);
 
 	/* render stars same as galaxian but nothing in the status area */
-	
+
 	/* update the star origin to the current frame */
 	stars_update_origin();
 

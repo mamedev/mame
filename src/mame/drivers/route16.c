@@ -669,7 +669,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
- ROM_START( route16 )
+	ROM_START( route16 )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "tvg54.a0",     0x0000, 0x0800, CRC(aef9ffc1) SHA1(178d23e4963336ded93c13cb17940a4ae98270c5) )
 	ROM_LOAD( "tvg55.a1",     0x0800, 0x0800, CRC(389bc077) SHA1(b0606f6e647e81ceae7148bda96bd4673a51e823) )

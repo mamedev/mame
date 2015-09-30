@@ -506,16 +506,16 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
-//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map_1)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zaccaria_state, cb1_toggle, (double)XTAL_3_579545MHz/4096)
-//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map_2)
-//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))

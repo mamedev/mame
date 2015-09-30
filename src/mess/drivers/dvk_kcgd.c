@@ -4,7 +4,7 @@
     Display Controller), a replacement for KSM (dvk_ksm.c) in later
     models of DVK desktops.
 
-    MPI (Q-Bus clone) board. Interfaces with MS7004 (DEC LK201 workalike) 
+    MPI (Q-Bus clone) board. Interfaces with MS7004 (DEC LK201 workalike)
     keyboard, mouse, and monochrome or color CRT.
 
     To do:
@@ -20,23 +20,23 @@
 #include "machine/clock.h"
 #include "machine/ms7004.h"
 
-#define KCGD_TOTAL_HORZ 1000	// XXX verify
+#define KCGD_TOTAL_HORZ 1000    // XXX verify
 #define KCGD_DISP_HORZ  800
-#define KCGD_HORZ_START 200	// XXX verify
+#define KCGD_HORZ_START 200 // XXX verify
 
-#define KCGD_TOTAL_VERT 600	// XXX verify
+#define KCGD_TOTAL_VERT 600 // XXX verify
 #define KCGD_DISP_VERT  480
-#define KCGD_VERT_START 100	// XXX verify
+#define KCGD_VERT_START 100 // XXX verify
 
-#define KCGD_STATUS_PAGE	0
-#define KCGD_STATUS_INTERLACE	1
-#define KCGD_STATUS_TIMER_INT	5
-#define KCGD_STATUS_MODE_INT	6
-#define KCGD_STATUS_MODE_LAST	7
-#define KCGD_STATUS_TIMER_VAL	15
+#define KCGD_STATUS_PAGE    0
+#define KCGD_STATUS_INTERLACE   1
+#define KCGD_STATUS_TIMER_INT   5
+#define KCGD_STATUS_MODE_INT    6
+#define KCGD_STATUS_MODE_LAST   7
+#define KCGD_STATUS_TIMER_VAL   15
 
-#define KCGD_PAGE_0	015574
-#define KCGD_PAGE_1	005574
+#define KCGD_PAGE_0 015574
+#define KCGD_PAGE_1 005574
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -57,7 +57,7 @@ public:
 	kcgd_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-//		m_ms7004(*this, "ms7004"),
+//      m_ms7004(*this, "ms7004"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")
 	{ }
@@ -102,8 +102,8 @@ private:
 	bitmap_ind16 m_tmpbmp;
 
 	struct {
-		UINT16 status;	// 167770
-		UINT8 control;	// 167772
+		UINT16 status;  // 167770
+		UINT8 control;  // 167772
 		int palette_index, vram_addr;
 		UINT8 palette[16];
 	} m_video;
@@ -111,7 +111,7 @@ private:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-//	required_device<ms7004_device> m_ms7004;
+//  required_device<ms7004_device> m_ms7004;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
@@ -123,10 +123,10 @@ static ADDRESS_MAP_START( kcgd_mem, AS_PROGRAM, 16, kcgd_state )
 	AM_RANGE (0160000, 0160001) AM_MIRROR(03774) AM_READWRITE(vram_addr_r, vram_addr_w)
 	AM_RANGE (0160002, 0160003) AM_MIRROR(03774) AM_READWRITE(vram_data_r, vram_data_w)
 	AM_RANGE (0167770, 0167771) AM_READWRITE(status_r, status_w)
-	AM_RANGE (0167772, 0167773) AM_READWRITE8(palette_index_r, palette_index_w, 0x00ff)	// reads always return 0
+	AM_RANGE (0167772, 0167773) AM_READWRITE8(palette_index_r, palette_index_w, 0x00ff) // reads always return 0
 	AM_RANGE (0167772, 0167773) AM_READWRITE8(palette_data_r, palette_data_w, 0xff00)
-//	AM_RANGE (0176560, 0176567) AM_RAM	// USART2 -- host
-//	AM_RANGE (0177560, 0177567) AM_RAM	// USART3 -- keyboard
+//  AM_RANGE (0176560, 0176567) AM_RAM  // USART2 -- host
+//  AM_RANGE (0177560, 0177567) AM_RAM  // USART3 -- keyboard
 ADDRESS_MAP_END
 
 void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -134,13 +134,13 @@ void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	switch (id)
 	{
 /*
-	case TIMER_ID_VSYNC_ON:
-		m_maincpu->set_input_line(INPUT_LINE_EVNT, ASSERT_LINE);
-		break;
+    case TIMER_ID_VSYNC_ON:
+        m_maincpu->set_input_line(INPUT_LINE_EVNT, ASSERT_LINE);
+        break;
 
-	case TIMER_ID_VSYNC_OFF:
-		m_maincpu->set_input_line(INPUT_LINE_EVNT, CLEAR_LINE);
-		break;
+    case TIMER_ID_VSYNC_OFF:
+        m_maincpu->set_input_line(INPUT_LINE_EVNT, CLEAR_LINE);
+        break;
 */
 	case TIMER_ID_500HZ:
 		m_video.status ^= (1 << KCGD_STATUS_TIMER_VAL);
@@ -155,7 +155,7 @@ void kcgd_state::machine_reset()
 
 void kcgd_state::video_start()
 {
-//	screen_device *screen = machine().device<screen_device>("screen");
+//  screen_device *screen = machine().device<screen_device>("screen");
 
 	// 64 kwords, word size is 17 bits
 	m_videoram = auto_alloc_array(machine(), UINT32, 65536);
@@ -163,11 +163,11 @@ void kcgd_state::video_start()
 	m_tmpclip = rectangle(0, KCGD_DISP_HORZ-1, 0, KCGD_DISP_VERT-1);
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 /*
-	m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
-	m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
+    m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
+    m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
 
-	m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
-	m_vsync_off_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
+    m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
+    m_vsync_off_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
 */
 	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
@@ -182,8 +182,8 @@ PALETTE_INIT_MEMBER(kcgd_state, kcgd)
 }
 
 /*
-	VRAM is 128K and is word-addressable, so address fits into 16 bits.
-	Low 32K of VRAM are not used to store pixel data -- XXX.
+    VRAM is 128K and is word-addressable, so address fits into 16 bits.
+    Low 32K of VRAM are not used to store pixel data -- XXX.
 */
 WRITE16_MEMBER(kcgd_state::vram_addr_w)
 {
@@ -247,7 +247,7 @@ WRITE8_MEMBER(kcgd_state::palette_data_w)
 {
 	DBG_LOG(1,"Palette data W", ("data %02XH index %d\n", data, m_video.palette_index));
 	m_video.palette[m_video.palette_index] = data;
-	m_palette->set_pen_color(m_video.palette_index, 
+	m_palette->set_pen_color(m_video.palette_index,
 		85*(data & 3), 85*((data >> 2) & 3), 85*((data >> 4) & 3));
 }
 

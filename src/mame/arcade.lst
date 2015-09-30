@@ -361,9 +361,9 @@ anteateruk      // (c) 1983 Free Enterprise Games
 rescue          // (c) 1982 Stern
 rescueb         // (c) Videl Games (Rescue bootleg)
 aponow          // bootleg
-rescuefe		// bootleg
+rescuefe        // bootleg
 minefld         // (c) 1983 Stern
-minefldfe		// bootleg
+minefldfe       // bootleg
 losttomb        // (c) 1982 Stern
 losttombh       // (c) 1982 Stern
 superbon        // bootleg
@@ -846,7 +846,7 @@ genpeitd        // (c) 1986
 rthunder        // (c) 1986
 rthunder2       // (c) 1986
 rthunder1       // (c) 1986
-rthunder0		// (c) 1986
+rthunder0       // (c) 1986
 wndrmomo        // (c) 1987
 
 // Thunder Ceptor HW
@@ -4570,8 +4570,8 @@ enduror         // (c) 1985 (FD1089B)
 enduror1        // (c) 1985 (FD1089B)
 endurob2        // (c) 1985 (Beta bootleg)
 endurobl        // (c) 1985 (Herb bootleg)
-endurord		// bootleg
-enduror1d		// bootleg
+endurord        // bootleg
+enduror1d       // bootleg
 hangon          // (c) 1985 (Rev A)
 hangon1         // (c) 1985
 hangon2         // (c) 1985
@@ -4863,11 +4863,11 @@ toutrun3        // 1987 (FD1094)
 toutrun2        // 1987 (FD1094)
 toutrun1        // 1987 (FD1094)
 toutrunj1       // 1987 (FD1094)
-toutrund		// bootleg
-toutrunjd		// bootleg
-toutrun3d		// bootleg
-toutrunj1d		// bootleg
-shangon3d		// bootleg
+toutrund        // bootleg
+toutrunjd       // bootleg
+toutrun3d       // bootleg
+toutrunj1d      // bootleg
+shangon3d       // bootleg
 
 // X Board
 aburner         // 1987.07 After Burner (Japan)
@@ -4892,11 +4892,11 @@ rachero         // 1990.?? Racing Hero (World, FD1094)
 abcop           // 1990.?? A.B.Cop (World, FD1094)
 abcopj          // 1991.01 A.B.Cop (Japan, FD1094)
 gpriderjs       // 1990.10 GP Rider (Japan, FD1094)
-gpriderj		// as above
+gpriderj        // as above
 gpriders        // 1990.?? GP Rider (World, FD1094)
-gprider	    	// as above
+gprider         // as above
 gpriderus       // 1990.12 GP Rider (US, FD1094)
-gprideru	 	// as above
+gprideru        // as above
 rascot          // 1991.?? Royal Ascot (Japan)
 
 // decrypted X-Board bootlegs
@@ -6396,7 +6396,7 @@ wc90t           // (c) 1989 Tecmo
 wc90b1          // bootleg
 wc90b2          // bootleg
 wc90ba          // bootleg
-pac90			// bootleg
+pac90           // bootleg
 spbactn         // 9002 - (c) 1991 Tecmo
 spbactnj        // 9002 - (c) 1991 Tecmo
 spbactnp        // prototype
@@ -6441,7 +6441,7 @@ trackfldc       // GX361 (c) 1983 + Centuri license
 trackfldnz      // (c) 1982 Goldberg Enterprizes Inc.
 hyprolym        // GX361 (c) 1983
 hyprolymb       // bootleg
-hyprolymba		// bootleg
+hyprolymba      // bootleg
 atlantol        // bootleg
 wizzquiz        // (c) 1985 Konami
 wizzquiza       // (c) 1985 Zilec-Zenitone
@@ -10033,7 +10033,7 @@ amazonia        // (c) 1999
 fruitpar        // (c) 200?
 zhongguo        // (c) 2000
 sdwx            // (c) 2002
-amazoni2		// (c) 2002
+amazoni2        // (c) 2002
 sddz            // (c) 200?
 lhzb3           // (c) 200?
 lhzb4           // (c) 200?
@@ -32323,4 +32323,3 @@ dumpump
 3lilpigs
 
 wackygtr   // Wacky Gator
-

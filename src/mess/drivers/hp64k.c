@@ -406,7 +406,7 @@ void hp64k_state::machine_reset()
 		m_floppy0_wpt = false;
 		m_floppy1_wpt = false;
 		m_beeper->set_state(0);
-                m_baud_rate->str_w((m_s5_sw->read() >> 1) & 0xf);
+				m_baud_rate->str_w((m_s5_sw->read() >> 1) & 0xf);
 		m_16x_clk = (m_rs232_sw->read() & 0x02) != 0;
 		m_loopback = false;
 		m_txd_state = true;
@@ -1389,7 +1389,7 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 				MCFG_TIMER_DRIVER_ADD("beep_timer" , hp64k_state , hp64k_beeper_off);
 
 				MCFG_DEVICE_ADD("baud_rate" , COM8116 , XTAL_5_0688MHz)
-                                MCFG_COM8116_FR_HANDLER(WRITELINE(hp64k_state , hp64k_baud_clk_w));
+								MCFG_COM8116_FR_HANDLER(WRITELINE(hp64k_state , hp64k_baud_clk_w));
 
 				MCFG_DEVICE_ADD("uart" , I8251 , 0)
 				MCFG_I8251_RXRDY_HANDLER(WRITELINE(hp64k_state , hp64k_rxrdy_w));

@@ -77,9 +77,9 @@ ROM_END
 static INPUT_PORTS_START( pgc )
 	PORT_START("DSW")
 /*
-	PORT_DIPNAME( 0x01, 0x00, "CGA emulator")
-	PORT_DIPSETTING(    0x00, DEF_STR(No) )
-	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+    PORT_DIPNAME( 0x01, 0x00, "CGA emulator")
+    PORT_DIPSETTING(    0x00, DEF_STR(No) )
+    PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 */
 	PORT_DIPNAME( 0x02, 0x00, "Communication area")
 	PORT_DIPSETTING(    0x00, "C6000" )
@@ -88,19 +88,19 @@ INPUT_PORTS_END
 
 /*
 write only
-	30000		LUT WR O L
-	30001		LUT WR I L
-	32000		MODE WT L
-	32001		NIBBLE WT L
-	3200A		??
-	34000		FUNCTION WT L
-	34001		STARTADD WT L
-	36001		CURSOR WT L
+    30000       LUT WR O L
+    30001       LUT WR I L
+    32000       MODE WT L
+    32001       NIBBLE WT L
+    3200A       ??
+    34000       FUNCTION WT L
+    34001       STARTADD WT L
+    36001       CURSOR WT L
 
 read only
-	38000		LUT RD O L
-	38001		LUT RD I L
-	3C001		INIT L/INIT H
+    38000       LUT RD O L
+    38001       LUT RD I L
+    3C001       INIT L/INIT H
 */
 
 static ADDRESS_MAP_START( pgc_map, AS_PROGRAM, 8, isa8_pgc_device )
@@ -108,10 +108,10 @@ static ADDRESS_MAP_START( pgc_map, AS_PROGRAM, 8, isa8_pgc_device )
 	AM_RANGE(0x00000, 0x07fff) AM_ROM
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE(0x10000, 0x1001f) AM_READWRITE(stateparam_r, stateparam_w)
-//	AM_RANGE(0x18000, 0x18fff) AM_RAM	// ??
+//  AM_RANGE(0x18000, 0x18fff) AM_RAM   // ??
 	AM_RANGE(0x28000, 0x287ff) AM_RAM AM_REGION("commarea", 0) AM_MIRROR(0x800)
 	AM_RANGE(0x3c000, 0x3c001) AM_READ(init_r)
-//	AM_RANGE(0x3e000, 0x3efff) AM_RAM	// ??
+//  AM_RANGE(0x3e000, 0x3efff) AM_RAM   // ??
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -311,7 +311,7 @@ WRITE8_MEMBER( isa8_pgc_device::lut_w ) {
 	if (offset & 1) {
 		m_lut[o + 2] = (data & 15) << 4;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
-		DBG_LOG(1,"lut",("W @ %02X <- %d %d %d\n", 
+		DBG_LOG(1,"lut",("W @ %02X <- %d %d %d\n",
 			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] ));
 	} else {
 		m_lut[o    ] = data & 0xf0;
@@ -330,7 +330,7 @@ READ8_MEMBER( isa8_pgc_device::init_r ) {
 	DBG_LOG(1,"INIT",("mapping LUT\n"));
 	space.install_write_handler(0xf8400, 0xf85ff,
 		write8_delegate(FUNC(isa8_pgc_device::lut_w), this));
-	
+
 	return 0; // XXX ignored
 }
 
@@ -341,7 +341,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 	UINT8 *v;
 
 	// XXX hpos shifts every frame -- fix
-	if (y == 0) DBG_LOG(2,"scanline_cb", 
+	if (y == 0) DBG_LOG(2,"scanline_cb",
 		("frame %d x %.4d y %.3d\n",
 		(int) m_screen->frame_number(), m_screen->hpos(), y));
 

@@ -125,18 +125,18 @@ This is a general guideline flag showing compatibility between the different rev
 1-7: Tested Working
 X  : Tested Not Working
 -  : Not Tested
-%  : 1 and 2; For testing purposes these games need a DVD drive. Using this hardware to play the actual game is 
+%  : 1 and 2; For testing purposes these games need a DVD drive. Using this hardware to play the actual game is
      normally impossible due to requiring controls/IO boards that can't be connected to this hardware version.
 #  : 5 and 6; Working only in S246+ mode.
 @  : Multiple different DVD's and/or dongles are available and are compatible in any combination.
 
 For 'Tested Working', working is defined as "boots to the attract mode".
-Some games need specific controls and are unplayable even though the game loads (eg. most games on earliest rev 246 
-or the driving or gun games on non-factory-provided hardware). Some games will start to boot but either get stuck 
+Some games need specific controls and are unplayable even though the game loads (eg. most games on earliest rev 246
+or the driving or gun games on non-factory-provided hardware). Some games will start to boot but either get stuck
 somewhere in the boot process or nothing loads after the initial booting.
-The DVD drive used for these tests was a Toshiba/Samsung SD-M1802. In the case where the original drive didn't work 
+The DVD drive used for these tests was a Toshiba/Samsung SD-M1802. In the case where the original drive didn't work
 (i.e. factory drive was a CDROM and the disc was a DVD), this drive was substituted.
-Finally, all games were tested with the SD-M1802 and worked, therefore no game requires a specific make and model of 
+Finally, all games were tested with the SD-M1802 and worked, therefore no game requires a specific make and model of
 optical drive to BOOT. But of course not all drive models will work or work for extended periods. YMMV.
 These makes and models have been tested and worked.....
 H-L Data Storage LG GSA-4164B Super Multi DVD Drive (September 2005)
@@ -150,21 +150,21 @@ Toshiba/Samsung SD-M1612 DVD-ROM Drive (January 2003) (Factory Supplied)
 Toshiba/Samsung SD-M1712 DVD-ROM Drive (November 2003) (Factory Supplied)
 Toshiba/Samsung SD-M1802 (Factory Supplied)
 
-Different security cart revisions of the same game are filled in with the same status even if they are not dumped as 
+Different security cart revisions of the same game are filled in with the same status even if they are not dumped as
 long as at least one revision is tested.
 
-1 = 246  1st generation using COH-H30000 or COH-H31000 Playstation 2 main board (GH-004/GH-006 with PS2 power supply) 
+1 = 246  1st generation using COH-H30000 or COH-H31000 Playstation 2 main board (GH-004/GH-006 with PS2 power supply)
          and custom Namco interface board 'System 246 MOTHER PCB' and Teac CD-540E CD drive
-2 = 246A 2nd generation using COH-H30000 or COH-H31000 Playstation 2 main board (GH-004/GH-006 with PS2 power supply) 
+2 = 246A 2nd generation using COH-H30000 or COH-H31000 Playstation 2 main board (GH-004/GH-006 with PS2 power supply)
          and custom Namco interface board 'System 246 MOTHER(A) PCB' and Teac CD-540E CD drive
-3 = 246B 3rd generation using COH-H31000 Playstation 2 main board (GH-006 without PS2 power supply) and custom Namco 
+3 = 246B 3rd generation using COH-H31000 Playstation 2 main board (GH-006 without PS2 power supply) and custom Namco
          interface board 'System 246 PMOTHER PCB'
 4 = 246C 4th generation using integrated single main board 'System 246 Main PCB'
-5 = 256  5th generation using integrated single main board 'System 256 Main PCB'. Note some games requiring S246 will 
+5 = 256  5th generation using integrated single main board 'System 256 Main PCB'. Note some games requiring S246 will
          work in S246+ mode.
-6 = 256B 6th generation using integrated single main board 'System 256 Main(B) PCB'. Note some games requiring S246 
+6 = 256B 6th generation using integrated single main board 'System 256 Main(B) PCB'. Note some games requiring S246
          will work in S246+ mode.
-7 = S256 7th generation using integrated single main board 'Super System 256 Main PCB'. All other games are X because 
+7 = S256 7th generation using integrated single main board 'Super System 256 Main PCB'. All other games are X because
          this system only runs Time Crisis 4.
 
 
@@ -381,7 +381,7 @@ System246 PAC PCB
 |J1  J2              SW1                              |
 |-----------------------------------------------------|
 Notes:
-      J1/J2 - RCA jacks for stereo audio output (mono audio is also output from the JAMMA connector on the I/O board 
+      J1/J2 - RCA jacks for stereo audio output (mono audio is also output from the JAMMA connector on the I/O board
               for Bloody Roar 3)
          J3 - Multi-pin connector (located on other side of PCB, plugs into J3 on MOTHER(A) PCB)
          J4 - 4-pin connector (not used)
@@ -419,7 +419,7 @@ Notes:
       TSSIOPROG - Atmel AT29C020 EEPROM stamped 'TSSIOP8' (PLCC32)
       C78       - Namco Custom C78, actually a rebadged Hitachi HD643334 MCU, clock input 14.746MHz (PLCC84)
       TSSIOPLD  - Altera MAX EPM7128ELC84 CPLD with label 'TSSIOPLD' (PLCC84)
-      SLA4060   - Sanken Electric SLA4060 NPN general purpose darlington transistor (used to drive the kick-back 
+      SLA4060   - Sanken Electric SLA4060 NPN general purpose darlington transistor (used to drive the kick-back
                   solenoid in the gun)
       PST592    - System Reset IC (SOIC4)
       J1        - 12 pin connector for power and I/O communication joined to main board
@@ -429,7 +429,7 @@ Notes:
       J601      - not used?
       JP1       - jumper set to 1-2 (lower position), labelled 'WR'
       DSW       - 4 position dipswitch block, all off
-      
+
 This board is used with Time Crisis 3 (System 246B/C twin CRT-screen version)
 It's also used with Time Crisis II (on System 23)
 Note this board requires a standard light gun.
@@ -514,10 +514,10 @@ Notes:
        MCU - Fujitsu MB90F574 Microcontroller with sticker 'FCAF11' (QFP120)
     ADM485 - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
 
-This PCB is used with Ridge Racer V and Wangan Midnight and will also work with most of the 
+This PCB is used with Ridge Racer V and Wangan Midnight and will also work with most of the
 System 246 games when wired to suit those games.
 
-FCA2 PCB 
+FCA2 PCB
 --------
 [to-do]
 
@@ -556,17 +556,17 @@ Connector J3 pinout       Connector J2 pinout
 2 - P2 Button 6           2 - Left - / Also wired to JAMMA audio output pins
 3 - P2 Button 5           3 - Right +
 4 - P2 Button 4           4 - Right -
-5 -     
-6 - P1 Button 6 
+5 -
+6 - P1 Button 6
 7 - P1 Button 5
 8 - P1 Button 4
-9 -  
+9 -
 10- GND
 
-This I/O board works with all the games that require regular joysticks and buttons which run on System 246B/C and 
+This I/O board works with all the games that require regular joysticks and buttons which run on System 246B/C and
 System 256.
 
- 
+
 Drive/Feedback Board
 --------------------
 
@@ -611,7 +611,7 @@ Notes:
           MB3773 - Fujitsu MB3773 Power Supply Monitor with Watch Dog Timer and Reset (SOIC8)
           MB3771 - Fujitsu MB3771 System Reset IC (SOIC8)
            DIP42 - Unpopulated DIP42 socket for 27C4096 EPROM
-        MB90242A - Fujitsu MB90242A 16-Bit CISC ROM-less F2MC-16F Family Microcontroller optimized for mechatronics 
+        MB90242A - Fujitsu MB90242A 16-Bit CISC ROM-less F2MC-16F Family Microcontroller optimized for mechatronics
                    control applications (TQFP80)
             7815 - LM7815 15V voltage regulator
             J101 - 8 pin connector (purpose unknown)
@@ -624,12 +624,12 @@ Notes:
 
 This PCB is used with Ridge Racer V and Wangan Midnight and controls the steering feed-back motor.
 When the driving games boot they test the feed-back motor by monitoring a potentiometer
-connected to the steering wheel mechanism. On Ridge Racer V, if the pot is faulty or not connected 
+connected to the steering wheel mechanism. On Ridge Racer V, if the pot is faulty or not connected
 or if the drive/feedback board isn't connected (including the 110VAC input voltage), the
 steering check will fail after a time-out period and the game will not continue further.
 Wangan Midnight doesn't test the potentiometer and will boot without it connected, but it does
 test for the presence of the feedback PCB.
-Note this same PCB (with a different ROM) is also used with Mario Kart on Triforce hardware and all of the Wangan 
+Note this same PCB (with a different ROM) is also used with Mario Kart on Triforce hardware and all of the Wangan
 Midnight Maximum Tune series up to Maximum Tune 3 DX.
 
 
@@ -1099,8 +1099,8 @@ ROM_START( tekken51b )
 
 	// this key should work with Tekken 5 or 5.1 discs, according to Guru
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-	ROM_LOAD( "te53verb.ic002", 0x000000, 0x800000, CRC(4d605636) SHA1(417b02d6c69f883920cd43a7278d0af183583c55) ) 
-	ROM_LOAD( "te53verb_spr.ic002", 0x800000, 0x040000, CRC(b7094978) SHA1(1e4903cd5f594c13dad2fd74666ba35c62550044) ) 
+	ROM_LOAD( "te53verb.ic002", 0x000000, 0x800000, CRC(4d605636) SHA1(417b02d6c69f883920cd43a7278d0af183583c55) )
+	ROM_LOAD( "te53verb_spr.ic002", 0x800000, 0x040000, CRC(b7094978) SHA1(1e4903cd5f594c13dad2fd74666ba35c62550044) )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "te51-dvd0", 0, SHA1(2a0ac3723725572c1810b0ef4bcfa7aa114062f8) )
@@ -1195,8 +1195,8 @@ ROM_START( cobrata )
 	SYSTEM246_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-	ROM_LOAD( "cbr1verb.ic002", 0x000000, 0x800000, CRC(aecda462) SHA1(97c8e98c44d66231ee3f2527756d92dbc947b76d) ) 
-	ROM_LOAD( "cbr1verb_spr.ic002", 0x800000, 0x040000, CRC(65aaadcf) SHA1(5cc642f71bef3b5e44db5e999e8abccca7fdaa4c) ) 
+	ROM_LOAD( "cbr1verb.ic002", 0x000000, 0x800000, CRC(aecda462) SHA1(97c8e98c44d66231ee3f2527756d92dbc947b76d) )
+	ROM_LOAD( "cbr1verb_spr.ic002", 0x800000, 0x040000, CRC(65aaadcf) SHA1(5cc642f71bef3b5e44db5e999e8abccca7fdaa4c) )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "cbr1-ha", 0, SHA1(a20d4ace91a2f2caab0804ebdf62c87ab267239b) )
@@ -1244,8 +1244,8 @@ ROM_START( rrvac1 )
 	SYSTEM246_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-	ROM_LOAD( "rrv1vera.ic002", 0x000000, 0x800000, CRC(e28bb0be) SHA1(9683ddc228e9aedd338cf2eb4d4373faeaea5b75) ) 
-	ROM_LOAD( "rrv1vera_spr.ic002", 0x800000, 0x040000, CRC(81c370b7) SHA1(7693c03b544c79fa3b6e536abb32ad34cf14dfbf) ) 
+	ROM_LOAD( "rrv1vera.ic002", 0x000000, 0x800000, CRC(e28bb0be) SHA1(9683ddc228e9aedd338cf2eb4d4373faeaea5b75) )
+	ROM_LOAD( "rrv1vera_spr.ic002", 0x800000, 0x040000, CRC(81c370b7) SHA1(7693c03b544c79fa3b6e536abb32ad34cf14dfbf) )
 
 	ROM_REGION(0x4010, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
 	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )

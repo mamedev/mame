@@ -44,13 +44,13 @@
 //**************************************************************************
 
 #define MCFG_PIT68230_PA_OUTPUT_CALLBACK(_write) \
-        devcb = &pit68230_device::set_pa_wr_callback (*device, DEVCB_ ## _write);
+		devcb = &pit68230_device::set_pa_wr_callback (*device, DEVCB_ ## _write);
 
 #define MCFG_PIT68230_PB_OUTPUT_CALLBACK(_write) \
-        devcb = &pit68230_device::set_pb_wr_callback (*device, DEVCB_ ## _write);
+		devcb = &pit68230_device::set_pb_wr_callback (*device, DEVCB_ ## _write);
 
 #define MCFG_PIT68230_H2_CALLBACK(_write) \
-        devcb = &pit68230_device::set_h2_wr_callback (*device, DEVCB_ ## _write);
+		devcb = &pit68230_device::set_h2_wr_callback (*device, DEVCB_ ## _write);
 
 /*-----------------------------------------------------------------------
  * Registers                RS1-RS5   R/W Description
@@ -90,11 +90,11 @@ pit68230_device(const machine_config &mconfig, device_type type, const char *nam
 pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 template<class _Object> static devcb_base &set_pa_wr_callback (device_t &device, _Object object)
 {
-        return downcast<pit68230_device &>(device).m_write_pa.set_callback (object);
+		return downcast<pit68230_device &>(device).m_write_pa.set_callback (object);
 }
 template<class _Object> static devcb_base &set_h2_wr_callback (device_t &device, _Object object)
 {
-        return downcast<pit68230_device &>(device).m_write_h2.set_callback (object);
+		return downcast<pit68230_device &>(device).m_write_h2.set_callback (object);
 }
 
 DECLARE_WRITE8_MEMBER (write);

@@ -108,7 +108,7 @@ static MACHINE_CONFIG_START( asst128, asst128_state )
 	asst128_mb_device::static_set_cputag(*device, "maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
-//	MCFG_DEVICE_REMOVE("mb:dma8237")
+//  MCFG_DEVICE_REMOVE("mb:dma8237")
 
 	MCFG_DEVICE_REMOVE("mb:cassette")
 	MCFG_CASSETTE_ADD("mb:cassette")

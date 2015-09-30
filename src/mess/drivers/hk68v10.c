@@ -8,18 +8,18 @@
  *
  * I baught this board from http://www.retrotechnology.com without documentation.
  * It has a Motorola 68010 CPU @ 10MHz and two 2764 EPROMS with HBUG firmware
- * The board is very populated and suitable to run a real server OS supported by 
- * FPU,MMU and DMA controller chips. The firmware supports SCSI, Centronics/FPI 
- * and a serial port. I have not found so much on the FPI interface yet and it is 
+ * The board is very populated and suitable to run a real server OS supported by
+ * FPU,MMU and DMA controller chips. The firmware supports SCSI, Centronics/FPI
+ * and a serial port. I have not found so much on the FPI interface yet and it is
  * possibly Heurikon specific. There is also a Heurikon Multibus board called
  * HK68/M10 for which I might add support from specs, however would need a ROM
  * to verify.
- *                                                                                   
- *       ||                                                                          
- * ||    ||                                                                          
- * ||||--||                                                                          
- * ||||--||                                                                          
- * ||    ||____________________________________________________________   ___ 
+ *
+ *       ||
+ * ||    ||
+ * ||||--||
+ * ||||--||
+ * ||    ||____________________________________________________________   ___
  *       ||     |     |        | 12 PALs 68/V-...    |   |   |   |   | |_|   |
  *       ||     |     |  2 x   |                     |74 |74 |74 |74 | | |   |
  *       ||     |     |  74273 | VS4-01     VM4-00   | 244 573 645 645 | |   |
@@ -37,14 +37,14 @@
  *       ||     |paral| | FPU     ||                 |   |    |      | | |   |
  *       ||     |Z8536| |_________||_________________|_ _|    |      | |_|   |
  *      |||     |     | |         |          |         |  ------------   |___|
- *   /==|||     |     | |         |          |         |  | 3 PALs   |   |  
- * FSM   ||     |     | | MC68010 | MC68451  | MC68450 |  |  MP1-00  |   |  
- * 1234  ||     |     | | CPU     | MMU      | DMA     |  |  MX2-00  |   |  
- * LEDs  ||     |-----| |_________|__________|_________|__|  MX1-01  |---|  
- *       ||     |     |  ____   ____   ---|               |__________|74 |  
- *   \==|||     |     | |    | |    |  |74|     4 x       | 3 PALs   |145|  
- *      |||     |SCC  | |    | |    |  |804     74245     |  CS3-00  |___|  
- * FPI   ||     |seria| |U12 | |U23 |  |  |               |  CS2-00  |   |  
+ *   /==|||     |     | |         |          |         |  | 3 PALs   |   |
+ * FSM   ||     |     | | MC68010 | MC68451  | MC68450 |  |  MP1-00  |   |
+ * 1234  ||     |     | | CPU     | MMU      | DMA     |  |  MX2-00  |   |
+ * LEDs  ||     |-----| |_________|__________|_________|__|  MX1-01  |---|
+ *       ||     |     |  ____   ____   ---|               |__________|74 |
+ *   \==|||     |     | |    | |    |  |74|     4 x       | 3 PALs   |145|
+ *      |||     |SCC  | |    | |    |  |804     74245     |  CS3-00  |___|
+ * FPI   ||     |seria| |U12 | |U23 |  |  |               |  CS2-00  |   |
  * paralell     |Z8530A |HBUG| |HBUG|  |  |               |  CS1-00  |   |___
  * port  ||     |     | |    | |    |  ---_---------------|__________|  _|   |
  *       ||     |     | |    | |    | |MTTLDL|MDLDM| 2 x |___________  | |   |
@@ -64,15 +64,15 @@
  *       ||  | each   || RFS-01                   |590|257          |  | |   |
  *      |||  |        || RCT-01                   |   |  |          |  |_|   |
  *   /==|||  +--------+|__________________________|___|__|__________|    |___|
- * ||    ||------------------------------------------------------------+-+             
- * ||||--||                                                            
- * ||||--||                                                            
+ * ||    ||------------------------------------------------------------+-+
+ * ||||--||
+ * ||||--||
  * ||
  *
  * History of Heurikon
  *---------------------
- * The company was founded 1972 as cellar company. Heurikon was aquired 
- * 1989 by Computer Products, 1990 by Artesyn and finally in 2005 by Emerson 
+ * The company was founded 1972 as cellar company. Heurikon was aquired
+ * 1989 by Computer Products, 1990 by Artesyn and finally in 2005 by Emerson
  * Electric who consilidated it fully by 2009 and closed the office.
  *
  * Misc links about Heurikon and this board:
@@ -116,13 +116,13 @@
  *                   (open)
  * 0x*00000                                    (maxmeml)
  *                   RAM (bus)                 (optional)
- * 0x200000                                    (top of 2 meg RAM) 
+ * 0x200000                                    (top of 2 meg RAM)
  *                   RAM (bus)                 (optional)
  * 0x100000                                    (top of 1 meg RAM)
  *                   User RAM
  * 0x001000          UNIX Kernel
  *                   Exception Vectors
- * 0x000000                                    (bottom of memory) 
+ * 0x000000                                    (bottom of memory)
  * --------------------------------------------------------------------------
  *
  * Interrupt sources M10/V10
@@ -130,8 +130,8 @@
  * Description                  Device  Lvl  IRQ    VME board
  *                           /Board      Vector  Address
  * ----------------------------------------------------------
- * On board Sources                     M10/V10  
- *  
+ * On board Sources                     M10/V10
+ *
  * Off board Sources (other VME boards)
  *  EXOS Ethernet                        5   4
  *  TapeMaster Reel-to-Reel Tape         3
@@ -198,9 +198,9 @@ class hk68v10_state : public driver_device
 {
 public:
 hk68v10_state(const machine_config &mconfig, device_type type, const char *tag) :
-        driver_device (mconfig, type, tag),
-        m_maincpu (*this, "maincpu")
-        ,m_sccterm(*this, "scc")
+		driver_device (mconfig, type, tag),
+		m_maincpu (*this, "maincpu")
+		,m_sccterm(*this, "scc")
 //        ,m_cart(*this, "exp_rom1")
 {
 }
@@ -222,8 +222,8 @@ required_device<cpu_device> m_maincpu;
 required_device<scc8530_device> m_sccterm;
 
 // Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
- UINT16  *m_sysrom;
- UINT16  m_sysram[4];
+	UINT16  *m_sysrom;
+	UINT16  m_sysram[4];
 };
 
 static ADDRESS_MAP_START (hk68v10_mem, AS_PROGRAM, 16, hk68v10_state)
@@ -233,7 +233,7 @@ AM_RANGE (0x000000, 0x000007) AM_RAM AM_WRITE (bootvect_w)       /* After first 
 AM_RANGE (0x000008, 0x1fffff) AM_RAM /* 2 Mb RAM */
 AM_RANGE (0xFC0000, 0xFC3fff) AM_ROM /* System EPROM Area 16Kb HBUG */
 AM_RANGE (0xFC4000, 0xFDffff) AM_ROM /* System EPROM Area an additional 112Kb for System ROM */
-AM_RANGE (0xFE9000, 0xFE9009) AM_RAM //AM_DEVREADWRITE8("scc", scc8530_device, ba_cd_r, ba_cd_w, 0xffff) /* Z80-PIO? */ 
+AM_RANGE (0xFE9000, 0xFE9009) AM_RAM //AM_DEVREADWRITE8("scc", scc8530_device, ba_cd_r, ba_cd_w, 0xffff) /* Z80-PIO? */
 AM_RANGE (0xFEA000, 0xFEA001) AM_DEVREADWRITE8("scc", scc8530_device, ca_r, ca_w, 0xff00) /* Dual serial port Z80-SCC */
 AM_RANGE (0xFEA002, 0xFEA003) AM_DEVREADWRITE8("scc", scc8530_device, cb_r, cb_w, 0xff00) /* Dual serial port Z80-SCC */
 AM_RANGE (0xFEA004, 0xFEA005) AM_DEVREADWRITE8("scc", scc8530_device, da_r, da_w, 0xff00) /* Dual serial port Z80-SCC */
@@ -249,13 +249,13 @@ INPUT_PORTS_END
 /* Start it up */
 void hk68v10_state::machine_start ()
 {
-        LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
+		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
 
-        /* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
+		/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
 }
 
-/* Support CPU resets 
+/* Support CPU resets
 
   TODO: Investigate why the user need two 'softreset' commands for the below to work. Eg F3 + F11 + F3 + F11
         If only one 'softreset' is given the reset PC gets the RAM content, not the intended ROM vector.
@@ -263,50 +263,50 @@ void hk68v10_state::machine_start ()
 */
 void hk68v10_state::machine_reset ()
 {
-        LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
+		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
 
-        /* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
-        if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-	        m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
+		/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
+		if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
+			m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xfc0000 to 0x0 at reset*/
-/* 
-  Right after HBUG reset the bootvector is masked by RAM:  
+/*
+  Right after HBUG reset the bootvector is masked by RAM:
   FC001C: move.w  #$700, $fe4000.l
   FC0024: move.l  #$0, $0.l # <- zeroing the reset vector
   FC002E: move.l  #$0, $4.l # There is for sure some hardware mapping going in here
 */
 READ16_MEMBER (hk68v10_state::bootvect_r){
-        //LOG (("bootvect_r %s\n", m_sysrom != &m_sysram[0] ? "as reset" : "as swapped"));
-        return m_sysrom[offset];
+		//LOG (("bootvect_r %s\n", m_sysrom != &m_sysram[0] ? "as reset" : "as swapped"));
+		return m_sysrom[offset];
 }
 
 WRITE16_MEMBER (hk68v10_state::bootvect_w){
-        LOG (("bootvect_w offset %08x, mask %08x, data %04x\n", offset, mem_mask, data));
-        m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-        m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-        m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset. 
+		LOG (("bootvect_w offset %08x, mask %08x, data %04x\n", offset, mem_mask, data));
+		m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
+		m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+		m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
 }
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (hk68v10_state::vme_a24_r){
-        LOG (("vme_a24_r\n"));
-        return (UINT16) 0;
+		LOG (("vme_a24_r\n"));
+		return (UINT16) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a24_w){
-        LOG (("vme_a24_w\n"));
+		LOG (("vme_a24_w\n"));
 }
 
 READ16_MEMBER (hk68v10_state::vme_a16_r){
-        LOG (("vme_16_r\n"));
-        return (UINT16) 0;
+		LOG (("vme_16_r\n"));
+		return (UINT16) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a16_w){
-        LOG (("vme_a16_w\n"));
+		LOG (("vme_a16_w\n"));
 }
 #endif
 
@@ -334,8 +334,8 @@ WRITE16_MEMBER (hk68v10_state::vme_a16_w){
  *
  */
 WRITE_LINE_MEMBER (hk68v10_state::write_sccterm_clock){
-        m_sccterm->txca_w (state);
-        m_sccterm->rxca_w (state);
+		m_sccterm->txca_w (state);
+		m_sccterm->rxca_w (state);
 }
 
 /*
