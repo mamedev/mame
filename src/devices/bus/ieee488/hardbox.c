@@ -18,7 +18,7 @@
     Start the pet8032 emulator with the HardBox attached as device 9,
     with the new CHD and the utilities floppy mounted:
 
-    $ mess pet8032 -ieee9 hardbox \
+    $ mame pet8032 -ieee9 hardbox \
                    -hard1 /path/to/corvus20mb.chd \
                    -flop1 /path/to/hardbox-utils.d80
 
@@ -85,7 +85,7 @@ ROM_START( hardbox )
 	         Disassembling the ROMs showed that v2.3 and v2.4 are for Corvus Systems drives but v3.1 is
 	         for Sunol Systems drives.  Both types use the Corvus flat cable interface but there may be
 	         some programming differences, e.g. the v3.1 firmware for Sunol does not have the park heads
-	     routine in the Corvus versions.  MESS emulates a Corvus drive so we default to the last
+	     routine in the Corvus versions.  MAME emulates a Corvus drive so we default to the last
 	     known HardBox firmware for Corvus (v2.4). */
 ROM_END
 

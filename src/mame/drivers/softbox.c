@@ -12,7 +12,7 @@
 
     The SoftBox can be used as a standalone computer with an RS-232 terminal,
     or as a PET/CBM peripheral.  This is an emulation of the standalone mode.
-    For the peripheral mode, see: src/emu/bus/ieee488/softbox.c.
+    For the peripheral mode, see: src/devices/bus/ieee488/softbox.c.
 
 
     Using the Corvus hard disk
@@ -27,7 +27,7 @@
 
     Start the SoftBox emulator with the floppy and hard disk images mounted:
 
-    $ mess softbox -flop1 /path/to/softbox-distrib.d80 \
+    $ mame softbox -flop1 /path/to/softbox-distrib.d80 \
                    -hard1 /path/to/corvus10mb.chd
 
     Before the Corvus can be used under CP/M, it must be prepared
@@ -78,7 +78,7 @@
 
     The SoftBox supports 5, 10, and 20 MB hard disks.  The distribution disk
     is configured for 10 MB as explained above.  To use other sizes, make
-    a new image with CHDMAN.  See the top of src/emu/machine/corvushd.h
+    a new image with CHDMAN.  See the top of src/devices/machine/corvushd.h
     for the parameters for the other drives.
 
     After the image has been created and the SoftBox emulator started with
