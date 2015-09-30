@@ -183,12 +183,6 @@
 #define logerror printf
 #endif
 
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
-
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
 /*
  */
@@ -249,7 +243,7 @@ INPUT_PORTS_END
 /* Start it up */
 void hk68v10_state::machine_start ()
 {
-		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
+		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), __func__));
 
 		/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
@@ -263,7 +257,7 @@ void hk68v10_state::machine_start ()
 */
 void hk68v10_state::machine_reset ()
 {
-		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), FUNCNAME));
+		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), __func__));
 
 		/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 		if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
