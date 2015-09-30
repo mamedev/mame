@@ -406,7 +406,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	MCFG_RSP_SP_SET_STATUS_CB(DEVWRITE32("rcp",n64_periphs, sp_set_status))
 	MCFG_CPU_PROGRAM_MAP(rsp_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(500000))
 	//MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
 	/* video hardware */
