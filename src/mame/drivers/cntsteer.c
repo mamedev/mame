@@ -509,20 +509,24 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_irq_w)
 {
-	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	//m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_nmi_w)
 {
 //  if (data)
-//  m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().scheduler().synchronize(); // force resync
+
+	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 //  popmessage("%02x", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
 {
-	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	machine().scheduler().synchronize(); // force resync
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
