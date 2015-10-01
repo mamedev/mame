@@ -2684,6 +2684,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mccpm.c",
 	MAME_DIR .. "src/mame/drivers/mes.c",
 	MAME_DIR .. "src/mame/drivers/mice.c",
+	MAME_DIR .. "src/mame/drivers/micral.c",
 	MAME_DIR .. "src/mame/drivers/micronic.c",
 	MAME_DIR .. "src/mame/drivers/mini2440.c",
 	MAME_DIR .. "src/mame/drivers/mmd1.c",
@@ -2721,6 +2722,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/seattlecmp.c",
 	MAME_DIR .. "src/mame/drivers/sh4robot.c",
 	MAME_DIR .. "src/mame/drivers/softbox.c",
+	MAME_DIR .. "src/mame/drivers/squale.c",
 	MAME_DIR .. "src/mame/drivers/swtpc.c",
 	MAME_DIR .. "src/mame/drivers/sys2900.c",
 	MAME_DIR .. "src/mame/drivers/systec.c",
@@ -2738,7 +2740,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/xor100.c",
 	MAME_DIR .. "src/mame/drivers/xavix.c",
 	MAME_DIR .. "src/mame/drivers/zorba.c",
-	MAME_DIR .. "src/mame/drivers/squale.c",
 }
 
 end
