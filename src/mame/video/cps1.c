@@ -1415,6 +1415,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightu1",    CPS_B_04,     mapper_S224B },
 	{"ffightua",    CPS_B_01,     mapper_S224B },
 	{"ffightub",    CPS_B_05,     mapper_S224B },
+	{"ffightuc",    CPS_B_03,     mapper_S224B },   // had 04 handwritten on the CPS_B chip, but clearly isn't.
 	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B

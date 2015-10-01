@@ -3136,6 +3136,7 @@ ffightu         // 12/1989 (c) 1989 (USA)
 ffightu1        // 12/1989 (c) 1989 (USA)
 ffightua        // 12/01/1990 (c) 1989 (USA)
 ffightub        // 13/06/1990 (c) 1989 (USA)
+ffightuc
 ffightj         // 12/1989 (c) 1989 (Japan)
 ffightj1        // 12/01/1990 (c) 1989 (Japan)
 ffightj2        // 05/03/1990 (c) 1989 (Japan)
@@ -4867,6 +4868,7 @@ toutrund        // bootleg
 toutrunjd       // bootleg
 toutrun3d       // bootleg
 toutrunj1d      // bootleg
+toutrun2d		// bootleg
 shangon3d       // bootleg
 
 // X Board
