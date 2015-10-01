@@ -98,6 +98,7 @@ void i8271_device::soft_reset()
 	rr = 0;
 	scan_sec = 0;
 	moder = 0xc0;
+	oport = 0;
 	scan_cnt[0] = scan_cnt[1] = 0;
 }
 
@@ -823,7 +824,7 @@ void i8271_device::start_command(int cmd)
 			break;
 		}
 		case 0x23:
-			rr = (command[0] << 1) & 0xc0;
+			rr = (command[0] & 0xc0) | oport;
 			break;
 		default:
 			rr = 0;
@@ -863,6 +864,7 @@ void i8271_device::start_command(int cmd)
 		case 0x22:
 			break;
 		case 0x23: {
+			oport = command[2] & ~0xc0;
 			floppy_info &fi = flopi[BIT(command[0], 7)];
 			fi.dev->dir_w(BIT(command[2], 2));
 			fi.dev->stp_w(BIT(command[2], 1));

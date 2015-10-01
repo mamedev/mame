@@ -209,7 +209,7 @@ private:
 	floppy_info flopi[2];
 
 	int command_pos, sectors_read, scan_len;
-	UINT8 command[6], dma_data;
+	UINT8 command[6], dma_data, oport;
 	UINT8 rr, scan_sec, moder;
 	UINT8 precomp, perpmode, scan_cnt[2];
 	UINT8 srate, hset, icnt, hload;
