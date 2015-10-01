@@ -4757,6 +4757,43 @@ ROM_START( ffightub )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 ROM_END
 
+
+
+
+ROM_START( ffightuc )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "ffu_30_3.11f",     0x00000, 0x20000, CRC(e619eb30) SHA1(41c2589a1b2cab2d0ded527a89f8e0e39e61efe1))
+	ROM_LOAD16_BYTE( "ffu_35_3.11h",     0x00001, 0x20000, CRC(bca85263) SHA1(249bc81426ee93cf2efa5594d6813d5dd896cea3) )
+	ROM_LOAD16_BYTE( "ffu_31_3.12f",     0x40000, 0x20000, CRC(59abd207) SHA1(9bc1f4d5dabd02cebce84f56f848694591c0629d) )
+	ROM_LOAD16_BYTE( "ffu_36_3.12h",     0x40001, 0x20000, CRC(df46ece8) SHA1(aa3081918d499f56664d6bb7b7ede2055d00375d) )
+	ROM_LOAD16_WORD_SWAP( "ff-32m.8h", 0x80000, 0x80000, CRC(c747696e) SHA1(d3362dadded31ccb7eaf71ef282d698d18edd722) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "ff-5m.7a", 0x000000, 0x80000, CRC(9c284108) SHA1(7868f5801347340867720255f8380548ad1a65a7) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff-7m.9a", 0x000002, 0x80000, CRC(a7584dfb) SHA1(f7b00a3ca8cb85264ab293089f9f540a8292b49c) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff-1m.3a", 0x000004, 0x80000, CRC(0b605e44) SHA1(5ce16af72858a57aefbf6efed820c2c51935882a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff-3m.5a", 0x000006, 0x80000, CRC(52291cd2) SHA1(df5f3d3aa96a7a33ff22f2a31382942c4c4f1111) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ff_09.12b", 0x00000, 0x08000, CRC(b8367eb5) SHA1(ec3db29fdd6200e9a8f4f8073a7e34aef731354f) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "ff_18.11c", 0x00000, 0x20000, CRC(375c66e7) SHA1(36189e23209ce4ae5d9cbabd1574540d0591e7b3) )
+	ROM_LOAD( "ff_19.12c", 0x20000, 0x20000, CRC(1ef137f9) SHA1(974b5e72aa28b87ebfa7438efbdfeda769dedf5e) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "s224b.1a",     0x0000, 0x0117, CRC(cdc4413e) SHA1(c74c60f8f4eb125ffb6414aefba270676d9b8a2d) )
+	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+ROM_END
+
 /* FIXME B-Board uncertain but should be 88622B/89625B from the program ROM names */
 ROM_START( ffightj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -11745,6 +11782,7 @@ GAME( 1989, ffightu,     ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     
 GAME( 1989, ffightu1,    ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     ROT0,   "Capcom", "Final Fight (USA, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightua,    ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     ROT0,   "Capcom", "Final Fight (USA 900112)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightub,    ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     ROT0,   "Capcom", "Final Fight (USA 900613)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffightuc,    ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     ROT0,   "Capcom", "Final Fight (USA 900424)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightj,     ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightj1,    ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900112)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightj2,    ffight,   cps1_10MHz, ffight,   cps_state,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", MACHINE_SUPPORTS_SAVE )
