@@ -2711,6 +2711,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pulsar.c",
 	MAME_DIR .. "src/mame/drivers/pv9234.c",
 	MAME_DIR .. "src/mame/drivers/qtsbc.c",
+	MAME_DIR .. "src/mame/drivers/rd100.c",
 	MAME_DIR .. "src/mame/drivers/rvoice.c",
 	MAME_DIR .. "src/mame/drivers/sacstate.c",
 	MAME_DIR .. "src/mame/drivers/sbrain.c",
