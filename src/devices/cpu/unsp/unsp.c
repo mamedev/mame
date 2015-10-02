@@ -4,7 +4,7 @@
 *
 *   SunPlus u'nSP core
 *
-*    by Harmony
+*    by Ryan Holtz
 *
 \**************************/
 

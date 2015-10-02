@@ -3,7 +3,7 @@
 /*
     Manchester Small-Scale Experimental Machine (SSEM)
 
-    Driver by MooglyGuy
+    Driver by Ryan Holtz
 */
 
 

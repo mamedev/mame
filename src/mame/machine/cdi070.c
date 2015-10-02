@@ -6,7 +6,7 @@
     CD-i-specific cdi68070 SoC peripheral emulation
     -------------------
 
-    MESS implementation by Harmony
+    written by Ryan Holtz
 
 
 *******************************************************************************

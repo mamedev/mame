@@ -5,7 +5,7 @@
     drivers/sgi_ip2.c
     SGI IRIS 3130 skeleton driver with some meat on its bones
 
-    by Harmony
+    by Ryan Holtz
 
         0x00000000 - ?              RAM (?)
         0x30000000 - 0x30017fff     ROM (3x32k)

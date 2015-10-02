@@ -4,7 +4,7 @@
 *
 *   SunPlus u'nSP disassembler
 *
-*    by Harmony
+*    by Ryan Holtz
 *
 \**************************/
 

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, David Haywood, Ryan Holtz, Stephh, Pierpaolo Prazzoli, Roberto Fresca
 /*****************************************************************
-* Status Triv Two driver by David Haywood, MooglyGuy, and Stephh *
-* Super Triv II driver by MooglyGuy                              *
-* Triv Quiz driver by MooglyGuy                                  *
+* Status Triv Two driver by David Haywood, Ryan Holtz, and Stephh*
+* Super Triv II driver by Ryan Holtz                             *
+* Triv Quiz driver by Ryan Holtz                                 *
 * Triv Four driver by Pierpaolo Prazzoli                         *
 * Super Triv III driver by Pierpaolo Prazzoli                    *
 * Hangman driver by Pierpaolo Prazzoli                           *
@@ -13,7 +13,7 @@
 *                                                                *
 * All notes by David Haywood unless otherwise noted              *
 *                                                                *
-* Thanks to MooglyGuy for working out why statriv2 was crashing  *
+* Thanks to Ryan Holtz for working out why statriv2 was crashing *
 * in attract and fixing the questions so it actually asked more  *
 * than one per category.                                         *
 *                                                                *
@@ -1082,7 +1082,7 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	* anyone can figure out a way to simplify the       *
 	* formula I'm using, PLEASE DO SO!                  *
 	*                                                   *
-	*                                       - MooglyGuy *
+	*                                       - Ryan Holtz*
 	*                                                   *
 	\***************************************************/
 

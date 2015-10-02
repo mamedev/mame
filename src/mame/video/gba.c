@@ -6,7 +6,7 @@
 
     File to handle emulation of the video hardware of the Game Boy Advance
 
-    By R. Belmont, MooglyGuy
+    By R. Belmont, Ryan Holtz
 
 ***************************************************************************/
 

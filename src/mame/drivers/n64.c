@@ -6,7 +6,7 @@
     Driver by Ville Linde
     Reformatted to share hardware by R. Belmont
     Additional work by Ryan Holtz
-    Porting from Mupen64 by Harmony
+    Porting from Mupen64 by Ryan Holtz
 */
 
 #include "emu.h"

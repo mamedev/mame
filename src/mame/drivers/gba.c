@@ -6,7 +6,7 @@
 
   Driver file to handle emulation of the Nintendo Game Boy Advance.
 
-  By R. Belmont & Harmony
+  By R. Belmont & Ryan Holtz
 
 ***************************************************************************/
 

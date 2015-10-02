@@ -6,7 +6,7 @@
     Philips CD-I-based games
     ------------------------
 
-    Preliminary MAME driver by Harmony
+    Preliminary MAME driver by Ryan Holtz
     Help provided by CD-i Fan
 
 

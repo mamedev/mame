@@ -7,7 +7,7 @@
     -------------------
 
     Preliminary driver by Angelo Salese
-    Improvements by Harmony
+    Improvements by Ryan Holtz
 
 
 *******************************************************************************

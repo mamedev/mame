@@ -5,7 +5,7 @@
     drivers/palm.c
     Palm (MC68328) emulation
 
-    Driver by MooglyGuy
+    Driver by Ryan Holtz
 
     Additional bug fixing by R. Belmont
 

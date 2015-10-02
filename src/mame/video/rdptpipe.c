@@ -6,7 +6,7 @@
     SGI/Nintendo Reality Display Texture Fetch Unit (TF)
     -------------------
 
-    by MooglyGuy
+    by Ryan Holtz
     based on initial C code by Ville Linde
     contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 

@@ -6,7 +6,7 @@
     SGI/Nintendo Reality Display Processor Blend Unit (BL)
     -------------------
 
-    by MooglyGuy
+    by Ryan Holtz
     based on initial C code by Ville Linde
     contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 

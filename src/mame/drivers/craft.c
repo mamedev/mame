@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/*\
-* * Linus Akesson's "Craft"
-* *
-* * Driver by MooglyGuy
-\*/
+/**********************************************************************
+
+ "Craft" demo platform by Linus Akesson
+
+ driver by Ryan Holtz
+
+ **********************************************************************/
 
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
