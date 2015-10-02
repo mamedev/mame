@@ -4454,7 +4454,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="aburner">
-		<description>Afterburner(Euro)</description>
+		<description>Afterburner (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4465,7 +4465,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="aburnera" cloneof="aburner">
-		<description>Afterburner(Euro, Alt)</description>
+		<description>Afterburner (Euro, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
