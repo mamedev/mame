@@ -8453,7 +8453,7 @@ COMP(19??, tpp311,     0,        0, tpp311,     msx2,     driver_device, 0, "Tal
 COMP(19??, tps312,     0,        0, tps312,     msx2,     driver_device, 0, "Talent", "TPS-312 (MSX2)", 0)
 COMP(1986, hx23,       hx23i,    0, hx23,       msx2,     driver_device, 0, "Toshiba", "HX-23 (MSX2)", 0)
 COMP(1986, hx23f,      hx23i,    0, hx23f,      msx2,     driver_device, 0, "Toshiba", "HX-23F (MSX2)", 0)
-COMP(190?, hx23i,      0,        0, hx23i,      msx2,     driver_device, 0, "Toshiba", "HX-23I (MSX2)", 0)
+COMP(19??, hx23i,      0,        0, hx23i,      msx2,     driver_device, 0, "Toshiba", "HX-23I (MSX2)", 0)
 COMP(1985, hx33,       0,        0, hx33,       msx2jp,   driver_device, 0, "Toshiba", "HX-33 (MSX2)", 0)
 COMP(1985, hx34,       hx34i,    0, hx34,       msx2jp,   driver_device, 0, "Toshiba", "HX-34 (MSX2)", 0)
 COMP(1985, hx34i,      0,        0, hx34i,      msx,      driver_device, 0, "Toshiba", "HX-34I (MSX2)", 0)
