@@ -729,6 +729,7 @@ a4000tn
 c65    // 1991 C65 / C64DX (Prototype, NTSC)
 c64dx    // 1991 C65 / C64DX (Prototype, German PAL)
 
+mps1000 // 1986 Commodore MPS-1000 (dot matrix printer)
 mps1230 // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
 
 // Epson
