@@ -10,17 +10,20 @@
     Improvements by Pierpaolo Prazzoli, David Haywood, Angelo Salese
 
     todo:
-    finish
+    both games
         - correct roz rotation;
-        - make cntsteer work, comms looks awkward and probably different than Zero Target;
         - flip screen support;
         - according to a side-by-side test, sound should be "darker" by some octaves,
           likely that a sound filter is needed;
+    cntsteer specific:
+    	- proper bus request support, starting from understanding the role of DP register in M6809 core 
+	  (having that returning non-zero in NMI for subcpu forces a reset?);
+	- Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol.
+	- understand who's master and who's slave between "back" and "mix" CPUs (order might be actually inverted);
+	- understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging);
     cleanup
         - split into driver/video;
 
-    note: To boot cntsteer, set a CPU #1 breakpoint on c225 and then 'do pc=c230'.
-          Protection maybe?
 
 ***************************************************************************************/
 
