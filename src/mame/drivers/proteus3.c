@@ -13,7 +13,7 @@
     6820 (PIA for Keyboard and video
     6844 DMA
     MC14411 baud rate generator
-    CRT96364 CRTC
+    CRT96364 CRTC @1008kHz
 
     To Do:
     - Everything
@@ -116,6 +116,33 @@ ROM_START(proteus3)
 
 	ROM_REGION(0x400, "chargen", 0)
 	ROM_LOAD( "proteus3_font.m25",   0x0000, 0x0400, CRC(6a3a30a5) SHA1(ab39bf09722928483e497b87ac2dbd870828893b) )
+
+	ROM_REGION(0xf000, "user1", 0) // roms not used yet
+	// Proteus III - pbug
+	ROM_LOAD( "proteus3_pbug.bin", 0x0000, 0x0800, CRC(1118694d) SHA1(2dfc08d405e8f2936f5b0bd1c4007995151abbba) )
+	// Proteus III - 14k basic - single-rom
+	ROM_LOAD( "proteus3_basic14k.bin", 0x0800, 0x3800, CRC(e0626ff5) SHA1(755e8c1aa71342a0f78ff3ba8b93d038b5b1301e) )
+	// Proteus III - 14k basic - split roms
+	ROM_LOAD( "bas1.bin",     0x4000, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3) )
+	ROM_LOAD( "bas2.bin",     0x4800, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7) )
+	ROM_LOAD( "bas3.bin",     0x5000, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34) )
+	ROM_LOAD( "bas4.bin",     0x5800, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2) )
+	ROM_LOAD( "bas5.bin",     0x6000, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42) )
+	ROM_LOAD( "bas6.bin",     0x6800, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398) )
+	ROM_LOAD( "bas7.bin",     0x7000, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776) )
+	// Micro-Systemes I - 8k basic - single rom
+	ROM_LOAD( "ms1_basic8k.bin", 0x7800, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9) )
+	// Micro-Systemes I - 8k basic - split roms
+	ROM_LOAD( "eprom1",       0xa000, 0x0480, CRC(de20c8a2) SHA1(2c62410888c8418990ff773578d350358e73b505) )
+	ROM_LOAD( "eprom1b",      0xa800, 0x0480, CRC(a168830c) SHA1(c39dd955295b1b18e21374d0bc361fb95f8767cd) )
+	ROM_LOAD( "eprom2",       0xb000, 0x0480, CRC(fa13fa1e) SHA1(f5e5aab9dc2eecdb587520bcac8a61eb10b96ba2) )
+	ROM_LOAD( "eprom3",       0xb800, 0x0480, CRC(6fbf88d1) SHA1(d949159c8a7201b38fae5955e8a79fac9beb873c) )
+	ROM_LOAD( "eprom4",       0xc000, 0x0480, CRC(84e0d659) SHA1(d49119d8338ce060e10c43f5c3ada792de48bf68) )
+	ROM_LOAD( "eprom5",       0xc800, 0x0480, CRC(e550fb62) SHA1(ebef2e3f76eeca422c896e186cc6ad82185c1db9) )
+	ROM_LOAD( "eprom6",       0xd000, 0x0480, CRC(c816d374) SHA1(b56db1e673273bc5cc4d5efaa257314d11d9b625) )
+	ROM_LOAD( "eprom7",       0xd800, 0x0480, CRC(d863a23f) SHA1(f23b0d5e81f85890f50fda5778adc86354330a7f) )
+	ROM_LOAD( "eprom8",       0xe000, 0x0480, CRC(034f2295) SHA1(80916c2fcd38ce474d47c75e82f1c5e578fb5f26) )
+	ROM_LOAD( "eprom8b",      0xe800, 0x0480, CRC(b8144b85) SHA1(ee0d6f495f52d2dc846d8d29cf37c72454ddd6c2) )
 ROM_END
 
 
