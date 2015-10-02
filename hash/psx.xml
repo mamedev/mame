@@ -13312,7 +13312,7 @@ A few comments on these:
 		<rom name="Picnic! Excellent (Japan) [SLPS-01345].bin" size="116066496" crc="f8014d99" />
 		<rom name="Picnic! Excellent (Japan) [SLPS-01345].cue" size="230" crc="b11fbc2e" />
 		-->
-		<description>Pikinya! Excellent(Japan)</description>
+		<description>Pikinya! Excellent (Japan)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ピキーニャ エクセレンテ"/>
@@ -19604,7 +19604,7 @@ A few comments on these:
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].bin" size="708417696" crc="312b7d05" />
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].cue" size="131" crc="54b7c369" />
 		-->
-		<description>Yuusha-Ou GaoGaiGar - Blockaded Numbers(Japan)</description>
+		<description>Yuusha-Ou GaoGaiGar - Blockaded Numbers (Japan)</description>
 		<year>1999</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="勇者王ガオガイガー"/>
