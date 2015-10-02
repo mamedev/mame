@@ -820,6 +820,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_DEVICE_ADD("i8271" , I8271 , 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
 	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_state, motor_w))
+	MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_state, side_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_525sd)
 	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_525sd)
 
