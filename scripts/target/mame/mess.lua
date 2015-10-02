@@ -2706,6 +2706,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/plan80.c",
 	MAME_DIR .. "src/mame/drivers/pm68k.c",
 	MAME_DIR .. "src/mame/drivers/poly.c",
+	MAME_DIR .. "src/mame/drivers/proteus3.c",
 	MAME_DIR .. "src/mame/drivers/pt68k4.c",
 	MAME_DIR .. "src/mame/drivers/ptcsol.c",
 	MAME_DIR .. "src/mame/drivers/pulsar.c",
