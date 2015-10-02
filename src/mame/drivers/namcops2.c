@@ -32,7 +32,7 @@ Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  H
 Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  Test mode shows 2.00E with same HDD 2.03J; HDD: Maxtor Fireball 3 30GB 2F030L0
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
-Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires 'FCA2 PCB' for IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
+Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires unknown I/O PCB for IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
 Dragon Chronicles (satellite)................... ------X *DCO31-TS CD0        *CD           NM00020   DC001 Ver.A            Namco 2002                    \
 Dragon Chronicles Legend of the Master Ark (sat) ------X *DGC11 CD0           *CD          *NM00014  *DGC11 Ver.A1           Namco 200?                    | server is a custom PC
 Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    |
@@ -484,6 +484,9 @@ ZUW1R51212 - Cosel ZUW1R51212 DC to DC Power Supply Module (input 9-18VDC, outpu
 This PCB is used with Vampire Night and Time Crisis 3 (DX projector-screen version on System 246B/C)
 It's also used with Crisis Zone (on System 23 Evolution2)
 Note this board requires a CCD camera gun sensor.
+Note: None of the I/O PCBs listed here in this src file will work with Cobra The Arcade. 
+Cobra The Arcade uses IR guns and IR sensors. The game will boot with several I/O boards but in the test mode in
+'I/O TEST' the I/O board is reported as 'NG'. Therefore the I/O board for Cobra The Arcade is currently unknown.
 
 
 Digital & Analog I/O boards
@@ -496,10 +499,10 @@ FCA PCB
 FCA2(B) PCB
 8662969200 (8662979100)
 |---------------------------------------------------|
-| J101                J106                          |
+| J101         3771         J106                    |
 |            4.9152MHz                              |
-|    DSW(6)                                         |
-| LED2              |-----|                         |
+|    DSW(6)               D1017 D1017 D1017 D1017   |
+| LED2              |-----|  D1017 D1017 D1017 D1017|
 |                   | MCU |                         |
 |     LEDS3-10      |     |                         |
 |  PIC16F84         |-----|                         |
@@ -517,14 +520,48 @@ Notes:
   PIC16F84 - Microchip PIC16F84 PIC with sticker 'FCAP11' (SOIC20)
        MCU - Fujitsu MB90F574 Microcontroller with sticker 'FCAF11' (QFP120)
     ADM485 - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
+     D1017 - D1017 transistor (8 parts populated)
 
-This PCB is used with Ridge Racer V and Wangan Midnight and will also work with most of the
-System 246 games when wired to suit those games.
+This PCB is used with Ridge Racer V and Wangan Midnight.
 The FCA2(B) PCB is pb-free but otherwise identical to FCA PCB.
 
-FCB PCB
--------
-[to-do]
+
+V290 FCB PCB
+2582960101 (2582970101)
+|---------------------------------------------------|
+| J101 ADM231L    3771 J108    J106                 |
+|            4.9152MHz                              |
+|    DSW(6)                X     X     X    D1017   |
+| LED2              |-----|   X     X    D1017 D1017|
+|                   | MCU |                         |
+|     LEDS3-10      |     |                         |
+|  PIC16F84         |-----|                         |
+|   JP1 LED1                           ADM485       |
+|                                       J204        |
+|                     J102                          |
+|---------------------------------------------------|
+Notes:
+      J101 - 6 pin connector for power input
+      J102 - 60 pin flat cable connector
+      J104 - 5 pin connector (not populated)
+      J204 - USB-B connector (also wired in-line with J104. Note the signal is still the 
+             normal Namco communication signal; i.e. RS485)
+      J106 - 30 pin flat cable connector
+      J108 - 4 pin connector
+       JP1 - 3 pin jumper position (not populated)
+      3771 - Fujitsu MB3771 System Reset IC (SOIC8)
+  PIC16F84 - Microchip PIC16F84 PIC without sticker (SOIC20)
+       MCU - Fujitsu MB90F574 Microcontroller with sticker 'FCB1 IO 0B'
+    ADM485 - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
+     D1017 - D1017 transistor (X = 5 parts not populated)
+   ADM231L - Analog Devices ADM231L RS-232 Driver/Receiver (SOIC16)
+
+V290 FCB PCB is almost identical to FCA PCB. The main differences are changed internal MCU code & PIC code,
+some extra/different connectors, less D1017 driver transistors and an added RS-232 IC.
+The V290 FCB PCB is used with touchscreen games such as Dragon Chronicles, Druaga Online, Idol Master etc. 
+It supports a serial touchscreen interface, card readers and buttons.
+The additional devices are supported via J108 which connects to another PCB 'XOU020-A' which contains a 
+Texas Instruments TMS32VC540x DSP, TSOP32 flash ROM and other components.
 
 
 System246 JAMMA(B) PCB
