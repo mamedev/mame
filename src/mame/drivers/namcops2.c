@@ -488,9 +488,13 @@ Note this board requires a CCD camera gun sensor.
 
 Digital & Analog I/O boards
 ---------------------------
-
+1st Revsion
 FCA PCB
 8662969102 (8662979102)
+
+2nd Revision
+FCA2(B) PCB
+8662969200 (8662979100)
 |---------------------------------------------------|
 | J101                J106                          |
 |            4.9152MHz                              |
@@ -516,10 +520,7 @@ Notes:
 
 This PCB is used with Ridge Racer V and Wangan Midnight and will also work with most of the
 System 246 games when wired to suit those games.
-
-FCA2 PCB
---------
-[to-do]
+The FCA2(B) PCB is pb-free but otherwise identical to FCA PCB.
 
 FCB PCB
 -------
