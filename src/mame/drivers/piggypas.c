@@ -10,79 +10,154 @@ game details unknown
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
+#include "video/hd44780.h"
+
+#include "piggypas.lh"
 
 class piggypas_state : public driver_device
 {
 public:
 	piggypas_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_ticket(*this, "ticket")
 	{ }
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
+	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
+	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
+
+	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<ticket_dispenser_device> m_ticket;
+	UINT8   m_ctrl;
+	UINT8   m_digit_idx;
 };
 
 
+
+WRITE8_MEMBER(piggypas_state::ctrl_w)
+{
+	if ((m_ctrl ^ data) & m_ctrl & 0x04)
+		m_digit_idx = 0;
+
+	m_ticket->write(space, 0, (data & 0x40) ? 0x80 : 0);
+
+	m_ctrl = data;
+}
+
+WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
+{
+	output_set_digit_value(m_digit_idx++, BITSWAP8(data,7,6,4,3,2,1,0,5) & 0x7f);
+}
 
 static ADDRESS_MAP_START( piggypas_map, AS_PROGRAM, 8, piggypas_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( piggypas_io, AS_IO, 8, piggypas_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+
+	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+
+	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN1")
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ctrl_w)
+	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("IN0")
+
+	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("hd44780", hd44780_device, write)
+	AM_RANGE(0x1802, 0x1803) AM_DEVREAD("hd44780", hd44780_device, read)
+
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READ_PORT("IN2")
+ADDRESS_MAP_END
+
+
+INPUT_CHANGED_MEMBER(piggypas_state::ball_sensor)
+{
+	m_maincpu->set_input_line(1, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+CUSTOM_INPUT_MEMBER(piggypas_state::ticket_r)
+{
+	return m_ticket->line_r();
+}
 
 static INPUT_PORTS_START( piggypas )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN4)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, piggypas_state, ticket_r, NULL)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Gate sensor")   PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN1)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_NAME("Decrease")   PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_NAME("Exit")       PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_NAME("Last")       PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_NAME("Run")        PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_NAME("Increase")   PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_NAME("Enter")      PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_NAME("Next")       PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE)  PORT_NAME("Program")
+
+	PORT_START("IN2")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, piggypas_state, ball_sensor, 0) // ball sensor
 INPUT_PORTS_END
 
 
 
 void piggypas_state::machine_start()
 {
+	m_maincpu->i8051_set_serial_tx_callback(WRITE8_DELEGATE(piggypas_state, mcs51_tx_callback));
 }
 
 void piggypas_state::machine_reset()
 {
+	m_digit_idx = 0;
+}
+
+static HD44780_PIXEL_UPDATE(piggypas_pixel_update)
+{
+	if (pos < 8)
+		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
 static MACHINE_CONFIG_START( piggypas, piggypas_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000) // wrong CPU? (not valid Z80 code)
+	MCFG_CPU_ADD("maincpu", I8031, 8000000) // unknown variant
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
+	MCFG_CPU_IO_MAP(piggypas_io)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
+
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
+	MCFG_SCREEN_SIZE(16*6, 8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-1, 0, 8-1)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_DEFAULT_LAYOUT(layout_piggypas)
+
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(1, 16)
+	MCFG_HD44780_PIXEL_UPDATE_CB(piggypas_pixel_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
 
