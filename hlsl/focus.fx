@@ -76,7 +76,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 TargetTexelDims = 1.0f / TargetDims;
+	float2 ScreenTexelDims = 1.0f / ScreenDims;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
@@ -88,13 +88,13 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord0 = TexCoord;
-	Output.TexCoord1 = TexCoord + Coord1Offset * TargetTexelDims * Defocus;
-	Output.TexCoord2 = TexCoord + Coord2Offset * TargetTexelDims * Defocus;
-	Output.TexCoord3 = TexCoord + Coord3Offset * TargetTexelDims * Defocus;
-	Output.TexCoord4 = TexCoord + Coord4Offset * TargetTexelDims * Defocus;
-	Output.TexCoord5 = TexCoord + Coord5Offset * TargetTexelDims * Defocus;
-	Output.TexCoord6 = TexCoord + Coord6Offset * TargetTexelDims * Defocus;
-	Output.TexCoord7 = TexCoord + Coord7Offset * TargetTexelDims * Defocus;
+	Output.TexCoord1 = TexCoord + Coord1Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord2 = TexCoord + Coord2Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord3 = TexCoord + Coord3Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord4 = TexCoord + Coord4Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord5 = TexCoord + Coord5Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord6 = TexCoord + Coord6Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord7 = TexCoord + Coord7Offset * ScreenTexelDims * Defocus;
 
 	Output.Color = Input.Color;
 

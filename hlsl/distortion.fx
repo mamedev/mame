@@ -112,8 +112,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Post-Processing Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float2 DefaultScreenRatio = float2(1.0f, 3.0f / 4.0f); // normalized screen ratio (defalt ratio of 4:3)
-
 uniform float CurvatureAmount = 0.0f;
 uniform float RoundCornerAmount = 0.0f;
 uniform float SmoothBorderAmount = 0.5f;
@@ -159,9 +157,8 @@ float GetSpotAddend(float2 coord, float amount)
 {
 	float2 RatioCorrection = GetRatioCorrecton();
 
-	float2 defaultScreenRatio = xor(OrientationSwapXY, RotationSwapXY)
-		? DefaultScreenRatio.yx
-		: DefaultScreenRatio.xy;
+	// normalized screen quad ratio
+	float2 QuadRatio = float2 (1.0f, QuadDims.y / QuadDims.x);
 
 	// upper right quadrant
 	float2 spotOffset =
@@ -174,7 +171,9 @@ float GetSpotAddend(float2 coord, float amount)
 					: float2(-0.25f, 0.25f);
 
 	float2 SpotCoord = coord;
-	SpotCoord += spotOffset * defaultScreenRatio * RatioCorrection;
+	SpotCoord += spotOffset * RatioCorrection;
+	SpotCoord *= QuadRatio;
+	SpotCoord /= RatioCorrection;
 
 	float SpotBlur = amount;
 
@@ -274,13 +273,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// // BaseCoord.x += (TexCoord.x > 0.5f ? +0.5f : 0.0f);
 	// BaseCoord.y += (TexCoord.y > 0.5 ? +0.5f : 0.0f);
 
-	float2 defaultScreenRatio = xor(OrientationSwapXY, RotationSwapXY)
-		? DefaultScreenRatio.yx
-		: DefaultScreenRatio.xy;
-
-	float2 BaseRatioCoordCentered = BaseCoordCentered;
-	BaseRatioCoordCentered *= defaultScreenRatio;
-
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
@@ -294,8 +286,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Light Reflection Simulation
 	float3 LightColor = float3(1.0f, 0.90f, 0.80f);
 
-	float2 SpotCoord = BaseRatioCoordCentered;
-	float2 NoiseCoord = BaseRatioCoordCentered;
+	float2 SpotCoord = BaseCoordCentered;
+	float2 NoiseCoord = BaseCoordCentered;
 
 	float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount);
 	float NoiseFactor = GetNoiseFactor(SpotAddend, random(NoiseCoord));
