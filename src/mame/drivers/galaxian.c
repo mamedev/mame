@@ -12,7 +12,7 @@
     a CPU section, a sound section, and a video section.
 
     The CPU section is based around a Z80 (though there are modified
-    designed that changed this to an S2650). The base galaxian hardware
+    designs that changed this to an S2650). The base galaxian hardware
     is designed to allow access to up to 16k of program ROM and 2k of
     working RAM.
 
@@ -10854,8 +10854,8 @@ GAME( 1982, tenspot,     0,        tenspot,    tenspot,    galaxian_state, tensp
 GAME( 1984, devilfsg,    devilfsh, pacmanbl,   devilfsg,   galaxian_state, devilfsg,   ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", MACHINE_SUPPORTS_SAVE )
 
 /* sound hardware replaced with AY8910 */
-GAME( 1982, zigzag,      0,        zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // maybe by Taito do Brasil?
-GAME( 1982, zigzag2,     zigzag,   zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1982, zigzag,      0,        zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "Taito do Brasil (LAX Alias?)", "Zig Zag (Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zigzag2,     zigzag,   zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "Taito do Brasil (LAX Alias?)", "Zig Zag (Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    galaxian_state, gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -10889,6 +10889,7 @@ GAME( 1980, eagle3,      mooncrst, mooncrst,   mooncrsa,   galaxian_state, moonc
 GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, mooncrsu,   ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, mooncrsu,   ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, mooncrsu,   ROT90,  "bootleg (Petaco S.A.)", "Moon Cresta (Petaco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+// there may be an alternate version called "Star Crest" according to flyers; is it the same?
 GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, mooncrsu,   ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, mooncrsu,   ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -10912,6 +10913,7 @@ GAME( 1982, skybase,     0,        mooncrst,   skybase,    galaxian_state, skyba
 GAME( 198?, kong,        0,        mooncrst,   kong,       galaxian_state, kong,       ROT90,  "Taito do Brasil", "Kong (Donkey Kong conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
+// there may be an alternate version called "Fantasy" according to flyers; is it the same?
 GAME( 198?, fantastc,    0,        fantastc,   fantastc,   galaxian_state, fantastc,   ROT90,  "Taito do Brasil", "Fantastic (Galaga conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
 
 /* like fantastc, plus larger spriteram, and maybe different bullet hw(?) */
