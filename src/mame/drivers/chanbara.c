@@ -150,6 +150,7 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 1) << 8);
 	int color = (m_colorram[tile_index] >> 1) & 0x1f;
+	//int flipy = (m_colorram[tile_index]) & 0x01; // not on this layer (although bit is used)
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -158,8 +159,9 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
 {
 	int code = m_videoram2[tile_index];
 	int color = (m_colorram2[tile_index] >> 1) & 0x1f;
+	int flipy = (m_colorram2[tile_index]) & 0x01;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, TILE_FLIPXY(flipy));
 }
 
 void chanbara_state::video_start()
@@ -343,7 +345,7 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( chanbara )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x80, 16 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x80, 16 )
 
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
 GFXDECODE_END
@@ -437,18 +439,18 @@ ROM_START( chanbara )
 	ROM_REGION( 0x08000, "gfx4", 0 )
 	ROM_LOAD( "cp14.13h",       0x00000, 0x2000, CRC(d31db368) SHA1(b62834137bfe4ac2013d2d16b0ead10bf2a2df83) )
 
-	ROM_REGION( 0x24000, "gfx2", 0 )
-	ROM_LOAD( "cp03.12c",     0x08000, 0x4000, CRC(dea247fb) SHA1(d54fa30813613ef6c3b5f86b563e9ab618a9f627))
-	ROM_LOAD( "cp04.10c",     0x04000, 0x4000, CRC(f7dce87b) SHA1(129ae41d70d96720e020ec1bc1d3f2d9e87ebf47) )
+	ROM_REGION( 0x30000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "cp05.9c",      0x00000, 0x4000, CRC(df2dc3cb) SHA1(3505042c91566bb09fcd2102fecbe2034551b8eb) )
+	ROM_LOAD( "cp04.10c",     0x04000, 0x4000, CRC(f7dce87b) SHA1(129ae41d70d96720e020ec1bc1d3f2d9e87ebf47) )
+	ROM_LOAD( "cp03.12c",     0x08000, 0x4000, CRC(dea247fb) SHA1(d54fa30813613ef6c3b5f86b563e9ab618a9f627))
 
-	ROM_LOAD( "cp06.7c",     0x14000, 0x4000,  CRC(2f337c08) SHA1(657ee6776780fa0a979a278ff27a49b459232cad) )
-	ROM_LOAD( "cp07.6c",     0x10000, 0x4000, CRC(0e3727f2) SHA1(d177651bc20a56f5651ae5ce6f3d3ff7ad0e2053) )
-	ROM_LOAD( "cp08.5c",     0x0c000, 0x4000, CRC(4cf35192) SHA1(1891dcc412caf72ba5a2ea56c1cab35cb3ae6123) )
+	ROM_LOAD( "cp08.5c",     0x10000, 0x4000, CRC(4cf35192) SHA1(1891dcc412caf72ba5a2ea56c1cab35cb3ae6123) )
+	ROM_LOAD( "cp07.6c",     0x14000, 0x4000, CRC(0e3727f2) SHA1(d177651bc20a56f5651ae5ce6f3d3ff7ad0e2053) )
+	ROM_LOAD( "cp06.7c",     0x18000, 0x4000,  CRC(2f337c08) SHA1(657ee6776780fa0a979a278ff27a49b459232cad) )
 
-	ROM_LOAD( "cp09.4c",     0x20000, 0x4000, CRC(3f58b647) SHA1(4eb212667aedd7c397a4911ac7f1b542c5c0a70d) )
-	ROM_LOAD( "cp10.2c",     0x1c000, 0x4000, CRC(bfa324c0) SHA1(c7ff09bb5f1dd2d3707970fae1fd60b6004250c0) )
-	ROM_LOAD( "cp11.1c",     0x18000, 0x4000, CRC(33e6160a) SHA1(b0171b554825072eebe935d12a6085d158b87bdc) )
+	ROM_LOAD( "cp11.1c",     0x20000, 0x4000, CRC(33e6160a) SHA1(b0171b554825072eebe935d12a6085d158b87bdc) )
+	ROM_LOAD( "cp10.2c",     0x24000, 0x4000, CRC(bfa324c0) SHA1(c7ff09bb5f1dd2d3707970fae1fd60b6004250c0) )
+	ROM_LOAD( "cp09.4c",     0x28000, 0x4000, CRC(3f58b647) SHA1(4eb212667aedd7c397a4911ac7f1b542c5c0a70d) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "cp17.4k", 0x0000, 0x0100, CRC(cf03706e) SHA1(2dd2b29067f418ec590c56a38cc64d09d8dc8e09) ) /* red */
