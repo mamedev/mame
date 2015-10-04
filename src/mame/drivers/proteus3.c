@@ -15,8 +15,16 @@
     MC14411 baud rate generator
     CRT96364 CRTC @1008kHz
 
+    There's an undumped 74S287 prom (M24) in the video section.
+    It converts ascii control codes into the crtc control codes
+
+    Schematic has lots of errors and omissions.
+
     To Do:
-    - Everything
+    - Storage
+    - Need software
+    - Need missing PROM, so that all the CRTC controls can be emulated
+    - Hook up other roms as extra bios sets
 
 ******************************************************************************/
 
@@ -39,8 +47,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	UINT32 screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
 	UINT8 m_video_data;
+	UINT8 m_flashcnt;
+	UINT16 m_curs_pos;
+	UINT8 *m_p_chargen;
+	UINT8 *m_p_videoram;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
@@ -76,6 +90,8 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( proteus3_state::kbd_put )
 {
+	if (data == 0x08)
+		data = 0x0f; // take care of backspace
 	m_pia->portb_w(data);
 	m_pia->cb1_w(1);
 	m_pia->cb1_w(0);
@@ -89,11 +105,113 @@ WRITE8_MEMBER( proteus3_state::video_w )
 WRITE_LINE_MEMBER( proteus3_state::ca2_w )
 {
 	if (state)
-		printf("%c", m_video_data);
+	{
+		switch(m_video_data)
+		{
+			case 0x0a: // Line Feed
+				if (m_curs_pos > 959) // off the bottom?
+				{
+					memmove(m_p_videoram, m_p_videoram+64, 960); // scroll
+					memset(m_p_videoram+960, 0x20, 64); // blank bottom line
+				}
+				else
+					m_curs_pos += 64;
+				break;
+			case 0x0d: // Carriage Return
+				m_curs_pos &= 0x3c0;
+				break;
+			case 0x0c: // CLS
+				m_curs_pos = 0; // home cursor
+				memset(m_p_videoram, 0x20, 1024); // clear screen
+				break;
+			case 0x0f: // Cursor Left
+				if (m_curs_pos)
+					m_curs_pos--;
+				break;
+			case 0x7f: // Erase character under cursor
+				m_p_videoram[m_curs_pos] = 0x20;
+				break;
+			default: // If a displayable character, show it
+				if ((m_video_data > 0x1f) && (m_video_data < 0x7f))
+				{
+					m_p_videoram[m_curs_pos] = m_video_data;
+					m_curs_pos++;
+					if (m_curs_pos > 1023) // have we run off the bottom?
+					{
+						m_curs_pos -= 64;
+						memmove(m_p_videoram, m_p_videoram+64, 960); // scroll
+						memset(m_p_videoram+960, 0x20, 64); // blank bottom line
+					}
+				}
+		}
+	}
 }
+
+UINT32 proteus3_state::screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+	m_flashcnt++;
+
+	for(y = 0; y < 16; y++ )
+	{
+		for (ra = 0; ra < 12; ra++)
+		{
+			UINT16 *p = &bitmap.pix16(sy++);
+
+			for (x = ma; x < ma + 64; x++)
+			{
+				gfx = 0;
+				if (ra < 8)
+				{
+					chr = m_p_videoram[x]; // get char in videoram
+					gfx = m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
+				}
+				else
+				if ((ra == 9) && (m_curs_pos == x) && BIT(m_flashcnt, 4))
+					gfx = 0xff;
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 7);
+			}
+		}
+		ma+=64;
+	}
+	return 0;
+}
+
+
+/* F4 Character Displayer */
+static const gfx_layout charlayout =
+{
+	8, 8,                  /* 8 x 8 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8                    /* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( proteus3 )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
+GFXDECODE_END
+
 
 void proteus3_state::machine_reset()
 {
+	m_p_chargen = memregion("chargen")->base();
+	m_p_videoram = memregion("vram")->base();
+	m_curs_pos = 0;
 }
 
 
@@ -106,6 +224,16 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz)  /* Divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(proteus3_mem)
 
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(200))
+	MCFG_SCREEN_SIZE(64*8, 16*12)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*12-1)
+	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", proteus3)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus3_state, video_w))
@@ -130,7 +258,12 @@ ROM_START(proteus3)
 	ROM_RELOAD( 0xc000, 0x2000 )
 
 	ROM_REGION(0x400, "chargen", 0)
-	ROM_LOAD( "proteus3_font.m25",   0x0000, 0x0400, CRC(6a3a30a5) SHA1(ab39bf09722928483e497b87ac2dbd870828893b) )
+	ROM_LOAD( "proteus3_font.m25",   0x0200, 0x0100, CRC(6a3a30a5) SHA1(ab39bf09722928483e497b87ac2dbd870828893b) )
+	ROM_CONTINUE( 0x100, 0x100 )
+	ROM_CONTINUE( 0x300, 0x100 )
+	ROM_CONTINUE( 0x000, 0x100 )
+
+	ROM_REGION(0x400, "vram", ROMREGION_ERASE00)
 
 	ROM_REGION(0xf000, "user1", 0) // roms not used yet
 	// Proteus III - pbug
