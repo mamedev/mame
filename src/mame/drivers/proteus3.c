@@ -24,6 +24,7 @@
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/keyboard.h"
 
 
 class proteus3_state : public driver_device
@@ -35,11 +36,11 @@ public:
 		, m_pia(*this, "pia")
 	{ }
 
-//	DECLARE_READ_LINE_MEMBER( proteus3_cb1_r );
-	DECLARE_READ8_MEMBER( proteus3_keyboard_r );
-//	DECLARE_WRITE_LINE_MEMBER( proteus3_cb2_w );
-//	DECLARE_WRITE8_MEMBER( proteus3_digit_w );
+	DECLARE_WRITE_LINE_MEMBER(ca2_w);
+	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
+	UINT8 m_video_data;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
@@ -73,6 +74,24 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(proteus3)
 INPUT_PORTS_END
 
+WRITE8_MEMBER( proteus3_state::kbd_put )
+{
+	m_pia->portb_w(data);
+	m_pia->cb1_w(1);
+	m_pia->cb1_w(0);
+}
+
+WRITE8_MEMBER( proteus3_state::video_w )
+{
+	m_video_data = data;
+}
+
+WRITE_LINE_MEMBER( proteus3_state::ca2_w )
+{
+	if (state)
+		printf("%c", m_video_data);
+}
+
 void proteus3_state::machine_reset()
 {
 }
@@ -89,18 +108,14 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	//MCFG_PIA_READPB_HANDLER(READ8(proteus3_state, proteus3_keyboard_r))
-	//MCFG_PIA_READCA1_HANDLER(READLINE(proteus3_state, proteus3_distance_r))
-	//MCFG_PIA_READCB1_HANDLER(READLINE(proteus3_state, proteus3_cb1_r))
-	//MCFG_PIA_READCA2_HANDLER(READLINE(proteus3_state, proteus3_fuel_sensor_r))
-	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus3_state, proteus3_segment_w))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(proteus3_state, proteus3_digit_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(proteus3_state, proteus3_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus3_state, video_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(proteus3_state, ca2_w))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 
 	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
 	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(proteus3_state, kbd_put))
 MACHINE_CONFIG_END
 
 
