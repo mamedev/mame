@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE16_MEMBER(imgfight_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(loht_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(dbreedm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(airduel_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(airduelm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
 	DECLARE_READ16_MEMBER(poundfor_trackball_r);
@@ -145,7 +145,7 @@ public:
 	DECLARE_DRIVER_INIT(gallop);
 	DECLARE_DRIVER_INIT(m72_8751);
 	DECLARE_DRIVER_INIT(dbreedm72);
-	DECLARE_DRIVER_INIT(airduel);
+	DECLARE_DRIVER_INIT(airduelm72);
 	DECLARE_DRIVER_INIT(nspirit);
 	DECLARE_DRIVER_INIT(loht);
 	DECLARE_DRIVER_INIT(imgfight);
