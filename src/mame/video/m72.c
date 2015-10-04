@@ -82,11 +82,6 @@ TILE_GET_INFO_MEMBER(m72_state::rtype2_get_fg_tile_info)
 }
 
 
-TILEMAP_MAPPER_MEMBER(m72_state::majtitle_scan_rows)
-{
-	/* logical (col,row) -> memory offset */
-	return row*256 + col;
-}
 
 
 /***************************************************************************
@@ -195,13 +190,8 @@ VIDEO_START_MEMBER(m72_state,hharryu)
 	m_bg_tilemap->set_scrolldy(-128,-128);
 }
 
-/* Major Title has a larger background RAM, and rowscroll */
-VIDEO_START_MEMBER(m72_state,majtitle)
+VIDEO_START_MEMBER(m72_state, m82_common)
 {
-// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
-// The layout ramains 256x64, the right half is just not displayed.
-//  m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,256,64);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::majtitle_scan_rows),this),8,8,128,64);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
@@ -216,15 +206,51 @@ VIDEO_START_MEMBER(m72_state,majtitle)
 
 	memset(m_buffered_spriteram,0,m_spriteram.bytes());
 
-	m_fg_tilemap->set_scrolldx(4,0);
-	m_fg_tilemap->set_scrolldy(-128,-128);
 
-	m_bg_tilemap->set_scrolldx(4,0);
-	m_bg_tilemap->set_scrolldy(-128,-128);
 
 	register_savestate();
 	save_item(NAME(m_majtitle_rowscroll));
 }
+
+/* Major Title has a larger background RAM, and rowscroll */
+// the Air Duel conversion on the same PCB does not, is it jumper selectable, or a register, or a different RAM chip?
+TILEMAP_MAPPER_MEMBER(m72_state::majtitle_scan_rows)
+{
+	/* logical (col,row) -> memory offset */
+	return row*256 + col;
+}
+
+VIDEO_START_MEMBER(m72_state,m82_large)
+{
+// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
+// The layout ramains 256x64, the right half is just not displayed.
+//  m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,256,64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::majtitle_scan_rows),this),8,8,128,64);
+
+	VIDEO_START_CALL_MEMBER(m82_common);
+
+	m_fg_tilemap->set_scrolldx(4,0);
+	m_fg_tilemap->set_scrolldy(-128,-128);
+	
+	m_bg_tilemap->set_scrolldx(4,0);
+	m_bg_tilemap->set_scrolldy(-128,-128);
+}
+
+VIDEO_START_MEMBER(m72_state, m82_small)
+{
+//  Air Duel expects the regular tilemap size
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+
+	VIDEO_START_CALL_MEMBER(m82_common);
+
+// why do the offsets also differ?
+	m_fg_tilemap->set_scrolldx(4,3);
+	m_fg_tilemap->set_scrolldy(-128,-128);
+
+	m_bg_tilemap->set_scrolldx(6-256,0);
+	m_bg_tilemap->set_scrolldy(-128,-128);
+}
+
 
 VIDEO_START_MEMBER(m72_state,hharry)
 {
