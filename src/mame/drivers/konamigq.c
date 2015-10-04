@@ -319,10 +319,10 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( konamigq_state::scsi_dma_read ), (konamigq_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( konamigq_state::scsi_dma_write ), (konamigq_state *) owner ) )
 
-	MCFG_CPU_ADD("soundcpu", M68000, 8000000)
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL_32MHz/4) /* 8MHz - measured */
 	MCFG_CPU_PROGRAM_MAP(konamigq_sound_map)
 
-	MCFG_CPU_ADD("dasp", TMS57002, 24000000/2)
+	MCFG_CPU_ADD("dasp", TMS57002, XTAL_48MHz/2) /* 24MHz - measured */
 	MCFG_CPU_DATA_MAP(konamigq_dasp_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(konamigq_state, tms_sync, 48000)
 
