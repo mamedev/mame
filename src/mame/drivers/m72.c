@@ -37,7 +37,34 @@ M82 - board made for Major Title, Z80 has a rom, no MCU
 	  * Some games were converted to run on this board,
 	  leaving the extra sprite HW unused.
 
-M84 - same as M82 but without the extra sprite hw??
+M84 -   2 PCB stack
+        functionally same as M82 but without the extra sprite hw??
+		
+		M84-A-A (bottom board)
+		supports
+		4 program roms
+		8 sprite roms
+		1 snd prg, 1 voice rom
+		CPUs and some customs etc.
+
+		M84-C-A (top board) (listed as for Hammering Harry)
+		4 tile roms (in a row)
+		6 larger chips with detail removed
+		etc.
+
+		M84-B-A (top board) (found on lightning swords, rtype 2)
+		4 tile roms (in a square)
+		various NANAO marked customs
+		KNA70H016(12)  NANAO 0201
+		KNA65005 17 NANAO 9048KS
+		KNA71H010(15) NANAO 0X2002
+		KNA72H010(14) NANAO 0Z2001
+		KNA71H009(13) NANAO 122001
+		KNA70H015(11) NANAO 092002
+		KNA91H014 NANAO 0Z2001V
+		etc.
+
+
 
 M85 - Pound for Pound uses this, possibly just M84 with
       a modified sound section?
@@ -53,22 +80,24 @@ X Multiply                         1989  M81                 N
 X Multiply                         1989  M72(1)              Y
 Dragon Breed                       1989  M81                 N
 Dragon Breed                       1989  M72                 Y
-R-Type II                          1989  M82/M84(2)          N
+R-Type II                          1989  M84-A-A + M84-B-A   N
 Major Title                        1990  M82-A-A + M82-B-A   N
 Hammerin' Harry (World ver)        1990  M81?                N
-Hammerin' H..(US)/ Daiku no Gensan 1990  M82? (or M84?)      N
+Hammerin' H..(US)/ Daiku no Gensan 1990  M84-A-A + M84-C-A   N
                    Daiku no Gensan 1990  M72(3)              Y
-Pound for Pound                    1990  MM85-A-B / M85-B    N
+Pound for Pound                    1990  MM85-A-B + M85-B    N
 Air Duel (World)                   1990  M82                 N
 Air Duel (Japan)                   1990  M72?                Y
 Cosmic Cop /                       1991  M84                 N
   Gallop - Armed Police Unit       1991  M72                 Y (sample playback only)
-Ken-Go                             1991  ?                  Encrypted
+Ken-Go / Lightning Swords          1991  M84-A-A + M84-B-A   Encrypted
 
 (1) different addressing PALs, so different memory map
-(2) rtype2j has M84 written on the board, but it's the same hardware as rtype2
 (3) normal M72 memory map, but IRQ vectors and sprite control as in X-Multiply
 
+ rtype2 has also been reported as running on M82, is it an official
+ conversion or not? we've only seen originals verified as M84, same for
+ Hammering Harry
 
 TODO:
 - majtitle_gfx_ctrl_w is unknown, it seems to be used to disable rowscroll,
@@ -2030,7 +2059,7 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(m72_state,poundfor)
+	MCFG_VIDEO_START_OVERRIDE(m72_state,hharryu)
 
 	MCFG_FRAGMENT_ADD(m72_audio_chips)
 MACHINE_CONFIG_END
@@ -3528,11 +3557,40 @@ ROM_START( ltswords )
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
 ROM_END
 
+
+
 ROM_START( kengo )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ken_d-h0.rom", 0x00001, 0x20000, CRC(f4ddeea5) SHA1(bcf016e40886e11c171f2f50de39ac0d8cabcdd1) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
 	ROM_LOAD16_BYTE( "ken_d-l0.rom", 0x00000, 0x20000, CRC(04dc0f81) SHA1(b296529f0bc26d53b344449dfa5a08eca70f30d8) )
+	ROM_RELOAD(                      0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "ken_d-sp.rom", 0x00000, 0x10000, CRC(233ca1cf) SHA1(4ebb6162773bd586a10016ccd77998a9b880f474) )
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "ken_m31.rom",  0x00000, 0x20000, CRC(e00b95a6) SHA1(6efcd8d58f8ebe3a42c60a0aa790b42c0e132777) )  /* sprites */
+	ROM_LOAD( "ken_m21.rom",  0x20000, 0x20000, CRC(d7722f87) SHA1(8606a53b8630934d2b5dfc986bd92ac4142f67e2) )
+	ROM_LOAD( "ken_m32.rom",  0x40000, 0x20000, CRC(30a844c4) SHA1(72b2caba3ee7a229ca56f004516dea8d3f0a7ba6) )
+	ROM_LOAD( "ken_m22.rom",  0x60000, 0x20000, CRC(a00dac85) SHA1(0c1ed852795046926f62843f6b256cbeecf9ebcf) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "ken_m51.rom",  0x00000, 0x20000, CRC(1646cf4f) SHA1(d240cb2bad3e766128e8e40aa7b1bf4f3b9a5559) )  /* tiles */
+	ROM_LOAD( "ken_m57.rom",  0x20000, 0x20000, CRC(a9f88d90) SHA1(c8d4a96fe55fed4b7499550f3c74b03d10306757) )
+	ROM_LOAD( "ken_m66.rom",  0x40000, 0x20000, CRC(e9d17645) SHA1(fbe18d6691686a1c458d4a91169c9850698b5ca7) )
+	ROM_LOAD( "ken_m64.rom",  0x60000, 0x20000, CRC(df46709b) SHA1(e7c2cd752e765bf7b8ff24637305d61031ce0baa) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
+ROM_END
+
+
+ROM_START( kengoa )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "KEN-D-H0-.IC55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) )
+	ROM_RELOAD(                      0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "KEN-D-L0-.IC61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c))
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -3609,4 +3667,5 @@ GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   driver_device, 0,     
 GAME( 1991, gallop,      cosmccop, m72,         gallop,   m72_state,     gallop,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, ltswords,    0,        kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengo,       ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M84-B-B ?
+GAME( 1991, kengo,       ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M84-B-B ?
+GAME( 1991, kengoa,      ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
