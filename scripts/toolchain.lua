@@ -198,10 +198,10 @@ function toolchain(_buildDir, _subDir)
 -- work around GCC 4.9.2 not having proper linker for LTO=1 usage
 			local version_4_ar = str_to_version(_OPTIONS["gcc_version"])
 			if (version_4_ar < 50000) then
-				premake.gcc.ar  = "$(MINGW32)/bin/i686-w64-mingw32-ar"
+				premake.gcc.ar  = "$(MINGW32)/bin/ar"
 			end
 			if (version_4_ar >= 50000) then
-				premake.gcc.ar  = "$(MINGW32)/bin/i686-w64-mingw32-gcc-ar"
+				premake.gcc.ar  = "$(MINGW32)/bin/gcc-ar"
 			end
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw32-gcc")
 		end
@@ -215,10 +215,10 @@ function toolchain(_buildDir, _subDir)
 -- work around GCC 4.9.2 not having proper linker for LTO=1 usage
 			local version_4_ar = str_to_version(_OPTIONS["gcc_version"])
 			if (version_4_ar < 50000) then
-				premake.gcc.ar  = "$(MINGW64)/bin/x86_64-w64-mingw32-ar"
+				premake.gcc.ar  = "$(MINGW64)/bin/ar"
 			end
 			if (version_4_ar >= 50000) then
-				premake.gcc.ar  = "$(MINGW64)/bin/x86_64-w64-mingw32-gcc-ar"
+				premake.gcc.ar  = "$(MINGW64)/bin/gcc-ar"
 			end
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw64-gcc")
 		end
