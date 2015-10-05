@@ -9,11 +9,21 @@ protection information by Nao
 
 board differences
 
-M72 - this is the original hardware, supports an MCU
+M72 - 3 board stack, 2 known variants
+
+      M72-B-D (bottom) / M72-A-C (middle) / M72-ROM-C (top)
+
+	  This is the original hardware used by R-type
       Z80 program uploaded to RAM rather than having a ROM
       each of the 2 tile layers uses it's own set of ROMs.
 	  Flip bits are with the tile num, so 0x3fff max tiles
 	  per layer
+
+	  M72-B-D (bottom) / M72-A-C (middle) / M72-C-A (top)
+
+	  This is used by all other M72 games, adds support
+	  for an I8751 MCU and sample playback
+
 
 M81 - revised hardware, Z80 uses a ROM, no MCU, same video
       system as M72 (some layer offsets - why?)
