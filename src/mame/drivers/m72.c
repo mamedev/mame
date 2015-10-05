@@ -7,6 +7,32 @@ IREM M72 board
 driver by Nicola Salmoria
 protection information by Nao
 
+board differences
+
+M72 - this is the original hardware, supports an MCU
+      Z80 program uploaded to RAM rather than having a ROM
+      each of the 2 tile layers uses it's own set of ROMs.
+	  Flip bits are with the tile num, so 0x3fff max tiles
+	  per layer
+
+M81 - revised hardware, Z80 uses a ROM, no MCU, same video
+      system as M72 (some layer offsets - why?)
+
+M82 - board made for Major Title, Z80 has a rom, no MCU
+      has an extra sprite layer, rowscroll, and a larger
+	  tilemap.  Tile data from both tile layers now comes
+	  from a single set of ROMs, flip bits moved to 2nd
+	  word meaning max of 0xffff tiles.
+
+	  * Some games were converted to run on this board,
+	  leaving the extra sprite HW unused.
+
+M84 - same as M82 but without the extra sprite hw??
+
+M85 - Pound for Pound uses this, possibly just M84 with
+      a modified sound section?
+
+
                                    Year Board                Protected?
 R-Type                             1987  M72                 N
 Battle Chopper / Mr. Heli          1987  M72                 Y
@@ -19,8 +45,9 @@ Dragon Breed                       1989  M81                 N
 Dragon Breed                       1989  M72                 Y
 R-Type II                          1989  M82/M84(2)          N
 Major Title                        1990  M82-A-A + M82-B-A   N
-Hammerin' Harry / Daiku no Gensan  1990  M82(3)              N
-                  Daiku no Gensan  1990  M72(4)              Y
+Hammerin' Harry (World ver)        1990  M81?                N
+Hammerin' H..(US)/ Daiku no Gensan 1990  M82? (or M84?)      N
+                   Daiku no Gensan 1990  M72(3)              Y
 Pound for Pound                    1990  MM85-A-B / M85-B    N
 Air Duel (World)                   1990  M82                 N
 Air Duel (Japan)                   1990  M72?                Y
@@ -30,8 +57,7 @@ Ken-Go                             1991  ?                  Encrypted
 
 (1) different addressing PALs, so different memory map
 (2) rtype2j has M84 written on the board, but it's the same hardware as rtype2
-(3) multiple versions supported, running on different hardware
-(4) normal M72 memory map, but IRQ vectors and sprite control as in X-Multiply
+(3) normal M72 memory map, but IRQ vectors and sprite control as in X-Multiply
 
 
 TODO:
@@ -50,6 +76,8 @@ TODO:
 
 IRQ controller
 --------------
+The IRQ controller is a UPD71059C 
+
 The initialization consists of one write to port 0x40 and multiple writes
 (2 or 3) to port 0x42. The first value written to 0x42 is the IRQ vector base.
 Cosmic Cop and Ken-Go have a V35 CPU with its own IRQ controller built in.
@@ -965,7 +993,7 @@ static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16, m72_state )
+static ADDRESS_MAP_START( m81_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1819,7 +1847,7 @@ static MACHINE_CONFIG_DERIVED( rtype, m72_base )
 	MCFG_DEVICE_REMOVE("dac")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xmultiplm72, m72_8751 )
+static MACHINE_CONFIG_DERIVED( m72_xmultipl, m72_8751 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xmultiplm72_map)
 
@@ -1832,7 +1860,7 @@ static MACHINE_CONFIG_DERIVED( xmultiplm72, m72_8751 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dbreedm72, m72_base )
+static MACHINE_CONFIG_DERIVED( m72_dbreed, m72_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dbreedm72_map)
 
@@ -1849,8 +1877,40 @@ static MACHINE_CONFIG_DERIVED( dkgenm72, m72 ) // dervices from 'm72' because we
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 MACHINE_CONFIG_END
 
+/****************************************** M81 ***********************************************/
 
+// M81 is closest to M72
+static MACHINE_CONFIG_DERIVED( m81_hharry, m72_base )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hharry_map)
+	MCFG_CPU_IO_MAP(m81_portmap)
 
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(sound_rom_map)
+	MCFG_CPU_IO_MAP(rtype2_sound_portmap)
+	MCFG_CPU_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55)
+
+	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
+
+	MCFG_VIDEO_START_OVERRIDE(m72_state,hharry)
+MACHINE_CONFIG_END
+
+// 'M81'
+static MACHINE_CONFIG_DERIVED( m81_xmultipl, m81_hharry )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(xmultipl_map)
+
+	MCFG_VIDEO_START_OVERRIDE(m72_state,xmultipl) // different offsets
+MACHINE_CONFIG_END
+
+// also 'M81' ? 
+static MACHINE_CONFIG_DERIVED( m81_dbreed, m81_xmultipl )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dbreed_map)
+MACHINE_CONFIG_END
+
+/****************************************** M82 / M84 ***********************************************/
 
 // Some R-Type 2s are M82? (conversion of Major Title?) others are M84?
 static MACHINE_CONFIG_START( rtype2, m72_state )
@@ -1891,40 +1951,8 @@ static MACHINE_CONFIG_DERIVED( hharryu, rtype2 )
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharryu)
 MACHINE_CONFIG_END
 
-// not m72, different video system (less tiles regions?)  (M84? M82?)
-static MACHINE_CONFIG_DERIVED( hharry, rtype2 )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hharry_map)
-	MCFG_CPU_IO_MAP(hharry_portmap)
-
-	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
-
-	MCFG_VIDEO_START_OVERRIDE(m72_state,hharry)
-MACHINE_CONFIG_END
 
 
-// 'M81'
-static MACHINE_CONFIG_DERIVED( xmultipl, rtype2 )
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xmultipl_map)
-	MCFG_CPU_IO_MAP(hharry_portmap)
-
-	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", m72)
-
-	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
-
-	MCFG_VIDEO_START_OVERRIDE(m72_state,xmultipl)
-MACHINE_CONFIG_END
-
-// also 'M81' ? 
-static MACHINE_CONFIG_DERIVED( dbreed, xmultipl )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dbreed_map)
-MACHINE_CONFIG_END
 
 /* Major Title uses 
 
@@ -2910,8 +2938,7 @@ ROM_START( dbreed )
 	ROM_LOAD( "db_k802m.20", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
 	ROM_LOAD( "db_k803m.30", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
 
-	ROM_REGION( 0x080000, "gfx2", ROMREGION_ERASE00 )
-	// if this set (dbreed) and xmultipl really are the same PCB (M81) then these roms need to be duplicated here?
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_ERASE00 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
 	ROM_LOAD( "db_k804m.a0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles */
 	ROM_LOAD( "db_k805m.a1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.a2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
@@ -2946,7 +2973,7 @@ ROM_START( dbreedm72 )
 	ROM_LOAD( "db_k802m.20", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
 	ROM_LOAD( "db_k803m.30", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_REGION( 0x080000, "gfx2", 0 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
 	ROM_LOAD( "db_k804m.a0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles #1 */
 	ROM_LOAD( "db_k805m.a1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.a2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
@@ -3149,6 +3176,12 @@ ROM_START( hharry )
 	ROM_LOAD( "hh_a1.rom",    0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
 	ROM_LOAD( "hh_a2.rom",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
 	ROM_LOAD( "hh_a3.rom",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 ) // if this is an M81 PCB then these need to be duplicated here, verify
+	ROM_LOAD( "hh_b0.rom",    0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  /* tiles */
+	ROM_LOAD( "hh_b1.rom",    0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
+	ROM_LOAD( "hh_b2.rom",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
+	ROM_LOAD( "hh_b3.rom",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "a-v0-0.rom",   0x00000, 0x20000, CRC(faaacaff) SHA1(ea3a3920255c07aa9c0a7e0191eae257a9f7f558) )
@@ -3536,11 +3569,11 @@ GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_state,     m72_875
 GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
 GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, driver_device, 0,           ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultipl,    0,        m81_xmultipl,xmultipl, driver_device, 0,           ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl,xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreed,      0,        dbreed,      dbreed,   driver_device, 0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbreedm72,   dbreed,   dbreedm72,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreed,      0,        m81_dbreed,   dbreed,   driver_device, 0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 // one of these is M84-B-A ?
 GAME( 1989, rtype2,      0,        rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -3550,9 +3583,9 @@ GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,     
 GAME( 1990, majtitle,    0,        m82_large,   rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
 GAME( 1990, majtitlej,   majtitle, m82_large,   rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, hharry,      0,        hharry,      hharry,   driver_device, 0,           ROT0,   "Irem", "Hammerin' Harry (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharry,      0,        m81_hharry,  hharry,   driver_device, 0,           ROT0,   "Irem", "Hammerin' Harry (World, M81?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US, M82?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or M84?
+GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or M84?
 GAME( 1990, dkgensanm72, hharry,   dkgenm72,    hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, poundfor,    0,        poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B

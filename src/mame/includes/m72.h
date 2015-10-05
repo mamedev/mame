@@ -123,9 +123,10 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(hharry_get_bg_tile_info);
+
 	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
+
 	TILEMAP_MAPPER_MEMBER(majtitle_scan_rows);
 
 	void machine_start();

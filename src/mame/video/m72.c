@@ -12,6 +12,12 @@
 inline void m72_state::get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
+	
+	// word 0               word 1
+	// fftt tttt tttt tttt  ---- ---- zz-? pppp
+
+	// f = flips, t = tilenum, z = pri, p = palette
+	// ? = possible more priority
 
 	tile_index *= 2;
 
@@ -34,6 +40,12 @@ inline void m72_state::get_tile_info(tile_data &tileinfo,int tile_index,const UI
 inline void m72_state::rtype2_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
+
+	// word 0               word 1
+	// tttt tttt tttt tttt  ---- ---z zff- pppp
+
+	// f = flips, t = tilenum, z = pri, p = palette
+
 
 	tile_index *= 2;
 
@@ -64,11 +76,6 @@ TILE_GET_INFO_MEMBER(m72_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(m72_state::get_fg_tile_info)
 {
 	get_tile_info(tileinfo,tile_index,m_videoram1,1);
-}
-
-TILE_GET_INFO_MEMBER(m72_state::hharry_get_bg_tile_info)
-{
-	get_tile_info(tileinfo,tile_index,m_videoram2,1);
 }
 
 TILE_GET_INFO_MEMBER(m72_state::rtype2_get_bg_tile_info)
@@ -137,9 +144,29 @@ VIDEO_START_MEMBER(m72_state,xmultipl)
 	VIDEO_START_CALL_MEMBER(m72);
 
 	m_fg_tilemap->set_scrolldx(4,64);
-	m_bg_tilemap->set_scrolldx(6,0);
 	m_fg_tilemap->set_scrolldy(-128, 0);
+	
+	m_bg_tilemap->set_scrolldx(6,0);
+	m_bg_tilemap->set_scrolldy(-128,-128);
+
 }
+
+
+VIDEO_START_MEMBER(m72_state,hharry)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+
+	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // ? maybe the standard logic is ok.
+
+	m_fg_tilemap->set_scrolldx(4,3);
+	m_fg_tilemap->set_scrolldy(-128,-128);
+
+	m_bg_tilemap->set_scrolldx(6,0);
+	m_bg_tilemap->set_scrolldy(-128,16);
+}
+
+
+
 
 VIDEO_START_MEMBER(m72_state,rtype2)
 {
@@ -251,32 +278,6 @@ VIDEO_START_MEMBER(m72_state, m82_small)
 	m_bg_tilemap->set_scrolldy(-128,-128);
 }
 
-
-VIDEO_START_MEMBER(m72_state,hharry)
-{
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::hharry_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),   TILEMAP_SCAN_ROWS,8,8,64,64);
-
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
-
-	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
-	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
-	m_fg_tilemap->set_transmask(2,0x0001,0xffff);
-
-	m_bg_tilemap->set_transmask(0,0xffff,0x0000);
-	m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
-	m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
-
-	memset(m_buffered_spriteram,0,m_spriteram.bytes());
-
-	m_fg_tilemap->set_scrolldx(4,3);
-	m_fg_tilemap->set_scrolldy(-128,-128);
-
-	m_bg_tilemap->set_scrolldx(6,0);
-	m_bg_tilemap->set_scrolldy(-128,16);
-
-	register_savestate();
-}
 
 
 /***************************************************************************
