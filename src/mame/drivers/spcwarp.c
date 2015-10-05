@@ -95,7 +95,7 @@ MACHINE_CONFIG_END
 ROM_START( spcwarp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
-	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, BAD_DUMP CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
+	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
 /* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
 	ROM_LOAD( "swarpt7m.bin", 0x3000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) )
 /* Stripped "repaired" rom.  Was original rom supposed to be 0x1000 or 0x800? */
