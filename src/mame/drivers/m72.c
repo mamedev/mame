@@ -43,12 +43,12 @@ M84 -   2 PCB stack
 		M84-A-A (bottom board)
 		supports
 		4 program roms
-		8 sprite roms
+		8 tile roms
 		1 snd prg, 1 voice rom
 		CPUs and some customs etc.
 
 		M84-C-A (top board) (listed as for Hammering Harry)
-		4 tile roms (in a row)
+		4 sprite roms (in a row)
 		6 larger chips with detail removed
 		etc.
 
@@ -56,7 +56,7 @@ M84 -   2 PCB stack
 		M84-B-B (top board) (lightning swords / kengo)
 		these both look very similar, if not the same
 
-		4 tile roms (in a square)
+		4 sprite roms (in a square)
 		various NANAO marked customs
 		KNA70H016(12)  NANAO 0201
 		KNA65005 17 NANAO 9048KS
