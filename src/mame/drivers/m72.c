@@ -52,7 +52,10 @@ M84 -   2 PCB stack
 		6 larger chips with detail removed
 		etc.
 
-		M84-B-A (top board) (found on lightning swords, rtype 2)
+		M84-B-A (top board) (found on rytpe 2)
+		M84-B-B (top board) (lightning swords / kengo)
+		these both look very similar, if not the same
+
 		4 tile roms (in a square)
 		various NANAO marked customs
 		KNA70H016(12)  NANAO 0201
