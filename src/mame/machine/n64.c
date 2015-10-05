@@ -1057,10 +1057,6 @@ void n64_periphs::vi_recalculate_resolution()
 	if (height > 480)
 		height = 480;
 
-	if(vi_control & 0x40) /* Interlace */
-	{
-	}
-
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
 	m_screen->configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
@@ -1088,7 +1084,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = (m_screen->vpos() & 0x3FE); // << 1);
+			ret = (m_screen->vpos() & 0x3FE) + field; // << 1);
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1461,7 +1457,7 @@ void n64_periphs::pi_dma_tick()
 
 	if(pi_dma_dir == 1)
 	{
-		UINT32 dma_length = pi_wr_len + 1;
+		UINT32 dma_length = pi_wr_len + 1 + 1; //Round Up Nearest 2
 		//logerror("PI Write, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_wr_len);
 
 		if (pi_dram_addr != 0xffffffff)
@@ -1477,7 +1473,7 @@ void n64_periphs::pi_dma_tick()
 	}
 	else
 	{
-		UINT32 dma_length = pi_rd_len + 1;
+		UINT32 dma_length = pi_rd_len + 1 + 1; //Round Up Nearest 2
 		//logerror("PI Read, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_rd_len);
 
 		if (pi_dram_addr != 0xffffffff)
