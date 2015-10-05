@@ -9,9 +9,16 @@ gfx is like cosmos according to hap(cvs.c)
 9/25/2015 - Initial commit of skeleton driver
 10/4/2015 - Preliminary memory map.
 
+Logic notes (to be updated over time):
+-uses an S2650 and S2636 like all cvs.c related games
+-no speech or dac
+
 TODO:
+-get the game to WORK!
 -merge with cvs_state
 -fix completely wrong ROM mapping; game crashes because of this
+-hook up inputs and read any writes to them
+-hook up video and sound
 
 Notes about the crash:
 There is a memory region at $13ff to $1fff. This causes problems with the ROM mapping,
