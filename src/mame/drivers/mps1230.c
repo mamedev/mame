@@ -120,7 +120,7 @@ void mps1230_state::machine_reset()
 ***************************************************************************/
 
 static ADDRESS_MAP_START( mps1230_map, AS_PROGRAM, 8, mps1230_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("mps1230", 0)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // as per the service manual
 	AM_RANGE(0xff00, 0xffff) AM_RAM // tested at PC=77, then used for the 7810's stack
 ADDRESS_MAP_END
@@ -143,12 +143,20 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+ROM_START(mps1000)
+	ROM_REGION(0x10000, "maincpu", 0)
+	// ver 2.20, 06/DEC/1986 (But it could also perhaps mean 12/JUN/1986)
+	// I can't tell the PCB reference because this was dumped from spare EPROMs from a drawer
+	// The dump seems to be good because the data content of all of my 4 spare EPROMs matched perfectly.
+	ROM_LOAD( "mps_1000_vers_2.20_12-06-86.rom", 0x000000, 0x010000, CRC(0a91ea8a) SHA1(ccb679f3d1f7f4eddb4e8899fe9e9a594dcfca5d) )
+ROM_END
+
 ROM_START(mps1230)
-	ROM_REGION(0x10000, "mps1230", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "pdl2.f03ee",   0x000000, 0x010000, CRC(f8a9f45c) SHA1(4e7bb0d382c55432665f5576b6a5cd3c4c33bd8e) ) // ver 1.1D, 10/NOV/1988
 	ROM_LOAD( "peek.f03ee",   0x000000, 0x010000, CRC(b5215f25) SHA1(dcfdd16942652447c472301392d9b39514547af1) ) // ver 2.1E, 09/AUG/1989
-
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT              COMPANY                         FULLNAME */
+COMP( 1986, mps1000,  0,        0,        mps1230,     mps1230,  driver_device, 0, "Commodore Business Machines", "MPS-1000 Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
 COMP( 1988, mps1230,  0,        0,        mps1230,     mps1230,  driver_device, 0, "Commodore Business Machines", "MPS-1230 NLQ Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
