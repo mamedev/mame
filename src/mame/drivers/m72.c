@@ -93,7 +93,7 @@ Air Duel (World)                   1990  M82                 N
 Air Duel (Japan)                   1990  M72?                Y
 Cosmic Cop /                       1991  M84                 N
   Gallop - Armed Police Unit       1991  M72                 Y (sample playback only)
-Ken-Go / Lightning Swords          1991  M84-A-A + M84-B-A   Encrypted
+Ken-Go / Lightning Swords          1991  M84-A-A + M84-B-B   Encrypted
 
 (1) different addressing PALs, so different memory map
 (3) normal M72 memory map, but IRQ vectors and sprite control as in X-Multiply
@@ -3093,6 +3093,10 @@ ROM_START( rtype2j )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "ic14.4c",      0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-A */
+	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
+	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) 
 ROM_END
 
 ROM_START( rtype2jc )
@@ -3613,6 +3617,10 @@ ROM_START( kengoa )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-B */
+	ROM_LOAD( "KEN_B-4N-.IC23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
+	ROM_LOAD( "KEN_B-4P-.IC24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // differs from rtype 2 / ninja spirit 
 ROM_END
 
 // in the case of the i8751 protected games the World and Japan sets should be using different MCU roms.
