@@ -21,10 +21,12 @@
     Schematic has lots of errors and omissions.
 
     To Do:
-    - Storage
+    - Hook up ACIAs
+    - Cassette
     - Need software
     - Need missing PROM, so that all the CRTC controls can be emulated
-    - Hook up other roms as extra bios sets
+    - Keyboard may have its own CPU etc, but no info available. There's some
+      missing keys and buttons, such as HERE-IS key.
 
 ******************************************************************************/
 
@@ -76,8 +78,7 @@ static ADDRESS_MAP_START(proteus3_mem, AS_PROGRAM, 8, proteus3_state)
 	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
 	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w)
 	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -109,7 +110,7 @@ WRITE_LINE_MEMBER( proteus3_state::ca2_w )
 		switch(m_video_data)
 		{
 			case 0x0a: // Line Feed
-				if (m_curs_pos > 959) // off the bottom?
+				if (m_curs_pos > 959) // on bottom line?
 				{
 					memmove(m_p_videoram, m_p_videoram+64, 960); // scroll
 					memset(m_p_videoram+960, 0x20, 64); // blank bottom line
@@ -254,7 +255,22 @@ MACHINE_CONFIG_END
 
 ROM_START(proteus3)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2) )
+	ROM_SYSTEM_BIOS( 0, "14k", "14k BASIC")
+	ROMX_LOAD( "bas1.bin",     0xc800, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3), ROM_BIOS(1) )
+	ROMX_LOAD( "bas2.bin",     0xd000, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7), ROM_BIOS(1) )
+	ROMX_LOAD( "bas3.bin",     0xd800, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34), ROM_BIOS(1) )
+	ROMX_LOAD( "bas4.bin",     0xe000, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2), ROM_BIOS(1) )
+	ROMX_LOAD( "bas5.bin",     0xe800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(1) )
+	ROMX_LOAD( "bas6.bin",     0xf000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(1) )
+	ROMX_LOAD( "bas7.bin",     0xf800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(1) )
+	ROM_FILL( 0xc000, 1, 0 )  // if c000 isn't 0 it assumes a rom is there and jumps to it
+
+	ROM_SYSTEM_BIOS( 1, "8k", "8k BASIC")
+	ROMX_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(2) )
+	ROM_RELOAD( 0xc000, 0x2000 )
+
+	ROM_SYSTEM_BIOS( 2, "8kms", "8k Micro-Systemes BASIC")
+	ROMX_LOAD( "ms1_basic8k.bin", 0xe000, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9), ROM_BIOS(3) )
 	ROM_RELOAD( 0xc000, 0x2000 )
 
 	ROM_REGION(0x400, "chargen", 0)
@@ -265,32 +281,9 @@ ROM_START(proteus3)
 
 	ROM_REGION(0x400, "vram", ROMREGION_ERASE00)
 
-	ROM_REGION(0xf000, "user1", 0) // roms not used yet
-	// Proteus III - pbug
+	ROM_REGION(0x0800, "user1", 0) // roms not used yet
+	// Proteus III - pbug F800-FFFF, expects RAM at F000-F7FF
 	ROM_LOAD( "proteus3_pbug.bin", 0x0000, 0x0800, CRC(1118694d) SHA1(2dfc08d405e8f2936f5b0bd1c4007995151abbba) )
-	// Proteus III - 14k basic - single-rom
-	ROM_LOAD( "proteus3_basic14k.bin", 0x0800, 0x3800, CRC(e0626ff5) SHA1(755e8c1aa71342a0f78ff3ba8b93d038b5b1301e) )
-	// Proteus III - 14k basic - split roms
-	ROM_LOAD( "bas1.bin",     0x4000, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3) )
-	ROM_LOAD( "bas2.bin",     0x4800, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7) )
-	ROM_LOAD( "bas3.bin",     0x5000, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34) )
-	ROM_LOAD( "bas4.bin",     0x5800, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2) )
-	ROM_LOAD( "bas5.bin",     0x6000, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42) )
-	ROM_LOAD( "bas6.bin",     0x6800, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398) )
-	ROM_LOAD( "bas7.bin",     0x7000, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776) )
-	// Micro-Systemes I - 8k basic - single rom
-	ROM_LOAD( "ms1_basic8k.bin", 0x7800, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9) )
-	// Micro-Systemes I - 8k basic - split roms
-	ROM_LOAD( "eprom1",       0xa000, 0x0480, CRC(de20c8a2) SHA1(2c62410888c8418990ff773578d350358e73b505) )
-	ROM_LOAD( "eprom1b",      0xa800, 0x0480, CRC(a168830c) SHA1(c39dd955295b1b18e21374d0bc361fb95f8767cd) )
-	ROM_LOAD( "eprom2",       0xb000, 0x0480, CRC(fa13fa1e) SHA1(f5e5aab9dc2eecdb587520bcac8a61eb10b96ba2) )
-	ROM_LOAD( "eprom3",       0xb800, 0x0480, CRC(6fbf88d1) SHA1(d949159c8a7201b38fae5955e8a79fac9beb873c) )
-	ROM_LOAD( "eprom4",       0xc000, 0x0480, CRC(84e0d659) SHA1(d49119d8338ce060e10c43f5c3ada792de48bf68) )
-	ROM_LOAD( "eprom5",       0xc800, 0x0480, CRC(e550fb62) SHA1(ebef2e3f76eeca422c896e186cc6ad82185c1db9) )
-	ROM_LOAD( "eprom6",       0xd000, 0x0480, CRC(c816d374) SHA1(b56db1e673273bc5cc4d5efaa257314d11d9b625) )
-	ROM_LOAD( "eprom7",       0xd800, 0x0480, CRC(d863a23f) SHA1(f23b0d5e81f85890f50fda5778adc86354330a7f) )
-	ROM_LOAD( "eprom8",       0xe000, 0x0480, CRC(034f2295) SHA1(80916c2fcd38ce474d47c75e82f1c5e578fb5f26) )
-	ROM_LOAD( "eprom8b",      0xe800, 0x0480, CRC(b8144b85) SHA1(ee0d6f495f52d2dc846d8d29cf37c72454ddd6c2) )
 ROM_END
 
 
