@@ -288,10 +288,8 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_16x16_info)
 
 WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 {
-	int realoff;
+	const int realoff = (offset * 4);
 	COMBINE_DATA(&m_videoram[offset]);
-
-	realoff = offset*4;
 
 	if ((realoff>=0) && (realoff<0x10000))
 	{
@@ -309,9 +307,9 @@ WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 	{
 		hng64_mark_tile_dirty(3, offset&0x3fff);
 	}
-
-//  if ((realoff>=0x40000)) osd_printf_debug("offsw %08x %08x\n",realoff,data);
-
+    
+    // Offsets 0x40000 - 0x58000 are for "floor" scanline control
+    
 	/* 400000 - 7fffff is scroll regs etc. */
 }
 
@@ -662,10 +660,6 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		else tilemap = m_tilemap[tm].m_tilemap_8x8; // _alt
 	}
 
-	// xrally's pink tilemaps make me think this is a tilemap enable bit.
-	// fatfurwa makes me think otherwise.
-//  if (!(tileregs & 0x0040)) return;
-
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
 		transmask = 0xff;
@@ -675,42 +669,92 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	// buriki tm1 = roz
 
 	// my life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
-	if ((tileregs & 0x0800)==0x0000) // floor mode
+	if ((tileregs & 0x0800)==0x0000) // floor mode  -- could actually be related to ((tileregs & 0xf000) == 0x1000).
 	{
-		/* Floor mode - per pixel simple / complex modes? -- every other line?
-		  (there doesn't seem to be enough data in Buriki for every line at least)
-		*/
-		//if ((tileregs&0xf000) == 0x1000)
+        // fprintf(stderr, "Tilemap %d is a floor using :\n", tm);
+
+        // Floor buffer enables
+        // TODO: the upper bit(s) in here are probably useful to check as well
+        const int floorInner0 = (hng64_videoregs[0x04] & 0x00000600) >> 9;
+        const int floorInner1 = (hng64_videoregs[0x05] & 0x06000000) >> 25; (void)floorInner1;
+        const int floorInner2 = (hng64_videoregs[0x05] & 0x00000600) >> 9;
+        const int floorOuter0 = (hng64_videoregs[0x04] & 0x00001800) >> 11;
+        const int floorOuter1 = (hng64_videoregs[0x05] & 0x18000000) >> 27; (void)floorOuter1;
+        const int floorOuter2 = (hng64_videoregs[0x05] & 0x00001800) >> 11;
+        // fprintf(stderr, "Buffers %d-%d %d-%d %d-%d\n", floorOuter2, floorInner2, floorOuter1, floorInner1, floorOuter0, floorInner0);
+        
+        // TODO: This can likely be simplified with some &s and some <<s, but this works for now
+        const UINT32 address0 = 0x40000 + (floorOuter0 * 0x8000) + (floorInner0 * 0x2000);
+        const UINT32 address1 = 0x40000 + (floorOuter1 * 0x8000) + (floorInner1 * 0x2000); (void)address1;
+        const UINT32 address2 = 0x40000 + (floorOuter2 * 0x8000) + (floorInner2 * 0x2000);
+
+        // TODO: Some bit somewhere probably specifies scissor layers, but for now we switch based on game :-(
+        const UINT32& dataAddress = (m_mcu_type == BURIKI_MCU) ? address0 : address2;
+        const UINT32& scissorAddress0 = address1; (void)scissorAddress0;
+        const UINT32& scissorAddress1 = (m_mcu_type == BURIKI_MCU) ? address2 : address0; (void)scissorAddress1;
+        //printf("dataAddress: %08x scissorAddress0: %08x scissorAddress1: %08x\n", dataAddress, scissorAddress0, scissorAddress1);
+
+        // See how many lines we have in the data region
+        // TODO: Change this to a loop that goes over each line and draws them - it's just for visualization now
+        int lineCount = 0;
+        for (int ii = 0; ii < 0x2000/4; ii += 2)
+        {
+            const int realAddress = dataAddress/4;
+            if (m_videoram[realAddress+ii] == 0xffffff00 && m_videoram[realAddress+ii+1] == 0xffffff00)
+                continue;
+            if (m_videoram[realAddress+ii] == 0x00000000 && m_videoram[realAddress+ii+1] == 0x00000000)
+                continue;
+            
+            lineCount++;
+        }
+        //printf("lines %d\n", lineCount);
+
+        // Fatfurwa writes twice as many lines as needed.  Odd.
+        if (m_mcu_type == FIGHT_MCU)
+            lineCount /= 2;
+
+        // DEBUG - draw a horizontal green line where the uppermost line of the floor is drawn
+        const rectangle &visarea = screen.visible_area();
+        //if (lineCount < visarea.height())
+        //{
+        //    for (int ii = 0; ii < visarea.width(); ii++)
+        //        bitmap.pix32((visarea.height()-lineCount), ii) = 0xff00ff00;
+        //}
+        
+        // HACK : Clear ram - this is "needed" in fatfurwa since it doesn't clear its own ram (buriki does)
+        //        Figure out what the difference between the two programs is.  It's possible writing to
+        //        the linescroll ram fills a buffer and it's cleared automatically between frames?
+        for (int ii = 0; ii < 0x2000/4; ii++)
+        {
+            const int realAddress = dataAddress/4;
+            m_videoram[realAddress+ii] = 0x00000000;
+        }
+        
+        
+        //if ((tileregs&0xf000) == 0x1000)
 		//{
 		//  popmessage("Floor is Active");
 		//}
-		int line;
-		rectangle clip;
-		INT32 xtopleft,xmiddle;
-		INT32 ytopleft,ymiddle;
-		int xinc,yinc;
-
-		const rectangle &visarea = screen.visible_area();
-		clip = visarea;
+        
+        // Floor mode - per pixel simple / complex modes? -- every other line?
+		//  (there doesn't seem to be enough data in Buriki for every line at least)
+		rectangle clip = visarea;
 
 		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
-			/* logic would dictate that this should be the 'complex' scroll register layout,
-			   but per-line.  That doesn't work however.
-
-			   You only have line data for the number of lines on the screen, not enough for
-			   the complex register layout
-
-			   HOWEVER, using the code below doesn't work either.  This might be because
-			   they have mosaic turned on, and it adopts a new meaning in linescroll modes?
-
-			   The code below could also be wrong, and rowscroll simply acts the same in all
-			   modes, this is hard to know because ss64_2 barely uses it.
-
-
-			   buriki line data is at 20146000 (physical)
-
-			*/
+			// Logic would dictate that this should be the 'complex' scroll register layout,
+			// but per-line.  That doesn't work however.
+            //
+			// You only have line data for the number of lines on the screen, not enough for
+			// the complex register layout
+            //
+			// HOWEVER, using the code below doesn't work either.  This might be because
+			// they have mosaic turned on, and it adopts a new meaning in linescroll modes?
+            //
+			// The code below could also be wrong, and rowscroll simply acts the same in all
+			// modes, this is hard to know because ss64_2 barely uses it.
+            //
+			// buriki line data is at 20146000 (physical)
 
 #if HNG64_VIDEO_DEBUG
 			popmessage("Unhandled rowscroll %02x", tileregs>>12);
@@ -718,16 +762,18 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
 		{
-			for (line=0;line<448;line++)
+            INT32 xtopleft, xmiddle;
+            INT32 ytopleft, ymiddle;
+            
+			for (int line=0; line < 448; line++)
 			{
 				clip.min_y = clip.max_y = line;
 
 				if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
 				{
-					/* If this bit is active the scroll registers don't seem valid at all?
-					   It either disables zooming, or disables use of the scroll registers completely
-					   - used at startup
-					*/
+					// If this bit is active the scroll registers don't seem valid at all?
+					// It either disables zooming, or disables use of the scroll registers completely
+					// - used at startup
 
 					xtopleft = 0;
 					xmiddle = 256<<16;
@@ -738,20 +784,18 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				else
 				{
 					xtopleft = (hng64_videoram[(0x40000+(line*0x10)+(scrollbase<<4))/4]);
-					xmiddle   = (hng64_videoram[(0x40004+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
+					xmiddle  = (hng64_videoram[(0x40004+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
 					ytopleft = (hng64_videoram[(0x40008+(line*0x10)+(scrollbase<<4))/4]);
-					ymiddle   = (hng64_videoram[(0x4000c+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
+					ymiddle  = (hng64_videoram[(0x4000c+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
 				}
 
-				xinc = (xmiddle - xtopleft) / 512;
-				yinc = (ymiddle - ytopleft) / 512;
+				const int xinc = (xmiddle - xtopleft) / 512;
+				const int yinc = (ymiddle - ytopleft) / 512;
 
 				hng64_tilemap_draw_roz(screen, bitmap,clip,tilemap,xtopleft,ytopleft,
 						xinc<<1,0,0,yinc<<1,
 						1,
 						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
-
-
 			}
 		}
 	}
