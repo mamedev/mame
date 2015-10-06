@@ -3535,7 +3535,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/slotcarn.c",
 	MAME_DIR .. "src/mame/drivers/smsmcorp.c",
 	MAME_DIR .. "src/mame/drivers/sothello.c",
-	MAME_DIR .. "src/mame/drivers/spcwarp.c",
 	MAME_DIR .. "src/mame/drivers/splus.c",
 	MAME_DIR .. "src/mame/drivers/spool99.c",
 	MAME_DIR .. "src/mame/drivers/sprcros2.c",
