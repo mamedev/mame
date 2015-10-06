@@ -1291,17 +1291,18 @@ struct namcos23_render_data
 
 class namcos23_state;
 
-class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
+class namcos23_renderer : public poly_manager<float, namcos23_render_data, 5, POLY_MAX_ENTRIES>
 {
 public:
 	namcos23_renderer(namcos23_state &state);
-
 	void render_flush(bitmap_rgb32& bitmap);
 	void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
+	float* zBuffer() { return m_zBuffer; }
 
 private:
 	namcos23_state& m_state;
 	bitmap_rgb32 m_bitmap;
+	float* m_zBuffer;
 };
 
 typedef namcos23_renderer::vertex_t poly_vertex;
@@ -1309,7 +1310,6 @@ typedef namcos23_renderer::vertex_t poly_vertex;
 struct namcos23_poly_entry
 {
 	namcos23_render_data rd;
-	float zkey;
 	int front;
 	int vertex_count;
 	poly_vertex pv[16];
@@ -1367,7 +1367,6 @@ struct render_t
 	int count[2];
 	namcos23_render_entry entries[2][RENDER_MAX_ENTRIES];
 	namcos23_poly_entry polys[POLY_MAX_ENTRIES];
-	namcos23_poly_entry *poly_order[POLY_MAX_ENTRIES];
 };
 
 class namcos23_state : public driver_device
@@ -1584,10 +1583,13 @@ UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
 ***************************************************************************/
 
 namcos23_renderer::namcos23_renderer(namcos23_state &state)
-	: poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
-		m_state(state),
-		m_bitmap(state.m_screen->width(), state.m_screen->height())
-{}
+	: poly_manager<float, namcos23_render_data, 5, POLY_MAX_ENTRIES>(state.machine()),
+	  m_state(state),
+	  m_bitmap(state.m_screen->width(), state.m_screen->height())
+{
+	const INT32 bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
+	m_zBuffer = auto_alloc_array(state.machine(), float, bufferSize);
+}
 
 // 3D hardware, to throw at least in part in video/namcos23.c
 
@@ -1883,27 +1885,38 @@ void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, 
 {
 	const namcos23_render_data& rd = object;
 
-	float w = extent.param[0].start;
-	float u = extent.param[1].start;
-	float v = extent.param[2].start;
-	float l = extent.param[3].start;
-	float dw = extent.param[0].dpdx;
-	float du = extent.param[1].dpdx;
-	float dv = extent.param[2].dpdx;
-	float dl = extent.param[3].dpdx;
+	float zz = extent.param[0].start;
+	float w = extent.param[1].start;
+	float u = extent.param[2].start;
+	float v = extent.param[3].start;
+	float l = extent.param[4].start;
+	float dz = extent.param[0].dpdx;
+	float dw = extent.param[1].dpdx;
+	float du = extent.param[2].dpdx;
+	float dv = extent.param[3].dpdx;
+	float dl = extent.param[4].dpdx;
+	
 	UINT32 *img = &m_bitmap.pix32(scanline, extent.startx);
-
+	float* zBuffer = &m_zBuffer[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+	
 	for(int x = extent.startx; x < extent.stopx; x++) {
-		float z = w ? 1/w : 0;
-		UINT32 pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
-		float ll = l*z;
-		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
-
+		if (zz < *zBuffer)
+		{
+			float z = w ? 1/w : 0;
+			UINT32 pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
+			float ll = l*z;
+			*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
+	
+			*zBuffer = zz;
+		}
+		
+		zz += dz;
 		w += dw;
 		u += du;
 		v += dv;
 		l += dl;
 		img++;
+		zBuffer++;
 	}
 }
 
@@ -1928,10 +1941,9 @@ void namcos23_state::render_project(poly_vertex &pv)
 	// 640/(3.125/3.75) = 768
 	// 480/(2.34375/3.75) = 768
 
-	float w = pv.p[0] ? 1/pv.p[0] : 0;
-	pv.x = 320 + 768*w*pv.x;
-	pv.y = 240 - 768*w*pv.y;
-	pv.p[0] = w;
+	pv.x = 320 + 768 * pv.x;
+	pv.y = 240 - 768 * pv.y;
+	pv.p[1] = 1.0f / pv.p[1];
 }
 
 static UINT32 render_texture_lookup_nocache_point(running_machine &machine, const pen_t *pens, float x, float y)
@@ -2034,38 +2046,76 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 
 		namcos23_poly_entry *p = render.polys + render.poly_count;
 
-		p->vertex_count = render.polymgr->zclip_if_less(ne, pv, p->pv, 4, 0.001f);
-
+		// Should be unnecessary now that frustum clipping happens, but this still culls polys behind the camera
+		p->vertex_count = render.polymgr->zclip_if_less(ne, pv, p->pv, 5, 0.001f);
+		
+		// Project if you don't clip on the near plane
 		if(p->vertex_count >= 3) {
+			// Project the eye points
+			frustum_clip_vertex<float, 3> clipVerts[10];
 			for(int i=0; i<p->vertex_count; i++) {
-				render_project(p->pv[i]);
-				float w = p->pv[i].p[0];
-				p->pv[i].p[1] *= w;
-				p->pv[i].p[2] *= w;
-				p->pv[i].p[3] *= w;
+				// A basic perspective transform
+				const float Z = p->pv[i].p[0];
+				const float projX = p->pv[i].x / Z;
+				const float projY = p->pv[i].y / Z;
+				
+				const float near = 0.001f;
+				const float far = 1000.0f;
+				const float m22 = -(far / (far-near));
+				const float m23 = -((far * near) / (far - near));
+				const float projZ = -(Z * m22) + m23;
+				
+				// Construct a frustum clipping vert from the NDCoords
+				clipVerts[i].x = projX;
+				clipVerts[i].y = projY;
+				clipVerts[i].z = projZ;
+				clipVerts[i].w = p->pv[i].p[0];
+				clipVerts[i].p[0] = p->pv[i].p[1];
+				clipVerts[i].p[1] = p->pv[i].p[2];
+				clipVerts[i].p[2] = p->pv[i].p[3];
 			}
-			p->zkey = 0.5f*(minz+maxz);
-			p->front = !(h & 0x00000001);
-			p->rd.machine = &machine();
-			p->rd.texture_lookup = render_texture_lookup_nocache_point;
-			p->rd.pens = m_palette->pens() + (color << 8);
-			render.poly_count++;
+
+			// Clip against all edges of the view frustum
+			int num_vertices = frustum_clip_all<float, 3>(clipVerts, p->vertex_count, clipVerts);
+			
+			if (num_vertices != 0)
+			{
+				// Push the results back into the main vertices
+				for (int i=0; i < num_vertices; i++)
+				{
+					p->pv[i].x = clipVerts[i].x;
+					p->pv[i].y = clipVerts[i].y;
+					p->pv[i].p[0] = clipVerts[i].z;
+					p->pv[i].p[1] = clipVerts[i].w;
+					p->pv[i].p[2] = clipVerts[i].p[0];
+					p->pv[i].p[3] = clipVerts[i].p[1];
+					p->pv[i].p[4] = clipVerts[i].p[2];
+				}
+				p->vertex_count = num_vertices;
+				
+				// This is our poor-man's projection matrix
+				for(int i=0; i<p->vertex_count; i++) 
+				{
+					render_project(p->pv[i]);
+					
+					const float w = p->pv[i].p[1];
+					p->pv[i].p[2] *= w;
+					p->pv[i].p[3] *= w;
+					p->pv[i].p[4] *= w;
+				}
+				
+				// Compute an odd sorta'-Z thing that can situate the polygon wherever you want in Z-depth
+				p->front = !(h & 0x00000001);
+				p->rd.machine = &machine();
+				p->rd.texture_lookup = render_texture_lookup_nocache_point;
+				p->rd.pens = m_palette->pens() + (color << 8);
+				render.poly_count++;
+			}
 		}
 
 		if(type & 0x000010000)
 			break;
 	}
-}
-
-static int render_poly_compare(const void *i1, const void *i2)
-{
-	const namcos23_poly_entry *p1 = *(const namcos23_poly_entry **)i1;
-	const namcos23_poly_entry *p2 = *(const namcos23_poly_entry **)i2;
-
-	if(p1->front != p2->front)
-		return p1->front ? 1 : -1;
-
-	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
 }
 
 void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
@@ -2075,28 +2125,32 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 	if(!render.poly_count)
 		return;
 
-	for(int i=0; i<render.poly_count; i++)
-		render.poly_order[i] = &render.polys[i];
-
-	qsort(render.poly_order, render.poly_count, sizeof(namcos23_poly_entry *), render_poly_compare);
-
 	const static rectangle scissor(0, 639, 0, 479);
 
 	for(int i=0; i<render.poly_count; i++) {
-		const namcos23_poly_entry *p = render.poly_order[i];
+		const namcos23_poly_entry *p = &render.polys[i];
 		namcos23_render_data& extra = render.polymgr->object_data_alloc();
 		extra = p->rd;
-
+		
+		// We should probably split the polygons into triangles ourselves to insure everything is being rendered properly
 		if (p->vertex_count == 3)
-			render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv[0], p->pv[1], p->pv[2]);
+			render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 5, p->pv[0], p->pv[1], p->pv[2]);
 		else if (p->vertex_count == 4)
-			render_polygon<4>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<4>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 5, p->pv);
 		else if (p->vertex_count == 5)
-			render_polygon<5>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<5>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 5, p->pv);
+		else if (p->vertex_count == 6)
+			render_polygon<6>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 5, p->pv);
 	}
 	render.poly_count = 0;
-
+	
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, scissor);
+
+	// Reset the buffers
+	for (int i = 0; i < (m_state.m_screen->visible_area().width())*(m_state.m_screen->visible_area().height()); i++)
+	{
+		m_zBuffer[i] = 1000.0f;     // TODO: set to far clipping plane value
+	}
 }
 
 void namcos23_state::render_run(bitmap_rgb32 &bitmap)

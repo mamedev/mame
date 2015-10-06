@@ -2004,7 +2004,7 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,      hng64, hng64, hng64_state,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,      hng64, hng64,    hng64_state,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
 GAME( 1997, roadedge, hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 001 */
