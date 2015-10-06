@@ -174,10 +174,6 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 
-<<<<<<< HEAD
-	/* 3D stuff */
-=======
->>>>>>> polyplay
 	UINT16* m_dl;
 	required_shared_ptr<UINT32> m_3dregs;
 	required_shared_ptr<UINT32> m_3d_1;
@@ -344,16 +340,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 
-<<<<<<< HEAD
-	hng64_poly_renderer* m_poly_renderer;
-
-	void clear3d();
-	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
-=======
     hng64_poly_renderer* m_poly_renderer;
     
     TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
->>>>>>> polyplay
 
     UINT8 *m_texturerom;
 	UINT16* m_vertsrom;
