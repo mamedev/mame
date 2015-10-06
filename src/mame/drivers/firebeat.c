@@ -101,6 +101,17 @@
     ???        GEA02          2001    Pop'n Music Animelo 2
     ???        ?              2001    Pop'n Music Mickey Tunes
 
+Dumpable pieces missing
+-----------------------
+Beatmania III - CD, HDD, EPROM on main board, EPROM on SPU board
+Beatmania III Append 6th Mix - HDD, dongle, EPROM on main board, EPROM on SPU board
+Para Para Paradise - dongle, program CD
+Para Para Paradise 1.1 - dongle
+Para Para Dancing - dongle, program CD
+Pop'n Music Animelo - dongle, CD, DVD
+Keyboard Mania  - dongle, program CD, audio CD
+Keyboard Mania 2nd Mix - dongle, program CD, audio CD
+
     TODO:
         - The external Yamaha MIDI sound board is not emulated (no keyboard sounds).
 
