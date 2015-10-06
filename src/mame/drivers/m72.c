@@ -25,8 +25,28 @@ M72 - 3 board stack, 2 known variants
 	  for an I8751 MCU and sample playback
 
 
-M81 - revised hardware, Z80 uses a ROM, no MCU, same video
+M81 - 2 PCB Stack
+
+	  M81-A-B (top board) (seen on Dragon Breed)
+	  CPUs, program roms etc.
+
+	  M81-B-B (bottom board) (seen on Dragon Breed)
+	  supports
+	  8 sprite ROMS
+	  4 tile roms for FG layer (A0-A3) 
+	   (Jumper J3 also allows them to be used for BG)
+	  4 tile roms for BG layer (B0-B3)
+
+	  The Jumper at J3 seems to be an important difference
+	  from M72, it allows both the FG and BG layers to
+	  operate from a single set of ROMs.
+	  W - use both sets of ROMs
+	  S - use a single set of ROMs (A0-A3)
+
+
+	  revised hardware, Z80 uses a ROM, no MCU, same video
       system as M72 (some layer offsets - why?)
+
 
 M82 - board made for Major Title, Z80 has a rom, no MCU
       has an extra sprite layer, rowscroll, and a larger
@@ -2980,13 +3000,17 @@ ROM_START( dbreed )
 	ROM_LOAD( "db_k802m.20", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
 	ROM_LOAD( "db_k803m.30", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
 
-	ROM_REGION( 0x080000, "gfx2", ROMREGION_ERASE00 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_ERASE00 )
 	ROM_LOAD( "db_k804m.a0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles */
 	ROM_LOAD( "db_k805m.a1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.a2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
 	ROM_LOAD( "db_k807m.a3", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
+	// actually need to confirm for sure these are present on some M81 PCBs, at least on the M81-B-B 
+	// PCB they can be unpopulated with Jumper J3 set to S, forcing use of the above for both layers.
+	// it might actually be boards with them populated are X-Multiple conversions with the X-Multiple
+	// roms still here
 	ROM_LOAD( "db_k804m.b0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles */
 	ROM_LOAD( "db_k805m.b1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.b2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
@@ -3223,7 +3247,11 @@ ROM_START( hharry )
 	ROM_LOAD( "hh_a2.rom",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
 	ROM_LOAD( "hh_a3.rom",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) // if this is an M81 PCB then these need to be duplicated here, verify
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	// actually need to confirm for sure these are present on some M81 PCBs, at least on the M81-B-B 
+	// PCB they can be unpopulated with Jumper J3 set to S, forcing use of the above for both layers.
+	// it might actually be boards with them populated are X-Multiple conversions with the X-Multiple
+	// roms still here
 	ROM_LOAD( "hh_b0.rom",    0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  /* tiles */
 	ROM_LOAD( "hh_b1.rom",    0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
 	ROM_LOAD( "hh_b2.rom",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
