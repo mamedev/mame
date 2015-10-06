@@ -81,9 +81,9 @@
     BIOS       Game ID        Year    Game
     ------------------------------------------------------------------
     GQ972      GQ972          2000    Beatmania III
-    GQ972(?)   ?              2001    Beatmania III Append 6th Mix
+    GQ972(?)   GCA21          2001    Beatmania III Append 6th Mix
     GQ972(?)   GCB07          2002    Beatmania III Append 7th Mix
-    GQ972(?)   ?              2000    Beatmania III Append Core Remix
+    GQ972(?)   GCA01          2000    Beatmania III Append Core Remix
     GQ972(?)   GCC01          2003    Beatmania III The Final
     GQ974      GQ974          2000    Keyboardmania
     GQ974      GCA01          2000    Keyboardmania 2nd Mix
@@ -1838,6 +1838,25 @@ ROM_START( ppp11 )
 ROM_END
 
 // Beatmania III has a different BIOS and SPU program, and they aren't dumped yet
+ROM_START( bm36th )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, BAD_DUMP CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))     // boots with KBM BIOS
+
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD( "gca01-ja", 0x000000, 0x0000c8, NO_DUMP )
+
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
+
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "a21jca01", 0, SHA1(d1b888379cc0b2c2ab58fa2c5be49258043c3ea1) )
+
+	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
+	DISK_IMAGE_READONLY( "a21jca02", 0, NO_DUMP )
+ROM_END
+
 ROM_START( bm37th )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, BAD_DUMP CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))     // boots with KBM BIOS
@@ -1891,5 +1910,6 @@ GAME( 2001, popn6,    0,       firebeat_spu,  popn, firebeat_state,   ppp,    RO
 GAME( 2001, popn7,    0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Pop'n Music 7", MACHINE_NOT_WORKING)
 GAME( 2001, popnanm2, 0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Pop'n Music Animelo 2", MACHINE_NOT_WORKING)
 GAME( 2002, popn8,    0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Pop'n Music 8", MACHINE_NOT_WORKING)
+GAME( 2001, bm36th,   0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Beatmania III Append 6th Mix", MACHINE_NOT_WORKING)
 GAME( 2002, bm37th,   0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Beatmania III Append 7th Mix", MACHINE_NOT_WORKING)
 GAME( 2003, bm3final, 0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Beatmania III The Final", MACHINE_NOT_WORKING)
