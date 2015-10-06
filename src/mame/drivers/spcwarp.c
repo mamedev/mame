@@ -7,9 +7,30 @@ ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin
 gfx is like cosmos according to hap(cvs.c)
 
 9/25/2015 - Initial commit of skeleton driver
+10/4/2015 - Preliminary memory map.
+
+Logic notes (to be updated over time):
+-uses an S2650 and S2636 like all cvs.c related games
+-no speech or dac
 
 TODO:
+-get the game to WORK!
 -merge with cvs_state
+-fix completely wrong ROM mapping; game crashes because of this
+-hook up inputs and read any writes to them
+-hook up video and sound
+
+Notes about the crash:
+There is a memory region at $13ff to $1fff. This causes problems with the ROM mapping,
+as the ROMs were dumped as three 4k files. However, ROM 2 crosses over the start of the
+memory region. ROM1 expects a jump to $2000, which is empty garbage because ROM 2
+is mapped wrong.
+
+I tried mapping ROM2 to $2000 and ROM3 to $3000 to get it correct, but it ends up writing
+several strange things to nonexistent memory addresses.... where the ROM region is. Did all
+of the ROMs in spcwarp needed to be split like the games in cvs.c?
+
+(Until then, there is no way I can boot this game.)
 
 */
 
@@ -30,7 +51,11 @@ public:
 };
 
 static ADDRESS_MAP_START( spcwarp_map, AS_PROGRAM, 8, spcwarp_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	// memory map is still uncertain. It seems to be like the usual cvs memory maps
+	// segmented and sandwiched ram between ROM
+	AM_RANGE(0x0000, 0x13ff) AM_ROM
+	AM_RANGE(0x1400, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spcwarp )
@@ -70,9 +95,9 @@ MACHINE_CONFIG_END
 ROM_START( spcwarp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
-	ROM_LOAD( "swarpt7h.bin", 0x1000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
+	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
 /* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
-	ROM_LOAD( "swarpt7m.bin", 0x2000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) )
+	ROM_LOAD( "swarpt7m.bin", 0x3000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) )
 /* Stripped "repaired" rom.  Was original rom supposed to be 0x1000 or 0x800? */
 //  ROM_LOAD( "swarpt7m-repair.bin", 0x2000, 0x0800, CRC(109f95cf) SHA1(d99171ffd6639fec28966edaf7cce3a4df5e948d) )
 
