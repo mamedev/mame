@@ -274,7 +274,7 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 	bottom  = uToF(packet[13]);
 
     // Note: The near and far clipping planes are totally guesses.
-    near_   = uToF(packet[6]);  // + (uToF(packet[6]) * uToF(packet[4]));
+    near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
 	far_    = 0.9f;             // uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
 
 	projectionMatrix[0]  = (2.0f*near_)/(right-left);
