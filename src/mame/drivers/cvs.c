@@ -460,15 +460,12 @@ static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x6000, 0x73ff) AM_ROM
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
 	AM_RANGE(0x00, 0xff) AM_READ(cvs_input_r) AM_WRITE(cvs_scroll_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITE(audio_command_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
-
-
 
 /*************************************
  *
@@ -1046,7 +1043,6 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 MACHINE_CONFIG_END
 
 
-
 /*************************************
  *
  *  ROM definitions
@@ -1534,6 +1530,29 @@ ROM_START( raidersr3 )
 ROM_END
 
 
+ROM_START( spcwarp )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	/* we're likely missing ROMs, no DAC or speech CPU roms anywhere */
+	/* also there's only 3 maincpu ROMS, which is odd; game calls to empty locations */
+	ROM_LOAD_STAGGERED( "swarpt7f.bin", 0x0000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
+	ROM_LOAD_STAGGERED( "swarpt7h.bin", 0x0400, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
+/* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
+	ROM_LOAD_STAGGERED( "swarpt7m.bin", 0x0800, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) )
+/* Stripped "repaired" rom.  Was original rom supposed to be 0x1000 or 0x800? */
+//  ROM_LOAD( "swarpt7m-repair.bin", 0x2000, 0x0800, CRC(109f95cf) SHA1(d99171ffd6639fec28966edaf7cce3a4df5e948d) )
+
+	ROM_REGION( 0x8000, "audiocpu", ROMREGION_ERASE )
+
+	ROM_REGION( 0x1000, "speechdata", ROMREGION_ERASE )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
+	ROM_LOAD( "swarpb1k.bin", 0x0800, 0x0800, CRC(da4cee6b) SHA1(28b91381658f598fa62049489beee443232825c6) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+
 /*************************************
  *
  *  Game specific initalization
@@ -1662,9 +1681,10 @@ GAME( 1982, goldbug,   0,        cvs,     goldbug, driver_device,  0,        ROT
 GAME( 1982, diggerc,   0,        cvs,     diggerc, driver_device,  0,        ROT90, "Century Electronics", "Digger (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, heartatk,  0,        cvs,     heartatk, driver_device, 0,        ROT90, "Century Electronics", "Heart Attack", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbak,  0,        cvs,     hunchbak, driver_device, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, cvs_state, hunchbaka,ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, superbik, ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raiders,   0,        cvs,     raiders, cvs_state,  raiders,  ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raidersr3, raiders,  cvs,     raiders, cvs_state,  raiders,  ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hero,      0,        cvs,     hero, cvs_state,     hero,     ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
-GAME( 1984, huncholy,  0,        cvs,     huncholy, cvs_state, huncholy, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, cvs_state, hunchbaka,    ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, spcwarp,   0,        cvs,     cvs,    driver_device,   0,        ROT90, "Century Electronics", "Space Warp?", MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, superbik,     ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raiders,   0,        cvs,     raiders, cvs_state,  raiders,      ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raidersr3, raiders,  cvs,     raiders, cvs_state,  raiders,      ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hero,      0,        cvs,     hero, cvs_state,     hero,         ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
+GAME( 1984, huncholy,  0,        cvs,     huncholy, cvs_state, huncholy,     ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
