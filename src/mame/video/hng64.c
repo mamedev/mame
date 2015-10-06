@@ -697,7 +697,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
         // See how many lines we have in the data region
         // TODO: Change this to a loop that goes over each line and draws them - it's just for visualization now
         int lineCount = 0;
-        for (int ii = 0; ii < 0x2000/4; ii += 2)
+        for (int ii = 0; ii < 0x2000/4; ii += 4)
         {
             const int realAddress = dataAddress/4;
             if (m_videoram[realAddress+ii] == 0xffffff00 && m_videoram[realAddress+ii+1] == 0xffffff00)
@@ -709,9 +709,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
         }
         //printf("lines %d\n", lineCount);
 
-        // Fatfurwa writes twice as many lines as needed.  Odd.
-        if (m_mcu_type == FIGHT_MCU)
-            lineCount /= 2;
+        // Buriki uses a 2x mosaic effect on its floor, so its line count is half
+        if (m_mcu_type == BURIKI_MCU)
+            lineCount *= 2;
 
         // DEBUG - draw a horizontal green line where the uppermost line of the floor is drawn
         const rectangle &visarea = screen.visible_area();
