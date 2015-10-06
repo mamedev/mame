@@ -530,7 +530,7 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		//case 0x108c:
 		case 0x1104: return m_irq_level;
 		case 0x111c:
-			printf("Read to IRQ ACK?\n");
+			//printf("Read to IRQ ACK?\n");
 			break;
 		case 0x1254: return 0x00000000; //dma status, 0x800
 	}
@@ -916,7 +916,7 @@ READ16_MEMBER(hng64_state::main_sound_comms_r)
 		case 0x06:
 			return sound_latch[1];
 		default:
-			printf("%08x R\n",offset*2);
+			//printf("%08x R\n",offset*2);
 			break;
 	}
 	return 0;
@@ -935,10 +935,10 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 		case 0x08:
 			m_audiocpu->set_input_line(5, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 			if(data & 0xfe)
-				printf("IRQ send %02x?\n",data);
+				//printf("IRQ send %02x?\n",data);
 			break;
 		default:
-			printf("%02x %04x\n",offset*2,data);
+			//printf("%02x %04x\n",offset*2,data);
 			break;
 	}
 }
