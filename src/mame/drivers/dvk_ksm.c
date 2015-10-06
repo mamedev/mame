@@ -34,11 +34,12 @@
     switching between them via SI/SO.   N2 charset has uppercase Cyrillic
     chars in place of lowercase Latin ones.
 
-    F1 toggles Hold Screen mode.
+    ESC toggles Cyrillic/Latin mode (depends in the host's terminal driver)
+    F1 toggles Hold Screen mode (also depends in the host's terminal driver)
     F9 resets terminal (clears memory).
     F20 toggles on/off-line mode.
 
-    Terminfo description would be something like
+    Terminfo description:
 
 ksm|DVK KSM,
     am, bw, dch1=\EP, ich1=\EQ,
@@ -46,9 +47,8 @@ ksm|DVK KSM,
     use=vt52,
 
     To do:
-    - make Caps Lock work
     - verify if pixel stretching is done by hw
-    - verify details of hw revisions
+    - verify details of hw revisions (memory map, DIP presence...)
     - baud rate selection (missing feature in bitbanger)
 
 ****************************************************************************/
@@ -140,7 +140,7 @@ protected:
 static ADDRESS_MAP_START( ksm_mem, AS_PROGRAM, 8, ksm_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x0000, 0x0fff) AM_ROM
-	AM_RANGE (0x2000, 0x21ff) AM_RAM
+	AM_RANGE (0x2000, 0x20ff) AM_RAM AM_MIRROR(0x0700)
 	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -408,11 +408,11 @@ ROM_START( dvk_ksm01 )
 	ROM_LOAD( "ksm_05_rom1_d33.bin", 0x0800, 0x0800, CRC(5b29bcd2) SHA1(1f4f82c2f88f1e8615ec02076559dc606497e654))
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_ERASE00)
-	ROM_LOAD("ksm_03_cg_d31.bin", 0x0000, 0x0800, CRC(98853aa7) SHA1(09b8e1b5b10a00c0b0ae7e36ad1328113d31230a))
+	ROM_LOAD("ksm_03_cg_d31.bin", 0x0000, 0x0800, CRC(6a8477e2) SHA1(c7871a96f135db05c3c8d718fbdf1728e22e72b7))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
 COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM",     0)
-COMP( 198?, dvk_ksm01,dvk_ksm,0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM-01",  0)
+COMP( 198?, dvk_ksm01,dvk_ksm,0,       ksm,       0,       driver_device,     0,     "USSR",     "DVK KSM-01",  0)
