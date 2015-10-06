@@ -37,7 +37,7 @@
          D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
  Partial D - SPG200 - V-Tech V-Smile
         ND - unknown - Wireless 60
-        ND - unknown - Wireless Ari 60
+        ND - unknown - Wireless Air 60
         ND - Likely many more
 
 
