@@ -1097,9 +1097,9 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
 
-$(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
+$(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py
 	@echo Converting $<...
-	$(SILENT)$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
+	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
 	
 #-------------------------------------------------

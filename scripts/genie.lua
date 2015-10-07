@@ -45,7 +45,7 @@ end
 
 function layoutbuildtask(_folder, _name)
 	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",
-		{  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
+		{  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
 end
 
 CPUS = {}
@@ -522,9 +522,9 @@ if (_OPTIONS["DRIVERS"] == nil) then
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 else
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "src/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " target " .. _OPTIONS["subtarget"])
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "src/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.c")
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.c")
 end
 configuration { "gmake" }
 	flags {
