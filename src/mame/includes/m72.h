@@ -7,6 +7,7 @@
 *************************************************************************/
 #include "audio/m72.h"
 #include "sound/dac.h"
+#include "machine/pic8259.h"
 
 class m72_state : public driver_device
 {
@@ -28,7 +29,9 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_soundram(*this, "soundram"),
 		m_generic_paletteram_16(*this, "paletteram"),
-		m_generic_paletteram2_16(*this, "paletteram2") { }
+		m_generic_paletteram2_16(*this, "paletteram2"),
+		m_upd71059c(*this, "upd71059c") 
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -47,10 +50,10 @@ public:
 	optional_shared_ptr<UINT8> m_soundram;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_shared_ptr<UINT16> m_generic_paletteram2_16;
+	optional_device<pic8259_device> m_upd71059c;
 
 	UINT16 *m_protection_ram;
 	emu_timer *m_scanline_timer;
-	UINT8 m_irq_base;
 	const UINT8 *m_protection_code;
 	const UINT8 *m_protection_crc;
 	UINT32 m_raster_irq_position;
