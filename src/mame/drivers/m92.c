@@ -959,7 +959,9 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_CPU_ADD("maincpu",V33,XTAL_18MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m92_map)
 	MCFG_CPU_IO_MAP(m92_portmap)
-//	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+#ifndef USE_HACKED_IRQS
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+#endif
 
 	MCFG_CPU_ADD("soundcpu" ,V35, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
