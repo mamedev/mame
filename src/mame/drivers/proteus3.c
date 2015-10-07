@@ -8,7 +8,7 @@
 
     Chips:
     6800 @ 894kHz
-    6850 (TTY interface)
+    6850 (TTY keyboard interface)
     6850 (Cassette interface)
     6820 (PIA for Keyboard and video
     6844 DMA
@@ -20,13 +20,27 @@
 
     Schematic has lots of errors and omissions.
 
+    Like many systems of the time, the cassette is grossly over-complicated,
+    using 12 chips for a standard Kansas-city interface. Speed = 600 baud.
+
+    To use the serial keyboard, type in the command: PORT#1
+    and to go back to the parallel keyboard type in: PORT#0
+
+    The Basic seems rather buggy and does odd things from time to time.
+    bios 0 doesn't seem to have any way to backspace and type over
+    bios 0 is the only one to have the EDIT command, although no idea how
+    to use it.
+    bios 2 is from a compatible system called "Micro Systemes 1", from the
+    same company.
+
     To Do:
-    - Hook up ACIAs
-    - Cassette
+    - Cassette (coded but too unreliable to be considered working)
+    - Add support for k7 cassette files.
     - Need software
     - Need missing PROM, so that all the CRTC controls can be emulated
-    - Keyboard may have its own CPU etc, but no info available. There's some
-      missing keys and buttons, such as HERE-IS key.
+    - Keyboard may have its own CPU etc, but no info available.
+    - Missing buttons: BYE, PANIC, SPEED, HERE-IS. Could be more.
+    - Should be able to type in some low-res graphics from the keyboard, not implemented.
 
 ******************************************************************************/
 
@@ -34,7 +48,11 @@
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
+#include "bus/rs232/rs232.h"
 
 
 class proteus3_state : public driver_device
@@ -44,11 +62,19 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_pia(*this, "pia")
+		, m_acia1(*this, "acia1")
+		, m_acia2(*this, "acia2")
+		, m_cass(*this, "cassette")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
+	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(acia2_clock_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	UINT32 screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
@@ -57,10 +83,16 @@ private:
 	UINT16 m_curs_pos;
 	UINT8 *m_p_chargen;
 	UINT8 *m_p_videoram;
+	UINT8 m_cass_data[4];
+	bool m_cass_state;
+	bool m_cassold;
+	UINT8 m_clockcnt;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
-	//required_device<acia6850_device> m_acia;
+	required_device<acia6850_device> m_acia1; // cassette uart
+	required_device<acia6850_device> m_acia2; // tty keyboard uart
+	required_device<cassette_image_device> m_cass;
 };
 
 
@@ -74,10 +106,10 @@ static ADDRESS_MAP_START(proteus3_mem, AS_PROGRAM, 8, proteus3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w)
+	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // cassette
 	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w)
-	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w)
+	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w) // serial keyboard
+	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w) // never writes data
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -92,12 +124,68 @@ INPUT_PORTS_END
 WRITE8_MEMBER( proteus3_state::kbd_put )
 {
 	if (data == 0x08)
-		data = 0x0f; // take care of backspace
+		data = 0x0f; // take care of backspace (bios 1 and 2)
 	m_pia->portb_w(data);
 	m_pia->cb1_w(1);
 	m_pia->cb1_w(0);
 }
 
+WRITE_LINE_MEMBER( proteus3_state::acia2_clock_w )
+{
+	m_acia2->write_txc(state);
+	m_acia2->write_rxc(state);
+}
+
+/******************************************************************************
+ Cassette
+******************************************************************************/
+TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_c )
+{
+	m_cass_data[3]++;
+
+	if (m_cass_state != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cass_state;
+	}
+
+	if (m_cass_state)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_p )
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.01) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_acia1->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
+}
+
+WRITE_LINE_MEMBER( proteus3_state::acia1_txdata_w )
+{
+	m_cass_state = state;
+}
+
+WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
+{
+	m_clockcnt++;
+	m_acia1->write_txc(BIT(m_clockcnt, 0));  // divide by 16 selected in the acia
+	if ((m_clockcnt & 0x0f) == 0x04)
+		m_acia1->write_rxc(BIT(m_clockcnt, 4));  // divide by 1 selected
+}
+
+
+/******************************************************************************
+ Video
+******************************************************************************/
 WRITE8_MEMBER( proteus3_state::video_w )
 {
 	m_video_data = data;
@@ -213,6 +301,10 @@ void proteus3_state::machine_reset()
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("vram")->base();
 	m_curs_pos = 0;
+	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
+	m_cass_state = 1;
+	m_cassold = 1;
+	m_acia1->write_rxd(1);
 }
 
 
@@ -236,15 +328,36 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", proteus3)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
+	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus3_state, video_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(proteus3_state, ca2_w))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-
-	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
-	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(proteus3_state, kbd_put))
+
+	/* cassette */
+	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(proteus3_state, acia1_txdata_w))
+	MCFG_DEVICE_ADD("acia1_clock", CLOCK, 9600) // this controls cassette baud rate
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(proteus3_state, acia1_clock_w))
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", proteus3_state, timer_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", proteus3_state, timer_p, attotime::from_hz(40000))
+
+	// optional tty keyboard
+	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("acia2_clock", CLOCK, 153600/8)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(proteus3_state, acia2_clock_w))
 MACHINE_CONFIG_END
 
 
