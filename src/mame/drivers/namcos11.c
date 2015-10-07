@@ -45,7 +45,7 @@ myangel3   Kosodate Quiz My Angel 3 (KQT1/VER.A)   COH-110             SYSTEM11 
 ptblank2ua Point Blank 2 (GNB3/VER.A)              COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8(64) PCB   C443     2
 
 
-Not Dumped Yet
+Not Dumped Yet (they possibly don't exist)
 --------------
 Point Blank 3                         (C) Namco, 2001
 Soul Edge Ver. III                    (C) Namco, 1996
@@ -262,12 +262,34 @@ Notes:
       SLA4060 - Sanken Electric Co. NPN Darlington Transistor Array (SIP12)
       J1      - 96 pin connector joining to the mother board (connector below the PCB)
       J2      - 96 pin connector joining to the CPU board (connector above the PCB)
-      J3      - 10 pin connector joining to the gun via a 24V solenoid driver board (for the gun recoil)
+      J3      - 10 pin connector joining to the gun via a 24V solenoid driver board (for the gun opto/recoil)
       S11GUN0 - PLCC84 FPGA (not populated)
       S11GUN1 - Altera Max EPM7128STC100-10 EPLD (QFP100, not populated)
       S11GUN2 - Altera Max EPM7128STC100-10 EPLD (QFP100, labelled 'S11GUN2)
       S11GUN3 - Altera Max EPM7128STC100-10 EPLD (QFP100, not populated)
       AV9170  - Integrated Circuit Systems Inc. AV9170 Clock Synchronizer and Multiplier, Voltage Controlled Oscillator (SOIC8)
+
+To connect a normal (i.e. HAPP) light gun only 4 wires are needed.
+Those are +5V, GND, trigger and gun optical sensor using pins 5 & 9 of J3 and pins 1, 3 & 22 (both solder and parts side)
+of the JAMMA connector. A Namco gun can also be connected the same way, with or without the kickback solenoid.
+
+J3 connector:
+Pin 1 - Not Used
+Pin 2 - Not Used
+Pin 3 - Gun 1 Solenoid
+Pin 4 - Player 1 Start Button Lamp
+Pin 5 - Gun 1 Sensor
+Pin 6 - GND
+Pin 7 - Gun 2 Solenoid
+Pin 8 - Player 2 Start Button Lamp
+Pin 9 - Gun 2 Sensor
+Pin 10- Not Used
+
+JAMMA Harness:
+Pin 1 Parts Side - GND
+Pin 3 Parts Side - +5V
+Pin 22 Parts Side - Gun 1 Trigger
+Pin 22 Solder Side - Gun 2 Trigger 
 
 ***************************************************************************/
 
