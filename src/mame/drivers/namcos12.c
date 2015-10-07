@@ -25,7 +25,7 @@ Namco System 12 - Arcade Playstation-based Hardware
 Game & software revision                 Company/Year            CPU board   Mother board        Daughter board   Keycus
 ------------------------------------------------------------------------------------------------------------------------
 Aqua Rush (AQ1/VER.A1)                   (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC053
-Attack Pla-Rail                          (C) Tomy/Namco,   199?
+Attack Pla-Rail (AP1/VER.A)              (C) Tomy/Namco,   1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC032
 Derby Quiz My Dream Horse (MDH1/VER.A2)  (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M10X64  KC035
 Ehrgeiz (EG1/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Ehrgeiz (EG2/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
@@ -228,6 +228,7 @@ Notes:
                      Game                      Sticker      Revision         MOTHER PCB
                      --------------------------------------------------------------------
                      Aqua Rush                 AQ1 Ver.A    AQ1/VER.A1       MOTHER(C) (ROMs serialised)
+                     Attack Pla-Rail           AP1 Ver.A    none             MOTHER(B)
                      Derby Quiz My Dream Horse MDH1 Ver.A   MDH1/VER.A2      MOTHER(B)
                      Ehrgeiz                   EG3 Ver.A    EG3/VER.A        MOTHER(B)
                      Golgo 13                  GLG1 Ver.A   GLG1/VER.A       MOTHER(C) (ROMs serialised)
@@ -267,6 +268,7 @@ Notes:
                                                             Test Mode S/W
                      Game                      Sticker      Revision         MOTHER PCB
                      --------------------------------------------------------------------
+                     Attack Pla-Rail           AP1 Ver.A    none             MOTHER(B)
                      Ehrgeiz                   EG2 Ver.A    EG2/VER.A        MOTHER(B)
                      Fighting Layer            FTL1 Ver.A   FTL0/VER.A       MOTHER(B)
                      Ghoul Panic               OB2 Ver.A    OB2/VER.A        MOTHER(B)
@@ -478,6 +480,11 @@ This PCB is used on:
                Software
 Game           Revision     PCB                                            KEYCUS   ROMs Populated
 -------------------------------------------------------------------------------------------------------------------
+Attack Pla-Rail AP1/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC032    AP1 WAVE0, AP1 WAVE1
+                                                                                    AP1 ROM0, AP1 ROM1, AP1 ROM2
+                                                                                    AP1 FL4L, AP1 FL4H
+                                                                                    AP1 FL3L, AP1 FL3H
+
 Fighting Layer FTL0/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC037    FTL1 WAVE0, FTL1 WAVE1
                                                                                     FTL1 ROM0, FTL1 ROM1, FTL1 ROM2
                                                                                     FTL1 FL4L, FTL1 FL4H
@@ -949,7 +956,7 @@ Notes:
       SLA4060 - Sanken Electric Co. NPN Darlington Transistor Array (SIP12)
       J1      - 96 pin connector joining to the mother board (connector below the PCB)
       J2      - 96 pin connector joining to the CPU board (connector above the PCB)
-      J3      - 10 pin connector joining to the gun via a 24V solenoid driver board (for the gun recoil)
+      J3      - 10 pin connector joining to the gun via a 24V solenoid driver board (for the gun opto/recoil)
       S11GUN0 - PLCC84 FPGA (not populated)
       S11GUN1 - Altera Max EPM7128STC100-10 EPLD (QFP100, not populated)
       S11GUN2 - Altera Max EPM7128STC100-10 EPLD (QFP100, labelled 'S11GUN2)
@@ -958,7 +965,31 @@ Notes:
 
       This PCB was found on the following games (so far)....
       Ghoul Panic (OB2/VER.A)
+      Oh! Bakyuuun (OB1/VER.A) 
+      Gunbarl (GNB4/VER.A) 
       Point Blank 2 (GNB5/VER.A)
+
+To connect a normal (i.e. HAPP) light gun only 4 wires are needed.
+Those are +5V, GND, trigger and gun optical sensor using pins 5 & 9 of J3 and pins 1, 3 & 22 (both solder and parts side)
+of the JAMMA connector. A Namco gun can also be connected the same way, with or without the kickback solenoid.
+
+J3 connector:
+Pin 1 - Not Used
+Pin 2 - Not Used
+Pin 3 - Gun 1 Solenoid
+Pin 4 - Player 1 Start Button Lamp
+Pin 5 - Gun 1 Sensor
+Pin 6 - GND
+Pin 7 - Gun 2 Solenoid
+Pin 8 - Player 2 Start Button Lamp
+Pin 9 - Gun 2 Sensor
+Pin 10- Not Used
+
+JAMMA Harness:
+Pin 1 Parts Side - GND
+Pin 3 Parts Side - +5V
+Pin 22 Parts Side - Gun 1 Trigger
+Pin 22 Solder Side - Gun 2 Trigger 
 
 
 CDXA PCB
@@ -1037,6 +1068,14 @@ Notes:
       JP1          - Jumper to configure the H8/3334 for internal or external ROM usage. Set to 2-3 (EXT)
       J1/2/3/8     - Multi-pin connectors joining to controls and main PCB
       J9           - Power input connector
+
+I/O board (for Attack Pla-Rail)      
+-------------------------------
+Attack Pla-Rail requires an I/O board to boot. Several I/O boards are accepted including TSS-I/O, FCA, ASCA3, ASCA5 
+and also the common JVS I/O boards manufactured by Sega.
+The game uses 3 buttons and a 5k potentiometer for the lever. The button signals come from the I/O board.
+The lever must be wired to pin 19 parts side of the Namco 48-way edge connector.
+
 */
 
 #include "emu.h"
