@@ -16,9 +16,9 @@
 #include "emu.h"
 #include "machine/pic8259.h"
 
-#define LOG_ICW     0
-#define LOG_OCW     0
-#define LOG_GENERAL  0
+#define LOG_ICW     1
+#define LOG_OCW     1
+#define LOG_GENERAL  1
 
 ALLOW_SAVE_TYPE(pic8259_device::pic8259_state_t); // allow save_item on a non-fundamental type
 
