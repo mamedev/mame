@@ -32,7 +32,7 @@ Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  H
 Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  Test mode shows 2.00E with same HDD 2.03J; HDD: Maxtor Fireball 3 30GB 2F030L0
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
-Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires unknown I/O PCB for IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
+Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires RAYS I/O PCB for IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
 Dragon Chronicles (satellite)................... ------X *DCO31-TS CD0        *CD           NM00020   DC001 Ver.A            Namco 2002                    \
 Dragon Chronicles Legend of the Master Ark (sat) ------X *DGC11 CD0           *CD          *NM00014  *DGC11 Ver.A1           Namco 200?                    | server is a custom PC
 Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    |
@@ -484,9 +484,51 @@ ZUW1R51212 - Cosel ZUW1R51212 DC to DC Power Supply Module (input 9-18VDC, outpu
 This PCB is used with Vampire Night and Time Crisis 3 (DX projector-screen version on System 246B/C)
 It's also used with Crisis Zone (on System 23 Evolution2)
 Note this board requires a CCD camera gun sensor.
-Note: None of the I/O PCBs listed here in this src file will work with Cobra The Arcade. 
-Cobra The Arcade uses IR guns and IR sensors. The game will boot with several I/O boards but in the test mode in
-'I/O TEST' the I/O board is reported as 'NG'. Therefore the I/O board for Cobra The Arcade is currently unknown.
+
+
+JVS I/O RAYS PCB
+8903960101 (8903970101)
+|---------------------------------------------|
+|   DSW(4)  DSW(4)        SDRAM       33.33MHz|
+|                                    |-----|  |
+|         EPM7064                    | SH4 |  |
+|J10                 24.576MHz       |-----|  |
+|    FLASH.8D  LLLLLLLL   XCS20XL             |
+|                                             |
+|                  KS0127B                    |
+|                                             |
+|                              NJM2267        |
+|   ADM485                                    |
+|J9                                  L        |
+|                                             |
+|  J8   J7     J6   J5    J4   J3   J2   J1   |
+|---------------------------------------------|
+Notes:
+       SH4 - Hitachi HD6417750 SH4 CPU
+  FLASH.8D - SHARP LH28F160S5T-L70 Flash ROM labelled 'JVS RAYS OA' (TSOP56)
+     SDRAM - SAMSUNG 2M x32-bit SDRAM (TSSOP86)
+   EPM7064 - Altera MAX EPM7064 CPLD labelled 'JVS RAY 1A' (TQFP100)
+   XCS20XL - Xilinx Spartan XCS20XL FPGA (TQFP144)
+   KS0127B - Samsung Multistandard Composite to RGB Video Decoder & Scaler (PQFP100)
+   NJM2267 - New Japan Radio NJM2267 Dual Video Amplifier (TSSOP8)
+    ADM485 - Analog Devices ADM485 RS-485 Transceiver (SOIC8)
+       DSW - 4 position dipswitch block, all off
+         L - LED
+        J1 - 6-pin connector for power input
+        J2 - 3-pin connector (not used)
+        J3 - 2-pin connector (not used)
+        J4 - 6-pin connector for CCD camera input
+        J5 - 12-pin connector for cabinet buttons (UP/DOWN/ENTER/TEST/SERVICE/COIN etc)
+        J6 - 4-pin connector for step pedal
+        J7 - 9-pin connector for gun LED, gun motor, gun trigger
+        J8 - 5-pin connector for communication with main PCB (sense, data+, data-)
+        J9 - 6-pin connector (not used)
+       J10 - 80-pin Namco connector (not used, probably for an add-on PCB with ROMs for diagnostics)
+
+This PCB is used with Cobra The Arcade. The game will boot with several I/O boards but in the test mode in 'I/O TEST' 
+the I/O board is only reported as good with the RAYS PCB, otherwise it reports 'NG'.
+This same PCB is also used with the DX rear-projection-screen version of Crisis Zone (on System 23 Evolution 2 hardware).
+Note this board requires a CCD camera and infrared guns and infrared sensors.
 
 
 Digital & Analog I/O boards
