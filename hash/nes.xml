@@ -45143,7 +45143,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dquest4a" cloneof="dwarr4">
+	<software name="dquest4a" cloneof="dwarr4" supported="no">
 		<description>Dragon Quest IV - Michibikareshi Monotachi (Jpn)</description>
 		<year>1990</year>
 		<publisher>Enix</publisher>
@@ -62524,23 +62524,6 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="sk5" supported="no">
-		<description>Sonic &amp; Knuckles 5</description>
-		<year>1997</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="Super Sonic 5 (on cart label)"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="super sonic 5 (1997) (unl) [!].chr" size="262144" crc="796303be" sha1="476cf4034fa5e69b8f74a33e8883cf9f96d47540" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="super sonic 5 (1997) (unl) [!].prg" size="262144" crc="cf2f673f" sha1="5a19f9e7565f7074dd2b041652c551e06937a1d3" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scontra7">
 		<description>Chao Ji Zhan Hun - Super Contra 7 (Asia)</description>
 		<year>1996</year>
@@ -70476,7 +70459,7 @@ Other
 		</part>
 	</software>
 
-	<software name="angrybr3">
+	<software name="angrybr3" supported="no">
 		<description>Angry Birds 3 (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
