@@ -56,44 +56,53 @@ WRITE16_MEMBER(hng64_state::dl_w)
 
 
 
-// TODO: different param for both Samurai games, less FIFO to process?
 WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
-	// this is written after the game uploads 16 packets, each 32 bytes long (2x 16 words?)
-	// we're assuming it to be a 'send to 3d hardware' trigger.
-	// this can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
+    // Data is:
+    // 00000f00 for everything else
+    // 00000b50 for the sams64 games
+    // TODO: different param for both Samurai games, less FIFO to process?
+    
+	// This is written after the game uploads 16 packets, each 16 words long
+	// We're assuming it to be a 'send to 3d hardware' trigger.
+	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
 g_profiler.start(PROFILER_USER1);
-	for(int packetStart=0;packetStart<0x200;packetStart+=32)
+	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
-		hng64_command3d(&m_dl[packetStart/2]);
+		hng64_command3d(&m_dl[packetStart]);
 	}
 
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
+    // Schedule a small amount of time to let the 3d hardware rasterize the display buffer
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 g_profiler.stop();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 {
-// ...
-	m_set_irq(0x0008);
+	set_irq(0x0008);
 }
 
-
-// Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown
-WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
+WRITE32_MEMBER(hng64_state::dl_control_w)
 {
+    // This could be a multiple display list thing, but the palette seems to be lost between lists?
+    // Many games briefly set this to 0x4 on startup. Maybe there are 3 display lists?
+    // The sams64 games briefly set this value to 0x0c00 on boot.  Maybe there are 4 lists and they can be combined?
+    if (data & 0x01)
+        m_activeDisplayList = 0;
+    else if (data & 0x02)
+        m_activeDisplayList = 1;
+    
 //  printf("dl_control_w %08x %08x\n", data, mem_mask);
-
-	//if(data & 2) // swap buffers
-	//{
-	//  clear3d();
-	//}
-
+//
+//  if(data & 2) // swap buffers
+//  {
+//      clear3d();
+//  }
+//
 //  printf("%02x\n",data);
-
+//
 //  if(data & 1) // process DMA from 3d FIFO to framebuffer
-
 //  if(data & 4) // reset buffer count
 }
 
@@ -1001,12 +1010,10 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 
 void hng64_state::clear3d()
 {
-	int i;
-
 	const rectangle &visarea = m_screen->visible_area();
 
 	// Reset the buffers...
-	for (i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
+	for (int i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
 		m_poly_renderer->depthBuffer3d()[i] = 100.0f;
 	}
@@ -1044,8 +1051,7 @@ void hng64_state::clear3d()
 // 4x4 matrix multiplication
 void hng64_state::matmul4(float *product, const float *a, const float *b)
 {
-	int i;
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		const float ai0 = a[0  + i];
 		const float ai1 = a[4  + i];
@@ -1080,9 +1086,7 @@ float hng64_state::vecDotProduct(const float *a, const float *b)
 
 void hng64_state::setIdentity(float *matrix)
 {
-	int i;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		matrix[i] = 0.0f;
 	}

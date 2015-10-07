@@ -203,7 +203,7 @@ public:
 	UINT32 m_mcu_fake_time;
 	UINT16 m_mcu_en;
 
-	UINT32 m_activeBuffer;
+	UINT32 m_activeDisplayList;
 	UINT32 m_no_machine_error_code;
 
 	UINT32 m_unk_vreg_toggle;
@@ -292,7 +292,7 @@ public:
 	DECLARE_DRIVER_INIT(hng64_fght);
 	DECLARE_DRIVER_INIT(hng64_reorder_gfx);
 
-	void m_set_irq(UINT32 irq_vector);
+	void set_irq(UINT32 irq_vector);
 	UINT32 m_irq_pending;
 	UINT8 *m_comm_rom;
 	UINT8 *m_comm_ram;
