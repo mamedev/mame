@@ -189,21 +189,25 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 	else
 	{
 		UINT8 data, attr;
-		int bgnd = 0;
+		int bgnd = 0, fgnd = 1;
 		data = m_charram[m_vram[address] * 16 + linecount];
 		attr = m_vram[address + 1];
 		if(cursor && blink)
 			data = 0xff;
 		if(ul && (attr & 0x20))
 			data = 0xff;
-		if(attr & 8)
-			bgnd = 2;
+
 		if(attr & 0x10)
 			data = ~data;
 		if(m_p2 & 8)
-			data = ~data;
+		{
+			fgnd = 0;
+			bgnd = (attr & 8) ? 2 : 1;
+		}
+		else if(attr & 8)
+			bgnd = 2;
 		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : bgnd);
+			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? fgnd : bgnd);
 	}
 }
 
