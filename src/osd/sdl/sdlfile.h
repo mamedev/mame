@@ -46,5 +46,6 @@ file_error sdl_open_ptty(const char *path, UINT32 openflags, osd_file **file, UI
 file_error sdl_read_ptty(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual);
 file_error sdl_write_ptty(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual);
 file_error sdl_close_ptty(osd_file *file);
+file_error sdl_slave_name_ptty(osd_file *file , char *name , size_t name_len);
 
 file_error error_to_file_error(UINT32 error);

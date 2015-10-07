@@ -79,6 +79,8 @@ files {
 	MAME_DIR .. "src/emu/dinvram.h",
 	MAME_DIR .. "src/emu/dioutput.c",
 	MAME_DIR .. "src/emu/dioutput.h",
+	MAME_DIR .. "src/emu/dipty.c",
+	MAME_DIR .. "src/emu/dipty.h",
 	MAME_DIR .. "src/emu/dirtc.c",
 	MAME_DIR .. "src/emu/dirtc.h",
 	MAME_DIR .. "src/emu/diserial.c",
