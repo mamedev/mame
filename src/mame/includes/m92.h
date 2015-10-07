@@ -54,7 +54,6 @@ public:
 	IRQ_CALLBACK_MEMBER(m92_irq_callback);
 
 	UINT16 m_sound_status;
-	UINT8 m_irq_vectorbase;
 	UINT32 m_raster_irq_position;
 	UINT16 m_videocontrol;
 	UINT8 m_sprite_buffer_busy;
@@ -88,7 +87,6 @@ public:
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
 	DECLARE_DRIVER_INIT(majtitl2);
 	DECLARE_DRIVER_INIT(ppan);
-	DECLARE_DRIVER_INIT(m92_alt);
 	DECLARE_DRIVER_INIT(lethalth);
 	DECLARE_DRIVER_INIT(m92);
 	DECLARE_DRIVER_INIT(m92_bank);
