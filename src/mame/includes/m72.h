@@ -9,6 +9,18 @@
 #include "sound/dac.h"
 #include "machine/pic8259.h"
 
+#define M81_B_B_JUMPER_J3_S \
+	PORT_START("JumperJ3") \
+	PORT_CONFNAME( 0x0001, 0x0000, "M81-B-B Jumper J3" ) \
+	PORT_CONFSETTING(      0x0000, "S" ) \
+	/* PORT_CONFSETTING(      0x0001, "W" ) */
+
+#define M81_B_B_JUMPER_J3_W \
+	PORT_START("JumperJ3") \
+	PORT_CONFNAME( 0x0001, 0x0001, "M81-B-B Jumper J3" ) \
+	/* PORT_CONFSETTING(      0x0000, "S" ) */ \
+	PORT_CONFSETTING(      0x0001, "W" )
+
 class m72_state : public driver_device
 {
 public:
@@ -30,7 +42,10 @@ public:
 		m_soundram(*this, "soundram"),
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_generic_paletteram2_16(*this, "paletteram2"),
-		m_upd71059c(*this, "upd71059c") 
+		m_upd71059c(*this, "upd71059c"),
+		m_fg_source(0),
+		m_bg_source(0),
+		m_m81_b_b_j3(*this, "JumperJ3")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -65,6 +80,10 @@ public:
 	INT32 m_scrollx2;
 	INT32 m_scrolly2;
 	INT32 m_video_off;
+
+	int m_fg_source;
+	int m_bg_source;
+	optional_ioport m_m81_b_b_j3;
 
 	//poundfor specific
 	int m_prev[4];
@@ -135,7 +154,6 @@ public:
 	void machine_start();
 	void machine_reset();
 	DECLARE_VIDEO_START(m72);
-	DECLARE_MACHINE_RESET(xmultipl);
 	DECLARE_VIDEO_START(xmultipl);
 	DECLARE_VIDEO_START(hharry);
 	DECLARE_VIDEO_START(rtype2);
@@ -165,9 +183,10 @@ public:
 
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_majtitle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
-	inline void rtype2_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
+	inline void m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
+	inline void m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
 	void register_savestate();
 	inline void changecolor(int color,int r,int g,int b);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
