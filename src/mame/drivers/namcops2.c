@@ -293,20 +293,32 @@ TMP95C061 - Toshiba TMP95C061 TLCS-900-series 16-bit Microcontroller (internal R
 K4S281632 - Samsung K4S281632B-TC1H 8M x16-bit SDRAM
 
 
-Add-on Memory Board (plugs into J10 on MOTHER(A) PCB)
--------------------
-This PCB is used with Bloody Roar 3, Vampire Night, Ridge Racer V and Wangan Midnight.
+Add-on Memory Boards (plugs into J10 on MOTHER(A) PCB)
+--------------------
 
 System246 RAM32 PCB
 8908960400 (8908970400)
 |--------------|
-|K4S281632     |
-|K4S281632     |
+|  16M   16M   |
+|              |
 |      J1      |
 |--------------|
 Notes:
-      K4S281632 - Samsung K4S281632B-TC1H 8M x16-bit SDRAM
-             J1 - Multi-pin connector
+      16M  - Samsung K4S281632B-TC1H 128Mbit (2M x16-bit x 4 banks) SDRAM
+        J1 - Multi-pin connector
+This PCB is used with Bloody Roar 3, Vampire Night and Ridge Racer V.
+
+System246 RAM64 PCB
+8908962800 (8908972800)
+|--------------|
+|16M   16M     |
+|   16M   16M  |
+|      J1      |
+|--------------|
+Notes:
+      16M - Hyundai HY57V281620AT-P 128Mbit (2M x16-bit x 4 banks) SDRAM
+       J1 - Multi-pin connector
+This PCB is used with Wangan Midnight and Wangan Midnight R.
 
 
 PS2 Adapter Board
@@ -564,7 +576,7 @@ Notes:
     ADM485 - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
      D1017 - D1017 transistor (8 parts populated)
 
-This PCB is used with Ridge Racer V and Wangan Midnight.
+This PCB is used with Ridge Racer V, Wangan Midnight and Wangan Midnight R.
 The FCA2(B) PCB is pb-free but otherwise identical to FCA PCB.
 
 
