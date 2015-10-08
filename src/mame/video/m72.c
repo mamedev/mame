@@ -170,12 +170,23 @@ VIDEO_START_MEMBER(m72_state,hharry)
 }
 
 
-// M82
-VIDEO_START_MEMBER(m72_state, m82_common)
+
+
+/* Major Title has a larger background RAM, and rowscroll */
+// the Air Duel conversion on the same PCB does not, is it jumper selectable, or a register, or a different RAM chip?
+TILEMAP_MAPPER_MEMBER(m72_state::m82_scan_rows)
+{
+	/* logical (col,row) -> memory offset */
+	return row*256 + col;
+}
+
+VIDEO_START_MEMBER(m72_state,m82)
 {
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
+// The layout ramains 256x64, the right half is just not displayed.
+	m_bg_tilemap_large = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::m82_scan_rows),this),8,8,128,64);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -185,52 +196,27 @@ VIDEO_START_MEMBER(m72_state, m82_common)
 	m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
 	m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
-	memset(m_buffered_spriteram,0,m_spriteram.bytes());
-
-
-
-	register_savestate();
-	save_item(NAME(m_majtitle_rowscroll));
-}
-
-/* Major Title has a larger background RAM, and rowscroll */
-// the Air Duel conversion on the same PCB does not, is it jumper selectable, or a register, or a different RAM chip?
-TILEMAP_MAPPER_MEMBER(m72_state::majtitle_scan_rows)
-{
-	/* logical (col,row) -> memory offset */
-	return row*256 + col;
-}
-
-VIDEO_START_MEMBER(m72_state,m82_large)
-{
-// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
-// The layout ramains 256x64, the right half is just not displayed.
-//  m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,256,64);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::majtitle_scan_rows),this),8,8,128,64);
-
-	VIDEO_START_CALL_MEMBER(m82_common);
+	m_bg_tilemap_large->set_transmask(0,0xffff,0x0000);
+	m_bg_tilemap_large->set_transmask(1,0x00ff,0xff00);
+	m_bg_tilemap_large->set_transmask(2,0x0001,0xfffe);
 
 	m_fg_tilemap->set_scrolldx(4,0);
 	m_fg_tilemap->set_scrolldy(-128,-128);
 	
-	m_bg_tilemap->set_scrolldx(4,0);
-	m_bg_tilemap->set_scrolldy(-128,-128);
-}
-
-VIDEO_START_MEMBER(m72_state, m82_small)
-{
-//  Air Duel expects the regular tilemap size
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-
-	VIDEO_START_CALL_MEMBER(m82_common);
-
-// why do the offsets also differ?
-	m_fg_tilemap->set_scrolldx(4,3);
-	m_fg_tilemap->set_scrolldy(-128,-128);
-
 	m_bg_tilemap->set_scrolldx(6-256,0);
 	m_bg_tilemap->set_scrolldy(-128,-128);
+
+	m_bg_tilemap_large->set_scrolldx(4,0);
+	m_bg_tilemap_large->set_scrolldy(-128,-128);
+
+	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
+	memset(m_buffered_spriteram,0,m_spriteram.bytes());
+
+	register_savestate();
+	save_item(NAME(m_m82_rowscroll));
+	save_item(NAME(m_m82_tmcontrol));
 }
+
 
 // M84
 VIDEO_START_MEMBER(m72_state,rtype2)
@@ -349,6 +335,11 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
+
+	// m82 has selectable tilemap size
+	if (m_bg_tilemap_large)
+		m_bg_tilemap_large->mark_tile_dirty(offset/2);
+
 }
 
 WRITE16_MEMBER(m72_state::irq_line_w)
@@ -432,13 +423,21 @@ WRITE16_MEMBER(m72_state::rtype2_port02_w)
 
 
 /* the following is mostly a kludge. This register seems to be used for something else */
-WRITE16_MEMBER(m72_state::majtitle_gfx_ctrl_w)
+WRITE16_MEMBER(m72_state::m82_gfx_ctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data & 0xff00) m_majtitle_rowscroll = 1;
-		else m_majtitle_rowscroll = 0;
+		if (data & 0xff00) m_m82_rowscroll = 1;
+		else m_m82_rowscroll = 0;
 	}
+//	printf("m82_gfx_ctrl_w %04x\n", data);
+
+}
+
+WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
+{
+	COMBINE_DATA(&m_m82_tmcontrol);
+	printf("tmcontrol %04x\n", m_m82_tmcontrol);
 }
 
 
@@ -585,9 +584,14 @@ UINT32 m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-UINT32 m72_state::screen_update_majtitle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 m72_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
+
+	tilemap_t* tm;
+
+	if (m_m82_tmcontrol & 0x40) tm = m_bg_tilemap_large;
+	else  tm = m_bg_tilemap;
 
 
 	if (m_video_off)
@@ -599,25 +603,25 @@ UINT32 m72_state::screen_update_majtitle(screen_device &screen, bitmap_ind16 &bi
 	m_fg_tilemap->set_scrollx(0,m_scrollx1);
 	m_fg_tilemap->set_scrolly(0,m_scrolly1);
 
-	if (m_majtitle_rowscroll)
+	if (m_m82_rowscroll)
 	{
-		m_bg_tilemap->set_scroll_rows(512);
+		tm->set_scroll_rows(512);
 		for (i = 0;i < 512;i++)
-			m_bg_tilemap->set_scrollx((i+m_scrolly2)&0x1ff,
-					256 + m_majtitle_rowscrollram[i]);
+			tm->set_scrollx((i+m_scrolly2)&0x1ff,
+					256 + m_m82_rowscrollram[i]);
 	}
 	else
 	{
-		m_bg_tilemap->set_scroll_rows(1);
-		m_bg_tilemap->set_scrollx(0,256 + m_scrollx2);
+		tm->set_scroll_rows(1);
+		tm->set_scrollx(0,256 + m_scrollx2);
 	}
-	m_bg_tilemap->set_scrolly(0,m_scrolly2);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
+	tm->set_scrolly(0,m_scrolly2);
+	tm->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	majtitle_draw_sprites(bitmap,cliprect);
 	draw_sprites(bitmap,cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	tm->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

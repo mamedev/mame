@@ -37,7 +37,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
-		m_majtitle_rowscrollram(*this, "majtitle_rowscr"),
+		m_m82_rowscrollram(*this, "majtitle_rowscr"),
 		m_spriteram2(*this, "spriteram2"),
 		m_soundram(*this, "soundram"),
 		m_generic_paletteram_16(*this, "paletteram"),
@@ -45,7 +45,9 @@ public:
 		m_upd71059c(*this, "upd71059c"),
 		m_fg_source(0),
 		m_bg_source(0),
-		m_m81_b_b_j3(*this, "JumperJ3")
+		m_m81_b_b_j3(*this, "JumperJ3"),
+		m_m82_rowscroll(0),
+		m_m82_tmcontrol(0)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -60,7 +62,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram1;
 	required_shared_ptr<UINT16> m_videoram2;
-	optional_shared_ptr<UINT16> m_majtitle_rowscrollram;
+	optional_shared_ptr<UINT16> m_m82_rowscrollram;
 	optional_shared_ptr<UINT16> m_spriteram2;
 	optional_shared_ptr<UINT8> m_soundram;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
@@ -75,6 +77,7 @@ public:
 	UINT16 *m_buffered_spriteram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap_large;
 	INT32 m_scrollx1;
 	INT32 m_scrolly1;
 	INT32 m_scrollx2;
@@ -90,7 +93,8 @@ public:
 	int m_diff[4];
 
 	// majtitle specific
-	int m_majtitle_rowscroll;
+	int m_m82_rowscroll;
+	UINT16 m_m82_tmcontrol;
 
 	// m72_i8751 specific
 	UINT8 m_mcu_snd_cmd_latch;
@@ -141,7 +145,8 @@ public:
 	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
 	DECLARE_READ16_MEMBER(poundfor_trackball_r);
 	DECLARE_WRITE16_MEMBER(rtype2_port02_w);
-	DECLARE_WRITE16_MEMBER(majtitle_gfx_ctrl_w);
+	DECLARE_WRITE16_MEMBER(m82_gfx_ctrl_w);
+	DECLARE_WRITE16_MEMBER(m82_tm_ctrl_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -149,7 +154,7 @@ public:
 	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
 
-	TILEMAP_MAPPER_MEMBER(majtitle_scan_rows);
+	TILEMAP_MAPPER_MEMBER(m82_scan_rows);
 
 	void machine_start();
 	void machine_reset();
@@ -157,9 +162,7 @@ public:
 	DECLARE_VIDEO_START(xmultipl);
 	DECLARE_VIDEO_START(hharry);
 	DECLARE_VIDEO_START(rtype2);
-	DECLARE_VIDEO_START(m82_common);
-	DECLARE_VIDEO_START(m82_small);
-	DECLARE_VIDEO_START(m82_large);
+	DECLARE_VIDEO_START(m82);
 	DECLARE_VIDEO_START(hharryu);
 	DECLARE_VIDEO_START(poundfor);
 	DECLARE_MACHINE_START(kengo);
@@ -184,7 +187,7 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_majtitle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
 	inline void m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
 	void register_savestate();

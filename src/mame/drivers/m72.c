@@ -123,7 +123,7 @@ Ken-Go / Lightning Swords          1991  M84-A-A + M84-B-B   Encrypted
  Hammering Harry
 
 TODO:
-- majtitle_gfx_ctrl_w is unknown, it seems to be used to disable rowscroll,
+- m82_gfx_ctrl_w is unknown, it seems to be used to disable rowscroll,
   and maybe other things
 
 - Maybe there is a layer enable register, e.g. nspirit shows (for an instant)
@@ -1038,7 +1038,7 @@ static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
+static ADDRESS_MAP_START( m82_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1049,7 +1049,10 @@ static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
 	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
-	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
+
+	// these ports control the tilemap sizes, rowscroll etc. that m82 has, exact bit usage not known (maybe one for each layer?)
+	AM_RANGE(0x8c, 0x8d) AM_WRITE(m82_tm_ctrl_w)
+	AM_RANGE(0x8e, 0x8f) AM_WRITE(m82_gfx_ctrl_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m81_portmap, AS_IO, 16, m72_state )
@@ -2071,12 +2074,12 @@ M82-A-A as the top board
 M82-B-A and as the bottom board
 
 */
-static MACHINE_CONFIG_START( m82_large, m72_state )
+static MACHINE_CONFIG_START( m82, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
 	MCFG_CPU_PROGRAM_MAP(majtitle_map)
-	MCFG_CPU_IO_MAP(majtitle_portmap)
+	MCFG_CPU_IO_MAP(m82_portmap)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK)
@@ -2093,22 +2096,13 @@ static MACHINE_CONFIG_START( m82_large, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_majtitle)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m82)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(m72_state,m82_large)
+	MCFG_VIDEO_START_OVERRIDE(m72_state,m82)
 
 	MCFG_FRAGMENT_ADD(m72_audio_chips)
 MACHINE_CONFIG_END
-
-// this is a conversion of Major Title
-static MACHINE_CONFIG_DERIVED( m82_small, m82_large ) // m82
-	MCFG_VIDEO_START_OVERRIDE(m72_state,m82_small)
-MACHINE_CONFIG_END
-
-
-
-
 
 
 /* Pound for Pound uses 
@@ -3722,8 +3716,8 @@ GAME( 1989, rtype2,      0,        rtype2,      rtype2,   driver_device, 0,     
 GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, majtitle,    0,        m82_large,   rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
-GAME( 1990, majtitlej,   majtitle, m82_large,   rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, majtitle,    0,        m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
+GAME( 1990, majtitlej,   majtitle, m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
 GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,driver_device,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -3734,7 +3728,7 @@ GAME( 1990, poundfor,    0,        poundfor,    poundfor, driver_device, 0,     
 GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
 GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, airduel,     0,        m82_small,   airduel,  driver_device, 0,           ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
+GAME( 1990, airduel,     0,        m82,         airduel,  driver_device, 0,           ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
 GAME( 1990, airduelm72,  airduel,  m72,         airduel,  m72_state,     airduelm72,  ROT270, "Irem", "Air Duel (Japan, M72)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   driver_device, 0,           ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
