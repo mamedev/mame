@@ -919,9 +919,9 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
 			fprintf(stderr,"Out:%06d ", this_sample);
 //#ifdef PERFECT_INTERPOLATION_HACK
-//			fprintf(stderr,"%d%d%d%d",m_old_zpar,m_zpar,m_old_uv_zpar,m_uv_zpar);
+//          fprintf(stderr,"%d%d%d%d",m_old_zpar,m_zpar,m_old_uv_zpar,m_uv_zpar);
 //#else
-//			fprintf(stderr,"x%dx%d",m_zpar,m_uv_zpar);
+//          fprintf(stderr,"x%dx%d",m_zpar,m_uv_zpar);
 //#endif
 			fprintf(stderr,"\n");
 #endif

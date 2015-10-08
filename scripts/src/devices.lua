@@ -65,8 +65,7 @@ if (_OPTIONS["DRIVERS"] == nil) then
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "src/mess", -- some mess bus devices need this
-		MAME_DIR .. "src/mame", -- used for nes bus devices
+		MAME_DIR .. "src/mame", -- used for nes bus devices,some mess bus devices need this
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 	}

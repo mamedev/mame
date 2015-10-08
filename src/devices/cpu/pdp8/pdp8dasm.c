@@ -3,7 +3,7 @@
 /*
     First-gen DEC PDP-8 disassembler
 
-    Written by MooglyGuy
+    Written by Ryan Holtz
 */
 
 #include "emu.h"

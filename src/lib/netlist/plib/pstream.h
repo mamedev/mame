@@ -288,8 +288,8 @@ protected:
 	pifilestream(void *file, const bool do_close);
 
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, unsigned n);
-	virtual void vseek(pos_type n);
+	virtual unsigned vread(void *buf, const unsigned n);
+	virtual void vseek(const pos_type n);
 	virtual pos_type vtell();
 
 private:
@@ -327,8 +327,8 @@ public:
 
 protected:
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, unsigned n);
-	virtual void vseek(pos_type n);
+	virtual unsigned vread(void *buf, const unsigned n);
+	virtual void vseek(const pos_type n);
 	virtual pos_type vtell();
 
 private:

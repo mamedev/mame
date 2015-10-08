@@ -35,8 +35,10 @@ class tonton_state : public driver_device
 public:
 	tonton_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_v9938(*this, "v9938") ,
-		m_maincpu(*this, "maincpu") { }
+		m_v9938(*this, "v9938"),
+		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper")
+	{ }
 
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
@@ -44,9 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_bout_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	TIMER_DEVICE_CALLBACK_MEMBER(tonton_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(tonton_vdp0_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<ticket_dispenser_device> m_hopper;
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -55,15 +57,6 @@ public:
 
 #define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
 #define VDP_MEM         0x30000
-
-
-/* from MSX2 driver, may be not accurate for this HW */
-#define MSX2_XBORDER_PIXELS     16
-#define MSX2_YBORDER_PIXELS     28
-#define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS      212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
 
 /*************************************************
@@ -84,7 +77,7 @@ WRITE8_MEMBER(tonton_state::tonton_outport_w)
 {
 	coin_counter_w(machine(), offset, data & 0x01);
 	coin_lockout_global_w(machine(), data & 0x02);  /* Coin Lock */
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x02));    /* Hopper Motor */
+	m_hopper->write(space, 0, (data & 0x02));    /* Hopper Motor */
 
 //  if(data & 0xfe)
 //      logerror("%02x %02x\n",data,offset);
@@ -213,12 +206,6 @@ void tonton_state::machine_reset()
 *      R/W Handlers and Interrupt Routines       *
 *************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(tonton_state::tonton_interrupt)
-{
-	m_v9938->interrupt();
-}
-
-
 WRITE8_MEMBER(tonton_state::ay_aout_w)
 {
 	logerror("AY8910: Port A out: %02X\n", data);
@@ -239,7 +226,6 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
 	MCFG_CPU_PROGRAM_MAP(tonton_map)
 	MCFG_CPU_IO_MAP(tonton_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tonton_state, tonton_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -247,16 +233,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(tonton_state,tonton_vdp0_interrupt))
-
-	MCFG_SCREEN_ADD("screen",RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
-	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
-	MCFG_SCREEN_PALETTE("v9938:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 

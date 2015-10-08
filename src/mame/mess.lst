@@ -40,6 +40,7 @@ dendy     // Dendy (Classic russian famiclone)
 gchinatv  // Golden China TV Game Centre (Chinese famiclone)
 gameboy   // Nintendo Game Boy Handheld
 supergb   // Nintendo Super Game Boy SNES Cartridge
+supergb2
 gbpocket  // Nintendo Game Boy Pocket Handheld
 gbcolor   // Nintendo Game Boy Color Handheld
 gba       // Nintendo Game Boy Advance Handheld
@@ -728,6 +729,9 @@ a4000tn
 c65    // 1991 C65 / C64DX (Prototype, NTSC)
 c64dx    // 1991 C65 / C64DX (Prototype, German PAL)
 
+mps1000 // 1986 Commodore MPS-1000 (dot matrix printer)
+mps1230 // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
+
 // Epson
 px4    // 1985 Epson PX-4
 px4p      // 1985 Epson PX-4+
@@ -1301,6 +1305,8 @@ gjrstar  // Genius Junior Redstar(Germany)
 gjrstar2 // Genius Junior Redstar 2 (Germany)
 gj5000   // Genius Junior 5000 (Germany)
 gl6600cx // Genius Leader 6600CX (Germany)
+gkidabc  // Genius KID ABC Fan (Germany)
+cars2lap // CARS 2 Laptop (Germany)
 glpn     // Genius Leader Power Notebook (Germany)
 lexipcm  // LexiPC Mega 2000 (Germany)
 pitagjr  // Pitagorin Junior
@@ -1606,6 +1612,7 @@ mekd2    // 1977 Motorola Evaluation Kit
 
 // DEC
 pdp1      // 1961 DEC PDP1
+la120 // 1978 Digital Equipment Corporation
 vt100 // 1978 Digital Equipment Corporation
 //vt100wp // 1978 Digital Equipment Corporation
 //vt100stp // 1978 Digital Equipment Corporation
@@ -1833,6 +1840,9 @@ lik
 erik
 specimx
 pioner
+
+// Steve Ciarcia (this is the name of the designer, not a company) / BYTE / McGRAW-HILL
+zapcomp    // (1981) ZAP computer - Z80 Applications Processor
 
 // Orion
 orion128
@@ -2272,6 +2282,7 @@ tibusan1
 wizatron
 lilprof
 lilprof78
+dataman
 
 // hh_ucom4
 ufombs      // Bambino
@@ -2319,6 +2330,7 @@ bcs3
 bcs3a
 bcs3b
 bcs3c
+bcs3d
 bob85
 c80
 ds348 //Sigtron Daruma
@@ -2714,6 +2726,7 @@ mcb216
 cb308
 myvision
 mkit09
+mkit09a
 cpu09
 ivg09
 pulsarlb
@@ -2740,3 +2753,9 @@ bitgrphb
 tvgame
 aussieby
 hp_ipc
+lggp40
+mt735
+squale
+micral
+rd100
+proteus3

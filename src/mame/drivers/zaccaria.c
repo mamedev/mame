@@ -506,16 +506,16 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
-//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map_1)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zaccaria_state, cb1_toggle, (double)XTAL_3_579545MHz/4096)
-//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map_2)
-//	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
@@ -686,6 +686,12 @@ ROM_START( jackrabt2 )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "jr-ic9g",      0x0000, 0x0200, CRC(85577107) SHA1(76575fa68b66130b18dfe7374d1a03740963cc73) )
 	ROM_LOAD( "jr-ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8.6j",   0x0000, 0x0104, CRC(a88e52d6) SHA1(32efecb91843d5d1bdace86cbcc94ebacf1b9389) )
+	ROM_LOAD( "pal16l8.6k",   0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "82s100.8c",    0x0400, 0x00f5, CRC(70ddfa6d) SHA1(904347cc63e88413c393f14b5f1260a57ab72677) )
+	ROM_LOAD( "82s100.8n",    0x0500, 0x00f5, CRC(e00625ee) SHA1(88bbd020be67355dc0eb58b79f7deb77cbe505bb) )
 ROM_END
 
 ROM_START( jackrabts )

@@ -3,7 +3,7 @@
 /*
     Atmel 8-bit AVR disassembler
 
-    Written by MooglyGuy
+    Written by Ryan Holtz
 */
 
 #include "emu.h"

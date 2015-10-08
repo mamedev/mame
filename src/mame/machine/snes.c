@@ -10,7 +10,7 @@
   Anthony Kruize
   Angelo Salese
   Fabio Priuli
-  Harmony
+  Ryan Holtz
   Based on the original code by Lee Hammerton (aka Savoury Snax)
   Thanks to Anomie for invaluable technical information.
   Thanks to byuu for invaluable technical information.

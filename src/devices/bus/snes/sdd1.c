@@ -5,7 +5,7 @@
  S-DD1 add-on chip emulation (for SNES/SFC)
 
  Based on Andreas Naive Public Domain code.
- Code ported by MooglyGuy and updated to slots by Fabio Priuli.
+ Code ported by Ryan Holtz and updated to slots by Fabio Priuli.
 
  ***********************************************************************************************************/
 

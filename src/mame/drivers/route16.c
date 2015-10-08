@@ -669,7 +669,28 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( route16 )
+	ROM_START( route16 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "tvg54.a0",     0x0000, 0x0800, CRC(aef9ffc1) SHA1(178d23e4963336ded93c13cb17940a4ae98270c5) )
+	ROM_LOAD( "tvg55.a1",     0x0800, 0x0800, CRC(389bc077) SHA1(b0606f6e647e81ceae7148bda96bd4673a51e823) )
+	ROM_LOAD( "tvg56.a2",     0x1000, 0x0800, CRC(1065a468) SHA1(4a707a42fb5a718043c173cb98ff3523eb274ccc) )
+	ROM_LOAD( "tvg57.a3",     0x1800, 0x0800, CRC(0b1987f3) SHA1(9b8abd6ec1ae15ca0d5e4de6b8a7ebf6c929d767) )
+	ROM_LOAD( "tvg58.a4",     0x2000, 0x0800, CRC(f67d853a) SHA1(7479e84082e78f8670cc50858ce6a006d3063413) )
+	ROM_LOAD( "tvg59.a5",     0x2800, 0x0800, CRC(d85cf758) SHA1(5af21250ee44ab1a43b844ede5a777a3d33b78b5) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "tvg60.b0",     0x0000, 0x0800, CRC(0f9588a7) SHA1(dfaffec4dbabd98cdc21a416bd2966d9d3ae6ad1) )
+	ROM_LOAD( "tvg61.b1",     0x0800, 0x0800, CRC(2b326cf9) SHA1(c6602a9440a982c39f5836c6ab72283b6f9241be) )
+	ROM_LOAD( "tvg62.b2",     0x1000, 0x0800, CRC(529cad13) SHA1(b533d20df1f2580e237c3d60bfe3483486ad9a48) )
+	ROM_LOAD( "tvg63.b3",     0x1800, 0x0800, CRC(3bd8b899) SHA1(bc0c7909dbf5ea85eba5a1bb815fdd98c3aa794e) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
+	ROM_LOAD( "mb7052.59",    0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
+	ROM_LOAD( "mb7052.61",    0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
+ROM_END
+
+ROM_START( route16c )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "route16.a0",   0x0000, 0x0800, CRC(8f9101bd) SHA1(b2c0156d41e295282387fb85fc272b031a6d1b64) )
 	ROM_LOAD( "route16.a1",   0x0800, 0x0800, CRC(389bc077) SHA1(b0606f6e647e81ceae7148bda96bd4673a51e823) )
@@ -711,7 +732,7 @@ ROM_START( route16a )
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
-ROM_START( route16b )
+ROM_START( route16bl )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "rt16.0",       0x0000, 0x0800, CRC(b1f0f636) SHA1(f21915ed40ebdf64970fb7e3cd8071ebfc4aa0b5) )
 	ROM_LOAD( "rt16.1",       0x0800, 0x0800, CRC(3ec52fe5) SHA1(451969b5caedd665231ef78cf262679d6d4c8507) )
@@ -731,6 +752,8 @@ ROM_START( route16b )
 	ROM_LOAD( "im5623.f10",   0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
+
+
 
 ROM_START( routex )
 	ROM_REGION( 0x10000, "cpu1", 0 )
@@ -938,6 +961,23 @@ READ8_MEMBER(route16_state::routex_prot_read)
 DRIVER_INIT_MEMBER(route16_state,route16)
 {
 	UINT8 *ROM = memregion("cpu1")->base();
+	/* TO DO : Replace these patches with simulation of the protection device */
+
+	/* patch the protection */
+	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
+	ROM[0x0106] = 0x00;
+	ROM[0x0107] = 0x00;
+
+	ROM[0x072a] = 0x00; /* jp nz,$4238 (nirvana) */
+	ROM[0x072b] = 0x00;
+	ROM[0x072c] = 0x00;
+
+	DRIVER_INIT_CALL(route16c);
+}
+
+DRIVER_INIT_MEMBER(route16_state,route16c)
+{
+	UINT8 *ROM = memregion("cpu1")->base();
 	/* Is this actually a bootleg? some of the protection has
 	   been removed */
 
@@ -958,7 +998,7 @@ DRIVER_INIT_MEMBER(route16_state,route16a)
 	/* patch the protection */
 	ROM[0x00e9] = 0x3a;
 
-	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16 */
+	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
 	ROM[0x0106] = 0x00;
 	ROM[0x0107] = 0x00;
 
@@ -973,6 +1013,8 @@ DRIVER_INIT_MEMBER(route16_state,route16a)
 
 
 
+
+
 /*************************************
  *
  *  Game drivers
@@ -981,12 +1023,15 @@ DRIVER_INIT_MEMBER(route16_state,route16a)
 
 GAME( 1981, route16,  0,        route16,  route16, route16_state,  route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, route16a, route16,  route16,  route16, route16_state,  route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16b, route16,  route16,  route16, driver_device,  0,        ROT270, "bootleg", "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16, driver_device,  0,        ROT270, "bootleg", "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakres, 0,        speakres, speakres, driver_device, 0,        ROT270, "Sun Electronics", "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb,speakres, speakres, speakres, driver_device, 0,        ROT270, "bootleg", "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16, route16_state,  route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16bl,route16,  route16,  route16, driver_device,  0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16, driver_device,  0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1980, speakres, 0,        speakres, speakres, driver_device, 0,        ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb,speakres, speakres, speakres, driver_device, 0,        ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, stratvox, speakres, stratvox, stratvox, driver_device, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "bootleg", "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)", "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)", "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, driver_device, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

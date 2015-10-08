@@ -7,6 +7,7 @@
 *************************************************************************/
 #include "audio/m72.h"
 #include "sound/dac.h"
+#include "machine/pic8259.h"
 
 class m72_state : public driver_device
 {
@@ -28,7 +29,9 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_soundram(*this, "soundram"),
 		m_generic_paletteram_16(*this, "paletteram"),
-		m_generic_paletteram2_16(*this, "paletteram2") { }
+		m_generic_paletteram2_16(*this, "paletteram2"),
+		m_upd71059c(*this, "upd71059c") 
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -47,10 +50,10 @@ public:
 	optional_shared_ptr<UINT8> m_soundram;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_shared_ptr<UINT16> m_generic_paletteram2_16;
+	optional_device<pic8259_device> m_upd71059c;
 
 	UINT16 *m_protection_ram;
 	emu_timer *m_scanline_timer;
-	UINT8 m_irq_base;
 	const UINT8 *m_protection_code;
 	const UINT8 *m_protection_crc;
 	UINT32 m_raster_irq_position;
@@ -114,7 +117,7 @@ public:
 	DECLARE_WRITE16_MEMBER(imgfight_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(loht_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(dbreedm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(airduel_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(airduelm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
 	DECLARE_READ16_MEMBER(poundfor_trackball_r);
@@ -123,9 +126,10 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(hharry_get_bg_tile_info);
+
 	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
+
 	TILEMAP_MAPPER_MEMBER(majtitle_scan_rows);
 
 	void machine_start();
@@ -135,7 +139,9 @@ public:
 	DECLARE_VIDEO_START(xmultipl);
 	DECLARE_VIDEO_START(hharry);
 	DECLARE_VIDEO_START(rtype2);
-	DECLARE_VIDEO_START(majtitle);
+	DECLARE_VIDEO_START(m82_common);
+	DECLARE_VIDEO_START(m82_small);
+	DECLARE_VIDEO_START(m82_large);
 	DECLARE_VIDEO_START(hharryu);
 	DECLARE_VIDEO_START(poundfor);
 	DECLARE_MACHINE_START(kengo);
@@ -145,7 +151,7 @@ public:
 	DECLARE_DRIVER_INIT(gallop);
 	DECLARE_DRIVER_INIT(m72_8751);
 	DECLARE_DRIVER_INIT(dbreedm72);
-	DECLARE_DRIVER_INIT(airduel);
+	DECLARE_DRIVER_INIT(airduelm72);
 	DECLARE_DRIVER_INIT(nspirit);
 	DECLARE_DRIVER_INIT(loht);
 	DECLARE_DRIVER_INIT(imgfight);

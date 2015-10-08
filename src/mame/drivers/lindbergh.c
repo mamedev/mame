@@ -71,63 +71,63 @@ is a combination of our research and things found on the internet.
 
 Lindbergh Game List
 -------------------
-                                               Security
-Game                                           Dongle Sticker    PIC Number      DVD Code
+                                              Security          Sega Part#
+Game                                          Dongle Sticker    printed on PIC  DVD Code
 ------------------------------------------------------------------------------------------
-*2 Spicy                                       253-5508-0491     317-0491-COM    DVP-0027A
- After Burner Climax (EXPORT)                  253-5508-0440A   ^317-0440-COM    DVP-0009
- After Burner Climax CE                        ?                 ?               DVP-0031A
- Ami-Gyo                                       ?                 ?               ?
- Answer X Answer                               ?                 ?               ?
- Answer X Answer 1.1                           ?                 ?               ?
- Answer X Answer DX                            ?                 ?               ?
- Answer X Answer Premium                       ?                 ?               ?
- Club Majesty Extend                           ?                 ?               ?
- Club Majesty Formal                           ?                 ?               ?
- Derby Owners Club 2008: Feel the Rush         ?                 ?               DVP-0047A
- Derby Owners Club 2008: Feel the Rush V2.0    ?                 ?               ?
-*Ghost Squad Evolution                         ?                 ?               DVP-0029A
- Harley Davidson: King of the Road             ?                 ?               ?
- Hummer Extreme                                ?                 ?               ?
- Initial D Arcade Stage 4                      ?                 ?               DVP-0019
- Initial D Arcade Stage 4 (rev A)              ?                 ?               DVP-0019A
- Initial D Arcade Stage 4 (rev B)              ?                 ?               DVP-0019B
- Initial D Arcade Stage 4 (rev D)              ?                 ?               DVP-0019D
- Initial D Arcade Stage 4 (rev G)              ?                 ?               DVP-0019G
- Initial D4                                    ?                 ?               DVP-0030
- Initial D4 (rev B)                            253-5508-0486E    317-0486-COM    DVP-0030B
-*Initial D4 (rev C)                            253-5508-0486E    317-0486-COM    DVP-0030C
-*Initial D4 (rev D)                            253-5508-0486E    317-0486-COM    DVP-0030D
- Initial D Arcade Stage 5                      ?                 ?               ?
- Let's Go Jungle (EXPORT)                      253-5508-0442     317-0442-COM    DVP-0011
- MJ4                                           ?                 ?               ?
- OutRun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
- OutRun 2 SP SDX                               ?                 ?               DVP-0015A
-*Primeval Hunt                                 253-5508-0512     317-0512-COM    DVP-0048A
- R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
-*Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM    DVP-0069
- SEGA Network Taisen Mahjong MJ4 (rev A)       ?                 ?               DVP-0049A
- SEGA Network Taisen Mahjong MJ4 (rev F)       ?                 ?               DVP-0049F
- SEGA Network Taisen Mahjong MJ4 (rev G)       ?                 ?               DVP-0049G
-*SEGA-Race TV (EXPORT)                         253-5508-0504    ^317-0504-COM    DVP-0044
- StarHorse 2: Fifth Expansion (rev D)          ?                 ?               DVP-0082D
- StarHorse 2: Fifth Expansion (rev E)          ?                 ?               DVP-0082E
-*The House Of The Dead 4 (EXPORT)              253-5508-0427    ^317-0427-COM    DVP-0003A
- The House Of The Dead EX (JAPAN)              253-5508-0550    ^317-0550-JPN    ?
- The House Of the Dead 4 Special               ?                 ?               ?
-*VBIOS Update                                  ?                 ?               DVP-0021B
- VBIOS Update [For VTF]                        ?                 ?               DVP-0023A
- Virtua Fighter 5 (EXPORT)                     253-5508-0438     317-0438-COM    DVP-0008E
- Virtua Tennis 3 (Power Smash 3)               ?                 ?               DVP-0005
- Virtua Tennis 3 (Power Smash 3) (EXPORT)      253-5508-0434    ^317-0434-COM    DVP-0005A
-*Virtua Tennis 3 (JAPAN)                       253-5508-0506     317-0506-JPN    DVP-0005C
- WCC Football Intercontinental Clubs 2006-2007 ?                 ?               ?
- WCC Football Intercontinental Clubs 2007-2008 ?                 ?               ?
- WCC Football Intercontinental Clubs 2008-2009 ?                 ?               ?
- WCC Football Intercontinental Clubs 2009-2010 ?                 ?               ?
+2 Spicy                                       253-5508-0491     317-0491-COM   ^DVP-0027A
+After Burner Climax (EXPORT)                  253-5508-0440A   ^317-0440-COM    DVP-0009
+After Burner Climax CE                        ?                 ?               DVP-0031A
+Ami-Gyo                                       ?                 ?               ?
+Answer X Answer                               253-5508-0618J    317-0618-JPN    ?
+Answer X Answer 1.1                           ?                 ?               ?
+Answer X Answer DX                            ?                 ?               ?
+Answer X Answer Premium                       ?                 ?               ?
+Club Majesty Extend                           ?                 ?               ?
+Club Majesty Formal                           ?                 ?               ?
+Derby Owners Club 2008: Feel the Rush         ?                 ?               DVP-0047A
+Derby Owners Club 2008: Feel the Rush V2.0    ?                 ?               ?
+Ghost Squad Evolution                         ?                 ?              ^DVP-0029A
+Harley Davidson: King of the Road             ?                 ?               ?
+Hummer Extreme                                253-5508-????    ^317-????-COM    ?
+Initial D Arcade Stage 4                      253-5508-0620     317-0620-COM    DVP-0019
+Initial D Arcade Stage 4 (rev A)              253-5508-0620     317-0620-COM    DVP-0019A
+Initial D Arcade Stage 4 (rev B)              253-5508-0620     317-0620-COM    DVP-0019B
+Initial D Arcade Stage 4 (rev C)              253-5508-0620     317-0620-COM   ^DVP-0019C
+Initial D Arcade Stage 4 (rev D)              253-5508-0620     317-0620-COM    DVP-0019D
+Initial D Arcade Stage 4 (rev G)              253-5508-0620     317-0620-COM    DVP-0019G
+Initial D4                                    253-5508-0486E    317-0486-COM    DVP-0030
+Initial D4 (rev B)                            253-5508-0486E    317-0486-COM    DVP-0030B
+Initial D4 (rev C)                            253-5508-0486E    317-0486-COM   ^DVP-0030C
+Initial D4 (rev D)                            253-5508-0486E    317-0486-COM   ^DVP-0030D
+Initial D Arcade Stage 5                      ?                 ?               ?
+Let's Go Jungle (EXPORT)                      253-5508-0442     317-0442-COM    DVP-0011
+MJ4                                           ?                 ?               ?
+OutRun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
+OutRun 2 SP SDX                               ?                 ?               DVP-0015A
+Primeval Hunt                                 253-5508-0512     317-0512-COM   ^DVP-0048A
+R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
+Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM   ^DVP-0069
+SEGA Network Taisen Mahjong MJ4 (rev A)       ?                 ?               DVP-0049A
+SEGA Network Taisen Mahjong MJ4 (rev F)       ?                 ?               DVP-0049F
+SEGA Network Taisen Mahjong MJ4 (rev G)       ?                 ?               DVP-0049G
+SEGA-Race TV (EXPORT)                         253-5508-0504    ^317-0504-COM   ^DVP-0044
+StarHorse 2: Fifth Expansion (rev D)          ?                 ?               DVP-0082D
+StarHorse 2: Fifth Expansion (rev E)          ?                 ?               DVP-0082E
+The House Of The Dead 4 (EXPORT)              253-5508-0427    ^317-0427-COM   ^DVP-0003A
+The House Of The Dead EX (JAPAN)              253-5508-0550    ^317-0550-JPN    ?
+The House Of the Dead 4 Special               ?                 ?               ?
+VBIOS Update                                  ?                 ?              ^DVP-0021B
+VBIOS Update [For VTF]                        ?                 ?               DVP-0023A
+Virtua Fighter 5 (EXPORT)                     253-5508-0438     317-0438-COM    DVP-0008E
+Virtua Tennis 3 (Power Smash 3)               ?                 ?               DVP-0005
+Virtua Tennis 3 (Power Smash 3) (EXPORT)      253-5508-0434    ^317-0434-COM    DVP-0005A
+Virtua Tennis 3 (JAPAN)                       253-5508-0506     317-0506-JPN   ^DVP-0005C
+WCC Football Intercontinental Clubs 2006-2007 ?                 ?               ?
+WCC Football Intercontinental Clubs 2007-2008 ?                 ?               ?
+WCC Football Intercontinental Clubs 2008-2009 ?                 ?               ?
+WCC Football Intercontinental Clubs 2009-2010 ?                 ?               ?
 
-* denotes these DVDs are archived.
-^ denotes these PICs are archived.
+^ denotes these parts are archived.
 This list is not necessarily correct or complete.
 Corrections and additions to the above are welcome.
 
@@ -156,19 +156,22 @@ Sticker: 838-14673
 |          14.31818MHz           |-------|    |           |  |
 |JP                                           |-----------|  |
 |12                                                          |
-|34  |-------| 932S208DG           SIMM1(512M DDR PC3200)    |
+|34  |-------| 932S208DG           SIMM1                     |
 |56  |6300ESB|                                               |
-|78  |SL7XJ  |                     SIMM2                     |
+|78  |SL7XJ  |                     SIMM2(not used)           |
 |910 |       |                                               |
-|1112|INTEL  |                     SIMM3                     |
+|1112|INTEL  |                     SIMM3(not used)           |
 |    |-------|                                               |
-|32.768kHz         |---------|     SIMM4                     |
+|32.768kHz         |---------|     SIMM4(not used)           |
 | 3V_BATT          |COMPACT  |                               |
 |    MB_BIOS.3J7   |FLASH    |     IDE40                     |
 |                  |SLOT     |     IDE40       ATX_POWER     |
 |------------------|---------|-------------------------------|
 Notes:
-           CPU - Intel Celeron D 335 SL8HM 2.8GHz 256k L2 cache, 533MHz FSB
+           CPU - Lindbergh RED: Intel Celeron D 335 SL8HM 2.8GHz 256k L2 cache, 533MHz FSB. 
+                 Lindbergh YELLOW: Intel Pentium 4 3.00GHz/1M/800 SL8JZ 
+         SIMM1 - Lindbergh RED: 512M DDR PC3200
+                 Lindbergh YELLOW: 1GB DDR PC3200
        82541PI - Intel Gigabit Ethernet Controller
        6300ESB - Intel Southbridge IC
        JG82875 - Intel Northbridge IC
@@ -498,7 +501,7 @@ ROM_START(initiad4)
 	LINDBERGH_BIOS
 
 	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0486E / 317-0486-COM
-	ROM_LOAD("317-0846-com.bin", 0, 0x2000, NO_DUMP)
+	ROM_LOAD("317-0486-com.bin", 0, 0x2000, NO_DUMP)
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY("dvp-0030d", 0, SHA1(e43e6d22fab4eceb81db8309e4634e049d9c41e6))
@@ -508,7 +511,7 @@ ROM_START(initiad4c)
 	LINDBERGH_BIOS
 
 	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0486E / 317-0486-COM
-	ROM_LOAD("317-0846-com.bin", 0, 0x2000, NO_DUMP)
+	ROM_LOAD("317-0486-com.bin", 0, 0x2000, NO_DUMP)
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY("dvp-0030c", 0, SHA1(b1919f28539afec4c4bc52357e5210a090b5ae32))

@@ -114,7 +114,7 @@ public:
 	// construction/destruction
 	netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file);
-	virtual ~netlist_mame_device_t() {}
+	virtual ~netlist_mame_device_t() { pstring::resetmem(); }
 
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
 

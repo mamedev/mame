@@ -442,8 +442,20 @@ void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitm
 	rectangle pageclip;
 	int page;
 
-	int width = screen.width();
-	int height = screen.height();
+
+	if (info->flip)
+	{
+		pages = BITSWAP16(pages,
+			3, 2, 1, 0,
+			7, 6, 5, 4,
+			11, 10, 9, 8,
+			15, 14, 13, 12
+			);
+
+	}
+
+	int width = screen.visible_area().max_x+1;
+	int height = screen.visible_area().max_y+1;
 
 	/* which half/halves of the virtual tilemap do we intersect in the X direction? */
 	if (xscroll < 64*8 - width)
@@ -501,33 +513,36 @@ void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitm
 		topmax = height - 1;
 	}
 
-	/* if the tilemap is flipped, we need to flip our sense within each quadrant */
+	// adjust split positions to compensate for flipping
 	if (info->flip)
 	{
-		if (leftmin != -1)
-		{
-			int temp = leftmin;
-			leftmin = width - 1 - leftmax;
-			leftmax = width - 1 - temp;
-		}
-		if (rightmin != -1)
-		{
-			int temp = rightmin;
-			rightmin = width - 1 - rightmax;
-			rightmax = width - 1 - temp;
-		}
-		if (topmin != -1)
-		{
-			int temp = topmin;
-			topmin = height - 1 - topmax;
-			topmax = height - 1 - temp;
-		}
-		if (bottommin != -1)
-		{
-			int temp = bottommin;
-			bottommin = height - 1 - bottommax;
-			bottommax = height - 1 - temp;
-		}
+		int temp;
+		if (bottommin != -1) bottommin = height - 1 - bottommin;
+		if (bottommax != -1) bottommax = height - 1 - bottommax;
+		if (topmin != -1) topmin = height - 1 - topmin;
+		if (topmax != -1) topmax = height - 1 - topmax;
+
+		temp = bottommin;
+		bottommin = topmax;
+		topmax = temp;
+
+		temp = bottommax;
+		bottommax = topmin;
+		topmin = temp;
+	
+		if (leftmin != -1) leftmin = width - 1 - leftmin;
+		if (leftmax != -1) leftmax = width - 1 - leftmax;
+		if (rightmin != -1) rightmin = width - 1 - rightmin;
+		if (rightmax != -1) rightmax = width - 1 - rightmax;
+
+		temp = leftmin;
+		leftmin = rightmax;
+		rightmax = temp;
+
+		temp = leftmax;
+		leftmax = rightmin;
+		rightmin = temp;
+
 	}
 
 	/* draw the upper-left chunk */
@@ -1112,8 +1127,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	info->textmap->set_user_data(&info->textmap_info);
 	info->textmap->set_palette_offset(colorbase);
 	info->textmap->set_transparent_pen(0);
-	info->textmap->set_scrolldx(-192 + xoffs, -170 + xoffs);
-	info->textmap->set_scrolldy(0, 38);
+	info->textmap->set_scrolldx(-192 + xoffs, -192 + xoffs);
+	info->textmap->set_scrolldy(0, 0);
 
 	/* create the tilemaps for the tile pages */
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1128,8 +1143,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 		info->tilemaps[pagenum]->set_user_data(&info->tmap_info[pagenum]);
 		info->tilemaps[pagenum]->set_palette_offset(colorbase);
 		info->tilemaps[pagenum]->set_transparent_pen(0);
-		info->tilemaps[pagenum]->set_scrolldx(0, 22);
-		info->tilemaps[pagenum]->set_scrolldy(0, 38);
+		info->tilemaps[pagenum]->set_scrolldx(0, 0);
+		info->tilemaps[pagenum]->set_scrolldy(0, 0);
 	}
 
 	save_item(NAME(info->flip), which);

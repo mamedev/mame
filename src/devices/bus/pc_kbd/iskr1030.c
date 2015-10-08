@@ -416,7 +416,7 @@ WRITE8_MEMBER( iskr_1030_keyboard_device::ram_w )
 READ8_MEMBER( iskr_1030_keyboard_device::ram_r )
 {
 	DBG_LOG(2,0,( "%s: ram_r[%02x] = %02x\n", tag(), offset, m_ram[offset]));
-	
+
 	return m_ram[offset];
 }
 

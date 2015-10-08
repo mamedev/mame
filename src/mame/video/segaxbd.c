@@ -18,7 +18,7 @@ void segaxbd_state::video_start()
 {
 	if(!m_segaic16vid->started())
 		throw device_missing_dependencies();
-	
+
 	if(!m_segaic16road->started())
 		throw device_missing_dependencies();
 

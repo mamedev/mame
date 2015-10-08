@@ -12,7 +12,7 @@
     a CPU section, a sound section, and a video section.
 
     The CPU section is based around a Z80 (though there are modified
-    designed that changed this to an S2650). The base galaxian hardware
+    designs that changed this to an S2650). The base galaxian hardware
     is designed to allow access to up to 16k of program ROM and 2k of
     working RAM.
 
@@ -6750,25 +6750,6 @@ ROM_START( galaxian )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-/* Suspected of being Space Warp - ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin */
-/* S2650 CPU, not Z80. gfx is like cosmos(cvs.c) */
-ROM_START( spcwarp )
-	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
-	ROM_LOAD( "swarpt7h.bin", 0x1000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
-/* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
-	ROM_LOAD( "swarpt7m.bin", 0x2000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) )
-/* Stripped "repaired" rom.  Was original rom supposed to be 0x1000 or 0x800? */
-//  ROM_LOAD( "swarpt7m-repair.bin", 0x2000, 0x0800, CRC(109f95cf) SHA1(d99171ffd6639fec28966edaf7cce3a4df5e948d) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
-	ROM_LOAD( "swarpb1k.bin", 0x0800, 0x0800, CRC(da4cee6b) SHA1(28b91381658f598fa62049489beee443232825c6) )
-
-	ROM_REGION( 0x0020, "proms", 0 ) /* unknown - using Galaxian's prom for now */
-	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
-ROM_END
-
 ROM_START( galaxiana )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "7f.bin",       0x0000, 0x1000, CRC(4335b1de) SHA1(e41e3d90dac738cf71377f3b476ec67b14dee27a) )
@@ -7780,7 +7761,7 @@ ROM_START( devilfsg )
 ROM_END
 
 
-ROM_START( zigzag )
+ROM_START( zigzagb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zz_d1.7l",    0x0000, 0x1000, CRC(8cc08d81) SHA1(be671192ef06dc3ed6963dc39e6bdce3275300e9) )
 	ROM_LOAD( "zz_d2.7k",    0x1000, 0x1000, CRC(326d8d45) SHA1(563b9fc64c34e36cfadffb107ce30d3a04d62d9c) )
@@ -7803,7 +7784,7 @@ ROM_START( zigzag )
 	ROM_LOAD( "zzbpr_e9.bin",0x0000, 0x0020, CRC(aa486dd0) SHA1(b845b52715bf6361ceee8c1ac541733963bd47af) )
 ROM_END
 
-ROM_START( zigzag2 )
+ROM_START( zigzagb2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "z1.7l",       0x0000, 0x1000, CRC(4c28349a) SHA1(646134ce506deaee88cc2ec5a973f8fedaddb66b) )
 	ROM_LOAD( "zz_d2.7k",    0x1000, 0x1000, CRC(326d8d45) SHA1(563b9fc64c34e36cfadffb107ce30d3a04d62d9c) )
@@ -8702,6 +8683,7 @@ ROM_START( kong )
 	ROM_REGION( 0x2000, "unk", 0 )
 	// what is this, speech? the video at https://www.youtube.com/watch?v=HTZEVKoYlGM shows the game apparently talking (2nd game, after The Pit)
 	// The video however seems to show a game closer to ckongg (a bootleg of Crazy Kong) rather than this version of Kong which is rewritten from scratch
+	// It could be "GORILA" as seen in the Taito do Brasil cabinet flyers
 	ROM_LOAD( "13",   0x0000, 0x1000, CRC(7d33ca0a) SHA1(8a65a4b913559e3fd17f6abb381db1ab813fc8f2) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -10826,7 +10808,6 @@ GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, galax
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, galaxian,   ROT90,  "<unknown>", "Chewing Gum", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, galaxian,   ROT90,  "MTM Games", "Catacomb", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, omega,       theend,   galaxian,   omega,      galaxian_state, galaxian,   ROT270, "bootleg?", "Omega", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, spcwarp,     0,        galaxian,   galaxian,   galaxian_state, galaxian,   ROT90,  "Century Electronics", "Space Warp?", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", MACHINE_SUPPORTS_SAVE )
@@ -10874,8 +10855,9 @@ GAME( 1982, tenspot,     0,        tenspot,    tenspot,    galaxian_state, tensp
 GAME( 1984, devilfsg,    devilfsh, pacmanbl,   devilfsg,   galaxian_state, devilfsg,   ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", MACHINE_SUPPORTS_SAVE )
 
 /* sound hardware replaced with AY8910 */
-GAME( 1982, zigzag,      0,        zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // maybe by Taito do Brasil?
-GAME( 1982, zigzag2,     zigzag,   zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // "
+// we're missing the original set by Taito do Brasil, we only have the bootlegs
+GAME( 1982, zigzagb,     0,        zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Dig Dug conversion on Galaxian hardware, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // rewrite of Dig Dug (!) not a clone
+GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Dig Dug conversion on Galaxian hardware, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    galaxian_state, gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -10909,6 +10891,7 @@ GAME( 1980, eagle3,      mooncrst, mooncrst,   mooncrsa,   galaxian_state, moonc
 GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, mooncrsu,   ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, mooncrsu,   ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, mooncrsu,   ROT90,  "bootleg (Petaco S.A.)", "Moon Cresta (Petaco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+// there may be an alternate version called "Star Crest" according to flyers; is it the same?
 GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, mooncrsu,   ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, mooncrsu,   ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -10935,6 +10918,7 @@ GAME( 198?, kong,        0,        mooncrst,   kong,       galaxian_state, kong,
 GAME( 198?, fantastc,    0,        fantastc,   fantastc,   galaxian_state, fantastc,   ROT90,  "Taito do Brasil", "Fantastic (Galaga conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
 
 /* like fantastc, plus larger spriteram, and maybe different bullet hw(?) */
+// there may be an alternate version called "Fantasy" according to flyers; is it the same?
 GAME( 198?, timefgtr,    0,        timefgtr,   timefgtr,   galaxian_state, timefgtr,   ROT90,  "Taito do Brasil", "Time Fighter (Time Pilot conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Time Pilot (!) not a clone
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */

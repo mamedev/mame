@@ -53,7 +53,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_subcpu(*this, "sub"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_bank1(*this, "bank1")
+	{ }
 
 	required_device<v9938_device> m_v9938;
 
@@ -78,7 +80,6 @@ public:
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
-	TIMER_DEVICE_CALLBACK_MEMBER(sothello_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
@@ -87,6 +88,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<msm5205_device> m_msm;
+	required_memory_bank m_bank1;
 };
 
 
@@ -104,7 +106,7 @@ public:
 
 void sothello_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
+	m_bank1->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
 WRITE8_MEMBER(sothello_state::bank_w)
@@ -117,7 +119,7 @@ WRITE8_MEMBER(sothello_state::bank_w)
 		case 4: bank=2; break;
 		case 8: bank=3; break;
 	}
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 }
 
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
@@ -336,11 +338,6 @@ WRITE_LINE_MEMBER(sothello_state::sothello_vdp_interrupt)
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sothello_state::sothello_interrupt)
-{
-	m_v9938->interrupt();
-}
-
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
@@ -358,7 +355,6 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_CPU_ADD("maincpu",Z80, MAINCPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sothello_state, sothello_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu",Z80, SOUNDCPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)
@@ -372,14 +368,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sothello_state,sothello_vdp_interrupt))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
-	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
-	MCFG_SCREEN_PALETTE("v9938:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

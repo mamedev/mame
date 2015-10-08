@@ -5,7 +5,7 @@
     rspcp2d.c
 
     Universal machine language-based Nintendo/SGI RSP COP2 emulator.
-    Written by Harmony of the MESS team.
+    Written by Ryan Holtz
 
 ***************************************************************************/
 

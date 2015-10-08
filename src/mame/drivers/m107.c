@@ -34,12 +34,34 @@ confirmed for m107 games as well.
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
 
+// this is the hacky code from m92.c, but better than per-game irq vector hacks.
+#define USE_HACKED_IRQS
 
-#define M107_IRQ_0 ((m_irq_vectorbase+0)/4)  /* VBL interrupt */
-#define M107_IRQ_1 ((m_irq_vectorbase+4)/4)  /* ??? */
-#define M107_IRQ_2 ((m_irq_vectorbase+8)/4)  /* Raster interrupt */
-#define M107_IRQ_3 ((m_irq_vectorbase+12)/4) /* Sound cpu interrupt */
+#ifdef USE_HACKED_IRQS
 
+#define M107_TRIGGER_IRQ0 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+0 ); /* VBL interrupt */
+#define M107_TRIGGER_IRQ1 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+1 ); /* Sprite buffer complete interrupt */
+#define M107_TRIGGER_IRQ2 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+2 ); /* Raster interrupt */
+#define M107_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
+// not used due to HOLD LINE logic
+#define M107_CLEAR_IRQ0 ;
+#define M107_CLEAR_IRQ1 ; 
+#define M107_CLEAR_IRQ2 ;
+#define M107_CLEAR_IRQ3 ;
+
+#else
+
+#define M107_TRIGGER_IRQ0 m_upd71059c->ir0_w(1); 
+#define M107_TRIGGER_IRQ1 m_upd71059c->ir1_w(1); 
+#define M107_TRIGGER_IRQ2 m_upd71059c->ir2_w(1); 
+#define M107_TRIGGER_IRQ3 m_upd71059c->ir3_w(1); 
+// not sure when these should happen, probably the source of our issues
+#define M107_CLEAR_IRQ0 m_upd71059c->ir0_w(0); 
+#define M107_CLEAR_IRQ1 m_upd71059c->ir1_w(0); 
+#define M107_CLEAR_IRQ2 m_upd71059c->ir2_w(0); 
+#define M107_CLEAR_IRQ3 m_upd71059c->ir3_w(0); 
+
+#endif
 
 /*****************************************************************************/
 
@@ -58,16 +80,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 	if (scanline == m_raster_irq_position)
 	{
 		m_screen->update_partial(scanline);
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_2);
+		M107_TRIGGER_IRQ2
 	}
-
-	/* VBLANK interrupt */
-	else if (scanline == m_screen->visible_area().max_y + 1)
+	else
 	{
-		m_screen->update_partial(scanline);
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_0);
+		M107_CLEAR_IRQ2
+
+		/* VBLANK interrupt */
+		if (scanline == m_screen->visible_area().max_y + 1)
+		{
+			m_screen->update_partial(scanline);
+			M107_TRIGGER_IRQ0
+		}
+		else
+		{
+			M107_CLEAR_IRQ0
+		}
+
 	}
 }
+
+
 
 /*****************************************************************************/
 
@@ -116,7 +149,7 @@ WRITE16_MEMBER(m107_state::sound_irq_ack_w)
 WRITE16_MEMBER(m107_state::sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_3);
+	M107_TRIGGER_IRQ3
 }
 
 WRITE16_MEMBER(m107_state::sound_reset_w)
@@ -145,6 +178,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(coincounter_w)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(control_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
 	AM_RANGE(0xb0, 0xb1) AM_WRITE(spritebuffer_w)
@@ -761,11 +795,15 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_CPU_ADD("maincpu", V33, 28000000/2)    /* NEC V33, 28MHz clock */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
+#ifndef USE_HACKED_IRQS
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+#endif
 
 	MCFG_CPU_ADD("soundcpu", V35, 14318000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
+	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NULL)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, scanline_interrupt, "screen", 0, 1)
 
@@ -1017,7 +1055,6 @@ DRIVER_INIT_MEMBER(m107_state,firebarr)
 
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
-	m_irq_vectorbase = 0x20;
 	m_spritesystem = 1;
 }
 
@@ -1028,13 +1065,11 @@ DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::bankswitch_w),this));
 
-	m_irq_vectorbase = 0x80;
 	m_spritesystem = 0;
 }
 
 DRIVER_INIT_MEMBER(m107_state,wpksoc)
 {
-	m_irq_vectorbase = 0x80;
 	m_spritesystem = 0;
 }
 

@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Ville Linde
 #include "emu.h"
-#include "video/poly.h"
 #include "video/rgbutil.h"
 #include "includes/model3.h"
 
@@ -1433,120 +1432,6 @@ void model3_state::set_projection(float left, float right, float top, float bott
 /*****************************************************************************/
 /* transformation and rasterizing */
 
-static int clip_w(const m3_clip_vertex* v, int num_vertices, m3_clip_vertex* out)
-{
-	if (num_vertices <= 0)
-		return 0;
-
-	const float W_PLANE = 0.000001f;
-
-	m3_clip_vertex clipv[10];
-	int clip_verts = 0;
-
-	int previ = num_vertices - 1;
-
-	for (int i=0; i < num_vertices; i++)
-	{
-		int v1_side = (v[i].w < W_PLANE) ? -1 : 1;
-		int v2_side = (v[previ].w < W_PLANE) ? -1 : 1;
-
-		if ((v1_side * v2_side) < 0)        // edge goes through W plane
-		{
-			// insert vertex at intersection point
-			float wdiv = v[previ].w - v[i].w;
-			if (wdiv == 0.0f)       // 0 edge means degenerate polygon
-				return 0;
-
-			float t = fabs((W_PLANE - v[previ].w) / wdiv);
-
-			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
-			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
-			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
-			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
-			clipv[clip_verts].u = v[previ].u + ((v[i].u - v[previ].u) * t);
-			clipv[clip_verts].v = v[previ].v + ((v[i].v - v[previ].v) * t);
-			clipv[clip_verts].i = v[previ].i + ((v[i].i - v[previ].i) * t);
-			clipv[clip_verts].s = v[previ].s + ((v[i].s - v[previ].s) * t);
-			++clip_verts;
-		}
-		if (v1_side > 0)                // current point is inside
-		{
-			clipv[clip_verts] = v[i];
-			++clip_verts;
-		}
-
-		previ = i;
-	}
-
-	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
-	return clip_verts;
-}
-
-static int clip(const m3_clip_vertex* v, int num_vertices, m3_clip_vertex* out, int axis, int sign)
-{
-	if (num_vertices <= 0)
-		return 0;
-
-	m3_clip_vertex clipv[10];
-	int clip_verts = 0;
-
-	int previ = num_vertices - 1;
-
-	for (int i=0; i < num_vertices; i++)
-	{
-		int v1_side, v2_side;
-		float* v1a = (float*)&v[i];
-		float* v2a = (float*)&v[previ];
-
-		float v1_axis, v2_axis;
-
-		if (sign)       // +axis
-		{
-			v1_axis = v1a[axis];
-			v2_axis = v2a[axis];
-		}
-		else            // -axis
-		{
-			v1_axis = -v1a[axis];
-			v2_axis = -v2a[axis];
-		}
-
-		v1_side = (v1_axis <= v[i].w) ? 1 : -1;
-		v2_side = (v2_axis <= v[previ].w) ? 1 : -1;
-
-		if ((v1_side * v2_side) < 0)        // edge goes through W plane
-		{
-			// insert vertex at intersection point
-			float wdiv = ((v[previ].w - v2_axis) - (v[i].w - v1_axis));
-
-			if (wdiv == 0.0f)           // 0 edge means degenerate polygon
-				return 0;
-
-			float t = fabs((v[previ].w - v2_axis) / wdiv);
-
-			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
-			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
-			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
-			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
-			clipv[clip_verts].u = v[previ].u + ((v[i].u - v[previ].u) * t);
-			clipv[clip_verts].v = v[previ].v + ((v[i].v - v[previ].v) * t);
-			clipv[clip_verts].i = v[previ].i + ((v[i].i - v[previ].i) * t);
-			clipv[clip_verts].s = v[previ].s + ((v[i].s - v[previ].s) * t);
-			++clip_verts;
-		}
-		if (v1_side > 0)                // current point is inside
-		{
-			clipv[clip_verts] = v[i];
-			++clip_verts;
-		}
-
-		previ = i;
-	}
-
-	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
-	return clip_verts;
-}
-
 void model3_state::reset_triangle_buffers()
 {
 	m_tri_buffer_ptr = 0;
@@ -1728,8 +1613,8 @@ void model3_state::draw_model(UINT32 addr)
 			clip_vert[i].z = p[i][2];
 			clip_vert[i].w = p[i][3];
 
-			clip_vert[i].u = vertex[i].u * texture_coord_scale * 256.0f;        // 8 bits of subtexel accuracy for bilinear filtering
-			clip_vert[i].v = vertex[i].v * texture_coord_scale * 256.0f;
+            clip_vert[i].p[0] = vertex[i].u * texture_coord_scale * 256.0f;        // 8 bits of subtexel accuracy for bilinear filtering
+			clip_vert[i].p[1] = vertex[i].v * texture_coord_scale * 256.0f;
 
 			// transform vertex normal
 			VECTOR3 n;
@@ -1767,17 +1652,11 @@ void model3_state::draw_model(UINT32 addr)
 				intensity = 255.0f;
 			}
 
-			clip_vert[i].i = intensity;
+			clip_vert[i].p[2] = intensity;
 		}
 
-		/* clip against view frustum */
-		num_vertices = clip_w(clip_vert, num_vertices, clip_vert);
-		num_vertices = clip(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
-		num_vertices = clip(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
-		num_vertices = clip(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
-		num_vertices = clip(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
-		num_vertices = clip(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
-		num_vertices = clip(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+		/* clip against all edges of the view frustum */
+        num_vertices = frustum_clip_all<float, 4>(clip_vert, num_vertices, clip_vert);
 
 		/* divide by W, transform to screen coords */
 		for(i=0; i < num_vertices; i++)
@@ -1787,8 +1666,8 @@ void model3_state::draw_model(UINT32 addr)
 			clip_vert[i].x *= oow;
 			clip_vert[i].y *= oow;
 			clip_vert[i].z *= oow;
-			clip_vert[i].u *= oow;
-			clip_vert[i].v *= oow;
+			clip_vert[i].p[0] *= oow;
+			clip_vert[i].p[1] *= oow;
 
 			clip_vert[i].x = (((clip_vert[i].x * 0.5f) + 0.5f) * m_viewport_width) + m_viewport_x;
 			clip_vert[i].y = (((clip_vert[i].y * 0.5f) + 0.5f) * m_viewport_height) + m_viewport_y;
@@ -2159,9 +2038,9 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
 				v[i].p[1] = 1.0f / tri->v[i].w;
-				v[i].p[2] = tri->v[i].u;
-				v[i].p[3] = tri->v[i].v;
-				v[i].p[4] = tri->v[i].i;
+                v[i].p[2] = tri->v[i].p[0];
+                v[i].p[3] = tri->v[i].p[1];
+                v[i].p[4] = tri->v[i].p[2];
 			}
 
 			model3_polydata &extra = object_data_alloc();
@@ -2189,7 +2068,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].x = tri->v[i].x;
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
-				v[i].p[1] = tri->v[i].i;
+                v[i].p[1] = tri->v[i].p[2];
 			}
 
 			model3_polydata &extra = object_data_alloc();
@@ -2224,9 +2103,9 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
 				v[i].p[1] = 1.0f / tri->v[i].w;
-				v[i].p[2] = tri->v[i].u;
-				v[i].p[3] = tri->v[i].v;
-				v[i].p[4] = tri->v[i].i;
+                v[i].p[2] = tri->v[i].p[0];
+				v[i].p[3] = tri->v[i].p[1];
+				v[i].p[4] = tri->v[i].p[2];
 			}
 
 			model3_polydata &extra = object_data_alloc();
@@ -2243,7 +2122,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].x = tri->v[i].x;
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
-				v[i].p[1] = tri->v[i].i;
+				v[i].p[1] = tri->v[i].p[2];
 			}
 
 			model3_polydata &extra = object_data_alloc();

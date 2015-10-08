@@ -3,7 +3,7 @@
 /*
     First-gen DEC PDP-8 CPU emulator
 
-    Written by MooglyGuy
+    Written by Ryan Holtz
 */
 
 #pragma once

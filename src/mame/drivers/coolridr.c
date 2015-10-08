@@ -8,7 +8,7 @@
     special thanks to Guru for references and HW advices
 
     Games on this system include Cool Riders and Aqua Stage.
-    
+
     This system is interesting in that it makes use of an RLE compression scheme, which
     is not something common for Sega hardware, there is a patent for it ( 6,141,122 )
     http://www.google.com/patents/US6141122

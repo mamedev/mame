@@ -1168,7 +1168,60 @@ ROM_START( hyprolym ) /* GX361 */
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) ) /* 361-d15.c09 */
 ROM_END
 
+// main program code on this set is IDENTICAL to the original hyprolym
+// audio hardware is changed significantly
 ROM_START( hyprolymb )
+	/* These ROM's are located on the CPU/Video Board */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_LOAD( "blue.a1",         0x6000, 0x2000, CRC(82257fb7) SHA1(4a5038292e582d5c3b5f2d82b01c57ccb24f3095) )
+	ROM_LOAD( "2.a2",         0x8000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )
+	ROM_LOAD( "3.a4",         0xa000, 0x2000, CRC(2d6fc308) SHA1(1ff95384670e40d560703f2238998a8e154aa4cf) )
+	ROM_LOAD( "4.a5",         0xc000, 0x2000, CRC(d099b1e8) SHA1(0472991ad6caef41ec6b8ec8bf3d9d07584a57cc) )
+	ROM_LOAD( "5.a7",         0xe000, 0x2000, CRC(974ff815) SHA1(11512df2008a79ba44bbb84bd70885f187113211) )
+
+	/* These ROM's are located on the Sound Board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "c2_d13.bin",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
+
+	/* These ROM's are located on the Sound Board */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /*  64k for the 6802 which plays ADPCM samples */
+	ROM_LOAD( "2764.1",       0x8000, 0x2000, CRC(a4cddeb8) SHA1(057981ad3b04239662bb19342e9ec14b0dab2351) )
+	ROM_LOAD( "2764.2",       0xa000, 0x2000, CRC(e9919365) SHA1(bd11d6e3ee2c6e698159c2768e315389d666107f) )
+	ROM_LOAD( "2764.3",       0xc000, 0x2000, CRC(c3ec42e1) SHA1(048a95726c4f031552e629c3788952c1bc5e7251) )
+	ROM_LOAD( "2764.4",       0xe000, 0x2000, CRC(76998389) SHA1(499189b0e20296af88712199b93b958655083608) )
+
+	/* These ROM's are located on the CPU/Video Board */
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "6.a18",       0x0000, 0x2000, CRC(82e2185a) SHA1(1da9ea20e7af0b49c62fb39834a7ec686491af04) )
+	ROM_LOAD( "7.a19",       0x2000, 0x2000, CRC(800ff1f1) SHA1(33d73b18903e3e6bfb30f1a06db4b8105d4040d8) )
+	ROM_LOAD( "8.a21",       0x4000, 0x2000, CRC(d9faf183) SHA1(4448b6242790783d37acf50704d597af5878c2ab) )
+	ROM_LOAD( "9.a22",       0x6000, 0x2000, CRC(5886c802) SHA1(884a12a8f63600da4f23b29be6dbaacef37add20) )
+
+	/* These ROM's are located on the CPU/Video Board */
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "12.h22",      0x0000, 0x2000, CRC(768bb63d) SHA1(effc46615c389245e5a4aac18292e1d764ff0e46) )
+	ROM_LOAD( "11.h21",      0x2000, 0x2000, CRC(3af0e2a8) SHA1(450f35fd7e45ecc88ee80bf57499b2e9f06f6487) )
+	ROM_LOAD( "10.h19",      0x4000, 0x2000, CRC(c2166a5c) SHA1(5ba25900e653ce4edcf35f1fbce758a327a715ce) )
+
+	/* These PROM's are located on the CPU/Video Board */
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "361b16.e1",   0x0000, 0x0020, CRC(d55f30b5) SHA1(4d6a851f4886778307f75771645078b97ad55f5f) ) /* palette */
+	ROM_LOAD( "361b17.b15",  0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
+	ROM_LOAD( "361b18.f22",  0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
+
+	/* These PAL's are located on the CPU/Video Board */
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "pal16l8.e4",  0x0000, 0x0104, CRC(641efc84) SHA1(d031b033d23d50a5f708f630945602e61d52d1e4) )
+	ROM_LOAD( "pal16l8.e6",  0x0200, 0x0104, CRC(122f23e6) SHA1(d178510843a46f043ecafaa44d95bb590ad67fb0) )
+ROM_END
+
+/*
+this set (which has been supported for longer than the above) has
+67F8: $F8 instead of $E8
+6D19: $F4 instead of $E4
+which differs from all other sets, is it an intentional change or a bad dump? (I can't find any reports of issues with this set)
+*/
+ROM_START( hyprolymba )
 	/* These ROM's are located on the CPU/Video Board */
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "1.a1",         0x6000, 0x2000, CRC(9aee2d5a) SHA1(81f151459f1113b5f2f76ddc140bf86676f778e4) )
@@ -1208,9 +1261,9 @@ ROM_START( hyprolymb )
 	ROM_LOAD( "361b18.f22",  0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
 	/* These PAL's are located on the CPU/Video Board */
-	ROM_REGION( 0x0002, "plds", 0 )
-	ROM_LOAD( "pal16l8.bin", 0x0000, 0x0001, NO_DUMP ) /* Located at 4E. */
-	ROM_LOAD( "pal16l8.bin", 0x0000, 0x0001, NO_DUMP ) /* Located at 6E. */
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "pal16l8.e4",  0x0000, 0x0104, CRC(641efc84) SHA1(d031b033d23d50a5f708f630945602e61d52d1e4) )
+	ROM_LOAD( "pal16l8.e6",  0x0200, 0x0104, CRC(122f23e6) SHA1(d178510843a46f043ecafaa44d95bb590ad67fb0) )
 ROM_END
 
 ROM_START( atlantol )
@@ -1426,6 +1479,16 @@ DRIVER_INIT_MEMBER(trackfld_state,trackfld)
 {
 }
 
+DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+	int i;
+
+	/* decrypt program rom */
+	for (i = 0x6000; i < 0x10000; i++)
+		ROM[i] = BITSWAP8(ROM[i], 6, 7, 5, 4, 3, 2, 1, 0);
+}
+
 DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -1488,14 +1551,19 @@ DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
 }
 
 
-GAME( 1983, trackfld,  0,        trackfld, trackfld, trackfld_state, trackfld, ROT0,  "Konami", "Track & Field", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, trackfldc, trackfld, trackfld, trackfld, trackfld_state, trackfld, ROT0,  "Konami (Centuri license)", "Track & Field (Centuri)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolym,  trackfld, trackfld, trackfld, trackfld_state, trackfld, ROT0,  "Konami", "Hyper Olympic", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolymb, trackfld, hyprolyb, trackfld, trackfld_state, trackfld, ROT0,  "bootleg", "Hyper Olympic (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, atlantol,  trackfld, atlantol, atlantol, trackfld_state, atlantol, ROT0,  "bootleg", "Atlant Olimpic", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, trackfldnz,trackfld, trackfld, trackfld, trackfld_state, trackfld, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)", MACHINE_NOT_WORKING)
-GAME( 1988, mastkin,   0,        mastkin,  mastkin, trackfld_state,  mastkin,  ROT0,  "Du Tech", "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizzquiz,  0,        wizzquiz, wizzquiz, trackfld_state, wizzquiz, ROT0,  "Zilec-Zenitone (Konami license)", "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizzquiza, wizzquiz, wizzquiz, wizzquiz, trackfld_state, wizzquiz, ROT0,  "Zilec-Zenitone", "Wizz Quiz (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, reaktor,   0,        reaktor,  reaktor, driver_device,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, yieartf,   yiear,    yieartf,  yieartf, driver_device,  0,        ROT0,  "Konami", "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...
+GAME( 1983, trackfld,  0,        trackfld, trackfld, trackfld_state, trackfld, ROT0,  "Konami",                               "Track & Field", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, trackfldc, trackfld, trackfld, trackfld, trackfld_state, trackfld, ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolym,  trackfld, trackfld, trackfld, trackfld_state, trackfld, ROT0,  "Konami",                               "Hyper Olympic", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymb, trackfld, hyprolyb, trackfld, trackfld_state, trackfld, ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymba,trackfld, hyprolyb, trackfld, trackfld_state, trackfld, ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, atlantol,  trackfld, atlantol, atlantol, trackfld_state, atlantol, ROT0,  "bootleg",                              "Atlant Olimpic", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, trackfldnz,trackfld, trackfld, trackfld, trackfld_state, trackfldnz,ROT0, "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)", MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
+
+GAME( 1988, mastkin,   0,        mastkin,  mastkin, trackfld_state,  mastkin,  ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1985, wizzquiz,  0,        wizzquiz, wizzquiz, trackfld_state, wizzquiz, ROT0,  "Zilec-Zenitone (Konami license)",      "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizzquiza, wizzquiz, wizzquiz, wizzquiz, trackfld_state, wizzquiz, ROT0,  "Zilec-Zenitone",                       "Wizz Quiz (version 4)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1987, reaktor,   0,        reaktor,  reaktor, driver_device,  0,        ROT90, "Zilec",                                 "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1985, yieartf,   yiear,    yieartf,  yieartf, driver_device,  0,        ROT0,  "Konami",                                "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

@@ -1,5 +1,3 @@
-// license:BSD-3-Clause
-// copyright-holders:Karl Stenerud
 #include "emu.h"
 #include "m68kcpu.h"
 extern void m68040_fpu_op0(m68000_base_device *m68k);
@@ -5346,7 +5344,7 @@ void m68000_base_device_ops::m68k_op_bfchg_32_ai(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte ^ mask_byte);
@@ -5400,7 +5398,7 @@ void m68000_base_device_ops::m68k_op_bfchg_32_di(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte ^ mask_byte);
@@ -5454,7 +5452,7 @@ void m68000_base_device_ops::m68k_op_bfchg_32_ix(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte ^ mask_byte);
@@ -5508,7 +5506,7 @@ void m68000_base_device_ops::m68k_op_bfchg_32_aw(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte ^ mask_byte);
@@ -5562,7 +5560,7 @@ void m68000_base_device_ops::m68k_op_bfchg_32_al(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte ^ mask_byte);
@@ -5653,7 +5651,7 @@ void m68000_base_device_ops::m68k_op_bfclr_32_ai(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte & ~mask_byte);
@@ -5707,7 +5705,7 @@ void m68000_base_device_ops::m68k_op_bfclr_32_di(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte & ~mask_byte);
@@ -5761,7 +5759,7 @@ void m68000_base_device_ops::m68k_op_bfclr_32_ix(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte & ~mask_byte);
@@ -5815,7 +5813,7 @@ void m68000_base_device_ops::m68k_op_bfclr_32_aw(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte & ~mask_byte);
@@ -5869,7 +5867,7 @@ void m68000_base_device_ops::m68k_op_bfclr_32_al(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte & ~mask_byte);
@@ -7177,7 +7175,7 @@ void m68000_base_device_ops::m68k_op_bfins_32_ai(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
@@ -7253,7 +7251,7 @@ void m68000_base_device_ops::m68k_op_bfins_32_di(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
@@ -7329,7 +7327,7 @@ void m68000_base_device_ops::m68k_op_bfins_32_ix(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
@@ -7405,7 +7403,7 @@ void m68000_base_device_ops::m68k_op_bfins_32_aw(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
@@ -7481,7 +7479,7 @@ void m68000_base_device_ops::m68k_op_bfins_32_al(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			insert_byte = MASK_OUT_ABOVE_8(insert_base);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
@@ -7544,7 +7542,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_ai(m68000_base_device* mc68kcpu)
 		UINT32 mask_byte = 0;
 		UINT32 ea = EA_AY_AI_8(mc68kcpu);
 
-
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D(mc68kcpu)[offset&7]);
 		if(BIT_5(word2))
@@ -7560,7 +7557,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_ai(m68000_base_device* mc68kcpu)
 		}
 		width = ((width-1) & 31) + 1;
 
-
 		mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 		mask_long = mask_base >> offset;
 
@@ -7574,7 +7570,7 @@ void m68000_base_device_ops::m68k_op_bfset_32_ai(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte | mask_byte);
@@ -7599,7 +7595,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_di(m68000_base_device* mc68kcpu)
 		UINT32 mask_byte = 0;
 		UINT32 ea = EA_AY_DI_8(mc68kcpu);
 
-
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D(mc68kcpu)[offset&7]);
 		if(BIT_5(word2))
@@ -7615,7 +7610,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_di(m68000_base_device* mc68kcpu)
 		}
 		width = ((width-1) & 31) + 1;
 
-
 		mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 		mask_long = mask_base >> offset;
 
@@ -7629,7 +7623,7 @@ void m68000_base_device_ops::m68k_op_bfset_32_di(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte | mask_byte);
@@ -7654,7 +7648,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_ix(m68000_base_device* mc68kcpu)
 		UINT32 mask_byte = 0;
 		UINT32 ea = EA_AY_IX_8(mc68kcpu);
 
-
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D(mc68kcpu)[offset&7]);
 		if(BIT_5(word2))
@@ -7670,7 +7663,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_ix(m68000_base_device* mc68kcpu)
 		}
 		width = ((width-1) & 31) + 1;
 
-
 		mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 		mask_long = mask_base >> offset;
 
@@ -7684,7 +7676,7 @@ void m68000_base_device_ops::m68k_op_bfset_32_ix(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte | mask_byte);
@@ -7709,7 +7701,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_aw(m68000_base_device* mc68kcpu)
 		UINT32 mask_byte = 0;
 		UINT32 ea = EA_AW_8(mc68kcpu);
 
-
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D(mc68kcpu)[offset&7]);
 		if(BIT_5(word2))
@@ -7725,7 +7716,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_aw(m68000_base_device* mc68kcpu)
 		}
 		width = ((width-1) & 31) + 1;
 
-
 		mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 		mask_long = mask_base >> offset;
 
@@ -7739,7 +7729,7 @@ void m68000_base_device_ops::m68k_op_bfset_32_aw(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte | mask_byte);
@@ -7764,7 +7754,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_al(m68000_base_device* mc68kcpu)
 		UINT32 mask_byte = 0;
 		UINT32 ea = EA_AL_8(mc68kcpu);
 
-
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D(mc68kcpu)[offset&7]);
 		if(BIT_5(word2))
@@ -7780,7 +7769,6 @@ void m68000_base_device_ops::m68k_op_bfset_32_al(m68000_base_device* mc68kcpu)
 		}
 		width = ((width-1) & 31) + 1;
 
-
 		mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 		mask_long = mask_base >> offset;
 
@@ -7794,7 +7782,7 @@ void m68000_base_device_ops::m68k_op_bfset_32_al(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, data_byte | mask_byte);
@@ -7881,7 +7869,7 @@ void m68000_base_device_ops::m68k_op_bftst_32_ai(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
@@ -7932,7 +7920,7 @@ void m68000_base_device_ops::m68k_op_bftst_32_di(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
@@ -7983,7 +7971,7 @@ void m68000_base_device_ops::m68k_op_bftst_32_ix(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
@@ -8034,7 +8022,7 @@ void m68000_base_device_ops::m68k_op_bftst_32_aw(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
@@ -8085,7 +8073,7 @@ void m68000_base_device_ops::m68k_op_bftst_32_al(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
@@ -8136,7 +8124,7 @@ void m68000_base_device_ops::m68k_op_bftst_32_pcdi(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
@@ -8187,7 +8175,7 @@ void m68000_base_device_ops::m68k_op_bftst_32_pcix(m68000_base_device* mc68kcpu)
 
 		if((width + offset) > 32)
 		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
+			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
 			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
 		}
@@ -26403,7 +26391,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm_ax7(m68000_base_device* mc68kcpu
 		ea_src = EA_AY_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -26420,7 +26408,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm_ay7(m68000_base_device* mc68kcpu
 		ea_src = EA_A7_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -26436,7 +26424,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm_axy7(m68000_base_device* mc68kcp
 		ea_src = EA_A7_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_A7_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -26453,7 +26441,7 @@ void m68000_base_device_ops::m68k_op_pack_16_mm(m68000_base_device* mc68kcpu)
 		ea_src = EA_AY_PD_8(mc68kcpu);
 		src = ((src << 8) | m68ki_read_8((mc68kcpu), ea_src)) + OPER_I_16(mc68kcpu);
 
-		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 4) & 0x00f0) | (src & 0x000f));
+		m68ki_write_8((mc68kcpu), EA_AX_PD_8(mc68kcpu), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32668,9 +32656,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm_ax7(m68000_base_device* mc68kcpu
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_A7_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_A7_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_A7_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32687,9 +32675,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm_ay7(m68000_base_device* mc68kcpu
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_AX_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_AX_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_AX_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32705,9 +32693,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm_axy7(m68000_base_device* mc68kcp
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_A7_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_A7_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_A7_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -32724,9 +32712,9 @@ void m68000_base_device_ops::m68k_op_unpk_16_mm(m68000_base_device* mc68kcpu)
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16(mc68kcpu);
 		ea_dst = EA_AX_PD_8(mc68kcpu);
-		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
-		ea_dst = EA_AX_PD_8(mc68kcpu);
 		m68ki_write_8((mc68kcpu), ea_dst, src & 0xff);
+		ea_dst = EA_AX_PD_8(mc68kcpu);
+		m68ki_write_8((mc68kcpu), ea_dst, (src >> 8) & 0xff);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);

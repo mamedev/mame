@@ -6,7 +6,7 @@
     CD-i Mono-I CDIC MCU simulation
     -------------------
 
-    MESS implementation by Harmony
+    written by Ryan Holtz
 
 
 *******************************************************************************

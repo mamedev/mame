@@ -4,8 +4,7 @@
 
  Motorola 68328 ("DragonBall") System-on-a-Chip implementation
 
- By MooglyGuy
- contact mooglyguy@gmail.com with licensing and usage questions.
+ By Ryan Holtz
 
  **********************************************************************/
 

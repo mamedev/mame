@@ -15,9 +15,11 @@
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_EMSCRIPTEN 0
 #define BX_PLATFORM_FREEBSD    0
+#define BX_PLATFORM_NETBSD     0
 #define BX_PLATFORM_IOS        0
 #define BX_PLATFORM_LINUX      0
 #define BX_PLATFORM_NACL       0
+#define BX_PLATFORM_NETBSD     0
 #define BX_PLATFORM_OSX        0
 #define BX_PLATFORM_PS4        0
 #define BX_PLATFORM_QNX        0
@@ -187,6 +189,9 @@
 #elif defined(__FreeBSD__)
 #	undef  BX_PLATFORM_FREEBSD
 #	define BX_PLATFORM_FREEBSD 1
+#elif defined(__NetBSD__)
+#	undef  BX_PLATFORM_NETBSD
+#	define BX_PLATFORM_NETBSD 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
@@ -195,9 +200,11 @@
 						|| BX_PLATFORM_ANDROID \
 						|| BX_PLATFORM_EMSCRIPTEN \
 						|| BX_PLATFORM_FREEBSD \
+						|| BX_PLATFORM_NETBSD \
 						|| BX_PLATFORM_IOS \
 						|| BX_PLATFORM_LINUX \
 						|| BX_PLATFORM_NACL \
+						|| BX_PLATFORM_NETBSD \
 						|| BX_PLATFORM_OSX \
 						|| BX_PLATFORM_QNX \
 						|| BX_PLATFORM_PS4 \
@@ -244,6 +251,8 @@
 				BX_STRINGIZE(__EMSCRIPTEN_tiny__)
 #elif BX_PLATFORM_FREEBSD
 #	define BX_PLATFORM_NAME "FreeBSD"
+#elif BX_PLATFORM_NETBSD
+#	define BX_PLATFORM_NAME "NetBSD"
 #elif BX_PLATFORM_IOS
 #	define BX_PLATFORM_NAME "iOS"
 #elif BX_PLATFORM_LINUX
@@ -251,6 +260,8 @@
 #elif BX_PLATFORM_NACL
 #	define BX_PLATFORM_NAME "NaCl " \
 				BX_STRINGIZE(BX_PLATFORM_NACL)
+#elif BX_PLATFORM_NETBSD
+#	define BX_PLATFORM_NAME "NetBSD"
 #elif BX_PLATFORM_OSX
 #	define BX_PLATFORM_NAME "OSX"
 #elif BX_PLATFORM_PS4

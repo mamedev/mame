@@ -3,7 +3,7 @@
 /*
     Manchester Small-Scale Experimental Machine (SSEM) emulator
 
-    Written by MooglyGuy
+    Written by Ryan Holtz
 */
 
 #include "emu.h"

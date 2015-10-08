@@ -6,11 +6,11 @@
     - Fixed Dip Switches and Inputs (after verification of the Z80 code)
     - Updated memory map to partially handle screen flipping
 
- 05/01/2003  MooglyGuy/Ryan Holtz
+ 05/01/2003  Ryan Holtz
     - Corrected second AY (shouldn't have been there)
     - Added first AY's status read
     - Added coinage DIP
-    - What the hell are those unmapped port writes!? Not AY...
+    - What are those unmapped port writes!? Not AY...
 
  2003.01.01. Tomasz Slanina
 

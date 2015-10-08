@@ -421,9 +421,9 @@ ROM_START( gunsmokeb )
 	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "14.ic25", 0x00000, 0x8000, CRC(0af4f7eb) SHA1(24a98fdeedeeaf1035b4af52d5a8dd5e47a5e62d) )
 
-    /* The names of the proms starting with "g-" do not yet reflect their position in the pcb layout of this bootleg.
-       As the ICs are not socketed, but directly soldered to the pcb, it is harder to identify which is which.
-       But it would be good to figure this out at some point, for the sake of documenting this specific board layout. */
+	/* The names of the proms starting with "g-" do not yet reflect their position in the pcb layout of this bootleg.
+	   As the ICs are not socketed, but directly soldered to the pcb, it is harder to identify which is which.
+	   But it would be good to figure this out at some point, for the sake of documenting this specific board layout. */
 	ROM_REGION( 0x0a00, "proms", 0 )
 	ROM_LOAD( "prom.ic3", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )    /* red component */
 	ROM_LOAD( "prom.ic4", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )    /* green component */

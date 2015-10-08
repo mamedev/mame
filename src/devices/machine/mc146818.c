@@ -37,7 +37,10 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 		m_last_refresh(attotime::zero),
 		m_write_irq(*this),
 		m_century_index(-1),
-		m_use_utc(false)
+		m_epoch(0),
+		m_use_utc(false),
+		m_binary(false),
+		m_hour(false)
 {
 }
 
@@ -48,7 +51,10 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		m_last_refresh(attotime::zero),
 		m_write_irq(*this),
 		m_century_index(-1),
-		m_use_utc(false)
+		m_epoch(0),
+		m_use_utc(false),
+		m_binary(false),
+		m_hour(false)
 {
 }
 
@@ -198,6 +204,11 @@ void mc146818_device::nvram_default()
 	{
 		memset(&m_data[0], 0, data_size());
 	}
+
+	if(m_binary)
+		m_data[0x0b] |= REG_B_DM;
+	if(m_hour)
+		m_data[0x0b] |= REG_B_24_12;
 
 	set_base_datetime();
 	update_timer();
@@ -391,7 +402,7 @@ void mc146818_device::set_base_datetime()
 	set_dayofweek(current_time.weekday + 1);
 	set_dayofmonth(current_time.mday);
 	set_month(current_time.month + 1);
-	set_year(current_time.year % 100);
+	set_year((current_time.year - m_epoch) % (m_data[0x0b] & REG_B_DM ? 0x100 : 100));
 
 	if (m_century_index >= 0)
 		m_data[m_century_index] = to_ram(current_time.year / 100);

@@ -209,7 +209,10 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),
-		m_adpcm(*this, "adpcm") { }
+		m_adpcm(*this, "adpcm"),
+		m_hopper(*this, "hopper"),
+		m_bank1(*this, "bank1")
+	{ }
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
@@ -230,11 +233,12 @@ public:
 	void update_sound_irq(UINT8 cause);
 	virtual void machine_start();
 	virtual void machine_reset();
-	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_vdp_scanline);
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
+	required_device<ticket_dispenser_device> m_hopper;
+	required_memory_bank m_bank1;
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -245,14 +249,6 @@ public:
 #define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
 #define VDP_MEM         0x30000
 
-/* from MSX2 driver, may be not accurate for this HW */
-#define MSX2_XBORDER_PIXELS     16
-#define MSX2_YBORDER_PIXELS     28
-#define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS      212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
-
 
 /*************************************************
 *                  Interrupts                    *
@@ -261,12 +257,6 @@ public:
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_vdp_interrupt)
 {
 	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
-}
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_state::kurukuru_vdp_scanline)
-{
-	m_v9938->interrupt();
 }
 
 
@@ -322,7 +312,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 	coin_counter_w(machine(), 0, data & 0x01);      /* Coin Counter 1 */
 	coin_counter_w(machine(), 1, data & 0x20);      /* Coin Counter 2 */
 	coin_lockout_global_w(machine(), data & 0x40);  /* Coin Lock */
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x40));    /* Hopper Motor */
+	m_hopper->write(space, 0, (data & 0x40));    /* Hopper Motor */
 
 	if (data & 0x9e)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
@@ -330,7 +320,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 {
-	membank("bank1")->set_entry(7); // remove banked rom
+	m_bank1->set_entry(7); // remove banked rom
 /*
     if bits 5,4 are 00,10,01 then IC10 is enabled
     if bits 3,2 are 00,10,01 then IC18 is enabled
@@ -342,7 +332,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 	for (int chip = 0; chip < 3; chip++)
 	{
 		if ((data & 3) != 3)
-			membank("bank1")->set_entry((chip << 1) | (~data & 1));
+			m_bank1->set_entry((chip << 1) | (~data & 1));
 		data >>= 2;
 	}
 }
@@ -527,7 +517,7 @@ INPUT_PORTS_END
 
 void kurukuru_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x8000);
+	m_bank1->configure_entries(0, 8, memregion("user1")->base(), 0x8000);
 }
 
 void kurukuru_state::machine_reset()
@@ -545,7 +535,6 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kurukuru_map)
 	MCFG_CPU_IO_MAP(kurukuru_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kurukuru_state, kurukuru_vdp_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -556,15 +545,7 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kurukuru_state,kurukuru_vdp_interrupt))
-
-	MCFG_SCREEN_ADD("screen",RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
-	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
-	MCFG_SCREEN_PALETTE("v9938:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 

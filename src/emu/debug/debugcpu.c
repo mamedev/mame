@@ -288,6 +288,8 @@ void debug_cpu_source_script(running_machine &machine, const char *file)
 
 bool debug_comment_save(running_machine &machine)
 {
+	bool comments_saved = false;
+
 	// if we don't have a root, bail
 	xml_data_node *root = xml_file_create();
 	if (root == NULL)
@@ -332,7 +334,10 @@ bool debug_comment_save(running_machine &machine)
 			emu_file file(machine.options().comment_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = file.open(machine.basename(), ".cmt");
 			if (filerr == FILERR_NONE)
+			{
 				xml_file_write(root, file);
+				comments_saved = true;
+			}
 		}
 	}
 	catch (emu_exception &)
@@ -343,7 +348,7 @@ bool debug_comment_save(running_machine &machine)
 
 	// free and get out of here
 	xml_file_free(root);
-	return true;
+	return comments_saved;
 }
 
 

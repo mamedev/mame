@@ -5,7 +5,7 @@
     rspdrc.c
 
     Universal machine language-based Nintendo/SGI RSP emulator.
-    Written by Harmony of the MESS team.
+    Written by Ryan Holtz
     SIMD versions of vector multiplication opcodes provided by Marathon Man
       of the CEN64 team.
 

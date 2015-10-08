@@ -239,6 +239,7 @@ typedef UINT32                              FPTR;
 static __inline double fmin(double x, double y){ return (x < y) ? x : y; }
 static __inline double fmax(double x, double y){ return (x > y) ? x : y; }
 static __inline double log2(double x) { return log(x) * M_LOG2E; }
+#define __func__ __FUNCTION__
 #endif // VS2013
 #else // VS2015
 #define _CRT_STDIO_LEGACY_WIDE_SPECIFIERS

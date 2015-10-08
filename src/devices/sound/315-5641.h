@@ -16,9 +16,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port_w);
 
 	UINT8       m_fifo_data[0x40];
-	UINT8       m_fifo_read;	// last read offset (will read in m_fifo_read+1)
-	UINT8       m_fifo_write;	// write offset
- 
+	UINT8       m_fifo_read;    // last read offset (will read in m_fifo_read+1)
+	UINT8       m_fifo_write;   // write offset
+
 protected:
 	// device-level overrides
 	virtual void device_start();

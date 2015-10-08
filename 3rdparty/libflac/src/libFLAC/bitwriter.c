@@ -35,22 +35,11 @@
 
 #include <stdlib.h> /* for malloc() */
 #include <string.h> /* for memcpy(), memset() */
-#ifdef _MSC_VER
-#include <winsock.h> /* for ntohl() */
-#elif defined FLAC__SYS_DARWIN
-#include <machine/endian.h> /* for ntohl() */
-#elif defined __MINGW32__
-#include <winsock.h> /* for ntohl() */
-#else
-#include <netinet/in.h> /* for ntohl() */
-#endif
-#if 0 /* UNUSED */
-#include "private/bitmath.h"
-#endif
 #include "private/bitwriter.h"
 #include "private/crc.h"
 #include "FLAC/assert.h"
 #include "share/alloc.h"
+#include "share/endswap.h"
 
 /* Things should be fastest when this matches the machine word size */
 /* WATCHOUT: if you change this you must also change the following #defines down to SWAP_BE_WORD_TO_HOST below to match */
@@ -63,11 +52,7 @@ typedef FLAC__uint32 bwword;
 #if WORDS_BIGENDIAN
 #define SWAP_BE_WORD_TO_HOST(x) (x)
 #else
-#ifdef _MSC_VER
-#define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
-#else
-#define SWAP_BE_WORD_TO_HOST(x) ntohl(x)
-#endif
+#define SWAP_BE_WORD_TO_HOST(x) ENDSWAP_32(x)
 #endif
 
 /*
@@ -106,15 +91,6 @@ struct FLAC__BitWriter {
 	unsigned words; /* # of complete words in buffer */
 	unsigned bits; /* # of used bits in accum */
 };
-
-#ifdef _MSC_VER
-/* OPT: an MSVC built-in would be better */
-static _inline FLAC__uint32 local_swap32_(FLAC__uint32 x)
-{
-	x = ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
-	return (x>>16) | (x<<16);
-}
-#endif
 
 /* * WATCHOUT: The current implementation only grows the buffer. */
 static FLAC__bool bitwriter_grow_(FLAC__BitWriter *bw, unsigned bits_to_add)

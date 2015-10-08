@@ -59,6 +59,7 @@ Final Fight (World, set 2)                                         89624B-3   S2
 Final Fight (USA, set 1)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
 Final Fight (USA, set 2)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
 Final Fight (USA 900112)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-04@ DL-0411-10001  None
+Final Fight (USA 900424)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-03  DL-0411-10003  None
 Final Fight (USA 900613)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
 Final Fight (Japan)                                                ?          S222B            ?     ?            CPS-B-04  DL-0411-10005
 Final Fight (Japan 900112)                                         89625B-1   S222B            LWIO  88622-C-5    CPS-B-01  DL-0411-10001  None
@@ -1414,7 +1415,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightu",     CPS_B_04,     mapper_S224B },
 	{"ffightu1",    CPS_B_04,     mapper_S224B },
 	{"ffightua",    CPS_B_01,     mapper_S224B },
-	{"ffightub",    CPS_B_05,     mapper_S224B },
+	{"ffightub",    CPS_B_03,     mapper_S224B },   // had 04 handwritten on the CPS_B chip, but clearly isn't.
+	{"ffightuc",    CPS_B_05,     mapper_S224B },
 	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B

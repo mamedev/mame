@@ -12,6 +12,12 @@
 inline void m72_state::get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
+	
+	// word 0               word 1
+	// fftt tttt tttt tttt  ---- ---- zz-? pppp
+
+	// f = flips, t = tilenum, z = pri, p = palette
+	// ? = possible more priority
 
 	tile_index *= 2;
 
@@ -34,6 +40,12 @@ inline void m72_state::get_tile_info(tile_data &tileinfo,int tile_index,const UI
 inline void m72_state::rtype2_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
+
+	// word 0               word 1
+	// tttt tttt tttt tttt  ---- ---z zff- pppp
+
+	// f = flips, t = tilenum, z = pri, p = palette
+
 
 	tile_index *= 2;
 
@@ -66,11 +78,6 @@ TILE_GET_INFO_MEMBER(m72_state::get_fg_tile_info)
 	get_tile_info(tileinfo,tile_index,m_videoram1,1);
 }
 
-TILE_GET_INFO_MEMBER(m72_state::hharry_get_bg_tile_info)
-{
-	get_tile_info(tileinfo,tile_index,m_videoram2,1);
-}
-
 TILE_GET_INFO_MEMBER(m72_state::rtype2_get_bg_tile_info)
 {
 	rtype2_get_tile_info(tileinfo,tile_index,m_videoram2,1);
@@ -82,11 +89,6 @@ TILE_GET_INFO_MEMBER(m72_state::rtype2_get_fg_tile_info)
 }
 
 
-TILEMAP_MAPPER_MEMBER(m72_state::majtitle_scan_rows)
-{
-	/* logical (col,row) -> memory offset */
-	return row*256 + col;
-}
 
 
 /***************************************************************************
@@ -142,9 +144,29 @@ VIDEO_START_MEMBER(m72_state,xmultipl)
 	VIDEO_START_CALL_MEMBER(m72);
 
 	m_fg_tilemap->set_scrolldx(4,64);
-	m_bg_tilemap->set_scrolldx(6,0);
 	m_fg_tilemap->set_scrolldy(-128, 0);
+	
+	m_bg_tilemap->set_scrolldx(6,0);
+	m_bg_tilemap->set_scrolldy(-128,-128);
+
 }
+
+
+VIDEO_START_MEMBER(m72_state,hharry)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+
+	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // ? maybe the standard logic is ok.
+
+	m_fg_tilemap->set_scrolldx(4,3);
+	m_fg_tilemap->set_scrolldy(-128,-128);
+
+	m_bg_tilemap->set_scrolldx(6,0);
+	m_bg_tilemap->set_scrolldy(-128,16);
+}
+
+
+
 
 VIDEO_START_MEMBER(m72_state,rtype2)
 {
@@ -195,13 +217,8 @@ VIDEO_START_MEMBER(m72_state,hharryu)
 	m_bg_tilemap->set_scrolldy(-128,-128);
 }
 
-/* Major Title has a larger background RAM, and rowscroll */
-VIDEO_START_MEMBER(m72_state,majtitle)
+VIDEO_START_MEMBER(m72_state, m82_common)
 {
-// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
-// The layout ramains 256x64, the right half is just not displayed.
-//  m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,256,64);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::majtitle_scan_rows),this),8,8,128,64);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
@@ -216,41 +233,51 @@ VIDEO_START_MEMBER(m72_state,majtitle)
 
 	memset(m_buffered_spriteram,0,m_spriteram.bytes());
 
-	m_fg_tilemap->set_scrolldx(4,0);
-	m_fg_tilemap->set_scrolldy(-128,-128);
 
-	m_bg_tilemap->set_scrolldx(4,0);
-	m_bg_tilemap->set_scrolldy(-128,-128);
 
 	register_savestate();
 	save_item(NAME(m_majtitle_rowscroll));
 }
 
-VIDEO_START_MEMBER(m72_state,hharry)
+/* Major Title has a larger background RAM, and rowscroll */
+// the Air Duel conversion on the same PCB does not, is it jumper selectable, or a register, or a different RAM chip?
+TILEMAP_MAPPER_MEMBER(m72_state::majtitle_scan_rows)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::hharry_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),   TILEMAP_SCAN_ROWS,8,8,64,64);
+	/* logical (col,row) -> memory offset */
+	return row*256 + col;
+}
 
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
+VIDEO_START_MEMBER(m72_state,m82_large)
+{
+// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
+// The layout ramains 256x64, the right half is just not displayed.
+//  m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,256,64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::majtitle_scan_rows),this),8,8,128,64);
 
-	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
-	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
-	m_fg_tilemap->set_transmask(2,0x0001,0xffff);
+	VIDEO_START_CALL_MEMBER(m82_common);
 
-	m_bg_tilemap->set_transmask(0,0xffff,0x0000);
-	m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
-	m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
+	m_fg_tilemap->set_scrolldx(4,0);
+	m_fg_tilemap->set_scrolldy(-128,-128);
+	
+	m_bg_tilemap->set_scrolldx(4,0);
+	m_bg_tilemap->set_scrolldy(-128,-128);
+}
 
-	memset(m_buffered_spriteram,0,m_spriteram.bytes());
+VIDEO_START_MEMBER(m72_state, m82_small)
+{
+//  Air Duel expects the regular tilemap size
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
+	VIDEO_START_CALL_MEMBER(m82_common);
+
+// why do the offsets also differ?
 	m_fg_tilemap->set_scrolldx(4,3);
 	m_fg_tilemap->set_scrolldy(-128,-128);
 
-	m_bg_tilemap->set_scrolldx(6,0);
-	m_bg_tilemap->set_scrolldy(-128,16);
-
-	register_savestate();
+	m_bg_tilemap->set_scrolldx(6-256,0);
+	m_bg_tilemap->set_scrolldy(-128,-128);
 }
+
 
 
 /***************************************************************************

@@ -288,7 +288,7 @@ void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 				//           note: fireballs in level 5 (fe20/40) should go above flames and score (text sprites)
 				int text_list  = (i - start) & 0x20;
 				int text_start = text_list ? 0x19c0 : 0x1980;
-				bool write_mask = (text_list == 0);	// hack?
+				bool write_mask = (text_list == 0); // hack?
 				draw_text_sprites(screen, bitmap, cliprect, text_start, text_start + 0x80, y, write_mask);
 				continue;
 			}
@@ -459,7 +459,7 @@ void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
         2.b                             X
 
-        3.b         7--- ----			0 = Last Sprite
+        3.b         7--- ----           0 = Last Sprite
                     -6-- ----           X (Sign Bit)
                     --54 3210           Tiles Bank ($400 tiles each)
 

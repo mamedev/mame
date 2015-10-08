@@ -171,7 +171,7 @@ static int create_window_class(void)
 		wc.lpszClassName    = OUTPUT_WINDOW_CLASS;
 		wc.hInstance        = GetModuleHandleUni();
 		wc.lpfnWndProc      = output_window_proc;
-		
+
 		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't

@@ -6000,7 +6000,7 @@ ROM_START( zombrvn )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28012b41" )
 ROM_END
 
-ROM_START( gunsur2 )
+ROM_START( gunsur2j )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -6025,7 +6025,7 @@ ROM_START( gunsur2 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000680d0" )
 ROM_END
 
-ROM_START( gunsur2e )
+ROM_START( gunsur2 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -6050,7 +6050,7 @@ ROM_START( gunsur2e )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000680d0" )
 ROM_END
 
-ROM_START( wldkicks )
+ROM_START( wldkicksa )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -6072,7 +6072,7 @@ ROM_START( wldkicks )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "052e2901" )
 ROM_END
 
-ROM_START( wldkicksa )
+ROM_START( wldkicks )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -6094,7 +6094,7 @@ ROM_START( wldkicksa )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "052e2901" )
 ROM_END
 
-ROM_START( wldkicksb )
+ROM_START( wldkicksj )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -6143,39 +6143,14 @@ ROM_START( toukon4 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "052e2901" )
 ROM_END
 
-ROM_START( ninjaslt )
-	NAOMI_BIOS
-	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "nja3vera.2d",     0x0800000, 0x0800000, CRC(442cb858) SHA1(8244871bdb0b49e14ea400d63fe759754a530410) )
-	ROM_LOAD( "nja3vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
-	ROM_LOAD( "nja3vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
-	ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
-	ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
-	ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
-	ROM_LOAD( "nja1ma5.4h",      0x5000000, 0x1000000, CRC(cf5df4d3) SHA1(220bc51979d2c5f753fc6b544bb38c0c306bbcb8) )
-	ROM_LOAD( "nja1ma6.4f",      0x6000000, 0x1000000, CRC(5daa6ed4) SHA1(139a68ea0cb5c071beeffb893533302fa80bc3f8) )
-	ROM_LOAD( "nja1ma7.4e",      0x7000000, 0x1000000, CRC(d866cfa8) SHA1(a57a761cef0eaaada088a6091ec2324c112253fc) )
-	ROM_LOAD( "nja1ma8.4d",      0x8000000, 0x1000000, CRC(1c959b74) SHA1(f1ff82c26df6250e1d8c23214f7827278cd572db) )
-	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
-	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
-
-	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
-	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
-
-	// 25469801    2000     317-5068-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
-ROM_END
-
-ROM_START( ninjaslt1 )
+ROM_START( ninjasltj )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "nja1vera.2d",     0x0800000, 0x0800000, CRC(c4c60b4c) SHA1(25e5c78b4704626a962b56405e6295bddfd2ae93) )
-	ROM_LOAD( "nja3vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
-	ROM_LOAD( "nja3vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
+	ROM_LOAD( "nja1vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
+	ROM_LOAD( "nja1vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
 	ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
 	ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
 	ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
@@ -6193,14 +6168,14 @@ ROM_START( ninjaslt1 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
 ROM_END
 
-ROM_START( ninjaslt2 )
+ROM_START( ninjaslta )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "nja2vera.2d",     0x0800000, 0x0800000, CRC(a5bdf581) SHA1(838a719e14449fb64ea0abd1497e395d86599b34) )
-	ROM_LOAD( "nja3vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
-	ROM_LOAD( "nja3vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
+	ROM_LOAD( "nja1vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
+	ROM_LOAD( "nja1vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
 	ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
 	ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
 	ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
@@ -6218,14 +6193,39 @@ ROM_START( ninjaslt2 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
 ROM_END
 
-ROM_START( ninjaslt4 )
+ROM_START( ninjasltu )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "nja3vera.2d",     0x0800000, 0x0800000, CRC(442cb858) SHA1(8244871bdb0b49e14ea400d63fe759754a530410) )
+	ROM_LOAD( "nja1vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
+	ROM_LOAD( "nja1vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
+	ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
+	ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
+	ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
+	ROM_LOAD( "nja1ma5.4h",      0x5000000, 0x1000000, CRC(cf5df4d3) SHA1(220bc51979d2c5f753fc6b544bb38c0c306bbcb8) )
+	ROM_LOAD( "nja1ma6.4f",      0x6000000, 0x1000000, CRC(5daa6ed4) SHA1(139a68ea0cb5c071beeffb893533302fa80bc3f8) )
+	ROM_LOAD( "nja1ma7.4e",      0x7000000, 0x1000000, CRC(d866cfa8) SHA1(a57a761cef0eaaada088a6091ec2324c112253fc) )
+	ROM_LOAD( "nja1ma8.4d",      0x8000000, 0x1000000, CRC(1c959b74) SHA1(f1ff82c26df6250e1d8c23214f7827278cd572db) )
+	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
+	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
+
+	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
+	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
+
+	// 25469801    2000     317-5068-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
+ROM_END
+
+ROM_START( ninjaslt )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "nja4vera.2d",     0x0800000, 0x0800000, CRC(a57c0576) SHA1(0c99a3e648798bf6a100512d682c08a3d4f05958) )
-	ROM_LOAD( "nja3vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
-	ROM_LOAD( "nja3vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
+	ROM_LOAD( "nja1vera.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
+	ROM_LOAD( "nja1vera.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
 	ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
 	ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
 	ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
@@ -6243,7 +6243,7 @@ ROM_START( ninjaslt4 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
 ROM_END
 
-ROM_START( mazan )
+ROM_START( mazana )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -6262,7 +6262,7 @@ ROM_START( mazan )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fea94" )
 ROM_END
 
-ROM_START( mazana )
+ROM_START( mazan )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -7181,7 +7181,7 @@ ROM_START( ss2005 )
 	ROM_LOAD("ss2005-default-eeprom.bin", 0, 0x80, CRC(26bd9003) SHA1(f35551c96c49eef5473ff50a94b82ef5110b0f10))
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0031a", 0,BAD_DUMP  SHA1(6091525845fc2042ed43cae5a1b60c603e16cf97) )
+	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(6702a3a67c3e40217e382578e4eb8d0ddc5dbbe4) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-5108-JPN)
@@ -8226,7 +8226,7 @@ ROM_START( vf4o )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0012", 0, BAD_DUMP SHA1(c34588f59c6091cd1c3ef235171dad8d5247e707) )
+	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(da231483b5351ab9f9eb0e6e8cd6c2a26d1f8f72) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0314-COM)
@@ -8307,7 +8307,7 @@ ROM_START( initd )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0020b", 0, BAD_DUMP SHA1(c0e901623ef4fcd97b7e4d29ae556e6f2e91b8ad) )
+	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(08a594af2933144d341a299e3160d3c8281b7241) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0331-JPN)
@@ -9080,8 +9080,8 @@ ROM_END
 /* 0043 */ GAME( 2000, crackndj, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmasho,  csmash,   naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmash,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
-// 0045 1999, "FortyFive / Sega", "Tokio Bus Guide" 
-// 0045 1999, "FortyFive / Sega", "Tokio Bus Guide (Rev A)" 
+// 0045 1999, "FortyFive / Sega", "Tokio Bus Guide"
+// 0045 1999, "FortyFive / Sega", "Tokio Bus Guide (Rev A)"
 /* 0047 */ GAME( 2000, samba2k,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Samba de Amigo ver. 2000", GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnt, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev T)", GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnta,alienfnt, naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev A)", GAME_FLAGS )
@@ -9165,19 +9165,19 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* HMG016007 */ GAME( 2001,hmgeo,naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Heavy Metal Geomatrix (JPN, USA, EUR, ASI, AUS) (Rev B)", GAME_FLAGS )
 
 /* Cart games on Namco custom ROM board */
-/* 25209801 */ GAME( 2000, wldkicks, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (WK2 Ver. A)", GAME_FLAGS )
-/* 25209801 */ GAME( 2000, wldkicksa,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (WK3 Ver. A)", GAME_FLAGS )
-/* 25349801 */ GAME( 2000, toukon4,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslt1,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (NJA1 Ver. A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslt2,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (NJA2 Ver. A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslt, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (NJA3 Ver. A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslt4,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (NJA4 Ver. A)", GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicksa,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (Asia, WK2 Ver.A)", GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicks, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (US, WK3 Ver.A)", GAME_FLAGS )
+/* 25349801 */ GAME( 2000, toukon4,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (Japan, TRF1 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjasltj,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Japan, NJA1 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjaslta,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Asia, NJA2 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjasltu,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (US, NJA3 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjaslt, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (World, NJA4 Ver.A)", GAME_FLAGS )
 /* Note: the game's full name is exactly "World Kicks PCB", have different s/n as well */
-/* 25509801 */ GAME( 2000, wldkicksb,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (WKC1 Ver. A)", GAME_FLAGS )
-/* 25709801 */ GAME( 2001, gunsur2,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1 Ver. E)", GAME_FLAGS )
-/* 25709801 */ GAME( 2001, gunsur2e, gunsur2, naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF2 Ver. E)", GAME_FLAGS )
-/* 25869812 */ GAME( 2002, mazan,    naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (MAZ2 Ver. A)", GAME_FLAGS )
-/* 25869812 */ GAME( 2002, mazana,   mazan,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (MAZ3 Ver. A)", GAME_FLAGS )
+/* 25509801 */ GAME( 2000, wldkicksj,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (Japan, WKC1 Ver.A)", GAME_FLAGS )
+/* 25709801 */ GAME( 2001, gunsur2j, gunsur2, naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)", GAME_FLAGS )
+/* 25709801 */ GAME( 2001, gunsur2,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)", GAME_FLAGS )
+/* 25869812 */ GAME( 2002, mazana,   mazan,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)", GAME_FLAGS )
+/* 25869812 */ GAME( 2002, mazan,    naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (US, MAZ3 Ver.A)", GAME_FLAGS )
 
 /* GDS-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2000, confmiss, naomigd, naomigd,  hotd2,   naomi_state, naomigd, ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_FLAGS )

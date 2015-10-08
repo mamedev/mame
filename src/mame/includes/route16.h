@@ -38,6 +38,7 @@ public:
 
 	DECLARE_DRIVER_INIT(route16);
 	DECLARE_DRIVER_INIT(route16a);
+	DECLARE_DRIVER_INIT(route16c);
 	DECLARE_MACHINE_START(speakres);
 	DECLARE_MACHINE_START(ttmahjng);
 	virtual void video_start();

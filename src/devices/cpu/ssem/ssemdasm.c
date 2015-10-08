@@ -3,7 +3,7 @@
 /*
     Manchester Small-Scale Experimental Machine (SSEM) disassembler
 
-    Written by MooglyGuy
+    Written by Ryan Holtz
 */
 
 #include "emu.h"

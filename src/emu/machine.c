@@ -1351,10 +1351,11 @@ void system_time::full_time::set(struct tm &t)
 
 static running_machine * jsmess_machine;
 
-void js_main_loop() {
+void js_main_loop()
+{
 	device_scheduler * scheduler;
 	scheduler = &(jsmess_machine->scheduler());
-	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
+	attotime stoptime(scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60)));
 	while (scheduler->time() < stoptime) {
 		scheduler->timeslice();
 	}

@@ -43,7 +43,11 @@ public:
 		m_tmp68301(*this, "tmp68301"),
 		m_v9958(*this, "v9958"),
 		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2")
+		m_dac2(*this, "dac2"),
+		m_key(*this, "KEY"),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_audiocpu(*this, "audiocpu"),
+		m_bank1(*this, "bank1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -51,6 +55,10 @@ public:
 	required_device<v9958_device> m_v9958;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
+	required_ioport_array<5> m_key;
+	required_memory_region m_region_maincpu;
+	required_memory_region m_region_audiocpu;
+	required_memory_bank m_bank1;
 
 	UINT16 m_mux_data;
 
@@ -80,19 +88,14 @@ public:
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
+
+	void general_init(int patchaddress, int patchvalue);
+	void soundbank_w(int data);
 };
 
 
 
 #define USE_H8 0
-
-// from MSX2 driver, may be not accurate for this HW
-#define MSX2_XBORDER_PIXELS     16
-#define MSX2_YBORDER_PIXELS     28
-#define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS      212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
 WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
 {
@@ -104,11 +107,11 @@ READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return ioport("KEY0")->read();
-		case 0x02: return ioport("KEY1")->read();
-		case 0x04: return ioport("KEY2")->read();
-		case 0x08: return ioport("KEY3")->read();
-		case 0x10: return ioport("KEY4")->read();
+		case 0x01: return m_key[0]->read();
+		case 0x02: return m_key[1]->read();
+		case 0x04: return m_key[2]->read();
+		case 0x08: return m_key[3]->read();
+		case 0x10: return m_key[4]->read();
 	}
 
 	return 0xffff;
@@ -177,11 +180,9 @@ sound HW is identical to Niyanpai
 #define DAC_WRITE   write_unsigned8
 #endif
 
-static void csplayh5_soundbank_w(running_machine &machine, int data)
+void csplayh5_state::soundbank_w(int data)
 {
-	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
-
-	machine.root_device().membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	m_bank1->set_base(m_region_audiocpu->base() + 0x08000 + (0x8000 * (data & 0x03)));
 }
 
 READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
@@ -202,7 +203,7 @@ READ8_MEMBER(csplayh5_state::soundcpu_portd_r)
 
 WRITE8_MEMBER(csplayh5_state::soundcpu_porta_w)
 {
-	csplayh5_soundbank_w(machine(), data & 0x03);
+	soundbank_w(data & 0x03);
 }
 
 WRITE8_MEMBER(csplayh5_state::soundcpu_dac2_w)
@@ -238,7 +239,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( csplayh5 )
-	PORT_START("KEY0")
+	PORT_START("KEY.0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(1)
@@ -256,7 +257,7 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY1")
+	PORT_START("KEY.1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(1)
@@ -274,7 +275,7 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")
+	PORT_START("KEY.2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
@@ -292,7 +293,7 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")
+	PORT_START("KEY.3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(1)
@@ -310,7 +311,7 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY4")
+	PORT_START("KEY.4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(1)
@@ -440,11 +441,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 
 	if(scanline == 212*2)
 		m_tmp68301->external_interrupt_0();
-
-	if((scanline % 2) == 0)
-	{
-		m_v9958->interrupt();
-	}
 }
 
 static const z80_daisy_config daisy_chain_sound[] =
@@ -458,7 +454,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
@@ -486,15 +482,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
-
-	MCFG_SCREEN_ADD("screen",RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
-	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
-	MCFG_SCREEN_PALETTE("v9958:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -515,13 +503,13 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void general_init(running_machine &machine, int patchaddress, int patchvalue)
+void csplayh5_state::general_init(int patchaddress, int patchvalue)
 {
-	UINT16 *MAINROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
+	UINT16 *MAINROM = (UINT16 *)m_region_maincpu->base();
+	UINT8 *SNDROM = m_region_audiocpu->base();
 
 	// initialize sound rom bank
-	csplayh5_soundbank_w(machine, 0);
+	soundbank_w(0);
 
 	/* patch DVD comms check */
 	MAINROM[patchaddress] = patchvalue;
@@ -531,16 +519,16 @@ void general_init(running_machine &machine, int patchaddress, int patchvalue)
 
 }
 
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(machine(), 0x6880/2,0x6020); }
+DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(0x6880/2, 0x6020); }
 
-DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(machine(), 0x679c/2,0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(machine(), 0x6b96/2,0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(machine(), 0x6588/2,0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(machine(), 0x4cb4/2,0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(machine(), 0x585c/2,0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(machine(), 0x69ec/2,0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(machine(), 0x7a20/2,0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(machine(), 0x9166/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(0x4cb4/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(0x585c/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
 
 /* TODO: correct rom labels*/
 ROM_START( csplayh1 )

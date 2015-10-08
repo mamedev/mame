@@ -6,7 +6,7 @@
  *  Magic Sound Board for the Aleste 520EX
  *
  *  DMA-based 4-channel sound board
- *  
+ *
  *  1x K1810WT37 DMA controller (i8237/AM9517A)
  *  2x K1810WT54 programmable timers  (i8254)
  *  1x K1118PA1 DAC  (MC10318)
@@ -72,9 +72,9 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8254_device> m_timer1;
 	required_device<pit8254_device> m_timer2;
-	
+
 	void set_timer_gate(bool state);
-	
+
 	UINT8 m_volume[4];
 	UINT32 m_page[4][4];
 	UINT8 m_output[4];

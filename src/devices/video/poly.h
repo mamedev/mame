@@ -1172,4 +1172,148 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 	return nextout - outv;
 }
 
+
+template<typename _BaseType, int _MaxParams>
+struct frustum_clip_vertex
+{
+	_BaseType x, y, z, w;       // A 3d coordinate already transformed by a projection matrix
+    _BaseType p[_MaxParams];    // Additional parameters to clip
+};
+
+
+template<typename _BaseType, int _MaxParams>
+int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
+{
+	if (num_vertices <= 0)
+		return 0;
+
+	const _BaseType W_PLANE = 0.000001f;
+
+	frustum_clip_vertex<_BaseType, _MaxParams> clipv[10];
+	int clip_verts = 0;
+
+	int previ = num_vertices - 1;
+
+	for (int i=0; i < num_vertices; i++)
+	{
+		int v1_side = (v[i].w < W_PLANE) ? -1 : 1;
+		int v2_side = (v[previ].w < W_PLANE) ? -1 : 1;
+
+		if ((v1_side * v2_side) < 0)        // edge goes through W plane
+		{
+			// insert vertex at intersection point
+			_BaseType wdiv = v[previ].w - v[i].w;
+			if (wdiv == 0.0f)       // 0 edge means degenerate polygon
+				return 0;
+
+			_BaseType t = fabs((W_PLANE - v[previ].w) / wdiv);
+
+			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
+			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
+			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
+			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
+            
+            // Interpolate the rest of the parameters
+            for (int pi = 0; pi < _MaxParams; pi++)
+                clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+            
+			++clip_verts;
+		}
+		if (v1_side > 0)                // current point is inside
+		{
+			clipv[clip_verts] = v[i];
+			++clip_verts;
+		}
+
+		previ = i;
+	}
+
+	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
+	return clip_verts;
+}
+
+
+template<typename _BaseType, int _MaxParams>
+int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out, int axis, int sign)
+{
+	if (num_vertices <= 0)
+		return 0;
+
+	frustum_clip_vertex<_BaseType, _MaxParams> clipv[10];
+	int clip_verts = 0;
+
+	int previ = num_vertices - 1;
+
+	for (int i=0; i < num_vertices; i++)
+	{
+		int v1_side, v2_side;
+		_BaseType* v1a = (_BaseType*)&v[i];
+		_BaseType* v2a = (_BaseType*)&v[previ];
+
+		_BaseType v1_axis, v2_axis;
+
+		if (sign)       // +axis
+		{
+			v1_axis = v1a[axis];
+			v2_axis = v2a[axis];
+		}
+		else            // -axis
+		{
+			v1_axis = -v1a[axis];
+			v2_axis = -v2a[axis];
+		}
+
+		v1_side = (v1_axis <= v[i].w) ? 1 : -1;
+		v2_side = (v2_axis <= v[previ].w) ? 1 : -1;
+
+		if ((v1_side * v2_side) < 0)        // edge goes through W plane
+		{
+			// insert vertex at intersection point
+			_BaseType wdiv = ((v[previ].w - v2_axis) - (v[i].w - v1_axis));
+
+			if (wdiv == 0.0f)           // 0 edge means degenerate polygon
+				return 0;
+
+			_BaseType t = fabs((v[previ].w - v2_axis) / wdiv);
+
+			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
+			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
+			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
+			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
+            
+            // Interpolate the rest of the parameters
+            for (int pi = 0; pi < _MaxParams; pi++)
+                clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+
+            ++clip_verts;
+		}
+		if (v1_side > 0)                // current point is inside
+		{
+			clipv[clip_verts] = v[i];
+			++clip_verts;
+		}
+
+		previ = i;
+	}
+
+	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
+	return clip_verts;
+}
+
+
+template<typename _BaseType, int _MaxParams>
+int frustum_clip_all(frustum_clip_vertex<_BaseType, _MaxParams>* clip_vert, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
+{
+    num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
+    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+    out = clip_vert;
+    return num_vertices;
+}
+
+
 #endif  // __POLY_H__

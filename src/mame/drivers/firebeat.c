@@ -81,9 +81,9 @@
     BIOS       Game ID        Year    Game
     ------------------------------------------------------------------
     GQ972      GQ972          2000    Beatmania III
-    GQ972(?)   ?              2001    Beatmania III Append 6th Mix
+    GQ972(?)   GCA21          2001    Beatmania III Append 6th Mix
     GQ972(?)   GCB07          2002    Beatmania III Append 7th Mix
-    GQ972(?)   ?              2000    Beatmania III Append Core Remix
+    GQ972(?)   GCA05          2000    Beatmania III Append Core Remix
     GQ972(?)   GCC01          2003    Beatmania III The Final
     GQ974      GQ974          2000    Keyboardmania
     GQ974      GCA01          2000    Keyboardmania 2nd Mix
@@ -100,6 +100,17 @@
     ???        ?              2000    Pop'n Music Animelo
     ???        GEA02          2001    Pop'n Music Animelo 2
     ???        ?              2001    Pop'n Music Mickey Tunes
+
+Dumpable pieces missing
+-----------------------
+Beatmania III - CD, HDD, EPROM on main board, EPROM on SPU board
+Beatmania III Append 6th Mix - HDD, dongle, EPROM on main board, EPROM on SPU board
+Para Para Paradise - dongle, program CD
+Para Para Paradise 1.1 - dongle
+Para Para Dancing - dongle, program CD
+Pop'n Music Animelo - dongle, CD, DVD
+Keyboard Mania  - dongle, program CD, audio CD
+Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 
     TODO:
         - The external Yamaha MIDI sound board is not emulated (no keyboard sounds).
@@ -1674,8 +1685,8 @@ ROM_START( kbm3rd )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
 
-	ROM_REGION(0xc0, "user2", 0)    // Security dongle
-	ROM_LOAD("gca12-ja", 0x00, 0xc0, BAD_DUMP CRC(cf01dc15) SHA1(da8d208233487ebe65a0a9826fc72f1f459baa26))
+	ROM_REGION(0xc8, "user2", 0)    // Security dongle
+	ROM_LOAD("gca12-ja_gca12-aa.bin", 0x00, 0xc8, CRC(96b12482) SHA1(199f20d9fa53108b3fe02d91d6793af1554b0f6f))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a12jaa01", 0, SHA1(ea30bf1273bce772f09063bfc8a74df360c743a7) )
@@ -1688,8 +1699,8 @@ ROM_START( popn4 )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
-	ROM_LOAD( "gq986-ja", 0x000000, 0x0000c0, CRC(6f8aa811) SHA1(fc970f6b4ada58eee361b3477abe503019b5dfda) )
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gq986_gc986.bin", 0x00, 0xc8, CRC(5c11469a) SHA1(efbe2e4a8cbb1285122fad22e3cfe9d47310da02))
 
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
@@ -1707,8 +1718,8 @@ ROM_START( popn5 )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP( "a02jaa03.21e", 0x000000, 0x080000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599) )
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
-	ROM_LOAD( "gca04-ja", 0x000000, 0x0000c0, CRC(7724fdbf) SHA1(b1b2d838d1938d9dc15151b7834502c1668bd31b) )
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gea04-ja_gca04-ja_gca04-jb.bin", 0x00, 0xc8, CRC(f48f62f7) SHA1(e28b3fd41fa4136cf9c271967d0e68f21a67ba1a))
 
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
@@ -1827,6 +1838,44 @@ ROM_START( ppp11 )
 ROM_END
 
 // Beatmania III has a different BIOS and SPU program, and they aren't dumped yet
+ROM_START( bm3core )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, BAD_DUMP CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))     // boots with KBM BIOS
+
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD( "gca05-jc.bin", 0x00, 0xc8, CRC(a4c67c80) SHA1(a87609052fa879116350564353df7f5b70ef3ae5) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
+
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "a05jca01", 0, SHA1(b89eced8a1325b087e3f875d1a643bebe9bad5c0) )
+
+	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
+	DISK_IMAGE_READONLY( "a05jca02", 0, NO_DUMP )
+ROM_END
+
+ROM_START( bm36th )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, BAD_DUMP CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))     // boots with KBM BIOS
+
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD( "gca21-jc", 0x000000, 0x0000c8, NO_DUMP )
+
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
+
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "a21jca01", 0, SHA1(d1b888379cc0b2c2ab58fa2c5be49258043c3ea1) )
+
+	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
+	DISK_IMAGE_READONLY( "a21jca02", 0, NO_DUMP )
+ROM_END
+
 ROM_START( bm37th )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, BAD_DUMP CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))     // boots with KBM BIOS
@@ -1880,5 +1929,7 @@ GAME( 2001, popn6,    0,       firebeat_spu,  popn, firebeat_state,   ppp,    RO
 GAME( 2001, popn7,    0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Pop'n Music 7", MACHINE_NOT_WORKING)
 GAME( 2001, popnanm2, 0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Pop'n Music Animelo 2", MACHINE_NOT_WORKING)
 GAME( 2002, popn8,    0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Pop'n Music 8", MACHINE_NOT_WORKING)
+GAME( 2000, bm3core,  0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Beatmania III Append Core Remix", MACHINE_NOT_WORKING)
+GAME( 2001, bm36th,   0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Beatmania III Append 6th Mix", MACHINE_NOT_WORKING)
 GAME( 2002, bm37th,   0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Beatmania III Append 7th Mix", MACHINE_NOT_WORKING)
 GAME( 2003, bm3final, 0,       firebeat_spu,  popn, firebeat_state,   ppp,    ROT0,   "Konami",  "Beatmania III The Final", MACHINE_NOT_WORKING)

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.2" green="1.0" blue="0.85" /></led7seg>
+	</element>
+
+	<element name="lamp_dot" defstate="0">
+		<disk state="1"><color red="0.2" green="1.0" blue="0.85" /></disk>
+		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
+	</element>
+	<element name="lamp_dash" defstate="0">
+		<rect state="1"><color red="0.2" green="1.0" blue="0.85" /></rect>
+		<rect state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></rect>
+	</element>
+	<element name="lamp_slash" defstate="0">
+		<text string="/" state="1"><color red="0.2" green="1.0" blue="0.85" /></text>
+		<text string="/" state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
+	</element>
+	<element name="lamp_backslash" defstate="0">
+		<text string="\" state="1"><color red="0.2" green="1.0" blue="0.85" /></text>
+		<text string="\" state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
+	</element>
+
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="105.5" top="0" bottom="15" />
+
+		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="10" y="0" width="10" height="15" /></bezel>
+
+		<bezel name="digit3" element="digit"><bounds x="30" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="40" y="0" width="10" height="15" /></bezel>
+
+		<bezel name="digit5" element="digit"><bounds x="60" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="70" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="80" y="0" width="10" height="15" /></bezel>
+
+<!-- math symbols custom digit -->
+
+		<bezel name="lamp26" element="lamp_dash"><bounds x="21.5" y="7.35" width="7" height="0.5" /></bezel>
+
+		<bezel name="lamp21" element="lamp_dash"><bounds x="24.75" y="3.7" width="0.5" height="3.0" /></bezel>
+		<bezel name="lamp24" element="lamp_dash"><bounds x="24.75" y="8.5" width="0.5" height="3.0" /></bezel>
+
+		<bezel name="lamp20" element="lamp_dot"><bounds x="24.25" y="1.8" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp23" element="lamp_dot"><bounds x="24.25" y="11.9" width="1.5" height="1.5" /></bezel>
+
+		<bezel name="lamp25" element="lamp_slash"><bounds x="24.3" y="-0.5" width="5" height="7.5" /></bezel>
+		<bezel name="lamp25" element="lamp_slash"><bounds x="20.7" y="7" width="5" height="7.5" /></bezel>
+		<bezel name="lamp25" element="lamp_backslash"><bounds x="20.7" y="-0.5" width="5" height="7.5" /></bezel>
+		<bezel name="lamp25" element="lamp_backslash"><bounds x="24.3" y="7" width="5" height="7.5" /></bezel>
+
+<!-- equals sign digit -->
+
+		<bezel name="lamp47" element="lamp_dash"><bounds x="51.5" y="3.7" width="7" height="1" /></bezel>
+		<bezel name="lamp47" element="lamp_dash"><bounds x="51.5" y="10.5" width="7" height="1" /></bezel>
+
+<!-- "bulls eye" digit, it's supposed to be a segmented circle but that's not really possible to draw here -->
+
+		<bezel name="lamp86" element="lamp_dash"><bounds x="92" y="3" width="1" height="4" /></bezel>
+		<bezel name="lamp84" element="lamp_dash"><bounds x="92" y="8" width="1" height="4" /></bezel>
+		<bezel name="lamp81" element="lamp_dash"><bounds x="104" y="3" width="1" height="4" /></bezel>
+		<bezel name="lamp87" element="lamp_dash"><bounds x="104" y="8" width="1" height="4" /></bezel>
+
+		<bezel name="lamp85" element="lamp_dash"><bounds x="94" y="1" width="4" height="1" /></bezel>
+		<bezel name="lamp80" element="lamp_dash"><bounds x="99" y="1" width="4" height="1" /></bezel>
+		<bezel name="lamp83" element="lamp_dash"><bounds x="94" y="13" width="4" height="1" /></bezel>
+		<bezel name="lamp82" element="lamp_dash"><bounds x="99" y="13" width="4" height="1" /></bezel>
+
+
+	</view>
+</mamelayout>

@@ -90,7 +90,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 const device_type IDE_CONTROLLER_32 = &device_creator<ide_controller_32_device>;
 
 ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	ide_controller_device(mconfig, IDE_CONTROLLER, "IDE Controller (32 bit)", tag, owner, clock, "ide_controller", __FILE__)
+	ide_controller_device(mconfig, IDE_CONTROLLER, "IDE Controller (32 bit)", tag, owner, clock, "ide_controller32", __FILE__)
 {
 }
 

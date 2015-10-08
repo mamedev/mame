@@ -4,7 +4,7 @@
 *
 *   SunPlus u'nSP emulator
 *
-*    by Harmony
+*    by Ryan Holtz
 *
 \**************************/
 

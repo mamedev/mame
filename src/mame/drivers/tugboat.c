@@ -3,7 +3,7 @@
 /****************************************************************************
 
 Tug Boat
-6502 hooked up + preliminary video by MooglyGuy
+6502 hooked up + preliminary video by Ryan Holtz
 
 TODO:
 - verify connections of the two PIAs. I only hooked up a couple of ports but

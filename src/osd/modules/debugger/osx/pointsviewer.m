@@ -74,7 +74,7 @@
 	[breakScroll setBorderType:NSNoBorder];
 	[breakScroll setDocumentView:breakView];
 	[breakView release];
-	breakTab = [[NSTabViewItem alloc] initWithIdentifier:nil];
+	breakTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
 	[breakTab setView:breakScroll];
 	[breakScroll release];
 
@@ -89,7 +89,7 @@
 	[watchScroll setBorderType:NSNoBorder];
 	[watchScroll setDocumentView:watchView];
 	[watchView release];
-	watchTab = [[NSTabViewItem alloc] initWithIdentifier:nil];
+	watchTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
 	[watchTab setView:watchScroll];
 	[watchScroll release];
 

@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x5080, 0x50ff) AM_RAM
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(galaxold_coin_counter_1_w)
 	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_nmi_enable_w)
+	//AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x6808, 0x6808) AM_WRITE(galaxold_coin_counter_0_w)
 	AM_RANGE(0x6809, 0x6809) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x680b, 0x680b) AM_WRITE(galaxold_flip_screen_y_w)
@@ -1451,13 +1451,14 @@ static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(newsin7_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
+	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
@@ -1902,6 +1903,28 @@ ROM_START( newsin7 )
 	ROM_LOAD( "newsin.6",     0x0000, 0x0020, CRC(5cf2cd8d) SHA1(0c85737add75545ab11aaf64fe37c7bd078308c9) )
 ROM_END
 
+ROM_START( newsin7a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr2732-1.u26",   0x0000, 0x1000, CRC(67bd4b05) SHA1(a3e397fe0b9baba48fa876c9cf53319f5c7c73f6) )
+	ROM_LOAD( "epr2732-2.u56",   0x1000, 0x1000, CRC(93ac59de) SHA1(8eed2bab741ca3d0deeeaede22547ebe90b46a46) )
+	ROM_LOAD( "epr2732-3.u69",   0x2000, 0x1000, CRC(6a778d95) SHA1(bf94017f06e7029a8a70e7b7ae741f7eac9d3e07) )
+	ROM_LOAD( "epr2732-4.u98",   0x3000, 0x1000, CRC(7f351640) SHA1(5db70661c75f125eb531e84df66d0127c29cb821) )
+	ROM_LOAD( "epr2732-5.u114",  0xa000, 0x1000, CRC(06275d59) SHA1(a5a5436c0b014af06181eeb044d8c4e3188414ea) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "epr2716.u39",     0x0000, 0x0800, CRC(d88489a2) SHA1(ab10fd4862129824301a0a847de298f1826aa03e) )
+	ROM_LOAD( "epr2716.u51",     0x0800, 0x0800, CRC(b154a7af) SHA1(91ca28b2530f22786ff581e5710b40f0cf99f516) )
+	ROM_LOAD( "epr2716.u78",     0x1000, 0x0800, CRC(7ade709b) SHA1(bda1401172139cd6e3e03424c56e4f59e5afebd5) ) /* u78 socket was empty, using the newsin7 one */
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "epr2732-7.db",    0x2000, 0x1000, CRC(6bc5d64f) SHA1(4f52224a4d5294a7487a1fc55eba13cf0b5fb6af) )
+	ROM_LOAD( "epr2732-6.u133",  0x1000, 0x1000, CRC(0c5b895a) SHA1(994ad7f051b30a3045ffc08ac8d9d7092fbadef3) )
+	ROM_LOAD( "epr2732-8.db",    0x0000, 0x1000, CRC(6b87adff) SHA1(c0943832e498ab04978b11b163ba951d4a7e2e60) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.u59",        0x0000, 0x0020, CRC(16cb5f4e) SHA1(36753611808d245d4f3ee55f71394297dd2afc09) ) /* Slightly different color prom */
+ROM_END
+
 ROM_START( mrkougar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2732-7.bin",   0x0000, 0x1000, CRC(fd060ffb) SHA1(b3bee6fe879f13f3178bef3b2dff3041e698f061) )
@@ -2272,7 +2295,8 @@ GAME( 1981, mars,     0,        mars,     mars,     scramble_state, mars,       
 
 GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, devilfsh,     ROT90, "Artic",               "Devil Fish",                     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",           MACHINE_SUPPORTS_SAVE )

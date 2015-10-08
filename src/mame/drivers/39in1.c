@@ -4,7 +4,7 @@
  *
  * 39in1.c - bootleg MAME-based "39-in-1" arcade PCB
  * Skeleton by R. Belmont, thanks to the Guru
- * PXA255 Peripheral hookup by MooglyGuy
+ * PXA255 Peripheral hookup by Ryan Holtz
  * Decrypt by Andreas Naive
  *
  * CPU: Intel Xscale PXA255 series @ 200 MHz, configured little-endian

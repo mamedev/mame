@@ -95,13 +95,13 @@
  - Added generic registers decode function
  - Some other little fixes.
 
- MooglyGuy 29/03/2004
+ Ryan Holtz 29/03/2004
     - Changed MOVI to use unsigned values instead of signed, correcting
       an ugly glitch when loading 32-bit immediates.
  Pierpaolo Prazzoli
     - Same fix in get_const
 
- MooglyGuy - 02/27/04
+ Ryan Holtz - 02/27/04
     - Fixed delayed branching
     - const_val for CALL should always have bit 0 clear
 
@@ -133,7 +133,7 @@
       (From the doc: A Call, Trap or Software instruction increments the FP and sets FL
       to 6, thus creating a new stack frame with the length of 6 registers).
 
- MooglyGuy - 10/25/03
+ Ryan Holtz - 10/25/03
     - Fixed CALL enough that it at least jumps to the right address, no word
       yet as to whether or not it's working enough to return.
     - Added get_lrconst() to get the const value for the CALL operand, since
@@ -152,7 +152,7 @@
       Apparently no matter what the current frame pointer is they'll always use
       local_regs[0] through local_regs[15].
 
- MooglyGuy - 08/20/03
+ Ryan Holtz - 08/20/03
     - Added H flag support for MOV and MOVI
     - Changed init routine to set S flag on boot. Apparently the CPU defaults to
       supervisor mode as opposed to user mode when it powers on, as shown by the
@@ -164,18 +164,18 @@
       (movd, divu, divs, ldxx1, ldxx2, stxx1, stxx2, mulu, muls, set, mul
       call, chk)
 
- MooglyGuy - 08/17/03
+ Ryan Holtz - 08/17/03
     - Working on support for H flag, nothing quite done yet
     - Added trap Range Error for CHK PC, PC
     - Fixed relative jumps, they have to be taken from the opcode following the
-      jump minstead of the jump opcode itself.
+      jump instead of the jump opcode itself.
 
  Pierpaolo Prazzoli - 08/17/03
     - Fixed get_pcrel() when OP & 0x80 is set.
     - Decremented PC by 2 also in MOV, ADD, ADDI, SUM, SUB and added the check if
       D_BIT is not set. (when pc is changed they are implicit branch)
 
- MooglyGuy - 08/17/03
+ Ryan Holtz - 08/17/03
     - Implemented a crude hack to set FL in the SR to 6, since according to the docs
       that's supposed to happen each time a trap occurs, apparently including when
       the processor starts up. The 3rd opcode executed in vamphalf checks to see if
@@ -191,7 +191,7 @@
       a few bytes. While it does indeed branch to valid code, I highly doubt that
       this is the desired effect. Check for signed/unsigned relative branch, maybe?
 
- MooglyGuy - 08/16/03
+ Ryan Holtz - 08/16/03
     - Fixed the debugger at least somewhat so that it displays hex instead of decimal,
       and so that it disassembles opcodes properly.
     - Fixed hyperstone_execute() to increment PC *after* executing the opcode instead of

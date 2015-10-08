@@ -101,16 +101,16 @@ READ32_MEMBER(konendev_state::mcu2_r)
 	{
 		r &= ~0x4000;       // MCU2 presence
 		r &= ~0x2000;       // IFU2 presence
-		r &= ~0x1000;       // FMU2 presence	
+		r &= ~0x1000;       // FMU2 presence
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		r |= ioport("DSW")->read() & 0xff;
 
-		//r |= 0x80;			// 0 = ram clear?
-		//r |= 0x40;			// logic door
-		r |= 0x04;			// battery 1 status
-		r |= 0x10;			// battery 2 status		
+		//r |= 0x80;            // 0 = ram clear?
+		//r |= 0x40;            // logic door
+		r |= 0x04;          // battery 1 status
+		r |= 0x10;          // battery 2 status
 	}
 
 	return r;
@@ -133,19 +133,19 @@ UINT8 konendev_state::rtc_dev_r(UINT32 reg)
 {
 	switch (reg)
 	{
-		case 0x0:		return 9;
-		case 0x1:		return 5;
-		case 0x2:		return 3;
-		case 0x3:		return 2;
-		case 0x4:		return 1;
-		case 0x5:		return 0;
-		case 0x6:		return 7;
-		case 0x7:		return 2;
-		case 0x8:		return 2;
-		case 0x9:		return 1;
-		case 0xa:		return 5;
-		case 0xb:		return 1;
-		case 0xc:		return 3;
+		case 0x0:       return 9;
+		case 0x1:       return 5;
+		case 0x2:       return 3;
+		case 0x3:       return 2;
+		case 0x4:       return 1;
+		case 0x5:       return 0;
+		case 0x6:       return 7;
+		case 0x7:       return 2;
+		case 0x8:       return 2;
+		case 0x9:       return 1;
+		case 0xa:       return 5;
+		case 0xb:       return 1;
+		case 0xc:       return 3;
 	}
 
 	return 0;
@@ -154,7 +154,7 @@ UINT8 konendev_state::rtc_dev_r(UINT32 reg)
 READ32_MEMBER(konendev_state::rtc_r)
 {
 	UINT32 r = 0;
-	
+
 	if (ACCESSING_BITS_24_31)
 		r |= (UINT32)(rtc_dev_r(offset * 4)) << 24;
 	if (ACCESSING_BITS_16_23)
@@ -229,34 +229,34 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( konendev )
 	PORT_START("IN0")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )		// "Take Win" button
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )		// "Gamble" button
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )			// "25 Lines" button
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 )			// "20 Lines" button
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )			// "15 Lines" button
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )			// "10 Lines" button	
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 )			// "5 Lines" button
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 )			// "1 Line" button	
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 )			// "Reserve" button
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON8 )			// "Collect" button
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON9 )			// "Bet 20" button
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON10 )			// "Bet 10" button
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON11 )			// "Bet 5" button
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON12 )			// "Bet 3" button
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON13 )			// "Bet 2" button
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON14 )			// "Bet 1" button
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )      // "Take Win" button
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )       // "Gamble" button
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )          // "25 Lines" button
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 )          // "20 Lines" button
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )          // "15 Lines" button
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )          // "10 Lines" button
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 )          // "5 Lines" button
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 )          // "1 Line" button
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 )          // "Reserve" button
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON8 )          // "Collect" button
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON9 )          // "Bet 20" button
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON10 )         // "Bet 10" button
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON11 )         // "Bet 5" button
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON12 )         // "Bet 3" button
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON13 )         // "Bet 2" button
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON14 )         // "Bet 1" button
 
 	PORT_START("IN1")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )					// Audit key
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON16 )			// Reset key	
+	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )                   // Audit key
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON16 )         // Reset key
 	PORT_DIPNAME( 0x0800, 0x0800, "Main door switch" )
 	PORT_DIPSETTING( 0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0400, 0x0400, "Cashbox door" )
 	PORT_DIPSETTING( 0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0300, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x0300, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "BNA Door" )
 	PORT_DIPSETTING( 0x0040, DEF_STR( Off ) )
@@ -482,15 +482,15 @@ DRIVER_INIT_MEMBER(konendev_state,konendev)
 DRIVER_INIT_MEMBER(konendev_state,enchlamp)
 {
 	UINT32 *rom = (UINT32*)memregion("program")->base();
-	rom[0x24/4] = 0x00002743;		// patch flash checksum for now
-	
+	rom[0x24/4] = 0x00002743;       // patch flash checksum for now
+
 	// patch sound data checksums
 	rom[0x2d924/4] = 0x00000000;
 	rom[0x2d928/4] = 0x00000000;
 	rom[0x2d934/4] = 0x00000000;
 	rom[0x2d938/4] = 0x00000000;
 
-	rom[0] = 0x5782b930;					// new checksum for program rom
+	rom[0] = 0x5782b930;                    // new checksum for program rom
 }
 
 // has a flash dump?

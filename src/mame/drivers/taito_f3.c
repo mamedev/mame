@@ -62,7 +62,7 @@ READ32_MEMBER(taito_f3_state::f3_control_r)
 	if (offset<6)
 		return m_input[offset]->read();
 	else logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", space.device().safe_pc(), offset);
-	
+
 	return 0xffffffff;
 }
 

@@ -117,6 +117,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "epson_ex800.h"
 #include "epson_lx800.h"
 #include "epson_lx810l.h"
+#include "nec_p72.h"
 #include "printer.h"
 #include "covox.h"
 
@@ -126,6 +127,7 @@ SLOT_INTERFACE_START(centronics_devices)
 	SLOT_INTERFACE("lx800", EPSON_LX800)
 	SLOT_INTERFACE("lx810l", EPSON_LX810L)
 	SLOT_INTERFACE("ap2000", EPSON_AP2000)
+	SLOT_INTERFACE("p72", NEC_P72)
 	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
 	SLOT_INTERFACE("covox", CENTRONICS_COVOX)
 	SLOT_INTERFACE("covox_stereo", CENTRONICS_COVOX_STEREO)

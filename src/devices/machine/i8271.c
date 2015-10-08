@@ -1,1510 +1,1698 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Thacker
-/* Intel 8271 Floppy Disc Controller */
-/* used in BBC Micro B,Acorn Atom */
-/* Jun 2000. Kev Thacker */
+// copyright-holders:Carl,Olivier Galibert
 
-/* TODO:
-
-    - Scan commands
-    - Check the commands work properly using a BBC disc copier program
-    - check if 0 is specified as number of sectors, how many sectors
-    is actually transfered
-    - deleted data functions (error if data finds deleted data?)
-*/
-
-
-#include "emu.h"
 #include "i8271.h"
-
-/* data request */
-#define I8271_FLAGS_DATA_REQUEST 0x01
-/* data direction. If 0x02, then it is from fdc to cpu, else
-it is from cpu to fdc */
-#define I8271_FLAGS_DATA_DIRECTION 0x02
-
-enum I8271_STATE_t
-{
-	I8271_STATE_EXECUTION_READ = 0,
-	I8271_STATE_EXECUTION_WRITE
-};
-
-/* commands accepted */
-#define I8271_COMMAND_SPECIFY                                       0x035
-#define I8271_COMMAND_SEEK                                          0x029
-#define I8271_COMMAND_READ_DRIVE_STATUS                             0x02c
-#define I8271_COMMAND_READ_SPECIAL_REGISTER                         0x03d
-#define I8271_COMMAND_WRITE_SPECIAL_REGISTER                        0x03a
-#define I8271_COMMAND_FORMAT                                        0x023
-#define I8271_COMMAND_READ_ID                                       0x01b
-#define I8271_COMMAND_READ_DATA_SINGLE_RECORD                       0x012
-#define I8271_COMMAND_READ_DATA_AND_DELETED_DATA_SINGLE_RECORD      0x016
-#define I8271_COMMAND_WRITE_DATA_SINGLE_RECORD                      0x00a
-#define I8271_COMMAND_WRITE_DELETED_DATA_SINGLE_RECORD              0x00e
-#define I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_SINGLE_RECORD    0x01e
-#define I8271_COMMAND_READ_DATA_MULTI_RECORD                        0x013
-#define I8271_COMMAND_READ_DATA_AND_DELETED_DATA_MULTI_RECORD       0x017
-#define I8271_COMMAND_WRITE_DATA_MULTI_RECORD                       0x00b
-#define I8271_COMMAND_WRITE_DELETED_DATA_MULTI_RECORD               0x00f
-#define I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_MULTI_RECORD     0x01f
-#define I8271_COMMAND_SCAN_DATA                                     0x000
-#define I8271_COMMAND_SCAN_DATA_AND_DELETED_DATA                    0x004
-
-/*
-#define I8271_COMMAND_READ_OPERATION                            (1<<4)
-#define I8271_COMMAND_DELETED_DATA                              (1<<2)
-#define I8271_COMMAND_MULTI_RECORD                              (1<<0)
-*/
-
-
-
-/* first parameter for specify command */
-#define I8271_SPECIFY_INITIALIZATION                                0x0d
-#define I8271_SPECIFY_LOAD_BAD_TRACKS_SURFACE_0                     0x010
-#define I8271_SPECIFY_LOAD_BAD_TRACKS_SURFACE_1                     0x018
-
-/* first parameter for read/write special register */
-#define I8271_SPECIAL_REGISTER_SCAN_SECTOR_NUMBER                   0x06
-#define I8271_SPECIAL_REGISTER_SCAN_MSB_OF_COUNT                    0x014
-#define I8271_SPECIAL_REGISTER_SCAN_LSB_OF_COUNT                    0x013
-#define I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK              0x012
-#define I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK              0x01a
-#define I8271_SPECIAL_REGISTER_MODE_REGISTER                        0x017
-#define I8271_SPECIAL_REGISTER_DRIVE_CONTROL_OUTPUT_PORT            0x023
-#define I8271_SPECIAL_REGISTER_DRIVE_CONTROL_INPUT_PORT             0x022
-#define I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1                0x010
-#define I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2                0x011
-#define I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_1                0x018
-#define I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_2                0x019
-
-
-/* status register bits */
-#define I8271_STATUS_COMMAND_BUSY   0x080
-#define I8271_STATUS_COMMAND_FULL   0x040
-#define I8271_STATUS_PARAMETER_FULL 0x020
-#define I8271_STATUS_RESULT_FULL    0x010
-#define I8271_STATUS_INT_REQUEST    0x008
-#define I8271_STATUS_NON_DMA_REQUEST    0x004
-
-#define VERBOSE 0
-
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-#define FDC_LOG(x) do { if (VERBOSE) logerror("I8271: %s\n",x); } while (0)
-#define FDC_LOG_COMMAND(x) do { if (VERBOSE) logerror("I8271: COMMAND %s\n",x); } while (0)
-
-
-/* Device Interface */
 
 const device_type I8271 = &device_creator<i8271_device>;
 
 i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__),
-	m_write_irq(*this),
-	m_write_drq(*this),
-	m_floppy_tag1(NULL),
-	m_floppy_tag2(NULL),
-	m_flags(0),
-	m_state(0),
-	m_Command(0),
-	m_StatusRegister(0),
-	m_CommandRegister(0),
-	m_ResultRegister(0),
-	m_ParameterRegister(0),
-	m_ResetRegister(0),
-	m_data(0),
-	m_ParameterCount(0),
-	m_ParameterCountWritten(0),
-	m_Mode(0),
-	m_drive(0),
-	m_side(0),
-	m_drive_control_output(0),
-	m_drive_control_input(0),
-	m_StepRate(0),
-	m_HeadSettlingTime(0),
-	m_IndexCountBeforeHeadUnload(0),
-	m_HeadLoadTime(0),
-	//m_ID_C(0),
-	//m_ID_H(0),
-	m_ID_R(0),
-	m_ID_N(0),
-	m_data_id(0),
-	m_ExecutionPhaseTransferCount(0),
-	m_ExecutionPhaseCount(0),
-	m_Counter(0)
-	//m_data_direction(0)
+	intrq_cb(*this),
+	drq_cb(*this),
+	hdl_cb(*this),
+	opt_cb(*this)
 {
-	for (int i = 0; i < 8; i++ )
-	{
-		m_CommandParameters[i] = 0;
-	}
-
-	for (int i = 0; i < 2; i++ )
-	{
-		m_CurrentTrack[i] = 0;
-	}
-
-	for (int i = 0; i < 4; i++ )
-	{
-		m_BadTracks[i] = 0;
-	}
+	select_connected = true;
+	external_ready = false;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+DEVICE_ADDRESS_MAP_START(map, 8, i8271_device)
+	AM_RANGE(0x0, 0x0) AM_READWRITE(sr_r, cmd_w)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(rr_r, param_w)
+	AM_RANGE(0x2, 0x2) AM_WRITE(reset_w)
+ADDRESS_MAP_END
+
+void i8271_device::set_ready_line_connected(bool _ready)
+{
+	ready_connected = _ready;
+}
+
+void i8271_device::set_select_lines_connected(bool _select)
+{
+	select_connected = _select;
+}
 
 void i8271_device::device_start()
 {
-	m_write_irq.resolve_safe();
-	m_write_drq.resolve_safe();
+	intrq_cb.resolve_safe();
+	drq_cb.resolve_safe();
+	hdl_cb.resolve_safe();
+	opt_cb.resolve_safe();
 
-	m_data_timer = timer_alloc(TIMER_DATA_CALLBACK);
-	m_command_complete_timer = timer_alloc(TIMER_TIMED_COMMAND_COMPLETE);
-	m_drive = 0;
-	m_pExecutionPhaseData = auto_alloc_array(machine(), char, 0x4000);
+	for(int i=0; i != 2; i++) {
+		char name[2];
+		flopi[i].tm = timer_alloc(i);
+		flopi[i].id = i;
+		if(select_connected) {
+			name[0] = '0'+i;
+			name[1] = 0;
+			floppy_connector *con = subdevice<floppy_connector>(name);
+			if(con) {
+				flopi[i].dev = con->get_device();
+				if (flopi[i].dev != NULL)
+					flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
+			} else
+				flopi[i].dev = NULL;
+		} else
+			flopi[i].dev = NULL;
 
-	m_floppy[0] = machine().device<legacy_floppy_image_device>(m_floppy_tag1);
-	m_floppy[1] = machine().device<legacy_floppy_image_device>(m_floppy_tag2);
+		flopi[i].main_state = IDLE;
+		flopi[i].sub_state = IDLE;
+		flopi[i].dir = 0;
+		flopi[i].counter = 0;
+		flopi[i].pcn = 0;
+		flopi[i].live = false;
+		flopi[i].index = false;
+		flopi[i].ready = true;
+	}
+	cur_rate = 250000;
 
-	// register for state saving
-	/*save_item(NAME(m_flags));
-	save_item(NAME(m_state));
-	save_item(NAME(m_Command));
-	save_item(NAME(m_StatusRegister));
-	save_item(NAME(m_CommandRegister));
-	save_item(NAME(m_ResultRegister));
-	save_item(NAME(m_ParameterRegister));
-	save_item(NAME(m_ResetRegister));
-	save_item(NAME(m_data));
-	//save_item(NAME(m_ParameterCount));
-	//save_item(NAME(m_ParameterCountWritten));
-	save_item(NAME(m_CommandParameters));
-	//save_item(NAME(m_CurrentTrack));
-	//save_item(NAME(m_BadTracks));
-	//save_item(NAME(m_Mode));
-	save_item(NAME(m_drive));
-	save_item(NAME(m_side));
-	save_item(NAME(m_drive_control_output));
-	save_item(NAME(m_drive_control_input));
-	//save_item(NAME(m_StepRate));
-	//save_item(NAME(m_HeadSettlingTime));
-	//save_item(NAME(m_IndexCountBeforeHeadUnload));
-	//save_item(NAME(m_HeadLoadTime));
-	save_item(NAME(m_ID_C));
-	save_item(NAME(m_ID_H));
-	save_item(NAME(m_ID_R));
-	save_item(NAME(m_ID_N));
-	save_item(NAME(m_data_id));
-	save_item(NAME(m_ExecutionPhaseTransferCount));
-	save_item(NAME(m_ExecutionPhaseCount));
-	save_item(NAME(m_Counter));
-	save_item(NAME(m_data_direction));
-	save_pointer(NAME(m_pExecutionPhaseData), 0x4000);*/
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+	cur_live.fi = NULL;
 }
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void i8271_device::device_reset()
 {
-	m_StatusRegister = 0;  //I8271_STATUS_INT_REQUEST | I8271_STATUS_NON_DMA_REQUEST;
-	m_Mode = 0x0c0; /* bits 0, 1 are initialized to zero */
-	m_ParameterCountWritten = 0;
-	m_ParameterCount = 0;
-
-	/* if timer is active remove */
-	m_command_complete_timer->reset();
-	m_data_timer->reset();
-
-	/* clear irq */
-	set_irq_state(0);
-	/* clear dma */
-	set_dma_drq();
+	soft_reset();
 }
 
-void i8271_device::seek_to_track(int track)
+void i8271_device::soft_reset()
 {
-	if (track==0)
-	{
-		/* seek to track 0 */
-		unsigned char StepCount = 0x0ff;
-
-		/*logerror("step\n"); */
-
-		/* track 0 not set, not seeked more than 255 tracks */
-		while (m_floppy[m_drive]->floppy_tk00_r() && (StepCount != 0))
-		{
-/*            logerror("step\n"); */
-			StepCount--;
-			m_floppy[m_drive]->floppy_drive_seek(-1);
-		}
-
-		m_CurrentTrack[m_drive] = 0;
-
-		/* failed to find track 0? */
-		if (StepCount==0)
-		{
-			/* Completion Type: operator intervation probably required for recovery */
-			/* Completion code: track 0 not found */
-			m_ResultRegister |= (2<<3) | 2<<1;
-		}
-
-		/* step out - towards track 0 */
-		m_drive_control_output &=~(1<<2);
+	main_phase = PHASE_IDLE;
+	for(int i=0; i<2; i++) {
+		flopi[i].main_state = IDLE;
+		flopi[i].sub_state = IDLE;
+		flopi[i].live = false;
+		flopi[i].ready = get_ready(i);
 	}
-	else
-	{
-		signed int SignedTracks;
-
-		/* calculate number of tracks to seek */
-		SignedTracks = track - m_CurrentTrack[m_drive];
-
-		/* step towards 0 */
-		m_drive_control_output &= ~(1<<2);
-
-		if (SignedTracks>0)
-		{
-			/* step away from 0 */
-			m_drive_control_output |= (1<<2);
-		}
-
-
-		/* seek to track 0 */
-		m_floppy[m_drive]->floppy_drive_seek(SignedTracks);
-
-		m_CurrentTrack[m_drive] = track;
-	}
+	set_irq(false);
+	set_drq(false);
+	command_pos = 0;
+	cur_live.fi = 0;
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+	cur_live.fi = NULL;
+	rr = 0;
+	scan_sec = 0;
+	moder = 0xc0;
+	oport = 0;
+	scan_cnt[0] = scan_cnt[1] = 0;
 }
 
-void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i8271_device::ready_w(bool _ready)
 {
-	switch (id)
-	{
-	case TIMER_DATA_CALLBACK:
-		/* ok, trigger data request now */
-		data_request();
+	external_ready = _ready;
+}
 
-		/* stop it */
-		m_data_timer->reset();
+bool i8271_device::get_ready(int fid)
+{
+	if(!flopi[fid].ready)
+		return false;
+	if(ready_connected)
+		return flopi[fid].dev ? !flopi[fid].dev->ready_r() : false;
+	return !external_ready;
+}
+
+void i8271_device::set_floppy(floppy_image_device *flop)
+{
+	for(int fid=0; fid<2; fid++) {
+		if(flopi[fid].dev)
+			flopi[fid].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		flopi[fid].dev = flop;
+	}
+	if(flop)
+		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
+}
+
+READ8_MEMBER(i8271_device::sr_r)
+{
+	UINT32 ret = (irq ? SR_IRQ : 0);
+	switch(main_phase) {
+	case PHASE_CMD:
+		ret |= SR_CF;
 		break;
-
-	case TIMER_TIMED_COMMAND_COMPLETE:
-		command_complete(1,1);
-
-		/* stop it, but don't allow it to be free'd */
-		m_command_complete_timer->reset();
+	case PHASE_EXEC:
+		ret |= SR_BSY;
+		if((moder & 1) && drq)
+			ret |= SR_DRQ;
 		break;
-
-	default:
+	case PHASE_RESULT:
+		ret |= SR_RF;
 		break;
 	}
+	return ret;
 }
 
-/* setup a timed data request - data request will be triggered in a few usecs time */
-void i8271_device::timed_data_request()
+READ8_MEMBER(i8271_device::rr_r)
 {
-	int usecs;
-	/* 64 for single density */
-	usecs = 64;
-
-	/* set timers */
-	m_command_complete_timer->reset();
-	m_data_timer->adjust(attotime::from_usec(usecs));
+	if(main_phase == PHASE_RESULT)
+		main_phase = PHASE_IDLE;
+	set_irq(false);
+	return rr;
 }
 
-
-/* setup a irq to occur 128us later - in reality this would be much later, because the int would
-come after reading the two CRC bytes at least! This function is used when a irq is required at
-command completion. Required for read data and write data, where last byte could be missed! */
-void i8271_device::timed_command_complete()
+void i8271_device::set_rate(int rate)
 {
-	int usecs;
-
-	/* 64 for single density - 2 crc bytes later*/
-	usecs = 64*2;
-
-	/* set timers */
-	m_data_timer->reset();
-	m_command_complete_timer->adjust(attotime::from_usec(usecs));
-}
-
-void i8271_device::set_irq_state(int state)
-{
-	m_StatusRegister &= ~I8271_STATUS_INT_REQUEST;
-	if (state)
-	{
-		m_StatusRegister |= I8271_STATUS_INT_REQUEST;
-	}
-
-	m_write_irq((m_StatusRegister & I8271_STATUS_INT_REQUEST) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void i8271_device::set_dma_drq()
-{
-	m_write_drq((m_flags & I8271_FLAGS_DATA_REQUEST) ? 1 : 0);
-}
-
-void i8271_device::load_bad_tracks(int surface)
-{
-	m_BadTracks[(surface<<1) + 0] = m_CommandParameters[1];
-	m_BadTracks[(surface<<1) + 1] = m_CommandParameters[2];
-	m_CurrentTrack[surface] = m_CommandParameters[3];
-}
-
-void i8271_device::write_bad_track(int surface, int track, int data)
-{
-	m_BadTracks[(surface<<1) + (track-1)] = data;
-}
-
-void i8271_device::write_current_track(int surface, int track)
-{
-	m_CurrentTrack[surface] = track;
-}
-
-int i8271_device::read_current_track(int surface)
-{
-	return m_CurrentTrack[surface];
-}
-
-int i8271_device::read_bad_track(int surface, int track)
-{
-	return m_BadTracks[(surface<<1) + (track-1)];
-}
-
-void i8271_device::get_drive()
-{
-	/* &40 = drive 0 side 0 */
-	/* &80 = drive 1 side 0 */
-
-
-
-	if (m_CommandRegister & (1<<6))
-	{
-		m_drive = 0;
-	}
-
-	if (m_CommandRegister & (1<<7))
-	{
-		m_drive = 1;
-	}
-
-}
-
-void i8271_device::check_all_parameters_written()
-{
-	if (m_ParameterCount == m_ParameterCountWritten)
-	{
-		m_StatusRegister &= ~I8271_STATUS_COMMAND_FULL;
-
-		command_execute();
-	}
-}
-
-
-void i8271_device::update_state()
-{
-	switch (m_state)
-	{
-		/* fdc reading data and passing it to cpu which must read it */
-		case I8271_STATE_EXECUTION_READ:
-		{
-	//      /* if data request has been cleared, i.e. caused by a read of the register */
-	//      if ((m_flags & I8271_FLAGS_DATA_REQUEST)==0)
-			{
-				/* setup data with byte */
-				m_data = m_pExecutionPhaseData[m_ExecutionPhaseCount];
-
-/*              logerror("read data %02x\n", m_data); */
-
-				/* update counters */
-				m_ExecutionPhaseCount++;
-				m_ExecutionPhaseTransferCount--;
-
-			//  logerror("Count: %04x\n", m_ExecutionPhaseCount);
-			//  logerror("Remaining: %04x\n", m_ExecutionPhaseTransferCount);
-
-				/* completed? */
-				if (m_ExecutionPhaseTransferCount==0)
-				{
-					/* yes */
-
-			//      logerror("sector read complete!\n");
-					/* continue command */
-					command_continue();
-				}
-				else
-				{
-					/* no */
-
-					/* issue data request */
-					timed_data_request();
-				}
-			}
-		}
-		break;
-
-		/* fdc reading data and passing it to cpu which must read it */
-		case I8271_STATE_EXECUTION_WRITE:
-		{
-			/* setup data with byte */
-			m_pExecutionPhaseData[m_ExecutionPhaseCount] = m_data;
-			/* update counters */
-			m_ExecutionPhaseCount++;
-			m_ExecutionPhaseTransferCount--;
-
-			/* completed? */
-			if (m_ExecutionPhaseTransferCount==0)
-			{
-				/* yes */
-
-				/* continue command */
-				command_continue();
-			}
-			else
-			{
-				/* no */
-
-				/* issue data request */
-				timed_data_request();
-			}
-		}
-		break;
-
-		default:
-			break;
-	}
-}
-
-void i8271_device::initialise_execution_phase_read(int transfer_size)
-{
-	/* read */
-	m_flags |= I8271_FLAGS_DATA_DIRECTION;
-	m_ExecutionPhaseCount = 0;
-	m_ExecutionPhaseTransferCount = transfer_size;
-	m_state = I8271_STATE_EXECUTION_READ;
-}
-
-
-void i8271_device::initialise_execution_phase_write(int transfer_size)
-{
-	/* write */
-	m_flags &= ~I8271_FLAGS_DATA_DIRECTION;
-	m_ExecutionPhaseCount = 0;
-	m_ExecutionPhaseTransferCount = transfer_size;
-	m_state = I8271_STATE_EXECUTION_WRITE;
-}
-
-/* for data transfers */
-void i8271_device::data_request()
-{
-	m_flags |= I8271_FLAGS_DATA_REQUEST;
-
-	if ((m_Mode & 0x01)!=0)
-	{
-		/* non-dma */
-		m_StatusRegister |= I8271_STATUS_NON_DMA_REQUEST;
-		/* set int */
-		set_irq_state(1);
-	}
-	else
-	{
-		/* dma */
-		m_StatusRegister &= ~I8271_STATUS_NON_DMA_REQUEST;
-
-		set_dma_drq();
-	}
-}
-
-void i8271_device::command_complete(int result, int int_rq)
-{
-	/* not busy, and not a execution phase data request in non-dma mode */
-	m_StatusRegister &= ~(I8271_STATUS_COMMAND_BUSY | I8271_STATUS_NON_DMA_REQUEST);
-
-	if (result)
-	{
-		m_StatusRegister |= I8271_STATUS_RESULT_FULL;
-	}
-
-	if (int_rq)
-	{
-		/* trigger an int */
-		set_irq_state(1);
-	}
-
-	/* correct?? */
-	m_drive_control_output &=~1;
-}
-
-
-/* for data transfers */
-void i8271_device::clear_data_request()
-{
-	m_flags &= ~I8271_FLAGS_DATA_REQUEST;
-
-	if ((m_Mode & 0x01)!=0)
-	{
-		/* non-dma */
-		m_StatusRegister &= ~I8271_STATUS_NON_DMA_REQUEST;
-		/* set int */
-		set_irq_state(0);
-	}
-	else
-	{
-		/* dma */
-		set_dma_drq();
-	}
-}
-
-
-void i8271_device::command_continue()
-{
-	switch (m_Command)
-	{
-		case I8271_COMMAND_READ_DATA_MULTI_RECORD:
-		case I8271_COMMAND_READ_DATA_SINGLE_RECORD:
-		{
-			/* completed all sectors? */
-			m_Counter--;
-			/* increment sector id */
-			m_ID_R++;
-
-			/* end command? */
-			if (m_Counter==0)
-			{
-				timed_command_complete();
-				return;
-			}
-
-			do_read();
-		}
-		break;
-
-		case I8271_COMMAND_WRITE_DATA_MULTI_RECORD:
-		case I8271_COMMAND_WRITE_DATA_SINGLE_RECORD:
-		{
-			/* put the buffer to the sector */
-			m_floppy[m_drive]->floppy_drive_write_sector_data(m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7),0);
-
-			/* completed all sectors? */
-			m_Counter--;
-			/* increment sector id */
-			m_ID_R++;
-
-			/* end command? */
-			if (m_Counter==0)
-			{
-				timed_command_complete();
-				return;
-			}
-
-			do_write();
-		}
-		break;
-
-		case I8271_COMMAND_READ_ID:
-		{
-			m_Counter--;
-
-			if (m_Counter==0)
-			{
-				timed_command_complete();
-				return;
-			}
-
-			do_read_id();
-		}
-		break;
-
-		default:
-			break;
-	}
-}
-
-void i8271_device::do_read()
-{
-	/* find the sector */
-	if (find_sector())
-	{
-		/* get the sector into the buffer */
-		m_floppy[m_drive]->floppy_drive_read_sector_data(m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7));
-
-		/* initialise for reading */
-		initialise_execution_phase_read(1<<(m_ID_N+7));
-
-		/* update state - gets first byte and triggers a data request */
-		timed_data_request();
-		return;
-	}
-	LOG(("error getting sector data\n"));
-
-	timed_command_complete();
-}
-
-void i8271_device::do_read_id()
-{
-	chrn_id id;
-
-	/* get next id from disc */
-	m_floppy[m_drive]->floppy_drive_get_next_id(m_side,&id);
-
-	m_pExecutionPhaseData[0] = id.C;
-	m_pExecutionPhaseData[1] = id.H;
-	m_pExecutionPhaseData[2] = id.R;
-	m_pExecutionPhaseData[3] = id.N;
-
-	initialise_execution_phase_read(4);
-}
-
-
-void i8271_device::do_write()
-{
-	/* find the sector */
-	if (find_sector())
-	{
-		/* initialise for reading */
-		initialise_execution_phase_write(1<<(m_ID_N+7));
-
-		/* update state - gets first byte and triggers a data request */
-		timed_data_request();
-		return;
-	}
-	LOG(("error getting sector data\n"));
-
-	timed_command_complete();
-}
-
-
-
-int i8271_device::find_sector()
-{
-//  int track_count_attempt;
-
-//  track_count_attempt
-	/* find sector within one revolution of the disc - 2 index pulses */
-
-	/* number of times we have seen index hole */
-	int index_count = 0;
-
-	/* get sector id's */
-	do
-	{
-		chrn_id id;
-
-		/* get next id from disc */
-		if (m_floppy[m_drive]->floppy_drive_get_next_id(m_side,&id))
-		{
-			/* tested on Amstrad CPC - All bytes must match, otherwise
-			a NO DATA error is reported */
-			if (id.R == m_ID_R)
-			{
-				/* TODO: Is this correct? What about bad tracks? */
-				if (id.C == m_CurrentTrack[m_drive])
-				{
-					m_data_id = id.data_id;
-					return 1;
-				}
-				else
-				{
-					/* TODO: if track doesn't match, the real 8271 does a step */
-
-
-					return 0;
-				}
-			}
-		}
-
-			/* index set? */
-		if (m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX))
-		{
-			index_count++;
-		}
-
-	}
-	while (index_count!=2);
-
-	/* completion type: command/drive error */
-	/* completion code: sector not found */
-	m_ResultRegister |= (3<<3);
-
-	return 0;
-}
-
-void i8271_device::command_execute()
-{
-	/* clear it = good completion status */
-	/* this will be changed if anything bad happens! */
-	m_ResultRegister = 0;
-
-	switch (m_Command)
-	{
-		case I8271_COMMAND_SPECIFY:
-		{
-			switch (m_CommandParameters[0])
-			{
-				case 0x0d:
-				{
-					LOG(("Initialization\n"));
-					m_StepRate = m_CommandParameters[1];
-					m_HeadSettlingTime = m_CommandParameters[2];
-					m_IndexCountBeforeHeadUnload = (m_CommandParameters[3]>>4) & 0x0f;
-					m_HeadLoadTime = (m_CommandParameters[3] & 0x0f);
-				}
-				break;
-
-				case 0x010:
-				{
-					LOG(("Load bad Tracks Surface 0\n"));
-					load_bad_tracks(0);
-
-				}
-				break;
-
-				case 0x018:
-				{
-					LOG(("Load bad Tracks Surface 1\n"));
-					load_bad_tracks(1);
-
-				}
-				break;
-			}
-
-			/* no result */
-			command_complete(0,0);
-		}
-		break;
-
-		case I8271_COMMAND_READ_SPECIAL_REGISTER:
-		{
-			/* unknown - what is read when a special register that isn't allowed is specified? */
-			int data = 0x0ff;
-
-			switch (m_CommandParameters[0])
-			{
-				case I8271_SPECIAL_REGISTER_MODE_REGISTER:
-				{
-					data = m_Mode;
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK:
-				{
-					data = read_current_track(0);
-
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK:
-				{
-					data = read_current_track(1);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1:
-				{
-					data = read_bad_track(0,1);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2:
-				{
-					data = read_bad_track(0,2);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_1:
-				{
-					data = read_bad_track(1,1);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_2:
-				{
-					data = read_bad_track(1,2);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_DRIVE_CONTROL_OUTPUT_PORT:
-				{
-					FDC_LOG_COMMAND("Read Drive Control Output port\n");
-
-					get_drive();
-
-					/* assumption: select bits reflect the select bits from the previous
-					command. i.e. read drive status */
-					data = (m_drive_control_output & ~0x0c0) | (m_CommandRegister & 0x0c0);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_DRIVE_CONTROL_INPUT_PORT:
-				{
-					/* bit 7: not used */
-					/* bit 6: ready 1 */
-					/* bit 5: write fault */
-					/* bit 4: index */
-					/* bit 3: wr prot */
-					/* bit 2: rdy 0 */
-					/* bit 1: track 0 */
-					/* bit 0: cnt/opi */
-
-					FDC_LOG_COMMAND("Read Drive Control Input port\n");
-
-
-					m_drive_control_input = (1<<6) | (1<<2);
-
-					/* bit 3 = 0 if write protected */
-					m_drive_control_input |= m_floppy[m_drive]->floppy_wpt_r() << 3;
-
-					/* bit 1 = 0 if head at track 0 */
-					m_drive_control_input |= m_floppy[m_drive]->floppy_tk00_r() << 1;
-
-					/* need to setup this register based on drive selected */
-					data = m_drive_control_input;
-				}
-				break;
-
-			}
-
-			m_ResultRegister = data;
-
-			command_complete(1,0);
-		}
-		break;
-
-
-		case I8271_COMMAND_WRITE_SPECIAL_REGISTER:
-		{
-			switch (m_CommandParameters[0])
-			{
-				case I8271_SPECIAL_REGISTER_MODE_REGISTER:
-				{
-					/* TODO: Check bits 6-7 and 5-2 are valid */
-					m_Mode = m_CommandParameters[1];
-
-					if (m_Mode & 0x01)
-					{
-						LOG(("Mode: Non-DMA\n"));
-					}
-					else
-					{
-						LOG(("Mode: DMA\n"));
-					}
-
-					if (m_Mode & 0x02)
-					{
-						LOG(("Single actuator\n"));
-					}
-					else
-					{
-						LOG(("Double actuator\n"));
-					}
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK:
-				{
-					LOG(("Surface 0 Current Track\n"));
-					write_current_track(0, m_CommandParameters[1]);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK:
-				{
-					LOG(("Surface 1 Current Track\n"));
-					write_current_track(1, m_CommandParameters[1]);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1:
-				{
-					LOG(("Surface 0 Bad Track 1\n"));
-					write_bad_track(0, 1, m_CommandParameters[1]);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2:
-				{
-					LOG(("Surface 0 Bad Track 2\n"));
-					write_bad_track(0, 2,m_CommandParameters[1]);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_1:
-				{
-					LOG(("Surface 1 Bad Track 1\n"));
-
-
-					write_bad_track(1, 1, m_CommandParameters[1]);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_2:
-				{
-					LOG(("Surface 1 Bad Track 2\n"));
-
-					write_bad_track(1, 2, m_CommandParameters[1]);
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_DRIVE_CONTROL_OUTPUT_PORT:
-				{
-//                  /* get drive selected */
-//                  m_drive = (m_CommandParameters[1]>>6) & 0x03;
-
-					FDC_LOG_COMMAND("Write Drive Control Output port\n");
-
-
-					if (m_CommandParameters[1] & 0x01)
-					{
-						LOG(("Write Enable\n"));
-					}
-					if (m_CommandParameters[1] & 0x02)
-					{
-						LOG(("Seek/Step\n"));
-					}
-					if (m_CommandParameters[1] & 0x04)
-					{
-						LOG(("Direction\n"));
-					}
-					if (m_CommandParameters[1] & 0x08)
-					{
-						LOG(("Load Head\n"));
-					}
-					if (m_CommandParameters[1] & 0x010)
-					{
-						LOG(("Low head current\n"));
-					}
-					if (m_CommandParameters[1] & 0x020)
-					{
-						LOG(("Write Fault Reset\n"));
-					}
-
-					LOG(("Select %02x\n", (m_CommandParameters[1] & 0x0c0)>>6));
-
-					/* get drive */
-					get_drive();
-
-					/* on bbc dfs 09 this is the side select output */
-					m_side = (m_CommandParameters[1]>>5) & 0x01;
-
-					/* load head - on mini-sized drives this turns on the disc motor,
-					on standard-sized drives this loads the head and turns the motor on */
-					m_floppy[m_drive]->floppy_mon_w(!BIT(m_CommandParameters[1], 3));
-					m_floppy[m_drive]->floppy_drive_set_ready_state(1, 1);
-
-					/* step pin changed? if so perform a step in the direction indicated */
-					if (((m_drive_control_output^m_CommandParameters[1]) & (1<<1))!=0)
-					{
-						/* step pin changed state? */
-
-						if (BIT(m_CommandParameters[1], 1))
-						{
-							signed int signed_tracks;
-
-							if (BIT(m_CommandParameters[1], 2))
-							{
-								signed_tracks = 1;
-							}
-							else
-							{
-								signed_tracks = -1;
-							}
-
-							m_floppy[m_drive]->floppy_drive_seek(signed_tracks);
-						}
-					}
-
-					m_drive_control_output = m_CommandParameters[1];
-
-
-				}
-				break;
-
-				case I8271_SPECIAL_REGISTER_DRIVE_CONTROL_INPUT_PORT:
-				{
-					FDC_LOG_COMMAND("Write Drive Control Input port\n");
-
-					//                  m_drive_control_input = m_CommandParameters[1];
-				}
-				break;
-
-			}
-
-			/* write doesn't supply a result */
-			command_complete(0,0);
-		}
-		break;
-
-		case I8271_COMMAND_READ_DRIVE_STATUS:
-		{
-			unsigned char status;
-
-			get_drive();
-
-			/* no write fault */
-			status = 0;
-
-			status |= (1<<2) | (1<<6);
-
-			/* these two do not appear to be set at all! ?? */
-
-			if (m_floppy[0])
-			{
-				if (m_floppy[0]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
-				{
-					status |= (1 << 2);
-				}
-			}
-
-			if (m_floppy[1])
-			{
-				if (m_floppy[1]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
-				{
-					status |= (1 << 6);
-				}
-			}
-
-			/* bit 3 = 1 if write protected */
-			status |= !m_floppy[m_drive]->floppy_wpt_r() << 3;
-
-			/* bit 1 = 1 if head at track 0 */
-			status |= !m_floppy[m_drive]->floppy_tk00_r() << 1;
-
-			m_ResultRegister = status;
-			command_complete(1,0);
-
-		}
-		break;
-
-		case I8271_COMMAND_SEEK:
-		{
-			get_drive();
-
-			seek_to_track(m_CommandParameters[0]);
-
-			/* check for bad seek */
-			timed_command_complete();
-
-		}
-		break;
-
-		case I8271_COMMAND_READ_DATA_MULTI_RECORD:
-		{
-			/* N value as stored in ID field */
-			m_ID_N = (m_CommandParameters[2]>>5) & 0x07;
-
-			/* starting sector id */
-			m_ID_R = m_CommandParameters[1];
-
-			/* number of sectors to transfer */
-			m_Counter = m_CommandParameters[2] & 0x01f;
-
-
-			FDC_LOG_COMMAND("READ DATA MULTI RECORD");
-
-			LOG(("Sector Count: %02x\n", m_Counter));
-			LOG(("Track: %02x\n",m_CommandParameters[0]));
-			LOG(("Sector: %02x\n", m_CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
-
-			get_drive();
-
-			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
-			{
-				/* Completion type: operation intervention probably required for recovery */
-				/* Completion code: Drive not ready */
-				m_ResultRegister = (2<<3);
-				timed_command_complete();
-			}
-			else
-			{
-				seek_to_track(m_CommandParameters[0]);
-
-
-				do_read();
-			}
-
-		}
-		break;
-
-		case I8271_COMMAND_READ_DATA_SINGLE_RECORD:
-		{
-			FDC_LOG_COMMAND("READ DATA SINGLE RECORD");
-
-			m_ID_N = 0;
-			m_Counter = 1;
-			m_ID_R = m_CommandParameters[1];
-
-			LOG(("Sector Count: %02x\n", m_Counter));
-			LOG(("Track: %02x\n",m_CommandParameters[0]));
-			LOG(("Sector: %02x\n", m_CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
-
-			get_drive();
-
-			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
-			{
-				/* Completion type: operation intervention probably required for recovery */
-				/* Completion code: Drive not ready */
-				m_ResultRegister = (2<<3);
-				timed_command_complete();
-			}
-			else
-			{
-				seek_to_track(m_CommandParameters[0]);
-
-				do_read();
-			}
-
-		}
-		break;
-
-		case I8271_COMMAND_WRITE_DATA_MULTI_RECORD:
-		{
-			/* N value as stored in ID field */
-			m_ID_N = (m_CommandParameters[2]>>5) & 0x07;
-
-			/* starting sector id */
-			m_ID_R = m_CommandParameters[1];
-
-			/* number of sectors to transfer */
-			m_Counter = m_CommandParameters[2] & 0x01f;
-
-			FDC_LOG_COMMAND("READ DATA MULTI RECORD");
-
-			LOG(("Sector Count: %02x\n", m_Counter));
-			LOG(("Track: %02x\n",m_CommandParameters[0]));
-			LOG(("Sector: %02x\n", m_CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
-
-			get_drive();
-
-			m_drive_control_output &=~1;
-
-			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
-			{
-				/* Completion type: operation intervention probably required for recovery */
-				/* Completion code: Drive not ready */
-				m_ResultRegister = (2<<3);
-				timed_command_complete();
-			}
-			else
-			{
-				if (m_floppy[m_drive]->floppy_wpt_r() == CLEAR_LINE)
-				{
-					/* Completion type: operation intervention probably required for recovery */
-					/* Completion code: Drive write protected */
-					m_ResultRegister = (2<<3) | (1<<1);
-					timed_command_complete();
-				}
-				else
-				{
-					m_drive_control_output |=1;
-
-					seek_to_track(m_CommandParameters[0]);
-
-					do_write();
-				}
-			}
-		}
-		break;
-
-		case I8271_COMMAND_WRITE_DATA_SINGLE_RECORD:
-		{
-			FDC_LOG_COMMAND("WRITE DATA SINGLE RECORD");
-
-			m_ID_N = 0;
-			m_Counter = 1;
-			m_ID_R = m_CommandParameters[1];
-
-
-			LOG(("Sector Count: %02x\n", m_Counter));
-			LOG(("Track: %02x\n",m_CommandParameters[0]));
-			LOG(("Sector: %02x\n", m_CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
-			get_drive();
-
-			m_drive_control_output &=~1;
-
-			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
-			{
-				/* Completion type: operation intervention probably required for recovery */
-				/* Completion code: Drive not ready */
-				m_ResultRegister = (2<<3);
-				timed_command_complete();
-			}
-			else
-			{
-				if (m_floppy[m_drive]->floppy_wpt_r() == CLEAR_LINE)
-				{
-					/* Completion type: operation intervention probably required for recovery */
-					/* Completion code: Drive write protected */
-					m_ResultRegister = (2<<3) | (1<<1);
-					timed_command_complete();
-				}
-				else
-				{
-					m_drive_control_output |=1;
-
-					seek_to_track(m_CommandParameters[0]);
-
-					do_write();
-				}
-			}
-
-		}
-		break;
-
-
-		case I8271_COMMAND_READ_ID:
-		{
-			FDC_LOG_COMMAND("READ ID");
-
-			LOG(("Track: %02x\n",m_CommandParameters[0]));
-			LOG(("ID Field Count: %02x\n", m_CommandParameters[2]));
-
-			get_drive();
-
-			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
-			{
-				/* Completion type: operation intervention probably required for recovery */
-				/* Completion code: Drive not ready */
-				m_ResultRegister = (2<<3);
-				timed_command_complete();
-			}
-			else
-			{
-				m_Counter = m_CommandParameters[2];
-
-				seek_to_track(m_CommandParameters[0]);
-
-				do_read_id();
-			}
-		}
-		break;
-
-		default:
-			LOG(("ERROR Unrecognised Command\n"));
-			break;
-	}
-}
-
-
-
-WRITE8_MEMBER(i8271_device::write)
-{
-	switch (offset & 3)
-	{
-		case 0:
-		{
-			LOG(("I8271 W Command Register: %02x\n", data));
-
-			m_CommandRegister = data;
-			m_Command = m_CommandRegister & 0x03f;
-
-			m_StatusRegister |= I8271_STATUS_COMMAND_BUSY | I8271_STATUS_COMMAND_FULL;
-			m_StatusRegister &= ~I8271_STATUS_PARAMETER_FULL | I8271_STATUS_RESULT_FULL;
-			m_ParameterCountWritten = 0;
-
-			switch (m_Command)
-			{
-				case I8271_COMMAND_SPECIFY:
-				{
-					FDC_LOG_COMMAND("SPECIFY");
-
-					m_ParameterCount = 4;
-				}
-				break;
-
-				case I8271_COMMAND_SEEK:
-				{
-					FDC_LOG_COMMAND("SEEK");
-
-					m_ParameterCount = 1;
-				}
-				break;
-
-				case I8271_COMMAND_READ_DRIVE_STATUS:
-				{
-					FDC_LOG_COMMAND("READ DRIVE STATUS");
-
-					m_ParameterCount = 0;
-				}
-				break;
-
-				case I8271_COMMAND_READ_SPECIAL_REGISTER:
-				{
-					FDC_LOG_COMMAND("READ SPECIAL REGISTER");
-
-					m_ParameterCount = 1;
-				}
-				break;
-
-				case I8271_COMMAND_WRITE_SPECIAL_REGISTER:
-				{
-					FDC_LOG_COMMAND("WRITE SPECIAL REGISTER");
-
-					m_ParameterCount = 2;
-				}
-				break;
-
-				case I8271_COMMAND_FORMAT:
-				{
-					m_ParameterCount = 5;
-				}
-				break;
-
-				case I8271_COMMAND_READ_ID:
-				{
-					m_ParameterCount = 3;
-
-				}
-				break;
-
-
-				case I8271_COMMAND_READ_DATA_SINGLE_RECORD:
-				case I8271_COMMAND_READ_DATA_AND_DELETED_DATA_SINGLE_RECORD:
-				case I8271_COMMAND_WRITE_DATA_SINGLE_RECORD:
-				case I8271_COMMAND_WRITE_DELETED_DATA_SINGLE_RECORD:
-				case I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_SINGLE_RECORD:
-				{
-					m_ParameterCount = 2;
-				}
-				break;
-
-				case I8271_COMMAND_READ_DATA_MULTI_RECORD:
-				case I8271_COMMAND_READ_DATA_AND_DELETED_DATA_MULTI_RECORD:
-				case I8271_COMMAND_WRITE_DATA_MULTI_RECORD:
-				case I8271_COMMAND_WRITE_DELETED_DATA_MULTI_RECORD:
-				case I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_MULTI_RECORD:
-				{
-					m_ParameterCount = 3;
-				}
-				break;
-
-				case I8271_COMMAND_SCAN_DATA:
-				case I8271_COMMAND_SCAN_DATA_AND_DELETED_DATA:
-				{
-					m_ParameterCount = 5;
-				}
-				break;
-
-
-
-
-
-
-			}
-
-			check_all_parameters_written();
-		}
-		break;
-
-		case 1:
-		{
-			LOG(("I8271 W Parameter Register: %02x\n",data));
-			m_ParameterRegister = data;
-
-			if (m_ParameterCount!=0)
-			{
-				m_CommandParameters[m_ParameterCountWritten] = data;
-				m_ParameterCountWritten++;
-			}
-
-			check_all_parameters_written();
-		}
-		break;
-
-		case 2:
-		{
-			LOG(("I8271 W Reset Register: %02x\n", data));
-			if (((data ^ m_ResetRegister) & 0x01)!=0)
-			{
-				if ((data & 0x01)==0)
-				{
-					reset();
-				}
-			}
-
-			m_ResetRegister = data;
-
-
-		}
-		break;
-
-		default:
-			break;
-	}
-}
-
-READ8_MEMBER(i8271_device::read)
-{
-	switch (offset & 3)
-	{
-		case 0:
-		{
-			/* bit 1,0 are zero other bits contain status data */
-			m_StatusRegister &= ~0x03;
-			LOG(("I8271 R Status Register: %02x\n",m_StatusRegister));
-			return m_StatusRegister;
-		}
-
-		case 1:
-		{
-			if ((m_StatusRegister & I8271_STATUS_COMMAND_BUSY)==0)
-			{
-				/* clear IRQ */
-				set_irq_state(0);
-
-				m_StatusRegister &= ~I8271_STATUS_RESULT_FULL;
-				LOG(("I8271 R Result Register %02x\n",m_ResultRegister));
-				return m_ResultRegister;
-			}
-
-			/* not useful information when command busy */
-			return 0x0ff;
-		}
-
-
-		default:
-			break;
-	}
-
-	return 0x0ff;
-}
-
-
-/* to be completed! */
-READ8_MEMBER(i8271_device::dack_r)
-{
-	return data_r(space, offset);
-}
-
-/* to be completed! */
-WRITE8_MEMBER(i8271_device::dack_w)
-{
-	data_w(space, offset, data);
+	cur_rate = rate;
 }
 
 READ8_MEMBER(i8271_device::data_r)
 {
-	clear_data_request();
-
-	update_state();
-
-	//  logerror("I8271 R data: %02x\n",m_data);
-
-
-	return m_data;
+	set_drq(false);
+	return dma_data;
 }
 
 WRITE8_MEMBER(i8271_device::data_w)
 {
-	m_data = data;
+	if(drq) {
+		set_drq(false);
+		dma_data = data;
+	}
+}
 
-//    logerror("I8271 W data: %02x\n",m_data);
+WRITE8_MEMBER(i8271_device::cmd_w)
+{
+	if(main_phase == PHASE_IDLE) {
+		command[0] = data;
+		command_pos = 1;
 
-	clear_data_request();
+		int cmd = check_command();
+		if(cmd != C_INVALID) {
+			main_phase = PHASE_CMD;
+			if(cmd != C_INCOMPLETE)
+				start_command(cmd);
+		}
+	}
+}
 
-	update_state();
+WRITE8_MEMBER(i8271_device::param_w)
+{
+	if(main_phase == PHASE_CMD) {
+		command[command_pos++] = data;
+		int cmd = check_command();
+		if(cmd != C_INCOMPLETE)
+			start_command(cmd);
+	}
+}
+
+bool i8271_device::set_output(UINT8 data)
+{
+	if(main_phase == PHASE_EXEC) {
+		if(drq) {
+			rr = ERR_DMA;
+			return false;
+		}
+		dma_data = data;
+		set_drq(true);
+	}
+	return true;
+}
+
+bool i8271_device::get_input(UINT8 *data)
+{
+	if(main_phase == PHASE_EXEC) {
+		if(drq) {
+			rr = ERR_DMA;
+			return false;
+		}
+		*data = dma_data;
+		set_drq(true);
+	}
+	return true;
+}
+
+void i8271_device::set_drq(bool state)
+{
+	if(state != drq) {
+		drq = state;
+		drq_cb(drq);
+		if(moder & 1)
+			intrq_cb(drq);
+	}
+}
+
+void i8271_device::set_irq(bool state)
+{
+	if(state != irq) {
+		irq = state;
+		intrq_cb(irq);
+	}
+}
+
+void i8271_device::live_start(floppy_info &fi, int state)
+{
+	cur_live.tm = machine().time();
+	cur_live.state = state;
+	cur_live.next_state = -1;
+	cur_live.fi = &fi;
+	cur_live.shift_reg = 0;
+	cur_live.crc = 0xffff;
+	cur_live.bit_counter = 0;
+	cur_live.data_separator_phase = false;
+	cur_live.data_reg = 0;
+	cur_live.previous_type = live_info::PT_NONE;
+	cur_live.data_bit_context = false;
+	cur_live.byte_counter = 0;
+	cur_live.pll.reset(cur_live.tm);
+	cur_live.pll.set_clock(attotime::from_hz(cur_rate));
+	checkpoint_live = cur_live;
+	fi.live = true;
+
+	live_run();
+}
+
+void i8271_device::checkpoint()
+{
+	if(cur_live.fi)
+		cur_live.pll.commit(cur_live.fi->dev, cur_live.tm);
+	checkpoint_live = cur_live;
+}
+
+void i8271_device::rollback()
+{
+	cur_live = checkpoint_live;
+}
+
+void i8271_device::live_delay(int state)
+{
+	cur_live.next_state = state;
+	if(cur_live.tm != machine().time())
+		cur_live.fi->tm->adjust(cur_live.tm - machine().time());
+	else
+		live_sync();
+}
+
+void i8271_device::live_sync()
+{
+	if(!cur_live.tm.is_never()) {
+		if(cur_live.tm > machine().time()) {
+			rollback();
+			live_run(machine().time());
+			cur_live.pll.commit(cur_live.fi->dev, cur_live.tm);
+		} else {
+			cur_live.pll.commit(cur_live.fi->dev, cur_live.tm);
+			if(cur_live.next_state != -1) {
+				cur_live.state = cur_live.next_state;
+				cur_live.next_state = -1;
+			}
+			if(cur_live.state == IDLE) {
+				cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+				cur_live.tm = attotime::never;
+				cur_live.fi->live = false;
+				cur_live.fi = 0;
+			}
+		}
+		cur_live.next_state = -1;
+		checkpoint();
+	}
+}
+
+void i8271_device::live_abort()
+{
+	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
+		rollback();
+		live_run(machine().time());
+	}
+
+	if(cur_live.fi) {
+		cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+		cur_live.fi->live = false;
+		cur_live.fi = 0;
+	}
+
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+}
+
+void i8271_device::live_run(attotime limit)
+{
+	if(cur_live.state == IDLE || cur_live.next_state != -1)
+		return;
+
+	if(limit == attotime::never) {
+		if(cur_live.fi->dev)
+			limit = cur_live.fi->dev->time_next_index();
+		if(limit == attotime::never) {
+			// Happens when there's no disk or if the fdc is not
+			// connected to a drive, hence no index pulse. Force a
+			// sync from time to time in that case, so that the main
+			// cpu timeout isn't too painful.  Avoids looping into
+			// infinity looking for data too.
+
+			limit = machine().time() + attotime::from_msec(1);
+			cur_live.fi->tm->adjust(attotime::from_msec(1));
+		}
+	}
+
+	for(;;) {
+		switch(cur_live.state) {
+		case SEARCH_ADDRESS_MARK_HEADER:
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter);
+#endif
+
+			if(cur_live.shift_reg == 0xf57e) {
+				cur_live.crc = 0xef21;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_ID_BLOCK;
+			}
+			break;
+
+		case READ_ID_BLOCK: {
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter & 15)
+				break;
+			int slot = (cur_live.bit_counter >> 4)-1;
+
+			if(0)
+				fprintf(stderr, "%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
+			cur_live.idbuf[slot] = cur_live.data_reg;
+			if(cur_live.fi->main_state == READ_ID) {
+				if(!set_output(cur_live.data_reg)) {
+					live_delay(IDLE);
+					return;
+				}
+			}
+			if(slot == 5) {
+				live_delay(IDLE);
+				return;
+			}
+			break;
+		}
+
+		case SEARCH_ADDRESS_MARK_DATA:
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
+#endif
+
+			if(cur_live.bit_counter > 23*16) {
+				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+				return;
+			}
+
+			if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg == 0xf56a || cur_live.shift_reg == 0xf56f)) {
+				cur_live.crc = cur_live.shift_reg == 0xf56a ? 0x8fe7 : 0xbf84;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_SECTOR_DATA;
+			}
+
+			break;
+
+		case SEARCH_ADDRESS_MARK_DATA_FAILED:
+			cur_live.state = IDLE;
+			return;
+
+		case READ_SECTOR_DATA: {
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter & 15)
+				break;
+			int slot = (cur_live.bit_counter >> 4)-1;
+			if(slot < sector_size) {
+				// Sector data
+				if(cur_live.fi->main_state == SCAN_DATA)
+					live_delay(SCAN_SECTOR_DATA_BYTE);
+				else if(cur_live.fi->main_state == VERIFY_DATA)
+					live_delay(VERIFY_SECTOR_DATA_BYTE);
+				else
+					live_delay(READ_SECTOR_DATA_BYTE);
+				return;
+			} else if(slot < sector_size+2) {
+				// CRC
+				if(slot == sector_size+1) {
+					live_delay(IDLE);
+					return;
+				}
+			}
+			break;
+		}
+
+		case READ_SECTOR_DATA_BYTE:
+			if(!set_output(cur_live.data_reg)) {
+				live_delay(IDLE);
+				return;
+			}
+			cur_live.state = READ_SECTOR_DATA;
+			checkpoint();
+			break;
+
+		case SCAN_SECTOR_DATA_BYTE:
+			if(!scan_done)
+			{
+				UINT8 data = 0;
+				if(!get_input(&data)) {
+					live_delay(IDLE);
+					return;
+				}
+				if(cur_live.data_reg != 0xff)
+				{
+					switch(command[4] >> 6) {
+					case 0:
+						if(cur_live.data_reg != data)
+							scan_match = false;
+						break;
+					case 1:
+						if(cur_live.data_reg < data)
+							scan_match = false;
+						break;
+					case 2:
+						if(cur_live.data_reg > data)
+							scan_match = false;
+						break;
+					default:
+						scan_match = false;
+						break;
+					}
+				}
+				scan_len++;
+				if(scan_len == command[5]) {
+					if(scan_match) {
+						int slot = calc_sector_size(command[3] >> 5) - ((cur_live.bit_counter >> 4)-1);
+						scan_sec = cur_live.idbuf[2];
+						scan_cnt[0] = slot & 0x7f;
+						scan_cnt[1] = slot >> 9;
+						scan_done = true;
+						rr = command[4] & 0xc0 ? ERR_SMNE : ERR_SMEQ;
+					}
+					else
+					{
+						scan_match = true;
+						scan_len = 0;
+					}
+				}
+			}
+			cur_live.state = READ_SECTOR_DATA;
+			checkpoint();
+			break;
+
+		case VERIFY_SECTOR_DATA_BYTE:
+			cur_live.state = READ_SECTOR_DATA;
+			checkpoint();
+			break;
+
+		case WRITE_SECTOR_SKIP_GAP2:
+			cur_live.bit_counter = 0;
+			cur_live.byte_counter = 0;
+			cur_live.state = WRITE_SECTOR_SKIP_GAP2_BYTE;
+			checkpoint();
+			break;
+
+		case WRITE_SECTOR_SKIP_GAP2_BYTE:
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter != 11*16)
+				break;
+			cur_live.bit_counter = 0;
+			cur_live.byte_counter = 0;
+			live_delay(WRITE_SECTOR_DATA);
+			return;
+
+		case WRITE_SECTOR_DATA:
+			if(cur_live.byte_counter < 6)
+				live_write_fm(0x00);
+			else if(cur_live.byte_counter < 7) {
+				cur_live.crc = 0xffff;
+				live_write_raw(BIT(command[0], 2) ? 0xf56a : 0xf56f);
+			} else if(cur_live.byte_counter < 7+sector_size) {
+				UINT8 data = 0;
+				if(!get_input(&data)) {
+					live_delay(IDLE);
+					return;
+				}
+				live_write_fm(data);
+			}
+			else if(cur_live.byte_counter < 7+sector_size+2)
+				live_write_fm(cur_live.crc >> 8);
+			else if(cur_live.byte_counter < 7+sector_size+2+1)
+				live_write_fm(0xff);
+			else {
+				cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+				cur_live.state = IDLE;
+				return;
+			}
+			cur_live.state = WRITE_SECTOR_DATA_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_PRE_SECTORS:
+			if(command[4]) {
+				if(cur_live.byte_counter < command[4])
+					live_write_fm(0xff);
+				else if(cur_live.byte_counter < (command[4] + 6))
+					live_write_fm(0x00);
+				else if(cur_live.byte_counter < (command[4] + 7))
+					live_write_raw(0xf77a);
+				else if(cur_live.byte_counter < (command[4] + command[5] + 7))
+					live_write_fm(0xff);
+				else {
+					cur_live.state = WRITE_TRACK_SECTOR;
+					cur_live.byte_counter = 0;
+					break;
+				}
+			} else {
+				if(cur_live.byte_counter < command[5])
+					live_write_fm(0xff);
+				else {
+					cur_live.state = WRITE_TRACK_SECTOR;
+					cur_live.byte_counter = 0;
+					break;
+				}
+			}
+			cur_live.state = WRITE_TRACK_PRE_SECTORS_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_SECTOR:
+			if(cur_live.byte_counter < 6)
+				live_write_fm(0x00);
+			else if(cur_live.byte_counter < 7) {
+				cur_live.crc = 0xffff;
+				live_write_raw(0xf57e);
+			} else if(cur_live.byte_counter < 11) {
+				UINT8 data = 0;
+				if(!get_input(&data)) {
+					live_delay(IDLE);
+					return;
+				}
+				live_write_fm(data);
+			} else if(cur_live.byte_counter < 13)
+				live_write_fm(cur_live.crc >> 8);
+			else if(cur_live.byte_counter < 24)
+				live_write_fm(0xff);
+			else if(cur_live.byte_counter < 30)
+				live_write_fm(0x00);
+			else if(cur_live.byte_counter < 31) {
+				cur_live.crc = 0xffff;
+				live_write_raw(0xf56f);
+			} else if(cur_live.byte_counter < 31+sector_size)
+				live_write_fm(0xe5);
+			else if(cur_live.byte_counter < 33+sector_size)
+				live_write_fm(cur_live.crc >> 8);
+			else if(cur_live.byte_counter < 33+sector_size+command[2])
+				live_write_fm(0xff);
+			else {
+				cur_live.byte_counter = 0;
+				command[3] = (command[3] & 0xe0) | ((command[3] & 0x1f) - 1);
+				cur_live.state = command[3] & 0x1f ? WRITE_TRACK_SECTOR : WRITE_TRACK_POST_SECTORS;
+				break;
+			}
+			cur_live.state = WRITE_TRACK_SECTOR_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_POST_SECTORS:
+			live_write_fm(0xff);
+			cur_live.state = WRITE_TRACK_POST_SECTORS_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_PRE_SECTORS_BYTE:
+		case WRITE_TRACK_SECTOR_BYTE:
+		case WRITE_TRACK_POST_SECTORS_BYTE:
+		case WRITE_SECTOR_DATA_BYTE:
+			if(write_one_bit(limit))
+				return;
+			if(cur_live.bit_counter == 0) {
+				cur_live.byte_counter++;
+				live_delay(cur_live.state-1);
+				return;
+			}
+			break;
+
+		default:
+			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).c_str(), cur_live.state);
+			return;
+		}
+	}
+}
+
+int i8271_device::check_command()
+{
+	switch(command[0] & 0x3f) {
+	case 0x00:
+	case 0x04:
+		return command_pos == 6 ? C_SCAN               : C_INCOMPLETE;
+
+	case 0x0a:
+	case 0x0e:
+		return command_pos == 3 ? C_WRITE_DATA_SINGLE   : C_INCOMPLETE;
+
+	case 0x0b:
+	case 0x0f:
+		return command_pos == 4 ? C_WRITE_DATA_MULTI    : C_INCOMPLETE;
+
+	case 0x12:
+	case 0x16:
+		return command_pos == 3 ? C_READ_DATA_SINGLE  : C_INCOMPLETE;
+
+	case 0x13:
+	case 0x17:
+		return command_pos == 4 ? C_READ_DATA_MULTI   : C_INCOMPLETE;
+
+	case 0x1e:
+		return command_pos == 3 ? C_VERIFY_DATA_SINGLE : C_INCOMPLETE;
+
+	case 0x1f:
+		return command_pos == 4 ? C_VERIFY_DATA_MULTI  : C_INCOMPLETE;
+
+	case 0x1b:
+		return command_pos == 4 ? C_READ_ID            : C_INCOMPLETE;
+
+	case 0x23:
+		return command_pos == 6 ? C_FORMAT_TRACK       : C_INCOMPLETE;
+
+	case 0x29:
+		return command_pos == 2 ? C_SEEK               : C_INCOMPLETE;
+
+	case 0x2c:
+		return C_READ_DRIVE_STATUS;
+
+	case 0x35:
+		return command_pos == 5 ? C_SPECIFY            : C_INCOMPLETE;
+
+	case 0x3a:
+		return command_pos == 3 ? C_WRITE_SPECIAL_REGISTER : C_INCOMPLETE;
+
+	case 0x3d:
+		return command_pos == 2 ? C_READ_SPECIAL_REGISTER  : C_INCOMPLETE;
+
+	default:
+		return C_INVALID;
+	}
+}
+
+void i8271_device::start_command(int cmd)
+{
+	command_pos = 0;
+	main_phase = PHASE_EXEC;
+	switch(cmd) {
+	case C_READ_DATA_SINGLE:
+		command[3] = 1;
+	case C_READ_DATA_MULTI:
+		read_data_start(flopi[BIT(command[0], 7)]);
+		break;
+
+	case C_VERIFY_DATA_SINGLE:
+		command[3] = 1;
+	case C_VERIFY_DATA_MULTI:
+		verify_data_start(flopi[BIT(command[0], 7)]);
+		break;
+
+	case C_FORMAT_TRACK:
+		format_track_start(flopi[BIT(command[0], 7)]);
+		break;
+
+	case C_READ_ID:
+		read_id_start(flopi[BIT(command[0], 7)]);
+		break;
+
+	case C_SCAN:
+		scan_start(flopi[BIT(command[0], 7)]);
+		break;
+
+	case C_SEEK:
+		if(!command[1])
+			recalibrate_start(flopi[BIT(command[0], 7)]);
+		else
+			seek_start(flopi[BIT(command[0], 7)]);
+		break;
+
+	case C_READ_DRIVE_STATUS:
+	{
+		floppy_info &fi = flopi[BIT(command[0], 7)];
+		rr = (get_ready(1) ? 0x40 : 0) | (fi.dev->idx_r() ? 0x10 : 0) | (fi.dev->wpt_r() ? 0 : 8) |
+				(get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
+		flopi[0].ready = true;
+		flopi[1].ready = true;
+		main_phase = PHASE_IDLE;
+		break;
+	}
+	case C_SPECIFY:
+		logerror("%s: command specify %02x %02x %02x %02x\n",
+					tag(), command[1],
+					command[2], command[3], command[4]);
+		switch(command[1]) {
+		case 0x0d:
+			srate = command[2];
+			hset = command[3];
+			icnt = command[4] >> 4;
+			hload = command[4] & 0xf;
+			break;
+		case 0x10:
+		case 0x18:
+		{
+			floppy_info &fi = flopi[BIT(command[1], 3)];
+			fi.badtrack[0] = command[2];
+			fi.badtrack[1] = command[3];
+			fi.pcn = command[4];
+		}
+		}
+		main_phase = PHASE_IDLE;
+		break;
+
+	case C_WRITE_DATA_SINGLE:
+		command[3] = 1;
+	case C_WRITE_DATA_MULTI:
+		write_data_start(flopi[BIT(command[0], 7)]);
+		break;
+
+	case C_READ_SPECIAL_REGISTER:
+		switch(command[1] & 0x3f) {
+		case 0x06:
+			rr = scan_sec;
+			break;
+		case 0x10:
+		case 0x11:
+			rr = flopi[0].badtrack[BIT(command[1], 0)];
+			break;
+		case 0x12:
+			rr = flopi[0].pcn;
+			break;
+		case 0x13:
+			rr = scan_cnt[0];
+			break;
+		case 0x14:
+			rr = scan_cnt[1];
+			break;
+		case 0x17:
+			rr = moder;
+			break;
+		case 0x18:
+		case 0x19:
+			rr = flopi[1].badtrack[BIT(command[1], 0)];
+			break;
+		case 0x1a:
+			rr = flopi[1].pcn;
+			break;
+		case 0x22: {
+			floppy_info &fi = flopi[BIT(command[0], 7)];
+			rr = (get_ready(1) ? 0x40 : 0) | (fi.dev->idx_r() ? 0x10 : 0) | (fi.dev->wpt_r() ? 0 : 8) |
+					(get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
+			break;
+		}
+		case 0x23:
+			rr = (command[0] & 0xc0) | oport;
+			break;
+		default:
+			rr = 0;
+			break;
+		}
+		main_phase = PHASE_IDLE;
+	break;
+
+	case C_WRITE_SPECIAL_REGISTER:
+		switch(command[1]) {
+		case 0x06:
+			scan_sec = command[2];
+			break;
+		case 0x10:
+		case 0x11:
+			flopi[0].badtrack[BIT(command[1], 0)] = command[2];
+			break;
+		case 0x12:
+			flopi[0].pcn = command[2];
+			break;
+		case 0x13:
+			scan_cnt[0] = command[2];
+			break;
+		case 0x14:
+			scan_cnt[1] = command[2];
+			break;
+		case 0x17:
+			moder = command[2] | 0xc0;
+			break;
+		case 0x18:
+		case 0x19:
+			flopi[1].badtrack[BIT(command[1], 0)] = command[2];
+			break;
+		case 0x1a:
+			flopi[1].pcn = command[2];
+			break;
+		case 0x22:
+			break;
+		case 0x23: {
+			oport = command[2] & ~0xc0;
+			floppy_info &fi = flopi[BIT(command[0], 7)];
+			fi.dev->dir_w(BIT(command[2], 2));
+			fi.dev->stp_w(BIT(command[2], 1));
+			opt_cb(BIT(command[2], 5));
+			hdl_cb(BIT(command[2], 3));
+			break;
+		}
+		}
+		main_phase = PHASE_IDLE;
+		break;
+
+	default:
+		fprintf(stderr, "start command %d\n", cmd);
+		exit(1);
+	}
+}
+
+void i8271_device::command_end(floppy_info &fi, bool data_completion)
+{
+	logerror("%s: command done (%s) - %02x\n", tag(), data_completion ? "data" : "seek", rr);
+	fi.main_state = fi.sub_state = IDLE;
+	main_phase = PHASE_RESULT;
+	set_irq(true);
+}
+
+void i8271_device::recalibrate_start(floppy_info &fi)
+{
+	logerror("%s: command recalibrate\n", tag());
+	fi.main_state = RECALIBRATE;
+	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
+	fi.dir = 1;
+	fi.counter = 255;
+	seek_continue(fi);
+}
+
+void i8271_device::seek_start(floppy_info &fi)
+{
+	logerror("%s: command seek %d\n", tag(), command[1]);
+	fi.main_state = SEEK;
+	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
+	fi.dir = fi.pcn > command[1] ? 1 : 0;
+	seek_continue(fi);
+}
+
+void i8271_device::delay_cycles(emu_timer *tm, int cycles)
+{
+	tm->adjust(attotime::from_double(double(cycles)/cur_rate));
+}
+
+void i8271_device::seek_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case SEEK_MOVE:
+			if(fi.dev) {
+				fi.dev->dir_w(fi.dir);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			do {
+				if(fi.pcn > command[1])
+					fi.pcn--;
+				else
+					fi.pcn++;
+			} while((fi.pcn == fi.badtrack[0]) || (fi.pcn == fi.badtrack[1]));
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*srate);
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE: {
+			bool done = false;
+			switch(fi.main_state) {
+			case RECALIBRATE:
+				fi.counter--;
+				done = fi.dev && !fi.dev->trk00_r();
+				if(done)
+					fi.pcn = 0;
+				else if(!fi.counter) {
+					rr = ERR_T0NF;
+					command_end(fi, false);
+					return;
+				}
+				break;
+			case SEEK:
+				done = fi.pcn == command[1];
+				break;
+			}
+			if(done) {
+				rr = ERR_NONE;
+				command_end(fi, false);
+				return;
+			}
+			fi.sub_state = SEEK_MOVE;
+			break;
+		}
+		}
+	}
+}
+
+void i8271_device::read_data_start(floppy_info &fi)
+{
+	fi.main_state = READ_DATA;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command read%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
+				tag(),
+				command[0] & 0x04 ? " deleted" : "",
+				command[0] & 0x01 ? " multi" : "",
+				command[0],
+				command[1],
+				command[2],
+				calc_sector_size(command[3] >> 5),
+				command[3] & 0x1f,
+				cur_rate);
+
+	rr = ERR_NONE;
+	fi.ready = get_ready(BIT(command[0], 7));
+
+	if(!fi.ready) {
+		rr = ERR_NR;
+		fi.sub_state = COMMAND_DONE;
+		read_data_continue(fi);
+		return;
+	}
+
+	read_data_continue(fi);
+}
+
+void i8271_device::scan_start(floppy_info &fi)
+{
+	fi.main_state = SCAN_DATA;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command scan%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
+				tag(),
+				command[0] & 0x04 ? " deleted" : "",
+				command[0] & 0x01 ? " multi" : "",
+				command[0],
+				command[1],
+				command[2],
+				calc_sector_size(command[3] >> 5),
+				command[3] & 0x1f,
+				cur_rate);
+
+	rr = ERR_NONE;
+	scan_done = false;
+	scan_len = 0;
+	scan_match = true;
+	fi.ready = get_ready(BIT(command[0], 7));
+
+	if(!fi.ready) {
+		rr = ERR_NR;
+		fi.sub_state = COMMAND_DONE;
+		read_data_continue(fi);
+		return;
+	}
+	read_data_continue(fi);
+}
+
+void i8271_device::verify_data_start(floppy_info &fi)
+{
+	fi.main_state = VERIFY_DATA;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command verify%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
+				tag(),
+				command[0] & 0x04 ? " deleted" : "",
+				command[0] & 0x01 ? " multi" : "",
+				command[0],
+				command[1],
+				command[2],
+				calc_sector_size(command[3] >> 5),
+				command[3] & 0x1f,
+				cur_rate);
+
+	rr = ERR_NONE;
+	fi.ready = get_ready(BIT(command[0], 7));
+
+	if(!fi.ready) {
+		rr = ERR_NR;
+		fi.sub_state = COMMAND_DONE;
+		read_data_continue(fi);
+		return;
+	}
+	read_data_continue(fi);
+}
+
+void i8271_device::read_data_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			if(fi.pcn == command[1]) {
+				fi.sub_state = SEEK_DONE;
+				break;
+			}
+			if(fi.dev) {
+				fi.dev->dir_w(fi.pcn > command[1] ? 1 : 0);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*srate);
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE:
+			do {
+				if(fi.pcn > command[1])
+					fi.pcn--;
+				else
+					fi.pcn++;
+			} while((fi.pcn == fi.badtrack[0]) || (fi.pcn == fi.badtrack[1]));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
+
+		case SEEK_DONE:
+			fi.counter = 0;
+			fi.sub_state = SCAN_ID;
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case SCAN_ID:
+			if(cur_live.crc) {
+				rr = ERR_ICRC;
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+			if(!sector_matches()) {
+				if(cur_live.idbuf[0] != command[1]) {
+					rr = ERR_NF;
+					fi.sub_state = COMMAND_DONE;
+					break;
+				}
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				return;
+			}
+			logerror("%s: reading sector %02x %02x %02x %02x\n",
+						tag(),
+						cur_live.idbuf[0],
+						cur_live.idbuf[1],
+						cur_live.idbuf[2],
+						cur_live.idbuf[3]);
+			sector_size = calc_sector_size(cur_live.idbuf[3]);
+			fi.sub_state = SECTOR_READ;
+			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
+			return;
+
+		case SCAN_ID_FAILED:
+			rr = ERR_NF;
+			fi.sub_state = COMMAND_DONE;
+			break;
+
+		case SECTOR_READ: {
+			if(cur_live.crc) {
+				rr = ERR_DCRC;
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+			bool done = rr || (!(command[0] & 1) && (fi.main_state != SCAN_DATA));
+			if(!done)
+			{
+				command[3] = (command[3] & 0xe0) | ((command[3] & 0x1f) - 1);
+				if(command[3] & 0x1f)
+					command[2]++;
+				else
+					done = true;
+			}
+			if(!done) {
+				fi.sub_state = SEEK_DONE;
+				break;
+			}
+			fi.sub_state = COMMAND_DONE;
+			break;
+		}
+
+		case COMMAND_DONE:
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: read sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+void i8271_device::write_data_start(floppy_info &fi)
+{
+	fi.main_state = WRITE_DATA;
+	fi.sub_state = HEAD_LOAD_DONE;
+	logerror("%s: command write%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
+				tag(),
+				command[0] & 0x04 ? " deleted" : "",
+				command[0] & 0x01 ? " multi" : "",
+				command[0],
+				command[1],
+				command[2],
+				calc_sector_size(command[3] >> 5),
+				command[3] & 0x1f,
+				cur_rate);
+
+	rr = ERR_NONE;
+	fi.ready = get_ready(BIT(command[0], 7));
+
+	if(!fi.ready) {
+		rr = ERR_NR;
+		fi.sub_state = COMMAND_DONE;
+		write_data_continue(fi);
+		return;
+	}
+
+	write_data_continue(fi);
+}
+
+void i8271_device::write_data_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			if(fi.pcn == command[1]) {
+				fi.sub_state = SEEK_DONE;
+				break;
+			}
+			if(fi.dev) {
+				fi.dev->dir_w(fi.pcn > command[1] ? 1 : 0);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*srate);
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE:
+			do {
+				if(fi.pcn > command[1])
+					fi.pcn--;
+				else
+					fi.pcn++;
+			} while((fi.pcn == fi.badtrack[0]) || (fi.pcn == fi.badtrack[1]));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
+
+		case SEEK_DONE:
+			fi.counter = 0;
+			fi.sub_state = SCAN_ID;
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case SCAN_ID:
+			if(!sector_matches()) {
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				return;
+			}
+			if(cur_live.crc) {
+				rr = ERR_ICRC;
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+			sector_size = calc_sector_size(cur_live.idbuf[3]);
+			fi.sub_state = SECTOR_WRITTEN;
+			set_drq(true);
+			live_start(fi, WRITE_SECTOR_SKIP_GAP2);
+			return;
+
+		case SCAN_ID_FAILED:
+			rr = ERR_NF;
+			fi.sub_state = COMMAND_DONE;
+			break;
+
+		case SECTOR_WRITTEN: {
+			bool done = rr || !(command[0] & 1);
+			if(!done)
+			{
+				command[3] = (command[3] & 0xe0) | ((command[3] & 0x1f) - 1);
+				if(command[3] & 0x1f)
+					command[2]++;
+				else
+					done = true;
+			}
+			if(!done) {
+				fi.sub_state = HEAD_LOAD_DONE;
+				break;
+			}
+			fi.sub_state = COMMAND_DONE;
+			break;
+		}
+
+		case COMMAND_DONE:
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: write sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+int i8271_device::calc_sector_size(UINT8 size)
+{
+	return size > 7 ? 16384 : 128 << size;
+}
+
+void i8271_device::format_track_start(floppy_info &fi)
+{
+	fi.main_state = FORMAT_TRACK;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command format track c=%02x n=%02x sc=%02x gap3=%02x gap5=%02x gap1=%02x\n",
+				tag(),
+				command[1], command[3] >> 5, command[3] & 0x1f, command[2], command[4], command[5]);
+
+	rr = ERR_NONE;
+
+	fi.ready = get_ready(BIT(command[0], 7));
+
+	if(!fi.ready) {
+		rr = ERR_NR;
+		fi.sub_state = TRACK_DONE;
+		format_track_continue(fi);
+		return;
+	}
+	sector_size = calc_sector_size(command[3] >> 5);
+
+	format_track_continue(fi);
+}
+
+void i8271_device::format_track_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			if(fi.pcn == command[1]) {
+				fi.sub_state = WAIT_INDEX;
+				break;
+			}
+			if(fi.dev) {
+				fi.dev->dir_w(fi.pcn > command[1] ? 1 : 0);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*srate);
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE:
+			do {
+				if(fi.pcn > command[1])
+					fi.pcn--;
+				else
+					fi.pcn++;
+			} while((fi.pcn == fi.badtrack[0]) || (fi.pcn == fi.badtrack[1]));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
+
+		case SEEK_DONE:
+			fi.sub_state = WAIT_INDEX;
+			break;
+
+		case WAIT_INDEX:
+			return;
+
+		case WAIT_INDEX_DONE:
+			logerror("%s: index found, writing track\n", tag());
+			fi.sub_state = TRACK_DONE;
+			cur_live.pll.start_writing(machine().time());
+			set_drq(true);
+			live_start(fi, WRITE_TRACK_PRE_SECTORS);
+			return;
+
+		case TRACK_DONE:
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: format track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+void i8271_device::read_id_start(floppy_info &fi)
+{
+	fi.main_state = READ_ID;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command read id, rate=%d\n",
+				tag(),
+				cur_rate);
+
+	rr = ERR_NONE;
+
+	for(int i=0; i<4; i++)
+		cur_live.idbuf[i] = 0x00;
+
+	fi.ready = get_ready(command[1] & 3);
+
+	if(!fi.ready) {
+		rr = ERR_NR;
+		fi.sub_state = COMMAND_DONE;
+		read_id_continue(fi);
+		return;
+	}
+
+	read_id_continue(fi);
+}
+
+void i8271_device::read_id_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			if(fi.pcn == command[1]) {
+				fi.sub_state = SEEK_DONE;
+				break;
+			}
+			if(fi.dev) {
+				fi.dev->dir_w(fi.pcn > command[1] ? 1 : 0);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*srate);
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE:
+			do {
+				if(fi.pcn > command[1])
+					fi.pcn--;
+				else
+					fi.pcn++;
+			} while((fi.pcn == fi.badtrack[0]) || (fi.pcn == fi.badtrack[1]));
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
+
+		case SEEK_DONE:
+			fi.counter = 0;
+			fi.sub_state = SCAN_ID;
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case SCAN_ID:
+			if(cur_live.crc) {
+				rr = ERR_ICRC;
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+			if(!(command[3]--)) {
+				fi.counter = 0;
+				fi.sub_state = SCAN_ID;
+			}
+			else
+				fi.sub_state = COMMAND_DONE;
+			break;
+
+		case SCAN_ID_FAILED:
+			if(rr != ERR_DMA)
+				rr = ERR_NF;
+			fi.sub_state = COMMAND_DONE;
+			break;
+
+		case COMMAND_DONE:
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: read id unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+std::string i8271_device::tts(attotime t)
+{
+	char buf[256];
+	const char *sign = "";
+	if(t.seconds() < 0) {
+		t = attotime::zero-t;
+		sign = "-";
+	}
+	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	return buf;
+}
+
+std::string i8271_device::ttsn()
+{
+	return tts(machine().time());
+}
+
+void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	live_sync();
+
+	floppy_info &fi = flopi[id];
+	switch(fi.sub_state) {
+	case SEEK_WAIT_STEP_SIGNAL_TIME:
+		fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME_DONE;
+		break;
+	case SEEK_WAIT_STEP_TIME:
+		fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
+		break;
+	}
+
+	general_continue(fi);
+}
+
+void i8271_device::index_callback(floppy_image_device *floppy, int state)
+{
+	for(int fid=0; fid<2; fid++) {
+		floppy_info &fi = flopi[fid];
+		if(fi.dev != floppy)
+			continue;
+
+		if(fi.live)
+			live_sync();
+		fi.index = state;
+
+		if(!state) {
+			general_continue(fi);
+			continue;
+		}
+
+		switch(fi.sub_state) {
+		case IDLE:
+		case SEEK_MOVE:
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+		case SEEK_WAIT_STEP_TIME:
+		case SEEK_WAIT_STEP_TIME_DONE:
+		case HEAD_LOAD_DONE:
+		case SCAN_ID_FAILED:
+		case SECTOR_READ:
+			break;
+
+		case WAIT_INDEX:
+			fi.sub_state = WAIT_INDEX_DONE;
+			break;
+
+		case SCAN_ID:
+			fi.counter++;
+			if(fi.counter == 2) {
+				fi.sub_state = SCAN_ID_FAILED;
+				live_abort();
+			}
+			break;
+
+		case TRACK_DONE:
+			live_abort();
+			break;
+
+		default:
+			logerror("%s: Index pulse on unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			break;
+		}
+
+		general_continue(fi);
+	}
+}
+
+
+void i8271_device::general_continue(floppy_info &fi)
+{
+	if(fi.live && cur_live.state != IDLE) {
+		live_run();
+		if(cur_live.state != IDLE)
+			return;
+	}
+
+	switch(fi.main_state) {
+	case IDLE:
+		break;
+
+	case RECALIBRATE:
+	case SEEK:
+		seek_continue(fi);
+		break;
+
+	case READ_DATA:
+	case SCAN_DATA:
+	case VERIFY_DATA:
+		read_data_continue(fi);
+		break;
+
+	case WRITE_DATA:
+		write_data_continue(fi);
+		break;
+
+	case FORMAT_TRACK:
+		format_track_continue(fi);
+		break;
+
+	case READ_ID:
+		read_id_continue(fi);
+		break;
+
+	default:
+		logerror("%s: general_continue on unknown main-state %d\n", ttsn().c_str(), fi.main_state);
+		break;
+	}
+}
+
+bool i8271_device::read_one_bit(const attotime &limit)
+{
+	int bit = cur_live.pll.get_next_bit(cur_live.tm, cur_live.fi->dev, limit);
+	if(bit < 0)
+		return true;
+	cur_live.shift_reg = (cur_live.shift_reg << 1) | bit;
+	cur_live.bit_counter++;
+	if(cur_live.data_separator_phase) {
+		cur_live.data_reg = (cur_live.data_reg << 1) | bit;
+		if((cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+			cur_live.crc = (cur_live.crc << 1) ^ 0x1021;
+		else
+			cur_live.crc = cur_live.crc << 1;
+	}
+	cur_live.data_separator_phase = !cur_live.data_separator_phase;
+	return false;
+}
+
+bool i8271_device::write_one_bit(const attotime &limit)
+{
+	bool bit = cur_live.shift_reg & 0x8000;
+	if(cur_live.pll.write_next_bit(bit, cur_live.tm, cur_live.fi->dev, limit))
+		return true;
+	if(cur_live.bit_counter & 1) {
+		if((cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+			cur_live.crc = (cur_live.crc << 1) ^ 0x1021;
+		else
+			cur_live.crc = cur_live.crc << 1;
+	}
+	cur_live.shift_reg = cur_live.shift_reg << 1;
+	cur_live.bit_counter--;
+	return false;
+}
+
+void i8271_device::live_write_raw(UINT16 raw)
+{
+	//  logerror("write %04x %04x\n", raw, cur_live.crc);
+	cur_live.shift_reg = raw;
+	cur_live.data_bit_context = raw & 1;
+}
+
+void i8271_device::live_write_fm(UINT8 fm)
+{
+	UINT16 raw = 0xaaaa;
+	for(int i=0; i<8; i++)
+		if(fm & (0x80 >> i))
+			raw |= 0x4000 >> (2*i);
+	cur_live.data_reg = fm;
+	cur_live.shift_reg = raw;
+	cur_live.data_bit_context = fm & 1;
+	//  logerror("write %02x   %04x %04x\n", fm, cur_live.crc, raw);
+}
+
+bool i8271_device::sector_matches() const
+{
+	if(0)
+		logerror("%s: matching %02x %02x %02x - %02x %02x %02x\n", tag(),
+					cur_live.idbuf[0], cur_live.idbuf[2], cur_live.idbuf[3],
+					command[1], command[2], command[3] >> 5);
+	return
+		cur_live.idbuf[0] == command[1] &&
+		cur_live.idbuf[2] == command[2] &&
+		cur_live.idbuf[3] == (command[3] >> 5);
 }

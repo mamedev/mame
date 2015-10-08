@@ -54,7 +54,7 @@ public:
 
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
 
@@ -78,7 +78,7 @@ protected:
 	};
 
 	// device overrides
-//	virtual void machine_reset();
+//  virtual void machine_reset();
 	virtual void video_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -193,6 +193,18 @@ protected:
 //  virtual void device_reset();
 };
 
+class segaxbd_lastsurv_state :  public segaxbd_state
+{
+public:
+	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+
 class segaxbd_smgp_fd1094_state :  public segaxbd_state
 {
 public:
@@ -204,6 +216,19 @@ protected:
 //  virtual void device_reset();
 };
 
+
+class segaxbd_smgp_state :  public segaxbd_state
+{
+public:
+	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+
 class segaxbd_rascot_state :  public segaxbd_state
 {
 public:
@@ -214,5 +239,3 @@ protected:
 //  virtual void device_start();
 //  virtual void device_reset();
 };
-
-

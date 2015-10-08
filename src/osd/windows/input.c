@@ -544,9 +544,9 @@ void wininput_poll(running_machine &machine)
 		mouse_enabled = machine.input().device_class(DEVICE_CLASS_MOUSE).enabled();
 		lightgun_enabled = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).enabled();
 	}
-	
+
 	bool polldevices = input_enabled && (global_inputs_enabled || winwindow_has_focus());
-	
+
 	// poll all of the devices
 	if (polldevices)
 	{
@@ -1750,14 +1750,14 @@ static void rawinput_init(running_machine &machine)
 	{
 		global_inputs_enabled = downcast<windows_options &>(machine.options()).global_inputs();
 	}
-	
+
 	// finally, register to receive raw input WM_INPUT messages
 	regcount = 0;
 	if (keyboard_list != NULL)
 	{
 		reglist[regcount].usUsagePage = 0x01;
 		reglist[regcount].usUsage = 0x06;
-		
+
 		if (global_inputs_enabled)
 		{
 			reglist[regcount].dwFlags = 0x00000100;
@@ -1766,7 +1766,7 @@ static void rawinput_init(running_machine &machine)
 		{
 			reglist[regcount].dwFlags = 0;
 		}
-		
+
 		reglist[regcount].hwndTarget = win_window_list->m_hwnd;
 		regcount++;
 	}
@@ -1774,7 +1774,7 @@ static void rawinput_init(running_machine &machine)
 	{
 		reglist[regcount].usUsagePage = 0x01;
 		reglist[regcount].usUsage = 0x02;
-		
+
 		if (global_inputs_enabled)
 		{
 			reglist[regcount].dwFlags = 0x00000100;
@@ -1783,7 +1783,7 @@ static void rawinput_init(running_machine &machine)
 		{
 			reglist[regcount].dwFlags = 0;
 		}
-		
+
 		reglist[regcount].hwndTarget = win_window_list->m_hwnd;
 		regcount++;
 	}

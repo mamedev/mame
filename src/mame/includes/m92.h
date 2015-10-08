@@ -8,6 +8,7 @@
 
 #include "video/bufsprite.h"
 #include "sound/okim6295.h"
+#include "machine/pic8259.h"
 
 struct M92_pf_layer_info
 {
@@ -35,7 +36,8 @@ public:
 			m_oki(*this, "oki"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_upd71059c(*this, "upd71059c") 
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -47,9 +49,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pic8259_device> m_upd71059c;
+
+	IRQ_CALLBACK_MEMBER(m92_irq_callback);
 
 	UINT16 m_sound_status;
-	UINT8 m_irq_vectorbase;
 	UINT32 m_raster_irq_position;
 	UINT16 m_videocontrol;
 	UINT8 m_sprite_buffer_busy;
@@ -83,7 +87,6 @@ public:
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
 	DECLARE_DRIVER_INIT(majtitl2);
 	DECLARE_DRIVER_INIT(ppan);
-	DECLARE_DRIVER_INIT(m92_alt);
 	DECLARE_DRIVER_INIT(lethalth);
 	DECLARE_DRIVER_INIT(m92);
 	DECLARE_DRIVER_INIT(m92_bank);

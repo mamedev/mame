@@ -207,7 +207,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 {
 	// read in irq5
-	printf("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
+	//printf("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
 	return 0;
 }
 
@@ -276,12 +276,12 @@ WRITE16_MEMBER(hng64_state::sound_comms_w)
 		case 0xa:
 			/* correct? */
 			m_audiocpu->set_input_line(5, CLEAR_LINE);
-			if(data)
-				printf("IRQ ACK %02x?\n",data);
+			//if(data)
+			//	printf("IRQ ACK %02x?\n",data);
 			return;
 	}
 
-	printf("SOUND W %02x %04x\n",offset*2,data);
+	//printf("SOUND W %02x %04x\n",offset*2,data);
 }
 
 READ16_MEMBER(hng64_state::sound_comms_r)
@@ -293,7 +293,7 @@ READ16_MEMBER(hng64_state::sound_comms_r)
 		case 0x06:
 			return main_latch[1];
 	}
-	printf("SOUND R %02x\n",offset*2);
+	//printf("SOUND R %02x\n",offset*2);
 
 	return 0;
 }
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 	if(i > 7)
 		i = 7;
 
-	printf("trigger %02x %d\n",i,state);
+	//printf("trigger %02x %d\n",i,state);
 
 	//if(machine().input().code_pressed_once(KEYCODE_C))
 	{

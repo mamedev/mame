@@ -40,20 +40,20 @@
       - Fixed V and C flags in SBIW opcode
 
       30 Oct. 2012
-      - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
-      - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
-      - Fixed incorrect bit testing in SBIC/SBIS opcodes [MooglyGuy]
+      - Added FMUL, FMULS, FMULSU opcodes [Ryan Holtz]
+      - Fixed incorrect flag calculation in ROR opcode [Ryan Holtz]
+      - Fixed incorrect bit testing in SBIC/SBIS opcodes [Ryan Holtz]
 
       25 Oct. 2012
-      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [MooglyGuy]
-      - Corrected cycle counts for LD and ST opcodes [MooglyGuy]
+      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [Ryan Holtz]
+      - Corrected cycle counts for LD and ST opcodes [Ryan Holtz]
       - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-        all subsequent 1-cycle opcodes to be 2 or 3 cycles [MooglyGuy]
-      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [MooglyGuy]
+        all subsequent 1-cycle opcodes to be 2 or 3 cycles [Ryan Holtz]
+      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [Ryan Holtz]
 
       18 Oct. 2012
-      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [MooglyGuy]
-      - Fixed COM, NEG, LSR opcodes [MooglyGuy]
+      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [Ryan Holtz]
+      - Fixed COM, NEG, LSR opcodes [Ryan Holtz]
 
 */
 

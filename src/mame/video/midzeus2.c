@@ -61,10 +61,10 @@ class midzeus2_renderer : public poly_manager<float, mz2_poly_extra_data, 4, 100
 public:
 	midzeus2_renderer(midzeus2_state &state);
 
-    void render_poly_8bit(INT32 scanline, const extent_t& extent, const mz2_poly_extra_data& object, int threadid);
-    
-    void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
-    
+	void render_poly_8bit(INT32 scanline, const extent_t& extent, const mz2_poly_extra_data& object, int threadid);
+
+	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
+
 private:
 	midzeus2_state& m_state;
 };
@@ -73,10 +73,9 @@ typedef midzeus2_renderer::vertex_t poly_vertex;
 typedef midzeus2_renderer::extent_t poly_extent;
 
 midzeus2_renderer::midzeus2_renderer(midzeus2_state &state)
-    : poly_manager<float, mz2_poly_extra_data, 4, 10000>(state.machine())
-    , m_state(state)
+	: poly_manager<float, mz2_poly_extra_data, 4, 10000>(state.machine())
+	, m_state(state)
 {
-    
 }
 
 
@@ -279,8 +278,8 @@ VIDEO_START_MEMBER(midzeus2_state,midzeus2)
 	waveram[1] = auto_alloc_array(machine(), UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
 
 	/* initialize polygon engine */
-    poly = auto_alloc(machine(), midzeus2_renderer(*this));
-    
+	poly = auto_alloc(machine(), midzeus2_renderer(*this));
+
 	/* we need to cleanup on exit */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus2_state::exit_handler2), this));
 
@@ -370,8 +369,8 @@ UINT32 midzeus2_state::screen_update_midzeus2(screen_device &screen, bitmap_rgb3
 {
 	int x, y;
 
-    poly->wait();
-    
+	poly->wait();
+
 if (machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", (double) zbase); }
 if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", (double) zbase); }
 
@@ -1226,7 +1225,7 @@ In memory:
 			clipvert[i].y += 0.0005f;
 	}
 
-    mz2_poly_extra_data& extra = poly->object_data_alloc();
+	mz2_poly_extra_data& extra = poly->object_data_alloc();
 	switch (texmode)
 	{
 		case 0x01d:     /* crusnexo: RHS of score bar */
@@ -1272,16 +1271,16 @@ In memory:
 	extra.texbase = WAVERAM_BLOCK0(zeus_texbase);
 	extra.palbase = waveram0_ptr_from_expanded_addr(m_state.m_zeusbase[0x41]);
 
-    // Note: Before being converted to the "poly.h" interface, this used to call the polylgcy function
-    //       poly_render_quad_fan.  The behavior seems to be the same as it once was after a few short
-    //       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
-    //       polygon.
-    if (numverts == 3)
-        render_triangle(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert[0], clipvert[1], clipvert[2]);
-    else if (numverts == 4)
-        render_polygon<4>(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert);
-    else if (numverts == 5)
-        render_polygon<5>(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert);
+	// Note: Before being converted to the "poly.h" interface, this used to call the polylgcy function
+	//       poly_render_quad_fan.  The behavior seems to be the same as it once was after a few short
+	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
+	//       polygon.
+	if (numverts == 3)
+		render_triangle(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert[0], clipvert[1], clipvert[2]);
+	else if (numverts == 4)
+		render_polygon<4>(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert);
+	else if (numverts == 5)
+		render_polygon<5>(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert);
 }
 
 

@@ -1193,6 +1193,8 @@ static void execute_comment_save(running_machine &machine, int ref, int params, 
 {
 	if (debug_comment_save(machine))
 		debug_console_printf(machine, "Comments successfully saved\n");
+	else
+		debug_console_printf(machine, "Comments not saved\n");
 }
 
 

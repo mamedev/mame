@@ -110,7 +110,7 @@ void x1_010_device::device_start()
 	int i;
 
 	m_base_clock    = clock();
-	m_rate          = clock() / 1024;
+	m_rate          = clock() / 512;
 
 	for( i = 0; i < SETA_NUM_CHANNELS; i++ ) {
 		m_smp_offset[i] = 0;

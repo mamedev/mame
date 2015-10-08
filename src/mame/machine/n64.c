@@ -28,6 +28,17 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, disk_present(false)
 	, cart_present(false)
 {
+	for (INT32 i = 0; i < 256; i++)
+	{
+		m_gamma_table[i] = sqrt((float)(i << 6));
+		m_gamma_table[i] <<= 1;
+	}
+
+	for (INT32 i = 0; i < 0x4000; i++)
+	{
+		m_gamma_dither_table[i] = sqrt((float)i);
+		m_gamma_dither_table[i] <<= 1;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(n64_periphs::reset_timer_callback)
@@ -907,6 +918,7 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 {
 	n64_state *state = space.machine().driver_data<n64_state>();
 	UINT32 ret = 0;
+
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
@@ -946,20 +958,39 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 WRITE32_MEMBER( n64_periphs::dp_reg_w )
 {
 	n64_state *state = space.machine().driver_data<n64_state>();
+	UINT32 status = state->m_rdp->get_status();
 
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			state->m_rdp->set_start(data);
-			state->m_rdp->set_current(state->m_rdp->get_start());
+			if(status & DP_STATUS_START_VALID)
+				break;
+			else
+			{
+				state->m_rdp->set_status(status | DP_STATUS_START_VALID);
+				state->m_rdp->set_start(data & ~7);
+			}
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			state->m_rdp->set_end(data);
-			g_profiler.start(PROFILER_USER1);
-			state->m_rdp->process_command_list();
-			g_profiler.stop();
-			break;
+			if(status & DP_STATUS_START_VALID)
+			{
+				state->m_rdp->set_status(status & ~DP_STATUS_START_VALID);
+				state->m_rdp->set_current(state->m_rdp->get_start());
+				state->m_rdp->set_end(data & ~ 7);
+				g_profiler.start(PROFILER_USER1);
+				state->m_rdp->process_command_list();
+				g_profiler.stop();
+				break;
+			}
+			else
+			{
+				state->m_rdp->set_end(data & ~ 7);
+				g_profiler.start(PROFILER_USER1);
+				state->m_rdp->process_command_list();
+				g_profiler.stop();
+				break;
+			}
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
@@ -995,17 +1026,16 @@ void n64_periphs::vi_scanline_tick()
 // Video Interface
 void n64_periphs::vi_recalculate_resolution()
 {
-	//n64_state *state = machine().driver_data<n64_state>();
-
 	int x_start = (vi_hstart & 0x03ff0000) >> 16;
 	int x_end = vi_hstart & 0x000003ff;
-	int y_start = ((vi_vstart & 0x03ff0000) >> 16) / 2;
-	int y_end = (vi_vstart & 0x000003ff) / 2;
+	int y_start = ((vi_vstart & 0x03ff0000) >> 16) >> 1;
+	int y_end = (vi_vstart & 0x000003ff) >> 1;
 	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
 
 	rectangle visarea = m_screen->visible_area();
-	attoseconds_t period = m_screen->frame_period().attoseconds();
+	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
+	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
 
 	if (width == 0 || height == 0)
 	{
@@ -1027,16 +1057,9 @@ void n64_periphs::vi_recalculate_resolution()
 	if (height > 480)
 		height = 480;
 
-	if(vi_control & 0x40) /* Interlace */
-	{
-		height *= 2;
-	}
-
-	//state->m_rdp->m_misc_state.m_fb_height = height;
-
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
-	m_screen->configure(width, 525, visarea, period);
+	m_screen->configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
 }
 
 READ32_MEMBER( n64_periphs::vi_reg_r )
@@ -1061,7 +1084,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = (m_screen->vpos() << 1) + 1;
+			ret = (m_screen->vpos() & 0x3FE) + field; // << 1);
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1134,7 +1157,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
+			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr)); // >> 1));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
@@ -1147,10 +1170,12 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x18/4:        // VI_V_SYNC_REG
 			vi_vsync = data;
+			vi_recalculate_resolution();
 			break;
 
 		case 0x1c/4:        // VI_H_SYNC_REG
 			vi_hsync = data;
+			vi_recalculate_resolution();
 			break;
 
 		case 0x20/4:        // VI_LEAP_REG
@@ -1432,12 +1457,8 @@ void n64_periphs::pi_dma_tick()
 
 	if(pi_dma_dir == 1)
 	{
-		UINT32 dma_length = pi_wr_len + 1;
+		UINT32 dma_length = pi_wr_len + 1 + 1; //Round Up Nearest 2
 		//logerror("PI Write, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_wr_len);
-		if (dma_length & 1)
-		{
-			dma_length = (dma_length + 1) & ~1;
-		}
 
 		if (pi_dram_addr != 0xffffffff)
 		{
@@ -1452,12 +1473,8 @@ void n64_periphs::pi_dma_tick()
 	}
 	else
 	{
-		UINT32 dma_length = pi_rd_len + 1;
+		UINT32 dma_length = pi_rd_len + 1 + 1; //Round Up Nearest 2
 		//logerror("PI Read, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_rd_len);
-		if (dma_length & 1)
-		{
-			dma_length = (dma_length + 1) & ~1;
-		}
 
 		if (pi_dram_addr != 0xffffffff)
 		{
@@ -2093,6 +2110,7 @@ TIMER_CALLBACK_MEMBER(n64_periphs::si_dma_callback)
 void n64_periphs::si_dma_tick()
 {
 	si_dma_timer->adjust(attotime::never);
+	si_status = 0;
 	si_status |= 0x1000;
 	signal_rcp_interrupt(SI_INTERRUPT);
 }
@@ -2136,8 +2154,8 @@ void n64_periphs::pif_dma(int direction)
 			*dst++ = d;
 		}
 	}
-
-	si_dma_timer->adjust(attotime::from_hz(500));
+	si_status |= 1;
+	si_dma_timer->adjust(attotime::from_hz(1000));
 	//si_status |= 0x1000;
 	//signal_rcp_interrupt(SI_INTERRUPT);
 }
@@ -2180,7 +2198,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 			break;
 
 		case 0x18/4:        // SI_STATUS_REG
-			si_status &= ~0x1000;
+			si_status = 0;
 			clear_rcp_interrupt(SI_INTERRUPT);
 			break;
 

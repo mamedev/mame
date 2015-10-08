@@ -3434,7 +3434,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6214"/>
 		<info name="release" value="200306xx"/>
 		<!-- * ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
-           malformed token?  Used normal Peter Pan alt_title for now -->
+		   malformed token?  Used normal Peter Pan alt_title for now -->
 		<info name="alt_title" value="ピーターパン ネバーランドへ いこう!"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />

@@ -26,7 +26,7 @@ const device_type SCC8530 = &device_creator<scc8530_t>;
 ***************************************************************************/
 
 scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SCC8530, "Zilog 8530 SCC", tag, owner, clock, "scc8530", __FILE__),
+	device_t(mconfig, SCC8530, "Zilog 8530 SCC (Legacy)", tag, owner, clock, "scc8530l", __FILE__),
 	intrq_cb(*this)
 {
 }

@@ -193,8 +193,8 @@ phoenxp2        // bootleg
 atlantisb       // bootleg
 tenspot         // (c) 1982 Thomas Automatics
 devilfsg        // (c) 1984 Vision / Artic (bootleg?)
-zigzag          // (c) 1982 LAX
-zigzag2         // (c) 1982 LAX
+zigzagb         // (c) 1982 LAX (bootleg)
+zigzagb2        // (c) 1982 LAX (bootleg)
 jumpbug         // (c) 1981 Rock-ola
 jumpbugb        // (c) 1981 Sega
 levers          // (c) 1983 Rock-ola
@@ -278,7 +278,6 @@ ckongis         //
 porter          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
 tdpgal          // 1983 Design Labs / Thomas Automatics
 guttangt
-spcwarp         // 1983 Century Electronics UK LTD
 
 // Has some similarities with Moon Cresta but Board is very different
 rockclim        // (c)1981 Taito
@@ -319,6 +318,7 @@ mariner         // (c) 1981 Amenip
 mars            // (c) 1981 Artic
 devilfsh        // (c) 1982 Artic
 newsin7         // (c) 1983 ATW USA, Inc.
+newsin7a        // (c) 1982 ATW USA, Inc.
 mrkougar        // (c) 1984 ATW
 mrkougar2       // (c) 1984 ATW
 mrkougb         // bootleg
@@ -361,7 +361,9 @@ anteateruk      // (c) 1983 Free Enterprise Games
 rescue          // (c) 1982 Stern
 rescueb         // (c) Videl Games (Rescue bootleg)
 aponow          // bootleg
+rescuefe        // bootleg
 minefld         // (c) 1983 Stern
+minefldfe       // bootleg
 losttomb        // (c) 1982 Stern
 losttombh       // (c) 1982 Stern
 superbon        // bootleg
@@ -844,7 +846,7 @@ genpeitd        // (c) 1986
 rthunder        // (c) 1986
 rthunder2       // (c) 1986
 rthunder1       // (c) 1986
-rthunder0		// (c) 1986
+rthunder0       // (c) 1986
 wndrmomo        // (c) 1987
 
 // Thunder Ceptor HW
@@ -980,6 +982,7 @@ xday2           // (c) 1995 (Japan)
 nebulray        // (c) 1994 (World)
 nebulrayj       // (c) 1994 (Japan)
 ptblank         // (c) 1994 (GN2 World)
+ptblanka        // (c) 1994 (GN2 World) - Alternate labels, NRx-SPR0 (X=1 to 9)
 gunbuletj       // (c) 1994 (GN1 Japan)
 gunbuletw       // (c) 1994 (GN3 World)
 gslugrsj        // (c) 1993 (Japan)
@@ -1084,6 +1087,7 @@ vnight
 bldyr3b
 rrvac
 rrvac2
+rrvac1
 wanganmd
 dragchrn
 netchu02
@@ -1104,9 +1108,11 @@ fghtjam
 sukuinuf
 zgundmdx
 zoidsinf
+cobrata
 gundzaft
 soulclb3
 soulclb3a
+soulclb3b
 taiko7
 taiko8
 qgundam
@@ -1117,6 +1123,7 @@ sbxc
 // Namco System 256
 sys256
 tekken51
+tekken51b
 tekken5d
 superdbz
 kinniku
@@ -1621,6 +1628,9 @@ huncholy        // (c) 1984 Seatongrove (c) CVS
 quasar          // (c) 1980 Zelco Games Italy
 quasara         // (c) 1980 Zelco Games Italy
 
+// Unknown Century Electronics hardware (CVS?)
+spcwarp         // 1983 Century Electronics UK LTD
+
 // Midway "Astrocade" games
 seawolf2        // (c) 1978
 spacezap        // (c) 1980
@@ -1842,10 +1852,13 @@ dkgensanm72     // (c) 1990 (Japan)
 poundfor        // (c) 1990 (World)
 poundforj       // (c) 1990 (Japan)
 poundforu       // (c) 1990 Irem America (US)
-airduel         // (c) 1990 (Japan)
+airduelm72      // (c) 1990 (Japan)
+airduel			// (c) 1990 (World)
 cosmccop        // (c) 1991 (World)
 gallop          // (c) 1991 (Japan)
-kengo           // (c) 1991
+ltswords        // (c) 1991 (World)
+kengo           // (c) 1991 (Japan)
+kengoa			// (c) 1991 (Japan)
 // not M72, but same sound hardware
 sichuan2        // (c) 1989 Tamtex
 sichuan2a       // (c) 1989 Tamtex
@@ -3125,7 +3138,8 @@ ffighta         // 12/1989 (c) 1989 (World)
 ffightu         // 12/1989 (c) 1989 (USA)
 ffightu1        // 12/1989 (c) 1989 (USA)
 ffightua        // 12/01/1990 (c) 1989 (USA)
-ffightub        // 13/06/1990 (c) 1989 (USA)
+ffightub        // 24/04/1990 (c) 1989 (USA)
+ffightuc        // 12/06/1990 (c) 1989 (USA)
 ffightj         // 12/1989 (c) 1989 (Japan)
 ffightj1        // 12/01/1990 (c) 1989 (Japan)
 ffightj2        // 05/03/1990 (c) 1989 (Japan)
@@ -4560,6 +4574,8 @@ enduror         // (c) 1985 (FD1089B)
 enduror1        // (c) 1985 (FD1089B)
 endurob2        // (c) 1985 (Beta bootleg)
 endurobl        // (c) 1985 (Herb bootleg)
+endurord        // bootleg
+enduror1d       // bootleg
 hangon          // (c) 1985 (Rev A)
 hangon1         // (c) 1985
 hangon2         // (c) 1985
@@ -4601,6 +4617,13 @@ timescan1       // (c) 1987 (FD1089B)
 wb31            // (c) 1988 Sega / Westone (FD1094)
 wb35            // (c) 1988 Sega / Westone (FD1089A)
 passsht16a      // (c) 1988 (FD1094)
+
+// System 16A decrypted bootlegs
+wb31d
+wb35d
+shinobi1d
+tetrisd
+tetris3d
 
 // System 16B
 aceattac        // (c) 1988 (FD1094)
@@ -4659,6 +4682,11 @@ riotcity        // (c) 1991 Sega / Westone (Unprotected)
 ryukyu          // (c) 1990 (FD1094)
 sdib            // (c) 1987 (FD1089A)
 sdibl           // (c) 1987 bootleg
+sdibl2			// bootleg
+sdibl3			// bootleg
+sdibl4			// bootleg
+sdibl5			// bootleg
+sdibl6			// bootleg
 defense         // (c) 1987 (FD1094)
 shinobi5        // (c) 1987 (Unprotected)
 shinobi4        // (c) 1987 (MC-8123B)
@@ -4689,6 +4717,48 @@ fantzn2xp       // (c) 2008 Sega / M2
 // Philko Boards
 atomicp         // (c) 1990 Philko - korean clone board
 snapper         // (c) 1990 Philko - korean clone board
+
+// S16 decrypted bootlegs
+cottonjd
+cottond
+cottonud
+cottonjad
+sonicbomd
+ryukyud
+mvpd
+mvpjd
+exctleagd
+fpointd
+fpoint1d
+bulletd
+eswatd
+eswatud
+eswatjd
+eswatj1d
+passshtd
+passshtad
+passshtjd
+tetris2d
+tetris1d
+wb34d
+wb33d
+wb32d
+dduxd
+dduxjd
+goldnaxeud
+goldnaxe1d
+goldnaxe3d
+goldnaxejd
+hwchampjd
+altbeast5d
+altbeastj3d
+aurail1d
+aurailjd
+bayrouted
+bayroutejd
+wrestwar2d
+wrestwar1d
+shinobi2d
 
 // S16 Bootlegs
 bayrouteb1      // (c) 1989 (protected) (bootleg)
@@ -4747,6 +4817,28 @@ desertbrj       // 1992.10 Desert Breaker (Japan, FD1094)
 pontoon
 hamaway         // prototype
 
+ddcrewd
+ddcrewud
+ddcrew2d
+ddcrew1d
+ddcrewjd
+ddcrewj2d
+cltchitrd
+cltchitrjd
+desertbrd
+desertbrjd
+lghostd
+lghostud
+astorm3d
+astormud
+astormjd
+bloxeedd
+mwalkd
+mwalkud
+mwalkjd
+wwallyjd
+wwallyjad
+
 // System18 Bootlegs
 astormbl        // BOOTLEG
 astormb2        // BOOTLEG
@@ -4780,6 +4872,12 @@ toutrun3        // 1987 (FD1094)
 toutrun2        // 1987 (FD1094)
 toutrun1        // 1987 (FD1094)
 toutrunj1       // 1987 (FD1094)
+toutrund        // bootleg
+toutrunjd       // bootleg
+toutrun3d       // bootleg
+toutrunj1d      // bootleg
+toutrun2d		// bootleg
+shangon3d       // bootleg
 
 // X Board
 aburner         // 1987.07 After Burner (Japan)
@@ -4804,13 +4902,29 @@ rachero         // 1990.?? Racing Hero (World, FD1094)
 abcop           // 1990.?? A.B.Cop (World, FD1094)
 abcopj          // 1991.01 A.B.Cop (Japan, FD1094)
 gpriderjs       // 1990.10 GP Rider (Japan, FD1094)
-gpriderj		// as above
+gpriderj        // as above
 gpriders        // 1990.?? GP Rider (World, FD1094)
-gprider	    	// as above
+gprider         // as above
 gpriderus       // 1990.12 GP Rider (US, FD1094)
-gprideru	 	// as above
+gprideru        // as above
 rascot          // 1991.?? Royal Ascot (Japan)
 
+// decrypted X-Board bootlegs
+thndrbldd
+racherod
+smgpd
+smgp6d
+smgp5d
+smgpud
+smgpu1d
+smgpu2d
+smgpjd
+abcopd
+abcopjd
+lastsurvd
+loffired
+loffireud
+loffirejd
 
 // Y-Board
 				// 1988.05 Galaxy Force (Japan)
@@ -5398,9 +5512,9 @@ virnbao         // 2000.02 Virtua NBA (original)
 virnbap         // 2000.02 Virtua NBA (prototype)
 mvsc2           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Rev A)
 smarinef        // 2000.03 Sega Marine Fishing
-wldkicks        // 2000.03 World Kicks (WK2 Ver. A)
-wldkicksa       // 2000.03 World Kicks (WK3 Ver. A)
-wldkicksb       // 2000.03 World Kicks PCB (WKC1 Ver. A)
+wldkicksa       // 2000.03 World Kicks (Asia, WK2 Ver.A)
+wldkicks        // 2000.03 World Kicks (US, WK3 Ver.A)
+wldkicksj       // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
 pstone2         // 2000.04 Power Stone 2
 toukon4         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)
 qmegamis        // 2000.05 Quiz Ah Megamisama
@@ -5420,10 +5534,10 @@ cspike          // 2000.10 Gun Spike / Cannon Spike
 sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A, set 1)
 sstrkfgta       // 2000.10 Sega Strike Fighter (Rev A, set 2)
 confmiss        // 2000.10.11 Confidential Mission         // First GD-ROM game?
-ninjaslt1       // 2000.11 Ninja Assault (NJA1 Ver. A)
-ninjaslt2       // 2000.11 Ninja Assault (NJA2 Ver. A)
-ninjaslt        // 2000.11 Ninja Assault (NJA3 Ver. A)
-ninjaslt4       // 2000.11 Ninja Assault (NJA4 Ver. A)
+ninjasltj       // 2000.11 Ninja Assault (Japan, NJA1 Ver.A)
+ninjaslta       // 2000.11 Ninja Assault (Asia, NJA2 Ver.A)
+ninjasltu       // 2000.11 Ninja Assault (US, NJA3 Ver.A)
+ninjaslt        // 2000.11 Ninja Assault (World, NJA4 Ver.A)
 wwfroyal        // 2000.11 WWF Royal Rumble
 sprtjam         // 2000.11.13 Sports Jam
 starhrcl        // 2000.11.28 Star Horse (satellite)
@@ -5450,8 +5564,8 @@ crakndj2        // 2001.06 Crackin' DJ Part 2
 hmgeo           // 2001.06 Heavy Metal Geomatrix (Rev B)
 wsbbgd          // 2001.06 Super Major League / World Series Baseball
 starseek        // 2001.07 Dokidoki Idol Star Seeker
-gunsur2         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF1)
-gunsur2e        // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF2 Ver. E)
+gunsur2j        // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)
+gunsur2         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)
 spkrbtl         // 2001.07 Spikers Battle
 cvs2gd          // 2001.07.05 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
 wrungp          // 2001.08 Wave Runner GP
@@ -5475,8 +5589,8 @@ luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
 cleoftp         // 2002.05 Cleopatra Fortune Plus
 ggxx            // 2002.05 Guilty Gear XX
 chocomk         // 2002.06 Musapey's Choco Marker (Rev A)
-mazan           // 2002.07 Mazan: Flash of the Blade (MAZ2 Ver. A)
-mazana          // 2002.07 Mazan: Flash of the Blade (MAZ3 Ver. A)
+mazana          // 2002.07 Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)
+mazan           // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
 				// 2002.09 Yonin Uchi Mahjong MJ
 azumanga        // 2002.12 Azumanga Daiou Puzzle Bobble
 moeru           // 2002.12 Moeru Casinyo
@@ -6292,7 +6406,7 @@ wc90t           // (c) 1989 Tecmo
 wc90b1          // bootleg
 wc90b2          // bootleg
 wc90ba          // bootleg
-pac90			// bootleg
+pac90           // bootleg
 spbactn         // 9002 - (c) 1991 Tecmo
 spbactnj        // 9002 - (c) 1991 Tecmo
 spbactnp        // prototype
@@ -6337,6 +6451,7 @@ trackfldc       // GX361 (c) 1983 + Centuri license
 trackfldnz      // (c) 1982 Goldberg Enterprizes Inc.
 hyprolym        // GX361 (c) 1983
 hyprolymb       // bootleg
+hyprolymba      // bootleg
 atlantol        // bootleg
 wizzquiz        // (c) 1985 Konami
 wizzquiza       // (c) 1985 Zilec-Zenitone
@@ -6818,6 +6933,8 @@ popn6           // GQA16 (c) 2001 (Japan)
 popn7           // GCB00 (c) 2001 (Japan)
 popnanm2        // GEA02 (c) 2001 (Japan)
 popn8           // GQB30 (c) 2002 (Japan)
+bm3core         // GCA05 (c) 2000 (Japan)
+bm36th          // GCA21 (c) 2001 (Japan)
 bm37th          // GCB07 (c) 2002 (Japan JCA)
 bm3final        // GCC01 (c) 2003 (Japan JCA)
 
@@ -7855,6 +7972,7 @@ fatfurwa        // 006 1999/01/28 Fatal Fury: Wild Ambition / Garou Densetsu: Wi
 buriki          // 007 1999/05/21 Buriki One
 
 // Neo Print
+neoprint
 npcartv1
 98best44
 nprsp
@@ -8368,6 +8486,8 @@ ccclass
 tsclass
 // Bromley
 srockbwl
+// Smart Industries
+smartoss
 
 
 // Cinematronics raster games
@@ -9312,7 +9432,8 @@ spacecho        // bootleg
 spacecho2       // bootleg
 route16         // (c) 1981 Tehkan/Sun + Centuri license
 route16a        // (c) 1981 Tehkan/Sun + Centuri license
-route16b        // bootleg
+route16c        // (c) 1981 Tehkan/Sun + Centuri license
+route16bl       // bootleg
 routex          // bootleg
 ttmahjng        // Taito
 fnkyfish        // (c) 1981 Sun Electronics
@@ -9361,6 +9482,7 @@ srangern        // (c) 1988 SunA (NOVA License)
 srangerw        // (c) 1988 SunA (WDK License)
 hardhead        // (c) 1988 SunA
 hardheadb       // bootleg
+hardheadb2      // bootleg
 pop_hh          // bootleg
 sparkman        // (c) 1989 SunA
 sparkmana       // (c) 1989 SunA
@@ -9856,6 +9978,7 @@ igs_ncs         // (c) 198? IGS
 igs_ncs2        // (c) 2000 IGS
 spk115it        // (c) 199? IGS
 spk116it        // (c) 199? IGS
+kungfu          // (c) 1992 IGS
 jackie          // (c) 1993 IGS
 pktet346        // (c) 199? IGS
 cpokerx         // (c) 1993 IGS
@@ -9923,7 +10046,7 @@ amazonia        // (c) 1999
 fruitpar        // (c) 200?
 zhongguo        // (c) 2000
 sdwx            // (c) 2002
-amazoni2		// (c) 2002
+amazoni2        // (c) 2002
 sddz            // (c) 200?
 lhzb3           // (c) 200?
 lhzb4           // (c) 200?
@@ -11542,6 +11665,7 @@ pex2150p        // (c) 1995 IGT - International Game Technology
 pex2172p        // (c) 1995 IGT - International Game Technology
 pex2172pa       // (c) 1995 IGT - International Game Technology
 pex2173p        // (c) 1995 IGT - International Game Technology
+pex2179p        // (c) 1995 IGT - International Game Technology
 pex2180p        // (c) 1995 IGT - International Game Technology
 pex2241p        // (c) 1995 IGT - International Game Technology
 pex2244p        // (c) 1995 IGT - International Game Technology
@@ -32202,3 +32326,14 @@ alinvade
 joystand   // 1997 Yuvo
 chexx83    // 1983 ICE
 faceoffh   // 1983 SoftLogic / Entertainment Enterprises
+
+// Doyle & Assoc.
+piggypas
+hoopshot
+rndrndqs
+fidlstix
+jackbean
+dumpump
+3lilpigs
+
+wackygtr   // Wacky Gator

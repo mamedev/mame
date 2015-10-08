@@ -13,7 +13,7 @@
         * none at this time
 
 NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
-	  Quantum PCB. It is assumed all Atari 136002-125 PROMs are the same data.
+      Quantum PCB. It is assumed all Atari 136002-125 PROMs are the same data.
 
 ****************************************************************************
 
