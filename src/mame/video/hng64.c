@@ -8,143 +8,6 @@
 #define HNG64_VIDEO_DEBUG 0
 
 
-
-
-/* Transition Control Video Registers
- * ----------------------------------
- *
- * UINT32 | Bits                                    | Use
- *        | 3322 2222 2222 1111 1111 11             |
- * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *      0 |                                         |
- *      1 | xxxx xxxx xxxx xxxx yyyy yyyy yyyy yyyy | Min X / Min Y visible area rectangle values
- *      2 | xxxx xxxx xxxx xxxx yyyy yyyy yyyy yyyy | Max X / Max Y visible area rectangle values (added up with the Min X / Min Y)
- *      3 |                                         |
- *      4 |                                         |
- *      5 | ---- ---- ---- ---? ---- --?? ???? ???? | Global Fade In/Fade Out control
- *      6 |                                         |
- *      7 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Port A of RGB fade (subtraction)
- *      8 |                                         |
- *      9 | ---- ---- ---- ---? ---- ---- ---- ???? | Per-layer Fade In/Fade Out control
- *     10 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Port B of RGB fade (additive)
- *     11 | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | Unknown - looks like an ARGB value - it seems to change when the scene changes
- *     12 |                                         |
- *     13 |                                         |
- *     14 |                                         |
- *     15 |                                         |
- *     16 |                                         |
- *     17 |                                         |
- *     18 | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | V-Blank related stuff
- *     19 |                                         |
- *     20 | ---- ---- ---- ---x ---- ---- ---- ---- | Back layer control register?
- *     21 |                                         |
- *     22 |                                         |
- *     23 |                                         |
- *     24 |                                         |
- *
- *
- *
- *  Various bits change depending on what is happening in the scene.
- *  These bits may set which 'layer' is affected by the blending.
- *  Or maybe they adjust the scale of the lightening and darkening...
- *  Or maybe it switches from fading by scaling to fading using absolute addition and subtraction...
- *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
- */
-
-/* this is broken for the 'How to Play' screen in Buriki after attract, disabled for now */
-void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int i, j;
-
-//  float colorScaleR, colorScaleG, colorScaleB;
-	INT32 finR, finG, finB;
-
-	INT32 darkR, darkG, darkB;
-	INT32 brigR, brigG, brigB;
-
-	// If either of the fading memory regions is non-zero...
-	if (m_tcram[0x00000007] != 0x00000000 || m_tcram[0x0000000a] != 0x00000000)
-	{
-		darkR = (INT32)( m_tcram[0x00000007]        & 0xff);
-		darkG = (INT32)((m_tcram[0x00000007] >> 8)  & 0xff);
-		darkB = (INT32)((m_tcram[0x00000007] >> 16) & 0xff);
-
-		brigR = (INT32)( m_tcram[0x0000000a]        & 0xff);
-		brigG = (INT32)((m_tcram[0x0000000a] >> 8)  & 0xff);
-		brigB = (INT32)((m_tcram[0x0000000a] >> 16) & 0xff);
-
-		for (i = cliprect.min_x; i < cliprect.max_x; i++)
-		{
-			for (j = cliprect.min_y; j < cliprect.max_y; j++)
-			{
-				rgb_t* thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix32(j, i));
-
-				finR = (INT32)thePixel->r();
-				finG = (INT32)thePixel->g();
-				finB = (INT32)thePixel->b();
-
-#if 0
-				// Apply the darkening pass (0x07)...
-				colorScaleR = 1.0f - (float)( m_tcram[0x00000007] & 0xff)        / 255.0f;
-				colorScaleG = 1.0f - (float)((m_tcram[0x00000007] >> 8)  & 0xff) / 255.0f;
-				colorScaleB = 1.0f - (float)((m_tcram[0x00000007] >> 16) & 0xff) / 255.0f;
-
-				finR = ((float)thePixel->r()   * colorScaleR);
-				finG = ((float)thePixel->g() * colorScaleG);
-				finB = ((float)thePixel->b()  * colorScaleB);
-
-
-				// Apply the lightening pass (0x0a)...
-				colorScaleR = 1.0f + (float)( m_tcram[0x0000000a] & 0xff)        / 255.0f;
-				colorScaleG = 1.0f + (float)((m_tcram[0x0000000a] >> 8)  & 0xff) / 255.0f;
-				colorScaleB = 1.0f + (float)((m_tcram[0x0000000a] >> 16) & 0xff) / 255.0f;
-
-				finR *= colorScaleR;
-				finG *= colorScaleG;
-				finB *= colorScaleB;
-
-
-				// Clamp
-				if (finR > 255.0f) finR = 255.0f;
-				if (finG > 255.0f) finG = 255.0f;
-				if (finB > 255.0f) finB = 255.0f;
-#endif
-
-
-				// Subtractive fading
-				if (m_tcram[0x00000007] != 0x00000000)
-				{
-					finR -= darkR;
-					finG -= darkG;
-					finB -= darkB;
-				}
-
-				// Additive fading
-				if (m_tcram[0x0000000a] != 0x00000000)
-				{
-					finR += brigR;
-					finG += brigG;
-					finB += brigB;
-				}
-
-				// Clamp the high end
-				if (finR > 255) finR = 255;
-				if (finG > 255) finG = 255;
-				if (finB > 255) finB = 255;
-
-				// Clamp the low end
-				if (finR < 0) finR = 0;
-				if (finG < 0) finG = 0;
-				if (finB < 0) finB = 0;
-
-				*thePixel = rgb_t(255, (UINT8)finR, (UINT8)finG, (UINT8)finB);
-			}
-		}
-	}
-}
-
-
-
 void hng64_state::hng64_mark_all_tiles_dirty( int tilemap )
 {
 	m_tilemap[tilemap].m_tilemap_8x8->mark_all_dirty();
@@ -305,7 +168,6 @@ WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 	{
 		hng64_mark_tile_dirty(3, offset&0x3fff);
 	}
-    
     // Offsets 0x40000 - 0x58000 are for "floor" scanline control
     
 	/* 400000 - 7fffff is scroll regs etc. */
@@ -573,12 +435,11 @@ void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_r
 {
 	blit_parameters blit;
 
-/* notes:
-   - startx and starty MUST be UINT32 for calculations to work correctly
-   - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
-   */
+    // notes:
+    // - startx and starty MUST be UINT32 for calculations to work correctly
+    // - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
 
-	/* skip if disabled */
+	// skip if disabled
 	//if (!tmap->enable)
 	//  return;
 
@@ -604,11 +465,69 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
 
 
 
-void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm )
-{
-    const UINT32 global_tileregs = m_videoregs[0x00];
-	const int global_dimensions = (global_tileregs & 0x03000000) >> 24;
+/*
+ * Video Regs Format (appear to just be tilemap regs)
+ * --------------------------------------------------
+ *
+ * UINT32 | Bits                                    | Use
+ *        | 3322 2222 2222 1111 1111 11             |
+ * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
+ *   0    | ---- -Cdd ---- -??Z ---- ---- ---- ---- |  C = global complex zoom
+          | 0000 0011  - road edge alt 1            | dd = global tilemap dimension selector
+          | 0000 0111  - road edge alt 2            |  ? = Always Set? 
+          |                                         |  Z = Global Zoom Disable?
+ *   1    | oooo oooo oooo oooo ---- ---- ---- ---- | unknown - 0001 is a popular value.  Explore.
+ *   1    | ---- ---- ---- ---- oooo oooo oooo oooo | unknown - untouched in sams64 games, initialized elsewhere
+ *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
+ *   2    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
+ *   3    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap2 per layer flags
+ *   3    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap3 per layer flags
+ *   4    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 scrollbase when not floor, lineram offset when floor
+ *   4    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 scrollbase when not floor, lineram offset when floor
+ *   5    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap3 scrollbase when not floor, lineram offset when floor
+ *   5    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 scrollbase when not floor, lineram offset when floor
+ *   6    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
+ *   7    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
+ *   8    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 80008000 (fatfurwa)
+ *   9    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
+ *   a    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
+ *   b    | mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm | auto animation mask for tilemaps
+ *   c    | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | auto animation bits for tilemaps
+ *   d    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
+ *   e    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
 
+    // tilemap0 per layer flags
+    // 0840 - startup tests, 8x8x4 layer
+    // 0cc0 - beast busters 2, 8x8x8 layer
+    // 0860 - fatal fury wa
+    // 08e0 - fatal fury wa during transitions
+    // 0940 - samurai shodown 64
+    // 0880 - buriki
+
+    // Individual tilemap regs format
+    // ------------------------------
+    // mmmm dbr? ??ez zzzz
+    // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
+    //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
+    //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
+    // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
+    // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
+    // r = tile size (seems correct)
+    // e = tilemap enable bit according to sams64_2
+    // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere? 
+    //              (debug layer on buriki has priority 0x020, which would be highest)
+ */
+
+
+void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm)
+{
+    // Useful bits from the global tilemap flags
+    const UINT32& global_tileregs = m_videoregs[0x00];
+	const int global_dimensions = (global_tileregs & 0x03000000) >> 24;
+    const int global_alt_scroll_register_format = global_tileregs & 0x04000000;
+    const int global_zoom_disable = global_tileregs & 0x00010000;
+    
+    // Debug blending on/off based on m_additive_tilemap_debug
     int debug_blend_enabled = 0;
 	if ((m_additive_tilemap_debug&(1 << tm)))
 		debug_blend_enabled = 1;
@@ -618,8 +537,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		popmessage("unsupported global_dimensions on tilemaps");
 #endif
 
-    UINT32 scrollbase = 0;
-    UINT32 tileregs = 0;
+    // Determine which tilemap registers and scroll base this tilemap uses
+    UINT16 tileregs = 0;
+    UINT16 scrollbase = 0;
 	if (tm==0)
 	{
 		scrollbase = (m_videoregs[0x04]&0x3fff0000)>>16;
@@ -641,71 +561,68 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		tileregs   = (m_videoregs[0x03]&0x0000ffff)>>0;
 	}
 
+    // Useful bits from the tilemap registers
+    const UINT8 mosaicValueBits  = (tileregs & 0xf000) >> 12; (void)mosaicValueBits;
+    const UINT8 floorModeBit     = (tileregs & 0x0800) >> 11;
+    const UINT8 bppBit           = (tileregs & 0x0400) >> 10;
+    const UINT8 bigTilemapBit    = (tileregs & 0x0200) >>  9;
+    const UINT8 tilemapEnableBit = (tileregs & 0x0040) >>  6; (void)tilemapEnableBit;
+    
+    // Tilemap drawing enable (sams64_2 demo mode says this is legit)
+    //if (!tilemapEnableBit)
+    //{
+    //    return;
+    //}
+    
+    // Select the proper tilemap size
     tilemap_t* tilemap = NULL;
 	if (global_dimensions==0)
 	{
-		if (tileregs&0x0200) tilemap = m_tilemap[tm].m_tilemap_16x16;
+		if (bigTilemapBit) tilemap = m_tilemap[tm].m_tilemap_16x16;
 		else tilemap = m_tilemap[tm].m_tilemap_8x8;
 	}
 	else
 	{
-		if (tileregs&0x0200) tilemap = m_tilemap[tm].m_tilemap_16x16_alt;
+		if (bigTilemapBit) tilemap = m_tilemap[tm].m_tilemap_16x16_alt;
 		else tilemap = m_tilemap[tm].m_tilemap_8x8; // _alt
 	}
 
-	// set the transmask so our manual copy is correct
+	// Set the transmask so our manual copy is correct
     int transmask = 0x00;
-	if (tileregs & 0x0400)
+	if (bppBit)
 		transmask = 0xff;
 	else
 		transmask = 0xf;
 
-	// buriki tm1 = roz
-
-	// my life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
-	if ((tileregs & 0x0800)==0x0000) // floor mode  -- could actually be related to ((tileregs & 0xf000) == 0x1000).
+	if (floorModeBit == 0x0000)
 	{
+        // floor mode
+        // life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
+
         // fprintf(stderr, "Tilemap %d is a floor using :\n", tm);
+        const UINT32 floorAddress = 0x40000 + (scrollbase << 4);
 
-        // Floor buffer enables
-        // TODO: the upper bit(s) in here are probably useful to check as well
-        const int floorInner0 = (m_videoregs[0x04] & 0x00000600) >> 9;
-        const int floorInner1 = (m_videoregs[0x05] & 0x06000000) >> 25; (void)floorInner1;
-        const int floorInner2 = (m_videoregs[0x05] & 0x00000600) >> 9;
-        const int floorOuter0 = (m_videoregs[0x04] & 0x00001800) >> 11;
-        const int floorOuter1 = (m_videoregs[0x05] & 0x18000000) >> 27; (void)floorOuter1;
-        const int floorOuter2 = (m_videoregs[0x05] & 0x00001800) >> 11;
-        // fprintf(stderr, "Buffers %d-%d %d-%d %d-%d\n", floorOuter2, floorInner2, floorOuter1, floorInner1, floorOuter0, floorInner0);
+        // TODO: The row count is correct, but how is this layer clipped? m_tcram?
         
-        // TODO: This can likely be simplified with some &s and some <<s, but this works for now
-        const UINT32 address0 = 0x40000 + (floorOuter0 * 0x8000) + (floorInner0 * 0x2000);
-        const UINT32 address1 = 0x40000 + (floorOuter1 * 0x8000) + (floorInner1 * 0x2000); (void)address1;
-        const UINT32 address2 = 0x40000 + (floorOuter2 * 0x8000) + (floorInner2 * 0x2000);
-
-        // TODO: Some bit somewhere probably specifies scissor layers, but for now we switch based on game :-(
-        const UINT32& dataAddress = (m_mcu_type == BURIKI_MCU) ? address0 : address2;
-        const UINT32& scissorAddress0 = address1; (void)scissorAddress0;
-        const UINT32& scissorAddress1 = (m_mcu_type == BURIKI_MCU) ? address2 : address0; (void)scissorAddress1;
-        //printf("dataAddress: %08x scissorAddress0: %08x scissorAddress1: %08x\n", dataAddress, scissorAddress0, scissorAddress1);
-
         // See how many lines we have in the data region
-        // TODO: Change this to a loop that goes over each line and draws them - it's just for visualization now
-        int lineCount = 0;
-        for (int ii = 0; ii < 0x2000/4; ii += 4)
-        {
-            const int realAddress = dataAddress/4;
-            if (m_videoram[realAddress+ii] == 0xffffff00 && m_videoram[realAddress+ii+1] == 0xffffff00)
-                continue;
-            if (m_videoram[realAddress+ii] == 0x00000000 && m_videoram[realAddress+ii+1] == 0x00000000)
-                continue;
-            
-            lineCount++;
-        }
+        // DEBUG: Change this to a loop that goes over each line and draws them - it's just for visualization now
+        //int lineCount = 0;
+        //for (int ii = 0; ii < 0x2000/4; ii += 4)
+        //{
+        //    const int realAddress = floorAddress/4;
+        //    if (m_videoram[realAddress+ii] == 0xffffff00 && m_videoram[realAddress+ii+1] == 0xffffff00)
+        //        continue;
+        //    if (m_videoram[realAddress+ii] == 0x00000000 && m_videoram[realAddress+ii+1] == 0x00000000)
+        //        continue;
+        //    
+        //    lineCount++;
+        //}
         //printf("lines %d\n", lineCount);
 
         // Buriki uses a 2x mosaic effect on its floor, so its line count is half
-        if (m_mcu_type == BURIKI_MCU)
-            lineCount *= 2;
+        // (but so does fatfurwa - maybe it overdraws a bunch of pixels?)
+        //if (m_mcu_type == BURIKI_MCU)
+        //    lineCount *= 2;
 
         // DEBUG - draw a horizontal green line where the uppermost line of the floor is drawn
         const rectangle &visarea = screen.visible_area();
@@ -715,26 +632,21 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
         //        bitmap.pix32((visarea.height()-lineCount), ii) = 0xff00ff00;
         //}
         
-        // HACK : Clear ram - this is "needed" in fatfurwa since it doesn't clear its own ram (buriki does)
+        // HACK : Clear RAM - this is "needed" in fatfurwa since it doesn't clear its own ram (buriki does)
         //        Figure out what the difference between the two programs is.  It's possible writing to
         //        the linescroll ram fills a buffer and it's cleared automatically between frames?
         for (int ii = 0; ii < 0x2000/4; ii++)
         {
-            const int realAddress = dataAddress/4;
+            const int realAddress = floorAddress/4;
             m_videoram[realAddress+ii] = 0x00000000;
         }
         
-        
-        //if ((tileregs&0xf000) == 0x1000)
-		//{
-		//  popmessage("Floor is Active");
-		//}
         
         // Floor mode - per pixel simple / complex modes? -- every other line?
 		//  (there doesn't seem to be enough data in Buriki for every line at least)
 		rectangle clip = visarea;
 
-		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
+		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 		{
 			// Logic would dictate that this should be the 'complex' scroll register layout,
 			// but per-line.  That doesn't work however.
@@ -763,7 +675,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 			{
 				clip.min_y = clip.max_y = line;
 
-				if (m_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
+				if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
 				{
 					// If this bit is active the scroll registers don't seem valid at all?
 					// It either disables zooming, or disables use of the scroll registers completely
@@ -795,13 +707,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 	else
 	{
-#if HNG64_VIDEO_DEBUG
-		if ((tileregs&0xf000))
-			popmessage("Tilemap Mosaic? %02x", tileregs>>12);
-#endif
 		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 
-		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
+		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 		{
 			/* complex zoom mode? */
 			/* with this scroll register layout rotation effects are possible
@@ -925,7 +833,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 						m_videoram[(0x4001c+(scrollbase<<4))/4]);
 #endif
 
-			if (m_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
+			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
 			{
 				/* If this bit is active the scroll registers don't seem valid at all?
 				   It either disables zooming, or disables use of the scroll registers completely
@@ -1003,63 +911,6 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 }
 
 
-
-/*
- * Video Regs Format
- * ------------------
- *
- * UINT32 | Bits                                    | Use
- *        | 3322 2222 2222 1111 1111 11             |
- * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | ---- -C-- ---- -??Z ---- ---- ---- ---- | unknown (scroll control?) C = Global Complex zoom, ? = Always Set?, Z = Global Zoom Disable?
-            0000 0011  - road edge alt 1
-            0000 0111  - road edge alt 2
- *   1    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | looks like it's 0001 most (all) of the time - turns off in buriki intro
- *   1    | ---- ---- ---- ---- oooo oooo oooo oooo | unknown - always seems to be 0000 (fatfurwa)
- *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
- *   2    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
- *   3    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap2 per layer flags
- *   3    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap3 per layer flags
- *   4    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 offset into tilemap RAM?
- *   4    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 offset into tilemap RAM
- *   5    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap3 offset into tilemap RAM
- *   5    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 offset into tilemap RAM?
- *   6    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
- *   7    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
- *   8    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 80008000 (fatfurwa)
- *   9    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
- *   a    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
- *   b    | mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm | auto animation mask for tilemaps, - use these bits from the original tile number
- *   c    | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | auto animation bits for tilemaps, - merge in these bits to auto animate the tilemap
- *   d    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
- *   e    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
-
-    per tile regs (0x2/0x3)
-
-    // tilemap0 per layer flags
-    // 0840 - startup tests, 8x8x4 layer
-    // 0cc0 - beast busters 2, 8x8x8 layer
-    // 0860 - fatal fury wa
-    // 08e0 - fatal fury wa during transitions
-    // 0940 - samurai shodown 64
-    // 0880 - buriki
-
-    // mmmm dbrz zzzz zzzz
-    // m = mosaic related?
-    //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
-    //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
-    // r = tile size (seems correct)
-    // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
-    // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
-    // z = z depth? tilemaps might also be affected by min / max clip values somewhere? (debug layer on buriki has priority 0x020, which would be highest)
-
-
- */
-
-
-
-#define IMPORTANT_DIRTY_TILEFLAG_MASK (0x0600)
-
 UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 
@@ -1088,25 +939,17 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 #endif
 
 
-
-
-
+    // Initialize some buffers
 	bitmap.fill(m_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
 	screen.priority().fill(0x00, cliprect);
 
+    // If the screen is disabled, don't draw anything (m_screen_dis is a shady variable at best)
 	if (m_screen_dis)
 		return 0;
 
+	// If the auto-animation mask or bits have changed search for tiles using them and mark as dirty
     const UINT32 animmask = m_videoregs[0x0b];
 	const UINT32 animbits = m_videoregs[0x0c];
-
-    UINT16 tileflags[4];
-    tileflags[0] = m_videoregs[0x02] >> 16;
-	tileflags[1] = m_videoregs[0x02] & 0xffff;
-	tileflags[2] = m_videoregs[0x03] >> 16;
-	tileflags[3] = m_videoregs[0x03] & 0xffff;
-
-	// if the auto-animation mask or bits have changed search for tiles using them and mark as dirty
 	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
 	{
 		int tile_index;
@@ -1134,6 +977,13 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		m_old_animbits = animbits;
 	}
 
+    // If any magic bits have been touched, mark every tilemap dirty
+    UINT16 tileflags[4];
+    tileflags[0] = m_videoregs[0x02] >> 16;
+	tileflags[1] = m_videoregs[0x02] & 0xffff;
+	tileflags[2] = m_videoregs[0x03] >> 16;
+	tileflags[3] = m_videoregs[0x03] & 0xffff;
+    const UINT16 IMPORTANT_DIRTY_TILEFLAG_MASK = 0x0600;
 	for (int i = 0; i < 4; i++)
 	{
 		if ((m_old_tileflags[i] & IMPORTANT_DIRTY_TILEFLAG_MASK) != (tileflags[i] & IMPORTANT_DIRTY_TILEFLAG_MASK))
@@ -1143,12 +993,13 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
+    // Draw the four tilemaps
 	hng64_drawtilemap(screen,bitmap,cliprect, 3);
 	hng64_drawtilemap(screen,bitmap,cliprect, 2);
 	hng64_drawtilemap(screen,bitmap,cliprect, 1);
 	hng64_drawtilemap(screen,bitmap,cliprect, 0);
 
-	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites.
+	// 3d gets drawn next
 	if(!(m_3dregs[0] & 0x1000000))
 	{
 		int x, y;
@@ -1170,10 +1021,13 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	draw_sprites(screen, bitmap,cliprect);
+    // Draw the sprites on top of everything
+	draw_sprites(screen, bitmap, cliprect);
 
+    // Layer the global frame buffer operations on top of everything
     // transition_control(bitmap, cliprect);
 
+    
 #if HNG64_VIDEO_DEBUG
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
@@ -1182,10 +1036,10 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
 		m_videoregs[0x00],
 		m_videoregs[0x01],
-        (m_videoregs[0x02]>>16)&0x01ff, // ----  bits we're sure about are masked out
-        (m_videoregs[0x02]>>0)&0x01ff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
-        (m_videoregs[0x03]>>16)&0x01ff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
-        (m_videoregs[0x03]>>0)&0x01ff,  //       fatal fury doesn't (all backgrounds have it set) joy
+        (m_videoregs[0x02]>>16)&0xffff,
+        (m_videoregs[0x02]>>0)&0xffff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
+        (m_videoregs[0x03]>>16)&0xffff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
+        (m_videoregs[0x03]>>0)&0xffff,  //       fatal fury doesn't (all backgrounds have it set) joy
         (m_videoregs[0x04]>>16)&0xffff,
         (m_videoregs[0x04]>>0)&0xffff,
         (m_videoregs[0x05]>>16)&0xffff,
@@ -1253,7 +1107,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
 #endif
-
+    
 	return 0;
 }
 
@@ -1262,6 +1116,138 @@ void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 		clear3d();
+}
+
+
+/* Transition Control Video Registers
+ * ----------------------------------
+ *
+ * UINT32 | Bits                                    | Use
+ *        | 3322 2222 2222 1111 1111 11             |
+ * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
+ *      0 |                                         |
+ *      1 | xxxx xxxx xxxx xxxx yyyy yyyy yyyy yyyy | Min X / Min Y visible area rectangle values
+ *      2 | xxxx xxxx xxxx xxxx yyyy yyyy yyyy yyyy | Max X / Max Y visible area rectangle values (added up with the Min X / Min Y)
+ *      3 |                                         |
+ *      4 |                                         |
+ *      5 | ---- ---- ---- ---? ---- --?? ???? ???? | Global Fade In/Fade Out control
+ *      6 |                                         |
+ *      7 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Port A of RGB fade (subtraction)
+ *      8 |                                         |
+ *      9 | ---- ---- ---- ---? ---- ---- ---- ???? | Per-layer Fade In/Fade Out control
+ *     10 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Port B of RGB fade (additive)
+ *     11 | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | Unknown - looks like an ARGB value - it seems to change when the scene changes
+ *     12 |                                         |
+ *     13 |                                         |
+ *     14 |                                         |
+ *     15 |                                         |
+ *     16 |                                         |
+ *     17 |                                         |
+ *     18 | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | V-Blank related stuff
+ *     19 |                                         |
+ *     20 | ---- ---- ---- ---x ---- ---- ---- ---- | Back layer control register?
+ *     21 |                                         |
+ *     22 |                                         |
+ *     23 |                                         |
+ *     24 |                                         |
+ *
+ *  Various bits change depending on what is happening in the scene.
+ *  These bits may set which 'layer' is affected by the blending.
+ *  Or maybe they adjust the scale of the lightening and darkening...
+ *  Or maybe it switches from fading by scaling to fading using absolute addition and subtraction...
+ *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
+ */
+
+// Very much a work in progress - no hard testing has been done
+void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int i, j;
+
+//  float colorScaleR, colorScaleG, colorScaleB;
+	INT32 finR, finG, finB;
+
+	INT32 darkR, darkG, darkB;
+	INT32 brigR, brigG, brigB;
+
+	// If either of the fading memory regions is non-zero...
+	if (m_tcram[0x00000007] != 0x00000000 || m_tcram[0x0000000a] != 0x00000000)
+	{
+		darkR = (INT32)( m_tcram[0x00000007]        & 0xff);
+		darkG = (INT32)((m_tcram[0x00000007] >> 8)  & 0xff);
+		darkB = (INT32)((m_tcram[0x00000007] >> 16) & 0xff);
+
+		brigR = (INT32)( m_tcram[0x0000000a]        & 0xff);
+		brigG = (INT32)((m_tcram[0x0000000a] >> 8)  & 0xff);
+		brigB = (INT32)((m_tcram[0x0000000a] >> 16) & 0xff);
+
+		for (i = cliprect.min_x; i < cliprect.max_x; i++)
+		{
+			for (j = cliprect.min_y; j < cliprect.max_y; j++)
+			{
+				rgb_t* thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix32(j, i));
+
+				finR = (INT32)thePixel->r();
+				finG = (INT32)thePixel->g();
+				finB = (INT32)thePixel->b();
+
+#if 0
+				// Apply the darkening pass (0x07)...
+				colorScaleR = 1.0f - (float)( m_tcram[0x00000007] & 0xff)        / 255.0f;
+				colorScaleG = 1.0f - (float)((m_tcram[0x00000007] >> 8)  & 0xff) / 255.0f;
+				colorScaleB = 1.0f - (float)((m_tcram[0x00000007] >> 16) & 0xff) / 255.0f;
+
+				finR = ((float)thePixel->r()   * colorScaleR);
+				finG = ((float)thePixel->g() * colorScaleG);
+				finB = ((float)thePixel->b()  * colorScaleB);
+
+
+				// Apply the lightening pass (0x0a)...
+				colorScaleR = 1.0f + (float)( m_tcram[0x0000000a] & 0xff)        / 255.0f;
+				colorScaleG = 1.0f + (float)((m_tcram[0x0000000a] >> 8)  & 0xff) / 255.0f;
+				colorScaleB = 1.0f + (float)((m_tcram[0x0000000a] >> 16) & 0xff) / 255.0f;
+
+				finR *= colorScaleR;
+				finG *= colorScaleG;
+				finB *= colorScaleB;
+
+
+				// Clamp
+				if (finR > 255.0f) finR = 255.0f;
+				if (finG > 255.0f) finG = 255.0f;
+				if (finB > 255.0f) finB = 255.0f;
+#endif
+
+
+				// Subtractive fading
+				if (m_tcram[0x00000007] != 0x00000000)
+				{
+					finR -= darkR;
+					finG -= darkG;
+					finB -= darkB;
+				}
+
+				// Additive fading
+				if (m_tcram[0x0000000a] != 0x00000000)
+				{
+					finR += brigR;
+					finG += brigG;
+					finB += brigB;
+				}
+
+				// Clamp the high end
+				if (finR > 255) finR = 255;
+				if (finG > 255) finG = 255;
+				if (finB > 255) finB = 255;
+
+				// Clamp the low end
+				if (finR < 0) finR = 0;
+				if (finG < 0) finG = 0;
+				if (finB < 0) finB = 0;
+
+				*thePixel = rgb_t(255, (UINT8)finR, (UINT8)finG, (UINT8)finB);
+			}
+		}
+	}
 }
 
 void hng64_state::video_start()
