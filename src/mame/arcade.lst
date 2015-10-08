@@ -6619,7 +6619,8 @@ vendetta2pd     // GX081 (c) 1991 (Asia)
 vendettaj       // GX081 (c) 1991 (Japan)
 mogura          // GX141 (c) 1991
 wecleman        // GX602 (c) 1986
-wecleman2       // GX602?(c) 1988
+weclemana       // GX602?(c) 1988
+weclemanb		// GX602 (c) 1986
 hotchase        // GX763 (c) 1988
 hotchasea
 chqflag         // GX717 (c) 1988
@@ -9071,6 +9072,7 @@ vastar4         // (c) 1983 Sesame Japan
 // Gaelco 2D games
 mastboy         // (c) 1987 - No Ref on the PCB
 mastboyi        // (c) 1987 - No Ref on the PCB
+mastboyia		// (c) 1987 - No Ref on the PCB
 xorworld        // (c) 1990 - prototype
 bigkarnk        // (c) 1991 - Ref 901112-1
 // Master Boy 2 // (c) 1991 - Ref ???
@@ -9712,6 +9714,7 @@ pclubysa        // (c) 2000 Yun Sung
 garogun         // (c) 2000 Yun Sung
 7ordi           // (c) 2002 Yun Sung
 wondstck        // (c) ???? Yun Sung
+wondstcka		// (c) ???? Yun Sung
 
 // Zilec games
 blueprnt        // (c) 1982 Bally Midway (Zilec in ROM 3U, and the programmer names)
@@ -11163,6 +11166,7 @@ lastfght        // (c) 2000 Subsino
 xplan           // (c) 2006 Subsino
 
 sliver          // (c) 1996 Hollow Corp
+slivera			//
 intrscti        // ????
 pasha2          // (c) 1998 Dong Sung
 trvmadns        // (c) 1985 Thunderhead Inc.
