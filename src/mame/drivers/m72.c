@@ -3715,9 +3715,9 @@ GAME( 1989, xmultipl,    0,        m81_xmultipl,m81_xmultipl,driver_device,0,   
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl,xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,driver_device,0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
 
-// one of these is M84-B-A ?
+
 GAME( 1989, rtype2,      0,        rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -3725,9 +3725,9 @@ GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,     
 GAME( 1990, majtitle,    0,        m82_large,   rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
 GAME( 1990, majtitlej,   majtitle, m82_large,   rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,driver_device,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US, M82?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or M84?
-GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or M84?
+GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,driver_device,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, dkgensanm72, hharry,   m72,         hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, poundfor,    0,        poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
