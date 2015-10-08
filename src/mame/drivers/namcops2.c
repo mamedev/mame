@@ -97,9 +97,9 @@ Time Crisis 3................................... 1234XXX  TST1 DVD0            D
    "         ................................... 1234XXX  TST1 DVD0            DVD          NM00012  *TST3 Ver.A             Namco 2002                    / %
 Time Crisis 4................................... XXXXXX7  TSF1-HA              HDD (40GB)   NM00032   TSF1002-NA-A           Namco 2005                      Uses 'V329 NA-JV PCB' for guns
 Vampire Night................................... 1234XXX  VPN1 CD0             CD           NM00003   VPN3 Ver.B             Namco/Sega/WOW Entertainment 2000
-Wangan Midnight................................. 1XXXXXX  WMN1-A               CD           NM00008   WMN1 Ver.A             Namco 2001
-   "           ................................. 1XXXXXX  WMN1-A               CD           NM00008  *WMN2 Ver.A             Namco 2001
-   "           ................................. 1XXXXXX  WMN1-A               CD           NM00008  *WMN2 Ver.B             Namco 2001
+Wangan Midnight (Japan)......................... 1XXXXXX  WMN1-A               CD           NM00008   WMN1 Ver.A             Namco 2001
+   "            (Export)........................ 1XXXXXX *WMN2-A               CD           NM00008  *WMN2 Ver.A             Namco 2001
+   "            (Export)........................ 1XXXXXX *WMN2-A               CD           NM00008  *WMN2 Ver.B             Namco 2001
 Wangan Midnight R............................... 1XXXXXX  WMR1-A               CD           NM00005   WMR1 Ver.A             Namco 2002
 Zoids Infinity.................................. ------X  M9006212A Ver.2.02J  HDD (40GB)   NM00016   B3900076A              Taito 2004                    HDD: Maxtor Fireball 3 40GB 2F040L0
 Zoids Infinity Ex............................... ------X *?                   *HDD          NM00025  *B3900098B              Taito 2005
@@ -1382,7 +1382,7 @@ ROM_START( wanganmd )
 	ROM_LOAD( "wmn1vera_spr.ic002", 0x800000, 0x040000, CRC(97253f9e) SHA1(652807972c62a96ba329b400e17dabd313134392) )
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "wmn1", 0, SHA1(4254e987e71d0d4038a87f11dc1a304396b3dffc) )
+	DISK_IMAGE_READONLY( "wmn1-a", 0, SHA1(4254e987e71d0d4038a87f11dc1a304396b3dffc) )
 ROM_END
 
 ROM_START( vnight )
