@@ -171,7 +171,7 @@ WRITE8_MEMBER (pit68230_device::write){
 				break;
 
 		default:
-				LOG (logerror ("unhandled register %02x", offset))
+				LOG (logerror ("unhandled register %02x", offset));
 		}
 
 		LOG (if (offset != ow_ofs || data != ow_data || ow_cnt >= 1000) {
