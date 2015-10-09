@@ -451,7 +451,7 @@ protected:
 				WR11_TRXSRC_SRC_XTAL  = 0x00, //  0 0
 				WR11_TRXSRC_SRC_TRA   = 0x01, //  0 1
 				WR11_TRXSRC_SRC_BR    = 0x02, //  1 0
-				WR11_TRXSRC_SRC_DPLL  = 0x03, //  1 1
+				WR11_TRXSRC_SRC_DPLL  = 0x03  //  1 1
 		};
 
 		enum

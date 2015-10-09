@@ -486,7 +486,7 @@ protected:
 
 	enum
 	{
-		TYPE_Z80SIO,
+		TYPE_Z80SIO
 	};
 
 	enum
