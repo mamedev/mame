@@ -268,6 +268,14 @@ extern const device_type FLOPPYSOUND;
 /*
     Floppy drive sound
 */
+enum
+{
+	FLOPPY_MOTOR_START = 0,
+	FLOPPY_MOTOR_LOOP,
+	FLOPPY_MOTOR_END,
+	FLOPPY_STEP_SOUNDS = 5
+};
+
 class floppy_sound_device : public samples_device
 {
 public:
@@ -287,18 +295,16 @@ private:
 	sound_stream*   m_sound;
 	bool            m_loaded;
 
-	int             m_sampleend_motor;
+	int             m_samplesize_motor_start;
+	int             m_samplesize_motor_loop;
+	int             m_samplesize_motor_end;
 	int             m_samplepos_motor;
-	int             m_samplestart_motor;
-	int             m_motor_mintime;        // min time for the samples; sound persists for that time
-	int             m_motor_time;
-	bool            m_motor;
+	int             m_motor_playback;
+	bool            m_motor_on;
 
-	int             m_sampleend_step;
-	int             m_samplestart_step;
+	int             m_samplesize_step[FLOPPY_STEP_SOUNDS];
 	int             m_samplepos_step;
-	int             m_step_mintime;
-	int             m_step_time;
+	int             m_step_playback;
 };
 
 class floppy_connector: public device_t,

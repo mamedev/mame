@@ -10,22 +10,22 @@
 
 I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 {
-	if (y < 360 || x >= HORIZONTAL_CHARACTER_PIXELS) // leftmost char on the 25th row is never displayed on actual MikroMikko 1 HW
+	UINT8 romdata = m_char_rom->base()[(charcode << 4) | linecount];
+
+	int gpa0 = BIT(gpa, 0);		// general purpose attribute 0
+	int llen = m_llen;			// light enable
+	int compl_in = rvv;			// reverse video
+	int hlt_in = hlgt;			// highlight;
+	int color;					// 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
+	int i, qh, video_in;
+
+	int d7 = BIT(romdata, 7);	// save MSB (1 indicates that this is a Visual Attribute or Special Code instead of a normal display character)
+	int d6 = BIT(romdata, 6);	// save also first and last char bitmap bits before shifting out the MSB
+	int d0 = BIT(romdata, 0);
+	UINT8 data = (romdata << 1) | (d7 & d0); // get rid of MSB, duplicate LSB for special characters
+
+	if (y < 360 || x >= HORIZONTAL_CHARACTER_PIXELS || compl_in == 0) // leftmost char on the 25th row is never displayed on actual MikroMikko 1 HW if it's inversed
 	{
-		UINT8 romdata = m_char_rom->base()[(charcode << 4) | linecount];
-
-		int gpa0 = BIT(gpa, 0);		// general purpose attribute 0
-		int llen = m_llen;			// light enable
-		int compl_in = rvv;			// reverse video
-		int hlt_in = hlgt;			// highlight;
-		int color;					// 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
-		int i, qh, video_in;
-
-		int d7 = BIT(romdata, 7);	// save MSB (indicates that this is a Visual Attribute or Special Code instead of a normal display character)
-		int d6 = BIT(romdata, 6);	// save also first and last char bitmap bits before shifting out the MSB
-		int d0 = BIT(romdata, 0);
-		UINT8 data = (romdata << 1) | (d7 & d0); // get rid of MSB, duplicate LSB for special characters
-
 		if (HORIZONTAL_CHARACTER_PIXELS == 10)
 		{
 			// Hack to stretch 8 pixels wide character bitmap to 10 pixels on screen.
