@@ -12,6 +12,7 @@
 #include "emuopts.h"
 #include "png.h"
 #include "rendutil.h"
+#include "validity.h"
 
 
 
@@ -55,6 +56,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yscale(1.0f),
 		m_palette(*this),
 		m_video_attributes(0),
+		m_orientation(0),
 		m_container(NULL),
 		m_width(100),
 		m_height(100),
@@ -239,6 +241,16 @@ void screen_device::static_set_video_attributes(device_t &device, UINT32 flags)
 	screen.m_video_attributes = flags;
 }
 //-------------------------------------------------
+//  static_set_orientation - set the screen orientation
+//-------------------------------------------------
+
+void screen_device::static_set_orientation(device_t &device, UINT32 orientation)
+{
+	screen_device &screen = downcast<screen_device &>(device);
+	screen.m_orientation = orientation;
+}
+
+//-------------------------------------------------
 //  device_validity_check - verify device
 //  configuration
 //-------------------------------------------------
@@ -269,6 +281,9 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Screen does not have palette defined\n");
 	if (m_palette != NULL && texformat == TEXFORMAT_RGB32)
 		osd_printf_warning("Screen does not need palette defined\n");
+
+//	if (m_orientation != (valid.driver()->flags & ORIENTATION_MASK))
+//		osd_printf_error("Screen orientation does not match\n");
 }
 
 

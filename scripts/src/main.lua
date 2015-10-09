@@ -2,7 +2,7 @@
 -- copyright-holders:MAMEdev Team
 
 function mainProject(_target, _subtarget)
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["SOURCES"] == nil) then 
 	if (_target == _subtarget) then
 		project (_target)
 	else
@@ -38,7 +38,7 @@ end
 	flags {
 		"Unicode",
 	}
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["SOURCES"] == nil) then 
 	configuration { "x64", "Release" }
 		targetsuffix "64"
 		if _OPTIONS["PROFILE"] then
@@ -91,7 +91,7 @@ end
 	links {
 		"osd_" .. _OPTIONS["osd"],
 	}
-	if (_OPTIONS["DRIVERS"] == nil) then 
+	if (_OPTIONS["SOURCES"] == nil) then 
 		links {
 			"bus",
 		}
@@ -101,7 +101,13 @@ end
 		"optional",
 		"emu",
 		"formats",
+	}
+if #disasm_files > 0 then
+	links {
 		"dasm",
+	}
+end
+	links {
 		"utils",
 		"expat",
 		"softfloat",
@@ -226,7 +232,7 @@ end
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
 	}
 	
-if (_OPTIONS["DRIVERS"] == nil) then 	
+if (_OPTIONS["SOURCES"] == nil) then 	
 	dependency {
 		{ "../../../../generated/mame/mame/drivlist.c",  MAME_DIR .. "src/mame/mess.lst", true },
 		{ "../../../../generated/mame/mame/drivlist.c" , MAME_DIR .. "src/mame/arcade.lst", true},

@@ -47,7 +47,7 @@ function devicesProject(_target, _subtarget)
 
 	dofile(path.join("src", "machine.lua"))
 
-if (_OPTIONS["DRIVERS"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) then
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind (LIBTYPE)
@@ -85,6 +85,7 @@ else
 	dofile(path.join("src", "bus.lua"))
 end
 
+if #disasm_files > 0 then
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
 	kind (LIBTYPE)
@@ -128,4 +129,6 @@ end
 			disasm_custombuildtask[1]
 		}
 	end
+end
+
 end

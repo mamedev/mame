@@ -589,6 +589,10 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( bounty, zodiack )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ORIENTATION(ROT180)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -711,4 +715,4 @@ GAME( 1983, zodiack,  0, zodiack, zodiack,  zodiack_state, zodiack, ROT270, "Orc
 GAME( 1983, dogfight, 0, zodiack, dogfight, zodiack_state, zodiack, ROT270, "Orca / Thunderbolt", "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
 GAME( 1982, moguchan, 0, zodiack, moguchan, zodiack_state, percuss, ROT270, "Orca (Eastern Commerce Inc. license)", "Mogu Chan (bootleg?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
 GAME( 1981, percuss,  0, zodiack, percuss,  zodiack_state, percuss, ROT270, "Orca", "The Percussor", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0, zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca", "The Bounty", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0, bounty,  bounty,   zodiack_state, percuss, ROT180, "Orca", "The Bounty", MACHINE_SUPPORTS_SAVE )

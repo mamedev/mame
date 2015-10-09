@@ -90,7 +90,7 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
-# DRIVERS = src/mame/drivers/1942.c,src/mame/drivers/cops.c
+# SOURCES = src/mame/drivers/asteroid.c,src/mame/audio/llander.c
 
 # FORCE_VERSION_COMPILE = 1
 
@@ -628,8 +628,8 @@ ifdef QT_HOME
 PARAMS += --QT_HOME='$(QT_HOME)'
 endif
 
-ifdef DRIVERS
-PARAMS += --DRIVERS='$(DRIVERS)'
+ifdef SOURCES
+PARAMS += --SOURCES='$(SOURCES)'
 endif
 
 ifdef FORCE_VERSION_COMPILE
@@ -661,7 +661,7 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
 
-ifndef DRIVERS
+ifndef SOURCES
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET).lua
 endif
 

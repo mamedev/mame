@@ -293,6 +293,7 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(speedspn_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT180)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedspn)
 	MCFG_PALETTE_ADD("palette", 0x400)
