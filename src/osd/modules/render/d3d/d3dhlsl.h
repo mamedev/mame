@@ -79,6 +79,7 @@ public:
 		CU_POST_VIGNETTING,
 		CU_POST_CURVATURE,
 		CU_POST_ROUND_CORNER,
+		CU_POST_SMOOTH_BORDER,
 		CU_POST_REFLECTION,
 		CU_POST_SHADOW_ALPHA,
 		CU_POST_SHADOW_COUNT,
@@ -194,6 +195,7 @@ struct hlsl_options
 	float                   shadow_mask_v_offset;
 	float                   curvature;
 	float                   round_corner;
+	float                   smooth_border;
 	float                   reflection;
 	float                   vignetting;
 	float                   scanline_alpha;
@@ -236,8 +238,7 @@ struct hlsl_options
 	float                   vector_length_ratio;
 
 	// Bloom
-	float                   vector_bloom_scale;
-	float                   raster_bloom_scale;
+	float                   bloom_scale;
 	float                   bloom_level0_weight;
 	float                   bloom_level1_weight;
 	float                   bloom_level2_weight;

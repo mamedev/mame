@@ -59,7 +59,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	{   // 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
 		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.03f, 0.03f, 0.03f, 0.03f,
+		0.03f, 0.0f, 0.0f, 0.0f, 0.0f,
 		0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -82,7 +82,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	{   // 25% Shadow mask, 0% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
 		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.03f, 0.03f, 0.03f, 0.03f,
+		0.03f, 0.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -105,7 +105,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	{   // 25% Shadow mask, 0% Scanlines, 0% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
 		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -128,7 +128,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	{   // 25% Shadow mask, 100% Scanlines, 15% Pincushion, 3 defocus, 24-degree Tint Out, 1.5 Exponent, 5% Floor, 70% Phosphor Return, 80% Saturation, Bad Convergence
 		true,
 		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.15f, 0.15f, 0.15f, 0.15f,
+		0.15f, 0.0f, 0.0f, 0.0f, 0.0f,
 		1.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.5f,
 		{ 3.0f, 3.0f },
 		{ 0.5f,-0.33f,0.7f },
@@ -780,6 +780,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		options->shadow_mask_v_offset = winoptions.screen_shadow_mask_v_offset();
 		options->curvature = winoptions.screen_curvature();
 		options->round_corner = winoptions.screen_round_corner();
+		options->smooth_border = winoptions.screen_smooth_border();
 		options->reflection = winoptions.screen_reflection();
 		options->vignetting = winoptions.screen_vignetting();
 		options->scanline_alpha = winoptions.screen_scanline_amount();
@@ -822,8 +823,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	options->yiq_phase_count = winoptions.screen_yiq_phase_count();
 	options->vector_length_scale = winoptions.screen_vector_length_scale();
 	options->vector_length_ratio = winoptions.screen_vector_length_ratio();
-	options->vector_bloom_scale = winoptions.screen_vector_bloom_scale();
-	options->raster_bloom_scale = winoptions.screen_raster_bloom_scale();
+	options->bloom_scale = winoptions.screen_bloom_scale();
 	options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
 	options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
 	options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
@@ -1105,6 +1105,7 @@ int shaders::create_resources(bool reset)
 	distortion_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
 	distortion_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
+	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
 
 	vector_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
@@ -1467,9 +1468,7 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 
 	bool prepare_vector =
 		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
-	float bloom_rescale = prepare_vector
-		? options->vector_bloom_scale
-		: options->raster_bloom_scale;
+	float bloom_rescale = options->bloom_scale;
 
 	// skip downsample if no influencing settings
 	if (bloom_rescale == 0.0f)
@@ -1513,11 +1512,7 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 {
 	int next_index = source_index;
 
-	bool prepare_vector =
-		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
-	float bloom_rescale = prepare_vector
-		? options->vector_bloom_scale
-		: options->raster_bloom_scale;
+	float bloom_rescale = options->bloom_scale;
 
 	// skip bloom if no influencing settings
 	if (bloom_rescale == 0.0f)
@@ -2355,6 +2350,12 @@ static INT32 slider_round_corner(running_machine &machine, void *arg, std::strin
 	return slider_set(&(((hlsl_options*)arg)->round_corner), 0.01f, "%2.2f", str, newval);
 }
 
+static INT32 slider_smooth_border(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->smooth_border), 0.01f, "%2.2f", str, newval);
+}
+
 static INT32 slider_reflection(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
@@ -2649,16 +2650,10 @@ static INT32 slider_vector_length_max(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->vector_length_ratio), 1.0f, "%4f", str, newval);
 }
 
-static INT32 slider_vector_bloom_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
+static INT32 slider_bloom_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->vector_bloom_scale), 0.001f, "%1.3f", str, newval);
-}
-
-static INT32 slider_raster_bloom_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->raster_bloom_scale), 0.001f, "%1.3f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->bloom_scale), 0.001f, "%1.3f", str, newval);
 }
 
 static INT32 slider_bloom_lvl0_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -2743,6 +2738,7 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, slider_shadow_mask_voffset },
 	{ "Screen Curvature",                    0,     3,   100, 1, slider_curvature },
 	{ "Screen Round Corner",                 0,     3,   100, 1, slider_round_corner },
+	{ "Screen Smooth Border",                0,     3,   100, 1, slider_smooth_border },
 	{ "Screen Reflection",                   0,     3,   100, 1, slider_reflection },
 	{ "Image Vignetting",                    0,     3,   100, 1, slider_vignetting },
 	{ "Scanline Darkness",                   0,   100,   100, 1, slider_scanline_alpha },
@@ -2792,8 +2788,7 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Blue Phosphor Life",                  0,    40,   100, 1, slider_blue_phosphor_life },
 	{ "Vector Length Attenuation",           0,    80,   100, 1, slider_vector_attenuation },
 	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, slider_vector_length_max },
-	{ "Vector Bloom Scale",                  0,   300,  1000, 5, slider_vector_bloom_scale },
-	{ "Raster Bloom Scale",                  0,   225,  1000, 5, slider_raster_bloom_scale },
+	{ "Bloom Scale",                         0,   250,  2000, 5, slider_bloom_scale },
 	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, slider_bloom_lvl0_scale },
 	{ "Bloom Level 1 Scale",                 0,    21,   100, 1, slider_bloom_lvl1_scale },
 	{ "Bloom Level 2 Scale",                 0,    19,   100, 1, slider_bloom_lvl2_scale },
@@ -3012,6 +3007,9 @@ void uniform::update()
 		case CU_POST_ROUND_CORNER:
 			m_shader->set_float("RoundCornerAmount", options->round_corner);
 			break;
+		case CU_POST_SMOOTH_BORDER:
+			m_shader->set_float("SmoothBorderAmount", options->smooth_border);
+			break;
 		case CU_POST_SHADOW_ALPHA:
 			m_shader->set_float("ShadowAlpha", shadersys->shadow_texture == NULL ? 0.0f : options->shadow_mask_alpha);
 			break;
@@ -3073,7 +3071,7 @@ void uniform::update()
 			break;
 
 		case CU_BLOOM_RESCALE:
-			m_shader->set_float("BloomRescale", options->raster_bloom_scale);
+			m_shader->set_float("BloomRescale", options->bloom_scale);
 			break;
 		case CU_BLOOM_LVL0123_WEIGHTS:
 		{

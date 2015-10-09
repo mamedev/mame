@@ -304,6 +304,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_SHADOW_MASK_VOFFSET";fs_shadwov(-1.0-1.0)",     "0.0",       OPTION_FLOAT,      "shadow mask texture offset in V direction" },
 	{ WINOPTION_CURVATURE";fs_curv(0.0-1.0)",                   "0.03",      OPTION_FLOAT,      "screen curvature amount" },
 	{ WINOPTION_ROUND_CORNER";fs_rndc(0.0-1.0)",                "0.03",      OPTION_FLOAT,      "screen round corner amount" },
+	{ WINOPTION_SMOOTH_BORDER";fs_smob(0.0-1.0)",               "0.03",      OPTION_FLOAT,      "screen smooth border amount" },
 	{ WINOPTION_REFLECTION";fs_ref(0.0-1.0)",                   "0.03",      OPTION_FLOAT,      "screen reflection amount" },
 	{ WINOPTION_VIGNETTING";fs_vig(0.0-1.0)",                   "0.03",      OPTION_FLOAT,      "image vignetting amount" },
 	/* Beam-related values below this line*/
@@ -350,8 +351,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_VECTOR_LENGTH_RATIO";vecsize",                  "500.0",     OPTION_FLOAT,      "Vector fade length (4.0 - vectors fade the most at and above 4 pixels, etc.)" },
 	/* Bloom below this line */
 	{ NULL,                                                     NULL,        OPTION_HEADER,     "BLOOM POST-PROCESSING OPTIONS" },
-	{ WINOPTION_VECTOR_BLOOM_SCALE,                             "0.3",       OPTION_FLOAT,      "Intensity factor for vector bloom" },
-	{ WINOPTION_RASTER_BLOOM_SCALE,                             "0.225",     OPTION_FLOAT,      "Intensity factor for raster bloom" },
+	{ WINOPTION_BLOOM_SCALE,                                    "0.25",      OPTION_FLOAT,      "Intensity factor for bloom" },
 	{ WINOPTION_BLOOM_LEVEL0_WEIGHT,                            "1.0",       OPTION_FLOAT,      "Bloom level 0  (full-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL1_WEIGHT,                            "0.21",      OPTION_FLOAT,      "Bloom level 1  (half-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                            "0.19",      OPTION_FLOAT,      "Bloom level 2  (quarter-size target) weight" },

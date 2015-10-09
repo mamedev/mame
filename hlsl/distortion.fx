@@ -206,8 +206,8 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 	float box = roundBox(ScreenDims * RoundCornerCoord, ScreenDims * RatioCorrection, radius);
 
 	// apply smooth
-	// box *= smooth;
-	// box += 1.0f - pow(smooth * 0.5f, 0.5f);
+	box *= smooth;
+	box += 1.0f - pow(smooth * 0.5f, 0.5f);
 
 	float border = smoothstep(1.0f, 0.0f, box);
 
@@ -296,7 +296,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Round Corners Simulation
 	float2 RoundCornerCoord = BaseCoordCentered;
 
-	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, 0);
+	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, SmoothBorderAmount);
 	BaseColor.rgb *= roundCornerFactor;
 
 	// // test code
