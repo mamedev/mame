@@ -30,67 +30,55 @@
 
 /* Memory Banking */
 
-READ8_MEMBER( tiki100_state::gfxram_r )
+READ8_MEMBER( tiki100_state::read )
 {
-	UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+	int mdis = 1;
+	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
+	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
 
-	return m_video_ram[addr];
-}
+	UINT8 data = 0xff;
 
-WRITE8_MEMBER( tiki100_state::gfxram_w )
-{
-	UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
-
-	m_video_ram[addr] = data;
-}
-
-void tiki100_state::bankswitch()
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (m_vire)
+	if (prom & ROM0)
 	{
-		if (!m_rome)
-		{
-			/* reserved */
-			program.unmap_readwrite(0x0000, 0xffff);
-		}
-		else
-		{
-			/* GFXRAM, GFXRAM, RAM */
-			program.install_readwrite_handler(0x0000, 0x7fff, READ8_DELEGATE(tiki100_state, gfxram_r), WRITE8_DELEGATE(tiki100_state, gfxram_w));
-			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
-
-			membank("bank1")->set_entry(BANK_VIDEO_RAM);
-			membank("bank2")->set_entry(BANK_VIDEO_RAM);
-			membank("bank3")->set_entry(BANK_RAM);
-		}
+		data = m_rom->base()[offset & 0x3fff];
 	}
-	else
+
+	if (prom & ROM1)
 	{
-		if (!m_rome)
-		{
-			/* ROM, RAM, RAM */
-			program.install_read_bank(0x0000, 0x3fff, "bank1");
-			program.unmap_write(0x0000, 0x3fff);
-			program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
-			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
+		data = m_rom->base()[0x2000 | (offset & 0x3fff)];
+	}
 
-			membank("bank1")->set_entry(BANK_ROM);
-			membank("bank2")->set_entry(BANK_RAM);
-			membank("bank3")->set_entry(BANK_RAM);
-		}
-		else
-		{
-			/* RAM, RAM, RAM */
-			program.install_readwrite_bank(0x0000, 0x3fff, "bank1");
-			program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
-			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
+	if (prom & VIR)
+	{
+		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
-			membank("bank1")->set_entry(BANK_RAM);
-			membank("bank2")->set_entry(BANK_RAM);
-			membank("bank3")->set_entry(BANK_RAM);
-		}
+		data = m_video_ram[addr];
+	}
+
+	if (prom & RAM)
+	{
+		data = m_ram->pointer()[offset];
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( tiki100_state::write )
+{
+	int mdis = 1;
+	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
+	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
+
+	if (prom & VIR)
+	{
+		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+
+		m_video_ram[addr] = data;
+	}
+
+	if (prom & RAM)
+	{
+		m_ram->pointer()[offset] = data;
 	}
 }
 
@@ -215,17 +203,13 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	/* bankswitch */
 	m_rome = BIT(data, 2);
 	m_vire = BIT(data, 3);
-
-	bankswitch();
 }
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START( tiki100_mem, AS_PROGRAM, 8, tiki100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
@@ -601,20 +585,6 @@ void tiki100_state::machine_start()
 	/* allocate video RAM */
 	m_video_ram.allocate(TIKI100_VIDEORAM_SIZE);
 
-	/* setup memory banking */
-	UINT8 *ram = m_ram->pointer();
-
-	membank("bank1")->configure_entry(BANK_ROM, m_rom->base());
-	membank("bank1")->configure_entry(BANK_RAM, ram);
-	membank("bank1")->configure_entry(BANK_VIDEO_RAM, m_video_ram);
-
-	membank("bank2")->configure_entry(BANK_RAM, ram + 0x4000);
-	membank("bank2")->configure_entry(BANK_VIDEO_RAM, m_video_ram + 0x4000);
-
-	membank("bank3")->configure_entry(BANK_RAM, ram + 0x8000);
-
-	bankswitch();
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -718,15 +688,15 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( kontiki )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "tikirom-1.30.u10",  0x0000, 0x2000, CRC(c482dcaf) SHA1(d140706bb7fc8b1fbb37180d98921f5bdda73cf9) )
 
-	ROM_REGION( 0x100, "proms", 0 )
+	ROM_REGION( 0x100, "u4", 0 )
 	ROM_LOAD( "53ls140.u4", 0x000, 0x100, CRC(894b756f) SHA1(429e10de0e0e749246895801b18186ff514c12bc) )
 ROM_END
 
 ROM_START( tiki100 )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "v203w" )
 
 	ROM_SYSTEM_BIOS( 0, "v135", "TIKI ROM v1.35" )
@@ -734,7 +704,7 @@ ROM_START( tiki100 )
 	ROM_SYSTEM_BIOS( 1, "v203w", "TIKI ROM v2.03 W" )
 	ROMX_LOAD( "tikirom-2.03w.u10", 0x0000, 0x2000, CRC(79662476) SHA1(96336633ecaf1b2190c36c43295ac9f785d1f83a), ROM_BIOS(2) )
 
-	ROM_REGION( 0x100, "proms", 0 )
+	ROM_REGION( 0x100, "u4", 0 )
 	ROM_LOAD( "53ls140.u4", 0x000, 0x100, CRC(894b756f) SHA1(429e10de0e0e749246895801b18186ff514c12bc) )
 
 	ROM_REGION( 0x1000, "8088", 0 )
