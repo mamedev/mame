@@ -64,6 +64,10 @@ correctly.
 #define MAIN_CPU_CLOCK      (XTAL_12MHz/3) /* 12MHz is the only OSC on the PCB */
 #define SOUND_CPU_CLOCK     (XTAL_12MHz/4) /* 12MHz is the only OSC on the PCB */
 #define AUDIO_CLOCK     (XTAL_12MHz/8) /* 12MHz is the only OSC on the PCB */
+/* this is a wild guess but according to a pcb video it has a similar crystal */
+#define MAIN_CPU_CLOCK_1942P      (XTAL_12_432MHz/3)
+#define SOUND_CPU_CLOCK_1942P     (XTAL_12_432MHz/4)
+#define AUDIO_CLOCK_1942P     (XTAL_12_432MHz/10)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -620,11 +624,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( 1942p, _1942_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* ??? */
 	MCFG_CPU_PROGRAM_MAP(c1942p_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _1942_state,  irq0_line_hold) // note, powerups won't move down the screen with the original '1942' logic.
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK_1942P)  /* ??? */
 	MCFG_CPU_PROGRAM_MAP(c1942p_sound_map)
 	MCFG_CPU_IO_MAP(c1942p_sound_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
@@ -650,9 +654,9 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
+	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK_1942P) /* unconfirmed but matches PCB video */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
+	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CLOCK_1942P) /* unconfirmed but matches PCB video */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
