@@ -415,7 +415,6 @@ inline void upd7220_device::recompute_parameters()
 	visarea.min_y = m_vbp + m_visarea_offset.min_y; // setting this to m_vbp by default; this works at least for pc9801 software (e.g. Dragon Buster) that uses vbp to offset the slave 7220 start line from the master
 	visarea.max_x = m_aw * horiz_mult - 1 + m_visarea_offset.max_x; //horiz_pix_total - (m_hfp * 8) - 1;
 	visarea.max_y = m_al * vert_mult + m_vbp - 1 + m_visarea_offset.max_y; //vert_pix_total - m_vfp - 1;
-	logerror("*** %d, %d, %d, %d", m_visarea_offset.min_y, m_visarea_offset.max_y, visarea.min_y, visarea.max_y);
 
 	LOG(("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh)));
 	LOG(("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y));
