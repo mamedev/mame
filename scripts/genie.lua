@@ -370,8 +370,8 @@ newoption {
 }
 
 newoption {
-	trigger = "DRIVERS",
-	description = "List of drivers to compile.",
+	trigger = "SOURCES",
+	description = "List of sources to compile.",
 }
 
 newoption {
@@ -516,15 +516,15 @@ msgarchiving ("Archiving $(notdir $@)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["DRIVERS"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) then
 	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 else
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " target " .. _OPTIONS["subtarget"])
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.c")
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.c")
 end
 configuration { "gmake" }
 	flags {

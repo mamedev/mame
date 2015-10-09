@@ -47,7 +47,7 @@ function devicesProject(_target, _subtarget)
 
 	dofile(path.join("src", "machine.lua"))
 
-if (_OPTIONS["DRIVERS"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) then
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind (LIBTYPE)
