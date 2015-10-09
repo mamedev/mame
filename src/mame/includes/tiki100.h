@@ -41,8 +41,8 @@
 class tiki100_state : public driver_device
 {
 public:
-	tiki100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tiki100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
 		m_fdc(*this, FD1797_TAG),
@@ -54,6 +54,7 @@ public:
 		m_cassette(*this, CASSETTE_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_rom(*this, Z80_TAG),
+		m_prom(*this, "u4"),
 		m_video_ram(*this, "video_ram"),
 		m_y1(*this, "Y1"),
 		m_y2(*this, "Y2"),
@@ -67,7 +68,9 @@ public:
 		m_y10(*this, "Y10"),
 		m_y11(*this, "Y11"),
 		m_y12(*this, "Y12"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_rome(1),
+		m_vire(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -81,6 +84,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_memory_region m_rom;
+	required_memory_region m_prom;
 	optional_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_y1;
 	required_ioport m_y2;
@@ -101,8 +105,9 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( gfxram_r );
-	DECLARE_WRITE8_MEMBER( gfxram_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_WRITE8_MEMBER( video_mode_w );
@@ -117,7 +122,13 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void bankswitch();
+	enum
+	{
+		ROM0 = 0x01,
+		ROM1 = 0x02,
+		VIR  = 0x04,
+		RAM  = 0x08
+	};
 
 	/* memory state */
 	int m_rome;
