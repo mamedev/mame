@@ -282,7 +282,7 @@ void screen_device::device_validity_check(validity_checker &valid) const
 	if (m_palette != NULL && texformat == TEXFORMAT_RGB32)
 		osd_printf_warning("Screen does not need palette defined\n");
 
-//	if (m_orientation != (valid.driver()->flags & ORIENTATION_MASK) &&  ((valid.driver()->flags & ORIENTATION_MASK)== ROT180))
+//	if (m_orientation != (valid.driver()->flags & ORIENTATION_MASK))
 //		osd_printf_error("Screen orientation does not match\n");
 }
 
