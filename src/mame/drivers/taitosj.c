@@ -1797,6 +1797,10 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( nomcu180, nomcu )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ORIENTATION(ROT180)
+MACHINE_CONFIG_END
 
 /* same as above, but with additional 68705 MCU */
 static MACHINE_CONFIG_DERIVED( mcu, nomcu )
@@ -2754,13 +2758,13 @@ DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
 
 GAME( 1981, spaceskr, 0,        nomcu,    spaceskr, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Space Seeker", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, spacecr,  0,        nomcu,    spacecr, taitosj_state,    spacecr, ROT90,  "Taito Corporation", "Space Cruiser", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglek,  0,        nomcu,    junglek, taitosj_state,    taitosj, ROT180, "Taito Corporation", "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekas,junglek,  nomcu,    junglek, taitosj_state,    taitosj, ROT180, "Taito Corporation", "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekj2,junglek,  nomcu,    junglek, taitosj_state,    taitosj, ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleh,  junglek,  nomcu,    junglek, taitosj_state,    taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junglehbr,junglek,  nomcu,    junglek, taitosj_state,    junglhbr,ROT180, "Taito do Brasil",   "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratpet, junglek,  nomcu,    piratpet, taitosj_state,   taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleby, junglek,  nomcu,    junglek, taitosj_state,    taitosj, ROT180, "bootleg", "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglek,  0,        nomcu180, junglek, taitosj_state,    taitosj, ROT180, "Taito Corporation", "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekas,junglek,  nomcu180, junglek, taitosj_state,    taitosj, ROT180, "Taito Corporation", "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekj2,junglek,  nomcu180, junglek, taitosj_state,    taitosj, ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleh,  junglek,  nomcu180, junglek, taitosj_state,    taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junglehbr,junglek,  nomcu180, junglek, taitosj_state,    junglhbr,ROT180, "Taito do Brasil",   "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratpet, junglek,  nomcu180, piratpet, taitosj_state,   taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleby, junglek,  nomcu180, junglek, taitosj_state,    taitosj, ROT180, "bootleg", "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, alpine,   0,        nomcu,    alpine, taitosj_state,     alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, alpinea,  alpine,   nomcu,    alpinea, taitosj_state,    alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, timetunl, 0,        nomcu,    timetunl, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Time Tunnel", MACHINE_SUPPORTS_SAVE )

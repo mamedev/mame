@@ -1086,6 +1086,11 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( skykiddx, hopmappy )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ORIENTATION(ROT180)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( roishtar, hopmappy )
 
 	/* basic machine hardware */
@@ -1666,7 +1671,7 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 
 
 GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skykiddxo,skykiddx, skykiddx, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, namco86, ROT0,   "Namco", "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
 
