@@ -96,7 +96,7 @@ M84 -   2 PCB stack
 
 M85 - Pound for Pound uses this, possibly just M84 with
       a modified sound section?
-	  - not Jamma, trackball input only
+	  - most Jamma inputs not connected, trackball only
 
 
                                    Year Board                Protected?
@@ -105,28 +105,31 @@ Battle Chopper / Mr. Heli          1987  M72                 Y
 Ninja Spirit                       1988  M72                 Y
 Image Fight                        1988  M72                 Y
 Legend of Hero Tonma               1989  M72                 Y
-X Multiply                         1989  M81                 N
-X Multiply                         1989  M72(1)              Y
-Dragon Breed                       1989  M81                 N
-Dragon Breed                       1989  M72                 Y
+X Multiply (World)                 1989  M81-A-B + M81-B-B   N
+X Multiply (Japan)                 1989  M72                 Y
+Dragon Breed                       1989  M81-A-B + M81-B-B   N
+Dragon Breed (Japan?)              1989  M72                 Y
 R-Type II                          1989  M84-A-A + M84-B-A   N
 Major Title                        1990  M82-A-A + M82-B-A   N
-Hammerin' Harry (World ver)        1990  M81?                N
+Hammerin' Harry (World ver)        1990  M81-A-B + M81-B-B   N
 Hammerin' H..(US)/ Daiku no Gensan 1990  M84-A-A + M84-C-A   N
-                   Daiku no Gensan 1990  M72(3)              Y
-Pound for Pound                    1990  MM85-A-B + M85-B    N
-Air Duel (World)                   1990  M82                 N
-Air Duel (Japan)                   1990  M72?                Y
-Cosmic Cop /                       1991  M84                 N
+                   Daiku no Gensan 1990  M72                 Y
+Pound for Pound                    1990  M85-A-B + M85-B     N
+Air Duel (World)                   1990  M82-A-A + M82-B-A   N
+Air Duel (Japan)                   1990  M72                 Y
+Cosmic Cop /                       1991  M84-D-B + M84-B-B   N
   Gallop - Armed Police Unit       1991  M72                 Y (sample playback only)
-Ken-Go / Lightning Swords          1991  M84-A-A + M84-B-B   Encrypted
+Ken-Go / Lightning Swords          1991  M84-D-B + M84-B-B   Encrypted
 
-(1) different addressing PALs, so different memory map
-(3) normal M72 memory map, but IRQ vectors and sprite control as in X-Multiply
 
- rtype2 has also been reported as running on M82, is it an official
- conversion or not? we've only seen originals verified as M84, same for
- Hammering Harry
+Rtype / Rtype 2 are often misreported as being M82 games, this is mostly
+due to the unofficial conversions that have become widespread, see:
+http://www.paulswan.me/arcade/m82-m72.htm (Rtype on M82, extensive wiremods)
+http://www.paulswan.me/arcade/m82-m84.htm (Rtype 2 on M82)
+these are supported as 'rtypem82b' and 'rtype2m82b' although the former
+still needs work because the wiremods change same of the behavior to be
+more like an M72 PCB than an M82
+
 
 TODO:
 - m82_gfx_ctrl_w is unknown, it seems to be used to disable rowscroll,
@@ -3291,6 +3294,76 @@ ROM_START( airduel )
 	ROM_LOAD( "AD_(M82)_A-V0-D.IC12",    0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
 ROM_END
 
+
+ROM_START( rtypem82b )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rt_h0.bin",    0x00001, 0x20000, CRC(5fa5068b) SHA1(b33891d2e0ca7e52226c1318ad657ac6bc7d6df4) )
+	ROM_LOAD16_BYTE( "rt_l0.bin",    0x00000, 0x20000, CRC(aee6fae8) SHA1(22645da3bfeb3a7517bdbf0829fd9d689ddc5368) )
+	ROM_LOAD16_BYTE( "rt_h1.bin",    0x40001, 0x20000, CRC(76389df4) SHA1(20004dd1d058589bdd8ea93a66a6cdf93382c7cc) )
+	ROM_RELOAD(                      0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "rt_l1.bin",    0x40000, 0x20000, CRC(6af66a05) SHA1(3c686b4559e4e223e3b03533fe2b2fc4758f4e02) )
+	ROM_RELOAD(                      0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "rt_sp.bin",    0x00000, 0x10000, CRC(24fded65) SHA1(34e085ebfc6415a60b7440ac53c8ae7130b5e9d4) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "rt_n0.bin",    0x00000, 0x20000, CRC(236e93ad) SHA1(a168c2f007a7469d8c1d834dc5247d99d13fd36d) )  /* sprites #1 */
+	ROM_LOAD( "rt_n1.bin",    0x20000, 0x20000, CRC(94e0da50) SHA1(0e8aef07b2a4a60bb6faa9ea3d02869d30dff84c) )
+	ROM_LOAD( "rt_n2.bin",    0x40000, 0x20000, CRC(6310dd0e) SHA1(4e4a50ef64cdfddea10d415a4b2d2490c1364074) )
+	ROM_LOAD( "rt_n3.bin",    0x60000, 0x20000, CRC(dd9674fb) SHA1(925bbd64015ec9109a74ce80747bea2bfdb0cde6) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "rt_c0.bin",    0x00000, 0x40000, CRC(c2511272) SHA1(138dd131f827215f13ba0761cacc0f383b5e5a48) )  /* tiles */
+	ROM_LOAD( "rt_c1.bin",    0x40000, 0x40000, CRC(6da33dae) SHA1(2b5f686c5c8e45a896ab115818066d03af767cb5) )
+	ROM_LOAD( "rt_c2.bin",    0x80000, 0x40000, CRC(29322d6e) SHA1(b553d46f1270dcc4754800e65c21b5e418994fcd) )
+	ROM_LOAD( "rt_c3.bin",    0xc0000, 0x40000, CRC(0ab3a8db) SHA1(7f4f5c18b5df0f5fdcb471db4e87c1be393aca92) )
+
+	ROM_REGION( 0x080000, "sprites2", 0 ) // leftover from Major Title
+	ROM_LOAD( "mt_f0.bin",    0x00000, 0x20000, CRC(2d5e05d5) SHA1(18bdc9c561dbf0f91642161ca985d2154bd58b5d) )  /* sprites #2 */
+	ROM_LOAD( "mt_f1.bin",    0x20000, 0x20000, CRC(c68cd65f) SHA1(8999b558b4af0f453ada9e4ef705163df96844e6) )
+	ROM_LOAD( "mt_f2.bin",    0x40000, 0x20000, CRC(a71feb2d) SHA1(47e366b422772bed08ee4d1c338970687d6c3b4c) )
+	ROM_LOAD( "mt_f3.bin",    0x60000, 0x20000, CRC(179f7562) SHA1(6d28b199daffc62e8fa9009878ac0bb976ccbb2a) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */  // leftover from Major Title
+	ROM_LOAD( "mt_vo.bin",    0x00000, 0x20000, CRC(eb24bb2c) SHA1(9fca04fba0249e8213dd164eb6829e1a5acbee65) )
+ROM_END
+
+ROM_START( rtype2m82b )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rt2_h0.bin",    0x00001, 0x20000, CRC(47639a78) SHA1(d7dd851fed96d46c850e5c8f24d9d1a081f6b297) )
+	ROM_LOAD16_BYTE( "rt2_l0.bin",    0x00000, 0x20000, CRC(a1661cdf) SHA1(d209328d678fc2fc405bd20f5134bd85b4cd4802) )
+	ROM_LOAD16_BYTE( "rt2_h1.bin",    0x40001, 0x20000, CRC(4b79840c) SHA1(6cf8c8cf4bcf5e2acdaa05b8dca2f2a969edc2c5) )
+	ROM_RELOAD(                      0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "rt2_l1.bin",    0x40000, 0x20000, CRC(6ab3ae42) SHA1(d3d7c35e1583b55cc668aa011471c3bf04a541af) )
+	ROM_RELOAD(                      0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "rt2_sp.bin",    0x00000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "rt2_n0.bin",    0x00000, 0x20000, CRC(2cd8f913) SHA1(a53752b35da95b420dd29a09176d265d292b3938) )  /* sprites #1 */
+	ROM_LOAD( "rt2_n1.bin",    0x20000, 0x20000, CRC(5033066d) SHA1(e125127f0610c63f9e59a585db547be5d49ed863) )
+	ROM_LOAD( "rt2_n2.bin",    0x40000, 0x20000, CRC(ec3a0450) SHA1(632bdd397f1bc67f6970faf7d09ab8d911e105fe) )
+	ROM_LOAD( "rt2_n3.bin",    0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "rt2_c0.bin",    0x00000, 0x40000, CRC(f5bad5f2) SHA1(dc86b93f62e8947e3551f07e393e740e5dc43f5e))  /* tiles */
+	ROM_LOAD( "rt2_c1.bin",    0x40000, 0x40000, CRC(71451778) SHA1(52ca7aa8522b988a19556313041450c767dad054) )
+	ROM_LOAD( "rt2_c2.bin",    0x80000, 0x40000, CRC(c6b0c352) SHA1(eec4fa88c27815960106881e7ccb23e62556bf1c) )
+	ROM_LOAD( "rt2_c3.bin",    0xc0000, 0x40000, CRC(6d530a32) SHA1(4e4100e5e5d88e65fb5494474d3692ecd8f44343) )
+
+	ROM_REGION( 0x080000, "sprites2", 0 ) // leftover from Major Title
+	ROM_LOAD( "mt_f0.bin",    0x00000, 0x20000, CRC(2d5e05d5) SHA1(18bdc9c561dbf0f91642161ca985d2154bd58b5d) )  /* sprites #2 */
+	ROM_LOAD( "mt_f1.bin",    0x20000, 0x20000, CRC(c68cd65f) SHA1(8999b558b4af0f453ada9e4ef705163df96844e6) )
+	ROM_LOAD( "mt_f2.bin",    0x40000, 0x20000, CRC(a71feb2d) SHA1(47e366b422772bed08ee4d1c338970687d6c3b4c) )
+	ROM_LOAD( "mt_f3.bin",    0x60000, 0x20000, CRC(179f7562) SHA1(6d28b199daffc62e8fa9009878ac0bb976ccbb2a) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_LOAD( "rt2_vo.bin",    0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
+ROM_END
+
+
 /*****************************
   M84 sets
 ******************************/
@@ -3660,6 +3733,8 @@ ROM_END
 // the program roms failing their tests.  This is why we still have simulation code for many games
 // despite having Japanese version MCU roms for several of them.  See notes next to the sets
 
+/* M72 */
+
 GAME( 1987, rtype,       0,        rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypej,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypejp,     rtype,    rtype,       rtypep,   driver_device, 0,           ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -3678,37 +3753,52 @@ GAME( 1988, imgfightj,   imgfight, m72_8751,    imgfight, m72_state,     m72_875
 GAME( 1989, loht,        0,        m72,         loht,     m72_state,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
 GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // waits for japan warning screen, works with our mcu dump (Japan Version)
 GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
-GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, xmultipl,    0,        m81_xmultipl,m81_xmultipl,driver_device,0,         ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl,xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,driver_device,0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
 
+GAME( 1991, gallop,      cosmccop, m72,         gallop,   m72_state,     gallop,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1990, airduelm72,  airduel,  m72,         airduel,  m72_state,     airduelm72,  ROT270, "Irem", "Air Duel (Japan, M72)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1990, dkgensanm72, hharry,   m72,         hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+/* M81 */
+GAME( 1989, xmultipl,    0,        m81_xmultipl,m81_xmultipl,driver_device,0,         ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,driver_device,0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,driver_device,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+/* M82 */
+GAME( 1990, majtitle,    0,        m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
+GAME( 1990, majtitlej,   majtitle, m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+
+GAME( 1990, airduel,     0,        m82,         airduel,  driver_device, 0,           ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
+
+GAME( 2009, rtypem82b,   rtype,    m82,         rtype,    driver_device, 0,           ROT0,   "bootleg", "R-Type (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
+
+GAME( 1997, rtype2m82b,  rtype2,   m82,         rtype2,   driver_device, 0,           ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
+
+/* M84 */
+
+GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, rtype2,      0,        rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, majtitle,    0,        m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
-GAME( 1990, majtitlej,   majtitle, m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   driver_device, 0,           ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,driver_device,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensanm72, hharry,   m72,         hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ltswords,    0,        kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengo,       ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengoa,      ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
+
+/* M85 */
 
 GAME( 1990, poundfor,    0,        poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
 GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
 GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, airduel,     0,        m82,         airduel,  driver_device, 0,           ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
-GAME( 1990, airduelm72,  airduel,  m72,         airduel,  m72_state,     airduelm72,  ROT270, "Irem", "Air Duel (Japan, M72)", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   driver_device, 0,           ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gallop,      cosmccop, m72,         gallop,   m72_state,     gallop,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-
-GAME( 1991, ltswords,    0,        kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengo,       ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M84-B-B ?
-GAME( 1991, kengoa,      ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+/* bootlegs, unique hw */
+GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
