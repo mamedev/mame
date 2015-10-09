@@ -454,6 +454,7 @@ static MACHINE_CONFIG_START( skykid, skykid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(skykid_state, screen_update_skykid)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT180)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skykid)
 	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)

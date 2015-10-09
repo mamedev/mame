@@ -345,25 +345,30 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 WRITE16_MEMBER(m72_state::irq_line_w)
 {
 	COMBINE_DATA(&m_raster_irq_position);
+//	printf("m_raster_irq_position %04x\n", m_raster_irq_position);
 }
 
 WRITE16_MEMBER(m72_state::scrollx1_w)
 {
+	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrollx1);
 }
 
 WRITE16_MEMBER(m72_state::scrollx2_w)
 {
+	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrollx2);
 }
 
 WRITE16_MEMBER(m72_state::scrolly1_w)
 {
+	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrolly1);
 }
 
 WRITE16_MEMBER(m72_state::scrolly2_w)
 {
+	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrolly2);
 }
 
@@ -437,7 +442,7 @@ WRITE16_MEMBER(m72_state::m82_gfx_ctrl_w)
 WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
 {
 	COMBINE_DATA(&m_m82_tmcontrol);
-	printf("tmcontrol %04x\n", m_m82_tmcontrol);
+//	printf("tmcontrol %04x\n", m_m82_tmcontrol);
 }
 
 
