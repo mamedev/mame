@@ -109,9 +109,9 @@ void pit68230_device::execute_run ()
 		} while (m_icount > 0);
 }
 
-LOG (static INT32 ow_cnt = 0);
-LOG (static INT32 ow_data = 0);
-LOG (static INT32 ow_ofs = 0);
+LOG (static INT32 ow_cnt = 0)
+LOG (static INT32 ow_data = 0)
+LOG (static INT32 ow_ofs = 0)
 
 WRITE8_MEMBER (pit68230_device::write){
 		switch (offset) {
@@ -185,9 +185,9 @@ WRITE8_MEMBER (pit68230_device::write){
 						ow_cnt++; )
 }
 
-LOG (static INT32 or_cnt = 0);
-LOG (static INT32 or_data = 0);
-LOG (static INT32 or_ofs = 0);
+LOG (static INT32 or_cnt = 0)
+LOG (static INT32 or_data = 0)
+LOG (static INT32 or_ofs = 0)
 
 READ8_MEMBER (pit68230_device::read){
 		UINT8 data = 0;

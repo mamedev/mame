@@ -208,7 +208,7 @@ protected:
 		{
 				REG_RR0_STATUS          = 0,
 				REG_RR1_SPEC_RCV_COND   = 1,
-				REG_RR2_INTERRUPT_VECT  = 2,
+				REG_RR2_INTERRUPT_VECT  = 2
 		};
 
 		// Write registers
@@ -221,7 +221,7 @@ protected:
 				REG_WR4_RX_TX_MODES     = 4,
 				REG_WR5_TX_CONTROL      = 5,
 				REG_WR6_SYNC_OR_SDLC_A  = 6,
-				REG_WR7_SYNC_OR_SDLC_F  = 7,
+				REG_WR7_SYNC_OR_SDLC_F  = 7
 		};
 
 	enum
@@ -486,7 +486,7 @@ protected:
 
 	enum
 	{
-		TYPE_Z80SIO,
+		TYPE_Z80SIO
 	};
 
 	enum
