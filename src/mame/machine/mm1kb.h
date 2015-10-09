@@ -55,9 +55,9 @@ public:
 				m_samples->start(1, 1); // power switch
 				first_time = false;
 			}
-			if (!m_samples->playing(0)) m_samples->start(0, 0); // beep
+			if (!m_samples->playing(0)) m_samples->start(0, 0); // beep; during boot, the second beep is in real HW very short (just before floppy seeks) but that's NYI
 		}
-		else if (m_samples->playing(0)) m_samples->stop(0);
+		else if (m_samples->playing(0)) m_samples->stop(0); // happens only once during boot, no effect on output
 	}
 	void shut_down_mm1();
 
