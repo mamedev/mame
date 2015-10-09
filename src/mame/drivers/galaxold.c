@@ -3489,13 +3489,15 @@ ROM_START( hunchbkg )
 ROM_END
 
 ROM_START( spcwarp )
+	// unknown Century Electronics space shooter which involves shooting down enemy ships to use them yourself for increasing rate of fire
+	// came out of an undumped ROMS collection - we have no idea if this is Space Warp but it's a unique dump compared to everything else.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
 	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
 	/* missing rom at $4000? todo: check valid calls */
 	ROM_LOAD( "swarpt7m.bin", 0x6000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) ) /* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) // gfx are very similar to 'cosmos' so I think it's a converion of that to Galaxian HW, maybe under the title Space Warp.
+	ROM_REGION( 0x1000, "gfx1", 0 ) // gfx are very similar to 'cosmos'
 	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
 	ROM_LOAD( "swarpb1k.bin", 0x0800, 0x0800, CRC(da4cee6b) SHA1(28b91381658f598fa62049489beee443232825c6) )
 
