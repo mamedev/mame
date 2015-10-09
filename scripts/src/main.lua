@@ -101,7 +101,13 @@ end
 		"optional",
 		"emu",
 		"formats",
+	}
+if #disasm_files > 0 then
+	links {
 		"dasm",
+	}
+end
+	links {
 		"utils",
 		"expat",
 		"softfloat",
