@@ -1016,6 +1016,44 @@ ROM_START( mastboyi )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
+// only one of the question roms differs (minor wording / spelling changes in most cases)
+ROM_START( mastboyia )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+	ROM_LOAD( "3-mem-a.ic77", 0x04000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(             0x04000, 0x4000 )
+	ROM_CONTINUE(             0x04000, 0x4000 )
+	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
+	/* 0x00000 - 0x0ffff = banked ram */
+
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_LOAD( "4.ic91", 0x00000, 0x10000, CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) )
+
+	ROM_REGION( 0x200000, "user1", 0 ) /* question data - 6 sockets */
+	ROM_LOAD( "1-mem-c.ic75", 0x000000, 0x040000, CRC(7c7b1cc5) SHA1(73ad7bdb61d1f99ce09ef3a5a3ae0f1e72364eee) ) // 99% gfx
+	ROM_LOAD( "2-mem-b.ic76", 0x040000, 0x020000, CRC(87015c18) SHA1(a16bf2707ce847da0923662796195b75719a6d77) ) // data
+	ROM_RELOAD(               0x060000, 0x020000) // 128kb roms are mirrored
+/*  Musica - Autori Canzoni
+    Scienza - Natura
+    Sport - Mondiali 90
+    Tempo Libero - Hobby Giochi */
+	ROM_LOAD( "5-alt.ic95",   0x080000, 0x020000, CRC(efa442fa) SHA1(5211ea122083120028348418e33cb71b4ce52b8f) )
+	ROM_RELOAD(               0x0a0000, 0x020000) // 128kb roms are mirrored
+/*  Spettacolo - Cine-TV
+    Sport - Generale  */
+	ROM_LOAD( "6-rom.ic96",   0x0c0000, 0x020000, CRC(2c52cb1e) SHA1(d58f21c09bd3983497f74ab6c5a37977d9e30f0c) )
+	ROM_RELOAD(               0x0e0000, 0x020000) // 128kb roms are mirrored
+/*  Scienza - Geografia
+    Scienza - Storia  */
+	ROM_LOAD( "7-rom.ic97",   0x100000, 0x020000, CRC(7818408f) SHA1(2a69688b6cda5baf2a45966dd86f10b2fcd54b66) )
+	ROM_RELOAD(               0x120000, 0x020000) // 128kb roms are mirrored
+	/*                  0x140000 to 0x17ffff EMPTY */
+	/*                  0x180000 to 0x1bffff EMPTY */
+	/*                  0x1c0000 to 0x1fffff EMPTY */
+ROM_END
 
 GAME( 1991, mastboy,  0,          mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )

@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "machine/6821pia.h"
 #include "machine/rescap.h"
@@ -28,27 +29,15 @@ class eti660_state : public driver_device
 {
 public:
 	eti660_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_cti(*this, CDP1864_TAG),
-			m_pia(*this, MC6821_TAG),
-			m_cassette(*this, "cassette"),
-			m_pa0(*this, "PA0"),
-			m_pa1(*this, "PA1"),
-			m_pa2(*this, "PA2"),
-			m_pa3(*this, "PA3"),
-			m_special(*this, "SPECIAL")
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_cti(*this, CDP1864_TAG)
+		, m_pia(*this, MC6821_TAG)
+		, m_cassette(*this, "cassette")
+		, m_io_keyboard(*this, "KEY")
+		, m_special(*this, "SPECIAL")
 	{ }
-
-	required_device<cosmac_device> m_maincpu;
-	required_device<cdp1864_device> m_cti;
-	required_device<pia6821_device> m_pia;
-	required_device<cassette_image_device> m_cassette;
-	required_ioport m_pa0;
-	required_ioport m_pa1;
-	required_ioport m_pa2;
-	required_ioport m_pa3;
-	required_ioport m_special;
 
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
@@ -63,13 +52,28 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
+	required_shared_ptr<UINT8> m_p_videoram;
+
+private:
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1864_device> m_cti;
+	required_device<pia6821_device> m_pia;
+	required_device<cassette_image_device> m_cassette;
+	required_ioport_array<4> m_io_keyboard;
+	required_ioport m_special;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+	UINT16 m_resetcnt;
 
 	/* keyboard state */
 	UINT8 m_keylatch;
 
 	/* video state */
-	UINT8 m_color_ram[0x100];
+	UINT8 m_color_ram[0xc0];
 	UINT8 m_color;
+	bool m_color_on;
 };
 
 #endif
