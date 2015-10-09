@@ -194,6 +194,8 @@ files {
 	MAME_DIR .. "src/emu/ui/imgcntrl.h",
 	MAME_DIR .. "src/emu/ui/info.c",
 	MAME_DIR .. "src/emu/ui/info.h",
+	MAME_DIR .. "src/emu/ui/info_pty.c",
+	MAME_DIR .. "src/emu/ui/info_pty.h",
 	MAME_DIR .. "src/emu/ui/inputmap.c",
 	MAME_DIR .. "src/emu/ui/inputmap.h",
 	MAME_DIR .. "src/emu/ui/selgame.c",

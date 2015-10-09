@@ -48,6 +48,11 @@ void device_pty_interface::close(void)
     }
 }
 
+bool device_pty_interface::is_open(void) const
+{
+    return m_opened;
+}
+
 ssize_t device_pty_interface::read(UINT8 *rx_chars , size_t count)
 {
     UINT32 actual_bytes;

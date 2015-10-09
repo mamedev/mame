@@ -22,6 +22,7 @@
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
 #include "ui/info.h"
+#include "ui/info_pty.h"
 #include "ui/inputmap.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
@@ -90,6 +91,10 @@ void ui_menu_main::populate()
 			item_append("Tape Control", NULL, 0, (void *)TAPE_CONTROL);
 	}
 
+        pty_interface_iterator ptyiter(machine().root_device());
+        if (ptyiter.first() != NULL) {
+            item_append("Pseudo terminals", NULL, 0, (void *)PTY_INFO);
+        }
 	if (machine().ioport().has_bioses())
 		item_append("Bios Selection", NULL, 0, (void *)BIOS_SELECTION);
 
@@ -189,6 +194,10 @@ void ui_menu_main::handle()
 
 		case TAPE_CONTROL:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_tape_control(machine(), container, NULL)));
+			break;
+
+                case PTY_INFO:
+                        ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_pty_info(machine(), container)));
 			break;
 
 		case SLOT_DEVICES:

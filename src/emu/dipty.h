@@ -27,6 +27,8 @@ public:
         bool open(void);
         void close(void);
 
+        bool is_open(void) const;
+
         ssize_t read(UINT8 *rx_chars , size_t count);
         void write(UINT8 tx_char);
 
