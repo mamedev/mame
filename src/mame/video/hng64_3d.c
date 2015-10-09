@@ -3,10 +3,10 @@
 
 #include "includes/hng64.h"
 
+
 /////////////////////////////////
 /// Hyper NeoGeo 64 - 3D bits ///
 /////////////////////////////////
-
 
 // Polygon rasterizer interface
 hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
@@ -56,44 +56,53 @@ WRITE16_MEMBER(hng64_state::dl_w)
 
 
 
-// TODO: different param for both Samurai games, less FIFO to process?
 WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
-	// this is written after the game uploads 16 packets, each 32 bytes long (2x 16 words?)
-	// we're assuming it to be a 'send to 3d hardware' trigger.
-	// this can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
+    // Data is:
+    // 00000b50 for the sams64 games
+    // 00000f00 for everything else
+    // TODO: different param for the two sams64 games, less FIFO to process?
+    
+	// This is written after the game uploads 16 packets, each 16 words long
+	// We're assuming it to be a 'send to 3d hardware' trigger.
+	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
 g_profiler.start(PROFILER_USER1);
-	for(int packetStart=0;packetStart<0x200;packetStart+=32)
+	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
-		hng64_command3d(&m_dl[packetStart/2]);
+		hng64_command3d(&m_dl[packetStart]);
 	}
 
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
+    // Schedule a small amount of time to let the 3d hardware rasterize the display buffer
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 g_profiler.stop();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 {
-// ...
-	m_set_irq(0x0008);
+	set_irq(0x0008);
 }
 
-
-// Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown
-WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
+WRITE32_MEMBER(hng64_state::dl_control_w)
 {
+    // This could be a multiple display list thing, but the palette seems to be lost between lists?
+    // Many games briefly set this to 0x4 on startup. Maybe there are 3 display lists?
+    // The sams64 games briefly set this value to 0x0c00 on boot.  Maybe there are 4 lists and they can be combined?
+    if (data & 0x01)
+        m_activeDisplayList = 0;
+    else if (data & 0x02)
+        m_activeDisplayList = 1;
+    
 //  printf("dl_control_w %08x %08x\n", data, mem_mask);
-
-	//if(data & 2) // swap buffers
-	//{
-	//  clear3d();
-	//}
-
+//
+//  if(data & 2) // swap buffers
+//  {
+//      clear3d();
+//  }
+//
 //  printf("%02x\n",data);
-
+//
 //  if(data & 1) // process DMA from 3d FIFO to framebuffer
-
 //  if(data & 4) // reset buffer count
 }
 
@@ -136,8 +145,6 @@ void hng64_state::printPacket(const UINT16* packet, int hex)
 // Camera transformation.
 void hng64_state::setCameraTransformation(const UINT16* packet)
 {
-	float *cameraMatrix = m_cameraMatrix;
-
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0001 ... ID
@@ -158,33 +165,31 @@ void hng64_state::setCameraTransformation(const UINT16* packet)
 	// [15] - ???? ... ? Same as 13 & 14
 	////////////*/
 	// CAMERA TRANSFORMATION MATRIX
-	cameraMatrix[0]  = uToF(packet[1]);
-	cameraMatrix[4]  = uToF(packet[2]);
-	cameraMatrix[8]  = uToF(packet[3]);
-	cameraMatrix[3]  = 0.0f;
+	m_cameraMatrix[0]  = uToF(packet[1]);
+	m_cameraMatrix[4]  = uToF(packet[2]);
+	m_cameraMatrix[8]  = uToF(packet[3]);
+	m_cameraMatrix[3]  = 0.0f;
 
-	cameraMatrix[1]  = uToF(packet[4]);
-	cameraMatrix[5]  = uToF(packet[5]);
-	cameraMatrix[9]  = uToF(packet[6]);
-	cameraMatrix[7]  = 0.0f;
+	m_cameraMatrix[1]  = uToF(packet[4]);
+	m_cameraMatrix[5]  = uToF(packet[5]);
+	m_cameraMatrix[9]  = uToF(packet[6]);
+	m_cameraMatrix[7]  = 0.0f;
 
-	cameraMatrix[2]  = uToF(packet[7]);
-	cameraMatrix[6]  = uToF(packet[8]);
-	cameraMatrix[10] = uToF(packet[9]);
-	cameraMatrix[11] = 0.0f;
+	m_cameraMatrix[2]  = uToF(packet[7]);
+	m_cameraMatrix[6]  = uToF(packet[8]);
+	m_cameraMatrix[10] = uToF(packet[9]);
+	m_cameraMatrix[11] = 0.0f;
 
-	cameraMatrix[12] = uToF(packet[10]);
-	cameraMatrix[13] = uToF(packet[11]);
-	cameraMatrix[14] = uToF(packet[12]);
-	cameraMatrix[15] = 1.0f;
+	m_cameraMatrix[12] = uToF(packet[10]);
+	m_cameraMatrix[13] = uToF(packet[11]);
+	m_cameraMatrix[14] = uToF(packet[12]);
+	m_cameraMatrix[15] = 1.0f;
 }
 
 // Operation 0010
 // Lighting information
 void hng64_state::setLighting(const UINT16* packet)
 {
-	float *lightVector = m_lightVector;
-
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0010 ... ID
@@ -196,7 +201,7 @@ void hng64_state::setLighting(const UINT16* packet)
 	// [6]  - ???? ... ? Seems to be another light vector ?
 	// [7]  - ???? ... ? Seems to be another light vector ?
 	// [8]  - ???? ... ? Seems to be another light vector ?
-	// [9]  - xxxx ... Strength according to sams64_2 [0000,01ff]
+	// [9]  - xxxx ... Strength according to sams64_2 (in combination with vector length) [0,512]
 	// [10] - ???? ... ? Used in fatfurwa
 	// [11] - ???? ... ? Used in fatfurwa
 	// [12] - ???? ... ? Used in fatfurwa
@@ -207,9 +212,9 @@ void hng64_state::setLighting(const UINT16* packet)
 	if (packet[1] != 0x0000) printf("ZOMG!  packet[1] in setLighting function is non-zero!\n");
 	if (packet[2] != 0x0000) printf("ZOMG!  packet[2] in setLighting function is non-zero!\n");
 
-	lightVector[0] = uToF(packet[3]);
-	lightVector[1] = uToF(packet[4]);
-	lightVector[2] = uToF(packet[5]);
+	m_lightVector[0] = uToF(packet[3]);
+	m_lightVector[1] = uToF(packet[4]);
+	m_lightVector[2] = uToF(packet[5]);
 	m_lightStrength = uToF(packet[9]);
 }
 
@@ -243,65 +248,63 @@ void hng64_state::set3dFlags(const UINT16* packet)
 // Projection Matrix.
 void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 {
-	float *projectionMatrix = m_projectionMatrix;
-
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0012 ... ID
 	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
 	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
 	// [3]  - ???? ... ? Contains a value
-	// [4]  - xxxx ... Camera projection near (?)
-	// [5]  - xxxx ... Camera projection near (?)
-	// [6]  - xxxx ... Camera projection near (?)
+	// [4]  - xxxx ... Camera projection near   - confirmed by sams64_2
+	// [5]  - xxxx ... Camera projection near   - confirmed by sams64_2
+	// [6]  - xxxx ... Camera projection near   - confirmed by sams64_2
 	// [7]  - xxxx ... Camera projection far (?)
 	// [8]  - xxxx ... Camera projection far (?)
 	// [9]  - xxxx ... Camera projection far (?)
-	// [10] - xxxx ... Camera projection right
-	// [11] - xxxx ... Camera projection left
-	// [12] - xxxx ... Camera projection top
-	// [13] - xxxx ... Camera projection bottom
+	// [10] - xxxx ... Camera projection right  - confirmed by sams64_2
+	// [11] - xxxx ... Camera projection left   - confirmed by sams64_2
+	// [12] - xxxx ... Camera projection top    - confirmed by sams64_2
+	// [13] - xxxx ... Camera projection bottom - confirmed by sams64_2
 	// [14] - ???? ... ? Gets data during buriki door-run
 	// [15] - ???? ... ? Gets data during buriki door-run
 	////////////*/
 
 	// Heisted from GLFrustum - 6 parameters...
-	float left, right, top, bottom, near_, far_;
+	const float left    = uToF(packet[11]);
+	const float right   = uToF(packet[10]);
+	const float top     = uToF(packet[12]);
+	const float bottom  = uToF(packet[13]);
 
-	left    = uToF(packet[11]);
-	right   = uToF(packet[10]);
-	top     = uToF(packet[12]);
-	bottom  = uToF(packet[13]);
+    // TODO: It's unclear how the 3 values combine to make a near clipping plane
+    const float near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
+	const float far_    = 0.9f;             // uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
 
-    // Note: The near and far clipping planes are totally guesses.
-    near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
-	far_    = 0.9f;             // uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
+	m_projectionMatrix[0]  = (2.0f*near_)/(right-left);
+	m_projectionMatrix[1]  = 0.0f;
+	m_projectionMatrix[2]  = 0.0f;
+	m_projectionMatrix[3]  = 0.0f;
 
-	projectionMatrix[0]  = (2.0f*near_)/(right-left);
-	projectionMatrix[1]  = 0.0f;
-	projectionMatrix[2]  = 0.0f;
-	projectionMatrix[3]  = 0.0f;
+	m_projectionMatrix[4]  = 0.0f;
+	m_projectionMatrix[5]  = (2.0f*near_)/(top-bottom);
+	m_projectionMatrix[6]  = 0.0f;
+	m_projectionMatrix[7]  = 0.0f;
 
-	projectionMatrix[4]  = 0.0f;
-	projectionMatrix[5]  = (2.0f*near_)/(top-bottom);
-	projectionMatrix[6]  = 0.0f;
-	projectionMatrix[7]  = 0.0f;
+	m_projectionMatrix[8]  = (right+left)/(right-left);
+	m_projectionMatrix[9]  = (top+bottom)/(top-bottom);
+	m_projectionMatrix[10] = -((far_+near_)/(far_-near_));
+	m_projectionMatrix[11] = -1.0f;
 
-	projectionMatrix[8]  = (right+left)/(right-left);
-	projectionMatrix[9]  = (top+bottom)/(top-bottom);
-	projectionMatrix[10] = -((far_+near_)/(far_-near_));
-	projectionMatrix[11] = -1.0f;
-
-	projectionMatrix[12] = 0.0f;
-	projectionMatrix[13] = 0.0f;
-	projectionMatrix[14] = -((2.0f*far_*near_)/(far_-near_));
-	projectionMatrix[15] = 0.0f;
+	m_projectionMatrix[12] = 0.0f;
+	m_projectionMatrix[13] = 0.0f;
+	m_projectionMatrix[14] = -((2.0f*far_*near_)/(far_-near_));
+	m_projectionMatrix[15] = 0.0f;
 }
 
 // Operation 0100
 // Polygon rasterization.
 void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 {
+    //printPacket(packet, 1);
+    
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
@@ -337,8 +340,6 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	// [15] - xxxx ... Transformation matrix
 	////////////*/
 
-
-
 	float objectMatrix[16];
 	setIdentity(objectMatrix);
 	/////////////////
@@ -369,7 +370,6 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	UINT32 address[4];
 	UINT32 megaOffset;
     polygon lastPoly = { 0 };
-	const rectangle &visarea = m_screen->visible_area();
 
 
 	//////////////////////////////////////////////////////////
@@ -469,10 +469,6 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 		UINT16* chunkOffset = &threeDRoms[address[k] * 3];
 		for (int l = 0; l < size[k]; l++)
 		{
-			////////////////////////////////////////////
-			// GATHER A SINGLE TRIANGLE'S INFORMATION //
-			////////////////////////////////////////////
-			// SINGLE POLY CHUNK FORMAT
 			////////////////////////////////////////////
 			// GATHER A SINGLE TRIANGLE'S INFORMATION //
 			////////////////////////////////////////////
@@ -866,6 +862,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
                         currentPoly.vert[m].light[2] = clipVerts[m].p[4];
                     }
 
+                    const rectangle& visarea = m_screen->visible_area();
 					for (int m = 0; m < currentPoly.n; m++)
 					{
 						// Convert into normalized device coordinates...
@@ -924,26 +921,19 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		break;
 
 	case 0x0010:    // Lighting information.
-		//if (packet[9]) printPacket(packet, 1);
 		setLighting(packet);
 		break;
 
 	case 0x0011:    // Palette / Model flags?
-		//printPacket(packet, 1); printf("\n");
 		set3dFlags(packet);
 		break;
 
 	case 0x0012:    // Projection Matrix
-		//printPacket(packet, 1);
 		setCameraProjectionMatrix(packet);
 		break;
 
 	case 0x0100:
 	case 0x0101:    // Geometry with full transformations
-		// HACK.  Masks out a piece of geo bbust2's drawShaded() crashes on.
-		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && m_mcu_type == SHOOT_MCU)
-			break;
-
 		recoverPolygonBlock(packet, numPolys);
 		break;
 
@@ -968,7 +958,6 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 
 		memset(miniPacket, 0, sizeof(UINT16)*16);
 		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
-		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
@@ -979,7 +968,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		//printPacket(packet, 1); printf("\n");
 		break;
 
-	case 0x1001:    // Unknown: Some sort of global flags (a group of 4, actually)?
+	case 0x1001:    // Unknown: Some sort of global flags?  Almost always comes in a group of 4 with an index [0,3].
 		//printPacket(packet, 1);
 		break;
 
@@ -1001,12 +990,9 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 
 void hng64_state::clear3d()
 {
-	int i;
-
-	const rectangle &visarea = m_screen->visible_area();
-
 	// Reset the buffers...
-	for (i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
+    const rectangle& visarea = m_screen->visible_area();
+	for (int i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
 		m_poly_renderer->depthBuffer3d()[i] = 100.0f;
 	}
@@ -1031,7 +1017,7 @@ void hng64_state::clear3d()
  *      0 | ???? ???? ???? ???? ccc? ???? ???? ???? | framebuffer color base, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One
  *      1 |                                         |
  *      2 | ???? ???? ???? ???? ???? ???? ???? ???? | camera / framebuffer global x/y? Actively used by Samurai Shodown 64 2
- *      3 | ---- --?x ---- ---- ---- ---- ---- ---- | unknown, unsetted by Buriki One and setted by Fatal Fury WA, buffering mode?
+ *      3 | ---- --?x ---- ---- ---- ---- ---- ---- | unknown, unsetted by Buriki One and set by Fatal Fury WA, buffering mode?
  *   4-11 | ---- ???? ---- ???? ---- ???? ---- ???? | Table filled with 0x0? data
  *
  */
@@ -1044,8 +1030,7 @@ void hng64_state::clear3d()
 // 4x4 matrix multiplication
 void hng64_state::matmul4(float *product, const float *a, const float *b)
 {
-	int i;
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		const float ai0 = a[0  + i];
 		const float ai1 = a[4  + i];
@@ -1080,9 +1065,7 @@ float hng64_state::vecDotProduct(const float *a, const float *b)
 
 void hng64_state::setIdentity(float *matrix)
 {
-	int i;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		matrix[i] = 0.0f;
 	}

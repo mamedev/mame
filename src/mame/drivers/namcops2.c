@@ -97,9 +97,9 @@ Time Crisis 3................................... 1234XXX  TST1 DVD0            D
    "         ................................... 1234XXX  TST1 DVD0            DVD          NM00012  *TST3 Ver.A             Namco 2002                    / %
 Time Crisis 4................................... XXXXXX7  TSF1-HA              HDD (40GB)   NM00032   TSF1002-NA-A           Namco 2005                      Uses 'V329 NA-JV PCB' for guns
 Vampire Night................................... 1234XXX  VPN1 CD0             CD           NM00003   VPN3 Ver.B             Namco/Sega/WOW Entertainment 2000
-Wangan Midnight................................. 1XXXXXX  WMN1-A               CD           NM00008   WMN1 Ver.A             Namco 2001
-   "           ................................. 1XXXXXX  WMN1-A               CD           NM00008  *WMN2 Ver.A             Namco 2001
-   "           ................................. 1XXXXXX  WMN1-A               CD           NM00008  *WMN2 Ver.B             Namco 2001
+Wangan Midnight (Japan)......................... 1XXXXXX  WMN1-A               CD           NM00008   WMN1 Ver.A             Namco 2001
+   "            (Export)........................ 1XXXXXX *WMN2-A               CD           NM00008  *WMN2 Ver.A             Namco 2001
+   "            (Export)........................ 1XXXXXX *WMN2-A               CD           NM00008  *WMN2 Ver.B             Namco 2001
 Wangan Midnight R............................... 1XXXXXX  WMR1-A               CD           NM00005   WMR1 Ver.A             Namco 2002
 Zoids Infinity.................................. ------X  M9006212A Ver.2.02J  HDD (40GB)   NM00016   B3900076A              Taito 2004                    HDD: Maxtor Fireball 3 40GB 2F040L0
 Zoids Infinity Ex............................... ------X *?                   *HDD          NM00025  *B3900098B              Taito 2005
@@ -293,20 +293,32 @@ TMP95C061 - Toshiba TMP95C061 TLCS-900-series 16-bit Microcontroller (internal R
 K4S281632 - Samsung K4S281632B-TC1H 8M x16-bit SDRAM
 
 
-Add-on Memory Board (plugs into J10 on MOTHER(A) PCB)
--------------------
-This PCB is used with Bloody Roar 3, Vampire Night, Ridge Racer V and Wangan Midnight.
+Add-on Memory Boards (plugs into J10 on MOTHER(A) PCB)
+--------------------
 
 System246 RAM32 PCB
 8908960400 (8908970400)
 |--------------|
-|K4S281632     |
-|K4S281632     |
+|  16M   16M   |
+|              |
 |      J1      |
 |--------------|
 Notes:
-      K4S281632 - Samsung K4S281632B-TC1H 8M x16-bit SDRAM
-             J1 - Multi-pin connector
+      16M  - Samsung K4S281632B-TC1H 128Mbit (2M x16-bit x 4 banks) SDRAM
+        J1 - Multi-pin connector
+This PCB is used with Bloody Roar 3, Vampire Night and Ridge Racer V.
+
+System246 RAM64 PCB
+8908962800 (8908972800)
+|--------------|
+|16M   16M     |
+|   16M   16M  |
+|      J1      |
+|--------------|
+Notes:
+      16M - Hyundai HY57V281620AT-P 128Mbit (2M x16-bit x 4 banks) SDRAM
+       J1 - Multi-pin connector
+This PCB is used with Wangan Midnight and Wangan Midnight R.
 
 
 PS2 Adapter Board
@@ -564,7 +576,7 @@ Notes:
     ADM485 - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
      D1017 - D1017 transistor (8 parts populated)
 
-This PCB is used with Ridge Racer V and Wangan Midnight.
+This PCB is used with Ridge Racer V, Wangan Midnight and Wangan Midnight R.
 The FCA2(B) PCB is pb-free but otherwise identical to FCA PCB.
 
 
@@ -1370,7 +1382,7 @@ ROM_START( wanganmd )
 	ROM_LOAD( "wmn1vera_spr.ic002", 0x800000, 0x040000, CRC(97253f9e) SHA1(652807972c62a96ba329b400e17dabd313134392) )
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "wmn1", 0, SHA1(4254e987e71d0d4038a87f11dc1a304396b3dffc) )
+	DISK_IMAGE_READONLY( "wmn1-a", 0, SHA1(4254e987e71d0d4038a87f11dc1a304396b3dffc) )
 ROM_END
 
 ROM_START( vnight )

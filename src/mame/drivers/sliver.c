@@ -515,4 +515,30 @@ ROM_START( sliver )
 	ROM_LOAD( "ka-12.bin", 0x100000, 0x80000, CRC(0901e142) SHA1(68ebd38beeedf53414a831c01813881feee33446) )
 ROM_END
 
-GAME( 1996, sliver, 0,        sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver", MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( slivera )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "ka-4.bin", 0x00001, 0x20000, CRC(044d1046) SHA1(dd6da44e65dccae7e2ea0c72c3f8d1452ae8c9e2) )
+	ROM_LOAD16_BYTE( "ka-5.bin", 0x00000, 0x20000, CRC(c2e8b785) SHA1(84444495c4ecb8da50fef0998dbd9b4352f46582) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 8031 */
+	ROM_LOAD( "ka-1.bin", 0x000000, 0x10000, CRC(56e616a2) SHA1(f8952aba62ae0410e300d99e95dc8b752543af1e) )
+
+	ROM_REGION( 0x180000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "ka-2.bin", 0x000000, 0x20000, CRC(3df96eb0) SHA1(ec3dfc29da08f6525a1c708839f83094a6784f72) )
+	ROM_LOAD( "ka-3.bin", 0x100000, 0x80000, CRC(33ee929c) SHA1(a652ad68c547248ef5fa1ed8006b7ac7aef76383) )
+
+	ROM_REGION( 0x200000, "user1", 0 ) /* Graphics (not tiles) */
+	ROM_LOAD16_BYTE( "ka-8.bin", 0x000000, 0x80000, CRC(dbfd7489) SHA1(4a7b07d041dce04a8d8d6688698164f988baefc9) )
+	ROM_LOAD16_BYTE( "ka-6.bin", 0x000001, 0x80000, CRC(bd182316) SHA1(a22db9f73a2865f59630183c14201aeede821642) )
+	ROM_LOAD16_BYTE( "ka-9.bin", 0x100000, 0x40000, CRC(71f044ba) SHA1(bd88bfaa0249de9fd8eb8bd25eae0126744a9046) )
+	ROM_LOAD16_BYTE( "ka-7.bin", 0x100001, 0x40000, CRC(1c5d6fb9) SHA1(372533264eb41a5f57b2a59eb039adb6334f36c5) )
+
+	ROM_REGION( 0x180000, "user2", 0 ) /* JPEG(!) compressed GFX */
+	ROM_LOAD( "ka-10.bin", 0x000000, 0x80000, CRC(639ad3ca) SHA1(d3c6a071aac62a3048e9f5bf2eb835619aa1a83b) )
+	ROM_LOAD( "ka-11.bin", 0x080000, 0x80000, CRC(47c05898) SHA1(51f7bb4ccaa5440a31aae9c02ed255243a3c8e22) )
+	// no rom 12 on PCB, played through the game and doesn't seem to be required for this gfx set, all girls present.
+ROM_END
+
+
+GAME( 1996, sliver,  0,        sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, slivera, sliver,   sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS )

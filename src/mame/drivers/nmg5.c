@@ -1422,6 +1422,37 @@ ROM_START( wondstck )
 	ROM_LOAD( "u137.bin", 0x000000, 0x40000, CRC(294b6cbd) SHA1(1498a3298c53d62f56f9c85c82035d09a5bb8b4a) )
 ROM_END
 
+ROM_START( wondstcka )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "4.u2", 0x000001, 0x20000, CRC(0b28ab9d) SHA1(3f536269a101071a8ef57775fc8a990c7131307f) )
+	ROM_LOAD16_BYTE( "3.u7", 0x000000, 0x20000, CRC(5f1337d8) SHA1(e8636dadc4459ffbdbdbb1716a61e3d22fc2f813) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "1.u128", 0x00000, 0x10000, CRC(86dba085) SHA1(6dedfb4bcf890490848409b6d9bce69e72bf1bba) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* 8x8x8 */
+	ROM_LOAD( "7.u63", 0x000000, 0x80000, CRC(25ee44ce) SHA1(bf1cad9d89af764d54eb9d35b1656208b8e0b594) )
+	ROM_LOAD( "2.u68", 0x080000, 0x80000, CRC(b26afb40) SHA1(f6c96d0ea72bfdf5b153fd599a67703c3c7609b1) )
+	ROM_LOAD( "8.u73", 0x100000, 0x80000, CRC(7cf46203) SHA1(97bd5fdc9004726846d9577ca7b4bc078d3731e8) )
+	ROM_LOAD( "4.u79", 0x180000, 0x80000, CRC(825213e0) SHA1(c37a892a070fe2f2884416472c35e37330911977) )
+	ROM_LOAD( "5.u64", 0x200000, 0x80000, CRC(9ece36d6) SHA1(71e0409f3d8058426a9d1531ab1ef953c0c65c5d) )
+	ROM_LOAD( "1.u69", 0x280000, 0x80000, CRC(ec091e87) SHA1(e41e9409347aa2c513515b7d7d6e95b63bc595f9) )
+	ROM_LOAD( "6.u74", 0x300000, 0x80000, CRC(9795ff80) SHA1(e369844382e8cb99d6d37eb40cdd62266b4031f2) )
+	ROM_LOAD( "3.u80", 0x380000, 0x80000, CRC(553c5781) SHA1(d5f694f6a50f51c80845a15e58d263fa629c3522) )
+
+	ROM_REGION( 0x280000, "gfx2", 0 )   /* 16x16x5 */
+	ROM_LOAD( "8.u83 ",  0x000000, 0x80000, CRC(f51cf9c6) SHA1(6d0fc749bab918ff6a9d7fae8be7c65823349283) )
+//	ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(8c6cff4d) SHA1(5a217ff60f10bf5c58091c189b3509d1361a16b3) ) // bad dump
+	ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(ddd3c60c) SHA1(19b68a44c877d0bf630d07b18541ef9636f5adac) )
+	ROM_LOAD( "7.u105",  0x100000, 0x80000, CRC(a7fc624d) SHA1(b336ab6e16555db30f9366bf5b797b5ba3ea767c) )
+	ROM_LOAD( "6.u96",   0x180000, 0x80000, CRC(2369d8a3) SHA1(4224f50c9c31624dfcac6215d60a2acdd39bb477) )
+	ROM_LOAD( "5.u97",   0x200000, 0x80000, CRC(aba1bd94) SHA1(28dce35ad92547a54912c5645e9979c0876d6fe8) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "2.u137", 0x000000, 0x40000, CRC(294b6cbd) SHA1(1498a3298c53d62f56f9c85c82035d09a5bb8b4a) )
+ROM_END
+
+
 ROM_START( garogun )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "p1.u7", 0x000000, 0x80000, CRC(9b5627f8) SHA1(d336d4f34de7fdf5ba16bc76223e701369d24a5e) )
@@ -1553,4 +1584,5 @@ GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, prot_val_10, R
 GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, 7ordi,     0,        7ordi,    7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick", MACHINE_SUPPORTS_SAVE )
+GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( ????, wondstcka, wondstck, nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 2, censored)", MACHINE_SUPPORTS_SAVE )
