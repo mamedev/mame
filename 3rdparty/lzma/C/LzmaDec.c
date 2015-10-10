@@ -967,7 +967,7 @@ SRes LzmaDec_Allocate(CLzmaDec *p, const Byte *props, unsigned propsSize, ISzAll
   return SZ_OK;
 }
 
-/* why isn't there an interface to pass in the properties directly???? */
+// why isn't there an interface to pass in the properties directly????
 SRes LzmaDec_Allocate_MAME(CLzmaDec *p, const CLzmaProps *propNew, ISzAlloc *alloc)
 {
 	SizeT dicBufSize;
