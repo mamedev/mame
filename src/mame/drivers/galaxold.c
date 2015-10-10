@@ -2762,21 +2762,11 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spcwarp, galaxold_base )
+static MACHINE_CONFIG_DERIVED( spcwarp, hunchbkg )
 	/* hunchbkg but with different banking */
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
-
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spcwarp)
-	MCFG_CPU_IO_MAP(hunchbkg_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
-
-	MCFG_DEVICE_MODIFY("7474_9m_1")
-	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", s2650_device, write_sense))
-
-	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
-
-	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
 
