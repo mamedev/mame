@@ -86,6 +86,7 @@
 #define WINOPTION_VECTOR_LENGTH_RATIO       "vector_length_ratio"
 #define WINOPTION_VECTOR_TIME_PERIOD        "vector_time_period"
 #define WINOPTION_BLOOM_SCALE               "bloom_scale"
+#define WINOPTION_BLOOM_OVERDRIVE           "bloom_overdrive"
 #define WINOPTION_BLOOM_LEVEL0_WEIGHT       "bloom_lvl0_weight"
 #define WINOPTION_BLOOM_LEVEL1_WEIGHT       "bloom_lvl1_weight"
 #define WINOPTION_BLOOM_LEVEL2_WEIGHT       "bloom_lvl2_weight"
@@ -181,6 +182,7 @@ public:
 	float screen_vector_length_ratio() const { return float_value(WINOPTION_VECTOR_LENGTH_RATIO); }
 	float screen_vector_time_period() const { return float_value(WINOPTION_VECTOR_TIME_PERIOD); }
 	float screen_bloom_scale() const { return float_value(WINOPTION_BLOOM_SCALE); }
+	const char *screen_bloom_overdrive() const { return value(WINOPTION_BLOOM_OVERDRIVE); }
 	float screen_bloom_lvl0_weight() const { return float_value(WINOPTION_BLOOM_LEVEL0_WEIGHT); }
 	float screen_bloom_lvl1_weight() const { return float_value(WINOPTION_BLOOM_LEVEL1_WEIGHT); }
 	float screen_bloom_lvl2_weight() const { return float_value(WINOPTION_BLOOM_LEVEL2_WEIGHT); }

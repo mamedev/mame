@@ -77,7 +77,9 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		1.2f,
 		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
 		0.9f, 4.0f,
-		1.0f, 0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
+		1.0f,
+		{ 0.0f, 0.0f, 0.0f },
+		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
 	},
 	{   // 25% Shadow mask, 0% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
@@ -100,7 +102,9 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		1.2f,
 		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
 		0.9f, 4.0f,
-		1.0f, 0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
+		1.0f,
+		{ 0.0f, 0.0f, 0.0f },
+		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
 	},
 	{   // 25% Shadow mask, 0% Scanlines, 0% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
@@ -123,7 +127,9 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		1.2f,
 		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
 		0.9f, 4.0f,
-		1.0f, 0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
+		1.0f,
+		{ 0.0f, 0.0f, 0.0f },
+		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
 	},
 	{   // 25% Shadow mask, 100% Scanlines, 15% Pincushion, 3 defocus, 24-degree Tint Out, 1.5 Exponent, 5% Floor, 70% Phosphor Return, 80% Saturation, Bad Convergence
 		true,
@@ -146,7 +152,9 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		0.8f,
 		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
 		0.9f, 4.0f,
-		1.0f, 0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
+		1.0f,
+		{ 0.0f, 0.0f, 0.0f },
+		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
 	},
 };
 
@@ -824,6 +832,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	options->vector_length_scale = winoptions.screen_vector_length_scale();
 	options->vector_length_ratio = winoptions.screen_vector_length_ratio();
 	options->bloom_scale = winoptions.screen_bloom_scale();
+	get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, TRUE);
 	options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
 	options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
 	options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
@@ -1549,6 +1558,8 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	curr_effect->set_vector("Level67Size", 4, bloom_dims[6]);
 	curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
 	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
+
+	curr_effect->set_vector("OverdriveWeight", 3, options->bloom_overdrive);
 
 	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
 
@@ -2656,6 +2667,24 @@ static INT32 slider_bloom_scale(running_machine &machine, void *arg, std::string
 	return slider_set(&(((hlsl_options*)arg)->bloom_scale), 0.001f, "%1.3f", str, newval);
 }
 
+static INT32 slider_bloom_red_overdrive(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->bloom_overdrive[0]), 0.001f, "%1.3f", str, newval);
+}
+
+static INT32 slider_bloom_green_overdrive(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->bloom_overdrive[1]), 0.001f, "%1.3f", str, newval);
+}
+
+static INT32 slider_bloom_blue_overdrive(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->bloom_overdrive[2]), 0.001f, "%1.3f", str, newval);
+}
+
 static INT32 slider_bloom_lvl0_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
@@ -2789,6 +2818,9 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Vector Length Attenuation",           0,    80,   100, 1, slider_vector_attenuation },
 	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, slider_vector_length_max },
 	{ "Bloom Scale",                         0,   250,  2000, 5, slider_bloom_scale },
+	{ "Bloom Red Overdrive",                 0,   250,  2000, 5, slider_bloom_red_overdrive },
+	{ "Bloom Green Overdrive",               0,   250,  2000, 5, slider_bloom_green_overdrive },
+	{ "Bloom Blue Overdrive",                0,   250,  2000, 5, slider_bloom_blue_overdrive },
 	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, slider_bloom_lvl0_scale },
 	{ "Bloom Level 1 Scale",                 0,    21,   100, 1, slider_bloom_lvl1_scale },
 	{ "Bloom Level 2 Scale",                 0,    19,   100, 1, slider_bloom_lvl2_scale },

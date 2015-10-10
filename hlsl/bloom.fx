@@ -240,6 +240,8 @@ uniform float4 Level0123Weight;
 uniform float4 Level4567Weight;
 uniform float3 Level89AWeight;
 
+uniform float3 OverdriveWeight;
+
 float3 GetNoiseFactor(float3 n, float random)
 {
 	// smaller n become more noisy
@@ -284,6 +286,15 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		texel9 +
 		texelA);
 
+	float3 bloomOverdrive = max(0.0f, texel0 + bloom - 1.0f) * OverdriveWeight;
+
+	bloom.r += bloomOverdrive.g * 0.5f;
+	bloom.r += bloomOverdrive.b * 0.5f;
+	bloom.g += bloomOverdrive.r * 0.5f;
+	bloom.g += bloomOverdrive.b * 0.5f;
+	bloom.b += bloomOverdrive.r * 0.5f;
+	bloom.b += bloomOverdrive.g * 0.5f;
+
 	float2 NoiseCoord = Input.TexCoord01.xy;
 	float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
 	
@@ -291,7 +302,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Downsample Effect
+// Bloom Effect
 //-----------------------------------------------------------------------------
 
 technique TestTechnique

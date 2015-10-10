@@ -239,6 +239,7 @@ struct hlsl_options
 
 	// Bloom
 	float                   bloom_scale;
+	float                   bloom_overdrive[3];
 	float                   bloom_level0_weight;
 	float                   bloom_level1_weight;
 	float                   bloom_level2_weight;

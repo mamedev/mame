@@ -352,6 +352,7 @@ const options_entry windows_options::s_option_entries[] =
 	/* Bloom below this line */
 	{ NULL,                                                     NULL,        OPTION_HEADER,     "BLOOM POST-PROCESSING OPTIONS" },
 	{ WINOPTION_BLOOM_SCALE,                                    "0.25",      OPTION_FLOAT,      "Intensity factor for bloom" },
+	{ WINOPTION_BLOOM_OVERDRIVE,                                "0.0,0.0,0.0",OPTION_STRING,    "Overdrive factor for bloom" },
 	{ WINOPTION_BLOOM_LEVEL0_WEIGHT,                            "1.0",       OPTION_FLOAT,      "Bloom level 0  (full-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL1_WEIGHT,                            "0.21",      OPTION_FLOAT,      "Bloom level 1  (half-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                            "0.19",      OPTION_FLOAT,      "Bloom level 2  (quarter-size target) weight" },

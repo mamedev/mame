@@ -452,6 +452,12 @@ void emu_options::parse_standard_inis(std::string &error_string)
 			parse_one_ini("vector", OPTION_PRIORITY_SCREEN_INI, &error_string);
 			break;
 		}
+		// parse "lcd.ini" for lcd games
+		if (device->screen_type() == SCREEN_TYPE_LCD)
+		{
+			parse_one_ini("lcd", OPTION_PRIORITY_SCREEN_INI, &error_string);
+			break;
+		}
 	}
 
 	// next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini
