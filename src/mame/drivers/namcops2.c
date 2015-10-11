@@ -47,9 +47,9 @@ Kinnikuman Muscle Grand Prix.................... XXXX56X  KN1-B                D
 Kinnikuman Muscle Grand Prix 2.................. XXXX56X  KN2                  DVD          NM00040   KN2 Ver.A              Banpresto 2007                #
 Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0    *DVD         *NM00036  *ZNT100-1-ST-A          Namco 2006
 Mobile Suit Gundam - Gundam vs Gundam........... XXXX56X  GVS1 DVD0B           DVD          NM00043   GVS1 Ver.A             Bandai/Capcom 2008
-Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 12X456X  SED1 DVD0            DVD          NM00024   SED1 Ver.A             Banpresto 2005                % #
-M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 12X456X  GSD1 DVD0            DVD          NM00034   GSD1 Ver.A             Banpresto 2006                % #
-Mobile Suit Z Gundam A.E.U.G. vs Titans......... 12X456X  ZGA1 DVD0            DVD          NM00013   ZGA1 Ver.A             Capcom/Banpresto 2003         %
+Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 123456X  SED1 DVD0            DVD          NM00024   SED1 Ver.A             Banpresto 2005                % #
+M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 123456X  GSD1 DVD0            DVD          NM00034   GSD1 Ver.A             Banpresto 2006                % #
+Mobile Suit Z Gundam A.E.U.G. vs Titans......... 123456X  ZGA1 DVD0            DVD          NM00013   ZGA1 Ver.A             Capcom/Banpresto 2003         %
 Mobile Suit Z Gundam DX A.E.U.G. vs Titans...... 12X456X  ZDX1 DVD0            DVD          NM00017   ZDX1 Ver.A             Capcom/Banpresto 2003         %
 Netchuu Pro Yakyuu 2002......................... X23XXXX  NPY1 CD0B            CD           NM00009   NPY Ver.B              Namco 2002
 Pride GP 2003................................... 123456X  PR21 DVD0            DVD          NM00011   PR21 Ver.A             Capcom 2003                   %
@@ -58,14 +58,14 @@ Ridge Racer V Arcade Battle..................... 1XXXXXX  RRV1-A               C
    "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV2 Ver.A             Namco 2001
    "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001  *RRV2 Ver.B             Namco 2001
    "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV3 Ver.A             Namco 2001
-Sengoku Basara X Cross.......................... 12X456X  BAX1 DVD0            DVD          NM00042   BAX1 VER.A             Capcom/ARC System Works 2007  % #
+Sengoku Basara X Cross.......................... 123456X  BAX1 DVD0            DVD          NM00042   BAX1 VER.A             Capcom/ARC System Works 2007  % #
 Smash Court Pro Tournament...................... ------X  SCP1 CD0             CD           NM00006   SCP1 Ver.A             Namco 2001
-Soul Calibur II................................. 12X456X  SC21 DVD0            DVD          NM00007   SC21 Ver.A             Namco 2002                    \
-   "            Rev. B.......................... 12X456X  SC21 DVD0B           DVD          NM00007   SC23 Ver.A             Namco 2002                    | # @ 1st & rev B DVD needs campaign memory card
-   "            Rev. D.......................... 12X456X  SC21 DVD0D           DVD          NM00007   SC22 Ver.D             Namco 2002                    /     rev D will allow skipping it if not available
-Soul Calibur III Arcade Edition................. 12X456X  SC31001-NA-DVD0-A    DVD          NM00031   SC31001-NA-A           Namco 2005                    \
-   "                           ................. 12X456X  SC31001-NA-DVD0-B    DVD          NM00031   SC31001-NA-A           Namco 2005                    / # % @
-Sukusuku Inufuku 2 / The Dog Luck 2............. 12X456X  HM-IN2               CD           NM00037   IN2 Ver.A              Hampster/Video System 2007
+Soul Calibur II................................. 123456X  SC21 DVD0            DVD          NM00007   SC21 Ver.A             Namco 2002                    \
+   "            Rev. B.......................... 123456X  SC21 DVD0B           DVD          NM00007   SC23 Ver.A             Namco 2002                    | # @ 1st & rev B DVD needs campaign memory card
+   "            Rev. D.......................... 123456X  SC21 DVD0D           DVD          NM00007   SC22 Ver.D             Namco 2002                    /     rev D will allow skipping it if not available
+Soul Calibur III Arcade Edition................. 123456X  SC31001-NA-DVD0-A    DVD          NM00031   SC31001-NA-A           Namco 2005                    \
+   "                           ................. 123456X  SC31001-NA-DVD0-B    DVD          NM00031   SC31001-NA-A           Namco 2005                    / # % @
+Sukusuku Inufuku 2 / The Dog Luck 2............. 123456X  HM-IN2               CD           NM00037   IN2 Ver.A              Hampster/Video System 2007
 Super Dragonball Z / Chou Dragonball Z.......... XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
 Taiko no Tatsujin 7............................. ------X  TK71 DVD0            DVD          NM00023   TK71 Ver.A             Namco 2005
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
@@ -764,7 +764,7 @@ Notes:
        J10 - 6-pin connector for programming EPM3128 CPLD (not populated)
        J11 - Flat cable connector joining to PS2 main board
        J12 - 40-pin IDE connector for CD/DVD/HDD drives
-       J13 - 4-pin power input connector (+5V/+12/GND) 
+       J13 - 4-pin power input connector (+5V/GND) 
        J14 - 34-pin connector plugged directly into PS2 main board
        J15 - 4-pin power output connector plugged directly into PS2 main board (the PS2 main board PSU is not populated)
 C807U-1V86 - Toshiba TMP87PH47U microcontroller with 16k x8-bit OTP EPROM re-badged as 'SONY C8707U-1V86 (C)2000 SCEI'
@@ -787,7 +787,8 @@ C807U-1V86 - Toshiba TMP87PH47U microcontroller with 16k x8-bit OTP EPROM re-bad
    BATTERY - CR2032 3.0V battery
    
 This revision was initially used with Tekken 4, Time Crisis 3, Battle Gear 3 and Soul Calibur II. There are reports
-that the DVD-based games on this system are fussy about the model of DVD-ROM drive used.
+that the DVD-based games on this system are fussy about the model of DVD-ROM drive used. Powering the drive from an
+external PSU will help in some cases.
 
 A PS2 main board (such as GH-006) is required and plugs into J14 & J15 directly and two flat cables 
 from J9 & J11 also connect to the PS2 main board.
