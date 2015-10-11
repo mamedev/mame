@@ -82,15 +82,6 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 
 UINT32 mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(screen.width() < 800) // adjust the width as the 8275 screen is 640 pixels wide and the 7220 is 800 pixels
-	{
-		rectangle newvis = screen.visible_area();
-		newvis.min_y *= 1.25;
-		newvis.max_y *= 1.25;
-		screen.configure(screen.width() * 1.25, screen.height(), newvis, screen.frame_period().m_attoseconds);
-		return 0;
-	}
-
 	/* text */
 	m_crtc->screen_update(screen, bitmap, cliprect);
 
