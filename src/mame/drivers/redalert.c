@@ -396,6 +396,7 @@ static MACHINE_CONFIG_START( redalert, redalert_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(redalert_video)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* audio hardware */
@@ -411,6 +412,7 @@ static MACHINE_CONFIG_START( ww3, redalert_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(ww3_video)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* audio hardware */
@@ -426,6 +428,7 @@ static MACHINE_CONFIG_START( panther, redalert_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(panther_video)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* audio hardware */
@@ -441,6 +444,7 @@ static MACHINE_CONFIG_START( demoneye, redalert_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(demoneye_video)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* audio hardware */
