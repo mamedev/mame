@@ -374,18 +374,6 @@ inline void upd7220_device::update_blank_timer(int state)
 
 
 //-------------------------------------------------
-//  static_set_visarea - configuration helper to
-//  set the visible area of the screen that is
-//  used by recompute_parameters()
-//-------------------------------------------------
-
-void upd7220_device::static_set_visible_area_offsets(device_t &device, INT16 dminx, INT16 dmaxx, INT16 dminy, INT16 dmaxy)
-{
-	downcast<upd7220_device &>(device).m_visarea_offset.set(dminx, dmaxx, dminy, dmaxy);
-}
-
-
-//-------------------------------------------------
 //  recompute_parameters -
 //-------------------------------------------------
 
@@ -405,30 +393,36 @@ inline void upd7220_device::recompute_parameters()
 
 	int horiz_pix_total = (m_hs + m_hbp + m_hfp + m_aw) * horiz_mult;
 	int vert_pix_total = (m_vs + m_vbp + m_al + m_vfp) * vert_mult;
+
+	//printf("%d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp);
+	//printf("%d %d\n",m_aw * 8,m_pitch * 8);
+
 	if (horiz_pix_total == 0 || vert_pix_total == 0) //bail out if screen params aren't valid
 		return;
 
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock() * 8) * horiz_pix_total * vert_pix_total;
 
 	rectangle visarea;
-	visarea.min_x = m_visarea_offset.min_x; //(m_hs + m_hbp) * 8;
-	visarea.min_y = m_vbp + m_visarea_offset.min_y; // setting this to m_vbp by default; this works at least for pc9801 software (e.g. Dragon Buster) that uses vbp to offset the slave 7220 start line from the master
-	visarea.max_x = m_aw * horiz_mult - 1 + m_visarea_offset.max_x; //horiz_pix_total - (m_hfp * 8) - 1;
-	visarea.max_y = m_al * vert_mult + m_vbp - 1 + m_visarea_offset.max_y; //vert_pix_total - m_vfp - 1;
+
+	visarea.min_x = 0; //(m_hs + m_hbp) * 8;
+	visarea.min_y = m_vbp; //m_vs + m_vbp;
+	visarea.max_x = m_aw * horiz_mult - 1;//horiz_pix_total - (m_hfp * 8) - 1;
+	visarea.max_y = m_al * vert_mult + m_vbp - 1;//vert_pix_total - m_vfp - 1;
 
 	LOG(("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh)));
 	LOG(("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y));
-	LOG(("hs=%d hbp=%d aw=%d hfp=%d pitch=%d hmult=%d htot=%d\n", m_hs, m_hbp, m_aw, m_hfp, m_pitch, horiz_mult, horiz_pix_total));
-	LOG(("vs=%d vbp=%d al=%d vfp=%d vmult=%d vtot=%d\n", m_vs, m_vbp, m_al, m_vfp, vert_mult, vert_pix_total));
+	LOG(("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch));
+	LOG(("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp));
 
 	if (m_m)
 	{
+		m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+
 		update_hsync_timer(0);
 		update_vsync_timer(0);
 	}
 	else
 	{
-		m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 		m_hsync_timer->enable(0);
 		m_vsync_timer->enable(0);
 	}
@@ -641,7 +635,6 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_hs(0),
 	m_hfp(0),
 	m_hbp(0),
-	m_visarea_offset(0, 0, 0, 0),
 	m_dc(0),
 	m_sc(0),
 	m_br(0),
@@ -1614,8 +1607,11 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	for (area = 0; area < 4; area++)
 	{
 		get_graphics_partition(area, &sad, &len, &im, &wd);
+
 		if (im || force_bitmap)
 		{
+			//get_graphics_partition(area, &sad, &len, &im, &wd);
+
 			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
 				break;
 

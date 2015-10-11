@@ -70,6 +70,8 @@ ADDRESS_MAP_END
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
 	UINT16 data = m_video_ram[address >> 1];
+	if(y >= 25)
+		y -= 25;
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -80,6 +82,15 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 
 UINT32 mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if(screen.width() < 800) // adjust the width as the 8275 screen is 640 pixels wide and the 7220 is 800 pixels
+	{
+		rectangle newvis = screen.visible_area();
+		newvis.min_y *= 1.25;
+		newvis.max_y *= 1.25;
+		screen.configure(screen.width() * 1.25, screen.height(), newvis, screen.frame_period().m_attoseconds);
+		return 0;
+	}
+
 	/* text */
 	m_crtc->screen_update(screen, bitmap, cliprect);
 
@@ -141,6 +152,5 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, XTAL_18_720MHz/8)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, mm1_upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mm1_state, hgdc_display_pixels)
-	MCFG_UPD7220_VISIBLE_AREA_OFFSET(0, 0, -25, 23) // match the visible area of I8275 output
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END
