@@ -264,9 +264,9 @@ void atari_motion_objects_device::apply_stain(bitmap_ind16 &bitmap, UINT16 *pf, 
 	for ( ; x < bitmap.width(); x++)
 	{
 		pf[x] |= 0x400;
-		if (mo[x] == 0xffff || (offnext && (mo[x] & START_MARKER) != START_MARKER))
+		if (offnext && ((mo[x] == 0xffff) || (mo[x] & START_MARKER) != START_MARKER))
 			break;
-		offnext = ((mo[x] & END_MARKER) == END_MARKER);
+		offnext = (mo[x] != 0xffff) && ((mo[x] & END_MARKER) == END_MARKER);
 	}
 }
 
