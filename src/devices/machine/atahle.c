@@ -346,16 +346,19 @@ int ata_hle_device::bit_to_mode(UINT16 word)
 	return -1;
 }
 
+// Return the currently selected single word dma mode, -1 if none selected
 int ata_hle_device::single_word_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[62]);
 }
 
+// Return the currently selected multi word dma mode, -1 if none selected
 int ata_hle_device::multi_word_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[63]);
 }
 
+// Return the currently selected ultra dma mode, -1 if none selected
 int ata_hle_device::ultra_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[88]);
@@ -459,7 +462,7 @@ void ata_hle_device::read_buffer_empty()
 
 	m_status &= ~IDE_STATUS_DRQ;
 
-	if (multi_word_dma_mode() >= 0)
+	if ((multi_word_dma_mode() >= 0) || (ultra_dma_mode() >= 0))
 		set_dmarq(CLEAR_LINE);
 
 	fill_buffer();
@@ -471,7 +474,7 @@ void ata_hle_device::write_buffer_full()
 
 	m_status &= ~IDE_STATUS_DRQ;
 
-	if (multi_word_dma_mode() >= 0)
+	if ((multi_word_dma_mode() >= 0) || (ultra_dma_mode() >= 0))
 		set_dmarq(CLEAR_LINE);
 
 	process_buffer();
@@ -546,6 +549,10 @@ UINT16 ata_hle_device::read_dma()
 		else if (!m_dmarq && multi_word_dma_mode() >= 0)
 		{
 			logerror( "%s: %s dev %d read_dma ignored (!DMARQ)\n", machine().describe_context(), tag(), dev() );
+		}
+		else if (!m_dmarq && ultra_dma_mode() >= 0)
+		{
+			logerror("%s: %s dev %d read_dma ignored (!DMARQ)\n", machine().describe_context(), tag(), dev());
 		}
 		else if (m_status & IDE_STATUS_BSY)
 		{
@@ -766,6 +773,10 @@ void ata_hle_device::write_dma( UINT16 data )
 		else if (!m_dmarq && multi_word_dma_mode() >= 0)
 		{
 			logerror( "%s: %s dev %d write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), tag(), dev(), data );
+		}
+		else if (!m_dmarq && ultra_dma_mode() >= 0)
+		{
+			logerror("%s: %s dev %d write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), tag(), dev(), data);
 		}
 		else if (m_status & IDE_STATUS_BSY)
 		{
