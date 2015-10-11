@@ -197,6 +197,7 @@ static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrangr)
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* sound hardware */
 

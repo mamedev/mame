@@ -262,6 +262,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srumbler)
 

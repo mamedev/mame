@@ -1688,6 +1688,7 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
 	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)

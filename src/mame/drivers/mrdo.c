@@ -178,6 +178,7 @@ static MACHINE_CONFIG_START( mrdo, mrdo_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrdo)
 	MCFG_PALETTE_ADD("palette", 64*4+16*4)

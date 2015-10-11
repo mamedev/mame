@@ -447,6 +447,7 @@ static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 

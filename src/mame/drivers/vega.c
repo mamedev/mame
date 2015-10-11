@@ -828,6 +828,7 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 280, 0*8, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(vega_state, screen_update_vega)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(vega_state, vega)

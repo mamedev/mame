@@ -652,6 +652,7 @@ static MACHINE_CONFIG_START( wyvernf0, wyvernf0_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wyvernf0_state, screen_update_wyvernf0)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wyvernf0)
 	MCFG_PALETTE_ADD("palette", 512)

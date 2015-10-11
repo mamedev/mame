@@ -171,6 +171,7 @@ static MACHINE_CONFIG_START( madalien, madalien_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(madalien_video)
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

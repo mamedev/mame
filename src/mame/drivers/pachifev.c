@@ -355,6 +355,7 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -533,6 +533,7 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", terracre)
 	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)

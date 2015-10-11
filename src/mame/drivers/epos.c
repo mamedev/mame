@@ -396,6 +396,7 @@ static MACHINE_CONFIG_START( epos, epos_state )
 	MCFG_SCREEN_SIZE(272, 241)
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update_epos)
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -425,6 +426,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_SCREEN_SIZE(272, 241)
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update_epos)
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -433,6 +433,7 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x100-1, 0, 0xf8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedeep_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedeep)
 	MCFG_PALETTE_ADD("palette", 512)

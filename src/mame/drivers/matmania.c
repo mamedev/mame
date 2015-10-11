@@ -443,6 +443,7 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_matmania)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", matmania)
 	MCFG_PALETTE_ADD("palette", 64+16)

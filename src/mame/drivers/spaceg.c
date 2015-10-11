@@ -427,6 +427,7 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update_spaceg)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_PALETTE_ADD("palette", 16+128-16)
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
