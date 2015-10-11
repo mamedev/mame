@@ -190,6 +190,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
 	MCFG_PALETTE_ADD("palette", 8*16+16*8)

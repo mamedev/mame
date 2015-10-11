@@ -212,6 +212,7 @@ static MACHINE_CONFIG_START( alinvade, alinvade_state )
 	MCFG_SCREEN_SIZE(128, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update)
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

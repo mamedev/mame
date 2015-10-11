@@ -384,6 +384,7 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(toratora_state, screen_update_toratora)
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

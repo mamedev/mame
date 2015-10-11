@@ -320,6 +320,7 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quasar_state, screen_update_quasar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quasar)
 	MCFG_PALETTE_ADD("palette", (64+1)*8+(4*256))

@@ -379,6 +379,7 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crbaloon_state, screen_update_crbaloon)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(crbaloon_audio)

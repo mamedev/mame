@@ -151,6 +151,7 @@ static MACHINE_CONFIG_START( ssrj, ssrj_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(ssrj_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssrj)
 	MCFG_PALETTE_ADD("palette", 128)

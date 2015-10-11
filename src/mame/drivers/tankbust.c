@@ -351,6 +351,7 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 //  MCFG_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbust )
 

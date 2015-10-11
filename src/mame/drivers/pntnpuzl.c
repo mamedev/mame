@@ -353,6 +353,9 @@ static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )

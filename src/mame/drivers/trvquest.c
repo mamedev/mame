@@ -186,6 +186,7 @@ static MACHINE_CONFIG_START( trvquest, gameplan_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(trvquest_video)
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

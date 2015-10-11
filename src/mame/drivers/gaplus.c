@@ -554,6 +554,7 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gaplus_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(gaplus_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaplus)
 	MCFG_PALETTE_ADD("palette", 64*4+64*8)

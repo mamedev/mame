@@ -101,6 +101,7 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 304-1, 0, 240-1) // 288 x 240, correct?
 	MCFG_SCREEN_UPDATE_DRIVER(beezer_state, screen_update_beezer)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
