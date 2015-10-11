@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( stactics, stactics_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(stactics_video)
-
+	MCFG_SCREEN_ORIENTATION(ORIENTATION_FLIP_X)
 	/* audio hardware */
 MACHINE_CONFIG_END
 

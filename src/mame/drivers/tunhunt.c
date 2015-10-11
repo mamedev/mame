@@ -281,6 +281,7 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ORIENTATION_SWAP_XY)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tunhunt)
 	MCFG_PALETTE_ADD("palette", 0x1a)

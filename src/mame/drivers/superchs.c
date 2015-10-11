@@ -346,6 +346,9 @@ static MACHINE_CONFIG_DERIVED( chase3, superchs )
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ORIENTATION(ORIENTATION_FLIP_X)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

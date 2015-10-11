@@ -275,6 +275,7 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(ntsc_video)
+	MCFG_SCREEN_ORIENTATION(ORIENTATION_FLIP_X)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(upscope_state,amiga)

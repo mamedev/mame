@@ -501,6 +501,7 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ORIENTATION_FLIP_X)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", destroyr)
 	MCFG_PALETTE_ADD("palette", 8)

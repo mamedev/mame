@@ -230,6 +230,7 @@ static MACHINE_CONFIG_START( skyraid, skyraid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_ORIENTATION(ORIENTATION_FLIP_Y)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyraid)
 

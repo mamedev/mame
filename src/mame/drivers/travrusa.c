@@ -338,6 +338,9 @@ static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ORIENTATION(ROT270 | ORIENTATION_FLIP_X)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( shtriderb, travrusa )
