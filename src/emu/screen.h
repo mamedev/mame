@@ -181,13 +181,11 @@ public:
 	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
 	static void static_set_palette(device_t &device, const char *tag);
 	static void static_set_video_attributes(device_t &device, UINT32 flags);
-	static void static_set_orientation(device_t &device, UINT32 orientation);
 
 	// information getters
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
 	palette_device *palette() { return m_palette; }
-	UINT32 orientation() { return m_orientation; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -268,7 +266,6 @@ private:
 	screen_vblank_delegate m_screen_vblank;         // screen vblank callback
 	optional_device<palette_device> m_palette;      // our palette
 	UINT32              m_video_attributes;         // flags describing the video system
-	UINT32              m_orientation;              // screen orientation
 
 	// internal state
 	render_container *  m_container;                // pointer to our container
@@ -432,8 +429,6 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 	screen_device::static_set_palette(*device, FINDER_DUMMY_TAG);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	screen_device::static_set_video_attributes(*device, _flags);
-#define MCFG_SCREEN_ORIENTATION(_orientation) \
-	screen_device::static_set_orientation(*device, _orientation);
 
 
 //**************************************************************************

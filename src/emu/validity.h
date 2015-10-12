@@ -39,7 +39,6 @@ public:
 	// getters
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
-	const game_driver *driver() const { return m_current_driver; }
 
 	// operations
 	void check_driver(const game_driver &driver);
