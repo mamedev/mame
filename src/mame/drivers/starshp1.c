@@ -309,7 +309,6 @@ static MACHINE_CONFIG_START( starshp1, starshp1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(starshp1_state, screen_update_starshp1)
 	MCFG_SCREEN_VBLANK_DRIVER(starshp1_state, screen_eof_starshp1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ORIENTATION_FLIP_X)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starshp1)
 	MCFG_PALETTE_ADD("palette", 19)
