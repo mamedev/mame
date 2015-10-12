@@ -837,7 +837,7 @@ ROM_START( leds2011 )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "ls-10.13a",    0x00001, 0x40000, BAD_DUMP CRC(961111d0) SHA1(481afbb534048a08ad71d72b0aa8cd20ab2b69ed) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */ // FIXED BITS (xxxxx0xxxxxxxxxx)
+	ROM_LOAD16_BYTE( "ls-10.13a",    0x00001, 0x40000, CRC(db2c5883) SHA1(00899f96e2cbf6930c107a53f660a944fa9a2682) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 	ROM_LOAD16_BYTE( "ls-09.5a",     0x00000, 0x40000, CRC(89949efb) SHA1(c4d2ca19e483e468dedd184d0158e11e5591ab02) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
@@ -866,4 +866,4 @@ GAME( 1988, lastduelb, lastduel, lastduel, lastduel, driver_device, 0, ROT270, "
 GAME( 1989, madgear,   0,        madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, madgearj,  madgear,  madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ledstorm,  madgear,  madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011,  0,        madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011,  0,        madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
