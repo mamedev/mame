@@ -516,6 +516,7 @@ void digitalker_device::digitalker_step()
 				return;
 			}
 		} else if(m_stop_after == 1) {
+			digitalker_set_intr(1);
 			m_bpos = 0xffff;
 			m_zero_count = 81920;
 			m_stop_after = 2;
@@ -525,7 +526,6 @@ void digitalker_device::digitalker_step()
 			m_repeats = 0;
 		} else {
 			m_stop_after = 0;
-			digitalker_set_intr(1);
 		}
 	}
 
