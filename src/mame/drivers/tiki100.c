@@ -26,17 +26,17 @@
 */
 
 #include "includes/tiki100.h"
-#include "bus/rs232/rs232.h"
 
 /* Memory Banking */
 
 READ8_MEMBER( tiki100_state::read )
 {
-	int mdis = 1;
+	bool mdis = 1;
+
+	UINT8 data = m_exp->mrq_r(space, offset, 0xff, mdis);
+
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
 	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
-
-	UINT8 data = 0xff;
 
 	if (prom & ROM0)
 	{
@@ -65,7 +65,7 @@ READ8_MEMBER( tiki100_state::read )
 
 WRITE8_MEMBER( tiki100_state::write )
 {
-	int mdis = 1;
+	bool mdis = 1;
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
 	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
 
@@ -80,6 +80,8 @@ WRITE8_MEMBER( tiki100_state::write )
 	{
 		m_ram->pointer()[offset] = data;
 	}
+
+	m_exp->mrq_w(space, offset, data);
 }
 
 /* Read/Write Handlers */
@@ -621,6 +623,13 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	// pixel clock 20.01782 MHz
 
+	MCFG_TIKI100_BUS_ADD()
+	//MCFG_TIKI100_BUS_IRQ_CALLBACK()
+	//MCFG_TIKI100_BUS_NMI_CALLBACK()
+	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
+	MCFG_TIKI100_BUS_SLOT_ADD("slot2", NULL)
+	MCFG_TIKI100_BUS_SLOT_ADD("slot3", NULL)
+
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, 0, 0, 0, 0 )
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
@@ -706,12 +715,6 @@ ROM_START( tiki100 )
 
 	ROM_REGION( 0x100, "u4", 0 )
 	ROM_LOAD( "53ls140.u4", 0x000, 0x100, CRC(894b756f) SHA1(429e10de0e0e749246895801b18186ff514c12bc) )
-
-	ROM_REGION( 0x1000, "8088", 0 )
-	ROM_LOAD( "boot 1.0.u3", 0x0000, 0x1000, CRC(436974aa) SHA1(837087b3ab982d047e4f15799fef3daa37dd6c01) )
-
-	ROM_REGION( 0x100, "8088_proms", 0 )
-	ROM_LOAD( "53ls140.u26", 0x000, 0x100, CRC(fc5902e1) SHA1(afb9cb54ab6fc449e7544ddb3cbebc3770c4f937) )
 ROM_END
 
 /* System Drivers */
