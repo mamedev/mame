@@ -5,9 +5,10 @@
 #ifndef __TIKI100__
 #define __TIKI100__
 
-
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "bus/tiki100/exp.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "formats/tiki100_dsk.h"
@@ -53,6 +54,7 @@ public:
 		m_floppy1(*this, FD1797_TAG":1"),
 		m_cassette(*this, CASSETTE_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
+		m_exp(*this, TIKI100_BUS_TAG),
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
 		m_video_ram(*this, "video_ram"),
@@ -83,6 +85,7 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
+	required_device<tiki100_bus_t> m_exp;
 	required_memory_region m_rom;
 	required_memory_region m_prom;
 	optional_shared_ptr<UINT8> m_video_ram;
