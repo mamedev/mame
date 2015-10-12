@@ -484,7 +484,6 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sandscrp)
 	MCFG_PALETTE_ADD("palette", 2048)

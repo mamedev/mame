@@ -440,7 +440,6 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vastar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vastar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)

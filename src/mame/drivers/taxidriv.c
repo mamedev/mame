@@ -381,7 +381,6 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 27*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taxidriv)
 	MCFG_PALETTE_ADD("palette", 16)

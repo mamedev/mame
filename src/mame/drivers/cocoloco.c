@@ -477,7 +477,6 @@ static MACHINE_CONFIG_START( cocoloco, cocoloco_state )
 	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256) /* TODO: not accurate, ~50 Hz */
 	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(cocoloco_state, cocoloco)

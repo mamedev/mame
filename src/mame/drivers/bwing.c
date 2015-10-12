@@ -386,7 +386,6 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bwing_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bwing)
 	MCFG_PALETTE_ADD("palette", 64)

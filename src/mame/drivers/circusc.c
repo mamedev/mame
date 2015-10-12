@@ -351,7 +351,6 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circusc_state, screen_update_circusc)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circusc)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)

@@ -628,7 +628,6 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	MCFG_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(polygonet_state, screen_update_polygonet)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(XRGB)

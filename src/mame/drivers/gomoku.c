@@ -135,7 +135,6 @@ static MACHINE_CONFIG_START( gomoku, gomoku_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gomoku_state, screen_update_gomoku)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gomoku)
 	MCFG_PALETTE_ADD("palette", 64)

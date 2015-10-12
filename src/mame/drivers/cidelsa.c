@@ -401,7 +401,6 @@ static MACHINE_CONFIG_START( destryer, cidelsa_state )
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(destryer_video)
-	MCFG_SCREEN_ORIENTATION(ROT90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( destryera, cidelsa_state )
@@ -417,7 +416,6 @@ static MACHINE_CONFIG_START( destryera, cidelsa_state )
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(destryer_video)
-	MCFG_SCREEN_ORIENTATION(ROT90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( altair, cidelsa_state )
@@ -447,7 +445,6 @@ static MACHINE_CONFIG_START( altair, cidelsa_state )
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(altair_video)
-	MCFG_SCREEN_ORIENTATION(ROT90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( draco, draco_state )
@@ -486,7 +483,6 @@ static MACHINE_CONFIG_START( draco, draco_state )
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(draco_video)
-	MCFG_SCREEN_ORIENTATION(ROT90)
 MACHINE_CONFIG_END
 
 /* ROMs */

@@ -219,7 +219,6 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mouser_state, screen_update_mouser)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mouser)
 	MCFG_PALETTE_ADD("palette", 64)

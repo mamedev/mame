@@ -433,7 +433,6 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
 	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

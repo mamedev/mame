@@ -300,7 +300,6 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcond1)
 	MCFG_PALETTE_ADD("palette", 256)

@@ -455,7 +455,6 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(flipjack_state, screen_update_flipjack)
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

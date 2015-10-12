@@ -221,7 +221,6 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tail2nos)
 	MCFG_PALETTE_ADD("palette", 2048)

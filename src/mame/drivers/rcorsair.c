@@ -151,7 +151,6 @@ static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rcorsair)
 	MCFG_PALETTE_ADD("palette", 0x100)
