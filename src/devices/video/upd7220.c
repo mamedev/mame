@@ -316,11 +316,10 @@ inline void upd7220_device::dequeue(UINT8 *data, int *flag)
 
 		m_fifo_ptr--;
 
-		if (m_fifo_ptr == -1)
-		{
-			m_sr &= ~UPD7220_SR_DATA_READY;
+		if (m_fifo_ptr <= 0)
 			m_sr |= UPD7220_SR_FIFO_EMPTY;
-		}
+		if (m_fifo_ptr == -1)
+			m_sr &= ~UPD7220_SR_DATA_READY;
 	}
 }
 

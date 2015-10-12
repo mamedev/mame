@@ -70,9 +70,6 @@ ADDRESS_MAP_END
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
 	UINT16 data = m_video_ram[address >> 1];
-	if(y >= 25)
-		y -= 25;
-
 	for (int i = 0; i < 16; i++)
 	{
 		if (BIT(data, i)) bitmap.pix32(y, x + i) = m_palette->pen(1);
