@@ -490,7 +490,6 @@ static MACHINE_CONFIG_START( changela, changela_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(changela_state, screen_update_changela)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT180)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 

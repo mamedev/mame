@@ -913,9 +913,6 @@ static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,darkplnt)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,darkplnt)
-	
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_ORIENTATION(ROT180)
 MACHINE_CONFIG_END
 
 

@@ -1800,7 +1800,6 @@ static MACHINE_CONFIG_DERIVED( pestplce, dkongjr )
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)  /* wrong! */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)
-	MCFG_SCREEN_ORIENTATION(ROT180)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dkong3b, dkongjr )
@@ -1830,12 +1829,6 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(dkong_state, hb_dma_write_byte))
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( shootgal, s2650 )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_ORIENTATION(ROT180)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( spclforc, s2650 )
@@ -3326,7 +3319,7 @@ GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state,   herodk,   R
 GAME( 1984, herodku,   hero,     s2650,     herodk,   driver_device, 0,        ROT90,  "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, 8ballact,  0,        s2650,     8ballact, driver_device, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (DK conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, 8ballact2, 8ballact, s2650,     8ballact, driver_device, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (DKJr conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, shootgal,  0,        shootgal,  shootgal, driver_device, 0,        ROT180, "Seatongrove Ltd (Zaccaria license)", "Shooting Gallery", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, shootgal,  0,        s2650,     shootgal, driver_device, 0,        ROT180, "Seatongrove Ltd (Zaccaria license)", "Shooting Gallery", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, spclforc,  0,        spclforc,  spclforc, driver_device, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, driver_device, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces II", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
