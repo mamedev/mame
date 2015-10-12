@@ -197,7 +197,6 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotya)
 	MCFG_PALETTE_ADD("palette", 16*4)

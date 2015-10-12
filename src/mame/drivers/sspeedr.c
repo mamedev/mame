@@ -203,7 +203,6 @@ static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
 	MCFG_SCREEN_VBLANK_DRIVER(sspeedr_state, screen_eof_sspeedr)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sspeedr)
 	MCFG_PALETTE_ADD("palette", 16)

@@ -507,7 +507,6 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 512-1-8*8, 0+8, 256-1-8)
 	MCFG_SCREEN_UPDATE_DRIVER(discoboy_state, screen_update_discoboy)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", discoboy)
 	MCFG_PALETTE_ADD("palette", 0x1000)

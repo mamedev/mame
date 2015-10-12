@@ -368,7 +368,6 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 303, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(videopin_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopin)
 

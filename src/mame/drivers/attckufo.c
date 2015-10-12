@@ -158,9 +158,6 @@ static MACHINE_CONFIG_START( attckufo, attckufo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL_14_31818MHz/14, vic_videoram_map, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-		
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 MACHINE_CONFIG_END
 
 ROM_START( attckufo )

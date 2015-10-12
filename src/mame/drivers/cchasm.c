@@ -164,7 +164,6 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

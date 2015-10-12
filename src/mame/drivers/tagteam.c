@@ -228,7 +228,6 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tagteam)
 	MCFG_PALETTE_ADD("palette", 32)

@@ -333,7 +333,6 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxygame_state, screen_update_galaxygame)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

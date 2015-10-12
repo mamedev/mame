@@ -103,7 +103,6 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
 	MCFG_SCREEN_UPDATE_DRIVER(vectrex_state, screen_update_vectrex)
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

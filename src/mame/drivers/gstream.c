@@ -917,7 +917,6 @@ static MACHINE_CONFIG_START( x2222, gstream_state )
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // doesn't use a palette, but keep fake gfxdecode happy
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x2222)

@@ -332,7 +332,6 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 244)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_UPDATE_DRIVER(capbowl_state, screen_update)
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */

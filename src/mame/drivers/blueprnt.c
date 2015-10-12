@@ -360,7 +360,6 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_ORIENTATION(ROT270)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blueprnt)
 	MCFG_PALETTE_ADD("palette", 128*4+8)
