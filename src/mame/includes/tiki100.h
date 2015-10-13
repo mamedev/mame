@@ -49,6 +49,7 @@ public:
 		m_fdc(*this, FD1797_TAG),
 		m_pio(*this, Z80PIO_TAG),
 		m_dart(*this, Z80DART_TAG),
+		m_psg(*this, AY8912_TAG),
 		m_ram(*this, RAM_TAG),
 		m_floppy0(*this, FD1797_TAG":0"),
 		m_floppy1(*this, FD1797_TAG":1"),
@@ -80,6 +81,7 @@ public:
 	required_device<fd1797_t> m_fdc;
 	required_device<z80pio_device> m_pio;
 	required_device<z80dart_device> m_dart;
+	required_device<ay8912_device> m_psg;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -108,8 +110,10 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( mrq_r );
+	DECLARE_WRITE8_MEMBER( mrq_w );
+	DECLARE_READ8_MEMBER( iorq_r );
+	DECLARE_WRITE8_MEMBER( iorq_w );
 
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( keyboard_w );

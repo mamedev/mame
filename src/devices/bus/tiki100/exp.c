@@ -91,7 +91,7 @@ UINT8 tiki100_bus_t::mrq_r(address_space &space, offs_t offset, UINT8 data, bool
 
 	while (entry)
 	{
-		data &= entry->tiki100_mrq_r(space, offset, data, mdis);
+		data &= entry->mrq_r(space, offset, data, mdis);
 		entry = entry->next();
 	}
 
@@ -109,7 +109,7 @@ WRITE8_MEMBER( tiki100_bus_t::mrq_w )
 
 	while (entry)
 	{
-		entry->tiki100_mrq_w(space, offset, data);
+		entry->mrq_w(space, offset, data);
 		entry = entry->next();
 	}
 }
@@ -125,7 +125,7 @@ UINT8 tiki100_bus_t::iorq_r(address_space &space, offs_t offset, UINT8 data)
 
 	while (entry)
 	{
-		data &= entry->tiki100_iorq_r(space, offset, data);
+		data &= entry->iorq_r(space, offset, data);
 		entry = entry->next();
 	}
 
@@ -143,7 +143,7 @@ WRITE8_MEMBER( tiki100_bus_t::iorq_w )
 
 	while (entry)
 	{
-		entry->tiki100_iorq_w(space, offset, data);
+		entry->iorq_w(space, offset, data);
 		entry = entry->next();
 	}
 }

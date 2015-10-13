@@ -133,12 +133,12 @@ public:
 	device_tiki100bus_card_interface *next() const { return m_next; }
 
 	// memory access
-	virtual UINT8 tiki100_mrq_r(address_space &space, offs_t offset, UINT8 data, bool &mdis) { mdis = 1; return data; };
-	virtual void tiki100_mrq_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual UINT8 mrq_r(address_space &space, offs_t offset, UINT8 data, bool &mdis) { mdis = 1; return data; };
+	virtual void mrq_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	// I/O access
-	virtual UINT8 tiki100_iorq_r(address_space &space, offs_t offset, UINT8 data) { return data; };
-	virtual void tiki100_iorq_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data) { return data; };
+	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	tiki100_bus_t  *m_bus;
 	tiki100_bus_slot_t *m_slot;

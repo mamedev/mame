@@ -63,7 +63,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( tiki100_8088 )
-	MCFG_CPU_ADD("maincpu", I8088, 4000000)
+	MCFG_CPU_ADD(I8088_TAG, I8088, 6000000)
 	MCFG_CPU_PROGRAM_MAP(i8088_mem)
 	MCFG_CPU_IO_MAP(i8088_io)
 MACHINE_CONFIG_END
@@ -91,7 +91,9 @@ machine_config_constructor tiki100_8088_t::device_mconfig_additions() const
 
 tiki100_8088_t::tiki100_8088_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TIKI100_8088, "TIKI-100 8/16", tag, owner, clock, "tiki100_8088", __FILE__),
-	device_tiki100bus_card_interface(mconfig, *this)
+	device_tiki100bus_card_interface(mconfig, *this),
+	m_maincpu(*this, I8088_TAG),
+	m_data(0)
 {
 }
 
@@ -111,6 +113,9 @@ void tiki100_8088_t::device_start()
 
 void tiki100_8088_t::device_reset()
 {
+	m_maincpu->reset();
+
+	m_data = 0;
 }
 
 
@@ -118,8 +123,13 @@ void tiki100_8088_t::device_reset()
 //  tiki100bus_iorq_r - I/O read
 //-------------------------------------------------
 
-UINT8 tiki100_8088_t::tiki100_iorq_r(address_space &space, offs_t offset, UINT8 data)
+UINT8 tiki100_8088_t::iorq_r(address_space &space, offs_t offset, UINT8 data)
 {
+	if ((offset & 0xff) == 0x7f)
+	{
+		data = m_data;
+	}
+
 	return data;
 }
 
@@ -128,8 +138,17 @@ UINT8 tiki100_8088_t::tiki100_iorq_r(address_space &space, offs_t offset, UINT8 
 //  tiki100bus_iorq_w - I/O write
 //-------------------------------------------------
 
-void tiki100_8088_t::tiki100_iorq_w(address_space &space, offs_t offset, UINT8 data)
+void tiki100_8088_t::iorq_w(address_space &space, offs_t offset, UINT8 data)
 {
+	if ((offset & 0xff) == 0x7f)
+	{
+		m_data = data & 0x0f;
+
+		if (BIT(data, 5))
+		{
+			device_reset();
+		}
+	}
 }
 
 
@@ -139,7 +158,7 @@ void tiki100_8088_t::tiki100_iorq_w(address_space &space, offs_t offset, UINT8 d
 
 READ8_MEMBER( tiki100_8088_t::read )
 {
-	return 0xff;
+	return m_data;
 }
 
 
@@ -149,4 +168,5 @@ READ8_MEMBER( tiki100_8088_t::read )
 
 WRITE8_MEMBER( tiki100_8088_t::write )
 {
+	m_data = data & 0x0f;
 }

@@ -74,6 +74,11 @@ const tiki100_format::format tiki100_format::formats[] = {
 		2000, 10, 40, 1, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
 
+	{   //  360K 5 1/4 inch double density
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 9, 40, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
+	},
+
 	// track description
 	// 20x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
 	// 24x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7

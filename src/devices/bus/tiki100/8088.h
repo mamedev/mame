@@ -43,8 +43,13 @@ protected:
 	virtual void device_reset();
 
 	// device_tiki100bus_card_interface overrides
-	virtual UINT8 tiki100_iorq_r(address_space &space, offs_t offset, UINT8 data);
-	virtual void tiki100_iorq_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data);
+	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data);
+
+private:
+	required_device<i8088_cpu_device> m_maincpu;
+
+	UINT8 m_data;
 };
 
 
