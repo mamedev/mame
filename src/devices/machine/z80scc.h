@@ -5,28 +5,28 @@
 	Z80-SCC Serial Communications Controller emulation
 
 ****************************************************************************
-			   _____   _____						  _____	  _____
-		AD1	 1|*	\_/		|40 AD0				D1	1|*	   \_/	   |40 D0
-		AD3	 2|				|39 AD2				D3	2|			   |39 D2
-		AD5	 3|				|38 AD4				D5	3|			   |38 D4
-		AD7	 4|				|37 AD6				D7	4|			   |37 D6
-	   _INT	 5|				|36 _DS			  _INT	5|			   |36 _RD
-		IEO	 6|				|35 _AS			   IEO	6|			   |35 _WR
-		IEI	 7|				|34 R/_W		   IEI	7|			   |34 B/_A
-	_INTACK	 8|				|33 _CS0	   _INTACK	8|			   |33 _CE
-		VCC	 9|				|32 CS1			   VCC	9|			   |32 C/_D
-   _W//REQA 10|				|31 GND		  _W//REQA 10|			   |31 GND
-	 _SYNCA 11|	  Z8030		|30 _W/_REQ		_SYNCA 11|	 Z8530	   |30 _W/_REQB
-	 _RTxCA 12|	  Z80C30	|29 _SYNCB		_RTxCA 12|	 Z85C30	   |29 _SYNCB
-	   RxDA 13|	  Z80230	|28 _RTxCB		  RxDA 13|	 Z85230	   |28 _RTxCB
-	 _TRxCA 14|				|27 RxDB		_TRxCA 14|			   |27 RxDB
-	   TxDA 15|				|26 _TRxCB		  TxDA 15|			   |26 _TRxCB
- _DTR//REQA 16|				|25 TxDB	_DTR//REQA 16|			   |25 TxDB
-	  _RTSA 17|				|24 _DTR/_REQB	 _RTSA 17|			   |24 _DTR/_REQB
-	  _CTSA 18|				|23 _RTSB		 _CTSA 18|			   |23 _RTSB
-	  _DCDA 19|				|22 _CTSB		 _DCDA 19|			   |22 _CTSB
-	   PCLK 20|_____________|21 _DCDB		  PCLK 20|_____________|21 _DCDB
-				  ZBUS								  Universal Bus
+               _____   _____                          _____   _____
+        AD1  1|*    \_/     |40 AD0             D1  1|*    \_/     |40 D0
+        AD3  2|             |39 AD2             D3  2|             |39 D2
+        AD5  3|             |38 AD4             D5  3|             |38 D4
+        AD7  4|             |37 AD6             D7  4|             |37 D6
+       _INT  5|             |36 _DS           _INT  5|             |36 _RD
+        IEO  6|             |35 _AS            IEO  6|             |35 _WR
+        IEI  7|             |34 R/_W           IEI  7|             |34 B/_A
+    _INTACK  8|             |33 _CS0       _INTACK  8|             |33 _CE
+        VCC  9|             |32 CS1            VCC  9|             |32 C/_D
+   _W//REQA 10|             |31 GND       _W//REQA 10|             |31 GND
+     _SYNCA 11|   Z8030     |30 _W/_REQ     _SYNCA 11|   Z8530     |30 _W/_REQB
+     _RTxCA 12|   Z80C30    |29 _SYNCB      _RTxCA 12|   Z85C30    |29 _SYNCB
+       RxDA 13|   Z80230    |28 _RTxCB        RxDA 13|   Z85230    |28 _RTxCB
+     _TRxCA 14|             |27 RxDB        _TRxCA 14|             |27 RxDB
+       TxDA 15|             |26 _TRxCB        TxDA 15|             |26 _TRxCB
+ _DTR//REQA 16|             |25 TxDB    _DTR//REQA 16|             |25 TxDB
+      _RTSA 17|             |24 _DTR/_REQB   _RTSA 17|             |24 _DTR/_REQB
+      _CTSA 18|             |23 _RTSB        _CTSA 18|             |23 _RTSB
+      _DCDA 19|             |22 _CTSB        _DCDA 19|             |22 _CTSB
+       PCLK 20|_____________|21 _DCDB         PCLK 20|_____________|21 _DCDB
+                  ZBUS                                Universal Bus
 
 ***************************************************************************/
 
