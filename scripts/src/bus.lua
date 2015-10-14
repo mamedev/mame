@@ -1110,6 +1110,8 @@ if (BUSES["TIKI100"]~=null) then
 		MAME_DIR .. "src/devices/bus/tiki100/exp.h",
 		MAME_DIR .. "src/devices/bus/tiki100/8088.c",
 		MAME_DIR .. "src/devices/bus/tiki100/8088.h",
+		MAME_DIR .. "src/devices/bus/tiki100/hdc.c",
+		MAME_DIR .. "src/devices/bus/tiki100/hdc.h",
 	}
 end
 

@@ -542,10 +542,10 @@
 	</software>
 
 	<software name="msdos">
-		<!-- 16 bit -->
 		<description>MS-DOS v2.11 (Nor)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="slot1:8088"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="msdos.dsk" size="368640" crc="4475dfa0" sha1="f925a7d60df8291c5b8aaa140a01933bba4a10c0" offset="0"/>
@@ -859,6 +859,7 @@
 		<description>TIKOS systemdiskett v2.0/24 (Nor)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="slot1:8088"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="tikos20.dsk" size="409600" crc="44ac5d24" sha1="25b8002738ae729539032a8eee49c64d316640cf" offset="0"/>

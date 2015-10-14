@@ -171,7 +171,9 @@ device_tiki100bus_card_interface::device_tiki100bus_card_interface(const machine
 
 // slot devices
 #include "8088.h"
+#include "hdc.h"
 
 SLOT_INTERFACE_START( tiki100_cards )
 	SLOT_INTERFACE("8088", TIKI100_8088)
+	SLOT_INTERFACE("hdc", TIKI100_HDC)
 SLOT_INTERFACE_END
