@@ -14,14 +14,12 @@
 
     TODO:
 
-    - 3 expansion slots
     - palette RAM should be written during HBLANK
     - DART clocks
     - winchester hard disk
     - analog/digital I/O
     - light pen
     - 8088 CPU card
-    - 360KB floppy format
 
 */
 
@@ -690,14 +688,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz, 1280, 0, 1024, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(tiki100_state, screen_update)
-	MCFG_SCREEN_SIZE(1024, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
-
 	MCFG_PALETTE_ADD("palette", 16)
-	// pixel clock 20.01782 MHz
 
 	MCFG_TIKI100_BUS_ADD()
 	//MCFG_TIKI100_BUS_IRQ_CALLBACK()
