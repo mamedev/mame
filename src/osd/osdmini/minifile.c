@@ -101,6 +101,14 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 	return FILERR_NONE;
 }
 
+//============================================================
+//  osd_openpty
+//============================================================
+
+file_error osd_openpty(osd_file **file, char *name, size_t name_len)
+{
+    return FILERR_FAILURE;
+}
 
 //============================================================
 //  osd_truncate

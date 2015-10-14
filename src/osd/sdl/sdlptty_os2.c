@@ -32,3 +32,8 @@ file_error sdl_close_ptty(osd_file *file)
 {
 	return FILERR_ACCESS_DENIED;
 }
+
+file_error sdl_slave_name_ptty(osd_file *file)
+{
+        return FILERR_ACCESS_DENIED;
+}
