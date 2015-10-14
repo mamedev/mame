@@ -313,6 +313,7 @@ public:
 	void decode_checkman();
 	void decode_dingoe();
 	void decode_frogger_sound();
+	void decode_froggermc_sound();
 	void decode_frogger_gfx();
 	void decode_anteater_gfx();
 	void decode_losttomb_gfx();
