@@ -451,6 +451,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 				break;
 		case 3: m_rotation_sign = (data & 7);
 				m_disable_roz = (~data & 0x08);
+				m_maincpu->set_input_line(INPUT_LINE_RESET, data & 8 ? CLEAR_LINE : ASSERT_LINE);
 				m_scrolly_hi = (data & 0x30) << 4;
 				m_scrollx_hi = (data & 0xc0) << 2;
 				break;
@@ -630,8 +631,8 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
 	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
 	//       between these operations brings us to this.
 	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
-	UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
+//	UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);
+//	m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
@@ -876,7 +877,7 @@ MACHINE_START_MEMBER(cntsteer_state,zerotrgt)
 }
 
 
-MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
+MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
 {
 	m_flipscreen = 0;
 	m_bg_bank = 0;
@@ -889,13 +890,14 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 
 	m_bg_color_bank = 0;
 	m_disable_roz = 0;
+	m_nmimask = 0;
 }
 
 
-MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
+MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 {
-	m_nmimask = 0;
-	MACHINE_RESET_CALL_MEMBER(cntsteer);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
 static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
