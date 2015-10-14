@@ -381,15 +381,16 @@ INPUT_PORTS_END
 static const gfx_layout sprite_layout =
 {
 	16,16,
-	RGN_FRAC(1,4),
+	RGN_FRAC(1,1),
 	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 16, 0, 24, 8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8
+			512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	128*8
 };
+
 
 static const gfx_layout text_layout =
 {
@@ -429,14 +430,14 @@ static const gfx_layout madgear_tile2 =
 };
 
 static GFXDECODE_START( lastduel )
-	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile,  0x100, 16 )  /* colors 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( madgear )
-	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile2, 0x100, 16 )  /* colors 0x100-0x1ff */
@@ -585,11 +586,11 @@ ROM_START( lastduel )
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ld_02.16h",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ld-11.12b",    0x000000, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) ) /* sprites */
-	ROM_LOAD( "ld-09.12a",    0x020000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) )
-	ROM_LOAD( "ld-12.17b",    0x040000, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
-	ROM_LOAD( "ld-10.17a",    0x060000, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "ld-09.12a",    0x000000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) ) /* sprites */
+	ROM_LOAD32_BYTE( "ld-10.17a",    0x000001, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
+	ROM_LOAD32_BYTE( "ld-11.12b",    0x000002, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) )
+	ROM_LOAD32_BYTE( "ld-12.17b",    0x000003, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "ld_01.12f",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
@@ -615,11 +616,11 @@ ROM_START( lastduelo )
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ld_02.16h",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ld-11.12b",    0x000000, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) ) /* sprites */
-	ROM_LOAD( "ld-09.12a",    0x020000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) )
-	ROM_LOAD( "ld-12.17b",    0x040000, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
-	ROM_LOAD( "ld-10.17a",    0x060000, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "ld-09.12a",    0x000000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) ) /* sprites */
+	ROM_LOAD32_BYTE( "ld-10.17a",    0x000001, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
+	ROM_LOAD32_BYTE( "ld-11.12b",    0x000002, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) )
+	ROM_LOAD32_BYTE( "ld-12.17b",    0x000003, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "ld_01.12f",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
@@ -645,11 +646,11 @@ ROM_START( lastduelj )
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ld_02.16h",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ld-11.12b",    0x000000, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) ) /* sprites */
-	ROM_LOAD( "ld-09.12a",    0x020000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) )
-	ROM_LOAD( "ld-12.17b",    0x040000, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
-	ROM_LOAD( "ld-10.17a",    0x060000, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "ld-09.12a",    0x000000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) ) /* sprites */
+	ROM_LOAD32_BYTE( "ld-10.17a",    0x000001, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
+	ROM_LOAD32_BYTE( "ld-11.12b",    0x000002, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) )
+	ROM_LOAD32_BYTE( "ld-12.17b",    0x000003, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "ld_01.12f",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
@@ -677,15 +678,15 @@ ROM_START( lastduelb )
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ld_02.bin",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ld_09.bin",    0x000000, 0x10000, CRC(f8fd5243) SHA1(fad80d8959f50a83eb2e47788a8183284d19bea6) ) /* sprites */
-	ROM_LOAD( "ld_10.bin",    0x010000, 0x10000, CRC(b49ad746) SHA1(4e609982d60155b0df13a156c37bdf2a25626632) )
-	ROM_LOAD( "ld_11.bin",    0x020000, 0x10000, CRC(1a0d180e) SHA1(a68a7f5d00da99a8068876fd2d61c726047aca80) )
-	ROM_LOAD( "ld_12.bin",    0x030000, 0x10000, CRC(b2745e26) SHA1(b511631fe4e21f3d2dc7440b3f69cd5edb43d20e) )
-	ROM_LOAD( "ld_15.bin",    0x040000, 0x10000, CRC(96b13bbc) SHA1(f2df8d4f11e9192063063ff2e9e4fe76971c5b24) )
-	ROM_LOAD( "ld_16.bin",    0x050000, 0x10000, CRC(9d80f7e6) SHA1(ce7c10eba6a9f6a1fad655c7de6b487aef6d7d64) )
-	ROM_LOAD( "ld_13.bin",    0x060000, 0x10000, CRC(a1a598ac) SHA1(a0d24d9125cd502b57adf9167cb61e8864d521ce) )
-	ROM_LOAD( "ld_14.bin",    0x070000, 0x10000, CRC(edf515cc) SHA1(8dc68d1d4e480afe9614ea85e2eced3fd3917484) )
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "ld_11.bin",    0x000000, 0x10000, CRC(1a0d180e) SHA1(a68a7f5d00da99a8068876fd2d61c726047aca80) ) /* sprites */
+	ROM_LOAD32_BYTE( "ld_12.bin",    0x040000, 0x10000, CRC(b2745e26) SHA1(b511631fe4e21f3d2dc7440b3f69cd5edb43d20e) )
+	ROM_LOAD32_BYTE( "ld_13.bin",    0x000001, 0x10000, CRC(a1a598ac) SHA1(a0d24d9125cd502b57adf9167cb61e8864d521ce) )
+	ROM_LOAD32_BYTE( "ld_14.bin",    0x040001, 0x10000, CRC(edf515cc) SHA1(8dc68d1d4e480afe9614ea85e2eced3fd3917484) )
+	ROM_LOAD32_BYTE( "ld_09.bin",    0x000002, 0x10000, CRC(f8fd5243) SHA1(fad80d8959f50a83eb2e47788a8183284d19bea6) )
+	ROM_LOAD32_BYTE( "ld_10.bin",    0x040002, 0x10000, CRC(b49ad746) SHA1(4e609982d60155b0df13a156c37bdf2a25626632) )
+	ROM_LOAD32_BYTE( "ld_15.bin",    0x000003, 0x10000, CRC(96b13bbc) SHA1(f2df8d4f11e9192063063ff2e9e4fe76971c5b24) )
+	ROM_LOAD32_BYTE( "ld_16.bin",    0x040003, 0x10000, CRC(9d80f7e6) SHA1(ce7c10eba6a9f6a1fad655c7de6b487aef6d7d64) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "ld_01.bin",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
@@ -721,15 +722,15 @@ ROM_START( madgear )
 	ROM_LOAD( "mg_05.14j",   0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 	ROM_CONTINUE(            0x10000,  0x08000 )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
-	ROM_LOAD( "mg_m11.rom0",   0x000000, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
-	ROM_LOAD( "mg_m07.rom2",   0x010000, 0x10000, CRC(e5c0b211) SHA1(dc4a92061c686a9d211a7b95aab2e41219508d67) )
-	ROM_LOAD( "mg_m12.rom1",   0x020000, 0x10000, CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
-	ROM_LOAD( "mg_m08.rom3",   0x030000, 0x10000, CRC(59709aa3) SHA1(384641da58c8b5198ad4fa51cd5fd9a628bcb888) )    /* Mask roms 07, 08, 11 & 12 located on first CN-SUB daughter card */
-	ROM_LOAD( "mg_m13.rom0",   0x040000, 0x10000, CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
-	ROM_LOAD( "mg_m09.rom2",   0x050000, 0x10000, CRC(40ee83eb) SHA1(35e11fcb3b75ada99df23715ecb955bd40e10da8) )
-	ROM_LOAD( "mg_m14.rom1",   0x060000, 0x10000, CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
-	ROM_LOAD( "mg_m10.rom3",   0x070000, 0x10000, CRC(b64afb54) SHA1(5fdd4f67e6b7440448adf395b61c79b79b4f86e7) )    /* Mask roms 09, 10, 13 & 14 located on second CN-SUB daughter card */
+	ROM_REGION( 0x80000, "sprites", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
+	ROM_LOAD32_BYTE( "mg_m11.rom0",   0x000002, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
+	ROM_LOAD32_BYTE( "mg_m07.rom2",   0x040002, 0x10000, CRC(e5c0b211) SHA1(dc4a92061c686a9d211a7b95aab2e41219508d67) )
+	ROM_LOAD32_BYTE( "mg_m12.rom1",   0x000000, 0x10000, CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
+	ROM_LOAD32_BYTE( "mg_m08.rom3",   0x040000, 0x10000, CRC(59709aa3) SHA1(384641da58c8b5198ad4fa51cd5fd9a628bcb888) )    /* Mask roms 07, 08, 11 & 12 located on first CN-SUB daughter card */
+	ROM_LOAD32_BYTE( "mg_m13.rom0",   0x000003, 0x10000, CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
+	ROM_LOAD32_BYTE( "mg_m09.rom2",   0x040003, 0x10000, CRC(40ee83eb) SHA1(35e11fcb3b75ada99df23715ecb955bd40e10da8) )
+	ROM_LOAD32_BYTE( "mg_m14.rom1",   0x000001, 0x10000, CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
+	ROM_LOAD32_BYTE( "mg_m10.rom3",   0x040001, 0x10000, CRC(b64afb54) SHA1(5fdd4f67e6b7440448adf395b61c79b79b4f86e7) )    /* Mask roms 09, 10, 13 & 14 located on second CN-SUB daughter card */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "mg_06.10k",    0x000000, 0x08000, CRC(382ee59b) SHA1(a1da439f0585f5cafe2fb7024f1ae0527e34cd92) ) /* 8x8 text */
@@ -759,15 +760,15 @@ ROM_START( madgearj )
 	ROM_LOAD( "mg_05.14j",   0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 	ROM_CONTINUE(            0x10000,  0x08000 )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
-	ROM_LOAD( "mg_m11.rom0",   0x000000, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
-	ROM_LOAD( "mg_m07.rom2",   0x010000, 0x10000, CRC(e5c0b211) SHA1(dc4a92061c686a9d211a7b95aab2e41219508d67) )
-	ROM_LOAD( "mg_m12.rom1",   0x020000, 0x10000, CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
-	ROM_LOAD( "mg_m08.rom3",   0x030000, 0x10000, CRC(59709aa3) SHA1(384641da58c8b5198ad4fa51cd5fd9a628bcb888) )    /* Mask roms 07, 08, 11 & 12 located on first CN-SUB daughter card */
-	ROM_LOAD( "mg_m13.rom0",   0x040000, 0x10000, CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
-	ROM_LOAD( "mg_m09.rom2",   0x050000, 0x10000, CRC(40ee83eb) SHA1(35e11fcb3b75ada99df23715ecb955bd40e10da8) )
-	ROM_LOAD( "mg_m14.rom1",   0x060000, 0x10000, CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
-	ROM_LOAD( "mg_m10.rom3",   0x070000, 0x10000, CRC(b64afb54) SHA1(5fdd4f67e6b7440448adf395b61c79b79b4f86e7) )    /* Mask roms 09, 10, 13 & 14 located on second CN-SUB daughter card */
+	ROM_REGION( 0x80000, "sprites", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
+	ROM_LOAD32_BYTE( "mg_m11.rom0",   0x000002, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
+	ROM_LOAD32_BYTE( "mg_m07.rom2",   0x040002, 0x10000, CRC(e5c0b211) SHA1(dc4a92061c686a9d211a7b95aab2e41219508d67) )
+	ROM_LOAD32_BYTE( "mg_m12.rom1",   0x000000, 0x10000, CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
+	ROM_LOAD32_BYTE( "mg_m08.rom3",   0x040000, 0x10000, CRC(59709aa3) SHA1(384641da58c8b5198ad4fa51cd5fd9a628bcb888) )    /* Mask roms 07, 08, 11 & 12 located on first CN-SUB daughter card */
+	ROM_LOAD32_BYTE( "mg_m13.rom0",   0x000003, 0x10000, CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
+	ROM_LOAD32_BYTE( "mg_m09.rom2",   0x040003, 0x10000, CRC(40ee83eb) SHA1(35e11fcb3b75ada99df23715ecb955bd40e10da8) )
+	ROM_LOAD32_BYTE( "mg_m14.rom1",   0x000001, 0x10000, CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
+	ROM_LOAD32_BYTE( "mg_m10.rom3",   0x040001, 0x10000, CRC(b64afb54) SHA1(5fdd4f67e6b7440448adf395b61c79b79b4f86e7) )    /* Mask roms 09, 10, 13 & 14 located on second CN-SUB daughter card */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "mg_06.10k",    0x000000, 0x08000, CRC(382ee59b) SHA1(a1da439f0585f5cafe2fb7024f1ae0527e34cd92) ) /* 8x8 text */
@@ -797,15 +798,15 @@ ROM_START( ledstorm )
 	ROM_LOAD( "mde_05.14j",   0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
-	ROM_LOAD( "11.rom0",   0x000000, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
-	ROM_LOAD( "07u.rom2",  0x010000, 0x10000, CRC(7152b212) SHA1(b021496e8b3c22c018907e6e374a7401d3843570) )
-	ROM_LOAD( "12.rom1",   0x020000, 0x10000, CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
-	ROM_LOAD( "08u.rom3",  0x030000, 0x10000, CRC(72e5d525) SHA1(209def4206e9b66be9879f0105d3f04980f156da) )    /* Mask roms 07, 08, 11 & 12 located on first CN-SUB daughter card */
-	ROM_LOAD( "13.rom0",   0x040000, 0x10000, CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
-	ROM_LOAD( "09u.rom2",  0x050000, 0x10000, CRC(7b5175cb) SHA1(8d8d4953dd787308bed75345af6789899d2afded) )
-	ROM_LOAD( "14.rom1",   0x060000, 0x10000, CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
-	ROM_LOAD( "10u.rom3",  0x070000, 0x10000, CRC(6db7ca64) SHA1(389cc93b9bfe2824a0de9796e79c6d452d09567e) )    /* Mask roms 09, 10, 13 & 14 located on second CN-SUB daughter card */
+	ROM_REGION( 0x80000, "sprites", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
+	ROM_LOAD32_BYTE( "11.rom0",   0x000002, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
+	ROM_LOAD32_BYTE( "07u.rom2",  0x040002, 0x10000, CRC(7152b212) SHA1(b021496e8b3c22c018907e6e374a7401d3843570) )
+	ROM_LOAD32_BYTE( "12.rom1",   0x000000, 0x10000, CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
+	ROM_LOAD32_BYTE( "08u.rom3",  0x040000, 0x10000, CRC(72e5d525) SHA1(209def4206e9b66be9879f0105d3f04980f156da) )    /* Mask roms 07, 08, 11 & 12 located on first CN-SUB daughter card */
+	ROM_LOAD32_BYTE( "13.rom0",   0x000003, 0x10000, CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
+	ROM_LOAD32_BYTE( "09u.rom2",  0x040003, 0x10000, CRC(7b5175cb) SHA1(8d8d4953dd787308bed75345af6789899d2afded) )
+	ROM_LOAD32_BYTE( "14.rom1",   0x000001, 0x10000, CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
+	ROM_LOAD32_BYTE( "10u.rom3",  0x040001, 0x10000, CRC(6db7ca64) SHA1(389cc93b9bfe2824a0de9796e79c6d452d09567e) )    /* Mask roms 09, 10, 13 & 14 located on second CN-SUB daughter card */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "mdu_06.10k",   0x000000, 0x08000, CRC(54bfdc02) SHA1(480ef755425aed9e0149bdb90bf30ddaef2be192) ) /* 8x8 text */
@@ -824,10 +825,10 @@ ROM_START( ledstorm )
 	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
-ROM_START( ledstorm2 )
+ROM_START( leds2011 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 256K for 68000 code */
-	ROM_LOAD16_BYTE( "lsu-04.8b", 0x00000, 0x20000, CRC(56a2f079) SHA1(da581c117d92ac5c1e8e44324f1aed2858a3cdc8) )
-	ROM_LOAD16_BYTE( "lsu-03.7b", 0x00001, 0x20000, CRC(9b6408c0) SHA1(8ef8349f58c62a2d626b1053eae2032d168d602c) )
+	ROM_LOAD16_BYTE( "lse_04.8b", 0x00000, 0x20000, CRC(166c0576) SHA1(1bae79fa565d87ebcaf92bf2531b759ec22111c7) )
+	ROM_LOAD16_BYTE( "lse_03.7b", 0x00001, 0x20000, CRC(0c8647b6) SHA1(ea041e3fdb0991fc7aae736f3043e3edbb2d10f5) )
 	ROM_LOAD16_BYTE( "ls-02.6b",  0x40000, 0x20000, CRC(05c0285e) SHA1(b155d2d0c41f614bd324813c5d3d87a6765ad812) )
 	ROM_LOAD16_BYTE( "ls-01.5b",  0x40001, 0x20000, CRC(8bf934dd) SHA1(f2287a4361af4986eb010dfbfb6de3a3d4124937) )
 
@@ -835,9 +836,9 @@ ROM_START( ledstorm2 )
 	ROM_LOAD( "ls-07.14j",    0x00000,  0x08000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* These ROMs are good but are incorrect for this set */
-	ROM_LOAD( "ls-10.13a",    0x00000, 0x40000, BAD_DUMP CRC(c5993f93) SHA1(29c565c112edb003c7d4adc5ac52e98e034bd1a1) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
-	ROM_LOAD( "ls-09.5a",     0x40000, 0x40000, BAD_DUMP CRC(80875e1d) SHA1(6f53694a0617bf3b4f65a0cf71750b0e65e49b46) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ls-10.13a",    0x00001, 0x40000, CRC(db2c5883) SHA1(00899f96e2cbf6930c107a53f660a944fa9a2682) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
+	ROM_LOAD16_BYTE( "ls-09.5a",     0x00000, 0x40000, CRC(89949efb) SHA1(c4d2ca19e483e468dedd184d0158e11e5591ab02) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "ls-08.10k",    0x000000, 0x08000, CRC(8803cf49) SHA1(7a01a05f760d8e2472fdbc1d10b53094babe295e) ) /* 8x8 text */
@@ -856,13 +857,51 @@ ROM_START( ledstorm2 )
 	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
+ROM_START( leds2011u )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 256K for 68000 code */
+	ROM_LOAD16_BYTE( "lsu-04.8b", 0x00000, 0x20000, CRC(56a2f079) SHA1(da581c117d92ac5c1e8e44324f1aed2858a3cdc8) )
+	ROM_LOAD16_BYTE( "lsu-03.7b", 0x00001, 0x20000, CRC(9b6408c0) SHA1(8ef8349f58c62a2d626b1053eae2032d168d602c) )
+	ROM_LOAD16_BYTE( "ls-02.6b",  0x40000, 0x20000, CRC(05c0285e) SHA1(b155d2d0c41f614bd324813c5d3d87a6765ad812) )
+	ROM_LOAD16_BYTE( "ls-01.5b",  0x40001, 0x20000, CRC(8bf934dd) SHA1(f2287a4361af4986eb010dfbfb6de3a3d4124937) )
+
+	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
+	ROM_LOAD( "ls-07.14j",    0x00000,  0x08000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
+	ROM_CONTINUE(             0x10000,  0x08000 )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ls-10.13a",    0x00001, 0x40000, CRC(db2c5883) SHA1(00899f96e2cbf6930c107a53f660a944fa9a2682) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
+	ROM_LOAD16_BYTE( "ls-09.5a",     0x00000, 0x40000, CRC(89949efb) SHA1(c4d2ca19e483e468dedd184d0158e11e5591ab02) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "ls-08.10k",    0x000000, 0x08000, CRC(8803cf49) SHA1(7a01a05f760d8e2472fdbc1d10b53094babe295e) ) /* 8x8 text */
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "ls-12.7l",     0x000000, 0x40000, CRC(6c1b2c6c) SHA1(18f22129f13c6bfa7e285f0e09a35644272f6ecb) ) /* NEC 23C2000 256kx8 mask ROM (QFP52) */
+
+	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_LOAD( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM */
+	ROM_LOAD( "ls-06.10e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
+	ROM_LOAD( "ls-05.12e",    0x20000, 0x20000, CRC(b06e03b5) SHA1(7d17e5cfb57866c60146bea1a4535e961c73327c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
+ROM_END
+
+
 /******************************************************************************/
 
 GAME( 1988, lastduel,  0,        lastduel, lastduel, driver_device, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, lastduelo, lastduel, lastduel, lastduel, driver_device, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, lastduelj, lastduel, lastduel, lastduel, driver_device, 0, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, lastduelb, lastduel, lastduel, lastduel, driver_device, 0, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
+
+// are both Mad Gear and Led Storm really US sets, both have a (c) Capcom USA, but so do several World sets from Capcom during this era, including Led Storm Rally 2011.  None of these display a region warning, 2011 does.
+// the region warning text is however still present in the ROM (albeit unused) and does appear to indicate both are US sets, so it's possible the title was revised to avoid confusion with the older Led Storm Rally 2011.
 GAME( 1989, madgear,   0,        madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, madgearj,  madgear,  madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ledstorm,  madgear,  madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ledstorm2, madgear,  madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) /* game still has wrong sprite issues */
+
+GAME( 1988, leds2011,  0,        madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011u, leds2011, madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )

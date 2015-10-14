@@ -552,6 +552,27 @@ ROM_START( joemacra )
 	ROM_LOAD( "mbn03",    0x00000, 0x200000, CRC(70b71a2a) SHA1(45851b0692de73016fc9b913316001af4690534c) )
 ROM_END
 
+ROM_START( joemacrj )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
+	ROM_LOAD( "my00-.e1",    0x000000, 0x080000,  CRC(2c184981) SHA1(976fbb554de96aa6405f6f64cd75b633439fe583) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // rebuilt with roms from other set
+	ROM_LOAD( "mbn00",    0x000000, 0x100000, CRC(11b2dac7) SHA1(71a50f606caddeb0ef266e2d3df9e429a4873f21) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "mbn01",    0x000001, 0x080000, CRC(a3a37353) SHA1(c4509c8268afb647c20e71b42ae8ebd2bdf075e6) )
+	ROM_LOAD16_BYTE( "mbn02",    0x000000, 0x080000, CRC(aa2230c5) SHA1(43b7ac5c69cde1840a5255a8897e1c5d5f89fd7b) )
+
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) )
+
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_LOAD( "mbn03",    0x00000, 0x200000, CRC(70b71a2a) SHA1(45851b0692de73016fc9b913316001af4690534c) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
+	ROM_LOAD16_WORD( "jmrj_ak93c45.h3", 0x00, 0x80, CRC(31f17522) SHA1(88fc10ffa2e0e3887ebaeafc0b132507e4c77d0d) )
+ROM_END
+
 /*
 
 Chain Reaction
@@ -1096,6 +1117,7 @@ DRIVER_INIT_MEMBER(simpl156_state,osman)
 /* Data East games running on the DE-0409-1 or DE-0491-1 PCB */
 GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
 GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, chainrec, 0,        chainrec,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, magdrop,  chainrec, magdrop,     simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, magdropp, chainrec, magdropp,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )

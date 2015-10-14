@@ -23,7 +23,7 @@
  TM-015               Cocktail Pong/Coup Franc (1974)                           ???????                            NO
  TM-048               Crash 'N Score/Stock Car (1975)                           A004256                            YES       003186(x2), 003187(x2), 004248, 004247
  TM-030               Crossfire (1975)                                          ???????                            NO?
- TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K/Race Circuit (1974)        A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
+ TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K (1974)                     A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
  TM-004,021           Gran Trak 20/Trak 20/Twin Racer (1974)                    A001791(RT20),A001793(A20-K4DRTA)  YES       74186 Racetrack prom (K5)
  TM-006,035           Goal 4/World Cup/Coupe De Monde (1975)                    A000823                            NO
  TM-016               Gotcha/Gotcha Color? (1973)                               A000816                            NO
@@ -430,7 +430,7 @@ GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Astroturf [TTL]",        MACHINE_IS_SKELETON)
-//GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 10/Trak 10/Formula K/Race Circuit [TTL]",     MACHINE_IS_SKELETON) //?
+//GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON) //?
 //GAME(1974,  gtrak20,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 20/Trak 20/Twin Racer [TTL]",     MACHINE_IS_SKELETON) //?
 //GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "LeMans [TTL]",           MACHINE_IS_SKELETON)
 //GAME(1974,  quack,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)

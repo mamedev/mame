@@ -415,4 +415,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
 COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM",     0)
-COMP( 198?, dvk_ksm01,dvk_ksm,0,       ksm,       0,       driver_device,     0,     "USSR",     "DVK KSM-01",  0)
+COMP( 198?, dvk_ksm01,dvk_ksm,0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM-01",  0)

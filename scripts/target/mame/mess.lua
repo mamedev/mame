@@ -645,6 +645,7 @@ BUSES["SNES_CTRL"] = true
 BUSES["SPC1000"] = true
 BUSES["TI99PEB"] = true
 BUSES["TI99X"] = true
+BUSES["TIKI100"] = true
 BUSES["TVC"] = true
 BUSES["VBOY"] = true
 BUSES["VC4000"] = true
@@ -1231,9 +1232,9 @@ files {
 }
 
 createMESSProjects(_target, _subtarget, "canon")
-files {             
-	MAME_DIR .. "src/mame/drivers/cat.c",       
-	MAME_DIR .. "src/mame/drivers/x07.c",       
+files {
+	MAME_DIR .. "src/mame/drivers/cat.c",
+	MAME_DIR .. "src/mame/drivers/x07.c",
 	MAME_DIR .. "src/mame/drivers/canon_s80.c",
 }
 
@@ -1640,8 +1641,8 @@ files {
 }
 
 createMESSProjects(_target, _subtarget, "heurikon")
-files {          
-	MAME_DIR .. "src/mame/drivers/hk68v10.c",  
+files {
+	MAME_DIR .. "src/mame/drivers/hk68v10.c",
 }
 
 createMESSProjects(_target, _subtarget, "intel")
@@ -1803,8 +1804,8 @@ files {
 }
 
 createMESSProjects(_target, _subtarget, "mizar")
-files {          
-	MAME_DIR .. "src/mame/drivers/mzr8105.c",  
+files {
+	MAME_DIR .. "src/mame/drivers/mzr8105.c",
 }
 
 createMESSProjects(_target, _subtarget, "morrow")

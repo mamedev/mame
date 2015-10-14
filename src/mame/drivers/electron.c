@@ -1,12 +1,54 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /******************************************************************************
-    Acorn Electron driver
+    Acorn Electron driver 
+    By Wilbert Pol
+    
+Hardware Overview
+-----------------
+The Acorn Electron is a budget version of the BBC Micro home computer
+Basic specs are:
+6502 CPU @ 2MHz or 1MHz
+32k RAM and 32k ROM
+Text modes: 20x32, 40x25, 40x32, 80x25, 80x32
+Graphics modes: 160x256 (4 or 16 colors), 320x256 (2 or 4 colors), 640x256 (2 colors), 320x200 (2 colors), 640x200 (2 colors)
+Colors: 8 colors (either solid or flashing)
+Sound: 1 channel, 7 octaves; built-in speaker
+Internal ports for cassette storage, RGB/CVBS monitors and TV output
+Various expansions can be added via the rear expansion port
 
-    MESS Driver By:
-
-    Wilbert Pol
-
+PCB Layout
+----------                           |-------------------|   
+                            |--------|  EXPANSION PORT   |
+|-----|---------------------|                            |---||---------|
+|MOD  | SPKR     16MHz                            LS169 18VAC||         []18VAC INPUT
+|     |17.7345MHz               ROM                     18VAC|| POWER   |
+|-----|       74S04                             |----|       || SUPPLY  |
+|          KBD_CONN                    6502     |ULA |       ||         |
+|CVBS                                           |----|       ||  +5VDC  |
+|RGB                  LS00 LS86                              ||  -5VDC  |
+|                                                         PWR||         |
+|CASS         LM324   LS00 LS86 S74 LS74 4164 4164 4164 4164 ||         |
+|------------------------------------------------------------||---------|
+Notes: (all IC's shown. Only 16 ICs are used)
+     6502 - 6502 CPU, clock input 2.000MHz [16/8]
+      ULA - Custom logic chip 12CO21, also containing most of the BBC Micro circuitry
+            Early PCB revisions used a PLCC68 chip in a socket. Later revisions used a 
+            PGA68 chip soldered directly into the motherboard
+     4164 - 4164 64k x4-bit DRAM (4 chips for 32kbytes total)
+      ROM - Hitachi HN613256 32k x8-bit MASK ROM containing OS & BASIC
+    LM324 - Texas Instruments LM324 Operational Amplifier
+      MOD - UHF TV modulator UM1233-E36
+     CVBS - Composite color video output socket
+      RGB - RGB monitor video output socket
+     CASS - Cassette port
+      PWR - 3-pin power input from internal power supply
+ KBD_CONN - 22-pin keyboard connector
+     SPKR - 2-pin internal speaker connector
+     
+******************************************************************************
+Emulation notes:
+ 
 I don't have a real system to verify the behaviour of the emulation. The things
 that can be done through BASIC programs seem to behave properly (most of the time :).
 
@@ -23,7 +65,6 @@ Missing:
     - Support for floppy disks
     - Other peripherals
     - Keyboard is missing the 'Break' key
-
 ******************************************************************************/
 
 #include "emu.h"

@@ -149,7 +149,7 @@ void ata_mass_storage_device::ide_build_identify_device()
 	m_identify_buffer[85] = 0x00;                      /* 85: command set/feature enabled */
 	m_identify_buffer[86] = 0x00;                      /* 86: command set/feature enabled */
 	m_identify_buffer[87] = 0x00;                      /* 87: command set/feature default */
-	m_identify_buffer[88] = 0x00;                      /* 88: additional DMA modes */
+	m_identify_buffer[88] = 0x00;                      /* 88: additional DMA modes (ultra dma) */
 	m_identify_buffer[89] = 0x00;                      /* 89: time required for security erase unit completion */
 	m_identify_buffer[90] = 0x00;                      /* 90: time required for enhanced security erase unit completion */
 	m_identify_buffer[91] = 0x00;                      /* 91: current advanced power management value */

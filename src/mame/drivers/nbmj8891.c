@@ -2747,9 +2747,6 @@ static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hnxmasev_map)
 	MCFG_CPU_IO_MAP(maiko_io_map)
-	
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_ORIENTATION(ROT180)	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hnageman, maiko )
@@ -2758,9 +2755,6 @@ static MACHINE_CONFIG_DERIVED( hnageman, maiko )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hnageman_map)
 	MCFG_CPU_IO_MAP(maiko_io_map)
-	
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_ORIENTATION(ROT180)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( scandal, hanamomo )

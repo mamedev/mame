@@ -26,17 +26,17 @@
 */
 
 #include "includes/tiki100.h"
-#include "bus/rs232/rs232.h"
 
 /* Memory Banking */
 
-READ8_MEMBER( tiki100_state::read )
+READ8_MEMBER( tiki100_state::mrq_r )
 {
-	int mdis = 1;
+	bool mdis = 1;
+
+	UINT8 data = m_exp->mrq_r(space, offset, 0xff, mdis);
+
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
 	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
-
-	UINT8 data = 0xff;
 
 	if (prom & ROM0)
 	{
@@ -63,9 +63,9 @@ READ8_MEMBER( tiki100_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::write )
+WRITE8_MEMBER( tiki100_state::mrq_w )
 {
-	int mdis = 1;
+	bool mdis = 1;
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
 	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
 
@@ -79,6 +79,100 @@ WRITE8_MEMBER( tiki100_state::write )
 	if (prom & RAM)
 	{
 		m_ram->pointer()[offset] = data;
+	}
+
+	m_exp->mrq_w(space, offset, data);
+}
+
+READ8_MEMBER( tiki100_state::iorq_r )
+{
+	UINT8 data = m_exp->iorq_r(space, offset, 0xff);
+
+	switch ((offset & 0xff) >> 2)
+	{
+	case 0x00: // KEYS
+		data = keyboard_r(space, 0);
+		break;
+
+	case 0x01: // SERS
+		data = m_dart->cd_ba_r(space, offset & 0x03);
+		break;
+
+	case 0x02: // PARS
+		data = m_pio->read(space, offset & 0x03);
+		break;
+
+	case 0x04: // FLOP
+		data = m_fdc->read(space, offset & 0x03);
+		break;
+
+	case 0x05: // VIPS
+		switch (offset & 0x03)
+		{
+		case 3:
+			data = m_psg->data_r(space, 0);
+			break;
+		}
+		break;
+
+	case 0x06: // TIMS
+		data = m_ctc->read(space, offset & 0x03);
+		break;
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( tiki100_state::iorq_w )
+{
+	m_exp->iorq_w(space, offset, data);
+
+	switch ((offset & 0xff) >> 2)
+	{
+	case 0x00: // KEYS
+		keyboard_w(space, 0, data);
+		break;
+
+	case 0x01: // SERS
+		m_dart->cd_ba_w(space, offset & 0x03, data);
+		break;
+
+	case 0x02: // PARS
+		m_pio->write(space, offset & 0x03, data);
+		break;
+
+	case 0x03: // VIPB
+		video_mode_w(space, 0, data);
+		break;
+
+	case 0x04: // FLOP
+		m_fdc->write(space, offset & 0x03, data);
+		break;
+
+	case 0x05: // VIPS
+		switch (offset & 0x03)
+		{
+		case 0: case 1:
+			palette_w(space, 0, data);
+			break;
+
+		case 2:
+			m_psg->address_w(space, 0, data);
+			break;
+
+		case 3:
+			m_psg->data_w(space, 0, data);
+			break;
+		}
+		break;
+
+	case 0x06: // TIMS
+		m_ctc->write(space, offset & 0x03, data);
+		break;
+
+	case 0x07: // SYL
+		system_w(space, 0, data);
+		break;
 	}
 }
 
@@ -209,28 +303,12 @@ WRITE8_MEMBER( tiki100_state::system_w )
 
 static ADDRESS_MAP_START( tiki100_mem, AS_PROGRAM, 8, tiki100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrq_r, mrq_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_WRITE(video_mode_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(FD1797_TAG, fd1797_t, read, write)
-	AM_RANGE(0x14, 0x14) AM_MIRROR(0x01) AM_WRITE(palette_w)
-	AM_RANGE(0x16, 0x16) AM_DEVWRITE(AY8912_TAG, ay8910_device, address_w)
-	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE(AY8912_TAG, ay8910_device, data_r, data_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
-//  AM_RANGE(0x20, 0x27) AM_NOP // winchester controller
-//  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
-//  AM_RANGE(0x60, 0x67) digital I/O (RVO)
-//  AM_RANGE(0x70, 0x77) analog/digital I/O
-//  AM_RANGE(0x78, 0x7b) light pen
-//  AM_RANGE(0x7e, 0x7f) 8088/87 processor w/128KB RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -621,6 +699,13 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	// pixel clock 20.01782 MHz
 
+	MCFG_TIKI100_BUS_ADD()
+	//MCFG_TIKI100_BUS_IRQ_CALLBACK()
+	//MCFG_TIKI100_BUS_NMI_CALLBACK()
+	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
+	MCFG_TIKI100_BUS_SLOT_ADD("slot2", NULL)
+	MCFG_TIKI100_BUS_SLOT_ADD("slot3", NULL)
+
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, 0, 0, 0, 0 )
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
@@ -706,12 +791,6 @@ ROM_START( tiki100 )
 
 	ROM_REGION( 0x100, "u4", 0 )
 	ROM_LOAD( "53ls140.u4", 0x000, 0x100, CRC(894b756f) SHA1(429e10de0e0e749246895801b18186ff514c12bc) )
-
-	ROM_REGION( 0x1000, "8088", 0 )
-	ROM_LOAD( "boot 1.0.u3", 0x0000, 0x1000, CRC(436974aa) SHA1(837087b3ab982d047e4f15799fef3daa37dd6c01) )
-
-	ROM_REGION( 0x100, "8088_proms", 0 )
-	ROM_LOAD( "53ls140.u26", 0x000, 0x100, CRC(fc5902e1) SHA1(afb9cb54ab6fc449e7544ddb3cbebc3770c4f937) )
 ROM_END
 
 /* System Drivers */

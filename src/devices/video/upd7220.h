@@ -64,8 +64,6 @@
 #define MCFG_UPD7220_BLANK_CALLBACK(_write) \
 	devcb = &upd7220_device::set_blank_wr_callback(*device, DEVCB_##_write);
 
-#define MCFG_UPD7220_VISIBLE_AREA_OFFSET(_dminx, _dmaxx, _dminy, _dmaxy) \
-	upd7220_device::static_set_visible_area_offsets(*device, _dminx, _dmaxx, _dminy, _dmaxy);
 
 
 //**************************************************************************
@@ -88,7 +86,6 @@ public:
 
 	static void static_set_display_pixels_callback(device_t &device, upd7220_display_pixels_delegate callback) { downcast<upd7220_device &>(device).m_display_cb = callback; }
 	static void static_set_draw_text_callback(device_t &device, upd7220_draw_text_delegate callback) { downcast<upd7220_device &>(device).m_draw_text_cb = callback; }
-	static void static_set_visible_area_offsets(device_t &device, INT16 dminx, INT16 dmaxx, INT16 dminy, INT16 dmaxy);
 
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_drq.set_callback(object); }
 	template<class _Object> static devcb_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_hsync.set_callback(object); }
@@ -196,8 +193,6 @@ private:
 	int m_hs;                       // horizontal sync width - 1
 	int m_hfp;                      // horizontal front porch width - 1
 	int m_hbp;                      // horizontal back porch width - 1
-
-	rectangle m_visarea_offset;		// device dependend visible area offsets for xmin, ymin, xmax and ymax
 
 	int m_dc;                       // display cursor
 	int m_sc;                       // 0 = blinking cursor / 1 = steady cursor

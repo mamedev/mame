@@ -3095,7 +3095,8 @@ lastduelb       // bootleg
 madgear         //  2/1989 (c) 1989 (US)
 madgearj        //  2/1989 (c) 1989 (Japan)
 ledstorm        //  1988 (c) 1988 (US)
-ledstorm2       //  1988 (c) 1988 (US)
+leds2011        //  1988 (c) 1988 (World)
+leds2011u		//  1988 (c) 1988 (US)
 //  3/1989 Dokaben (baseball) - see below among "Mitchell" games
 //  8/1989 Dokaben 2 (baseball) - see below among "Mitchell" games
 // 10/1989 Capcom Baseball - see below among "Mitchell" games
@@ -3864,7 +3865,7 @@ soulclbrjb      // 1998.?? Soul Calibur (Japan, SOC11/VER.B)
 soulclbrja      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
 technodr        // 1998.07 Techno Drive
 mdhorse         // 1998.11 Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)
-				// 1998.12 Attack Pla Rail
+aplarail		// 1998.12 Attack Pla Rail
 tenkomor        // 1998.?? Tenkomori Shooting (Asia, TKM2/VER.A1)
 tenkomorja      // 1998.12 Tenkomori Shooting (Japan, TKM1/VER.A1)
 pacapp          // 1998.12 Paca Paca Passion (Japan, PPP1/VER.A2)
@@ -6291,8 +6292,9 @@ nslasheru       // MBH (c) 1993 Data East Corporation (US)
 lockload        // MBM (c) 1994 Data East Corporation (World)
 lockloadu       // MBM (c) 1994 Data East Corporation (US)
 gunhard         // MBM (c) 1994 Data East Corporation (Japan)
-joemacr         // MBN (c) 1994
-joemacra        // MBN (c) 1994
+joemacr         // MBN (c) 1994 Data East Corporation (World)
+joemacra        // MBN (c) 1994 Data East Corporation (World)
+joemacrj        // MBN (c) 1994 Data East Corporation (Japan)
 				// MBO ??
 				// MBP ??
 				// MBQ ??
