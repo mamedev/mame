@@ -450,7 +450,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3: m_rotation_sign = (data & 7);
-				m_disable_roz = (~data & 0x08);
+				m_disable_roz = 0; //(~data & 0x08);
 				m_maincpu->set_input_line(INPUT_LINE_RESET, data & 8 ? CLEAR_LINE : ASSERT_LINE);
 				m_scrolly_hi = (data & 0x30) << 4;
 				m_scrollx_hi = (data & 0xc0) << 2;
