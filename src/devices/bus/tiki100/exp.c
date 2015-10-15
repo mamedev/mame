@@ -28,7 +28,8 @@ const device_type TIKI100_BUS_SLOT = &device_creator<tiki100_bus_slot_t>;
 
 tiki100_bus_slot_t::tiki100_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TIKI100_BUS_SLOT, "TIKI-100 expansion bus slot", tag, owner, clock, "tiki100bus_slot", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -41,7 +42,11 @@ void tiki100_bus_slot_t::device_start()
 {
 	m_bus = machine().device<tiki100_bus_t>(TIKI100_BUS_TAG);
 	device_tiki100bus_card_interface *dev = dynamic_cast<device_tiki100bus_card_interface *>(get_card_device());
-	if (dev) m_bus->add_card(dev);
+	if (dev)
+	{
+		m_bus->add_card(dev);
+		m_card = dev;
+	}
 }
 
 

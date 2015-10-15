@@ -15,6 +15,7 @@
 #define __TIKI100_BUS__
 
 #include "emu.h"
+#include "cpu/z80/z80daisy.h"
 
 
 
@@ -53,9 +54,47 @@
 // ======================> tiki100_bus_slot_t
 
 class tiki100_bus_t;
+class tiki100_bus_slot_t;
+
+
+// ======================> device_tiki100bus_card_interface
+
+class device_tiki100bus_card_interface : public device_slot_card_interface
+{
+	friend class tiki100_bus_t;
+
+public:
+	// construction/destruction
+	device_tiki100bus_card_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_tiki100bus_card_interface() { }
+
+	device_tiki100bus_card_interface *next() const { return m_next; }
+
+	// memory access
+	virtual UINT8 mrq_r(address_space &space, offs_t offset, UINT8 data, bool &mdis) { mdis = 1; return data; };
+	virtual void mrq_w(address_space &space, offs_t offset, UINT8 data) { };
+
+	// I/O access
+	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data) { return data; };
+	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data) { };
+
+	// Z80 daisy chain
+	virtual int z80daisy_irq_state() { return 0; }
+	virtual int z80daisy_irq_ack() { return 0; }
+	virtual void z80daisy_irq_reti() { }
+
+	tiki100_bus_t  *m_bus;
+	tiki100_bus_slot_t *m_slot;
+
+	device_tiki100bus_card_interface *m_next;
+};
+
+
+// ======================> tiki100_bus_slot_t
 
 class tiki100_bus_slot_t : public device_t,
-							   public device_slot_interface
+						   public device_slot_interface,
+						   public device_z80daisy_interface
 {
 public:
 	// construction/destruction
@@ -64,17 +103,21 @@ public:
 	// device-level overrides
 	virtual void device_start();
 
+protected:
+	// device_z80daisy_interface overrides
+	virtual int z80daisy_irq_state() { return get_card_device() ? m_card->z80daisy_irq_state() : 0; }
+	virtual int z80daisy_irq_ack() { return get_card_device() ? m_card->z80daisy_irq_ack() : 0; }
+	virtual void z80daisy_irq_reti() { if (get_card_device()) m_card->z80daisy_irq_reti(); }
+
 private:
 	// configuration
 	tiki100_bus_t  *m_bus;
+	device_tiki100bus_card_interface *m_card;
 };
 
 
 // device type definition
 extern const device_type TIKI100_BUS_SLOT;
-
-
-class device_tiki100bus_card_interface;
 
 
 // ======================> tiki100_bus_t
@@ -118,33 +161,6 @@ private:
 extern const device_type TIKI100_BUS;
 
 
-// ======================> device_tiki100bus_card_interface
-
-// class representing interface-specific live tiki100bus card
-class device_tiki100bus_card_interface : public device_slot_card_interface
-{
-	friend class tiki100_bus_t;
-
-public:
-	// construction/destruction
-	device_tiki100bus_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_tiki100bus_card_interface() { }
-
-	device_tiki100bus_card_interface *next() const { return m_next; }
-
-	// memory access
-	virtual UINT8 mrq_r(address_space &space, offs_t offset, UINT8 data, bool &mdis) { mdis = 1; return data; };
-	virtual void mrq_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	// I/O access
-	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data) { return data; };
-	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	tiki100_bus_t  *m_bus;
-	tiki100_bus_slot_t *m_slot;
-
-	device_tiki100bus_card_interface *m_next;
-};
 
 
 SLOT_INTERFACE_EXTERN( tiki100_cards );
