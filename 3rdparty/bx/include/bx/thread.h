@@ -260,7 +260,7 @@ namespace bx
 		uint32_t m_id;
 	};
 
-#elif !(BX_PLATFORM_WINRT)
+#elif !BX_PLATFORM_WINRT
 
 	class TlsData
 	{
@@ -291,7 +291,7 @@ namespace bx
 	private:
 		pthread_key_t m_id;
 	};
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_*
 
 } // namespace bx
 
