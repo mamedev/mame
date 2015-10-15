@@ -851,11 +851,18 @@ READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::froggrmc_sound_control_w)
+WRITE8_MEMBER(galaxian_state::froggermc_sound_control_w)
 {
-	m_audiocpu->set_input_line(0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
+IRQ_CALLBACK_MEMBER(galaxian_state::froggermc_audiocpu_irq_ack)
+{
+	// cleared when taking the interrupt using the m1 line
+	// schematic: http://www.jrok.com/schem/FROGSND.pdf
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return 0xff;
+}
 
 /*************************************
  *
@@ -3722,7 +3729,7 @@ static INPUT_PORTS_START( frogger )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( froggrmc )
+static INPUT_PORTS_START( froggermc )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -3763,7 +3770,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( frogg )
-	PORT_INCLUDE(froggrmc)
+	PORT_INCLUDE(froggermc)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL )       // See notes
@@ -5332,12 +5339,15 @@ static MACHINE_CONFIG_DERIVED( frogger, konami_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( froggrmc, galaxian_base )
+static MACHINE_CONFIG_DERIVED( froggermc, galaxian_base )
 	MCFG_FRAGMENT_ADD(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mooncrst_map_base)     /* no discrete sound ! */
+	
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, galaxian_state, froggermc_audiocpu_irq_ack)
 MACHINE_CONFIG_END
 
 
@@ -5762,7 +5772,7 @@ void galaxian_state::decode_frogger_sound()
 		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
-// froggrmc has a bigger first ROM of the sound CPU, thus a different decode
+// froggermc has a bigger first ROM of the sound CPU, thus a different decode
 void galaxian_state::decode_froggermc_sound()
 {
 	UINT8 *rombase = memregion("audiocpu")->base();
@@ -5828,7 +5838,7 @@ void galaxian_state::decode_superbon()
 	offs_t i;
 	UINT8 *RAM;
 
-	/* Deryption worked out by hand by Chris Hardy. */
+	/* Decryption worked out by hand by Chris Hardy. */
 
 	RAM = memregion("maincpu")->base();
 
@@ -6589,7 +6599,7 @@ DRIVER_INIT_MEMBER(galaxian_state,quaak)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,froggrmc)
+DRIVER_INIT_MEMBER(galaxian_state,froggermc)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6597,7 +6607,7 @@ DRIVER_INIT_MEMBER(galaxian_state,froggrmc)
 	common_init(NULL, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
 
 	space.install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),this));
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggrmc_sound_control_w),this));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggermc_sound_control_w),this));
 
 	/* actually needs 2k of RAM */
 	space.install_ram(0x8000, 0x87ff);
@@ -10966,7 +10976,7 @@ GAME( 1980, kingballj,   kingball, kingball,   kingball,   galaxian_state, kingb
 GAME( 1981, frogger,     0,        frogger,    frogger,    galaxian_state, frogger,    ROT90,  "Konami", "Frogger", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers1,   frogger,  frogger,    frogger,    galaxian_state, frogger,    ROT90,  "Konami (Sega license)", "Frogger (Sega set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers2,   frogger,  frogger,    frogger,    galaxian_state, frogger,    ROT90,  "Konami (Sega license)", "Frogger (Sega set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, froggermc,   frogger,  froggrmc,   froggrmc,   galaxian_state, froggrmc,   ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggermc,   frogger,  froggermc,  froggermc,  galaxian_state, froggermc,  ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, froggers,   ROT90,  "bootleg", "Frog", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, froggers,   ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogg,       frogger,  galaxian,   frogg,      galaxian_state, frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )

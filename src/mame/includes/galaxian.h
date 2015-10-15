@@ -158,7 +158,8 @@ public:
 	DECLARE_WRITE8_MEMBER(frogger_ppi8255_w);
 	DECLARE_READ8_MEMBER(frogger_ay8910_r);
 	DECLARE_WRITE8_MEMBER(frogger_ay8910_w);
-	DECLARE_WRITE8_MEMBER(froggrmc_sound_control_w);
+	IRQ_CALLBACK_MEMBER(froggermc_audiocpu_irq_ack);
+	DECLARE_WRITE8_MEMBER(froggermc_sound_control_w);
 	DECLARE_READ8_MEMBER(frogf_ppi8255_r);
 	DECLARE_WRITE8_MEMBER(frogf_ppi8255_w);
 	DECLARE_READ8_MEMBER(turtles_ppi8255_0_r);
@@ -245,7 +246,7 @@ public:
 	DECLARE_DRIVER_INIT(scobrae);
 	DECLARE_DRIVER_INIT(losttomb);
 	DECLARE_DRIVER_INIT(frogger);
-	DECLARE_DRIVER_INIT(froggrmc);
+	DECLARE_DRIVER_INIT(froggermc);
 	DECLARE_DRIVER_INIT(froggers);
 	DECLARE_DRIVER_INIT(quaak);
 	DECLARE_DRIVER_INIT(turtles);
