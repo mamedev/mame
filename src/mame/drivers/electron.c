@@ -53,7 +53,6 @@ I don't have a real system to verify the behaviour of the emulation. The things
 that can be done through BASIC programs seem to behave properly (most of the time :).
 
 Incomplete:
-    - Sound (sound is too high?)
     - Graphics (seems to be wrong for several games)
     - 1 MHz bus is not emulated
     - Bus claiming by ULA is not implemented
@@ -246,4 +245,4 @@ ROM_START(electron)
 ROM_END
 
 /*     YEAR  NAME      PARENT COMPAT    MACHINE   INPUT     INIT  COMPANY  FULLNAME */
-COMP ( 1983, electron, 0,     0,        electron, electron, driver_device, 0,    "Acorn", "Acorn Electron", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1983, electron, 0,     0,        electron, electron, driver_device, 0,    "Acorn", "Acorn Electron", MACHINE_IMPERFECT_GRAPHICS )

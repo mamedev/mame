@@ -2762,21 +2762,11 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spcwarp, galaxold_base )
+static MACHINE_CONFIG_DERIVED( spcwarp, hunchbkg )
 	/* hunchbkg but with different banking */
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
-
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spcwarp)
-	MCFG_CPU_IO_MAP(hunchbkg_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
-
-	MCFG_DEVICE_MODIFY("7474_9m_1")
-	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", s2650_device, write_sense))
-
-	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
-
-	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
 
@@ -3098,7 +3088,6 @@ ROM_START( ckonggx )
 	ROM_LOAD( "(ckonggx__)6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-
 /*
 
 on a cocktail galaxian pcb (eagle style)
@@ -3188,7 +3177,6 @@ ROM_START( ckongis )
 	ROM_LOAD( "dkp.bin",     0x0000, 0x0020, CRC(97c473cc) SHA1(1bbb7f17b8d6a3a621e8c22d473eb26d4c1a750b) )
 ROM_END
 
-
 ROM_START( scramblb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scramble.1k",  0x0000, 0x0800, CRC(9e025c4a) SHA1(a8cc9391bdd01a5a2fe7f0c4e889b4e2495df891) )
@@ -3231,7 +3219,6 @@ ROM_START( scramb2 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
-
 
 ROM_START( scrambler )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3416,7 +3403,6 @@ ROM_START( tazzmang2 )  // Original Sparcade set
 	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-
 ROM_START( bongo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bg1.bin",    0x0000, 0x1000, CRC(de9a8ec6) SHA1(b5ee99b26d1a39e31b643ad0f5723ee8e364023e) )
@@ -3489,15 +3475,20 @@ ROM_START( hunchbkg )
 ROM_END
 
 ROM_START( spcwarp )
-	// unknown Century Electronics space shooter which involves shooting down enemy ships to use them yourself for increasing rate of fire
-	// came out of an undumped ROMS collection - we have no idea if this is Space Warp but it's a unique dump compared to everything else.
+	/* Cosmos (cvs.c) conversion - came out of an undumped ROMS collection, runs on modified hunchbkg hardware.
+	No idea if this is Space Warp but it's a unique dump compared to everything else.
+	NOTES:
+	-the wikipedia article gave the description of the game more like a bootleg game similar to mooncrst
+	(different game under same name?)
+	-there might be a missing rom at $4000, however nothing seen in the code calls it (so far)
+	-theres likely a checksum check every 10 frames, which is probably failing and crashing the game because of ROM3 (bad dump) */
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
 	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
-	/* missing rom at $4000? todo: check valid calls */
+	/* ROM3 - one address line was likely not connected, duplicate strings everywhere */
 	ROM_LOAD( "swarpt7m.bin", 0x6000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) ) /* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) // gfx are very similar to 'cosmos'
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
 	ROM_LOAD( "swarpb1k.bin", 0x0800, 0x0800, CRC(da4cee6b) SHA1(28b91381658f598fa62049489beee443232825c6) )
 
@@ -3679,7 +3670,6 @@ ROM_START( trvchlng )
 	ROM_LOAD( "senko1.bin",   0x0000, 0x0020, CRC(1434c7ff) SHA1(0ee5f5351dd84fbf8d3d8eaafbdbe86dd29960f8) )
 ROM_END
 
-
 // PCB made by Recreativos Franco
 ROM_START( guttangt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3700,7 +3690,6 @@ ROM_START( guttangt )
 	ROM_REGION( 0x0020, "proms", 0 ) // no PROM was present..
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
-
 
 /*
 Bulls Eye Darts conversion by Senko Industries Ltd (1984)
@@ -3756,7 +3745,6 @@ DRIVER_INIT_MEMBER(galaxold_state,guttangt)
 	UINT8 *rom = memregion("maincpu")->base();
 	membank("cpubank")->set_base(rom + 0x2000);
 }
-
 
 /* Z80 games */
 //    YEAR  NAME       PARENT    MACHINE    INPUT      INIT                       ROT     COMPANY, FULLNAME, FLAGS, LAYOUT

@@ -246,7 +246,11 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 	case 0x06:  /* Counter divider */
 		if ( m_ula.communication_mode == 0x01)
 		{
-			m_beeper->set_frequency( 1000000 / ( 16 * ( data + 1 ) ) );
+			/* frequency derives from internal clock in ULA    */
+			/* acorn electron user guide says the frequency is */
+			/* 1MHz but the algorithm described is wrong;      */
+			/* divider should be 32, not 16!                   */
+			m_beeper->set_frequency( 1000000 / ( 32 * ( data + 1 ) ) );
 		}
 		break;
 	case 0x07:  /* Misc. */
