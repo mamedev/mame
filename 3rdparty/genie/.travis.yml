@@ -1,11 +1,13 @@
 language: cpp
-
-compiler:
-  - gcc
-  - clang
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+    - compiler: clang
+      os: osx
 
 script:
-  make -C build/gmake.linux clean all
+  make
 
 branches:
   only:
@@ -13,10 +15,6 @@ branches:
 
 notifications:
   email: false
-
-os:
-  - linux
-  - osx
 
 osx_image:
   xcode61

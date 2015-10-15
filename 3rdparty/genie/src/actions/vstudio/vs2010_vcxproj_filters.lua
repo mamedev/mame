@@ -35,7 +35,7 @@
 				if not filters[path] then
 					filters[path] = true
 					_p(2, '<Filter Include="%s">', path)
-					_p(3, '<UniqueIdentifier>{%s}</UniqueIdentifier>', os.uuid())
+					_p(3, '<UniqueIdentifier>{%s}</UniqueIdentifier>', os.uuid(path))
 					_p(2, '</Filter>')
 				end
 
@@ -61,7 +61,7 @@
 					if not filters[path] then
 						filters[path] = true
 						_p(2, '<Filter Include="%s">', path)
-						_p(3, '<UniqueIdentifier>{%s}</UniqueIdentifier>', os.uuid())
+						_p(3, '<UniqueIdentifier>{%s}</UniqueIdentifier>', os.uuid(path))
 						_p(2, '</Filter>')
 					end
 
