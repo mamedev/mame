@@ -16,11 +16,13 @@
         - according to a side-by-side test, sound should be "darker" by some octaves,
           likely that a sound filter is needed;
     cntsteer specific:
-    	- proper bus request support, starting from understanding the role of DP register in M6809 core 
-	  (having that returning non-zero in NMI for subcpu forces a reset?);
-	- Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol.
-	- understand who's master and who's slave between "back" and "mix" CPUs (order might be actually inverted);
-	- understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging);
+        - In Back Rotate Test, rotation is tested with the following arrangement (upper bits of rotation parameter):
+          04 -> 05 -> 02 -> 03 -> 00 -> 01 -> 06 -> 07 -> 04 and backwards
+          Anything with bit 0 set is tested from 0xff to 0, with bit 0 clear that's 0 -> 0xff, fun.
+	- Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol. 
+	  We currently have slave CPU irq hooked up to vblank, might or might not be correct.
+	- invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
+	- understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging, missing video bit or it's actually a RMW thing);
     cleanup
         - split into driver/video;
 
