@@ -13,7 +13,7 @@
 #include <stdint.h>  // uint32_t
 #include <stdlib.h>  // size_t
 
-#include "bgfxdefines.h"
+#include <bgfx/bgfxdefines.h>
 
 typedef enum bgfx_renderer_type
 {
@@ -123,6 +123,7 @@ typedef enum bgfx_texture_format
     BGFX_TEXTURE_FORMAT_RG32I,
     BGFX_TEXTURE_FORMAT_RG32U,
     BGFX_TEXTURE_FORMAT_RG32F,
+    BGFX_TEXTURE_FORMAT_RGB9E5F,
     BGFX_TEXTURE_FORMAT_BGRA8,
     BGFX_TEXTURE_FORMAT_RGBA8,
     BGFX_TEXTURE_FORMAT_RGBA8I,
@@ -638,7 +639,7 @@ BGFX_C_API bgfx_uniform_handle_t bgfx_create_uniform(const char* _name, bgfx_uni
 BGFX_C_API void bgfx_destroy_uniform(bgfx_uniform_handle_t _handle);
 
 /**/
-BGFX_C_API void bgfx_set_clear_color(uint8_t _index, const float _rgba[4]);
+BGFX_C_API void bgfx_set_palette_color(uint8_t _index, const float _rgba[4]);
 
 /**/
 BGFX_C_API void bgfx_set_view_name(uint8_t _id, const char* _name);

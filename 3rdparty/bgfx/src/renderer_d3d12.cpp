@@ -221,6 +221,7 @@ namespace bgfx { namespace d3d12
 		{ DXGI_FORMAT_R32G32_SINT,        DXGI_FORMAT_R32G32_SINT,           DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN             }, // RG32I
 		{ DXGI_FORMAT_R32G32_UINT,        DXGI_FORMAT_R32G32_UINT,           DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN             }, // RG32U
 		{ DXGI_FORMAT_R32G32_FLOAT,       DXGI_FORMAT_R32G32_FLOAT,          DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN             }, // RG32F
+		{ DXGI_FORMAT_R9G9B9E5_SHAREDEXP, DXGI_FORMAT_R9G9B9E5_SHAREDEXP,    DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN             }, // RGB9E5F
 		{ DXGI_FORMAT_B8G8R8A8_UNORM,     DXGI_FORMAT_B8G8R8A8_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_B8G8R8A8_UNORM_SRGB }, // BGRA8
 		{ DXGI_FORMAT_R8G8B8A8_UNORM,     DXGI_FORMAT_R8G8B8A8_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_R8G8B8A8_UNORM_SRGB }, // RGBA8
 		{ DXGI_FORMAT_R8G8B8A8_SINT,      DXGI_FORMAT_R8G8B8A8_SINT,         DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_R8G8B8A8_UNORM_SRGB }, // RGBA8I
@@ -457,6 +458,7 @@ namespace bgfx { namespace d3d12
 		RendererContextD3D12()
 			: m_wireframe(false)
 			, m_flags(BGFX_RESET_NONE)
+			, m_maxAnisotropy(1)
 			, m_fsChanges(0)
 			, m_vsChanges(0)
 			, m_backBufferColorIdx(0)
@@ -835,10 +837,10 @@ namespace bgfx { namespace d3d12
 
 				D3D12_ROOT_PARAMETER rootParameter[] =
 				{
-					{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &descRange[Rdt::Sampler] }, D3D12_SHADER_VISIBILITY_ALL },
-					{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &descRange[Rdt::SRV]     }, D3D12_SHADER_VISIBILITY_ALL },
-					{ D3D12_ROOT_PARAMETER_TYPE_CBV,              { 0, 0                        }, D3D12_SHADER_VISIBILITY_ALL },
-					{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &descRange[Rdt::UAV]     }, D3D12_SHADER_VISIBILITY_ALL },
+					{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { { 1, &descRange[Rdt::Sampler] } }, D3D12_SHADER_VISIBILITY_ALL },
+					{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { { 1, &descRange[Rdt::SRV]     } }, D3D12_SHADER_VISIBILITY_ALL },
+					{ D3D12_ROOT_PARAMETER_TYPE_CBV,              { { 0, 0                        } }, D3D12_SHADER_VISIBILITY_ALL },
+					{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { { 1, &descRange[Rdt::UAV]     } }, D3D12_SHADER_VISIBILITY_ALL },
 				};
 				rootParameter[Rdt::CBV].Descriptor.RegisterSpace  = 0;
 				rootParameter[Rdt::CBV].Descriptor.ShaderRegister = 0;
@@ -1364,7 +1366,7 @@ namespace bgfx { namespace d3d12
 			box.back   = 1;
 
 			setResourceBarrier(m_commandList, backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_COPY_SOURCE);
-			D3D12_TEXTURE_COPY_LOCATION dst = { readback,   D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,  layout };
+			D3D12_TEXTURE_COPY_LOCATION dst = { readback,   D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,  { layout } };
 			D3D12_TEXTURE_COPY_LOCATION src = { backBuffer, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, {}     };
 			m_commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, &box);
 			setResourceBarrier(m_commandList, backBuffer, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PRESENT);
@@ -1467,7 +1469,7 @@ namespace bgfx { namespace d3d12
 
 			TextureD3D12& texture = m_textures[_blitter.m_texture.idx];
 			uint32_t samplerFlags[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS] = { texture.m_flags & BGFX_TEXTURE_SAMPLER_BITS_MASK };
-			uint16_t samplerStateIdx = getSamplerState(samplerFlags);
+			uint16_t samplerStateIdx = getSamplerState(samplerFlags, BGFX_CONFIG_MAX_TEXTURE_SAMPLERS, NULL);
 			m_commandList->SetGraphicsRootDescriptorTable(Rdt::Sampler, m_samplerAllocator.get(samplerStateIdx) );
 			D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
 			scratchBuffer.allocSrv(srvHandle, texture);
@@ -1627,6 +1629,15 @@ data.NumQualityLevels = 0;
 
 		void updateResolution(const Resolution& _resolution)
 		{
+			if (!!(_resolution.m_flags & BGFX_RESET_MAXANISOTROPY) )
+			{
+				m_maxAnisotropy = D3D12_REQ_MAXANISOTROPY;
+			}
+			else
+			{
+				m_maxAnisotropy = 1;
+			}
+
 			if ( (uint32_t)m_scd.BufferDesc.Width != _resolution.m_width
 			||   (uint32_t)m_scd.BufferDesc.Height != _resolution.m_height
 			||   m_flags != _resolution.m_flags)
@@ -1761,7 +1772,7 @@ data.NumQualityLevels = 0;
 
 				m_currentColor        = &m_rtvHandle;
 				m_currentDepthStencil = &m_dsvHandle;
-				m_commandList->OMSetRenderTargets(1, m_currentColor, false, m_currentDepthStencil);
+				m_commandList->OMSetRenderTargets(1, m_currentColor, true, m_currentDepthStencil);
 			}
 			else
 			{
@@ -1805,7 +1816,7 @@ data.NumQualityLevels = 0;
 
 				m_commandList->OMSetRenderTargets(frameBuffer.m_num
 												, m_currentColor
-												, true //NULL == m_currentDepthStencil
+												, true
 												, m_currentDepthStencil
 												);
 			}
@@ -2265,7 +2276,7 @@ data.NumQualityLevels = 0;
 			return pso;
 		}
 
-		uint16_t getSamplerState(const uint32_t* _flags, uint32_t _num = BGFX_CONFIG_MAX_TEXTURE_SAMPLERS)
+		uint16_t getSamplerState(const uint32_t* _flags, uint32_t _num, const float _palette[][4])
 		{
 			bx::HashMurmur2A murmur;
 			murmur.begin();
@@ -2275,20 +2286,20 @@ data.NumQualityLevels = 0;
 			uint16_t sampler = m_samplerStateCache.find(hash);
 			if (UINT16_MAX == sampler)
 			{
-				sampler = m_samplerAllocator.alloc(_flags, _num);
+				sampler = m_samplerAllocator.alloc(_flags, _num, _palette);
 				m_samplerStateCache.add(hash, sampler);
 			}
 
 			return sampler;
 		}
 
-		void commit(ConstantBuffer& _constantBuffer)
+		void commit(UniformBuffer& _uniformBuffer)
 		{
-			_constantBuffer.reset();
+			_uniformBuffer.reset();
 
 			for (;;)
 			{
-				uint32_t opcode = _constantBuffer.read();
+				uint32_t opcode = _uniformBuffer.read();
 
 				if (UniformType::End == opcode)
 				{
@@ -2299,17 +2310,17 @@ data.NumQualityLevels = 0;
 				uint16_t loc;
 				uint16_t num;
 				uint16_t copy;
-				ConstantBuffer::decodeOpcode(opcode, type, loc, num, copy);
+				UniformBuffer::decodeOpcode(opcode, type, loc, num, copy);
 
 				const char* data;
 				if (copy)
 				{
-					data = _constantBuffer.read(g_uniformTypeSize[type]*num);
+					data = _uniformBuffer.read(g_uniformTypeSize[type]*num);
 				}
 				else
 				{
 					UniformHandle handle;
-					memcpy(&handle, _constantBuffer.read(sizeof(UniformHandle) ), sizeof(UniformHandle) );
+					memcpy(&handle, _uniformBuffer.read(sizeof(UniformHandle) ), sizeof(UniformHandle) );
 					data = (const char*)m_uniforms[handle.idx];
 				}
 
@@ -2355,7 +2366,7 @@ data.NumQualityLevels = 0;
 					break;
 
 				default:
-					BX_TRACE("%4d: INVALID 0x%08x, t %d, l %d, n %d, c %d", _constantBuffer.getPos(), opcode, type, loc, num, copy);
+					BX_TRACE("%4d: INVALID 0x%08x, t %d, l %d, n %d, c %d", _uniformBuffer.getPos(), opcode, type, loc, num, copy);
 					break;
 				}
 #undef CASE_IMPLEMENT_UNIFORM
@@ -2522,6 +2533,7 @@ data.NumQualityLevels = 0;
 
 		DXGI_SWAP_CHAIN_DESC m_scd;
 		uint32_t m_flags;
+		uint32_t m_maxAnisotropy;
 
 		BufferD3D12 m_indexBuffers[BGFX_CONFIG_MAX_INDEX_BUFFERS];
 		VertexBufferD3D12 m_vertexBuffers[BGFX_CONFIG_MAX_VERTEX_BUFFERS];
@@ -2784,11 +2796,12 @@ data.NumQualityLevels = 0;
 		return idx;
 	}
 
-	uint16_t DescriptorAllocatorD3D12::alloc(const uint32_t* _flags, uint32_t _num)
+	uint16_t DescriptorAllocatorD3D12::alloc(const uint32_t* _flags, uint32_t _num, const float _palette[][4])
 	{
 		uint16_t idx = m_handleAlloc->alloc();
 
-		ID3D12Device* device = s_renderD3D12->m_device;
+		ID3D12Device* device   = s_renderD3D12->m_device;
+		uint32_t maxAnisotropy = s_renderD3D12->m_maxAnisotropy;
 
 		for (uint32_t ii = 0; ii < _num; ++ii)
 		{
@@ -2806,12 +2819,27 @@ data.NumQualityLevels = 0;
 			sd.AddressV = s_textureAddress[(flags&BGFX_TEXTURE_V_MASK)>>BGFX_TEXTURE_V_SHIFT];
 			sd.AddressW = s_textureAddress[(flags&BGFX_TEXTURE_W_MASK)>>BGFX_TEXTURE_W_SHIFT];
 			sd.MipLODBias     = 0.0f;
-			sd.MaxAnisotropy  = 1; //m_maxAnisotropy;
+			sd.MaxAnisotropy  = maxAnisotropy;
 			sd.ComparisonFunc = 0 == cmpFunc ? D3D12_COMPARISON_FUNC_NEVER : s_cmpFunc[cmpFunc];
-			sd.BorderColor[0] = 0.0f;
-			sd.BorderColor[1] = 0.0f;
-			sd.BorderColor[2] = 0.0f;
-			sd.BorderColor[3] = 0.0f;
+
+			uint32_t index = (flags & BGFX_TEXTURE_BORDER_COLOR_MASK) >> BGFX_TEXTURE_BORDER_COLOR_SHIFT;
+
+			if (NULL != _palette
+			&&  needBorderColor(flags) )
+			{
+				const float* rgba = _palette[index];
+				sd.BorderColor[0] = rgba[0];
+				sd.BorderColor[1] = rgba[1];
+				sd.BorderColor[2] = rgba[2];
+				sd.BorderColor[3] = rgba[3];
+			}
+			else
+			{
+				sd.BorderColor[0] = 0.0f;
+				sd.BorderColor[1] = 0.0f;
+				sd.BorderColor[2] = 0.0f;
+				sd.BorderColor[3] = 0.0f;
+			}
 			sd.MinLOD   = 0;
 			sd.MaxLOD   = D3D12_FLOAT32_MAX;
 
@@ -3000,10 +3028,10 @@ data.NumQualityLevels = 0;
 
 		D3D12_INDIRECT_ARGUMENT_DESC drawArgDesc[] =
 		{
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW, { Rdt::CBV } },
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   0            },
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   1            },
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW,                 0            },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW, { { Rdt::CBV } } },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   { { 0        } } },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   { { 1        } } },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW,                 { { 0        } } },
 		};
 
 		D3D12_COMMAND_SIGNATURE_DESC drawCommandSignature =
@@ -3022,11 +3050,11 @@ data.NumQualityLevels = 0;
 
 		D3D12_INDIRECT_ARGUMENT_DESC drawIndexedArgDesc[] =
 		{
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW, { Rdt::CBV } },
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   0            },
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   1            },
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW,    0            },
-			{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED,         0            },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW, { { Rdt::CBV } } },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   { { 0        } } },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,   { { 1        } } },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW,    { { 0        } } },
+			{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED,         { { 0        } } },
 		};
 
 		D3D12_COMMAND_SIGNATURE_DESC drawIndexedCommandSignature =
@@ -3528,12 +3556,13 @@ data.NumQualityLevels = 0;
 				else if (0 == (BGFX_UNIFORM_SAMPLERBIT & type) )
 				{
 					const UniformInfo* info = s_renderD3D12->m_uniformReg.find(name);
+					BX_CHECK(NULL != info, "User defined uniform '%s' is not found, it won't be set.", name);
 
 					if (NULL != info)
 					{
 						if (NULL == m_constantBuffer)
 						{
-							m_constantBuffer = ConstantBuffer::create(1024);
+							m_constantBuffer = UniformBuffer::create(1024);
 						}
 
 						kind = "user";
@@ -3998,9 +4027,9 @@ data.NumQualityLevels = 0;
 		box.front  = _z;
 		box.back   = _z+_depth;
 
-		D3D12_TEXTURE_COPY_LOCATION dst = { m_ptr,   D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, {}     };
+		D3D12_TEXTURE_COPY_LOCATION dst = { m_ptr,   D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, {        } };
 		dst.SubresourceIndex = subres;
-		D3D12_TEXTURE_COPY_LOCATION src = { staging, D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,  layout };
+		D3D12_TEXTURE_COPY_LOCATION src = { staging, D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,  { layout } };
 		_commandList->CopyTextureRegion(&dst, _rect.m_x, _rect.m_y, 0, &src, &box);
 
 		setState(_commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -4351,7 +4380,7 @@ data.NumQualityLevels = 0;
 					{
 						Rect clearRect = rect;
 						clearRect.intersect(rect, viewScissorRect);
-						clearQuad(clearRect, clr, _render->m_clearColor);
+						clearQuad(clearRect, clr, _render->m_colorPalette);
 					}
 
 					prim = s_primInfo[BX_COUNTOF(s_primName)]; // Force primitive type update.
@@ -4386,8 +4415,8 @@ data.NumQualityLevels = 0;
 					{
 						currentBindHash  = bindHash;
 
-						Bind* bind = bindLru.find(bindHash);
-						if (NULL == bind)
+						Bind* bindCached = bindLru.find(bindHash);
+						if (NULL == bindCached)
 						{
 							D3D12_GPU_DESCRIPTOR_HANDLE srvHandle[BGFX_MAX_COMPUTE_BINDINGS] = {};
 							uint32_t samplerFlags[BGFX_MAX_COMPUTE_BINDINGS] = {};
@@ -4441,7 +4470,7 @@ data.NumQualityLevels = 0;
 								}
 							}
 
-							uint16_t samplerStateIdx = getSamplerState(samplerFlags, BGFX_MAX_COMPUTE_BINDINGS);
+							uint16_t samplerStateIdx = getSamplerState(samplerFlags, BGFX_MAX_COMPUTE_BINDINGS, _render->m_colorPalette);
 							if (samplerStateIdx != currentSamplerStateIdx)
 							{
 								currentSamplerStateIdx = samplerStateIdx;
@@ -4458,14 +4487,14 @@ data.NumQualityLevels = 0;
 						}
 						else
 						{
-							uint16_t samplerStateIdx = bind->m_samplerStateIdx;
+							uint16_t samplerStateIdx = bindCached->m_samplerStateIdx;
 							if (samplerStateIdx != currentSamplerStateIdx)
 							{
 								currentSamplerStateIdx = samplerStateIdx;
 								m_commandList->SetComputeRootDescriptorTable(Rdt::Sampler, m_samplerAllocator.get(samplerStateIdx) );
 							}
-							m_commandList->SetComputeRootDescriptorTable(Rdt::SRV, bind->m_srvHandle);
-							m_commandList->SetComputeRootDescriptorTable(Rdt::UAV, bind->m_srvHandle);
+							m_commandList->SetComputeRootDescriptorTable(Rdt::SRV, bindCached->m_srvHandle);
+							m_commandList->SetComputeRootDescriptorTable(Rdt::UAV, bindCached->m_srvHandle);
 						}
 					}
 
@@ -4473,12 +4502,12 @@ data.NumQualityLevels = 0;
 					if (compute.m_constBegin < compute.m_constEnd
 					||  currentProgramIdx != key.m_program)
 					{
-						rendererUpdateUniforms(this, _render->m_constantBuffer, compute.m_constBegin, compute.m_constEnd);
+						rendererUpdateUniforms(this, _render->m_uniformBuffer, compute.m_constBegin, compute.m_constEnd);
 
 						currentProgramIdx = key.m_program;
 						ProgramD3D12& program = m_program[currentProgramIdx];
 
-						ConstantBuffer* vcb = program.m_vsh->m_constantBuffer;
+						UniformBuffer* vcb = program.m_vsh->m_constantBuffer;
 						if (NULL != vcb)
 						{
 							commit(*vcb);
@@ -4569,7 +4598,7 @@ data.NumQualityLevels = 0;
 					primIndex = uint8_t(pt>>BGFX_STATE_PT_SHIFT);
 				}
 
-				rendererUpdateUniforms(this, _render->m_constantBuffer, draw.m_constBegin, draw.m_constEnd);
+				rendererUpdateUniforms(this, _render->m_uniformBuffer, draw.m_constBegin, draw.m_constEnd);
 
 				if (isValid(draw.m_vertexBuffer) )
 				{
@@ -4607,8 +4636,8 @@ data.NumQualityLevels = 0;
 					{
 						currentBindHash  = bindHash;
 
-						Bind* bind = bindLru.find(bindHash);
-						if (NULL == bind)
+						Bind* bindCached = bindLru.find(bindHash);
+						if (NULL == bindCached)
 						{
 							D3D12_GPU_DESCRIPTOR_HANDLE srvHandle[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS];
 							uint32_t samplerFlags[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS];
@@ -4625,7 +4654,7 @@ data.NumQualityLevels = 0;
 										samplerFlags[stage] = (0 == (BGFX_SAMPLER_DEFAULT_FLAGS & bind.m_un.m_draw.m_flags)
 											? bind.m_un.m_draw.m_flags
 											: texture.m_flags
-											) & BGFX_TEXTURE_SAMPLER_BITS_MASK
+											) & (BGFX_TEXTURE_SAMPLER_BITS_MASK|BGFX_TEXTURE_BORDER_COLOR_MASK)
 											;
 									}
 									else
@@ -4638,7 +4667,7 @@ data.NumQualityLevels = 0;
 
 							if (srvHandle[0].ptr != 0)
 							{
-								uint16_t samplerStateIdx = getSamplerState(samplerFlags);
+								uint16_t samplerStateIdx = getSamplerState(samplerFlags, BGFX_CONFIG_MAX_TEXTURE_SAMPLERS, _render->m_colorPalette);
 								if (samplerStateIdx != currentSamplerStateIdx)
 								{
 									currentSamplerStateIdx = samplerStateIdx;
@@ -4655,13 +4684,13 @@ data.NumQualityLevels = 0;
 						}
 						else
 						{
-							uint16_t samplerStateIdx = bind->m_samplerStateIdx;
+							uint16_t samplerStateIdx = bindCached->m_samplerStateIdx;
 							if (samplerStateIdx != currentSamplerStateIdx)
 							{
 								currentSamplerStateIdx = samplerStateIdx;
 								m_commandList->SetGraphicsRootDescriptorTable(Rdt::Sampler, m_samplerAllocator.get(samplerStateIdx) );
 							}
-							m_commandList->SetGraphicsRootDescriptorTable(Rdt::SRV, bind->m_srvHandle);
+							m_commandList->SetGraphicsRootDescriptorTable(Rdt::SRV, bindCached->m_srvHandle);
 						}
 					}
 
@@ -4740,13 +4769,13 @@ data.NumQualityLevels = 0;
 						currentProgramIdx = key.m_program;
 						ProgramD3D12& program = m_program[currentProgramIdx];
 
-						ConstantBuffer* vcb = program.m_vsh->m_constantBuffer;
+						UniformBuffer* vcb = program.m_vsh->m_constantBuffer;
 						if (NULL != vcb)
 						{
 							commit(*vcb);
 						}
 
-						ConstantBuffer* fcb = program.m_fsh->m_constantBuffer;
+						UniformBuffer* fcb = program.m_fsh->m_constantBuffer;
 						if (NULL != fcb)
 						{
 							commit(*fcb);
@@ -4925,7 +4954,7 @@ data.NumQualityLevels = 0;
 // 				}
 
 				tvm.printf(10, pos++, 0x8e, "      Indices: %7d ", statsNumIndices);
-				tvm.printf(10, pos++, 0x8e, " Uniform size: %7d ", _render->m_constEnd);
+				tvm.printf(10, pos++, 0x8e, " Uniform size: %7d, Max: %7d ", _render->m_uniformEnd, _render->m_uniformMax);
 				tvm.printf(10, pos++, 0x8e, "     DVB size: %7d ", _render->m_vboffset);
 				tvm.printf(10, pos++, 0x8e, "     DIB size: %7d ", _render->m_iboffset);
 

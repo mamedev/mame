@@ -3,7 +3,7 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/uint32_t.h>
 
 #include "common.h"
@@ -125,6 +125,11 @@ class DrawStress : public entry::AppI
 			case bgfx::RendererType::Direct3D12:
 				vs_drawstress = bgfx::makeRef(vs_drawstress_dx11, sizeof(vs_drawstress_dx11) );
 				fs_drawstress = bgfx::makeRef(fs_drawstress_dx11, sizeof(fs_drawstress_dx11) );
+				break;
+
+			case bgfx::RendererType::Metal:
+				vs_drawstress = bgfx::makeRef(vs_drawstress_mtl, sizeof(vs_drawstress_mtl) );
+				fs_drawstress = bgfx::makeRef(fs_drawstress_mtl, sizeof(fs_drawstress_mtl) );
 				break;
 
 			default:

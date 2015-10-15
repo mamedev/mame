@@ -141,7 +141,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		loadTexture("texture_compression_bc1.dds",  BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP),
 		loadTexture("texture_compression_bc2.dds",  BGFX_TEXTURE_U_CLAMP),
 		loadTexture("texture_compression_bc3.dds",  BGFX_TEXTURE_V_CLAMP),
-		loadTexture("texture_compression_etc1.ktx", BGFX_TEXTURE_U_BORDER|BGFX_TEXTURE_V_BORDER),
+		loadTexture("texture_compression_etc1.ktx", BGFX_TEXTURE_U_BORDER|BGFX_TEXTURE_V_BORDER|BGFX_TEXTURE_BORDER_COLOR(1) ),
 		loadTexture("texture_compression_etc2.ktx"),
 		loadTexture("texture_compression_ptc12.pvr"),
 		loadTexture("texture_compression_ptc14.pvr"),
@@ -197,19 +197,21 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	// Create static index buffer.
 	bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) ) );
 
-	// Create texture sampler uniforms.
-	bgfx::UniformHandle s_texCube  = bgfx::createUniform("s_texCube",  bgfx::UniformType::Int1);
-	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
-
-	bgfx::UniformHandle u_time = bgfx::createUniform("u_time", bgfx::UniformType::Vec4);
-
-	bgfx::ProgramHandle program     = loadProgram("vs_update", "fs_update");
-	bgfx::ProgramHandle programCmp  = loadProgram("vs_update", "fs_update_cmp");
-	bgfx::ProgramHandle program3d   = BGFX_INVALID_HANDLE;
+	// Create programs.
+	bgfx::ProgramHandle program    = loadProgram("vs_update", "fs_update");
+	bgfx::ProgramHandle programCmp = loadProgram("vs_update", "fs_update_cmp");
+	bgfx::ProgramHandle program3d  = BGFX_INVALID_HANDLE;
 	if (texture3DSupported)
 	{
 		program3d = loadProgram("vs_update", "fs_update_3d");
 	}
+
+	// Create texture sampler uniforms.
+	bgfx::UniformHandle s_texCube  = bgfx::createUniform("s_texCube",  bgfx::UniformType::Int1);
+	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
+
+	// Create time uniform.
+	bgfx::UniformHandle u_time = bgfx::createUniform("u_time", bgfx::UniformType::Vec4);
 
 	const uint32_t textureSide = 2048;
 
@@ -243,6 +245,9 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 	while (!entry::processEvents(width, height, debug, reset) )
 	{
+		float borderColor[4] = { float(rand()%255)/255.0f, float(rand()%255)/255.0f, float(rand()%255)/255.0f, float(rand()%255)/255.0f };
+		bgfx::setPaletteColor(1, borderColor);
+
 		// Set view 0 and 1 viewport.
 		bgfx::setViewRect(0, 0, 0, width, height);
 		bgfx::setViewRect(1, 0, 0, width, height);

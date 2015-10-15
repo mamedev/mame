@@ -28,7 +28,7 @@
 #include <math.h>
 #include "nanovg.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 
 #include <bx/bx.h>
 
@@ -666,7 +666,6 @@ namespace
 				| BGFX_STATE_PT_TRISTRIP
 				);
 			bgfx::setVertexBuffer(&gl->tvb, paths[i].strokeOffset, paths[i].strokeCount);
-			bgfx::setTexture(0, gl->s_tex, gl->th);
 			bgfx::setTexture(0, gl->s_tex, gl->th);
 			bgfx::submit(gl->viewid, gl->prog);
 		}

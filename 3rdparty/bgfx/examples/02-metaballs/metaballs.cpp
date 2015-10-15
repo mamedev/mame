@@ -4,7 +4,7 @@
  */
 
 #include "common.h"
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 
 // embedded shaders
 #include "vs_metaballs.bin.h"
@@ -502,6 +502,11 @@ class Metaballs : public entry::AppI
 			case bgfx::RendererType::Direct3D12:
 				vs_metaballs = bgfx::makeRef(vs_metaballs_dx11, sizeof(vs_metaballs_dx11) );
 				fs_metaballs = bgfx::makeRef(fs_metaballs_dx11, sizeof(fs_metaballs_dx11) );
+				break;
+
+			case bgfx::RendererType::Metal:
+				vs_metaballs = bgfx::makeRef(vs_metaballs_mtl, sizeof(vs_metaballs_mtl) );
+				fs_metaballs = bgfx::makeRef(fs_metaballs_mtl, sizeof(fs_metaballs_mtl) );
 				break;
 
 			default:
