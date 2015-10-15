@@ -1563,7 +1563,11 @@ again:
 
 				if (windowsVersionIs(Condition::GreaterEqual, 0x0602) )
 				{
+#if defined(__MINGW32__)
+					first  = RendererType::Direct3D11;
+#else
 					first  = RendererType::Direct3D12;
+#endif // __MINGW32__
 					second = RendererType::Direct3D11;
 					if (!s_rendererCreator[second].supported)
 					{
