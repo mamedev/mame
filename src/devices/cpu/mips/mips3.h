@@ -366,6 +366,7 @@ private:
 	UINT32      m_nextpc;
 	UINT32      m_pcbase;
 	UINT8       m_cf[4][8];
+	bool	    m_delayslot;
 	int         m_op;
 	int         m_interrupt_cycles;
 	UINT32      m_ll_value;

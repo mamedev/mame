@@ -556,9 +556,9 @@ void n64_periphs::sp_dma(int direction)
 		length = (length + 7) & ~7;
 	}
 
-	if (sp_mem_addr & 0x3)
+	if (sp_mem_addr & 0x7)
 	{
-		sp_mem_addr = sp_mem_addr & ~3;
+		sp_mem_addr = sp_mem_addr & ~7;
 	}
 	if (sp_dram_addr & 0x7)
 	{
@@ -977,7 +977,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			{
 				state->m_rdp->set_status(status & ~DP_STATUS_START_VALID);
 				state->m_rdp->set_current(state->m_rdp->get_start());
-				state->m_rdp->set_end(data & ~ 7);
+				state->m_rdp->set_end(data & ~7);
 				g_profiler.start(PROFILER_USER1);
 				state->m_rdp->process_command_list();
 				g_profiler.stop();
@@ -985,7 +985,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			}
 			else
 			{
-				state->m_rdp->set_end(data & ~ 7);
+				state->m_rdp->set_end(data & ~7);
 				g_profiler.start(PROFILER_USER1);
 				state->m_rdp->process_command_list();
 				g_profiler.stop();
