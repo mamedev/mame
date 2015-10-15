@@ -5758,7 +5758,18 @@ void galaxian_state::decode_frogger_sound()
 	UINT32 offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
-	for (offs = 0; offs < 0x0800; offs++)
+	for (offs = 0; offs < 0x800; offs++)
+		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+}
+
+// froggrmc has a bigger first ROM of the sound CPU, thus a different decode
+void galaxian_state::decode_froggermc_sound()
+{
+	UINT8 *rombase = memregion("audiocpu")->base();
+	UINT32 offs;
+
+	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
+	for (offs = 0; offs < 0x1000; offs++)
 		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
@@ -6592,7 +6603,7 @@ DRIVER_INIT_MEMBER(galaxian_state,froggrmc)
 	space.install_ram(0x8000, 0x87ff);
 
 	/* decrypt */
-	decode_frogger_sound();
+	decode_froggermc_sound();
 }
 
 

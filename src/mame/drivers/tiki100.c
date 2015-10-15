@@ -14,14 +14,11 @@
 
     TODO:
 
-    - 3 expansion slots
     - palette RAM should be written during HBLANK
-    - DART clocks
     - winchester hard disk
     - analog/digital I/O
     - light pen
     - 8088 CPU card
-    - 360KB floppy format
 
 */
 
@@ -450,6 +447,11 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("ST")
+	PORT_CONFNAME( 0x01, 0x01, "DART TxCA")
+	PORT_CONFSETTING( 0x00, "BAR0" )
+	PORT_CONFSETTING( 0x01, "BAR2" )
 INPUT_PORTS_END
 
 /* Video */
@@ -607,16 +609,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
 	m_ctc->trg1(0);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::ctc_z0_w )
+WRITE_LINE_MEMBER( tiki100_state::bar0_w )
 {
 	m_ctc->trg2(state);
 
 	m_dart->rxca_w(state);
-	m_dart->txca_w(state);
+
+	if (!m_st) m_dart->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::ctc_z2_w )
+WRITE_LINE_MEMBER( tiki100_state::bar2_w )
 {
+	if (m_st) m_dart->txca_w(state);
+
 	m_ctc->trg3(state);
 }
 
@@ -670,6 +675,10 @@ void tiki100_state::machine_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_palette_val));
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_perror));
+	save_item(NAME(m_st));
 }
 
 void tiki100_state::machine_reset()
@@ -677,6 +686,8 @@ void tiki100_state::machine_reset()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	system_w(space, 0, 0);
+
+	m_st = m_st_io->read();
 }
 
 /* Machine Driver */
@@ -690,20 +701,15 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz, 1280, 0, 1024, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(tiki100_state, screen_update)
-	MCFG_SCREEN_SIZE(1024, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
-
 	MCFG_PALETTE_ADD("palette", 16)
-	// pixel clock 20.01782 MHz
 
 	MCFG_TIKI100_BUS_ADD()
 	//MCFG_TIKI100_BUS_IRQ_CALLBACK()
 	//MCFG_TIKI100_BUS_NMI_CALLBACK()
 	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
-	MCFG_TIKI100_BUS_SLOT_ADD("slot2", NULL)
+	MCFG_TIKI100_BUS_SLOT_ADD("slot2", "hdc")
 	MCFG_TIKI100_BUS_SLOT_ADD("slot3", NULL)
 
 	/* devices */
@@ -725,9 +731,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(tiki100_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(tiki100_state, bar0_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(tiki100_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(tiki100_state, bar2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
 

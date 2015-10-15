@@ -6,15 +6,15 @@
 
  Game Name                        Model #
  -----------------------------------------
- Demolition Derby (1976)          #466
- Super Flipper (1975)             #458
- Olympic TV Football (1973)       #429-A
- Olympic TV Hockey (1973)         #429
- TV Goalee (1973)                 #414
  TV Ping Pong (1973)              #424
- TV Pin Game (1975)               #451
  TV Tennis (1973)                 #427
-
+ Olympic TV Hockey (1973)         #429
+ Olympic TV Football (1973)       #429-A
+ TV Goalee (1974)                 #414
+ TV Pingame (1975)                #451
+ Super Flipper (1975)             #458
+ Demolition Derby (1976)          #466
+ 
 ***************************************************************************/
 
 

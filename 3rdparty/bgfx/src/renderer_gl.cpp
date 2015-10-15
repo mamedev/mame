@@ -232,6 +232,7 @@ namespace bgfx { namespace gl
 		{ GL_RG32I,                                    GL_ZERO,                                       GL_RG,                                       GL_INT,                          false }, // RG32I
 		{ GL_RG32UI,                                   GL_ZERO,                                       GL_RG,                                       GL_UNSIGNED_INT,                 false }, // RG32U
 		{ GL_RG32F,                                    GL_ZERO,                                       GL_RG,                                       GL_FLOAT,                        false }, // RG32F
+		{ GL_RGB9_E5,                                  GL_ZERO,                                       GL_RGB,                                      GL_UNSIGNED_INT_5_9_9_9_REV,     false }, // RGB9E5F
 		{ GL_RGBA8,                                    GL_SRGB8_ALPHA8,                               GL_BGRA,                                     GL_UNSIGNED_BYTE,                false }, // BGRA8
 		{ GL_RGBA8,                                    GL_SRGB8_ALPHA8,                               GL_RGBA,                                     GL_UNSIGNED_BYTE,                false }, // RGBA8
 		{ GL_RGBA8I,                                   GL_ZERO,                                       GL_RGBA,                                     GL_BYTE,                         false }, // RGBA8I
@@ -310,6 +311,7 @@ namespace bgfx { namespace gl
 		GL_RG32I,              // RG32I
 		GL_RG32UI,             // RG32U
 		GL_RG32F,              // RG32F
+		GL_RGB9_E5,            // RGB9E5F
 		GL_RGBA8,              // BGRA8
 		GL_RGBA8,              // RGBA8
 		GL_RGBA8I,             // RGBA8I
@@ -386,6 +388,7 @@ namespace bgfx { namespace gl
 		GL_RG32I,          // RG32I
 		GL_RG32UI,         // RG32U
 		GL_RG32F,          // RG32F
+		GL_RGB9_E5,        // RGB9E5F
 		GL_RGBA8,          // BGRA8
 		GL_RGBA8,          // RGBA8
 		GL_RGBA8I,         // RGBA8I
@@ -522,6 +525,7 @@ namespace bgfx { namespace gl
 			EXT_texture_filter_anisotropic,
 			EXT_texture_format_BGRA8888,
 			EXT_texture_rg,
+			EXT_texture_shared_exponent,
 			EXT_texture_snorm,
 			EXT_texture_sRGB,
 			EXT_texture_storage,
@@ -720,6 +724,7 @@ namespace bgfx { namespace gl
 		{ "EXT_texture_filter_anisotropic",        false,                             true  },
 		{ "EXT_texture_format_BGRA8888",           false,                             true  },
 		{ "EXT_texture_rg",                        false,                             true  }, // GLES2 extension.
+		{ "EXT_texture_shared_exponent",           false,                             true  },
 		{ "EXT_texture_snorm",                     BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
 		{ "EXT_texture_sRGB",                      false,                             true  },
 		{ "EXT_texture_storage",                   false,                             true  },
@@ -1034,7 +1039,7 @@ namespace bgfx { namespace gl
 			;
 
 		GLsizei size = (16*16*getBitsPerPixel(_format) )/8;
-		void* data = alloca(size);
+		void* data = bx::alignPtr(alloca(size+16), 0, 16);
 
 		if (isCompressed(_format) )
 		{
@@ -1053,8 +1058,7 @@ namespace bgfx { namespace gl
 			? tfi.m_internalFmtSrgb
 			: tfi.m_internalFmt
 			;
-		if (!s_textureFormat[_format].m_supported
-		||  GL_ZERO == internalFmt)
+		if (GL_ZERO == internalFmt)
 		{
 			return false;
 		}
@@ -1194,6 +1198,7 @@ namespace bgfx { namespace gl
 			, m_vaoSupport(false)
 			, m_samplerObjectSupport(false)
 			, m_shadowSamplersSupport(false)
+			, m_borderColorSupport(BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
 			, m_programBinarySupport(false)
 			, m_textureSwizzleSupport(false)
 			, m_depthTextureSupport(false)
@@ -1372,13 +1377,6 @@ namespace bgfx { namespace gl
 
 			// Allow all texture filters.
 			memset(s_textureFilter, true, BX_COUNTOF(s_textureFilter) );
-			for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
-			{
-				s_textureFormat[ii].m_supported = true
-					&& TextureFormat::Unknown != ii
-					&& TextureFormat::UnknownDepth != ii
-					;
-			}
 
 			bool bc123Supported = 0
 				|| s_extension[Extension::EXT_texture_compression_s3tc        ].m_supported
@@ -1556,7 +1554,10 @@ namespace bgfx { namespace gl
 				s_textureFormat[TextureFormat::R8].m_fmt         = GL_LUMINANCE;
 			}
 
-			for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
+			for (uint32_t ii = BX_ENABLED(BX_PLATFORM_IOS) ? TextureFormat::Unknown : 0 // skip test on iOS!
+				; ii < TextureFormat::Count
+				; ++ii
+				)
 			{
 				if (TextureFormat::Unknown != ii
 				&&  TextureFormat::UnknownDepth != ii)
@@ -1782,6 +1783,7 @@ namespace bgfx { namespace gl
 
 			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES) )
 			{
+				m_borderColorSupport = s_extension[Extension::NV_texture_border_clamp].m_supported;
 				s_textureAddress[BGFX_TEXTURE_U_BORDER>>BGFX_TEXTURE_U_SHIFT] = s_extension[Extension::NV_texture_border_clamp].m_supported
 					? GL_CLAMP_TO_BORDER
 					: GL_CLAMP_TO_EDGE
@@ -2517,21 +2519,53 @@ namespace bgfx { namespace gl
 			}
 		}
 
-		void setSamplerState(uint32_t _stage, uint32_t _numMips, uint32_t _flags)
+		void setSamplerState(uint32_t _stage, uint32_t _numMips, uint32_t _flags, const float _rgba[4])
 		{
 			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
 			||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
 			{
 				if (0 == (BGFX_SAMPLER_DEFAULT_FLAGS & _flags) )
 				{
+					const uint32_t index = (_flags & BGFX_TEXTURE_BORDER_COLOR_MASK) >> BGFX_TEXTURE_BORDER_COLOR_SHIFT;
+
 					_flags &= ~BGFX_TEXTURE_RESERVED_MASK;
 					_flags &= BGFX_TEXTURE_SAMPLER_BITS_MASK;
 					_flags |= _numMips<<BGFX_TEXTURE_RESERVED_SHIFT;
-					GLuint sampler = m_samplerStateCache.find(_flags);
+
+					GLuint sampler;
+
+					bool hasBorderColor = false;
+					bx::HashMurmur2A murmur;
+					uint32_t hash;
+
+					murmur.begin();
+					murmur.add(_flags);
+					if (!needBorderColor(_flags) )
+					{
+						murmur.add(-1);
+						hash = murmur.end();
+
+						sampler = m_samplerStateCache.find(hash);
+					}
+					else
+					{
+						murmur.add(index);
+						hash = murmur.end();
+
+						if (NULL != _rgba)
+						{
+							hasBorderColor = true;
+							sampler = UINT32_MAX;
+						}
+						else
+						{
+							sampler = m_samplerStateCache.find(hash);
+						}
+					}
 
 					if (UINT32_MAX == sampler)
 					{
-						sampler = m_samplerStateCache.add(_flags);
+						sampler = m_samplerStateCache.add(hash);
 
 						GL_CHECK(glSamplerParameteri(sampler
 							, GL_TEXTURE_WRAP_S
@@ -2552,8 +2586,14 @@ namespace bgfx { namespace gl
 						GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, magFilter) );
 						GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, minFilter) );
 
-						const float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-						GL_CHECK(glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, color) );
+						if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
+						||  m_borderColorSupport)
+						{
+							if (hasBorderColor)
+							{
+								GL_CHECK(glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, _rgba) );
+							}
+						}
 
 						if (0 != (_flags & (BGFX_TEXTURE_MIN_ANISOTROPIC|BGFX_TEXTURE_MAG_ANISOTROPIC) )
 						&&  0.0f < m_maxAnisotropy)
@@ -2767,13 +2807,13 @@ namespace bgfx { namespace gl
 			}
 		}
 
-		void commit(ConstantBuffer& _constantBuffer)
+		void commit(UniformBuffer& _uniformBuffer)
 		{
-			_constantBuffer.reset();
+			_uniformBuffer.reset();
 
 			for (;;)
 			{
-				uint32_t opcode = _constantBuffer.read();
+				uint32_t opcode = _uniformBuffer.read();
 
 				if (UniformType::End == opcode)
 				{
@@ -2784,21 +2824,21 @@ namespace bgfx { namespace gl
 				uint16_t ignore;
 				uint16_t num;
 				uint16_t copy;
-				ConstantBuffer::decodeOpcode(opcode, type, ignore, num, copy);
+				UniformBuffer::decodeOpcode(opcode, type, ignore, num, copy);
 
 				const char* data;
 				if (copy)
 				{
-					data = _constantBuffer.read(g_uniformTypeSize[type]*num);
+					data = _uniformBuffer.read(g_uniformTypeSize[type]*num);
 				}
 				else
 				{
 					UniformHandle handle;
-					memcpy(&handle, _constantBuffer.read(sizeof(UniformHandle) ), sizeof(UniformHandle) );
+					memcpy(&handle, _uniformBuffer.read(sizeof(UniformHandle) ), sizeof(UniformHandle) );
 					data = (const char*)m_uniforms[handle.idx];
 				}
 
-				uint32_t loc = _constantBuffer.read();
+				uint32_t loc = _uniformBuffer.read();
 
 #define CASE_IMPLEMENT_UNIFORM(_uniform, _glsuffix, _dxsuffix, _type) \
 		case UniformType::_uniform: \
@@ -2835,7 +2875,7 @@ namespace bgfx { namespace gl
 					break;
 
 				default:
-					BX_TRACE("%4d: INVALID 0x%08x, t %d, l %d, n %d, c %d", _constantBuffer.getPos(), opcode, type, loc, num, copy);
+					BX_TRACE("%4d: INVALID 0x%08x, t %d, l %d, n %d, c %d", _uniformBuffer.getPos(), opcode, type, loc, num, copy);
 					break;
 				}
 
@@ -2862,7 +2902,7 @@ namespace bgfx { namespace gl
 				{
 					if (BGFX_CLEAR_COLOR_USE_PALETTE & _clear.m_flags)
 					{
-						uint8_t index = (uint8_t)bx::uint32_min(BGFX_CONFIG_MAX_CLEAR_COLOR_PALETTE-1, _clear.m_index[0]);
+						uint8_t index = (uint8_t)bx::uint32_min(BGFX_CONFIG_MAX_COLOR_PALETTE-1, _clear.m_index[0]);
 						const float* rgba = _palette[index];
 						const float rr = rgba[0];
 						const float gg = rgba[1];
@@ -2987,7 +3027,7 @@ namespace bgfx { namespace gl
 					float mrtClear[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS][4];
 					for (uint32_t ii = 0; ii < numMrt; ++ii)
 					{
-						uint8_t index = (uint8_t)bx::uint32_min(BGFX_CONFIG_MAX_CLEAR_COLOR_PALETTE-1, _clear.m_index[ii]);
+						uint8_t index = (uint8_t)bx::uint32_min(BGFX_CONFIG_MAX_COLOR_PALETTE-1, _clear.m_index[ii]);
 						memcpy(mrtClear[ii], _palette[index], 16);
 					}
 
@@ -3047,6 +3087,7 @@ namespace bgfx { namespace gl
 		bool m_vaoSupport;
 		bool m_samplerObjectSupport;
 		bool m_shadowSamplersSupport;
+		bool m_borderColorSupport;
 		bool m_programBinarySupport;
 		bool m_textureSwizzleSupport;
 		bool m_depthTextureSupport;
@@ -3295,7 +3336,7 @@ namespace bgfx { namespace gl
 	{
 		if (NULL != m_constantBuffer)
 		{
-			ConstantBuffer::destroy(m_constantBuffer);
+			UniformBuffer::destroy(m_constantBuffer);
 			m_constantBuffer = NULL;
 		}
 		m_numPredefined = 0;
@@ -3476,11 +3517,13 @@ namespace bgfx { namespace gl
 			else
 			{
 				const UniformInfo* info = s_renderGL->m_uniformReg.find(name);
+				BX_WARN(NULL != info, "User defined uniform '%s' is not found, it won't be set.", name);
+
 				if (NULL != info)
 				{
 					if (NULL == m_constantBuffer)
 					{
-						m_constantBuffer = ConstantBuffer::create(1024);
+						m_constantBuffer = UniformBuffer::create(1024);
 					}
 
 					UniformType::Enum type = convertGlType(gltype);
@@ -3719,7 +3762,7 @@ namespace bgfx { namespace gl
 		m_width   = _width;
 		m_height  = _height;
 		m_depth   = _depth;
-		m_currentFlags    = UINT32_MAX;
+		m_currentSamplerHash    = UINT32_MAX;
 		m_requestedFormat = _format;
 		m_textureFormat   = _format;
 
@@ -3779,7 +3822,7 @@ namespace bgfx { namespace gl
 				}
 			}
 
-			setSamplerState(_flags);
+			setSamplerState(_flags, NULL);
 
 			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
 			&&  TextureFormat::BGRA8 == m_requestedFormat
@@ -4156,7 +4199,7 @@ namespace bgfx { namespace gl
 		}
 	}
 
-	void TextureGL::setSamplerState(uint32_t _flags)
+	void TextureGL::setSamplerState(uint32_t _flags, const float _rgba[4])
 	{
 		if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES < 30)
 		&&  !s_textureFilter[m_textureFormat])
@@ -4175,9 +4218,26 @@ namespace bgfx { namespace gl
 		}
 
 		const uint32_t flags = (0 != (BGFX_SAMPLER_DEFAULT_FLAGS & _flags) ? m_flags : _flags) & BGFX_TEXTURE_SAMPLER_BITS_MASK;
-		if (flags != m_currentFlags)
+
+		bool hasBorderColor = false;
+		bx::HashMurmur2A murmur;
+		murmur.begin();
+		murmur.add(flags);
+		if (NULL != _rgba)
 		{
-			const GLenum target = m_target;
+			if (BGFX_TEXTURE_U_BORDER == (flags & BGFX_TEXTURE_U_BORDER)
+			||  BGFX_TEXTURE_V_BORDER == (flags & BGFX_TEXTURE_V_BORDER)
+			||  BGFX_TEXTURE_W_BORDER == (flags & BGFX_TEXTURE_W_BORDER) )
+			{
+				murmur.add(_rgba, 16);
+				hasBorderColor = true;
+			}
+		}
+		uint32_t hash = murmur.end();
+
+		if (hash != m_currentSamplerHash)
+		{
+			const GLenum  target  = m_target;
 			const uint8_t numMips = m_numMips;
 
 			GL_CHECK(glTexParameteri(target, GL_TEXTURE_WRAP_S, s_textureAddress[(flags&BGFX_TEXTURE_U_MASK)>>BGFX_TEXTURE_U_SHIFT]) );
@@ -4200,8 +4260,14 @@ namespace bgfx { namespace gl
 			GL_CHECK(glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter) );
 			GL_CHECK(glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter) );
 
-			const float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-			GL_CHECK(glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, color) );
+			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
+			||  s_renderGL->m_borderColorSupport)
+			{
+				if (hasBorderColor)
+				{
+					GL_CHECK(glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, _rgba) );
+				}
+			}
 
 			if (0 != (flags & (BGFX_TEXTURE_MIN_ANISOTROPIC|BGFX_TEXTURE_MAG_ANISOTROPIC) )
 			&&  0.0f < s_renderGL->m_maxAnisotropy)
@@ -4224,12 +4290,18 @@ namespace bgfx { namespace gl
 				}
 			}
 
-			m_currentFlags = flags;
+			m_currentSamplerHash = hash;
 		}
 	}
 
-	void TextureGL::commit(uint32_t _stage, uint32_t _flags)
+	void TextureGL::commit(uint32_t _stage, uint32_t _flags, const float _palette[][4])
 	{
+		const uint32_t flags = 0 == (BGFX_SAMPLER_DEFAULT_FLAGS & _flags)
+			? _flags
+			: m_flags
+			;
+		const uint32_t index = (flags & BGFX_TEXTURE_BORDER_COLOR_MASK) >> BGFX_TEXTURE_BORDER_COLOR_SHIFT;
+
 		GL_CHECK(glActiveTexture(GL_TEXTURE0+_stage) );
 		GL_CHECK(glBindTexture(m_target, m_id) );
 
@@ -4237,7 +4309,7 @@ namespace bgfx { namespace gl
 		&&  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES < 30) )
 		{
 			// GLES2 doesn't have support for sampler object.
-			setSamplerState(_flags);
+			setSamplerState(flags, _palette[index]);
 		}
 		else if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
 			 &&  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL < 31) )
@@ -4245,17 +4317,17 @@ namespace bgfx { namespace gl
 			// In case that GL 2.1 sampler object is supported via extension.
 			if (s_renderGL->m_samplerObjectSupport)
 			{
-				s_renderGL->setSamplerState(_stage, m_numMips, _flags);
+				s_renderGL->setSamplerState(_stage, m_numMips, flags, _palette[index]);
 			}
 			else
 			{
-				setSamplerState(_flags);
+				setSamplerState(flags, _palette[index]);
 			}
 		}
 		else
 		{
 			// Everything else has sampler object.
-			s_renderGL->setSamplerState(_stage, m_numMips, _flags);
+			s_renderGL->setSamplerState(_stage, m_numMips, flags, _palette[index]);
 		}
 	}
 
@@ -5177,7 +5249,7 @@ namespace bgfx { namespace gl
 
 					if (BGFX_CLEAR_NONE != (clear.m_flags & BGFX_CLEAR_MASK) )
 					{
-						clearQuad(_clearQuad, viewState.m_rect, clear, height, _render->m_clearColor);
+						clearQuad(_clearQuad, viewState.m_rect, clear, height, _render->m_colorPalette);
 					}
 
 					GL_CHECK(glDisable(GL_STENCIL_TEST) );
@@ -5253,7 +5325,7 @@ namespace bgfx { namespace gl
 						if (0 != barrier)
 						{
 							bool constantsChanged = compute.m_constBegin < compute.m_constEnd;
-							rendererUpdateUniforms(this, _render->m_constantBuffer, compute.m_constBegin, compute.m_constEnd);
+							rendererUpdateUniforms(this, _render->m_uniformBuffer, compute.m_constBegin, compute.m_constEnd);
 
 							if (constantsChanged
 							&&  NULL != program.m_constantBuffer)
@@ -5609,7 +5681,7 @@ namespace bgfx { namespace gl
 				bool programChanged = false;
 				bool constantsChanged = draw.m_constBegin < draw.m_constEnd;
 				bool bindAttribs = false;
-				rendererUpdateUniforms(this, _render->m_constantBuffer, draw.m_constBegin, draw.m_constEnd);
+				rendererUpdateUniforms(this, _render->m_uniformBuffer, draw.m_constBegin, draw.m_constEnd);
 
 				if (key.m_program != programIdx)
 				{
@@ -5649,7 +5721,7 @@ namespace bgfx { namespace gl
 								if (invalidHandle != bind.m_idx)
 								{
 									TextureGL& texture = m_textures[bind.m_idx];
-									texture.commit(stage, bind.m_un.m_draw.m_flags);
+									texture.commit(stage, bind.m_un.m_draw.m_flags, _render->m_colorPalette);
 								}
 							}
 
@@ -6072,7 +6144,7 @@ namespace bgfx { namespace gl
 				}
 
 				tvm.printf(10, pos++, 0x8e, "      Indices: %7d ", statsNumIndices);
-				tvm.printf(10, pos++, 0x8e, " Uniform size: %7d ", _render->m_constEnd);
+				tvm.printf(10, pos++, 0x8e, " Uniform size: %7d, Max: %7d ", _render->m_uniformEnd, _render->m_uniformMax);
 				tvm.printf(10, pos++, 0x8e, "     DVB size: %7d ", _render->m_vboffset);
 				tvm.printf(10, pos++, 0x8e, "     DIB size: %7d ", _render->m_iboffset);
 

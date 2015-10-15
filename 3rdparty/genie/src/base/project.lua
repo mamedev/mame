@@ -507,8 +507,6 @@
 				bundlename = name .. ".app"
 				bundlepath = path.join(dir, bundlename)
 				dir = path.join(bundlepath, "Contents/MacOS")
-			elseif (kind == "ConsoleApp" or kind == "WindowedApp") and system == "os2" then
-				ext = ".exe"
 			elseif kind == "SharedLib" then
 				prefix = "lib"
 				ext = iif(system == "macosx", ".dylib", ".so")

@@ -71,6 +71,7 @@ public:
 		m_y10(*this, "Y10"),
 		m_y11(*this, "Y11"),
 		m_y12(*this, "Y12"),
+		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
 		m_rome(1),
 		m_vire(1)
@@ -103,6 +104,7 @@ public:
 	required_ioport m_y10;
 	required_ioport m_y11;
 	required_ioport m_y12;
+	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start();
@@ -120,14 +122,21 @@ public:
 	DECLARE_WRITE8_MEMBER( video_mode_w );
 	DECLARE_WRITE8_MEMBER( palette_w );
 	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	DECLARE_WRITE_LINE_MEMBER( bar0_w );
+	DECLARE_WRITE_LINE_MEMBER( bar2_w );
 	DECLARE_WRITE8_MEMBER( video_scroll_w );
 
 	DECLARE_READ8_MEMBER( pio_pb_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
+	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
 	enum
 	{
@@ -137,28 +146,25 @@ public:
 		RAM  = 0x08
 	};
 
-	/* memory state */
-	int m_rome;
-	int m_vire;
+	// memory state
+	bool m_rome;
+	bool m_vire;
 
-	/* video state */
+	// video state
 	UINT8 m_scroll;
 	UINT8 m_mode;
 	UINT8 m_palette_val;
 
-	/* keyboard state */
+	// keyboard state
 	int m_keylatch;
 
-	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
-	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
-
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
-
+	// printer state
 	int m_centronics_ack;
 	int m_centronics_busy;
 	int m_centronics_perror;
+
+	// serial state
+	bool m_st;
 };
 
 #endif

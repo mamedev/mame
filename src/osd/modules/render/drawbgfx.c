@@ -28,8 +28,8 @@
 #include "emu.h"
 #include "window.h"
 
-#include <bgfxplatform.h>
-#include <bgfx.h>
+#include <bgfx/bgfxplatform.h>
+#include <bgfx/bgfx.h>
 
 //============================================================
 //  DEBUGGING
