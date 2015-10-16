@@ -49,6 +49,8 @@ const rom_entry *tiki100_8088_t::device_rom_region() const
 
 
 static ADDRESS_MAP_START( i8088_mem, AS_PROGRAM, 8, tiki100_8088_t )
+	AM_RANGE(0x00000, 0xbffff) AM_RAM
+	AM_RANGE(0xc0000, 0xcffff) AM_DEVREADWRITE(":" TIKI100_BUS_TAG, tiki100_bus_t, exin_mrq_r, exin_mrq_w)
 	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
 
@@ -158,7 +160,7 @@ void tiki100_8088_t::iorq_w(address_space &space, offs_t offset, UINT8 data)
 
 READ8_MEMBER( tiki100_8088_t::read )
 {
-	return m_data;
+	return m_busak << 4 | m_data;
 }
 
 
@@ -169,4 +171,6 @@ READ8_MEMBER( tiki100_8088_t::read )
 WRITE8_MEMBER( tiki100_8088_t::write )
 {
 	m_data = data & 0x0f;
+
+	m_bus->busrq_w(BIT(data, 4));
 }

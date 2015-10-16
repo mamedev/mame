@@ -657,11 +657,16 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 	{ NULL }
 };
 
-
-
 TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 {
 	m_pio->port_b_write((m_cassette->input() > 0.0) << 7);
+}
+
+WRITE_LINE_MEMBER( tiki100_state::busrq_w )
+{
+	// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_exp->busak_w(state);
 }
 
 /* Machine Start */
@@ -711,6 +716,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_TIKI100_BUS_ADD()
 	MCFG_TIKI100_BUS_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_TIKI100_BUS_NMI_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_NMI))
+	MCFG_TIKI100_BUS_BUSRQ_CALLBACK(WRITELINE(tiki100_state, busrq_w))
+	MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(READ8(tiki100_state, mrq_r))
+	MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(WRITE8(tiki100_state, mrq_w))
 	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
 	MCFG_TIKI100_BUS_SLOT_ADD("slot2", "hdc")
 	MCFG_TIKI100_BUS_SLOT_ADD("slot3", NULL)

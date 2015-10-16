@@ -57,7 +57,10 @@ void tiki100_bus_slot_t::device_start()
 tiki100_bus_t::tiki100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TIKI100_BUS, "TIKI-100 expansion bus", tag, owner, clock, "tiki100bus", __FILE__),
 	m_irq_cb(*this),
-	m_nmi_cb(*this)
+	m_nmi_cb(*this),
+	m_busrq_cb(*this),
+	m_in_mrq_cb(*this),
+	m_out_mrq_cb(*this)
 {
 }
 
@@ -71,6 +74,9 @@ void tiki100_bus_t::device_start()
 	// resolve callbacks
 	m_irq_cb.resolve_safe();
 	m_nmi_cb.resolve_safe();
+	m_busrq_cb.resolve_safe();
+	m_in_mrq_cb.resolve();
+	m_out_mrq_cb.resolve();
 }
 
 
@@ -154,6 +160,22 @@ WRITE8_MEMBER( tiki100_bus_t::iorq_w )
 }
 
 
+//-------------------------------------------------
+//  busak_w - bus acknowledge write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( tiki100_bus_t::busak_w )
+{
+	device_tiki100bus_card_interface *entry = m_device_list.first();
+
+	while (entry)
+	{
+		entry->busak_w(state);
+		entry = entry->next();
+	}
+}
+
+
 
 //**************************************************************************
 //  DEVICE TIKI-100 BUS CARD INTERFACE
@@ -164,7 +186,8 @@ WRITE8_MEMBER( tiki100_bus_t::iorq_w )
 //-------------------------------------------------
 
 device_tiki100bus_card_interface::device_tiki100bus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_slot_card_interface(mconfig, device),
+	m_busak(CLEAR_LINE)
 {
 	m_slot = dynamic_cast<tiki100_bus_slot_t *>(device.owner());
 }

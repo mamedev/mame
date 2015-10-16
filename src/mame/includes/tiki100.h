@@ -138,6 +138,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
+	DECLARE_WRITE_LINE_MEMBER( busrq_w );
+
 	enum
 	{
 		ROM0 = 0x01,
