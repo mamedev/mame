@@ -18,7 +18,7 @@
 */
 
 // Show step operation
-#define TRACE_STEP 1
+#define TRACE_STEP 0
 
 #define FLOPSND_TAG "floppysound"
 
@@ -1070,71 +1070,100 @@ void ui_menu_control_floppy_image::handle()
 floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__)
 {
-	m_motor = false;
 	m_loaded = false;
 }
 
 void floppy_sound_device::register_for_save_states()
 {
-	save_item(NAME(m_sampleend_motor));
+	save_item(NAME(m_is525));
+	save_item(NAME(m_sampleindex_motor_start));
+	save_item(NAME(m_sampleindex_motor_loop));
+	save_item(NAME(m_sampleindex_motor_end));
+	save_item(NAME(m_samplesize_motor_start));
+	save_item(NAME(m_samplesize_motor_loop));
+	save_item(NAME(m_samplesize_motor_end));
 	save_item(NAME(m_samplepos_motor));
-	save_item(NAME(m_motor_mintime));
-	save_item(NAME(m_motor_time));
-	save_item(NAME(m_motor));
-	save_item(NAME(m_sampleend_step));
-	save_item(NAME(m_samplestart_step));
+	save_item(NAME(m_motor_playback_state));
+	save_item(NAME(m_motor_on));
+	save_item(NAME(m_step_samples));
+	save_item(NAME(m_sampleindex_step1));
+	save_item(NAME(m_samplesize_step));
 	save_item(NAME(m_samplepos_step));
-	save_item(NAME(m_step_mintime));
-	save_item(NAME(m_step_time));
+	save_item(NAME(m_step_playback_state));
 }
 
 void floppy_sound_device::device_start()
 {
+	// Sample playback phases
+	m_motor_playback_state = 0; // 0 == currently not playing, 1 == playing startup sample, 2 == playing the loop, 3 == playing loop for the last time, 4 == playing the spin down sample
+	m_step_playback_state = 0;  // 0 == currently not playing, > 0 = playing one of the step samples from start to end
+
+	m_motor_on = false;
+	m_is525 = strstr(tag(), "525") != NULL;
+	if (m_is525)
+	{
+		m_sampleindex_motor_start = 2;
+		m_sampleindex_motor_loop = 3;
+		m_sampleindex_motor_end = 4;
+		m_step_samples = 5;
+		m_sampleindex_step1 = 5;
+	}
+	else
+	{
+		m_sampleindex_motor_start = 0;
+		m_sampleindex_motor_loop = 0;
+		m_sampleindex_motor_end = 0;
+		m_step_samples = 1;
+		m_sampleindex_step1 = 1;
+	}
+	m_samplepos_motor = 0;
+	m_samplepos_step = 0;
+	m_samplesize_motor_start = 0;
+	m_samplesize_motor_loop = 0;
+	m_samplesize_motor_end = 0;
+	for (int i = 0; i < MAX_STEP_SAMPLES; ++i) m_samplesize_step[i] = 0;
+
 	// Read audio samples. The samples are stored in the list m_samples.
 	m_loaded = load_samples();
 
-	// The per-floppy stream. If we don't have all samples, don't allocate a stream.
-	if (m_loaded) m_sound = machine().sound().stream_alloc(*this, 0, 1, clock());
+	// If we don't have all samples, don't allocate a stream or access sample data.
+	if (m_loaded)
+	{
+		m_sound = machine().sound().stream_alloc(*this, 0, 1, clock()); // per-floppy stream
 
-	// Of course, we can read the length from the sample_t, but we want to
-	// be able to fine-tune it, for instance, choose different start and end points
-	m_samplestart_motor = 0;
-	m_sampleend_motor = 8820;       // 200ms
-	m_samplestart_step = 0;
-	m_sampleend_step = 2205;        // 50ms
+		// Get the sample lengths from the sample_t
+		m_samplesize_motor_start = m_sample[m_sampleindex_motor_start].data.size();
+		m_samplesize_motor_loop = m_sample[m_sampleindex_motor_loop].data.size();
+		m_samplesize_motor_end = m_sample[m_sampleindex_motor_end].data.size();
+		for (int i = 0; i < m_step_samples; ++i) m_samplesize_step[i] = m_sample[m_sampleindex_step1 + i].data.size();
+	}
 
-	// Mintime says how long the sound persists after the initiating signal
-	// is cleared (important for short step pulses)
-	m_motor_mintime = 8820;
-	m_step_mintime = 1500;
-
-	// Number of updates until the sample stops
-	m_motor_time = 0;
-	m_step_time = 0;
-
-	// Initialize position
-	m_samplepos_step = m_samplestart_step;
-	m_samplepos_motor = m_samplestart_motor;
 	register_for_save_states();
 }
 
 void floppy_sound_device::motor(bool state)
 {
-	m_sound->update();
-	// We do not reset the motor sample on state==true because we don't want
-	// the sound to "jump"
-	if (state==true) m_motor_time = m_motor_mintime;
-	m_motor = state;
+	if (!m_loaded) return;
+	m_sound->update(); // required
+	if ((!m_motor_playback_state || m_motor_playback_state > 2) && state) // motor was either off or already spinning down
+	{
+		m_samplepos_motor = 0;
+		m_motor_playback_state = 1; // (re)start the motor sound
+	}
+	else if (m_motor_playback_state == 2 && !state) m_motor_playback_state = 3; // go to spin down sound when loop is finished
+	m_motor_on = state;
 }
 
-/*
-    Activate the step sound.
-*/
+// Activate the step sound.
 void floppy_sound_device::step()
 {
+	if (!m_loaded) return;
 	m_sound->update();  // required
-	m_step_time = m_step_mintime;
-	m_samplepos_step = m_samplestart_step;
+	if (m_step_playback_state == 0)
+	{
+		m_step_playback_state = machine().rand() % m_step_samples + 1; // play one of the floppy drive step samples
+		m_samplepos_step = 0; // restart step sound
+	}
 }
 
 //-------------------------------------------------
@@ -1148,39 +1177,71 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// one sample rate of 44100 for all samples
 
 	INT16 out = 0;
-
 	stream_sample_t *samplebuffer = outputs[0];
-	sample_t&   motor_sample = m_sample[0];
-	sample_t&   step_sample = m_sample[1];
 
 	while (samples-- > 0)
 	{
 		out = 0;
-		// Motor sound
-		if (m_motor_time > 0)
-		{
-			if (m_samplepos_motor < m_sampleend_motor)
-				// Stream value
-				out = motor_sample.data[m_samplepos_motor++];
-			else
-				m_samplepos_motor = m_samplestart_motor;
 
-			// When the motor is turned off, count down the samples
-			if (!m_motor) m_motor_time--;
+		// make sure we are spinning the motor if stepping is going on!
+		if (m_motor_playback_state == 0 && m_step_playback_state > 0)
+		{
+			m_samplepos_motor = 0;
+			m_motor_playback_state = 2;
+		}
+
+		// Motor sound
+		if (m_motor_playback_state > 0)
+		{
+			switch (m_motor_playback_state)
+			{
+			case 1:
+				out = m_sample[m_sampleindex_motor_start].data[m_samplepos_motor++];
+				if (m_samplepos_motor >= m_samplesize_motor_start)
+				{
+					m_samplepos_motor = 0;
+					m_motor_playback_state = 2; // move to looping sound
+				}
+				break;
+			case 2:
+				out = m_sample[m_sampleindex_motor_loop].data[m_samplepos_motor++];
+				if (m_samplepos_motor >= m_samplesize_motor_loop)
+				{
+					m_samplepos_motor = 0; // continue loop, unless...
+					if (!m_motor_on) m_motor_playback_state = 4; // motor was turned off already (during spin-up maybe) -> spin down
+				}
+				break;
+			case 3:
+				out = m_sample[m_sampleindex_motor_loop].data[m_samplepos_motor++];
+				if (m_samplepos_motor >= m_samplesize_motor_loop)
+				{
+					m_samplepos_motor = 0;
+					m_motor_playback_state = 4; // move to spin down sound
+				}
+				break;
+			case 4:
+				out = m_sample[m_sampleindex_motor_end].data[m_samplepos_motor++];
+				if (m_samplepos_motor >= m_samplesize_motor_end)
+				{
+					m_samplepos_motor = 0;
+					m_motor_playback_state = !m_motor_on ? 0 : 1; // stop or restart motor sound
+				}
+				break;
+			}
 		}
 
 		// Stepper sound
-		if (m_step_time > 0)
+		if (m_step_playback_state > 0)
 		{
-			if (m_samplepos_step < m_sampleend_step)
-				// Mix it into the stream value
-				out = out + step_sample.data[m_samplepos_step++];
-			else
-				m_samplepos_step = m_samplestart_step;
-
-			// Count down the samples
-			m_step_time--;
+			// Mix it into the stream value
+			out += m_sample[m_sampleindex_step1 + m_step_playback_state - 1].data[m_samplepos_step++];
+			if (m_samplepos_step >= m_samplesize_step[m_step_playback_state - 1])
+			{
+				m_samplepos_step = 0;
+				m_step_playback_state = 0;
+			}
 		}
+
 		// Write to the stream buffer
 		*(samplebuffer++) = out;
 	}
@@ -1191,6 +1252,14 @@ static const char *const floppy_sample_names[] =
 	"*floppy",
 	"floppy_35_motor",
 	"floppy_35_step",
+	"floppy_525_motor_start",
+	"floppy_525_motor_loop",
+	"floppy_525_motor_end",
+	"floppy_525_step1",
+	"floppy_525_step2",
+	"floppy_525_step3",
+	"floppy_525_step4",
+	"floppy_525_step5",
 	0
 };
 
@@ -1200,7 +1269,7 @@ MACHINE_CONFIG_FRAGMENT( floppy_img )
 	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
 	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
 	MCFG_SAMPLES_NAMES(floppy_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
 MACHINE_CONFIG_END
 
 machine_config_constructor floppy_image_device::device_mconfig_additions() const

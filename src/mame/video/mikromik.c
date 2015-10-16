@@ -72,7 +72,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 	UINT16 data = m_video_ram[address >> 1];
 	for (int i = 0; i < 16; i++)
 	{
-		if (BIT(data, i)) bitmap.pix32(y, x + i) = m_palette->pen(1);
+		if (BIT(data, i)) bitmap.pix32(y, x + i) = m_palette->pen(2);
 	}
 }
 
@@ -114,6 +114,13 @@ static GFXDECODE_START( mm1 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
+PALETTE_INIT_MEMBER( mm1_state, mm1 )
+{
+	palette.set_pen_color(0, rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(1, rgb_t(0x00,0x7F,0x0A)); // dark green ("highlight" mode color)
+	palette.set_pen_color(2, rgb_t(0x08,0xD0,0x1A)); // bright green (normal color)
+}
+
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( mm1m6_video )
@@ -128,7 +135,8 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mm1)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(mm1_state, mm1)
 
 	MCFG_DEVICE_ADD(I8275_TAG, I8275, XTAL_18_720MHz/8)
 	MCFG_I8275_CHARACTER_WIDTH(HORIZONTAL_CHARACTER_PIXELS)
