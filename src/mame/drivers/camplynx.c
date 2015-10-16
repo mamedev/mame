@@ -64,6 +64,10 @@
 
     48k and 96k are basically the same machine. 128k is different.
 
+    This computer is weird, because it allows reads and writes from multiple banks
+    at the same time. We can write to multiple banks, but we must limit ourselves
+    to reading from the lowest bank selected.
+
     Notes:
     - The screen doesn't scroll. This is normal.
     - Variable names are case-sensitive.
@@ -77,15 +81,25 @@
     - Cassette tapes made on 128k are a different speed to 48k tapes. To load a 128k
       tape on a 48k system, enter TAPE 3 before loading. (2,3,4,5 all seem to work).
     - When loading, there's no wildcard; you must specify the name.
+    - INT should be activated by the MC6845 CURS pin (inverted), or by holding down
+      the BREAK key. However, the rom leaves interrupts disabled, so none of this works.
 
     To Do:
+    - Need disk-based software (only ones found are LDF format)
     - finish memory banking
-    - how is alt-green bank selected on 48k?
     - port 80 on 48k
-    - disk
+    - disk (only partially done due to no schematic)
     - printer
     - joysticks
-    - find out the mc6845 clock frequency
+    - UART type COM8017
+    Bugs:
+    - YNXVADERS: Top row of invaders is missing and can't be killed, but they
+      continue to fire at you. This makes the game unwinnable.
+    Game bugs (reproducible in Jynx):
+    - 3D Monster Craze: When attacked, garbage on screen
+    - 3D Monster Craze: When you find the key, the game freezes
+    - LogiChess: unable to enter an acceptable move
+    - Power Blaster: Bad Tape
 
 ****************************************************************************/
 
@@ -96,6 +110,7 @@
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "formats/camplynx_cas.h"
+#include "machine/wd_fdc.h"
 
 class camplynx_state : public driver_device
 {
@@ -107,18 +122,30 @@ public:
 		, m_cass(*this, "cassette")
 		//, m_printer(*this, "centronics")
 		, m_crtc(*this, "crtc")
-		//, m_fdc(*this, "fdc")
 		, m_dac(*this, "dac")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
 	{ }
 
 	// 48k
+	DECLARE_WRITE8_MEMBER(bank1_w);
+	DECLARE_WRITE8_MEMBER(bank2_w);
+	DECLARE_WRITE8_MEMBER(bank3_w);
+	DECLARE_WRITE8_MEMBER(bank4_w);
+	DECLARE_WRITE8_MEMBER(bank5_w);
+	DECLARE_WRITE8_MEMBER(bank6_w);
+	DECLARE_WRITE8_MEMBER(bank7_w);
+	DECLARE_WRITE8_MEMBER(bank8_w);
+	DECLARE_WRITE8_MEMBER(port7f_w); // banking 48k
 	DECLARE_READ8_MEMBER(port80_r); // cassin for 48k
 	DECLARE_WRITE8_MEMBER(port80_w); // control port 48k
 	DECLARE_WRITE8_MEMBER(port84_w); // dac port 48k
-	DECLARE_WRITE8_MEMBER(lynx48k_bank_w); // banking 48k
+	DECLARE_MACHINE_RESET(lynx48k);
 	DECLARE_DRIVER_INIT(lynx48k);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	// 128k
+	DECLARE_WRITE8_MEMBER(port58_w); // drive select etc
 	DECLARE_WRITE8_MEMBER(lynx128k_port80_w); // control port 128k
 	DECLARE_READ8_MEMBER(lynx128k_port82_r); // cassin for 128k
 	DECLARE_WRITE8_MEMBER(lynx128k_port84_w); // dac port 128k
@@ -129,31 +156,140 @@ public:
 	// common
 	required_device<palette_device> m_palette;
 private:
+	UINT8 m_port58;
+	UINT8 m_port7f;
 	UINT8 m_port80;
-	required_device<cpu_device> m_maincpu;
+	UINT8 m_wbyte;
+	UINT8 *m_p_ram;
+	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
-	//optional_device<> m_fdc;
 	required_device<dac_device> m_dac;
+	optional_device<fd1793_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
 };
 
-/* These bankswitch handlers are very incomplete, just enough to get the
-    computer working. Also, as it happens 6 times for every scanline
-    of every character, it causes a huge slowdown. */
-
-WRITE8_MEMBER( camplynx_state::lynx48k_bank_w )
+WRITE8_MEMBER( camplynx_state::port7f_w )
 {
-	if (!data)
-		membank("bank1")->set_entry(0);
-	else
-	if (data & 2)
-		membank("bank1")->set_entry(1);
-	else
-	if (data & 4)
-		membank("bank1")->set_entry(2);
-	else
-		logerror("%04X: Cannot understand bankswitch command %X\n",m_maincpu->pc(), data);
+/*
+d0 = write to bank 1
+d1 = write to bank 2
+d2 = write to bank 3
+d3 = write to bank 4
+d4 = read from bank 0 - roms
+d5 = read from bank 1 - user ram
+d6 = read from banks 2 and 3 - videoram
+d7 = read from bank 4 */
+
+	m_port7f = data;
+	data ^= 0x31; // make all lines active high
+//printf("%s:%X\n", machine().describe_context(), data);
+	// do writes
+	m_wbyte = (data & 0x0f) | ((m_port80 & 0x0c) << 3);
+	// do reads
+	UINT8 rbyte = (data & 0x70) | (m_port80 & 0x0c);
+	switch (rbyte)
+	{
+		case 0x00:
+		case 0x04:
+		case 0x08:
+		case 0x0c:
+		case 0x10:
+		case 0x14:
+		case 0x18:
+		case 0x1c:
+			membank("bankr1")->set_entry(0);
+			membank("bankr2")->set_entry(1);
+			membank("bankr3")->set_entry(2);
+			membank("bankr4")->set_entry(3);
+			membank("bankr5")->set_entry(0);
+			membank("bankr6")->set_entry(1);
+			membank("bankr7")->set_entry(2);
+			membank("bankr8")->set_entry(3);
+			break;
+		case 0x20:
+		case 0x24:
+		case 0x28:
+		case 0x2c:
+			membank("bankr1")->set_entry(8);
+			membank("bankr2")->set_entry(9);
+			membank("bankr3")->set_entry(10);
+			membank("bankr4")->set_entry(11);
+			membank("bankr5")->set_entry(12);
+			membank("bankr6")->set_entry(13);
+			membank("bankr7")->set_entry(14);
+			membank("bankr8")->set_entry(15);
+			break;
+		case 0x30:
+		case 0x34:
+		case 0x38:
+		case 0x3c:
+			membank("bankr1")->set_entry(0);
+			membank("bankr2")->set_entry(1);
+			membank("bankr3")->set_entry(2);
+			membank("bankr4")->set_entry(11);
+			membank("bankr5")->set_entry(12);
+			membank("bankr6")->set_entry(13);
+			membank("bankr7")->set_entry(14);
+			membank("bankr8")->set_entry(BIT(m_port58, 4) ? 15 : 7);
+			break;
+		case 0x44:
+		case 0x64:
+			membank("bankr1")->set_entry(24);
+			membank("bankr2")->set_entry(25);
+			membank("bankr3")->set_entry(26);
+			membank("bankr4")->set_entry(27);
+			membank("bankr5")->set_entry(28);
+			membank("bankr6")->set_entry(28);
+			membank("bankr7")->set_entry(30);
+			membank("bankr8")->set_entry(30);
+			break;
+		case 0x40:
+		case 0x60:
+		case 0x48:
+		case 0x68:
+		case 0x4c:
+		case 0x6c:
+			membank("bankr1")->set_entry(16);
+			membank("bankr2")->set_entry(17);
+			membank("bankr3")->set_entry(18);
+			membank("bankr4")->set_entry(19);
+			membank("bankr5")->set_entry(20);
+			membank("bankr6")->set_entry(20);
+			membank("bankr7")->set_entry(22);
+			membank("bankr8")->set_entry(22);
+			break;
+		case 0x54:
+		case 0x74:
+			membank("bankr1")->set_entry(0);
+			membank("bankr2")->set_entry(1);
+			membank("bankr3")->set_entry(2);
+			membank("bankr4")->set_entry(27);
+			membank("bankr5")->set_entry(28);
+			membank("bankr6")->set_entry(28);
+			membank("bankr7")->set_entry(30);
+			membank("bankr8")->set_entry(30);
+			break;
+		case 0x50:
+		case 0x70:
+		case 0x58:
+		case 0x78:
+		case 0x5c:
+		case 0x7c:
+			membank("bankr1")->set_entry(0);
+			membank("bankr2")->set_entry(1);
+			membank("bankr3")->set_entry(2);
+			membank("bankr4")->set_entry(19);
+			membank("bankr5")->set_entry(20);
+			membank("bankr6")->set_entry(20);
+			membank("bankr7")->set_entry(22);
+			membank("bankr8")->set_entry(22);
+			break;
+		default:
+			printf("Banking code %X not handled\n", rbyte);
+	}
 }
 
 WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
@@ -222,53 +358,65 @@ WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 
 static ADDRESS_MAP_START( lynx48k_mem, AS_PROGRAM, 8, camplynx_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x5fff) AM_ROM
-	AM_RANGE(0x6000,0x7fff) AM_RAM
-	AM_RANGE(0x8000,0xffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000,0x1fff) AM_READ_BANK("bankr1") AM_WRITE(bank1_w)
+	AM_RANGE(0x2000,0x3fff) AM_READ_BANK("bankr2") AM_WRITE(bank2_w)
+	AM_RANGE(0x4000,0x5fff) AM_READ_BANK("bankr3") AM_WRITE(bank3_w)
+	AM_RANGE(0x6000,0x7fff) AM_READ_BANK("bankr4") AM_WRITE(bank4_w)
+	AM_RANGE(0x8000,0x9fff) AM_READ_BANK("bankr5") AM_WRITE(bank5_w)
+	AM_RANGE(0xa000,0xbfff) AM_READ_BANK("bankr6") AM_WRITE(bank6_w)
+	AM_RANGE(0xc000,0xdfff) AM_READ_BANK("bankr7") AM_WRITE(bank7_w)
+	AM_RANGE(0xe000,0xffff) AM_READ_BANK("bankr8") AM_WRITE(bank8_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lynx128k_mem, AS_PROGRAM, 8, camplynx_state )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx48k_io , AS_IO, 8, camplynx_state )
+static ADDRESS_MAP_START( lynx48k_io, AS_IO, 8, camplynx_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(lynx48k_bank_w)
+	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff80) AM_WRITE(port7f_w)
 	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(port80_w)
-	AM_RANGE(0x0080,0x0080) AM_READ(port80_r)
-	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
-	AM_RANGE(0x0280,0x0280) AM_READ_PORT("LINE2")
-	AM_RANGE(0x0380,0x0380) AM_READ_PORT("LINE3")
-	AM_RANGE(0x0480,0x0480) AM_READ_PORT("LINE4")
-	AM_RANGE(0x0580,0x0580) AM_READ_PORT("LINE5")
-	AM_RANGE(0x0680,0x0680) AM_READ_PORT("LINE6")
-	AM_RANGE(0x0780,0x0780) AM_READ_PORT("LINE7")
-	AM_RANGE(0x0880,0x0880) AM_READ_PORT("LINE8")
-	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
+	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xf000) AM_READ(port80_r)
+	AM_RANGE(0x0180,0x0180) AM_MIRROR(0xf000) AM_READ_PORT("LINE1")
+	AM_RANGE(0x0280,0x0280) AM_MIRROR(0xf000) AM_READ_PORT("LINE2")
+	AM_RANGE(0x0380,0x0380) AM_MIRROR(0xf000) AM_READ_PORT("LINE3")
+	AM_RANGE(0x0480,0x0480) AM_MIRROR(0xf000) AM_READ_PORT("LINE4")
+	AM_RANGE(0x0580,0x0580) AM_MIRROR(0xf000) AM_READ_PORT("LINE5")
+	AM_RANGE(0x0680,0x0680) AM_MIRROR(0xf000) AM_READ_PORT("LINE6")
+	AM_RANGE(0x0780,0x0780) AM_MIRROR(0xf000) AM_READ_PORT("LINE7")
+	AM_RANGE(0x0880,0x0880) AM_MIRROR(0xf000) AM_READ_PORT("LINE8")
+	AM_RANGE(0x0980,0x0980) AM_MIRROR(0xf000) AM_READ_PORT("LINE9")
 	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_WRITE(port84_w)
 	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx128k_io , AS_IO, 8, camplynx_state )
+static ADDRESS_MAP_START( lynx96k_io, AS_IO, 8, camplynx_state )
+	AM_IMPORT_FROM(lynx48k_io)
+	AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_DEVREAD("fdc", fd1793_t, read)
+	AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_DEVWRITE("fdc", fd1793_t, write)
+	AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(port58_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lynx128k_io, AS_IO, 8, camplynx_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_READ(wd179x_r) // uses a 1793
-//  AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_WRITE(wd179x_w)
-//  AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(lynx128k_disk_w)
+	AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_DEVREAD("fdc", fd1793_t, read)
+	AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_DEVWRITE("fdc", fd1793_t, write)
+	AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(port58_w)
 //  AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
 //  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
 //  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
 //  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
 	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(lynx128k_port80_w)
-	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
-	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
-	AM_RANGE(0x0280,0x0280) AM_READ_PORT("LINE2")
-	AM_RANGE(0x0380,0x0380) AM_READ_PORT("LINE3")
-	AM_RANGE(0x0480,0x0480) AM_READ_PORT("LINE4")
-	AM_RANGE(0x0580,0x0580) AM_READ_PORT("LINE5")
-	AM_RANGE(0x0680,0x0680) AM_READ_PORT("LINE6")
-	AM_RANGE(0x0780,0x0780) AM_READ_PORT("LINE7")
-	AM_RANGE(0x0880,0x0880) AM_READ_PORT("LINE8")
-	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
+	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xf000) AM_READ_PORT("LINE0")
+	AM_RANGE(0x0180,0x0180) AM_MIRROR(0xf000) AM_READ_PORT("LINE1")
+	AM_RANGE(0x0280,0x0280) AM_MIRROR(0xf000) AM_READ_PORT("LINE2")
+	AM_RANGE(0x0380,0x0380) AM_MIRROR(0xf000) AM_READ_PORT("LINE3")
+	AM_RANGE(0x0480,0x0480) AM_MIRROR(0xf000) AM_READ_PORT("LINE4")
+	AM_RANGE(0x0580,0x0580) AM_MIRROR(0xf000) AM_READ_PORT("LINE5")
+	AM_RANGE(0x0680,0x0680) AM_MIRROR(0xf000) AM_READ_PORT("LINE6")
+	AM_RANGE(0x0780,0x0780) AM_MIRROR(0xf000) AM_READ_PORT("LINE7")
+	AM_RANGE(0x0880,0x0880) AM_MIRROR(0xf000) AM_READ_PORT("LINE8")
+	AM_RANGE(0x0980,0x0980) AM_MIRROR(0xf000) AM_READ_PORT("LINE9")
 	AM_RANGE(0x0082,0x0082) AM_MIRROR(0xff00) AM_READWRITE(lynx128k_port82_r,lynx128k_bank_w) // read=serial buffer
 	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_WRITE(lynx128k_port84_w)
 	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
@@ -355,6 +503,86 @@ static INPUT_PORTS_START( lynx48k )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 INPUT_PORTS_END
 
+WRITE8_MEMBER( camplynx_state::bank1_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x10000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x20000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x30000] = data;
+}
+
+WRITE8_MEMBER( camplynx_state::bank2_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x12000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x22000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x32000] = data;
+}
+
+WRITE8_MEMBER( camplynx_state::bank3_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x14000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x24000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x34000] = data;
+}
+
+WRITE8_MEMBER( camplynx_state::bank4_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x16000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x26000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x36000] = data;
+}
+
+WRITE8_MEMBER( camplynx_state::bank5_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x18000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x28000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x38000] = data;
+}
+
+WRITE8_MEMBER( camplynx_state::bank6_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x1a000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x28000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x38000] = data;
+}
+
+WRITE8_MEMBER( camplynx_state::bank7_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x1c000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x2c000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x3c000] = data;
+}
+
+WRITE8_MEMBER( camplynx_state::bank8_w )
+{
+	if BIT(m_wbyte, 0)
+		m_p_ram[offset+0x1e000] = data;
+	if ((m_wbyte & 0x22) == 0x02)
+		m_p_ram[offset+0x2c000] = data;
+	if ((m_wbyte & 0x44) == 0x04)
+		m_p_ram[offset+0x3c000] = data;
+}
+
 READ8_MEMBER( camplynx_state::port80_r )
 {
 	UINT8 data = ioport("LINE0")->read();
@@ -373,6 +601,7 @@ WRITE8_MEMBER( camplynx_state::port80_w )
 {
 	m_port80 = data;
 	m_cass->change_state( BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	port7f_w(space, 0, m_port7f);
 }
 
 /* DAC port. If writing cassette, output goes to tape as a sine wave, otherwise it goes to speaker.
@@ -435,7 +664,16 @@ WRITE8_MEMBER( camplynx_state::lynx128k_port84_w )
 		m_dac->write_unsigned8(space, 0, data);
 }
 
-MACHINE_RESET_MEMBER(camplynx_state,lynx128k)
+MACHINE_RESET_MEMBER(camplynx_state, lynx48k)
+{
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	port7f_w( mem, 0, 0 );
+	m_port58 = 0;
+	m_port80 = 0;
+	m_maincpu->reset();
+}
+
+MACHINE_RESET_MEMBER(camplynx_state, lynx128k)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	mem.install_read_bank (0x0000, 0x1fff, "bank1");
@@ -465,16 +703,21 @@ WRITE8_MEMBER( camplynx_state::lynx128k_irq )
 
 MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	UINT8 r,g,b,x;
-	UINT32 *p = &bitmap.pix32(y);
-	UINT16 mem = ((ma << 2) + (ra << 5)) & 0x3fff;
+	UINT8 r=0,g=0,b=0,x;
+	UINT32 green_bank, *p = &bitmap.pix32(y);
+	UINT16 mem = ((ma << 2) + (ra << 5)) & 0x1fff;
+
+	// determine green bank
+	if BIT(m_port80, 4)
+		green_bank = 0x38000+mem; // alt green
+	else
+		green_bank = 0x3c000+mem; // normal green
 
 	for (x = 0; x < x_count; x++)
 	{
-		r = RAM[0x14000+mem+x];
-		g = RAM[0x1c000+mem+x];
-		b = RAM[0x10000+mem+x];
+		r = m_p_ram[0x2c000+mem+x];
+		b = m_p_ram[0x28000+mem+x];
+		g = m_p_ram[green_bank+x];
 
 		*p++ = m_palette->pen_color((BIT(b, 7) << 2) | (BIT(g, 7) << 1) | (BIT(r, 7)));
 		*p++ = m_palette->pen_color((BIT(b, 6) << 2) | (BIT(g, 6) << 1) | (BIT(r, 6)));
@@ -516,12 +759,52 @@ MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 	}
 }
 
+WRITE8_MEMBER( camplynx_state::port58_w )
+{
+/*
+d0,d1 = drive select
+d2 = side
+d3 = motor
+d4 = eprom
+d5 = not used
+d6 = no precomp
+d7 = 125ns or 250ns */
+
+	if (BIT(m_port58, 4) ^ BIT(data, 4))
+	{
+		m_port58 = data;
+		port7f_w(space, 0, m_port7f);
+	}
+	m_fdc->dden_w(BIT(data, 7));
+
+	floppy_image_device *floppy = NULL;
+	if ((data & 3) == 0) floppy = m_floppy0->get_device();
+	else
+	if ((data & 3) == 1) floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+		floppy->ss_w(BIT(data, 2));
+
+	m_floppy0->get_device()->mon_w(BIT(data, 3));
+	m_floppy1->get_device()->mon_w(BIT(data, 3));
+}
+
+
+static SLOT_INTERFACE_START( camplynx_floppies )
+	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(lynx48k_mem)
 	MCFG_CPU_IO_MAP(lynx48k_io)
+
+	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -538,13 +821,14 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.02)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
+	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(lynx48k_cassette_formats)
@@ -552,10 +836,25 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	//MCFG_CASSETTE_INTERFACE("camplynx_cass")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( lynx96k, lynx48k )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(lynx96k_io)
+
+	// floppy-disk
+	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24) // no idea what crystal, no schematic of fdc found
+	//MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(camplynx_state, fdc_intrq_w))
+	//MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(camplynx_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(lynx128k_mem)
 	MCFG_CPU_IO_MAP(lynx128k_io)
 
@@ -576,31 +875,47 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.02)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITE8(camplynx_state, lynx128k_irq))
+	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(lynx128k_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	//MCFG_CASSETTE_INTERFACE("camplynx_cass")
+
+	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24) // no idea what crystal, no schematic of fdc found
+	//MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(camplynx_state, fdc_intrq_w))
+	//MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(camplynx_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(camplynx_state,lynx48k)
+DRIVER_INIT_MEMBER(camplynx_state, lynx48k)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 3, &RAM[0x8000],  0x8000);
+	m_p_ram = memregion("maincpu")->base();
+	membank("bankr1")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
+	membank("bankr2")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
+	membank("bankr3")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
+	membank("bankr4")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
+	membank("bankr5")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
+	membank("bankr6")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
+	membank("bankr7")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
+	membank("bankr8")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
 }
 
 
 /* ROM definition */
 ROM_START( lynx48k )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_FILL( 0x4000, 0xc000, 0xff )
 	ROM_SYSTEM_BIOS(0, "1", "Set1")
 	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(1) )
 	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(1) )
@@ -610,7 +925,7 @@ ROM_START( lynx48k )
 ROM_END
 
 ROM_START( lynx96k )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx9646.rom",  0x0000, 0x2000, CRC(f86c5514) SHA1(77a4af7557382003d697d08f364839e2dc28f063) )
 	ROM_LOAD( "lynx9645.rom",  0x2000, 0x2000, CRC(f596b9a3) SHA1(3fca46bd68422d34c6cd801dd904507e52bd8846) )
 	ROM_LOAD( "lynx9644.rom",  0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b) )
@@ -627,7 +942,7 @@ ROM_END
 
 
 /* Driver */
-/*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT         COMPANY     FULLNAME     FLAGS */
-COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k",   MACHINE_NOT_WORKING)
-COMP( 1983, lynx96k,   lynx48k,   0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT    CLASS            INIT         COMPANY     FULLNAME     FLAGS */
+COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k", 0 )
+COMP( 1983, lynx96k,   lynx48k,   0,       lynx96k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",   MACHINE_NOT_WORKING)
 COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, driver_device,   0,        "Camputers",  "Lynx 128k",  MACHINE_NOT_WORKING)
