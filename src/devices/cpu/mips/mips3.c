@@ -254,9 +254,9 @@ void mips3_device::generate_exception(int exception, int backup)
 	}
 
 	/* if we were in a branch delay slot, adjust */
-	//if ((m_nextpc != ~0) 
-	if (m_delayslot)
+	if ((m_nextpc != ~0) || (m_delayslot))
 	{
+		m_delayslot = false;
 		m_nextpc = ~0;
 		m_core->cpr[0][COP0_EPC] -= 4;
 		CAUSE |= 0x80000000;
