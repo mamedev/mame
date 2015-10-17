@@ -1972,7 +1972,7 @@ WRITE8_MEMBER(amstrad_state::rom_select)
 		exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
 	}
 
-	amstrad_setUpperRom();
+	amstrad_rethinkMemory();
 }
 
 /* Offset handler for write */

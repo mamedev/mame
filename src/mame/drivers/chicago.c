@@ -10,7 +10,7 @@
  TV Tennis (1973)                 #427
  Olympic TV Hockey (1973)         #429
  Olympic TV Football (1973)       #429-A
- TV Goalee (1974)                 #414
+ TV Goalee (1974)                 #434
  TV Pingame (1975)                #451
  Super Flipper (1975)             #458
  Demolition Derby (1976)          #466
