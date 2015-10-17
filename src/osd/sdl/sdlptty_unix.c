@@ -118,9 +118,13 @@ file_error sdl_close_ptty(osd_file *file)
 
 file_error sdl_slave_name_ptty(osd_file *file , char *name , size_t name_len)
 {
-        if (ptsname_r(file->handle , name , name_len) < 0) {
+        const char *slave_name = ptsname(file->handle);
+
+        if (slave_name == NULL || strlen(slave_name) >= name_len) {
                 return FILERR_INVALID_ACCESS;
         }
+
+        strcpy(name , slave_name);
 
         return FILERR_NONE;
 }
