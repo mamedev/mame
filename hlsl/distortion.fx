@@ -114,7 +114,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 uniform float CurvatureAmount = 0.0f;
 uniform float RoundCornerAmount = 0.0f;
-uniform float SmoothBorderAmount = 0.5f;
+uniform float SmoothBorderAmount = 0.0f;
 uniform float VignettingAmount = 0.0f;
 uniform float ReflectionAmount = 0.0f;
 
@@ -122,7 +122,7 @@ uniform bool OrientationSwapXY = false; // false landscape, true portrait for de
 uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
 uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
-float2 GetRatioCorrecton()
+float2 GetRatioCorrection()
 {
 	float ScreenRatio = ScreenDims.x / ScreenDims.y;
 	float QuadRatio = QuadDims.x / QuadDims.y;
@@ -155,7 +155,7 @@ float GetVignetteFactor(float2 coord, float amount)
 
 float GetSpotAddend(float2 coord, float amount)
 {
-	float2 RatioCorrection = GetRatioCorrecton();
+	float2 RatioCorrection = GetRatioCorrection();
 
 	// normalized screen quad ratio
 	float2 QuadRatio = float2 (1.0f, QuadDims.y / QuadDims.x);
@@ -191,19 +191,17 @@ float GetSpotAddend(float2 coord, float amount)
 
 float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 {
-	float2 RatioCorrection = GetRatioCorrecton();
+	float2 RatioCorrection = GetRatioCorrection();
 
+	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
 
-	float2 RoundCornerCoord = coord * 2;
-
-	float MinScreenDims = min(ScreenDims.x, ScreenDims.y);
-
-	float radius = MinScreenDims * 0.5 * max(radiusAmount, 0.01f);
-	float smooth = 1.0 / (MinScreenDims * 0.25 * max(smoothAmount, 0.01f));
+	float range = min(ScreenDims.x, ScreenDims.y) * 0.5;
+	float radius = range * max(radiusAmount, 0.01f);
+	float smooth = 1.0 / (range * max(smoothAmount, 0.01f));
 
 	// compute box
-	float box = roundBox(ScreenDims * RoundCornerCoord, ScreenDims * RatioCorrection, radius);
+	float box = roundBox(ScreenDims * (coord * 2.0f), ScreenDims * RatioCorrection, radius);
 
 	// apply smooth
 	box *= smooth;
@@ -215,16 +213,9 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 }
 
 // www.francois-tarlier.com/blog/cubic-lens-distortion-shader/
-float2 GetDistortedCoords(float2 coord, float amount)
+float2 GetDistortedCoords(float2 centerCoord, float amount)
 {
 	amount *= 0.25f; // reduced amount
-
-	float2 RatioCorrection = GetRatioCorrecton();
-
-	// center coordinates
-	coord -= 0.5f;
-
-	coord /= RatioCorrection;
 
 	// lens distortion coefficient
 	float k = amount;
@@ -233,20 +224,37 @@ float2 GetDistortedCoords(float2 coord, float amount)
 	float kcube = amount * 2.0f;
 
 	// compute cubic distortion factor
-	float r2 = coord.x * coord.x + coord.y * coord.y;
+	float r2 = centerCoord.x * centerCoord.x + centerCoord.y * centerCoord.y;
 	float f = kcube == 0.0f
-		? 1 + r2 * k
-		: 1 + r2 * (k + kcube * sqrt(r2));
+		? 1.0f + r2 * k
+		: 1.0f + r2 * (k + kcube * sqrt(r2));
 
-   	// correct zoom
+   	// fit screen bounds
 	f /= 1.0f + amount * 0.5f;
 
 	// apply cubic distortion factor
-   	coord *= f;
+   	centerCoord *= f;
 
+	return centerCoord;
+}
+
+float2 GetCoords(float2 coord, float distortionAmount)
+{
+	float2 RatioCorrection = GetRatioCorrection();
+
+	// center coordinates
+	coord -= 0.5f;
+
+	// apply ratio difference between screen and quad
+	coord /= RatioCorrection;
+
+	// distort coordinates
+	coord = GetDistortedCoords(coord, distortionAmount);
+
+	// revert ratio difference between screen and quad
 	coord *= RatioCorrection;
 
-	// uncenter coordinates
+	// un-center coordinates
 	coord += 0.5f;
 
 	return coord;
@@ -257,21 +265,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 TexCoord = Input.TexCoord;
 	float2 BaseCoord = TexCoord;
 
-	// // test code
-	// // BaseCoord.x += (TexCoord.x > 0.5f ? -0.5f : 0.0f);
-	// BaseCoord.y += (TexCoord.y > 0.5f ? -0.5f : 0.0f);
-	// BaseCoord.y *= 2.0f;
-
 	// Screen Curvature
-	BaseCoord = GetDistortedCoords(BaseCoord, CurvatureAmount);
+	BaseCoord = GetCoords(BaseCoord, CurvatureAmount);
 
 	float2 BaseCoordCentered = BaseCoord;
 	BaseCoordCentered -= 0.5f;
-
-	// // test code
-	// BaseCoord.y /= 2.0f;
-	// // BaseCoord.x += (TexCoord.x > 0.5f ? +0.5f : 0.0f);
-	// BaseCoord.y += (TexCoord.y > 0.5 ? +0.5f : 0.0f);
 
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
@@ -284,7 +282,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	BaseColor.rgb *= VignetteFactor;
 
 	// Light Reflection Simulation
-	float3 LightColor = float3(1.0f, 0.90f, 0.80f);
+	float3 LightColor = float3(1.0f, 0.90f, 0.80f); // color temperature 5.000 Kelvin
 
 	float2 SpotCoord = BaseCoordCentered;
 	float2 NoiseCoord = BaseCoordCentered;
@@ -298,10 +296,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, SmoothBorderAmount);
 	BaseColor.rgb *= roundCornerFactor;
-
-	// // test code
-	// BaseColor.rgb = BaseCoord.x * BaseCoord.y;
-	// BaseColor.rgb = TexCoord.y > 0.5f ? 1.0f : 0.5f;
 
 	return BaseColor;
 }

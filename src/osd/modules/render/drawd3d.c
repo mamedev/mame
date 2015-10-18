@@ -2074,13 +2074,13 @@ error:
 //  texture_info::compute_size_subroutine
 //============================================================
 
-void texture_info::compute_size_subroutine(texture_manager* texture_manager, int texwidth, int texheight, int* p_width, int* p_height)
+void texture_info::compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height)
 {
 	int finalheight = texheight;
 	int finalwidth = texwidth;
 
 	// round width/height up to nearest power of 2 if we need to
-	if (!(texture_manager->get_texture_caps() & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
+	if (!(m_texture_manager->get_texture_caps() & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
 	{
 		// first the width
 		if (finalwidth & (finalwidth - 1))
@@ -2104,7 +2104,7 @@ void texture_info::compute_size_subroutine(texture_manager* texture_manager, int
 	}
 
 	// round up to square if we need to
-	if (texture_manager->get_texture_caps() & D3DPTEXTURECAPS_SQUAREONLY)
+	if (m_texture_manager->get_texture_caps() & D3DPTEXTURECAPS_SQUAREONLY)
 	{
 		if (finalwidth < finalheight)
 			finalwidth = finalheight;
@@ -2113,11 +2113,11 @@ void texture_info::compute_size_subroutine(texture_manager* texture_manager, int
 	}
 
 	// adjust the aspect ratio if we need to
-	while (finalwidth < finalheight && finalheight / finalwidth > texture_manager->get_max_texture_aspect())
+	while (finalwidth < finalheight && finalheight / finalwidth > m_texture_manager->get_max_texture_aspect())
 	{
 		finalwidth *= 2;
 	}
-	while (finalheight < finalwidth && finalwidth / finalheight > texture_manager->get_max_texture_aspect())
+	while (finalheight < finalwidth && finalwidth / finalheight > m_texture_manager->get_max_texture_aspect())
 	{
 		finalheight *= 2;
 	}
@@ -2151,7 +2151,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 	finalwidth += 2 * m_xborderpix;
 	finalheight += 2 * m_yborderpix;
 
-	texture_info::compute_size_subroutine(m_texture_manager, finalwidth, finalheight, &finalwidth, &finalheight);
+	compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 
 	// if we added pixels for the border, and that just barely pushed us over, take it back
 	if (finalwidth > m_texture_manager->get_max_texture_width() || finalheight > m_texture_manager->get_max_texture_height())
@@ -2162,7 +2162,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 		m_xborderpix = 0;
 		m_yborderpix = 0;
 
-		texture_info::compute_size_subroutine(m_texture_manager, finalwidth, finalheight, &finalwidth, &finalheight);
+		compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 	}
 
 	// if we're above the max width/height, do what?

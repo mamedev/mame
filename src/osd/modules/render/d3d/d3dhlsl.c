@@ -1609,7 +1609,8 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 	if (options->reflection == 0 &&
 		options->vignetting == 0 &&
 		options->curvature == 0 &&
-		options->round_corner == 0)
+		options->round_corner == 0 &&
+		options->smooth_border == 0)
 	{
 		return next_index;
 	}
@@ -2765,11 +2766,11 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Shadow Mask Pixel Count Y",           1,     6,    64, 1, slider_shadow_mask_vsize },
 	{ "Shadow Mask Offset X",             -100,     0,   100, 1, slider_shadow_mask_uoffset },
 	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, slider_shadow_mask_voffset },
-	{ "Screen Curvature",                    0,     3,   100, 1, slider_curvature },
-	{ "Screen Round Corner",                 0,     3,   100, 1, slider_round_corner },
-	{ "Screen Smooth Border",                0,     3,   100, 1, slider_smooth_border },
-	{ "Screen Reflection",                   0,     3,   100, 1, slider_reflection },
-	{ "Image Vignetting",                    0,     3,   100, 1, slider_vignetting },
+	{ "Screen Curvature",                    0,     0,   100, 1, slider_curvature },
+	{ "Screen Round Corner",                 0,     0,   100, 1, slider_round_corner },
+	{ "Screen Smooth Border",                0,     0,   100, 1, slider_smooth_border },
+	{ "Screen Reflection",                   0,     0,   100, 1, slider_reflection },
+	{ "Image Vignetting",                    0,     0,   100, 1, slider_vignetting },
 	{ "Scanline Darkness",                   0,   100,   100, 1, slider_scanline_alpha },
 	{ "Scanline Screen Height",              1,    20,    80, 1, slider_scanline_scale },
 	{ "Scanline Indiv. Height",              1,    20,    80, 1, slider_scanline_height },
@@ -2922,7 +2923,7 @@ void uniform::update()
 		}
 		case CU_SOURCE_DIMS:
 		{
-			vec2f& sourcedims = shadersys->curr_texture->get_rawdims();
+			vec2f sourcedims = shadersys->curr_texture->get_rawdims();
 			m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
 			break;
 		}
