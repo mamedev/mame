@@ -1548,6 +1548,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/printer.h",
 		MAME_DIR .. "src/devices/bus/rs232/rs232.c",
 		MAME_DIR .. "src/devices/bus/rs232/rs232.h",
+		MAME_DIR .. "src/devices/bus/rs232/pty.c",
+		MAME_DIR .. "src/devices/bus/rs232/pty.h",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.c",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.c",

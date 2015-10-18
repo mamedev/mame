@@ -359,6 +359,25 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 	}
 }
 
+//============================================================
+//  osd_openpty
+//============================================================
+
+file_error osd_openpty(osd_file **file, char *name, size_t name_len)
+{
+        file_error res;
+        UINT64 filesize;
+
+        if ((res = osd_open(sdlfile_ptty_identifier , 0 , file , &filesize)) != FILERR_NONE) {
+                return res;
+        }
+
+        if ((res = sdl_slave_name_ptty(*file , name , name_len)) != FILERR_NONE) {
+                osd_close(*file);
+        }
+
+        return res;
+}
 
 //============================================================
 //  osd_truncate

@@ -165,6 +165,25 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, 
 -----------------------------------------------------------------------------*/
 file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual);
 
+/*-----------------------------------------------------------------------------
+    osd_openpty: create a new PTY pair
+
+    Parameters:
+
+        file - pointer to an osd_file * to receive the handle of the master
+            side of the newly-created PTY; this is only valid if the function
+            returns FILERR_NONE
+
+        name - pointer to memory where slave filename will be stored
+
+        name_len - space allocated for name
+
+    Return value:
+
+        a file_error describing any error that occurred while creating the
+        PTY, or FILERR_NONE if no error occurred
+-----------------------------------------------------------------------------*/
+file_error osd_openpty(osd_file **file, char *name, size_t name_len);
 
 /*-----------------------------------------------------------------------------
     osd_truncate: change the size of an open file
