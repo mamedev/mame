@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
-//  sdlptty_unix.c - SDL psuedo tty access functions
+//  sdlptty_unix.c - SDL pseudo tty access functions
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -28,9 +28,7 @@
 #elif defined(SDLMAME_HAIKU)
 # include <bsd/pty.h>
 #endif
-#if defined(SDLMAME_LINUX)
 #include <stdlib.h>
-#endif
 
 #include "sdlfile.h"
 
