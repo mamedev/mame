@@ -11372,10 +11372,14 @@ pepp0040a       // (c) 1987 IGT - International Game Technology
 pepp0040b       // (c) 1987 IGT - International Game Technology
 pepp0041        // (c) 1987 IGT - International Game Technology
 pepp0042        // (c) 1987 IGT - International Game Technology
+pepp0042a       // (c) 1987 IGT - International Game Technology
 pepp0043        // (c) 1987 IGT - International Game Technology
 pepp0043a       // (c) 1987 IGT - International Game Technology
 pepp0043b       // (c) 1987 IGT - International Game Technology
 pepp0045        // (c) 1987 IGT - International Game Technology
+pepp0045a       // (c) 1987 IGT - International Game Technology
+pepp0045b       // (c) 1987 IGT - International Game Technology
+pepp0045c       // (c) 1987 IGT - International Game Technology
 pepp0046        // (c) 1987 IGT - International Game Technology
 pepp0046a       // (c) 1987 IGT - International Game Technology
 pepp0046b       // (c) 1987 IGT - International Game Technology
@@ -11385,6 +11389,7 @@ pepp0053        // (c) 1987 IGT - International Game Technology
 pepp0055        // (c) 1987 IGT - International Game Technology
 pepp0055a       // (c) 1987 IGT - International Game Technology
 pepp0055b       // (c) 1987 IGT - International Game Technology
+pepp0055c       // (c) 1987 IGT - International Game Technology
 pepp0057        // (c) 1987 IGT - International Game Technology
 pepp0057a       // (c) 1987 IGT - International Game Technology
 pepp0059        // (c) 1987 IGT - International Game Technology
@@ -11468,6 +11473,7 @@ pepp0426        // (c) 1987 IGT - International Game Technology
 pepp0428        // (c) 1987 IGT - International Game Technology
 pepp0429        // (c) 1987 IGT - International Game Technology
 pepp0429a       // (c) 1987 IGT - International Game Technology
+pepp0430        // (c) 1987 IGT - International Game Technology
 pepp0431        // (c) 1987 IGT - International Game Technology
 pepp0434        // (c) 1987 IGT - International Game Technology
 pepp0447        // (c) 1987 IGT - International Game Technology
@@ -11478,6 +11484,7 @@ pepp0452        // (c) 1987 IGT - International Game Technology
 pepp0454        // (c) 1987 IGT - International Game Technology
 pepp0455        // (c) 1987 IGT - International Game Technology
 pepp0458        // (c) 1987 IGT - International Game Technology
+pepp0459        // (c) 1987 IGT - International Game Technology
 pepp0467        // (c) 1987 IGT - International Game Technology
 pepp0488        // (c) 1987 IGT - International Game Technology
 pepp0508        // (c) 1987 IGT - International Game Technology
@@ -11489,6 +11496,7 @@ pepp0514b       // (c) 1987 IGT - International Game Technology
 pepp0515        // (c) 1987 IGT - International Game Technology
 pepp0515a       // (c) 1987 IGT - International Game Technology
 pepp0515b       // (c) 1987 IGT - International Game Technology
+pepp0515c       // (c) 1987 IGT - International Game Technology
 pepp0516        // (c) 1987 IGT - International Game Technology
 pepp0516a       // (c) 1987 IGT - International Game Technology
 pepp0516b       // (c) 1987 IGT - International Game Technology
@@ -11539,10 +11547,13 @@ pemg0183        // (c) 1994 IGT - International Game Technology
 pemg0252        // (c) 1994 IGT - International Game Technology
 pebe0014        // (c) 1994 IGT - International Game Technology
 pebe0014a       // (c) 1994 IGT - International Game Technology
+peke0004        // (c) 1994 IGT - International Game Technology
 peke0017        // (c) 1994 IGT - International Game Technology
+peke1006        // (c) 1994 IGT - International Game Technology
 peke1012        // (c) 1994 IGT - International Game Technology
 peke1012a       // (c) 1994 IGT - International Game Technology
 peke1013        // (c) 1994 IGT - International Game Technology
+peke1013a       // (c) 1994 IGT - International Game Technology
 peps0014        // (c) 1996 IGT - International Game Technology
 peps0021        // (c) 1996 IGT - International Game Technology
 peps0022        // (c) 1996 IGT - International Game Technology
@@ -11610,6 +11621,7 @@ pex0242p        // (c) 1995 IGT - International Game Technology
 pex0265p        // (c) 1995 IGT - International Game Technology
 pex0291p        // (c) 1995 IGT - International Game Technology
 pex0417p        // (c) 1995 IGT - International Game Technology
+pex0426p        // (c) 1995 IGT - International Game Technology
 pex0430p        // (c) 1995 IGT - International Game Technology
 pex0434p        // (c) 1995 IGT - International Game Technology
 pex0447p        // (c) 1995 IGT - International Game Technology
@@ -11687,6 +11699,7 @@ pex2275p        // (c) 1995 IGT - International Game Technology
 pex2276p        // (c) 1995 IGT - International Game Technology
 pex2283p        // (c) 1995 IGT - International Game Technology
 pex2284p        // (c) 1995 IGT - International Game Technology
+pex2287p        // (c) 1995 IGT - International Game Technology
 pex2297p        // (c) 1995 IGT - International Game Technology
 pex2302p        // (c) 1995 IGT - International Game Technology
 pex2303p        // (c) 1995 IGT - International Game Technology
@@ -11730,6 +11743,7 @@ pexm003p        // (c) 1997 IGT - International Game Technology
 pexm004p        // (c) 1997 IGT - International Game Technology
 pexm005p        // (c) 1997 IGT - International Game Technology
 pexm006p        // (c) 1997 IGT - International Game Technology
+pexm006pa       // (c) 1997 IGT - International Game Technology
 pexm007p        // (c) 1997 IGT - International Game Technology
 pexm008p        // (c) 1997 IGT - International Game Technology
 pexm009p        // (c) 1997 IGT - International Game Technology
