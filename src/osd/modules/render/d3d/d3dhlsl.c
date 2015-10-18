@@ -1090,8 +1090,16 @@ int shaders::create_resources(bool reset)
 	bloom_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 
 	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT); // backward compatibility
 	post_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	post_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+	post_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS); // backward compatibility
+
+	post_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING); // backward compatibility
+	post_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE); // backward compatibility
+	post_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER); // backward compatibility
+	post_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER); // backward compatibility
+	post_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION); // backward compatibility
 
 	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
@@ -1585,9 +1593,19 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
+	// skip distortion if no influencing settings
+	if (options->reflection == 0 &&
+		options->vignetting == 0 &&
+		options->curvature == 0 &&
+		options->round_corner == 0 &&
+		options->smooth_border == 0)
+	{
+		return next_index;
+	}
+
 	int screen_count = d3d->window().target()->current_view()->screens().count();
 
-	// todo: currently only one screen is supported
+	// only one screen is supported
 	if (screen_count > 1)
 	{
 		return next_index;
@@ -1596,21 +1614,11 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 	render_bounds bounds = d3d->window().target()->current_view()->bounds();
 	render_bounds screen_bounds = d3d->window().target()->current_view()->screen_bounds();
 
-	// todo: cuccently artworks are not supported
+	// artworks are not supported
 	if (bounds.x0 != screen_bounds.x0 ||
 		bounds.y0 != screen_bounds.y0 ||
 		bounds.x1 != screen_bounds.x1 ||
 		bounds.y1 != screen_bounds.y1)
-	{
-		return next_index;
-	}
-
-	// skip distortion if no influencing settings
-	if (options->reflection == 0 &&
-		options->vignetting == 0 &&
-		options->curvature == 0 &&
-		options->round_corner == 0 &&
-		options->smooth_border == 0)
 	{
 		return next_index;
 	}

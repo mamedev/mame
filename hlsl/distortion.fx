@@ -87,7 +87,7 @@ float roundBox(float2 p, float2 b, float r)
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims; // size of the window or fullscreen
-uniform float2 TargetDims;
+uniform float2 TargetDims; // size of the target surface
 uniform float2 QuadDims; // size of the screen quad
 
 VS_OUTPUT vs_main(VS_INPUT Input)
