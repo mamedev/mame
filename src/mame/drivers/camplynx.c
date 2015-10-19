@@ -83,11 +83,13 @@
     - When loading, there's no wildcard; you must specify the name.
     - INT should be activated by the MC6845 CURS pin (inverted), or by holding down
       the BREAK key. However, the rom leaves interrupts disabled, so none of this works.
+    - The 128k has major hardware differences, which means that most programs written
+      for the 48k/96k will not display anything useful. BASIC-based text programs are
+      the most likely to work.
 
     To Do:
     - Need disk-based software (only ones found are LDF format)
-    - finish memory banking
-    - disk (only partially done)
+    - disk (coded but not working)
     - printer
     - joysticks
     - UART type COM8017
@@ -110,6 +112,7 @@
 #include "sound/wave.h"
 #include "formats/camplynx_cas.h"
 #include "machine/wd_fdc.h"
+#include "formats/camplynx_dsk.h"
 
 class camplynx_state : public driver_device
 {
@@ -144,6 +147,7 @@ public:
 	DECLARE_MACHINE_RESET(lynx128k);
 	DECLARE_DRIVER_INIT(lynx48k);
 	DECLARE_DRIVER_INIT(lynx128k);
+	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
 	required_device<palette_device> m_palette;
@@ -200,7 +204,7 @@ d7 = read from bank 4 */
 			membank("bankr5")->set_entry(0);
 			membank("bankr6")->set_entry(1);
 			membank("bankr7")->set_entry(2);
-			membank("bankr8")->set_entry(3);
+			membank("bankr8")->set_entry(7);
 			break;
 		case 0x20:
 		case 0x24:
@@ -235,9 +239,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(26);
 			membank("bankr4")->set_entry(27);
 			membank("bankr5")->set_entry(28);
-			membank("bankr6")->set_entry(28);
+			membank("bankr6")->set_entry(29);
 			membank("bankr7")->set_entry(30);
-			membank("bankr8")->set_entry(30);
+			membank("bankr8")->set_entry(31);
 			break;
 		case 0x40:
 		case 0x60:
@@ -250,9 +254,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(18);
 			membank("bankr4")->set_entry(19);
 			membank("bankr5")->set_entry(20);
-			membank("bankr6")->set_entry(20);
+			membank("bankr6")->set_entry(21);
 			membank("bankr7")->set_entry(22);
-			membank("bankr8")->set_entry(22);
+			membank("bankr8")->set_entry(23);
 			break;
 		case 0x54:
 		case 0x74:
@@ -261,9 +265,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(2);
 			membank("bankr4")->set_entry(27);
 			membank("bankr5")->set_entry(28);
-			membank("bankr6")->set_entry(28);
+			membank("bankr6")->set_entry(29);
 			membank("bankr7")->set_entry(30);
-			membank("bankr8")->set_entry(30);
+			membank("bankr8")->set_entry(31);
 			break;
 		case 0x50:
 		case 0x70:
@@ -276,9 +280,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(2);
 			membank("bankr4")->set_entry(19);
 			membank("bankr5")->set_entry(20);
-			membank("bankr6")->set_entry(20);
+			membank("bankr6")->set_entry(21);
 			membank("bankr7")->set_entry(22);
-			membank("bankr8")->set_entry(22);
+			membank("bankr8")->set_entry(23);
 			break;
 		default:
 			printf("Banking code %X not handled\n", m_bankdata);
@@ -397,11 +401,12 @@ static ADDRESS_MAP_START( lynx48k_mem, AS_PROGRAM, 8, camplynx_state )
 	AM_RANGE(0x2000,0x3fff) AM_READ_BANK("bankr2")
 	AM_RANGE(0x4000,0x5fff) AM_READ_BANK("bankr3")
 	AM_RANGE(0x6000,0x7fff) AM_READ_BANK("bankr4")
-	AM_RANGE(0x8000,0x9fff) AM_READ_BANK("bankr5") AM_WRITE(bank5_w)
-	AM_RANGE(0xa000,0xbfff) AM_READ_BANK("bankr6") AM_WRITE(bank6_w)
-	AM_RANGE(0xc000,0xdfff) AM_READ_BANK("bankr7") AM_WRITE(bank7_w)
-	AM_RANGE(0xe000,0xffff) AM_READ_BANK("bankr8") AM_WRITE(bank8_w)
+	AM_RANGE(0x8000,0x9fff) AM_READ_BANK("bankr5")
+	AM_RANGE(0xa000,0xbfff) AM_READ_BANK("bankr6")
+	AM_RANGE(0xc000,0xdfff) AM_READ_BANK("bankr7")
+	AM_RANGE(0xe000,0xffff) AM_READ_BANK("bankr8")
 	AM_RANGE(0x0000,0x7fff) AM_WRITE(bank1_w)
+	AM_RANGE(0x8000,0xffff) AM_WRITE(bank5_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lynx128k_mem, AS_PROGRAM, 8, camplynx_state )
@@ -566,39 +571,15 @@ WRITE8_MEMBER( camplynx_state::bank5_w )
 	if BIT(m_wbyte, 0)
 		m_p_ram[offset+0x18000] = data;
 	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x28000] = data;
+	{
+		m_p_ram[(offset & 0x5fff) | 0x28000] = data;
+		m_p_ram[offset | 0x2a000] = data;
+	}
 	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x38000] = data;
-}
-
-WRITE8_MEMBER( camplynx_state::bank6_w )
-{
-	if BIT(m_wbyte, 0)
-		m_p_ram[offset+0x1a000] = data;
-	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x28000] = data;
-	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x38000] = data;
-}
-
-WRITE8_MEMBER( camplynx_state::bank7_w )
-{
-	if BIT(m_wbyte, 0)
-		m_p_ram[offset+0x1c000] = data;
-	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x2c000] = data;
-	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x3c000] = data;
-}
-
-WRITE8_MEMBER( camplynx_state::bank8_w )
-{
-	if BIT(m_wbyte, 0)
-		m_p_ram[offset+0x1e000] = data;
-	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x2c000] = data;
-	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x3c000] = data;
+	{
+		m_p_ram[(offset & 0x5fff) | 0x38000] = data;
+		m_p_ram[offset | 0x3a000] = data;
+	}
 }
 
 READ8_MEMBER( camplynx_state::port80_r )
@@ -773,6 +754,9 @@ d7 = 125ns or 250ns */
 	m_floppy1->get_device()->mon_w(BIT(data, 3));
 }
 
+FLOPPY_FORMATS_MEMBER( camplynx_state::camplynx_floppy_formats )
+	FLOPPY_CAMPLYNX_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( camplynx_floppies )
 	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
@@ -791,10 +775,10 @@ static MACHINE_CONFIG_FRAGMENT( lynx_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( lynx_disk )
-	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 3) // no idea what crystal, no schematic of fdc found
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "drive1", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
