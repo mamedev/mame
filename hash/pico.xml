@@ -3814,7 +3814,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-150240"/>
-		<!---This also contains a complement CD which will be dumped -->
 		<!-- * 左脳開発シリーズ5 迷路・記憶 (CD付き) (malformed token? - using sanouk4 above to fill field for now) -->
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="左脳開発シリーズ4 推理・構成"/>
@@ -3824,6 +3823,11 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18458-t.ic1" size="524288" crc="6340c18a" sha1="101d5652ffd704788f1f44b671be843e3430e58a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
+      <!-- this is a 22 track companion audio CD (to be played on standalone CD player while operating the game?) -->
+      <!-- dumping software / drive: BurnAtOnce 0.99.5 / TS-L633R -->
+ 			<diskarea name="cdrom">
+				<disk name="sanouk5cd" sha1="c9330bbf118405c02347bd83a1cc24ab2bb4310d"/>
+			</diskarea>
 		</part>
 	</software>
 
