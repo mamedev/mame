@@ -216,7 +216,9 @@ float GetSpotAddend(float2 coord, float amount)
 	// normalized screen canvas ratio
 	float2 CanvasRatio = PrepareVector
 		? float2(1.0f, QuadDims.y / QuadDims.x)
-		: 1.0f / float2(1.0f, SourceRect.y / SourceRect.x);
+		: float2(1.0f, xor(OrientationSwapXY, RotationSwapXY) 
+			? QuadDims.x / QuadDims.y 
+			: QuadDims.y / QuadDims.x);
 
 	// upper right quadrant
 	float2 spotOffset = OrientationSwapXY 
@@ -251,16 +253,16 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 
 	float2 CanvasDims = PrepareVector
 		? ScreenDims
-		: SourceDims;
-	
-	// hack: alignment correction
+		: xor(OrientationSwapXY, RotationSwapXY) 
+			? QuadDims.yx / SourceRect 
+			: QuadDims.xy / SourceRect;
+
+	// raster graphics 
 	if (!PrepareVector)
 	{
-		float2 SourceArea = 1.0f / SourceRect;
-		float2 SourceTexelDims = 1.0f / CanvasDims;
-
-		coord -= SourceTexelDims * SourceArea * 0.75;
-		coord *= SourceTexelDims * SourceArea * 0.25 + 1.0f;
+		// alignment correction
+		float2 SourceTexelDims = 1.0f / SourceDims;
+		coord -= SourceTexelDims;
 	}
 
 	float range = min(CanvasDims.x, CanvasDims.y) * 0.5;
@@ -330,7 +332,6 @@ float2 GetCoords(float2 coord, float2 centerOffset, float distortionAmount)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
-	float2 SourceTexelDims = 1.0f / SourceDims;
 
 	float2 HalfSourceRect = PrepareVector
 		? float2(0.5f, 0.5f)
