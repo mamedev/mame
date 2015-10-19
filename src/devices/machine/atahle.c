@@ -110,6 +110,7 @@ void ata_hle_device::device_start()
 	save_item(NAME(m_identify_buffer));
 
 	m_busy_timer = timer_alloc(TID_BUSY);
+	m_buffer_empty_timer = timer_alloc(TID_BUFFER_EMPTY);
 }
 
 void ata_hle_device::device_reset()
@@ -157,6 +158,10 @@ void ata_hle_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_status &= ~IDE_STATUS_BSY;
 
 		finished_busy(param);
+		break;
+	case TID_BUFFER_EMPTY:
+		m_buffer_empty_timer->enable(false);
+		fill_buffer();
 		break;
 	}
 }
@@ -465,7 +470,8 @@ void ata_hle_device::read_buffer_empty()
 	if ((multi_word_dma_mode() >= 0) || (ultra_dma_mode() >= 0))
 		set_dmarq(CLEAR_LINE);
 
-	fill_buffer();
+	m_buffer_empty_timer->enable(true);
+	m_buffer_empty_timer->adjust(attotime::zero);
 }
 
 void ata_hle_device::write_buffer_full()

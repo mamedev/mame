@@ -34,6 +34,8 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag);
 
+	TIMER_CALLBACK_MEMBER(buffer_empty_timer_work);
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -160,7 +162,8 @@ protected:
 
 	enum
 	{
-		TID_BUSY
+		TID_BUSY,
+		TID_BUFFER_EMPTY
 	};
 
 	enum
@@ -213,6 +216,7 @@ private:
 	bool m_resetting;
 
 	emu_timer *m_busy_timer;
+	emu_timer *m_buffer_empty_timer;
 };
 
 #endif
