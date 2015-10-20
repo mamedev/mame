@@ -12,7 +12,7 @@
 #define __MM1_KEYBOARD__
 
 #include "emu.h"
-#include "sound/speaker.h"
+#include "sound/samples.h"
 
 
 
@@ -46,7 +46,20 @@ public:
 
 	DECLARE_READ8_MEMBER( read ) { return m_data; }
 
-	DECLARE_WRITE_LINE_MEMBER( bell_w ) { m_speaker->level_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( bell_w )
+	{
+		if (state == 1)
+		{
+			if (first_time)
+			{
+				m_samples->start(1, 1); // power switch
+				first_time = false;
+			}
+			if (!m_samples->playing(0)) m_samples->start(0, 0); // beep; during boot, the second beep is in real HW very short (just before floppy seeks) but that's NYI
+		}
+		else if (m_samples->playing(0)) m_samples->stop(0); // happens only once during boot, no effect on output
+	}
+	void shut_down_mm1();
 
 protected:
 	// device-level overrides
@@ -56,7 +69,7 @@ protected:
 private:
 	devcb_write_line m_write_kbst;
 
-	required_device<speaker_sound_device> m_speaker;
+	required_device<samples_device> m_samples;
 	required_memory_region m_rom;
 	required_ioport m_y0;
 	required_ioport m_y1;
@@ -74,7 +87,8 @@ private:
 	int m_drive;
 	UINT8 m_data;
 
-	emu_timer *m_scan_timer;
+	static bool first_time;					// for power switch sound
+	emu_timer *m_scan_timer;				// scan timer
 };
 
 
