@@ -375,4 +375,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1995, suprslam, 0, suprslam, suprslam, driver_device, 0, ROT0, "Banpresto / Toei Animation", "From TV Animation Slam Dunk - Super Slams", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, suprslam, 0, suprslam, suprslam, driver_device, 0, ROT0, "Banpresto / Toei Animation", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

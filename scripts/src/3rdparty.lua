@@ -500,7 +500,6 @@ project "portmidi"
 	kind "StaticLib"
 
 	includedirs {
-		MAME_DIR .. "src/osd",
 		MAME_DIR .. "3rdparty/portmidi/pm_common",
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
@@ -530,6 +529,13 @@ project "portmidi"
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinuxalsa.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
+			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
+		}
+	end
+	if _OPTIONS["targetos"]=="netbsd" then
+		files {
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
@@ -569,16 +575,19 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
 	}
 
 	configuration { "vs*" }
 		includedirs {
-			MAME_DIR .. "3rdparty/dxsdk/Include",
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
 		}
 	configuration { "mingw*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
+		}
+		defines {
+			"nullptr=NULL" -- not used but needed for C++11 code
 		}
 
 	configuration { "osx*" }
@@ -587,6 +596,11 @@ project "bgfx"
 		}
 		
 	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "netbsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
@@ -619,6 +633,9 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_null.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderdoc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.cpp",
@@ -628,7 +645,7 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_buffer_manager.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
+		--MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 	}
@@ -636,7 +653,7 @@ project "bgfx"
 		files {
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
-			
+			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
 	end
 	if (_OPTIONS["SHADOW_CHECK"]=="1") then
@@ -783,73 +800,25 @@ links {
 end
 		
 --------------------------------------------------
--- UnitTest++ library objects
+-- GoogleTest library objects
 --------------------------------------------------
 
-project "unittest-cpp"
-	uuid "717d39e5-b6ff-4507-a092-c27c05b60ab5"
+project "gtest"
+	uuid "fa306a8d-fb10-4d4a-9d2e-fdb9076407b4"
 	kind "StaticLib"
 
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-undef",
+			"-Wno-unused-variable",
+		}
+
+	configuration { }
+
+	includedirs {
+		MAME_DIR .. "3rdparty/googletest/googletest/include",
+		MAME_DIR .. "3rdparty/googletest/googletest",
+	}	
 	files {		
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CheckMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Config.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExceptionMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExecuteTest.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/HelperMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssertImpl.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestMacros.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestSuite.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeHelpers.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTest++.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTestPP.h",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.cpp",
-		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.h",
+		MAME_DIR .. "3rdparty/googletest/googletest/src/gtest-all.cc",
 	}
-
-	if _OPTIONS["targetos"]~="windows" then
-		files {
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.cpp",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.h",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.cpp",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.h",
-		}
-	end
-
-	if _OPTIONS["targetos"]=="windows" then
-		files {
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.cpp",
-			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.h",
-		}
-	end

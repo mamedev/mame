@@ -847,6 +847,12 @@ static MACHINE_CONFIG_DERIVED( avengers, trojan )
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( avengersb, avengers )
+	/* video hardware */
+	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
+MACHINE_CONFIG_END
+
+
 /*************************************
  *
  *  ROM definition(s)
@@ -1054,7 +1060,7 @@ ROM_START( trojan )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1101,7 +1107,7 @@ ROM_START( trojana )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU  */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1148,7 +1154,7 @@ ROM_START( trojanr )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1195,7 +1201,7 @@ ROM_START( trojanj )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1242,7 +1248,7 @@ ROM_START( trojanb )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "2.6q", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "1.3f", 0x0000, 0x8000, CRC(83c715b2) SHA1(0c69c086657f91828a639ff7c72c703a27ade710) ) // different
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1290,7 +1296,7 @@ ROM_START( avengers )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "02.15h",       0x0000, 0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* ?? */
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU (not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "01.6d",        0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1337,7 +1343,7 @@ ROM_START( avengers2 )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "02.15h",       0x0000,  0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* MISSING from this set */
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU (not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "01.6d",        0x0000,  0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1384,7 +1390,7 @@ ROM_START( buraiken )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "02.15h",       0x0000,  0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU (not emulated) */
+	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "01.6d",        0x0000,  0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1424,6 +1430,59 @@ ROM_END
 
 
 
+ROM_START( buraikenb )
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_LOAD( "a4",       0x00000, 0x8000, CRC(b4ac7928) SHA1(4a525532f634dd9e800dc3dbd1230a5c431f869a) )
+	ROM_LOAD( "a6",       0x10000, 0x8000, CRC(b1c6d40d) SHA1(d150adace829130ebf99b8beeedde0e673124984) )
+	ROM_LOAD( "av_05.12n",    0x18000, 0x8000, CRC(9a214b42) SHA1(e13d47dcf9fa055fef467a10751badffcc3b8734) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "a2",       0x0000, 0x8000, CRC(5e991c96) SHA1(1866f38043f61244b65213544fa5ec5d6d82f96f) )
+
+	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
+	ROM_LOAD( "01.6d",        0x0000,  0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "03.8k",        0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD( "13.6b",        0x00000, 0x8000, CRC(9b5ff305) SHA1(8843c757e040b58efd36299eb3c56d9c51362b20) ) /* plane 1 */
+	ROM_LOAD( "09.6a",        0x08000, 0x8000, CRC(08323355) SHA1(c5778c6835f2801fba0250cea21796ea201642f7) )
+	ROM_LOAD( "12.4b",        0x10000, 0x8000, CRC(6d5261ba) SHA1(667e3b8df871c3052bde7a3c79daa7f70eaa0b8b) ) /* plane 2 */
+	ROM_LOAD( "08.4a",        0x18000, 0x8000, CRC(a13d9f54) SHA1(e1bcb6d12cdfc9ad780f131272d12d9af751f429) )
+	ROM_LOAD( "11.3b",        0x20000, 0x8000, CRC(a2911d8b) SHA1(f51ef7bb8a275fdd92a9a9ad516218d2f8c3e1fb) ) /* plane 3 */
+	ROM_LOAD( "07.3a",        0x28000, 0x8000, CRC(cde78d32) SHA1(8cb69b7a25e935073887628565cb4f9787186ea9) )
+	ROM_LOAD( "14.8b",        0x30000, 0x8000, CRC(44ac2671) SHA1(60baa541debd8aa7d32a512906d0d6c6e9955968) ) /* plane 4 */
+	ROM_LOAD( "10.8a",        0x38000, 0x8000, CRC(b1a717cb) SHA1(2730764ece0e9231955b9c07de537f1f97729599) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD( "18.7l",        0x00000, 0x8000, CRC(3c876a17) SHA1(1f06b695b78a2e1db151f3c5baa1bb17ccef951e) ) /* planes 0,1 */
+	ROM_LOAD( "16.3l",        0x08000, 0x8000, CRC(4b1ff3ac) SHA1(5166f2a2c9ba2483a4e340d756303cba46b7de88) )
+	ROM_LOAD( "17.5l",        0x10000, 0x8000, CRC(4eb543ef) SHA1(5dfdd2568a50b179e724643880d79f79d831be19) )
+	ROM_LOAD( "15.2l",        0x18000, 0x8000, CRC(8041de7f) SHA1(c301b20edad1981dd20cd6d4f7de703d9dc80b83) )
+	ROM_LOAD( "22.7n",        0x20000, 0x8000, CRC(bdaa8b22) SHA1(9a03d20cc7010f9b7c602db86808d54fdd7e228d) ) /* planes 2,3 */
+	ROM_LOAD( "20.3n",        0x28000, 0x8000, CRC(566e3059) SHA1(cf3e5cfcb5ebbff3f9a8e1da9f7242a7a00fee83) )
+	ROM_LOAD( "21.5n",        0x30000, 0x8000, CRC(301059aa) SHA1(c529ad83d4e4139ce4d4d912c00aef9ece297706) )
+	ROM_LOAD( "19.2n",        0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
+
+	ROM_REGION( 0x10000, "gfx4", 0 )
+	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 */
+	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 */
+
+	ROM_REGION( 0x08000, "gfx5", 0 )
+	ROM_LOAD( "23.9n",        0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbb_2bpr.7j",  0x0000,  0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )   /* timing (not used) */
+	ROM_LOAD( "tbb_1bpr.1e",  0x0100,  0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )   /* priority (not used) */
+ROM_END
+
+
+DRIVER_INIT_MEMBER(lwings_state, avengersb)
+{
+	/* set up protection handlers */
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8_delegate(FUNC(lwings_state::soundlatch_byte_w), this));
+}
 
 
 /*************************************
@@ -1432,20 +1491,21 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, sectionz,  0,        lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, sectionza, sectionz, lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, sectionz,  0,        lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionza, sectionz, lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",                   "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, lwings,    0,        lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwings2,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwingsj,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Ares no Tsubasa (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb,  driver_device, 0, ROT90, "bootleg",                  "Legendary Wings (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lwings,    0,        lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwings2,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsj,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",                   "Ares no Tsubasa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb,  driver_device, 0, ROT90, "bootleg",                  "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, trojan,    0,        trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojana,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanr,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanj,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom",                   "Tatakai no Banka (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanb,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "bootleg",                  "Trojan (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, trojan,    0,        trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojana,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",                   "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanr,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanj,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom",                   "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanb,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "bootleg",                  "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, avengers,  0,        avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, avengers2, avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, buraiken,  avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Hissatsu Buraiken (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, avengers,  0,        avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, avengers2, avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraiken,  avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Hissatsu Buraiken (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraikenb, avengers, avengersb,avengers, lwings_state, avengersb, ROT90, "Capcom",            "Hissatsu Buraiken (Japan, bootleg?)", MACHINE_SUPPORTS_SAVE ) // unprotected at least

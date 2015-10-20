@@ -17012,7 +17012,7 @@
 
 	<software name="ann0501">
 		<description>ANN Disk - 2005-01 - NIAD BNDV #24</description>
-		<year></year>
+		<year>????</year>
 		<publisher>ADAM News Network</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -17144,7 +17144,7 @@
 
 	<software name="ann0512">
 		<description>ANN Disk - 2005-12 - X-Mas Card</description>
-		<year></year>
+		<year>????</year>
 		<publisher>ADAM News Network</publisher>
 
 		<part name="flop1" interface="floppy_5_25">

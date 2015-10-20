@@ -18,19 +18,19 @@ Sega System 32 Comm PCB 837-9409
 | |---------------------------------|                                            |
 | |---------------------------------|  LED     CN? CN?                 CNK       |
 |--------------------------------------------------------------------------------|
-	Setup:
-		Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
-		MB89237A - Fujitsu MB89237A DMA-Controller (DIP20) [most likely i8237A clone]
-		MB89374  - Fujitsu MB89374 Data Link Controller (SDIP42)
-		MB8464   - Fujitsu MB8464 8k x8 SRAM (DIP28)
-		MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
+    Setup:
+        Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
+        MB89237A - Fujitsu MB89237A DMA-Controller (DIP20) [most likely i8237A clone]
+        MB89374  - Fujitsu MB89374 Data Link Controller (SDIP42)
+        MB8464   - Fujitsu MB8464 8k x8 SRAM (DIP28)
+        MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
 
-	Board:
-		837-9409	F1 Super Lap
+    Board:
+        837-9409    F1 Super Lap
 
-	EEPROM:
-		14084.17	Rad Rally
-		15612.17	F1 Super Lap
+    EEPROM:
+        14084.17    Rad Rally
+        15612.17    F1 Super Lap
 
 Sega System Multi32 Comm PCB 837-8792-91
 ( http://images.arianchen.de/sega-comm/orunners-front.jpg )
@@ -49,21 +49,21 @@ Sega System Multi32 Comm PCB 837-8792-91
 | |---------------------------------|        |---------------------------------| |
 |                                  CN8 CN9                                       |
 |--------------------------------------------------------------------------------|
-	Setup:
-		15033.17 - INTEL D27C100 128k x8 EPROM (DIP32, labelled 'EPR-15033')
-		Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
-		MB89237A - Fujitsu MB89237A DMA-Controller (DIP20) [most likely i8237A clone]
-		MB89374  - Fujitsu MB89374 Data Link Controller (SDIP42)
-		MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
-		MB8464A  - Fujitsu MB8464-10LL 8k x8 SRAM (DIP28)
-		315-5611 - Lattice GAL16V8A PAL (DIP20)
-		315-5506 - Lattice GAL16V8A PAL (DIP20)
+    Setup:
+        15033.17 - INTEL D27C100 128k x8 EPROM (DIP32, labelled 'EPR-15033')
+        Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
+        MB89237A - Fujitsu MB89237A DMA-Controller (DIP20) [most likely i8237A clone]
+        MB89374  - Fujitsu MB89374 Data Link Controller (SDIP42)
+        MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
+        MB8464A  - Fujitsu MB8464-10LL 8k x8 SRAM (DIP28)
+        315-5611 - Lattice GAL16V8A PAL (DIP20)
+        315-5506 - Lattice GAL16V8A PAL (DIP20)
 
-	Board:
-		837-8792  OutRunners, Stadium Cross
+    Board:
+        837-8792  OutRunners, Stadium Cross
 
-	EEPROM:
-		15033.17  OutRunners, Stadium Cross
+    EEPROM:
+        15033.17  OutRunners, Stadium Cross
 */
 
 #include "machine/s32comm.h"
@@ -198,7 +198,7 @@ WRITE8_MEMBER(s32comm_device::cn_w)
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
 		m_linktimer = 0x04; //0x00E8; // 58 fps * 4s
-		
+
 		comm_tick();
 	}
 #endif
@@ -213,7 +213,7 @@ WRITE8_MEMBER(s32comm_device::fg_w)
 {
 	if (!m_cn)
 		return;
-		
+
 	m_fg = data & 0x01;
 }
 
@@ -229,7 +229,7 @@ void s32comm_device::check_vint_irq()
 void s32comm_device::set_linktype(UINT16 linktype)
 {
 	m_linktype = linktype;
-	
+
 	switch (m_linktype)
 	{
 		case 14084:
@@ -268,7 +268,7 @@ void s32comm_device::comm_tick()
 
 void s32comm_device::comm_tick_14084()
 {
-	if (m_linkenable == 0x01)	
+	if (m_linkenable == 0x01)
 	{
 		int frameStart = 0x0480;
 		int frameOffset = 0x0000;
@@ -287,21 +287,21 @@ void s32comm_device::comm_tick_14084()
 		{
 			// waiting...
 			m_shared[4] = 0x00;
-			
+
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
 				printf("S32COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
-			
+
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
 				printf("S32COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
-			
+
 			// if both sockets are there check ring
 			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
 			{
@@ -338,7 +338,7 @@ void s32comm_device::comm_tick_14084()
 								m_line_tx.write(m_buffer, dataSize);
 							}
 						}
-						
+
 						// 0xFE - link size
 						else if (idx == 0xFE)
 						{
@@ -349,11 +349,11 @@ void s32comm_device::comm_tick_14084()
 								// slave and relay forward message
 								m_line_tx.write(m_buffer, dataSize);
 							}
-							
+
 							// consider it done
 							printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
-							
+
 							// write to shared mem
 							m_shared[4] = 0x01;
 							m_shared[1] = m_linkid;
@@ -371,13 +371,13 @@ void s32comm_device::comm_tick_14084()
 						}
 						printf("S32COMM: droped a message...\n");
 					}
-					
+
 					if (m_linkalive == 0x00)
 						recv = m_line_rx.read(m_buffer, dataSize);
 					else
 						recv = 0;
 				}
-				
+
 				// if we are master and link is not yet established
 				if (isMaster && (m_linkalive == 0x00))
 				{
@@ -405,7 +405,7 @@ void s32comm_device::comm_tick_14084()
 						m_shared[1] = m_linkid;
 						m_shared[0] = m_linkcount;
 					}
-					
+
 					else if (m_linktimer > 0x02)
 					{
 						// decrease delay timer
@@ -415,7 +415,7 @@ void s32comm_device::comm_tick_14084()
 					}
 				}
 			}
-		}	
+		}
 
 		// update "ring buffer" if link established
 		if (m_linkalive == 0x01)
@@ -470,7 +470,7 @@ void s32comm_device::comm_tick_14084()
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
-			
+
 			// update "ring buffer" if link established
 			// live relay does not send data
 			if (m_linkid != 0x00 && m_shared[3] != 0x00)
@@ -486,7 +486,7 @@ void s32comm_device::comm_tick_14084()
 				// push message to other nodes
 				m_line_tx.write(m_buffer, dataSize);
 
-				// master sends some additional status bytes 
+				// master sends some additional status bytes
 				if (isMaster){
 					m_buffer[0] = 0xF0;
 					for (int j = 0x00 ; j < frameSize ; j++)
@@ -501,16 +501,16 @@ void s32comm_device::comm_tick_14084()
 					m_line_tx.write(m_buffer, dataSize);
 				}
 			}
-			
+
 			// clear 03
 			m_shared[3] = 0x00;
 		}
-	}	
+	}
 }
 
 void s32comm_device::comm_tick_15033()
 {
-	if (m_linkenable == 0x01)	
+	if (m_linkenable == 0x01)
 	{
 		int frameStartTX = 0x0710;
 		int frameStartRX = 0x0010;
@@ -540,21 +540,21 @@ void s32comm_device::comm_tick_15033()
 		{
 			// waiting...
 			m_shared[4] = 0x00;
-			
+
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
 				printf("S32COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
-			
+
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
 				printf("S32COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
-			
+
 			// if both sockets are there check ring
 			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
 			{
@@ -591,7 +591,7 @@ void s32comm_device::comm_tick_15033()
 								m_line_tx.write(m_buffer, dataSize);
 							}
 						}
-						
+
 						// 0xFE - link size
 						else if (idx == 0xFE)
 						{
@@ -602,11 +602,11 @@ void s32comm_device::comm_tick_15033()
 								// slave and relay forward message
 								m_line_tx.write(m_buffer, dataSize);
 							}
-							
+
 							// consider it done
 							printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
-							
+
 							// write to shared mem
 							m_shared[4] = 0x01;
 							m_shared[1] = m_linkid;
@@ -624,13 +624,13 @@ void s32comm_device::comm_tick_15033()
 						}
 						printf("S32COMM: droped a message...\n");
 					}
-					
+
 					if (m_linkalive == 0x00)
 						recv = m_line_rx.read(m_buffer, dataSize);
 					else
 						recv = 0;
 				}
-				
+
 				// if we are master and link is not yet established
 				if (isMaster && (m_linkalive == 0x00))
 				{
@@ -658,7 +658,7 @@ void s32comm_device::comm_tick_15033()
 						m_shared[1] = m_linkid;
 						m_shared[0] = m_linkcount;
 					}
-					
+
 					else if (m_linktimer > 0x02)
 					{
 						// decrease delay timer
@@ -668,7 +668,7 @@ void s32comm_device::comm_tick_15033()
 					}
 				}
 			}
-		}	
+		}
 
 		// update "ring buffer" if link established
 		if (m_linkalive == 0x01)
@@ -723,7 +723,7 @@ void s32comm_device::comm_tick_15033()
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
-			
+
 			// update "ring buffer" if link established
 			// live relay does not send data
 			if (m_linkid != 0x00 && m_shared[3] != 0x00)
@@ -739,7 +739,7 @@ void s32comm_device::comm_tick_15033()
 				// push message to other nodes
 				m_line_tx.write(m_buffer, dataSize);
 
-				// master sends some additional status bytes 
+				// master sends some additional status bytes
 				if (isMaster){
 					m_buffer[0] = 0xF0;
 					for (int j = 0x00 ; j < frameSize ; j++)
@@ -757,12 +757,12 @@ void s32comm_device::comm_tick_15033()
 			// clear 03
 			m_shared[3] = 0x00;
 		}
-	}	
+	}
 }
 
 void s32comm_device::comm_tick_15612()
 {
-	if (m_linkenable == 0x01)	
+	if (m_linkenable == 0x01)
 	{
 		int frameStart = 0x0010;
 		int frameOffset = 0x0000;
@@ -781,21 +781,21 @@ void s32comm_device::comm_tick_15612()
 		{
 			// waiting...
 			m_shared[0] = 0x05;
-			
+
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
 				printf("S32COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
-			
+
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
 				printf("S32COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
-			
+
 			// if both sockets are there check ring
 			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
 			{
@@ -832,7 +832,7 @@ void s32comm_device::comm_tick_15612()
 								m_line_tx.write(m_buffer, dataSize);
 							}
 						}
-						
+
 						// 0xFE - link size
 						else if (idx == 0xFE)
 						{
@@ -843,11 +843,11 @@ void s32comm_device::comm_tick_15612()
 								// slave and relay forward message
 								m_line_tx.write(m_buffer, dataSize);
 							}
-							
+
 							// consider it done
 							printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
-							
+
 							// write to shared mem
 							m_shared[0] = 0x01;
 							m_shared[2] = m_linkid;
@@ -865,13 +865,13 @@ void s32comm_device::comm_tick_15612()
 						}
 						printf("S32COMM: droped a message...\n");
 					}
-					
+
 					if (m_linkalive == 0x00)
 						recv = m_line_rx.read(m_buffer, dataSize);
 					else
 						recv = 0;
 				}
-				
+
 				// if we are master and link is not yet established
 				if (isMaster && (m_linkalive == 0x00))
 				{
@@ -899,7 +899,7 @@ void s32comm_device::comm_tick_15612()
 						m_shared[2] = m_linkid;
 						m_shared[3] = m_linkcount;
 					}
-					
+
 					else if (m_linktimer > 0x02)
 					{
 						// decrease delay timer
@@ -909,7 +909,7 @@ void s32comm_device::comm_tick_15612()
 					}
 				}
 			}
-		}	
+		}
 
 		// update "ring buffer" if link established
 		if (m_linkalive == 0x01)
@@ -964,7 +964,7 @@ void s32comm_device::comm_tick_15612()
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
-			
+
 			// update "ring buffer" if link established
 			// live relay does not send data
 			if (m_linkid != 0x00 && m_shared[4] != 0x00)
@@ -980,7 +980,7 @@ void s32comm_device::comm_tick_15612()
 				// push message to other nodes
 				m_line_tx.write(m_buffer, dataSize);
 
-				// master sends some additional status bytes 
+				// master sends some additional status bytes
 				if (isMaster){
 					m_buffer[0] = 0xF0;
 					for (int j = 0x00 ; j < frameSize ; j++)

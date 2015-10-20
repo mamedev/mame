@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midtunit_state )
 	AM_RANGE(0x01600010, 0x0160001f) AM_READ_PORT("IN1")
 	AM_RANGE(0x01600020, 0x0160002f) AM_READ_PORT("IN2")
 	AM_RANGE(0x01600030, 0x0160003f) AM_READ_PORT("DSW")
-	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_WRITE(midtunit_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x01a80000, 0x01a800ff) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
 	AM_RANGE(0x01b00000, 0x01b0001f) AM_WRITE(midtunit_control_w)
 /*  AM_RANGE(0x01c00060, 0x01c0007f) AM_WRITE(midtunit_cmos_enable_w) */
@@ -602,6 +602,7 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	// from TMS340 registers
@@ -1477,29 +1478,29 @@ ROM_END
  *
  *************************************/
 
-GAME( 1992, mk,       0,       tunit_adpcm, mk, midtunit_state,       mktunit,  ROT0, "Midway",   "Mortal Kombat (rev 5.0 T-Unit 03/19/93)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkr4,     mk,      tunit_adpcm, mk, midtunit_state,       mktunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 T-Unit 02/11/93)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mktturbo,  mk,     tunit_adpcm, mk, midtunit_state,       mkturbo,  ROT0, "hack",     "Mortal Kombat (Turbo Ninja T-Unit 03/19/93, hack)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mk,       0,       tunit_adpcm, mk, midtunit_state,       mktunit,  ROT0, "Midway",   "Mortal Kombat (rev 5.0 T-Unit 03/19/93)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkr4,     mk,      tunit_adpcm, mk, midtunit_state,       mktunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 T-Unit 02/11/93)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mktturbo,  mk,     tunit_adpcm, mk, midtunit_state,       mkturbo,  ROT0, "hack",     "Mortal Kombat (Turbo Ninja T-Unit 03/19/93, hack)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, mk2,      0,       tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.1)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r32e,  mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.2 (European))", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r31e,  mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.1 (European))", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r30,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.0)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r21,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L2.1)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r20,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L2.0)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r14,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L1.4)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r11,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L1.1)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r42,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "hack",     "Mortal Kombat II (rev L4.2, hack)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2r91,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "hack",     "Mortal Kombat II (rev L9.1, hack)", GAME_SUPPORTS_SAVE )
-GAME( 1993, mk2chal,  mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "hack",     "Mortal Kombat II Challenger (hack)", GAME_SUPPORTS_SAVE )
+GAME( 1993, mk2,      0,       tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r32e,  mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.2 (European))", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r31e,  mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.1 (European))", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r30,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r21,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r20,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r14,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L1.4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r11,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r42,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "hack",     "Mortal Kombat II (rev L4.2, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2r91,   mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "hack",     "Mortal Kombat II (rev L9.1, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2chal,  mk2,     tunit_dcs,   mk2, midtunit_state,      mk2,      ROT0, "hack",     "Mortal Kombat II Challenger (hack)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, jdreddp,  0,       tunit_adpcm, jdreddp, midtunit_state,  jdreddp,  ROT0, "Midway",   "Judge Dredd (rev LA1, prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1993, jdreddp,  0,       tunit_adpcm, jdreddp, midtunit_state,  jdreddp,  ROT0, "Midway",   "Judge Dredd (rev LA1, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, nbajam,   0,       tunit_adpcm, nbajam, midtunit_state,   nbajam,   ROT0, "Midway",   "NBA Jam (rev 3.01 04/07/93)", GAME_SUPPORTS_SAVE )
-GAME( 1993, nbajamr2, nbajam,  tunit_adpcm, nbajam, midtunit_state,   nbajam,   ROT0, "Midway",   "NBA Jam (rev 2.00 02/10/93)", GAME_SUPPORTS_SAVE )
+GAME( 1993, nbajam,   0,       tunit_adpcm, nbajam, midtunit_state,   nbajam,   ROT0, "Midway",   "NBA Jam (rev 3.01 04/07/93)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nbajamr2, nbajam,  tunit_adpcm, nbajam, midtunit_state,   nbajam,   ROT0, "Midway",   "NBA Jam (rev 2.00 02/10/93)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, nbajamte, 0,         tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 4.0 03/23/94)", GAME_SUPPORTS_SAVE )
-GAME( 1994, nbajamte1,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 1.0 01/17/94)", GAME_SUPPORTS_SAVE )
-GAME( 1994, nbajamte2,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 2.0 01/28/94)", GAME_SUPPORTS_SAVE )
-GAME( 1994, nbajamte3,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 3.0 03/04/94)", GAME_SUPPORTS_SAVE )
-GAME( 1995, nbajamten,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam T.E. Nani Edition (rev 5.2 8/11/95, prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1994, nbajamte, 0,         tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 4.0 03/23/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte1,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 1.0 01/17/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte2,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 2.0 01/28/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte3,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 3.0 03/04/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, nbajamten,nbajamte,  tunit_adpcm, nbajamte, midtunit_state, nbajamte, ROT0, "Midway",   "NBA Jam T.E. Nani Edition (rev 5.2 8/11/95, prototype)", MACHINE_SUPPORTS_SAVE )

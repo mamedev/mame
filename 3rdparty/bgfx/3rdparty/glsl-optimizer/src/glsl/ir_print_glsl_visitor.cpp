@@ -231,6 +231,10 @@ _mesa_print_ir_glsl(exec_list *instructions,
 		}
 		if (state->ARB_shader_texture_lod_enable)
 			str.asprintf_append ("#extension GL_ARB_shader_texture_lod : enable\n");
+		if (state->ARB_draw_instanced_enable)
+			str.asprintf_append ("#extension GL_ARB_draw_instanced : enable\n");
+		if (state->EXT_gpu_shader4_enable)
+			str.asprintf_append ("#extension GL_EXT_gpu_shader4 : enable\n");
 		if (state->EXT_shader_texture_lod_enable)
 			str.asprintf_append ("#extension GL_EXT_shader_texture_lod : enable\n");
 		if (state->OES_standard_derivatives_enable)
@@ -242,12 +246,16 @@ _mesa_print_ir_glsl(exec_list *instructions,
 		if (state->es_shader && state->language_version < 300)
 		{
 			if (state->EXT_draw_buffers_enable)
-				str.asprintf_append ("#extension GL_EXT_draw_buffers : require\n");
+				str.asprintf_append ("#extension GL_EXT_draw_buffers : enable\n");
+			if (state->EXT_draw_instanced_enable)
+				str.asprintf_append ("#extension GL_EXT_draw_instanced : enable\n");
 		}
 		if (state->EXT_shader_framebuffer_fetch_enable)
 			str.asprintf_append ("#extension GL_EXT_shader_framebuffer_fetch : enable\n");
 		if (state->ARB_shader_bit_encoding_enable)
 			str.asprintf_append("#extension GL_ARB_shader_bit_encoding : enable\n");
+		if (state->EXT_texture_array_enable)
+			str.asprintf_append ("#extension GL_EXT_texture_array : enable\n");
 	}
 	
 	// remove unused struct declarations
@@ -816,14 +824,17 @@ void ir_print_glsl_visitor::visit(ir_texture *ir)
 {
 	glsl_sampler_dim sampler_dim = (glsl_sampler_dim)ir->sampler->type->sampler_dimensionality;
 	const bool is_shadow = ir->sampler->type->sampler_shadow;
+	const bool is_array = ir->sampler->type->sampler_array;
 	const glsl_type* uv_type = ir->coordinate->type;
 	const int uv_dim = uv_type->vector_elements;
 	int sampler_uv_dim = tex_sampler_dim_size[sampler_dim];
 	if (is_shadow)
 		sampler_uv_dim += 1;
+	if (is_array)
+		sampler_uv_dim += 1;
 	const bool is_proj = (uv_dim > sampler_uv_dim);
 	const bool is_lod = (ir->op == ir_txl);
-
+	
 #if 0 // BK - disable LOD workarounds.
 	if (is_lod && state->es_shader && state->language_version < 300 && state->stage == MESA_SHADER_FRAGMENT)
 	{
@@ -855,6 +866,7 @@ void ir_print_glsl_visitor::visit(ir_texture *ir)
 	}
 #endif // 0
 
+	
     // texture function name
     //ACS: shadow lookups and lookups with dimensionality included in the name were deprecated in 130
     if(state->language_version<130) 
@@ -869,6 +881,9 @@ void ir_print_glsl_visitor::visit(ir_texture *ir)
         else
             buffer.asprintf_append ("texture");
     }
+
+	if (is_array && state->EXT_texture_array_enable)
+		buffer.asprintf_append ("Array");
 	
 	if (is_proj)
 		buffer.asprintf_append ("Proj");

@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
 
-#include "UnitTest++/UnitTest++.h"
+#include <stdio.h>
+#include "gtest/gtest.h"
 
-int main(int, char const *[])
+int main(int argc, char **argv) 
 {
-    return UnitTest::RunAllTests();
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
+

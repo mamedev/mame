@@ -195,22 +195,22 @@ extern const device_type SEIBU_ADPCM;
 	MCFG_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map)                    \
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
-#define SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()							\
-	MCFG_DEVICE_MODIFY("seibu_sound")								\
-	downcast<seibu_sound_device *>(device)->set_encryption(1);		\
-	MCFG_DEVICE_MODIFY("audiocpu")									\
+#define SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()                          \
+	MCFG_DEVICE_MODIFY("seibu_sound")                               \
+	downcast<seibu_sound_device *>(device)->set_encryption(1);      \
+	MCFG_DEVICE_MODIFY("audiocpu")                                  \
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 
-#define SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()							\
-	MCFG_DEVICE_MODIFY("seibu_sound")								\
-	downcast<seibu_sound_device *>(device)->set_encryption(2);		\
-	MCFG_DEVICE_MODIFY("audiocpu")									\
+#define SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()                         \
+	MCFG_DEVICE_MODIFY("seibu_sound")                               \
+	downcast<seibu_sound_device *>(device)->set_encryption(2);      \
+	MCFG_DEVICE_MODIFY("audiocpu")                                  \
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 
-#define SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()						\
-	MCFG_DEVICE_MODIFY("seibu_sound")								\
-	downcast<seibu_sound_device *>(device)->set_encryption(3);		\
-	MCFG_DEVICE_MODIFY("audiocpu")									\
+#define SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()                       \
+	MCFG_DEVICE_MODIFY("seibu_sound")                               \
+	downcast<seibu_sound_device *>(device)->set_encryption(3);      \
+	MCFG_DEVICE_MODIFY("audiocpu")                                  \
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2)            \

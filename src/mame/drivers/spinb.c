@@ -848,8 +848,8 @@ ROM_START(vrnwrld)
 	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
 ROM_END
 
-GAME(1993, bushido,   0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1993, bushidoa,  bushido, spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 2)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Spinball",       "Mach 2",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1996, jolypark,  0,       spinb,   spinb, spinb_state,  game1,  ROT0,  "Spinball",       "Jolly Park",      GAME_IS_SKELETON_MECHANICAL)
-GAME(1996, vrnwrld,   0,       vrnwrld, spinb, spinb_state,  game2,  ROT0,  "Spinball",       "Verne's World",   GAME_IS_SKELETON_MECHANICAL)
+GAME(1993, bushido,   0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidoa,  bushido, spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,     0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, jolypark,  0,       spinb,   spinb, spinb_state,  game1,  ROT0,  "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, vrnwrld,   0,       vrnwrld, spinb, spinb_state,  game2,  ROT0,  "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)

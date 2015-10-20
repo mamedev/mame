@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- fccpu1.lay -->
+<!-- 2015-07-27: Initial version.  [JLE] -->
+<mamelayout version="2">
+	<element name="front">
+				<image file="front.png" />
+	</element>
+	<view name="Force Computers SYS68K/CPU-1">
+		<screen index="0">
+			<bounds left="100" top="0" right="640" bottom="480" />
+		</screen>
+	<bezel name="frontpanel" element="front">
+		<bounds x="0" y="0" width="36" height="480" />
+	</bezel>
+	</view>
+</mamelayout>
+

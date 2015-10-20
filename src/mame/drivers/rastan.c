@@ -638,12 +638,12 @@ ROM_START( rastsagaa )
 ROM_END
 
 /* Newer revised code base */
-GAME( 1987, rastan,    0,      rastan, rastan, driver_device,   0, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastana,   rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation Japan",   "Rastan (World)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastanu,   rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastanua,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastan,    0,      rastan, rastan, driver_device,   0, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastana,   rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation Japan",   "Rastan (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanu,   rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanua,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US)", MACHINE_SUPPORTS_SAVE )
 
 /* Based on earliest code base */
-GAME( 1987, rastanub,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastsaga,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastsagaa, rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastanub,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsaga,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagaa, rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan)", MACHINE_SUPPORTS_SAVE )

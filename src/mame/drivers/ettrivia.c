@@ -466,4 +466,4 @@ GAME( 1985, promutrv, 0,        ettrivia, ettrivia, driver_device, 0, ROT270, "E
 GAME( 1985, promutrva,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
 GAME( 1985, promutrvb,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
 GAME( 1985, promutrvc,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
-GAME( 1986, strvmstr, 0,        ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master", GAME_WRONG_COLORS )
+GAME( 1986, strvmstr, 0,        ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master", MACHINE_WRONG_COLORS )

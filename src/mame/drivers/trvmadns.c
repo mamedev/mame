@@ -461,5 +461,5 @@ ROM_START( trvmadnsa )
 	// empty space, for 3 roms (each one max 0x8000 bytes long)
 ROM_END
 
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, driver_device, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, driver_device, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1985, trvmadns,         0, trvmadns, trvmadns, driver_device, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, driver_device, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

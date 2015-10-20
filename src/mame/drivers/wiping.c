@@ -383,5 +383,5 @@ ROM_END
 
 
 
-GAME( 1982, wiping,  0,      wiping, wiping, driver_device,  0, ROT90, "Nichibutsu", "Wiping", GAME_SUPPORTS_SAVE )
-GAME( 1983, rugrats, wiping, wiping, rugrats, driver_device, 0, ROT90, "Nichibutsu", "Rug Rats", GAME_SUPPORTS_SAVE )
+GAME( 1982, wiping,  0,      wiping, wiping, driver_device,  0, ROT90, "Nichibutsu", "Wiping", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rugrats, wiping, wiping, rugrats, driver_device, 0, ROT90, "Nichibutsu", "Rug Rats", MACHINE_SUPPORTS_SAVE )

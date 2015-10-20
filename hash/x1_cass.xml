@@ -12,6 +12,20 @@ Titles, publishers and release dates taken from:
 
 <softwarelist name="x1_cass" description="Sharp X1 cassettes">
 
+	<software name="alamein">
+		<description>El Alamein</description>
+		<year>1983</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
+		<info name="alt_title" value="エル・アラメイン"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="12742140">
+				<rom name="alamein.wav" size="12742140" crc="04e00f60" sha1="42f3ef356fdb67ddd0fbdb57e473c23d267f9bf4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blckonyx" supported="no">
 		<description>The Black Onyx</description>
 		<year>1985</year>
@@ -73,6 +87,18 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="300004">
 				<rom name="the castle.tap" size="300004" crc="0ba30a7d" sha1="732e04231f82f749ca2fe529d7ac5db3353d6894" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cball">
+		<description>Cannon Ball</description>
+		<year>1983</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="キャノンボール"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="4857558">
+				<rom name="cball.wav" size="4857558" crc="4405cf21" sha1="769a43d97f69b5d72347ca8b72547e464b9d059b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -293,6 +319,18 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="1748293">
 				<rom name="lizard.tap" size="1748293" crc="69706160" sha1="ddc801375e92cfb64f4771aabd62a6291bcdec37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="machgjoe">
+		<description>Ginkou Goutou - Machinegun Joe vs. the Mafia</description>
+		<year>1983</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="銀行強盗 マシンガンジョー VS ザ・マフィア"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="15591932">
+				<rom name="machgjoe.wav" size="15591932" crc="3769199a" sha1="81614c317f432055f2c5fdcce51438de9fbdad7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

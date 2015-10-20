@@ -342,5 +342,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz, driver_device,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", GAME_SUPPORTS_SAVE )
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, driver_device, 0, ROT0, "Atari Games", "Shuuz (version 7.1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, shuuz,  0,     shuuz, shuuz, driver_device,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, driver_device, 0, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )

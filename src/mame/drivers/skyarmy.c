@@ -6,11 +6,11 @@
     - Fixed Dip Switches and Inputs (after verification of the Z80 code)
     - Updated memory map to partially handle screen flipping
 
- 05/01/2003  MooglyGuy/Ryan Holtz
+ 05/01/2003  Ryan Holtz
     - Corrected second AY (shouldn't have been there)
     - Added first AY's status read
     - Added coinage DIP
-    - What the hell are those unmapped port writes!? Not AY...
+    - What are those unmapped port writes!? Not AY...
 
  2003.01.01. Tomasz Slanina
 
@@ -341,4 +341,4 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, driver_device, 0, ROT90, "Shoei", "Sky Army", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, driver_device, 0, ROT90, "Shoei", "Sky Army", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

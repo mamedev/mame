@@ -293,4 +293,4 @@ ROM_START( pass )
 ROM_END
 
 
-GAME( 1992, pass, 0, pass, pass, driver_device, 0, ROT0, "Oksan", "Pass", GAME_SUPPORTS_SAVE )
+GAME( 1992, pass, 0, pass, pass, driver_device, 0, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )

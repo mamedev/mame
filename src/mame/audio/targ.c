@@ -37,6 +37,12 @@ void exidy_state::adjust_sample(UINT8 freq)
 {
 	m_tone_freq = freq;
 
+	if (!m_samples->playing(3))
+	{
+		m_samples->set_volume(3, 0);
+		m_samples->start_raw(3, sine_wave, 32, 1000, true);
+	}
+
 	if ((m_tone_freq == 0xff) || (m_tone_freq == 0x00))
 		m_samples->set_volume(3, 0);
 	else
@@ -136,8 +142,13 @@ void exidy_state::common_audio_start(int freq)
 	m_tone_freq = 0;
 	m_tone_active = 0;
 
-	m_samples->set_volume(3, 0);
-	m_samples->start_raw(3, sine_wave, 32, 1000, true);
+	/* start_raw can't be called here: chan.source will be set by
+	samples_device::device_start and then nulled out by samples_device::device_reset
+	at the soft_reset stage of init_machine() and will never be set again.
+	Thus, I've moved it to exidy_state::adjust_sample() were it will be set after
+	machine initialization. */
+	//m_samples->set_volume(3, 0);
+	//m_samples->start_raw(3, sine_wave, 32, 1000, true);
 
 	save_item(NAME(m_port_1_last));
 	save_item(NAME(m_port_2_last));

@@ -82,7 +82,7 @@ UINT32 vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitm
 
 UINT32 vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *color_prom = (UINT8 *)memregion("proms")->base();
+	UINT8 *color_prom = (UINT8 *)m_proms->base();
 	UINT8 x = 0;
 	UINT8 y = cliprect.min_y;
 	UINT8 video_data = 0;

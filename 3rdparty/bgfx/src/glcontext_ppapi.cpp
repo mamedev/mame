@@ -6,7 +6,7 @@
 #include "bgfx_p.h"
 
 #if BX_PLATFORM_NACL && (BGFX_CONFIG_RENDERER_OPENGLES || BGFX_CONFIG_RENDERER_OPENGL)
-#	include <bgfxplatform.h>
+#	include <bgfx/bgfxplatform.h>
 #	include "renderer_gl.h"
 
 namespace bgfx { namespace gl
@@ -153,9 +153,9 @@ namespace bgfx { namespace gl
 		s_ppapi.resize(_width, _height, _flags);
 	}
 
-	bool GlContext::isSwapChainSupported()
+	uint64_t GlContext::getCaps() const
 	{
-		return false;
+		return 0;
 	}
 
 	SwapChainGL* GlContext::createSwapChain(void* /*_nwh*/)

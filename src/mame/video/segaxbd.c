@@ -16,6 +16,12 @@
 
 void segaxbd_state::video_start()
 {
+	if(!m_segaic16vid->started())
+		throw device_missing_dependencies();
+
+	if(!m_segaic16road->started())
+		throw device_missing_dependencies();
+
 	// initialize the tile/text layers
 	m_segaic16vid->tilemap_init( 0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2);
 

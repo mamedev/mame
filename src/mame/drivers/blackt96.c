@@ -664,4 +664,4 @@ ROM_START( blackt96 )
 	ROM_CONTINUE(          0x00001, 0x08000 ) // first half is empty
 ROM_END
 
-GAME( 1996, blackt96,    0,        blackt96,    blackt96, driver_device,    0, ROT0,  "D.G.R.M.", "Black Touch '96", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1996, blackt96,    0,        blackt96,    blackt96, driver_device,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

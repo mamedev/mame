@@ -243,14 +243,6 @@ VIDEO_START_MEMBER(liberate_state,prosport)
 
 /***************************************************************************/
 
-WRITE8_MEMBER(liberate_state::prosport_paletteram_w)
-{
-	m_paletteram[offset] = data;
-
-	/* RGB output is inverted */
-	m_palette->set_pen_color(offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
-}
-
 PALETTE_INIT_MEMBER(liberate_state,liberate)
 {
 	const UINT8 *color_prom = memregion("proms")->base();

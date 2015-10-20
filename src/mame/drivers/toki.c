@@ -853,15 +853,15 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 
 // these 2 are both unique revisions
-GAME( 1989, toki,  0,    tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tokiu, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, toki,  0,    tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokiu, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", MACHINE_SUPPORTS_SAVE )
 
 // these 3 are all the same revision, only the region byte differs
-GAME( 1989, tokia, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tokiua,toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, juju,  toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tokia, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokiua,toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, juju,  toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, tokib,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1990, jujub,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Playmark)", "JuJu Densetsu (Playmark bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, tokib,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, jujub,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Playmark)", "JuJu Densetsu (Playmark bootleg)", MACHINE_SUPPORTS_SAVE )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
-GAME( 1989, jujuba, toki, tokic, toki, toki_state,  jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // bootleg of tokia/juju revison
+GAME( 1989, jujuba, toki, tokic, toki, toki_state,  jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg of tokia/juju revison

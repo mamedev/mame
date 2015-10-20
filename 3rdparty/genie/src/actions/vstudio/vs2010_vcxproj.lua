@@ -21,9 +21,14 @@
 	end
 
 	local function vs2010_globals(prj)
+		local action = premake.action.current()
 		_p(1,'<PropertyGroup Label="Globals">')
 			_p(2,'<ProjectGuid>{%s}</ProjectGuid>',prj.uuid)
 			_p(2,'<RootNamespace>%s</RootNamespace>',prj.name)
+			local windowsTargetPlatformVersion = prj.windowstargetplatformversion or action.vstudio.windowsTargetPlatformVersion
+			if windowsTargetPlatformVersion ~= nil then
+				_p(2,'<WindowsTargetPlatformVersion>%s</WindowsTargetPlatformVersion>',windowsTargetPlatformVersion)
+			end
 		--if prj.flags is required as it is not set at project level for tests???
 		--vs200x generator seems to swap a config for the prj in test setup
 		if prj.flags and prj.flags.Managed then
@@ -115,20 +120,29 @@
 		end
 	end
 
+	local function add_trailing_backslash(dir)
+		if dir:len() > 0 and dir:sub(-1) ~= "\\" then
+			return dir.."\\"
+		end
+		return dir
+	end
+
 	function vc2010.outputProperties(prj)
 			for _, cfginfo in ipairs(prj.solution.vstudio_configs) do
 				local cfg = premake.getconfig(prj, cfginfo.src_buildcfg, cfginfo.src_platform)
 				local target = cfg.buildtarget
+				local outdir = add_trailing_backslash(target.directory)
+				local intdir = add_trailing_backslash(cfg.objectsdir)
 
 				_p(1,'<PropertyGroup '..if_config_and_platform() ..'>', premake.esc(cfginfo.name))
 
-				_p(2,'<OutDir>%s\\</OutDir>', premake.esc(target.directory))
+				_p(2,'<OutDir>%s</OutDir>', premake.esc(outdir))
 
 				if cfg.platform == "Xbox360" then
 					_p(2,'<OutputFile>$(OutDir)%s</OutputFile>', premake.esc(target.name))
 				end
 
-				_p(2,'<IntDir>%s\\</IntDir>', premake.esc(cfg.objectsdir))
+				_p(2,'<IntDir>%s</IntDir>', premake.esc(intdir))
 				_p(2,'<TargetName>%s</TargetName>', premake.esc(path.getbasename(target.name)))
 				_p(2,'<TargetExt>%s</TargetExt>', premake.esc(path.getextension(target.name)))
 

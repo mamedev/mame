@@ -401,11 +401,11 @@ ROM_START( usg182 ) /* Version 18.2 */
 ROM_END
 
 
-GAME( 1987, usg32,    0,        usg32,  usg32, driver_device, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, superten, 0,        usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3", GAME_SUPPORTS_SAVE )
-GAME( 1988, usg83x,   superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3X", GAME_SUPPORTS_SAVE ) /* "Experimental" version?? */
-GAME( 1988, usg82,    superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , GAME_SUPPORTS_SAVE )
-GAME( 1992, usgames,  0,        usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V25.4X", GAME_SUPPORTS_SAVE )
-GAME( 1991, usg187c,  usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.7C", GAME_SUPPORTS_SAVE )
-GAME( 1990, usg185,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.5", GAME_SUPPORTS_SAVE )
-GAME( 1989, usg182,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.2", GAME_SUPPORTS_SAVE )
+GAME( 1987, usg32,    0,        usg32,  usg32, driver_device, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, superten, 0,        usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, usg83x,   superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3X", MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
+GAME( 1988, usg82,    superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , MACHINE_SUPPORTS_SAVE )
+GAME( 1992, usgames,  0,        usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V25.4X", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.7C", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, usg185,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.5", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, usg182,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.2", MACHINE_SUPPORTS_SAVE )

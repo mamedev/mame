@@ -3,7 +3,7 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include <bgfx.c99.h>
+#include <bgfx/c99/bgfx.h>
 #include "../00-helloworld/logo.h"
 
 extern bool entry_process_events(uint32_t* _width, uint32_t* _height, uint32_t* _debug, uint32_t* _reset);
@@ -47,7 +47,7 @@ int _main_(int _argc, char** _argv)
 
 		// This dummy draw call is here to make sure that view 0 is cleared
 		// if no other draw calls are submitted to view 0.
-		bgfx_submit(0, 0);
+		bgfx_touch(0);
 
 		// Use debug font to print information about this example.
 		bgfx_dbg_text_clear(0, false);

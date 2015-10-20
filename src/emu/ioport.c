@@ -2902,12 +2902,11 @@ g_profiler.start(PROFILER_INPUT);
 	ioport_field *mouse_field = NULL;
 	if (mouse_button && mouse_target != NULL)
 	{
-		const char *tag = NULL;
+		ioport_port *port = NULL;
 		ioport_value mask;
 		float x, y;
-		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, tag, mask, x, y))
+		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, port, mask, x, y))
 		{
-			ioport_port *port = machine().root_device().ioport(tag);
 			if (port != NULL)
 				mouse_field = port->field(mask);
 		}
@@ -3443,9 +3442,11 @@ void ioport_manager::playback_frame(const attotime &curtime)
 	if (m_playback_file.is_open())
 	{
 		// first the absolute time
-		attotime readtime;
-		playback_read(readtime.seconds);
-		playback_read(readtime.attoseconds);
+		seconds_t seconds_temp;
+		attoseconds_t attoseconds_temp;
+		playback_read(seconds_temp);
+		playback_read(attoseconds_temp);
+		attotime readtime(seconds_temp, attoseconds_temp);
 		if (readtime != curtime)
 			playback_end("Out of sync");
 
@@ -3582,8 +3583,8 @@ void ioport_manager::record_frame(const attotime &curtime)
 	if (m_record_file.is_open())
 	{
 		// first the absolute time
-		record_write(curtime.seconds);
-		record_write(curtime.attoseconds);
+		record_write(curtime.seconds());
+		record_write(curtime.attoseconds());
 
 		// then the current speed
 		record_write(UINT32(machine().video().speed_percent() * double(1 << 20)));

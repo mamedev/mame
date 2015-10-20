@@ -374,6 +374,7 @@ const options_entry windows_options::s_option_entries[] =
 
 	// input options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
+	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enable global inputs" },
 	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
 
 	{ NULL }
@@ -1322,7 +1323,7 @@ FPTR symbol_manager::get_text_section_base()
 	dynamic_bind<PIMAGE_NT_HEADERS (WINAPI *)(PVOID)> image_nt_header(TEXT("dbghelp.dll"), "ImageNtHeader");
 
 	// start with the image base
-	PVOID base = reinterpret_cast<PVOID>(GetModuleHandle(NULL));
+	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());
 	assert(base != NULL);
 
 	// make sure we have the functions we need

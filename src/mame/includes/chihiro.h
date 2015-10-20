@@ -185,6 +185,7 @@ public:
 		memset(pfifo, 0, sizeof(pfifo));
 		memset(pcrtc, 0, sizeof(pcrtc));
 		memset(pmc, 0, sizeof(pmc));
+		memset(pgraph, 0, sizeof(pgraph));
 		memset(ramin, 0, sizeof(ramin));
 		computedilated();
 		objectdata = &(object_data_alloc());
@@ -194,6 +195,7 @@ public:
 		enabled_vertex_attributes = 0;
 		indexesleft_count = 0;
 		vertex_pipeline = 4;
+		color_mask = 0xffffffff;
 		alpha_test_enabled = false;
 		alpha_reference = 0;
 		alpha_func = nv2a_renderer::ALWAYS;
@@ -222,8 +224,10 @@ public:
 		dilate_rendertarget = 0;
 		antialiasing_rendertarget = 0;
 		type_rendertarget = nv2a_renderer::LINEAR;
-		depth_rendertarget = nv2a_renderer::NV2A_RT_DEPTH_FORMAT_Z24S8;
-		color_rendertarget = nv2a_renderer::NV2A_COLOR_FORMAT_A8R8G8B8;
+		depthformat_rendertarget = nv2a_renderer::NV2A_RT_DEPTH_FORMAT_Z24S8;
+		colorformat_rendertarget = nv2a_renderer::NV2A_COLOR_FORMAT_A8R8G8B8;
+		bytespixel_rendertarget = 4;
+		antialias_control = 0;
 		rendertarget = NULL;
 		depthbuffer = NULL;
 		displayedtarget = NULL;
@@ -238,8 +242,10 @@ public:
 	}
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);
-	bool vblank_callback(screen_device &screen, bool state);
+	void vblank_callback(screen_device &screen, bool state);
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	bool update_interrupts();
+	void set_interrupt_device(pic8259_device *device);
 
 	void render_texture_simple(INT32 scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
 	void render_color(INT32 scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
@@ -250,6 +256,7 @@ public:
 	void geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT32 &size);
 	int geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
 	UINT32 texture_get_texel(int number, int x, int y);
+	UINT8 *read_pixel(int x, int y, UINT32 c[4]);
 	void write_pixel(int x, int y, UINT32 color, UINT32 depth);
 	void combiner_initialize_registers(UINT32 argb8[6]);
 	void combiner_initialize_stage(int stage_number);
@@ -289,6 +296,7 @@ public:
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	void clear_depth_buffer(int what, UINT32 value);
 	inline UINT8 *direct_access_ptr(offs_t address);
 	TIMER_CALLBACK_MEMBER(puller_timer_work);
 
@@ -303,10 +311,12 @@ public:
 	UINT32 pfifo[0x2000 / 4];
 	UINT32 pcrtc[0x1000 / 4];
 	UINT32 pmc[0x1000 / 4];
+	UINT32 pgraph[0x2000 / 4];
 	UINT32 ramin[0x100000 / 4];
 	UINT32 dma_offset[2];
 	UINT32 dma_size[2];
 	UINT8 *basemempointer;
+	pic8259_device *interruptdevice;
 	rectangle limits_rendertarget;
 	UINT32 pitch_rendertarget;
 	UINT32 pitch_depthbuffer;
@@ -315,8 +325,10 @@ public:
 	int dilate_rendertarget;
 	int antialiasing_rendertarget;
 	int type_rendertarget;
-	int depth_rendertarget;
-	int color_rendertarget;
+	int depthformat_rendertarget;
+	int colorformat_rendertarget;
+	int bytespixel_rendertarget;
+	UINT32 antialias_control;
 	UINT32 *rendertarget;
 	UINT32 *depthbuffer;
 	UINT32 *displayedtarget;
@@ -441,6 +453,7 @@ public:
 		int used;
 		osd_lock *lock;
 	} combiner;
+	UINT32 color_mask;
 	bool alpha_test_enabled;
 	int alpha_func;
 	int alpha_reference;
@@ -649,9 +662,13 @@ public:
 	};
 
 	enum NV2A_COLOR_FORMAT {
+		NV2A_COLOR_FORMAT_X1R5G6B5 = 0x0002,
 		NV2A_COLOR_FORMAT_R5G6B5 = 0x0003,
+		NV2A_COLOR_FORMAT_UNKNOWN4 = 0x0004,
 		NV2A_COLOR_FORMAT_X8R8G8B8 = 0x0005,
+		NV2A_COLOR_FORMAT_X1A7R8G8B8 = 0x0007,
 		NV2A_COLOR_FORMAT_A8R8G8B8 = 0x0008,
-		NV2A_COLOR_FORMAT_B8 = 0x0009
+		NV2A_COLOR_FORMAT_B8 = 0x0009,
+		NV2A_COLOR_FORMAT_G8B8 = 0x000a
 	};
 };

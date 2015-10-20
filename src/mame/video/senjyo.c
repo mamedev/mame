@@ -108,6 +108,22 @@ void senjyo_state::video_start()
 	m_fg_tilemap->set_scroll_cols(32);
 }
 
+PALETTE_DECODER_MEMBER( senjyo_state, IIBBGGRR )
+{
+	UINT8 i = (raw >> 6) & 3;
+	UINT8 r = (raw << 2) & 0x0c;
+	UINT8 g = (raw     ) & 0x0c;
+	UINT8 b = (raw >> 2) & 0x0c;
+
+	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
+}
+
+PALETTE_INIT_MEMBER( senjyo_state, radar )
+{
+	// two colors for the radar dots (verified on the real board)
+	m_radar_palette->set_pen_color(0, rgb_t(0xff, 0x00, 0x00));  // red for enemies
+	m_radar_palette->set_pen_color(1, rgb_t(0xff, 0xff, 0x00));  // yellow for player
+}
 
 
 /***************************************************************************
@@ -148,10 +164,10 @@ WRITE8_MEMBER(senjyo_state::bg3videoram_w)
 
 ***************************************************************************/
 
-void senjyo_state::draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_bgstripes == 0xff) /* off */
-		bitmap.fill(0, cliprect);
+		bitmap.fill(m_palette->pen_color(0), cliprect);
 	else
 	{
 		int flip = flip_screen();
@@ -166,10 +182,10 @@ void senjyo_state::draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		{
 			if (flip)
 				for (int y = 0;y < 256;y++)
-					bitmap.pix16(y, 255 - x) = 384 + pen;
+					bitmap.pix32(y, 255 - x) = m_palette->pen_color(384 + pen);
 			else
 				for (int y = 0;y < 256;y++)
-					bitmap.pix16(y, x) = 384 + pen;
+					bitmap.pix32(y, x) = m_palette->pen_color(384 + pen);
 
 			count += 0x10;
 			if (count >= strwid)
@@ -181,7 +197,7 @@ void senjyo_state::draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	}
 }
 
-void senjyo_state::draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void senjyo_state::draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0;offs < 0x400;offs++)
 		for (int x = 0;x < 8;x++)
@@ -199,11 +215,11 @@ void senjyo_state::draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				}
 
 				if (cliprect.contains(sx, sy))
-					bitmap.pix16(sy, sx) = offs < 0x200 ? 512 : 513;
+					bitmap.pix32(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
 			}
 }
 
-void senjyo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int priority)
+void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
 {
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
@@ -250,44 +266,38 @@ void senjyo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 	}
 }
 
-UINT32 senjyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* two colors for the radar dots (verified on the real board) */
-	m_palette->set_pen_color(512,rgb_t(0xff,0x00,0x00));  /* red for enemies */
-	m_palette->set_pen_color(513,rgb_t(0xff,0xff,0x00));  /* yellow for player */
+	int flip = flip_screen();
 
+	for (int i = 0;i < 32;i++)
+		m_fg_tilemap->set_scrolly(i, m_fgscroll[i]);
+
+	int scrollx = m_scrollx1[0];
+	int scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
+	if (flip)
+		scrollx = -scrollx;
+	m_bg1_tilemap->set_scrollx(0, scrollx);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
+
+	scrollx = m_scrollx2[0];
+	scrolly = m_scrolly2[0] + 256 * m_scrolly2[1];
+	if (m_scrollhack)   /* Star Force, but NOT the encrypted version */
 	{
-		int flip = flip_screen();
-
-		for (int i = 0;i < 32;i++)
-			m_fg_tilemap->set_scrolly(i, m_fgscroll[i]);
-
-		int scrollx = m_scrollx1[0];
-		int scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
-		if (flip)
-			scrollx = -scrollx;
-		m_bg1_tilemap->set_scrollx(0, scrollx);
-		m_bg1_tilemap->set_scrolly(0, scrolly);
-
-		scrollx = m_scrollx2[0];
-		scrolly = m_scrolly2[0] + 256 * m_scrolly2[1];
-		if (m_scrollhack)   /* Star Force, but NOT the encrypted version */
-		{
-			scrollx = m_scrollx1[0];
-			scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
-		}
-		if (flip)
-			scrollx = -scrollx;
-		m_bg2_tilemap->set_scrollx(0, scrollx);
-		m_bg2_tilemap->set_scrolly(0, scrolly);
-
-		scrollx = m_scrollx3[0];
-		scrolly = m_scrolly3[0] + 256 * m_scrolly3[1];
-		if (flip)
-			scrollx = -scrollx;
-		m_bg3_tilemap->set_scrollx(0, scrollx);
-		m_bg3_tilemap->set_scrolly(0, scrolly);
+		scrollx = m_scrollx1[0];
+		scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
 	}
+	if (flip)
+		scrollx = -scrollx;
+	m_bg2_tilemap->set_scrollx(0, scrollx);
+	m_bg2_tilemap->set_scrolly(0, scrolly);
+
+	scrollx = m_scrollx3[0];
+	scrolly = m_scrolly3[0] + 256 * m_scrolly3[1];
+	if (flip)
+		scrollx = -scrollx;
+	m_bg3_tilemap->set_scrollx(0, scrollx);
+	m_bg3_tilemap->set_scrolly(0, scrolly);
 
 	draw_bgbitmap(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect, 0);

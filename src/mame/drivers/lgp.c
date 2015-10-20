@@ -571,5 +571,5 @@ DRIVER_INIT_MEMBER(lgp_state,lgp)
 }
 
 /*    YEAR  NAME PARENT   MACHINE INPUT INIT MONITOR  COMPANY   FULLNAME             FLAGS) */
-GAME( 1983, lgp, 0,       lgp,    lgp, lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix",  GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, lgpalt, lgp,  lgp,    lgp, lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, lgp, 0,       lgp,    lgp, lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, lgpalt, lgp,  lgp,    lgp, lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

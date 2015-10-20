@@ -1396,6 +1396,14 @@ ROM_START( cninja ) /* World ver 4 */
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "mb7122h.7v", 0x00000, 0x400, CRC(a1267336) SHA1(d11ea9d78526ac3c0dc6e57a2da5914273ad1e3f) )    /* Priority  Unused */
+
+	ROM_REGION( 0x0e00, "plds", 0 )
+	ROM_LOAD( "tj-00.9j", 0x0000, 0x0117, CRC(46defe8f) SHA1(50db2c265a0ab592938f780f212ef86070b2daa2) ) /* GAL16V8 */
+	ROM_LOAD( "tj-01.9h", 0x0200, 0x0117, CRC(7a86902d) SHA1(7e116dbabe615ddae1588001b31a0a6e6e4dc46d) ) /* GAL16V8 */
+	ROM_LOAD( "tj-02.9h", 0x0400, 0x0117, CRC(b476d59c) SHA1(c17b7884180b5041d1524e9fd479cddac787a3cb) ) /* GAL16V8 */
+	ROM_LOAD( "tj-03.9e", 0x0600, 0x0117, CRC(cfb6e4aa) SHA1(fc70d1d43d8836ae7984c432b3f9e35c2256b18e) ) /* GAL16V8 */
+	ROM_LOAD( "tj-04.5n", 0x0800, 0x0117, CRC(bca07086) SHA1(cf713185d7430e17077a95a58a42d28336432c95) ) /* GAL16V8 */
+	ROM_LOAD( "tj-05.1r", 0x0a00, 0x0117, CRC(0dfc091b) SHA1(ab7ff0c8ada10633d27d5305f1f41f738647412a) ) /* GAL16V8 */
 ROM_END
 
 ROM_START( cninja1 ) /* World ver 1 */
@@ -1437,6 +1445,14 @@ ROM_START( cninja1 ) /* World ver 1 */
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "mb7122h.7v", 0x00000, 0x400, CRC(a1267336) SHA1(d11ea9d78526ac3c0dc6e57a2da5914273ad1e3f) )    /* Priority  Unused */
+
+	ROM_REGION( 0x0e00, "plds", 0 )
+	ROM_LOAD( "tj-00.9j", 0x0000, 0x0117, CRC(46defe8f) SHA1(50db2c265a0ab592938f780f212ef86070b2daa2) ) /* GAL16V8 */
+	ROM_LOAD( "tj-01.9h", 0x0200, 0x0117, CRC(7a86902d) SHA1(7e116dbabe615ddae1588001b31a0a6e6e4dc46d) ) /* GAL16V8 */
+	ROM_LOAD( "tj-02.9h", 0x0400, 0x0117, CRC(b476d59c) SHA1(c17b7884180b5041d1524e9fd479cddac787a3cb) ) /* GAL16V8 */
+	ROM_LOAD( "tj-03.9e", 0x0600, 0x0117, CRC(cfb6e4aa) SHA1(fc70d1d43d8836ae7984c432b3f9e35c2256b18e) ) /* GAL16V8 */
+	ROM_LOAD( "tj-04.5n", 0x0800, 0x0117, CRC(bca07086) SHA1(cf713185d7430e17077a95a58a42d28336432c95) ) /* GAL16V8 */
+	ROM_LOAD( "tj-05.1r", 0x0a00, 0x0117, CRC(0dfc091b) SHA1(ab7ff0c8ada10633d27d5305f1f41f738647412a) ) /* GAL16V8 */
 ROM_END
 
 ROM_START( cninjau ) /* US ver 4 */
@@ -1478,6 +1494,14 @@ ROM_START( cninjau ) /* US ver 4 */
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "mb7122h.7v", 0x00000, 0x400, CRC(a1267336) SHA1(d11ea9d78526ac3c0dc6e57a2da5914273ad1e3f) )    /* Priority  Unused */
+
+	ROM_REGION( 0x0e00, "plds", 0 )
+	ROM_LOAD( "tj-00.9j", 0x0000, 0x0117, CRC(46defe8f) SHA1(50db2c265a0ab592938f780f212ef86070b2daa2) ) /* GAL16V8 */
+	ROM_LOAD( "tj-01.9h", 0x0200, 0x0117, CRC(7a86902d) SHA1(7e116dbabe615ddae1588001b31a0a6e6e4dc46d) ) /* GAL16V8 */
+	ROM_LOAD( "tj-02.9h", 0x0400, 0x0117, CRC(b476d59c) SHA1(c17b7884180b5041d1524e9fd479cddac787a3cb) ) /* GAL16V8 */
+	ROM_LOAD( "tj-03.9e", 0x0600, 0x0117, CRC(cfb6e4aa) SHA1(fc70d1d43d8836ae7984c432b3f9e35c2256b18e) ) /* GAL16V8 */
+	ROM_LOAD( "tj-04.5n", 0x0800, 0x0117, CRC(bca07086) SHA1(cf713185d7430e17077a95a58a42d28336432c95) ) /* GAL16V8 */
+	ROM_LOAD( "tj-05.1r", 0x0a00, 0x0117, CRC(0dfc091b) SHA1(ab7ff0c8ada10633d27d5305f1f41f738647412a) ) /* GAL16V8 */
 ROM_END
 
 ROM_START( joemac ) /* Japan ver 1 */
@@ -1519,6 +1543,14 @@ ROM_START( joemac ) /* Japan ver 1 */
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "mb7122h.7v", 0x00000, 0x400, CRC(a1267336) SHA1(d11ea9d78526ac3c0dc6e57a2da5914273ad1e3f) )    /* Priority  Unused */
+
+	ROM_REGION( 0x0e00, "plds", 0 )
+	ROM_LOAD( "tj-00.9j", 0x0000, 0x0117, CRC(46defe8f) SHA1(50db2c265a0ab592938f780f212ef86070b2daa2) ) /* GAL16V8 */
+	ROM_LOAD( "tj-01.9h", 0x0200, 0x0117, CRC(7a86902d) SHA1(7e116dbabe615ddae1588001b31a0a6e6e4dc46d) ) /* GAL16V8 */
+	ROM_LOAD( "tj-02.9h", 0x0400, 0x0117, CRC(b476d59c) SHA1(c17b7884180b5041d1524e9fd479cddac787a3cb) ) /* GAL16V8 */
+	ROM_LOAD( "tj-03.9e", 0x0600, 0x0117, CRC(cfb6e4aa) SHA1(fc70d1d43d8836ae7984c432b3f9e35c2256b18e) ) /* GAL16V8 */
+	ROM_LOAD( "tj-04.5n", 0x0800, 0x0117, CRC(bca07086) SHA1(cf713185d7430e17077a95a58a42d28336432c95) ) /* GAL16V8 */
+	ROM_LOAD( "tj-05.1r", 0x0a00, 0x0117, CRC(0dfc091b) SHA1(ab7ff0c8ada10633d27d5305f1f41f738647412a) ) /* GAL16V8 */
 ROM_END
 
 ROM_START( stoneage )
@@ -2280,26 +2312,26 @@ DRIVER_INIT_MEMBER(cninja_state,mutantf)
 
 /**********************************************************************************/
 
-GAME( 1990, edrandy,  0,       edrandy,  edrandy,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, edrandy2, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, edrandy1, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, edrandyj, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (Japan ver 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, edrandy,  0,       edrandy,  edrandy,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, edrandy2, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, edrandy1, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, edrandyj, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (Japan ver 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, cninja,   0,       cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 4)", GAME_SUPPORTS_SAVE )
-GAME( 1991, cninja1,  cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, cninjau,  cninja,  cninja,   cninjau,  cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)", GAME_SUPPORTS_SAVE )
-GAME( 1991, joemac,   cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, stoneage, cninja,  stoneage, cninja,   cninja_state,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", GAME_SUPPORTS_SAVE )
-GAME( 1991, cninjabl, cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1991, cninjabl2,cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", GAME_NOT_WORKING )
+GAME( 1991, cninja,   0,       cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cninja1,  cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cninjau,  cninja,  cninja,   cninjau,  cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, joemac,   cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, stoneage, cninja,  stoneage, cninja,   cninja_state,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cninjabl, cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cninjabl2,cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", MACHINE_NOT_WORKING )
 
-GAME( 1991, robocop2, 0,       robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", GAME_SUPPORTS_SAVE )
-GAME( 1991, robocop2u,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.10)", GAME_SUPPORTS_SAVE )
-GAME( 1991, robocop2ua,robocop2,robocop2,robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", GAME_SUPPORTS_SAVE )
-GAME( 1991, robocop2j,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", GAME_SUPPORTS_SAVE )
+GAME( 1991, robocop2, 0,       robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, robocop2u,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, robocop2ua,robocop2,robocop2,robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, robocop2j,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mutantf,  0,       mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mutantf4, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mutantf3, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mutantf2, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", GAME_SUPPORTS_SAVE )
-GAME( 1992, deathbrd, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mutantf,  0,       mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mutantf4, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mutantf3, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mutantf2, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, deathbrd, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)", MACHINE_SUPPORTS_SAVE )

@@ -12,9 +12,11 @@
 
 K052109_CB_MEMBER(spy_state::tile_callback)
 {
+	static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
+
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 
@@ -26,30 +28,16 @@ K052109_CB_MEMBER(spy_state::tile_callback)
 
 K051960_CB_MEMBER(spy_state::sprite_callback)
 {
+	enum { sprite_colorbase = 512 / 16 };
+
 	/* bit 4 = priority over layer A (0 = have priority) */
 	/* bit 5 = priority over layer B (1 = have priority) */
 	*priority = 0x00;
-	if ( *color & 0x10) *priority |= 0xa;
-	if (~*color & 0x20) *priority |= 0xc;
+	if ( *color & 0x10) *priority |= GFX_PMASK_1;
+	if (~*color & 0x20) *priority |= GFX_PMASK_2;
 
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	*color = sprite_colorbase + (*color & 0x0f);
 }
-
-
-/***************************************************************************
-
-    Start the video hardware emulation.
-
-***************************************************************************/
-
-void spy_state::video_start()
-{
-	m_layer_colorbase[0] = 48;
-	m_layer_colorbase[1] = 0;
-	m_layer_colorbase[2] = 16;
-	m_sprite_colorbase = 32;
-}
-
 
 
 /***************************************************************************
@@ -65,7 +53,7 @@ UINT32 spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap,
 	screen.priority().fill(0, cliprect);
 
 	if (!m_video_enable)
-		bitmap.fill(16 * m_layer_colorbase[0], cliprect);
+		bitmap.fill(768, cliprect); // ?
 	else
 	{
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);

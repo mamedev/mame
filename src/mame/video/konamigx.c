@@ -1557,37 +1557,6 @@ UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitma
 	return 0;
 }
 
-
-WRITE32_MEMBER(konamigx_state::konamigx_palette_w)
-{
-	int r,g,b;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	r = (m_generic_paletteram_32[offset] >>16) & 0xff;
-	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-	b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
-
-#ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(konamigx_state::konamigx_palette2_w)
-{
-	int r,g,b;
-
-	COMBINE_DATA(&m_subpaletteram32[offset]);
-
-	r = (m_subpaletteram32[offset] >>16) & 0xff;
-	g = (m_subpaletteram32[offset] >> 8) & 0xff;
-	b = (m_subpaletteram32[offset] >> 0) & 0xff;
-
-	offset += (0x8000/4);
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
-#endif
-
 INLINE void set_color_555(palette_device &palette, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette.set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
@@ -1619,7 +1588,6 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 	set_color_555(m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
 #endif
-
 
 WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
 {

@@ -46,9 +46,9 @@ READ8_MEMBER(tnzs_state::tnzs_port1_r)
 
 	switch (m_input_select & 0x0f)
 	{
-		case 0x0a:  data = ioport("IN2")->read(); break;
-		case 0x0c:  data = ioport("IN0")->read(); break;
-		case 0x0d:  data = ioport("IN1")->read(); break;
+		case 0x0a:  data = m_in2->read(); break;
+		case 0x0c:  data = m_in0->read(); break;
+		case 0x0d:  data = m_in1->read(); break;
 		default:    data = 0xff; break;
 	}
 
@@ -59,7 +59,7 @@ READ8_MEMBER(tnzs_state::tnzs_port1_r)
 
 READ8_MEMBER(tnzs_state::tnzs_port2_r)
 {
-	int data = ioport("IN2")->read();
+	int data = m_in2->read();
 
 //  logerror("I8742:%04x  Read %02x from port 2\n", space.device().safe_pcbase(), data);
 
@@ -82,11 +82,11 @@ WRITE8_MEMBER(tnzs_state::tnzs_port2_w)
 
 READ8_MEMBER(tnzs_state::arknoid2_sh_f000_r)
 {
-	int val;
-
 //  logerror("PC %04x: read input %04x\n", space.device().safe_pc(), 0xf000 + offset);
 
-	val = ioport((offset / 2) ? "AN2" : "AN1")->read_safe(0);
+	ioport_port *port = (offset / 2) ? m_an2 : m_an1;
+	int val = port ? port->read() : 0;
+
 	if (offset & 1)
 		return ((val >> 8) & 0xff);
 	else
@@ -213,7 +213,7 @@ READ8_MEMBER(tnzs_state::mcu_arknoid2_r)
 					}
 					else return m_mcu_credits;
 				}
-				else return ioport("IN0")->read();  /* buttons */
+				else return m_in0->read();  /* buttons */
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -305,16 +305,16 @@ READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
 		switch (m_mcu_command)
 		{
 			case 0x01:
-				return ioport("IN0")->read() ^ 0xff;    /* player 1 joystick + buttons */
+				return m_in0->read() ^ 0xff;    /* player 1 joystick + buttons */
 
 			case 0x02:
-				return ioport("IN1")->read() ^ 0xff;    /* player 2 joystick + buttons */
+				return m_in1->read() ^ 0xff;    /* player 2 joystick + buttons */
 
 			case 0x1a:
-				return (ioport("COIN1")->read() | (ioport("COIN2")->read() << 1));
+				return (m_coin1->read() | (m_coin2->read() << 1));
 
 			case 0x21:
-				return ioport("IN2")->read() & 0x0f;
+				return m_in2->read() & 0x0f;
 
 			case 0x41:
 				return m_mcu_credits;
@@ -342,7 +342,7 @@ READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
 					else return m_mcu_credits;
 				}
 				/* buttons */
-				else return ((ioport("IN0")->read() & 0xf0) | (ioport("IN1")->read() >> 4)) ^ 0xff;
+				else return ((m_in0->read() & 0xf0) | (m_in1->read() >> 4)) ^ 0xff;
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -529,7 +529,7 @@ DRIVER_INIT_MEMBER(tnzs_state,kabukiz)
 	UINT8 *SOUND = memregion("audiocpu")->base();
 	m_mcu_type = MCU_NONE_KABUKIZ;
 
-	membank("audiobank")->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
+	m_audiobank->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
 }
 
 DRIVER_INIT_MEMBER(tnzs_state,insectx)
@@ -598,9 +598,9 @@ INTERRUPT_GEN_MEMBER(tnzs_state::arknoid2_interrupt)
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
 			coin  = 0;
-			coin |= ((ioport("COIN1")->read() & 1) << 0);
-			coin |= ((ioport("COIN2")->read() & 1) << 1);
-			coin |= ((ioport("IN2")->read() & 3) << 2);
+			coin |= ((m_coin1->read() & 1) << 0);
+			coin |= ((m_coin2->read() & 1) << 1);
+			coin |= ((m_in2->read() & 3) << 2);
 			coin ^= 0x0c;
 			mcu_handle_coins(coin);
 			break;
@@ -642,8 +642,8 @@ MACHINE_START_MEMBER(tnzs_state,tnzs_common)
 {
 	UINT8 *SUB = memregion("sub")->base();
 
-	membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
-	membank("subbank")->set_entry(m_bank2);
+	m_subbank->configure_entries(0, 4, &SUB[0x08000], 0x2000);
+	m_subbank->set_entry(m_bank2);
 
 	m_bank2 = 0;
 	m_mainbank->set_bank(2);
@@ -733,5 +733,5 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
 
 	/* bits 0-1 select ROM bank */
 	m_bank2 = data & 0x03;
-	membank("subbank")->set_entry(m_bank2);
+	m_subbank->set_entry(m_bank2);
 }

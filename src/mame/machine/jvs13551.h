@@ -29,6 +29,8 @@ public:
 	sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void static_set_port_tag(device_t &device, int port, const char *tag);
 
+	virtual const rom_entry *device_rom_region() const;
+
 	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_1_w);
 	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_2_w);
 	void inc_coin(int coin);
@@ -54,6 +56,7 @@ protected:
 
 private:
 	const char *port_tag[12];
+	ioport_port *port[12];
 	UINT16 coin_counter[2];
 };
 

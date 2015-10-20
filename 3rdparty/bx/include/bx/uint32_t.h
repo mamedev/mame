@@ -652,8 +652,8 @@ namespace bx
 	inline uint64_t uint64_cntlz_ref(uint64_t _val)
 	{
 		return _val & UINT64_C(0xffffffff00000000)
-			 ? uint32_cntlz(uint32_t(_val>>32) ) + 32
-			 : uint32_cntlz(uint32_t(_val) )
+			 ? uint32_cntlz(uint32_t(_val>>32) )
+			 : uint32_cntlz(uint32_t(_val) ) + 32
 			 ;
 	}
 

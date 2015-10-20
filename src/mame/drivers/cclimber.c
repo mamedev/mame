@@ -375,6 +375,10 @@ static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xba00, 0xba00) AM_READ_PORT("START")  /* maybe a mirror of b800 */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( yamato_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cclimber_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6bff) AM_RAM AM_SHARE("ram")
@@ -1056,7 +1060,7 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(yamato_map)
 	MCFG_CPU_IO_MAP(yamato_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(yamato_decrypted_opcodes_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(yamato_audio_map)
@@ -2415,7 +2419,7 @@ DRIVER_INIT_MEMBER(cclimber_state,yamato)
 		{ 0x20,0xa0,0x28,0xa8 }, { 0x00,0x08,0x20,0x28 }    /* ...1...1...1...1 */
 	};
 
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x6000, convtable);
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
@@ -2473,56 +2477,56 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 }
 
 
-GAME( 1980, cclimber,    0,        cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", GAME_SUPPORTS_SAVE )
-GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1980, ccboot,      cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, cclimbroper, cclimber, cclimber,  cclimber, driver_device,  0,        ROT0,   "bootleg (Operamatic)", "Crazy Climber (Spanish, Operamatic bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, cclimber,    0,        cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccboot,      cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbroper, cclimber, cclimber,  cclimber, driver_device,  0,        ROT0,   "bootleg (Operamatic)", "Crazy Climber (Spanish, Operamatic bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
   - there is a Falcon logo in the text roms which is unused
   - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckong,       0,        cclimber, ckong, driver_device,    0,        ROT270, "Kyoei / Falcon", "Crazy Kong", GAME_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
-GAME( 1981, ckongalc,    ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, monkeyd,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Monkey Donkey", GAME_SUPPORTS_SAVE )
-GAME( 1981, dking,       ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", GAME_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
-GAME( 1981, ckongdks,    ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey Kong (Spanish Crazy Kong bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, ckong,       0,        cclimber, ckong, driver_device,    0,        ROT270, "Kyoei / Falcon", "Crazy Kong", MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
+GAME( 1981, ckongalc,    ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, monkeyd,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Monkey Donkey", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dking,       ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
+GAME( 1981, ckongdks,    ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
  - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckongo,      ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, bigkong,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Big Kong", GAME_SUPPORTS_SAVE )
+GAME( 1981, ckongo,      ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bigkong,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Big Kong", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and the extra attract screen, they also make use of the Falcon logo, some sets hack out the Falcon
    text on the extra screen */
-GAME( 1981, ckongpt2,    0,        cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2a,   ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2j,   ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2jeu, ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2b,   ckongpt2, cclimber, ckongb, cclimber_state,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", GAME_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2,    0,        cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2a,   ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2j,   ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2jeu, ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2b,   ckongpt2, cclimber, ckongb, cclimber_state,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", MACHINE_SUPPORTS_SAVE )
 
 // see bagman.c for parent
-GAME( 1981, bagmanf,     bagman,   cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, bagmanf,     bagman,   cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        cclimber, rpatrol, driver_device,  0,        ROT0,   "Orca", "River Patrol (Orca)", GAME_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "Falcon", "Silver Land", GAME_SUPPORTS_SAVE )
+GAME( 1981, rpatrol,     0,        cclimber, rpatrol, driver_device,  0,        ROT0,   "Orca", "River Patrol (Orca)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "Falcon", "Silver Land", MACHINE_SUPPORTS_SAVE )
 
 // see pacman.c for parent
-GAME( 1985, cannonb,     cannonbp, cannonb,  cannonb, cclimber_state,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb2,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", GAME_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb3,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", GAME_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue
+GAME( 1985, cannonb,     cannonbp, cannonb,  cannonb, cclimber_state,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb2,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb3,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", MACHINE_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue
 
-GAME( 1982, swimmer,     0,        swimmer,  swimmer, driver_device,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, swimmera,    swimmer,  swimmer,  swimmer, driver_device,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, swimmerb,    swimmer,  swimmer,  swimmerb, driver_device, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1982, swimmer,     0,        swimmer,  swimmer, driver_device,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmera,    swimmer,  swimmer,  swimmer, driver_device,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmerb,    swimmer,  swimmer,  swimmerb, driver_device, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, guzzler,     0,        guzzler,  guzzler, driver_device,  0,        ROT90,  "Tehkan", "Guzzler", GAME_SUPPORTS_SAVE )
-GAME( 1983, guzzlers,    guzzler,  guzzler,  guzzler, driver_device,  0,        ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1983, guzzler,     0,        guzzler,  guzzler, driver_device,  0,        ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzlers,    guzzler,  guzzler,  guzzler, driver_device,  0,        ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,   yamato, cclimber_state,   yamato,   ROT90,  "Sega", "Yamato (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1983, yamato2,     yamato,   yamato,   yamato, cclimber_state,   yamato,   ROT90,  "Sega", "Yamato (World?)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,   yamato, cclimber_state,   yamato,   ROT90,  "Sega", "Yamato (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato2,     yamato,   yamato,   yamato, cclimber_state,   yamato,   ROT90,  "Sega", "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, toprollr,    0,        toprollr, toprollr, cclimber_state, toprollr, ROT90,  "Jaleco", "Top Roller", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, toprollr,    0,        toprollr, toprollr, cclimber_state, toprollr, ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -75,4 +75,4 @@ ROM_START(bntyhunt)
 ROM_END
 
 
-GAME( 200?, bntyhunt,  0,   bntyhunt,  bntyhunt, driver_device,  0,  ROT0,  "GCTech Co., LTD",    "Bounty Hunter (GCTech Co., LTD)",   GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, bntyhunt,  0,   bntyhunt,  bntyhunt, driver_device,  0,  ROT0,  "GCTech Co., LTD",    "Bounty Hunter (GCTech Co., LTD)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

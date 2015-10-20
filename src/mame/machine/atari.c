@@ -98,15 +98,15 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
 	{
 	case pokey_device::POK_KEY_BREAK:
 		/* special case ... */
-		ret |= ((m_keyboard[0]->read_safe(0) & 0x08) ? 0x02 : 0x00);
+		ret |= ((m_keyboard[0] && m_keyboard[0]->read() & 0x08) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_CTRL:
 		/* CTRL */
-		ret |= ((m_fake->read_safe(0) & 0x02) ? 0x02 : 0x00);
+		ret |= ((m_fake && m_fake->read() & 0x02) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_SHIFT:
 		/* SHIFT */
-		ret |= ((m_fake->read_safe(0) & 0x01) ? 0x02 : 0x00);
+		ret |= ((m_fake && m_fake->read() & 0x01) ? 0x02 : 0x00);
 		break;
 	}
 
@@ -115,7 +115,7 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
 		return ret;
 
 	/* decode regular key */
-	ipt = m_keyboard[k543210 >> 3]->read_safe(0);
+	ipt = m_keyboard[k543210 >> 3] ? m_keyboard[k543210 >> 3]->read() : 0;
 
 	if (ipt & (1 << (k543210 & 0x07)))
 		ret |= 0x01;
@@ -162,7 +162,7 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 	{
 	case pokey_device::POK_KEY_BREAK:
 		/* special case ... */
-		ret |= ((m_keypad[0]->read_safe(0) & 0x01) ? 0x02 : 0x00);
+		ret |= ((m_keypad[0] && m_keypad[0]->read() & 0x01) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_CTRL:
 		break;
@@ -184,7 +184,7 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 	if (k543210 == 0)
 		return ret;
 
-	ipt = m_keypad[k543210 >> 2]->read_safe(0);
+	ipt = m_keypad[k543210 >> 2] ? m_keypad[k543210 >> 2]->read() : 0;
 
 	if (ipt & (1 << (k543210 & 0x03)))
 		ret |= 0x01;

@@ -615,7 +615,11 @@ public:
 		m_ata(*this, "ata"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_main_ram(*this, "main_ram"),
+		m_sub_ram(*this, "sub_ram"),
+		m_gfx_ram0(*this, "gfx_main_ram_0"),
+		m_gfx_ram1(*this, "gfx_main_ram_1")
 	{
 	}
 
@@ -628,6 +632,10 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_shared_ptr<UINT64> m_main_ram;
+	required_shared_ptr<UINT32> m_sub_ram;
+	required_shared_ptr<UINT64> m_gfx_ram0;
+	required_shared_ptr<UINT64> m_gfx_ram1;
 
 	DECLARE_READ64_MEMBER(main_comram_r);
 	DECLARE_WRITE64_MEMBER(main_comram_w);
@@ -1569,6 +1577,25 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		}
 #endif
 
+		if (m_main_debug_state == 0x6b)
+		{
+			// install HD patches for bujutsu
+			if (strcmp(space.machine().system().name, "bujutsu") == 0)
+			{
+				UINT32 *main_ram = (UINT32*)(UINT64*)m_main_ram;
+				UINT32 *sub_ram = (UINT32*)m_sub_ram;
+				UINT32 *gfx_ram = (UINT32*)(UINT64*)m_gfx_ram0;
+
+				main_ram[(0x0005ac^4) / 4] = 0x60000000;        // skip IRQ fail
+				main_ram[(0x001ec4^4) / 4] = 0x60000000;        // waiting for IRQ?
+				main_ram[(0x001f00^4) / 4] = 0x60000000;        // waiting for IRQ?
+
+				sub_ram[0x568 / 4] = 0x60000000;                // skip IRQ fail
+
+				gfx_ram[(0x38632c^4) / 4] = 0x38600000;     // skip check_one_scene()
+			}
+		}
+
 		m_main_debug_state = 0;
 		m_main_debug_state_wc = 0;
 	}
@@ -1616,7 +1643,7 @@ WRITE32_MEMBER(cobra_state::main_cpu_dc_store)
 }
 
 static ADDRESS_MAP_START( cobra_main_map, AS_PROGRAM, 64, cobra_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_READWRITE(main_mpc106_r, main_mpc106_w)
 	AM_RANGE(0xc0000000, 0xc03fffff) AM_RAM AM_SHARE("gfx_main_ram_0")              // GFX board main ram, bank 0
@@ -1956,7 +1983,7 @@ WRITE8_MEMBER(cobra_state::sub_jvs_w)
 }
 
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM                                           // Main RAM
+	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM AM_SHARE("sub_ram")                       // Main RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)         // Double buffered shared RAM between Main and Sub
 //  AM_RANGE(0x78000000, 0x780000ff) AM_MIRROR(0x80000000) AM_NOP                                           // SCSI controller (unused)
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w, 0xffffffff)
@@ -3500,5 +3527,5 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu, 0, cobra, cobra, cobra_state, bujutsu, ROT0, "Konami", "Fighting Bujutsu", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, racjamdx, ROT0, "Konami", "Racing Jam DX", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, bujutsu, 0, cobra, cobra, cobra_state, bujutsu, ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, racjamdx, ROT0, "Konami", "Racing Jam DX", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

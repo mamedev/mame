@@ -20,8 +20,10 @@
 
 K052109_CB_MEMBER(ajax_state::tile_callback)
 {
+	static const int layer_colorbase[] = { 1024 / 16, 0 / 16, 512 / 16 };
+
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
-	*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
 }
 
 
@@ -33,17 +35,19 @@ K052109_CB_MEMBER(ajax_state::tile_callback)
 
 K051960_CB_MEMBER(ajax_state::sprite_callback)
 {
+	enum { sprite_colorbase = 256 / 16 };
+
 	/* priority bits:
 	   4 over zoom (0 = have priority)
 	   5 over B    (0 = have priority)
 	   6 over A    (1 = have priority)
 	   never over F
 	*/
-	*priority = 0xff00;                         /* F = 8 */
-	if ( *color & 0x10) *priority |= 0xf0f0;    /* Z = 4 */
-	if (~*color & 0x40) *priority |= 0xcccc;    /* A = 2 */
-	if ( *color & 0x20) *priority |= 0xaaaa;    /* B = 1 */
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	*priority = 0;
+	if ( *color & 0x10) *priority |= GFX_PMASK_4; /* Z = 4 */
+	if (~*color & 0x40) *priority |= GFX_PMASK_2; /* A = 2 */
+	if ( *color & 0x20) *priority |= GFX_PMASK_1; /* B = 1 */
+	*color = sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -55,26 +59,11 @@ K051960_CB_MEMBER(ajax_state::sprite_callback)
 
 K051316_CB_MEMBER(ajax_state::zoom_callback)
 {
+	enum { zoom_colorbase = 768 / 128 };
+
 	*code |= ((*color & 0x07) << 8);
-	*color = m_zoom_colorbase + ((*color & 0x08) >> 3);
+	*color = zoom_colorbase + ((*color & 0x08) >> 3);
 }
-
-
-/***************************************************************************
-
-    Start the video hardware emulation.
-
-***************************************************************************/
-
-void ajax_state::video_start()
-{
-	m_layer_colorbase[0] = 64;
-	m_layer_colorbase[1] = 0;
-	m_layer_colorbase[2] = 32;
-	m_sprite_colorbase = 16;
-	m_zoom_colorbase = 6;   /* == 48 since it's 7-bit graphics */
-}
-
 
 
 /***************************************************************************
@@ -103,8 +92,7 @@ UINT32 ajax_state::screen_update_ajax(screen_device &screen, bitmap_ind16 &bitma
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
 		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 4);
 	}
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
-
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

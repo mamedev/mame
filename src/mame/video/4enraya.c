@@ -18,13 +18,6 @@ WRITE8_MEMBER(_4enraya_state::fenraya_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-PALETTE_INIT_MEMBER(_4enraya_state, _4enraya)
-{
-	/* RGB format */
-	for (int i = 0; i < 8; i++)
-		m_palette->set_pen_color(i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
-}
-
 TILE_GET_INFO_MEMBER(_4enraya_state::get_tile_info)
 {
 	int code = m_videoram[tile_index * 2] + (m_videoram[tile_index * 2 + 1] << 8);

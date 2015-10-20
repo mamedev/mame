@@ -285,6 +285,7 @@ protected:
 
 private:
 	devcb_write8 irq_cb;
+	required_ioport m_mamedebug;
 
 	// Core registers
 	UINT32 softreset;

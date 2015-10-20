@@ -2182,23 +2182,23 @@ DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
  *************************************/
 
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,                     MONITOR, COMPANY,                        FULLNAME, FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
-GAME( 1987, legionj,  legion,   legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", GAME_SUPPORTS_SAVE )
-GAME( 1987, legionjb, legion,   legionjb, legion,   armedf_state,   legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", GAME_SUPPORTS_SAVE) /* blitter protection removed */
+GAME( 1987, legion,   0,        legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionj,  legion,   legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionjb, legion,   legionjb, legion,   armedf_state,   legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
 
-GAME( 1987, terraf,   0,        terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafj,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafb,  terraf,   terraf,   terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terraf,   0,        terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafj,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafb,  terraf,   terraf,   terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
+GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
 
-GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", GAME_SUPPORTS_SAVE )
-GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
+GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

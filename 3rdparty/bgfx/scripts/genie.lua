@@ -24,6 +24,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-scintilla",
+	description = "Enable building with Scintilla editor.",
+}
+
+newoption {
 	trigger = "with-shared-lib",
 	description = "Enable building shared library.",
 }
@@ -300,22 +305,19 @@ function exampleProject(_name)
 		}
 
 	configuration { "osx" }
-		files {
-			path.join(BGFX_DIR, "examples/common/**.mm"),
-		}
-		links {
-			"Cocoa.framework",
-			"OpenGL.framework",
+		linkoptions {
+			"-framework Cocoa",
+			"-framework Metal",
+			"-framework QuartzCore",
+			"-framework OpenGL",
 		}
 
-	configuration { "ios*" }
+	configuration { "ios* or tvos*" }
 		kind "ConsoleApp"
-		files {
-			path.join(BGFX_DIR, "examples/common/**.mm"),
-		}
 		linkoptions {
 			"-framework CoreFoundation",
 			"-framework Foundation",
+			"-framework Metal",
 			"-framework OpenGLES",
 			"-framework UIKit",
 			"-framework QuartzCore",
@@ -325,6 +327,12 @@ function exampleProject(_name)
 		kind "WindowedApp"
 		files {
 			path.join(BGFX_DIR, "examples/runtime/iOS-Info.plist"),
+		}
+
+	configuration { "xcode4", "tvos" }
+		kind "WindowedApp"
+		files {
+			path.join(BGFX_DIR, "examples/runtime/tvOS-Info.plist"),
 		}
 
 	configuration { "qnx*" }

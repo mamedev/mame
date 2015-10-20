@@ -205,10 +205,10 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	// the screen parameters are guessed but should be accurate. They
+	// give a theoretical refresh rate of 59.1856Hz while the measured
+	// rate on a snk68.c with very similar hardware board is 59.16Hz.
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -345,7 +345,7 @@ ROM_END
 /******************************************************************************/
 
 
-GAME( 1989, prehisle, 0,        prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, prehisleu,prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, prehislek,prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 1989, gensitou, prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )
+GAME( 1989, prehisle, 0,        prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisleu,prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehislek,prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gensitou, prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Genshi-Tou 1930's", MACHINE_SUPPORTS_SAVE )

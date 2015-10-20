@@ -10,6 +10,7 @@ public:
 	tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_bootleg(device_t &device, int bootleg);
+	static void set_yoffset(device_t &device, int bootleg);
 
 	// gaiden.c / spbactn.c / tecmo16.c sprites
 	void gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap);
@@ -29,7 +30,7 @@ protected:
 
 	UINT8 m_gfxregion;
 	int m_bootleg; // for Gals Pinball / Hot Pinball
-
+	int m_yoffset;
 
 private:
 };
@@ -42,3 +43,6 @@ extern const device_type TECMO_SPRITE;
 
 #define MCFG_TECMO_SPRITE_BOOTLEG(_bootleg) \
 	tecmo_spr_device::set_bootleg(*device, _bootleg);
+
+#define MCFG_TECMO_SPRITE_YOFFSET(_yoffset) \
+	tecmo_spr_device::set_yoffset(*device, _yoffset);

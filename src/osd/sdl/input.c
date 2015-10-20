@@ -1730,13 +1730,6 @@ void sdlinput_poll(running_machine &machine)
 			if (!SDL_PollEvent(&event))
 				break;
 		}
-
-		if (event.type == SDL_KEYUP &&
-			event.key.keysym.sym == SDLK_CAPSLOCK)
-		{
-			/* more caps-lock hack */
-			event.type = SDL_KEYDOWN;
-		}
 		switch(event.type) {
 		case SDL_KEYDOWN:
 #ifdef SDL2_MULTIAPI

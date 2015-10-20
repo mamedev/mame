@@ -355,6 +355,8 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_ds3dac2(*this, "ds3dac2"),
 			m_harddriv_sound(*this, "harddriv_sound"),
 			m_jsa(*this, "jsa"),
+			m_screen(*this, "screen"),
+			m_duartn68681(*this, "duartn68681"),
 			m_hd34010_host_access(0),
 			m_dsk_pio_access(0),
 			m_msp_ram(*this, "msp_ram"),
@@ -384,6 +386,11 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_gsp_control_hi(*this, "gsp_control_hi"),
 			m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
 			m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
+			m_in0(*this, "IN0"),
+			m_sw1(*this, "SW1"),
+			m_a80000(*this, "a80000"),
+			m_8badc(*this, "8BADC"),
+			m_12badc(*this, "12BADC"),
 			m_irq_state(0),
 			m_gsp_irq_state(0),
 			m_msp_irq_state(0),
@@ -499,9 +506,18 @@ class harddriv_new_state : public driver_device
 public:
 	harddriv_new_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_mainpcb(*this, "mainpcb")
+		, m_leftpcb(*this, "leftpcb")
+		, m_rightpcb(*this, "rightpcb")
 	{ }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(hack_timer);
+	DECLARE_WRITE_LINE_MEMBER(tx_a);
+
+	required_device<harddriv_state> m_mainpcb;
+	optional_device<harddriv_state> m_leftpcb;
+	optional_device<harddriv_state> m_rightpcb;
+
 };
 
 
@@ -777,40 +793,40 @@ static INPUT_PORTS_START( harddriv )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )    /* aux coin */
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC0") /* b00000 - 8 bit ADC 0 - gas pedal */
+	PORT_START("mainpcb:8BADC.0") /* b00000 - 8 bit ADC 0 - gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
 
-	PORT_START("mainpcb:8BADC1")        /* b00000 - 8 bit ADC 1 - clutch pedal */
+	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 - clutch pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_NAME("Clutch Pedal")
 
-	PORT_START("mainpcb:8BADC2")        /* b00000 - 8 bit ADC 2 - seat */
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - seat */
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("mainpcb:8BADC3")        /* b00000 - 8 bit ADC 3 - shifter lever Y */
+	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - shifter lever Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(128) PORT_CODE_DEC(KEYCODE_R) PORT_CODE_INC(KEYCODE_F) PORT_NAME("Shifter Lever Y")
 
-	PORT_START("mainpcb:8BADC4")        /* b00000 - 8 bit ADC 4 - shifter lever X*/
+	PORT_START("mainpcb:8BADC.4")        /* b00000 - 8 bit ADC 4 - shifter lever X*/
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(128) PORT_CODE_DEC(KEYCODE_D) PORT_CODE_INC(KEYCODE_G) PORT_NAME("Shifter Lever X")
 
-	PORT_START("mainpcb:8BADC5")        /* b00000 - 8 bit ADC 5 - wheel */
+	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 - wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Wheel")
 
-	PORT_START("mainpcb:8BADC6")        /* b00000 - 8 bit ADC 6 - line volts */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - line volts */
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("mainpcb:8BADC7")        /* b00000 - 8 bit ADC 7 - shift force */
+	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - shift force */
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("mainpcb:12BADC0")       /* b80000 - 12 bit ADC 0 - steering wheel */
+	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
-	PORT_START("mainpcb:12BADC1")       /* b80000 - 12 bit ADC 1 - force brake */
+	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 - force brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
 
-	PORT_START("mainpcb:12BADC2")       /* b80000 - 12 bit ADC 2 */
+	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC3")       /* b80000 - 12 bit ADC 3 */
+	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
@@ -861,40 +877,40 @@ static INPUT_PORTS_START( racedriv )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )    /* aux coin */
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC0")        /* b00000 - 8 bit ADC 0 - gas pedal */
+	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
 
-	PORT_START("mainpcb:8BADC1")        /* b00000 - 8 bit ADC 1 - clutch pedal */
+	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 - clutch pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_NAME("Clutch Pedal")
 
-	PORT_START("mainpcb:8BADC2")        /* b00000 - 8 bit ADC 2 - seat */
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - seat */
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("mainpcb:8BADC3")        /* b00000 - 8 bit ADC 3 - shifter lever Y */
+	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - shifter lever Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(128) PORT_CODE_DEC(KEYCODE_R) PORT_CODE_INC(KEYCODE_F) PORT_NAME("Shifter Lever Y")
 
-	PORT_START("mainpcb:8BADC4")        /* b00000 - 8 bit ADC 4 - shifter lever X*/
+	PORT_START("mainpcb:8BADC.4")        /* b00000 - 8 bit ADC 4 - shifter lever X*/
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(128) PORT_CODE_DEC(KEYCODE_D) PORT_CODE_INC(KEYCODE_G) PORT_NAME("Shifter Lever X")
 
-	PORT_START("mainpcb:8BADC5")        /* b00000 - 8 bit ADC 5 - wheel */
+	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 - wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Wheel")
 
-	PORT_START("mainpcb:8BADC6")        /* b00000 - 8 bit ADC 6 - line volts */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - line volts */
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("mainpcb:8BADC7")        /* b00000 - 8 bit ADC 7 */
+	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC0")       /* b80000 - 12 bit ADC 0 - steering wheel */
+	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
-	PORT_START("mainpcb:12BADC1")       /* b80000 - 12 bit ADC 1 - force brake */
+	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 - force brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
 
-	PORT_START("mainpcb:12BADC2")       /* b80000 - 12 bit ADC 2 */
+	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC3")       /* b80000 - 12 bit ADC 3 */
+	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -991,39 +1007,39 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC0")        /* b00000 - 8 bit ADC 0 - gas pedal */
+	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
 
-	PORT_START("mainpcb:8BADC1")        /* b00000 - 8 bit ADC 1 - clutch pedal */
+	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 - clutch pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_NAME("Clutch Pedal")
 
-	PORT_START("mainpcb:8BADC2")        /* b00000 - 8 bit ADC 2 */
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC3")        /* b00000 - 8 bit ADC 3 */
+	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC4")        /* b00000 - 8 bit ADC 4 */
+	PORT_START("mainpcb:8BADC.4")        /* b00000 - 8 bit ADC 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC5")        /* b00000 - 8 bit ADC 5 */
+	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC6")        /* b00000 - 8 bit ADC 6 - force brake */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - force brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
 
-	PORT_START("mainpcb:8BADC7")        /* b00000 - 8 bit ADC 7 */
+	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC0")       /* 400000 - steering wheel */
+	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
-	PORT_START("mainpcb:12BADC1")
+	PORT_START("mainpcb:12BADC.1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("mainpcb:12BADC2")
+	PORT_START("mainpcb:12BADC.2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("mainpcb:12BADC3")
+	PORT_START("mainpcb:12BADC.3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1073,40 +1089,40 @@ static INPUT_PORTS_START( stunrun )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC0")        /* b00000 - 8 bit ADC 0 */
+	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:8BADC1")        /* b00000 - 8 bit ADC 1 */
+	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC2")        /* b00000 - 8 bit ADC 2 */
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:8BADC3")        /* b00000 - 8 bit ADC 3 */
+	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC4")        /* b00000 - 8 bit ADC 4 */
+	PORT_START("mainpcb:8BADC.4")        /* b00000 - 8 bit ADC 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC5")        /* b00000 - 8 bit ADC 5 */
+	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC6")        /* b00000 - 8 bit ADC 6 */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC7")        /* b00000 - 8 bit ADC 7 */
+	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC0")       /* b80000 - 12 bit ADC 0 */
+	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC1")       /* b80000 - 12 bit ADC 1 */
+	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC2")       /* b80000 - 12 bit ADC 2 */
+	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC3")       /* b80000 - 12 bit ADC 3 */
+	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* stunrun has its own coins */
@@ -1163,40 +1179,40 @@ static INPUT_PORTS_START( steeltal )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Real Helicopter Flight")
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC0")        /* b00000 - 8 bit ADC 0 */
+	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC1")        /* b00000 - 8 bit ADC 1 */
+	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* volume control */
 
-	PORT_START("mainpcb:8BADC2")        /* b00000 - 8 bit ADC 2 */
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC3")        /* b00000 - 8 bit ADC 3 */
+	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC4")        /* b00000 - 8 bit ADC 4 */
+	PORT_START("mainpcb:8BADC.4")        /* b00000 - 8 bit ADC 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC5")        /* b00000 - 8 bit ADC 5 */
+	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC6")        /* b00000 - 8 bit ADC 6 */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC7")        /* b00000 - 8 bit ADC 7 */
+	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC0")       /* b80000 - 12 bit ADC 0 */
+	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)   /* left/right */
 
-	PORT_START("mainpcb:12BADC1")       /* b80000 - 12 bit ADC 1 */
+	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)   /* up/down */
 
-	PORT_START("mainpcb:12BADC2")       /* b80000 - 12 bit ADC 2 */
+	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Collective") PORT_REVERSE /* collective */
 
-	PORT_START("mainpcb:12BADC3")       /* b80000 - 12 bit ADC 3 */
+	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Rudder") PORT_PLAYER(2)   /* rudder */
 
 	/* steeltal has its own coins */
@@ -1260,39 +1276,39 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC0")        /* b00000 - 8 bit ADC 0 - gas pedal */
+	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
 
-	PORT_START("mainpcb:8BADC1")        /* b00000 - 8 bit ADC 1 */
+	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC2")        /* b00000 - 8 bit ADC 2 - voice mic */
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - voice mic */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC3")        /* b00000 - 8 bit ADC 3 - volume */
+	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - volume */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC4")        /* b00000 - 8 bit ADC 4 - elevator */
+	PORT_START("mainpcb:8BADC.4")        /* b00000 - 8 bit ADC 4 - elevator */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_NAME("Elevator") PORT_REVERSE  /* up/down */
 
-	PORT_START("mainpcb:8BADC5")        /* b00000 - 8 bit ADC 5 - canopy */
+	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 - canopy */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC6")        /* b00000 - 8 bit ADC 6 - brake */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_NAME("Brake") PORT_REVERSE
 
-	PORT_START("mainpcb:8BADC7")        /* b00000 - 8 bit ADC 7 - seat adjust */
+	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC0")       /* 400000 - steering wheel */
+	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
-	PORT_START("mainpcb:12BADC1")       /* FAKE */
+	PORT_START("mainpcb:12BADC.1")       /* FAKE */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("mainpcb:12BADC2")       /* FAKE */
+	PORT_START("mainpcb:12BADC.2")       /* FAKE */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("mainpcb:12BADC3")       /* FAKE */
+	PORT_START("mainpcb:12BADC.3")       /* FAKE */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1350,39 +1366,39 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC0")        /* b00000 - 8 bit ADC 0 - gas pedal */
+	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
 
-	PORT_START("mainpcb:8BADC1")        /* b00000 - 8 bit ADC 1 */
+	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC2")        /* b00000 - 8 bit ADC 2 - voice mic */
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - voice mic */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC3")        /* b00000 - 8 bit ADC 3 - volume */
+	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - volume */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC4")        /* b00000 - 8 bit ADC 4 - elevator */
+	PORT_START("mainpcb:8BADC.4")        /* b00000 - 8 bit ADC 4 - elevator */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_NAME("Elevator") /* up/down */
 
-	PORT_START("mainpcb:8BADC5")        /* b00000 - 8 bit ADC 5 - canopy */
+	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 - canopy */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC6")        /* b00000 - 8 bit ADC 6 - brake */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Brake")
 
-	PORT_START("mainpcb:8BADC7")        /* b00000 - 8 bit ADC 7 - seat adjust */
+	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC0")       /* 400000 - steering wheel */
+	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
-	PORT_START("mainpcb:12BADC1")
+	PORT_START("mainpcb:12BADC.1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("mainpcb:12BADC2")
+	PORT_START("mainpcb:12BADC.2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("mainpcb:12BADC3")
+	PORT_START("mainpcb:12BADC.3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1986,13 +2002,11 @@ static MACHINE_CONFIG_START( steeltalp_machine, harddriv_new_state )
 	MCFG_DEVICE_ADD("mainpcb", STEELTALP_BOARD_DEVICE, 0)
 MACHINE_CONFIG_END
 
-WRITE_LINE_MEMBER(racedriv_board_device_state::tx_a)
+WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
 {
 	// passive connection, one way, to both screens
-	mc68681_device* left = machine().device<mc68681_device>(":leftpcb:duartn68681");
-	mc68681_device* right = machine().device<mc68681_device>(":rightpcb:duartn68681");
-	left->rx_a_w(state);
-	right->rx_a_w(state);
+	m_leftpcb->m_duartn68681->rx_a_w(state);
+	m_rightpcb->m_duartn68681->rx_a_w(state);
 }
 
 static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
@@ -2002,7 +2016,7 @@ static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(racedriv_board_device_state,tx_a ))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, harddriv_new_state,tx_a))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
@@ -2012,13 +2026,9 @@ MACHINE_CONFIG_END
 // by forcing them to stay in sync using this ugly method everything works much better.
 TIMER_DEVICE_CALLBACK_MEMBER(harddriv_new_state::hack_timer)
 {
-	screen_device* middle = machine().device<screen_device>(":mainpcb:screen");
-	screen_device* left = machine().device<screen_device>(":leftpcb:screen");
-	screen_device* right = machine().device<screen_device>(":rightpcb:screen");
-
-	left->reset_origin(0, 0);
-	middle->reset_origin(0, 0);
-	right->reset_origin(0, 0);
+	m_leftpcb->m_screen->reset_origin(0, 0);
+	m_mainpcb->m_screen->reset_origin(0, 0);
+	m_rightpcb->m_screen->reset_origin(0, 0);
 }
 
 /*************************************
@@ -5203,9 +5213,9 @@ GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, dri
 GAME( 1991, steeltal,  0,        steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
 GAME( 1991, steeltalg, steeltal, steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
 GAME( 1991, steeltal1, steeltal, steeltal1_machine, steeltal, driver_device, 0,ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
-GAME( 1991, steeltalp, steeltal, steeltalp_machine, steeltal, driver_device, 0,ROT0, "Atari Games", "Steel Talons (prototype)", GAME_NOT_WORKING )
+GAME( 1991, steeltalp, steeltal, steeltalp_machine, steeltal, driver_device, 0,ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
 
 GAME( 1993, strtdriv, 0,        strtdriv_machine, strtdriv, driver_device, 0, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
 
-GAME( 1993, hdrivair,  0,        hdrivair_machine, hdrivair, driver_device, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", GAME_IMPERFECT_SOUND )
-GAME( 1993, hdrivairp, hdrivair, hdrivairp_machine, hdrivair, driver_device, 0,ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1993, hdrivair,  0,        hdrivair_machine, hdrivair, driver_device, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, hdrivairp, hdrivair, hdrivairp_machine, hdrivair, driver_device, 0,ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

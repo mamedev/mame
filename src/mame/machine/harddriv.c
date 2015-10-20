@@ -200,7 +200,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
 
 READ16_MEMBER( harddriv_state::hd68k_a80000_r )
 {
-	return ioport("a80000")->read_safe(0xffff);
+	return m_a80000->read();
 }
 
 READ16_MEMBER( harddriv_state::hd68k_port0_r )
@@ -222,7 +222,7 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 	*/
 	screen_device &scr = m_gsp->screen();
 
-	int temp = (ioport("SW1")->read_safe(0xff) << 8) | ioport("IN0")->read_safe(0xff);
+	int temp = ((m_sw1 ? m_sw1->read() : 0xff) << 8) | m_in0->read();
 	if (get_hblank(scr)) temp ^= 0x0002;
 	temp ^= 0x0018;     /* both EOCs always high for now */
 	return temp;
@@ -231,7 +231,7 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 
 READ16_MEMBER( harddriv_state::hdc68k_port1_r )
 {
-	UINT16 result = ioport("a80000")->read_safe(0xffff);
+	UINT16 result = m_a80000->read();
 	UINT16 diff = result ^ m_hdc68k_last_port1;
 
 	/* if a new shifter position is selected, use it */
@@ -259,7 +259,7 @@ READ16_MEMBER( harddriv_state::hdc68k_port1_r )
 
 READ16_MEMBER( harddriv_state::hda68k_port1_r )
 {
-	UINT16 result = ioport("a80000")->read_safe(0xffff);
+	UINT16 result = m_a80000->read();
 
 	/* merge in the wheel edge latch bit */
 	if (m_hdc68k_wheel_edge)
@@ -272,7 +272,7 @@ READ16_MEMBER( harddriv_state::hda68k_port1_r )
 READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
 {
 	/* grab the new wheel value and upconvert to 12 bits */
-	UINT16 new_wheel = ioport("12BADC0")->read_safe(0xffff) << 4;
+	UINT16 new_wheel = (m_12badc[0] ? m_12badc[0]->read() : 0xffff) << 4;
 
 	/* hack to display the wheel position */
 	if (space.machine().input().code_pressed(KEYCODE_LSHIFT))
@@ -317,23 +317,20 @@ READ16_MEMBER( harddriv_state::hd68k_sound_reset_r )
 
 WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 {
-	static const char *const adc8names[] = { "8BADC0", "8BADC1", "8BADC2", "8BADC3", "8BADC4", "8BADC5", "8BADC6", "8BADC7" };
-	static const char *const adc12names[] = { "12BADC0", "12BADC1", "12BADC2", "12BADC3" };
-
 	COMBINE_DATA(&m_adc_control);
 
 	/* handle a write to the 8-bit ADC address select */
 	if (m_adc_control & 0x08)
 	{
 		m_adc8_select = m_adc_control & 0x07;
-		m_adc8_data = ioport(adc8names[m_adc8_select])->read_safe(0xffff);
+		m_adc8_data = m_8badc[m_adc8_select] ? m_8badc[m_adc8_select]->read() : 0xffff;
 	}
 
 	/* handle a write to the 12-bit ADC address select */
 	if (m_adc_control & 0x40)
 	{
 		m_adc12_select = (m_adc_control >> 4) & 0x03;
-		m_adc12_data = ioport(adc12names[m_adc12_select])->read_safe(0xffff) << 4;
+		m_adc12_data = (m_12badc[m_adc12_select] ? m_12badc[m_adc12_select]->read() : 0xffff) << 4;
 	}
 
 	/* bit 7 selects which byte of the 12 bit data to read */

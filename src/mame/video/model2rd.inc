@@ -56,12 +56,11 @@
 
 #ifndef MODEL2_TEXTURED
 /* non-textured render path */
-static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
 #if !defined( MODEL2_TRANSLUCENT)
-	const m2_poly_extra_data *extra = (const m2_poly_extra_data *)extradata;
-	model2_state *state = extra->state;
-	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	model2_state *state = object.state;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)&m_destmap;
 	UINT32 *p = &destmap->pix32(scanline);
 
 	/* extract color information */
@@ -69,8 +68,8 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	const UINT16 *colortable_g = (const UINT16 *)&state->m_colorxlat[0x4000/4];
 	const UINT16 *colortable_b = (const UINT16 *)&state->m_colorxlat[0x8000/4];
 	const UINT16 *lumaram = (const UINT16 *)state->m_lumaram.target();
-	UINT32  lumabase = extra->lumabase;
-	UINT32  color = extra->colorbase;
+	UINT32  lumabase = object.lumabase;
+	UINT32  color = object.colorbase;
 	UINT8   luma;
 	UINT32  tr, tg, tb;
 	int     x;
@@ -98,7 +97,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	/* build the final color */
 	color = rgb_t(tr, tg, tb);
 
-	for(x = extent->startx; x < extent->stopx; x++)
+	for(x = extent.startx; x < extent.stopx; x++)
 #if defined(MODEL2_CHECKER)
 		if ((x^scanline) & 1) p[x] = color;
 #else
@@ -109,35 +108,34 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 
 #else
 /* textured render path */
-static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
-	const m2_poly_extra_data *extra = (const m2_poly_extra_data *)extradata;
-	model2_state *state = extra->state;
-	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	model2_state *state = object.state;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)&m_destmap;
 	UINT32 *p = &destmap->pix32(scanline);
 
-	UINT32  tex_width = extra->texwidth;
-	UINT32  tex_height = extra->texheight;
+	UINT32  tex_width = object.texwidth;
+	UINT32  tex_height = object.texheight;
 
 	/* extract color information */
 	const UINT16 *colortable_r = (const UINT16 *)&state->m_colorxlat[0x0000/4];
 	const UINT16 *colortable_g = (const UINT16 *)&state->m_colorxlat[0x4000/4];
 	const UINT16 *colortable_b = (const UINT16 *)&state->m_colorxlat[0x8000/4];
 	const UINT16 *lumaram = (const UINT16 *)state->m_lumaram.target();
-	UINT32  colorbase = extra->colorbase;
-	UINT32  lumabase = extra->lumabase;
-	UINT32  tex_x = extra->texx;
-	UINT32  tex_y = extra->texy;
+	UINT32  colorbase = object.colorbase;
+	UINT32  lumabase = object.lumabase;
+	UINT32  tex_x = object.texx;
+	UINT32  tex_y = object.texy;
 	UINT32  tex_x_mask, tex_y_mask;
-	UINT32  tex_mirr_x = extra->texmirrorx;
-	UINT32  tex_mirr_y = extra->texmirrory;
-	UINT32 *sheet = extra->texsheet;
-	float ooz = extent->param[0].start;
-	float uoz = extent->param[1].start;
-	float voz = extent->param[2].start;
-	float dooz = extent->param[0].dpdx;
-	float duoz = extent->param[1].dpdx;
-	float dvoz = extent->param[2].dpdx;
+	UINT32  tex_mirr_x = object.texmirrorx;
+	UINT32  tex_mirr_y = object.texmirrory;
+	UINT32 *sheet = object.texsheet;
+	float ooz = extent.param[0].start;
+	float uoz = extent.param[1].start;
+	float voz = extent.param[2].start;
+	float dooz = extent.param[0].dpdx;
+	float duoz = extent.param[1].dpdx;
+	float dvoz = extent.param[2].dpdx;
 	int     x;
 
 	tex_x_mask  = tex_width - 1;
@@ -149,7 +147,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	colortable_g += ((colorbase >>  5) & 0x1f) << 8;
 	colortable_b += ((colorbase >> 10) & 0x1f) << 8;
 
-	for(x = extent->startx; x < extent->stopx; x++, uoz += duoz, voz += dvoz, ooz += dooz)
+	for(x = extent.startx; x < extent.stopx; x++, uoz += duoz, voz += dvoz, ooz += dooz)
 	{
 		float z = recip_approx(ooz) * 256.0f;
 		INT32 u = uoz * z;

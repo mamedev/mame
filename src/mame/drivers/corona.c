@@ -1677,11 +1677,11 @@ ROM_END
 ******************************************/
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                   LAYOUT      */
-GAME(  1981, winner81,  winner82, winner81, winner81, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           GAME_IMPERFECT_SOUND )
+GAME(  1981, winner81,  winner82, winner81, winner81, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
 GAME(  1981, winner81b, winner82, winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
 GAME(  1982, winner82,  0,        winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
 GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                      layout_re800 )
 GAMEL( 1991, re800v1,   0,        re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                      layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS,  layout_re800 )
 GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                      layout_re800 )
 GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, driver_device, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                      layout_luckyrlt )

@@ -1015,7 +1015,7 @@ DRIVER_INIT_MEMBER(m63_state,fghtbskt)
 	m_sy_offset = 240;
 }
 
-GAME( 1984, wilytowr, 0,        m63,      wilytowr, m63_state, wilytowr, ROT180, "Irem",                    "Wily Tower", GAME_SUPPORTS_SAVE )
-GAME( 1985, atomboy,  wilytowr, atomboy,  wilytowr, m63_state, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", GAME_SUPPORTS_SAVE )
-GAME( 1985, atomboya, wilytowr, atomboy,  wilytowr, m63_state, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision A)", GAME_SUPPORTS_SAVE )
-GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, m63_state, fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", GAME_SUPPORTS_SAVE )
+GAME( 1984, wilytowr, 0,        m63,      wilytowr, m63_state, wilytowr, ROT180, "Irem",                    "Wily Tower", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, atomboy,  wilytowr, atomboy,  wilytowr, m63_state, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, atomboya, wilytowr, atomboy,  wilytowr, m63_state, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, m63_state, fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", MACHINE_SUPPORTS_SAVE )

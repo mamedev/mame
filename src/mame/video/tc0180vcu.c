@@ -3,7 +3,6 @@
 /* Taito TC0180VCU */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "tc0180vcu.h"
 
 #define TC0180VCU_RAM_SIZE          0x10000

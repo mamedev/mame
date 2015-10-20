@@ -200,6 +200,7 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(ultraman_state, sprite_callback)
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
@@ -269,4 +270,4 @@ ROM_START( ultraman )
 ROM_END
 
 
-GAME( 1991, ultraman, 0, ultraman, ultraman, driver_device, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, ultraman, 0, ultraman, ultraman, driver_device, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )

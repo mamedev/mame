@@ -1366,38 +1366,38 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 /* rom numbering, with guesses:
-	A75 01   = Z80 code 1/2 v1.0 Japan
-	A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar
-	A75 02   = Z80 code 2/2 v1.0 Japan
-	A75 03   = GFX 1/3
-	A75 04   = GFX 2/3
-	A75 05   = GFX 3/3
-	A75 06   = MC68705P5 MCU code, v1.0 Japan and v1.0 USA/Romstar
-	A75 07   = PROM red
-	A75 08   = PROM green
-	A75 09   = PROM blue
-	A75 10   = Z80 code 2/2 v1.1 USA/Romstar
-	A75 11   = Z80 code 2/2 v1.2 Japan (paired with 01-1 v1.1 Japan)
-	(A75 12 through 17 are unknown, could be another two sets of z80 code plus mc68705p5)
-	A75 18   = Z80 code v2.0 2/2 USA/Romstar
-	A75 19   = Z80 code v2.0 1/2 USA/Romstar
-	A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar
-	A75 21   = Z80 code v2.0 1/2 Japan
-	A75 22   = Z80 code v2.0 2/2 Japan
-	A75 23   = MC68705P5 MCU code, v2.0 Japan
-	A75 24   = Z80 code v2.1 1/2 Japan
-	A75 25   = Z80 code v2.1 2/2 Japan
-	A75 26   = MC68705P5 MCU code, v2.1 Japan
-	A75 27   = Z80 code 1/2 Tournament
-	A75 28   = Z80 code 2/2 Tournament
-	A75 29   = GFX 1/3 Tournament
-	A75 30   = GFX 2/3 Tournament
-	A75 31   = GFX 3/3 Tournament
-	A75 32   = MC68705P5 MCU code, Tournament
-	A75 33   = PROM red Tournament
-	A75 34   = PROM green Tournament
-	A75 35   = PROM blue Tournament
-	(one of the 21/22/23 or 24/25/26 sets is likely 'world'? or are these really two japan sets?)
+    A75 01   = Z80 code 1/2 v1.0 Japan
+    A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar
+    A75 02   = Z80 code 2/2 v1.0 Japan
+    A75 03   = GFX 1/3
+    A75 04   = GFX 2/3
+    A75 05   = GFX 3/3
+    A75 06   = MC68705P5 MCU code, v1.0 Japan and v1.0 USA/Romstar
+    A75 07   = PROM red
+    A75 08   = PROM green
+    A75 09   = PROM blue
+    A75 10   = Z80 code 2/2 v1.1 USA/Romstar
+    A75 11   = Z80 code 2/2 v1.2 Japan (paired with 01-1 v1.1 Japan)
+    (A75 12 through 17 are unknown, could be another two sets of z80 code plus mc68705p5)
+    A75 18   = Z80 code v2.0 2/2 USA/Romstar
+    A75 19   = Z80 code v2.0 1/2 USA/Romstar
+    A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar
+    A75 21   = Z80 code v2.0 1/2 Japan
+    A75 22   = Z80 code v2.0 2/2 Japan
+    A75 23   = MC68705P5 MCU code, v2.0 Japan
+    A75 24   = Z80 code v2.1 1/2 Japan
+    A75 25   = Z80 code v2.1 2/2 Japan
+    A75 26   = MC68705P5 MCU code, v2.1 Japan
+    A75 27   = Z80 code 1/2 Tournament
+    A75 28   = Z80 code 2/2 Tournament
+    A75 29   = GFX 1/3 Tournament
+    A75 30   = GFX 2/3 Tournament
+    A75 31   = GFX 3/3 Tournament
+    A75 32   = MC68705P5 MCU code, Tournament
+    A75 33   = PROM red Tournament
+    A75 34   = PROM green Tournament
+    A75 35   = PROM blue Tournament
+    (one of the 21/22/23 or 24/25/26 sets is likely 'world'? or are these really two japan sets?)
 */
 
 ROM_START( arkanoid )
@@ -2049,33 +2049,33 @@ DRIVER_INIT_MEMBER(arkanoid_state,brixian)
 /* Game Drivers */
 
 // original sets of Arkanoid
-GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World, oldest rev)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, oldest rev)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidj,  arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidja, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, older rev)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjb, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, oldest rev)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World, oldest rev)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, oldest rev)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidj,  arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidja, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, older rev)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjb, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, oldest rev)", MACHINE_SUPPORTS_SAVE )
 // bootlegs of Arkanoid
-GAME( 1986, arkanoidjbl, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjbl2,arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg (Beta)", "Arkanoid (bootleg with MCU, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, driver_device, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc, arkanoid_state,  arkangc,  ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkanoid_state, arkangc2, ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkblock,   arkanoid, bootleg,  arkangc, arkanoid_state,  arkblock, ROT90, "bootleg (Game Corporation)", "Block (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkbloc2,   arkanoid, bootleg,  arkangc, arkanoid_state,  arkbloc2, ROT90, "bootleg (Game Corporation)", "Block (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkbloc3,   arkanoid, bootleg,  block2, arkanoid_state,   block2,   ROT90, "bootleg (Game Corporation)", "Block (Game Corporation bootleg, set 3)", GAME_SUPPORTS_SAVE )    // Both these sets have an extra unknown rom
-GAME( 1986, block2,     arkanoid, bootleg,  block2, arkanoid_state,   block2,   ROT90, "bootleg (S.P.A. Co.)", "Block 2 (S.P.A. Co. bootleg)", GAME_SUPPORTS_SAVE ) //  and scrambled gfx roms with 'space invader' themed gfx
-GAME( 1986, arkgcbl,    arkanoid, bootleg,  arkgcbl, arkanoid_state,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkgcbla,   arkanoid, bootleg,  arkgcbl, arkanoid_state,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, paddle2,    arkanoid, bootleg,  paddle2, arkanoid_state,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkatayt,   arkanoid, bootleg,  arkatayt, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjbl, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjbl2,arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg (Beta)", "Arkanoid (bootleg with MCU, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, driver_device, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc, arkanoid_state,  arkangc,  ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkanoid_state, arkangc2, ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkblock,   arkanoid, bootleg,  arkangc, arkanoid_state,  arkblock, ROT90, "bootleg (Game Corporation)", "Block (Game Corporation bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkbloc2,   arkanoid, bootleg,  arkangc, arkanoid_state,  arkbloc2, ROT90, "bootleg (Game Corporation)", "Block (Game Corporation bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkbloc3,   arkanoid, bootleg,  block2, arkanoid_state,   block2,   ROT90, "bootleg (Game Corporation)", "Block (Game Corporation bootleg, set 3)", MACHINE_SUPPORTS_SAVE )    // Both these sets have an extra unknown rom
+GAME( 1986, block2,     arkanoid, bootleg,  block2, arkanoid_state,   block2,   ROT90, "bootleg (S.P.A. Co.)", "Block 2 (S.P.A. Co. bootleg)", MACHINE_SUPPORTS_SAVE ) //  and scrambled gfx roms with 'space invader' themed gfx
+GAME( 1986, arkgcbl,    arkanoid, bootleg,  arkgcbl, arkanoid_state,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkgcbla,   arkanoid, bootleg,  arkgcbl, arkanoid_state,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, paddle2,    arkanoid, bootleg,  paddle2, arkanoid_state,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkatayt,   arkanoid, bootleg,  arkatayt, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 // Other games
-GAME( 1987, arkatour,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, arkatour,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, arkanoid_state, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )
+GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, arkanoid_state, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, hexa,       0,        hexa,     hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 199?, hexaa,      hexa,     hexaa,    hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa (with 2xZ80, protected)", GAME_NOT_WORKING )
+GAME( 199?, hexa,       0,        hexa,     hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, hexaa,      hexa,     hexaa,    hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa (with 2xZ80, protected)", MACHINE_NOT_WORKING )
 
-GAME( 1993, brixian,    0,        brixian,  brixian, arkanoid_state,  brixian,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE )
+GAME( 1993, brixian,    0,        brixian,  brixian, arkanoid_state,  brixian,        ROT0,  "Cheil Computer System", "Brixian", MACHINE_SUPPORTS_SAVE )

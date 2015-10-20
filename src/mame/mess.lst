@@ -40,6 +40,7 @@ dendy     // Dendy (Classic russian famiclone)
 gchinatv  // Golden China TV Game Centre (Chinese famiclone)
 gameboy   // Nintendo Game Boy Handheld
 supergb   // Nintendo Super Game Boy SNES Cartridge
+supergb2
 gbpocket  // Nintendo Game Boy Pocket Handheld
 gbcolor   // Nintendo Game Boy Color Handheld
 gba       // Nintendo Game Boy Advance Handheld
@@ -99,6 +100,7 @@ multmega  // 1994 Sega Multi-Mega (Europe)
 32xe
 32xj
 32x_scd   // 1994 Sega Sega CD (USA w/32X addon)
+segapm    // 1996 Sega Picture Magic (32x type hardware)
 
 saturnjp  // 1994 Sega Saturn (Japan)
 saturn  // 1995 Sega Saturn (USA)
@@ -327,7 +329,6 @@ mu100r  // 1997 MU-100 Rackable version
 fb01    // 1986 FB-01
 
 // Roland
-tb303
 mt32
 cm32l
 d110
@@ -342,12 +343,17 @@ atomeb    // 1979 Acorn Atom
 atombb    // 1979 Acorn Atom
 //prophet2
 bbca      // 1981 BBC Micro Model A
-bbcb      // 1981 BBC Micro Model B
+bbcb      // 1981 BBC Micro Model B w/8271 FDC
 bbcb_de   // 1981 BBC Micro Model B (German)
-bbcb_us   // 1981 BBC Micro Model B (US)
+bbcb_us   // 1983 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
+bbcb1770  // 1985 BBC Micro Model B w/1770 FDC
 bbcbp     // 1985 BBC Micro Model B+ 64K
 bbcbp128  // 1985 BBC Micro Model B+ 128K
+abc110    // 1985 ABC 110
+abc210    // 1985 ABC 210/Cambridge Workstation
+abc310    // 1985 ABC 310
+reutapm   // 1985 Reuters APM Board
 bbcm      // 1986 BBC Master 128
 bbcmt     // 1986 BBC Master Turbo
 bbcmaiv   // 1986 BBC Master AIV
@@ -355,7 +361,8 @@ bbcmet    // 1986 BBC Master ET
 bbcm512   // 1986 BBC Master 512
 bbcmarm   // 1986 ARM Evaluation System
 bbcmc     // 1986 BBC Master Compact
-bbcmc_ar  // 1986 BBC Master Comapact (Arabic)
+bbcmc_ar  // 1986 BBC Master Compact (Arabic)
+pro128s   // 1987 Olivetti Prodest PC 128S
 bbcbc     // 1985 BBC Bridge Companion
 a310      // 1988 Acorn Archimedes 310
 a3010     // 1988 Acorn Archimedes 3010
@@ -433,6 +440,7 @@ prav82  // Pravetz 82
 prav8m  // Pravetz 8M
 uniap2en // 1982 Unitron AP II (in English)
 uniap2pt // 1982 Unitron AP II (in Brazilian Portuguese)
+uniap2ti // 1982 Unitron AP II+ (Teclado Inteligente)
 apple2jp  // ??? ???? Apple ][j+
 apple2e   // Jan 1983 Apple //e
 apple2euk // Jan 1983 Apple //e (UK)
@@ -610,6 +618,7 @@ cbm4032b
 pet8032
 cbm8032
 cbm8032_de
+cbm8032_fr
 cbm8032_se
 superpet
 mmf9000
@@ -720,6 +729,9 @@ a4000tn
 c65    // 1991 C65 / C64DX (Prototype, NTSC)
 c64dx    // 1991 C65 / C64DX (Prototype, German PAL)
 
+mps1000 // 1986 Commodore MPS-1000 (dot matrix printer)
+mps1230 // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
+
 // Epson
 px4    // 1985 Epson PX-4
 px4p      // 1985 Epson PX-4+
@@ -750,6 +762,7 @@ ssam88s
 
 // Non-PC msdos
 pcd     // Siemens PC-D
+pcx     // Siemens PC-X
 slicer  // 1983 Slicer Computers
 olypeopl // Olympia People PC
 
@@ -1043,16 +1056,6 @@ avigo_es     // 1997 Avigo (Spanish)
 avigo_it     // 1997 Avigo (Italian)
 
 // Texas Instruments Calculators
-tisr16    // 1974 SR-16
-tisr16ii
-ti1270
-ti1000
-ti30      // 1976 TI-30
-tiprog
-tibusan1
-wizatron
-lilprof
-lilprof78
 ti73      // 1990 TI-73
 ti74      // 1985 TI-74
 ti95      // 1986 TI-95
@@ -1302,6 +1305,8 @@ gjrstar  // Genius Junior Redstar(Germany)
 gjrstar2 // Genius Junior Redstar 2 (Germany)
 gj5000   // Genius Junior 5000 (Germany)
 gl6600cx // Genius Leader 6600CX (Germany)
+gkidabc  // Genius KID ABC Fan (Germany)
+cars2lap // CARS 2 Laptop (Germany)
 glpn     // Genius Leader Power Notebook (Germany)
 lexipcm  // LexiPC Mega 2000 (Germany)
 pitagjr  // Pitagorin Junior
@@ -1349,6 +1354,7 @@ canonv20e
 canonv20f
 canonv20g
 canonv20s
+canons80
 mx10
 mx101
 mx15
@@ -1591,7 +1597,7 @@ fsa1gt
 fsa1st
 
 // Microsoft
-xbox	
+xbox
 
 // NASCOM Microcomputers
 nascom1   // 1978 Nascom 1
@@ -1606,6 +1612,7 @@ mekd2    // 1977 Motorola Evaluation Kit
 
 // DEC
 pdp1      // 1961 DEC PDP1
+la120 // 1978 Digital Equipment Corporation
 vt100 // 1978 Digital Equipment Corporation
 //vt100wp // 1978 Digital Equipment Corporation
 //vt100stp // 1978 Digital Equipment Corporation
@@ -1833,6 +1840,9 @@ lik
 erik
 specimx
 pioner
+
+// Steve Ciarcia (this is the name of the designer, not a company) / BYTE / McGRAW-HILL
+zapcomp    // (1981) ZAP computer - Z80 Applications Processor
 
 // Orion
 orion128
@@ -2164,9 +2174,14 @@ bmboxing    // Bambino
 bfriskyt    // Bandai
 packmon     // Bandai
 msthawk     // Bandai/Mattel
+bzaxxon     // Bandai
 zackman     // Bandai
+bpengo      // Bandai
+bbtime      // Bandai
 bdoramon    // Bandai
+bultrman    // Bandai
 machiman    // Bandai
+pairmtch    // Bandai
 alnattck    // Coleco
 cdkong      // Coleco
 cgalaxn     // Coleco
@@ -2189,6 +2204,7 @@ vinvader    // VTech
 
 // hh_melps4
 cfrogger    // Coleco
+gjungler    // Gakken
 
 // hh_pic16
 maniac      // Ideal
@@ -2235,18 +2251,38 @@ tbreakup    // Tomy
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
-// TI snspell
+// hh_tms1k tispeak.c
 snspell
+snspellp
 snspella
 snspellb
 snspelluk
 snspelluka
 snspelljp
-ladictee
+snspellfr
+snspellit
 snmath
 snmathp
 snread
 lantutor
+tntell
+tntelluk
+tntellfr
+tntellp
+vocaid
+
+// hh_tms1k ticalc1x.c
+tisr16
+tisr16ii
+ti1270
+ti1000
+ti30
+tiprog
+tibusan1
+wizatron
+lilprof
+lilprof78
+dataman
 
 // hh_ucom4
 ufombs      // Bambino
@@ -2255,6 +2291,7 @@ bmsoccer    // Bambino
 bmsafari    // Bambino
 splasfgt    // Bambino
 bcclimbr    // Bandai
+tactix      // Castle Toy
 invspace    // Epoch
 efball      // Epoch
 galaxy2     // Epoch
@@ -2266,6 +2303,9 @@ tmtennis    // Tomy
 tmscramb    // Tomy
 tcaveman    // Tomy
 alnchase    // Tomy
+
+// hh_ucom4 derivatives
+tb303       // Roland
 
 // other
 tama        // Bandai
@@ -2286,11 +2326,11 @@ craft // Craft, by [lft]
 
 a5105
 attache
-attachef
 bcs3
 bcs3a
 bcs3b
 bcs3c
+bcs3d
 bob85
 c80
 ds348 //Sigtron Daruma
@@ -2585,6 +2625,9 @@ prose2ko
 eacc
 argo
 applix
+mzr8105
+hk68v10
+fccpu1
 68ksbc
 lcmate2
 cm1800
@@ -2630,7 +2673,9 @@ itt3030
 vax785
 ms0515
 ie15
+dvk_kcgd
 dvk_ksm
+dvk_ksm01
 asmapro
 asma2k
 altos5
@@ -2681,6 +2726,7 @@ mcb216
 cb308
 myvision
 mkit09
+mkit09a
 cpu09
 ivg09
 pulsarlb
@@ -2705,3 +2751,11 @@ excali64
 bitgrpha
 bitgrphb
 tvgame
+aussieby
+hp_ipc
+lggp40
+mt735
+squale
+micral
+rd100
+proteus3

@@ -4,11 +4,10 @@
 #include "sound/msm5205.h"
 #include "machine/netlist.h"
 
-class irem_audio_device : public device_t,
-									public device_sound_interface
+class irem_audio_device : public device_t
 {
 public:
-	irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~irem_audio_device() {}
 
 	DECLARE_WRITE8_MEMBER( cmd_w );
@@ -31,9 +30,6 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
 private:
 	// internal state
 	UINT8           m_port1;
@@ -53,8 +49,31 @@ private:
 	netlist_mame_logic_input_t * m_audio_CH;
 };
 
-MACHINE_CONFIG_EXTERN( m52_sound_c_audio );
-MACHINE_CONFIG_EXTERN( m52_large_audio );
-MACHINE_CONFIG_EXTERN( m62_audio );
+class m62_audio_device : public irem_audio_device
+{
+public:
+	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
 
-extern const device_type IREM_AUDIO;
+class m52_soundc_audio_device : public irem_audio_device
+{
+public:
+	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+class m52_large_audio_device : public irem_audio_device
+{
+public:
+	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+//MACHINE_CONFIG_EXTERN( m52_sound_c_audio );
+//MACHINE_CONFIG_EXTERN( m52_large_audio );
+//MACHINE_CONFIG_EXTERN( m62_audio );
+
+extern const device_type IREM_M62_AUDIO;
+extern const device_type IREM_M52_SOUNDC_AUDIO;
+extern const device_type IREM_M52_LARGE_AUDIO;

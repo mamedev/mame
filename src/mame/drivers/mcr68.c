@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x071000, 0x071fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x090000, 0x09007f) AM_WRITE(mcr68_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x090000, 0x09007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x0b0000, 0x0bffff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0d0000, 0x0dffff) AM_READ_PORT("IN0")
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(zwackery_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(zwackery_spriteram_w) AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( pigskin_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(pigskin_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ(pigskin_port_2_r)
-	AM_RANGE(0x0c0000, 0x0c007f) AM_WRITE(mcr68_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0c0000, 0x0c007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0effff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( trisport_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(trisport_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ_PORT("DSW")
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x120000, 0x12007f) AM_WRITE(mcr68_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x120000, 0x12007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
@@ -1054,6 +1054,7 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zwackery)
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
 
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,zwackery)
 
@@ -1086,6 +1087,7 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr68)
 	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_FORMAT(xxxxxxxRRRBBBGGG)
 
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
 
@@ -1831,22 +1833,22 @@ DRIVER_INIT_MEMBER(mcr68_state,trisport)
  *
  *************************************/
 
-GAME( 1984, zwackery, 0,        zwackery, zwackery, mcr68_state, zwackery, ROT0,   "Bally Midway", "Zwackery", GAME_SUPPORTS_SAVE )
+GAME( 1984, zwackery, 0,        zwackery, zwackery, mcr68_state, zwackery, ROT0,   "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE )
+GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
-GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, blasted,  ROT0,   "Bally Midway", "Blasted", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", GAME_SUPPORTS_SAVE )
-GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", GAME_SUPPORTS_SAVE )
-GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE )
+GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", MACHINE_SUPPORTS_SAVE )

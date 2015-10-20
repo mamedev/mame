@@ -165,6 +165,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/asst128_dsk.h",
 		MAME_DIR .. "src/lib/formats/atari_dsk.c",
 		MAME_DIR .. "src/lib/formats/atari_dsk.h",
+		MAME_DIR .. "src/lib/formats/atom_dsk.c",
+		MAME_DIR .. "src/lib/formats/atom_dsk.h",
 		MAME_DIR .. "src/lib/formats/atom_tap.c",
 		MAME_DIR .. "src/lib/formats/atom_tap.h",
 		MAME_DIR .. "src/lib/formats/bbc_dsk.c",
@@ -296,6 +298,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/msx_dsk.h",
 		MAME_DIR .. "src/lib/formats/mfi_dsk.c",
 		MAME_DIR .. "src/lib/formats/mfi_dsk.h",
+		MAME_DIR .. "src/lib/formats/mfm_hd.c",
+		MAME_DIR .. "src/lib/formats/mfm_hd.h",
 		MAME_DIR .. "src/lib/formats/mz_cas.c",
 		MAME_DIR .. "src/lib/formats/mz_cas.h",
 		MAME_DIR .. "src/lib/formats/nanos_dsk.c",
@@ -417,4 +421,7 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/itt3030_dsk.c",
 		MAME_DIR .. "src/lib/formats/itt3030_dsk.h",
 	}
+
+--  netlist now defines a project
+dofile("netlist.lua")
 

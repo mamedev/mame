@@ -61,7 +61,7 @@
   Funky Jet                                146                                     Interleave             No
   Sotsugyo Shousho                         (same board / config as Funky Jet)
   Nitro Ball                               146                                     Reversed               Yes
-  Fighters History                         146? (surface scratched)                Interleave             Yes
+  Fighters History                         75                                      Interleave             Yes
   Stadium Hero 96                          146                                     None                   Yes
   Dragon Gun                               146                                     Reversed               No
   Lock 'n' Loaded                          (same board / config as Dragon Gun)

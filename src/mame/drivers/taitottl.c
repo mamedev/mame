@@ -7,29 +7,29 @@
 
  Game Name(s)                                                      Part #'s       Data      PROM/ROM Chip Numbers
  ----------------------------------------------------------------+--------------+---------+---------------------------------------
- Astro Race (11/1973) (clone of Atari's Space Race)                               UNKNOWN
  Anti-Aircraft (1975) (clone of Atari's Anti-Aircraft)                            YES
+ Astro Race (11/1973) (clone of Atari's Space Race)                               UNKNOWN
  Attack (09/1976)                                                                 UNKNOWN
  Attack UFO (08/1974)                                                             UNKNOWN
  Avenger (??/1976) (clone of Electra's Avenger)                                   YES
- Ball Park/TT Ball Park (??/1974)  (clone of Midway's Ball Park)                  YES
- Basketball (04/1974) (clone of Midway's TV Basketball)                           YES
- Bombs Away (??/1977)  (clone of Meadows' Bombs Away)                             YES
+ Ball Park/TT Ball Park (??/1974) (clone of Midway's Ball Park)                   YES
+ Basketball (04/1974) (clone of Midway's TV Basketball)                           NO
+ Bombs Away (??/1977) (clone of Meadows' Bombs Away)                              YES
  Cisco/Fisco 400 (04/1977)                                                        UNKNOWN
  Clean Sweep (??/1976) (clone of Ramtek's Clean Sweep)                            YES
  Clean Sweep II (??/1976) (clone of Ramtek's Clean Sweep)                         YES
  Crashing Race (06/1976) (clone of Atari's Crash'n Score?)                        UNKNOWN
  Cross Fire (08/1977) (clone of PSE's Bazooka)                                    YES
- Davis Cup (12/1973) (clone of Atari's Coupe Davis / Pong Doubles?)               UNKNOWN
+ Davis Cup (12/1973) (clone of Atari's Coupe Davis / Pong Doubles?)               NO
  Dead Heat (??/1975)                                                              UNKNOWN
  Elepong (07/1973)                                                                UNKNOWN
- Flying Fortress (??/1977) (clone of Electra's Flying Fortress?)                  UNKNOWN
+ Flying Fortress (??/1977) (clone of Electra's Flying Fortress?)                  YES
  Flying Fortress II (06/1977)                                                     UNKNOWN
  Gunman (10/1977)                                                                 YES        8 x 32bytes (or 11? )
  Interceptor (03/1976)                                                            UNKNOWN
  Missile-X (??/1977)                                                              YES        10 - (5 x 512bytes, 5x32bytes)
  Pro Hockey (11/1973)                                                             UNKNOWN
- Road Champion (04/1977) (clone of Williams' Road Champion?)                      UNKNOWN
+ Road Champion (04/1977) (clone of Williams' Road Champion?)                      YES
  Road Champion S (06/1977)                                                        UNKNOWN
  Soccer (11/1973)                                                                 UNKNOWN
  Soccer DX (??/1977)                                                              UNKNOWN
@@ -274,9 +274,9 @@ ROM_START( zzblock )
 ROM_END
 
 
-GAME( 1977, gunman,    0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Gunman [TTL]", GAME_IS_SKELETON )
-GAME( 1977, bazooka,   0,       taitottl, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", GAME_IS_SKELETON ) // clone of Taito Cross Fire - or is Cross Fire a clone of PSE Bazooka?
-GAME( 1977, bazookabr, bazooka, taitottl, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", GAME_IS_SKELETON )
-GAME( 1977, missilex,  0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Missile-X [TTL]", GAME_IS_SKELETON )
-GAME( 1977, ttblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "T.T. Block [TTL]", GAME_IS_SKELETON )
-GAME( 1979, zzblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Zun Zun Block [TTL]", GAME_IS_SKELETON )
+GAME( 1977, gunman,    0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Gunman [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, bazooka,   0,       taitottl, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON ) // clone of Taito Cross Fire - or is Cross Fire a clone of PSE Bazooka?
+GAME( 1977, bazookabr, bazooka, taitottl, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, missilex,  0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Missile-X [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "T.T. Block [TTL]", MACHINE_IS_SKELETON )
+GAME( 1979, zzblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Zun Zun Block [TTL]", MACHINE_IS_SKELETON )

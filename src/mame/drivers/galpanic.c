@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")  /* + work RAM */
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  /* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x702000, 0x704fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
@@ -235,7 +235,8 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpanic)
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
-	MCFG_PALETTE_INIT_OWNER(galpanic_state,galpanic)
+	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx) // fg palette ram, bit 0 seems to be a transparency flag for the front bitmap
+	MCFG_PALETTE_INIT_OWNER(galpanic_state, galpanic)
 
 	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_OFFSETS(0, -16)
@@ -314,5 +315,5 @@ ROM_START( galpanica ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_LOAD( "pm007e.u",     0xc0000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
-GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
+GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", MACHINE_NO_COCKTAIL )
+GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", MACHINE_NO_COCKTAIL )

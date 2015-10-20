@@ -1,5 +1,5 @@
 /*-
- * Copyright 2012 Matthew Endsley
+ * Copyright 2012-1015 Matthew Endsley
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,9 +35,9 @@
 
 struct complex {
 	complex() {data = 0;}
-	complex(const char* s) { data = _strdup(s); }
+	complex(const char* s) { data = strdup(s); }
 	~complex() { free(data); }
-	complex(const complex& other) { data = 0; if (other.data) data = _strdup(other.data); }
+	complex(const complex& other) { data = 0; if (other.data) data = strdup(other.data); }
 	complex& operator=(const complex& other) { complex(other).swap(*this); return *this; }
 	void swap(complex& other) { std::swap(data, other.data); }
 

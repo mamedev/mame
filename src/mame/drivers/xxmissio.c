@@ -270,7 +270,6 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -282,8 +281,7 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxmissio)
 	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
-
+	MCFG_PALETTE_FORMAT_CLASS(1, xxmissio_state, BBGGRRII)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -330,4 +328,4 @@ ROM_START( xxmissio )
 	ROM_LOAD16_BYTE( "xx11.4b", 0x0001,  0x8000, CRC(d9dd827c) SHA1(aea3a5abd871adf7f75ad4d6cc57eff0833135c7) )
 ROM_END
 
-GAME( 1986, xxmissio, 0, xxmissio, xxmissio, driver_device, 0, ROT90, "UPL", "XX Mission", GAME_SUPPORTS_SAVE )
+GAME( 1986, xxmissio, 0, xxmissio, xxmissio, driver_device, 0, ROT90, "UPL", "XX Mission", MACHINE_SUPPORTS_SAVE )

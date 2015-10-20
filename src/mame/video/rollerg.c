@@ -11,6 +11,7 @@
 
 K05324X_CB_MEMBER(rollerg_state::sprite_callback)
 {
+	enum { sprite_colorbase = 256 / 16 };
 #if 0
 	if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x80)) *color = rand();
 	if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
@@ -18,7 +19,7 @@ K05324X_CB_MEMBER(rollerg_state::sprite_callback)
 	if (machine().input().code_pressed(KEYCODE_R) && (*color & 0x10)) *color = rand();
 #endif
 	*priority = (*color & 0x10) ? 0 : 0x02;
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	*color = sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -32,20 +33,7 @@ K051316_CB_MEMBER(rollerg_state::zoom_callback)
 {
 	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
-	*color = m_zoom_colorbase + ((*color & 0x30) >> 4);
-}
-
-
-/***************************************************************************
-
-    Start the video hardware emulation.
-
-***************************************************************************/
-
-void rollerg_state::video_start()
-{
-	m_sprite_colorbase = 16;
-	m_zoom_colorbase = 0;
+	*color = ((*color & 0x30) >> 4);
 }
 
 

@@ -730,4 +730,4 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-GAME( 1995, srmp6, 0, srmp6, srmp6, driver_device, 0, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+GAME( 1995, srmp6, 0, srmp6, srmp6, driver_device, 0, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

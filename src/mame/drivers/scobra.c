@@ -199,6 +199,74 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+// weird address map like anteateruk in galaxian.c (also a free enterprise set)
+static ADDRESS_MAP_START( rescuefe_map, AS_PROGRAM, 8, scobra_state )
+	AM_RANGE(0x0000, 0x05ff) AM_ROM
+	AM_RANGE(0x0600, 0x0fff) AM_RAM // sets stack here
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1400, 0x143f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x1440, 0x145f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x1460, 0x147f) AM_RAM AM_SHARE("bulletsram")
+	AM_RANGE(0x1480, 0x14ff) AM_RAM
+
+	AM_RANGE(0x4400, 0x5dff) AM_ROM
+	AM_RANGE(0x5e00, 0x6bff) AM_ROM // some right?
+
+	AM_RANGE(0x8200, 0x93ff) AM_ROM // wrong? (maybe some correct?)
+
+	AM_RANGE(0xa600, 0xa6ff) AM_ROM // wrong (taunt string) jumps to around a600 so something must map in this area?
+
+	AM_RANGE(0xEA01, 0xEA01) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0xEA93, 0xEA93) AM_WRITE(scrambold_background_enable_w)
+	AM_RANGE(0xEA86, 0xEA86) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0xEA87, 0xEA87) AM_WRITE(galaxold_flip_screen_y_w)
+
+	// does it have a real ppi8255?
+	AM_RANGE(0xC190, 0xC193) AM_DEVREAD("ppi8255_0", i8255_device, read) // ?
+	AM_RANGE(0xC160, 0xC163) AM_DEVREAD("ppi8255_0", i8255_device, read) // ?
+
+	AM_RANGE(0xC4Ac, 0xC4AF) AM_DEVREAD("ppi8255_1", i8255_device, read) // ?
+
+	AM_RANGE(0xc180, 0xc183) AM_DEVWRITE("ppi8255_0", i8255_device, write) // correct based on main set?
+	AM_RANGE(0xc220, 0xc223) AM_DEVWRITE("ppi8255_1", i8255_device, write) // ^
+
+	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
+//  AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
+//  AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
+	AM_RANGE(0x0000, 0x0bff) AM_ROM // ok
+	AM_RANGE(0x0c00, 0x0c3f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram") // ok
+	AM_RANGE(0x0c40, 0x0c5f) AM_RAM AM_SHARE("spriteram") // ok
+	AM_RANGE(0x0c60, 0x0c7f) AM_RAM AM_SHARE("bulletsram") // ok
+	AM_RANGE(0x0c80, 0x17ff) AM_RAM
+
+	AM_RANGE(0x2200, 0x3fff) AM_ROM // ok
+	AM_RANGE(0x5800, 0x6dff) AM_ROM
+	AM_RANGE(0x8a00, 0x91ff) AM_ROM
+
+	AM_RANGE(0x4200, 0x45ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") // ok
+
+	AM_RANGE(0x7621, 0x7621) AM_WRITE(galaxold_nmi_enable_w) // a801
+	AM_RANGE(0x7673, 0x7673) AM_WRITE(scrambold_background_enable_w) // a083
+	AM_RANGE(0x7704, 0x7704) AM_WRITE(galaxold_stars_enable_w) // a804
+	AM_RANGE(0x7616, 0x7616) AM_WRITE(galaxold_flip_screen_x_w) // a806
+	AM_RANGE(0x7617, 0x7617) AM_WRITE(galaxold_flip_screen_y_w) // a807
+
+	AM_RANGE(0x4C00, 0x4C03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x4B00, 0x4B03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+
+
+
+
+	AM_RANGE(0x1D98, 0x1D98) AM_READ(watchdog_reset_r) // 0xb000
+
+
+	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
+	AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
+ADDRESS_MAP_END
+
 
 READ8_MEMBER(scobra_state::scobra_soundram_r)
 {
@@ -534,6 +602,61 @@ static INPUT_PORTS_START( minefld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+// doesn't seem to have a 'starting level' dipswitch, probably has difficult tho?
+static INPUT_PORTS_START( minefldfe )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY // fire up
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) // bomb
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) // also credit sound!
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY // fire down
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "Coin A 1/1 Coin B 1/10" )
+	PORT_DIPSETTING(    0x02, "Coin A 2/1 Coin B 1/3" )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0c, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY // move up
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY // move down
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( hustler )
 	PORT_START("IN0")
@@ -711,6 +834,17 @@ static MACHINE_CONFIG_DERIVED( rescue, type1 )
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( rescuefe, rescue )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rescuefe_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( rescueb, rescue )
+	MCFG_DEVICE_MODIFY("ppi8255_1")
+	MCFG_I8255_IN_PORTC_CB(READ8(scobra_state, rescueb_a002_r)) // protection? must return 0xfc or the game jumps to 0x00
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( minefld, type1 )
 
@@ -723,6 +857,11 @@ static MACHINE_CONFIG_DERIVED( minefld, type1 )
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,minefld)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( minefldfe, minefld )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(minefldfe_map)
 MACHINE_CONFIG_END
 
 
@@ -1061,6 +1200,199 @@ ROM_START( minefld )
 	ROM_LOAD( "minefld.clr",  0x0000, 0x0020, CRC(1877368e) SHA1(5850e03debe572f72abd91c756c0f8613018a962) )
 ROM_END
 
+/*
+
+This is a bootleg by Free Enterprise Games.
+The host board is common Scramble hardware.
+There is a small sub-board containing a Z80, the 3 'sub' eproms, a 2kx8 SRAM and an unknown
+DIP24 chip by AMD(C)1979. I'm sure there is some obfuscation going on with this sub board.
+There's a taunt in one of the EPROMs telling people they won't be able to copy it and get
+it working ;-)
+There are 2 GFX ROMs on the main board and 2 program ROMs and a color PROM.
+There's also another small sub board plugged in at position 5L and 5M replacing 2 logic chips
+with 8 logic chips and it's also wired to various logic chips on the main board.
+The games are possibly Minefield and Scramble together on one board although both boards could
+be running different games.
+One board is missing the 2 sound ROMs (possibly on purpose, don't know)
+Both are missing the top sound PCB.
+
+*/
+
+/* the 'Minefield' shop shows a Logicshop copyright, and a phone number with a Great Yarmouth area code
+   which seems to indicate the following manufacturer / operator.
+
+    The Logicshop (Great Yarmouth)
+    Caesar's Arcade
+    Beach Rd
+    Hemsby
+    Great Yarmouth
+    Norfolk
+    NR29 4HS
+
+*/
+
+
+ROM_START( minefldfe )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "sub-1.bin",        0x0000, 0x0c00, CRC(0511df9f) SHA1(e4b93e70a070a8f42442c8329478b98cba387971) ) // all used
+	ROM_CONTINUE(0x2200, 0x1400)
+	ROM_LOAD( "sub-2.bin",        0x3600, 0x0a00, CRC(00205e04) SHA1(f8e8399a1aaa548ae2448ebc96fb3e68625f9260) ) //
+	ROM_CONTINUE(0x5800, 0x1600)
+	ROM_LOAD( "sub-3.bin",        0x8a00, 0x0800, CRC(98c05d8d) SHA1(9c89504421df754bb0228ca08c7bfae5f6dc3e91) ) // all used
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "snd.2l",        0x0000, 0x0800, CRC(8bef736b) SHA1(c5c7ce9c40e6fe60a4914b6bbd646ba6853c9043) )
+	ROM_LOAD( "snd.2m",        0x0800, 0x0800, CRC(f67b3f97) SHA1(bb15f95eab6594508b5c02af60ed9fff3abd23ee) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "gfx.5f",        0x0000, 0x0800, CRC(8b5e187a) SHA1(3afd348a2ade9fc01fd1fc6a5ce9b148e0a1ead1) )
+	ROM_LOAD( "gfx.5h",        0x0800, 0x0800, CRC(4b7e1fbc) SHA1(334c09f380a3750874c4bef8e987112e7a50fdbd) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6e",  0x0000, 0x0020, CRC(1877368e) SHA1(5850e03debe572f72abd91c756c0f8613018a962) )
+ROM_END
+
+/*
+
+notes about missing code in rescuefe - where is this??
+
+the first part of 0xa600 - 0xa643 should be a set of jumps
+based on the replaced code, setting 'a' them jumping
+elsewhere (probably directly after the table)
+
+547C: CD 00 A6      call $A600
+is
+1E34: 3E 00         ld   a,$00
+1E36: CD 50 09      call $0950
+
+4FA2: CD 03 A6      call $A603
+is
+18D7: 3E 01         ld   a,$01
+18D9: CD 50 09      call $0950
+
+48CF: CD 07 A6      call $A607
+is
+11F6: 3E 02         ld   a,$02
+11F8: CD 50 09      call $0950
+
+640B: CD 0B A6      call $A60B
+is
+2EBD: 3E 03         ld   a,$03
+2EBF: CD 50 09      call $0950
+
+// there's no ld   a,0x04? anywhere in the original code
+// so next entry is 0x05
+
+58CB: CD 0F A6      call $A60F
+is
+2296: 3E 05         ld   a,$05
+2298: CD 50 09      call $0950
+
+49DB: CD 13 A6      call $A613
+is
+1304: 3E 06         ld   a,$06
+1306: CD 50 09      call $0950
+
+5FA9: CD 17 A6      call $A617
+is
+2A35: 3E 07         ld   a,$07
+2A37: CD 50 09      call $0950
+
+
+5834: F5            push af
+5835: CD 1B A6      call $A61B
+5838: F1            pop  af
+is inserted, replaces nothing?!
+elsewhere, as expected we have
+
+5DA9: CD 1B A6      call $A61B
+is
+281C: 3E 08         ld   a,$08
+281E: CD 50 09      call $0950
+
+5E45: CD 1F A6      call $A61F
+is
+28CB: 3E 09         ld   a,$09
+28CD: CD 50 09      call $0950
+
+
+51B8: CD 23 A6      call $A623
+is
+1B0A: 3E 0A         ld   a,$0A
+1B0C: CD 50 09      call $0950
+
+4FE4: CD 27 A6      call $A627
+is
+1930: 3E 0B         ld   a,$0B
+1932: CD 50 09      call $0950
+
+4A51: CD 2B A6      call $A62B
+is
+137C: 3E 0C         ld   a,$0C
+137E: CD 50 09      call $0950
+
+4648: CD 2F A6      call $A62F
+is
+0E6D: 3E 0D         ld   a,$0D
+0E6F: CD 50 09      call $0950
+
+516D: CD 33 A6      call $A633
+is
+1ABC: 3E 0E         ld   a,$0E
+1ABE: CD 50 09      call $0950
+
+5476: CD 37 A6      call $A637
+is
+1E2C: 3E 0F         ld   a,$0F
+1E2E: CD 50 09      call $0950
+
+4DD3: CD 3B A6      call $A63B
+is
+1704: 3E 10         ld   a,$10
+1706: CD 50 09      call $0950
+
+4AF0: CD 3F A6      call $A63F
+is
+141D: 3E 11         ld   a,$11
+141F: CD 50 09      call $0950
+
+I imagine the a643 - A664 area is the code that was originally at 0x950
+
+479F: CD 65 A6      call $A665 << call to bigger function
+is
+0FE2: CD EB 0F      call $0FEB << call to bigger function
+
+so $a665 - $a69a is probably the code from 0x0feb
+
+
+44EC: CD 9B A6      call $A69B << call to bigger function
+is
+0D0D: CD D2 10      call $10D2 << call to bigger function
+
+and 0xa69b - 0xa??? is the code from 0x10d2
+
+*/
+
+ROM_START( rescuefe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sub-1.bin",        0x0000, 0x0600, CRC(7a6e813e) SHA1(5f9fff576f6a8d8e09f11404ca49b1011d17fa36) ) // correct?
+	ROM_CONTINUE( 0x4400, 0x1a00 ) // seems to be correct at least for the majority of blocks
+	ROM_LOAD( "sub-2.bin",        0x5e00, 0x0e00, CRC(28fcec83) SHA1(f2b2b2c8f65450b627587cf5f16620b95d7fe4e2) ) // correct at least mapping of 6903?
+	ROM_CONTINUE(0x8200, 0x1200) // some of this seems to be in the right place
+	ROM_LOAD( "sub-3.bin",        0xa000, 0x0800, CRC(6fbeb239) SHA1(cb81719e8bb6b99ad4e46d9404c61c09db8475c3) ) // strange size, contains nothing except a taunt message which seems to be cut off at the start??
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF ) // audio CPU code was missing, assuming the same as regular Rescue due to sound code on the minefield bootleg matching.
+	ROM_LOAD( "rb15csnd.2l", 0x0000, 0x0800, CRC(8b24bf17) SHA1(cc49fef3c629c12f1a7eb9886fdc2df4b08f4b37) )
+	ROM_LOAD( "rb15dsnd.2m", 0x0800, 0x0800, CRC(d96e4fb3) SHA1(8bb023c7c668f93d2333d648fc3cefdbd66f92db) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "gfx.5f",        0x0000, 0x0800, CRC(60f49e88) SHA1(92ea21715b2d4d28a0509a31b35b43354be7b75f) )
+	ROM_LOAD( "gfx.5h",        0x0800, 0x0800, CRC(9486e09e) SHA1(a8c2b48a3a2633c2eae19bb40299c4da1499c15c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6e",  0x0000, 0x0020, CRC(40c6bcbd) SHA1(cb0c058eadc37eba4b1a99be095da81a14099d8d) )
+ROM_END
+
 ROM_START( hustler )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hustler.1",    0x0000, 0x1000, CRC(94479a3e) SHA1(ea3a1a3f6bee3d35a6a0fb0ba689a25f6b919e5d) )
@@ -1232,26 +1564,28 @@ ROM_START( mimonsco )
 ROM_END
 
 
-GAME( 1981, stratgyx,  0,        stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami",                             "Strategy X", GAME_SUPPORTS_SAVE )
-GAME( 1981, stratgys,  stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "bootleg",                            "Strong X", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgyx,  0,        stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami",                             "Strategy X", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, stratgys,  stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "bootleg",                            "Strong X", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scramble_state,  darkplnt,     ROT180, "Stern Electronics",                  "Dark Planet", GAME_SUPPORTS_SAVE )
+GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scramble_state,  darkplnt,     ROT180, "Stern Electronics",                  "Dark Planet", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scramble_state,  tazmani2,     ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scramble_state,  tazmani2,     ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, rescue,    0,        rescue,    rescue,    scramble_state,  rescue,       ROT90,  "Stern Electronics",                  "Rescue", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescueb,   rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg (Videl Games)",              "Rescue (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1982, aponow,    rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg",                            "Apocaljpse Now (bootleg of Rescue)", GAME_SUPPORTS_SAVE )
+GAME( 1982, rescue,    0,        rescue,    rescue,    scramble_state,  rescue,       ROT90,  "Stern Electronics",                  "Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rescueb,   rescue,   rescueb,   rescue,    scramble_state,  rescue,       ROT90,  "bootleg (Videl Games)",              "Tuono Blu (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, aponow,    rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg",                            "Apocaljpse Now (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rescuefe,  rescue,   rescuefe,  rescue,    driver_device,   0,            ROT90,  "bootleg (Free Enterprise Games)",    "Rescue (Free Enterprise Games, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, minefld,   0,        minefld,   minefld,   scramble_state,  minefld,      ROT90,  "Stern Electronics",                  "Minefield", GAME_SUPPORTS_SAVE )
+GAME( 1983, minefld,   0,        minefld,   minefld,   scramble_state,  minefld,      ROT90,  "Stern Electronics",                  "Minefield", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, minefldfe, minefld,  minefldfe, minefldfe, driver_device,   0,            ROT90,  "bootleg (The Logicshop)",            "Minefield (The Logicshop, bootleg)", MACHINE_SUPPORTS_SAVE ) // The Logicshop ('licensed' from Free Enterprise Games?
 
-GAME( 1981, hustler,   0,        hustler,   hustler,   scramble_state,  hustler,      ROT90,  "Konami",                             "Video Hustler", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerd,  hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
-GAME( 1981, billiard,  hustler,  hustler,   hustler,   scramble_state,  billiard,     ROT90,  "bootleg",                            "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,            ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustler,   0,        hustler,   hustler,   scramble_state,  hustler,      ROT90,  "Konami",                             "Video Hustler", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerd,  hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, billiard,  hustler,  hustler,   hustler,   scramble_state,  billiard,     ROT90,  "bootleg",                            "The Billiards (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,            ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", GAME_SUPPORTS_SAVE )
-GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", MACHINE_SUPPORTS_SAVE )

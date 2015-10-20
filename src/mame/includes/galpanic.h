@@ -14,7 +14,6 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
-			m_generic_paletteram_16(*this, "paletteram"),
 			m_pandora(*this, "pandora")
 	{ }
 
@@ -27,7 +26,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_device<kaneko_pandora_device> m_pandora;
 
 	DECLARE_WRITE16_MEMBER(galpanic_6295_bankswitch_w);
@@ -38,9 +36,7 @@ public:
 	UINT32 screen_update_galpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_galpanic(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpanic_scanline);
-	void comad_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	/*----------- defined in video/galpanic.c -----------*/
 	DECLARE_WRITE16_MEMBER( galpanic_bgvideoram_w );
-	DECLARE_WRITE16_MEMBER( galpanic_paletteram_w );
 };

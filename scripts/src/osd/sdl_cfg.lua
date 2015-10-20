@@ -144,6 +144,9 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 		"-isystem /usr/local/include",
 	}
 elseif _OPTIONS["targetos"]=="os2" then
+	defines {
+		"SDLMAME_OS2",
+	}
 	buildoptions {
 		backtick(sdlconfigcmd() .. " --cflags"),
 	}

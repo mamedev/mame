@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP // LAN board
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
@@ -1002,7 +1002,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
@@ -1587,6 +1587,7 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx)
 
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(XRGB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
@@ -1749,13 +1750,13 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_6, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_6, 0, 2, "none")
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -132, -23)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16384)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
@@ -1796,8 +1797,8 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8192)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
@@ -2057,7 +2058,7 @@ ROM_START( tbyahhoo )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
-	ROM_LOAD32_WORD_SWAP( "426jaa02.31b", 0x200002, 512*1024, CRC(0416ad78) SHA1(a94c37a95e431c8f8cc3db66713faed406ab27c4) )
+	ROM_LOAD32_WORD_SWAP( "424jaa02.31b", 0x200002, 512*1024, CRC(0416ad78) SHA1(a94c37a95e431c8f8cc3db66713faed406ab27c4) )
 	ROM_LOAD32_WORD_SWAP( "424jaa04.27b", 0x200000, 512*1024, CRC(bcbe0e40) SHA1(715f72a172a0662e6e65a57baa1f5a18d6210389) )
 
 	/* sound program */
@@ -2273,8 +2274,8 @@ ROM_START( rushhero )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
-	ROM_LOAD32_WORD_SWAP( "605b03.29m", 0x200000, 512*1024, CRC(c5b8d31d) SHA1(6c5b359e1fcf511c50d6a876946631fc38a6dade) )
-	ROM_LOAD32_WORD_SWAP( "605b02.31m", 0x200002, 512*1024, CRC(94c3d835) SHA1(f48d34987fa6575a2c41d3ca3359e9e2cbc817e0) )
+	ROM_LOAD32_WORD_SWAP( "605uab03.29m", 0x200000, 512*1024, CRC(c5b8d31d) SHA1(6c5b359e1fcf511c50d6a876946631fc38a6dade) )
+	ROM_LOAD32_WORD_SWAP( "605uab02.31m", 0x200002, 512*1024, CRC(94c3d835) SHA1(f48d34987fa6575a2c41d3ca3359e9e2cbc817e0) )
 
 	/* data roms */
 	ROM_LOAD32_WORD_SWAP( "605a05.29r", 0x400000, 1024*1024, CRC(9bca4297) SHA1(c20be1ffcee8bd56f69d4fcc19d0035b3f74b8f2))
@@ -2621,13 +2622,13 @@ ROM_START( dragoona )
 	ROM_LOAD( "dragoona.nv", 0x0000, 0x080, CRC(7980ad2b) SHA1(dccaab02d23edbd81ae13441fbac0dbd7112c258) )
 ROM_END
 
-/* Soccer Superstars (Europe ver EAA)*/
+/* Soccer Superstars (94.12.19 - Europe ver EAC) Writes EAA to EEPROM and reports as EAA despite chip labels EAC */
 ROM_START( soccerss )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
-	ROM_LOAD32_WORD_SWAP( "427ea_c02.28m", 0x200000, 512*1024, CRC(1817b218) SHA1(d69c70f0d8f1cbf385046c755a9533c01fe1eb4a) )
-	ROM_LOAD32_WORD_SWAP( "427ea_c03.30m", 0x200002, 512*1024, CRC(8a17f509) SHA1(c3944b766499f2b6f217357159a02e54e44060c2) )
+	ROM_LOAD32_WORD_SWAP( "427eac02.28m", 0x200000, 512*1024, CRC(1817b218) SHA1(d69c70f0d8f1cbf385046c755a9533c01fe1eb4a) )
+	ROM_LOAD32_WORD_SWAP( "427eac03.30m", 0x200002, 512*1024, CRC(8a17f509) SHA1(c3944b766499f2b6f217357159a02e54e44060c2) )
 
 	/* data roms */
 	ROM_LOAD32_WORD_SWAP( "427a04.28r",   0x400000, 0x080000, CRC(c7d3e1a2) SHA1(5e1e4f4c97def36902ad853248014a7af62e0c5e) )
@@ -2680,13 +2681,72 @@ ROM_START( soccerss )
 	ROM_LOAD( "soccerss.nv", 0x0000, 0x080, CRC(f222dae4) SHA1(fede48a4e1fe91cf2b17ff3f3996bca4816fc283) )
 ROM_END
 
-/* Soccer Superstars (Japan ver JAC)*/
+/* Soccer Superstars (94.12.19 - U.S.A. ver UAC) Writes UAA to EEPROM and reports as UAA despite chip labels UAC */
+ROM_START( soccerssu )
+	/* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "427uac02.28m", 0x200000, 512*1024, CRC(cd999967) SHA1(6731b8f15ec73148993e3bce251f2392590da162) )
+	ROM_LOAD32_WORD_SWAP( "427uac03.30m", 0x200002, 512*1024, CRC(2edd4d49) SHA1(4118908dd84ebff2571cd7e4ce72951120ee82a9) )
+
+	/* data roms */
+	ROM_LOAD32_WORD_SWAP( "427a04.28r",   0x400000, 0x080000, CRC(c7d3e1a2) SHA1(5e1e4f4c97def36902ad853248014a7af62e0c5e) )
+	ROM_LOAD32_WORD_SWAP( "427a05.30r",   0x400002, 0x080000, CRC(5372f0a5) SHA1(36e8d0a73918cbd018c1865d1a05445daba8997c) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE("427a07.6m", 0x000000, 128*1024, CRC(8dbaf4c7) SHA1(cb69bf94090a4871b35e7ba1f58e3225077b82cd) )
+	ROM_LOAD16_BYTE("427a06.9m", 0x000001, 128*1024, CRC(979df65d) SHA1(7499e9a27aa562692bd3a296789696492a6254bc) )
+
+	/* tiles */
+	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	TILE_WORDS2_ROM_LOAD( "427a15.11r", 0x000000, 0x100000, CRC(33ce2b8e) SHA1(b0936386cdc7c41f33b1d7b4f5ce25fe618d1286) )
+	TILE_BYTES2_ROM_LOAD( "427a14.143", 0x000004, 0x080000, CRC(7575a0ed) SHA1(92fda2747ac090f93e60cff8478af6721b949dc2) )
+
+	/* sprites */
+	ROM_REGION( 0xc00000, "gfx2", ROMREGION_ERASE00 )
+	_48_WORD_ROM_LOAD( "427a13.18r", 0x000000, 2*1024*1024, CRC(815a9b87) SHA1(7d9d5932fff7dd7aa4cbccf0c8d3784dc8042e70) )
+	_48_WORD_ROM_LOAD( "427a11.23r", 0x000002, 2*1024*1024, CRC(c1ca74c1) SHA1(b7286df8e59f8f1939ebf17aaf9345a857b0b100) )
+	_48_WORD_ROM_LOAD( "427a09.137", 0x000004, 2*1024*1024, CRC(56bdd480) SHA1(01d164aedc77f71f6310cfd739c00b33289a2e7e) )
+	_48_WORD_ROM_LOAD( "427a12.21r", 0x600000, 2*1024*1024, CRC(97d6fd38) SHA1(8d2895850cafdea95db08c84e7eeea90a1921515) )
+	_48_WORD_ROM_LOAD( "427a10.25r", 0x600002, 2*1024*1024, CRC(6b3ccb41) SHA1(b246ef350a430e60f0afd1b80ff48139c325e926) )
+	_48_WORD_ROM_LOAD( "427a08.140", 0x600004, 2*1024*1024, CRC(221250af) SHA1(fd24e7f0e3024df5aa08506523953c5e35d2267b) )
+
+	/* PSAC2 tiles */
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 )
+	ROM_LOAD( "427a18.145", 0x000000, 0x100000, CRC(bb6e6ec6) SHA1(aa1365a4318866d9e7e74461a6e6c113f83b6771) )
+
+	/* PSAC2 map data */
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_ERASE00 )
+	// 4 banks of 0x20000?  (only the first 2 seem valid tho)
+	// maybe this is CPU addressable and the 'garbage' is sprite related?
+	ROM_LOAD( "427a17.24c", 0x000000, 0x080000, CRC(fb6eb01f) SHA1(28cdb30ff70ee5fc7624e18fe048dd85dfa49ace) )
+	/* 0x00000-0x1ffff pitch+crowd */
+
+	/* 0x20000-0x2ffff attract screens */
+	/* 0x30000-0x3ffff garbage? */
+
+	/* 0x40000-0x4ffff blank */
+	/* 0x50000-0x5ffff garbage? */
+
+	/* 0x60000-0x6ffff blank */
+	/* 0x70000-0x7ffff garbage? */
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "soccerssu.nv", 0x0000, 0x080, CRC(812f6878) SHA1(fc4975211720a7eb413bceda8109231cb1c00834) )
+ROM_END
+
+/* Soccer Superstars (94.12.19 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
 ROM_START( soccerssj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
-	ROM_LOAD32_WORD_SWAP( "427c02.28m", 0x200000, 512*1024, CRC(399fe89d) SHA1(e42cf87cff8cd421afd121621ba1f67c43f728ef) )
-	ROM_LOAD32_WORD_SWAP( "427c03.30m", 0x200002, 512*1024, CRC(f9c6ab08) SHA1(371b05a3990436a16b77b3d58aa235202abe78db) )
+	ROM_LOAD32_WORD_SWAP( "427jac02.28m", 0x200000, 512*1024, CRC(399fe89d) SHA1(e42cf87cff8cd421afd121621ba1f67c43f728ef) )
+	ROM_LOAD32_WORD_SWAP( "427jac03.30m", 0x200002, 512*1024, CRC(f9c6ab08) SHA1(371b05a3990436a16b77b3d58aa235202abe78db) )
 
 	/* data roms */
 	ROM_LOAD32_WORD_SWAP( "427a04.28r",   0x400000, 0x080000, CRC(c7d3e1a2) SHA1(5e1e4f4c97def36902ad853248014a7af62e0c5e) )
@@ -2727,7 +2787,7 @@ ROM_START( soccerssj )
 	ROM_LOAD( "soccerssj.nv", 0x0000, 0x080, CRC(7440255e) SHA1(af379b5b1f765f9050f18fbd41c5031c5ad4918b) )
 ROM_END
 
-/* Soccer Superstars (Japan ver JAA)*/
+/* Soccer Superstars (94.12.3 - Japan ver JAA) Writes JAA to EEPROM and reports as JAA */
 ROM_START( soccerssja )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -2774,7 +2834,7 @@ ROM_START( soccerssja )
 	ROM_LOAD( "soccerssja.nv", 0x0000, 0x080, CRC(60dba700) SHA1(087b086b29748727b41fdd4c154ff9b4bef42959) )
 ROM_END
 
-/* Soccer Superstars (Asian ver AAA) */
+/* Soccer Superstars (94.12.19 - Asia ver AAA) Writes AAA to EEPROM and reports as AAA */
 ROM_START( soccerssa )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3598,21 +3658,16 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 
 	const char *setname = machine().system().name;
 
-	if (!strcmp(setname, "opengolf") ||
-		!strcmp(setname, "opengolf2")||
-		!strcmp(setname, "ggreats2") ||
-		!strcmp(setname, "tbyahhoo") ||
-		!strcmp(setname, "dragoona") ||
-		!strcmp(setname, "dragoonj"))
+	if (m_use_68020_post_clock_hack)
 	{
 		// [HACK] The 68020 instruction cache is disabled during POST.
 		// We don't emulate this nor the slow program ROM access times (120ns)
 		// so some games that rely on wait loops timeout far too quickly
 		// waiting for the sound system tests to complete.
 
-		// To hack around this, we underclock the 68020 for 10 seconds during POST
+		// To hack around this, we underclock the 68020 for 12 seconds during POST (soccerss requires longest)
 		m_maincpu->set_clock_scale(0.66f);
-		m_boothack_timer->adjust(attotime::from_seconds(10));
+		m_boothack_timer->adjust(attotime::from_seconds(12));
 	}
 
 	if (!strcmp(setname, "le2") ||
@@ -3663,6 +3718,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "winspike",  8, 7, BPP4 },
 	{ "winspikej", 8, 7, BPP4 },
 	{ "soccerss",  7, 0, BPP4 },
+	{ "soccerssu", 7, 0, BPP4 },
 	{ "soccerssa", 7, 0, BPP4 },
 	{ "soccerssj", 7, 0, BPP4 },
 	{ "soccerssja",7, 0, BPP4 },
@@ -3770,11 +3826,18 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 #undef BPP66
 }
 
+DRIVER_INIT_MEMBER(konamigx_state,posthack)
+{
+	m_use_68020_post_clock_hack = 1;
+	DRIVER_INIT_CALL(konamigx);
+}
+
+
 /**********************************************************************************/
 /*     year  ROM       parent    machine   inp       init */
 
 /* dummy parent for the BIOS */
-GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx_state, konamigx, ROT0, "Konami", "System GX", GAME_IS_BIOS_ROOT )
+GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx_state, konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
@@ -3782,71 +3845,72 @@ GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx_state, konamigx, ROT0, "Ko
 /* needs the ROZ layer to be playable */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, racinfrc, konamigx, racinfrc,  racinfrc, konamigx_state, konamigx, ROT0, "Konami", "Racin' Force (ver EAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 1994, racinfrcu,racinfrc, racinfrc,  racinfrc, konamigx_state, konamigx, ROT0, "Konami", "Racin' Force (ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 1994, racinfrc, konamigx, racinfrc,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, racinfrcu,racinfrc, racinfrc,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 
-GAME( 1994, opengolf, konamigx, opengolf,  racinfrc, konamigx_state, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 1994, opengolf2,opengolf, opengolf,  racinfrc, konamigx_state, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 1994, ggreats2, opengolf, opengolf,  racinfrc, konamigx_state, konamigx, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1994, opengolf, konamigx, opengolf,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, opengolf2,opengolf, opengolf,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, ggreats2, opengolf, opengolf,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 2: totally stock, sometimes with funny protection chips on the ROM board */
 /* these games work and are playable with minor graphics glitches */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, le2,      konamigx, le2,      le2, konamigx_state,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, le2u,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, le2j,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, le2,      konamigx, le2,      le2, konamigx_state,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2u,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2j,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, fantjour, konamigx, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, fantjoura,fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, gokuparo, fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjour, konamigx, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjoura,fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gokuparo, fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, crzcross, konamigx, gokuparo, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Crazy Cross (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, puzldama, crzcross, gokuparo, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, crzcross, konamigx, gokuparo, puzldama, konamigx_state, posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, puzldama, crzcross, gokuparo, puzldama, konamigx_state, posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tbyahhoo, konamigx, tbyahhoo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, tbyahhoo, konamigx, tbyahhoo, gokuparo, konamigx_state, posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tkmmpzdm, konamigx, konamigx_6bpp, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, tkmmpzdm, konamigx, konamigx_6bpp, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, dragoona, konamigx, dragoonj, dragoonj, konamigx_state, konamigx, ROT0, "Konami", "Dragoon Might (ver AAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, dragoonj, dragoona, dragoonj, dragoonj, konamigx_state, konamigx, ROT0, "Konami", "Dragoon Might (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, dragoona, konamigx, dragoonj, dragoonj, konamigx_state, posthack, ROT0, "Konami", "Dragoon Might (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dragoonj, dragoona, dragoonj, dragoonj, konamigx_state, posthack, ROT0, "Konami", "Dragoon Might (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, sexyparo, konamigx, sexyparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, sexyparoa,sexyparo, sexyparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, sexyparo, konamigx, sexyparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sexyparoa,sexyparo, sexyparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* protection controls player ship direction in attract mode - doesn't impact playability */
-GAME( 1996, salmndr2, konamigx, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, salmndr2a,salmndr2, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, salmndr2, konamigx, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, salmndr2a,salmndr2, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
 
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
-GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx_state, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, winspikej,winspike, winspike, konamigx, konamigx_state, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx_state, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winspikej,winspike, winspike, konamigx, konamigx_state, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, soccerss,  konamigx, gxtype3,  type3, konamigx_state, konamigx, ROT0, "Konami", "Soccer Superstars (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, soccerssj, soccerss, gxtype3,  type3, konamigx_state, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAC)", GAME_IMPERFECT_GRAPHICS ) // writes JAB to EEPROM, but should be version JAC according to labels
-GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx_state, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, soccerssa, soccerss, gxtype3,  type3, konamigx_state, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, soccerss,  konamigx, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver EAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes EAA to EEPROM, but should be version EAC according to labels
+GAME( 1994, soccerssu, soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver UAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes UAA to EEPROM, but should be version UAC according to labels
+GAME( 1994, soccerssj, soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver JAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes JAB to EEPROM, but should be version JAC according to labels
+GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, soccerssa, soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, vsnetscru, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, vsnetscra, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, vsnetscrj, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscru, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscra, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscrj, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, rungun2,   konamigx, gxtype4sd2,  type3, konamigx_state, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, slamdnk2,  rungun2,  gxtype4sd2,  type3, konamigx_state, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, rungun2,   konamigx, gxtype4sd2,  type3, konamigx_state, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, slamdnk2,  rungun2,  gxtype4sd2,  type3, konamigx_state, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, rushhero,  konamigx, gxtype4,     type3, konamigx_state, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_IMPERFECT_GRAPHICS  )
+GAME( 1996, rushhero,  konamigx, gxtype4,     type3, konamigx_state, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", MACHINE_IMPERFECT_GRAPHICS  )

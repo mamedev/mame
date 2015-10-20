@@ -274,5 +274,5 @@ ROM_START( gotya )
 	ROM_LOAD( "gb-07.bin",  0x7000, 0x1000, CRC(92a9f8bf) SHA1(9231cd86f24f1e6a585c3a919add50c1f8e42a4c) )
 ROM_END
 
-GAME( 1981, thehand, 0,       gotya, gotya, driver_device, 0, ROT270, "T.I.C.",      "The Hand",                        GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, gotya,   thehand, gotya, gotya, driver_device, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981, prototype?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, thehand, 0,       gotya, gotya, driver_device, 0, ROT270, "T.I.C.",      "The Hand",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, gotya,   thehand, gotya, gotya, driver_device, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981, prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

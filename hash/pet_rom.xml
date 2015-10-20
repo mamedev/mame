@@ -292,9 +292,9 @@
 		<part name="rom" interface="pet_b000_rom">
 		<!--
 		TODO: The screen fills with garbage when run like this:
-			$ mame64 pet2001n32 toolkit2
+		    $ mame64 pet2001n32 toolkit2
 		and started with:
-			SYS 45056
+		    SYS 45056
 		We need to check this and should add notes with the emulator
 		options required to run the various versions of Toolkit.
 		-->
@@ -396,6 +396,18 @@
 		<part name="rom" interface="pet_a000_rom">
 			<dataarea name="rom" size="0x1000">
 				<rom name="kram2_pet8032_ud11_hn462532.bin" size="0x1000" crc="db606731" sha1="70b3fca8792e1010c3ad31e07df837f4772f8e3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="edex44fr">
+		<description>Edex (France, v4.4)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="edex_4.4_fr_91d9.ud11" size="0x1000" crc="82993411" sha1="d4bf02217e6b589bf0985ae81a9000119ac781c4" offset="0" />
 			</dataarea>
 		</part>
 	</software>

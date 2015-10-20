@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, David Haywood, Ryan Holtz, Stephh, Pierpaolo Prazzoli, Roberto Fresca
 /*****************************************************************
-* Status Triv Two driver by David Haywood, MooglyGuy, and Stephh *
-* Super Triv II driver by MooglyGuy                              *
-* Triv Quiz driver by MooglyGuy                                  *
+* Status Triv Two driver by David Haywood, Ryan Holtz, and Stephh*
+* Super Triv II driver by Ryan Holtz                             *
+* Triv Quiz driver by Ryan Holtz                                 *
 * Triv Four driver by Pierpaolo Prazzoli                         *
 * Super Triv III driver by Pierpaolo Prazzoli                    *
 * Hangman driver by Pierpaolo Prazzoli                           *
@@ -13,7 +13,7 @@
 *                                                                *
 * All notes by David Haywood unless otherwise noted              *
 *                                                                *
-* Thanks to MooglyGuy for working out why statriv2 was crashing  *
+* Thanks to Ryan Holtz for working out why statriv2 was crashing *
 * in attract and fixing the questions so it actually asked more  *
 * than one per category.                                         *
 *                                                                *
@@ -1082,7 +1082,7 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	* anyone can figure out a way to simplify the       *
 	* formula I'm using, PLEASE DO SO!                  *
 	*                                                   *
-	*                                       - MooglyGuy *
+	*                                       - Ryan Holtz*
 	*                                                   *
 	\***************************************************/
 
@@ -1125,16 +1125,16 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
  *
  *************************************/
 
-GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", GAME_SUPPORTS_SAVE )
-GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1984, hangman,  0,        statriv2,  hangman, statriv2_state,  addr_lmh,  ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
-GAME( 1984, trivquiz, 0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
-GAME( 1984, statriv2, 0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0, "Status Games", "Triv Two", GAME_SUPPORTS_SAVE )
-GAME( 1985, statriv2v,statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  ROT90,"Status Games", "Triv Two (Vertical)", GAME_SUPPORTS_SAVE )
-GAME( 1985, statriv4, 0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0, "Status Games", "Triv Four", GAME_SUPPORTS_SAVE )
-GAME( 1985, sextriv,  0,        statriv2,  sextriv, statriv2_state,  addr_lhx,  ROT0, "Status Games", "Sex Triv", GAME_SUPPORTS_SAVE )
-GAME( 1985, quaquiz2, 0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1986, supertr2, 0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0, "Status Games", "Super Triv II", GAME_SUPPORTS_SAVE )
-GAME( 1988, supertr3, 0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Super Triv III", GAME_SUPPORTS_SAVE )
-GAME( 1990, cstripxi, 0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0, "Status Games", "Casino Strip XI", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, hangman,  0,        statriv2,  hangman, statriv2_state,  addr_lmh,  ROT0, "Status Games", "Hangman", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trivquiz, 0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Triv Quiz", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, statriv2, 0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0, "Status Games", "Triv Two", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv2v,statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  ROT90,"Status Games", "Triv Two (Vertical)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv4, 0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0, "Status Games", "Triv Four", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sextriv,  0,        statriv2,  sextriv, statriv2_state,  addr_lhx,  ROT0, "Status Games", "Sex Triv", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quaquiz2, 0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, supertr2, 0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0, "Status Games", "Super Triv II", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, supertr3, 0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Super Triv III", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cstripxi, 0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0, "Status Games", "Casino Strip XI", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

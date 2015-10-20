@@ -149,7 +149,7 @@ void itech8_state::video_start()
 	/* fetch the GROM base */
 	m_grom_base = memregion("grom")->base();
 	m_grom_size = memregion("grom")->bytes();
-	
+
 	save_item(NAME(m_blitter_data));
 	save_item(NAME(m_blit_in_progress));
 	save_item(NAME(m_page_select));
@@ -417,7 +417,6 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 READ8_MEMBER(itech8_state::blitter_r)
 {
 	int result = m_blitter_data[offset / 2];
-	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 	/* debugging */
 	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", space.device().safe_pcbase(), offset / 2);
@@ -437,7 +436,7 @@ READ8_MEMBER(itech8_state::blitter_r)
 
 	/* a read from offsets 12-15 return input port values */
 	if (offset >= 12 && offset <= 15)
-		result = ioport(portnames[offset - 12])->read_safe(0x00);
+		result = m_an[offset - 12] ? m_an[offset - 12]->read() : 0;
 
 	return result;
 }

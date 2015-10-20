@@ -238,4 +238,4 @@ ROM_START( hotblock )
 	ROM_LOAD( "hotblk6.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
 ROM_END
 
-GAME( 1993, hotblock, 0,        hotblock, hotblock, driver_device, 0, ROT0,  "NIX?", "Hot Blocks - Tetrix II", GAME_SUPPORTS_SAVE )
+GAME( 1993, hotblock, 0,        hotblock, hotblock, driver_device, 0, ROT0,  "NIX?", "Hot Blocks - Tetrix II", MACHINE_SUPPORTS_SAVE )

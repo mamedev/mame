@@ -5195,25 +5195,25 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Xain Soft</publisher>
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
 				<rom name="gulf stream. galf streem (1989)(xain)(jp)(disk 1 of 4)[b].dsk" size="737280" crc="ebe9ca53" sha1="d917fb14fd8dc35033baaab3e33a332d792f542d" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="gulf stream. galf streem (1989)(xain)(jp)(disk 2 of 4)[b].dsk" size="737280" crc="ed78946f" sha1="f5a7dcf962e929d5aee2e29241dfbaa09bfaceb1" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
 				<rom name="gulf stream. galf streem (1989)(xain)(jp)(disk 3 of 4)[b].dsk" size="737280" crc="7a243e71" sha1="6240760c3c9a332d8cdd8b4c373949cbfe2a919c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-		<feature name="part_id" value="User Disk"/>
+			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="741376">
 				<rom name="gulf stream. galf streem (1989)(xain)(jp)(disk 4 of 4)(user disk)[o].dsk" size="741376" crc="41122643" sha1="d1f488c4c626efc17ff14dcefb0718a73fd00c7e" offset="0" status="baddump" />
 			</dataarea>
@@ -11175,21 +11175,21 @@ The following floppies came with the machines.
 		<description>The Tower? of Cabin - Cabin Panic (Jpn)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
-        <part name="flop1" interface="floppy_3_5">
-            <dataarea name="flop" size="737280">
-                <rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 1 of 3).dsk" size="737280" crc="0471dbee" sha1="0e8d2b0177bd601e84c71735b4b498be2818085f" offset="0" />
-            </dataarea>
-        </part>
-        <part name="flop2" interface="floppy_3_5">
-            <dataarea name="flop" size="737280">
-                <rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 2 of 3).dsk" size="737280" crc="0d3afd17" sha1="d8cb95e558065b19f21f434a97a4a59b1892fc1a" offset="0" />
-            </dataarea>
-        </part>
-        <part name="flop3" interface="floppy_3_5">
-            <dataarea name="flop" size="737280">
-                <rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 3 of 3).dsk" size="737280" crc="9ad7d280" sha1="ed0e55d97817e9d98d563fdeb634cc6443564840" offset="0" />
-            </dataarea>
-        </part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 1 of 3).dsk" size="737280" crc="0471dbee" sha1="0e8d2b0177bd601e84c71735b4b498be2818085f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 2 of 3).dsk" size="737280" crc="0d3afd17" sha1="d8cb95e558065b19f21f434a97a4a59b1892fc1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="tower of cabin, the (1992)(micro cabin)(jp)(disk 3 of 3).dsk" size="737280" crc="9ad7d280" sha1="ed0e55d97817e9d98d563fdeb634cc6443564840" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="towercaba" cloneof="towercab">

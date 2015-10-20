@@ -124,6 +124,19 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<software name="aircars94" cloneof="aircars" supported="no">
+		<description>Air Cars (1994 version)</description>
+		<year>1994</year>
+		<publisher>Midnite Entertainment Group</publisher>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x200000"  width="32" endianness="big"  >
+				<rom name="aircars94.u1" size="0x100000" crc="bbd4c4bd" sha1="4f9c914b43208eb100fb25b8be87dec370fd205d" offset="0x000000" loadflag="load32_word"/>
+				<rom name="aircars94.u2" size="0x100000" crc="d9958c79" sha1="d7aa26e084b68023076ac025eff819f0e568e2a0" offset="0x000002" loadflag="load32_word"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="avsp" supported="no">
 		<description>Alien vs Predator</description>
 		<year>1994</year>

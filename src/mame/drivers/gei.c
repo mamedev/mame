@@ -143,8 +143,6 @@ public:
 	DECLARE_READ8_MEMBER(portC_r);
 	DECLARE_DRIVER_INIT(geimulti);
 	DECLARE_DRIVER_INIT(setbank);
-	DECLARE_PALETTE_INIT(gei);
-	DECLARE_PALETTE_INIT(quizvid);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
@@ -175,26 +173,6 @@ WRITE8_MEMBER(gei_state::gei_bitmap_w)
 
 	for (i = 0; i < 8; i++)
 		m_bitmap.pix16(sy, sx+i) = m_color[8-i-1];
-}
-
-PALETTE_INIT_MEMBER(gei_state, gei)
-{
-	int i;
-
-	for (i = 0; i < 8; i++ )
-	{
-		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
-	}
-}
-
-PALETTE_INIT_MEMBER(gei_state,quizvid)
-{
-	int i;
-
-	for (i = 0; i < 8; i++ )
-	{
-		palette.set_pen_color(i, rgb_t(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
-	}
 }
 
 void gei_state::video_start()
@@ -752,15 +730,14 @@ static INPUT_PORTS_START( getrivia )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sextriv1 )
@@ -920,57 +897,8 @@ static INPUT_PORTS_START( gt103 )
 	PORT_INCLUDE(trivia_standard)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gt103a )
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x01, "Questions" )     PORT_DIPLOCATION("SW1:1,22")
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x01, "5" )
-//  PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Show Answer" )   PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Max Coins" )     PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "30" )
-	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x10, 0x00, "Timeout" )       PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Tickets" )       PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "No Coins" )      PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, EQUALS, 0x40)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, EQUALS, 0x00) PORT_NAME ("Start in no coins mode")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, EQUALS, 0x40)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSWA", 0x40, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)       /* ticket status */
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")   /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( quiz )
-	PORT_INCLUDE( gt103a )
+	PORT_INCLUDE( getrivia )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  /* no tickets */
@@ -1052,19 +980,9 @@ static INPUT_PORTS_START(geimulti)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(sprtauth)
-	PORT_INCLUDE(getrivia)
+	PORT_INCLUDE(trivia_standard)
 
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)       /* ticket status */
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
@@ -1094,7 +1012,6 @@ static INPUT_PORTS_START(sprtauth)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -1119,8 +1036,7 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(gei_state, gei)
+	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1160,8 +1076,8 @@ static MACHINE_CONFIG_DERIVED( quizvid, findout )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(quizvid_map)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(gei_state,quizvid)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD_3BIT_GRB("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gselect, getrivia )
@@ -1671,15 +1587,24 @@ ROM_START( gt507uk )
 	ROM_LOAD( "pop_music",       0x30000, 0x8000, CRC(884fec7c) SHA1(b389216c17f516df4e15eee46246719dd4acb587) )
 ROM_END
 
-ROM_START( gtsers8 )
+ROM_START( gtsers8 ) /* TRIV-3 PCB, stickered 256 TRIV #8 4/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "science",         0x10000, 0x8000, CRC(2f940ebd) SHA1(bead4988ac0a97d70f2a3c0b40a05968436de2ed) )
 	ROM_LOAD( "general",         0x18000, 0x8000, CRC(1efa01c3) SHA1(801ef5ab55184e488b08ef99ebd641ea4f7edb24) )
 	ROM_LOAD( "sports",          0x20000, 0x8000, CRC(6bd1ba9a) SHA1(7caac1bd438a9b1d11fb33e11814b5d76951211a) )
-	ROM_LOAD( "soccer",          0x28000, 0x8000, CRC(f821f860) SHA1(b0437ef5d31c507c6499c1fb732d2ba3b9beb151) )
-	ROM_LOAD( "potpourri",       0x30000, 0x8000, CRC(f2968a28) SHA1(87c08c59dfee71e7bf071f09c3017c750a1c5694) )
-	/* Missing Alternate question set: "Adult Sex" */
+	ROM_LOAD( "entertainment+",  0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) ) /* Labeled as ENTR 2* */
+	ROM_LOAD( "adult_sex",       0x30000, 0x8000, CRC(bc8ea9c3) SHA1(6aa4c5468508a50843d3f40b320fc06149fdd292) )
+ROM_END
+
+ROM_START( gtsers8a ) /* TRIV-3 PCB, stickered 256 TRIV #8 4/85 */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "science",         0x10000, 0x8000, CRC(2f940ebd) SHA1(bead4988ac0a97d70f2a3c0b40a05968436de2ed) )
+	ROM_LOAD( "general",         0x18000, 0x8000, CRC(1efa01c3) SHA1(801ef5ab55184e488b08ef99ebd641ea4f7edb24) )
+	ROM_LOAD( "sports",          0x20000, 0x8000, CRC(6bd1ba9a) SHA1(7caac1bd438a9b1d11fb33e11814b5d76951211a) )
+	ROM_LOAD( "entertainment+",  0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) ) /* Labeled as ENTR 2* */
+	ROM_LOAD( "potpourri",       0x30000, 0x8000, CRC(f2968a28) SHA1(87c08c59dfee71e7bf071f09c3017c750a1c5694) ) /* Listed as an alternate question set */
 ROM_END
 
 ROM_START( gtsers9 ) /* TRIV-3 PCB, stickered 256 TRIV #9 7/85 */
@@ -1700,17 +1625,8 @@ ROM_START( gtsers10 ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
 	ROM_LOAD( "new_tv_mash",    0x18000, 0x8000, CRC(f73240c6) SHA1(78020644074da719414133a86a91c1328e5d8929) )
 	ROM_LOAD( "new_entrtnmnt",  0x20000, 0x8000, CRC(0f54340c) SHA1(1ca4c23b542339791a2d8f4a9a857f755feca8a1) )
 	ROM_LOAD( "new_sports",     0x28000, 0x8000, CRC(19eff1a3) SHA1(8e024ae6cc572176c90d819a438ace7b2512dbf2) )
-	ROM_LOAD( "new_science",    0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) )
-ROM_END
-
-ROM_START( gtsers10a ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
-	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) ) /* Also found with program v5.03 (not dumped) */
-	ROM_LOAD( "new_general",    0x10000, 0x8000, CRC(ba1f5b92) SHA1(7e94be0ef6904331d3a6b266e5887e9a15c5e7f9) )
-	ROM_LOAD( "new_tv_mash",    0x18000, 0x8000, CRC(f73240c6) SHA1(78020644074da719414133a86a91c1328e5d8929) )
-	ROM_LOAD( "new_entrtnmnt",  0x20000, 0x8000, CRC(0f54340c) SHA1(1ca4c23b542339791a2d8f4a9a857f755feca8a1) )
-	ROM_LOAD( "new_sports",     0x28000, 0x8000, CRC(19eff1a3) SHA1(8e024ae6cc572176c90d819a438ace7b2512dbf2) )
 	ROM_LOAD( "adult_sex_3",    0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* Listed as an alternate question set */
+	/* Missing "new_science" */
 ROM_END
 
 ROM_START( gtsers11 ) /* TRIV-3 PCB, stickered 256 TRIV #11 8/85 */
@@ -1735,7 +1651,7 @@ ROM_END
 
 ROM_START( gtsers12 )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "program_v5.03",   0x00000, 0x4000, CRC(888b7d9b) SHA1(e5ed4f22bff99c26cd6ef9a06cb386221e84bbf5) )
 	ROM_LOAD( "new_science_2+",  0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Labeled as NEW SCNE 2* */
 	ROM_LOAD( "adult_sex_4+",    0x18000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* Labeled as ADULT SEX 4* */
 	ROM_LOAD( "cops_&_robbers",  0x20000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) )
@@ -1771,28 +1687,28 @@ ROM_START( gt103a1 ) /* Need to verify which series these belong to */
 	ROM_LOAD( "history-geog",    0x10000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) )
 	ROM_LOAD( "n.f.l._football", 0x18000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) )
 	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) )
-	ROM_LOAD( "entertainment",   0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) )
+	ROM_LOAD( "soccer",          0x28000, 0x8000, CRC(f821f860) SHA1(b0437ef5d31c507c6499c1fb732d2ba3b9beb151) )
 	ROM_LOAD( "horrors",         0x30000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) )
 ROM_END
 
 ROM_START( gt103aa )
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
-	ROM_LOAD( "entertainment_alt", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) )
+	ROM_LOAD( "entertainment_alt", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) ) /* From series 8 */
 	ROM_LOAD( "general_alt",       0x18000, 0x8000, CRC(df34f7f9) SHA1(329d123eea711d5135dc02dd7b89b220ce8ddd28) )
-	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) )
-	ROM_LOAD( "science_alt2",      0x28000, 0x8000, CRC(ac93d348) SHA1(55550ba6b5daffdf9653854075ad4f8398a5e621) )
+	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) ) /* From series 8 */
+	ROM_LOAD( "science_alt2",      0x28000, 0x8000, CRC(ac93d348) SHA1(55550ba6b5daffdf9653854075ad4f8398a5e621) ) /* From series 8 */
 	ROM_LOAD( "sports_alt2",       0x30000, 0x8000, CRC(40207845) SHA1(2dddb9685dcefabfde07057a639aa9d08da2329e) )
 ROM_END
 
 ROM_START( gt103ab )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.rom",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
-	ROM_LOAD( "new_science_2_alt", 0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) )
+	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
+	ROM_LOAD( "new_science_2_alt", 0x10000, 0x8000, CRC(95836bfb) SHA1(deb546bcd9109efd2b1f405354916e439cd0749b) )
 	ROM_LOAD( "adult_sex_2_alt",   0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) )
 	ROM_LOAD( "adult_sex_3_alt",   0x20000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) )
-	ROM_LOAD( "adult_sex_4_alt",   0x28000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) )
-	ROM_LOAD( "rock-n-roll_alt",   0x30000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
+	ROM_LOAD( "rock-n-roll_alt",   0x28000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
+	ROM_LOAD( "cops_&_robbers_alt",0x30000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) )
 ROM_END
 
 ROM_START( gt103asx ) /* Not sure there was ever an all Adult Trivia version. These are just the collection from all the series combined here */
@@ -1957,65 +1873,65 @@ DRIVER_INIT_MEMBER(gei_state,geimulti)
 	membank("bank1")->set_base(memregion("bank")->base() + 0x0000);
 }
 
-GAME( 1982, jokpoker, 0,        gselect,  gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1983, jokpokera,jokpoker, jokpokera,gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Joker Poker ICB 9-30-86)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1983, jokpokerb,jokpoker, jokpokera,gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1983, jokpokerc,jokpoker, jokpokera,gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Poker No Raise ICB 9-30-86)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1982, superbwl, 0,        gselect,  gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Super Bowl (Version 16.03B)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1982, jokpoker, 0,        gselect,  gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, jokpokera,jokpoker, jokpokera,gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Joker Poker ICB 9-30-86)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, jokpokerb,jokpoker, jokpokera,gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, jokpokerc,jokpoker, jokpokera,gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Poker No Raise ICB 9-30-86)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, superbwl, 0,        gselect,  gselect, gei_state,  setbank, ROT0, "Greyhound Electronics", "Super Bowl (Version 16.03B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1982, gs4002,   0,        gselect,  gselect, driver_device,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 1)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1982, gs4002a,  gs4002,   gselect,  gselect, driver_device,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 2)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1982, gs4002,   0,        gselect,  gselect, driver_device,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, gs4002a,  gs4002,   gselect,  gselect, driver_device,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 2)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1982, amuse,    0,        amuse,    gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1982, amuse1,   amuse,    amuse1,   gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08 IBA)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1983, amuse1a,  amuse,    amuse1,   gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08A)",                  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1982, amuse,    0,        amuse,    gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, amuse1,   amuse,    amuse1,   gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08 IBA)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, amuse1a,  amuse,    amuse1,   gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08A)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, gepoker,  0,        gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gepoker1, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gepoker2, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3)",        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gepoker,  0,        gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gepoker1, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gepoker2, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, gtsers1,  0,        getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 1)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers2,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 2)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers3,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 3)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers4,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 4)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers5,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 5)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers7,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 7)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsersa,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 1)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsersb,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 2)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers8,  0,        findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers9,  gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers10, gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers10a,gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 10 Alt Question Rom)",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers11, gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers11a,gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers12, gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1986, gtsers14, gtsers8,  findout,  gt103, driver_device,    0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1986, gtsers15, gtsers8,  findout,  gt103, driver_device,    0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103a1,  gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103aa,  gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103ab,  gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103asx, gtsers8,  findout,  gt103a, driver_device,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers1,  0,        getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 1)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers2,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 2)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers3,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 3)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers4,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 4)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers5,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 5)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers7,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 7)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsersa,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsersb,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers8,  0,        findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers8a, gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 8 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers9,  gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers10, gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers11, gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers11a,gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gtsers12, gtsers8,  findout,  gt103,    driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, gtsers14, gtsers8,  findout,  gt103,    driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, gtsers15, gtsers8,  findout,  gt103,    driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gt103a1,  gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gt103aa,  gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gt103ab,  gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gt103asx, gtsers8,  findout,  getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1985, sextriv1, 0,        getrivia, sextriv1, driver_device, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1985, sextriv2, sextriv1, getrivia, sextriv1, driver_device, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1985, sextriv1, 0,        getrivia, sextriv1, driver_device, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, sextriv2, sextriv1, getrivia, sextriv1, driver_device, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, gt507uk,  0,        findout,  gt507uk, driver_device,  0,       ROT0, "Grayhound Electronics", "Trivia (UK Version 5.07)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, gt507uk,  0,        findout,  gt507uk, driver_device,  0,       ROT0, "Grayhound Electronics", "Trivia (UK Version 5.07)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, quiz,     0,        findout,  quiz, driver_device,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2)",                       GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, quiz,     0,        findout,  quiz, driver_device,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, quizvid,  0,        quizvid,  quiz, driver_device,     0,       ROT0, "bootleg",               "Video Quiz",                              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, quizvid,  0,        quizvid,  quiz, driver_device,     0,       ROT0, "bootleg",               "Video Quiz",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, reelfun,  0,        findout,  reelfun, driver_device,  0,       ROT0, "Grayhound Electronics", "Reel Fun (Version 7.03)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1986, reelfun1, reelfun,  findout,  reelfun, driver_device,  0,       ROT0, "Grayhound Electronics", "Reel Fun (Version 7.01)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1987, findout,  0,        findout,  findout, driver_device,  0,       ROT0, "Elettronolo",           "Find Out (Version 4.04)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, reelfun,  0,        findout,  reelfun, driver_device,  0,       ROT0, "Grayhound Electronics", "Reel Fun (Version 7.03)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, reelfun1, reelfun,  findout,  reelfun, driver_device,  0,       ROT0, "Grayhound Electronics", "Reel Fun (Version 7.01)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, findout,  0,        findout,  findout, driver_device,  0,       ROT0, "Elettronolo",           "Find Out (Version 4.04)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, suprpokr, 0,        suprpokr, suprpokr, driver_device, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.19S)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1986, suprpokra,suprpokr, suprpokr, suprpokr, driver_device, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.15S)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1986, suprpokrb,suprpokr, suprpokr, suprpokr, driver_device, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.10)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, suprpokr, 0,        suprpokr, suprpokr, driver_device, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.19S)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, suprpokra,suprpokr, suprpokr, suprpokr, driver_device, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.15S)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, suprpokrb,suprpokr, suprpokr, suprpokr, driver_device, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.10)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1991, quiz211,  0,        findout,  quiz, driver_device,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2.11)",                    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1991, quiz211,  0,        findout,  quiz, driver_device,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2.11)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1992, sexappl,  0,        findout,  sexappl, driver_device,  0,       ROT0, "Grayhound Electronics", "Sex Appeal (Version 6.02)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1992, sexappl,  0,        findout,  sexappl, driver_device,  0,       ROT0, "Grayhound Electronics", "Sex Appeal (Version 6.02)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1992, geimulti, 0,        geimulti, geimulti, gei_state, geimulti,    ROT0, "Grayhound Electronics", "GEI Multi Game",                          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1992, sprtauth, 0,        sprtauth, sprtauth, gei_state, geimulti,    ROT0, "Classic Games",         "Sports Authority",                        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1992, geimulti, 0,        geimulti, geimulti, gei_state, geimulti,    ROT0, "Grayhound Electronics", "GEI Multi Game",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, sprtauth, 0,        sprtauth, sprtauth, gei_state, geimulti,    ROT0, "Classic Games",         "Sports Authority",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

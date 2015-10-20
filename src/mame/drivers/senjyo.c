@@ -118,28 +118,13 @@ WRITE8_MEMBER(senjyo_state::sound_cmd_w)
 	m_pio->strobe_a(1);
 }
 
-WRITE8_MEMBER(senjyo_state::paletteram_w)
-{
-	int r = (data << 2) & 0xC;
-	int g = (data     ) & 0xC;
-	int b = (data >> 2) & 0xC;
-	int i = (data >> 6) & 0x3;
-
-	int rr = r|((r!=0)?i:0);
-	int gg = g|((g!=0)?i:0);
-	int bb = b|((b!=0)?i:0);
-
-	m_generic_paletteram_8[offset] = data;
-	m_palette->set_pen_color(offset, pal4bit(rr), pal4bit(gg), pal4bit(bb) );
-}
-
 static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("fgcolorram")
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_SHARE("fgscroll")
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
@@ -210,7 +195,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("fgcolorram")
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	/* The format / use of the ram here is different on the bootleg */
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_SHARE("scrollx3")
@@ -588,11 +573,14 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", senjyo)
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512+2)  /* 512 real palette + 2 for the radar */
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
+	MCFG_PALETTE_FORMAT_CLASS(1, senjyo_state, IIBBGGRR)
+
+	MCFG_PALETTE_ADD("radar_palette", 2)
+	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -980,10 +968,10 @@ DRIVER_INIT_MEMBER(senjyo_state,senjyo)
 }
 
 
-GAME( 1983, senjyo,   0,        senjyo,  senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", GAME_SUPPORTS_SAVE )
-GAME( 1984, starforc, 0,        senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", GAME_SUPPORTS_SAVE )
-GAME( 1984, starforce,starforc, senjyox, starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, starforcb,starforc, starforb,starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1984, starforca,starforc, senjyox, starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, megaforc, starforc, senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", GAME_SUPPORTS_SAVE )
-GAME( 1986, baluba,   0,        senjyo,  baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, senjyo,   0,        senjyo,  senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforc, 0,        senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforce,starforc, senjyox, starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforcb,starforc, starforb,starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforca,starforc, senjyox, starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, megaforc, starforc, senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, baluba,   0,        senjyo,  baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )

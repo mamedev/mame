@@ -434,4 +434,4 @@ DRIVER_INIT_MEMBER(istellar_state,istellar)
 }
 
 /*    YEAR  NAME    PARENT   MACHINE  INPUT    INIT    MONITOR  COMPANY          FULLNAME                       FLAGS) */
-GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

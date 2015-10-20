@@ -674,7 +674,7 @@ ROM_END
 
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins,  0,        powerins,  powerins, driver_device, 0, ROT0, "Atlus", "Power Instinct (USA)", GAME_SUPPORTS_SAVE )
-GAME( 1993, powerinsj, powerins, powerins,  powerinj, driver_device, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1993, powerinsa, powerins, powerinsa, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1993, powerinsb, powerins, powerinsb, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1993, powerins,  0,        powerins,  powerins, driver_device, 0, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsj, powerins, powerins,  powerinj, driver_device, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsa, powerins, powerinsa, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsb, powerins, powerinsb, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )

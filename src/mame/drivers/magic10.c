@@ -99,8 +99,7 @@ public:
 		m_vregs(*this, "vregs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	tilemap_t *m_layer0_tilemap;
 	tilemap_t *m_layer1_tilemap;
@@ -114,7 +113,6 @@ public:
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(magic102_r);
 	DECLARE_READ16_MEMBER(hotslot_copro_r);
 	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
@@ -132,7 +130,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 
@@ -157,13 +154,6 @@ WRITE16_MEMBER(magic10_state::layer2_videoram_w)
 	COMBINE_DATA(&m_layer2_videoram[offset]);
 	m_layer2_tilemap->mark_tile_dirty(offset >> 1);
 }
-
-WRITE16_MEMBER(magic10_state::paletteram_w)
-{
-	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	m_palette->set_pen_color( offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
-}
-
 
 TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
 {
@@ -302,7 +292,7 @@ static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSW")
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_out_w)
@@ -318,7 +308,7 @@ static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
@@ -334,7 +324,7 @@ static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x500001) AM_READ(magic102_r)
 	AM_RANGE(0x500004, 0x500005) AM_READNOP // gives credits
 	AM_RANGE(0x500006, 0x500007) AM_READNOP // gives credits
@@ -353,7 +343,7 @@ static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w) // copro comm
 	AM_RANGE(0x500006, 0x500011) AM_RAM
 	AM_RANGE(0x500012, 0x500013) AM_READ_PORT("IN0")
@@ -372,7 +362,7 @@ static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -743,9 +733,10 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(magic10_state, screen_update_magic10)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magic10)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magic10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1273,9 +1264,9 @@ GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, magic10,  RO
 GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
-GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         GAME_NOT_WORKING                 )
-GAME(  1997, suprpool, 0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Super Pool (9743 rev.01)",       GAME_NOT_WORKING                 )
-GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          GAME_NOT_WORKING                 )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       GAME_NOT_WORKING                 )
+GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         MACHINE_NOT_WORKING                 )
+GAME(  1997, suprpool, 0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Super Pool (9743 rev.01)",       MACHINE_NOT_WORKING                 )
+GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING                 )
+GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING                 )
 GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
 GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )

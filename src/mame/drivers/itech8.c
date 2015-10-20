@@ -504,7 +504,6 @@
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
-#include "machine/ticket.h"
 #include "includes/itech8.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
@@ -518,6 +517,8 @@
 #define CLOCK_12MHz     (12000000)
 
 
+
+IOPORT_ARRAY_MEMBER(itech8_state::analog_inputs) { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 /*************************************
  *
@@ -597,7 +598,7 @@ MACHINE_START_MEMBER(itech8_state,sstrike)
 	/* we need to update behind the beam as well */
 	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);
 	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(0), 32);
-	
+
 	itech8_state::machine_start();
 }
 
@@ -605,7 +606,7 @@ void itech8_state::machine_start()
 {
 	if (membank("bank1"))
 		membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
-	
+
 	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 	m_delayed_sound_data_timer = timer_alloc(TIMER_DELAYED_SOUND_DATA);
 	m_blitter_done_timer = timer_alloc(TIMER_BLITTER_DONE);
@@ -747,7 +748,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	m_pia_portb_data = data;
-	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x10) << 3);
+	m_ticket->write(space, 0, (data & 0x10) << 3);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -761,7 +762,7 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	m_pia_portb_data = data;
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, data & 0x80);
+	m_ticket->write(machine().driver_data()->generic_space(), 0, data & 0x80);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -2611,7 +2612,7 @@ DRIVER_INIT_MEMBER(itech8_state,grmatch)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x01e0, 0x01ff);
-	
+
 	save_item(NAME(m_grmatch_palcontrol));
 	save_item(NAME(m_grmatch_xscroll));
 	save_item(NAME(m_grmatch_palette));
@@ -2623,9 +2624,9 @@ DRIVER_INIT_MEMBER(itech8_state,slikshot)
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01cf, 0x01cf, write8_delegate(FUNC(itech8_state::slikshot_z80_control_w),this));
-	
+
 	m_delayed_z80_control_timer = timer_alloc(TIMER_DELAYED_Z80_CONTROL);
-	
+
 	save_item(NAME(m_z80_ctrl));
 	save_item(NAME(m_z80_port_val));
 	save_item(NAME(m_z80_clear_to_send));
@@ -2717,11 +2718,11 @@ GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t, driver_device,    0,  
 GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg, driver_device,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", GAME_MECHANICAL )
-GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", GAME_MECHANICAL )
-GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", GAME_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop, itech8_state,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", GAME_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike, itech8_state,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", GAME_MECHANICAL )
+GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop, itech8_state,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike, itech8_state,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
 GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */

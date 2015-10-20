@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Andrew Gardner, R. Belmont, Ville Linde
+// copyright-holders:R. Belmont, Ville Linde
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
 #include "machine/53c810.h"
@@ -34,17 +34,7 @@ struct m3_vertex
 	float nz;
 };
 
-struct m3_clip_vertex
-{
-	float x;
-	float y;
-	float z;
-	float w;
-	float u;
-	float v;
-	float i;
-	float s;
-};
+typedef frustum_clip_vertex<float, 4> m3_clip_vertex;
 
 struct m3_triangle
 {

@@ -415,7 +415,7 @@ ROM_START( skylancre )
 	ROM_LOAD( "18s030.1a",     0x0000, 0x0020, CRC(e645bacb) SHA1(5f4c299c4cf165fd229731c0e5799a34892bf28e) )
 ROM_END
 
-GAME( 1982, funkybee,  0,        funkybee, funkybee, driver_device, 0, ROT90, "Orca",                           "Funky Bee",                            GAME_SUPPORTS_SAVE )
-GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, driver_device,0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          GAME_SUPPORTS_SAVE )
-GAME( 1983, skylancr,  0,        funkybee, skylancr, driver_device, 0, ROT90, "Orca",                           "Sky Lancer",                           GAME_SUPPORTS_SAVE )
-GAME( 1983, skylancre, skylancr, funkybee, skylancre, driver_device,0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", GAME_SUPPORTS_SAVE )
+GAME( 1982, funkybee,  0,        funkybee, funkybee, driver_device, 0, ROT90, "Orca",                           "Funky Bee",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, driver_device,0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancr,  0,        funkybee, skylancr, driver_device, 0, ROT90, "Orca",                           "Sky Lancer",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancre, skylancr, funkybee, skylancre, driver_device,0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", MACHINE_SUPPORTS_SAVE )

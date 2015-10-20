@@ -417,4 +417,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mrflea,   0,        mrflea,   mrflea, driver_device,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , GAME_SUPPORTS_SAVE )
+GAME( 1982, mrflea,   0,        mrflea,   mrflea, driver_device,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , MACHINE_SUPPORTS_SAVE )

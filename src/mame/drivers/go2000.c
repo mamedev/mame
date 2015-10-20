@@ -52,7 +52,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_videoram2;
-//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices */
 	required_device<cpu_device> m_soundcpu;
@@ -372,4 +371,4 @@ ROM_START( go2000 )
 ROM_END
 
 
-GAME( 2000, go2000,    0, go2000,    go2000, driver_device,    0, ROT0,  "SunA?", "Go 2000", GAME_SUPPORTS_SAVE )
+GAME( 2000, go2000,    0, go2000,    go2000, driver_device,    0, ROT0,  "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )

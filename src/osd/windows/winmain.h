@@ -106,6 +106,7 @@
 #define WINOPTION_FULLSCREENGAMMA       "full_screen_gamma"
 
 // input options
+#define WINOPTION_GLOBAL_INPUTS         "global_inputs"
 #define WINOPTION_DUAL_LIGHTGUN         "dual_lightgun"
 
 
@@ -208,6 +209,7 @@ public:
 	float full_screen_gamma() const { return float_value(WINOPTION_FULLSCREENGAMMA); }
 
 	// input options
+	bool global_inputs() const { return bool_value(WINOPTION_GLOBAL_INPUTS); }
 	bool dual_lightgun() const { return bool_value(WINOPTION_DUAL_LIGHTGUN); }
 
 private:

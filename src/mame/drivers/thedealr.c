@@ -4,13 +4,13 @@
 
     The Dealer (Visco Games)
 
-	Driver by Luca Elia
-	This game runs on Seta Hardware
+    Driver by Luca Elia
+    This game runs on Seta Hardware
 
     P0-040A PCB:
 
     R65C02P2 x 2
-    X0-009 (Intel 8742 MCU?)
+    X0-009 (Intel 8742 MCU)
 
     X1-001
     X1-002
@@ -94,7 +94,7 @@ UINT32 thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->set_bg_yoffsets(  0x11+1, -0x10 );	// + is up (down with flip)
+	m_seta001->set_bg_yoffsets(  0x11+1, -0x10 );   // + is up (down with flip)
 	m_seta001->set_fg_yoffsets( -0x12+1, -0x01 );
 
 	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000, 1);
@@ -110,7 +110,7 @@ void thedealr_state::screen_eof(screen_device &screen, bool state)
 
 /***************************************************************************
 
-    IOX (i8742 MCU?) Simulation
+    IOX (i8742 MCU) Simulation
 
 ***************************************************************************/
 
@@ -120,11 +120,11 @@ void thedealr_state::screen_eof(screen_device &screen, bool state)
 
 void thedealr_state::iox_reset()
 {
-	m_iox_status	=	0x00;
-	m_iox_ret		=	0x00;
-	m_iox_cmd		=	0xff;
-	m_iox_leds		=	0x00;
-	m_iox_coins		=	0x00;
+	m_iox_status    =   0x00;
+	m_iox_ret       =   0x00;
+	m_iox_cmd       =   0xff;
+	m_iox_leds      =   0x00;
+	m_iox_coins     =   0x00;
 }
 
 MACHINE_RESET_MEMBER(thedealr_state,thedealr)
@@ -150,19 +150,19 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 
 		switch (m_iox_cmd)
 		{
-			case 0x20:	// leds
+			case 0x20:  // leds
 				m_iox_leds = data;
-				set_led_status(machine(), 0, data & 0x01);	// bet
-				set_led_status(machine(), 1, data & 0x02);	// deal
+				set_led_status(machine(), 0, data & 0x01);  // bet
+				set_led_status(machine(), 1, data & 0x02);  // deal
 				set_led_status(machine(), 2, data & 0x04);
 				set_led_status(machine(), 3, data & 0x08);
-				set_led_status(machine(), 4, data & 0x10);	// hold 1-5?
+				set_led_status(machine(), 4, data & 0x10);  // hold 1-5?
 				set_led_status(machine(), 5, data & 0x20);
 				set_led_status(machine(), 6, data & 0x40);
 				set_led_status(machine(), 7, data & 0x80);
 				break;
 
-			case 0x40:	// coin counters
+			case 0x40:  // coin counters
 				m_iox_coins = data;
 				coin_counter_w(machine(), 0, (~data) & 0x02); // coin1 or service coin
 				coin_counter_w(machine(), 1, (~data) & 0x04); // coupon
@@ -177,7 +177,7 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 				break;
 		}
 
-//		popmessage("LED: %02X COIN: %02X", m_iox_leds, m_iox_coins);
+//      popmessage("LED: %02X COIN: %02X", m_iox_leds, m_iox_coins);
 	}
 	else
 	{
@@ -186,7 +186,7 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 
 		switch (m_iox_cmd)
 		{
-			case 0x01:	// inputs?
+			case 0x01:  // inputs?
 			{
 				UINT16 buttons = ioport("IOX")->read();
 				m_iox_ret = 0;
@@ -202,30 +202,30 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 				break;
 			}
 
-//			case 0x04:	// ? at boot
+//          case 0x04:  // ? at boot
 
-			case 0x08:	// return iox version
+			case 0x08:  // return iox version
 				m_iox_ret = 0x54;
 				m_iox_status |= IOX_OUT_FULL;
 				break;
 
-			case 0x20:	// leds
+			case 0x20:  // leds
 				m_iox_status |= IOX_WAITDATA;
 				break;
 
-			case 0x40:	// coin counters
+			case 0x40:  // coin counters
 				m_iox_status |= IOX_WAITDATA;
 				break;
 
-			case 0x80:	// store param?
+			case 0x80:  // store param?
 				m_iox_status |= IOX_WAITDATA;
 				break;
 
-			case 0x81:	// store param?
+			case 0x81:  // store param?
 				m_iox_status |= IOX_WAITDATA;
 				break;
 
-			case 0xff:	// reset
+			case 0xff:  // reset
 				iox_reset();
 				break;
 
@@ -262,18 +262,18 @@ WRITE8_MEMBER(thedealr_state::unk_w)
 	// bit 2 - ? 0 during game
 	// bit 3 - ? 1 during game
 	// bit 7 - ? 0 during game
-//	popmessage("UNK %02x", data);
+//  popmessage("UNK %02x", data);
 }
 
 static ADDRESS_MAP_START( thedealr, AS_PROGRAM, 8, thedealr_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x2000, 0x2000) AM_RAM	// w ff at boot (after clearing commram)
+	AM_RANGE(0x2000, 0x2000) AM_RAM // w ff at boot (after clearing commram)
 
-	AM_RANGE(0x2400, 0x2400) AM_READ(irq_ack_r)	// r = irq ack.
-	AM_RANGE(0x2400, 0x2400) AM_WRITE(unk_w)	// w = ?
+	AM_RANGE(0x2400, 0x2400) AM_READ(irq_ack_r) // r = irq ack.
+	AM_RANGE(0x2400, 0x2400) AM_WRITE(unk_w)    // w = ?
 
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("COINS") AM_WRITENOP	// rw
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("COINS") AM_WRITENOP  // rw
 
 	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("DSW4")
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("DSW3")
@@ -281,8 +281,8 @@ static ADDRESS_MAP_START( thedealr, AS_PROGRAM, 8, thedealr_state )
 	AM_RANGE(0x3400, 0x3400) AM_READWRITE(iox_r, iox_w)
 	AM_RANGE(0x3401, 0x3401) AM_READ(iox_status_r)
 
-	AM_RANGE(0x3000, 0x3000) AM_RAM	// rw, comm in test mode
-	AM_RANGE(0x3001, 0x3001) AM_RAM	// rw, ""
+	AM_RANGE(0x3000, 0x3000) AM_RAM // rw, comm in test mode
+	AM_RANGE(0x3001, 0x3001) AM_RAM // rw, ""
 
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("commram")
 
@@ -375,7 +375,7 @@ static INPUT_PORTS_START( thedealr )
  Switches 7 & 8 control the payout as follows:
 
             Off/Off Off/On  On/Off  On/On   Notes
-		    ---------------------------------------------------------------------------------------------
+            ---------------------------------------------------------------------------------------------
 Jackpot MB   5000    5000    5000    2000   Ryl Flush bonus at Max Bet
    Jackpot   2500    2500    2500    1000   Ryl Flush bonus at 5 coins + 500 (or 200) per coin up to Max Bet
    Mini JP   1500    1500    1000     500   Str Flush bonus at Max Bet
@@ -444,7 +444,7 @@ Fever Mode:
   3 of a Kind winning hand Jacks or higher enters Fever Mode
   You start with a pair of your 3 of a Kind cards & you draw 3 cards each hand.
     Jacks through Kings get 5 Fever Mode Draws
-	Aces get 15 Fever Mode Draws
+    Aces get 15 Fever Mode Draws
 */
 	PORT_DIPNAME( 0x20, 0x20, "Fever Mode" ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
@@ -455,12 +455,12 @@ Fever Mode:
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:7" )	// X in service mode
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:8" )	// ""
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:7" )   // X in service mode
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:8" )   // ""
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW4:2" )	// "Excess switch time" error
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW4:2" )   // "Excess switch time" error
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW4:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW4:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW4:5" )
@@ -522,11 +522,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 static MACHINE_CONFIG_START( thedealr, thedealr_state )
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_16MHz/8)	// 2 MHz?
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL_16MHz/8)   // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(thedealr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedealr_state, thedealr_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("subcpu", R65C02, XTAL_16MHz/8)	// 2 MHz?
+	MCFG_CPU_ADD("subcpu", R65C02, XTAL_16MHz/8)    // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(thedealr_sub)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedealr_state, nmi_line_pulse)
 
@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( thedealr, thedealr_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_16MHz/8)	// 2 MHz?
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_16MHz/8)   // 2 MHz?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -574,6 +574,10 @@ ROM_START( thedealr )
 	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "xb3_002", 0x00000, 0x10000, CRC(53a37fa4) SHA1(2adfea2dd08f298cda885bc72606d03f8af886a0) )
 
+	// To do: hook up
+	ROM_REGION( 0x0800, "iocpu", 0 )
+	ROM_LOAD( "x0-009",  0x0000, 0x0800, CRC(e8b86d5a) SHA1(ad12e8f4411c30cd691792c6b0b3429db786d8b5) )
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "xb0-002-w45.u42", 0x00000, 0x80000, CRC(41ec6a57) SHA1(d3f0508d5f4054fd2b0ee5227325a95fd1272aad) )
 	ROM_LOAD( "xb0-001-w44.u41", 0x80000, 0x80000, CRC(bdaca555) SHA1(5ae1dc1514993fd804a101182735d5fb6815f720) )
@@ -583,4 +587,4 @@ ROM_START( thedealr )
 	ROM_LOAD( "xb0-u68.u68", 0x200, 0x200, CRC(c0c54d43) SHA1(5ce352fb888c8e683014c73e6da00ec95f2ae572) )
 ROM_END
 
-GAME( 1988?, thedealr, 0, thedealr, thedealr, driver_device, 0, ROT0, "Visco Games", "The Dealer (Visco)", GAME_SUPPORTS_SAVE )
+GAME( 1988?, thedealr, 0, thedealr, thedealr, driver_device, 0, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )

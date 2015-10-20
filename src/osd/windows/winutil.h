@@ -15,5 +15,6 @@
 file_error win_error_to_file_error(DWORD error);
 osd_dir_entry_type win_attributes_to_entry_type(DWORD attributes);
 BOOL win_is_gui_application(void);
+HMODULE WINAPI GetModuleHandleUni();
 
 #endif // __WINUTIL__

@@ -260,6 +260,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	if (view != NULL) machine->debug_view().free_view(*view);
 	if (font != nil) [font release];
 	if (text != nil) [text release];
 	[super dealloc];
@@ -403,7 +404,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	[text addAttribute:NSFontAttributeName value:font range:run];
 	NSPasteboard *const board = [NSPasteboard generalPasteboard];
 	[board declareTypes:[NSArray arrayWithObject:NSRTFPboardType] owner:nil];
-	[board setData:[text RTFFromRange:run documentAttributes:nil] forType:NSRTFPboardType];
+	[board setData:[text RTFFromRange:run documentAttributes:@{}] forType:NSRTFPboardType];
 	[text deleteCharactersInRange:run];
 }
 

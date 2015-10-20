@@ -516,12 +516,12 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 READ16_MEMBER(wgp_state::wgp_adinput_r)
 {
 	int steer = 0x40;
-	int fake = ioport(FAKE_PORT_TAG)->read_safe(0x00);
+	int fake = m_fake ? m_fake->read() : 0;
 
 	if (!(fake & 0x10)) /* Analogue steer (the real control method) */
 	{
 		/* Reduce span to 0x80 */
-		steer = (ioport(STEER_PORT_TAG)->read_safe(0x00) * 0x80) / 0x100;
+		steer = ((m_steer ? m_steer->read() : 0) * 0x80) / 0x100;
 	}
 	else    /* Digital steer */
 	{
@@ -566,7 +566,7 @@ READ16_MEMBER(wgp_state::wgp_adinput_r)
 		}
 
 		case 0x05:
-			return ioport(UNKNOWN_PORT_TAG)->read_safe(0x00);   /* unknown */
+			return m_unknown ? m_unknown->read() : 0;   /* unknown */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",space.device().safe_pc(),offset);
@@ -590,7 +590,7 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
 
 WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 3);
+	m_z80bank->set_entry(data & 3);
 }
 
 WRITE16_MEMBER(wgp_state::wgp_sound_w)
@@ -909,7 +909,7 @@ void wgp_state::machine_reset()
 
 void wgp_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_port_sel));
@@ -1208,8 +1208,8 @@ DRIVER_INIT_MEMBER(wgp_state,wgp2)
 
 /* Working Games with some graphics problems - e.g. missing rotation */
 
-GAME( 1989, wgp,      0,      wgp,    wgp, wgp_state,    wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1989, wgpj,     wgp,    wgp,    wgpj, wgp_state,   wgp,    ROT0, "Taito Corporation", "World Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1990, wgp2,     wgp,    wgp2,   wgp2, wgp_state,   wgp2,   ROT0, "Taito Corporation", "World Grand Prix 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1989, wgp,      0,      wgp,    wgp, wgp_state,    wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgpj,     wgp,    wgp,    wgpj, wgp_state,   wgp,    ROT0, "Taito Corporation", "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1990, wgp2,     wgp,    wgp2,   wgp2, wgp_state,   wgp2,   ROT0, "Taito Corporation", "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

@@ -1,9 +1,34 @@
 // license:???
 // copyright-holders:Hau
 #include "machine/eepromser.h"
-#include "video/polylgcy.h"
+
+#include "video/poly.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
+
+
+class galastrm_state;
+
+struct gs_poly_data
+{
+	bitmap_ind16* texbase;
+};
+
+class galastrm_renderer : public poly_manager<float, gs_poly_data, 2, 10000>
+{
+public:
+	galastrm_renderer(galastrm_state &state);
+
+	void tc0610_draw_scanline(INT32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
+	void tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip);
+
+	bitmap_ind16 &screenbits() { return m_screenbits; }
+
+private:
+	galastrm_state& m_state;
+	bitmap_ind16 m_screenbits;
+};
+
 
 struct gs_tempsprite
 {
@@ -56,8 +81,8 @@ public:
 	struct gs_tempsprite *m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
-	bitmap_ind16 m_polybitmap;
-	legacy_poly_manager *m_poly;
+	galastrm_renderer *m_poly;
+
 	int m_rsxb;
 	int m_rsyb;
 	int m_rsxoffs;
@@ -74,7 +99,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
-	void galastrm_exit();
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 	void tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip);

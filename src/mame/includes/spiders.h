@@ -8,8 +8,6 @@
 #include "sound/discrete.h"
 #include "video/mc6845.h"
 
-#define NUM_PENS    (8)
-
 class spiders_state : public driver_device
 {
 public:
@@ -18,6 +16,7 @@ public:
 		m_ram(*this, "ram"),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_ram;
@@ -27,7 +26,7 @@ public:
 	UINT8 m_gfx_rom_ctrl_mode;
 	UINT8 m_gfx_rom_ctrl_latch;
 	UINT8 m_gfx_rom_ctrl_data;
-	pen_t m_pens[NUM_PENS];
+
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_firq);
 	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
@@ -42,9 +41,11 @@ public:
 	DECLARE_WRITE8_MEMBER(spiders_audio_a_w);
 	DECLARE_WRITE8_MEMBER(spiders_audio_b_w);
 	DECLARE_WRITE8_MEMBER(spiders_audio_ctrl_w);
-	MC6845_BEGIN_UPDATE(crtc_begin_update);
+
 	MC6845_UPDATE_ROW(crtc_update_row);
+
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
 };
 

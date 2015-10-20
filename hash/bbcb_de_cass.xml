@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro Model B (German) Tapes -->
+
+<!-- I believe all the Cassette images here are original, so some require the manuals for additional copy protection -->
+
+<!-- Loading Instructions:
+
+      If the system has a disk drive (which the BBC Model B does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
+
+      To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
+-->
+
+<softwarelist name="bbcb_de_cass" description="BBC Micro Model B (German) cassettes">
+
+	<!-- Games -->
+
+	<software name="hopperg">
+		<description>Hopper (Ger)</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8112">
+				<rom name="hopper-german(1983)(acornsoft)(g23).uef" size="8112" crc="3972b897" sha1="b5f7897dcad92b758d0473ac840f2b41e8049ef4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteorsg">
+		<description>Meteors (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="6610">
+				<rom name="meteors-german(1982)(acornsoft)(g13).uef" size="6610" crc="0bb65e55" sha1="238ba733b0094942dd477ca49754249284741c40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monsterg">
+		<description>Monsters (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7890">
+				<rom name="monsters-german(1982)(acornsoft)(g03).uef" size="7890" crc="37838358" sha1="c3c698a8174d0b67d6ee563bcecb9a42354ae3fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetog">
+		<description>Planetoid (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8515">
+				<rom name="planetoid-german(1982)(acornsoft)(g15).uef" size="8515" crc="bfaa94f8" sha1="fc8cb246c19cd717f7684074979ea5cb6d98e4fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocketrg">
+		<description>Rocket Raid (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7747">
+				<rom name="rocketraid-german(1982)(acornsoft)(g05).uef" size="7747" crc="3a6ccbd0" sha1="afd7318589bb419606b25b575c7488369acf2c9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snapperg">
+		<description>Snapper (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7174">
+				<rom name="snapper-german(1982)(acornsoft)(g04).uef" size="7174" crc="6ffbe578" sha1="0cc295dba1b771475ae8e71340b6ce4f885040e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supering">
+		<description>Super Invaders (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7812">
+				<rom name="superinvaders-german(1982)(acornsoft)(g16).uef" size="7812" crc="382b3412" sha1="4361fba1203b07fb05f62273ac02db403a3f38ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="welcomeg">
+		<description>Welcome (Ger)</description>
+		<year>1981</year>
+		<publisher>BBC Soft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="48009">
+				<rom name="welcome-german(1981)(bbc).uef" size="48009" crc="a2d78451" sha1="b0ff9fd8a51412dee878e763fe0aa54deef2c962" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Business -->
+
+	<software name="dskdiarg">
+		<description>Desk Diary (Ger)</description>
+		<year>198?</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="9739">
+				<rom name="deskdiary-german(198x)(acornsoft)(b01).uef" size="9739" crc="7ef32892" sha1="ec3910be9c7b5c1729586ba88a88173d08dcf34b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="numberbg">
+		<description>Number Balance (Ger)</description>
+		<year>198?</year>
+		<publisher>Acornsoft/ESM</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7727">
+				<rom name="numberbalance-german(acornsoftesm).uef" size="7727" crc="2461e7a8" sha1="7b2ce801a3213fcac582b173d65aaa347555a2c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sentseqg">
+		<description>Sentence Sequencing (Ger)</description>
+		<year>198?</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="10769">
+				<rom name="sentencesequencing-german(198x)(acornsoft)(e07).uef" size="10769" crc="28955bf7" sha1="f6422764589cbe5d1acefca2d90f288b95e84280" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treeknog">
+		<description>Tree Of Knowledge (Ger)</description>
+		<year>198?</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="11319">
+				<rom name="treeofknowledge-german(198x)(acornsoft)(e04).uef" size="11319" crc="c1b66b33" sha1="53bd97ccc48c5b00a1e57728800e786b6a9d30d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jars">
+		<description>Jars (Ger)</description>
+		<year>198?</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8325">
+				<rom name="jars-german(198x)(acornsoft)(e15).uef" size="8325" crc="943ba245" sha1="5a911796040eb708926d5c9e1aecb3d0e7ea546b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

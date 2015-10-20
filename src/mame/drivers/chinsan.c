@@ -688,4 +688,4 @@ DRIVER_INIT_MEMBER(chinsan_state,chinsan)
  *
  *************************************/
 
-GAME( 1987, chinsan,  0,    chinsan, chinsan, chinsan_state, chinsan, ROT0, "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", GAME_SUPPORTS_SAVE )
+GAME( 1987, chinsan,  0,    chinsan, chinsan, chinsan_state, chinsan, ROT0, "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )

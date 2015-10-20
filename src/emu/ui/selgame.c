@@ -225,7 +225,7 @@ void ui_menu_select_game::populate()
 	int curitem;
 
 	for (curitem = matchcount = 0; m_driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
-		if (!(m_driverlist[curitem]->flags & GAME_NO_STANDALONE))
+		if (!(m_driverlist[curitem]->flags & MACHINE_NO_STANDALONE))
 			matchcount++;
 
 	// if nothing there, add a single multiline item and return
@@ -332,22 +332,22 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		strprintf(tempbuf[2],"Driver: %-.100s", core_filename_extract_base(tempbuf[3], driver->source_file).c_str());
 
 		// next line is overall driver status
-		if (driver->flags & GAME_NOT_WORKING)
+		if (driver->flags & MACHINE_NOT_WORKING)
 			tempbuf[3].assign("Overall: NOT WORKING");
-		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
+		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
 			tempbuf[3].assign("Overall: Unemulated Protection");
 		else
 			tempbuf[3].assign("Overall: Working");
 
 		// next line is graphics, sound status
-		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
+		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
 			gfxstat = "Imperfect";
 		else
 			gfxstat = "OK";
 
-		if (driver->flags & GAME_NO_SOUND)
+		if (driver->flags & MACHINE_NO_SOUND)
 			soundstat = "Unimplemented";
-		else if (driver->flags & GAME_IMPERFECT_SOUND)
+		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
 			soundstat = "Imperfect";
 		else
 			soundstat = "OK";
@@ -399,9 +399,9 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	color = UI_BACKGROUND_COLOR;
 	if (driver != NULL)
 		color = UI_GREEN_COLOR;
-	if (driver != NULL && (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND | GAME_IMPERFECT_SOUND)) != 0)
+	if (driver != NULL && (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
 		color = UI_YELLOW_COLOR;
-	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
+	if (driver != NULL && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, color);
 

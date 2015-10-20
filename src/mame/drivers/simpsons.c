@@ -344,11 +344,10 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240)
+//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
+//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(59.1856)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(simpsons_state, screen_update_simpsons)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -605,10 +604,10 @@ ROM_END
 ***************************************************************************/
 
 // the region warning, if one exists, is shown after the high-score screen in attract mode
-GAME( 1991, simpsons,    0,        simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players Asia)", GAME_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, simpsons,    0,        simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players Asia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players Japan)", MACHINE_SUPPORTS_SAVE )

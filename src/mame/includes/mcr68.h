@@ -28,8 +28,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
@@ -79,8 +78,6 @@ public:
 	DECLARE_READ16_MEMBER(mcr68_6840_r_common);
 	void reload_count(int counter);
 	UINT16 compute_counter(int counter);
-	DECLARE_WRITE16_MEMBER(mcr68_paletteram_w);
-	DECLARE_WRITE16_MEMBER(zwackery_paletteram_w);
 	DECLARE_WRITE16_MEMBER(mcr68_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_spriteram_w);
@@ -129,5 +126,4 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };

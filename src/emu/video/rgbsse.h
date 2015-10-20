@@ -349,7 +349,7 @@ public:
 		add(other);
 		clamp_to_uint8();
 	}
-	
+
 	inline void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{
 		mul(scale);
@@ -362,7 +362,7 @@ public:
 	{
 		rgbaint_t color2(other);
 		color2.mul(scale2);
-	
+
 		mul(scale);
 		add(color2);
 		sra_imm(8);
@@ -512,10 +512,10 @@ protected:
 	struct _statics
 	{
 		__m128  dummy_for_alignment;
-		INT16   alpha_mask[8];
-		INT16   red_mask[8];
-		INT16   green_mask[8];
-		INT16   blue_mask[8];
+		UINT16   alpha_mask[8];
+		UINT16   red_mask[8];
+		UINT16   green_mask[8];
+		UINT16   blue_mask[8];
 		INT16   scale_table[256][8];
 	};
 

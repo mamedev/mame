@@ -1003,10 +1003,10 @@ ROM_START( dynamski )
 ROM_END
 
 
-GAME( 1984, dynamski, 0,        dynamski, dynamski, driver_device, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1984, chinhero, 0,        chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero", GAME_SUPPORTS_SAVE ) // by Nihon Game?
-GAME( 1984, chinhero2,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, chinhero3,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, chinherot,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo (Taito license)", "Chinese Heroe (Taito)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, dynamski, 0,        dynamski, dynamski, driver_device, 0,        ROT90, "Taiyo", "Dynamic Ski", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinhero, 0,        chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero", MACHINE_SUPPORTS_SAVE ) // by Nihon Game?
+GAME( 1984, chinhero2,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinhero3,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinherot,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo (Taito license)", "Chinese Heroe (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Taito license)", "Hokuha Syourin Hiryu no Ken", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

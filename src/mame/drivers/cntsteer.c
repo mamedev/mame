@@ -10,17 +10,22 @@
     Improvements by Pierpaolo Prazzoli, David Haywood, Angelo Salese
 
     todo:
-    finish
+    both games
         - correct roz rotation;
-        - make cntsteer work, comms looks awkward and probably different than Zero Target;
         - flip screen support;
         - according to a side-by-side test, sound should be "darker" by some octaves,
           likely that a sound filter is needed;
+    cntsteer specific:
+        - In Back Rotate Test, rotation is tested with the following arrangement (upper bits of rotation parameter):
+          04 -> 05 -> 02 -> 03 -> 00 -> 01 -> 06 -> 07 -> 04 and backwards
+          Anything with bit 0 set is tested from 0xff to 0, with bit 0 clear that's 0 -> 0xff, fun.
+	- Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol. 
+	  We currently have slave CPU irq hooked up to vblank, might or might not be correct.
+	- invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
+	- understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging, missing video bit or it's actually a RMW thing);
     cleanup
         - split into driver/video;
 
-    note: To boot cntsteer, set a CPU #1 breakpoint on c225 and then 'do pc=c230'.
-          Protection maybe?
 
 ***************************************************************************************/
 
@@ -68,6 +73,7 @@ public:
 
 	/* misc */
 	int      m_nmimask; // zerotrgt only
+	bool     m_sub_nmimask; // counter steer only
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -81,6 +87,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_attr_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_background_w);
+	DECLARE_READ8_MEMBER(cntsteer_background_mirror_r);
 	DECLARE_WRITE8_MEMBER(gekitsui_sub_irq_ack);
 	DECLARE_WRITE8_MEMBER(cntsteer_sound_w);
 	DECLARE_WRITE8_MEMBER(zerotrgt_ctrl_w);
@@ -102,6 +109,7 @@ public:
 	DECLARE_PALETTE_INIT(zerotrgt);
 	UINT32 screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(subcpu_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -438,10 +446,14 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 		case 1: m_scrollx = data; break;
 		case 2: m_bg_bank = (data & 0x01) << 8;
 				m_bg_color_bank = (data & 6) >> 1;
+				// TODO: of course this just inibits bus request for master.
+				// TODO: after further investigation, this isn't right, it disables once that player insert a coin.
+
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3: m_rotation_sign = (data & 7);
-				m_disable_roz = (~data & 0x08);
+				m_disable_roz = 0; //(~data & 0x08);
+				m_maincpu->set_input_line(INPUT_LINE_RESET, data & 8 ? CLEAR_LINE : ASSERT_LINE);
 				m_scrolly_hi = (data & 0x30) << 4;
 				m_scrollx_hi = (data & 0xc0) << 2;
 				break;
@@ -465,6 +477,12 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+/* checks area 0x2000-0x2fff with this address config. */
+READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
+{
+	return m_videoram2[BITSWAP16(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
 /*************************************
@@ -497,20 +515,24 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_irq_w)
 {
-	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	//m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_nmi_w)
 {
 //  if (data)
-//  m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().scheduler().synchronize(); // force resync
+
+	//m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 //  popmessage("%02x", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
 {
-	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	machine().scheduler().synchronize(); // force resync
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
@@ -585,7 +607,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2")
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(cntsteer_background_mirror_r,cntsteer_background_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
@@ -603,6 +625,17 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cntsteer_state::nmimask_w)
 {
 	m_nmimask = data & 0x80;
+}
+
+INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
+{
+	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed.
+	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
+	//       between these operations brings us to this.
+	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
+//	UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);
+//	m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
@@ -847,7 +880,7 @@ MACHINE_START_MEMBER(cntsteer_state,zerotrgt)
 }
 
 
-MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
+MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
 {
 	m_flipscreen = 0;
 	m_bg_bank = 0;
@@ -860,13 +893,14 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 
 	m_bg_color_bank = 0;
 	m_disable_roz = 0;
+	m_nmimask = 0;
 }
 
 
-MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
+MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 {
-	m_nmimask = 0;
-	MACHINE_RESET_CALL_MEMBER(cntsteer);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
 static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
@@ -879,7 +913,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MCFG_DEVICE_DISABLE()
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  subcpu_vblank_irq) /* ? */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -897,7 +931,8 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_cntsteer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("subcpu")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cntsteer)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1179,7 +1214,7 @@ DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
 
 /***************************************************************************/
 
-GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt, cntsteer_state,  zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
-GAME( 1985, zerotrgta, zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CT)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
-GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
-GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer, cntsteer_state,  zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS|GAME_NO_COCKTAIL|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
+GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt, cntsteer_state,  zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, zerotrgta, zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CT)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer, cntsteer_state,  zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )

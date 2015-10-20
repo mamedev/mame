@@ -5,7 +5,7 @@
 
 #include "../common.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <stddef.h> // offsetof
 #include <memory.h> // memcpy
 #include <wchar.h>  // wcslen
@@ -329,6 +329,15 @@ void TextBuffer::clearTextBuffer()
 
 void TextBuffer::appendGlyph(FontHandle _handle, CodePoint _codePoint)
 {
+	if (_codePoint == L'\t')
+	{
+		for (uint32_t ii = 0; ii < 4; ++ii)
+		{
+			appendGlyph(_handle, L' ');
+		}
+		return;
+	}
+
 	const GlyphInfo* glyph = m_fontManager->getGlyphInfo(_handle, _codePoint);
 	BX_WARN(NULL != glyph, "Glyph not found (font handle %d, code point %d)", _handle.idx, _codePoint);
 	if (NULL == glyph)
@@ -336,27 +345,27 @@ void TextBuffer::appendGlyph(FontHandle _handle, CodePoint _codePoint)
 		return;
 	}
 
-	const FontInfo& font = m_fontManager->getFontInfo(_handle);
-
 	if( m_vertexCount/4 >= MAX_BUFFERED_CHARACTERS)
 	{
 		return;
 	}
+
+	const FontInfo& font = m_fontManager->getFontInfo(_handle);
 
 	if (_codePoint == L'\n')
 	{
 		m_penX = m_originX;
 		m_penY += m_lineGap + m_lineAscender -m_lineDescender;
 		m_lineGap = font.lineGap;
-		m_lineDescender = font.descender;
-		m_lineAscender = font.ascender;
+		m_lineDescender  = font.descender;
+		m_lineAscender   = font.ascender;
 		m_lineStartIndex = m_vertexCount;
 		return;
 	}
 
 	//is there a change of font size that require the text on the left to be centered again ?
 	if (font.ascender > m_lineAscender
-		|| (font.descender < m_lineDescender) )
+	|| (font.descender < m_lineDescender) )
 	{
 		if (font.descender < m_lineDescender)
 		{
@@ -377,7 +386,7 @@ void TextBuffer::appendGlyph(FontHandle _handle, CodePoint _codePoint)
 	const Atlas* atlas = m_fontManager->getAtlas();
 
 	if (m_styleFlags & STYLE_BACKGROUND
-	&&  m_backgroundColor & 0xFF000000)
+	&&  m_backgroundColor & 0xff000000)
 	{
 		float x0 = (m_penX - kerning);
 		float y0 = (m_penY);
@@ -584,6 +593,15 @@ TextBufferManager::TextBufferManager(FontManager* _fontManager)
 		fs_font_distance_field_subpixel = bgfx::makeRef(fs_font_distance_field_subpixel_dx11, sizeof(fs_font_distance_field_subpixel_dx11) );
 		break;
 
+	case bgfx::RendererType::Metal:
+		vs_font_basic = bgfx::makeRef(vs_font_basic_mtl, sizeof(vs_font_basic_mtl) );
+		fs_font_basic = bgfx::makeRef(fs_font_basic_mtl, sizeof(fs_font_basic_mtl) );
+		vs_font_distance_field = bgfx::makeRef(vs_font_distance_field_mtl, sizeof(vs_font_distance_field_mtl) );
+		fs_font_distance_field = bgfx::makeRef(fs_font_distance_field_mtl, sizeof(fs_font_distance_field_mtl) );
+		vs_font_distance_field_subpixel = bgfx::makeRef(vs_font_distance_field_subpixel_mtl, sizeof(vs_font_distance_field_subpixel_mtl) );
+		fs_font_distance_field_subpixel = bgfx::makeRef(fs_font_distance_field_subpixel_mtl, sizeof(fs_font_distance_field_subpixel_mtl) );
+		break;
+
 	default:
 		vs_font_basic = bgfx::makeRef(vs_font_basic_glsl, sizeof(vs_font_basic_glsl) );
 		fs_font_basic = bgfx::makeRef(fs_font_basic_glsl, sizeof(fs_font_basic_glsl) );
@@ -619,7 +637,7 @@ TextBufferManager::TextBufferManager(FontManager* _fontManager)
 		.add(bgfx::Attrib::Color0,    4, bgfx::AttribType::Uint8, true)
 		.end();
 
-	u_texColor = bgfx::createUniform("u_texColor", bgfx::UniformType::Uniform1iv);
+	s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 }
 
 TextBufferManager::~TextBufferManager()
@@ -627,7 +645,7 @@ TextBufferManager::~TextBufferManager()
 	BX_CHECK(m_textBufferHandles.getNumHandles() == 0, "All the text buffers must be destroyed before destroying the manager");
 	delete [] m_textBuffers;
 
-	bgfx::destroyUniform(u_texColor);
+	bgfx::destroyUniform(s_texColor);
 
 	bgfx::destroyProgram(m_basicProgram);
 	bgfx::destroyProgram(m_distanceProgram);
@@ -706,12 +724,13 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 		return;
 	}
 
-	bgfx::setTexture(0, u_texColor, m_fontManager->getAtlas()->getTextureHandle() );
+	bgfx::setTexture(0, s_texColor, m_fontManager->getAtlas()->getTextureHandle() );
 
+	bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
 	switch (bc.fontType)
 	{
 	case FONT_TYPE_ALPHA:
-		bgfx::setProgram(m_basicProgram);
+		program = m_basicProgram;
 		bgfx::setState(0
 			| BGFX_STATE_RGB_WRITE
 			| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
@@ -719,7 +738,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 		break;
 
 	case FONT_TYPE_DISTANCE:
-		bgfx::setProgram(m_distanceProgram);
+		program = m_distanceProgram;
 		bgfx::setState(0
 			| BGFX_STATE_RGB_WRITE
 			| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
@@ -727,7 +746,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 		break;
 
 	case FONT_TYPE_DISTANCE_SUBPIXEL:
-		bgfx::setProgram(m_distanceSubpixelProgram);
+		program = m_distanceSubpixelProgram;
 		bgfx::setState(0
 			| BGFX_STATE_RGB_WRITE
 			| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_FACTOR, BGFX_STATE_BLEND_INV_SRC_COLOR)
@@ -764,7 +783,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 			}
 
 			bgfx::setVertexBuffer(vbh, 0, bc.textBuffer->getVertexCount() );
-			bgfx::setIndexBuffer(ibh, bc.textBuffer->getIndexCount() );
+			bgfx::setIndexBuffer(ibh, 0, bc.textBuffer->getIndexCount() );
 		}
 		break;
 
@@ -793,10 +812,12 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 				vbh.idx = bc.vertexBufferHandleIdx;
 
 				bgfx::updateDynamicIndexBuffer(ibh
+						, 0
 						, bgfx::copy(bc.textBuffer->getIndexBuffer(), indexSize)
 						);
 
 				bgfx::updateDynamicVertexBuffer(vbh
+						, 0
 						, bgfx::copy(bc.textBuffer->getVertexBuffer(), vertexSize)
 						);
 			}
@@ -820,7 +841,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 		break;
 	}
 
-	bgfx::submit(_id, _depth);
+	bgfx::submit(_id, program, _depth);
 }
 
 void TextBufferManager::setStyle(TextBufferHandle _handle, uint32_t _flags)

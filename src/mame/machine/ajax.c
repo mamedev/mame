@@ -214,9 +214,3 @@ void ajax_state::machine_reset()
 	m_priority = 0;
 	m_firq_enable = 0;
 }
-
-INTERRUPT_GEN_MEMBER(ajax_state::ajax_interrupt)
-{
-	if (m_k051960->k051960_is_irq_enabled())
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-}

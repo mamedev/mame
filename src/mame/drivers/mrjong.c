@@ -273,6 +273,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mrjong,   0,      mrjong, mrjong, driver_device, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, crazyblk, mrjong, mrjong, mrjong, driver_device, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", GAME_SUPPORTS_SAVE )
-GAME( 1983, blkbustr, mrjong, mrjong, mrjong, driver_device, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", GAME_SUPPORTS_SAVE )
+GAME( 1983, mrjong,   0,      mrjong, mrjong, driver_device, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, crazyblk, mrjong, mrjong, mrjong, driver_device, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blkbustr, mrjong, mrjong, mrjong, driver_device, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", MACHINE_SUPPORTS_SAVE )

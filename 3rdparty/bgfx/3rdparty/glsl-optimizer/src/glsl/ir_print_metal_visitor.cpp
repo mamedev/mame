@@ -101,6 +101,7 @@ struct metal_print_context
 	, paramsStr(ralloc_strdup(buffer, ""))
 	, writingParams(false)
 	, matrixCastsDone(false)
+	, matrixConstructorsDone(false)
 	, shadowSamplerDone(false)
 	, textureCounter(0)
 	, attributeCounter(0)
@@ -118,6 +119,7 @@ struct metal_print_context
 	string_buffer paramsStr;
 	bool writingParams;
 	bool matrixCastsDone;
+	bool matrixConstructorsDone;
 	bool shadowSamplerDone;
 	int textureCounter;
 	int attributeCounter;
@@ -207,6 +209,7 @@ _mesa_print_ir_metal(exec_list *instructions,
 
 	// includes, prefix etc.
 	ctx.prefixStr.asprintf_append ("#include <metal_stdlib>\n");
+	ctx.prefixStr.asprintf_append ("#pragma clang diagnostic ignored \"-Wparentheses-equality\"\n");
 	ctx.prefixStr.asprintf_append ("using namespace metal;\n");
 
 	ctx.inputStr.asprintf_append("struct xlatMtlShaderInput {\n");
@@ -233,8 +236,10 @@ _mesa_print_ir_metal(exec_list *instructions,
 			// skip gl_ variables if they aren't used/assigned
 			if (strstr(var->name, "gl_") == var->name)
 			{
-				if (!var->data.used && !var->data.assigned)
-					continue;
+				if (NULL == strstr(var->name, "gl_FragData_") ) {
+					if (!var->data.used && !var->data.assigned)
+						continue;
+				}
 			}
 
 			//
@@ -462,6 +467,8 @@ static void print_type_precision(string_buffer& buffer, const glsl_type *t, glsl
 		typeName = "depth2d<float>"; // depth type must always be float
 	else if (!strcmp(typeName, "samplerCubeShadow"))
 		typeName = "depthcube<float>"; // depth type must always be float
+	else if (!strcmp(typeName, "sampler2DArray"))
+		typeName = halfPrec ? "texture2d_array<half>" : "texture2d_array<float>";
 
 	if (t->base_type == GLSL_TYPE_ARRAY) {
 		print_type_precision(buffer, t->fields.array, prec, true);
@@ -940,22 +947,57 @@ void ir_print_metal_visitor::visit(ir_expression *ir)
 	bool op0cast = ir->operands[0] && is_different_precision(arg_prec, ir->operands[0]->get_precision());
 	bool op1cast = ir->operands[1] && is_different_precision(arg_prec, ir->operands[1]->get_precision());
 	bool op2cast = ir->operands[2] && is_different_precision(arg_prec, ir->operands[2]->get_precision());
+	const bool op0matrix = ir->operands[0] && ir->operands[0]->type->is_matrix();
+	const bool op1matrix = ir->operands[1] && ir->operands[1]->type->is_matrix();
+	bool op0castTo1 = false;
+	bool op1castTo0 = false;
 
 	// Metal does not support matrix precision casts, so when any of the arguments is a matrix,
 	// take precision from it. This isn't fully robust now, but oh well.
-	if (op0cast && ir->operands[0]->type->is_matrix() && !op1cast)
+	if (op0cast && op0matrix && !op1cast)
 	{
 		op0cast = false;
 		arg_prec = ir->operands[0]->get_precision();
 		op1cast = ir->operands[1] && is_different_precision(arg_prec, ir->operands[1]->get_precision());
 	}
-	if (op1cast && ir->operands[1]->type->is_matrix() && !op0cast)
+	if (op1cast && op1matrix && !op0cast)
 	{
 		op1cast = false;
 		arg_prec = ir->operands[1]->get_precision();
 		op0cast = ir->operands[0] && is_different_precision(arg_prec, ir->operands[0]->get_precision());
 	}
 
+	// Metal does not have matrix+scalar and matrix-scalar operations; we need to create matrices
+	// out of the non-matrix argument.
+	if (ir->operation == ir_binop_add || ir->operation == ir_binop_sub)
+	{
+		if (op0matrix && !op1matrix)
+		{
+			op1cast = true;
+			op1castTo0 = true;
+		}
+		if (op1matrix && !op0matrix)
+		{
+			op0cast = true;
+			op0castTo1 = true;
+		}
+		if (op1castTo0 || op0castTo1)
+		{
+			if (!ctx.matrixConstructorsDone)
+			{
+				ctx.prefixStr.asprintf_append(
+											  "inline float4x4 _xlinit_float4x4(float v) { return float4x4(float4(v), float4(v), float4(v), float4(v)); }\n"
+											  "inline float3x3 _xlinit_float3x3(float v) { return float3x3(float3(v), float3(v), float3(v)); }\n"
+											  "inline float2x2 _xlinit_float2x2(float v) { return float2x2(float2(v), float2(v)); }\n"
+											  "inline half4x4 _xlinit_half4x4(half v) { return half4x4(half4(v), half4(v), half4(v), half4(v)); }\n"
+											  "inline half3x3 _xlinit_half3x3(half v) { return half3x3(half3(v), half3(v), half3(v)); }\n"
+											  "inline half2x2 _xlinit_half2x2(half v) { return half2x2(half2(v), half2(v)); }\n"
+											  );
+				ctx.matrixConstructorsDone = true;
+			}
+		}
+	}
+	
 	const bool rescast = is_different_precision(arg_prec, res_prec) && !ir->type->is_boolean();
 	if (rescast)
 	{
@@ -1000,6 +1042,7 @@ void ir_print_metal_visitor::visit(ir_expression *ir)
 	}
 	else if (is_binop_func_like(ir->operation, ir->type))
 	{
+		// binary operation that must be printed like a function, "foo(a,b)"
 		if (ir->operation == ir_binop_mod)
 		{
 			buffer.asprintf_append ("(");
@@ -1025,23 +1068,58 @@ void ir_print_metal_visitor::visit(ir_expression *ir)
 		if (ir->operation == ir_binop_mod)
             buffer.asprintf_append ("))");
 	}
+	else if (ir->get_num_operands() == 2 && ir->operation == ir_binop_div && op0matrix && !op1matrix)
+	{
+		// "matrix/scalar" - Metal does not have it, so print multiply by inverse instead
+		buffer.asprintf_append ("(");
+		ir->operands[0]->accept(this);
+		const bool halfCast = (arg_prec == glsl_precision_medium || arg_prec == glsl_precision_low);
+		buffer.asprintf_append (halfCast ? " * (1.0h/half(" : " * (1.0/(");
+		ir->operands[1]->accept(this);
+		buffer.asprintf_append (")))");
+	}
 	else if (ir->get_num_operands() == 2)
 	{
+		// regular binary operator
 		buffer.asprintf_append ("(");
 		if (ir->operands[0])
 		{
-			if (op0cast)
+			if (op0castTo1)
+			{
+				buffer.asprintf_append ("_xlinit_");
+				print_type_precision(buffer, ir->operands[1]->type, arg_prec, false);
+				buffer.asprintf_append ("(");
+			}
+			else if (op0cast)
+			{
 				print_cast (buffer, arg_prec, ir->operands[0]);
+			}
 			ir->operands[0]->accept(this);
+			if (op0castTo1)
+			{
+				buffer.asprintf_append (")");
+			}
 		}
 
 		buffer.asprintf_append (" %s ", operator_glsl_strs[ir->operation]);
 
 		if (ir->operands[1])
 		{
-			if (op1cast)
+			if (op1castTo0)
+			{
+				buffer.asprintf_append ("_xlinit_");
+				print_type_precision(buffer, ir->operands[0]->type, arg_prec, false);
+				buffer.asprintf_append ("(");
+			}
+			else if (op1cast)
+			{
 				print_cast (buffer, arg_prec, ir->operands[1]);
+			}
 			ir->operands[1]->accept(this);
+			if (op1castTo0)
+			{
+				buffer.asprintf_append (")");
+			}
 		}
 		buffer.asprintf_append (")");
 	}
@@ -1087,16 +1165,25 @@ static int tex_sampler_dim_size[] = {
 };
 
 
-static void print_texture_uv (ir_print_metal_visitor* vis, ir_texture* ir, bool is_shadow, bool is_proj, int uv_dim, int sampler_uv_dim)
+static void print_texture_uv (ir_print_metal_visitor* vis, ir_texture* ir, bool is_shadow, bool is_proj, bool is_array, int uv_dim, int sampler_uv_dim)
 {
 	if (!is_shadow)
 	{
-		if (!is_proj)
+		if (!is_proj && !is_array)
 		{
 			// regular UV
 			vis->buffer.asprintf_append (sampler_uv_dim == 3 ? "(float3)(" : "(float2)(");
 			ir->coordinate->accept(vis);
 			vis->buffer.asprintf_append (")");
+		}
+		else if (is_array)
+		{
+			// array sample
+			vis->buffer.asprintf_append ("(float2)((");
+			ir->coordinate->accept(vis);
+			vis->buffer.asprintf_append (").xy), (uint)((");
+			ir->coordinate->accept(vis);
+			vis->buffer.asprintf_append (").z)");
 		}
 		else
 		{
@@ -1139,12 +1226,13 @@ void ir_print_metal_visitor::visit(ir_texture *ir)
 {
 	glsl_sampler_dim sampler_dim = (glsl_sampler_dim)ir->sampler->type->sampler_dimensionality;
 	const bool is_shadow = ir->sampler->type->sampler_shadow;
+	const bool is_array = ir->sampler->type->sampler_array;
 	const glsl_type* uv_type = ir->coordinate->type;
 	const int uv_dim = uv_type->vector_elements;
 	int sampler_uv_dim = tex_sampler_dim_size[sampler_dim];
 	if (is_shadow)
 		sampler_uv_dim += 1;
-	const bool is_proj = (uv_dim > sampler_uv_dim);
+	const bool is_proj = (uv_dim > sampler_uv_dim) && !is_array;
 
 	// texture name & call to sample
 	ir->sampler->accept(this);
@@ -1166,7 +1254,7 @@ void ir_print_metal_visitor::visit(ir_texture *ir)
 	buffer.asprintf_append (", ");
 
 	// texture coordinate
-	print_texture_uv (this, ir, is_shadow, is_proj, uv_dim, sampler_uv_dim);
+	print_texture_uv (this, ir, is_shadow, is_proj, is_array, uv_dim, sampler_uv_dim);
 
 	// lod bias
 	if (ir->op == ir_txb)

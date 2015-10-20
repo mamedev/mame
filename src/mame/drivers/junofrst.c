@@ -291,7 +291,7 @@ WRITE8_MEMBER(junofrst_state::irq_enable_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x800f) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
 	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
@@ -423,6 +423,9 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_MACHINE_START_OVERRIDE(junofrst_state,junofrst)
 	MCFG_MACHINE_RESET_OVERRIDE(junofrst_state,junofrst)
 
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -511,5 +514,5 @@ DRIVER_INIT_MEMBER(junofrst_state,junofrst)
 }
 
 
-GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami", "Juno First", GAME_SUPPORTS_SAVE )
-GAME( 1983, junofrstg,junofrst, junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", GAME_SUPPORTS_SAVE )
+GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrstg,junofrst, junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )

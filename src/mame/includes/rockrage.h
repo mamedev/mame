@@ -37,7 +37,6 @@ public:
 	required_memory_bank m_rombank;
 
 	/* video-related */
-	int        m_layer_colorbase[2];
 	int        m_vreg;
 
 	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);

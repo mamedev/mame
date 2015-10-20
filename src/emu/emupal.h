@@ -119,8 +119,14 @@
 #define PALETTE_FORMAT_BBGGGRRR raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 0,3,6>)
 #define PALETTE_FORMAT_RRRGGGBB raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>)
 
-// standard 2-2-2-2 formats
-#define PALETTE_FORMAT_BBGGRRII raw_to_rgb_converter(1, &raw_to_rgb_converter::BBGGRRII_decoder)
+// data-inverted 3-3-2 formats
+#define PALETTE_FORMAT_BBGGGRRR_inverted raw_to_rgb_converter(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 0,3,6>)
+#define PALETTE_FORMAT_RRRGGGBB_inverted raw_to_rgb_converter(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 5,2,0>)
+
+// standard 3-3-3 formats
+#define PALETTE_FORMAT_xxxxxxxBBBGGGRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 0,3,6>)
+#define PALETTE_FORMAT_xxxxxxxRRRBBBGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 6,0,3>)
+#define PALETTE_FORMAT_xxxxxxxRRRGGGBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 6,3,0>)
 
 // standard 4-4-4 formats
 #define PALETTE_FORMAT_xxxxBBBBGGGGRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 0,4,8>)
@@ -140,11 +146,15 @@
 #define PALETTE_FORMAT_xRRRRRGGGGGBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>)
 #define PALETTE_FORMAT_xGGGGGRRRRRBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 5,10,0>)
 #define PALETTE_FORMAT_xGGGGGBBBBBRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 0,10,5>)
-#define PALETTE_FORMAT_RRRRRGGGGGBBBBBx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 11,6,1>)
+#define PALETTE_FORMAT_BBBBBRRRRRGGGGGx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 6,1,11>)
 #define PALETTE_FORMAT_GGGGGRRRRRBBBBBx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 6,11,1>)
+#define PALETTE_FORMAT_RRRRRGGGGGBBBBBx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 11,6,1>)
 #define PALETTE_FORMAT_RRRRGGGGBBBBRGBx raw_to_rgb_converter(2, &raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder)
 #define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit0 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder)
 #define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit4 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder)
+
+// data-inverted 5-5-5 formats
+#define PALETTE_FORMAT_xRRRRRBBBBBGGGGG_inverted raw_to_rgb_converter(2, &raw_to_rgb_converter::inverted_rgb_decoder<5,5,5, 10,0,5>)
 
 // standard 5-6-5 formats
 #define PALETTE_FORMAT_RRRRRGGGGGGBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,6,5, 11,5,0>)
@@ -232,6 +242,30 @@
 	MCFG_PALETTE_ADD(_tag, 2) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_yellow), downcast<palette_device *>(device)));
 
+#define MCFG_PALETTE_ADD_3BIT_RGB(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_rgb), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_RBG(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_rbg), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_BRG(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_brg), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_GRB(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_grb), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_GBR(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_gbr), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_3BIT_BGR(_tag) \
+	MCFG_PALETTE_ADD(_tag, 8) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_bgr), downcast<palette_device *>(device)));
+
 #define MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 32768) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
@@ -294,6 +328,17 @@ public:
 		UINT8 b = palexpand<_BlueBits>(raw >> _BlueShift);
 		return rgb_t(r, g, b);
 	}
+
+	// data-inverted generic raw-to-RGB conversion helpers
+	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
+	static rgb_t inverted_rgb_decoder(UINT32 raw)
+	{
+		UINT8 r = palexpand<_RedBits>(~raw >> _RedShift);
+		UINT8 g = palexpand<_GreenBits>(~raw >> _GreenShift);
+		UINT8 b = palexpand<_BlueBits>(~raw >> _BlueShift);
+		return rgb_t(r, g, b);
+	}
+
 	template<int _IntBits, int _RedBits, int _GreenBits, int _BlueBits, int _IntShift, int _RedShift, int _GreenShift, int _BlueShift>
 	static rgb_t standard_irgb_decoder(UINT32 raw)
 	{
@@ -305,7 +350,6 @@ public:
 	}
 
 	// other standard decoders
-	static rgb_t BBGGRRII_decoder(UINT32 raw);
 	static rgb_t IRRRRRGGGGGBBBBB_decoder(UINT32 raw);
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);  // bits 3/2/1 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(UINT32 raw);  // bits 14/13/12 are LSb
@@ -359,6 +403,9 @@ public:
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
+	void set_pen_red_level(pen_t pen, UINT8 level) { m_palette->entry_set_red_level(pen, level); }
+	void set_pen_green_level(pen_t pen, UINT8 level) { m_palette->entry_set_green_level(pen, level); }
+	void set_pen_blue_level(pen_t pen, UINT8 level) { m_palette->entry_set_blue_level(pen, level); }
 	void set_pen_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
 	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
 	void set_pen_colors(pen_t color_base, const std::vector<rgb_t> &colors) { for(unsigned int i=0; i != colors.size(); i++) set_pen_color(color_base+i, colors[i]); }
@@ -396,6 +443,12 @@ public:
 	void palette_init_monochrome_green(palette_device &palette);
 	void palette_init_monochrome_green_highlight(palette_device &palette);
 	void palette_init_monochrome_yellow(palette_device &palette);
+	void palette_init_3bit_rgb(palette_device &palette);
+	void palette_init_3bit_rbg(palette_device &palette);
+	void palette_init_3bit_brg(palette_device &palette);
+	void palette_init_3bit_grb(palette_device &palette);
+	void palette_init_3bit_gbr(palette_device &palette);
+	void palette_init_3bit_bgr(palette_device &palette);
 	void palette_init_RRRRGGGGBBBB_proms(palette_device &palette);
 	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);

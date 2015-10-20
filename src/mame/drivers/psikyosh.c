@@ -541,7 +541,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" )     /* Debug stuff. Resets EEPROM? */
+	PORT_DIPNAME( 0x00000040, 0x00000040, "Tilt (Enables Debug Mode)" )     /* Debug stuff. Resets EEPROM? */
 	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -654,13 +654,9 @@ static INPUT_PORTS_START( s1945iii ) /* Different Region again */
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
+static INPUT_PORTS_START( dragnblz )
 	PORT_INCLUDE( common )
-
-	PORT_MODIFY("INPUTS")
-	PORT_DIPNAME( 0x00000040, 0x00000000, "Debug" )     /* Must be HIGH (Or Security Error), so can perform test */
-	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	/* If Debug is LOW then you can perform rom test and EEPROM security check is skipped, EEPROM doesn't reset */
 
 	PORT_START("JP4")   /* jumper pads on the PCB */
 	PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
@@ -710,7 +706,7 @@ static INPUT_PORTS_START( mjgtaste )
 
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" )     /* Debug stuff. Resets EEPROM? */
+	PORT_DIPNAME( 0x00000040, 0x00000040, "Tilt (Enables Debug Mode)" )     /* Debug stuff. Resets EEPROM? */
 	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 
@@ -1022,7 +1018,7 @@ ROM_START( dragnblz )
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7fd1b225) SHA1(6aa61021ada51393bbb34fd1aea00b8feccc8197) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
-	ROM_LOAD( "eeprom-dragnblz.bin", 0x0000, 0x0100, CRC(70a8a3a6) SHA1(80ded1fce090b87b8c8b56f4fb74ef4e751b51d2) )
+	ROM_LOAD16_WORD_SWAP( "eeprom-dragnblz.u44", 0x0000, 0x0100, CRC(46e85da9) SHA1(673cf974fd23a20e6bfa7b2b234206d550011f54) )
 ROM_END
 
 /*
@@ -1098,7 +1094,7 @@ ROM_START( mjgtaste )
 	ROM_LOAD( "snd0.u52", 0x000000, 0x400000, CRC(0179f018) SHA1(16ae63e021230356777342ed902e02407a1a1b82) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
-	ROM_LOAD( "eeprom-mjgtaste.bin", 0x0000, 0x0100, CRC(bbf7cfae) SHA1(34a36d5c4d273fc2a081a8f4062b45ee873eef09) )
+	ROM_LOAD16_WORD_SWAP( "eeprom-mjgtaste.u44", 0x0000, 0x0100, CRC(d35586f2) SHA1(ce26a82d760f87dccfc15468ac3d24efc258648d) )
 ROM_END
 
 ROM_START( tgm2 )
@@ -1192,19 +1188,19 @@ DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
 /*     YEAR  NAME      PARENT    MACHINE    INPUT     INIT      MONITOR COMPANY   FULLNAME FLAGS */
 
 /* ps3-v1 */
-GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, psikyosh_state, ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", GAME_SUPPORTS_SAVE )
-GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  psikyosh_state, ps3, ROT270, "Psikyo", "Strikers 1945 II", GAME_SUPPORTS_SAVE )
-GAME( 1998, daraku,   0,        psikyo3v1,   daraku,   psikyosh_state, ps3, ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", GAME_SUPPORTS_SAVE )
-GAME( 1998, sbomber,  0,        psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber (ver. B)", GAME_SUPPORTS_SAVE )
-GAME( 1998, sbombera, sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber", GAME_SUPPORTS_SAVE )
+GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, psikyosh_state, ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  psikyosh_state, ps3, ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, daraku,   0,        psikyo3v1,   daraku,   psikyosh_state, ps3, ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbomber,  0,        psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbombera, sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
 
 /* ps5 */
-GAME( 1998, gunbird2, 0,        psikyo5,     gunbird2, psikyosh_state, ps5, ROT270, "Psikyo", "Gunbird 2", GAME_SUPPORTS_SAVE )
-GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, psikyosh_state, ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1998, gunbird2, 0,        psikyo5,     gunbird2, psikyosh_state, ps5, ROT270, "Psikyo", "Gunbird 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, psikyosh_state, ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 /* ps5v2 */
-GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, psikyosh_state, ps5,      ROT270, "Psikyo", "Dragon Blaze", GAME_SUPPORTS_SAVE )
-GAME( 2000, tgm2,     0,        psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", GAME_SUPPORTS_SAVE )
-GAME( 2000, tgm2p,    tgm2,     psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", GAME_SUPPORTS_SAVE )
-GAME( 2001, gnbarich, 0,        psikyo5,     gnbarich, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbarich", GAME_SUPPORTS_SAVE )
-GAME( 2002, mjgtaste, 0,        psikyo5,     mjgtaste, psikyosh_state, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", GAME_SUPPORTS_SAVE )
+GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, psikyosh_state, ps5,      ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2,     0,        psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2p,    tgm2,     psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gnbarich, 0,        psikyo5,     gnbarich, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mjgtaste, 0,        psikyo5,     mjgtaste, psikyosh_state, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )

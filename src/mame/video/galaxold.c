@@ -95,6 +95,7 @@ PALETTE_INIT_MEMBER(galaxold_state,scrambold)
 }
 
 
+
 PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 {
 	int base = BACKGROUND_COLOR_BASE;
@@ -459,6 +460,14 @@ VIDEO_START_MEMBER(galaxold_state,scrambold)
 
 	m_draw_background = &galaxold_state::scrambold_draw_background;
 }
+
+VIDEO_START_MEMBER(galaxold_state, newsin7)
+{
+	VIDEO_START_CALL_MEMBER(scrambold);
+
+	m_leftclip = 0;
+}
+
 
 VIDEO_START_MEMBER(galaxold_state,darkplnt)
 {
@@ -1643,8 +1652,8 @@ void galaxold_state::draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &
 
 void galaxold_state::draw_sprites(bitmap_ind16 &bitmap, UINT8 *spriteram, size_t spriteram_size)
 {
-	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8,   30*8-1);
-	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
+	const rectangle spritevisiblearea((0+m_leftclip)*8+1, 32*8-1, 2*8,   30*8-1);
+	const rectangle spritevisibleareaflipx(0*8, (32-m_leftclip)*8-2, 2*8, 30*8-1);
 
 	int offs;
 

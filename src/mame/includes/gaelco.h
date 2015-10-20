@@ -25,7 +25,6 @@ public:
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_screenram;
-//  UINT16 *     paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t      *m_tilemap[2];

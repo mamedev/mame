@@ -830,6 +830,6 @@ ROM_END
 
 
 
-GAME( 1991, welltris, 0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1991, welltrisj,welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, quiz18k,  0,        quiz18k,  quiz18k,  driver_device,  0,        ROT0,   "EIM", "Miyasu Nonki no Quiz 18-Kin", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, welltris, 0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltrisj,welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,  0,        quiz18k,  quiz18k,  driver_device,  0,        ROT0,   "EIM", "Miyasu Nonki no Quiz 18-Kin", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

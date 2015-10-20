@@ -97,7 +97,6 @@ public:
 	DECLARE_WRITE16_MEMBER(amusco_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(amusco);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
@@ -113,7 +112,6 @@ public:
 	INTERRUPT_GEN_MEMBER(amusco_timer_irq);
 	UINT16 m_mc6845_address;
 	UINT16 m_video_update_address;
-	DECLARE_PALETTE_INIT(amusco_palette_init);
 };
 
 
@@ -124,18 +122,6 @@ public:
 WRITE16_MEMBER(amusco_state::amusco_videoram_w)
 {
 }
-
-PALETTE_INIT_MEMBER(amusco_state, amusco_palette_init)
-{
-	int i;
-
-	for (i = 0; i < 8; i++)
-	{
-		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
-	}
-}
-
-
 
 TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 {
@@ -164,10 +150,6 @@ UINT32 amusco_state::screen_update_amusco(screen_device &screen, bitmap_ind16 &b
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-PALETTE_INIT_MEMBER(amusco_state, amusco)
-{
 }
 
 
@@ -528,8 +510,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amusco)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco_palette_init)
+	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -540,7 +521,6 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn", SN76489, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
 MACHINE_CONFIG_END
 
 
@@ -573,4 +553,4 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY   FULLNAME                      FLAGS */
-GAME( 1987, amusco,   0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco", "American Music Poker (V1.4)", GAME_NOT_WORKING )
+GAME( 1987, amusco,   0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco", "American Music Poker (V1.4)", MACHINE_NOT_WORKING )

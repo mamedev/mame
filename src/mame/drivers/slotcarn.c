@@ -702,5 +702,5 @@ ROM_END
 **********************************************
 
       YEAR  NAME      PARENT   MACHINE   INPUT     INIT   ROT    COMPANY           FULLNAME               FLAGS  */
-GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, driver_device, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        GAME_NOT_WORKING )
-GAME( 1985, spielbud, 0,       slotcarn, spielbud, driver_device, 0,     ROT0, "ADP",            "Spiel Bude (German)",  GAME_NOT_WORKING )
+GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, driver_device, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
+GAME( 1985, spielbud, 0,       slotcarn, spielbud, driver_device, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )

@@ -298,4 +298,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, embargo, 0, embargo, embargo, driver_device, 0, ROT0, "Cinematronics", "Embargo", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1977, embargo, 0, embargo, embargo, driver_device, 0, ROT0, "Cinematronics", "Embargo", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

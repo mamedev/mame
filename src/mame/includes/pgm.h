@@ -44,7 +44,6 @@ public:
 	UINT8  *      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
 	UINT16 *      m_spritebufferram; // buffered spriteram
-//  UINT16 *      m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t       *m_bg_tilemap;
@@ -475,7 +474,8 @@ ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
 
 INPUT_PORTS_EXTERN( orlegend );
 INPUT_PORTS_EXTERN( orlegendt );
-INPUT_PORTS_EXTERN( orld105k );
+INPUT_PORTS_EXTERN( orlegendk );
+
 
 MACHINE_CONFIG_EXTERN( pgm_asic3 );
 

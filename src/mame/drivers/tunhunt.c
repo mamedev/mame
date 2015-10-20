@@ -392,5 +392,5 @@ ROM_END
  *************************************/
 
 /*         rom   parent  machine    inp         init */
-GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, driver_device,    0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", GAME_SUPPORTS_SAVE )
-GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, driver_device,    0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", GAME_SUPPORTS_SAVE )
+GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, driver_device,    0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, driver_device,    0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )

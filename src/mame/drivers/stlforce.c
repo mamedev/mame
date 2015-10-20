@@ -372,6 +372,6 @@ DRIVER_INIT_MEMBER(stlforce_state,twinbrat)
 }
 
 
-GAME( 1994, stlforce, 0,        stlforce, stlforce, stlforce_state, stlforce, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", GAME_SUPPORTS_SAVE )
-GAME( 1995, twinbrat, 0,        twinbrat, stlforce, stlforce_state, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1995, twinbrata,twinbrat, twinbrat, stlforce, stlforce_state, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1994, stlforce, 0,        stlforce, stlforce, stlforce_state, stlforce, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbrat, 0,        twinbrat, stlforce, stlforce_state, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbrata,twinbrat, twinbrat, stlforce, stlforce_state, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )

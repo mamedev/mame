@@ -7,6 +7,7 @@
 
 **************************************************************************/
 
+#include "machine/ticket.h"
 #include "video/tlc34076.h"
 #include "video/tms34061.h"
 
@@ -23,6 +24,10 @@ public:
 		m_tms34061(*this, "tms34061"),
 		m_tlc34076(*this, "tlc34076"),
 		m_screen(*this, "screen"),
+		m_ticket(*this, "ticket"),
+		m_an(*this, analog_inputs),
+		m_fakex(*this, "FAKEX"),
+		m_fakey(*this, "FAKEY"),
 		m_visarea(0, 0, 0, 0) { }
 
 	enum
@@ -40,7 +45,12 @@ public:
 	required_device<tms34061_device> m_tms34061;
 	required_device<tlc34076_device> m_tlc34076;
 	required_device<screen_device> m_screen;
-	
+	required_device<ticket_dispenser_device> m_ticket;
+	DECLARE_IOPORT_ARRAY(analog_inputs);
+	optional_ioport_array<4> m_an;
+	optional_ioport m_fakex;
+	optional_ioport m_fakey;
+
 	rectangle m_visarea;
 
 	UINT8 m_grom_bank;
@@ -165,7 +175,7 @@ public:
 							UINT16 *sens0, UINT16 *sens1, UINT16 *sens2, UINT16 *sens3);
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

@@ -34,8 +34,6 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram2;
 	required_device<vsystem_spr_device> m_spr;
 
-	//      UINT16 *  m_paletteram;   // currently this uses generic palette handling
-
 	/* video-related */
 	tilemap_t   *m_tilemap1;
 	tilemap_t   *m_tilemap2;

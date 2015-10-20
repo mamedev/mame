@@ -22,7 +22,6 @@ public:
 	/* memory pointers */
 //  UINT8 *    m_spriteram;   // currently directly used in a 16bit map...
 //  UINT8 *    m_spriteram_2; // currently directly used in a 16bit map...
-//  UINT8 *    m_paletteram;  // currently this uses generic palette handling
 
 	/* misc */
 	UINT8      m_nmi_enable;

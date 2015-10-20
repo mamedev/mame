@@ -164,7 +164,7 @@ ROM_END
 
 
 
-GAME( 1976, bombaway,  0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Bombs Away [TTL]", GAME_IS_SKELETON )
-GAME( 1976, ckidzo,    0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Ckidzo [TTL]", GAME_IS_SKELETON )
-GAME( 1976, cgunship,  0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Cobra Gunship [TTL]", GAME_IS_SKELETON )
-GAME( 197?, mead4in1,  0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Meadows 4 in 1 [TTL]", GAME_IS_SKELETON )
+GAME( 1976, bombaway,  0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Bombs Away [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, ckidzo,    0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Ckidzo [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, cgunship,  0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Cobra Gunship [TTL]", MACHINE_IS_SKELETON )
+GAME( 197?, mead4in1,  0,        meadows,  0,  driver_device,  0, ROT0, "Meadows",  "Meadows 4 in 1 [TTL]", MACHINE_IS_SKELETON )

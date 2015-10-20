@@ -92,4 +92,4 @@ ROM_START( caprcyc )
 ROM_END
 
 
-GAME (1999, caprcyc, 0, caprcyc, caprcyc, driver_device, 0, ROT0, "Taito", "Capriccio Cyclone", GAME_IS_SKELETON_MECHANICAL )
+GAME (1999, caprcyc, 0, caprcyc, caprcyc, driver_device, 0, ROT0, "Taito", "Capriccio Cyclone", MACHINE_IS_SKELETON_MECHANICAL )

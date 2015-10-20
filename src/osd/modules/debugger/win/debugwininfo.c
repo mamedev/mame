@@ -17,6 +17,8 @@
 #include "window.h"
 #include "winutf8.h"
 
+#include "winutil.h"
+
 
 bool debugwin_info::s_window_class_registered = false;
 
@@ -36,7 +38,7 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 	register_window_class();
 
 	m_wnd = win_create_window_ex_utf8(DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
-			0, 0, 100, 100, win_window_list->m_hwnd, create_standard_menubar(), GetModuleHandle(NULL), this);
+			0, 0, 100, 100, win_window_list->m_hwnd, create_standard_menubar(), GetModuleHandleUni(), this);
 	if (m_wnd == NULL)
 		return;
 
@@ -580,7 +582,7 @@ void debugwin_info::register_window_class()
 
 		// initialize the description of the window class
 		wc.lpszClassName    = TEXT("MAMEDebugWindow");
-		wc.hInstance        = GetModuleHandle(NULL);
+		wc.hInstance        = GetModuleHandleUni();
 		wc.lpfnWndProc      = &debugwin_info::static_window_proc;
 		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
 		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
@@ -589,6 +591,8 @@ void debugwin_info::register_window_class()
 		wc.style            = 0;
 		wc.cbClsExtra       = 0;
 		wc.cbWndExtra       = 0;
+
+		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))

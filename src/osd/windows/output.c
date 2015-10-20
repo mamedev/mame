@@ -17,6 +17,8 @@
 // MAMEOS headers
 #include "output.h"
 
+#include "winutil.h"
+
 
 
 //============================================================
@@ -101,7 +103,7 @@ bool windows_osd_interface::output_init()
 						1, 1,
 						NULL,
 						NULL,
-						GetModuleHandle(NULL),
+						GetModuleHandleUni(),
 						NULL);
 	assert(output_hwnd != NULL);
 
@@ -167,8 +169,10 @@ static int create_window_class(void)
 
 		// initialize the description of the window class
 		wc.lpszClassName    = OUTPUT_WINDOW_CLASS;
-		wc.hInstance        = GetModuleHandle(NULL);
+		wc.hInstance        = GetModuleHandleUni();
 		wc.lpfnWndProc      = output_window_proc;
+
+		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))

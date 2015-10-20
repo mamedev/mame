@@ -13,18 +13,17 @@
 #include "sstrangr.lh"
 
 
-#define NUM_PENS    (8)
-
 class sstrangr_state : public driver_device
 {
 public:
 	sstrangr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_ram(*this, "ram") { }
 
 	required_device<cpu_device> m_maincpu;
-
+	optional_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_ram;
 
 	UINT8 m_flip_screen;
@@ -86,32 +85,12 @@ UINT32 sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-
-static void get_pens(pen_t *pens)
-{
-	offs_t i;
-
-	for (i = 0; i < NUM_PENS; i++)
-	{
-		pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
-	}
-}
-
-
 UINT32 sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pen_t pens[NUM_PENS];
-	offs_t offs;
-	UINT8 *color_map_base;
+	UINT8 *color_map_base = &memregion("proms")->base()[m_flip_screen ? 0x0000 : 0x0200];
 
-	get_pens(pens);
-
-	color_map_base = &memregion("proms")->base()[m_flip_screen ? 0x0000 : 0x0200];
-
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int i;
-
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
@@ -120,7 +99,7 @@ UINT32 sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rgb3
 		UINT8 data = m_ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			UINT8 color;
 
@@ -135,7 +114,7 @@ UINT32 sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rgb3
 				data = data >> 1;
 			}
 
-			bitmap.pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = m_palette->pen_color(color);
 
 			x = x + 1;
 		}
@@ -282,6 +261,7 @@ static MACHINE_CONFIG_DERIVED( sstrngr2, sstrangr )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrngr2)
 
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 MACHINE_CONFIG_END
 
 
@@ -308,5 +288,5 @@ ROM_START( sstrangr2 )
 ROM_END
 
 
-GAMEL( 1978, sstrangr, 0,        sstrangr, sstrangr, driver_device, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_sstrangr )
-GAME( 1979, sstrangr2,sstrangr, sstrngr2, sstrngr2, driver_device, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL( 1978, sstrangr, 0,        sstrangr, sstrangr, driver_device, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
+GAME( 1979, sstrangr2,sstrangr, sstrngr2, sstrngr2, driver_device, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -58,6 +58,7 @@ public:
 		m_ic79(*this, "ic79"),
 		m_ic80(*this, "ic80"),
 		m_ic81(*this, "ic81"),
+		m_palette(*this, "palette"),
 		m_dai3wksi_videoram(*this, "videoram"),
 		m_in2(*this, "IN2") { }
 
@@ -69,6 +70,7 @@ public:
 	optional_device<sn76477_device> m_ic79;
 	optional_device<sn76477_device> m_ic80;
 	optional_device<sn76477_device> m_ic81;
+	required_device<palette_device> m_palette;
 
 	/* video */
 	required_shared_ptr<UINT8> m_dai3wksi_videoram;
@@ -140,29 +142,10 @@ static const UINT8 vr_prom2[64*8*2]={
 	3, 3,3,2,2,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 7,7,7,7,7,7,7,7, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
 };
 
-
-static void dai3wksi_get_pens(pen_t *pens)
-{
-	offs_t i;
-
-	for (i = 0; i <= 7; i++)
-	{
-		pens[i] = rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	}
-}
-
-
 UINT32 dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-	pen_t pens[8];
-
-	dai3wksi_get_pens(pens);
-
-	for (offs = 0; offs < m_dai3wksi_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_dai3wksi_videoram.bytes(); offs++)
 	{
-		offs_t i;
-
 		UINT8 x = offs << 2;
 		UINT8 y = offs >> 6;
 		UINT8 data = m_dai3wksi_videoram[offs];
@@ -181,9 +164,9 @@ UINT32 dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rgb3
 				color = vr_prom1[value];
 		}
 
-		for (i = 0; i <= 3; i++)
+		for (int i = 0; i <= 3; i++)
 		{
-			pen_t pen = (data & (1 << i)) ? pens[color] : pens[0];
+			rgb_t pen = (data & (1 << i)) ? m_palette->pen_color(color) : rgb_t::black;
 
 			if (m_dai3wksi_flipscreen)
 				bitmap.pix32(255-y, 255-x) = pen;
@@ -428,6 +411,8 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(dai3wksi_state, screen_update_dai3wksi)
 
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 #if (USE_SAMPLES)
@@ -562,4 +547,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, driver_device, 0, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, driver_device, 0, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

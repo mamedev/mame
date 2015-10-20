@@ -30,7 +30,19 @@ namespace bx
 
 		void add(const void* _data, int _len)
 		{
-			const uint8_t* data = (uint8_t*)_data;
+			if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN)
+			&&  BX_UNLIKELY(!isPtrAligned(_data, 4) ) )
+			{
+				addUnaligned(_data, _len);
+				return;
+			}
+
+			addAligned(_data, _len);
+		}
+
+		void addAligned(const void* _data, int _len)
+		{
+			const uint8_t* data = (const uint8_t*)_data;
 			m_size += _len;
 
 			mixTail(data, _len);
@@ -38,6 +50,27 @@ namespace bx
 			while(_len >= 4)
 			{
 				uint32_t kk = *(uint32_t*)data;
+
+				mmix(m_hash, kk);
+
+				data += 4;
+				_len -= 4;
+			}
+
+			mixTail(data, _len);
+		}
+
+		void addUnaligned(const void* _data, int _len)
+		{
+			const uint8_t* data = (const uint8_t*)_data;
+			m_size += _len;
+
+			mixTail(data, _len);
+
+			while(_len >= 4)
+			{
+				uint32_t kk;
+				readUnaligned(data, kk);
 
 				mmix(m_hash, kk);
 
@@ -67,6 +100,29 @@ namespace bx
 		}
 
 	private:
+		static void readUnaligned(const void* _data, uint32_t& _out)
+		{
+			const uint8_t* data = (const uint8_t*)_data;
+			if (BX_ENABLED(BX_CPU_ENDIAN_LITTLE) )
+			{
+				_out = 0
+					| data[0]<<24
+					| data[1]<<16
+					| data[2]<<8
+					| data[3]
+					;
+			}
+			else
+			{
+				_out = 0
+					| data[0]
+					| data[1]<<8
+					| data[2]<<16
+					| data[3]<<24
+					;
+			}
+		}
+
 		void mixTail(const uint8_t*& _data, int& _len)
 		{
 			while( _len && ((_len<4) || m_count) )

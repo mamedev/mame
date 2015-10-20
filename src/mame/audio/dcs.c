@@ -1955,7 +1955,7 @@ void dcs_audio_device::recompute_sample_rate()
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = sample_period * (16 * m_channels);
-	dmadac_set_frequency(&m_dmadac[0], m_channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
+	dmadac_set_frequency(&m_dmadac[0], m_channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
 	dmadac_enable(&m_dmadac[0], m_channels, 1);
 
 	/* fire off a timer which will hit every half-buffer */

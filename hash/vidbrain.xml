@@ -221,6 +221,22 @@
 		</part>
 	</software>
 
+	<software name="infoman" supported="no">
+		<description>Information Manager (Proto)</description>
+		<year>1978</year>
+		<publisher>VideoBrain Computer Company</publisher>
+		<info name="serial" value="VB-1200"/>
+		<part name="cart" interface="vidbrain_cart">
+			<feature name="slot" value="infomanager" />
+			<dataarea name="rom" size="0x1800">
+				<rom name="vb1200a_1000-17ff_9_25_78.bin" size="0x800" crc="7fc58830" sha1="39c2821f73c86c3e368fe5429628672cfe594306" offset="0x0000" />
+				<rom name="vb1200c_3000-37ff_9_25_78.bin" size="0x800" crc="e5d18447" sha1="d98b94ae1cce2ce6e6ae933180a7bf001b73932f" offset="0x0800" />
+				<rom name="vb-1200_3800-3fff_9_26_78.bin" size="0x800" crc="df9d9437" sha1="3a38a889b552acaa1a284e2ca7447f142b494737" offset="0x1000" />
+			</dataarea>
+			<dataarea name="ram" size="0x800"/>
+		</part>
+	</software>
+
 	<!-- Demonstration Series -->
 
 	<software name="demo">

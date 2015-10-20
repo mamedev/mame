@@ -90,7 +90,9 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
-# DRIVERS = src/mame/drivers/1942.c,src/mame/drivers/cops.c
+# SOURCES = src/mame/drivers/asteroid.c,src/mame/audio/llander.c
+
+# FORCE_VERSION_COMPILE = 1
 
 -include useroptions.mak
 
@@ -143,6 +145,10 @@ GENIEOS := darwin
 endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
+endif
+ifeq ($(firstword $(filter OS/2,$(UNAME))),OS/2)
+OS := os2
+GENIEOS := os2
 endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
@@ -297,11 +303,19 @@ ifeq ($(TARGETOS),freebsd)
 OSD := sdl
 endif
 
+ifeq ($(TARGETOS),netbsd)
+OSD := sdl
+endif
+
 ifeq ($(TARGETOS),solaris)
 OSD := sdl
 endif
 
 ifeq ($(TARGETOS),macosx)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),os2)
 OSD := sdl
 endif
 endif
@@ -614,8 +628,12 @@ ifdef QT_HOME
 PARAMS += --QT_HOME='$(QT_HOME)'
 endif
 
-ifdef DRIVERS
-PARAMS += --DRIVERS='$(DRIVERS)'
+ifdef SOURCES
+PARAMS += --SOURCES='$(SOURCES)'
+endif
+
+ifdef FORCE_VERSION_COMPILE
+PARAMS += --FORCE_VERSION_COMPILE='$(FORCE_VERSION_COMPILE)'
 endif
 
 #-------------------------------------------------
@@ -643,7 +661,7 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
 
-ifndef DRIVERS
+ifndef SOURCES
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET).lua
 endif
 
@@ -672,6 +690,9 @@ endif
 ifeq (/bin,$(findstring /bin,$(SHELL)))
   SHELLTYPE := posix
 endif
+ifeq (/bin,$(findstring /bin,$(MAKESHELL)))
+  SHELLTYPE := posix
+endif
 
 ifeq (posix,$(SHELLTYPE))
   MKDIR = $(SILENT) mkdir -p "$(1)"
@@ -697,19 +718,17 @@ CHECK_CLANG      :=
 else
 GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
 ifneq ($(OS),solaris)
-CLANG_VERSION    := $(shell clang --version  2> /dev/null | head -n 1 | grep '[0-9]\.[0-9]' -o | tail -n 1)
+CLANG_VERSION    := $(shell clang --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
 
 ifeq ($(TARGETOS),macosx)
-ifneq (,$(findstring 3.,$(CLANG_VERSION)))
 ifeq ($(ARCHITECTURE),_x64)
 ARCHITECTURE := _x64_clang
 else
 ARCHITECTURE := _x86_clang
-endif
 endif
 endif
 
@@ -1007,6 +1026,42 @@ freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
 
 
 #-------------------------------------------------
+# gmake-netbsd
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-netbsd/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=netbsd --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: netbsd_x64
+netbsd_x64: generate $(PROJECTDIR)/gmake-netbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)64
+
+.PHONY: netbsd
+netbsd: netbsd_x86
+
+.PHONY: netbsd_x86
+netbsd_x86: generate $(PROJECTDIR)/gmake-netbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# gmake-os2
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-os2/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=os2 --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: os2
+os2: os2_x86
+
+.PHONY: os2_x86
+os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-os2 config=$(CONFIG)32
+
+
+#-------------------------------------------------
 # Clean/bootstrap
 #-------------------------------------------------
 
@@ -1042,9 +1097,9 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
 
-$(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
+$(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py
 	@echo Converting $<...
-	$(SILENT)$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
+	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
 	
 #-------------------------------------------------
@@ -1104,7 +1159,6 @@ CPPCHECK_PARAMS += -Isrc/emu
 CPPCHECK_PARAMS += -Isrc/lib
 CPPCHECK_PARAMS += -Isrc/lib/util
 CPPCHECK_PARAMS += -Isrc/mame
-CPPCHECK_PARAMS += -Isrc/mess 
 CPPCHECK_PARAMS += -Isrc/osd/modules/render
 CPPCHECK_PARAMS += -Isrc/osd/windows
 CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
@@ -1119,7 +1173,6 @@ CPPCHECK_PARAMS += -I3rdparty/bgfx/include
 CPPCHECK_PARAMS += -I3rdparty/bx/include
 CPPCHECK_PARAMS += -Ibuild/generated/emu 
 CPPCHECK_PARAMS += -Ibuild/generated/emu/layout
-CPPCHECK_PARAMS += -Ibuild/generated/mess/layout
 CPPCHECK_PARAMS += -Ibuild/generated/mame/layout 
 CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
 CPPCHECK_PARAMS += -DPTR64=1

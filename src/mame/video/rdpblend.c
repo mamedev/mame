@@ -6,7 +6,7 @@
     SGI/Nintendo Reality Display Processor Blend Unit (BL)
     -------------------
 
-    by MooglyGuy
+    by Ryan Holtz
     based on initial C code by Ville Linde
     contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 
@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "includes/n64.h"
 #include "video/n64.h"
-#include "video/rdpbhelp.h"
 
 n64_blender_t::n64_blender_t()
 {

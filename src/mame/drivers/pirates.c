@@ -446,5 +446,5 @@ DRIVER_INIT_MEMBER(pirates_state,genix)
 
 /* GAME */
 
-GAME( 1994, pirates, 0, pirates, pirates, pirates_state, pirates, 0, "NIX", "Pirates", GAME_SUPPORTS_SAVE )
-GAME( 1994, genix,   0, pirates, pirates, pirates_state, genix,   0, "NIX", "Genix Family", GAME_SUPPORTS_SAVE )
+GAME( 1994, pirates, 0, pirates, pirates, pirates_state, pirates, 0, "NIX", "Pirates", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, genix,   0, pirates, pirates, pirates_state, genix,   0, "NIX", "Genix Family", MACHINE_SUPPORTS_SAVE )

@@ -25,8 +25,7 @@ public:
 		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -42,7 +41,6 @@ public:
 	required_shared_ptr<UINT16> m_dsp56k_p_8000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	ioport_port *m_inputs[4];
 	UINT8 m_sys0;
@@ -76,7 +74,6 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_w_lines);
 	DECLARE_WRITE32_MEMBER(dsp_host_interface_w);
 	DECLARE_READ32_MEMBER(network_r);
-	DECLARE_WRITE32_MEMBER(plygonet_palette_w);
 	DECLARE_READ16_MEMBER(dsp56k_bootload_r);
 	DECLARE_READ16_MEMBER(dsp56k_ram_bank00_read);
 	DECLARE_WRITE16_MEMBER(dsp56k_ram_bank00_write);

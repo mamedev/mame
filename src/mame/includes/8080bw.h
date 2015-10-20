@@ -127,6 +127,7 @@ public:
 	DECLARE_MACHINE_START(claybust);
 
 	DECLARE_PALETTE_INIT(rollingc);
+	DECLARE_PALETTE_INIT(sflush);
 
 	UINT32 screen_update_invadpt2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -150,12 +151,9 @@ public:
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_3_w);
 
 	void schaser_reinit_555_time_remain();
-	void invadpt2_get_pens( pen_t *pens );
-	void sflush_get_pens( pen_t *pens );
-	void cosmo_get_pens( pen_t *pens );
-	inline void set_pixel( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, const pen_t *pens, UINT8 color );
-	inline void set_8_pixels( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, const pen_t *pens, UINT8 fore_color, UINT8 back_color );
-	void clear_extra_columns( bitmap_rgb32 &bitmap, const pen_t *pens, UINT8 color );
+	inline void set_pixel( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, int color );
+	inline void set_8_pixels( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, int fore_color, int back_color );
+	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
 	void invmulti_bankswitch_restore();
 };
 

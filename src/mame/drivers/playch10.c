@@ -1638,7 +1638,7 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the other drivers, so that we do not have to include */
 /* them in every zip file */
-GAME( 1986, playch10, 0, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo of America", "PlayChoice-10 BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1986, playch10, 0, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo of America", "PlayChoice-10 BIOS", MACHINE_IS_BIOS_ROOT )
 
 /******************************************************************************/
 
@@ -1669,7 +1669,7 @@ GAME( 1984, pc_golf,  playch10, playch10, playch10, playch10_state, playch10, RO
 GAME( 1985, pc_kngfu, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Irem (Nintendo license)",                  "Kung Fu (PlayChoice-10)", 0 )
 GAME( 1985, pc_smb,   playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Super Mario Bros. (PlayChoice-10)", 0 )
 GAME( 1986, pc_vball, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Volley Ball (PlayChoice-10)", 0 )
-GAME( 1987, pc_1942,  playch10, playch10, playch10, playch10_state, pc_hrz,   ROT0, "Capcom",                                   "1942 (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, pc_1942,  playch10, playch10, playch10, playch10_state, pc_hrz,   ROT0, "Capcom",                                   "1942 (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* Gun Games */
 GAME( 1984, pc_duckh, playch10, playch10, playc10g, playch10_state, pc_gun,   ROT0, "Nintendo",                                 "Duck Hunt (PlayChoice-10)", 0 )
@@ -1698,7 +1698,7 @@ GAME( 1986, pc_mtoid, playch10, playch10, playch10, playch10_state, pcdboard_2, 
 GAME( 1987, pc_radrc, playch10, playch10, playch10, playch10_state, pcdboard, ROT0, "Square",                                   "Rad Racer (PlayChoice-10)", 0 )
 
 /* E-Board Games */
-GAME( 1987, pc_miket, playch10, playchnv, playch10, playch10_state, pceboard, ROT0, "Nintendo",                                 "Mike Tyson's Punch-Out!! (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, pc_miket, playch10, playchnv, playch10, playch10_state, pceboard, ROT0, "Nintendo",                                 "Mike Tyson's Punch-Out!! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* F-Board Games */
 GAME( 1987, pc_rcpam, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Rare",                                     "R.C. Pro-Am (PlayChoice-10)", 0 )
@@ -1707,7 +1707,7 @@ GAME( 1988, pc_ddrgn, playch10, playch10, playch10, playch10_state, pcfboard, RO
 GAME( 1989, pc_ngaid, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
 GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
 GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Sunsoft (Nintendo of America license)",    "Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
-GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
 GAME( 1990, pc_virus, pc_drmro, playch10, playch10, playch10_state, virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
@@ -1727,10 +1727,10 @@ GAME( 1991, pc_pwbld, playch10, playch10, playch10, playch10_state, pcgboard, RO
 GAME( 1991, pc_rkats, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
 /* variant with 4 screen mirror */
 GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
-GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* H-Board Games */
-GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, pchboard, ROT0, "Rare (Nintendo of America license)", "PinBot (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, pchboard, ROT0, "Rare (Nintendo of America license)", "PinBot (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* i-Board Games */
 GAME( 1989, pc_cshwk, playch10, playch10, playch10, playch10_state, pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )

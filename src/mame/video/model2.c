@@ -89,7 +89,6 @@
 *********************************************************************************************************************************/
 #include "emu.h"
 #include "video/segaic24.h"
-#include "video/polylgcy.h"
 #include "includes/model2.h"
 
 #define MODEL2_VIDEO_DEBUG 0
@@ -98,59 +97,6 @@
 #define pz      p[0]
 #define pu      p[1]
 #define pv      p[2]
-
-
-/*******************************************
- *
- *  Basic Data Types
- *
- *******************************************/
-
-struct plane
-{
-	poly_vertex normal;
-	float       distance;
-};
-
-struct texture_parameter
-{
-	float   diffuse;
-	float   ambient;
-	UINT32  specular_control;
-	float   specular_scale;
-};
-
-struct triangle
-{
-	void *              next;
-	poly_vertex         v[3];
-	UINT16              z;
-	UINT16              texheader[4];
-	UINT8               luma;
-	INT16               viewport[4];
-	INT16               center[2];
-};
-
-struct quad_m2
-{
-	poly_vertex         v[4];
-	UINT16              z;
-	UINT16              texheader[4];
-	UINT8               luma;
-};
-
-struct m2_poly_extra_data
-{
-	model2_state *  state;
-	UINT32      lumabase;
-	UINT32      colorbase;
-	UINT32 *    texsheet;
-	UINT32      texwidth;
-	UINT32      texheight;
-	UINT32      texx, texy;
-	UINT8       texmirrorx;
-	UINT8       texmirrory;
-};
 
 
 /*******************************************
@@ -835,100 +781,13 @@ static void model2_3d_process_triangle( raster_state *raster, UINT32 attr )
 
 /***********************************************************************************************/
 
-INLINE UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
-{
-	UINT32  baseoffs = ((base_y/2)*512)+(base_x/2);
-	UINT32  texeloffs = ((y/2)*512)+(x/2);
-	UINT32  offset = baseoffs + texeloffs;
-	UINT32  texel = sheet[offset>>1];
-
-	if ( offset & 1 )
-		texel >>= 16;
-
-	if ( (y & 1) == 0 )
-		texel >>= 8;
-
-	if ( (x & 1) == 0 )
-		texel >>= 4;
-
-	return (texel & 0x0f);
-}
-
-/* checker = 0, textured = 0, transparent = 0 */
-#define MODEL2_FUNC 0
-#define MODEL2_FUNC_NAME    model2_3d_render_0
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
-/* checker = 0, textured = 0, translucent = 1 */
-#define MODEL2_FUNC 1
-#define MODEL2_FUNC_NAME    model2_3d_render_1
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
-/* checker = 0, textured = 1, translucent = 0 */
-#define MODEL2_FUNC 2
-#define MODEL2_FUNC_NAME    model2_3d_render_2
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
-/* checker = 0, textured = 1, translucent = 1 */
-#define MODEL2_FUNC 3
-#define MODEL2_FUNC_NAME    model2_3d_render_3
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
-/* checker = 1, textured = 0, translucent = 0 */
-#define MODEL2_FUNC 4
-#define MODEL2_FUNC_NAME    model2_3d_render_4
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
-/* checker = 1, textured = 0, translucent = 1 */
-#define MODEL2_FUNC 5
-#define MODEL2_FUNC_NAME    model2_3d_render_5
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
-/* checker = 1, textured = 1, translucent = 0 */
-#define MODEL2_FUNC 6
-#define MODEL2_FUNC_NAME    model2_3d_render_6
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
-/* checker = 1, textured = 1, translucent = 1 */
-#define MODEL2_FUNC 7
-#define MODEL2_FUNC_NAME    model2_3d_render_7
-#include "model2rd.inc"
-#undef MODEL2_FUNC
-#undef MODEL2_FUNC_NAME
-
 /***********************************************************************************************/
 
-static const poly_draw_scanline_func render_funcs[8] =
+void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 {
-	model2_3d_render_0, /* checker = 0, textured = 0, translucent = 0 */
-	model2_3d_render_1, /* checker = 0, textured = 0, translucent = 1 */
-	model2_3d_render_2, /* checker = 0, textured = 1, translucent = 0 */
-	model2_3d_render_3, /* checker = 0, textured = 1, translucent = 1 */
-	model2_3d_render_4, /* checker = 1, textured = 0, translucent = 0 */
-	model2_3d_render_5, /* checker = 1, textured = 0, translucent = 1 */
-	model2_3d_render_6, /* checker = 1, textured = 1, translucent = 0 */
-	model2_3d_render_7  /* checker = 1, textured = 1, translucent = 1 */
-};
-
-static void model2_3d_render( model2_state *state, bitmap_rgb32 &bitmap, triangle *tri, const rectangle &cliprect )
-{
-	legacy_poly_manager *poly = state->m_poly;
-	m2_poly_extra_data *extra = (m2_poly_extra_data *)poly_get_extra_data(poly);
-	UINT8       renderer;
+	model2_renderer *poly = m_state.m_poly;
+	m2_poly_extra_data& extra = poly->object_data_alloc();
+	UINT8 renderer;
 
 	/* select renderer based on attributes (bit15 = checker, bit14 = textured, bit13 = transparent */
 	renderer = (tri->texheader[0] >> 13) & 7;
@@ -937,20 +796,20 @@ static void model2_3d_render( model2_state *state, bitmap_rgb32 &bitmap, triangl
 	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
 	vp &= cliprect;
 
-	extra->state = state;
-	extra->lumabase = ((tri->texheader[1] & 0xFF) << 7) + ((tri->luma >> 5) ^ 0x7);
-	extra->colorbase = (tri->texheader[3] >> 6) & 0x3FF;
+	extra.state = &m_state;
+	extra.lumabase = ((tri->texheader[1] & 0xFF) << 7) + ((tri->luma >> 5) ^ 0x7);
+	extra.colorbase = (tri->texheader[3] >> 6) & 0x3FF;
 
 	if (renderer & 2)
 	{
-		extra->texwidth = 32 << ((tri->texheader[0] >> 0) & 0x7);
-		extra->texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
-		extra->texx = 32 * ((tri->texheader[2] >> 0) & 0x1f);
-		extra->texy = 32 * (((tri->texheader[2] >> 6) & 0x1f) + ( tri->texheader[2] & 0x20 ));
+		extra.texwidth = 32 << ((tri->texheader[0] >> 0) & 0x7);
+		extra.texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
+		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x1f);
+		extra.texy = 32 * (((tri->texheader[2] >> 6) & 0x1f) + ( tri->texheader[2] & 0x20 ));
 		/* TODO: Virtua Striker contradicts with this. */
-		extra->texmirrorx = 0;//(tri->texheader[0] >> 9) & 1;
-		extra->texmirrory = 0;//(tri->texheader[0] >> 8) & 1;
-		extra->texsheet = (tri->texheader[2] & 0x1000) ? state->m_textureram1 : state->m_textureram0;
+		extra.texmirrorx = 0;//(tri->texheader[0] >> 9) & 1;
+		extra.texmirrory = 0;//(tri->texheader[0] >> 8) & 1;
+		extra.texsheet = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
 
 		tri->v[0].pz = 1.0f / (1.0f + tri->v[0].pz);
 		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * (1.0f / 8.0f);
@@ -962,10 +821,35 @@ static void model2_3d_render( model2_state *state, bitmap_rgb32 &bitmap, triangl
 		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * (1.0f / 8.0f);
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
 
-		poly_render_triangle(poly, &bitmap, vp, render_funcs[renderer], 3, &tri->v[0], &tri->v[1], &tri->v[2]);
+		// Note : The class model2_renderer has an array of function pointers in it named m_renderfuncs, in theory this simply
+		//        needs to be passed into the render_triangle function as such model2_renderer::m_renderfuncs[renderer], but
+		//        I was unable to make it work when converting to the new polygon rasterizer interface.
+		switch (renderer)
+		{
+		case 0: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_0), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 1: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_1), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 2: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_2), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 3: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_3), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 4: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_4), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 5: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_5), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 6: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_6), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 7: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_7), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		}
 	}
 	else
-		poly_render_triangle(poly, &bitmap, vp, render_funcs[renderer], 0, &tri->v[0], &tri->v[1], &tri->v[2]);
+	{
+		switch (renderer)
+		{
+		case 0: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_0), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 1: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_1), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 2: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_2), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 3: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_3), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 4: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_4), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 5: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_5), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 6: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_6), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 7: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_7), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		}
+	}
 }
 
 /*
@@ -1019,7 +903,7 @@ static void model2_3d_frame_start( model2_state *state )
 void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	raster_state *raster = m_raster;
-	INT32       z;
+	INT32 z;
 
 	/* if we have nothing to render, bail */
 	if ( raster->tri_list_index == 0 )
@@ -1063,6 +947,8 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 	}
 #endif
 
+	m_poly->destmap().fill(0x00000000, cliprect);
+
 	/* go through the Z levels, and render each bucket */
 	for( z = raster->max_z; z >= raster->min_z; z-- )
 	{
@@ -1077,13 +963,15 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 			{
 				/* project and render */
 				model2_3d_project( tri );
-				model2_3d_render( this, bitmap, tri, cliprect );
+				m_poly->model2_3d_render(tri, cliprect);
 
 				tri = (triangle *)tri->next;
 			}
 		}
 	}
-	poly_wait(m_poly, "End of frame");
+	m_poly->wait("End of frame");
+
+	copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
 }
 
 /* 3D Rasterizer main data input port */
@@ -2694,11 +2582,6 @@ static void geo_parse( model2_state *state )
 /***********************************************************************************************/
 
 
-void model2_state::model2_exit()
-{
-	poly_free(m_poly);
-}
-
 VIDEO_START_MEMBER(model2_state,model2)
 {
 	const rectangle &visarea = m_screen->visible_area();
@@ -2707,8 +2590,7 @@ VIDEO_START_MEMBER(model2_state,model2)
 
 	m_sys24_bitmap.allocate(width, height+4);
 
-	m_poly = poly_alloc(machine(), 4000, sizeof(m2_poly_extra_data), 0);
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model2_state::model2_exit), this));
+	m_poly = auto_alloc(machine(), model2_renderer(*this));
 
 	/* initialize the hardware rasterizer */
 	model2_3d_init( machine(), (UINT16*)memregion("user3")->base() );

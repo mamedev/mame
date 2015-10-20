@@ -34,7 +34,6 @@ public:
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_device<decospr_device> m_sprgen;
-//  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -113,24 +113,24 @@ namespace bx
 		return NULL;
 	}
 
-	/// Find substring in string. Case insensitive. Limit search to _size.
+	/// Find substring in string. Case insensitive. Limit search to _max.
 	inline const char* stristr(const char* _str, const char* _find, size_t _max)
 	{
 		const char* ptr = _str;
 
-		const size_t total = strlen(_str);
-		size_t len = _max < total ? _max : total;
+		size_t       stringLen = strnlen(_str, _max);
+		const size_t findLen   = strlen(_find);
 
-		for (const size_t searchLen = strlen(_find); len >= searchLen; ++ptr, --len)
+		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
 			// Find start of the string.
 			while (tolower(*ptr) != tolower(*_find) )
 			{
 				++ptr;
-				--len;
+				--stringLen;
 
 				// Search pattern lenght can't be longer than the string.
-				if (searchLen > len)
+				if (findLen > stringLen)
 				{
 					return NULL;
 				}

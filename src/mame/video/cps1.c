@@ -59,6 +59,7 @@ Final Fight (World, set 2)                                         89624B-3   S2
 Final Fight (USA, set 1)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
 Final Fight (USA, set 2)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
 Final Fight (USA 900112)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-04@ DL-0411-10001  None
+Final Fight (USA 900424)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-03  DL-0411-10003  None
 Final Fight (USA 900613)                                           89624B-3   S224B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
 Final Fight (Japan)                                                ?          S222B            ?     ?            CPS-B-04  DL-0411-10005
 Final Fight (Japan 900112)                                         89625B-1   S222B            LWIO  88622-C-5    CPS-B-01  DL-0411-10001  None
@@ -477,6 +478,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define CPS_B_21_QS4 0x2e,0x0c01,  -1,  -1,  -1,  -1,  0x1c,0x1e,0x08,  0x16,{0x00,0x02,0x28,0x2a},0x2c, {0x04,0x08,0x10,0x00,0x00}
 #define CPS_B_21_QS5 0x1e,0x0c02,  -1,  -1,  -1,  -1,  0x0c, -1,  -1,   0x2a,{0x2c,0x2e,0x30,0x32},0x1c, {0x04,0x08,0x10,0x00,0x00}
 #define HACK_B_1      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x0e,0x0e,0x0e,0x30,0x30}
+#define HACK_B_2      -1,   -1,   0x0e,0x0c,0x0a,0x08, 0x06,0x04,0x02,  0x28,{0x26,0x24,0x22,0x20},0x22, {0x20,0x04,0x08,0x12,0x12}
 
 /*
 CPS_B_21_DEF is CPS-B-21 at default settings (no battery)
@@ -1413,7 +1415,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightu",     CPS_B_04,     mapper_S224B },
 	{"ffightu1",    CPS_B_04,     mapper_S224B },
 	{"ffightua",    CPS_B_01,     mapper_S224B },
-	{"ffightub",    CPS_B_05,     mapper_S224B },
+	{"ffightub",    CPS_B_03,     mapper_S224B },   // had 04 handwritten on the CPS_B chip, but clearly isn't.
+	{"ffightuc",    CPS_B_05,     mapper_S224B },
 	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B
@@ -1477,8 +1480,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"3wondersr1",  CPS_B_21_BT1, mapper_RT24B },
 	{"3wondersu",   CPS_B_21_BT1, mapper_RT24B },
 	{"wonder3",     CPS_B_21_BT1, mapper_RT22B },   // equivalent to RT24B
-	{"3wondersb",   CPS_B_21_BT1, mapper_RT24B },
-	{"3wondersh",   CPS_B_02    , mapper_RT24B },   /* Not 100% sure of the CPS B-ID */
+	{"3wondersb",   CPS_B_21_BT1, mapper_RT24B,  0x36, 0, 0, 0x88 }, // same as 3wonders except some registers are hard wired rather than written to
+	{"3wondersh",   HACK_B_2,     mapper_RT24B },  // one port is changed from 3wonders, and no protection
 	{"kod",         CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodr1",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
@@ -1767,7 +1770,7 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 	{
 		if (offset == 0x10/2)
 		{
-			// UNKNOWN--only mmatrix appears to read this, and I'm not sure if the result is actuallyused
+			// UNKNOWN--only mmatrix appears to read this, and I'm not sure if the result is actually used
 			return m_cps_b_regs[0x10 / 2];
 		}
 		if (offset == 0x12/2)
@@ -1949,6 +1952,18 @@ void cps_state::cps1_get_video_base()
 		scroll1xoff = -0x08;
 		scroll2xoff = -0x0b;
 		scroll3xoff = -0x0c;
+	}
+	else
+	if (m_game_config->bootleg_kludge == 0x88) // 3wondersb
+	{
+		scroll1xoff = 0x4;
+		scroll2xoff = 0x6;
+		scroll3xoff = 0xa;
+		m_cps_b_regs[0x30/2] = 0x3f;
+		m_cps_a_regs[CPS1_VIDEOCONTROL] = 0x3e;
+		m_cps_a_regs[CPS1_SCROLL2_BASE] = 0x90c0;
+		m_cps_a_regs[CPS1_SCROLL3_BASE] = 0x9100;
+		m_cps_a_regs[CPS1_PALETTE_BASE] = 0x9140;
 	}
 
 	m_obj = cps1_base(CPS1_OBJ_BASE, m_obj_size);
@@ -2958,6 +2973,9 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 
 	if (m_cps_version == 1)
 	{
+		if BIT(m_game_config->bootleg_kludge, 7)
+			cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
+
 		cps1_render_layer(screen, bitmap, cliprect, l0, 0);
 
 		if (l1 == 0)

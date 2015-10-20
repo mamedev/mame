@@ -13,8 +13,14 @@ typedef device_delegate<void (int layer, int bank, int *code, int *color, int *f
 #define MCFG_K052109_CHARRAM(_ram) \
 	k052109_device::set_ram(*device, _ram);
 
-class k052109_device : public device_t,
-							public device_gfx_interface
+#define MCFG_K052109_SCREEN_TAG(_tag) \
+		k052109_device::set_screen_tag(*device, owner, _tag);
+
+#define MCFG_K052109_IRQ_HANDLER(_devcb) \
+	devcb = &k052109_device::set_irq_handler(*device, DEVCB_##_devcb);
+
+
+class k052109_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout charlayout;
 	static const gfx_layout charlayout_ram;
@@ -25,8 +31,12 @@ public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k052109_device() {}
 
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
+			{ return downcast<k052109_device &>(device).m_irq_handler.set_callback(object); }
+
 	static void set_k052109_callback(device_t &device, k052109_cb_delegate callback) { downcast<k052109_device &>(device).m_k052109_cb = callback; }
 	static void set_ram(device_t &device, bool ram);
+	static void set_screen_tag(device_t &device, device_t *owner, const char *tag);
 
 	/*
 	The callback is passed:
@@ -57,10 +67,13 @@ public:
 	void tilemap_mark_dirty(int tmap_num);
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority);
 
+	void vblank_callback(screen_device &screen, bool state);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
 	UINT8    *m_ram;
@@ -86,7 +99,13 @@ private:
 	UINT8 *m_char_rom;
 	UINT32 m_char_size;
 
+	const char *m_screen_tag;
+
 	k052109_cb_delegate m_k052109_cb;
+
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_firq_handler;
+	devcb_write_line m_nmi_handler;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);

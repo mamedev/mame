@@ -39,8 +39,6 @@
 #undef min
 #undef max
 
-
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -90,34 +88,48 @@ class attotime
 public:
 	// construction/destruction
 	attotime()
-		: seconds(0),
-			attoseconds(0) { }
+		: m_seconds(0),
+			m_attoseconds(0) { }
 
 	attotime(seconds_t secs, attoseconds_t attos)
-		: seconds(secs),
-			attoseconds(attos) { }
+		: m_seconds(secs),
+			m_attoseconds(attos) { }
 
 	attotime(const attotime& that)
-		: seconds(that.seconds),
-			attoseconds(that.attoseconds) { }
+		: m_seconds(that.m_seconds),
+			m_attoseconds(that.m_attoseconds) { }
 
 	// assignment
 	attotime& operator=(const attotime& that)
 	{
-		this->seconds = that.seconds;
-		this->attoseconds = that.attoseconds;
+		this->m_seconds = that.m_seconds;
+		this->m_attoseconds = that.m_attoseconds;
 		return *this;
 	}
 
 	// queries
-	bool is_zero() const { return (seconds == 0 && attoseconds == 0); }
-	bool is_never() const { return (seconds >= ATTOTIME_MAX_SECONDS); }
+	bool is_zero() const { return (m_seconds == 0 && m_attoseconds == 0); }
+	bool is_never() const { return (m_seconds >= ATTOTIME_MAX_SECONDS); }
 
 	// conversion to other forms
-	double as_double() const { return double(seconds) + ATTOSECONDS_TO_DOUBLE(attoseconds); }
+	double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
 	attoseconds_t as_attoseconds() const;
 	UINT64 as_ticks(UINT32 frequency) const;
 	const char *as_string(int precision = 9) const;
+
+	// Needed by gba.c FIXME: this shouldn't be necessary?
+
+	void normalize()
+	{
+			while (m_attoseconds >= ATTOSECONDS_PER_SECOND)
+			{
+				m_seconds++;
+				m_attoseconds -= ATTOSECONDS_PER_SECOND;
+			}
+	}
+
+	attoseconds_t attoseconds() const { return m_attoseconds; }
+	seconds_t seconds() const { return m_seconds; }
 
 	// conversion from other forms
 	static attotime from_double(double _time);
@@ -135,8 +147,8 @@ public:
 	attotime &operator/=(UINT32 factor);
 
 	// members
-	seconds_t       seconds;
-	attoseconds_t   attoseconds;
+	seconds_t       m_seconds;
+	attoseconds_t   m_attoseconds;
 
 	// constants
 	static const attotime never;
@@ -159,22 +171,22 @@ inline attotime operator+(const attotime &left, const attotime &right)
 	attotime result;
 
 	// if one of the items is never, return never
-	if (left.seconds >= ATTOTIME_MAX_SECONDS || right.seconds >= ATTOTIME_MAX_SECONDS)
+	if (left.m_seconds >= ATTOTIME_MAX_SECONDS || right.m_seconds >= ATTOTIME_MAX_SECONDS)
 		return attotime::never;
 
 	// add the seconds and attoseconds
-	result.attoseconds = left.attoseconds + right.attoseconds;
-	result.seconds = left.seconds + right.seconds;
+	result.m_attoseconds = left.m_attoseconds + right.m_attoseconds;
+	result.m_seconds = left.m_seconds + right.m_seconds;
 
 	// normalize and return
-	if (result.attoseconds >= ATTOSECONDS_PER_SECOND)
+	if (result.m_attoseconds >= ATTOSECONDS_PER_SECOND)
 	{
-		result.attoseconds -= ATTOSECONDS_PER_SECOND;
-		result.seconds++;
+		result.m_attoseconds -= ATTOSECONDS_PER_SECOND;
+		result.m_seconds++;
 	}
 
 	// overflow
-	if (result.seconds >= ATTOTIME_MAX_SECONDS)
+	if (result.m_seconds >= ATTOTIME_MAX_SECONDS)
 		return attotime::never;
 	return result;
 }
@@ -182,22 +194,22 @@ inline attotime operator+(const attotime &left, const attotime &right)
 inline attotime &attotime::operator+=(const attotime &right)
 {
 	// if one of the items is never, return never
-	if (this->seconds >= ATTOTIME_MAX_SECONDS || right.seconds >= ATTOTIME_MAX_SECONDS)
+	if (this->m_seconds >= ATTOTIME_MAX_SECONDS || right.m_seconds >= ATTOTIME_MAX_SECONDS)
 		return *this = never;
 
 	// add the seconds and attoseconds
-	attoseconds += right.attoseconds;
-	seconds += right.seconds;
+	m_attoseconds += right.m_attoseconds;
+	m_seconds += right.m_seconds;
 
 	// normalize and return
-	if (this->attoseconds >= ATTOSECONDS_PER_SECOND)
+	if (this->m_attoseconds >= ATTOSECONDS_PER_SECOND)
 	{
-		this->attoseconds -= ATTOSECONDS_PER_SECOND;
-		this->seconds++;
+		this->m_attoseconds -= ATTOSECONDS_PER_SECOND;
+		this->m_seconds++;
 	}
 
 	// overflow
-	if (this->seconds >= ATTOTIME_MAX_SECONDS)
+	if (this->m_seconds >= ATTOTIME_MAX_SECONDS)
 		return *this = never;
 	return *this;
 }
@@ -213,18 +225,18 @@ inline attotime operator-(const attotime &left, const attotime &right)
 	attotime result;
 
 	// if time1 is never, return never
-	if (left.seconds >= ATTOTIME_MAX_SECONDS)
+	if (left.m_seconds >= ATTOTIME_MAX_SECONDS)
 		return attotime::never;
 
 	// add the seconds and attoseconds
-	result.attoseconds = left.attoseconds - right.attoseconds;
-	result.seconds = left.seconds - right.seconds;
+	result.m_attoseconds = left.m_attoseconds - right.m_attoseconds;
+	result.m_seconds = left.m_seconds - right.m_seconds;
 
 	// normalize and return
-	if (result.attoseconds < 0)
+	if (result.m_attoseconds < 0)
 	{
-		result.attoseconds += ATTOSECONDS_PER_SECOND;
-		result.seconds--;
+		result.m_attoseconds += ATTOSECONDS_PER_SECOND;
+		result.m_seconds--;
 	}
 	return result;
 }
@@ -232,18 +244,18 @@ inline attotime operator-(const attotime &left, const attotime &right)
 inline attotime &attotime::operator-=(const attotime &right)
 {
 	// if time1 is never, return never
-	if (this->seconds >= ATTOTIME_MAX_SECONDS)
+	if (this->m_seconds >= ATTOTIME_MAX_SECONDS)
 		return *this = never;
 
 	// add the seconds and attoseconds
-	attoseconds -= right.attoseconds;
-	seconds -= right.seconds;
+	m_attoseconds -= right.m_attoseconds;
+	m_seconds -= right.m_seconds;
 
 	// normalize and return
-	if (this->attoseconds < 0)
+	if (this->m_attoseconds < 0)
 	{
-		this->attoseconds += ATTOSECONDS_PER_SECOND;
-		this->seconds--;
+		this->m_attoseconds += ATTOSECONDS_PER_SECOND;
+		this->m_seconds--;
 	}
 	return *this;
 }
@@ -284,32 +296,32 @@ inline attotime operator/(const attotime &left, UINT32 factor)
 
 inline bool operator==(const attotime &left, const attotime &right)
 {
-	return (left.seconds == right.seconds && left.attoseconds == right.attoseconds);
+	return (left.m_seconds == right.m_seconds && left.m_attoseconds == right.m_attoseconds);
 }
 
 inline bool operator!=(const attotime &left, const attotime &right)
 {
-	return (left.seconds != right.seconds || left.attoseconds != right.attoseconds);
+	return (left.m_seconds != right.m_seconds || left.m_attoseconds != right.m_attoseconds);
 }
 
 inline bool operator<(const attotime &left, const attotime &right)
 {
-	return (left.seconds < right.seconds || (left.seconds == right.seconds && left.attoseconds < right.attoseconds));
+	return (left.m_seconds < right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds < right.m_attoseconds));
 }
 
 inline bool operator<=(const attotime &left, const attotime &right)
 {
-	return (left.seconds < right.seconds || (left.seconds == right.seconds && left.attoseconds <= right.attoseconds));
+	return (left.m_seconds < right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds <= right.m_attoseconds));
 }
 
 inline bool operator>(const attotime &left, const attotime &right)
 {
-	return (left.seconds > right.seconds || (left.seconds == right.seconds && left.attoseconds > right.attoseconds));
+	return (left.m_seconds > right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds > right.m_attoseconds));
 }
 
 inline bool operator>=(const attotime &left, const attotime &right)
 {
-	return (left.seconds > right.seconds || (left.seconds == right.seconds && left.attoseconds >= right.attoseconds));
+	return (left.m_seconds > right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds >= right.m_attoseconds));
 }
 
 
@@ -319,11 +331,11 @@ inline bool operator>=(const attotime &left, const attotime &right)
 
 inline attotime min(const attotime &left, const attotime &right)
 {
-	if (left.seconds > right.seconds)
+	if (left.m_seconds > right.m_seconds)
 		return right;
-	if (left.seconds < right.seconds)
+	if (left.m_seconds < right.m_seconds)
 		return left;
-	if (left.attoseconds > right.attoseconds)
+	if (left.m_attoseconds > right.m_attoseconds)
 		return right;
 	return left;
 }
@@ -335,11 +347,11 @@ inline attotime min(const attotime &left, const attotime &right)
 
 inline attotime max(const attotime &left, const attotime &right)
 {
-	if (left.seconds > right.seconds)
+	if (left.m_seconds > right.m_seconds)
 		return left;
-	if (left.seconds < right.seconds)
+	if (left.m_seconds < right.m_seconds)
 		return right;
-	if (left.attoseconds > right.attoseconds)
+	if (left.m_attoseconds > right.m_attoseconds)
 		return left;
 	return right;
 }
@@ -353,15 +365,15 @@ inline attotime max(const attotime &left, const attotime &right)
 inline attoseconds_t attotime::as_attoseconds() const
 {
 	// positive values between 0 and 1 second
-	if (seconds == 0)
-		return attoseconds;
+	if (m_seconds == 0)
+		return m_attoseconds;
 
 	// negative values between -1 and 0 seconds
-	else if (seconds == -1)
-		return attoseconds - ATTOSECONDS_PER_SECOND;
+	else if (m_seconds == -1)
+		return m_attoseconds - ATTOSECONDS_PER_SECOND;
 
 	// out-of-range positive values
-	else if (seconds > 0)
+	else if (m_seconds > 0)
 		return ATTOSECONDS_PER_SECOND;
 
 	// out-of-range negative values
@@ -377,8 +389,8 @@ inline attoseconds_t attotime::as_attoseconds() const
 
 inline UINT64 attotime::as_ticks(UINT32 frequency) const
 {
-	UINT32 fracticks = (attotime(0, attoseconds) * frequency).seconds;
-	return mulu_32x32(seconds, frequency) + fracticks;
+	UINT32 fracticks = (attotime(0, m_attoseconds) * frequency).m_seconds;
+	return mulu_32x32(m_seconds, frequency) + fracticks;
 }
 
 

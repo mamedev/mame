@@ -296,6 +296,35 @@ IC Type       27C2048   27C2048   27C4200   27C4200   27C1000   27C160    27C160
 Stadium Cross EPR15093  EPR15094  EPR15018  EPR15019  EPR15192  EPR15020  EPR15021  EPR15022  EPR15023  EPR15024  EPR15025  EPR15026  EPR15027  EPR15028  EPR15029  EPR15031  EPR15032  -
 
 
+System 32 Multi COMM board
+--------------------------
+
+SEGA 1992 837-8792
+sticker: 837-9016-03
+|--------------------------------------------------------|
+|           CN3                           CN4            |
+|                                                        |
+|   32MHz   JP1(1-2)                                     |
+|        Z80        MB89374      MB89237A    MB8421      |
+|                                                        |
+|  JP2(1-2)                                              |
+|     EPR-15033.IC17                                     |
+|  JP3(2-3)                                              |
+|  JP4(1-2)                                              |
+|     8464            GAL16V8                GAL16V8     |
+|                     (315-5610)             (315-5506)  |
+|           CN1                           CN2            |
+|                      CN8  CN9                          |
+|--------------------------------------------------------|
+EPR-15033 - AM27C100 EPROM found on Stadium Cross
+  MB89374 - Fujitsu MB89374 Data Link Controller. Clock input 8MHz [32/4]
+ MB89237A - Fujitsu MB89237A DMA Controller
+     8464 - Fujitsu MB8464 8k x8 SRAM
+      CN8 - TX connector
+      CN9 - RX connector
+    CN1-4 - Joins to Main Board. Connections on top allow plugging in the ROM PCB
+
+
 *********************************************************************************************
 
 
@@ -2486,7 +2515,7 @@ static MACHINE_CONFIG_FRAGMENT( system32 )
 	MCFG_RF5C68_ADD("rfsnd", RFC_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
-	
+
 	MCFG_S32COMM_ADD("s32comm")
 MACHINE_CONFIG_END
 
@@ -2572,7 +2601,7 @@ static MACHINE_CONFIG_FRAGMENT( multi32 )
 	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	
+
 	MCFG_S32COMM_ADD("s32comm")
 MACHINE_CONFIG_END
 
@@ -5237,7 +5266,7 @@ void segas32_state::init_f1lap(void)
 	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
 
 	m_sw1_output = &segas32_state::f1lap_sw1_output;
-		
+
 	m_s32comm->set_linktype(15612); // EPR-15612
 }
 
@@ -5303,7 +5332,7 @@ void segas32_state::init_radr(void)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 	m_sw1_output = &segas32_state::radm_sw1_output;
 	m_sw2_output = &segas32_state::radr_sw2_output;
-		
+
 	m_s32comm->set_linktype(14084); // EPR-14084
 }
 
@@ -5374,77 +5403,77 @@ void segas32_state::init_titlef(void)
  *
  *************************************/
 
-GAME( 1992, arescue,   0,        sega_system32_dual_direct,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, arescue,   0,        sega_system32_dual_direct,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, alien3,    0,        sega_system32,     alien3,   segas32_new_state, alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, alien3u,   alien3,   sega_system32,     alien3,   segas32_new_state, alien3,   ROT0, "Sega",   "Alien3: The Gun (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3,    0,        sega_system32,     alien3,   segas32_new_state, alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3u,   alien3,   sega_system32,     alien3,   segas32_new_state, alien3,   ROT0, "Sega",   "Alien3: The Gun (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1991, arabfgt,   0,        sega_system32,     arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", GAME_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
-GAME( 1991, arabfgtu,  arabfgt,  sega_system32,     arabfgtu, segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, arabfgtj,  arabfgt,  sega_system32,     arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, arabfgt,   0,        sega_system32,     arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
+GAME( 1991, arabfgtu,  arabfgt,  sega_system32,     arabfgtu, segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, arabfgtj,  arabfgt,  sega_system32,     arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, brival,    0,        sega_system32,     brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, brivalj,   brival,   sega_system32,     brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, brival,    0,        sega_system32,     brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, brivalj,   brival,   sega_system32,     brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, darkedge,  0,        sega_system32,     darkedge, segas32_new_state, darkedge, ROT0, "Sega",   "Dark Edge (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, darkedgej, darkedge, sega_system32,     darkedge, segas32_new_state, darkedge, ROT0, "Sega",   "Dark Edge (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, darkedge,  0,        sega_system32,     darkedge, segas32_new_state, darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, darkedgej, darkedge, sega_system32,     darkedge, segas32_new_state, darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32,     dbzvrvs,  segas32_new_state, dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan)", GAME_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32,     dbzvrvs,  segas32_new_state, dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan)", MACHINE_IMPERFECT_GRAPHICS)
 
-GAME( 1991, f1en,      0,        sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, f1en,      0,        sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, f1lap,     0,        sega_system32,     f1lap,    segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, f1lapj,    f1lap,    sega_system32,     f1lap,    segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, f1lap,     0,        sega_system32,     f1lap,    segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, f1lapj,    f1lap,    sega_system32,     f1lap,    segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, ga2,       0,        sega_system32_v25, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2u,      ga2,      sega_system32_v25, ga2u,     segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2j,      ga2,      sega_system32_v25, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2,       0,        sega_system32_v25, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2u,      ga2,      sega_system32_v25, ga2u,     segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2j,      ga2,      sega_system32_v25, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, holo,      0,        sega_system32,     holo,     segas32_new_state, holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, holo,      0,        sega_system32,     holo,     segas32_new_state, holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, jpark,     0,        sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (World)", GAME_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
-GAME( 1993, jparkj,    jpark,    sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, jparkja,   jpark,    sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, jparkjc,   jpark,    sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, jpark,     0,        sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
+GAME( 1993, jparkj,    jpark,    sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, jparkja,   jpark,    sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, jparkjc,   jpark,    sega_system32,     jpark,    segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, kokoroj2,  0,        sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Kokoroji 2", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING) /* uses an Audio CD */
+GAME( 1994, kokoroj2,  0,        sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Kokoroji 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING) /* uses an Audio CD */
 
-GAME( 1990, radm,      0,        sega_system32,     radm,     segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (World)", GAME_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
-GAME( 1990, radmu,     radm,     sega_system32,     radm,     segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, radm,      0,        sega_system32,     radm,     segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
+GAME( 1990, radmu,     radm,     sega_system32,     radm,     segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAMEL(1991, radr,      0,        sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (World)", GAME_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1991, radru,     radr,     sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (US)", GAME_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1991, radrj,     radr,     sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (Japan)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radr,      0,        sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (World)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radru,     radr,     sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (US)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radrj,     radr,     sega_system32,     radr,     segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (Japan)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
 
-GAMEL(1995, slipstrm,  0,        sega_system32,     slipstrm, segas32_new_state, slipstrm, ROT0, "Capcom", "Slip Stream (Brazil 950515)", GAME_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1995, slipstrmh, slipstrm, sega_system32,     slipstrm, segas32_new_state, slipstrm, ROT0, "Capcom", "Slip Stream (Hispanic 950515)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrm,  0,        sega_system32,     slipstrm, segas32_new_state, slipstrm, ROT0, "Capcom", "Slip Stream (Brazil 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrmh, slipstrm, sega_system32,     slipstrm, segas32_new_state, slipstrm, ROT0, "Capcom", "Slip Stream (Hispanic 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
 
-GAME( 1992, sonic,     0,        sega_system32,     sonic,    segas32_new_state, sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, sonicp,    sonic,    sega_system32,     sonic,    segas32_new_state, sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, sonic,     0,        sega_system32,     sonic,    segas32_new_state, sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, sonicp,    sonic,    sega_system32,     sonic,    segas32_new_state, sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1991, spidman,   0,        sega_system32,     spidman,  segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, spidmanu,  spidman,  sega_system32,     spidmanu, segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, spidmanj,  spidman,  sega_system32,     spidman,  segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, spidman,   0,        sega_system32,     spidman,  segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, spidmanu,  spidman,  sega_system32,     spidmanu, segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, spidmanj,  spidman,  sega_system32,     spidman,  segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, svf,       0,        sega_system32,     svf,      segas32_new_state, svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, svs,       svf,      sega_system32,     svf,      segas32_new_state, svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, jleague,   svf,      sega_system32,     svf,      segas32_new_state, jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, svf,       0,        sega_system32,     svf,      segas32_new_state, svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, svs,       svf,      sega_system32,     svf,      segas32_new_state, svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jleague,   svf,      sega_system32,     svf,      segas32_new_state, jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 
-GAME( 1994, harddunk,  0,        sega_multi32,      harddunk, segas32_new_state, harddunk, ROT0, "Sega",   "Hard Dunk (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, harddunkj, harddunk, sega_multi32,      harddunk, segas32_new_state, harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, harddunk,  0,        sega_multi32,      harddunk, segas32_new_state, harddunk, ROT0, "Sega",   "Hard Dunk (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, harddunkj, harddunk, sega_multi32,      harddunk, segas32_new_state, harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, orunners,  0,        sega_multi32,      orunners, segas32_new_state, orunners, ROT0, "Sega",   "OutRunners (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, orunnersu, orunners, sega_multi32,      orunners, segas32_new_state, orunners, ROT0, "Sega",   "OutRunners (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, orunnersj, orunners, sega_multi32,      orunners, segas32_new_state, orunners, ROT0, "Sega",   "OutRunners (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, orunners,  0,        sega_multi32,      orunners, segas32_new_state, orunners, ROT0, "Sega",   "OutRunners (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, orunnersu, orunners, sega_multi32,      orunners, segas32_new_state, orunners, ROT0, "Sega",   "OutRunners (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, orunnersj, orunners, sega_multi32,      orunners, segas32_new_state, orunners, ROT0, "Sega",   "OutRunners (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, scross,    0,        sega_multi32,      scross,   segas32_new_state, scross,   ROT0, "Sega",   "Stadium Cross (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, scrossa,   scross,   sega_multi32,      scross,   segas32_new_state, scross,   ROT0, "Sega",   "Stadium Cross (World, alt)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, scrossu,   scross,   sega_multi32,      scross,   segas32_new_state, scross,   ROT0, "Sega",   "Stadium Cross (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, scross,    0,        sega_multi32,      scross,   segas32_new_state, scross,   ROT0, "Sega",   "Stadium Cross (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, scrossa,   scross,   sega_multi32,      scross,   segas32_new_state, scross,   ROT0, "Sega",   "Stadium Cross (World, alt)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, scrossu,   scross,   sega_multi32,      scross,   segas32_new_state, scross,   ROT0, "Sega",   "Stadium Cross (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, titlef,    0,        sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, titlefu,   titlef,   sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, titlefj,   titlef,   sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, titlef,    0,        sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, titlefu,   titlef,   sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, titlefj,   titlef,   sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )

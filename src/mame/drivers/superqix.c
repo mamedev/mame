@@ -941,7 +941,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -980,7 +980,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
@@ -1071,7 +1071,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
@@ -1329,12 +1329,12 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 
 
 
-GAME( 1986, pbillian, 0,        pbillian, pbillian, driver_device, 0,        ROT0,  "Kaneko / Taito", "Prebillian", GAME_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, driver_device, 0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqixu,    superqix, driver_device, 0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixb1,   sqix,     sqix,     superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixb2,   sqix,     sqixbl,   superqix, driver_device, 0,        ROT90, "bootleg", "Super Qix (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1994, perestro, 0,        sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", GAME_SUPPORTS_SAVE )
-GAME( 1993, perestrof,perestro, sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", GAME_SUPPORTS_SAVE )
+GAME( 1986, pbillian, 0,        pbillian, pbillian, driver_device, 0,        ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, driver_device, 0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqixu,    superqix, driver_device, 0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,   sqix,     sqix,     superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb2,   sqix,     sqixbl,   superqix, driver_device, 0,        ROT90, "bootleg", "Super Qix (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, perestro, 0,        sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, perestrof,perestro, sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )

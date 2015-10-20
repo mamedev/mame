@@ -24,8 +24,15 @@ public:
 		m_coinstate_timer(*this, "coinstate"),
 		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_screen(*this, "screen"),
+		m_proms(*this, "proms"),
 		m_videoram(*this, "videoram"),
-		m_characterram(*this, "characterram")
+		m_characterram(*this, "characterram"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_coinage(*this, "COINAGE"),
+		m_color_bw(*this, "COLOR_BW"),
+		m_fake_lives(*this, "FAKE_LIVES")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -36,9 +43,17 @@ public:
 	required_device<timer_device> m_coinstate_timer;
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
+	optional_memory_region m_proms;
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_characterram;
+
+	required_ioport m_in0;
+	required_ioport m_in1;
+	optional_ioport m_in2;
+	optional_ioport m_coinage;
+	optional_ioport m_color_bw;
+	optional_ioport_array<2> m_fake_lives;
 
 	UINT8 m_coin_status;
 	UINT8 m_palette_bank;

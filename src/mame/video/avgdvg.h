@@ -189,7 +189,7 @@ public:
 
 	virtual int handler_6();
 	virtual int handler_7();
-	virtual void vggo();
+	//virtual void vggo();
 };
 
 // device type definition

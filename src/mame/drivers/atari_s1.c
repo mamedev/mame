@@ -517,8 +517,8 @@ ROM_START(spcrider)
 ROM_END
 
 
-GAME( 1976, atarians, 0,         atarians, atari_s1, driver_device, 0, ROT0, "Atari", "The Atarians", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1977, time2000, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Time 2000", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1977, aavenger, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Airborne Avenger", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1978, midearth, 0,         midearth, atari_s1, driver_device, 0, ROT0, "Atari", "Middle Earth", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, spcrider, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Space Riders", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
+GAME( 1976, atarians, 0,         atarians, atari_s1, driver_device, 0, ROT0, "Atari", "The Atarians", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, time2000, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Time 2000", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, aavenger, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Airborne Avenger", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME( 1978, midearth, 0,         midearth, atari_s1, driver_device, 0, ROT0, "Atari", "Middle Earth", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, spcrider, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Space Riders", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)

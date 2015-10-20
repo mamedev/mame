@@ -670,6 +670,7 @@ int avg_tempest_device::handler_7() // tempest_strobe3
 	return cycles;
 }
 
+#if 0
 void avg_tempest_device::vggo() // tempest_vggo
 {
 	m_pc = 0;
@@ -682,7 +683,7 @@ void avg_tempest_device::vggo() // tempest_vggo
 	 */
 	nvect = 0;
 }
-
+#endif
 
 	/*************************************
 	*
@@ -911,7 +912,6 @@ void avg_quantum_device::vggo() // tempest_vggo
 	 */
 	nvect = 0;
 }
-
 
 int avg_quantum_device::handler_0() // quantum_st2st3
 {

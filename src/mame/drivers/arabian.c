@@ -418,5 +418,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, arabian,  0,       arabian, arabian, driver_device,  0, ROT270, "Sun Electronics",                 "Arabian",         GAME_SUPPORTS_SAVE )
-GAME( 1983, arabiana, arabian, arabian, arabiana, driver_device, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", GAME_SUPPORTS_SAVE )
+GAME( 1983, arabian,  0,       arabian, arabian, driver_device,  0, ROT270, "Sun Electronics",                 "Arabian",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, arabiana, arabian, arabian, arabiana, driver_device, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", MACHINE_SUPPORTS_SAVE )

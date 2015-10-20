@@ -27,7 +27,6 @@ public:
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_READ8_MEMBER(test_r);
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(buster);
 	UINT32 screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -314,14 +313,6 @@ static GFXDECODE_START( buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(buster_state, buster)
-{
-	int i;
-
-	/* RGB format */
-	for(i=0;i<8;i++)
-		palette.set_pen_color(i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
-}
 
 static MACHINE_CONFIG_START( buster, buster_state )
 	/* basic machine hardware */
@@ -343,8 +334,8 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buster)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(buster_state, buster)
+
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -367,4 +358,4 @@ ROM_START( buster )
 ROM_END
 
 
-GAME( 1982, buster,  0,    buster, buster, driver_device,  0, ROT0, "Marian Electronics Ltd.", "Buster", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1982, buster,  0,    buster, buster, driver_device,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

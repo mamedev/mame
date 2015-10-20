@@ -702,6 +702,6 @@ DRIVER_INIT_MEMBER(powerbal_state,magicstk)
 *************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY     FULLNAME                      FLAGS */
-GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0, "Playmark", "Power Balls",                 GAME_SUPPORTS_SAVE )
-GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0, "Playmark", "Magic Sticks",                GAME_SUPPORTS_SAVE )
-GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0, "Playmark", "Hot Mind (adjustable prize)", GAME_SUPPORTS_SAVE )
+GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0, "Playmark", "Power Balls",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0, "Playmark", "Magic Sticks",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0, "Playmark", "Hot Mind (adjustable prize)", MACHINE_SUPPORTS_SAVE )

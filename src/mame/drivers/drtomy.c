@@ -30,7 +30,6 @@ public:
 	required_shared_ptr<UINT16> m_videoram_fg;
 	required_shared_ptr<UINT16> m_videoram_bg;
 	required_shared_ptr<UINT16> m_spriteram;
-//  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t   *m_tilemap_bg;
@@ -175,7 +174,7 @@ static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM /* ROM */
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_SHARE("videorafg")   /* Video RAM FG */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_SHARE("videorabg") /* Video RAM BG */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
@@ -354,4 +353,4 @@ ROM_START( drtomy )
 ROM_END
 
 
-GAME( 1993, drtomy, 0, drtomy, drtomy, driver_device, 0, ROT0, "Playmark", "Dr. Tomy", GAME_SUPPORTS_SAVE )
+GAME( 1993, drtomy, 0, drtomy, drtomy, driver_device, 0, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )

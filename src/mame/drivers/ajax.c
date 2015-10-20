@@ -167,9 +167,8 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* 12/4 MHz*/
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 12/4 MHz*/
 	MCFG_CPU_PROGRAM_MAP(ajax_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ajax_state,  ajax_interrupt)   /* IRQs triggered by the 051960 */
 
 	MCFG_CPU_ADD("sub", M6809, 3000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(ajax_sub_map)
@@ -181,10 +180,9 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240)
+//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
+//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update_ajax)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -198,7 +196,9 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(ajax_state, sprite_callback)
+	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("k051316", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -376,6 +376,6 @@ ROM_START( ajaxj )
 ROM_END
 
 
-GAME( 1987, ajax,    0,    ajax, ajax, driver_device, 0, ROT90, "Konami", "Ajax", GAME_SUPPORTS_SAVE )
-GAME( 1987, typhoon, ajax, ajax, ajax, driver_device, 0, ROT90, "Konami", "Typhoon", GAME_SUPPORTS_SAVE )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, driver_device, 0, ROT90, "Konami", "Ajax (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ajax,    0,    ajax, ajax, driver_device, 0, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, driver_device, 0, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, driver_device, 0, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )

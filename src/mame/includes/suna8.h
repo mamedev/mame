@@ -64,7 +64,7 @@ public:
 	}   m_gfxbank_type;
 	UINT8 m_gfxbank;
 
-	int m_text_dim; // vertical size of the text layer (0 = no text layer)
+	bool m_has_text; // has text sprites (older games)
 
 	// samples
 	INT16 *m_samplebuf;
@@ -148,9 +148,8 @@ public:
 	DECLARE_DRIVER_INIT(hardhead);
 	DECLARE_DRIVER_INIT(suna8);
 
-	void suna8_vh_start_common(int text_dim, GFXBANK_TYPE_T gfxbank_type);
-	DECLARE_VIDEO_START(suna8_textdim8);
-	DECLARE_VIDEO_START(suna8_textdim12);
+	void suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_type);
+	DECLARE_VIDEO_START(suna8_text);
 	DECLARE_VIDEO_START(suna8_sparkman);
 	DECLARE_VIDEO_START(suna8_brickzn);
 	DECLARE_VIDEO_START(suna8_starfigh);
@@ -168,7 +167,7 @@ public:
 	void play_sample(int index);
 	SAMPLES_START_CB_MEMBER(sh_start);
 
-	void draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int which);
-	void draw_text_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites     (screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int which);
+	void draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask);
 	UINT8 *brickzn_decrypt();
 };

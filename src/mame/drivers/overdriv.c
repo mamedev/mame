@@ -475,6 +475,6 @@ ROM_START( overdrivb )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
 
-GAMEL( 1990, overdriv,         0, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_overdriv )
-GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_overdriv )
-GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 3)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_overdriv )
+GAMEL( 1990, overdriv,         0, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv )
+GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv )
+GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv )

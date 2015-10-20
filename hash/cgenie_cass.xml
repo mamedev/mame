@@ -88,7 +88,7 @@ distributor of the Colour Genie EG2000 computers.
 	</software>
 
 	<!-- Missing: Break Out -->
-	<!-- Missing: Colour-Assembler -->	
+	<!-- Missing: Colour-Assembler -->
 
 	<software name="colcom" supported="yes">
 		<description>Colour Basic Compiler 3.05</description>

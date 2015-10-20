@@ -86,23 +86,6 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
  *
  *************************************/
 
-WRITE32_MEMBER(djmain_state::paletteram32_w)
-{
-	int r,g,b;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	data = m_generic_paletteram_32[offset];
-
-	r = (data >>  0) & 0xff;
-	g = (data >>  8) & 0xff;
-	b = (data >> 16) & 0xff;
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
-}
-
-
-//---------
-
 void djmain_state::sndram_set_bank()
 {
 	m_sndram = memregion("shared")->base() + 0x80000 * m_sndram_bank;
@@ -396,8 +379,7 @@ WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
 static ADDRESS_MAP_START( maincpu_djmain, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                         // PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                         // WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE(paletteram32_w)       // COLOR RAM
-									AM_SHARE("paletteram")
+	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")       // COLOR RAM
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)               // SOUND RAM
 	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)      // VIDEO REG (tilemap)
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??
@@ -1416,6 +1398,7 @@ static MACHINE_CONFIG_START( djmainj, djmain_state )
 	MCFG_SCREEN_UPDATE_DRIVER(djmain_state, screen_update_djmain)
 
 	MCFG_PALETTE_ADD("palette", 0x4440/4)
+	MCFG_PALETTE_FORMAT(XBGR)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djmain)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)

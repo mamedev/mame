@@ -63,6 +63,8 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_curtexture(0),
 		m_changed(true),
 		m_last_partial_scan(0),
+		m_color(rgb_t(0xff, 0xff, 0xff, 0xff)),
+		m_brightness(0xff),
 		m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds()),
 		m_scantime(1),
 		m_pixeltime(1),
@@ -356,12 +358,24 @@ void screen_device::device_start()
 	save_item(NAME(m_visarea.max_y));
 	save_item(NAME(m_last_partial_scan));
 	save_item(NAME(m_frame_period));
+	save_item(NAME(m_brightness));
 	save_item(NAME(m_scantime));
 	save_item(NAME(m_pixeltime));
 	save_item(NAME(m_vblank_period));
 	save_item(NAME(m_vblank_start_time));
 	save_item(NAME(m_vblank_end_time));
 	save_item(NAME(m_frame_number));
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void screen_device::device_reset()
+{
+	// reset brightness to default
+	m_brightness = 0xff;
 }
 
 
@@ -884,9 +898,12 @@ bool screen_device::update_quads()
 				m_curbitmap = 1 - m_curbitmap;
 			}
 
+			// brightness adjusted render color
+			rgb_t color = m_color - rgb_t(0, 0xff - m_brightness, 0xff - m_brightness, 0xff - m_brightness);
+
 			// create an empty container with a single quad
 			m_container->empty();
-			m_container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0xff,0xff,0xff), m_texture[m_curtexture], PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+			m_container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, color, m_texture[m_curtexture], PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 		}
 	}
 

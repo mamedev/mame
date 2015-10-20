@@ -22,6 +22,24 @@ static INPUT_PORTS_START(sega_837_13551_coins)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551, jvs13551_coin_2_w)
 INPUT_PORTS_END
 
+ROM_START( jvs13551 )
+	// TMP90PH44N firmwares
+	ROM_REGION( 0x8000, "jvs13551", ROMREGION_ERASE )
+	// Sega 838-13683-93
+	ROM_LOAD( "sp5001.bin",   0x0000, 0x8000, CRC(2f17e21a) SHA1(ac227ef3ca52ef17321bd60e435dba147645d8b8))
+	// Sega 838-13683-93 Rev.B
+	ROM_LOAD( "sp5001-b.bin", 0x0000, 0x8000, CRC(121693cd) SHA1(c9834aca671aff5e283ac708788c2a0f4a5bdecc))
+	// Sega 838-13683-02
+	ROM_LOAD( "sp5002-a.bin", 0x0000, 0x8000, CRC(a088df8c) SHA1(8237e9b18b8367d3f5b99b8f29c528a55c2e0fbf))
+	// Sega 837-13551-92 0007 Type1
+	ROM_LOAD( "315-6215.bin", 0x0000, 0x8000, CRC(d7c97e40) SHA1(b1ae8db332f869c4fdbbae15967baeca0bc7f57d))
+ROM_END
+
+const rom_entry *sega_837_13551::device_rom_region() const
+{
+	return ROM_NAME(jvs13551);
+}
+
 void sega_837_13551::static_set_port_tag(device_t &device, int port, const char *tag)
 {
 	sega_837_13551 &ctrl = downcast<sega_837_13551 &>(device);
@@ -33,7 +51,7 @@ ioport_constructor sega_837_13551::device_input_ports() const
 	return INPUT_PORTS_NAME(sega_837_13551_coins);
 }
 
-sega_837_13551::sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : jvs_device(mconfig, SEGA_837_13551, "Sega 837-13551 I/O Board", tag, owner, clock, "sega_837_13551", __FILE__)
+sega_837_13551::sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : jvs_device(mconfig, SEGA_837_13551, "Sega 837-13551 I/O Board", tag, owner, clock, "jvs13551", __FILE__)
 {
 	memset(port_tag, 0, sizeof(port_tag));
 }
@@ -61,6 +79,10 @@ UINT8 sega_837_13551::comm_method_version()
 void sega_837_13551::device_start()
 {
 	jvs_device::device_start();
+	for (int i = 0; i < ARRAY_LENGTH(port_tag); i++)
+	{
+		port[i] = ioport(port_tag[i]);
+	}
 	save_item(NAME(coin_counter));
 }
 
@@ -122,9 +144,9 @@ bool sega_837_13551::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_
 	if(count_players > 2 || bytes_per_switch > 2)
 		return false;
 
-	*buf++ = ioport(port_tag[0])->read_safe(0);
+	*buf++ = port[0] ? port[0]->read() : 0;
 	for(int i=0; i<count_players; i++) {
-		UINT32 val = ioport(port_tag[1+i])->read_safe(0);
+		UINT32 val = port[1+i] ? port[1+i]->read() : 0;
 		for(int j=0; j<bytes_per_switch; j++)
 			*buf++ = val >> ((1-j) << 3);
 	}
@@ -137,7 +159,7 @@ bool sega_837_13551::analogs(UINT8 *&buf, UINT8 count)
 	if(count > 8)
 		return false;
 	for(int i=0; i<count; i++) {
-		UINT16 val = ioport(port_tag[3+i])->read_safe(0x8000);
+		UINT16 val = port[3+i] ? port[3+i]->read() : 0x8000;
 		*buf++ = val >> 8;
 		*buf++ = val;
 	}
@@ -152,7 +174,10 @@ bool sega_837_13551::swoutputs(UINT8 count, const UINT8 *vals)
 		return false;
 	jvs_outputs = vals[0] & 0xfc;
 	logerror("837-13551: output %02x\n", jvs_outputs);
-	ioport(port_tag[11])->write_safe(jvs_outputs, 0xfc);
+	if (port[11])
+	{
+		port[11]->write(jvs_outputs, 0xfc);
+	}
 	return true;
 }
 
@@ -160,7 +185,7 @@ bool sega_837_13551::swoutputs(UINT8 id, UINT8 val)
 {
 	if(id > 6)
 		return false;
-	handle_output(port_tag[11], id, val);
+	handle_output(port[11], id, val);
 	logerror("837-13551: output %d, %d\n", id, val);
 	return true;
 }

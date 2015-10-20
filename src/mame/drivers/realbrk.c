@@ -1275,13 +1275,13 @@ ROM_START( dai2kaku_alt_rom_size )
 ROM_END
 #endif
 
-GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh, driver_device,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh, driver_device,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, driver_device, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, driver_device, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, realbrk,  0,       realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1998, realbrko, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1998, realbrkj, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1998, realbrkk, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, realbrk,  0,       realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrko, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkj, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkk, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, driver_device, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, driver_device, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

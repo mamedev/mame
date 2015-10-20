@@ -40,7 +40,7 @@ namespace bx
 		uint32_t consume(uint32_t _size) // consumer only
 		{
 			const uint32_t maxSize    = distance(m_read, m_current);
-			const uint32_t sizeNoSign = uint32_and(_size, 0x7FFFFFFF);
+			const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
 			const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
 			const uint32_t size       = uint32_sels(test, _size, maxSize);
 			const uint32_t advance    = uint32_add(m_read, size);
@@ -53,7 +53,7 @@ namespace bx
 		{
 			const uint32_t dist       = distance(m_write, m_read)-1;
 			const uint32_t maxSize    = uint32_sels(dist, m_size-1, dist);
-			const uint32_t sizeNoSign = uint32_and(_size, 0x7FFFFFFF);
+			const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
 			const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
 			const uint32_t size       = uint32_sels(test, _size, maxSize);
 			const uint32_t advance    = uint32_add(m_write, size);
@@ -65,7 +65,7 @@ namespace bx
 		uint32_t commit(uint32_t _size) // producer only
 		{
 			const uint32_t maxSize    = distance(m_current, m_write);
-			const uint32_t sizeNoSign = uint32_and(_size, 0x7FFFFFFF);
+			const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
 			const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
 			const uint32_t size       = uint32_sels(test, _size, maxSize);
 			const uint32_t advance    = uint32_add(m_current, size);
@@ -124,7 +124,7 @@ namespace bx
 		uint32_t consume(uint32_t _size) // consumer only
 		{
 			const uint32_t maxSize    = distance(m_read, m_current);
-			const uint32_t sizeNoSign = uint32_and(_size, 0x7FFFFFFF);
+			const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
 			const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
 			const uint32_t size       = uint32_sels(test, _size, maxSize);
 			const uint32_t advance    = uint32_add(m_read, size);
@@ -137,7 +137,7 @@ namespace bx
 		{
 			const uint32_t dist       = distance(m_write, m_read)-1;
 			const uint32_t maxSize    = uint32_sels(dist, m_size-1, dist);
-			const uint32_t sizeNoSign = uint32_and(_size, 0x7FFFFFFF);
+			const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
 			const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
 			const uint32_t size       = uint32_sels(test, _size, maxSize);
 			const uint32_t advance    = uint32_add(m_write, size);
@@ -149,7 +149,7 @@ namespace bx
 		uint32_t commit(uint32_t _size) // producer only
 		{
 			const uint32_t maxSize    = distance(m_current, m_write);
-			const uint32_t sizeNoSign = uint32_and(_size, 0x7FFFFFFF);
+			const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
 			const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
 			const uint32_t size       = uint32_sels(test, _size, maxSize);
 			const uint32_t advance    = uint32_add(m_current, size);

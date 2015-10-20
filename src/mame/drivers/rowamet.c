@@ -242,4 +242,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(198?, heavymtl, 0, rowamet, rowamet, driver_device, 0,  ROT0,  "Rowamet", "Heavy Metal", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(198?, heavymtl, 0, rowamet, rowamet, driver_device, 0,  ROT0,  "Rowamet", "Heavy Metal", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

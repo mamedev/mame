@@ -601,6 +601,6 @@ GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, starwars, RO
 GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, starwars, ROT0, "Atari", "Star Wars (set 3)", 0 ) // oldest
 // is there an even older starwars set with 136021-106.1m ?
 
-GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", GAME_NO_SOUND )
+GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )
 
 GAME( 1985, esb,      0,        starwars, esb, starwars_state,      esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )

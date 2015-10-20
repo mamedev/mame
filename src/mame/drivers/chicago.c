@@ -6,15 +6,15 @@
 
  Game Name                        Model #
  -----------------------------------------
- Demolition Derby (1976)          #466
- Super Flipper (1975)             #458
- Olympic TV Football (1973)       #429-A
- Olympic TV Hockey (1973)         #429
- TV Goalee (1973)                 #414
  TV Ping Pong (1973)              #424
- TV Pin Game (1975)               #451
  TV Tennis (1973)                 #427
-
+ Olympic TV Hockey (1973)         #429
+ Olympic TV Football (1973)       #429-A
+ TV Goalee (1974)                 #434
+ TV Pingame (1975)                #451
+ Super Flipper (1975)             #458
+ Demolition Derby (1976)          #466
+ 
 ***************************************************************************/
 
 
@@ -115,7 +115,7 @@ MACHINE_CONFIG_END
  ***************************************************************************/
 
 
-ROM_START( destdrby )
+ROM_START( dmodrbcc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
@@ -138,4 +138,4 @@ ROM_START( destdrby )
 ROM_END
 
 
-GAME( 1976, destdrby,  0, chicago, 0, driver_device,  0, ROT0, "Chicago Coin", "Destruction Derby [TTL]", GAME_IS_SKELETON )
+GAME( 1976, dmodrbcc,  0, chicago, 0, driver_device,  0, ROT0, "Chicago Coin", "Demolition Derby [TTL]", MACHINE_IS_SKELETON )

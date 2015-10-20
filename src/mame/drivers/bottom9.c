@@ -323,6 +323,7 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 
 	MCFG_DEVICE_ADD("k051960", K051960, 0)
 	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(bottom9_state, sprite_callback)
 
 	MCFG_DEVICE_ADD("k051316", K051316, 0)
@@ -523,6 +524,6 @@ ROM_END
 
 
 
-GAME( 1989, bottom9,  0,       bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version T)", GAME_SUPPORTS_SAVE )
-GAME( 1989, bottom9n, bottom9, bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version N)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mstadium, bottom9, bottom9, mstadium, driver_device, 0, ROT0, "Konami", "Main Stadium (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, bottom9,  0,       bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9n, bottom9, bottom9, bottom9, driver_device,  0, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mstadium, bottom9, bottom9, mstadium, driver_device, 0, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )

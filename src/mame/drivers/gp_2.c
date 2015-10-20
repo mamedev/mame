@@ -807,24 +807,24 @@ ROM_START(suprnova)
 ROM_END
 
 // GP1 dips
-GAME(1979,  sshootep,   0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Sharpshooter", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1979,  coneyis,    0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Old Coney Island!", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1980,  lizard,     0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Pinball Lizard", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1982,  suprnova,   0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Super Nova", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1983,  sshootr2,   0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Sharp Shooter II", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1979,  sshootep,   0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Sharpshooter", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1979,  coneyis,    0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Old Coney Island!", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1980,  lizard,     0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Pinball Lizard", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1982,  suprnova,   0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Super Nova", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1983,  sshootr2,   0,          gp_2,   gp_1, driver_device, 0,   ROT0,   "Game Plan", "Sharp Shooter II", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
 
 // GP2 dips
-GAME(1981,  gwarfare,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Global Warfare", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1982,  mbossy,     0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Mike Bossy", GAME_IS_SKELETON_MECHANICAL)
-GAME(1984,  attila,     0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Attila The Hun", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1981,  gwarfare,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Global Warfare", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1982,  mbossy,     0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Mike Bossy", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  attila,     0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Attila The Hun", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
 
 // revolving match
-GAME(1984,  agent777,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Agents 777", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1985,  cpthook,    0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Captain Hook", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1985,  ladyshot,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Lady Sharpshooter (set 1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1985,  ladyshota,  ladyshot,   gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Lady Sharpshooter (set 2)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1984,  agent777,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Agents 777", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1985,  cpthook,    0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Captain Hook", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1985,  ladyshot,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Lady Sharpshooter (set 1)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1985,  ladyshota,  ladyshot,   gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Lady Sharpshooter (set 2)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
 
 // credit (start) button not working
-GAME(1985,  andromep,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Andromeda (set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  andromepa,  andromep,   gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Andromeda (set 2)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  cyclopes,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Cyclopes", GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  andromep,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Andromeda (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  andromepa,  andromep,   gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Andromeda (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  cyclopes,   0,          gp_2,   gp_2, driver_device, 0,   ROT0,   "Game Plan", "Cyclopes", MACHINE_IS_SKELETON_MECHANICAL)

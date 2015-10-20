@@ -1885,6 +1885,28 @@ static INPUT_PORTS_START( kbash )
 //  PORT_CONFSETTING(        0x00f0, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kbashk )
+	PORT_INCLUDE( kbash )
+
+	PORT_MODIFY("JMPR")
+	PORT_CONFNAME( 0x00f0,  0x0000, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!4,!3,!2,!1")
+	PORT_CONFSETTING(       0x0000, "Japan (Taito license)" ) // Taito license
+	PORT_CONFSETTING(       0x0010, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x0020, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x0030, DEF_STR( Korea ) )
+	PORT_CONFSETTING(       0x0040, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(       0x0050, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(       0x0060, DEF_STR( Southeast_Asia ) )
+	PORT_CONFSETTING(       0x0070, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x0080, DEF_STR( Japan ) ) // no Taito license
+	PORT_CONFSETTING(       0x0090, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x00a0, DEF_STR( Unused ) )
+	PORT_CONFSETTING(       0x00b0, DEF_STR( Korea ) )
+	PORT_CONFSETTING(       0x00c0, DEF_STR( Hong_Kong ))
+	PORT_CONFSETTING(       0x00d0, DEF_STR( Taiwan ))
+	PORT_CONFSETTING(       0x00e0, DEF_STR( Southeast_Asia ))
+	PORT_CONFSETTING(       0x00f0, DEF_STR( Unused ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( kbash2 )
 	PORT_INCLUDE( kbash )
@@ -4135,7 +4157,25 @@ ROM_START( kbash )
 	ROM_LOAD( "tp023_7.bin", 0x00000, 0x40000, CRC(3732318f) SHA1(f0768459f5ad2dee53d408a0a5ae3a314864e667) )
 ROM_END
 
+ROM_START( kbashk )
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "tp023_01.u52", 0x000000, 0x080000, CRC(099aefbc) SHA1(8daa0deffe221e1bb5a8744ced18c23ad319ffd3) ) // same label as parent?
 
+	/* Secondary CPU is a Toaplan marked chip, (TS-004-Dash  TOA PLAN) */
+	/* It's a NEC V25 (PLCC94) (encrypted) */
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )         /* Sound CPU code */
+	ROM_LOAD( "tp023_02.bin", 0x0000, 0x8000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
+
+	ROM_REGION( 0x800000, "gp9001", 0 )
+	ROM_LOAD( "tp023_3.bin", 0x000000, 0x200000, CRC(32ad508b) SHA1(e473489beaf649d3e5236770eb043327e309850c) )
+	ROM_LOAD( "tp023_5.bin", 0x200000, 0x200000, CRC(b84c90eb) SHA1(17a1531d884d9a9696d1b25d65f9155f02396e0e) )
+	ROM_LOAD( "tp023_4.bin", 0x400000, 0x200000, CRC(e493c077) SHA1(0edcfb70483ad07206695d9283031b85cd198a36) )
+	ROM_LOAD( "tp023_6.bin", 0x600000, 0x200000, CRC(9084b50a) SHA1(03b58278619524d2f09a4b1c152d5e057e792a56) )
+
+	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM Samples */
+	ROM_LOAD( "tp023_7.bin", 0x00000, 0x40000, CRC(3732318f) SHA1(f0768459f5ad2dee53d408a0a5ae3a314864e667) )
+ROM_END
 /*
 Knuckle Bash 2
 This is a hacked version of Knuckle Bash on bootleg/Korean/Chinese
@@ -5304,90 +5344,91 @@ ROM_END
 // See list at top of file
 
 //  ( YEAR  NAME        PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS )
-GAME( 1991, tekipaki,   0,        tekipaki, tekipaki, driver_device, 0,        ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, tekipaki,   0,        tekipaki, tekipaki, driver_device, 0,        ROT0,   "Toaplan", "Teki Paki", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ghox,       0,        ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (spinner)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1991, ghoxj,      ghox,     ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghox,       0,        ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (spinner)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ghoxj,      ghox,     ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (joystick)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,    0,        dogyuun,  dogyuun, toaplan2_state,  dogyuun,  ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuuna,   dogyuun,  dogyuun,  dogyuuna, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunt,   dogyuun,  dogyuun,  dogyuunt, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (location test)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,    0,        dogyuun,  dogyuun, toaplan2_state,  dogyuun,  ROT270, "Toaplan", "Dogyuun", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuuna,   dogyuun,  dogyuun,  dogyuuna, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (older set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuunt,   dogyuun,  dogyuun,  dogyuunt, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, kbash,      0,        kbash,    kbash, driver_device,    0,        ROT0,   "Toaplan", "Knuckle Bash", GAME_SUPPORTS_SAVE )
+GAME( 1993, kbash,      0,        kbash,    kbash, driver_device,    0,        ROT0,   "Toaplan / Atari", "Knuckle Bash", MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
+GAME( 1993, kbashk,     kbash,    kbash,    kbashk,driver_device,    0,        ROT0,   "Toaplan / Taito", "Knuckle Bash (Korean PCB)", MACHINE_SUPPORTS_SAVE ) // Japan region has optional Taito license, maybe the original Japan release?
 
-GAME( 1999, kbash2,     0,        kbash2,   kbash2, driver_device,   0,        ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1999, kbash2,     0,        kbash2,   kbash2, driver_device,   0,        ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, truxton2,   0,        truxton2, truxton2, driver_device, 0,        ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
+GAME( 1992, truxton2,   0,        truxton2, truxton2, driver_device, 0,        ROT270, "Toaplan", "Truxton II / Tatsujin Oh", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pipibibs,   0,        pipibibs, pipibibs, driver_device, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, pipibibsa,  pipibibs, pipibibs, pipibibs, driver_device, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, pipibibsp,  pipibibs, pipibibs, pipibibsp, driver_device,0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1991, whoopee,    pipibibs, tekipaki, whoopee, driver_device,  0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Teki Paki hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
+GAME( 1991, pipibibs,   0,        pipibibs, pipibibs, driver_device, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsa,  pipibibs, pipibibs, pipibibs, driver_device, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsp,  pipibibs, pipibibs, pipibibsp, driver_device,0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, whoopee,    pipibibs, tekipaki, whoopee, driver_device,  0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Teki Paki hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 
-GAME( 1991, pipibibsbl, pipibibs, pipibibsbl, pipibibsbl, toaplan2_state, pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibsbl, pipibibs, pipibibsbl, pipibibsbl, toaplan2_state, pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
-GAME( 1992, fixeight,   0,        fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Europe)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightk,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Korea)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeighth,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Hong Kong)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeighttw, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Taiwan)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeighta,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Southeast Asia)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightu,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (USA)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightj,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Japan)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightt,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightkt, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightht, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeighttwt,fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightat, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightut, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightjt, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Japan, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeight,   0,        fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Europe)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightk,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Korea)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighth,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttw, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Taiwan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighta,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Southeast Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightu,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (USA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightj,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightt,  fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightkt, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightht, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttwt,fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightat, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightut, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightjt, fixeight, fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Japan, Taito license)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, fixeightbl, fixeight, fixeightbl, fixeightbl, toaplan2_state, fixeightbl, ROT270, "bootleg", "FixEight (Korea, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightbl, fixeight, fixeightbl, fixeightbl, toaplan2_state, fixeightbl, ROT270, "bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, grindstm,   0,        vfive,    grindstm, toaplan2_state,   vfive,   ROT270, "Toaplan", "Grind Stormer", GAME_SUPPORTS_SAVE )
-GAME( 1992, grindstma,  grindstm, vfive,    grindstma, toaplan2_state,  vfive,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, vfive,      grindstm, vfive,    vfive, toaplan2_state,      vfive,   ROT270, "Toaplan", "V-Five (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstm,   0,        vfive,    grindstm, toaplan2_state,   vfive,   ROT270, "Toaplan", "Grind Stormer", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, grindstma,  grindstm, vfive,    grindstma, toaplan2_state,  vfive,   ROT270, "Toaplan", "Grind Stormer (older set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, vfive,      grindstm, vfive,    vfive, toaplan2_state,      vfive,   ROT270, "Toaplan", "V-Five (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, batsugun,   0,        batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
-GAME( 1993, batsuguna,  batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, batsugunsp, batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugun,   0,        batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, batsuguna,  batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, batsugunsp, batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, pwrkick,    0,        pwrkick,  pwrkick, driver_device,    0,       ROT0,   "Sunwise",  "Power Kick (Japan)", 0 )
 GAME( 1995, othldrby,   0,        othldrby, othldrby,driver_device,    0,       ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
-GAME( 1994, snowbro2,   0,        snowbro2, snowbro2, driver_device,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
-GAME( 1998, snowbro2b,  snowbro2, snowbro2, snowbro2, driver_device,   0,       ROT0,   "bootleg", "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1994, snowbro2,   0,        snowbro2, snowbro2, driver_device,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, snowbro2b,  snowbro2, snowbro2, snowbro2, driver_device,   0,       ROT0,   "bootleg", "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sstriker,   0,        mahoudai, sstriker, driver_device,   0,       ROT270, "Raizing", "Sorcer Striker (set 1)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
-GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera, driver_device,  0,       ROT270, "Raizing", "Sorcer Striker (set 2)" , GAME_SUPPORTS_SAVE ) // from Korean board
-GAME( 1993, mahoudai,   sstriker, mahoudai, mahoudai, driver_device,   0,       ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sstriker,   0,        mahoudai, sstriker, driver_device,   0,       ROT270, "Raizing", "Sorcer Striker (set 1)" , MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera, driver_device,  0,       ROT270, "Raizing", "Sorcer Striker (set 2)" , MACHINE_SUPPORTS_SAVE ) // from Korean board
+GAME( 1993, mahoudai,   sstriker, mahoudai, mahoudai, driver_device,   0,       ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, kingdmgp,   0,        shippumd, kingdmgp, driver_device,   0,       ROT270, "Raizing / Eighting", "Kingdom Grandprix", GAME_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
-GAME( 1994, shippumd,   kingdmgp, shippumd, shippumd, driver_device,   0,       ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, kingdmgp,   0,        shippumd, kingdmgp, driver_device,   0,       ROT270, "Raizing / Eighting", "Kingdom Grandprix", MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
+GAME( 1994, shippumd,   kingdmgp, shippumd, shippumd, driver_device,   0,       ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, bgaregga,   0,        bgaregga, bgaregga, toaplan2_state,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgareggahk, bgaregga, bgaregga, bgareggahk, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgareggatw, bgaregga, bgaregga, bgareggatw, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareggahk, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays New Version only when set to HK
-GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga, toaplan2_state,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
-GAME( 1996, bgareggacn, bgaregga, bgaregga, bgareggacn, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
-GAME( 1996, bgareggabl, bgaregga, bgareggabl,bgareggacn, toaplan2_state,bgaregga, ROT270, "bootleg", "1945 Part-2 (Chinese hack of Battle Garegga)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgareggabla,bgaregga, bgareggabl,bgareggacn, toaplan2_state,bgaregga, ROT270, "bootleg", "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgaregga,   0,        bgaregga, bgaregga, toaplan2_state,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggahk, bgaregga, bgaregga, bgareggahk, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggatw, bgaregga, bgaregga, bgareggatw, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareggahk, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
+GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga, toaplan2_state,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
+GAME( 1996, bgareggacn, bgaregga, bgaregga, bgareggacn, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
+GAME( 1996, bgareggabl, bgaregga, bgareggabl,bgareggacn, toaplan2_state,bgaregga, ROT270, "bootleg", "1945 Part-2 (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggabla,bgaregga, bgareggabl,bgareggacn, toaplan2_state,bgaregga, ROT270, "bootleg", "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
-GAME( 1998, batrider,   0,        batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batrideru,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batriderc,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batriderj,  batrider, batrider, batriderj, toaplan2_state, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, B version) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batriderk,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batrider,   0,        batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batrideru,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderc,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderj,  batrider, batrider, batriderj, toaplan2_state, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, B version) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderk,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1998, batriderja, batrider, batrider, batriderj, toaplan2_state, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batridert,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batriderja, batrider, batrider, batriderj, toaplan2_state, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batridert,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
 
 // Battle Bakraid
 // the 'unlimited' version is a newer revision of the code
-GAME( 1999, bbakraid,   0,        bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
-GAME( 1999, bbakraidc,  bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
-GAME( 1999, bbakraidj,  bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bbakraid,   0,        bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidc,  bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidj,  bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1999, bbakraidja, bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bbakraidja, bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", MACHINE_SUPPORTS_SAVE )

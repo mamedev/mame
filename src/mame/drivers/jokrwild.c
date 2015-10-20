@@ -505,4 +505,4 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY  FULLNAME                   FLAGS */
-GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -158,13 +158,13 @@ ROM_END
 
 
 
-GAME( 200?, maski,    0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Maski Show (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, adults,   0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Adults Only (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, bloto,    0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Blits Loto (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, blpearl,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Black Pearl (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, grancan,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Grand Canyon (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, luckshel, 0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Lucky Shell (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, exsafar,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Safari (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, strlink,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Strong Link (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, extrmth,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Treasure Hunt (Russia) (Extrema)", GAME_IS_SKELETON)
-GAME( 200?, extrmti,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Treasure Island (Russia) (Extrema)", GAME_IS_SKELETON)
+GAME( 200?, maski,    0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Maski Show (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, adults,   0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Adults Only (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, bloto,    0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Blits Loto (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, blpearl,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Black Pearl (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, grancan,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Grand Canyon (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, luckshel, 0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Lucky Shell (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, exsafar,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Safari (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, strlink,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Strong Link (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, extrmth,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Treasure Hunt (Russia) (Extrema)", MACHINE_IS_SKELETON)
+GAME( 200?, extrmti,  0,          extrema, extrema, driver_device,  0,             ROT0,  "Extrema", "Treasure Island (Russia) (Extrema)", MACHINE_IS_SKELETON)

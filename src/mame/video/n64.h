@@ -195,9 +195,6 @@ public:
 	UINT8*      get_tmem8() { return m_tmem; }
 	UINT16*     get_tmem16() { return (UINT16*)m_tmem; }
 
-	// Emulation Accelerators
-	UINT8       get_random() { return m_misc_state.m_random_seed += 0x13; }
-
 	// YUV Factors
 	void        set_yuv_factors(color_t k023, color_t k1, color_t k4, color_t k5) { m_k023 = k023; m_k1 = k1; m_k4 = k4; m_k5 = k5; }
 	color_t&    get_k023() { return m_k023; }
@@ -225,9 +222,6 @@ public:
 	UINT32          dz_compress(UINT32 value);
 	INT32           normalize_dzpix(INT32 sum);
 	bool            z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix, rdp_span_aux* userdata, const rdp_poly_state &object);
-
-	// Fullscreen update-related
-	void            video_update(n64_periphs* n64, bitmap_rgb32 &bitmap);
 
 	// Commands
 	void        cmd_invalid(UINT32 w1, UINT32 w2);
@@ -311,8 +305,6 @@ public:
 	rectangle_t     m_scissor;
 	span_base_t     m_span_base;
 
-	rectangle       m_visarea;
-
 	void            draw_triangle(bool shade, bool texture, bool zbuffer, bool rect);
 
 	void*           m_aux_buf;
@@ -375,9 +367,6 @@ private:
 	// Texture perspective division
 	INT32 m_norm_point_rom[64];
 	INT32 m_norm_slope_rom[64];
-
-	INT32 m_gamma_table[256];
-	INT32 m_gamma_dither_table[0x4000];
 
 	static UINT32 s_special_9bit_clamptable[512];
 	static const z_decompress_entry_t m_z_dec_table[8];

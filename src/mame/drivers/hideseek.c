@@ -154,4 +154,4 @@ DRIVER_INIT_MEMBER(hideseek_state,hideseek)
 }
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, hideseek,    ROT0, "<unknown>", "Hide & Seek",GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, hideseek,    ROT0, "<unknown>", "Hide & Seek",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

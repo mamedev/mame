@@ -79,7 +79,7 @@ bool ti99_floppy_format::check_for_address_marks(UINT8* trackdata, int encoding)
 		while (i < 5)
 		{
 			if (trackdata[40 + 13 + i*340] != 0xfe) break;
-			if (trackdata[40 + 57 + i*340] != 0xfb && trackdata[40 + 57 + i*334] != 0xf8) break;
+			if (trackdata[40 + 57 + i*340] != 0xfb && trackdata[40 + 57 + i*340] != 0xf8) break;
 			i++;
 		}
 	}
@@ -410,8 +410,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 			// IDAM
 			for (int j=0; j < 3; j++)
 				raw_w(buffer, 16, 0x4489);  // 3 times A1
-			mfm_w(buffer, 8, 0xfe);
-			i += 3;
+			i += 2;
 		}
 		else
 		{
@@ -420,8 +419,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 				// DAM
 				for (int j=0; j < 3; j++)
 					raw_w(buffer, 16, 0x4489);  // 3 times A1
-				mfm_w(buffer, 8, 0xfb);
-				i += 3;
+				i += 2;
 			}
 			else
 			{

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett, Andrew Gardner
+// copyright-holders:Philip Bennett
 /***************************************************************************
 
     Namco 62XX

@@ -40,7 +40,6 @@ each one of them can declare to have four different priority levels.
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "tc0360pri.h"
 
 

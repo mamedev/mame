@@ -849,6 +849,6 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
  *
  *************************************/
 
-GAME( 1991, roadriot, 0,        atarig42_0x200, roadriot, atarig42_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 13 Nov 1991)", GAME_UNEMULATED_PROTECTION )
-GAME( 1991, roadrioto,roadriot, atarig42_0x200, roadriot, atarig42_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 04 Jun 1991)", GAME_UNEMULATED_PROTECTION )
+GAME( 1991, roadriot, 0,        atarig42_0x200, roadriot, atarig42_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, roadrioto,roadriot, atarig42_0x200, roadriot, atarig42_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1992, guardian, 0,        atarig42_0x400, guardian, atarig42_state, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )

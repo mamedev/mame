@@ -642,7 +642,7 @@ ROM_END
 
 
 
-GAME( 1995, galpani3,  0,        galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Euro)",  GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, galpani3j, galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, galpani3k, galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, galpani3,  0,        galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Euro)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3j, galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3k, galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -659,9 +659,9 @@ ROM_START( nostk )
 ROM_END
 
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Catt (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, nost,     0,       nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, nostj,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, nostk,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Korea)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Catt (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Korea)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

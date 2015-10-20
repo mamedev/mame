@@ -2597,10 +2597,10 @@ ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-#define GAME_FLAGS GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL
+#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL
 
 //Adder 2
-GAME( 1996, m_tppokr        , 0         ,  scorpion1_adder2 , toppoker  , bfm_sc1_state, toppoker       , 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+GAME( 1996, m_tppokr        , 0         ,  scorpion1_adder2 , toppoker  , bfm_sc1_state, toppoker       , 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
 
 
 /********************************************************************************************************************************************************************************************************************
@@ -3108,7 +3108,7 @@ GAME( 1988, sc1lotusa       , sc1lotus  , scorpion1         , scorpion1 , bfm_sc
 GAME( 1988, sc1roul         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, rou029         , 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
 
 // PROJECT NUMBER 6045       ARMADA          GAME No 39-370-729  - 28-AUG-1992 14:37:00
-GAME( 198?, sc1armad        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Armada (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1armad        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Armada (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 6043       CALYPSO         GAME No 39-370-754  - 08-DEC-1992 13:20:00
 GAME( 198?, sc1calyp        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Calypso (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
@@ -3147,7 +3147,7 @@ GAME( 198?, sc1copdd        , 0         , scorpion1         , scorpion1 , bfm_sc
 GAME( 198?, sc1disc         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Discovey (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 5956  FLASH      GAME No 95-750-771 - 17-JUN-1996 09:30:53
-GAME( 198?, sc1flash        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Flash (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1flash        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Flash (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 5391  FRUIT LINES  GAME No 39-370-653 - 30-JUL-1992 09:31:10
 GAME( 198?, sc1fruit        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
@@ -3284,19 +3284,19 @@ GAME( 199?, sc1lamb         , 0         , scorpion1         , scorpion1 , bfm_sc
 
 // Misc 3rd Party
 
-GAME( 199?, sc1smoke        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Smokey Vs The Bandit (Mdm) (set 1) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1smokea       , sc1smoke  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Smokey Vs The Bandit (Mdm) (set 2) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1smoke        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Smokey Vs The Bandit (Mdm) (set 1) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
+GAME( 199?, sc1smokea       , sc1smoke  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Smokey Vs The Bandit (Mdm) (set 2) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
 
-GAME( 199?, sc1ccroc        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 1) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1ccroca       , sc1ccroc  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 2) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1ccrocb       , sc1ccroc  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 3) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1ccrocc       , sc1ccroc  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 4) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1ccroc        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 1) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
+GAME( 199?, sc1ccroca       , sc1ccroc  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 2) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
+GAME( 199?, sc1ccrocb       , sc1ccroc  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 3) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
+GAME( 199?, sc1ccrocc       , sc1ccroc  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Crazy Crocs (Mdm) (set 4) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
 
-GAME( 199?, sc1crocr        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Croc And Roll (Mdm) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1crocr        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Croc And Roll (Mdm) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
 
-GAME( 199?, sc1btclk        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Beat The Clock (Mdm) (set 1) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1btclka       , sc1btclk  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Beat The Clock (Mdm) (set 2) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1btclkb       , sc1btclk  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Beat The Clock (Mdm) (set 3) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1btclk        , 0         , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Beat The Clock (Mdm) (set 1) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
+GAME( 199?, sc1btclka       , sc1btclk  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Beat The Clock (Mdm) (set 2) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
+GAME( 199?, sc1btclkb       , sc1btclk  , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "Mdm",      "Beat The Clock (Mdm) (set 3) (Scorpion 2/3?)",   MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NO_SOUND )
 
 GAME( 199?, sc1days         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "Global",   "All In A Days Work (Global) (set 1)", GAME_FLAGS)
 GAME( 199?, sc1daysa        , sc1days   , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "Global",   "All In A Days Work (Global) (set 2)", GAME_FLAGS)

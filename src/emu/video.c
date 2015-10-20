@@ -239,7 +239,7 @@ void video_manager::frame_update(bool debug)
 		update_frameskip();
 
 	// update speed computations
-	if (!debug)
+	if (!debug && !skipped_it)
 		recompute_speed(current_time);
 
 	// call the end-of-frame callback
@@ -381,7 +381,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		// build up information about this new movie
 		avi_movie_info info;
 		info.video_format = 0;
-		info.video_timescale = 1000 * ((machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+		info.video_timescale = 1000 * ((machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE);
 		info.video_sampletime = 1000;
 		info.video_numsamples = 0;
 		info.video_width = m_snap_bitmap.width();
@@ -447,7 +447,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		if (filerr == FILERR_NONE)
 		{
 			// start the capture
-			int rate = (machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE;
+			int rate = (machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE;
 			png_error pngerr = mng_capture_start(*m_mng_file, m_snap_bitmap, rate);
 			if (pngerr != PNGERR_NONE)
 			{
@@ -540,12 +540,12 @@ void video_manager::exit()
 	m_snap_bitmap.reset();
 
 	// print a final result if we have at least 2 seconds' worth of data
-	if (m_overall_emutime.seconds >= 1)
+	if (m_overall_emutime.seconds() >= 1)
 	{
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;
 		double final_emu_time = m_overall_emutime.as_double();
-		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime(0, ATTOSECONDS_PER_SECOND / 2)).seconds);
+		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime(0, ATTOSECONDS_PER_SECOND / 2)).seconds());
 	}
 }
 
@@ -962,7 +962,7 @@ void video_manager::update_refresh_speed()
 			screen_device_iterator iter(machine().root_device());
 			for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
 			{
-				attoseconds_t period = screen->frame_period().attoseconds;
+				attoseconds_t period = screen->frame_period().attoseconds();
 				if (period != 0)
 					min_frame_period = MIN(min_frame_period, period);
 			}
@@ -1034,7 +1034,7 @@ void video_manager::recompute_speed(const attotime &emutime)
 	}
 
 	// if we're past the "time-to-execute" requested, signal an exit
-	if (m_seconds_to_run != 0 && emutime.seconds >= m_seconds_to_run)
+	if (m_seconds_to_run != 0 && emutime.seconds() >= m_seconds_to_run)
 	{
 #ifdef MAME_DEBUG
 		if (g_tagmap_counter_enabled)

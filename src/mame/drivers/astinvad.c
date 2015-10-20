@@ -57,6 +57,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_samples(*this, "samples"),
 		m_screen(*this, "screen"){ }
@@ -64,6 +65,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
+	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_videoram;
 
 	UINT8 *    m_colorram;
@@ -144,17 +146,16 @@ WRITE8_MEMBER(astinvad_state::spaceint_videoram_w)
 
 void astinvad_state::plot_byte( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
 {
-	pen_t fore_pen = rgb_t(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
 	UINT8 flip_xor = m_screen_flip & 7;
 
-	bitmap.pix32(y, x + (0 ^ flip_xor)) = (data & 0x01) ? fore_pen : 0;
-	bitmap.pix32(y, x + (1 ^ flip_xor)) = (data & 0x02) ? fore_pen : 0;
-	bitmap.pix32(y, x + (2 ^ flip_xor)) = (data & 0x04) ? fore_pen : 0;
-	bitmap.pix32(y, x + (3 ^ flip_xor)) = (data & 0x08) ? fore_pen : 0;
-	bitmap.pix32(y, x + (4 ^ flip_xor)) = (data & 0x10) ? fore_pen : 0;
-	bitmap.pix32(y, x + (5 ^ flip_xor)) = (data & 0x20) ? fore_pen : 0;
-	bitmap.pix32(y, x + (6 ^ flip_xor)) = (data & 0x40) ? fore_pen : 0;
-	bitmap.pix32(y, x + (7 ^ flip_xor)) = (data & 0x80) ? fore_pen : 0;
+	bitmap.pix32(y, x + (0 ^ flip_xor)) = (data & 0x01) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (1 ^ flip_xor)) = (data & 0x02) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (2 ^ flip_xor)) = (data & 0x04) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (3 ^ flip_xor)) = (data & 0x08) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (4 ^ flip_xor)) = (data & 0x10) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (5 ^ flip_xor)) = (data & 0x20) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (6 ^ flip_xor)) = (data & 0x40) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (7 ^ flip_xor)) = (data & 0x80) ? m_palette->pen_color(color) : rgb_t::black;
 }
 
 
@@ -170,7 +171,7 @@ UINT32 astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb3
 		{
 			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
 			UINT8 data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
-			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color);
+			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color & 0x07);
 		}
 
 	return 0;
@@ -651,6 +652,8 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_astinvad)
 
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -694,6 +697,8 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_spaceint)
+
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -817,9 +822,9 @@ DRIVER_INIT_MEMBER(astinvad_state,spcking2)
  *
  *************************************/
 
-GAME( 1979, kamikaze, 0,        kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, astinvad, kamikaze, kamikaze, astinvad,  astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979, spcking2, 0,        spcking2, spcking2,  astinvad_state, spcking2, ROT270, "Konami", "Space King 2", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spaceint, 0,        spaceint, spaceint,  driver_device,  0,        ROT90,  "Shoei", "Space Intruder", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1980, spaceintj,spaceint, spaceint, spaceintj, driver_device,  0,        ROT90,  "Shoei", "Space Intruder (Japan)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, kamikaze, 0,        kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, astinvad, kamikaze, kamikaze, astinvad,  astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
+GAME( 1979, spcking2, 0,        spcking2, spcking2,  astinvad_state, spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spaceint, 0,        spaceint, spaceint,  driver_device,  0,        ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spaceintj,spaceint, spaceint, spaceintj, driver_device,  0,        ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -89,7 +89,9 @@ static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32, nexus3d_state )
 	AM_RANGE(0x9C000018, 0x9C00001b) AM_DEVWRITE8("flash", serflash_device, n3d_flash_addr_w, 0xffffffff)
 
 	// lots of accesses in this range
-//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often
+	// 0xc00018xx seems CRTC related
+	// 0xc000091x loads a "gfx charset"?
+//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often, status for something.
 //  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE(nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
 	AM_RANGE(0xE0000014, 0xE0000017) AM_READ(nexus3d_unk_r ) // sits waiting for this
@@ -173,5 +175,5 @@ DRIVER_INIT_MEMBER(nexus3d_state,nexus3d)
 	memcpy( m_mainram, memregion("flash")->base(), 4 * 1024);
 }
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",GAME_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart Full",GAME_IS_SKELETON )
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",MACHINE_IS_SKELETON )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart Full",MACHINE_IS_SKELETON )

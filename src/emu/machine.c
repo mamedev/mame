@@ -275,6 +275,8 @@ void running_machine::start()
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debugger_init(*this);
 
+	m_render->resolve_tags();
+
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
@@ -293,7 +295,7 @@ void running_machine::start()
 		schedule_load(savegame);
 
 	// if we're in autosave mode, schedule a load
-	else if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) != 0)
+	else if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
 
 	// set up the cheat engine
@@ -339,7 +341,7 @@ int running_machine::run(bool firstrun)
 		m_current_phase = MACHINE_PHASE_INIT;
 
 		// if we have a logfile, set up the callback
-		if (options().log())
+		if (options().log() && &system() != &GAME_NAME(___empty))
 		{
 			m_logfile.reset(global_alloc(emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)));
 			file_error filerr = m_logfile->open("error.log");
@@ -501,7 +503,7 @@ void running_machine::schedule_exit()
 #endif
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
+	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
 }
 
@@ -848,7 +850,7 @@ void running_machine::base_datetime(system_time &systime)
 
 void running_machine::current_datetime(system_time &systime)
 {
-	systime.set(m_base_time + this->time().seconds);
+	systime.set(m_base_time + this->time().seconds());
 }
 
 
@@ -935,7 +937,7 @@ void running_machine::handle_saveload()
 				break;
 
 			case STATERR_NONE:
-				if (!(m_system.flags & GAME_SUPPORTS_SAVE))
+				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
 					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
 				else
 					popmessage("State successfully %s.", opnamed);
@@ -1349,10 +1351,11 @@ void system_time::full_time::set(struct tm &t)
 
 static running_machine * jsmess_machine;
 
-void js_main_loop() {
+void js_main_loop()
+{
 	device_scheduler * scheduler;
 	scheduler = &(jsmess_machine->scheduler());
-	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
+	attotime stoptime(scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60)));
 	while (scheduler->time() < stoptime) {
 		scheduler->timeslice();
 	}

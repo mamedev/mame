@@ -610,12 +610,12 @@ ROM_START(columbia)
 ROM_END
 
 // system 3
-GAME(1981, atla_ltd, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",     GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",   GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1981, zephy,    0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1981, atla_ltd, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",     MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",   MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME(1981, zephy,    0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",              MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 4
-GAME(1981, cowboy,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2", GAME_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men", GAME_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1981, cowboy,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, pecmen,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, alcapone, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, columbia, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",           MACHINE_IS_SKELETON_MECHANICAL)

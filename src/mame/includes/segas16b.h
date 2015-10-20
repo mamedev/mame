@@ -50,7 +50,8 @@ public:
 			m_mj_input_num(0),
 			m_mj_last_val(0),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
+			m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	// memory mapping
@@ -68,9 +69,13 @@ public:
 	DECLARE_WRITE16_MEMBER( standard_io_w );
 	DECLARE_WRITE16_MEMBER( atomicp_sound_w );
 
+	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
+	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
+
 	// sound CPU read/write handlers
 	DECLARE_WRITE8_MEMBER( upd7759_control_w );
 	DECLARE_READ8_MEMBER( upd7759_status_r );
+	DECLARE_WRITE16_MEMBER( sound_w16 );
 
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
@@ -169,6 +174,7 @@ protected:
 	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
 	DECLARE_WRITE16_MEMBER( sjryuko_custom_io_w );
 
+	protected:
 	// devices
 	optional_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
@@ -205,6 +211,7 @@ protected:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
+	optional_shared_ptr<UINT16> m_decrypted_opcodes;
 };
 
 
@@ -237,7 +244,6 @@ public:
 	void init_tetrbx();
 
 	// read/write handlers
-	DECLARE_WRITE16_MEMBER( sound_w16 );
 	DECLARE_WRITE16_MEMBER( cart_addr_high_w );
 	DECLARE_WRITE16_MEMBER( cart_addr_low_w );
 	DECLARE_READ16_MEMBER( cart_data_r );

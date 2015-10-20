@@ -100,4 +100,4 @@ ROM_START(sleicpin)
 	ROM_LOAD("sp02-1_1.rom", 0x00000, 0x80000, CRC(0e4851a0) SHA1(0692ee2df0b560e2013db9c03fd27c6eb12e618d))
 ROM_END
 
-GAME(1993,  sleicpin,  0,  sleic,  sleic, sleic_state,  sleic,  ROT0,  "Sleic",    "Sleic Pin Ball",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  sleicpin,  0,  sleic,  sleic, sleic_state,  sleic,  ROT0,  "Sleic",    "Sleic Pin Ball",     MACHINE_IS_SKELETON_MECHANICAL)

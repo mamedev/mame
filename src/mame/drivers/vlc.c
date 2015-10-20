@@ -700,4 +700,4 @@ DRIVER_INIT_MEMBER(nevada_state,nevada)
 
 /*    YEAR  NAME     PARENT MACHINE INPUT   INIT    ROT    COMPANY    FULLNAME             FLAGS... */
 
-GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, nevada, ROT0, "VLC Inc.", "VLC Nevada",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

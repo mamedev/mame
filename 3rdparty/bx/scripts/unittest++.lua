@@ -4,7 +4,6 @@
 --
 
 project "UnitTest++"
-	uuid "ab932f5c-2409-11e3-b000-887628d43830"
 	kind "StaticLib"
 
 	removeflags {
@@ -16,7 +15,7 @@ project "UnitTest++"
 		"../3rdparty/UnitTest++/src/*.h",
 	}
 
-	configuration { "linux or osx or android-* or *nacl*" }
+	configuration { "linux or osx or android-* or *nacl* or ps4" }
 		files {
 			"../3rdparty/UnitTest++/src/Posix/**.cpp",
 			"../3rdparty/UnitTest++/src/Posix/**.h",

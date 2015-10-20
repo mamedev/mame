@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="tntell" description="Touch &amp; Tell modules">
+
+
+	<software name="alphabet">
+		<description>Alphabet Fun</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2611"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x1000">
+				<rom name="cd2611.vsm" size="0x1000" crc="80fba6f5" sha1="44145579824b9a88bdd2f57434dcce7fbe2fc1e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animalfr">
+		<description>Animal Friends</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2355"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2355.vsm" size="0x4000" crc="1e99016a" sha1="7dfd78ec2508767fb91321642a30fd66e4faa3f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numfun">
+		<description>Number Fun</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2612"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x1000">
+				<rom name="cd2612a.vsm" size="0x1000" crc="3de47ecd" sha1="6a0308ddc167d521de8f454a1a11b1361f6f06a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aboutme">
+		<description>All About Me</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2613"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x1000">
+				<rom name="cd2613.vsm" size="0x1000" crc="4f124bbe" sha1="3be4598379ebc94b04232af47066dbfbdea42263" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wot">
+		<description>World of Transportation</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2361"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2361.vsm" size="0x4000" crc="d88fdc52" sha1="6387aeea689567df0ce6060981e64210ac5113f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lilcreat">
+		<description>Little Creatures</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2362"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2362.vsm" size="0x4000" crc="326622dd" sha1="afc848fb6cd4bf82ffe6c152e75aad134dc811b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="et">
+		<description>E.T. the Extra-Terrestial</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2363"/>
+		<part name="cart" interface="tntell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2363.vsm" size="0x4000" crc="f8363d2a" sha1="0450b185b121a51307637c42c0719af90c22206f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

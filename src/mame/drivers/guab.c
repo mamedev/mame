@@ -574,5 +574,5 @@ ROM_END
  *************************************/
 
 GAME( 1986, guab,     0, guab, guab,  driver_device, 0, ROT0, "JPM", "Give us a Break",      0 )
-GAME( 1986, crisscrs, 0, guab, guab,  driver_device, 0, ROT0, "JPM", "Criss Cross (Sweden)", GAME_NOT_WORKING )
+GAME( 1986, crisscrs, 0, guab, guab,  driver_device, 0, ROT0, "JPM", "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
 GAME( 1988, tenup,    0, guab, tenup, driver_device, 0, ROT0, "JPM", "Ten Up",               0 )
