@@ -196,9 +196,9 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
 
-	float range = min(ScreenDims.x, ScreenDims.y) * 0.5;
-	float radius = range * max(radiusAmount, 0.01f);
-	float smooth = 1.0 / (range * max(smoothAmount, 0.01f));
+	float range = min(QuadDims.x, QuadDims.y) * 0.5;
+	float radius = range * max(radiusAmount, 0.0025f);
+	float smooth = 1.0 / (range * max(smoothAmount, 0.0025f));
 
 	// compute box
 	float box = roundBox(ScreenDims * (coord * 2.0f), ScreenDims * RatioCorrection, radius);

@@ -112,6 +112,7 @@ uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
 
 uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
 uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
+uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures 
 uniform bool PrepareVector = false;
@@ -221,9 +222,17 @@ float GetSpotAddend(float2 coord, float amount)
 			: QuadDims.y / QuadDims.x);
 
 	// upper right quadrant
-	float2 spotOffset = OrientationSwapXY 
-		? float2(0.25f, 0.25f)
-		: float2(-0.25f, 0.25f);
+	float2 spotOffset = PrepareVector
+		? RotationType == 1 // 90°
+			? float2(-0.25f, -0.25f)
+			: RotationType == 2 // 180°
+				? float2(0.25f, -0.25f)
+				: RotationType == 3 // 270°
+					? float2(0.25f, 0.25f)
+					: float2(-0.25f, 0.25f)
+		: OrientationSwapXY
+			? float2(0.25f, 0.25f)
+			: float2(-0.25f, 0.25f);		
 
 	float2 SpotCoord = coord;
 	SpotCoord += spotOffset * RatioCorrection;
@@ -257,17 +266,13 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 			? QuadDims.yx / SourceRect 
 			: QuadDims.xy / SourceRect;
 
-	// raster graphics 
-	if (!PrepareVector)
-	{
-		// alignment correction
-		float2 SourceTexelDims = 1.0f / SourceDims;
-		coord -= SourceTexelDims;
-	}
+	coord = PrepareVector
+		? coord
+		: coord - 1.0f / SourceDims; // alignment correction (raster graphics)
 
-	float range = min(CanvasDims.x, CanvasDims.y) * 0.5;
-	float radius = range * max(radiusAmount, 0.01f);
-	float smooth = 1.0 / (range * max(smoothAmount, 0.01f));
+	float range = min(QuadDims.x, QuadDims.y) * 0.5;
+	float radius = range * max(radiusAmount, 0.0025f);
+	float smooth = 1.0 / (range * max(smoothAmount, 0.0025f));
 
 	// compute box
 	float box = roundBox(CanvasDims * (coord * 2.0f), CanvasDims * RatioCorrection, radius);

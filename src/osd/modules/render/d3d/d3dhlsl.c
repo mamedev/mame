@@ -1462,6 +1462,14 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	bool rotation_swap_xy =
 		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
 		(d3d->window().target()->orientation() & ROT270) == ROT270;
+	int rotation_type =
+		(d3d->window().target()->orientation() & ROT90) == ROT90
+			? 1
+			: (d3d->window().target()->orientation() & ROT180) == ROT180
+				? 2
+				: (d3d->window().target()->orientation() & ROT270) == ROT270
+					? 3
+					: 0;
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
@@ -1470,6 +1478,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
 	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
 	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
+	curr_effect->set_int("RotationType", rotation_type); // backward compatibility
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
 
