@@ -752,6 +752,7 @@ static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
 	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
+	MCFG_SOFTWARE_LIST_ADD("cd_list", "segacd")
 MACHINE_CONFIG_END
 
 
