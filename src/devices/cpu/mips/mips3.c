@@ -95,8 +95,6 @@ static const UINT8 fpmode_source[4] =
 	uml::ROUND_FLOOR
 };
 
-
-
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
@@ -130,6 +128,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_ppc(0)
 	, m_nextpc(0)
 	, m_pcbase(0)
+	, m_delayslot(false)
 	, m_op(0)
 	, m_interrupt_cycles(0)
 	, m_ll_value(0)
@@ -255,8 +254,9 @@ void mips3_device::generate_exception(int exception, int backup)
 	}
 
 	/* if we were in a branch delay slot, adjust */
-	if (m_nextpc != ~0)
+	if ((m_nextpc != ~0) || (m_delayslot))
 	{
+		m_delayslot = false;
 		m_nextpc = ~0;
 		m_core->cpr[0][COP0_EPC] -= 4;
 		CAUSE |= 0x80000000;
@@ -2767,12 +2767,16 @@ void mips3_device::execute_run()
 		/* adjust for next PC */
 		if (m_nextpc != ~0)
 		{
+			/* Exceptions need to be able to see delayslot, since nextpc gets cleared before instruction execution */
+			m_delayslot = true;
 			m_core->pc = m_nextpc;
 			m_nextpc = ~0;
 		}
 		else
+		{
+			m_delayslot = false;
 			m_core->pc += 4;
-
+		}
 		/* parse the instruction */
 		const int switch_val = (op >> 26) & 0x3f;
 
@@ -2910,6 +2914,8 @@ void mips3_device::execute_run()
 			case 0x3f:  /* SD */        WDOUBLE(SIMMVAL+RSVAL32, RTVAL64);                                      break;
 			default:    /* ??? */       invalid_instruction(op);                                                break;
 		}
+		/* Clear this flag once instruction execution is finished, will interfere with interrupt exceptions otherwise */
+		m_delayslot = false;
 		m_core->icount--;
 
 	} while (m_core->icount > 0 || m_nextpc != ~0);
