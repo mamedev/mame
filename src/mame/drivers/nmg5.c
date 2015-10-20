@@ -1575,7 +1575,7 @@ DRIVER_INIT_MEMBER(nmg5_state,prot_val_40)
 }
 
 GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2, censored)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, nmg5e,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 3, earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, searchey,  0,        nmg5,     searchey,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean / Japanese / Italian)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, searcheya, searchey, nmg5,     searcheya, nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean)", MACHINE_SUPPORTS_SAVE )
