@@ -1811,7 +1811,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32, amiga_base, cd32_state )
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("cd32_cdrom")
-
+	MCFG_SOFTWARE_LIST_ADD("cd_list", "cd32")
 	MCFG_DEVICE_REMOVE("kbd")
 MACHINE_CONFIG_END
 
