@@ -25,7 +25,8 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void set_mapping();
+	virtual void set_mapping(UINT8 type);
+	virtual WRITE_LINE_MEMBER( romen_w ) { m_romen = state; }
 
 	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_WRITE8_MEMBER(fdc_w);
@@ -43,6 +44,7 @@ private:
 	required_device<floppy_connector> m_connector;
 	
 	bool m_rom_active;
+	bool m_romen;
 };
 
 // device type definition
