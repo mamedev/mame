@@ -40,51 +40,72 @@ unsigned int bbc_state::calculate_video_address(int ma,int ra)
 {
 	// ma = output from IC2 6845 MA address
 
-	int c0=m_b4_video0; // output from IC32 74LS259 bits 4 and 5
-	int c1=m_b5_video1;
+	int c0 = m_b4_video0; // output from IC32 74LS259 bits 4 and 5
+	int c1 = m_b5_video1;
 
 	/* the 4 bit input port b on IC39 are produced by 4 NAND gates.
 	these NAND gates take their
 	inputs from c0 and c1 (from IC32) and ma12 (from the 6845) */
 
 	/* get bit m12 from the 6845 */
-	int ma12=(ma>>12)&1;
+	int ma12 = BIT(ma,12);
 
 	// 4 bit input B on IC39 74LS283 (4 bit adder)
 	/* 3 input NAND part of IC 36 */
 	int b1=(~(c1 & c0 & ma12)) & 1;
 	/* 2 input NAND part of IC40 (b3 is calculated before b2 and b4 because b3 feed back into b2 and b4) */
-	int b3=(~(c0 & ma12)) & 1;
+	int b3 = (~(c0 & ma12)) & 1;
 	/* 3 input NAND part of IC 36 */
-	int b2=(~(c1 & b3 & ma12)) & 1;
+	int b2 = (~(c1 & b3 & ma12)) & 1;
 	/* 2 input NAND part of IC 27 */
-	int b4=(~(b3 & ma12)) & 1;
+	int b4 = (~(b3 & ma12)) & 1;
 
 	/* inputs port b to IC39 are taken from the NAND gates b1 to b4 */
-	int b=(b1<<0)|(b2<<1)|(b3<<2)|(b4<<3);
+	int b = (b1<<0) | (b2<<1) | (b3<<2) | (b4<<3);
 
 	/* inputs port a to IC39 are MA8 to MA11 from the 6845 */
-	int a=(ma>>8)&0xf;
+	int a = (ma>>8) & 0xf;
 
 	/* IC39 performs the 4 bit add with the carry input set high */
-	int s=(a+b+1)&0xf;
+	int s = (a+b+1) & 0xf;
 
 	/* if MA13 (TTXVDU) is low then IC8 and IC9 are used to calculate
 	   the memory location required for the hi res video.
-	   if MA13 is hight then IC10 and IC11 are used to calculate the memory location for the teletext chip*/
+	   if MA13 is high then IC10 and IC11 are used to calculate the memory location for the teletext chip */
 	unsigned int m;
-	if ((ma>>13)&1)
+	if (BIT(ma,13))
 	{
 		// IC 10 and IC 11
-		m=((ma&0x3ff)|0x3c00)|((s&0x8)<<11);
+		m = ((ma&0x3ff) | 0x3c00) | ((s&0x8)<<11);
 	} else {
 		// IC 8 and IC 9
-		m=((ma&0xff)<<3)|(s<<11)|(ra&0x7);
+		m = ((ma&0xff)<<3) | (s<<11) | (ra&0x7);
 	}
-	if (m_memorySize==16)
+	if (m_memorySize == 16)
 		return  m & 0x3fff;
 
 	return m;
+}
+
+/***************************************************************************
+ * Palette
+ ***************************************************************************/
+
+static const rgb_t bbc_palette[8] =
+{
+	rgb_t(0x0ff, 0x0ff, 0x0ff),
+	rgb_t(0x000, 0x0ff, 0x0ff),
+	rgb_t(0x0ff, 0x000, 0x0ff),
+	rgb_t(0x000, 0x000, 0x0ff),
+	rgb_t(0x0ff, 0x0ff, 0x000),
+	rgb_t(0x000, 0x0ff, 0x000),
+	rgb_t(0x0ff, 0x000, 0x000),
+	rgb_t(0x000, 0x000, 0x000)
+};
+
+PALETTE_INIT_MEMBER(bbc_state, bbc)
+{
+	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
 }
 
 /************************************************************************
@@ -101,7 +122,7 @@ void bbc_state::set_pixel_lookup()
 {
 	for (int i=0; i<256; i++)
 	{
-		m_pixel_bits[i] = (((i>>7)&1)<<3) | (((i>>5)&1)<<2) | (((i>>3)&1)<<1) | (((i>>1)&1)<<0);
+		m_pixel_bits[i] = (BIT(i,7)<<3) | (BIT(i,5)<<2) | (BIT(i,3)<<1) | (BIT(i,1)<<0);
 	}
 }
 
@@ -122,39 +143,36 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 	{
 	// Set the control register in the Video ULA
 	case 0:
-		{
-		m_videoULA_Reg=data;
-		m_videoULA_master_cursor_size=    (m_videoULA_Reg>>7)&0x01;
-		m_videoULA_width_of_cursor=       (m_videoULA_Reg>>5)&0x03;
-		m_videoULA_6845_clock_rate=       (m_videoULA_Reg>>4)&0x01;
-		m_videoULA_characters_per_line=   (m_videoULA_Reg>>2)&0x03;
-		m_videoULA_teletext_normal_select=(m_videoULA_Reg>>1)&0x01;
-		m_videoULA_flash_colour_select=    m_videoULA_Reg    &0x01;
+		m_videoULA_Reg = data;
+		m_videoULA_master_cursor_size     = (m_videoULA_Reg>>7)&0x01;
+		m_videoULA_width_of_cursor        = (m_videoULA_Reg>>5)&0x03;
+		m_videoULA_6845_clock_rate        = (m_videoULA_Reg>>4)&0x01;
+		m_videoULA_characters_per_line    = (m_videoULA_Reg>>2)&0x03;
+		m_videoULA_teletext_normal_select = (m_videoULA_Reg>>1)&0x01;
+		m_videoULA_flash_colour_select    =  m_videoULA_Reg    &0x01;
 
-		m_videoULA_pallet_lookup=m_videoULA_flash_colour_select?m_videoULA_pallet0:m_videoULA_pallet1;
+		m_videoULA_palette_lookup = m_videoULA_flash_colour_select ? m_videoULA_palette0 : m_videoULA_palette1;
 
-		m_emulation_cursor_size=width_of_cursor_set[m_videoULA_width_of_cursor|(m_videoULA_master_cursor_size<<2)];
+		m_emulation_cursor_size = width_of_cursor_set[m_videoULA_width_of_cursor | (m_videoULA_master_cursor_size<<2)];
 
 		// this is the number of BBC pixels held in each byte
 		if (m_videoULA_teletext_normal_select)
-		{
-			m_pixels_per_byte=6;
-		} else {
-			m_pixels_per_byte=pixels_per_byte_set[m_videoULA_characters_per_line|(m_videoULA_6845_clock_rate<<2)];
-		}
+			m_pixels_per_byte = 12;
+		else
+			m_pixels_per_byte = pixels_per_byte_set[m_videoULA_characters_per_line | (m_videoULA_6845_clock_rate<<2)];
+
 		m_mc6845->set_hpixels_per_column(m_pixels_per_byte);
 		if (m_videoULA_6845_clock_rate)
-			m_mc6845->set_clock(2000000);
+			m_mc6845->set_clock(XTAL_16MHz/8);
 		else
-			m_mc6845->set_clock(1000000);
-		}
+			m_mc6845->set_clock(XTAL_16MHz/16);
 		break;
-	// Set a pallet register in the Video ULA
+	// Set a palette register in the Video ULA
 	case 1:
-		int tpal=(data>>4)&0x0f;
-		int tcol=data&0x0f;
-		m_videoULA_pallet0[tpal]=tcol;
-		m_videoULA_pallet1[tpal]=tcol<8?tcol:tcol^7;
+		int tpal = (data >> 4)&0x0f;
+		int tcol = data&0x0f;
+		m_videoULA_palette0[tpal] = tcol;
+		m_videoULA_palette1[tpal] = tcol<8 ? tcol : tcol^7;
 		break;
 	}
 }
@@ -178,21 +196,21 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 			//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
 			//Teletext Latch bit 7 goes to LOSE on the Teletext chip
 
-			if (((ma>>13)&1)==0)
+			if (BIT(ma,13) == 0)
 			{
-				m_Teletext_Latch=0;
+				m_Teletext_Latch = 0;
 			}
 			else
 			{
-				m_Teletext_Latch=(m_BBC_Video_RAM[calculate_video_address(ma+x_pos,ra)]);
+				m_Teletext_Latch = m_BBC_Video_RAM[calculate_video_address(ma+x_pos,ra)];
 			}
 
-			m_trom->write((m_Teletext_Latch&0x3f)|(m_Teletext_Latch&0x40));
+			m_trom->write((m_Teletext_Latch&0x3f) | (m_Teletext_Latch&0x40));
 
 			m_trom->f1_w(1);
 			m_trom->f1_w(0);
 
-			for(int pixelno=0;pixelno<6;pixelno++)
+			for(int pixelno=0; pixelno<12; pixelno++)
 			{
 				m_trom->tr6_w(1);
 				m_trom->tr6_w(0);
@@ -224,14 +242,14 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 		{
 			for(int x_pos=0; x_pos<x_count; x_pos++)
 			{
-				int vmem=calculate_video_address(ma+x_pos,ra);
-				unsigned char i=m_BBC_Video_RAM[vmem];
+				int vmem = calculate_video_address(ma+x_pos,ra);
+				unsigned char i = m_BBC_Video_RAM[vmem];
 
-				for(int pixelno=0;pixelno<m_pixels_per_byte;pixelno++)
+				for(int pixelno=0; pixelno<m_pixels_per_byte; pixelno++)
 				{
-					int col=m_videoULA_pallet_lookup[m_pixel_bits[i]] ^ ((x_pos==cursor_x) ? 7 : 0);
-					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno)=palette[col];
-					i=(i<<1)|1;
+					int col = m_videoULA_palette_lookup[m_pixel_bits[i]] ^ ((x_pos==cursor_x) ? 7 : 0);
+					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = palette[col];
+					i = (i<<1) | 1;
 				}
 			}
 		}
@@ -239,9 +257,9 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 		{
 			for(int x_pos=0; x_pos<x_count; x_pos++)
 			{
-				for(int pixelno=0;pixelno<m_pixels_per_byte;pixelno++)
+				for(int pixelno=0; pixelno<m_pixels_per_byte; pixelno++)
 				{
-					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno)=palette[7];
+					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = palette[7];
 				}
 			}
 		}
@@ -259,11 +277,9 @@ WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 void bbc_state::bbcbp_setvideoshadow(int vdusel)
 {
 	if (vdusel)
-	{
-		m_BBC_Video_RAM= m_region_maincpu->base()+0x8000;
-	} else {
-		m_BBC_Video_RAM= m_region_maincpu->base();
-	}
+		m_BBC_Video_RAM = m_region_maincpu->base()+0x8000;
+	else
+		m_BBC_Video_RAM = m_region_maincpu->base();
 }
 
 /************************************************************************
@@ -275,13 +291,10 @@ void bbc_state::common_init(int memorySize)
 {
 	m_emulation_cursor_size = 1;
 
-	m_VideoULA_CR = 7;
-	m_VideoULA_CR_counter = 0;
-
 	set_pixel_lookup();
 
 	m_BBC_Video_RAM = m_region_maincpu->base();
-	m_memorySize=memorySize;
+	m_memorySize = memorySize;
 
 }
 
