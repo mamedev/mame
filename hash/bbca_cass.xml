@@ -10,6 +10,8 @@
       Use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
 -->
 
+<!-- This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum. -->
+
 <softwarelist name="bbca_cass" description="BBC Micro Model A cassettes">
 
 	<!-- Games -->
@@ -29,6 +31,7 @@
 		<description>Arcade Action</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="G06" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13352">
 				<rom name="arcadeaction-v2.5(1982)(acornsoft)(g06).uef" size="13352" crc="6c2db1cd" sha1="b86be839f41ce68dc229f4ca84bac63c24326f9a" offset="0"/>
@@ -38,7 +41,7 @@
 
 	<software name="beebtrek">
 		<description>Beebtrek</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>Software For All</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7235">
@@ -73,6 +76,7 @@
 		<description>Draughts And Reversi</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="G20" />
 		<part name="cass1" interface="bbc_cass">
 			<dataarea name="cass" size="6165">
 				<rom name="dar-draughts-v2.1(1983)(acornsoft)(g20).uef" size="6165" crc="35e365ed" sha1="0000bae54eaaa8d5507cc0d7a444aaeac03df97d" offset="0" />
@@ -87,7 +91,7 @@
 
 	<software name="famgames">
 		<description>Family Games</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>I.J.K.</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<dataarea name="cass" size="2152">
@@ -123,7 +127,7 @@
 
 	<software name="fruitmc">
 		<description>Fruit Machine</description>
-			<year>19??</year>
+			<year>198?</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4421">
@@ -209,6 +213,18 @@
 		</part>
 	</software>
 
+	<software name="spacinva">
+		<description>Space Invaders 16K</description>
+		<year>1982</year>
+		<publisher>David McKeran</publisher>
+		<info name="usage" value="Load with *RUN" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="4513">
+				<rom name="spaceinvaders16k_run(1982)(davidmckeran).uef" size="4513" crc="a95a6a41" sha1="dff22b2d7a5c1d5355b8f72edf60acaa67f06c90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacmaze">
 		<description>Space Maze</description>
 		<year>1981</year>
@@ -222,7 +238,7 @@
 
 	<software name="sppirate">
 		<description>Space Pirates</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>Bug Byte</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3557">
@@ -233,7 +249,7 @@
 
 	<software name="startrek">
 		<description>Star Trek</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>I.J.K.</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5376">
@@ -248,6 +264,7 @@
 		<description>Peeko Computer (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E02" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4821">
 				<rom name="peekocomputer-german(198x)(acornsoft)(e02).uef" size="4821" crc="c6503a6b" sha1="813a6399a45a75a4aab3d2edd1722488edf41a52" offset="0" />
@@ -259,6 +276,7 @@
 		<description>Peeko Computer</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E02" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3993">
 				<rom name="peekocomputer(198x)(acornsoft)(e02).uef" size="3993" crc="9a78f3b9" sha1="ff974eb52d6d984637e21e15a883a7572991e38b" offset="0" />
@@ -270,6 +288,7 @@
 		<description>Business Games (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E03" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11858">
 				<rom name="businessgames-german(198x)(acornsoft)(e03).uef" size="11858" crc="ae23e0dd" sha1="2a4ca1e06870e41d9fa4c4e86ab196251869b160" offset="0" />
@@ -281,6 +300,7 @@
 		<description>Word Hunt (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E05" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10849">
 				<rom name="wordhunt-german(198x)(acornsoft)(e05).uef" size="10849" crc="e412d5af" sha1="3163432f2388b0795ec03b61ab77e90e37a3f18d" offset="0" />
@@ -292,6 +312,7 @@
 		<description>Word Sequencing (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E06" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10883">
 				<rom name="wordsequencing-german(198x)(acornsoft)(e06).uef" size="10883" crc="605ebb74" sha1="5d2b67151889a0fa90c490dd4db40d579a8fb386" offset="0" />
@@ -303,6 +324,7 @@
 		<description>Word Sequencing</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E06" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7955">
 				<rom name="wordsequencing(198x)(acornsoft)(e06).uef" size="7955" crc="b6a37e42" sha1="b0b2088cd4bbbed7accd33e943eb8f343e36c7a2" offset="0" />
@@ -314,6 +336,7 @@
 		<description>Missing Signs (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E09" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11055">
 				<rom name="missingsigns-german(198x)(acornsoft)(e09).uef" size="11055" crc="3a6c4f59" sha1="e02115cbf2cdcc0996b12fe8db25c02ca234248b" offset="0" />
@@ -325,6 +348,7 @@
 		<description>Missing Signs</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="E09" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7977">
 				<rom name="missingsigns(198x)(acornsoft)(e09).uef" size="7977" crc="7da85f67" sha1="ebc8116fa980c0d268918a3aa333f772de0a7cb9" offset="0" />
