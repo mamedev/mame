@@ -3825,7 +3825,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			</dataarea>
       <!-- this is a 22 track companion audio CD (to be played on standalone CD player while operating the game?) -->
       <!-- dumping software / drive: BurnAtOnce 0.99.5 / TS-L633R -->
- 			<diskarea name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="sanouk5cd" sha1="c9330bbf118405c02347bd83a1cc24ab2bb4310d"/>
 			</diskarea>
 		</part>
