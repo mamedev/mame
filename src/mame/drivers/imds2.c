@@ -172,7 +172,6 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ioctimer(*this , "ioctimer"),
 	m_iocfdc(*this , "iocfdc"),
 	m_flop0(*this, "iocfdc:0"),
-	m_flop1(*this, "iocfdc:1"),
 	m_iocpio(*this , "iocpio"),
 	m_kbcpu(*this , "kbcpu"),
 	m_palette(*this , "palette"),
@@ -552,17 +551,6 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 	}
 }
 
-int imds2_state::floppy_load(floppy_image_device *dev)
-{
-	dev->mon_w(0);
-	return IMAGE_INIT_PASS;
-}
-
-void imds2_state::floppy_unload(floppy_image_device *dev)
-{
-	dev->mon_w(1);
-}
-
 void imds2_state::driver_start()
 {
 	// Allocate 64k for IPC RAM
@@ -578,11 +566,7 @@ void imds2_state::driver_start()
 
 void imds2_state::machine_start()
 {
-	// As far as I can tell from the schmatic, there's no software motor control
-	m_flop0->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(imds2_state::floppy_load), this));
-	m_flop0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(imds2_state::floppy_unload), this));
-	m_flop1->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(imds2_state::floppy_load), this));
-	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(imds2_state::floppy_unload), this));
+        m_iocfdc->set_ready_line_connected(true);
 }
 
 void imds2_state::video_start()
@@ -595,8 +579,6 @@ void imds2_state::machine_reset()
 	m_iocbeep->set_frequency(IOC_BEEP_FREQ);
 	m_ipc_control = 0x00;
 	m_ipc_ioc_status = 0x0f;
-	m_flop0->get_device()->mon_w(!m_flop0->get_device()->exists());
-	m_flop1->get_device()->mon_w(!m_flop1->get_device()->exists());
 
 	m_iocfdc->set_rate(500000); // The IMD images show a rate of 500kbps
 }
@@ -830,7 +812,7 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_DEVICE_ADD("iocfdc" , I8271 , IOC_XTAL_Y1 / 2)
 		MCFG_I8271_DRQ_CALLBACK(DEVWRITELINE("iocdma" , i8257_device , dreq1_w))
 		MCFG_FLOPPY_DRIVE_ADD("iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
-		MCFG_FLOPPY_DRIVE_ADD("iocfdc:1", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
+                MCFG_SLOT_FIXED(true)
 
 		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
 		MCFG_CPU_IO_MAP(pio_io_map)

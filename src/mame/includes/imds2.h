@@ -80,7 +80,6 @@ class imds2_state : public driver_device
 	required_device<pit8253_device> m_ioctimer;
 	required_device<i8271_device> m_iocfdc;
 	required_device<floppy_connector> m_flop0;
-	required_device<floppy_connector> m_flop1;
 	required_device<i8041_device> m_iocpio;
 	required_device<i8741_device> m_kbcpu;
 	required_device<palette_device> m_palette;
@@ -102,8 +101,6 @@ class imds2_state : public driver_device
 
 	void imds2_update_beeper(void);
 	void imds2_update_printer(void);
-	int floppy_load(floppy_image_device *dev);
-	void floppy_unload(floppy_image_device *dev);
 
 	// IPC control port
 	UINT8 m_ipc_control;
