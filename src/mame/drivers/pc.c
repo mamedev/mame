@@ -22,7 +22,7 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 IBM5550
 =======
 Information can be found at http://homepage3.nifty.com/ibm5550/index-e.html
-It's an heavily modified IBM PC-XT machine, with a completely different
+It's a heavily modified IBM PC-XT machine, with a completely different
 video HW too.
 
 ***************************************************************************/
@@ -173,6 +173,10 @@ static DEVICE_INPUT_DEFAULTS_START( pccga )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( siemens )
+	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x30)
+DEVICE_INPUT_DEFAULTS_END
+
 #define MCFG_CPU_PC(mem, port, type, clock) \
 	MCFG_CPU_ADD("maincpu", type, clock)                \
 	MCFG_CPU_PROGRAM_MAP(mem##_map) \
@@ -268,6 +272,28 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
+
+
+static MACHINE_CONFIG_START( siemens, pc_state )
+	/* basic machine hardware */
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+
+	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
+	MCFG_DEVICE_INPUT_DEFAULTS(siemens)
+
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
+
+	/* keyboard */
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( ibm5550, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(ibm5550, ibm5550, I8086, 8000000)
@@ -297,9 +323,15 @@ static MACHINE_CONFIG_DERIVED(mk88, poisk2)
 	MCFG_SLOT_DEFAULT_OPTION("cga_ec1841")
 MACHINE_CONFIG_END
 
+
 ROM_START( bw230 )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
+ROM_END
+
+ROM_START( sicpc1605 )
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD("multitech pc-700 3.1.bin", 0xfe000, 0x2000, CRC(0ac7a2e1) SHA1(b9c8504e21213d81a068dde9f51f9c973d726e7b))
 ROM_END
 
 ROM_START( zdsupers )
@@ -455,12 +487,14 @@ COMP( 1985, bw230,      ibm5150,    0,          bondwell,   bondwell, pc_state, 
 COMP( 1984, compc1,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Commodore Business Machines", "Commodore PC-1" , MACHINE_NOT_WORKING)
 COMP( 1987, pc10iii,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Commodore Business Machines", "Commodore PC-10 III" , MACHINE_NOT_WORKING)
 
+
 COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pccga, driver_device,      0,      "Schetmash", "Iskra 3104", MACHINE_NOT_WORKING)
 COMP( 1989, mk88,       ibm5150,    0,          mk88,       pccga, driver_device,      0,      "<unknown>", "MK-88", MACHINE_NOT_WORKING)
 COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga, driver_device,      0,      "<unknown>", "Poisk-2", MACHINE_NOT_WORKING)
 COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "<unknown>", "Elektronika MC-1702", MACHINE_NOT_WORKING)
 
 COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, driver_device,      0,      "Zenith Data Systems", "SuperSport", 0)
+COMP( 1985, sicpc1605,  ibm5150,    0,          siemens,    pccga, driver_device,      0,      "Siemens", "Sicomp PC16-05", 0)
 
 COMP( 198?, olivm15,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Olivetti", "M15", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // is this a pc clone or not?
 
