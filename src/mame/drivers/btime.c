@@ -1345,6 +1345,16 @@ static MACHINE_CONFIG_DERIVED( cookrace, btime )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
+	/* no discrete filter! */
+	MCFG_SOUND_REPLACE("ay1", AY8910, HCLK2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(btime_state, ay_audio_nmi_enable_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_REPLACE("ay2", AY8910, HCLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_REMOVE("discrete")
+
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cookrace)
 
