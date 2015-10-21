@@ -713,7 +713,7 @@
 	</software>
 
 	<software name="airbrush">
-		<description>Antix</description>
+		<description>Airbrush</description>
 		<year>1983</year>
 		<publisher>Soft Hits</publisher>
 		<part name="cass" interface="bbc_cass">
