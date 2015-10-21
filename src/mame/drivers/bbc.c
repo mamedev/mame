@@ -30,14 +30,6 @@
     ARM1  - ARM Evaluation System
     ADB20 - Master Compact
 
-
-    MESS Driver By:
-
-    Gordon Jefferyes
-    mess_bbc@romvault.com
-    Nigel Barnes
-    ngbarnes@hotmail.com
-
 ******************************************************************************/
 
 /* Core includes */
@@ -57,6 +49,7 @@
 /* Devices */
 #include "imagedev/flopdrv.h"
 #include "formats/bbc_dsk.h"
+//#include "formats/fsd_dsk.h"
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
@@ -175,7 +168,7 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)  /*    fe08-fe0F  6850 ACIA      Serial controller               */
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
-	AM_RANGE(0xfe18, 0xfe1f) AM_READ_PORT("S11")                                                                /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
+	AM_RANGE(0xfe18, 0xfe1f) AM_READ_PORT("STATID")                                                             /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                                           /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																												/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
@@ -194,8 +187,8 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe80, 0xfe83) AM_DEVICE("i8271" , i8271_device, map)                             /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
-	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, data_r, data_w)             /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe80, 0xfe83) AM_DEVICE("i8271", i8271_device, map)                              /*    fe80-fe83  8271 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, data_r, data_w)             /*    fe84-fe9f  8271 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -284,24 +277,6 @@ static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfc00, 0xfeff) AM_READ_BANK("bank8") AM_WRITE(bbcm_w)                             /*    processed directly because it can be ROM or hardware      */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                     /*    ff00-ffff                 OS ROM (continued)              */
 ADDRESS_MAP_END
-
-
-static const rgb_t bbc_palette[8]=
-{
-	rgb_t(0x0ff,0x0ff,0x0ff),
-	rgb_t(0x000,0x0ff,0x0ff),
-	rgb_t(0x0ff,0x000,0x0ff),
-	rgb_t(0x000,0x000,0x0ff),
-	rgb_t(0x0ff,0x0ff,0x000),
-	rgb_t(0x000,0x0ff,0x000),
-	rgb_t(0x0ff,0x000,0x000),
-	rgb_t(0x000,0x000,0x000)
-};
-
-PALETTE_INIT_MEMBER(bbc_state, bbc)
-{
-	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
-}
 
 
 INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
@@ -488,24 +463,82 @@ static INPUT_PORTS_START(bbc_dipswitch)
 
 	PORT_MODIFY("COL7")
 	PORT_DIPNAME(0x01, 0x01, "Screen Mode") PORT_DIPLOCATION("KBD:6")
-	PORT_DIPSETTING(   0x00, "+0" )
-	PORT_DIPSETTING(   0x01, "+4" )
+	PORT_DIPSETTING(   0x00, "0" )
+	PORT_DIPSETTING(   0x01, "4" )
 
 	PORT_MODIFY("COL8")
 	PORT_DIPNAME(0x01, 0x01, "Screen Mode") PORT_DIPLOCATION("KBD:7")
-	PORT_DIPSETTING(   0x00, "+0" )
-	PORT_DIPSETTING(   0x01, "+2" )
+	PORT_DIPSETTING(   0x00, "0" )
+	PORT_DIPSETTING(   0x01, "2" )
 
 	PORT_MODIFY("COL9")
 	PORT_DIPNAME(0x01, 0x01, "Screen Mode") PORT_DIPLOCATION("KBD:8")
-	PORT_DIPSETTING(   0x00, "+0" )
-	PORT_DIPSETTING(   0x01, "+1" )
+	PORT_DIPSETTING(   0x00, "0" )
+	PORT_DIPSETTING(   0x01, "1" )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START(bbc_links)
-	PORT_START("S11")
-	PORT_DIPNAME(0xff, 0xfe, "Econet ID") PORT_DIPLOCATION("S11:1,2,3,4,5,6,7,8")
+static INPUT_PORTS_START(bbcb_links)
+	PORT_START("STATID")
+	PORT_DIPNAME(0xff, 0xfe, "Econet ID") PORT_DIPLOCATION("S11:0,1,2,3,4,5,6,7")
+	PORT_DIPSETTING(   0x00,   "0" )    PORT_DIPSETTING(   0x01,   "1" )    PORT_DIPSETTING(   0x02,   "2" )    PORT_DIPSETTING(   0x03,   "3" )    PORT_DIPSETTING(   0x04,   "4" )
+	PORT_DIPSETTING(   0x05,   "5" )    PORT_DIPSETTING(   0x06,   "6" )    PORT_DIPSETTING(   0x07,   "7" )    PORT_DIPSETTING(   0x08,   "8" )    PORT_DIPSETTING(   0x09,   "9" )
+	PORT_DIPSETTING(   0x0a,  "10" )    PORT_DIPSETTING(   0x0b,  "11" )    PORT_DIPSETTING(   0x0c,  "12" )    PORT_DIPSETTING(   0x0d,  "13" )    PORT_DIPSETTING(   0x0e,  "14" )
+	PORT_DIPSETTING(   0x0f,  "15" )    PORT_DIPSETTING(   0x10,  "16" )    PORT_DIPSETTING(   0x11,  "17" )    PORT_DIPSETTING(   0x12,  "18" )    PORT_DIPSETTING(   0x13,  "19" )
+	PORT_DIPSETTING(   0x14,  "20" )    PORT_DIPSETTING(   0x15,  "21" )    PORT_DIPSETTING(   0x16,  "22" )    PORT_DIPSETTING(   0x17,  "23" )    PORT_DIPSETTING(   0x18,  "24" )
+	PORT_DIPSETTING(   0x19,  "25" )    PORT_DIPSETTING(   0x1a,  "26" )    PORT_DIPSETTING(   0x1b,  "27" )    PORT_DIPSETTING(   0x1c,  "28" )    PORT_DIPSETTING(   0x1d,  "29" )
+	PORT_DIPSETTING(   0x1e,  "30" )    PORT_DIPSETTING(   0x1f,  "31" )    PORT_DIPSETTING(   0x20,  "32" )    PORT_DIPSETTING(   0x21,  "33" )    PORT_DIPSETTING(   0x22,  "34" )
+	PORT_DIPSETTING(   0x23,  "35" )    PORT_DIPSETTING(   0x24,  "36" )    PORT_DIPSETTING(   0x25,  "37" )    PORT_DIPSETTING(   0x26,  "38" )    PORT_DIPSETTING(   0x27,  "39" )
+	PORT_DIPSETTING(   0x28,  "40" )    PORT_DIPSETTING(   0x29,  "41" )    PORT_DIPSETTING(   0x2a,  "42" )    PORT_DIPSETTING(   0x2b,  "43" )    PORT_DIPSETTING(   0x2c,  "44" )
+	PORT_DIPSETTING(   0x2d,  "45" )    PORT_DIPSETTING(   0x2e,  "46" )    PORT_DIPSETTING(   0x2f,  "47" )    PORT_DIPSETTING(   0x30,  "48" )    PORT_DIPSETTING(   0x31,  "49" )
+	PORT_DIPSETTING(   0x32,  "50" )    PORT_DIPSETTING(   0x33,  "51" )    PORT_DIPSETTING(   0x34,  "52" )    PORT_DIPSETTING(   0x35,  "53" )    PORT_DIPSETTING(   0x36,  "54" )
+	PORT_DIPSETTING(   0x37,  "15" )    PORT_DIPSETTING(   0x38,  "56" )    PORT_DIPSETTING(   0x39,  "57" )    PORT_DIPSETTING(   0x3a,  "58" )    PORT_DIPSETTING(   0x3b,  "59" )
+	PORT_DIPSETTING(   0x3c,  "60" )    PORT_DIPSETTING(   0x3d,  "61" )    PORT_DIPSETTING(   0x3e,  "62" )    PORT_DIPSETTING(   0x3f,  "63" )    PORT_DIPSETTING(   0x40,  "64" )
+	PORT_DIPSETTING(   0x41,  "65" )    PORT_DIPSETTING(   0x42,  "66" )    PORT_DIPSETTING(   0x43,  "67" )    PORT_DIPSETTING(   0x44,  "68" )    PORT_DIPSETTING(   0x45,  "69" )
+	PORT_DIPSETTING(   0x46,  "70" )    PORT_DIPSETTING(   0x47,  "71" )    PORT_DIPSETTING(   0x48,  "72" )    PORT_DIPSETTING(   0x49,  "73" )    PORT_DIPSETTING(   0x4a,  "74" )
+	PORT_DIPSETTING(   0x4b,  "75" )    PORT_DIPSETTING(   0x4c,  "76" )    PORT_DIPSETTING(   0x4d,  "77" )    PORT_DIPSETTING(   0x4e,  "78" )    PORT_DIPSETTING(   0x4f,  "79" )
+	PORT_DIPSETTING(   0x50,  "80" )    PORT_DIPSETTING(   0x51,  "81" )    PORT_DIPSETTING(   0x52,  "82" )    PORT_DIPSETTING(   0x53,  "83" )    PORT_DIPSETTING(   0x54,  "84" )
+	PORT_DIPSETTING(   0x55,  "85" )    PORT_DIPSETTING(   0x56,  "86" )    PORT_DIPSETTING(   0x57,  "87" )    PORT_DIPSETTING(   0x58,  "88" )    PORT_DIPSETTING(   0x59,  "89" )
+	PORT_DIPSETTING(   0x5a,  "90" )    PORT_DIPSETTING(   0x5b,  "91" )    PORT_DIPSETTING(   0x5c,  "92" )    PORT_DIPSETTING(   0x5d,  "93" )    PORT_DIPSETTING(   0x5e,  "94" )
+	PORT_DIPSETTING(   0x5f,  "95" )    PORT_DIPSETTING(   0x60,  "96" )    PORT_DIPSETTING(   0x61,  "97" )    PORT_DIPSETTING(   0x62,  "98" )    PORT_DIPSETTING(   0x63,  "99" )
+	PORT_DIPSETTING(   0x64, "100" )    PORT_DIPSETTING(   0x65, "101" )    PORT_DIPSETTING(   0x66, "102" )    PORT_DIPSETTING(   0x67, "103" )    PORT_DIPSETTING(   0x68, "104" )
+	PORT_DIPSETTING(   0x69, "105" )    PORT_DIPSETTING(   0x6a, "106" )    PORT_DIPSETTING(   0x6b, "107" )    PORT_DIPSETTING(   0x6c, "108" )    PORT_DIPSETTING(   0x6d, "109" )
+	PORT_DIPSETTING(   0x6e, "110" )    PORT_DIPSETTING(   0x6f, "111" )    PORT_DIPSETTING(   0x70, "112" )    PORT_DIPSETTING(   0x71, "113" )    PORT_DIPSETTING(   0x72, "114" )
+	PORT_DIPSETTING(   0x73, "115" )    PORT_DIPSETTING(   0x74, "116" )    PORT_DIPSETTING(   0x75, "117" )    PORT_DIPSETTING(   0x76, "118" )    PORT_DIPSETTING(   0x77, "119" )
+	PORT_DIPSETTING(   0x78, "120" )    PORT_DIPSETTING(   0x79, "121" )    PORT_DIPSETTING(   0x7a, "122" )    PORT_DIPSETTING(   0x7b, "123" )    PORT_DIPSETTING(   0x7c, "124" )
+	PORT_DIPSETTING(   0x7d, "125" )    PORT_DIPSETTING(   0x7e, "126" )    PORT_DIPSETTING(   0x7f, "127" )    PORT_DIPSETTING(   0x80, "128" )    PORT_DIPSETTING(   0x81, "129" )
+	PORT_DIPSETTING(   0x82, "130" )    PORT_DIPSETTING(   0x83, "131" )    PORT_DIPSETTING(   0x84, "132" )    PORT_DIPSETTING(   0x85, "133" )    PORT_DIPSETTING(   0x86, "134" )
+	PORT_DIPSETTING(   0x87, "135" )    PORT_DIPSETTING(   0x88, "136" )    PORT_DIPSETTING(   0x89, "137" )    PORT_DIPSETTING(   0x8a, "138" )    PORT_DIPSETTING(   0x8b, "139" )
+	PORT_DIPSETTING(   0x8c, "140" )    PORT_DIPSETTING(   0x8d, "141" )    PORT_DIPSETTING(   0x8e, "142" )    PORT_DIPSETTING(   0x8f, "143" )    PORT_DIPSETTING(   0x90, "144" )
+	PORT_DIPSETTING(   0x91, "145" )    PORT_DIPSETTING(   0x92, "146" )    PORT_DIPSETTING(   0x93, "147" )    PORT_DIPSETTING(   0x94, "148" )    PORT_DIPSETTING(   0x95, "149" )
+	PORT_DIPSETTING(   0x96, "150" )    PORT_DIPSETTING(   0x97, "151" )    PORT_DIPSETTING(   0x98, "152" )    PORT_DIPSETTING(   0x99, "153" )    PORT_DIPSETTING(   0x9a, "154" )
+	PORT_DIPSETTING(   0x9b, "155" )    PORT_DIPSETTING(   0x9c, "156" )    PORT_DIPSETTING(   0x9d, "157" )    PORT_DIPSETTING(   0x9e, "158" )    PORT_DIPSETTING(   0x9f, "159" )
+	PORT_DIPSETTING(   0xa0, "160" )    PORT_DIPSETTING(   0xa1, "161" )    PORT_DIPSETTING(   0xa2, "162" )    PORT_DIPSETTING(   0xa3, "163" )    PORT_DIPSETTING(   0xa4, "164" )
+	PORT_DIPSETTING(   0xa5, "165" )    PORT_DIPSETTING(   0xa6, "166" )    PORT_DIPSETTING(   0xa7, "167" )    PORT_DIPSETTING(   0xa8, "168" )    PORT_DIPSETTING(   0xa9, "169" )
+	PORT_DIPSETTING(   0xaa, "170" )    PORT_DIPSETTING(   0xab, "171" )    PORT_DIPSETTING(   0xac, "172" )    PORT_DIPSETTING(   0xad, "173" )    PORT_DIPSETTING(   0xae, "174" )
+	PORT_DIPSETTING(   0xaf, "175" )    PORT_DIPSETTING(   0xb0, "176" )    PORT_DIPSETTING(   0xb1, "177" )    PORT_DIPSETTING(   0xb2, "178" )    PORT_DIPSETTING(   0xb3, "179" )
+	PORT_DIPSETTING(   0xb4, "180" )    PORT_DIPSETTING(   0xb5, "181" )    PORT_DIPSETTING(   0xb6, "182" )    PORT_DIPSETTING(   0xb7, "183" )    PORT_DIPSETTING(   0xb8, "184" )
+	PORT_DIPSETTING(   0xb9, "185" )    PORT_DIPSETTING(   0xba, "186" )    PORT_DIPSETTING(   0xbb, "187" )    PORT_DIPSETTING(   0xbc, "188" )    PORT_DIPSETTING(   0xbd, "189" )
+	PORT_DIPSETTING(   0xbe, "190" )    PORT_DIPSETTING(   0xbf, "191" )    PORT_DIPSETTING(   0xc0, "192" )    PORT_DIPSETTING(   0xc1, "193" )    PORT_DIPSETTING(   0xc2, "194" )
+	PORT_DIPSETTING(   0xc3, "195" )    PORT_DIPSETTING(   0xc4, "196" )    PORT_DIPSETTING(   0xc5, "197" )    PORT_DIPSETTING(   0xc6, "198" )    PORT_DIPSETTING(   0xc7, "199" )
+	PORT_DIPSETTING(   0xc8, "200" )    PORT_DIPSETTING(   0xc9, "201" )    PORT_DIPSETTING(   0xca, "202" )    PORT_DIPSETTING(   0xcb, "203" )    PORT_DIPSETTING(   0xcc, "204" )
+	PORT_DIPSETTING(   0xcd, "205" )    PORT_DIPSETTING(   0xce, "206" )    PORT_DIPSETTING(   0xcf, "207" )    PORT_DIPSETTING(   0xd0, "208" )    PORT_DIPSETTING(   0xd1, "209" )
+	PORT_DIPSETTING(   0xd2, "210" )    PORT_DIPSETTING(   0xd3, "211" )    PORT_DIPSETTING(   0xd4, "212" )    PORT_DIPSETTING(   0xd5, "213" )    PORT_DIPSETTING(   0xd6, "214" )
+	PORT_DIPSETTING(   0xd7, "215" )    PORT_DIPSETTING(   0xd8, "216" )    PORT_DIPSETTING(   0xd9, "217" )    PORT_DIPSETTING(   0xda, "218" )    PORT_DIPSETTING(   0xdb, "219" )
+	PORT_DIPSETTING(   0xdc, "220" )    PORT_DIPSETTING(   0xdd, "221" )    PORT_DIPSETTING(   0xde, "222" )    PORT_DIPSETTING(   0xdf, "223" )    PORT_DIPSETTING(   0xe0, "224" )
+	PORT_DIPSETTING(   0xe1, "225" )    PORT_DIPSETTING(   0xe2, "226" )    PORT_DIPSETTING(   0xe3, "227" )    PORT_DIPSETTING(   0xe4, "228" )    PORT_DIPSETTING(   0xe5, "229" )
+	PORT_DIPSETTING(   0xe6, "230" )    PORT_DIPSETTING(   0xe7, "231" )    PORT_DIPSETTING(   0xe8, "232" )    PORT_DIPSETTING(   0xe9, "233" )    PORT_DIPSETTING(   0xea, "234" )
+	PORT_DIPSETTING(   0xeb, "235" )    PORT_DIPSETTING(   0xec, "236" )    PORT_DIPSETTING(   0xed, "237" )    PORT_DIPSETTING(   0xee, "238" )    PORT_DIPSETTING(   0xef, "239" )
+	PORT_DIPSETTING(   0xf0, "240" )    PORT_DIPSETTING(   0xf1, "241" )    PORT_DIPSETTING(   0xf2, "242" )    PORT_DIPSETTING(   0xf3, "243" )    PORT_DIPSETTING(   0xf4, "244" )
+	PORT_DIPSETTING(   0xf5, "245" )    PORT_DIPSETTING(   0xf6, "246" )    PORT_DIPSETTING(   0xf7, "247" )    PORT_DIPSETTING(   0xf8, "248" )    PORT_DIPSETTING(   0xf9, "249" )
+	PORT_DIPSETTING(   0xfa, "250" )    PORT_DIPSETTING(   0xfb, "251" )    PORT_DIPSETTING(   0xfc, "252" )    PORT_DIPSETTING(   0xfd, "253" )    PORT_DIPSETTING(   0xfe, "254" )
+	PORT_DIPSETTING(   0xff, "255" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START(bbcbp_links)
+	PORT_START("STATID")
+	PORT_DIPNAME(0xff, 0xfe, "Econet ID") PORT_DIPLOCATION("S23:0,1,2,3,4,5,6,7")
 	PORT_DIPSETTING(   0x00,   "0" )    PORT_DIPSETTING(   0x01,   "1" )    PORT_DIPSETTING(   0x02,   "2" )    PORT_DIPSETTING(   0x03,   "3" )    PORT_DIPSETTING(   0x04,   "4" )
 	PORT_DIPSETTING(   0x05,   "5" )    PORT_DIPSETTING(   0x06,   "6" )    PORT_DIPSETTING(   0x07,   "7" )    PORT_DIPSETTING(   0x08,   "8" )    PORT_DIPSETTING(   0x09,   "9" )
 	PORT_DIPSETTING(   0x0a,  "10" )    PORT_DIPSETTING(   0x0b,  "11" )    PORT_DIPSETTING(   0x0c,  "12" )    PORT_DIPSETTING(   0x0d,  "13" )    PORT_DIPSETTING(   0x0e,  "14" )
@@ -600,15 +633,22 @@ static INPUT_PORTS_START(bbcb)
 	PORT_INCLUDE(bbc_config)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
-	PORT_INCLUDE(bbc_links)
+	PORT_INCLUDE(bbcb_links)
+	PORT_INCLUDE(bbc_joy)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(bbcbp)
+	PORT_INCLUDE(bbc_config)
+	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(bbc_dipswitch)
+	PORT_INCLUDE(bbcbp_links)
 	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(abc)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_keypad)
-	PORT_INCLUDE(bbc_dipswitch)
-	PORT_INCLUDE(bbc_links)
+	PORT_INCLUDE(bbcbp_links)
 	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
@@ -635,19 +675,22 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 }
 
 
-FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_525sd )
-	FLOPPY_BBC_SSD_525_FORMAT,
-	FLOPPY_BBC_DSD_525_FORMAT
+FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
+	FLOPPY_BBC_DFS_FORMAT,
+	FLOPPY_BBC_CPM_FORMAT
+	//FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
 
-FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_525dd )
-	FLOPPY_BBC_SSD_525_FORMAT,
-	FLOPPY_BBC_DSD_525_FORMAT,
-	FLOPPY_BBC_ADF_525_FORMAT
+FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
+	FLOPPY_BBC_DFS_FORMAT,
+	FLOPPY_BBC_ADFS_FORMAT,
+	FLOPPY_BBC_CPM_FORMAT,
+	FLOPPY_BBC_DOS_FORMAT
+	//FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
 
-FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_35dd )
-	FLOPPY_BBC_ADF_35_FORMAT
+FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcmc )
+	FLOPPY_BBC_ADFS_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( bbc_floppies_525 )
@@ -698,7 +741,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)         /* 2.00 MHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_16MHz/8)         /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbca_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
@@ -725,13 +768,15 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
 
 	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12MHz/2)
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
+	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
 	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
+	//MCFG_MC6845_OUT_DE_CB(WRITELINE(bbc_state, bbc_de_changed))
+	//MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(bbc_state, bbc_hsync))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbca)
@@ -740,7 +785,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489", SN76489, 4000000) /* 4 MHz */
+	MCFG_SOUND_ADD("sn76489", SN76489, XTAL_16MHz/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette */
@@ -767,7 +812,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bbc_state, write_acia_clock))
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_16MHz / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
@@ -797,9 +842,10 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 	MCFG_SOUND_ADD("tms5220", TMS5220, 640000)
 	MCFG_TMS52XX_SPEECHROM("vsm")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
@@ -821,13 +867,16 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
 	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_state, motor_w))
 	MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_state, side_w))
-	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_525sd)
-	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_525sd)
+	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbc)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbc)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b", "bbcb_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a", "bbca_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b", "bbcb_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
 MACHINE_CONFIG_END
 
 
@@ -843,18 +892,16 @@ static MACHINE_CONFIG_DERIVED(bbcb1770, bbcb)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcb_de, bbcb )
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_de_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b", "bbcb_cass")
 MACHINE_CONFIG_END
 
 
@@ -866,9 +913,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbcb )
 	MCFG_SCREEN_REFRESH_RATE(60)
 
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_us", "bbcb_us_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b", "bbcb_cass")
 MACHINE_CONFIG_END
 
 
@@ -921,10 +966,15 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 
 	/* Add 10MB ST-412 Winchester */
 
+	/* software lists */
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( abc210, bbcbp )
+static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -936,6 +986,11 @@ static MACHINE_CONFIG_DERIVED( abc210, bbcbp )
 
 	/* Add 20MB ST-412 Winchester Cambridge */
 
+	/* software lists */
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 MACHINE_CONFIG_END
 
 
@@ -949,6 +1004,12 @@ static MACHINE_CONFIG_DERIVED( abc310, bbcbp )
 
 	/* Add 10MB ST-412 Winchester */
 
+	/* software lists */
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 MACHINE_CONFIG_END
 
 
@@ -977,8 +1038,11 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	MCFG_DEVICE_REMOVE("wd1770")
 
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cass_ls_a")
-	MCFG_DEVICE_REMOVE("cass_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
+	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 MACHINE_CONFIG_END
 
 
@@ -991,7 +1055,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
+	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_16MHz/8)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbcm_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
@@ -1018,12 +1082,12 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
 
 	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12MHz/2)
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
+	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
 	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
 
@@ -1031,7 +1095,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489", SN76489, 4000000) /* 4 MHz */
+	MCFG_SOUND_ADD("sn76489", SN76489, XTAL_16MHz/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* rtc and cmos */
@@ -1057,9 +1121,13 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_m", "bbcm_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_m", "bbcm_flop")
+	MCFG_SOFTWARE_LIST_ADD("cart_ls_m", "bbcm_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a", "bbca_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b", "bbcb_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_ls_m", "bbcm_cart")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b", "bbcb_flop")
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
@@ -1081,7 +1149,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_16MHz / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
@@ -1089,7 +1157,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
@@ -1101,9 +1169,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_525dd)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* econet */
@@ -1120,6 +1188,8 @@ static MACHINE_CONFIG_DERIVED( bbcmt, bbcm )
 
 	/* Add 65C102 co-processor */
 
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_65c102", "bbc_65c102_flop")
 MACHINE_CONFIG_END
 
 
@@ -1149,6 +1219,10 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 
 	/* acia */
 	MCFG_DEVICE_REMOVE("acia6850")
@@ -1168,6 +1242,8 @@ static MACHINE_CONFIG_DERIVED( bbcm512, bbcm )
 
 	/* Add Intel 80186 co-processor */
 
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_80186", "bbc_80186_flop")
 MACHINE_CONFIG_END
 
 
@@ -1175,6 +1251,8 @@ static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
 
 	/* Add ARM co-processor */
 
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_arm_flop")
 MACHINE_CONFIG_END
 
 
@@ -1196,9 +1274,9 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_35, "qd", bbc_state::floppy_formats_35dd)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_35, "qd", bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, NULL, bbc_state::floppy_formats_35dd)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, NULL, bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* eeprom pcd8572 */
@@ -1208,14 +1286,20 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("cart_ls_m")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_mc", "bbcmc_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_pro128s", "pro128s_flop")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED(pro128s, bbcmc)
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_mc")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_pro128s")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_pro128s", "pro128s_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_mc", "bbcmc_flop")
 MACHINE_CONFIG_END
@@ -1229,10 +1313,10 @@ ROM_START(bbca)
 	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
 	ROM_REGION(0x14000,"option",0) /* ROM */
-	/* rom page 0  00000 SPARE SOCKET */
-	/* rom page 1  04000 SPARE SOCKET */
-	/* rom page 2  08000 SPARE SOCKET */
-	/* rom page 3  0c000 BASIC */
+	/* rom page 12 00000 IC52  SPARE SOCKET */
+	/* rom page 13 04000 IC88  SPARE SOCKET */
+	/* rom page 14 08000 IC100 SPARE SOCKET */
+	/* rom page 15 0c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
 	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) /* os */
@@ -1246,19 +1330,13 @@ ROM_START(bbca)
 	ROM_SYSTEM_BIOS( 3, "os10b1", "OS 1.00 / BASIC1" )
 	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(4)) /* os */
 	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) /* rom page 3  0c000 */
-	/* OS0.1 does not support rom paging, load BASIC into all pages */
-	ROM_SYSTEM_BIOS( 4, "os01b2", "OS 0.10 / BASIC2" )
+	ROM_SYSTEM_BIOS( 4, "os01b1", "OS 0.10 / BASIC1" )
 	ROMX_LOAD("os01.rom",   0x10000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(5)) /* os */
-	ROMX_LOAD("basic2.rom", 0x00000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(5)) /* rom page 0  00000 */
-	ROMX_LOAD("basic2.rom", 0x04000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(5)) /* rom page 1  04000 */
-	ROMX_LOAD("basic2.rom", 0x08000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(5)) /* rom page 2  08000 */
-	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(5)) /* rom page 3  0c000 */
-	ROM_SYSTEM_BIOS( 5, "os01b1", "OS 0.10 / BASIC1" )
-	ROMX_LOAD("os01.rom",   0x10000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(6)) /* os */
-	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(6)) /* rom page 0  00000 */
-	ROMX_LOAD("basic1.rom", 0x04000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(6)) /* rom page 1  04000 */
-	ROMX_LOAD("basic1.rom", 0x08000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(6)) /* rom page 2  08000 */
-	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(6)) /* rom page 3  0c000 */
+	/* OS0.1 does not support rom paging, load BASIC into all pages */
+	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(5)) /* rom page 0  00000 */
+	ROM_RELOAD(             0x04000, 0x4000 )
+	ROM_RELOAD(             0x08000, 0x4000 )
+	ROM_RELOAD(             0x0c000, 0x4000 )
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x10000, 0, 0x4000)
@@ -1286,10 +1364,10 @@ ROM_START(bbcb)
 	/* rom page 9  24000 */
 	/* rom page 10 28000 */
 	/* rom page 11 2c000 */
-	/* rom page 12 30000 SPARE SOCKET */
-	/* rom page 13 34000 SPARE SOCKET */
-	/* rom page 14 38000 DFS */
-	/* rom page 15 3c000 BASIC */
+	/* rom page 12 30000 IC52  SPARE SOCKET */
+	/* rom page 13 34000 IC88  SPARE SOCKET */
+	/* rom page 14 38000 IC100 DFS */
+	/* rom page 15 3c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
 	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) /* os */
@@ -1303,8 +1381,15 @@ ROM_START(bbcb)
 	ROM_SYSTEM_BIOS( 3, "os10b1", "OS 1.00 / BASIC1" )
 	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(4)) /* os */
 	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) /* rom page 15 3c000 */
+	ROM_SYSTEM_BIOS( 4, "os01b1", "OS 0.10 / BASIC1" )
+	ROMX_LOAD("os01.rom",   0x40000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(5)) /* os */
+	/* OS0.1 does not support rom paging, load BASIC into all pages */
+	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(5)) /* rom page 0 00000 */
+	ROM_RELOAD(             0x04000, 0x4000 )
+	ROM_RELOAD(             0x08000, 0x4000 )
+	ROM_RELOAD(             0x0c000, 0x4000 )
 
-	ROM_LOAD("dnfs.rom",    0x38000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
+	ROM_LOAD("dnfs120-201666.rom", 0x38000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1330,10 +1415,10 @@ ROM_START(bbcb1770)
 	/* rom page 9  24000 */
 	/* rom page 10 28000 */
 	/* rom page 11 2c000 */
-	/* rom page 12 30000 SPARE SOCKET */
-	/* rom page 13 34000 SPARE SOCKET */
-	/* rom page 14 38000 DDFS */
-	/* rom page 15 3c000 BASIC */
+	/* rom page 12 30000 IC52  SPARE SOCKET */
+	/* rom page 13 34000 IC88  SPARE SOCKET */
+	/* rom page 14 38000 IC100 DDFS */
+	/* rom page 15 3c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
 	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) /* os */
@@ -1374,10 +1459,10 @@ ROM_START(bbcb_de)
 	/* rom page 9  24000 */
 	/* rom page 10 28000 */
 	/* rom page 11 2c000 */
-	/* rom page 12 30000 SPARE SOCKET */
-	/* rom page 13 34000 SPARE SOCKET */
-	/* rom page 14 38000 DFS */
-	/* rom page 15 3c000 BASIC */
+	/* rom page 12 30000 IC72 SPARE SOCKET */
+	/* rom page 13 34000 IC73 SPARE SOCKET */
+	/* rom page 14 38000 IC74 DFS */
+	/* rom page 15 3c000 IC75 BASIC */
 	ROM_DEFAULT_BIOS("os12")
 	ROM_SYSTEM_BIOS( 0, "os12", "OS 1.20 / BASIC2" )
 	ROMX_LOAD("os_de.rom",   0x40000, 0x4000, CRC(b7262caf) SHA1(aadf90338ee9d1c85dfa73beba50e930c2a38f10), ROM_BIOS(1))
@@ -1409,16 +1494,17 @@ ROM_START(bbcb_us)
 	/* rom page 9  24000 */
 	/* rom page 10 28000 */
 	/* rom page 11 2c000 */
-	/* rom page 12 30000 SPARE SOCKET */
-	/* rom page 13 34000 SPARE SOCKET */
-	/* rom page 14 38000 DFS */
-	/* rom page 15 3c000 BASIC */
+	/* rom page 12 30000 IC72 VIEW */
+	/* rom page 13 34000 IC73 US DNFS */
+	/* rom page 14 38000 IC74 US BASIC */
+	/* rom page 15 3c000 IC75 SPARE SOCKET */
 	ROM_DEFAULT_BIOS("os10b3")
 	ROM_SYSTEM_BIOS( 0, "os10b3", "OS A1.0 / BASIC3" )
-	ROMX_LOAD("os10_us.rom", 0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(1))
-	ROMX_LOAD("basic3.rom",  0x3c000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("usmos10.rom",  0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(1))
+	ROMX_LOAD("usbasic3.rom", 0x3c000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
 
-	ROM_LOAD("dfs10.rom",    0x38000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
+	ROM_LOAD("viewa210.rom", 0x30000, 0x4000, CRC(0abd418b) SHA1(e23e5bbc59339cbda87e8dafa8d80116378ac305))
+	ROM_LOAD("usdnfs10.rom", 0x38000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1436,22 +1522,22 @@ ROM_START(bbcbp)
 	ROM_SYSTEM_BIOS( 0, "os20", "OS 2.00" )
 	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(1)) /* rom page 15 3C000 BASIC */
 	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
-	/* rom page 0  00000 */
-	/* rom page 1  04000 */
-	/* rom page 2  08000  32K IN PAGE 3 */
-	/* rom page 3  0c000  SPARE SOCKET */
-	/* rom page 4  10000  32K IN PAGE 5 */
-	/* rom page 5  14000  ADFS */
-	/* rom page 6  18000  32K IN PAGE 7 */
-	/* rom page 7  1c000  DDFS */
-	/* rom page 8  20000  32K IN PAGE 9 */
-	/* rom page 9  24000  SPARE SOCKET */
-	/* rom page 10 28000  32K IN PAGE 11 */
-	/* rom page 11 2c000  SPARE SOCKET */
-	/* rom page 12 30000 */
-	/* rom page 13 34000 */
+	/* rom page 0  00000 SWRAM (B+ 128K only) */
+	/* rom page 1  04000 SWRAM (B+ 128K only) */
+	/* rom page 2  08000 IC35 32K IN PAGE 3 */
+	/* rom page 3  0c000 IC35 SPARE SOCKET */
+	/* rom page 4  10000 IC44 32K IN PAGE 5 */
+	/* rom page 5  14000 IC44 ADFS */
+	/* rom page 6  18000 IC57 32K IN PAGE 7 */
+	/* rom page 7  1c000 IC57 DDFS */
+	/* rom page 8  20000 IC62 32K IN PAGE 9 */
+	/* rom page 9  24000 IC62 SPARE SOCKET */
+	/* rom page 10 28000 IC68 32K IN PAGE 11 */
+	/* rom page 11 2c000 IC68 SPARE SOCKET */
+	/* rom page 12 30000 SWRAM (B+ 128K only) */
+	/* rom page 13 34000 SWRAM (B+ 128K only) */
 	/* rom page 14 38000  32K IN PAGE 15 */
-	/* rom page 15 3C000  BASIC */
+	/* rom page 15 3C000 IC71 BASIC */
 	ROM_LOAD("adfs130.rom", 0x14000, 0x4000, CRC(d3855588) SHA1(301fd05c475a629c4bec70510d4507256a5b00d8))
 	ROM_LOAD("ddfs223.rom", 0x1c000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
 
@@ -1463,39 +1549,7 @@ ROM_START(bbcbp)
 ROM_END
 
 
-ROM_START(bbcbp128)
-	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
-
-	ROM_REGION(0x44000,"option",0) /* ROM */
-	ROM_DEFAULT_BIOS("os20")
-	ROM_SYSTEM_BIOS( 0, "os20", "OS 2.00" )
-	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(1)) /* rom page 15 3C000 BASIC */
-	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
-	/* rom page 0  00000 */
-	/* rom page 1  04000 */
-	/* rom page 2  08000  32K IN PAGE 3 */
-	/* rom page 3  0c000  SPARE SOCKET */
-	/* rom page 4  10000  32K IN PAGE 5 */
-	/* rom page 5  14000  ADFS */
-	/* rom page 6  18000  32K IN PAGE 7 */
-	/* rom page 7  1c000  DDFS */
-	/* rom page 8  20000  32K IN PAGE 9 */
-	/* rom page 9  24000  SPARE SOCKET */
-	/* rom page 10 28000  32K IN PAGE 11 */
-	/* rom page 11 2c000  SPARE SOCKET */
-	/* rom page 12 30000 */
-	/* rom page 13 34000 */
-	/* rom page 14 38000  32K IN PAGE 15 */
-	/* rom page 15 3C000  BASIC */
-	ROM_LOAD("adfs130.rom", 0x14000, 0x4000, CRC(d3855588) SHA1(301fd05c475a629c4bec70510d4507256a5b00d8))
-	ROM_LOAD("ddfs223.rom", 0x1c000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
-
-	ROM_REGION(0x4000, "os", 0)
-	ROM_COPY("option", 0x40000, 0, 0x4000)
-
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
-	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
-ROM_END
+#define rom_bbcbp128 rom_bbcbp
 
 
 ROM_START(abc110)
@@ -1505,29 +1559,35 @@ ROM_START(abc110)
 	ROM_DEFAULT_BIOS("mos200")
 	ROM_SYSTEM_BIOS( 0, "mos200", "MOS2.00" )
 	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mos123", "MOS1.23" )
-	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "mos120", "MOS1.20" )
-	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(3))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "mos123stor", "MOS1.23 + ViewStore" )
+	ROMX_LOAD("mos123stor.rom", 0x3c000, 0x4000, CRC(4e84f452) SHA1(145ee54f04b3eb4d0e5afaabe21915be48db3c54), ROM_BIOS(2)) /* rom page 15 3C000 ViewStore */
+	ROM_CONTINUE(               0x40000, 0x4000)  /* OS */
+	ROM_SYSTEM_BIOS( 2, "mos123", "MOS1.23" )
+	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(3))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "mos120", "MOS1.20" )
+	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(4))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(4))
 	/* rom page 0  00000 */
-	/* rom page 1  04000 */
-	/* rom page 2  08000  32K IN PAGE 3 */
-	/* rom page 3  0c000  SPARE SOCKET */
-	/* rom page 4  10000  32K IN PAGE 5 */
-	/* rom page 5  14000  DDFS */
-	/* rom page 6  18000  32K IN PAGE 7 */
-	/* rom page 7  1c000  ADFS */
-	/* rom page 8  20000  32K IN PAGE 9 */
-	/* rom page 9  24000  SPARE SOCKET */
-	/* rom page 10 28000  32K IN PAGE 11 */
-	/* rom page 11 2c000  SPARE SOCKET */
+	/* rom page 1  04000 IC71 selectable with link S13 */
+	/* rom page 2  08000 IC35 32K IN PAGE 3 */
+	/* rom page 3  0c000 IC35 SPARE SOCKET */
+	/* rom page 4  10000 IC44 32K IN PAGE 5 */
+	/* rom page 5  14000 IC44 DDFS */
+	/* rom page 6  18000 IC57 32K IN PAGE 7 */
+	/* rom page 7  1c000 IC57 ADFS */
+	/* rom page 8  20000 IC62 32K IN PAGE 9 */
+	/* rom page 9  24000 IC62 SPARE SOCKET */
+	/* rom page 10 28000 IC68 32K IN PAGE 11 */
+	/* rom page 11 2c000 IC68 SPARE SOCKET */
 	/* rom page 12 30000 */
 	/* rom page 13 34000 */
-	/* rom page 14 38000  32K IN PAGE 15 */
-	/* rom page 15 3C000  BASIC */
-	ROM_LOAD("ddfs223.rom", 0x14000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
+	/* rom page 14 38000 */
+	/* rom page 15 3C000 IC71 BASIC */
+	//ROM_LOAD("ddfs223.rom", 0x14000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
+	ROM_LOAD("acwddfs225.rom", 0x14000, 0x4000, CRC(7d0f9016) SHA1(bdfe44c79e18142d747436627e71a362a04cf746))
 	ROM_LOAD("adfs130.rom", 0x1c000, 0x4000, CRC(d3855588) SHA1(301fd05c475a629c4bec70510d4507256a5b00d8))
-	ROM_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1537,75 +1597,39 @@ ROM_START(abc110)
 ROM_END
 
 
-ROM_START(abc210)
+#define rom_abc310 rom_abc110
+
+
+ROM_START(acw443)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000,"option",0) /* ROM */
-	ROM_DEFAULT_BIOS("mos200")
-	ROM_SYSTEM_BIOS( 0, "mos200", "MOS2.00" )
-	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mos123", "MOS1.23" )
-	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "mos120", "MOS1.20" )
-	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(3))
+	ROM_DEFAULT_BIOS("mos210")
+	ROM_SYSTEM_BIOS( 0, "mos210", "MOS2.10" )
+	ROMX_LOAD("acwmos210.rom", 0x40000, 0x4000, CRC(168d6753) SHA1(dcd01d8f5f6e0cd92ae626ca52a3db71abf5d282), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "mos200", "MOS2.00" )
+	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(2))
 	/* rom page 0  00000 */
-	/* rom page 1  04000 */
-	/* rom page 2  08000  32K IN PAGE 3 */
-	/* rom page 3  0c000  SPARE SOCKET */
-	/* rom page 4  10000  32K IN PAGE 5 */
-	/* rom page 5  14000  DDFS */
-	/* rom page 6  18000  32K IN PAGE 7 */
-	/* rom page 7  1c000  ADFS */
-	/* rom page 8  20000  32K IN PAGE 9 */
-	/* rom page 9  24000  SPARE SOCKET */
-	/* rom page 10 28000  32K IN PAGE 11 */
-	/* rom page 11 2c000  SPARE SOCKET */
+	/* rom page 1  04000  IC71 selectable with link S13 */
+	/* rom page 2  08000  IC35 32K IN PAGE 3 */
+	/* rom page 3  0c000  IC35 DNFS */
+	/* rom page 4  10000  IC44 32K IN PAGE 5 */
+	/* rom page 5  14000  IC44 ACW DFS */
+	/* rom page 6  18000  IC57 32K IN PAGE 7 */
+	/* rom page 7  1c000  IC57 TERMINAL */
+	/* rom page 8  20000  IC62 32K IN PAGE 9 */
+	/* rom page 9  24000  IC62 ADFS */
+	/* rom page 10 28000  IC68 BASIC */
+	/* rom page 11 2c000  IC68 Unused OS? */
 	/* rom page 12 30000 */
 	/* rom page 13 34000 */
-	/* rom page 14 38000  32K IN PAGE 15 */
-	/* rom page 15 3C000  BASIC */
-	ROM_LOAD("ddfs223.rom",  0x14000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
-	ROM_LOAD("adfs130.rom",  0x1c000, 0x4000, CRC(d3855588) SHA1(301fd05c475a629c4bec70510d4507256a5b00d8))
-	ROM_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
-
-	ROM_REGION(0x4000, "os", 0)
-	ROM_COPY("option", 0x40000, 0, 0x4000)
-
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
-	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
-ROM_END
-
-
-ROM_START(abc310)
-	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
-
-	ROM_REGION(0x44000,"option",0) /* ROM */
-	ROM_DEFAULT_BIOS("mos200")
-	ROM_SYSTEM_BIOS( 0, "mos200", "MOS2.00" )
-	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mos123", "MOS1.23" )
-	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "mos120", "MOS1.20" )
-	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(3))
-	/* rom page 0  00000 */
-	/* rom page 1  04000 */
-	/* rom page 2  08000  32K IN PAGE 3 */
-	/* rom page 3  0c000  SPARE SOCKET */
-	/* rom page 4  10000  32K IN PAGE 5 */
-	/* rom page 5  14000  DDFS */
-	/* rom page 6  18000  32K IN PAGE 7 */
-	/* rom page 7  1c000  ADFS */
-	/* rom page 8  20000  32K IN PAGE 9 */
-	/* rom page 9  24000  SPARE SOCKET */
-	/* rom page 10 28000  32K IN PAGE 11 */
-	/* rom page 11 2c000  SPARE SOCKET */
-	/* rom page 12 30000 */
-	/* rom page 13 34000 */
-	/* rom page 14 38000  32K IN PAGE 15 */
-	/* rom page 15 3C000  BASIC */
-	ROM_LOAD("ddfs223.rom",  0x14000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
-	ROM_LOAD("adfs130.rom",  0x1c000, 0x4000, CRC(d3855588) SHA1(301fd05c475a629c4bec70510d4507256a5b00d8))
-	ROM_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
+	/* rom page 14 38000 */
+	/* rom page 15 3C000  IC71 selectable with link S13 */
+	ROM_LOAD("dnfs120-201666.rom", 0x0c000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
+	ROM_LOAD("acwddfs225.rom", 0x14000, 0x4000, CRC(7d0f9016) SHA1(bdfe44c79e18142d747436627e71a362a04cf746))
+	ROM_LOAD("acwterminal.rom", 0x1c000, 0x4000, CRC(81afaeb9) SHA1(6618ed9158776b4b8aa030957bd19ba77e4a993c))
+	ROM_LOAD("adfs130.rom", 0x24000, 0x4000, CRC(d3855588) SHA1(301fd05c475a629c4bec70510d4507256a5b00d8))
+	ROM_LOAD("basic200.rom", 0x28000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1651,26 +1675,26 @@ ROM_START(bbcm)
 	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(2))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(2))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
-	/* 00000 rom 0   Rear Cartridge bottom 16K */
-	/* 04000 rom 1   Rear Cartridge top 16K */
-	/* 08000 rom 2   Front Cartridge bottom 16K */
-	/* 0c000 rom 3   Front Cartridge top 16K */
-	/* 10000 rom 4   SWRAM */
-	/* 14000 rom 5   SWRAM */
-	/* 18000 rom 6   SWRAM */
-	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   SPARE SOCKET */
-	/* 24000 rom 9   DFS + SRAM */
-	/* 28000 rom 10  Viewsheet */
-	/* 2c000 rom 11  Edit */
-	/* 30000 rom 12  BASIC */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  View + MOS code */
-	/* 3c000 rom 15  Terminal + Tube host + CFS */
-//  ROM_LOAD("anfs424.rom", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) ) // TODO where to load this?
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SWRAM or bottom 16K */
+	/* 14000 rom 5   IC41 SWRAM or top 16K */
+	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
+	/* 1c000 rom 7   IC37 SWRAM or top 16K */
+	/* 20000 rom 8   IC27 ANFS */
+	/* 24000 rom 9   IC24 DFS + SRAM */
+	/* 28000 rom 10  IC24 Viewsheet */
+	/* 2c000 rom 11  IC24 Edit */
+	/* 30000 rom 12  IC24 BASIC */
+	/* 34000 rom 13  IC24 ADFS */
+	/* 38000 rom 14  IC24 View + MOS code */
+	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
+	//ROM_LOAD("anfs424.rom", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1682,43 +1706,8 @@ ROM_START(bbcm)
 ROM_END
 
 
-ROM_START(bbcmt)
-	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
-
-	ROM_REGION(0x44000,"option",0) /* ROM */
-	ROM_DEFAULT_BIOS("mos350")
-	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
-	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(2))
-	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x20000, 0x4000, 0xFFFF)
-	/* 00000 rom 0   Rear Cartridge bottom 16K */
-	/* 04000 rom 1   Rear Cartridge top 16K */
-	/* 08000 rom 2   Front Cartridge bottom 16K */
-	/* 0c000 rom 3   Front Cartridge top 16K */
-	/* 10000 rom 4   SWRAM */
-	/* 14000 rom 5   SWRAM */
-	/* 18000 rom 6   SWRAM */
-	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   SPARE SOCKET */
-	/* 24000 rom 9   DFS + SRAM */
-	/* 28000 rom 10  Viewsheet */
-	/* 2c000 rom 11  Edit */
-	/* 30000 rom 12  BASIC */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  View + MOS code */
-	/* 3c000 rom 15  Terminal + Tube host + CFS */
-//  ROM_LOAD("anfs424.ic27", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) ) // TODO where to load this?
-
-	ROM_REGION(0x4000, "os", 0)
-	ROM_COPY("option", 0x40000, 0, 0x4000)
-
-	ROM_REGION(0x40,"rtc",0) /* mc146818 */
-	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(2))
-ROM_END
+#define rom_bbcmt rom_bbcm
+#define rom_bbcm512 rom_bbcm
 
 
 ROM_START(bbcmaiv)
@@ -1727,25 +1716,25 @@ ROM_START(bbcmaiv)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
-	/* 00000 rom 0   Rear Cartridge bottom 16K */
-	/* 04000 rom 1   Rear Cartridge top 16K */
-	/* 08000 rom 2   Front Cartridge bottom 16K */
-	/* 0c000 rom 3   Front Cartridge top 16K */
-	/* 10000 rom 4   SWRAM */
-	/* 14000 rom 5   SWRAM */
-	/* 18000 rom 6   SWRAM */
-	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   VFS */
-	/* 24000 rom 9   DFS + SRAM */
-	/* 28000 rom 10  Viewsheet */
-	/* 2c000 rom 11  Edit */
-	/* 30000 rom 12  BASIC */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  View + MOS code */
-	/* 3c000 rom 15  Terminal + Tube host + CFS */
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SWRAM or bottom 16K */
+	/* 14000 rom 5   IC41 SWRAM or top 16K */
+	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
+	/* 1c000 rom 7   IC37 SWRAM or top 16K */
+	/* 20000 rom 8   IC27 VFS */
+	/* 24000 rom 9   IC24 DFS + SRAM */
+	/* 28000 rom 10  IC24 Viewsheet */
+	/* 2c000 rom 11  IC24 Edit */
+	/* 30000 rom 12  IC24 BASIC */
+	/* 34000 rom 13  IC24 ADFS */
+	/* 38000 rom 14  IC24 View + MOS code */
+	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
 	ROM_LOAD("vfs170.rom", 0x20000, 0x4000, CRC(b124a0bb) SHA1(ba31c757815cf470402d7829a70a0e1d3fb1355b) )
 
 	ROM_REGION(0x4000, "os", 0)
@@ -1763,26 +1752,26 @@ ROM_START(bbcmet)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos400")
 	ROM_SYSTEM_BIOS( 0, "mos400", "Econet MOS 4.00" )
-	ROMX_LOAD("mos400.ic24", 0x30000, 0x10000, BAD_DUMP CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
+	ROMX_LOAD("mos400.ic24", 0x30000, 0x10000, CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(1))
 	ROM_COPY("option", 0x34000, 0x24000, 0xC000) /* Mirror */
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xFFFF)
-	/* 00000 rom 0   Rear Cartridge bottom 16K */
-	/* 04000 rom 1   Rear Cartridge top 16K */
-	/* 08000 rom 2   Front Cartridge bottom 16K */
-	/* 0c000 rom 3   Front Cartridge top 16K */
-	/* 10000 rom 4   SWRAM */
-	/* 14000 rom 5   SWRAM */
-	/* 18000 rom 6   SWRAM */
-	/* 1c000 rom 7   SWRAM */
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SWRAM or bottom 16K */
+	/* 14000 rom 5   IC41 SWRAM or top 16K */
+	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
+	/* 1c000 rom 7   IC37 SWRAM or top 16K */
 	/* 20000 rom 8   NO SOCKET */
-	/* 24000 rom 9   BASIC */
-	/* 28000 rom 10  ANFS */
-	/* 2c000 rom 11  MOS code */
-	/* 30000 rom 12  UNUSED */
-	/* 34000 rom 13  BASIC */
-	/* 38000 rom 14  ANFS */
-	/* 3c000 rom 15  MOS code */
+	/* 24000 rom 9   IC24 BASIC */
+	/* 28000 rom 10  IC24 ANFS */
+	/* 2c000 rom 11  IC24 MOS code */
+	/* 30000 rom 12  IC24 UNUSED */
+	/* 34000 rom 13  IC24 BASIC */
+	/* 38000 rom 14  IC24 ANFS */
+	/* 3c000 rom 15  IC24 MOS code */
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1793,71 +1782,32 @@ ROM_START(bbcmet)
 ROM_END
 
 
-ROM_START(bbcm512)
-	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
-
-	ROM_REGION(0x44000,"option",0) /* ROM */
-	ROM_DEFAULT_BIOS("mos350")
-	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
-	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(2))
-	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x20000, 0x4000, 0xFFFF)
-	/* 00000 rom 0   Rear Cartridge bottom 16K */
-	/* 04000 rom 1   Rear Cartridge top 16K */
-	/* 08000 rom 2   Front Cartridge bottom 16K */
-	/* 0c000 rom 3   Front Cartridge top 16K */
-	/* 10000 rom 4   SWRAM */
-	/* 14000 rom 5   SWRAM */
-	/* 18000 rom 6   SWRAM */
-	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   SPARE SOCKET */
-	/* 24000 rom 9   DFS + SRAM */
-	/* 28000 rom 10  Viewsheet */
-	/* 2c000 rom 11  Edit */
-	/* 30000 rom 12  BASIC */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  View + MOS code */
-	/* 3c000 rom 15  Terminal + Tube host + CFS */
-//  ROM_LOAD("anfs424.ic27", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) )
-
-	ROM_REGION(0x4000, "os", 0)
-	ROM_COPY("option", 0x40000, 0, 0x4000)
-
-	ROM_REGION(0x40,"rtc",0) /* mc146818 */
-	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(2))
-ROM_END
-
-
 ROM_START(bbcmarm)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
-	/* 00000 rom 0   Rear Cartridge bottom 16K */
-	/* 04000 rom 1   Rear Cartridge top 16K */
-	/* 08000 rom 2   Front Cartridge bottom 16K */
-	/* 0c000 rom 3   Front Cartridge top 16K */
-	/* 10000 rom 4   SWRAM */
-	/* 14000 rom 5   SWRAM */
-	/* 18000 rom 6   SWRAM */
-	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   SPARE SOCKET */
-	/* 24000 rom 9   DFS + SRAM */
-	/* 28000 rom 10  Viewsheet */
-	/* 2c000 rom 11  Edit */
-	/* 30000 rom 12  BASIC */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  View + MOS code */
-	/* 3c000 rom 15  Terminal + Tube host + CFS */
-//  ROM_LOAD("anfs424.ic27", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) )
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SWRAM or bottom 16K */
+	/* 14000 rom 5   IC41 SWRAM or top 16K */
+	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
+	/* 1c000 rom 7   IC37 SWRAM or top 16K */
+	/* 20000 rom 8   IC27 ANFS */
+	/* 24000 rom 9   IC24 DFS + SRAM */
+	/* 28000 rom 10  IC24 Viewsheet */
+	/* 2c000 rom 11  IC24 Edit */
+	/* 30000 rom 12  IC24 BASIC */
+	/* 34000 rom 13  IC24 ADFS */
+	/* 38000 rom 14  IC24 View + MOS code */
+	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
+	//ROM_LOAD("anfs424.rom", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1876,25 +1826,25 @@ ROM_START(bbcmc)
 	ROM_SYSTEM_BIOS( 0, "mos510", "Enhanced MOS 5.10" )
 	ROMX_LOAD("mos510.ic49", 0x30000, 0x10000, BAD_DUMP CRC(9a2a6086) SHA1(094ab37b0b6437c4f1653eaa0602ef102737adb6), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
 	ROM_SYSTEM_BIOS( 1, "mos500", "Original MOS 5.00" )
-	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, BAD_DUMP CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(2)) /* Merged individual ROM bank dumps */
+	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(2))
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
-	/* 08000 rom 2   SPARE SOCKET */
-	/* 0c000 rom 3   SPARE SOCKET */
+	/* 08000 rom 2   IC23 SPARE SOCKET */
+	/* 0c000 rom 3   IC17 SPARE SOCKET */
 	/* 10000 rom 4   SWRAM */
 	/* 14000 rom 5   SWRAM */
 	/* 18000 rom 6   SWRAM */
 	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   SPARE SOCKET */
+	/* 20000 rom 8   IC29 SPARE SOCKET */
 	/* 24000 rom 9   UNUSED */
 	/* 28000 rom 10  UNUSED */
 	/* 2c000 rom 11  UNUSED */
 	/* 30000 rom 12  UNUSED */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  BASIC */
-	/* 3c000 rom 15  Utils */
+	/* 34000 rom 13  IC16 ADFS */
+	/* 38000 rom 14  IC16 BASIC */
+	/* 3c000 rom 15  IC16 Utils */
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1916,20 +1866,20 @@ ROM_START(bbcmc_ar)
 	ROM_FILL(0x30000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
-	/* 08000 rom 2   International */
-	/* 0c000 rom 3   SPARE SOCKET */
+	/* 08000 rom 2   IC23 International */
+	/* 0c000 rom 3   IC17 SPARE SOCKET */
 	/* 10000 rom 4   SWRAM */
 	/* 14000 rom 5   SWRAM */
 	/* 18000 rom 6   SWRAM */
 	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   Arabian */
+	/* 20000 rom 8   IC29 Arabian */
 	/* 24000 rom 9   UNUSED */
 	/* 28000 rom 10  UNUSED */
 	/* 2c000 rom 11  UNUSED */
 	/* 30000 rom 12  UNUSED */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  BASIC */
-	/* 3c000 rom 15  Utils */
+	/* 34000 rom 13  IC16 ADFS */
+	/* 38000 rom 14  IC16 BASIC */
+	/* 3c000 rom 15  IC16 Utils */
 	ROM_LOAD("international16.rom", 0x8000 , 0x4000, CRC(0ef527b1) SHA1(dc5149ccf588cd591a6ad47727474ef3313272ce) )
 	ROM_LOAD("arabian-c22.rom"    , 0x20000, 0x4000, CRC(4f3aadff) SHA1(2bbf61ba68264ce5845aab9c54e750b0efe219c8) )
 
@@ -1953,20 +1903,20 @@ ROM_START(pro128s)
 	ROM_FILL(0x30000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
-	/* 08000 rom 2   SPARE SOCKET */
-	/* 0c000 rom 3   SPARE SOCKET */
+	/* 08000 rom 2   IC23 SPARE SOCKET */
+	/* 0c000 rom 3   IC17 SPARE SOCKET */
 	/* 10000 rom 4   SWRAM */
 	/* 14000 rom 5   SWRAM */
 	/* 18000 rom 6   SWRAM */
 	/* 1c000 rom 7   SWRAM */
-	/* 20000 rom 8   SPARE SOCKET */
+	/* 20000 rom 8   IC29 SPARE SOCKET */
 	/* 24000 rom 9   UNUSED */
 	/* 28000 rom 10  UNUSED */
 	/* 2c000 rom 11  UNUSED */
 	/* 30000 rom 12  UNUSED */
-	/* 34000 rom 13  ADFS */
-	/* 38000 rom 14  BASIC */
-	/* 3c000 rom 15  Utils */
+	/* 34000 rom 13  IC16 ADFS */
+	/* 38000 rom 14  IC16 BASIC */
+	/* 3c000 rom 15  IC16 Utils */
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1979,14 +1929,14 @@ ROM_END
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  CLASS        INIT     COMPANY     FULLNAME                         FLAGS */
 COMP ( 1981, bbcb,     0,        bbca,  bbcb,     bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B w/8271 FDC",  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,     0,     bbca,     bbca,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model A",             MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1981, bbcb_de,  bbcb,     0,     bbcb_de,  bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B (German)",    MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1982, bbcb_de,  bbcb,     0,     bbcb_de,  bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B (German)",    MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1983, bbcb_us,  bbcb,     0,     bbcb_us,  bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B (US)",        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, bbcb1770, bbcb,     0,     bbcb1770, bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B w/1770 FDC",  MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, bbcbp,    0,        bbcb,  bbcbp,    bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 64K",        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, bbcbp128, bbcbp,    0,     bbcbp128, bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 128K",       MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, abc110,   abc210,   0,     abc110,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 110",                       MACHINE_NOT_WORKING)
-COMP ( 1985, abc210,   0,        0,     abc210,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 210/Cambridge Workstation", MACHINE_NOT_WORKING)
-COMP ( 1985, abc310,   abc210,   0,     abc310,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 310",                       MACHINE_NOT_WORKING)
+COMP ( 1984, bbcb1770, bbcb,     0,     bbcb1770, bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B w/1770 FDC",  MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1985, bbcbp,    0,        bbcb,  bbcbp,    bbcbp, bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 64K",        MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1985, bbcbp128, bbcbp,    0,     bbcbp128, bbcbp, bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 128K",       MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1985, acw443,   0,        0,     acw443,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 210/Cambridge Workstation", MACHINE_NOT_WORKING)
+COMP ( 1985, abc110,   acw443,   0,     abc110,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 110",                       MACHINE_NOT_WORKING)
+COMP ( 1985, abc310,   acw443,   0,     abc310,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 310",                       MACHINE_NOT_WORKING)
 COMP ( 1985, reutapm,  0,        0,     reutapm,  bbcb,  bbc_state,   bbc,     "Acorn",    "Reuters APM",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 COMP ( 1986, bbcm,     0,        bbcb,  bbcm,     bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master 128",                MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmt,    bbcm,     0,     bbcmt,    bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master Turbo",              MACHINE_NOT_WORKING)
