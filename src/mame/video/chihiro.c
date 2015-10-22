@@ -2335,6 +2335,8 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 {
 	int m;
 
+	if (what == 0)
+		return;
 	m = antialias_control;
 	if (antialiasing_rendertarget != 0)
 		m = 2;
