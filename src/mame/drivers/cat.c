@@ -513,12 +513,12 @@ public:
 	DECLARE_MACHINE_RESET(cat);
 	DECLARE_VIDEO_START(cat);
 	DECLARE_DRIVER_INIT(cat);
-	DECLARE_MACHINE_START(swyft);
-	DECLARE_MACHINE_RESET(swyft);
-	DECLARE_VIDEO_START(swyft);
+	//DECLARE_MACHINE_START(swyft);
+	//DECLARE_MACHINE_RESET(swyft);
+	//DECLARE_VIDEO_START(swyft);
 
 	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	//UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
@@ -547,9 +547,9 @@ public:
 	DECLARE_READ16_MEMBER(cat_0080_r);
 	DECLARE_READ16_MEMBER(cat_0000_r);
 
-	DECLARE_READ8_MEMBER(swyft_d0000);
+	//DECLARE_READ8_MEMBER(swyft_d0000);
 
-	DECLARE_READ8_MEMBER(swyft_via0_r);
+	/*DECLARE_READ8_MEMBER(swyft_via0_r);
 	DECLARE_WRITE8_MEMBER(swyft_via0_w);
 	DECLARE_READ8_MEMBER(via0_pa_r);
 	DECLARE_WRITE8_MEMBER(via0_pa_w);
@@ -571,7 +571,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_int_w);
 
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);*/
 
 	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
 	   rolls over at FFFF->0000; on roll-over (or likely at FFFF terminal count)
@@ -1136,9 +1136,9 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\xb1') PORT_CHAR('\xb0') // PORT_CHAR('\\') PORT_CHAR('~')
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( swyft )
+//static INPUT_PORTS_START( swyft )
 // insert dwight and sandy's swyft keyboard map here once we figure out the byte line order
-INPUT_PORTS_END
+//INPUT_PORTS_END
 
 
 void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1434,7 +1434,7 @@ A0->D4
 read next stream byte (in this case, 0x03) from address pointed to by A5 (which is CD08), inc A5, OR the opcode (0x03) to D7
 
 */
-
+/*
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 8, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_MIRROR(0xF00000) // 64 KB ROM
@@ -1633,21 +1633,22 @@ WRITE_LINE_MEMBER( cat_state::write_acia_clock )
 	m_acia6850->write_txc(state);
 	m_acia6850->write_rxc(state);
 }
+*/
 
-static MACHINE_CONFIG_START( swyft, cat_state )
+//static MACHINE_CONFIG_START( swyft, cat_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
+	/*MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
 	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,swyft)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,swyft)
-
+*/
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	/*MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(320, 242)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) *//* not accurate */
+	/*MCFG_SCREEN_SIZE(320, 242)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 242-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_swyft)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1681,18 +1682,18 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(cat_state, via1_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cat_state, via1_int_w))
 MACHINE_CONFIG_END
-
+*/
 /* ROM definition */
-ROM_START( swyft )
+/*ROM_START( swyft )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v331", "IAI Swyft Version 331 Firmware")
 	ROMX_LOAD( "331-lo.u30", 0x0000, 0x8000, CRC(d6cc2e2f) SHA1(39ff26c18b1cf589fc48793263f280ef3780cc61), ROM_BIOS(1))
-	ROMX_LOAD( "331-hi.u31", 0x8000, 0x8000, CRC(4677630a) SHA1(8845d702fa8b8e1a08352f4c59d3076cc2e1307e), ROM_BIOS(1))
+	ROMX_LOAD( "331-hi.u31", 0x8000, 0x8000, CRC(4677630a) SHA1(8845d702fa8b8e1a08352f4c59d3076cc2e1307e), ROM_BIOS(1))*/
 	/* this version of the swyft code identifies itself at 0x3FCB as version 330 */
-	ROM_SYSTEM_BIOS( 1, "v330", "IAI Swyft Version 330 Firmware")
+	/*ROM_SYSTEM_BIOS( 1, "v330", "IAI Swyft Version 330 Firmware")
 	ROMX_LOAD( "infoapp.lo.u30", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca), ROM_BIOS(2))
 	ROMX_LOAD( "infoapp.hi.u31", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0), ROM_BIOS(2))
-	ROM_REGION( 0x4000, "pals", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "pals", ROMREGION_ERASEFF )*/
 	/* Swyft PALs:
 	 * The Swyft has four PALs, whose rough function can be derived from their names:
 	 * TIMING - state machine for DRAM refresh/access; handles ras/cas and choosing whether the video out shifter or the 68k is accessing ram. also divides clock
@@ -1725,7 +1726,7 @@ ROM_START( swyft )
 	 * |\----------------->? output? to ram multiplexer 'A' pins
 	 * \------------------< ?
 	 */
-	ROM_LOAD( "timing_b.ampal16r4a.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))
+	//ROM_LOAD( "timing_b.ampal16r4a.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))
 	/* U20: Decode AMPAL16L8
 	 *
 	 * pins:
@@ -1751,10 +1752,10 @@ ROM_START( swyft )
 	 * |\-----------------? goes to j9 connector pin 5
 	 * \------------------< ?
 	 */
-	ROM_LOAD( "decode_e.ampal16l8.u20.jed", 0x1000, 0xb08, CRC(0b1dbd76) SHA1(08c144ad7a7bbdd53eefd271b2f6813f8b3b1594))
-	ROM_LOAD( "video_2b.ampal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
-	ROM_LOAD( "disk_3.5c.ampal16r4.u28.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
-ROM_END
+	//ROM_LOAD( "decode_e.ampal16l8.u20.jed", 0x1000, 0xb08, CRC(0b1dbd76) SHA1(08c144ad7a7bbdd53eefd271b2f6813f8b3b1594))
+	//ROM_LOAD( "video_2b.ampal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
+	//ROM_LOAD( "disk_3.5c.ampal16r4.u28.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
+//ROM_END
 
 ROM_START( cat )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
@@ -1839,5 +1840,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, swyft,0,      0,       swyft,     swyft,   driver_device, 0,       "Information Applicance Inc", "Swyft", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, cat,  swyft,  0,       cat,       cat,     driver_device, 0,       "Canon",  "Cat", MACHINE_NOT_WORKING)
+//COMP( 1985, swyft,0,      0,       swyft,     swyft,   driver_device, 0,       "Information Applicance Inc", "Swyft", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, cat,  0,  0,       cat,       cat,     driver_device, 0,       "Canon",  "Cat", MACHINE_NOT_WORKING)

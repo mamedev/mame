@@ -2723,6 +2723,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/softbox.c",
 	MAME_DIR .. "src/mame/drivers/squale.c",
 	MAME_DIR .. "src/mame/drivers/swtpc.c",
+	MAME_DIR .. "src/mame/drivers/swyft.c",
 	MAME_DIR .. "src/mame/drivers/sys2900.c",
 	MAME_DIR .. "src/mame/drivers/systec.c",
 	MAME_DIR .. "src/mame/drivers/tavernie.c",
