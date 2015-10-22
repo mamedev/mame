@@ -38,7 +38,8 @@ public:
 		m_tia(*this, "tia_video"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_swb(*this, "SWB")
+		m_swb(*this, "SWB"),
+		m_riot(*this,"riot")
 	{ }
 
 	required_shared_ptr<UINT8> m_riot_ram;
@@ -58,6 +59,8 @@ public:
 	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
 	DECLARE_READ8_MEMBER(cart_over_riot_r);
 	DECLARE_WRITE8_MEMBER(cart_over_riot_w);
+	DECLARE_READ8_MEMBER(cart_over_all_r);
+	DECLARE_WRITE8_MEMBER(cart_over_all_w);
 
 protected:
 	required_device<vcs_control_port_device> m_joy1;
@@ -69,6 +72,7 @@ protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_ioport m_swb;
+	required_device<mos6532_t> m_riot;
 };
 
 
@@ -87,6 +91,71 @@ static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
 	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVICE("riot", mos6532_t, io_map)
 	// AM_RANGE(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
 ADDRESS_MAP_END
+
+
+READ8_MEMBER(a2600_state::cart_over_all_r)
+{
+	if (!space.debugger_access())
+		m_cart->write_bank(space, offset, 0);
+
+	int masked_offset = offset &~ 0x0d00;
+	UINT8 ret = 0x00;
+
+	if (masked_offset < 0x80)
+	{
+		ret = m_tia->read(space, masked_offset&0x7f);
+	}
+	else if (masked_offset < 0x100)
+	{
+		ret = m_riot_ram[masked_offset & 0x7f];
+	}
+	/* 0x100 - 0x1ff already masked out */
+	else if (masked_offset < 0x280)
+	{
+		ret = m_tia->read(space, masked_offset&0x7f);
+	}
+	else if (masked_offset < 0x2a0)
+	{
+		ret = m_riot->io_r(space, masked_offset);
+	}
+	else if (masked_offset < 0x300)
+	{
+		/* 0x2a0 - 0x2ff nothing? */
+	}
+	/* 0x300 - 0x3ff already masked out */
+
+	return ret;
+}
+
+WRITE8_MEMBER(a2600_state::cart_over_all_w)
+{
+	m_cart->write_bank(space, offset, 0);
+
+	int masked_offset = offset &~ 0x0d00;
+
+	if (masked_offset < 0x80)
+	{
+		m_tia->write(space, masked_offset & 0x7f, data);
+	}
+	else if (masked_offset < 0x100)
+	{
+		m_riot_ram[masked_offset & 0x7f] = data;
+	}
+	/* 0x100 - 0x1ff already masked out */
+	else if (masked_offset < 0x280)
+	{
+		m_tia->write(space, masked_offset & 0x7f, data);
+	}
+	else if (masked_offset < 0x2a0)
+	{
+		m_riot->io_w(space, masked_offset, data);
+	}
+	else if (masked_offset < 0x300)
+	{
+		/* 0x2a0 - 0x2ff nothing? */
+	}
+	/* 0x300 - 0x3ff already masked out */
+}
 
 WRITE8_MEMBER(a2600_state::switch_A_w)
 {
@@ -317,6 +386,11 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 		case A26_CM:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
 			break;
+		case A26_X07:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(a2600_state::cart_over_all_r), this), write8_delegate(FUNC(a2600_state::cart_over_all_w), this));
+
+			break;
 	}
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
@@ -450,6 +524,7 @@ static SLOT_INTERFACE_START(a2600_cart)
 	SLOT_INTERFACE_INTERNAL("a26_4in1",  A26_ROM_4IN1)
 	SLOT_INTERFACE_INTERNAL("a26_8in1",  A26_ROM_8IN1)
 	SLOT_INTERFACE_INTERNAL("a26_32in1", A26_ROM_32IN1)
+	SLOT_INTERFACE_INTERNAL("a26_x07",    A26_ROM_X07)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)

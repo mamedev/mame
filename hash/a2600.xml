@@ -17940,4 +17940,18 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
+
+  <!-- The AtariAge logo looks incorrect, but games function, there are probably other version too, YouTube shows a 2007 version. -->
+	<software name="stelstok">
+		<description>Stella's Stocking 2008</description>
+		<year>2008</year>
+		<publisher>AtariAge</publisher>
+    <sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_x07" />
+			<dataarea name="rom" size="65536">
+				<rom name="m27c512.bin" size="65536" crc="c1da7d3b" sha1="4d9c06940754ba03e2eca2d88ea4201b8d9e7805" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
 </softwarelist>
