@@ -72,7 +72,11 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 		m_pf_data(NULL),
 		m_pf_rowscroll(NULL),
 		m_pf_colscroll(NULL),
-		m_tile_region(0),
+		m_tile_region_8(0),
+		m_tile_region_16(0),
+		m_supports_8x8(true),
+		m_supports_16x16(true),
+		m_supports_rc_scroll(true),
 		m_gfxcolmask(0),
 		m_rambank(0),
 		m_gfxregion8x8(0),
@@ -171,7 +175,7 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(m_tile_region,tile&0xfff,0,0);
+	SET_TILE_INFO_MEMBER(m_tile_region_8,tile&0xfff,0,0);
 	tileinfo.category = colourpri;
 }
 
@@ -180,19 +184,19 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf16x16_tile_info)
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(m_tile_region,tile&0xfff,0,0);
+	SET_TILE_INFO_MEMBER(m_tile_region_16,tile&0xfff,0,0);
 	tileinfo.category = colourpri;
 }
 
 void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 {
-	m_tile_region = region8x8;
+	m_tile_region_8 = region8x8;
+	m_tile_region_16 = region16x16;
 
 	m_pf8x8_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_8x8_scan),this), 8, 8,128, 32);
 	m_pf8x8_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_8x8_scan),this), 8, 8, 64, 64);
 	m_pf8x8_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_8x8_scan),this), 8, 8, 32,128);
 
-	m_tile_region = region16x16;
 
 	if (m_wide==2)
 	{
@@ -246,10 +250,13 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	int row_scroll_enabled = 0;
 	int col_scroll_enabled = 0;
 
-	if (control0)
+	if (m_supports_rc_scroll)
 	{
-		row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
-		col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
+		if (control0)
+		{
+			row_scroll_enabled = (rowscroll_ptr && (control0[0] & 0x4));
+			col_scroll_enabled = (colscroll_ptr && (control0[0] & 0x8));
+		}
 	}
 
 	width_mask = src_bitmap.width() - 1;
@@ -310,29 +317,31 @@ void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle 
 {
 	tilemap_t* tm = 0;
 
-	switch (m_pf_control_0[3]&0x3) {
-		case 0: /* 4x1 */
-			if (m_pf_control_0[0]&0x1)
-				tm = m_pf8x8_tilemap[0];
-			else
-				tm = m_pf16x16_tilemap[0];
-			break;
+	int tm_dimensions = m_pf_control_0[3] & 0x3;
+	if (tm_dimensions == 3) tm_dimensions = 1; // 3 is invalid / the same as 1?
 
-		case 1: /* 2x2 */
-		default:
-			if (m_pf_control_0[0]&0x1)
-				tm = m_pf8x8_tilemap[1];
-			else
-				tm = m_pf16x16_tilemap[1];
-			break;
-
-		case 2: /* 1x4 */
-			if (m_pf_control_0[0]&0x1)
-				tm = m_pf8x8_tilemap[2];
-			else
-				tm = m_pf16x16_tilemap[2];
-			break;
-	};
+	if (m_pf_control_0[0]&0x1) // is 8x8 tiles mode selected?
+	{
+		if (m_supports_8x8)
+		{
+			tm = m_pf8x8_tilemap[tm_dimensions];
+		}
+		else if (m_supports_16x16)
+		{
+			tm = m_pf16x16_tilemap[tm_dimensions];
+		}
+	}
+	else // 16x16 tiles mode is selected
+	{
+		if (m_supports_16x16)
+		{
+			tm = m_pf16x16_tilemap[tm_dimensions];
+		}
+		else if (m_supports_8x8)
+		{
+			tm = m_pf8x8_tilemap[tm_dimensions];
+		}
+	}
 
 	if (tm)
 		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll,m_pf_colscroll,m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
