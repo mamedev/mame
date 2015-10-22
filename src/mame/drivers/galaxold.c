@@ -2762,21 +2762,11 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spcwarp, galaxold_base )
+static MACHINE_CONFIG_DERIVED( spcwarp, hunchbkg )
 	/* hunchbkg but with different banking */
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
-
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spcwarp)
-	MCFG_CPU_IO_MAP(hunchbkg_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
-
-	MCFG_DEVICE_MODIFY("7474_9m_1")
-	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", s2650_device, write_sense))
-
-	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
-
-	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
 
@@ -3489,15 +3479,19 @@ ROM_START( hunchbkg )
 ROM_END
 
 ROM_START( spcwarp )
-	// unknown Century Electronics space shooter which involves shooting down enemy ships to use them yourself for increasing rate of fire
-	// came out of an undumped ROMS collection - we have no idea if this is Space Warp but it's a unique dump compared to everything else.
+	// conversion of 'cosmos' (cvs.c) to Galaxian hardware
+	// notes: 
+	// -came out of an unemulated games collection - may or may not be actually spcwarp but it's unique
+	// -uses hunchbkg hardware with a different map
+	// -the game likely calls a checksum check every 10 frames, causes game to freeze (probably because of bad ROM)
+	// -so far using hunchbkg inputs work
+	// -text in ROM confirms year of release and company; ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
 	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
-	/* missing rom at $4000? todo: check valid calls */
 	ROM_LOAD( "swarpt7m.bin", 0x6000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) ) /* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) // gfx are very similar to 'cosmos'
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
 	ROM_LOAD( "swarpb1k.bin", 0x0800, 0x0800, CRC(da4cee6b) SHA1(28b91381658f598fa62049489beee443232825c6) )
 
@@ -3789,7 +3783,7 @@ GAME( 1981, froggerv,  frogger,  videotron, froggerv,  driver_device,  0,       
 /* S2650 games */
 //    YEAR  NAME       PARENT    MACHINE    INPUT      INIT                       ROT     COMPANY, FULLNAME, FLAGS, LAYOUT
 GAME( 1983, hunchbkg,  hunchbak, hunchbkg,  hunchbkg,  driver_device,  0,         ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  driver_device,  0,         ROT90,  "Century Electronics", "Space Warp?",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // bad dump
+GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  driver_device,  0,         ROT90,  "Century Electronics", "Space Warp? (Cosmos conversion on Galaxian hardware)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // bad dump
 GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  driver_device,  0,         ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  driver_device,  0,         ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  driver_device,  0,         ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", MACHINE_SUPPORTS_SAVE )

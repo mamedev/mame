@@ -36,6 +36,19 @@ const rom_entry *mm1_keyboard_t::device_rom_region() const
 	return ROM_NAME( mm1_keyboard );
 }
 
+//-------------------------------------------------
+//  sampled sounds from MM1 keyboard beeper
+//-------------------------------------------------
+
+static const char *const mm1_kb_sample_names[] =
+{
+	"*MM1_keyboard",
+	"beep",			// beep at 2.6 kHz
+	"power_switch", // not actually on the keyboard, but close enough :)
+	0
+};
+
+bool mm1_keyboard_t::first_time = true;
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( mm1_keyboard )
@@ -43,8 +56,10 @@ const rom_entry *mm1_keyboard_t::device_rom_region() const
 
 static MACHINE_CONFIG_FRAGMENT( mm1_keyboard )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("keyboard_and_chassis_sounds", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(mm1_kb_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_CONFIG_END
 
 
@@ -193,7 +208,7 @@ ioport_constructor mm1_keyboard_t::device_input_ports() const
 mm1_keyboard_t::mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MM1_KEYBOARD, "MikroMikko 1 keyboard", tag, owner, clock, "mm1kb", __FILE__),
 	m_write_kbst(*this),
-	m_speaker(*this, "speaker"),
+	m_samples(*this, "keyboard_and_chassis_sounds"),
 	m_rom(*this, "keyboard"),
 	m_y0(*this, "Y0"),
 	m_y1(*this, "Y1"),
@@ -212,6 +227,10 @@ mm1_keyboard_t::mm1_keyboard_t(const machine_config &mconfig, const char *tag, d
 {
 }
 
+enum
+{
+	SCAN_TIMER,
+};
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -223,8 +242,11 @@ void mm1_keyboard_t::device_start()
 	m_write_kbst.resolve_safe();
 
 	// allocate timers
-	m_scan_timer = timer_alloc();
+	m_scan_timer = timer_alloc(SCAN_TIMER);
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+
+	// add notification request for system shut down (to play back the power switch sound once more)
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(mm1_keyboard_t::shut_down_mm1), this));
 
 	// state saving
 	save_item(NAME(m_sense));
@@ -232,6 +254,10 @@ void mm1_keyboard_t::device_start()
 	save_item(NAME(m_data));
 }
 
+void mm1_keyboard_t::shut_down_mm1()
+{
+	m_samples->start(1, 1); // pretty useless this, as far as there is no way to delay the shut down process...
+}
 
 //-------------------------------------------------
 //  device_timer - handler timer events
@@ -239,6 +265,7 @@ void mm1_keyboard_t::device_start()
 
 void mm1_keyboard_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	// handle scan timer
 	UINT8 data = 0xff;
 
 	switch (m_drive)

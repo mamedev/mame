@@ -1140,6 +1140,11 @@ void amstrad_state::amstrad_setLowerRom()
 		}
 		m_bank1->set_base(bank_base);
 		m_bank2->set_base(bank_base+0x02000);
+		if ((m_gate_array.mrer & (1<<2)) == 0 && m_gate_array.romdis == 0)
+		{
+			if (m_exp)
+				m_exp->set_mapping(MAP_LOWER);
+		}
 	}
 	else  // CPC+/GX4000
 	{
@@ -1204,6 +1209,8 @@ void amstrad_state::amstrad_setLowerRom()
 			{
 				m_bank1->set_base(m_region_cart->base());
 				m_bank2->set_base(m_region_cart->base() + 0x2000);
+				if (m_exp)
+					m_exp->set_mapping(MAP_LOWER);
 			}
 		}
 	}
@@ -1235,6 +1242,12 @@ void amstrad_state::amstrad_setUpperRom()
 		m_bank7->set_base(bank_base);
 		m_bank8->set_base(bank_base+0x2000);
 	}
+	if ( ! ( m_gate_array.mrer & 0x08 ) && m_gate_array.romdis == 0)
+	{
+		if (m_exp)
+			m_exp->set_mapping(MAP_UPPER);
+	}
+
 }
 
 
@@ -1660,12 +1673,11 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		/* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */
 		if (m_exp)
 		{
-			if((dataToGateArray & 0x0c) != 0)
+			if((dataToGateArray & 0x0c) != 0x0c)
 				m_exp->romen_w(0);  // active low
 			else
 				m_exp->romen_w(1);
 		}
-
 		amstrad_setLowerRom();
 		amstrad_setUpperRom();
 
@@ -2396,7 +2408,7 @@ void amstrad_state::amstrad_rethinkMemory()
 
 	/* mappings for other expansion devices */
 	if (m_exp)
-		m_exp->set_mapping();
+		m_exp->set_mapping(MAP_OTHER);
 }
 
 
@@ -2952,7 +2964,7 @@ void amstrad_state::amstrad_common_init()
 	m_gate_array.hsync = 0;
 	m_GateArray_RamConfiguration = 0;
 	m_gate_array.hsync_counter = 2;
-
+	AmstradCPC_GA_SetRamConfiguration();
 /*  space.install_read_bank(0x0000, 0x1fff, "bank1");
     space.install_read_bank(0x2000, 0x3fff, "bank2");
 
