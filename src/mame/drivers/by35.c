@@ -1183,34 +1183,6 @@ ROM_START(playboy)
 	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
-#if 0
-/*--------------------------------
-/ Playboy #1116
-/-------------------------------*/
-ROM_START(playboyd10)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD( "743-14_1.716",    0x1000, 0x0800, CRC(5c40984a) SHA1(dea104242fcb6d604faa0f01f087bc58bd43cd9d))
-	ROM_LOAD( "743-12_2.716",    0x5000, 0x0800, CRC(6fa66664) SHA1(4943220942ce74d4620eb5fbbab8f8a763f65a2e))
-	ROM_LOAD( "7-3032-d10un.u6", 0x1800, 0x0800, CRC(03344105) SHA1(78fd822854a0843ef0e73e261716b15da07ae3b8))
-	ROM_CONTINUE( 0x5800, 0x0800 )
-	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x0020, "sound1", 0)
-	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
-ROM_END
-/*--------------------------------
-/ Playboy #1116
-/-------------------------------*/
-ROM_START(playboy7d)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD( "743-14_1.716",    0x1000, 0x0800, CRC(5c40984a) SHA1(dea104242fcb6d604faa0f01f087bc58bd43cd9d))
-	ROM_LOAD( "743-12_2.716",    0x5000, 0x0800, CRC(6fa66664) SHA1(4943220942ce74d4620eb5fbbab8f8a763f65a2e))
-	ROM_LOAD( "7-3032-d7un.n6",  0x1800, 0x0800, CRC(c0fc5342) SHA1(0511162ac54e1c630c7460cec7311bc928baf656))
-	ROM_CONTINUE( 0x5800, 0x0800 )
-	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x0020, "sound1", 0)
-	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
-ROM_END
-#endif
 
 /*--------------------------------
 / Lost World #1119
