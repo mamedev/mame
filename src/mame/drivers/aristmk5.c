@@ -648,7 +648,7 @@ ROM_START( margmgc )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( adonis )
+ROM_START( adonis )	// NSW/ACT 602/9 revision 10
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200751v.u7",  0x000000, 0x80000, CRC(ab386ab0) SHA1(56c5baea4272866a9fe18bdc371a49f155251f86) )
 	ROM_LOAD32_WORD( "0200751v.u11", 0x000002, 0x80000, CRC(ce8c8449) SHA1(9894f0286f27147dcc437e4406870fe695a6f61a) )
@@ -660,6 +660,13 @@ ROM_START( adonis )
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0005, "plds", 0 )
+	ROM_LOAD( "gal20v8b.u22", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal16v8d.u23", 0x0000, 0x0001, NO_DUMP ) /* 20-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal16v8d.u24", 0x0000, 0x0001, NO_DUMP ) /* 20-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal20v8b.u36", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal20v8b.u65", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
 ROM_END
 
 ROM_START( adonisa )	// NSW/ACT 602/9 revision 9
