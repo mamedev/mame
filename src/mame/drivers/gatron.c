@@ -7,9 +7,9 @@
 
   Games running on this hardware:
 
-  * Poker 4-1,  1983, Game-A-Tron.
-  * Pull Tabs,  1983, Game-A-Tron.
-  * Bingo,      1983, Game-A-Tron.
+  * Four In One Poker,  1983, Game-A-Tron.
+  * Pull Tabs,          1983, Game-A-Tron.
+  * Bingo,              1983, Game-A-Tron.
 
 
 *****************************************************************************************
@@ -65,7 +65,8 @@
 
 
   Identified the unknown writes as a init sequence for 1x PSG sound device.
-  The type/class is unknown due to almost all devices are plastic covered.
+  Is a SN76489/496 family device, and can't be identified accurately due to
+  almost all devices are plastic covered.
 
 
   * PCB 3: BINGO.
@@ -132,10 +133,10 @@
   You must to RESET (F3) the machine to initialize the NVRAM properly.
 
   NOTE: These games are intended to be for amusement only.
-  There is not such a payout system, so...Dont ask about it!
+  There is not such a payout system, so... Dont ask about it!
 
 
-  * Four in One Poker:
+  * Four In One Poker:
 
   Pressing SERVICE 1 (key 9) you enter the Test/Settings Mode. You can test
   inputs there, and change all the game settings. Press "DISCARD 1" (key Z)
@@ -185,6 +186,30 @@
   Press "SUPER STAR TICKET" (key Z) to play with Super Star (left) Ticket.
   Press "LADY LUCK TICKET" (key X) to play with Lady Luck (center) Ticket.
   Press "BIG BAR TICKET" (key C) to play with Big Bar (right) Ticket.
+
+  A curiosity...
+  
+  The Pull Tabs flyer shows the following paytable:
+
+  - Super Star -      - Lady Luck -         - Big Bar -
+   3x Stars  75     3x Oranges     100     3x Bars     75
+   3x Hearts  8     3x Watermelons  25     3x Cherries 10
+   3x Cups    4     3x Horseshoes   10     3x Pears     6
+   3x Clubs   3     3x Licquors      5     3x Plums     4
+   3x Crowns  1     3x Bells         2     3x Bananas   2
+
+  ...but the game seems to have inverted objects importance:
+ 
+  - Super Star -      - Lady Luck -         - Big Bar -
+   3x Crowns 75     3x Bells       100     3x Bananas  75
+   3x Clubs   8     3x Licquors     25     3x Plums    10
+   3x Cups    4     3x Horseshoes   10     3x Pears     6
+   3x Hearts  3     3x Watermelons   5     3x Cherries  4
+   3x Stars   1     3x Oranges       2     3x Bars      2
+ 
+  Can't get an input or combination of them that change this logic.
+  Maybe the paytable is different in this set, or just the flyer doesn't
+  reflect the real thing.
 
 
   * Bingo:
@@ -244,10 +269,17 @@
 
   DRIVER UPDATES:
 
+  [2015-10-22]
+  - Added siren/alarm input to Pull Tabs, and beeps/alarm input
+     to Four In One Poker. All these are present in the Test Mode.
+     However, their functions aren't clear.
+  - Switched the PSG to SN76489, since it's present in the Bingo PCB.
+  - Added technical notes and more documentation.
+
   [2014-02-04]
   - Added Bingo (1983). PCB seems bootleg, but the game looks legit.
   - Worked from the scratch a whole set of inputs and button-lamps support for this game.
-  - Changed the poker41 description to Four in One Poker (as seen in the official brochure).
+  - Changed the poker41 description to Four In One Poker (as seen in the official brochure).
   - Added game and technical notes.
 
   [2008-10-14]
@@ -415,7 +447,7 @@ static ADDRESS_MAP_START( gat_map, AS_PROGRAM, 8, gatron_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")                          /* battery backed RAM */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76496_device, write)       /* PSG */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76489_device, write)       /* PSG */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)                         /* lamps */
 ADDRESS_MAP_END
 
@@ -434,17 +466,17 @@ static INPUT_PORTS_START( poker41 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Bet / Ante")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Hit")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Free Bonus Draw / Stand")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Start")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5 / High / Double Down")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )     PORT_NAME("Service 3 (Trigger bips/alarm in Test Mode)") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_NAME("Service 2 (Test Mode Out / Coin Stuck)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Payout? */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* Payout? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service 1 (Test/Settings)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -454,16 +486,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pulltabs )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ante") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Ante") PORT_CODE(KEYCODE_1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(2) /* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_IMPULSE(2) /* Coin A */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Big Bar Ticket") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Lady Luck Ticket") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Big Bar Ticket") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Lady Luck Ticket") PORT_CODE(KEYCODE_X)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service 3 (Trigger siren/alarm in Test Mode)") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Service 2 (Test Mode Out / Coin Stuck)") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -478,14 +510,14 @@ static INPUT_PORTS_START( bingo )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ante") PORT_CODE(KEYCODE_1)                // bet/ante
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Change Game / High") PORT_CODE(KEYCODE_C)  // change game (lucky game X-L-T-C-N-U) / change values in settings.
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(2)                                        // coin in
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)                                       // coin in
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Change Card / Low")  PORT_CODE(KEYCODE_Z)  // change card / move down in settings
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Start") PORT_CODE(KEYCODE_X)               // start
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service 3 (Trigger beeps in Test Mode)") PORT_CODE(KEYCODE_8) // beeps in test-settings mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service 3 (Trigger beeps/alarm in Test Mode)") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Service 2 (Test Mode Out / Coin Stuck)") PORT_CODE(KEYCODE_0) // exit test-settings mode
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -557,7 +589,7 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8 )   /* 2 MHz, guess */
+	MCFG_SOUND_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
@@ -603,6 +635,6 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME      PARENT  MACHINE  INPUT      STATE           INIT  ROT    COMPANY         FULLNAME             FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,   driver_device,  0,    ROT0, "Game-A-Tron",  "Four in One Poker",  0,     layout_poker41  )
+GAMEL( 1983, poker41,  0,      gat,     poker41,   driver_device,  0,    ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
 GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  driver_device,  0,    ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
 GAMEL( 1983, bingo,    0,      gat,     bingo,     driver_device,  0,    ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )
