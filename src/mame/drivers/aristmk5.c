@@ -1,19 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Palindrome
-/*
+/****************************************************************************************************************
 
     Aristocrat MK5 / MKV hardware
     possibly 'Acorn Archimedes on a chip' hardware
 
     Note: ARM250 mapping is not identical to plain AA
 
-    BIOS ROMs are actually nowhere to be found on a regular MK5 system. They can be used to change the system configurations on a PCB board
-    by swapping them with the game ROMs u7/u11 locations.
+    BIOS ROMs are actually nowhere to be found on a regular MK5 system. They can be used
+    to change the system configurations on a PCB board by swapping them with the game ROMs
+    u7/u11 locations.
 
     TODO (MK-5 specific):
     - Fix remaining errors
     - If all tests passes, this msg is printed on the keyboard serial port:
-    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n Unrecoverable error occurred. System will now restart"
+    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n
+    Unrecoverable error occurred. System will now restart"
     Apparently it looks like some sort of protection device ...
 
     code DASMing of POST (adonis):
@@ -49,15 +51,115 @@
         bp 3400640: checks 2MByte DRAM
             - writes from 0x1000 to 0x100000, with 0x400 bytes index increment and 0xfb data increment
             - writes from 0x100000 to 0x200000, with 0x400 bytes index increment and 0xfb data increment
-            - bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check at 0x1000, it returns the
-              value that actually should be at 0x141000)
+            - bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check
+              at 0x1000, it returns the value that actually should be at 0x141000)
         bp 340064c: if R0 == 0 2MB DRAM is ok, otherwise there's an error
 
     set chip (BIOS):
         same as goldprmd (serial + ext video crystal check)
         bp 3400110: External Video Crystal test
 
-*/
+*****************************************************************************************************************
+
+  MKV Mainboard. PCB Layout:
+
+  +--------------------------------------------------------------------------------------------------------+
+  |   |    96-pin male connector     |  |    96-pin male connector     |  |    96-pin male connector     | |
+  |   +------------------------------+  +------------------------------+  +------------------------------+ |
+  |            +---+       +--+                                                          +---+ +---+ +---+ |
+  +-+          |VR1|       |  |U89              +------+        +------+                 |AA | |AB | |AC | |
+  | |          |   |       |  |                 |AMP   |        |U35   |                 +---+ +---+ +---+ |
+  |S|          |   |       |  |                 +------+        +------+                 +---+ +---+ +---+ |
+  |I|          +---+       +--+ +--+                                                     |U46| |U21| |U66| |
+  |M|                           |  |U52                  ARISTOCRAT                      +---+ +---+ +---+ |
+  |M|                    +----+ |  |                     MKV S2 MAINBOARD                   +------------+ |
+  | |    +---------+     |U47 | |  |                     PCB 0801-410091                    | 3V BATTERY | |
+  |S|    |U72      |     +----+ +--+                     ASSY 2501-410389                   |            | |
+  |O|    |         |       +-----+                       ISSUE A01                          +------------+ |
+  |C|    |         |       |U23  |                                                                  +----+ |
+  |K|    |         |       |     |                                                                  |U53 | |
+  |E|    +---------+       +-----+       +------------+                                             +----+ |
+  |T|                                    |U85         |    +----+ +----+ +--+ +--+ +----+ +----+ +--+ +--+ |
+  | |    +---------+                     |            |    |U58 | |U54 | |U | |U | |U59 | |U61 | |U | |U | |
+  | |    |U71      |                     |    CPU     |    +----+ +----+ |1 | |4 | +----+ +----+ |1 | |4 | |
+  | |    |         |                     |            |           +----+ |4 | |8 |  +------+     |5 | |9 | |
+  | |    |         |  +-----+            |            |           |U56 | |9 | |  |  |U36   |     |2 | |  | |
+  | |    |         |  |U65  |            |            |           +----+ +--+ +--+  |      |     +--+ +--+ |
+  | |    +---------+  |     |            +------------+                             +------+               |
+  | |                 +-----+     +-----+ +---+                                                            |
+  +-+    +---+                    |U73  | |X2 |                    +----------------+   +----------------+ |
+  |      |U26|                    |     | +---+   +---+            |U14             |   |U10             | |
+  |      +---+                    +-----+         |U50|            |                |   |                | |
+  |      |U27|                       +-----+      +---+            +----------------+   +----------------+ |
+  |      +---+                       |U5   |      |U40|            |U13             |   |U9              | |
+  |                                  |     |      +---+            |                |   |                | |
+  |                                  +-----+      |U41|            +----------------+   +----------------+ |
+  |                                               +---+            |U12             |   |U8              | |
+  |          +---+                                                 |                |   |                | |
+  |          |VR2|                         +-----+         +-----+ +----------------+   +----------------+ |
+  |          |   |                         |U24  |         |U22  | |U11             |   |U7              | |
+  |          |   |                         |     |         |     | |                |   |                | |
+  |          |   |                         +-----+         +-----+ +----------------+   +----------------+ |
+  |          +---+                                            +----------------------------------+         |
+  |                                                           |     96-pin female connector      |         |
+  +--------------------------------------------------------------------------------------------------------+
+
+  U5: 48 MHz crystal (unpopulated from factory).
+
+  U7:  27C4096 ROM socket (bank 0).
+  U8:  27C4096 ROM socket (bank 1).
+  U9:  27C4096 ROM socket (bank 2).
+  U10: 27C4096 ROM socket (bank 3).
+
+  U11: 27C4096 ROM socket (bank 0).
+  U12: 27C4096 ROM socket (bank 1).
+  U13: 27C4096 ROM socket (bank 2).
+  U14: 27C4096 ROM socket (bank 3).
+
+  U21: NEC D43256BGU-70LL (32k x 8bit CMOS Static RAM).
+  U22: LATTICE GAL20V8B-15LJ (High Performance E2CMOS PLD Generic Array Logic, 28-Lead PLCC).
+  U23: LATTICE GAL16V8D-25LJ (High Performance E2CMOS PLD Generic Array Logic, 20-Lead PLCC).
+  U24: LATTICE GAL16V8D-25LJ (High Performance E2CMOS PLD Generic Array Logic, 20-Lead PLCC).
+  U26: SGS THOMSON ST93C46 (1K (64 x 16 or 128 x 8) Serial EEPROM).
+  U27: SGS THOMSON ST93C46 (1K (64 x 16 or 128 x 8) Serial EEPROM).
+
+  U35: PHILIPS 74HC2...
+  U36: LATTICE GAL20V8B-15LJ (High Performance E2CMOS PLD Generic Array Logic, 28-Lead PLCC).
+  U40: Dallas Semiconductor DS1202S (Serial Timekeeping Chip).
+  U41: Maxim Integrated MAX705CSA (MPU Supervisory Circuits).
+  U46: NEC D43256BGU-70LL (32k x 8bit CMOS Static RAM).
+  U47: Maxim Integrated MAX202CWE (RS-232 Interface IC).
+  U48: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+  U49: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+  U50: Dallas Semiconductor DS1620 (Digital Thermometer and Thermostat).
+  U52: Allegro MicroSystems UDN2543B (Protected quad power driver).
+  U53: SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  U54: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U56: SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  U58: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U59: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U61: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U65: LATTICE GAL20V8B-15LJ (High Performance E2CMOS PLD Generic Array Logic, 28-Lead PLCC).
+  U66: NEC D43256BGU-70LL (32k x 8bit CMOS Static RAM).
+  U71: Texas Instruments TL16C452FN (UART Interface IC Dual UART w/Prl Port & w/o FIFO).
+  U72: Texas Instruments TL16C452FN (UART Interface IC Dual UART w/Prl Port & w/o FIFO).
+  U73: CX0826 72 MHz crystal.
+  U89: Allegro MicroSystems UDN2543B (Protected quad power driver).
+  U149: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+  U152: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+
+  AA:  SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  AB:  SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  AC:  PHILIPS 74HC245D (Octal bus transceiver, 3-state).
+
+  AMP: TDA 2006 (12W Audio Amplifier).
+
+  VR1: Motorola 7805 (3-Terminal 1A Positive Voltage Regulator).
+  VR2: SGS THOMSON L4975A (5A stepdown monolithic power switching regulator at 5.1V-40V).
+
+  X2:  Unpopulated crystal (from factory).
+
+*****************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/arm/arm.h"
