@@ -1183,6 +1183,7 @@ ROM_START(playboy)
 	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
+#if 0
 /*--------------------------------
 / Playboy #1116
 /-------------------------------*/
@@ -1209,6 +1210,7 @@ ROM_START(playboy7d)
 	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
+#endif
 
 /*--------------------------------
 / Lost World #1119
