@@ -863,6 +863,23 @@ ROM_START( goldprmd )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// MV4104  3,5,10,20,25,50 Credit Multiplier / 9-20 Line Multiline 
+// CUCKOO   Export  C - 02/02/00
+ROM_START( cuckoo )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u7",  0x000000, 0x80000, CRC(0bd17338) SHA1(b8f467bdf8d76533a2b7d44fe93be414f25a3c31) )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u11", 0x000002, 0x80000, CRC(4c407deb) SHA1(57589e61a376ddff99cd420eb47bf8c902c6a249) )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u8",  0x100000, 0x80000, CRC(33f52052) SHA1(89cbfe588d91244adff4c520fa94962d69ff20bf) )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u12", 0x100002, 0x80000, CRC(00bb7597) SHA1(f4d6b21091e320a82d59477469340633b001ed0d) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 ROM_START( magicmsk )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -893,6 +910,7 @@ GAME( 1998, adonisa,  adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5
 GAME( 1998, reelrock, 0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628,    A - 13/07/98
 GAME( 1998, indiandr, 0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (0100845V, Local)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628/1,  B - 15/12/98
 GAME( 1999, wtiger,   0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 638/1,  B - 08/07/99
+GAME( 2000, cuckoo,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Cuckoo (MV4104, Export)",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4104, C - 02/02/2000
 GAME( 2000, magicmsk, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export)",                          MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115, A - 09/05/2000
 GAME( 2000, margmgc,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // JB005,  A - 07/07/2000
 GAME( 2001, geishanz, 0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4127, A - 05/03/01
