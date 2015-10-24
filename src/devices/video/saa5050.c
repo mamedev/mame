@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Nigel Barnes
 /**********************************************************************
 
     Mullard SAA5050 Teletext Character Generator emulation
@@ -12,7 +12,6 @@
 
     TODO:
 
-    - character rounding
     - remote controller input
     - boxing
 
@@ -40,8 +39,8 @@ const device_type SAA5057 = &device_creator<saa5057_device>;
 //-------------------------------------------------
 
 ROM_START( saa5050 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5050", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5050", 0x0140, 0x03c0, BAD_DUMP CRC(6298fc0b) SHA1(ae38e7f51dd33733bacfa896425ca105682b31d6))
 ROM_END
 
 
@@ -50,8 +49,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5051 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5051", 0x0140, 0x08c0, NO_DUMP )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5051", 0x0140, 0x03c0, BAD_DUMP CRC(a770611c) SHA1(9ab9d24b845fe2964fba2f4770d54025d2c8026a))
 ROM_END
 
 
@@ -60,8 +59,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5052 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5052", 0x0140, 0x08c0, BAD_DUMP CRC(cda3bf79) SHA1(cf5ea94459c09001d422dadc212bc970b4b4aa20) )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5052", 0x0140, 0x03c0, BAD_DUMP CRC(2eb76737) SHA1(ec4bc515e28e851a6433f7ca0a11ede0f1d21a68))
 ROM_END
 
 
@@ -70,8 +69,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5053 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5053", 0x0140, 0x08c0, NO_DUMP )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5053", 0x0140, 0x03c0, BAD_DUMP CRC(46288c33) SHA1(1e471a1b5670d7163e9f62d31be7cab0330a07cd))
 ROM_END
 
 
@@ -80,8 +79,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5054 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5054", 0x0140, 0x08c0, NO_DUMP )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5054", 0x0140, 0x03c0, BAD_DUMP CRC(56298472) SHA1(7a273ad7270507dca4ce621fc1e6b51a1ac25085))
 ROM_END
 
 
@@ -90,8 +89,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5055 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5055", 0x0140, 0x08c0, NO_DUMP )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5055", 0x0140, 0x03c0, BAD_DUMP CRC(f95b9c8c) SHA1(c5ce7fe84df6de6a317fa0e87bda413c82c04618))
 ROM_END
 
 
@@ -100,8 +99,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5056 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5056", 0x0140, 0x08c0, NO_DUMP )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5056", 0x0140, 0x03c0, BAD_DUMP CRC(86ab8b85) SHA1(2d1ff08b4dda15cf70832881750a962189455f41))
 ROM_END
 
 
@@ -110,8 +109,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5057 )
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "saa5057", 0x0140, 0x08c0, NO_DUMP )
+	ROM_REGION( 0x500, "chargen", 0 )
+	ROM_LOAD("saa5057", 0x0140, 0x08c0, BAD_DUMP CRC(d6664fb3) SHA1(5a93445dde03066073e2909a935900e5f8439d81))
 ROM_END
 
 
@@ -159,6 +158,10 @@ const rom_entry *saa5057_device::device_rom_region() const
 	return ROM_NAME( saa5057 );
 }
 
+
+#define ALPHANUMERIC    0x01
+#define CONTIGUOUS      0x02
+#define SEPARATED       0x03
 
 
 //**************************************************************************
@@ -225,22 +228,25 @@ void saa5050_device::device_start()
 
 	// register for state saving
 	save_item(NAME(m_code));
-	save_item(NAME(m_last_code));
+	save_item(NAME(m_held_char));
 	save_item(NAME(m_char_data));
 	save_item(NAME(m_bit));
 	save_item(NAME(m_color));
 	save_item(NAME(m_ra));
 	save_item(NAME(m_bg));
 	save_item(NAME(m_fg));
+	save_item(NAME(m_prev_col));
 	save_item(NAME(m_graphics));
 	save_item(NAME(m_separated));
-	save_item(NAME(m_conceal));
 	save_item(NAME(m_flash));
 	save_item(NAME(m_boxed));
 	save_item(NAME(m_double_height));
-	save_item(NAME(m_double_height_top_row));
+	save_item(NAME(m_double_height_old));
 	save_item(NAME(m_double_height_bottom_row));
-	save_item(NAME(m_hold));
+	save_item(NAME(m_double_height_prev_row));
+	save_item(NAME(m_hold_char));
+	save_item(NAME(m_hold_clear));
+	save_item(NAME(m_hold_off));
 	save_item(NAME(m_frame_count));
 }
 
@@ -252,7 +258,7 @@ void saa5050_device::device_start()
 void saa5050_device::device_reset()
 {
 	m_ra = 0;
-	m_double_height_top_row = false;
+	m_double_height = false;
 	m_double_height_bottom_row = false;
 }
 
@@ -263,86 +269,175 @@ void saa5050_device::device_reset()
 
 void saa5050_device::process_control_character(UINT8 data)
 {
+	m_hold_clear = false;
+	m_hold_off = false;
+
 	switch (data)
 	{
-	case ALPHA_RED:
-	case ALPHA_GREEN:
-	case ALPHA_YELLOW:
-	case ALPHA_BLUE:
-	case ALPHA_MAGENTA:
-	case ALPHA_CYAN:
-	case ALPHA_WHITE:
-		m_graphics = false;
-		m_conceal = false;
-		m_fg = data & 0x07;
+		case ALPHA_RED:
+		case ALPHA_GREEN:
+		case ALPHA_YELLOW:
+		case ALPHA_BLUE:
+		case ALPHA_MAGENTA:
+		case ALPHA_CYAN:
+		case ALPHA_WHITE:
+			m_graphics = false;
+			m_hold_clear = true;
+			m_fg = data & 0x07;
+			set_next_chartype();
+			break;
+
+		case FLASH:
+			m_flash = true;
+			break;
+
+		case STEADY:
+			m_flash = false;
+			break;
+
+		case END_BOX:
+		case START_BOX:
+			// TODO
+			break;
+
+		case NORMAL_HEIGHT:
+		case DOUBLE_HEIGHT:
+			m_double_height = !!(data & 1);
+			if (m_double_height) m_double_height_prev_row = true;
+			break;
+
+		case GRAPHICS_RED:
+		case GRAPHICS_GREEN:
+		case GRAPHICS_YELLOW:
+		case GRAPHICS_BLUE:
+		case GRAPHICS_MAGENTA:
+		case GRAPHICS_CYAN:
+		case GRAPHICS_WHITE:
+			m_graphics = true;
+			m_fg = data & 0x07;
+			set_next_chartype();
+			break;
+
+		case CONCEAL_DISPLAY:
+			m_fg = m_prev_col = m_bg;
+			break;
+
+		case CONTIGUOUS_GFX:
+			m_separated = false;
+			set_next_chartype();
+			break;
+
+		case SEPARATED_GFX:
+			m_separated = true;
+			set_next_chartype();
+			break;
+
+		case BLACK_BACKGROUND:
+			m_bg = 0;
+			break;
+
+		case NEW_BACKGROUND:
+			m_bg = m_fg;
+			break;
+
+		case HOLD_GRAPHICS:
+			m_hold_char = true;
+			break;
+
+		case RELEASE_GRAPHICS:
+			m_hold_off = true;
+			break;
+	}
+}
+
+
+void saa5050_device::set_next_chartype()
+{
+	if (m_graphics)
+	{
+		if (m_separated)
+			m_next_chartype = SEPARATED;
+		else
+			m_next_chartype = CONTIGUOUS;
+	}
+	else
+	{
+		m_next_chartype = ALPHANUMERIC;
+	}
+};
+
+
+//-------------------------------------------------
+//  get_gfx_data - graphics generator
+//-------------------------------------------------
+
+UINT16 saa5050_device::get_gfx_data(UINT8 data, offs_t row, bool separated)
+{
+	UINT16 c = 0;
+	switch (row >> 1)
+	{
+	case 0: case 1:
+		c += (data & 0x01) ? 0xfc0 : 0; // bit 1 top left
+		c += (data & 0x02) ? 0x03f : 0; // bit 2 top right
+		if (separated) c &= 0x3cf;
 		break;
-
-	case FLASH:
-		m_flash = true;
+	case 2:
+		if (separated) break;
+		c += (data & 0x01) ? 0xfc0 : 0; // bit 1 top left
+		c += (data & 0x02) ? 0x03f : 0; // bit 2 top right
 		break;
-
-	case STEADY:
-		m_flash = false;
+	case 3: case 4: case 5:
+		c += (data & 0x04) ? 0xfc0 : 0; // bit 3 middle left
+		c += (data & 0x08) ? 0x03f : 0; // bit 4 middle right
+		if (separated) c &= 0x3cf;
 		break;
-
-	case END_BOX:
-	case START_BOX:
-		// TODO
+	case 6:
+		if (separated) break;
+		c += (data & 0x04) ? 0xfc0 : 0; // bit 3 middle left
+		c += (data & 0x08) ? 0x03f : 0; // bit 4 middle right
 		break;
-
-	case NORMAL_HEIGHT:
-		m_double_height = 0;
+	case 7: case 8:
+		c += (data & 0x10) ? 0xfc0 : 0; // bit 5 bottom left
+		c += (data & 0x40) ? 0x03f : 0; // bit 7 bottom right
+		if (separated) c &= 0x3cf;
 		break;
-
-	case DOUBLE_HEIGHT:
-		if (!m_double_height_bottom_row)
-		{
-			m_double_height_top_row = true;
-		}
-
-		m_double_height = 1;
-		break;
-
-	case GRAPHICS_RED:
-	case GRAPHICS_GREEN:
-	case GRAPHICS_YELLOW:
-	case GRAPHICS_BLUE:
-	case GRAPHICS_MAGENTA:
-	case GRAPHICS_CYAN:
-	case GRAPHICS_WHITE:
-		m_graphics = true;
-		m_conceal = false;
-		m_fg = data & 0x07;
-		break;
-
-	case CONCEAL_DISPLAY:
-		m_conceal = true;
-		break;
-
-	case CONTIGUOUS_GFX:
-		m_separated = false;
-		break;
-
-	case SEPARATED_GFX:
-		m_separated = true;
-		break;
-
-	case BLACK_BACKGROUND:
-		m_bg = 0;
-		break;
-
-	case NEW_BACKGROUND:
-		m_bg = m_fg;
-		break;
-
-	case HOLD_GRAPHICS:
-		m_hold = true;
-		break;
-
-	case RELEASE_GRAPHICS:
-		m_hold = false;
+	case 9:
+		if (separated) break;
+		c += (data & 0x10) ? 0xfc0 : 0; // bit 5 bottom left
+		c += (data & 0x40) ? 0x03f : 0; // bit 7 bottom right
 		break;
 	}
+	return c;
+}
+
+
+//-------------------------------------------------
+//  get_rom_data - read rom
+//-------------------------------------------------
+
+UINT16 saa5050_device::get_rom_data(UINT8 data, offs_t row)
+{
+	UINT16 c;
+	if (row < 0 || row >= 20)
+	{
+		c = 0;
+	}
+	else
+	{
+		c = m_char_rom[(data * 10) + (row >> 1)];
+		c = ((c & 0x01) * 0x03) + ((c & 0x02) * 0x06) + ((c & 0x04) * 0x0c) + ((c & 0x08) * 0x18) + ((c & 0x10) * 0x30);
+	}
+	return c;
+}
+
+
+//-------------------------------------------------
+//  character_rounding
+//-------------------------------------------------
+
+UINT16 saa5050_device::character_rounding(UINT16 a, UINT16 b)
+{
+	return a | ((a >> 1) & b & ~(b >> 1)) | ((a << 1) & b & ~(b << 1));
 }
 
 
@@ -352,23 +447,64 @@ void saa5050_device::process_control_character(UINT8 data)
 
 void saa5050_device::get_character_data(UINT8 data)
 {
-	if (m_graphics && (data & 0x20))
+	m_double_height_old = m_double_height;
+	m_prev_col = m_fg;
+	m_curr_chartype = m_next_chartype;
+
+	if (data < 0x20)
 	{
-		data += (data & 0x40) ? 64 : 96;
-		if (m_separated) data += 64;
+		process_control_character(data);
+		if (m_hold_char && m_double_height == m_double_height_old)
+		{
+			data = m_held_char;
+			if (data >= 0x40 && data < 0x60) data = 0x20;
+			m_curr_chartype = m_held_chartype;
+		}
+		else
+		{
+			data = 0x20;
+		}
+	}
+	else if (m_graphics)
+	{
+		m_held_char = data;
+		m_held_chartype = m_curr_chartype;
 	}
 
-	if ((data < 0x20) && m_hold) data = m_last_code;
-	if (m_conceal) data = 0x20;
+	offs_t ra = m_ra;
+	if (m_double_height_old)
+	{
+		ra >>= 1;
+		if (m_double_height_bottom_row) ra += 10;
+	}
+
 	if (m_flash && (m_frame_count > 38)) data = 0x20;
 	if (m_double_height_bottom_row && !m_double_height) data = 0x20;
-	m_last_code = data;
 
-	offs_t ra = m_ra >> 1;
-	if (m_double_height) ra >>= 1;
-	if (m_double_height && m_double_height_bottom_row) ra += 5;
+	if (m_hold_off)
+	{
+		m_hold_char = false;
+		m_held_char = 32;
+	}
+	if (m_hold_clear)
+	{
+		m_held_char = 32;
+	}
 
-	m_char_data = m_char_rom[(data * 10) + ra];
+	if (m_curr_chartype == ALPHANUMERIC || !BIT(data,5))
+		m_char_data = character_rounding(get_rom_data(data, ra), get_rom_data(data, ra + ((ra & 1) ? 1 : -1)));
+	else
+		m_char_data = get_gfx_data(data, ra, (m_curr_chartype == SEPARATED));
+}
+
+
+//-------------------------------------------------
+//  crs_w - character rounding select
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( saa5050_device::crs_w )
+{
+	m_crs = !(state & 1);
 }
 
 
@@ -381,7 +517,6 @@ WRITE_LINE_MEMBER( saa5050_device::dew_w )
 	if (state)
 	{
 		m_ra = 19;
-		m_double_height_top_row = false;
 
 		m_frame_count++;
 		if (m_frame_count > 50) m_frame_count = 0;
@@ -400,23 +535,27 @@ WRITE_LINE_MEMBER( saa5050_device::lose_w )
 		m_ra++;
 		m_ra %= 20;
 
+		if (m_ra == 19)
+		{
+			if (m_double_height_bottom_row)
+				m_double_height_bottom_row = false;
+			else
+				m_double_height_bottom_row = m_double_height_prev_row;
+		}
+
 		m_fg = 7;
 		m_bg = 0;
 		m_graphics = false;
 		m_separated = false;
-		m_conceal = false;
 		m_flash = false;
 		m_boxed = false;
-		m_hold = false;
-		m_double_height = 0;
-		m_bit = 5;
-		m_last_code = 0x20;
-
-		if (!m_ra)
-		{
-			m_double_height_bottom_row = m_double_height_top_row;
-			m_double_height_top_row = false;
-		}
+		m_hold_char = false;
+		m_held_char = 0x20;
+		m_next_chartype = ALPHANUMERIC;
+		m_held_chartype = ALPHANUMERIC;
+		m_double_height = false;
+		m_double_height_prev_row = false;
+		m_bit = 11;
 	}
 }
 
@@ -439,7 +578,6 @@ WRITE_LINE_MEMBER( saa5050_device::f1_w )
 {
 	if (state)
 	{
-		process_control_character(m_code);
 		get_character_data(m_code);
 	}
 }
@@ -453,10 +591,10 @@ WRITE_LINE_MEMBER( saa5050_device::tr6_w )
 {
 	if (state)
 	{
-		m_color = BIT(m_char_data, m_bit) ? m_fg : m_bg;
+		m_color = BIT(m_char_data, m_bit) ? m_prev_col : m_bg;
 
 		m_bit--;
-		if (m_bit < 0) m_bit = 5;
+		if (m_bit < 0) m_bit = 11;
 	}
 }
 
@@ -500,7 +638,7 @@ UINT32 saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			f1_w(1);
 			f1_w(0);
 
-			for (int bit = 0; bit < 6; bit++)
+			for (int bit = 0; bit < 12; bit++)
 			{
 				tr6_w(1);
 				tr6_w(0);
@@ -515,7 +653,6 @@ UINT32 saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 				rgb_t rgb = rgb_t(r, g, b);
 
-				bitmap.pix32(y, x++) = rgb;
 				bitmap.pix32(y, x++) = rgb;
 			}
 		}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Master Disks -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+
+      Ensure suitable DFS is active for FM and MFM images.
+      - FM  requires DFS  (D and BREAK)
+      - MFM requires ADFS (A and BREAK)
+-->
+
+<softwarelist name="bbcm_flop" description="BBC Master disks">
+
+	<software name="welcomem">
+		<description>Welcome &amp; Utilities Disc</description>
+		<year>1986</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="masterwelcome.adl" size="655360" crc="606598eb" sha1="13cb8944fc6905bc601a94b5c271d1df2b0a4644" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elitexec" supported="partial">
+		<description>Elite (Executive Edition)</description>
+		<year>1986</year>
+		<publisher>Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

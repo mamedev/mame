@@ -443,17 +443,29 @@ void emu_options::parse_standard_inis(std::string &error_string)
 		parse_one_ini("computer", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
 	else if (cursystem->flags & MACHINE_TYPE_OTHER)
 		parse_one_ini("othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-
-	// parse "vector.ini" for vector games
+	
+	machine_config config(*cursystem, *this);
+	screen_device_iterator iter(config.root_device());
+	for (const screen_device *device = iter.first(); device != NULL; device = iter.next())
 	{
-		machine_config config(*cursystem, *this);
-		screen_device_iterator iter(config.root_device());
-		for (const screen_device *device = iter.first(); device != NULL; device = iter.next())
-			if (device->screen_type() == SCREEN_TYPE_VECTOR)
-			{
-				parse_one_ini("vector", OPTION_PRIORITY_VECTOR_INI, &error_string);
-				break;
-			}
+		// parse "raster.ini" for raster games
+		if (device->screen_type() == SCREEN_TYPE_RASTER)
+		{
+			parse_one_ini("raster", OPTION_PRIORITY_SCREEN_INI, &error_string);
+			break;
+		}
+		// parse "vector.ini" for vector games
+		if (device->screen_type() == SCREEN_TYPE_VECTOR)
+		{
+			parse_one_ini("vector", OPTION_PRIORITY_SCREEN_INI, &error_string);
+			break;
+		}
+		// parse "lcd.ini" for lcd games
+		if (device->screen_type() == SCREEN_TYPE_LCD)
+		{
+			parse_one_ini("lcd", OPTION_PRIORITY_SCREEN_INI, &error_string);
+			break;
+		}
 	}
 
 	// next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini

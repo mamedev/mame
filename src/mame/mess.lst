@@ -344,14 +344,14 @@ atombb    // 1979 Acorn Atom
 //prophet2
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B w/8271 FDC
-bbcb_de   // 1981 BBC Micro Model B (German)
+bbcb_de   // 1982 BBC Micro Model B (German)
 bbcb_us   // 1983 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
-bbcb1770  // 1985 BBC Micro Model B w/1770 FDC
+bbcb1770  // 1984 BBC Micro Model B w/1770 FDC
 bbcbp     // 1985 BBC Micro Model B+ 64K
 bbcbp128  // 1985 BBC Micro Model B+ 128K
 abc110    // 1985 ABC 110
-abc210    // 1985 ABC 210/Cambridge Workstation
+acw443    // 1985 ABC 210/Cambridge Workstation
 abc310    // 1985 ABC 310
 reutapm   // 1985 Reuters APM Board
 bbcm      // 1986 BBC Master 128

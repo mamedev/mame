@@ -13,21 +13,16 @@
 #ifndef __BBC_DSK_H__
 #define __BBC_DSK_H__
 
-#include "flopimg.h"
 #include "wd177x_dsk.h"
 
-/**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(bbc);
-
-/**************************************************************************/
-
-class bbc_ssd_525_format : public wd177x_format
+class bbc_dfs_format : public wd177x_format
 {
 public:
-	bbc_ssd_525_format();
+	bbc_dfs_format();
 
 	virtual int find_size(io_generic *io, UINT32 form_factor);
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual int get_image_offset(const format &f, int head, int track);
 	virtual const char *name() const;
 	virtual const char *description() const;
 	virtual const char *extensions() const;
@@ -36,12 +31,14 @@ private:
 	static const format formats[];
 };
 
-class bbc_dsd_525_format : public wd177x_format
+class bbc_adfs_format : public wd177x_format
 {
 public:
-	bbc_dsd_525_format();
+	bbc_adfs_format();
 
 	virtual int find_size(io_generic *io, UINT32 form_factor);
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual int get_image_offset(const format &f, int head, int track);
 	virtual const char *name() const;
 	virtual const char *description() const;
 	virtual const char *extensions() const;
@@ -50,11 +47,14 @@ private:
 	static const format formats[];
 };
 
-class bbc_adf_525_format : public wd177x_format
+class bbc_dos_format : public wd177x_format
 {
 public:
-	bbc_adf_525_format();
+	bbc_dos_format();
 
+	virtual int find_size(io_generic *io, UINT32 form_factor);
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual int get_image_offset(const format &f, int head, int track);
 	virtual const char *name() const;
 	virtual const char *description() const;
 	virtual const char *extensions() const;
@@ -63,11 +63,13 @@ private:
 	static const format formats[];
 };
 
-class bbc_adf_35_format : public wd177x_format
+class bbc_cpm_format : public wd177x_format
 {
 public:
-	bbc_adf_35_format();
+	bbc_cpm_format();
 
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual int get_image_offset(const format &f, int head, int track);
 	virtual const char *name() const;
 	virtual const char *description() const;
 	virtual const char *extensions() const;
@@ -77,9 +79,9 @@ private:
 };
 
 
-extern const floppy_format_type FLOPPY_BBC_SSD_525_FORMAT;
-extern const floppy_format_type FLOPPY_BBC_DSD_525_FORMAT;
-extern const floppy_format_type FLOPPY_BBC_ADF_525_FORMAT;
-extern const floppy_format_type FLOPPY_BBC_ADF_35_FORMAT;
+extern const floppy_format_type FLOPPY_BBC_DFS_FORMAT;
+extern const floppy_format_type FLOPPY_BBC_ADFS_FORMAT;
+extern const floppy_format_type FLOPPY_BBC_DOS_FORMAT;
+extern const floppy_format_type FLOPPY_BBC_CPM_FORMAT;
 
 #endif // __BBC_DSK_H__

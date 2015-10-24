@@ -65,6 +65,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 
+	DECLARE_WRITE_LINE_MEMBER( crs_w );
 	DECLARE_WRITE_LINE_MEMBER( dew_w );
 	DECLARE_WRITE_LINE_MEMBER( lose_w );
 	void write(UINT8 data);
@@ -120,6 +121,10 @@ private:
 	};
 
 	void process_control_character(UINT8 data);
+	void set_next_chartype();
+	UINT16 get_gfx_data(UINT8 data, offs_t row, bool separated);
+	UINT16 get_rom_data(UINT8 data, offs_t row);
+	UINT16 character_rounding(UINT16 a, UINT16 b);
 	void get_character_data(UINT8 data);
 
 	required_region_ptr<UINT8> m_char_rom;
@@ -127,22 +132,29 @@ private:
 	devcb_read8    m_read_d;
 
 	UINT8 m_code;
-	UINT8 m_last_code;
-	UINT8 m_char_data;
+	UINT8 m_held_char;
+	UINT8 m_next_chartype;
+	UINT8 m_curr_chartype;
+	UINT8 m_held_chartype;
+	UINT16 m_char_data;
 	int m_bit;
 	rgb_t m_color;
+	int m_crs;
 	int m_ra;
 	int m_bg;
 	int m_fg;
+	int m_prev_col;
 	bool m_graphics;
 	bool m_separated;
-	bool m_conceal;
 	bool m_flash;
 	bool m_boxed;
-	int m_double_height;
-	bool m_double_height_top_row;
+	bool m_double_height;
+	bool m_double_height_old;
 	bool m_double_height_bottom_row;
-	bool m_hold;
+	bool m_double_height_prev_row;
+	bool m_hold_char;
+	bool m_hold_clear;
+	bool m_hold_off;
 	int m_frame_count;
 
 	int m_cols;
@@ -248,7 +260,7 @@ extern const device_type SAA5051; // German
 extern const device_type SAA5052; // Swedish/Finnish
 extern const device_type SAA5053; // Italian
 extern const device_type SAA5054; // Belgian
-extern const device_type SAA5055; // U.S. ASCII
+extern const device_type SAA5055; // US ASCII
 extern const device_type SAA5056; // Hebrew
 extern const device_type SAA5057; // Cyrillic
 
