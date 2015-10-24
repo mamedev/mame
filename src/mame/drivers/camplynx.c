@@ -100,8 +100,6 @@
     Game bugs (reproducible in Jynx):
     - 3D Monster Craze: When attacked, garbage on screen
     - 3D Monster Craze: When you find the key, the game freezes
-    - LogiChess: unable to enter an acceptable move
-    - Power Blaster: Common version is a Bad Tape
     - YNXVADERS: Colours of top 2 rows of invaders should be white and yellow
       but they show as magenta and red. After game ends, title screen has wrong
       colours.
@@ -113,6 +111,8 @@
         You can then move into the vacated areas. Even though it says you have
         3 lives, you actually only have 1.
       - Backgammon. This is just the instructions. The game is missing.
+      - LogiChess. The page at http://www.nascomhomepage.com/games/logichess.html
+        should provide enough clues to enable you to work out how to play.
 
 ****************************************************************************/
 
