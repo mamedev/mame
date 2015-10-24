@@ -1412,8 +1412,8 @@ WRITE32_MEMBER(xbox_base_state::smbus_w)
 }
 
 ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
-	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM // 128 megabytes
-	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM
+	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM AM_SHARE("nv2a_share") // 128 megabytes
+	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
 	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
 	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(usbctrl_r, usbctrl_w)
 	AM_RANGE(0xfe800000, 0xfe85ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
