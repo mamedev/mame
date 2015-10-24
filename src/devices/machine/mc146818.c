@@ -402,7 +402,11 @@ void mc146818_device::set_base_datetime()
 	set_dayofweek(current_time.weekday + 1);
 	set_dayofmonth(current_time.mday);
 	set_month(current_time.month + 1);
-	set_year((current_time.year - m_epoch) % 100);
+
+	if(m_binyear)
+		set_year((current_time.year - m_epoch) % (m_data[REG_B] & REG_B_DM ? 0x100 : 100)); // pcd actually depends on this
+	else
+		set_year((current_time.year - m_epoch) % 100);
 
 	if (m_century_index >= 0)
 		m_data[m_century_index] = to_ram(current_time.year / 100);
