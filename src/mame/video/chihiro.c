@@ -6,7 +6,7 @@
 #include "machine/pic8259.h"
 #include "includes/chihiro.h"
 
-//#define LOG_NV2A
+// #define LOG_NV2A
 
 const char *vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
 const char *vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
@@ -4027,16 +4027,12 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	int countlen;
 	int ret;
 	address_space *space = puller_space;
-#ifdef LOG_NV2A
 	UINT32 subch;
-#endif
 
 	chanel = puller_channel;
 	subchannel = puller_subchannel;
 	dmaput = &channel[chanel][subchannel].regs[0x40 / 4];
 	dmaget = &channel[chanel][subchannel].regs[0x44 / 4];
-	chanel = puller_channel;
-	subchannel = puller_subchannel;
 	while (*dmaget != *dmaput) {
 		cmd = space->read_dword(*dmaget);
 		*dmaget += 4;
@@ -4054,20 +4050,21 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 0: // increasing method
 			method = (cmd >> 2) & 2047; // method*4 is address // if method >= 0x40 send it to assigned object
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
@@ -4077,7 +4074,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 				ret = 0;
 				while (count > 0) {
 					countlen = 1;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					count--;
 					method++;
 					*dmaget += 4;
@@ -4093,23 +4090,21 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 5: // non-increasing method
 			method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
-#ifdef LOG_NV2A
-				logerror("  assign channel %d\n", subch);
-#endif
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
@@ -4118,7 +4113,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 #endif
 				while (count > 0) {
 					countlen = count;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					*dmaget += 4 * (count - countlen);
 					count = countlen;
 				}
@@ -4126,21 +4121,22 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 3: // long non-increasing method
 			method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = space->read_dword(*dmaget);
 			*dmaget += 4;
 			if ((method == 0) && (count == 1)) {
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
@@ -4149,7 +4145,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 #endif
 				while (count > 0) {
 					countlen = count;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					*dmaget += 4 * (count - countlen);
 					count = countlen;
 				}
