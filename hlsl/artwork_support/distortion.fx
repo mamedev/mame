@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz,ImJezze
+// copyright-holders:ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Distortion Effect
 //-----------------------------------------------------------------------------
 
 texture DiffuseTexture;
@@ -21,16 +21,16 @@ sampler DiffuseSampler = sampler_state
 // Vertex Definitions
 //-----------------------------------------------------------------------------
 
-struct VS_OUTPUT
+struct VS_INPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
 };
 
-struct VS_INPUT
+struct VS_OUTPUT
 {
-	float3 Position : POSITION;
+	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
 };
@@ -42,10 +42,11 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Simple Vertex Shader
+// Distortion Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float2 ScreenDims;
+uniform float2 ScreenDims; // size of the window or fullscreen
+uniform float2 TargetDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -57,37 +58,40 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = Input.Position.xy / ScreenDims;
-
 	Output.Color = Input.Color;
+
+	Output.TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	return Output;
 }
 
 //-----------------------------------------------------------------------------
-// Simple Pixel Shader
+// Post-Processing Pixel Shader
 //-----------------------------------------------------------------------------
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 texel = tex2D(DiffuseSampler, Input.TexCoord);
+	float2 BaseCoord = Input.TexCoord;
 
-	return float4(texel.rgb, 1.0f);
+	// Color
+	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
+	BaseColor.a = 1.0f;
+
+	return BaseColor;
 }
 
 //-----------------------------------------------------------------------------
-// Simple Effect
+// Distortion Effect
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DistortionTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
 
-		Sampler[0] = <DiffuseSampler>;
-
-		VertexShader = compile vs_2_0 vs_main();
-		PixelShader = compile ps_2_0 ps_main();
+		VertexShader = compile vs_3_0 vs_main();
+		PixelShader = compile ps_3_0 ps_main();
 	}
 }

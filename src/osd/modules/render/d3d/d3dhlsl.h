@@ -44,6 +44,8 @@ public:
 		CU_SCREEN_DIMS = 0,
 		CU_SOURCE_DIMS,
 		CU_SOURCE_RECT,
+		CU_TARGET_DIMS,
+		CU_QUAD_DIMS,
 
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
@@ -77,6 +79,7 @@ public:
 		CU_POST_VIGNETTING,
 		CU_POST_CURVATURE,
 		CU_POST_ROUND_CORNER,
+		CU_POST_SMOOTH_BORDER,
 		CU_POST_REFLECTION,
 		CU_POST_SHADOW_ALPHA,
 		CU_POST_SHADOW_COUNT,
@@ -192,6 +195,7 @@ struct hlsl_options
 	float                   shadow_mask_v_offset;
 	float                   curvature;
 	float                   round_corner;
+	float                   smooth_border;
 	float                   reflection;
 	float                   vignetting;
 	float                   scanline_alpha;
@@ -234,8 +238,8 @@ struct hlsl_options
 	float                   vector_length_ratio;
 
 	// Bloom
-	float                   vector_bloom_scale;
-	float                   raster_bloom_scale;
+	float                   bloom_scale;
+	float                   bloom_overdrive[3];
 	float                   bloom_level0_weight;
 	float                   bloom_level1_weight;
 	float                   bloom_level2_weight;
@@ -314,8 +318,7 @@ public:
 	};
 
 private:
-	void                    blit(surface *dst, texture *src, surface *new_dst,
-									D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
+	void                    blit(surface *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
 	void                    enumerate_screens();
 
 	void                    end_avi_recording();
@@ -328,15 +331,20 @@ private:
 	void                    remove_cache_target(cache_target *cache);
 
 	// Shader passes
-	void                    ntsc_pass(render_target *rt, vec2f &texsize, vec2f &delta);
-	void                    color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
-	void                    prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
-	void                    deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
-	void                    defocus_pass(render_target *rt, vec2f &texsize);
-	void                    phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable);
-	void                    post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum, bool prepare_bloom);
-	void                    bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
-	void                    screen_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
+	int                     ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     prescale_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     deconverge_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     defocus_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum);
+	int                     post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
+	int                     downsample_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     distortion_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     vector_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     vector_buffer_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	void                    menu_pass(poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 
@@ -358,6 +366,8 @@ private:
 	int                     prescale_size_y;            // prescale size y
 	int                     hlsl_prescale_x;            // hlsl prescale x
 	int                     hlsl_prescale_y;            // hlsl prescale y
+	float                   bloom_dims[11][2];          // bloom texture dimensions
+	int                     bloom_count;                // count of used bloom textures
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
@@ -395,9 +405,9 @@ private:
 	surface *               backbuffer;                 // pointer to our device's backbuffer
 	effect *                curr_effect;                // pointer to the currently active effect object
 	effect *                default_effect;             // pointer to the primary-effect object
-	effect *                simple_effect;              // pointer to the simple-effect object
 	effect *                prescale_effect;            // pointer to the prescale-effect object
 	effect *                post_effect;                // pointer to the post-effect object
+	effect *                distortion_effect;          // pointer to the distortion-effect object
 	effect *                focus_effect;               // pointer to the focus-effect object
 	effect *                phosphor_effect;            // pointer to the phosphor-effect object
 	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
@@ -410,7 +420,8 @@ private:
 	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
 
 	texture_info *          curr_texture;
-	bool                    phosphor_passthrough;
+	render_target *         curr_render_target;
+	poly_info *             curr_poly;
 
 public:
 	render_target *         targethead;

@@ -48,45 +48,33 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-uniform float2 TargetSize;
+uniform float2 TargetDims;
 
-uniform float2 Prescale = float2(8.0f, 8.0f);
-
-uniform float BloomRescale;
-
-uniform bool PrepareVector = false;
+uniform bool PrepareVector;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 TargetTexelSize = 1.0f / TargetSize;
+	float2 TargetTexelDims = 1.0f / TargetDims;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
 	Output.Color = Input.Color;
 
 	float2 TexCoord = Input.Position.xy / ScreenDims;
+	TexCoord += PrepareVector
+		? 0.5f / TargetDims // half texel offset correction (DX9)
+		: 0.0f;
 
-	// Vector graphics is not prescaled it has the size of the screen
-	if (PrepareVector)
-	{
-		Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelSize;
-		Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelSize;
-		Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelSize;
-		Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelSize;
-	}
-	else
-	{
-		Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelSize * Prescale;
-		Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelSize * Prescale;
-		Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelSize * Prescale;
-		Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelSize * Prescale;
-	}
+	Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelDims;
+	Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelDims;
+	Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelDims;
+	Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelDims;
 
 	return Output;
 }
@@ -102,7 +90,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy);
 	float4 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw);
 
-	float4 outTexel = (texel0 + texel1 + texel2 + texel3) / 4.0 * BloomRescale;
+	float4 outTexel = (texel0 + texel1 + texel2 + texel3) / 4.0;
 
 	return float4(outTexel.rgb, 1.0f);
 }

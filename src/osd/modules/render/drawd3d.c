@@ -44,13 +44,11 @@
 #include "drawd3d.h"
 
 
-
 //============================================================
 //  DEBUGGING
 //============================================================
 
 extern void mtlog_add(const char *event);
-
 
 
 //============================================================
@@ -67,13 +65,11 @@ enum
 };
 
 
-
 //============================================================
 //  MACROS
 //============================================================
 
 #define FSWAP(var1, var2) do { float temp = var1; var1 = var2; var2 = temp; } while (0)
-
 
 
 //============================================================
@@ -94,6 +90,7 @@ static const line_aa_step line_aa_4step[] =
 	{  0.00f,  0.25f,  0.25f  },
 	{ 0 }
 };
+
 
 //============================================================
 //  INLINES
@@ -167,11 +164,13 @@ INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 	return rgb_t(0xff, r, g, b);
 }
 
+
 //============================================================
 //  drawd3d_init
 //============================================================
 
 static d3d::base *               d3dintf; // FIX ME
+
 
 //============================================================
 //  PROTOTYPES
@@ -179,6 +178,7 @@ static d3d::base *               d3dintf; // FIX ME
 
 // core functions
 static void drawd3d_exit(void);
+
 
 //============================================================
 //  drawd3d_window_init
@@ -195,6 +195,7 @@ int d3d::renderer::create()
 
 	return 0;
 }
+
 
 //============================================================
 //  drawd3d_exit
@@ -222,7 +223,6 @@ void d3d::renderer::save()
 }
 
 
-
 //============================================================
 //  drawd3d_window_destroy
 //============================================================
@@ -233,7 +233,6 @@ void d3d::renderer::destroy()
 		get_shaders()->window_record();
 
 }
-
 
 
 //============================================================
@@ -252,6 +251,7 @@ render_primitive_list *d3d::renderer::get_primitives()
 	}
 	return &window().target()->get_primitives();
 }
+
 
 //============================================================
 //  drawnone_create
@@ -282,6 +282,7 @@ int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks)
 	callbacks->create = drawd3d_create;
 	return 0;
 }
+
 
 //============================================================
 //  drawd3d_window_draw
@@ -314,7 +315,6 @@ void renderer::set_texture(texture_info *texture)
 	}
 }
 
-
 void renderer::set_filter(int filter)
 {
 	if (filter != m_last_filter)
@@ -330,7 +330,6 @@ void renderer::set_filter(int filter)
 		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_texture_stage_state call\n", (int)result);
 	}
 }
-
 
 void renderer::set_wrap(D3DTEXTUREADDRESS wrap)
 {
@@ -348,7 +347,6 @@ void renderer::set_wrap(D3DTEXTUREADDRESS wrap)
 	}
 }
 
-
 void renderer::set_modmode(DWORD modmode)
 {
 	if (modmode != m_last_modmode)
@@ -360,7 +358,6 @@ void renderer::set_modmode(DWORD modmode)
 		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_texture_stage_state call\n", (int)result);
 	}
 }
-
 
 void renderer::set_blendmode(int blendmode)
 {
@@ -409,7 +406,6 @@ void renderer::set_blendmode(int blendmode)
 	}
 }
 
-
 void renderer::reset_render_states()
 {
 	// this ensures subsequent calls to the above setters will force-update the data
@@ -421,8 +417,6 @@ void renderer::reset_render_states()
 	m_last_blenddst = -1;
 	m_last_wrap = (D3DTEXTUREADDRESS)-1;
 }
-
-
 
 texture_manager::texture_manager(renderer *d3d)
 {
@@ -737,7 +731,7 @@ void renderer::begin_frame()
 	m_texture_manager->update_textures();
 
 	// begin the scene
-mtlog_add("drawd3d_window_draw: begin_scene");
+	mtlog_add("drawd3d_window_draw: begin_scene");
 	result = (*d3dintf->device.begin_scene)(m_device);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device begin_scene call\n", (int)result);
 
@@ -934,7 +928,6 @@ try_again:
 }
 
 
-
 //============================================================
 //  device_create_resources
 //============================================================
@@ -1000,7 +993,6 @@ int renderer::device_create_resources()
 }
 
 
-
 //============================================================
 //  device_delete
 //============================================================
@@ -1039,6 +1031,7 @@ void renderer::device_delete()
 	m_device = NULL;
 }
 
+
 //============================================================
 //  device_delete_resources
 //============================================================
@@ -1052,7 +1045,6 @@ void renderer::device_delete_resources()
 		(*d3dintf->vertexbuf.release)(m_vertexbuf);
 	m_vertexbuf = NULL;
 }
-
 
 
 //============================================================
@@ -1125,7 +1117,6 @@ int renderer::device_verify_caps()
 }
 
 
-
 //============================================================
 //  device_test_cooperative
 //============================================================
@@ -1172,7 +1163,6 @@ int renderer::device_test_cooperative()
 	}
 	return 0;
 }
-
 
 
 //============================================================
@@ -1250,7 +1240,6 @@ int renderer::config_adapter_mode()
 }
 
 
-
 //============================================================
 //  get_adapter_for_monitor
 //============================================================
@@ -1275,7 +1264,6 @@ int renderer::get_adapter_for_monitor()
 	// default to the default
 	return D3DADAPTER_DEFAULT;
 }
-
 
 
 //============================================================
@@ -1366,7 +1354,6 @@ void renderer::pick_best_mode()
 }
 
 
-
 //============================================================
 //  update_window_size
 //============================================================
@@ -1400,6 +1387,7 @@ int renderer::update_window_size()
 	window().m_resize_state = RESIZE_STATE_NORMAL;
 	return TRUE;
 }
+
 
 //============================================================
 //  batch_vectors
@@ -1554,6 +1542,7 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 	}
 }
 
+
 //============================================================
 //  draw_line
 //============================================================
@@ -1636,7 +1625,6 @@ void renderer::draw_line(const render_primitive *prim)
 		m_numpolys++;
 	}
 }
-
 
 
 //============================================================
@@ -1752,6 +1740,7 @@ void poly_info::init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
 	m_prim_height = prim_height;
 }
 
+
 //============================================================
 //  primitive_alloc
 //============================================================
@@ -1789,7 +1778,6 @@ vertex *renderer::mesh_alloc(int numverts)
 	}
 	return NULL;
 }
-
 
 
 //============================================================
@@ -1877,6 +1865,7 @@ void renderer::primitive_flush_pending()
 	m_numpolys = 0;
 }
 
+
 //============================================================
 //  texture_info destructor
 //============================================================
@@ -1903,6 +1892,7 @@ texture_info::~texture_info()
 		m_d3dsurface = NULL;
 	}
 }
+
 
 //============================================================
 //  texture_info constructor
@@ -2080,7 +2070,6 @@ error:
 }
 
 
-
 //============================================================
 //  texture_info::compute_size_subroutine
 //============================================================
@@ -2136,6 +2125,7 @@ void texture_info::compute_size_subroutine(int texwidth, int texheight, int* p_w
 	*p_width = finalwidth;
 	*p_height = finalheight;
 }
+
 
 //============================================================
 //  texture_info::compute_size
@@ -2195,7 +2185,6 @@ void texture_info::compute_size(int texwidth, int texheight)
 }
 
 
-
 //============================================================
 //  copyline_palette16
 //============================================================
@@ -2214,7 +2203,6 @@ INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const 
 }
 
 
-
 //============================================================
 //  copyline_palettea16
 //============================================================
@@ -2231,7 +2219,6 @@ INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const
 	if (xborderpix)
 		*dst++ = palette[*--src];
 }
-
 
 
 //============================================================
@@ -2277,7 +2264,6 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 }
 
 
-
 //============================================================
 //  copyline_argb32
 //============================================================
@@ -2319,7 +2305,6 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 			*dst++ = *--src;
 	}
 }
-
 
 
 //============================================================
@@ -2387,7 +2372,6 @@ INLINE void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, co
 }
 
 
-
 //============================================================
 //  copyline_yuy16_to_uyvy
 //============================================================
@@ -2449,7 +2433,6 @@ INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, co
 		}
 	}
 }
-
 
 
 //============================================================
@@ -2527,7 +2510,6 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 		}
 	}
 }
-
 
 
 //============================================================
@@ -2610,7 +2592,6 @@ void texture_info::set_data(const render_texinfo *texsource, UINT32 flags)
 	// prescale
 	prescale();
 }
-
 
 
 //============================================================
@@ -2776,26 +2757,30 @@ cache_target::~cache_target()
 
 bool cache_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
 {
-	int bloom_size = (width < height) ? width : height;
 	int bloom_index = 0;
+	int bloom_size = (width < height) ? width : height;
 	int bloom_width = width;
 	int bloom_height = height;
 	for (; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
 	{
 		bloom_width >>= 1;
 		bloom_height >>= 1;
+
 		HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), bloom_width, bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
 		if (result != D3D_OK)
 		{
 			return false;
 		}
 		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);
+
 		bloom_index++;
 	}
 
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture);
 	if (result != D3D_OK)
+	{
 		return false;
+	}
 	(*d3dintf->texture.get_surface_level)(last_texture, 0, &last_target);
 
 	target_width = width * prescale_x;
@@ -2803,6 +2788,7 @@ bool cache_target::init(renderer *d3d, base *d3dintf, int width, int height, int
 
 	return true;
 }
+
 
 //============================================================
 //  render_target::~render_target
@@ -2824,40 +2810,28 @@ render_target::~render_target()
 		}
 	}
 
-	for (int index = 0; index < 5; index++)
+	for (int index = 0; index < 2; index++)
 	{
-		if (render_texture[index] != NULL)
+		if (native_texture[index] != NULL)
 		{
-			(*d3dintf->texture.release)(render_texture[index]);
-			render_texture[index] = NULL;
+			(*d3dintf->texture.release)(native_texture[index]);
+			native_texture[index] = NULL;
 		}
-		if (target[index] != NULL)
+		if (native_target[index] != NULL)
 		{
-			(*d3dintf->surface.release)(target[index]);
-			target[index] = NULL;
+			(*d3dintf->surface.release)(native_target[index]);
+			native_target[index] = NULL;
 		}
-	}
-
-	if (prescaletexture != NULL)
-	{
-		(*d3dintf->texture.release)(prescaletexture);
-		prescaletexture = NULL;
-	}
-	if (prescaletarget != NULL)
-	{
-		(*d3dintf->surface.release)(prescaletarget);
-		prescaletarget = NULL;
-	}
-
-	if (smalltexture != NULL)
-	{
-		(*d3dintf->texture.release)(smalltexture);
-		smalltexture = NULL;
-	}
-	if (smalltarget != NULL)
-	{
-		(*d3dintf->surface.release)(smalltarget);
-		smalltarget = NULL;
+		if (prescale_texture[index] != NULL)
+		{
+			(*d3dintf->texture.release)(prescale_texture[index]);
+			prescale_texture[index] = NULL;
+		}
+		if (prescale_target[index] != NULL)
+		{
+			(*d3dintf->surface.release)(prescale_target[index]);
+			prescale_target[index] = NULL;
+		}
 	}
 }
 
@@ -2868,55 +2842,41 @@ render_target::~render_target()
 
 bool render_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
 {
-	D3DFORMAT format = D3DFMT_A8R8G8B8;
+	HRESULT result;
 
-	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, format, D3DPOOL_DEFAULT, &render_texture[0]);
-	if (result != D3D_OK)
-		return false;
-	(*d3dintf->texture.get_surface_level)(render_texture[0], 0, &target[0]);
+	for (int index = 0; index < 2; index++)
+	{
+		result = (*d3dintf->device.create_texture)(d3d->get_device(), width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &native_texture[index]);
+		if (result != D3D_OK)
+		{
+			return false;
+		}
+		(*d3dintf->texture.get_surface_level)(native_texture[index], 0, &native_target[index]);
 
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, format, D3DPOOL_DEFAULT, &render_texture[1]);
-	if (result != D3D_OK)
-		return false;
-	(*d3dintf->texture.get_surface_level)(render_texture[1], 0, &target[1]);
+		result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescale_texture[index]);
+		if (result != D3D_OK)
+		{
+			return false;
+		}
+		(*d3dintf->texture.get_surface_level)(prescale_texture[index], 0, &prescale_target[index]);
+	}
 
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, format, D3DPOOL_DEFAULT, &render_texture[2]);
-	if (result != D3D_OK)
-		return false;
-	(*d3dintf->texture.get_surface_level)(render_texture[2], 0, &target[2]);
-
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &render_texture[3]);
-	if (result != D3D_OK)
-		return false;
-	(*d3dintf->texture.get_surface_level)(render_texture[3], 0, &target[3]);
-
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &render_texture[4]);
-	if (result != D3D_OK)
-		return false;
-	(*d3dintf->texture.get_surface_level)(render_texture[4], 0, &target[4]);
-
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &smalltexture);
-	if (result != D3D_OK)
-		return false;
-	(*d3dintf->texture.get_surface_level)(smalltexture, 0, &smalltarget);
-
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescaletexture);
-	if (result != D3D_OK)
-		return false;
-	(*d3dintf->texture.get_surface_level)(prescaletexture, 0, &prescaletarget);
-
-	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	int bloom_index = 0;
+	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	float bloom_width = d3d->get_width();
 	float bloom_height = d3d->get_height();
 	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
 		bloom_width *= 0.5f;
 		bloom_height *= 0.5f;
+
 		result = (*d3dintf->device.create_texture)(d3d->get_device(), (int)bloom_width, (int)bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
 		if (result != D3D_OK)
+		{
 			return false;
+		}
 		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);
+
 		bloom_index++;
 	}
 
