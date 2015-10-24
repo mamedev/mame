@@ -16,7 +16,6 @@
     800KB disks are double sided 80 tracks.
 
     The numbers below are guesswork since there's no documentation.
-    Currently not working.
 
 *********************************************************************/
 
