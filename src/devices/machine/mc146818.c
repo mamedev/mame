@@ -40,7 +40,8 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 		m_epoch(0),
 		m_use_utc(false),
 		m_binary(false),
-		m_hour(false)
+		m_hour(false),
+		m_binyear(false)
 {
 }
 
@@ -54,7 +55,8 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		m_epoch(0),
 		m_use_utc(false),
 		m_binary(false),
-		m_hour(false)
+		m_hour(false),
+		m_binyear(false)
 {
 }
 
