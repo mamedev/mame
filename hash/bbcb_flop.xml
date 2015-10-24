@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro Model B Disks -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<!-- This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum. -->
+
+<!-- All images in this list contain no protection, they are either deprotected disc images or transferred from cassette. Some may never have been protected and will be marked if known. -->
+
+
+<softwarelist name="bbcb_flop" description="BBC Micro Model B disks">
+
+	<software name="3dbombal">
+		<description>3D Bomb Alley</description>
+		<year>1983</year>
+		<publisher>Software Invasion</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="3dbomballey.ssd" size="102400" crc="5a8deaff" sha1="d0f4716a376e4407492b4db7f87597bc07d7651f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cutekill">
+		<description>Cute To Kill: Beyond Infinity</description>
+		<year>1987</year>
+		<publisher>Mandarin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="48640">
+				<rom name="beyondinfinity-cutetokill.ssd" size="48640" crc="350daf5c" sha1="afe6bc6448e86e6bc6bee34cae09c8cf46828b1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="elite">
+		<description>Elite</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="elitebbc.ssd" size="204800" crc="1f15458d" sha1="ac47c0d6d0006ceef2102dda521df3364aff32aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elitexec" supported="partial">
+		<description>Elite (Executive Edition)</description>
+		<year>1986</year>
+		<publisher>Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyes">
+		<description>Eyes</description>
+		<year>1984</year>
+		<publisher>Ocean (Unreleased)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="12544">
+				<rom name="eyes-unreleased.ssd" size="12544" crc="19f1dd27" sha1="182b05ef661872b4e63a7e627675f1f6297da8df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogman">
+		<description>Frogman (Demo)</description>
+		<year>1993</year>
+		<publisher>Unreleased</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="65280">
+				<rom name="frogman-demo.ssd" size="65280" crc="c4fc4bc9" sha1="c81ab2374b31fb3cd761e5a6aca7ed1fc321667f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mapocaly">
+		<description>Mega Apocalypse</description>
+		<year>1988</year>
+		<publisher>Martech (Unreleased)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="40192">
+				<rom name="megaapocalypse.ssd" size="40192" crc="4a6e1489" sha1="399e09d9782d7f0068a9acd9113595657dbb4673" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssgames">
+		<description>Superior Software - Games on Disc</description>
+		<year>1983</year>
+		<publisher>Superior Software (Demo)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="78336">
+				<rom name="superiorsoftware-games.ssd" size="78336" crc="6ba0c45b" sha1="df86cfeae73db805307b0e3120fe008ab7a5bc38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="welcome">
+		<description>Welcome and Disc Utils</description>
+		<year>1982</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="78336">
+				<rom name="welcome.ssd" size="78336" crc="03728f14" sha1="d212aa33a14b30dc2ff64920f834fe8c4e6715cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

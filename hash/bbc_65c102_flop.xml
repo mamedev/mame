@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Master 65C102 Co-Processor Support Disc -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<softwarelist name="bbc_65c102_flop" description="BBC Master 65C102 Co-Processor Support Disc">
+
+	<software name="coprosup" supported="no">
+		<description>65C102 Co-Processor Support Disc</description>
+		<year>1983</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="DFS" />
+		<info name="compatibility" value="65C102 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="bbcmaster65c102coprocessorsupportdisc.ssd" size="102400" crc="f6378bb4" sha1="03bfe9e860ecc6117f2e78771c4e301751269055" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
