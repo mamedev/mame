@@ -752,8 +752,8 @@ ROM_START( margmgc )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-// 0200751V - 10 Credit Multiplier / 20 Line Multiline
-// ADONIS  NSW/ACT  A - 25/05/98  Revision: 10  602/9
+// 0200751V - 10 Credit Multiplier / 20 Line Multiline.
+// ADONIS - NSW/ACT A - 25/05/98  Revision: 10  602/9.
 ROM_START( adonis )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200751v.u7",  0x000000, 0x80000, CRC(ab386ab0) SHA1(56c5baea4272866a9fe18bdc371a49f155251f86) )
@@ -779,8 +779,8 @@ ROM_START( adonis )
 	ROM_LOAD( "gal20v8b.u65", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
 ROM_END
 
-// 0100751V - 10 Credit Multiplier / 20 Line Multiline
-// ADONIS  NSW/ACT  A - 25/05/98  Revision: 9  602/9
+// 0100751V - 10 Credit Multiplier / 20 Line Multiline.
+// ADONIS - NSW/ACT A - 25/05/98  Revision: 9  602/9.
 ROM_START( adonisa )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100751v.u7",  0x000000, 0x80000, CRC(ca3e97db) SHA1(bd0a4402e57891899d92ea85a87fb8925a44f706) )
@@ -850,7 +850,25 @@ ROM_START( geishanz )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-/*********************** US games (requires set chips) ***********************/
+/*********************** US and Export games (requires set chips) ***********************/
+
+// 602/1 - 10 Credit Multiplier / 9 Line Multiline.
+// Dolphin Treasure - Export B - 06/12/96.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( dolphtre )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u7",  0x000000, 0x80000, CRC(97e3e4d0) SHA1(211b9b9e0f25dfaf9d1dfe1d3d88592522aa6f07) )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u11", 0x000002, 0x80000, CRC(de221eb5) SHA1(0e550e90b7fd5670f3f3a8589239c342ed70dc3d) )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u8",  0x100000, 0x80000, CRC(cb3ca8b6) SHA1(dba8bdaa406c07870f95241466359e39a012a70b) )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u12", 0x100002, 0x80000, CRC(8ee1c2d3) SHA1(e6ecaaac0cb4518ecc0d36532ab532f46e3e628b) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START( goldprmd )
 	ARISTOCRAT_MK5_BIOS
@@ -867,12 +885,13 @@ ROM_START( goldprmd )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-// MV4104  3,5,10,20,25,50 Credit Multiplier / 9-20 Line Multiline 
-// CUCKOO   Export  C - 02/02/00
+// MV4104  3,5,10,20,25,50 Credit Multiplier / 9-20 Line Multiline. 
+// CUCKOO - Export C - 02/02/00.
+// All devices are 27c4002 instead of 27c4096.
 ROM_START( cuckoo )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "mv4104_cuckoo.u7",  0x000000, 0x80000, CRC(0bd17338) SHA1(b8f467bdf8d76533a2b7d44fe93be414f25a3c31) )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u7",  0x000000, 0x80000, CRC(0bd17338) SHA1(b8f467bdf8d76533a2b7d44fe93be414f25a3c31) )	// 
 	ROM_LOAD32_WORD( "mv4104_cuckoo.u11", 0x000002, 0x80000, CRC(4c407deb) SHA1(57589e61a376ddff99cd420eb47bf8c902c6a249) )
 	ROM_LOAD32_WORD( "mv4104_cuckoo.u8",  0x100000, 0x80000, CRC(33f52052) SHA1(89cbfe588d91244adff4c520fa94962d69ff20bf) )
 	ROM_LOAD32_WORD( "mv4104_cuckoo.u12", 0x100002, 0x80000, CRC(00bb7597) SHA1(f4d6b21091e320a82d59477469340633b001ed0d) )
@@ -906,6 +925,7 @@ GAME( 1995, enchfrst, 0,        aristmk5,     aristmk5, aristmk5_state, aristmk5
 GAME( 1995, swthrt2v, 0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 577/1,  C - 07/09/95
 GAME( 1996, dolphntr, 0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96, Rev 3
 GAME( 1996, dolphtra, dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96, Rev 1.24.4.0
+GAME( 1996, dolphtre, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (Export)",                            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96
 GAME( 1997, goldprmd, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (MV4091, USA)",                        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4091, B - 13/05/97
 GAME( 1997, qotn,     0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/4,  B - 13/05/97
 GAME( 1997, dmdtouch, 0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (0400433V, Local)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 604,    E - 30/06/97
