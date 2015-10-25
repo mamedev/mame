@@ -1147,9 +1147,10 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			CLK(POP_R16);
 			break;
 
-// 8086 'invalid opcodes', as documented at http://www.os2museum.com/wp/?p=2147
-// - 0x60 - 0x6f are an alias to 0x70 - 0x7f.
+// 8086 'invalid opcodes', as documented at http://www.os2museum.com/wp/?p=2147 and tested on real hardware
+// - 0x60 - 0x6f are aliases to 0x70 - 0x7f.
 // - 0xc0,  0xc1, 0xc8, 0xc9 are also aliases where the CPU ignores BIT 1 (*).
+// - 0xf1 is an alias to 0xf0.
 //
 //      Instructions are used in the boot sector for some versions of
 //      MS-DOS  (e.g. the DEC Rainbow-100 version of DOS 2.x)
@@ -1692,7 +1693,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			}
 			break;
 
-		case 0xc1: //  0xc1 is 0xc3 - see (*)
+		case 0xc1: // 0xc1 is 0xc3 - see (*)
 		case 0xc3: // i_ret
 			m_ip = POP();
 			CLK(RET_NEAR);
@@ -1724,7 +1725,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			CLKM(MOV_RI16,MOV_MI16);
 			break;
 
-		case 0xc8:  // 0xc8 = 0xca - see (*)
+		case 0xc8: // 0xc8 = 0xca - see (*)
 		case 0xca: // i_retf_d16
 			{
 				UINT32 count = fetch_word();
@@ -1735,7 +1736,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			}
 			break;
 
-		case 0xc9:  // 0xc9 = 0xcb  - see (*)
+		case 0xc9: // 0xc9 = 0xcb  - see (*)
 		case 0xcb: // i_retf
 			m_ip = POP();
 			m_sregs[CS] = POP();
@@ -2017,6 +2018,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 
 
 		case 0xf0: // i_lock
+		case 0xf1: // 0xf1 is 0xf0; verified on custom hardware
 			logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
 			m_lock = true;
 			m_no_interrupt = 1;
