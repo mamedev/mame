@@ -735,6 +735,7 @@ static MACHINE_CONFIG_START( mdj_scd, md_cons_state )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
 MACHINE_CONFIG_END
 
+/******************SEGA CD + 32X****************************/
 
 static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
@@ -755,7 +756,43 @@ static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "segacd")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( md_32x_scd, md_32x )
 
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
+	MCFG_GFX_PALETTE("gen_vdp:palette")
+
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("scd_cdrom")
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+
+	MCFG_DEVICE_REMOVE("cartslot")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
+	MCFG_GENERIC_EXTENSIONS("32x,bin")
+	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+
+	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
+	MCFG_SOFTWARE_LIST_ADD("cd_list", "megacd")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mdj_32x_scd, mdj_32x )
+
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
+	MCFG_GFX_PALETTE("gen_vdp:palette")
+
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("scd_cdrom")
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+
+	MCFG_DEVICE_REMOVE("cartslot")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
+	MCFG_GENERIC_EXTENSIONS("32x,bin")
+	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+
+	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
+	MCFG_SOFTWARE_LIST_ADD("cd_list", "megacdj")
+MACHINE_CONFIG_END
 
 /* We need proper names for most of these BIOS ROMs! */
 ROM_START( segacd )
@@ -903,6 +940,58 @@ ROM_START( 32x_scd )
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
 ROM_END
 
+ROM_START( 32x_mcd )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
+	ROM_LOAD( "megacd_model1_bios_1_00_e.bin", 0x000000,  0x020000, CRC(529ac15a) SHA1(f891e0ea651e2232af0c5c4cb46a0cae2ee8f356) )
+
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
+	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+
+	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
+	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
+
+	ROM_REGION32_BE( 0x400000, "master", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
+
+	ROM_REGION32_BE( 0x400000, "slave", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
+ROM_END
+
+ROM_START( 32x_mcdj )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
+	ROM_DEFAULT_BIOS("v100g")   // this seems the only revision where the cursor in CD menu works, allowing to boot games
+	/* Confirmed by ElBarto */
+	ROM_SYSTEM_BIOS(0, "v100s", "v1.00S")
+	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
+	/* Confirmed by ElBarto */
+	ROM_SYSTEM_BIOS(1, "v100g", "v1.00G")
+	ROMX_LOAD( "epr-14088b.bin", 0x000000,  0x020000, CRC(69ed6ccd) SHA1(27d11c3836506f01ee81cd142c0cd8b51abebbd2), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE)
+	/* Confirmed by ElBarto */
+	ROM_SYSTEM_BIOS(2, "v100l", "v1.00L")
+	ROMX_LOAD( "mpr-14088c.bin", 0x000000,  0x020000, CRC(03134289) SHA1(d60cb5a53f26d6b13e354bc149217587f2301718), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
+	/* Confirmed by ElBarto */
+	ROM_SYSTEM_BIOS(3, "v100o", "v1.00O")
+	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(4) | ROM_GROUPWORD | ROM_REVERSE)
+	ROM_SYSTEM_BIOS(4, "v100p", "v1.00P")   // CRC: e2e70bc8 when byteswapped
+	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(5) )
+
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
+	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+
+	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
+	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
+
+	ROM_REGION32_BE( 0x400000, "master", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
+
+	ROM_REGION32_BE( 0x400000, "slave", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
+ROM_END
+
 
 
 /***************************************************************************
@@ -937,4 +1026,8 @@ CONS( 1992, wmega,      xeye,      0,      mdj_scd,         md, md_cons_state,  
 CONS( 1993, wmegam2,    xeye,      0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1994, multmega,   cdx,       0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC, w/32X)", MACHINE_NOT_WORKING )
+
+//32X plugged in the cart slot + SegaCD plugged into the expansion port..
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1995, 32x_mcd,    32x_scd,   0,      md_32x_scd,      md, md_cons_state,     md_eur,    "Sega",   "Mega-CD with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x_mcdj,   32x_scd,   0,      mdj_32x_scd,     md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
