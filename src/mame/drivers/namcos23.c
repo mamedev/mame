@@ -1286,6 +1286,7 @@ struct namcos23_render_data
 {
 	running_machine *machine;
 	const pen_t *pens;
+	bitmap_rgb32 *bitmap;
 	UINT32 (*texture_lookup)(running_machine &machine, const pen_t *pens, float x, float y);
 };
 
@@ -1301,7 +1302,6 @@ public:
 
 private:
 	namcos23_state& m_state;
-	bitmap_rgb32 m_bitmap;
 	float* m_zBuffer;
 };
 
@@ -1584,8 +1584,7 @@ UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
 
 namcos23_renderer::namcos23_renderer(namcos23_state &state)
 	: poly_manager<float, namcos23_render_data, 5, POLY_MAX_ENTRIES>(state.machine()),
-	  m_state(state),
-	  m_bitmap(state.m_screen->width(), state.m_screen->height())
+	  m_state(state)
 {
 	const INT32 bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
 	m_zBuffer = auto_alloc_array(state.machine(), float, bufferSize);
@@ -1896,7 +1895,7 @@ void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, 
 	float dv = extent.param[3].dpdx;
 	float dl = extent.param[4].dpdx;
 	
-	UINT32 *img = &m_bitmap.pix32(scanline, extent.startx);
+	UINT32 *img = &object.bitmap->pix32(scanline, extent.startx);
 	float* zBuffer = &m_zBuffer[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 	
 	for(int x = extent.startx; x < extent.stopx; x++) {
@@ -2131,7 +2130,8 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 		const namcos23_poly_entry *p = &render.polys[i];
 		namcos23_render_data& extra = render.polymgr->object_data_alloc();
 		extra = p->rd;
-		
+		extra.bitmap = &bitmap;
+
 		// We should probably split the polygons into triangles ourselves to insure everything is being rendered properly
 		if (p->vertex_count == 3)
 			render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 5, p->pv[0], p->pv[1], p->pv[2]);
@@ -2143,8 +2143,7 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 			render_polygon<6>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 5, p->pv);
 	}
 	render.poly_count = 0;
-	
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, scissor);
+	render.polymgr->wait();
 
 	// Reset the buffers
 	for (int i = 0; i < (m_state.m_screen->visible_area().width())*(m_state.m_screen->visible_area().height()); i++)
@@ -2171,7 +2170,6 @@ void namcos23_state::render_run(bitmap_rgb32 &bitmap)
 		re++;
 	}
 	render.polymgr->render_flush(bitmap);
-	render.polymgr->wait();
 }
 
 
