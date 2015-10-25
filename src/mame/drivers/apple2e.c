@@ -779,11 +779,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	if((scanline % 8) == 0)
-	{
-		machine().first_screen()->update_partial(machine().first_screen()->vpos());
-	}
-
 	if (m_isiic)
 	{
 		update_iic_mouse();
@@ -1101,10 +1096,12 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			switch (offset)
 			{
 				case 0x5e:  // SETDHIRES
+					machine().first_screen()->update_now();
 					m_video->m_dhires = true;
 					break;
 
 				case 0x5f:  // CLRDHIRES
+					machine().first_screen()->update_now();
 					m_video->m_dhires = false;
 					break;
 			}
@@ -1155,35 +1152,47 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			break;
 
 		case 0x50:  // graphics mode
-			m_video->m_graphics = true; break;
+			machine().first_screen()->update_now();
+			m_video->m_graphics = true; 
+			break;
 
 		case 0x51:  // text mode
-			m_video->m_graphics = false; break;
+			machine().first_screen()->update_now();
+			m_video->m_graphics = false; 
+			break;
 
 		case 0x52:  // no mix
-			m_video->m_mix = false; break;
+			machine().first_screen()->update_now();
+			m_video->m_mix = false; 
+			break;
 
 		case 0x53:  // mixed mode
-			m_video->m_mix = true; break;
+			machine().first_screen()->update_now();
+			m_video->m_mix = true; 
+			break;
 
 		case 0x54:  // set page 1
+			machine().first_screen()->update_now();
 			m_page2 = false;
 			m_video->m_page2 = false;
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
+			machine().first_screen()->update_now();
 			m_page2 = true;
 			m_video->m_page2 = true;
 			auxbank_update();
 			break;
 
 		case 0x56: // select lo-res
+			machine().first_screen()->update_now();
 			m_video->m_hires = false;
 			auxbank_update();
 			break;
 
 		case 0x57: // select hi-res
+			machine().first_screen()->update_now();
 			m_video->m_hires = true;
 			auxbank_update();
 			break;

@@ -42,7 +42,7 @@ public:
 	static void set_verbose(int on_off);
 
 	// get sector diskaddr of logical unit lun into data_buffer
-	UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);
+	static UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);
 
 	required_device<pc_fdc_interface> m_fdc;
 	required_ioport m_iobase;

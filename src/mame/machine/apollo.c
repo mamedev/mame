@@ -95,11 +95,11 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFNAME(APOLLO_CONF_25_YEARS_AGO, APOLLO_CONF_25_YEARS_AGO, "25 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_25_YEARS_AGO, DEF_STR ( On ) )
-
-//      PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
-//      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-//      PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
-
+#ifdef APOLLO_XXL
+		PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
+		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+		PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
+#endif
 //      PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
 //      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 //      PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
@@ -111,15 +111,15 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFNAME(APOLLO_CONF_FPU_TRACE, 0x00, "FPU Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_FPU_TRACE, DEF_STR ( On ) )
+#ifdef APOLLO_XXL
+		PORT_CONFNAME(APOLLO_CONF_DISK_TRACE, 0x00, "Disk Trace")
+		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+		PORT_CONFSETTING(APOLLO_CONF_DISK_TRACE, DEF_STR ( On ) )
 
-//      PORT_CONFNAME(APOLLO_CONF_DISK_TRACE, 0x00, "Disk Trace")
-//      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-//      PORT_CONFSETTING(APOLLO_CONF_DISK_TRACE, DEF_STR ( On ) )
-
-//      PORT_CONFNAME(APOLLO_CONF_NET_TRACE, 0x00, "Network Trace")
-//      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-//      PORT_CONFSETTING(APOLLO_CONF_NET_TRACE, DEF_STR ( On ) )
-
+		PORT_CONFNAME(APOLLO_CONF_NET_TRACE, 0x00, "Network Trace")
+		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+		PORT_CONFSETTING(APOLLO_CONF_NET_TRACE, DEF_STR ( On ) )
+#endif
 INPUT_PORTS_END
 
 class apollo_config_device : public device_t
@@ -857,6 +857,216 @@ WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 }
 
 //##########################################################################
+// machine/apollo_ni.c - APOLLO DS3500 node ID
+//##########################################################################
+
+#undef VERBOSE
+#define VERBOSE 0
+
+#define DEFAULT_NODE_ID 0x12345
+
+/***************************************************************************
+ IMPLEMENTATION
+ ***************************************************************************/
+
+/*** Apollo Node ID device ***/
+
+// device type definition
+const device_type APOLLO_NI = &device_creator<apollo_ni> ;
+
+//-------------------------------------------------
+//  apollo_ni - constructor
+//-------------------------------------------------
+
+apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
+		device_t *owner, UINT32 clock) :
+	device_t(mconfig, APOLLO_NI, "Node ID", tag, owner, clock, "node ID",
+			__FILE__), device_image_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
+//  apollo_ni - destructor
+//-------------------------------------------------
+
+apollo_ni::~apollo_ni()
+{
+}
+
+void apollo_ni::device_config_complete()
+{
+	update_names(APOLLO_NI, "node_id", "ni");
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void apollo_ni::device_start()
+{
+	CLOG1(("apollo_ni::device_start"));
+	set_node_id(DEFAULT_NODE_ID);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void apollo_ni::device_reset()
+{
+	CLOG1(("apollo_ni::device_reset"));
+}
+
+//-------------------------------------------------
+//  set node ID
+//-------------------------------------------------
+
+void apollo_ni::set_node_id(UINT32 node_id)
+{
+	m_node_id = node_id;
+	CLOG1(("apollo_ni::set_node_id: node ID is %x", node_id));
+}
+
+//-------------------------------------------------
+//  read/write
+//-------------------------------------------------
+
+WRITE16_MEMBER(apollo_ni::write)
+{
+	CLOG1(("Error: writing node id ROM at offset %02x = %04x & %04x", offset, data, mem_mask));
+}
+
+READ16_MEMBER(apollo_ni::read)
+{
+	UINT16 data = 0;
+	switch (offset & 0x0f)
+	{
+	case 1: // msb
+		data = (m_node_id >> 16) & 0xff;
+		break;
+	case 2:
+		data = (m_node_id >> 8) & 0xff;
+		break;
+	case 3: // lsb
+		data = m_node_id & 0xff;
+		break;
+	case 15: // checksum
+		data = ((m_node_id >> 16) + (m_node_id >> 8) + m_node_id) & 0xff;
+		break;
+	default:
+		data = 0;
+		break;
+	}
+	data <<= 8;
+	CLOG2(("reading node id ROM at offset %02x = %04x & %04x", offset, data, mem_mask));
+	return data;
+}
+
+/*-------------------------------------------------
+ DEVICE_IMAGE_LOAD( rom )
+ -------------------------------------------------*/
+bool apollo_ni::call_load()
+{
+	CLOG1(("apollo_ni::call_load: %s", filename()));
+
+	UINT64 size = length();
+	 if (size != 32)
+	{
+		CLOG(("apollo_ni::call_load: %s has unexpected file size %" I64FMT "d", filename(), size));
+	}
+	else
+	{
+		UINT8 data[32];
+		fread(data, sizeof(data));
+
+		UINT8 checksum = data[2] + data[4] + data[6];
+		if (checksum != data[30])
+		{
+			CLOG(("apollo_ni::call_load: checksum is %02x - should be %02x", checksum, data[30]));
+		}
+		else
+		{
+			m_node_id = (((data[2] << 8) | data[4]) << 8) | (data[6]);
+			CLOG1(("apollo_ni::call_load: node ID is %x", m_node_id));
+			return IMAGE_INIT_PASS;
+		}
+	}
+	return IMAGE_INIT_FAIL;
+}
+
+/*-------------------------------------------------
+ DEVICE_IMAGE_CREATE( rom )
+ -------------------------------------------------*/
+
+bool apollo_ni::call_create(int format_type, option_resolution *format_options)
+{
+	CLOG1(("apollo_ni::call_create:"));
+
+	if (length() > 0)
+	{
+		CLOG(("apollo_ni::call_create: %s already exists", filename()));
+	}
+	else
+	{
+		UINT32 node_id = 0;
+		sscanf(basename_noext(), "%x", &node_id);
+		if (node_id == 0 || node_id > 0xfffff)
+		{
+			CLOG(("apollo_ni::call_create: filename %s is no valid node ID", basename()));
+		}
+		else
+		{
+			UINT8 data[32];
+			memset(data, 0, sizeof(data));
+			data[2] = node_id >> 16;
+			data[4] = node_id >> 8;
+			data[6] = node_id;
+			data[30] = data[2] + data[4] + data[6];
+			fwrite(data, sizeof(data));
+			CLOG(("apollo_ni::call_create: created %s with node ID %x", filename(), node_id));
+			set_node_id(node_id);
+			return IMAGE_INIT_PASS;
+		}
+	}
+	return IMAGE_INIT_FAIL;
+}
+
+/*-------------------------------------------------
+ DEVICE_IMAGE_UNLOAD( rom )
+ -------------------------------------------------*/
+void apollo_ni::call_unload()
+{
+	CLOG1(("apollo_ni::call_unload:"));
+}
+
+//-------------------------------------------------
+//  set node ID from disk
+//-------------------------------------------------
+
+void apollo_ni::set_node_id_from_disk()
+{
+#ifdef APOLLO_XXL
+	// set node ID from UID of logical volume 1 of logical unit 0
+	UINT8 db[0x50];
+
+	// check label of physical volume and get sector data of logical volume 1
+	// Note: sector data starts with 32 byte block header
+	if (omti8621_device::get_sector(0, db, sizeof(db), 0) == sizeof(db)
+			&& memcmp(db + 0x22, "APOLLO", 6) == 0)
+	{
+		UINT16 sector1 = apollo_is_dn5500() ? 4 : 1;
+
+		if (omti8621_device::get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
+		{
+			// set node_id from UID of logical volume 1 of logical unit 0
+			m_node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
+			CLOG1(("apollo_ni::set_node_id_from_disk: node ID is %x", m_node_id));
+		}
+	}
+#endif
+}
+
+//##########################################################################
 // machine/apollo.c - APOLLO DS3500 CPU Board
 //##########################################################################
 
@@ -916,6 +1126,11 @@ MACHINE_CONFIG_FRAGMENT( common )
 
 	MCFG_MC146818_ADD( APOLLO_RTC_TAG, XTAL_32_768kHz )
 	MCFG_MC146818_UTC( true )
+	MCFG_MC146818_BINARY( false )
+	MCFG_MC146818_24_12( false )
+	MCFG_MC146818_EPOCH( 0 )
+
+	MCFG_APOLLO_NI_ADD( APOLLO_NI_TAG, 0 )
 
 	MCFG_APOLLO_SIO_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio2_irq_handler))
@@ -959,6 +1174,10 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
 	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
 	MCFG_APOLLO_SIO_A_TX_CALLBACK(DEVWRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
+
+#ifdef APOLLO_XXL
+	MCFG_APOLLO_SIO_B_TX_CALLBACK(DEVWRITELINE(APOLLO_STDIO_TAG, apollo_stdio_device, rx_w))
+#endif
 MACHINE_CONFIG_END
 
 static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
@@ -1015,20 +1234,20 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 	apollo_csr_set_servicemode(apollo_config(APOLLO_CONF_SERVICE_MODE));
 
 	// change year according to configuration settings
-	if (year < 20 && apollo_config(APOLLO_CONF_20_YEARS_AGO))
-	{
-		year+=80;
-		apollo_rtc_w(space, 9, year);
-	}
-	else if (year < 25 && apollo_config(APOLLO_CONF_25_YEARS_AGO))
+	if (year < 25 && apollo_config(APOLLO_CONF_25_YEARS_AGO))
 	{
 		year += 75;
+		apollo_rtc_w(space, 9, year);
+	}
+	else if (year < 20 && apollo_config(APOLLO_CONF_20_YEARS_AGO))
+	{
+		year += 80;
 		apollo_rtc_w(space, 9, year);
 	}
 	else if (year >= 80 && !apollo_config(APOLLO_CONF_20_YEARS_AGO)
 			&& !apollo_config(APOLLO_CONF_25_YEARS_AGO))
 	{
-		year -=80;
+		year -= 80;
 		apollo_rtc_w(space, 9, year);
 	}
 
@@ -1040,3 +1259,154 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 		m_dn3000_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 	}
 }
+
+#ifdef APOLLO_XXL
+
+//##########################################################################
+// machine/apollo_stdio.c - stdio terminal for mess
+//##########################################################################
+
+#undef VERBOSE
+#define VERBOSE 0
+
+#if defined(__linux__)
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+
+/***************************************************************************
+ IMPLEMENTATION
+ ***************************************************************************/
+
+// device type definition
+const device_type APOLLO_STDIO = &device_creator<apollo_stdio_device> ;
+
+//-------------------------------------------------
+// apollo_stdio_device - constructor
+//-------------------------------------------------
+
+apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig,
+		const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, APOLLO_STDIO, "Apollo STDIO", tag, owner, clock,
+			"apollo_stdio", __FILE__), device_serial_interface(mconfig, *this),
+			m_tx_w(*this)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void apollo_stdio_device::device_start()
+{
+	CLOG1(("device_start"));
+
+	m_tx_w.resolve_safe();
+
+	m_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(
+			FUNC(apollo_stdio_device::poll_timer), this));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void apollo_stdio_device::device_reset()
+{
+	CLOG1(("device_reset"));
+
+	// comms is at 8N1, 9600 baud
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rcv_rate(9600);
+	set_tra_rate(9600);
+
+	m_tx_busy = false;
+	m_xmit_read = m_xmit_write = 0;
+
+#if defined(__linux__)
+	// FIXME: unavailable in mingw
+	// set stdin to nonblocking to allow polling
+	fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
+#endif
+
+	// start timer
+	m_poll_timer->adjust(attotime::zero, 0, attotime::from_msec(1)); // every 1ms
+}
+
+void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
+		int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
+void apollo_stdio_device::rcv_complete() // Rx completed receiving byte
+{
+	receive_register_extract();
+	UINT8 data = get_received_char();
+
+	// output data to stdout (FIXME: '\r' may confuse ceterm)
+	if (data != '\r')
+	{
+		::putchar(data);
+		::fflush(stdout);
+	}
+	CLOG1(("rcv_complete %02x - %c", data, data));
+}
+
+void apollo_stdio_device::tra_complete() // Tx completed sending byte
+{
+	// is there more waiting to send?
+	if (m_xmit_read != m_xmit_write)
+	{
+		transmit_register_setup(m_xmitring[m_xmit_read++]);
+		if (m_xmit_read >= XMIT_RING_SIZE)
+		{
+			m_xmit_read = 0;
+		}
+	}
+	else
+	{
+		m_tx_busy = false;
+	}
+}
+
+void apollo_stdio_device::tra_callback() // Tx send bit
+{
+	int bit = transmit_register_get_data_bit();
+	m_tx_w(bit);
+
+	CLOG2(("tra_callback %02x", bit));
+}
+
+TIMER_CALLBACK_MEMBER(apollo_stdio_device::poll_timer)
+{
+#if defined(__linux__)
+	UINT8 data;
+	while (::read(STDIN_FILENO, &data, 1) == 1)
+	{
+		xmit_char(data == '\n' ? '\r' : data);
+	}
+#endif
+}
+
+void apollo_stdio_device::xmit_char(UINT8 data)
+{
+	CLOG1(("xmit_char %02x - %c", data, data));
+
+	// if tx is busy it'll pick this up automatically when it completes
+	if (!m_tx_busy)
+	{
+		m_tx_busy = true;
+		transmit_register_setup(data);
+	}
+	else
+	{
+		// tx is busy, it'll pick this up next time
+		m_xmitring[m_xmit_write++] = data;
+		if (m_xmit_write >= XMIT_RING_SIZE)
+		{
+			m_xmit_write = 0;
+		}
+	}
+}
+#endif
