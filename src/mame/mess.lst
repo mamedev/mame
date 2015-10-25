@@ -100,6 +100,8 @@ multmega  // 1994 Sega Multi-Mega (Europe)
 32xe
 32xj
 32x_scd   // 1994 Sega Sega CD (USA w/32X addon)
+32x_mcd   // 1995 Sega Mega-CD (Europe w/32X addon)
+32x_mcdj   // 1994 Sega Mega-CD (Japan w/32X addon)
 segapm    // 1996 Sega Picture Magic (32x type hardware)
 
 saturnjp  // 1994 Sega Saturn (Japan)
