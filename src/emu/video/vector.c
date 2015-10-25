@@ -140,9 +140,8 @@ vector_device::vector_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-float vector_device::m_flicker_correction = 0.0f;
+float vector_device::m_flicker = 0.0f;
 float vector_device::m_beam_width = 0.0f;
-int vector_device::m_flicker;
 int vector_device::m_vector_index;
 
 void vector_device::device_start()
@@ -160,13 +159,12 @@ void vector_device::device_start()
 
 void vector_device::set_flicker(float _flicker)
 {
-	m_flicker_correction = _flicker;
-	m_flicker = (int)(m_flicker_correction * 2.55f);
+	m_flicker = _flicker;
 }
 
 float vector_device::get_flicker()
 {
-	return m_flicker_correction;
+	return m_flicker;
 }
 
 void vector_device::set_beam(float _beam)
@@ -184,21 +182,30 @@ float vector_device::get_beam()
  * Adds a line end point to the vertices list. The vector processor emulation
  * needs to call this.
  */
-void vector_device::add_point (int x, int y, rgb_t color, int intensity)
+void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
-	if (intensity > 0xff)
-		intensity = 0xff;
+	if (intensity > 255)
+	{
+		intensity = 255;
+	}
 
 	if (m_flicker && (intensity > 0))
 	{
-		intensity += (intensity * (0x80-(machine().rand()&0xff)) * m_flicker)>>16;
+		float random = (float)(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
+		
+		intensity -= (int)(intensity * random * m_flicker);
 		if (intensity < 0)
+		{
 			intensity = 0;
-		if (intensity > 0xff)
-			intensity = 0xff;
+		}		
+		if (intensity > 255)
+		{
+			intensity = 255;
+		}
 	}
+
 	newpoint = &m_vector_list[m_vector_index];
 	newpoint->x = x;
 	newpoint->y = y;
@@ -214,10 +221,11 @@ void vector_device::add_point (int x, int y, rgb_t color, int intensity)
 	}
 }
 
+
 /*
  * Add new clipping info to the list
  */
-void vector_device::add_clip (int x1, int yy1, int x2, int y2)
+void vector_device::add_clip(int x1, int yy1, int x2, int y2)
 {
 	point *newpoint;
 
@@ -241,7 +249,7 @@ void vector_device::add_clip (int x1, int yy1, int x2, int y2)
  * The vector CPU creates a new display list. We save the old display list,
  * but only once per refresh.
  */
-void vector_device::clear_list (void)
+void vector_device::clear_list(void)
 {
 	m_vector_index = 0;
 }
@@ -286,22 +294,32 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else
 		{
+			// todo: implement beam_width_overdrive based on intensity
+
+			float beam_width = m_beam_width * (1.0f / (float)VECTOR_WIDTH_DENOM);
+
 			coords.x0 = ((float)lastx - xoffs) * xscale;
 			coords.y0 = ((float)lasty - yoffs) * yscale;
 			coords.x1 = ((float)curpoint->x - xoffs) * xscale;
 			coords.y1 = ((float)curpoint->y - yoffs) * yscale;
 
-			if (curpoint->intensity != 0)
-				if (!render_clip_line(&coords, &clip))
-					screen.container().add_line(coords.x0, coords.y0, coords.x1, coords.y1,
-							m_beam_width * (1.0f / (float)VECTOR_WIDTH_DENOM),
-							(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
-							flags);
+			// todo: extend line length by half beam_width on both sides
+
+			if (curpoint->intensity != 0 && !render_clip_line(&coords, &clip))
+			{
+				screen.container().add_line(
+					coords.x0, coords.y0, coords.x1, coords.y1,
+					beam_width,
+					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
+					flags);
+			}
 
 			lastx = curpoint->x;
 			lasty = curpoint->y;
 		}
+
 		curpoint++;
 	}
+
 	return 0;
 }

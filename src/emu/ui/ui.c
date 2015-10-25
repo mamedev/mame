@@ -2340,10 +2340,10 @@ static INT32 slider_flicker(running_machine &machine, void *arg, std::string *st
 {
 	vector_device *vector = NULL;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_flicker((float)newval * 0.1f);
+		vector->set_flicker((float)newval * 0.001f);
 	if (str != NULL)
 		strprintf(*str,"%1.2f", (double) vector->get_flicker());
-	return floor(vector->get_flicker() * 10.0f + 0.5f);
+	return floor(vector->get_flicker() * 1000.0f + 0.5f);
 }
 
 

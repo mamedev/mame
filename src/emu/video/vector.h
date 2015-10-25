@@ -56,8 +56,7 @@ public:
 	virtual void device_start();
 
 private:
-	static int m_flicker;                              /* beam flicker value     */
-	static float m_flicker_correction;
+	static float m_flicker;
 	static float m_beam_width;
 	point *m_vector_list;
 	static int m_vector_index;
