@@ -272,10 +272,13 @@ WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 }
 
 
-/**** BBC B+ Shadow Ram change ****/
+/**** BBC B+/Master Shadow Ram change ****/
 
-void bbc_state::bbcbp_setvideoshadow(int vdusel)
+void bbc_state::bbc_setvideoshadow(int vdusel)
 {
+	// LYNNE lives at 0xb000 in our map, but the offset we use here is 0x8000
+	// as the video circuitry will already be looking at 0x3000 or so above
+	// the offset.
 	if (vdusel)
 		m_BBC_Video_RAM = m_region_maincpu->base()+0x8000;
 	else
