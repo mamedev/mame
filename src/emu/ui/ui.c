@@ -124,7 +124,9 @@ static INT32 slider_overyscale(running_machine &machine, void *arg, std::string 
 static INT32 slider_overxoffset(running_machine &machine, void *arg, std::string *str, INT32 newval);
 static INT32 slider_overyoffset(running_machine &machine, void *arg, std::string *str, INT32 newval);
 static INT32 slider_flicker(running_machine &machine, void *arg, std::string *str, INT32 newval);
-static INT32 slider_beam(running_machine &machine, void *arg, std::string *str, INT32 newval);
+static INT32 slider_beam_min(running_machine &machine, void *arg, std::string *str, INT32 newval);
+static INT32 slider_beam_max(running_machine &machine, void *arg, std::string *str, INT32 newval);
+static INT32 slider_beam_intensity_weight(running_machine &machine, void *arg, std::string *str, INT32 newval);
 static char *slider_get_screen_desc(screen_device &screen);
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine &machine, void *arg, std::string *str, INT32 newval);
@@ -1964,10 +1966,14 @@ static slider_state *slider_init(running_machine &machine)
 	for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 		{
-			// add flicker control
+			// add vector control
 			*tailptr = slider_alloc(machine, "Vector Flicker", 0, 0, 1000, 10, slider_flicker, NULL);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Width", 10, 100, 1000, 10, slider_beam, NULL);
+			*tailptr = slider_alloc(machine, "Beam Width Minimum", 10, 100, 1000, 10, slider_beam_min, NULL);
+			tailptr = &(*tailptr)->next;
+			*tailptr = slider_alloc(machine, "Beam Width Maximum", 10, 100, 1000, 10, slider_beam_max, NULL);
+			tailptr = &(*tailptr)->next;
+			*tailptr = slider_alloc(machine, "Beam Intensity Weight", -1000, 0, 1000, 10, slider_beam_intensity_weight, NULL);
 			tailptr = &(*tailptr)->next;
 			break;
 		}
@@ -2348,18 +2354,50 @@ static INT32 slider_flicker(running_machine &machine, void *arg, std::string *st
 
 
 //-------------------------------------------------
-//  slider_beam - vector beam width slider
+//  slider_beam_min - minimum vector beam width slider
 //  callback
 //-------------------------------------------------
 
-static INT32 slider_beam(running_machine &machine, void *arg, std::string *str, INT32 newval)
+static INT32 slider_beam_min(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	vector_device *vector = NULL;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_beam((float)newval * 0.01f);
+		vector->set_beam_min(MIN((float)newval * 0.001f, vector->get_beam_max()));
 	if (str != NULL)
-		strprintf(*str,"%1.2f", (double) vector->get_beam());
-	return floor(vector->get_beam() * 100.0f + 0.5f);
+		strprintf(*str,"%1.2f", (double) vector->get_beam_min());
+	return floor(vector->get_beam_min() * 1000.0f + 0.5f);
+}
+
+
+//-------------------------------------------------
+//  slider_beam_max - maximum vector beam width slider
+//  callback
+//-------------------------------------------------
+
+static INT32 slider_beam_max(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	vector_device *vector = NULL;
+	if (newval != SLIDER_NOCHANGE)
+		vector->set_beam_max(MAX((float)newval * 0.001f, vector->get_beam_min()));
+	if (str != NULL)
+		strprintf(*str,"%1.2f", (double) vector->get_beam_max());
+	return floor(vector->get_beam_max() * 1000.0f + 0.5f);
+}
+
+
+//-------------------------------------------------
+//  slider_beam_intensity_weight - vector beam intensity weight slider
+//  callback
+//-------------------------------------------------
+
+static INT32 slider_beam_intensity_weight(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	vector_device *vector = NULL;
+	if (newval != SLIDER_NOCHANGE)
+		vector->set_beam_intensity_weight((float)newval * 0.001f);
+	if (str != NULL)
+		strprintf(*str,"%1.2f", (double) vector->get_beam_intensity_weight());
+	return floor(vector->get_beam_intensity_weight() * 1000.0f + 0.5f);
 }
 
 
