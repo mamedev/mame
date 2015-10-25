@@ -852,6 +852,24 @@ ROM_END
 
 /*********************** US and Export games (requires set chips) ***********************/
 
+// 559/2 - 10 Credit Multiplier / 9 Line Multiline.
+// Mine, Mine, Mine - Export E - 14/02/96.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( minemine )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "mine_export.u7",  0x000000, 0x80000, CRC(41bc3714) SHA1(5a8f7d24a6a697524af7997dcedd214fcaf48768) )
+	ROM_LOAD32_WORD( "mine_export.u11", 0x000002, 0x80000, CRC(75803b10) SHA1(2ff3d966da2992ddcc7e229d979cc1ee623b4900) )
+	ROM_LOAD32_WORD( "mine_export.u8",  0x100000, 0x80000, CRC(0a3e2baf) SHA1(b9ab989cf383cd6ea0aa1ead137558a1a6f5901d) )
+	ROM_LOAD32_WORD( "mine_export.u12", 0x100002, 0x80000, CRC(26c01532) SHA1(ec68ad44b703609c7bc27275f8d9250a16d9067c) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 // 602/1 - 10 Credit Multiplier / 9 Line Multiline.
 // Dolphin Treasure - Export B - 06/12/96.
 // All devices are 27c4002 instead of 27c4096.
@@ -947,12 +965,17 @@ ROM_START( magicmska )
 ROM_END
 
 
+/*************************
+*      Game Drivers      *
+*************************/
+
 //    YEAR  NAME       PARENT    MACHINE       INPUT     STATE           INIT      ROT     COMPANY       FULLNAME                                               FLAGS
 GAME( 1995, aristmk5,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "MKV Set/Clear Chips (USA)",                            MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 
 // Dates listed below are for the combination (reel layout), not release dates
 GAME( 1995, enchfrst,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (0400122V, Local)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 570/3,  E - 23/06/95
 GAME( 1995, swthrt2v,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 577/1,  C - 07/09/95
+GAME( 1996, minemine,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Mine, Mine, Mine (Export)",                            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 559/2,  E - 14/02/96
 GAME( 1996, dolphntr,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96, Rev 3
 GAME( 1996, dolphtra,  dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96, Rev 1.24.4.0
 GAME( 1996, dolphtre,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (Export)",                            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96
