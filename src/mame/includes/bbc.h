@@ -154,8 +154,6 @@ public:
 	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
 	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_via_user_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
 	void update_acia_rxd();
 	void update_acia_dcd();
@@ -166,7 +164,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(side_w);
 
@@ -345,20 +344,12 @@ public: // HACK FOR MC6845
 
 
 							/**************************************
-							   i8271 disc control
-							***************************************/
-
-	int m_previous_i8271_int_state; // 8271 interrupt status
-
-							/**************************************
 							   WD1770 disc control
 							***************************************/
 
 	int m_drive_control;
-	int m_wd177x_irq_state;
-	int m_wd177x_drq_state;
-	int m_previous_wd177x_int_state;
-	int m_wd177x_int_enabled;
+	int m_fdc_irq;
+	int m_fdc_drq;
 
 							/**************************************
 							   Video Code
@@ -409,7 +400,7 @@ public: // HACK FOR MC6845
 	int m_videoULA_palette1[16];
 	int *m_videoULA_palette_lookup;
 
-	void bbcbp_setvideoshadow(int vdusel);
+	void bbc_setvideoshadow(int vdusel);
 	void common_init(int memorySize);
 	void set_pixel_lookup();
 	void set_cursor(bbc_state *state);
@@ -422,10 +413,9 @@ public: // HACK FOR MC6845
 	int bbc_keyboard(address_space &space, int data);
 	void bbcb_IC32_initialise(bbc_state *state);
 	void MC146818_set(address_space &space);
-	void bbc_TMSint(int status);
 	void MC6850_Receive_Clock(int new_clock);
 	void BBC_Cassette_motor(unsigned char status);
-	void bbc_update_fdq_int(int state);
+	void bbc_update_nmi();
 	unsigned int calculate_video_address(int ma,int ra);
 	required_device<palette_device> m_palette;
 };
