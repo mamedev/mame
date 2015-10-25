@@ -880,7 +880,7 @@ const device_type APOLLO_NI = &device_creator<apollo_ni> ;
 
 apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
 		device_t *owner, UINT32 clock) :
-	device_t(mconfig, APOLLO_NI, "Node ID", tag, owner, clock, "node ID",
+	device_t(mconfig, APOLLO_NI, "Node ID", tag, owner, clock, "node_id",
 			__FILE__), device_image_interface(mconfig, *this)
 {
 }
