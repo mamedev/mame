@@ -1969,9 +1969,9 @@ static slider_state *slider_init(running_machine &machine)
 			// add vector control
 			*tailptr = slider_alloc(machine, "Vector Flicker", 0, 0, 1000, 10, slider_flicker, NULL);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Width Minimum", 10, 100, 1000, 10, slider_beam_min, NULL);
+			*tailptr = slider_alloc(machine, "Beam Width Minimum", 1, 100, 1000, 1, slider_beam_min, NULL);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Width Maximum", 10, 100, 1000, 10, slider_beam_max, NULL);
+			*tailptr = slider_alloc(machine, "Beam Width Maximum", 1, 100, 1000, 1, slider_beam_max, NULL);
 			tailptr = &(*tailptr)->next;
 			*tailptr = slider_alloc(machine, "Beam Intensity Weight", -1000, 0, 1000, 10, slider_beam_intensity_weight, NULL);
 			tailptr = &(*tailptr)->next;
@@ -2362,10 +2362,10 @@ static INT32 slider_beam_min(running_machine &machine, void *arg, std::string *s
 {
 	vector_device *vector = NULL;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_beam_min(MIN((float)newval * 0.001f, vector->get_beam_max()));
+		vector->set_beam_min(MIN((float)newval * 0.01f, vector->get_beam_max()));
 	if (str != NULL)
 		strprintf(*str,"%1.2f", (double) vector->get_beam_min());
-	return floor(vector->get_beam_min() * 1000.0f + 0.5f);
+	return floor(vector->get_beam_min() * 100.0f + 0.5f);
 }
 
 
@@ -2378,10 +2378,10 @@ static INT32 slider_beam_max(running_machine &machine, void *arg, std::string *s
 {
 	vector_device *vector = NULL;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_beam_max(MAX((float)newval * 0.001f, vector->get_beam_min()));
+		vector->set_beam_max(MAX((float)newval * 0.01f, vector->get_beam_min()));
 	if (str != NULL)
 		strprintf(*str,"%1.2f", (double) vector->get_beam_max());
-	return floor(vector->get_beam_max() * 1000.0f + 0.5f);
+	return floor(vector->get_beam_max() * 100.0f + 0.5f);
 }
 
 
