@@ -1205,10 +1205,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
-	/* sound hardware */
-	MCFG_DEVICE_REMOVE("mono")
-	MCFG_DEVICE_REMOVE("sn76489")
-
 	/* printer */
 	MCFG_DEVICE_REMOVE("centronics")
 
@@ -1503,7 +1499,7 @@ ROM_START(bbcb_us)
 	ROMX_LOAD("usmos10.rom",  0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(1))
 	ROMX_LOAD("usbasic3.rom", 0x3c000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
 
-	ROM_LOAD("viewa210.rom", 0x30000, 0x2e50, CRC(0abd418b) SHA1(e23e5bbc59339cbda87e8dafa8d80116378ac305)) /* Valid size? */
+	ROM_LOAD("viewa210.rom", 0x30000, 0x4000, CRC(4345359f) SHA1(88c93df1854f5fbe6cd6e5f0e29a8bf4ea3b5614))
 	ROM_LOAD("usdnfs10.rom", 0x38000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
 
 	ROM_REGION(0x4000, "os", 0)
@@ -1941,7 +1937,7 @@ COMP ( 1985, reutapm,  0,        0,     reutapm,  bbcb,  bbc_state,   bbc,     "
 COMP ( 1986, bbcm,     0,        bbcb,  bbcm,     bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master 128",                MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmt,    bbcm,     0,     bbcmt,    bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master Turbo",              MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmaiv,  bbcm,     0,     bbcmaiv,  bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master AIV",                MACHINE_NOT_WORKING)
-COMP ( 1986, bbcmet,   bbcm,     0,     bbcmet,   bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master ET",                 MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1986, bbcmet,   bbcm,     0,     bbcmet,   bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master ET",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcm512,  bbcm,     0,     bbcm512,  bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master 512",                MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmarm,  bbcm,     0,     bbcmarm,  bbcm,  bbc_state,   bbc,     "Acorn",    "ARM Evaluation System",         MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmc,    0,        bbcm,  bbcmc,    bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master Compact",            MACHINE_IMPERFECT_GRAPHICS)
