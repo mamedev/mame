@@ -3546,6 +3546,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/stellafr.c",
 	MAME_DIR .. "src/mame/drivers/stuntair.c",
 	MAME_DIR .. "src/mame/drivers/su2000.c",
+	MAME_DIR .. "src/mame/drivers/subhuntr.c",
 	MAME_DIR .. "src/mame/drivers/summit.c",
 	MAME_DIR .. "src/mame/drivers/sumt8035.c",
 	MAME_DIR .. "src/mame/drivers/supercrd.c",
