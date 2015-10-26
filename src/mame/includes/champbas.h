@@ -6,9 +6,8 @@
 
 *************************************************************************/
 
-
-#define CPUTAG_MCU "mcu"
 #include "sound/dac.h"
+
 
 class champbas_state : public driver_device
 {
@@ -20,12 +19,13 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, CPUTAG_MCU),
+		m_mcu(*this, "mcu"),
 		m_dac(*this, "dac"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_videoram;

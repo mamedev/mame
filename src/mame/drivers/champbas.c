@@ -40,7 +40,7 @@ write:
 7001      8910 control
 8ff0-8fff sprites
 a000      ?
-a006      MCU HALT controll
+a006      MCU HALT control
 a007      NOP (MCU shared RAM switch)
 a060-a06f sprites
 a080      command for the sound CPU
@@ -86,6 +86,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/alph8201/alph8201.h"
+//#include "cpu/hmcs40/hmcs40.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "includes/champbas.h"
@@ -567,7 +568,7 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Machine driver
+ *  Machine drivers
  *
  *************************************/
 
@@ -581,6 +582,7 @@ MACHINE_START_MEMBER(champbas_state,champbas)
 MACHINE_START_MEMBER(champbas_state,exctsccr)
 {
 	// FIXME
+	// I dun wanna
 	machine().scheduler().timer_pulse(attotime::from_hz(75), timer_expired_delegate(FUNC(champbas_state::exctsccr_fm_callback),this)); /* updates fm */
 
 	MACHINE_START_CALL_MEMBER(champbas);
@@ -595,7 +597,7 @@ MACHINE_RESET_MEMBER(champbas_state,champbas)
 
 INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 {
-	if(m_irq_mask)
+	if (m_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
@@ -608,7 +610,7 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
 
 	/* MCU */
-	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
@@ -681,7 +683,7 @@ static MACHINE_CONFIG_DERIVED( champmcu, champbas )
 	/* basic machine hardware */
 
 	/* MCU */
-	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* to MCU timeout champbbj */
@@ -702,7 +704,7 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse,  4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
-	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)     /* Actually 8302 */
+	MCFG_CPU_ADD("mcu", ALPHA8301, XTAL_18_432MHz/6/8)     /* Actually 8302 */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,exctsccr)
