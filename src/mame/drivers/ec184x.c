@@ -18,7 +18,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
 
-#define EC1841_MEMBOARD_SIZE	512*1024
+#define EC1841_MEMBOARD_SIZE	(512*1024)
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -43,7 +43,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_MACHINE_RESET(ec184x);
+	DECLARE_MACHINE_RESET(ec1841);
 	DECLARE_DRIVER_INIT(ec1841);
 
 	struct {
@@ -79,11 +79,11 @@ READ8_MEMBER(ec184x_state::memboard_r)
 	UINT8 data;
 
 	data = offset % 4;
-	if (data > m_memory.boards)
+	if (data >= m_memory.boards)
 		data = 0xff;
 	else
 		data = m_memory.enable[data];
-	DBG_LOG(1,"ec1841_memboard",("R (%d of %d) == %02X\n", offset, m_memory.boards, data ));
+	DBG_LOG(1,"ec1841_memboard",("R (%d of %d) == %02X\n", offset+1, m_memory.boards, data ));
 
 	return data;
 }
@@ -96,9 +96,9 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 
 	current = m_memory.enable[offset];
 
-	DBG_LOG(1,"ec1841_memboard",("W (%d of %d) <- %02X (%02X)\n", offset, m_memory.boards, data, current));
+	DBG_LOG(1,"ec1841_memboard",("W (%d of %d) <- %02X (%02X)\n", offset+1, m_memory.boards, data, current));
 
-	if (offset > m_memory.boards) {
+	if (offset >= m_memory.boards) {
 		return;
 	}
 
@@ -140,9 +140,9 @@ DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
 
-	m_memory.boards = m_ram->size()/EC1841_MEMBOARD_SIZE - 1;
-	if (m_memory.boards > 3)
-		m_memory.boards = 3;
+	m_memory.boards = m_ram->size()/EC1841_MEMBOARD_SIZE;
+	if (m_memory.boards > 4)
+		m_memory.boards = 4;
 
 	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
 	// XXX verify this was actually the case
@@ -157,7 +157,7 @@ DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
 	membank( "bank20" )->set_base( m_ram->pointer() );
 }
 
-MACHINE_RESET_MEMBER( ec184x_state, ec184x )
+MACHINE_RESET_MEMBER( ec184x_state, ec1841 )
 {
 	memset(m_memory.enable, 0, sizeof(m_memory.enable));
 	// mark 1st board enabled
@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 	MCFG_CPU_IO_MAP(ec1841_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec184x)
+	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
 	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(ec1841)
