@@ -256,6 +256,7 @@ void running_machine::start()
 	m_memory.initialize();
 
 	// initialize the watchdog
+	m_watchdog_counter = 0;
 	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
 	if (config().m_watchdog_vblank_count != 0 && primary_screen != NULL)
 		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));

@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
+/*************************************************************************
+
+    Talbot - Champion Base Ball - Exciting Soccer
+
+*************************************************************************/
+
 #include "emu.h"
 #include "video/resnet.h"
 #include "includes/champbas.h"
@@ -28,7 +34,6 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
-	int i;
 
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
@@ -37,7 +42,7 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 			2, &resistances_b[0],  bweights, 0, 0);
 
 	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -64,7 +69,7 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 
 	color_prom += 0x20;
 
-	for (i = 0; i < 0x200; i++)
+	for (int i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[i & 0xff] & 0x0f) | ((i & 0x100) >> 4);
 		palette.set_pen_indirect(i, ctabentry);
@@ -75,10 +80,9 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
 	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -108,7 +112,7 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 	color_prom += 0x20;
 
 	/* characters / sprites (3bpp) */
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		int swapped_i = BITSWAP8(i, 2, 7, 6, 5, 4, 3, 1, 0);
 		UINT8 ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
@@ -116,7 +120,7 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 	}
 
 	/* sprites (4bpp) */
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[0x100 + i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i + 0x100, ctabentry);
@@ -186,10 +190,9 @@ WRITE8_MEMBER(champbas_state::champbas_flipscreen_w)
 
 void champbas_state::champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
 	gfx_element* const gfx = m_gfxdecode->gfx(1);
 
-	for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
+	for (int offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
 		int code = (m_spriteram[offs] >> 2) | (m_gfx_bank << 6);
 		int color = (m_spriteram[offs + 1] & 0x1f) | (m_palette_bank << 6);
@@ -198,32 +201,29 @@ void champbas_state::champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		int sx = m_spriteram_2[offs + 1] - 16;
 		int sy = 255 - m_spriteram_2[offs];
 
-
-				gfx->transmask(bitmap,cliprect,
-				code, color,
-				flipx, flipy,
-				sx, sy,
-				m_palette->transpen_mask(*gfx, color, 0));
+		gfx->transmask(bitmap,cliprect,
+			code, color,
+			flipx, flipy,
+			sx, sy,
+			m_palette->transpen_mask(*gfx, color, 0));
 
 		// wraparound
-
-				gfx->transmask(bitmap,cliprect,
-				code, color,
-				flipx, flipy,
-				sx + 256, sy,
-				m_palette->transpen_mask(*gfx, color, 0));
+		gfx->transmask(bitmap,cliprect,
+			code, color,
+			flipx, flipy,
+			sx + 256, sy,
+			m_palette->transpen_mask(*gfx, color, 0));
 	}
 }
 
 void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
 	UINT8 *obj1, *obj2;
 
 	obj1 = m_bg_videoram;
 	obj2 = &(m_spriteram[0x20]);
 
-	for (offs = 0x0e; offs >= 0; offs -= 2)
+	for (int offs = 0x0e; offs >= 0; offs -= 2)
 	{
 		int sx, sy, code, bank, flipx, flipy, color;
 
@@ -236,18 +236,17 @@ void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		color = (obj1[offs + 1]) & 0x0f;
 		bank = ((obj1[offs + 1] >> 4) & 1);
 
-
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				code + (bank << 6),
-				color,
-				flipx, flipy,
-				sx,sy,0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			code + (bank << 6),
+			color,
+			flipx, flipy,
+			sx,sy,0);
 	}
 
 	obj1 = m_spriteram_2;
 	obj2 = m_spriteram;
 
-	for (offs = 0x0e; offs >= 0; offs -= 2)
+	for (int offs = 0x0e; offs >= 0; offs -= 2)
 	{
 		int sx, sy, code, flipx, flipy, color;
 
@@ -259,13 +258,12 @@ void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		flipy = (~obj1[offs]) & 0x02;
 		color = (obj1[offs + 1]) & 0x0f;
 
-
-				m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
-				code,
-				color,
-				flipx, flipy,
-				sx,sy,
-				m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0x10));
+		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
+			code,
+			color,
+			flipx, flipy,
+			sx,sy,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0x10));
 	}
 }
 

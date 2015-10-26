@@ -226,6 +226,7 @@ public:
 	// watchdog control
 	void watchdog_reset();
 	void watchdog_enable(bool enable = true);
+	INT32 get_vblank_watchdog_counter() { return m_watchdog_counter; }
 
 	// misc
 	void CLIB_DECL vlogerror(const char *format, va_list args);

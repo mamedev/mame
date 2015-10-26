@@ -709,7 +709,97 @@
 		</part>
 	</software>
 
+  <!-- Homebrew released at http://spectralinterlude.com/#download for use on real systems & emulators -->
+  <software name="castlvsi">
+    <description>Castlevania - Spectral Interlude (v1.1, English, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="126394">
+        <rom name="castlevania_si_en_v11.tap" size="126394" crc="c100bb38" sha1="ba89e73dbc16621fc52f886c6b1abb2d6a93ffc7" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
 
+  <software name="castlvsiru" cloneof="castlevsi">
+    <description>Castlevania - Spectral Interlude (v1.1, Russian, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="127054">
+        <rom name="castlevania_si_ru_v11.tap" size="127054" crc="45561b70" sha1="b44b7e93c8fbf74d23ad694182d99e5a5ec01f98" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsipl" cloneof="castlevsi">
+    <description>Castlevania - Spectral Interlude (v1.1, Polish, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="127378">
+        <rom name="castlevania_si_pl_v11.tap" size="127378" crc="2f11f5bd" sha1="4f4448f6f70eebdf6af81977cac61d0f41b7744f" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsies" cloneof="castlevsi">
+    <description>Castlevania - Spectral Interlude (v1.1, Spanish, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="126950">
+        <rom name="castlevania_si_es_v11.tap" size="126950" crc="27e8ae63" sha1="1dced2991e51854fdf31fe323aa6ee75b25d55a2" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsiit" cloneof="castlevsi">
+    <description>Castlevania - Spectral Interlude (v1.1, Italian, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="127355">
+        <rom name="castlevania_si_it_v11.tap" size="127355" crc="d9a89fc5" sha1="885d3489c94937b0db8a536a1aa6435629942d77" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsi10" cloneof="castlevsi">
+    <description>Castlevania - Spectral Interlude (v1.0, English, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="126410">
+        <rom name="castlevania_si_en_v10.tap" size="126410" crc="0d022bc5" sha1="450dfd57ea7407f47bbfd785d981e4a92e166029" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsiru10" cloneof="castlevsi">
+    <description>Castlevania - Spectral Interlude (v1.0, Russian, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="127066">
+        <rom name="castlevania_si_ru_v10.tap" size="127066" crc="2dceb444" sha1="10ca28195652a9f3f20a48e8e761f0dd138abcf6" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsipl10" cloneof="castlevsi">
+    <description>Castlevania - Spectral Interlude (v1.0, Polish, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="127361">
+        <rom name="castlevania_si_pl_v10.tap" size="127361" crc="e8dc0e6b" sha1="4802a4cef916466ccbf25cabb3f447db17b802bd" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+  
+  <!-- V1.0 doesn't exist in Spanish? or Italian (translations were made after the 1.1 release) -->
+  
 </softwarelist>
 
 
