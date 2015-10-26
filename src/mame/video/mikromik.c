@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 #include "includes/mikromik.h"
 
-
+#define HORIZONTAL_CHARACTER_PIXELS 10
 
 //-------------------------------------------------
 //  i8275 crtc display pixels
@@ -12,24 +12,43 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 {
 	UINT8 romdata = m_char_rom->base()[(charcode << 4) | linecount];
 
+	int gpa0 = BIT(gpa, 0);		// general purpose attribute 0
+	int llen = m_llen;			// light enable
+	int compl_in = rvv;			// reverse video
+	int hlt_in = hlgt;			// highlight;
+	int color;					// 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
+	int i, qh, video_in;
+
+	int d7 = BIT(romdata, 7);	// save MSB (1 indicates that this is a Visual Attribute or Special Code instead of a normal display character)
+	int d6 = BIT(romdata, 6);	// save also first and last char bitmap bits before shifting out the MSB
 	int d0 = BIT(romdata, 0);
-	int d7 = BIT(romdata, 7);
-	int gpa0 = BIT(gpa, 0);
-	int llen = m_llen;
-	int i;
+	UINT8 data = (romdata << 1) | (d7 & d0); // get rid of MSB, duplicate LSB for special characters
 
-	UINT8 data = (romdata << 1) | (d7 & d0);
-
-	for (i = 0; i < 8; i++)
+	if (y < 360 || x >= HORIZONTAL_CHARACTER_PIXELS || compl_in == 0) // leftmost char on the 25th row is never displayed on actual MikroMikko 1 HW if it's inversed
 	{
-		int qh = BIT(data, i);
-		int video_in = ((((d7 & llen) | !vsp) & !gpa0) & qh) | lten;
-		int compl_in = rvv;
-		int hlt_in = hlgt;
+		if (HORIZONTAL_CHARACTER_PIXELS == 10)
+		{
+			// Hack to stretch 8 pixels wide character bitmap to 10 pixels on screen.
+			// This was needed because high res graphics use 800 pixels wide bitmap but 
+			// 80 chars * 8 pixels is only 640 -> characters would cover only 80% of the screen width.
+			// Step 1: Instead of 8, set MCFG_I8275_CHARACTER_WIDTH(10) at the end of this file
+			// Step 2: Make sure i8275_device::recompute_parameters() is called in i8275_device::device_start()
+			// Step 3: Fill in missing 2 pixels in the screen bitmap by repeating last column of the char bitmap
+			// (works better with MikroMikko 1 font than duplicating the first and the last column)
+			qh = d7 & d6; // extend pixels on the right side only if there were two adjacent ones before shifting out the MSB
+			video_in = ((((d7 & llen) | !vsp) & !gpa0) & qh) | lten;
+			color = (hlt_in ? 1 : 2)*(video_in ^ compl_in);
+			bitmap.pix32(y, x + 8) = m_palette->pen(color);
+			bitmap.pix32(y, x + 9) = m_palette->pen(color);
+		}
 
-		int color = hlt_in ? 2 : (video_in ^ compl_in);
-
-		bitmap.pix32(y, x + i) = m_palette->pen(color);
+		for (i = 0; i < 8; ++i) // ...and now the actual character bitmap bits for this scanline
+		{
+			qh = BIT(data, i);
+			video_in = ((((d7 & llen) | !vsp) & !gpa0) & qh) | lten;
+			color = (hlt_in ? 1 : 2)*(video_in ^ compl_in);
+			bitmap.pix32(y, x + i) = m_palette->pen(color);
+		}
 	}
 }
 
@@ -51,7 +70,6 @@ ADDRESS_MAP_END
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
 	UINT16 data = m_video_ram[address >> 1];
-
 	for (int i = 0; i < 16; i++)
 	{
 		if (BIT(data, i)) bitmap.pix32(y, x + i) = m_palette->pen(1);
@@ -105,15 +123,15 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )
 	MCFG_SCREEN_REFRESH_RATE( 50 )
 	MCFG_SCREEN_UPDATE_DRIVER(mm1_state, screen_update)
-	MCFG_SCREEN_SIZE( 800, 400 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 400-1 )
+	MCFG_SCREEN_SIZE( 800, 375 ) // (25 text rows * 15 vertical pixels / character)
+	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 375-1 )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mm1)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_DEVICE_ADD(I8275_TAG, I8275, XTAL_18_720MHz/8)
-	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_CHARACTER_WIDTH(HORIZONTAL_CHARACTER_PIXELS)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mm1_state, crtc_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq0_w))
 	MCFG_I8275_VRTC_CALLBACK(DEVWRITELINE(UPD7220_TAG, upd7220_device, ext_sync_w))

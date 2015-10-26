@@ -70,6 +70,7 @@ public:
 	DECLARE_DRIVER_INIT(98best44);
 	DECLARE_DRIVER_INIT(npcartv1);
 	DECLARE_DRIVER_INIT(nprsp);
+	DECLARE_DRIVER_INIT(unkneo);
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(nprsp);
@@ -450,12 +451,12 @@ INPUT_PORTS_END
 static const gfx_layout neoprint_layout =
 {
 	16,16,
-	RGN_FRAC(1,3),
+	RGN_FRAC(1,1),
 	6,
-	{ RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0, RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0, RGN_FRAC(0,3)+8, RGN_FRAC(0,3)+0  },
-	{ 0,1,2,3,4,5,6,7, 256,257,258,259,260,261,262,263 },
-	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
-	32*16,
+	{ 48, 16, 40, 8, 32, 0  },
+	{ 0,1,2,3,4,5,6,7, 1024+0,1024+1,1024+2,1024+3,1024+4,1024+5,1024+6,1024+7 },
+	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+	32*64,
 };
 
 static GFXDECODE_START( neoprint )
@@ -557,6 +558,26 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 MACHINE_CONFIG_END
 
 
+// uses NEO-MVS PROGBK1 (Same as NeoGeo MVS cart)
+// and PSTM-ROMC (unique to NeoPrint) (has ZMC chip)
+ROM_START( neoprint )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(271da3ee) SHA1(50132d2ac5524e880ec0c2ba3617bf516fd36e7d) )
+//  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_LOAD( "m1- tc571000.bin", 0x00000, 0x20000, CRC(d720f53e) SHA1(7a20200065d3da43fcf7d5922d1808dc896b0da8) ) // possible bad dump? (although looks ok, just mostly empty?)
+
+	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_LOAD( "v1.bin", 0x00000, 0x200000, CRC(c1984fa9) SHA1(9702d253ad75e0b0f0182d8da449328648ff1a2f) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "c1.bin", 0x000000, 0x80000, CRC(ec6770e1) SHA1(2f4629dbadcdbd90117fe5fad1aa5601808864c9) )
+	ROM_LOAD32_BYTE( "c2.bin", 0x000001, 0x80000, CRC(8855bae0) SHA1(cb717abb3f8a121c0e5bb7c6ef76ff30bbc66895) )
+	ROM_LOAD32_BYTE( "c3.bin", 0x200000, 0x80000, CRC(c54be0b2) SHA1(ab64c6115c9033babcaeb0910609ef0f41a5f3f2) )
+	ROM_LOAD32_BYTE( "c4.bin", 0x200001, 0x80000, CRC(c7e5e6ce) SHA1(f1e37732446ae6146b3cb51a9714c5edd539d7e4) )
+ROM_END
+
 ROM_START( npcartv1 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(18606198) SHA1(d968e09131c22769e22c7310aca1f02e739f38f1) )
@@ -568,9 +589,9 @@ ROM_START( npcartv1 )
 	ROM_REGION( 0x080000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "v1.bin", 0x00000, 0x80000, CRC(2d6608f9) SHA1(7dbde1c305ab3438b7fe7417816427c682371bd4) )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_ERASE00 )
-	ROM_LOAD( "c1.bin", 0x00000, 0x80000, CRC(b89f1fb6) SHA1(e711f91a7872b2e0edc3f42a726d969096d684f2) )
-	ROM_LOAD( "c2.bin", 0x80000, 0x80000, CRC(7ce39dc2) SHA1(c5be90657350258b670b55dd9c77f7899133ced3) )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "c1.bin", 0x00000, 0x80000, CRC(b89f1fb6) SHA1(e711f91a7872b2e0edc3f42a726d969096d684f2) )
+	ROM_LOAD32_BYTE( "c2.bin", 0x00001, 0x80000, CRC(7ce39dc2) SHA1(c5be90657350258b670b55dd9c77f7899133ced3) )
 ROM_END
 
 	/* logo: Neo Print
@@ -589,9 +610,9 @@ ROM_START( 98best44 )
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
 
-	ROM_REGION( 0x300000, "gfx1", ROMREGION_ERASE00 )
-	ROM_LOAD( "pt060-c1", 0x000000, 0x100000, CRC(22a23090) SHA1(0e219fcfea6ca2ddf4b7b4197aac8bc55a29d5cf) )
-	ROM_LOAD( "pt060-c2", 0x100000, 0x100000, CRC(66a8e56a) SHA1(adfd1e52d52806a785f1e9b1ae2ac969b6ed60af) )
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "pt060-c1", 0x000000, 0x100000, CRC(22a23090) SHA1(0e219fcfea6ca2ddf4b7b4197aac8bc55a29d5cf) )
+	ROM_LOAD32_BYTE( "pt060-c2", 0x000001, 0x100000, CRC(66a8e56a) SHA1(adfd1e52d52806a785f1e9b1ae2ac969b6ed60af) )
 ROM_END
 
 ROM_START( nprsp )
@@ -605,10 +626,11 @@ ROM_START( nprsp )
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "s001-v1.bin", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
 
-	ROM_REGION( 0x600000, "gfx1", 0 )
-	ROM_LOAD( "s046-c1.bin", 0x000000, 0x200000, CRC(06fffce0) SHA1(0d9bb9d3107b1efb66ee82341c3f80ec093d5987) )
-	ROM_LOAD( "s046-c2.bin", 0x200000, 0x200000, CRC(7cc353e7) SHA1(5c4fa9fdf90bd0d03608becaa174d68735f28bbb) )
-	ROM_LOAD( "s046-c3.bin", 0x400000, 0x200000, CRC(f68f0f6f) SHA1(2fc105953a17259353f74376661c442658f9a644) )
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "s046-c1.bin", 0x000000, 0x200000, CRC(06fffce0) SHA1(0d9bb9d3107b1efb66ee82341c3f80ec093d5987) )
+	ROM_LOAD32_BYTE( "s046-c2.bin", 0x000001, 0x200000, CRC(7cc353e7) SHA1(5c4fa9fdf90bd0d03608becaa174d68735f28bbb) )
+	ROM_LOAD32_BYTE( "s046-c3.bin", 0x000002, 0x200000, CRC(f68f0f6f) SHA1(2fc105953a17259353f74376661c442658f9a644) )
+	// 8bpp might be possible with another ROM?
 ROM_END
 
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
@@ -641,6 +663,13 @@ DRIVER_INIT_MEMBER(neoprint_state,nprsp)
 	ROM[0x4834/2] = 0x4e71;
 }
 
-GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state,   npcartv1, ROT0, "SNK", "Neo Print V1 (World)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state,   98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS |  MACHINE_NOT_WORKING )
+DRIVER_INIT_MEMBER(neoprint_state,unkneo)
+{
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	ROM[0x12c2/2] = 0x4e71;
+}
+
+GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state,   unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state,   npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state,   98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS |  MACHINE_NOT_WORKING )
 GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state,   nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

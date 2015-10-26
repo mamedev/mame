@@ -97,7 +97,7 @@ WRITE16_MEMBER( sega_16bit_sprite_device::draw_write )
 sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_HANGON_SPRITES, "Sega Custom Sprites (Hang On)", tag, owner, "sega_hangon_sprite", __FILE__)
 {
-	set_origin(189, -1);
+	set_local_origin(189, -1);
 }
 
 
@@ -273,7 +273,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SHARRIER_SPRITES, "Sega Custom Sprites (Space Harrier)", tag, owner, "sega_sharrier_sprite", __FILE__)
 {
-	set_origin(189, -1);
+	set_local_origin(189, -1);
 }
 
 
@@ -460,7 +460,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 sega_sys16a_sprite_device::sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16A_SPRITES, "Sega System 16A Sprites", tag, owner, "sega_sys16a_sprite", __FILE__)
 {
-	set_origin(189, -1);
+	set_local_origin(189, -1, -189, -1);
 }
 
 
@@ -542,6 +542,11 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 			bottom = 224 - temp;
 			xpos = 320 - xpos;
 			xdelta = -1;
+			set_origin(m_xoffs_flipped, m_yoffs_flipped);
+		}
+		else
+		{
+			set_origin(m_xoffs, m_yoffs);
 		}
 
 		// loop from top to bottom
@@ -642,7 +647,7 @@ bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config 
 	m_addrmap[5] = 5;
 	m_addrmap[6] = 6;
 	m_addrmap[7] = 7;
-	set_origin(189, -1);
+	set_local_origin(189, -1);
 }
 
 
@@ -724,6 +729,11 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 			bottom = 224 - temp;
 			xpos = 320 - xpos;
 			xdelta = -1;
+			set_origin(m_xoffs_flipped, m_yoffs_flipped);
+		}
+		else
+		{
+			set_origin(m_xoffs, m_yoffs);
 		}
 
 		// loop from top to bottom
@@ -817,7 +827,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16B_SPRITES, "Sega System 16B Sprites", tag, owner, "sega_16bit_sprite", __FILE__)
 {
-	set_origin(184, 0x00);
+	set_local_origin(184, 0x00, -184, 0);
 }
 
 
@@ -907,6 +917,11 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 			bottom = 224 - temp;
 			xpos = 320 - xpos;
 			xdelta = -1;
+			set_origin(m_xoffs_flipped, m_yoffs_flipped);
+		}
+		else
+		{
+			set_origin(m_xoffs, m_yoffs);
 		}
 
 		// loop from top to bottom
@@ -1008,14 +1023,14 @@ sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconf
 	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Custom Sprites (Out Run)", tag, owner, "sega_outrun_sprite", __FILE__),
 		m_is_xboard(false)
 {
-	set_origin(189, 0x00);
+	set_local_origin(189, 0x00);
 }
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source)
 	: sega_16bit_sprite_device(mconfig, SEGA_XBOARD_SPRITES, "Sega X-Board Sprites", tag, owner, shortname, source),
 		m_is_xboard(true)
 {
-	set_origin(190, 0x00);
+	set_local_origin(190, 0x00);
 }
 
 
@@ -1026,6 +1041,7 @@ sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconf
 sega_xboard_sprite_device::sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_outrun_sprite_device(mconfig, tag, owner, clock, true, "sega_xboard_sprite", __FILE__)
 {
+
 }
 
 
@@ -1070,6 +1086,8 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//            ----cccc cccc----  Sprite color palette
 	//            -------- ----llll  4-bit pixel data
 	//
+	
+	set_origin(m_xoffs, m_yoffs);
 
 	// render the sprites in order
 	const UINT32 *spritebase = reinterpret_cast<const UINT32 *>(region()->base());
@@ -1218,7 +1236,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 sega_yboard_sprite_device::sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_YBOARD_SPRITES, "Sega Y-Board Sprites", tag, owner, "sega_yboard_sprite", __FILE__)
 {
-	set_origin(0x600, 0x600);
+	set_local_origin(0x600, 0x600);
 }
 
 
@@ -1260,6 +1278,8 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//  to poke our nose into the rotation structure, but there are no known cases of Y-board
 	//  sprites without rotation RAM.
 	//
+
+	set_origin(m_xoffs, m_yoffs);
 
 	// clear out any scanlines we might be using
 	const UINT16 *rotatebase = m_segaic16_rotate[0].buffer ? m_segaic16_rotate[0].buffer : m_segaic16_rotate[0].rotateram;

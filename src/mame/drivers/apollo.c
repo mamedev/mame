@@ -109,11 +109,6 @@ static int parity_error_handler_install_counter = 0;
 static UINT16 latch_page_on_parity_error_register = 0x0000;
 static UINT16 master_req_register = 0x0000;
 
-// DN3000: Node Id 1D117 at 0x9600 - 0x961f
-// DN3500: Node Id 2616D at 0x11200 - 0x1121f
-
-static UINT32 node_id = DEFAULT_NODE_ID;
-
 static UINT32 ram_base_address;
 static UINT32 ram_end_address;
 
@@ -208,14 +203,6 @@ int apollo_is_dsp3x00(void) {
 
 UINT8 apollo_get_ram_config_byte(void) {
 	return ram_config_byte;
-}
-
-/***************************************************************************
- apollo_get_node_id - get the node id
- ***************************************************************************/
-
-UINT32 apollo_get_node_id(void) {
-	return node_id;
 }
 
 /***************************************************************************
@@ -348,38 +335,6 @@ WRITE8_MEMBER(apollo_state::task_alias_register_w){
 READ8_MEMBER(apollo_state::task_alias_register_r){
 	UINT8 data = 0xff;
 	SLOG(("reading Task Alias Register at offset %02x = %02x", offset, data));
-	return data;
-}
-
-/***************************************************************************
- DN3000/DN3500 Node Id PROM at 0x9600/0x11200
- ***************************************************************************/
-
-WRITE16_MEMBER(apollo_state::apollo_node_id_w){
-	SLOG1(("Error: writing node id ROM at offset %02x = %04x & %04x", offset, data, mem_mask));
-}
-
-READ16_MEMBER(apollo_state::apollo_node_id_r){
-	UINT16 data;
-	switch (offset & 0x0f) {
-	case 1: // msb
-		data = (node_id >> 16) & 0xff;
-		break;
-	case 2:
-		data = (node_id >> 8) & 0xff;
-		break;
-	case 3: // lsb
-		data = node_id & 0xff;
-		break;
-	case 15: // checksum
-		data = ((node_id >> 16) + (node_id >> 8) + node_id) & 0xff;
-		break;
-	default:
-		data = 0;
-		break;
-	}
-	data <<= 8;
-	SLOG2(("reading node id ROM at offset %02x = %04x & %04x", offset, data, mem_mask));
 	return data;
 }
 
@@ -576,7 +531,7 @@ READ16_MEMBER(apollo_state::apollo_atbus_io_r)
 	// Motorola CPU is MSB first, ISA Bus is LSB first
 	UINT16 data = m_isa->io16_swap_r(space, isa_addr, mem_mask);
 
-	SLOG2(("apollo_atbus_io_r at %08x -> %04x = %04x & %04x", offset*2, isa_addr*2, data, mem_mask));
+	SLOG2(("apollo_atbus_io_r at %08x -> %04x = %04x & %04x", ATBUS_IO_BASE + offset*2, isa_addr*2, data, mem_mask));
 
 	return data;
 }
@@ -585,7 +540,7 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_io_w)
 {
 	UINT32 isa_addr = (offset & 3) + ((offset & ~0x1ff) >> 7);
 
-	SLOG2(("apollo_atbus_io_w at %08x -> %04x = %04x & %04x", offset*2, isa_addr*2, data, mem_mask));
+	SLOG2(("apollo_atbus_io_w at %08x -> %04x = %04x & %04x", ATBUS_IO_BASE + offset*2, isa_addr*2, data, mem_mask));
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
 	m_isa->io16_swap_w(space, isa_addr, data, mem_mask);
@@ -597,20 +552,53 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_io_w)
 
 READ16_MEMBER(apollo_state::apollo_atbus_memory_r)
 {
+	UINT16 data;
+
 	// Motorola CPU is MSB first, ISA Bus is LSB first
-	UINT16 data = m_isa->prog16_swap_r(space, offset, mem_mask);
+	data = m_isa->prog16_swap_r(space, offset, mem_mask);
 
-	SLOG2(("apollo_atbus_memory_r at %08x = %04x & %04x", offset*2, data, mem_mask));
-
+	SLOG2(("apollo_atbus_memory_r at %08x = %04x & %04x", ATBUS_MEMORY_BASE + offset * 2, data, mem_mask));
 	return data;
 }
 
 WRITE16_MEMBER(apollo_state::apollo_atbus_memory_w)
 {
-	SLOG2(("apollo_atbus_memory_w at %08x = %04x & %04x", offset*2, data, mem_mask));
+	SLOG2(("apollo_atbus_memory_w at %08x = %04x & %04x", ATBUS_MEMORY_BASE + offset*2, data, mem_mask));
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
 	m_isa->prog16_swap_w(space, offset, data, mem_mask);
+}
+
+/***************************************************************************
+ DN3000/DN3500 AT Bus unmapped read/write
+ ***************************************************************************/
+
+READ16_MEMBER(apollo_state::apollo_atbus_unmap_io_r)
+{
+	// ISA bus has 0xff for unmapped addresses
+	UINT16 data = 0xffff;
+	UINT32 isa_addr = (offset & 3) + ((offset & ~0x1ff) >> 7);
+	SLOG1(("apollo_atbus_unmap_io_r at %08x -> %04x = %04x & %04x", ATBUS_IO_BASE + offset*2, isa_addr*2, data, mem_mask));
+	return data;
+}
+
+WRITE16_MEMBER(apollo_state::apollo_atbus_unmap_io_w)
+{
+	UINT32 isa_addr = (offset & 3) + ((offset & ~0x1ff) >> 7);
+	SLOG1(("apollo_atbus_unmap_io_w at %08x -> %04x = %04x & %04x", ATBUS_IO_BASE + offset*2, isa_addr*2, data, mem_mask));
+}
+
+READ8_MEMBER(apollo_state::apollo_atbus_unmap_r)
+{
+	// ISA bus has 0xff for unmapped addresses
+	UINT8 data = 0xff;
+	SLOG2(("apollo_atbus_unmap_r at %08x = %02x & %02x", ATBUS_MEMORY_BASE + offset, data, mem_mask));
+	return data;
+}
+
+WRITE8_MEMBER(apollo_state::apollo_atbus_unmap_w)
+{
+	SLOG1(("apollo_atbus_unmap_w at %08x = %02x & %02x", ATBUS_MEMORY_BASE + offset, data, mem_mask));
 }
 
 /***************************************************************************
@@ -697,7 +685,7 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
 		AM_RANGE(0x011000, 0x0110ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x011100, 0x0111ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
-		AM_RANGE(0x011200, 0x0112ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
+		AM_RANGE(0x011200, 0x0112ff) AM_DEVREADWRITE16(APOLLO_NI_TAG, apollo_ni, read, write, 0xffffffff)
 		AM_RANGE(0x011300, 0x0113ff) AM_READWRITE16(latch_page_on_parity_error_register_r, latch_page_on_parity_error_register_w, 0xffffffff )
 		AM_RANGE(0x011600, 0x0116ff) AM_READWRITE8(master_req_register_r, master_req_register_w, 0xffffffff)
 
@@ -741,7 +729,7 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
 		AM_RANGE(0x011000, 0x0110ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x011100, 0x0111ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
-		AM_RANGE(0x011200, 0x0112ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
+		AM_RANGE(0x011200, 0x0112ff) AM_DEVREADWRITE16(APOLLO_NI_TAG, apollo_ni, read, write, 0xffffffff)
 		AM_RANGE(0x011300, 0x0113ff) AM_READWRITE16(latch_page_on_parity_error_register_r, latch_page_on_parity_error_register_w, 0xffffffff )
 		AM_RANGE(0x011600, 0x0116ff) AM_READWRITE8(master_req_register_r, master_req_register_w, 0xffffffff)
 
@@ -772,7 +760,7 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x009300, 0x0093ff) AM_READWRITE16(latch_page_on_parity_error_register_r, latch_page_on_parity_error_register_w, 0xffffffff )
 		AM_RANGE(0x009400, 0x0094ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009500, 0x0095ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
-		AM_RANGE(0x009600, 0x0096ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
+		AM_RANGE(0x009600, 0x0096ff) AM_DEVREADWRITE16(APOLLO_NI_TAG, apollo_ni, read, write, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8(APOLLO_SCREEN_TAG, apollo_graphics_15i, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16(APOLLO_SCREEN_TAG, apollo_graphics_15i, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -806,7 +794,7 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x009300, 0x0093ff) AM_READWRITE16(latch_page_on_parity_error_register_r, latch_page_on_parity_error_register_w, 0xffffffff )
 		AM_RANGE(0x009400, 0x0094ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009500, 0x0095ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
-		AM_RANGE(0x009600, 0x0096ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
+		AM_RANGE(0x009600, 0x0096ff) AM_DEVREADWRITE16(APOLLO_NI_TAG, apollo_ni, read, write, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -835,7 +823,7 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
 		AM_RANGE(0x011000, 0x0110ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x011100, 0x0111ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
-		AM_RANGE(0x011200, 0x0112ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
+		AM_RANGE(0x011200, 0x0112ff) AM_DEVREADWRITE16(APOLLO_NI_TAG, apollo_ni, read, write, 0xffffffff)
 		AM_RANGE(0x011300, 0x0113ff) AM_READWRITE16(latch_page_on_parity_error_register_r, latch_page_on_parity_error_register_w, 0xffffffff )
 		AM_RANGE(0x011400, 0x0114ff) AM_READWRITE8(dn5500_memory_present_register_r, dn5500_memory_present_register_w, 0xffffffff )
 		AM_RANGE(0x011500, 0x0115ff) AM_READWRITE8(dn5500_11500_r, dn5500_11500_w, 0xffffffff )
@@ -882,7 +870,7 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
 		AM_RANGE(0x011000, 0x0110ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x011100, 0x0111ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
-		AM_RANGE(0x011200, 0x0112ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
+		AM_RANGE(0x011200, 0x0112ff) AM_DEVREADWRITE16(APOLLO_NI_TAG, apollo_ni, read, write, 0xffffffff)
 		AM_RANGE(0x011300, 0x0113ff) AM_READWRITE16(latch_page_on_parity_error_register_r, latch_page_on_parity_error_register_w, 0xffffffff )
 		AM_RANGE(0x011400, 0x0114ff) AM_READWRITE8(dn5500_memory_present_register_r, dn5500_memory_present_register_w, 0xffffffff )
 		AM_RANGE(0x011500, 0x0115ff) AM_READWRITE8(dn5500_11500_r, dn5500_11500_w, 0xffffffff )
@@ -909,34 +897,21 @@ ADDRESS_MAP_END
 
 void apollo_state::machine_reset()
 {
-	//MLOG1(("machine_reset_dn3500"));
+	MLOG1(("machine_reset"));
 
 	MACHINE_RESET_CALL_MEMBER(apollo);
 
-	// we can't do this any more
-	#if 0
+#ifdef APOLLO_XXL
 	// set configuration
 	omti8621_device::set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
 	threecom3c505_device::set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
 
 	if (apollo_config(APOLLO_CONF_NODE_ID))
 	{
-		UINT8 db[0x50];
-		UINT16 sector1 = apollo_is_dn5500() ? 4 : 1;
-
-		// check label of physical volume and get sector data of logical volume 1
-		// Note: sector data starts with 32 byte block header
-		if (omti8621_get_sector(machine().device(APOLLO_WDC_TAG), 0, db,    sizeof(db), 0) == sizeof(db) &&
-			memcmp (db+0x22, "APOLLO", 6) == 0 &&
-			omti8621_get_sector(machine().device(APOLLO_WDC_TAG), sector1, db,  sizeof(db), 0) == sizeof(db))
-		{
-			// set node_id from UID of logical volume 1 of logical unit 0
-			node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
-
-			MLOG2(("machine_reset_dn3500: node ID is %06X (from disk)", node_id));
-		}
+		// set node ID from UID of logical volume 1 of logical unit 0
+		m_node_id->set_node_id_from_disk();
 	}
-	#endif
+#endif
 
 	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
 }
@@ -955,6 +930,9 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
 	{
 		machine().device(APOLLO_SCREEN_TAG)->reset();
 		machine().device(APOLLO_KBD_TAG )->reset();
+#ifdef APOLLO_XXL
+		machine().device(APOLLO_STDIO_TAG )->reset();
+#endif
 	}
 }
 
@@ -970,6 +948,10 @@ void apollo_state::machine_start(){
 	memset(messram->ptr(), 0x55, messram->bytes());
 
 	MACHINE_START_CALL_MEMBER(apollo);
+
+	// install nop handlers for unmapped ISA bus addresses
+	m_isa->install16_device(0, ATBUS_IO_END, 0, 0, read16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_r), this), write16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_w), this));
+	m_isa->install_memory(0, ATBUS_MEMORY_END, 0, 0, read8_delegate(FUNC(apollo_state::apollo_atbus_unmap_r), this), write8_delegate(FUNC(apollo_state::apollo_atbus_unmap_w), this));
 }
 
 /***************************************************************************
@@ -1078,6 +1060,11 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 	MCFG_RAM_ADD("messram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
+
+#ifdef APOLLO_XXL
+	MCFG_DEVICE_ADD(APOLLO_STDIO_TAG, APOLLO_STDIO, 0)
+	MCFG_APOLLO_STDIO_TX_CALLBACK(DEVWRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
+#endif
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dsp3500, apollo_state )
@@ -1220,8 +1207,6 @@ ROM_START( dn3500 )
 	// Note: this duplicates boot rom md7c-rev-8.00-1989-08-16-17-23-52.bin
 	ROM_SYSTEM_BIOS( 0, "md7c-rev-8.00", "MD7C REV 8.00, 1989/08/16.17:23:52" )
 	ROMX_LOAD( "3500_boot_12191_7.bin", 0x00000, 0x10000, CRC(3132067d) SHA1(36f3c83d9f2df42f2537b09ca2f051a8c9dfbfc2) , ROM_BIOS(1) )
-
-	ROM_LOAD_OPTIONAL( "3000_3c505_010728-00.bin", 0x80000, 0x02000, CRC(69b77ec6) SHA1(7ac36cc6fc90b90ddfc56c45303b514cbe18ae58) )
 ROM_END
 
 ROM_START( dn5500 )
@@ -1230,8 +1215,6 @@ ROM_START( dn5500 )
 
 	ROM_SYSTEM_BIOS( 0, "md7c-rev-8.00", "MD7C REV 8.00, 1989/08/16.17:23:52" )
 	ROMX_LOAD( "5500_boot_a1631-80046_1-30-92.bin", 0x00000, 0x10000, CRC(7b9ed610) SHA1(7315a884ec4551c44433c6079cc06509223cb02b) , ROM_BIOS(1) )
-
-	ROM_LOAD_OPTIONAL( "3000_3c505_010728-00.bin", 0x80000, 0x02000, CRC(69b77ec6) SHA1(7ac36cc6fc90b90ddfc56c45303b514cbe18ae58) )
 ROM_END
 
 ROM_START( dn3000)
@@ -1239,8 +1222,6 @@ ROM_START( dn3000)
 
 	ROM_SYSTEM_BIOS( 0, "md8-rev-7.0", "MD8 REV 7.0, 1988/08/16.15:14:39" )
 	ROMX_LOAD( "3000_boot_8475_7.bin",  0x00000, 0x08000, CRC(0fe2d471) SHA1(6c383d2266719a3d069b7bf015f6945179395e7a), ROM_BIOS(1) )
-
-	ROM_LOAD_OPTIONAL( "3000_3c505_010728-00.bin", 0x80000, 0x02000, CRC(69b77ec6) SHA1(7ac36cc6fc90b90ddfc56c45303b514cbe18ae58) )
 ROM_END
 
 #define rom_dsp3500    rom_dn3500

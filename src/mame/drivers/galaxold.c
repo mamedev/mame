@@ -361,7 +361,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     to 0x00, so routine at 0x042a ALWAYS thinks that you've pressed COIN2,
     and as a consequence, it ALWAYS adds 1 credit (even when you are playing) !
 
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -895,6 +894,36 @@ static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x1606, 0x1606) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x1607, 0x1607) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x2000, 0x2fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_ROM
+ADDRESS_MAP_END
+
+/* majorly shifted, hunchbkg style */
+static ADDRESS_MAP_START( spcwarp, AS_PROGRAM, 8, galaxold_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ_PORT("IN0")
+	AM_RANGE(0x1500, 0x1501) AM_MIRROR(0x6000) AM_WRITE(galaxold_leds_w)
+	AM_RANGE(0x1502, 0x1502) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_lockout_w)
+	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_counter_w)
+	AM_RANGE(0x1504, 0x1507) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
+	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
+	AM_RANGE(0x1580, 0x1587) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
+	AM_RANGE(0x1583, 0x1583) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, noise_enable_w)
+	AM_RANGE(0x1585, 0x1585) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w)
+	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, vol_w)
+	// everything else in the $16xx range is moved to $17xx
+	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0x1700, 0x1700) AM_MIRROR(0x6000) AM_READ_PORT("DSW0")
+	AM_RANGE(0x1701, 0x1701) AM_MIRROR(0x6000) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0x1704, 0x1704) AM_MIRROR(0x6000) AM_WRITE(galaxold_stars_enable_w)
+	AM_RANGE(0x1706, 0x1706) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0x1707, 0x1707) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_y_w)
+	// the rest
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
@@ -2733,6 +2762,14 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( spcwarp, hunchbkg )
+	/* hunchbkg but with different banking */
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spcwarp)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( tazzmang, galaxian )
 
 	/* basic machine hardware */
@@ -3441,6 +3478,28 @@ ROM_START( hunchbkg )
 	ROM_LOAD( "gal_hb_cp",    0x0000, 0x0020, CRC(cbff6762) SHA1(4515a6e12a0a5c485a55291feee17a571120a549) )
 ROM_END
 
+ROM_START( spcwarp )
+	// conversion of 'cosmos' (cvs.c) to Galaxian hardware
+	// notes: 
+	// -came out of an unemulated games collection - may or may not be actually spcwarp but it's unique
+	// -uses hunchbkg hardware with a different map
+	// -the game likely calls a checksum check every 10 frames, causes game to freeze (probably because of bad ROM)
+	// -so far using hunchbkg inputs work
+	// -text in ROM confirms year of release and company; ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
+	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
+	ROM_LOAD( "swarpt7m.bin", 0x6000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) ) /* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
+	ROM_LOAD( "swarpb1k.bin", 0x0800, 0x0800, CRC(da4cee6b) SHA1(28b91381658f598fa62049489beee443232825c6) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "clr",    0x0000, 0x0020, NO_DUMP )
+ROM_END
+
+
 ROM_START( drivfrcg )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "dfgp1.bin",    0x2800, 0x0400, CRC(52d5e77d) SHA1(4e68ac1274bbc8cb5b6a7dfb511232bd83482453) )
@@ -3724,6 +3783,7 @@ GAME( 1981, froggerv,  frogger,  videotron, froggerv,  driver_device,  0,       
 /* S2650 games */
 //    YEAR  NAME       PARENT    MACHINE    INPUT      INIT                       ROT     COMPANY, FULLNAME, FLAGS, LAYOUT
 GAME( 1983, hunchbkg,  hunchbak, hunchbkg,  hunchbkg,  driver_device,  0,         ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  driver_device,  0,         ROT90,  "Century Electronics", "Space Warp? (Cosmos conversion on Galaxian hardware)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // bad dump
 GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  driver_device,  0,         ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  driver_device,  0,         ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  driver_device,  0,         ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", MACHINE_SUPPORTS_SAVE )

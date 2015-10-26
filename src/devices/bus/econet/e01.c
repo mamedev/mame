@@ -4,9 +4,9 @@
 
     Acorn FileStore E01/E01S network hard disk emulation
 
-    http://acorn.chriswhy.co.uk/Network/Econet.html
-    http://acorn.chriswhy.co.uk/Network/Pics/Acorn_FileStoreE01.html
-    http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_FileStoreE01S.html
+    http://chrisacorns.computinghistory.org.uk/Network/Econet.html
+    http://chrisacorns.computinghistory.org.uk/Network/Pics/Acorn_FileStoreE01.html
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Acorn_FileStoreE01S.html
     http://www.heyrick.co.uk/econet/fs/emulator.html
     http://www.pdfio.com/k-1019481.html#
 

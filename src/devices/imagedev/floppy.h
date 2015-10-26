@@ -265,9 +265,13 @@ DECLARE_FLOPPY_IMAGE_DEVICE(alps_3255190x, "floppy_5_25")
 
 extern const device_type FLOPPYSOUND;
 
+
 /*
     Floppy drive sound
 */
+
+#define MAX_STEP_SAMPLES 5
+
 class floppy_sound_device : public samples_device
 {
 public:
@@ -286,20 +290,25 @@ private:
 
 	sound_stream*   m_sound;
 	bool            m_loaded;
+	bool			m_is525; // true if this is a 5.25" floppy drive
 
-	int             m_sampleend_motor;
+	int				m_sampleindex_motor_start;
+	int				m_sampleindex_motor_loop;
+	int				m_sampleindex_motor_end;
+	int             m_samplesize_motor_start;
+	int             m_samplesize_motor_loop;
+	int             m_samplesize_motor_end;
 	int             m_samplepos_motor;
-	int             m_samplestart_motor;
-	int             m_motor_mintime;        // min time for the samples; sound persists for that time
-	int             m_motor_time;
-	bool            m_motor;
+	int             m_motor_playback_state;
+	bool            m_motor_on;
 
-	int             m_sampleend_step;
-	int             m_samplestart_step;
+	int				m_step_samples;
+	int				m_sampleindex_step1;
+	int             m_samplesize_step[MAX_STEP_SAMPLES];
 	int             m_samplepos_step;
-	int             m_step_mintime;
-	int             m_step_time;
+	int             m_step_playback_state;
 };
+
 
 class floppy_connector: public device_t,
 						public device_slot_interface
@@ -318,7 +327,7 @@ protected:
 
 private:
 	const floppy_format_type *formats;
-	bool    m_enable_sound;
+	bool m_enable_sound;
 };
 
 

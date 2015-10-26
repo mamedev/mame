@@ -206,7 +206,7 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S06 - [6]
    S07 - [7]
    S08 - [8]
-   S09 - UNUSED (under the [8] key, no metal contact on key)
+   S09 - UNUSED (under the [8] key, no metal contact on this part of the key)
    S10 - [9]
    S11 - [10]
 
@@ -227,10 +227,10 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S26 - BACKSPACE
    S27 - INS
    S28 - DEL
-   S29 - MODE CALC/= (white keypad key)
-   S30 - % (white keypad key)
-   S31 - (division symbol U+00F7) (white keypad key)
-   S32 - (multiplication symbol U+00D7) (white keypad key)
+   S29 - MODE CALC/= (beige keypad key)
+   S30 - % (beige keypad key)
+   S31 - (division symbol U+00F7) (beige keypad key)
+   S32 - (multiplication symbol U+00D7) (beige keypad key)
 
    S33 - (up arrow, SCRL, down arrow)//VTAB
    S34 - TAB//BACK
@@ -246,13 +246,13 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S44 - P
    S45 - (1/4 symbol U+00BC)/(1/2 symbol U+00BD)
    S46 - [/]
-   S47 - UNUSED (under the RETURN key, no metal contact on key)
+   S47 - UNUSED (under the RETURN key, no metal contact on this part of the key)
    S48 - ERASE/EOL
    S49 - REQ/CAN
    S50 - 7 (white keypad key)
    S51 - 8 (white keypad key)
    S52 - 9 (white keypad key)
-   S53 - - (white keypad key)
+   S53 - - (beige keypad key)
 
    S54 - (OFF,RVS,ON)//ESC
    S55 - LOCK//CAPS LOCK
@@ -267,20 +267,20 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S64 - L
    S65 - :/;
    S66 - "/'
-   S67 - UNUSED (under the RETURN key, no metal contact on key)
+   S67 - UNUSED (under the RETURN key, no metal contact on this part of the key)
    S68 - RETURN
    S69 - WORD/(left arrow U+2190)/(volume up U+1F508 plus U+25B4) (i.e. 'Previous Word')
    S70 - WORD/(right arrow U+2192)/(volume down U+1F508 plus U+25BE) (i.e. 'Next Word')
    S71 - 4 (white keypad key)
    S72 - 5 (white keypad key)
    S73 - 6 (white keypad key)
-   S74 - + (white keypad key)
+   S74 - + (beige keypad key)
 
    S75 - (OFF,UNDL,ON)
    S76 - SHIFT (left shift)
-   S77 - UNUSED (under the left SHIFT key, no metal contact on key)
-   S78 - Z
-   S79 - X
+   S77 - UNUSED (under the left SHIFT key, no metal contact on this part of the key)
+   S78 - Z//SUB
+   S79 - X//SUPER
    S80 - C
    S81 - V
    S82 - B
@@ -295,7 +295,7 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S91 - 1 (white keypad key)
    S92 - 2 (white keypad key)
    S93 - 3 (white keypad key)
-   S94 - ENTER (white keypad key)
+   S94 - ENTER (beige keypad key)
 
    S95 - RPT
    S96 - ALT
@@ -306,7 +306,7 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S101 - 0 (white keypad key)
    S102 - 00 (white keypad key) ('double zero')
    S103 - . (white keypad key)
-   S104 - UNUSED (under the ENTER (keypad) key, no metal contact on key)
+   S104 - UNUSED (under the ENTER (beige keypad) key, no metal contact on this part of the key)
 
    Note that the five unused key contacts:
    S09, S47, S67, S77 and S104
@@ -431,7 +431,7 @@ INPUT_PORTS_START( victor9k_keyboard )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') // S56
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') // S57
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("UNUSED S75") // unused // S75
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') // S76
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Z SUB") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') // S76
 
 	PORT_START("Y2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3 # >") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR('>') // S16
@@ -440,7 +440,7 @@ INPUT_PORTS_START( victor9k_keyboard )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') // S38
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') // S58
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') // S59
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') // S79
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("X SUPER") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') // S79
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') // S80
 
 	PORT_START("Y3")

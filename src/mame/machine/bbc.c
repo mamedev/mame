@@ -115,7 +115,7 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 {
 	if ((offset&0x04)==0)
 	{
-		m_pagedRAM = (data >> 7) & 0x01;
+		m_pagedRAM = BIT(data,7);
 		m_rombank =  data & 0x0f;
 
 		if (m_pagedRAM)
@@ -135,8 +135,8 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 	else
 	{
 		//the video display should now use this flag to display the shadow ram memory
-		m_vdusel=(data>>7)&0x01;
-		bbcbp_setvideoshadow(m_vdusel);
+		m_vdusel=BIT(data,7);
+		bbc_setvideoshadow(m_vdusel);
 		//need to make the video display do a full screen refresh for the new memory area
 		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 	}
@@ -291,7 +291,7 @@ b0 D    1=Display LYNNE as screen
 
 ACCCON is a read/write register
 
-HAZEL is the 8K of RAM used by the MOS, filing system, and other Roms at &C000-&DFFF
+HAZEL is the 8K of RAM used by the MOS, filing system, and other ROMs at &C000-&DFFF
 
 ANDY is the name of the 4K of RAM used by the MOS at &8000-&8FFF
 
@@ -326,14 +326,14 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	tempIRR=m_ACCCON_IRR;
 
-	m_ACCCON_IRR=(data>>7)&1;
-	m_ACCCON_TST=(data>>6)&1;
-	m_ACCCON_IFJ=(data>>5)&1;
-	m_ACCCON_ITU=(data>>4)&1;
-	m_ACCCON_Y  =(data>>3)&1;
-	m_ACCCON_X  =(data>>2)&1;
-	m_ACCCON_E  =(data>>1)&1;
-	m_ACCCON_D  =(data>>0)&1;
+	m_ACCCON_IRR = BIT(data,7);
+	m_ACCCON_TST = BIT(data,6);
+	m_ACCCON_IFJ = BIT(data,5);
+	m_ACCCON_ITU = BIT(data,4);
+	m_ACCCON_Y   = BIT(data,3);
+	m_ACCCON_X   = BIT(data,2);
+	m_ACCCON_E   = BIT(data,1);
+	m_ACCCON_D   = BIT(data,0);
 
 	if (tempIRR!=m_ACCCON_IRR)
 	{
@@ -349,7 +349,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 		m_bank7->set_base(m_region_os->base());
 	}
 
-	bbcbp_setvideoshadow(m_ACCCON_D);
+	bbc_setvideoshadow(m_ACCCON_D);
 
 
 	if (m_ACCCON_X)
@@ -558,7 +558,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x10) && (myo<=0x17))                   return 0xfe;                                                    /* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f))                   return m_upd7002 ? m_upd7002->read(space, myo-0x18) : 0xfe;     /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   return 0xfe;                                                    /* VideoULA */
-		if ((myo>=0x24) && (myo<=0x27))                   return bbcm_wd177xl_read(space, myo - 0x24);                    /* 177x Control Latch */
+		if ((myo>=0x24) && (myo<=0x27))                   return bbcm_wd177xl_read(space, myo-0x24);                      /* 177x Control Latch */
 		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(space, myo-0x28);                         /* 1770 Controller */
 		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(space, myo-0x28);                         /* 1772 Controller */
 		if ((myo>=0x28) && (myo<=0x2f))                   return 0xfe;                                                    /* No Controller */
@@ -726,6 +726,9 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		/* keyboard not enabled so increment counter */
 		m_column = (m_column + 1) % 16;
 
+		/* OS 0.1 programs CA2 to interrupt on negative edge and expects the keyboard to still work */
+		//int set = (m_os01 ? 0 : 1);
+
 		if (m_column < 13)
 		{
 			/* KBD IC4 8 input NAND gate */
@@ -778,6 +781,9 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 	{
 		bit = 1;
 	}
+
+	/* OS 0.1 programs CA2 to interrupt on negative edge and expects the keyboard to still work */
+	//int set = (m_os01 ? 0 : 1);
 
 	if ((res | 1) != 0xff)
 	{
@@ -872,7 +878,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 {
 	int bit, value;
 	bit = data & 0x07;
-	value = (data >> 3) & 0x01;
+	value = BIT(data,3);
 
 	//logerror("SYSTEM write portb %d %d %d\n",data,bit,value);
 
@@ -1048,16 +1054,16 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 	if (m_rtc)
 	{
 		//set the Address Select
-		if (m_MC146818_AS != ((data>>7)&1))
+		if (m_MC146818_AS != BIT(data,7))
 		{
-			m_MC146818_AS=(data>>7)&1;
+			m_MC146818_AS = BIT(data,7);
 			MC146818_set(space);
 		}
 
 		//if CE changes
-		if (m_MC146818_CE != ((data>>6)&1))
+		if (m_MC146818_CE != BIT(data,6))
 		{
-			m_MC146818_CE=(data>>6)&1;
+			m_MC146818_CE = BIT(data,6);
 			MC146818_set(space);
 		}
 	}
@@ -1418,31 +1424,16 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 ***************************************/
 
 
-WRITE_LINE_MEMBER(bbc_state::bbc_i8271_interrupt)
-{
-	/* I'm assuming that the nmi is edge triggered */
-	/* a interrupt from the fdc will cause a change in line state, and
-	the nmi will be triggered, but when the state changes because the int
-	is cleared this will not cause another nmi */
-	/* I'll emulate it like this to be sure */
-
-	if (state!=m_previous_i8271_int_state)
-	{
-		if (state)
-		{
-			/* I'll pulse it because if I used hold-line I'm not sure
-			it would clear - to be checked */
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		}
-	}
-
-	m_previous_i8271_int_state = state;
-}
-
 WRITE_LINE_MEMBER(bbc_state::motor_w)
 {
 	m_i8271->subdevice<floppy_connector>("0")->get_device()->mon_w(!state);
 	m_i8271->subdevice<floppy_connector>("1")->get_device()->mon_w(!state);
+}
+
+WRITE_LINE_MEMBER(bbc_state::side_w)
+{
+	m_i8271->subdevice<floppy_connector>("0")->get_device()->ss_w(state);
+	m_i8271->subdevice<floppy_connector>("1")->get_device()->ss_w(state);
 }
 
 
@@ -1450,6 +1441,38 @@ WRITE_LINE_MEMBER(bbc_state::motor_w)
    WD1770 disc control function
 ***************************************/
 
+
+/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
+   wd177x_DRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
+   the output of the above two NAND gates are then OR'ED together and sent to the 6502 NMI line.
+    DRQ and IRQ are active low outputs from wd177x. We use wd177x_DRQ_SET for DRQ = 0,
+    and wd177x_DRQ_CLR for DRQ = 1. Similarly wd177x_IRQ_SET for IRQ = 0 and wd177x_IRQ_CLR
+    for IRQ = 1.
+
+  The above means that if IRQ or DRQ are set, a interrupt should be generated.
+  The nmi_enable decides if interrupts are actually triggered.
+  The nmi is edge triggered, and triggers on a +ve edge.
+*/
+
+
+void bbc_state::bbc_update_nmi()
+{
+	if (m_fdc_irq || m_fdc_drq)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+WRITE_LINE_MEMBER(bbc_state::fdc_intrq_w)
+{
+	m_fdc_irq = state;
+	bbc_update_nmi();
+
+}
+
+WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
+{
+	m_fdc_drq = state;
+	bbc_update_nmi();
+}
 
 /*
    B/ B+ drive control:
@@ -1465,76 +1488,11 @@ WRITE_LINE_MEMBER(bbc_state::motor_w)
          0        Drive select 0.
 */
 
-/*
-density select
-single density is as the 8271 disc format
-double density is as the 8271 disc format but with 16 sectors per track
-*/
-
-
-/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
-   wd177x_DRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
-   the output of the above two NAND gates are then OR'ED together and sent to the 6502 NMI line.
-    DRQ and IRQ are active low outputs from wd177x. We use wd177x_DRQ_SET for DRQ = 0,
-    and wd177x_DRQ_CLR for DRQ = 1. Similarly wd177x_IRQ_SET for IRQ = 0 and wd177x_IRQ_CLR
-    for IRQ = 1.
-
-  The above means that if IRQ or DRQ are set, a interrupt should be generated.
-  The nmi_enable decides if interrupts are actually triggered.
-  The nmi is edge triggered, and triggers on a +ve edge.
-*/
-
-void bbc_state::bbc_update_fdq_int(int state)
-{
-	int bbc_state;
-
-	/* if drq or irq is set, and interrupt is enabled */
-	if ((m_wd177x_irq_state || m_wd177x_drq_state) && (m_177x_IntEnabled))
-	{
-		/* int trigger */
-		bbc_state = 1;
-	}
-	else
-	{
-		/* do not trigger int */
-		bbc_state = 0;
-	}
-	/* nmi is edge triggered, and triggers when the state goes from clear->set.
-	Here we are checking this transition before triggering the nmi */
-	if (bbc_state != m_previous_wd177x_int_state)
-	{
-		if (bbc_state)
-		{
-			/* I'll pulse it because if I used hold-line I'm not sure
-			it would clear - to be checked */
-			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
-		}
-	}
-
-	m_previous_wd177x_int_state = bbc_state;
-}
-
-WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_intrq_w)
-{
-	m_wd177x_irq_state = state;
-	bbc_update_fdq_int(state);
-}
-
-WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_drq_w)
-{
-	m_wd177x_drq_state = state;
-	bbc_update_fdq_int(state);
-}
-
 WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
 {
 	floppy_image_device *floppy = NULL;
 
 	m_drive_control = data;
-	logerror("Drive control %d \n", data);
-
-	// bit 5: reset
-	if (!BIT(data, 5)) m_wd1770->reset();
 
 	// bit 0, 1: drive select
 	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
@@ -1548,13 +1506,23 @@ WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
 	// bit 3: density
 	m_wd1770->dden_w(BIT(data, 3));
 
-	// bit 4: interrupt enable
-	m_177x_IntEnabled = !BIT(data, 4);
+	// bit 5: reset
+	if (!BIT(data, 5)) m_wd1770->soft_reset();
 }
 
-/***************************************
-BBC MASTER DISC SUPPORT
-***************************************/
+/*
+   Master drive control:
+
+        Bit       Meaning
+        -----------------
+        7,6       Not used.
+         5        Double density select (0 = double, 1 = single).
+         4        Side select (0 = side 0, 1 = side 1).
+         3        Drive select 2.
+         2        Reset drive controller chip. (0 = reset controller, 1 = no reset)
+         1        Drive select 1.
+         0        Drive select 0.
+*/
 
 READ8_MEMBER(bbc_state::bbcm_wd177xl_read)
 {
@@ -1566,10 +1534,6 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 	floppy_image_device *floppy = NULL;
 
 	m_drive_control = data;
-	//logerror("Drive control %d \n", data);
-
-	// bit 2: reset
-	if (!BIT(data, 2)) m_wd1770->reset();
 
 	// bit 0, 1, 3: drive select
 	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
@@ -1584,7 +1548,8 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 	// bit 5: density
 	m_wd1770->dden_w(BIT(data, 5));
 
-	m_177x_IntEnabled = 1;
+	// bit 2: reset
+	if (!BIT(data, 2)) m_wd1770->soft_reset();
 }
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
@@ -1592,10 +1557,6 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
 	floppy_image_device *floppy = NULL;
 
 	m_drive_control = data;
-	//logerror("Drive control %d \n", data);
-
-	// bit 2: reset
-	if (!BIT(data, 2)) m_wd1772->reset();
 
 	// bit 0, 1, 3: drive select
 	if (BIT(data, 0)) floppy = m_wd1772->subdevice<floppy_connector>("0")->get_device();
@@ -1610,20 +1571,21 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
 	// bit 5: density
 	m_wd1772->dden_w(BIT(data, 5));
 
-	m_177x_IntEnabled = 1;
+	// bit 2: reset
+	if (!BIT(data, 2)) m_wd1772->soft_reset();
 }
 
 /**************************************
    BBC B Rom loading functions
 ***************************************/
 
-int bbc_state::bbc_load_cart(device_image_interface &image, generic_slot_device *slot)
+int bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *slot)
 {
 	UINT32 size = slot->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -1679,6 +1641,8 @@ int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device
 
 DRIVER_INIT_MEMBER(bbc_state,bbc)
 {
+	m_os01 = false;
+
 	m_rxd_cass = 0;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
@@ -1691,6 +1655,7 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 	/* light pen strobe detect (not emulated) */
 	m_via6522_0->write_cb2(1);
 }
+
 
 // setup pointers for optional EPROMs
 void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
@@ -1785,8 +1750,6 @@ MACHINE_RESET_MEMBER(bbc_state, bbca)
 MACHINE_START_MEMBER(bbc_state, bbcb)
 {
 	m_mc6850_clock = 0;
-	m_previous_i8271_int_state=0;
-	m_previous_wd177x_int_state=1;
 	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
 }
 
@@ -1821,14 +1784,12 @@ MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 {
 	m_Speech = 1;
 	m_bank1->set_base(m_region_maincpu->base());
-	m_bank2->set_base(m_region_maincpu->base() + 0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
+	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
 	m_bank4->set_entry(0);
 	m_bank6->set_entry(0);
-	m_bank7->set_base(m_region_os->base());                 /* bank 7 points at the OS rom  from c000 to ffff */
+	m_bank7->set_base(m_region_os->base());                /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(this);
-
-	m_previous_wd177x_int_state=1;
 }
 
 
@@ -1856,6 +1817,4 @@ MACHINE_RESET_MEMBER(bbc_state, bbcm)
 	m_bank7->set_base(m_region_os->base());                /* bank 6 OS rom of RAM         from c000 to dfff */
 
 	bbcb_IC32_initialise(this);
-
-	m_previous_wd177x_int_state=1;
 }

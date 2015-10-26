@@ -223,6 +223,7 @@ enum
 	XTAL_64MHz          = 64000000,     /* BattleToads */
 	XTAL_66_6667MHz     = 66666700,     /* Later Midway games */
 	XTAL_67_7376MHz     = 67737600,     /* PSX-based h/w, Sony ZN1-2-based */
+	XTAL_72MHz          = 72000000,     /* Aristocrat MKV */
 	XTAL_72_576MHz      = 72576000,     /* Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	XTAL_73_728MHz      = 73728000,     /* Ms. Pac-Man/Galaga 20th Anniversary */
 	XTAL_100MHz         = 100000000,    /* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */

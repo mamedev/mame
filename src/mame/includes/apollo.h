@@ -46,11 +46,15 @@
 #define MLOG(x)  { logerror ("%s: ", apollo_cpu_context(machine().device(MAINCPU))); LOG(x) }
 #define MLOG1(x) { if (VERBOSE > 0) MLOG(x) }
 #define MLOG2(x) { if (VERBOSE > 1) MLOG(x) }
-#define SLOG(x)  { logerror ("%s: ", apollo_cpu_context(&space.device())); LOG(x) }
+#define SLOG(x)  { logerror ("%s: ", apollo_cpu_context(m_maincpu)); LOG(x) }
 #define SLOG1(x) { if (VERBOSE > 0) SLOG(x) }
 #define SLOG2(x) { if (VERBOSE > 1) SLOG(x) }
 
 #define  MAINCPU "maincpu"
+
+// Enabling this is >NOT< supported by MESSdev
+// Do *not* report any issues on Mametesters if this is enabled!
+// #define APOLLO_XXL
 
 /*----------- machine/apollo_dbg.c -----------*/
 
@@ -69,6 +73,9 @@ void apollo_check_log();
 
 // return 1 if node is DN3000 or DSP3000, 0 otherwise
 int apollo_is_dn3000(void);
+
+// return 1 if node is DN5500 or DSP5500, 0 otherwise
+int apollo_is_dn5500(void);
 
 // return 1 if node is DSP3000 or DSP3500, 0 otherwise
 int apollo_is_dsp3x00(void);
@@ -98,10 +105,12 @@ void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
 #define APOLLO_SIO_TAG  "sio"
 #define APOLLO_SIO2_TAG "sio2"
 #define APOLLO_ETH_TAG  "3c505"
+#define APOLLO_NI_TAG  "node_id"
 #define APOLLO_ISA_TAG "isabus"
 
 // forward declaration
 class apollo_sio;
+class apollo_ni;
 
 class apollo_state : public driver_device
 {
@@ -118,6 +127,7 @@ public:
 			m_sio(*this, APOLLO_SIO_TAG),
 			m_sio2(*this, APOLLO_SIO2_TAG),
 			m_rtc(*this, APOLLO_RTC_TAG),
+			m_node_id(*this, APOLLO_NI_TAG),
 			m_isa(*this, APOLLO_ISA_TAG)
 			{ }
 
@@ -132,6 +142,7 @@ public:
 	required_device<apollo_sio> m_sio;
 	optional_device<apollo_sio> m_sio2;
 	required_device<mc146818_device> m_rtc;
+	required_device<apollo_ni> m_node_id;
 	required_device<isa16_device> m_isa;
 
 	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
@@ -173,6 +184,10 @@ public:
 	DECLARE_WRITE16_MEMBER(apollo_atbus_io_w);
 	DECLARE_READ16_MEMBER(apollo_atbus_memory_r);
 	DECLARE_WRITE16_MEMBER(apollo_atbus_memory_w);
+	DECLARE_READ16_MEMBER(apollo_atbus_unmap_io_r);
+	DECLARE_WRITE16_MEMBER(apollo_atbus_unmap_io_w);
+	DECLARE_READ8_MEMBER(apollo_atbus_unmap_r);
+	DECLARE_WRITE8_MEMBER(apollo_atbus_unmap_w);
 	DECLARE_WRITE8_MEMBER(dn5500_memory_present_register_w);
 	DECLARE_READ8_MEMBER(dn5500_memory_present_register_r);
 	DECLARE_WRITE8_MEMBER(dn5500_11500_w);
@@ -334,6 +349,55 @@ private:
 };
 
 extern const device_type APOLLO_SIO;
+
+/*----------- machine/apollo_ni.c -----------*/
+
+#define MCFG_APOLLO_NI_ADD(_tag, _xtal) \
+	MCFG_DEVICE_ADD(_tag, APOLLO_NI, _xtal)
+
+/*** Apollo Node ID device ***/
+
+class apollo_ni: public device_t, public device_image_interface
+{
+public:
+	// construction/destruction
+	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~apollo_ni();
+
+	virtual iodevice_t image_type() const { return IO_ROM; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "ani,bin"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+
+	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_READ16_MEMBER(read);
+
+	// image-level overrides
+	virtual bool call_load();
+	virtual bool call_create(int format_type, option_resolution *format_options);
+	virtual void call_unload();
+
+	void set_node_id_from_disk();
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete() ;
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	void set_node_id(UINT32 node_id);
+	UINT32 m_node_id;
+};
+
+// device type definition
+extern const device_type APOLLO_NI;
 
 /*----------- video/apollo.c -----------*/
 
@@ -598,5 +662,63 @@ extern const device_type APOLLO_MONO19I;
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
 
 MACHINE_CONFIG_EXTERN( apollo_mono19i );
+
+#ifdef APOLLO_XXL
+
+/*----------- machine/apollo_stdio.c -----------*/
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_APOLLO_STDIO_TX_CALLBACK(_cb) \
+	devcb = &apollo_stdio_device::set_tx_cb(*device, DEVCB_##_cb);
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> apollo_stdio_device
+
+class apollo_stdio_device: public device_t, public device_serial_interface
+{
+public:
+	// construction/destruction
+	apollo_stdio_device(const machine_config &mconfig, const char *tag,
+			device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object)
+	{
+		return downcast<apollo_stdio_device &> (device).m_tx_w.set_callback(object);
+	}
+
+	devcb_write_line m_tx_w;
+
+private:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// serial overrides
+	virtual void rcv_complete(); // Rx completed receiving byte
+	virtual void tra_complete(); // Tx completed sending byte
+	virtual void tra_callback(); // Tx send bit
+
+	TIMER_CALLBACK_MEMBER( poll_timer );
+	void xmit_char(UINT8 data);
+
+	static const int XMIT_RING_SIZE = 64;
+
+	UINT8 m_xmitring[XMIT_RING_SIZE];
+	int m_xmit_read, m_xmit_write;
+	bool m_tx_busy;
+
+	emu_timer* m_poll_timer;
+};
+
+// device type definition
+extern const device_type APOLLO_STDIO;
+#endif /* APOLLO_XXL */
 
 #endif /* APOLLO_H_ */

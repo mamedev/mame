@@ -978,7 +978,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
 static MACHINE_CONFIG_START( cosmic, cosmic_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz*/
+	MCFG_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
 
 	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
 	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmic)
@@ -1099,7 +1099,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", Z80, Z80_MASTER_CLOCK/4) /* 2.704 MHz, verified via schematics */
 	MCFG_CPU_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */

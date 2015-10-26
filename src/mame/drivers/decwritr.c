@@ -108,8 +108,7 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
 			m_led_7seg[m_led_7seg_counter-1] = (offset&0xF)^0xF;
 		}
 	}
-#ifdef LED_VERBOSE
-	logerror("LEDs: %c %c %c %c : %s  %s  %s  %s  %s  %s  %s  %s\n",
+	popmessage("LEDs: %c %c %c %c : %s  %s  %s  %s  %s  %s  %s  %s\n",
 	m_led_7seg[3]+0x30, m_led_7seg[2]+0x30, m_led_7seg[1]+0x30, m_led_7seg[0]+0x30,
 	(m_led_array&0x80)?"ON LINE":"-------",
 	(m_led_array&0x40)?"LOCAL":"-----",
@@ -119,7 +118,6 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
 	(m_led_array&0x4)?"DSR":"---",
 	(m_led_array&0x2)?"SET-UP":"------",
 	(m_led_array&0x1)?"PAPER OUT":"---------" );
-#endif
 }
 
 READ8_MEMBER( decwriter_state::la120_NVR_r )
@@ -145,8 +143,8 @@ static ADDRESS_MAP_START(la120_mem, AS_PROGRAM, 8, decwriter_state)
 	AM_RANGE( 0x4000, 0x43ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'low ram'
 	AM_RANGE( 0x5000, 0x53ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'high ram'
 	AM_RANGE( 0x6000, 0x6fff ) AM_MIRROR(0x08fe) AM_READWRITE(la120_NVR_r, la120_NVR_w) // ER1400 EAROM
-	AM_RANGE( 0x7000, 0x7003 ) AM_MIRROR(0x0ffc) AM_READWRITE(la120_DC305_r, la120_DC305_w) // DC305 printer controller ASIC stuff
-	// 8000-ffff is reserved for expansion (i.e. unused, open bus); since this can generate interrupts this needs to be split to its own device.
+	AM_RANGE( 0x7000, 0x7003 ) AM_MIRROR(0x0ffc) AM_READWRITE(la120_DC305_r, la120_DC305_w) // DC305 printer controller ASIC stuff; since this can generate interrupts this needs to be split to its own device.
+	// 8000-ffff is reserved for expansion (i.e. unused, open bus)
 ADDRESS_MAP_END
 
 /*

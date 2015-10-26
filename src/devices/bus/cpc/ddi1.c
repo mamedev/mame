@@ -23,7 +23,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 ROM_START( cpc_ddi1 )
-	ROM_REGION( 0x4000, "exp_rom", 0 )
+	ROM_REGION( 0x4000, "disc_rom", 0 )
 	ROM_LOAD("cpcados.rom",  0x0000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
 ROM_END
 
@@ -80,6 +80,7 @@ void cpc_ddi1_device::device_start()
 
 	space.install_write_handler(0xfa7e,0xfa7f,0,0,write8_delegate(FUNC(cpc_ddi1_device::motor_w),this));
 	space.install_readwrite_handler(0xfb7e,0xfb7f,0,0,read8_delegate(FUNC(cpc_ddi1_device::fdc_r),this),write8_delegate(FUNC(cpc_ddi1_device::fdc_w),this));
+	space.install_write_handler(0xdf00,0xdfff,0,0,write8_delegate(FUNC(cpc_ddi1_device::rombank_w),this));
 }
 
 //-------------------------------------------------
@@ -88,6 +89,7 @@ void cpc_ddi1_device::device_start()
 
 void cpc_ddi1_device::device_reset()
 {
+	m_rom_active = false;
 }
 
 WRITE8_MEMBER(cpc_ddi1_device::motor_w)
@@ -136,4 +138,25 @@ READ8_MEMBER(cpc_ddi1_device::fdc_r)
 		break;
 	}
 	return data;
+}
+
+WRITE8_MEMBER(cpc_ddi1_device::rombank_w)
+{
+	if(data == 0x07)
+		m_rom_active = true;
+	else
+		m_rom_active = false;
+	m_slot->rom_select(space,0,data);
+}
+
+void cpc_ddi1_device::set_mapping(UINT8 type)
+{
+	if(type != MAP_UPPER)
+		return;
+	if(m_rom_active)
+	{
+		UINT8* ROM = memregion("disc_rom")->base();
+		membank(":bank7")->set_base(ROM);
+		membank(":bank8")->set_base(ROM+0x2000);
+	}
 }

@@ -6,7 +6,7 @@
 #include "machine/pic8259.h"
 #include "includes/chihiro.h"
 
-//#define LOG_NV2A
+// #define LOG_NV2A
 
 const char *vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
 const char *vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
@@ -1261,6 +1261,7 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, UINT32 c[4])
 		c[1] = pal6bit((color & 0x07e0) >> 5);
 		c[0] = pal5bit(color & 0x1f);
 		return (UINT8 *)addr16;
+	case NV2A_COLOR_FORMAT_UNKNOWN4:
 	case NV2A_COLOR_FORMAT_X8R8G8B8:
 		addr = (UINT32 *)((UINT8 *)rendertarget + offset);
 		color = *addr;
@@ -1861,6 +1862,7 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 			w = ((w >> 8) & 0xf800) + ((w >> 5) & 0x7e0) + ((w >> 3) & 0x1f);
 			*((UINT16 *)addr) = (UINT16)w;
 			break;
+		case NV2A_COLOR_FORMAT_UNKNOWN4:
 		case NV2A_COLOR_FORMAT_X8R8G8B8:
 			*((UINT32 *)addr) = w;
 			break;
@@ -2333,6 +2335,8 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 {
 	int m;
 
+	if (what == 0)
+		return;
 	m = antialias_control;
 	if (antialiasing_rendertarget != 0)
 		m = 2;
@@ -2451,8 +2455,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				read_vertices_0x1810(space, vert, n + offset, 4);
 				convert_vertices_poly(vert, xy, 4);
 				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_FAN) {
 			vertex_nv vert[3];
@@ -2466,8 +2470,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				read_vertices_0x1810(space, vert + (((n + 1) & 1) + 1), offset + n, 1);
 				convert_vertices_poly(vert + (((n + 1) & 1) + 1), xy + (((n + 1) & 1) + 1), 1);
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~(n + 1) & 1) + 1], xy[((n + 1) & 1) + 1]);
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
 			vertex_nv vert[4];
@@ -2481,8 +2485,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				read_vertices_0x1810(space, vert + ((n + 2) & 3), offset + n, 1);
 				convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+				wait();
 			}
-			wait();
 		}
 		else {
 			logerror("Unsupported primitive %d for method 0x1810\n", type);
@@ -2526,8 +2530,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				countlen = countlen - c;
 				convert_vertices_poly(vert, xy, 4);
 				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_FAN) {
 			if ((countlen * mult + indexesleft_count) >= 3) {
@@ -2553,8 +2557,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					address = address + c * 4;
 					countlen = countlen - c;
 					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
+					wait();
 				}
-				wait();
 			}
 		}
 		else if (type == nv2a_renderer::TRIANGLES) {
@@ -2573,8 +2577,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				countlen = countlen - c;
 				convert_vertices_poly(vert, xy, 3);
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
 			if ((countlen * mult + indexesleft_count) >= 3) {
@@ -2601,8 +2605,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					if (xy[(n + 2) & 3].y > 293800000.0f)
 						xy[(n + 2) & 3].y = xy[(n + 2) & 3].y + 1.0f;
 					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+					wait();
 				}
-				wait();
 			}
 		}
 		else {
@@ -2670,8 +2674,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				address = address + c * 4;
 				convert_vertices_poly(vert + ((n & 1) + 1), xy + ((n & 1) + 1), 1);
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLES) {
 			while (countlen > 0) {
@@ -2689,8 +2693,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				}
 				address = address + c * 3;
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
 			vertex_nv vert[4];
@@ -2717,8 +2721,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				}
 				address = address + c * 4;
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::QUADS) {
 			while (countlen > 0) {
@@ -2736,8 +2740,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				}
 				address = address + c * 4;
 				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				wait();
 			}
-			wait();
 		}
 		else if (type == nv2a_renderer::QUAD_STRIP) {
 			vertex_nv vert[4];
@@ -2765,8 +2769,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				address = address + c * 4;
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[n & 3], xy[(n + 1) & 3], xy[(n + 2) & 3]);
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[(n + 2) & 3], xy[(n + 1) & 3], xy[(n + 3) & 3]);
+				wait();
 			}
-			wait();
 		}
 		else {
 			logerror("Unsupported primitive %d for method 0x1818\n", type);
@@ -2909,6 +2913,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		case NV2A_COLOR_FORMAT_R5G6B5:
 			bytespixel_rendertarget = 2;
 			break;
+		case NV2A_COLOR_FORMAT_UNKNOWN4:
 		case NV2A_COLOR_FORMAT_X8R8G8B8:
 		case NV2A_COLOR_FORMAT_A8R8G8B8:
 			bytespixel_rendertarget = 4;
@@ -2917,9 +2922,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			bytespixel_rendertarget = 1;
 			break;
 		default:
-#ifdef LOG_NV2A
-			printf("Unknown render target color format %d\n\r", colorformat_rendertarget);
-#endif
+			logerror("Unknown render target color format %d\n\r", colorformat_rendertarget);
 			bytespixel_rendertarget = 4;
 			break;
 		}
@@ -4024,16 +4027,12 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	int countlen;
 	int ret;
 	address_space *space = puller_space;
-#ifdef LOG_NV2A
 	UINT32 subch;
-#endif
 
 	chanel = puller_channel;
 	subchannel = puller_subchannel;
 	dmaput = &channel[chanel][subchannel].regs[0x40 / 4];
 	dmaget = &channel[chanel][subchannel].regs[0x44 / 4];
-	chanel = puller_channel;
-	subchannel = puller_subchannel;
 	while (*dmaget != *dmaput) {
 		cmd = space->read_dword(*dmaget);
 		*dmaget += 4;
@@ -4051,20 +4050,21 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 0: // increasing method
 			method = (cmd >> 2) & 2047; // method*4 is address // if method >= 0x40 send it to assigned object
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
@@ -4074,7 +4074,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 				ret = 0;
 				while (count > 0) {
 					countlen = 1;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					count--;
 					method++;
 					*dmaget += 4;
@@ -4090,23 +4090,21 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 5: // non-increasing method
 			method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
-#ifdef LOG_NV2A
-				logerror("  assign channel %d\n", subch);
-#endif
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
@@ -4115,7 +4113,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 #endif
 				while (count > 0) {
 					countlen = count;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					*dmaget += 4 * (count - countlen);
 					count = countlen;
 				}
@@ -4123,21 +4121,22 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 3: // long non-increasing method
 			method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = space->read_dword(*dmaget);
 			*dmaget += 4;
 			if ((method == 0) && (count == 1)) {
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
@@ -4146,7 +4145,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 #endif
 				while (count > 0) {
 					countlen = count;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					*dmaget += 4 * (count - countlen);
 					count = countlen;
 				}

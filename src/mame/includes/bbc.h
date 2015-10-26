@@ -83,9 +83,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats_525sd);
-	DECLARE_FLOPPY_FORMATS(floppy_formats_525dd);
-	DECLARE_FLOPPY_FORMATS(floppy_formats_35dd);
+	DECLARE_FLOPPY_FORMATS(floppy_formats_bbc);
+	DECLARE_FLOPPY_FORMATS(floppy_formats_bbcm);
+	DECLARE_FLOPPY_FORMATS(floppy_formats_bbcmc);
 
 	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
@@ -154,8 +154,6 @@ public:
 	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
 	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_via_user_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
 	void update_acia_rxd();
 	void update_acia_dcd();
@@ -166,8 +164,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	DECLARE_WRITE_LINE_MEMBER(side_w);
 
 	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
 	UPD7002_EOC(BBC_uPD7002_EOC);
@@ -175,11 +175,11 @@ public:
 	void bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
 	void bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
 
-	int bbc_load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_cart(image, m_exp1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp2_load) { return bbc_load_cart(image, m_exp2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp3_load) { return bbc_load_cart(image, m_exp3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp4_load) { return bbc_load_cart(image, m_exp4); }
+	int bbc_load_rom(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_rom(image, m_exp1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp2_load) { return bbc_load_rom(image, m_exp2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp3_load) { return bbc_load_rom(image, m_exp3); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp4_load) { return bbc_load_rom(image, m_exp4); }
 
 	int bbcm_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp1_load) { return bbcm_load_cart(image, m_exp1); }
@@ -227,6 +227,7 @@ public: // HACK FOR MC6845
 
 	void check_interrupts();
 
+	bool m_os01;            // flag indicating whether OS 0.1 is being used
 	int m_SWRAMtype;        // this stores the DIP switch setting for the SWRAM type being used
 	int m_Speech;           // this stores the CONF setting for Speech enabled/disabled
 
@@ -343,20 +344,12 @@ public: // HACK FOR MC6845
 
 
 							/**************************************
-							   i8271 disc control
-							***************************************/
-
-	int m_previous_i8271_int_state; // 8271 interrupt status
-
-							/**************************************
 							   WD1770 disc control
 							***************************************/
 
 	int m_drive_control;
-	int m_wd177x_irq_state;
-	int m_wd177x_drq_state;
-	int m_previous_wd177x_int_state;
-	int m_177x_IntEnabled;
+	int m_fdc_irq;
+	int m_fdc_drq;
 
 							/**************************************
 							   Video Code
@@ -385,7 +378,6 @@ public: // HACK FOR MC6845
 	int m_BBC_HSync;
 	int m_BBC_VSync;
 
-
 	int m_Teletext_Latch;
 	int m_VideoULA_CR;
 	int m_VideoULA_CR_counter;
@@ -397,7 +389,6 @@ public: // HACK FOR MC6845
 	int m_videoULA_teletext_normal_select;
 	int m_videoULA_flash_colour_select;
 
-
 	int m_pixels_per_byte;
 	int m_emulation_pixels_per_real_pixel;
 	int m_emulation_pixels_per_byte;
@@ -405,33 +396,26 @@ public: // HACK FOR MC6845
 	int m_emulation_cursor_size;
 	int m_cursor_state;
 
-	int m_videoULA_pallet0[16];
-	int m_videoULA_pallet1[16];
-	int *m_videoULA_pallet_lookup;
+	int m_videoULA_palette0[16];
+	int m_videoULA_palette1[16];
+	int *m_videoULA_palette_lookup;
 
-	void (*m_draw_function)(running_machine &machine);
-
-	void bbcbp_setvideoshadow(int vdusel);
+	void bbc_setvideoshadow(int vdusel);
 	void common_init(int memorySize);
 	void set_pixel_lookup();
 	void set_cursor(bbc_state *state);
 	void BBC_Clock_CR(bbc_state *state);
-	void BBC_draw_teletext();
-	void BBC_ula_drawpixel(bbc_state *state, int col, int number_of_pixels);
-	void BBC_draw_hi_res();
 	void BBC_Set_HSync(int offset, int data);
 	void BBC_Set_VSync(int offset, int data);
 	void BBC_Set_CRE(int offset, int data);
-	void bbc_frameclock();
 	int vdudriverset();
 	int bbcm_vdudriverset();
 	int bbc_keyboard(address_space &space, int data);
 	void bbcb_IC32_initialise(bbc_state *state);
 	void MC146818_set(address_space &space);
-	void bbc_TMSint(int status);
 	void MC6850_Receive_Clock(int new_clock);
 	void BBC_Cassette_motor(unsigned char status);
-	void bbc_update_fdq_int(int state);
+	void bbc_update_nmi();
 	unsigned int calculate_video_address(int ma,int ra);
 	required_device<palette_device> m_palette;
 };

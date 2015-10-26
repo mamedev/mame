@@ -160,7 +160,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 	if(space.debugger_access())
 		return 0;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
-	m_stat |= 8;
+	m_stat |= 0xfd;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
@@ -170,7 +170,7 @@ WRITE8_MEMBER( pcd_state::nmi_io_w )
 	if(space.debugger_access())
 		return;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
-	m_stat |= 8;
+	m_stat |= 0xfd;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -538,6 +538,7 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir7_w))
 	MCFG_MC146818_BINARY(true)
+	MCFG_MC146818_BINARY_YEAR(true)
 	MCFG_MC146818_EPOCH(1900)
 	MCFG_MC146818_24_12(true)
 

@@ -18,11 +18,6 @@
 static float s_texelHalf = 0.0f;
 static bool s_originBottomLeft = false;
 
-inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far)
-{
-	bx::mtxProj(_result, _fovy, _aspect, _near, _far, s_originBottomLeft);
-}
-
 struct PosNormalTangentTexcoordVertex
 {
 	float m_x;
@@ -233,11 +228,11 @@ class Deferred : public entry::AppI
 		// Enable m_debug text.
 		bgfx::setDebug(m_debug);
 
-		// Set clear color palette for index 0
-		bgfx::setClearColor(0, UINT32_C(0x00000000) );
+		// Set palette color for index 0
+		bgfx::setPaletteColor(0, UINT32_C(0x00000000) );
 
-		// Set clear color palette for index 1
-		bgfx::setClearColor(1, UINT32_C(0x303030ff) );
+		// Set palette color for index 1
+		bgfx::setPaletteColor(1, UINT32_C(0x303030ff) );
 
 		// Set geometry pass view clear state.
 		bgfx::setViewClear(RENDER_PASS_GEOMETRY_ID
@@ -504,7 +499,7 @@ class Deferred : public entry::AppI
 					bgfx::setViewFrameBuffer(RENDER_PASS_LIGHT_ID, m_lightBuffer);
 
 					float proj[16];
-					mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
+					bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, s_originBottomLeft);
 
 					bgfx::setViewFrameBuffer(RENDER_PASS_GEOMETRY_ID, m_gbuffer);
 					bgfx::setViewTransform(RENDER_PASS_GEOMETRY_ID, view, proj);

@@ -282,7 +282,7 @@ VIDEOS["FIXFREQ"] = true
 VIDEOS["H63484"] = true
 --VIDEOS["HD44102"] = true
 --VIDEOS["HD44352"] = true
---VIDEOS["HD44780"] = true
+VIDEOS["HD44780"] = true
 VIDEOS["HD61830"] = true
 VIDEOS["HD63484"] = true
 --VIDEOS["HD66421"] = true
@@ -3535,7 +3535,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/slotcarn.c",
 	MAME_DIR .. "src/mame/drivers/smsmcorp.c",
 	MAME_DIR .. "src/mame/drivers/sothello.c",
-	MAME_DIR .. "src/mame/drivers/spcwarp.c",
 	MAME_DIR .. "src/mame/drivers/splus.c",
 	MAME_DIR .. "src/mame/drivers/spool99.c",
 	MAME_DIR .. "src/mame/drivers/sprcros2.c",

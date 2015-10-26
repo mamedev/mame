@@ -18,112 +18,112 @@ const device_type V53A =&device_creator<v53a_device>;
 
 WRITE8_MEMBER(v53_base_device::BSEL_w)
 {
-	printf("v53: BSEL_w %02x\n", data);
+	//printf("v53: BSEL_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::BADR_w)
 {
-	printf("v53: BADR_w %02x\n", data);
+	//printf("v53: BADR_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::BRC_w)
 {
-	printf("v53: BRC_w %02x\n", data);
+	//printf("v53: BRC_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WMB0_w)
 {
-	printf("v53: WMB0_w %02x\n", data);
+	//printf("v53: WMB0_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WCY1_w)
 {
-	printf("v53: WCY1_w %02x\n", data);
+	//printf("v53: WCY1_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WCY0_w)
 {
-	printf("v53: WCY0_w %02x\n", data);
+	//printf("v53: WCY0_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WAC_w)
 {
-	printf("v53: WAC_w %02x\n", data);
+	//printf("v53: WAC_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::TCKS_w)
 {
-	printf("v53: TCKS_w %02x\n", data);
+	//printf("v53: TCKS_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::SBCR_w)
 {
-	printf("v53: SBCR_w %02x\n", data);
+	//printf("v53: SBCR_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::REFC_w)
 {
-	printf("v53: REFC_w %02x\n", data);
+	//printf("v53: REFC_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WMB1_w)
 {
-	printf("v53: WMB1_w %02x\n", data);
+	//printf("v53: WMB1_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WCY2_w)
 {
-	printf("v53: WCY2_w %02x\n", data);
+	//printf("v53: WCY2_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WCY3_w)
 {
-	printf("v53: WCY3_w %02x\n", data);
+	//printf("v53: WCY3_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::WCY4_w)
 {
-	printf("v53: WCY4_w %02x\n", data);
+	//printf("v53: WCY4_w %02x\n", data);
 }
 
 WRITE8_MEMBER(v53_base_device::SULA_w)
 {
-	printf("v53: SULA_w %02x\n", data);
+	//printf("v53: SULA_w %02x\n", data);
 	m_SULA = data;
 	install_peripheral_io();
 }
 
 WRITE8_MEMBER(v53_base_device::TULA_w)
 {
-	printf("v53: TULA_w %02x\n", data);
+	//printf("v53: TULA_w %02x\n", data);
 	m_TULA = data;
 	install_peripheral_io();
 }
 
 WRITE8_MEMBER(v53_base_device::IULA_w)
 {
-	printf("v53: IULA_w %02x\n", data);
+	//printf("v53: IULA_w %02x\n", data);
 	m_IULA = data;
 	install_peripheral_io();
 }
 
 WRITE8_MEMBER(v53_base_device::DULA_w)
 {
-	printf("v53: DULA_w %02x\n", data);
+	//printf("v53: DULA_w %02x\n", data);
 	m_DULA = data;
 	install_peripheral_io();
 }
 
 WRITE8_MEMBER(v53_base_device::OPHA_w)
 {
-	printf("v53: OPHA_w %02x\n", data);
+	//printf("v53: OPHA_w %02x\n", data);
 	m_OPHA = data;
 	install_peripheral_io();
 }
 
 WRITE8_MEMBER(v53_base_device::OPSEL_w)
 {
-	printf("v53: OPSEL_w %02x\n", data);
+	//printf("v53: OPSEL_w %02x\n", data);
 	m_OPSEL = data;
 	install_peripheral_io();
 }
@@ -139,7 +139,7 @@ WRITE8_MEMBER(v53_base_device::SCTL_w)
 	// bit 1: uPD71037 DMA mode enable (otherwise in uPD71071 mode)
 	// bit 0: Onboard pripheral I/O maps to 8-bit boundaries? (otherwise 16-bit)
 
-	printf("v53: SCTL_w %02x\n", data);
+	//printf("v53: SCTL_w %02x\n", data);
 	m_SCTL = data;
 	install_peripheral_io();
 }
@@ -311,14 +311,14 @@ void v53_base_device::install_peripheral_io()
 
 READ8_MEMBER(v53_base_device::scu_simk_r)
 {
-	printf("v53: scu_simk_r\n");
+	//printf("v53: scu_simk_r\n");
 	return m_simk;
 }
 
 WRITE8_MEMBER(v53_base_device::scu_simk_w)
 {
 	m_simk = data;
-	printf("v53: scu_simk_w %02x\n", data);
+	//printf("v53: scu_simk_w %02x\n", data);
 }
 
 
@@ -350,7 +350,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq0_w)
 	}
 	else
 	{
-		printf("v53: dreq0 not in 71071mode\n");
+		//printf("v53: dreq0 not in 71071mode\n");
 	}
 }
 
@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq1_w)
 	}
 	else
 	{
-		printf("v53: dreq1 not in 71071mode\n");
+		//printf("v53: dreq1 not in 71071mode\n");
 	}
 }
 
@@ -374,7 +374,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq2_w)
 	}
 	else
 	{
-		printf("v53: dreq2 not in 71071mode\n");
+		//printf("v53: dreq2 not in 71071mode\n");
 	}
 }
 
@@ -386,7 +386,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq3_w)
 	}
 	else
 	{
-		printf("v53: dreq3 not in 71071mode\n");
+		//printf("v53: dreq3 not in 71071mode\n");
 	}
 }
 
@@ -398,7 +398,7 @@ WRITE_LINE_MEMBER(v53_base_device::hack_w)
 	}
 	else
 	{
-		printf("v53: hack_w not in 71071mode\n");
+		//printf("v53: hack_w not in 71071mode\n");
 	}
 }
 

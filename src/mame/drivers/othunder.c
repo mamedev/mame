@@ -11,7 +11,7 @@ David Graves
 Nicola Salmoria. Thanks to Richard Bush and the Raine team, whose open
 source was very helpful in many areas particularly the sprites.)
 
-                *****
+*************************************************************************
 
 Operation Thunderbolt
 Taito, 1988
@@ -22,36 +22,43 @@ PCB Layout
 K1100381A
 J1100166A MAIN PCB
 |-----------------------------------------------------------------------|
-|     VOL     VOL        YM3016   B67-13.40  16MHz  24MHz               |
-|                |------|                                           PAL |
-|                |TAITO |         Z80                                   |
-|                |TC0140|         6264          26.686MHz    6116  6116 |
-|                |SYT   |                                    6116  6116 |
-|                |------|         YM2610                     6116  6116 |
+|  VOL   VOL          TC0310FAM  YM3016 B67-13.40 16MHz 24MHz      PAL  |
+|        TL074  |------|TC0310FAM TL074                                 |
+|  MB3735 MB3735|TAITO |            Z80                                 |
+|               |TC0140|            6264.46     26.686MHz    6116  6116 |
+|               |SYT   |                                     6116  6116 |
+|               |------|            YM2610                   6116  6116 |
 |    ADC0808     B67-08.67                                   6116  6116 |
-|                                B67-07.44         |------|             |
-|J               B67-06.66                         |TAITO |    |------| |
-|A    |------|                                     |TC0020|    |TAITO | |
-|M    |TAITO |                62256  62256         |VAR   |    |TC0050| |
-|M    |TC0220|       |------|                      |------|    |VDZ   | |
-|A    |IOC   |       |TAITO |                                  |------| |
-|     |------|       |TC0100|  6116 6116                                |
-|                    |SCN   |                        |------|           |
+|          MB3771                  B67-07.44       |------|             |
+|2               B67-06.66                         |TAITO |    |------| |
+|8    |------|                                     |TC0020|    |TAITO | |
+||    |TAITO |               62256.57 62256.55     |VAR   |    |TC0050| |
+|W    |TC0220|       |------|                      |------|    |VDZ   | |
+|A    |IOC   |       |TAITO |            B67-05.43             |------| |
+|Y    |------|       |TC0100|  6116.56                                  |
+|                    |SCN   |       6116.54          |------|           |
 |    DSWA  DSWB      |------|         B67-05.43      |TAITO |           |
 |                                                    |TC0050|           |
-|                            |------|                |VDZ   |           |
+|  93C46                     |------|                |VDZ   |           |
 |     |------|    B67-23.64  |TAITO |   |----|       |------|  B67-04.4 |
 |     |TAITO |               |TC0320|   | 6  |                          |
 | 555 |TC0110|    B67-20.63  |OBR   |   | 8  |  PAL  |------|  B67-03.3 |
 |     |PCR   |               |------|   | 0  |       |TAITO |           |
-|     |------|    B67-15.62    62256    | 0  |  PAL  |TC0050|  B67-02.2 |
-|                                       | 0  |       |VDZ   |           |
-|         6264    B67-14.61    62256    |----|  PAL  |------|  B67-01.1 |
+|     |------|    B67-15.62   62256.52  | 0  |  PAL  |TC0050|  B67-02.2 |
+| 6264.73 6264.74                       | 0  |       |VDZ   |           |
+|     TC0070RGB   B67-14.61   62256.51  |----|  PAL  |------|  B67-01.1 |
 |-----------------------------------------------------------------------|
 Notes:
       68000 running at 12.000MHz [24/2]
       Z80 running at 4.000MHz [24/6]
       YM2610 running at 8.000MHz [16/2]
+      62256.51 & 52 - Main program 68000 work RAM
+      6264.46 - Sound program Z80 work RAM
+      62256.55 & 57 - Background RAM, tied to TC0100SCN
+      6116.56 & 54 - Sprite attribute/enable RAM, tied to TC0320OBR
+      Other 6116 RAM - Sprite RAM, connected to TC0020VAR & TC0050VDZ
+      6264.73 & 74 - Color RAM
+      
       Taito Custom ICs -
                          TC0220IOC
                          TC0110PCR
@@ -60,7 +67,49 @@ Notes:
                          TC0320OBR
                          TC0020VAR
                          TC0050VDZ (x3)
+                         TC0070RGB (ceramic module) 
+                         TC0310FAM (ceramic module)
+      VSync: 60.0552Hz
+      HSync: 15.4938kHz
 
+      Note: The hardware outputs reversed video because the cabinet uses a mirror.
+      The video can't be flipped/reversed with the DIPs, it's fixed in hardware.
+
+      PCB edge connector is 28-way non-JAMMA. 
+      The gun is NOT a light gun, it uses two 5k-ohm potentiometers for the X-Y position
+
+               Solder | Parts
+               -------+-------
+               Ground | 1 Ground
+               Ground | 2 Ground
+                  +5v | 3 +5v
+                  +5v | 4 +5v
+                  -5v | 5 -5v
+                  12v | 6 12v
+                  Key | 7 Key
+          - L Speaker | 8 + L Speaker
+          - R Speaker | 9 + R Speaker
+                      |10
+                      |11
+            1 P Start |12
+            2 P Start |13
+             1 P Bomb |14
+          1 P Trigger |15 2 P Bomb
+          2 P Trigger |16 Service Credit
+               Coin B |17 Coin A
+       Coin Counter B |18 Coin Counter A
+                      |19
+     2 P Gun Solenoid |20 1 P Gun Solenoid
+          Video Green |21 Video Red
+           Video Sync |22 Video Blue
+   2 P Gun X Position |23 Ground
+   2 P Gun Y Position |24 1 P Gun X Position
+                      |25 1 P Gun Y Position
+                      |26
+               Ground |27 Ground
+               Ground |28 Ground
+
+*************************************************************************
 
 Operation Thunderbolt operates on hardware very similar to the Taito Z
 system, in particular the game Spacegun. The lightgun hardware in these
@@ -714,31 +763,31 @@ MACHINE_CONFIG_END
 
 ROM_START( othunder )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code */
-	ROM_LOAD16_BYTE( "b67-20.63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
-	ROM_LOAD16_BYTE( "b67-23.64",   0x00001, 0x20000, CRC(789e9daa) SHA1(15bb0eec68aeea0b9f55889566338c9ce0ac9b5e) )
-	ROM_LOAD16_BYTE( "b67-14.61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
-	ROM_LOAD16_BYTE( "b67-15.62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
+	ROM_LOAD16_BYTE( "b67-20.ic63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
+	ROM_LOAD16_BYTE( "b67-23.ic64",   0x00001, 0x20000, CRC(789e9daa) SHA1(15bb0eec68aeea0b9f55889566338c9ce0ac9b5e) )
+	ROM_LOAD16_BYTE( "b67-14.ic61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
+	ROM_LOAD16_BYTE( "b67-15.ic62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "b67-13.40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
+	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
-	ROM_LOAD16_WORD( "b67-05.43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
+	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
+	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
+	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "plhs18p8b-b67-09.ic15", 0x0000, 0x0149, CRC(62035487) SHA1(5d9538ea9eabff324d274772b1e1fc9a9aec9100) )
@@ -747,36 +796,36 @@ ROM_START( othunder )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
+	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code */
-	ROM_LOAD16_BYTE( "b67-20-1.63", 0x00000, 0x20000, CRC(851a453b) SHA1(48b8c379e78cd79463f1e24dc23816a97cf819b8) )
-	ROM_LOAD16_BYTE( "b67-22-1.64", 0x00001, 0x20000, CRC(19480dc0) SHA1(8bbc982c89f0878e7639330970df5aa93ecbb083) )
-	ROM_LOAD16_BYTE( "b67-14.61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
-	ROM_LOAD16_BYTE( "b67-15.62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
+	ROM_LOAD16_BYTE( "b67-20-1.ic63", 0x00000, 0x20000, CRC(851a453b) SHA1(48b8c379e78cd79463f1e24dc23816a97cf819b8) )
+	ROM_LOAD16_BYTE( "b67-22-1.ic64", 0x00001, 0x20000, CRC(19480dc0) SHA1(8bbc982c89f0878e7639330970df5aa93ecbb083) )
+	ROM_LOAD16_BYTE( "b67-14.ic61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
+	ROM_LOAD16_BYTE( "b67-15.ic62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "b67-13.40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
+	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
-	ROM_LOAD16_WORD( "b67-05.43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
+	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
+	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
+	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "plhs18p8b-b67-09.ic15", 0x0000, 0x0149, CRC(62035487) SHA1(5d9538ea9eabff324d274772b1e1fc9a9aec9100) )
@@ -785,36 +834,36 @@ ROM_START( othunderu )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
+	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderuo )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code */
-	ROM_LOAD16_BYTE( "b67-20.63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
-	ROM_LOAD16_BYTE( "b67-22.64",   0x00001, 0x20000, CRC(0f99ad3c) SHA1(dd6c9e822470ca867ec01e642443a871e879bae5) )
-	ROM_LOAD16_BYTE( "b67-14.61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
-	ROM_LOAD16_BYTE( "b67-15.62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
+	ROM_LOAD16_BYTE( "b67-20.ic63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
+	ROM_LOAD16_BYTE( "b67-22.ic64",   0x00001, 0x20000, CRC(0f99ad3c) SHA1(dd6c9e822470ca867ec01e642443a871e879bae5) )
+	ROM_LOAD16_BYTE( "b67-14.ic61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
+	ROM_LOAD16_BYTE( "b67-15.ic62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "b67-13.40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
+	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
-	ROM_LOAD16_WORD( "b67-05.43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
+	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
+	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
+	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "plhs18p8b-b67-09.ic15", 0x0000, 0x0149, CRC(62035487) SHA1(5d9538ea9eabff324d274772b1e1fc9a9aec9100) )
@@ -823,36 +872,36 @@ ROM_START( othunderuo )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
+	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code */
-	ROM_LOAD16_BYTE( "b67-20.63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
-	ROM_LOAD16_BYTE( "b67-21.64",   0x00001, 0x20000, CRC(9690fc86) SHA1(4e695554fc9cc91c5f8cff95dc290333bb56d571) )
-	ROM_LOAD16_BYTE( "b67-14.61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
-	ROM_LOAD16_BYTE( "b67-15.62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
+	ROM_LOAD16_BYTE( "b67-20.ic63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
+	ROM_LOAD16_BYTE( "b67-21.ic64",   0x00001, 0x20000, CRC(9690fc86) SHA1(4e695554fc9cc91c5f8cff95dc290333bb56d571) )
+	ROM_LOAD16_BYTE( "b67-14.ic61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
+	ROM_LOAD16_BYTE( "b67-15.ic62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "b67-13.40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
+	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
-	ROM_LOAD16_WORD( "b67-05.43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
+	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
+	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
+	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "plhs18p8b-b67-09.ic15", 0x0000, 0x0149, CRC(62035487) SHA1(5d9538ea9eabff324d274772b1e1fc9a9aec9100) )
@@ -861,7 +910,7 @@ ROM_START( othunderj )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
+	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 

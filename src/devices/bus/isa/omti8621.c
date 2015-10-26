@@ -215,7 +215,8 @@ MACHINE_CONFIG_FRAGMENT( omti_disk )
 	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(omti8621_device, fdc_irq_w))
 	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(omti8621_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
+// Apollo workstations never have more then 1 floppy drive
+//	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( omti8621_device::floppy_formats )
@@ -231,8 +232,12 @@ ROM_START( omti8621 )
 	ROM_REGION(0x4000, OMTI_CPU_REGION, 0)  // disassembles fine as Z8 code
 	ROM_LOAD( "omti_8621_102640-b.bin", 0x000000, 0x004000, CRC(e6f20dbb) SHA1(cf1990ad72eac6b296485410f5fa3309a0d6d078) )
 
+#if 1
+	// OMTI 8621 boards for Apollo workstations never use a BIOS ROM
+	// They don't even have a socket for the BIOS ROM
 	ROM_REGION(0x1000, OMTI_BIOS_REGION, 0)
-	ROM_LOAD("omti_bios", 0x0000, 0x1000, NO_DUMP)
+	ROM_LOAD_OPTIONAL("omti_bios", 0x0000, 0x1000, NO_DUMP)
+#endif
 ROM_END
 
 static INPUT_PORTS_START( omti_port )
@@ -280,6 +285,8 @@ ioport_constructor omti8621_device::device_input_ports() const
 
 void omti8621_device::device_start()
 {
+	LOG2(("device_start"));
+
 	set_isa_device();
 
 	m_installed = false;
@@ -300,7 +307,7 @@ void omti8621_device::device_reset()
 {
 	static const int io_bases[8] = { 0x320, 0x324, 0x328, 0x32c, 0x1a0, 0x1a4, 0x1a8, 0x1ac };
 
-	LOG2(("device_reset_omti8621"));
+	LOG2(("device_reset"));
 
 	// you can't read I/O ports in device_start() even if they're required_ioport<> in your class!
 	if (!m_installed)
@@ -1201,11 +1208,13 @@ void omti8621_device::set_verbose(int on_off)
  get_sector - get sector diskaddr of logical unit lun into data_buffer
  ***************************************************************************/
 
+// FIXME: this will work, but is not supported by MESS
+#if 0 // APOLLO_XXL
 UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun)
 {
-	omti_disk_image_device *disk = our_disks[lun];
+	omti_disk_image_device *disk = omti8621_device_1->our_disks[lun];
 
-	if (disk->m_image == NULL || !disk->m_image->exists())
+	if (disk == NULL || disk->m_image == NULL || !disk->m_image->exists())
 	{
 		return 0;
 	}
@@ -1222,7 +1231,7 @@ UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 le
 		return length;
 	}
 }
-
+#endif
 
 /***************************************************************************
  omti_set_jumper - set OMI jumpers

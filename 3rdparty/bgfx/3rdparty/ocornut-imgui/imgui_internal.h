@@ -14,6 +14,11 @@
 #include <stdio.h>      // FILE*
 #include <math.h>       // sqrtf()
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4251) // class 'xxx' needs to have dll-interface to be used by clients of struct 'xxx' // when IMGUI_API is set to__declspec(dllexport)
+#endif
+
 //-----------------------------------------------------------------------------
 // Forward Declarations
 //-----------------------------------------------------------------------------
@@ -331,6 +336,7 @@ struct ImGuiState
 
     float                   Time;
     int                     FrameCount;
+    int                     FrameCountEnded;
     int                     FrameCountRendered;
     ImVector<ImGuiWindow*>  Windows;
     ImVector<ImGuiWindow*>  WindowsSortBuffer;
@@ -340,12 +346,13 @@ struct ImGuiState
     ImGuiWindow*            HoveredWindow;                      // Will catch mouse inputs
     ImGuiWindow*            HoveredRootWindow;                  // Will catch mouse inputs (for focus/move only)
     ImGuiID                 HoveredId;                          // Hovered widget
+    bool                    HoveredIdAllowHoveringOthers;
     ImGuiID                 HoveredIdPreviousFrame;
     ImGuiID                 ActiveId;                           // Active widget
     ImGuiID                 ActiveIdPreviousFrame;
     bool                    ActiveIdIsAlive;
     bool                    ActiveIdIsJustActivated;            // Set at the time of activation for one frame
-    bool                    ActiveIdIsFocusedOnly;              // Set only by active widget. Denote focus but no active interaction
+    bool                    ActiveIdAllowHoveringOthers;        // Set only by active widget
     ImGuiWindow*            ActiveIdWindow;
     ImGuiWindow*            MovedWindow;                        // Track the child window we clicked on to move a window. Pointer is only valid if ActiveID is the "#MOVE" identifier of a window.
     ImVector<ImGuiIniData>  Settings;                           // .ini Settings
@@ -416,18 +423,19 @@ struct ImGuiState
 
         Time = 0.0f;
         FrameCount = 0;
-        FrameCountRendered = -1;
+        FrameCountEnded = FrameCountRendered = -1;
         CurrentWindow = NULL;
         FocusedWindow = NULL;
         HoveredWindow = NULL;
         HoveredRootWindow = NULL;
         HoveredId = 0;
+        HoveredIdAllowHoveringOthers = false;
         HoveredIdPreviousFrame = 0;
         ActiveId = 0;
         ActiveIdPreviousFrame = 0;
         ActiveIdIsAlive = false;
         ActiveIdIsJustActivated = false;
-        ActiveIdIsFocusedOnly = false;
+        ActiveIdAllowHoveringOthers = false;
         ActiveIdWindow = NULL;
         MovedWindow = NULL;
         SettingsDirtyTimer = 0.0f;
@@ -473,7 +481,7 @@ struct ImGuiState
 
 // Transient per-window data, reset at the beginning of the frame
 // FIXME: That's theory, in practice the delimitation between ImGuiWindow and ImGuiDrawContext is quite tenuous and could be reconsidered.
-struct ImGuiDrawContext
+struct IMGUI_API ImGuiDrawContext
 {
     ImVec2                  CursorPos;
     ImVec2                  CursorPosPrevLine;
@@ -631,13 +639,20 @@ public:
 
 namespace ImGui
 {
-    inline    ImGuiWindow*  GetCurrentWindowRead()      { ImGuiState& g = *GImGui; return g.CurrentWindow; }        // If this ever crash it means that ImGui::NewFrame() has never been called (which is illegal). We should always have a CurrentWindow in the stack (there is an implicit "Debug" window)
+    // We should always have a CurrentWindow in the stack (there is an implicit "Debug" window)
+    // If this ever crash because g.CurrentWindow is NULL it means that either
+    // - ImGui::NewFrame() has never been called, which is illegal.
+    // - You are calling ImGui functions after ImGui::Render() and before the next ImGui::NewFrame(), which is also illegal.
+    inline    ImGuiWindow*  GetCurrentWindowRead()      { ImGuiState& g = *GImGui; return g.CurrentWindow; }
     inline    ImGuiWindow*  GetCurrentWindow()          { ImGuiState& g = *GImGui; g.CurrentWindow->Accessed = true; return g.CurrentWindow; }
     IMGUI_API ImGuiWindow*  GetParentWindow();
     IMGUI_API void          FocusWindow(ImGuiWindow* window);
 
     IMGUI_API void          SetActiveID(ImGuiID id, ImGuiWindow* window);
+    IMGUI_API void          SetHoveredID(ImGuiID id);
     IMGUI_API void          KeepAliveID(ImGuiID id);
+
+    IMGUI_API void          EndFrame();                 // This automatically called by Render()
 
     IMGUI_API void          ItemSize(const ImVec2& size, float text_offset_y = 0.0f);
     IMGUI_API void          ItemSize(const ImRect& bb, float text_offset_y = 0.0f);
@@ -683,3 +698,6 @@ namespace ImGui
 
 } // namespace ImGuiP
 
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif

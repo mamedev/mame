@@ -19,6 +19,11 @@ S  Substitute memory locations
 X  Examine registers
 
 Please note this rom set boots into BASIC, not monitor.
+All commands must be in upper case.
+To correct a mistake, use DEL not Backspace. It will print a \ to indicate
+a removed character.
+
+No known manual or schematic of the video board.
 
 ****************************************************************************/
 
@@ -124,6 +129,15 @@ WRITE_LINE_MEMBER( sdk80_state::usart_clock_tick )
 	}
 }
 
+static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 4800
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_4800 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_4800 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( sdk80, sdk80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz/9)
@@ -135,9 +149,10 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "null_modem")
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_18_432MHz/60)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sdk80_state, usart_clock_tick))
@@ -180,8 +195,6 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 //  MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
 //  MCFG_I8279_IN_CTRL_CB(VCC)
 
-	//MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	//MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sdk80_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -1631,6 +1631,18 @@ static MACHINE_CONFIG_DERIVED( midresb, midres )
 	MCFG_SOUND_MODIFY("ym2")
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec0_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	// bootleg doesn't seem to support row/col scroll (or enable is different)
+//	MCFG_DEVICE_MODIFY("tilegen1")
+//	MCFG_BAC06_BOOTLEG_DISABLE_16x16
+//	MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL
+	MCFG_DEVICE_MODIFY("tilegen2")
+//	MCFG_BAC06_BOOTLEG_DISABLE_8x8
+	MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL
+	MCFG_DEVICE_MODIFY("tilegen3")
+//	MCFG_BAC06_BOOTLEG_DISABLE_8x8
+	MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL
+
 MACHINE_CONFIG_END
 
 /******************************************************************************/

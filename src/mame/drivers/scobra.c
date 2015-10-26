@@ -1252,6 +1252,127 @@ ROM_START( minefldfe )
 	ROM_LOAD( "82s123.6e",  0x0000, 0x0020, CRC(1877368e) SHA1(5850e03debe572f72abd91c756c0f8613018a962) )
 ROM_END
 
+/*
+
+notes about missing code in rescuefe - where is this??
+
+the first part of 0xa600 - 0xa643 should be a set of jumps
+based on the replaced code, setting 'a' them jumping
+elsewhere (probably directly after the table)
+
+547C: CD 00 A6      call $A600
+is
+1E34: 3E 00         ld   a,$00
+1E36: CD 50 09      call $0950
+
+4FA2: CD 03 A6      call $A603
+is
+18D7: 3E 01         ld   a,$01
+18D9: CD 50 09      call $0950
+
+48CF: CD 07 A6      call $A607
+is
+11F6: 3E 02         ld   a,$02
+11F8: CD 50 09      call $0950
+
+640B: CD 0B A6      call $A60B
+is
+2EBD: 3E 03         ld   a,$03
+2EBF: CD 50 09      call $0950
+
+// there's no ld   a,0x04? anywhere in the original code
+// so next entry is 0x05
+
+58CB: CD 0F A6      call $A60F
+is
+2296: 3E 05         ld   a,$05
+2298: CD 50 09      call $0950
+
+49DB: CD 13 A6      call $A613
+is
+1304: 3E 06         ld   a,$06
+1306: CD 50 09      call $0950
+
+5FA9: CD 17 A6      call $A617
+is
+2A35: 3E 07         ld   a,$07
+2A37: CD 50 09      call $0950
+
+
+5834: F5            push af
+5835: CD 1B A6      call $A61B
+5838: F1            pop  af
+is inserted, replaces nothing?!
+elsewhere, as expected we have
+
+5DA9: CD 1B A6      call $A61B
+is
+281C: 3E 08         ld   a,$08
+281E: CD 50 09      call $0950
+
+5E45: CD 1F A6      call $A61F
+is
+28CB: 3E 09         ld   a,$09
+28CD: CD 50 09      call $0950
+
+
+51B8: CD 23 A6      call $A623
+is
+1B0A: 3E 0A         ld   a,$0A
+1B0C: CD 50 09      call $0950
+
+4FE4: CD 27 A6      call $A627
+is
+1930: 3E 0B         ld   a,$0B
+1932: CD 50 09      call $0950
+
+4A51: CD 2B A6      call $A62B
+is
+137C: 3E 0C         ld   a,$0C
+137E: CD 50 09      call $0950
+
+4648: CD 2F A6      call $A62F
+is
+0E6D: 3E 0D         ld   a,$0D
+0E6F: CD 50 09      call $0950
+
+516D: CD 33 A6      call $A633
+is
+1ABC: 3E 0E         ld   a,$0E
+1ABE: CD 50 09      call $0950
+
+5476: CD 37 A6      call $A637
+is
+1E2C: 3E 0F         ld   a,$0F
+1E2E: CD 50 09      call $0950
+
+4DD3: CD 3B A6      call $A63B
+is
+1704: 3E 10         ld   a,$10
+1706: CD 50 09      call $0950
+
+4AF0: CD 3F A6      call $A63F
+is
+141D: 3E 11         ld   a,$11
+141F: CD 50 09      call $0950
+
+I imagine the a643 - A664 area is the code that was originally at 0x950
+
+479F: CD 65 A6      call $A665 << call to bigger function
+is
+0FE2: CD EB 0F      call $0FEB << call to bigger function
+
+so $a665 - $a69a is probably the code from 0x0feb
+
+
+44EC: CD 9B A6      call $A69B << call to bigger function
+is
+0D0D: CD D2 10      call $10D2 << call to bigger function
+
+and 0xa69b - 0xa??? is the code from 0x10d2
+
+*/
+
 ROM_START( rescuefe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sub-1.bin",        0x0000, 0x0600, CRC(7a6e813e) SHA1(5f9fff576f6a8d8e09f11404ca49b1011d17fa36) ) // correct?

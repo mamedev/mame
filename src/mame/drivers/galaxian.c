@@ -12,7 +12,7 @@
     a CPU section, a sound section, and a video section.
 
     The CPU section is based around a Z80 (though there are modified
-    designed that changed this to an S2650). The base galaxian hardware
+    designs that changed this to an S2650). The base galaxian hardware
     is designed to allow access to up to 16k of program ROM and 2k of
     working RAM.
 
@@ -851,11 +851,18 @@ READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::froggrmc_sound_control_w)
+WRITE8_MEMBER(galaxian_state::froggermc_sound_control_w)
 {
-	m_audiocpu->set_input_line(0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
+IRQ_CALLBACK_MEMBER(galaxian_state::froggermc_audiocpu_irq_ack)
+{
+	// cleared when taking the interrupt using the m1 line
+	// schematic: http://www.jrok.com/schem/FROGSND.pdf
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return 0xff;
+}
 
 /*************************************
  *
@@ -3722,7 +3729,7 @@ static INPUT_PORTS_START( frogger )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( froggrmc )
+static INPUT_PORTS_START( froggermc )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -3763,7 +3770,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( frogg )
-	PORT_INCLUDE(froggrmc)
+	PORT_INCLUDE(froggermc)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL )       // See notes
@@ -5332,12 +5339,15 @@ static MACHINE_CONFIG_DERIVED( frogger, konami_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( froggrmc, galaxian_base )
+static MACHINE_CONFIG_DERIVED( froggermc, galaxian_base )
 	MCFG_FRAGMENT_ADD(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mooncrst_map_base)     /* no discrete sound ! */
+	
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, galaxian_state, froggermc_audiocpu_irq_ack)
 MACHINE_CONFIG_END
 
 
@@ -5758,7 +5768,18 @@ void galaxian_state::decode_frogger_sound()
 	UINT32 offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
-	for (offs = 0; offs < 0x0800; offs++)
+	for (offs = 0; offs < 0x800; offs++)
+		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+}
+
+// froggermc has a bigger first ROM of the sound CPU, thus a different decode
+void galaxian_state::decode_froggermc_sound()
+{
+	UINT8 *rombase = memregion("audiocpu")->base();
+	UINT32 offs;
+
+	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
+	for (offs = 0; offs < 0x1000; offs++)
 		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
@@ -5817,7 +5838,7 @@ void galaxian_state::decode_superbon()
 	offs_t i;
 	UINT8 *RAM;
 
-	/* Deryption worked out by hand by Chris Hardy. */
+	/* Decryption worked out by hand by Chris Hardy. */
 
 	RAM = memregion("maincpu")->base();
 
@@ -6578,7 +6599,7 @@ DRIVER_INIT_MEMBER(galaxian_state,quaak)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,froggrmc)
+DRIVER_INIT_MEMBER(galaxian_state,froggermc)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6586,13 +6607,13 @@ DRIVER_INIT_MEMBER(galaxian_state,froggrmc)
 	common_init(NULL, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
 
 	space.install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),this));
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggrmc_sound_control_w),this));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggermc_sound_control_w),this));
 
 	/* actually needs 2k of RAM */
 	space.install_ram(0x8000, 0x87ff);
 
 	/* decrypt */
-	decode_frogger_sound();
+	decode_froggermc_sound();
 }
 
 
@@ -7761,7 +7782,7 @@ ROM_START( devilfsg )
 ROM_END
 
 
-ROM_START( zigzag )
+ROM_START( zigzagb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zz_d1.7l",    0x0000, 0x1000, CRC(8cc08d81) SHA1(be671192ef06dc3ed6963dc39e6bdce3275300e9) )
 	ROM_LOAD( "zz_d2.7k",    0x1000, 0x1000, CRC(326d8d45) SHA1(563b9fc64c34e36cfadffb107ce30d3a04d62d9c) )
@@ -7784,7 +7805,7 @@ ROM_START( zigzag )
 	ROM_LOAD( "zzbpr_e9.bin",0x0000, 0x0020, CRC(aa486dd0) SHA1(b845b52715bf6361ceee8c1ac541733963bd47af) )
 ROM_END
 
-ROM_START( zigzag2 )
+ROM_START( zigzagb2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "z1.7l",       0x0000, 0x1000, CRC(4c28349a) SHA1(646134ce506deaee88cc2ec5a973f8fedaddb66b) )
 	ROM_LOAD( "zz_d2.7k",    0x1000, 0x1000, CRC(326d8d45) SHA1(563b9fc64c34e36cfadffb107ce30d3a04d62d9c) )
@@ -8683,6 +8704,7 @@ ROM_START( kong )
 	ROM_REGION( 0x2000, "unk", 0 )
 	// what is this, speech? the video at https://www.youtube.com/watch?v=HTZEVKoYlGM shows the game apparently talking (2nd game, after The Pit)
 	// The video however seems to show a game closer to ckongg (a bootleg of Crazy Kong) rather than this version of Kong which is rewritten from scratch
+	// It could be "GORILA" as seen in the Taito do Brasil cabinet flyers
 	ROM_LOAD( "13",   0x0000, 0x1000, CRC(7d33ca0a) SHA1(8a65a4b913559e3fd17f6abb381db1ab813fc8f2) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -8974,7 +8996,7 @@ guess at what the game actually is.
 Roms 1 through 8 read well in-circuit in the right
 places in the memory map for moon cresta,
 (through the fluke 9100) but the game does not
-currently run. Roms dumped adn verified with no
+currently run. Roms dumped and verified with no
 anomalies.
 
 Rom 9 was placed on the through-socket and has
@@ -10838,7 +10860,6 @@ GAME( 1980, galemp,      uniwars,  galaxian,   superg,     galaxian_state, pisce
 GAME( 1980, asideral,    uniwars,  galaxian,   asideral,   galaxian_state, pisces,     ROT90,  "bootleg (Electrogame S.A.)", "Ataque Sideral (Spanish bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pajaroes,    uniwars,  galaxian,   asideral,   galaxian_state, pisces,     ROT90,  "bootleg (PSV S.A.)", "Pajaro del Espacio (Spanish bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE ) // very similar to above
 
-
 /* Artic Multi-System games - separate tile/sprite ROMs */
 GAME( 1980, streakng,    0,        pacmanbl,   streakng,   galaxian_state, galaxian,   ROT90,  "Shoei", "Streaking (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, streaknga,   streakng, pacmanbl,   streakng,   galaxian_state, galaxian,   ROT90,  "Shoei", "Streaking (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
@@ -10854,8 +10875,9 @@ GAME( 1982, tenspot,     0,        tenspot,    tenspot,    galaxian_state, tensp
 GAME( 1984, devilfsg,    devilfsh, pacmanbl,   devilfsg,   galaxian_state, devilfsg,   ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", MACHINE_SUPPORTS_SAVE )
 
 /* sound hardware replaced with AY8910 */
-GAME( 1982, zigzag,      0,        zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // maybe by Taito do Brasil?
-GAME( 1982, zigzag2,     zigzag,   zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // "
+// we're missing the original set by Taito do Brasil, we only have the bootlegs
+GAME( 1982, zigzagb,     0,        zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Dig Dug conversion on Galaxian hardware, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // rewrite of Dig Dug (!) not a clone
+GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     galaxian_state, zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Dig Dug conversion on Galaxian hardware, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    galaxian_state, gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -10889,6 +10911,7 @@ GAME( 1980, eagle3,      mooncrst, mooncrst,   mooncrsa,   galaxian_state, moonc
 GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, mooncrsu,   ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, mooncrsu,   ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, mooncrsu,   ROT90,  "bootleg (Petaco S.A.)", "Moon Cresta (Petaco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+// there may be an alternate version called "Star Crest" according to flyers; is it the same?
 GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, mooncrsu,   ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, mooncrsu,   ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -10906,12 +10929,12 @@ GAME( 1980, moonal2b,    galaxian, mooncrst,   moonal2,    galaxian_state, galax
 /* larger romspace, interrupt enable moved */
 GAME( 198?, thepitm,     thepit,   mooncrst,   thepitm,    galaxian_state, thepitm,    ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
 
-
 /* other games on basic mooncrst hardware */
 GAME( 1982, skybase,     0,        mooncrst,   skybase,    galaxian_state, skybase,    ROT90,  "Omori Electric Co., Ltd.", "Sky Base", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, kong,        0,        mooncrst,   kong,       galaxian_state, kong,       ROT90,  "Taito do Brasil", "Kong (Donkey Kong conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
+// there may be an alternate version called "Fantasy" according to flyers; is it the same?
 GAME( 198?, fantastc,    0,        fantastc,   fantastc,   galaxian_state, fantastc,   ROT90,  "Taito do Brasil", "Fantastic (Galaga conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
 
 /* like fantastc, plus larger spriteram, and maybe different bullet hw(?) */
@@ -10951,7 +10974,7 @@ GAME( 1980, kingballj,   kingball, kingball,   kingball,   galaxian_state, kingb
 GAME( 1981, frogger,     0,        frogger,    frogger,    galaxian_state, frogger,    ROT90,  "Konami", "Frogger", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers1,   frogger,  frogger,    frogger,    galaxian_state, frogger,    ROT90,  "Konami (Sega license)", "Frogger (Sega set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers2,   frogger,  frogger,    frogger,    galaxian_state, frogger,    ROT90,  "Konami (Sega license)", "Frogger (Sega set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, froggermc,   frogger,  froggrmc,   froggrmc,   galaxian_state, froggrmc,   ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggermc,   frogger,  froggermc,  froggermc,  galaxian_state, froggermc,  ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, froggers,   ROT90,  "bootleg", "Frog", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, froggers,   ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogg,       frogger,  galaxian,   frogg,      galaxian_state, frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
@@ -10994,9 +11017,6 @@ GAME( 1981, scrambp,     scramble, scramble,   scramble,   galaxian_state, scram
 GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg (Centromatic S.A.)",         "Scramble (Centromatic S.A., Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // similar to above
 GAME( 1981, scrampt,     scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg (Petaco S.A.)",              "Scramble (Petaco S.A., Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // ^^
 GAME( 1981, scramrf,     scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg (Recreativos Franco)",       "Scramble (Recreativos Franco, Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
-
-
-
 GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg?", "Scramble (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg (Alca)", "Bomber (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
 
@@ -11037,6 +11057,7 @@ GAME( 1981, armorcar2,   armorcar, scobra,     armorcar2,  galaxian_state, scobr
 
 GAME( 1982, tazmania,    0,        scobra,     tazmania,   galaxian_state, scobra,     ROT90,  "Stern Electronics", "Tazz-Mania (set 1)", MACHINE_SUPPORTS_SAVE )
 
+
 /*
     Anteater (sold as conversion kit)
 
@@ -11048,6 +11069,7 @@ GAME( 1982, anteateruk,  anteater, anteateruk, anteateruk, galaxian_state, antea
 GAME( 1982, anteaterg,   anteater, anteaterg,  anteateruk, galaxian_state, anteateruk, ROT90,  "Tago Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, calipso,     0,        scobra,     calipso,    galaxian_state, calipso,    ROT90,  "Tago Electronics", "Calipso",  MACHINE_SUPPORTS_SAVE )
+
 
 /*
     Lost Tomb

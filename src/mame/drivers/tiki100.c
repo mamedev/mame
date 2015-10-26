@@ -14,83 +14,162 @@
 
     TODO:
 
-    - 3 expansion slots
     - palette RAM should be written during HBLANK
-    - DART clocks
     - winchester hard disk
     - analog/digital I/O
     - light pen
     - 8088 CPU card
-    - 360KB floppy format
 
 */
 
 #include "includes/tiki100.h"
-#include "bus/rs232/rs232.h"
 
 /* Memory Banking */
 
-READ8_MEMBER( tiki100_state::gfxram_r )
+READ8_MEMBER( tiki100_state::mrq_r )
 {
-	UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+	bool mdis = 1;
 
-	return m_video_ram[addr];
-}
+	UINT8 data = m_exp->mrq_r(space, offset, 0xff, mdis);
 
-WRITE8_MEMBER( tiki100_state::gfxram_w )
-{
-	UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
+	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
 
-	m_video_ram[addr] = data;
-}
-
-void tiki100_state::bankswitch()
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (m_vire)
+	if (prom & ROM0)
 	{
-		if (!m_rome)
-		{
-			/* reserved */
-			program.unmap_readwrite(0x0000, 0xffff);
-		}
-		else
-		{
-			/* GFXRAM, GFXRAM, RAM */
-			program.install_readwrite_handler(0x0000, 0x7fff, READ8_DELEGATE(tiki100_state, gfxram_r), WRITE8_DELEGATE(tiki100_state, gfxram_w));
-			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
-
-			membank("bank1")->set_entry(BANK_VIDEO_RAM);
-			membank("bank2")->set_entry(BANK_VIDEO_RAM);
-			membank("bank3")->set_entry(BANK_RAM);
-		}
+		data = m_rom->base()[offset & 0x3fff];
 	}
-	else
+
+	if (prom & ROM1)
 	{
-		if (!m_rome)
-		{
-			/* ROM, RAM, RAM */
-			program.install_read_bank(0x0000, 0x3fff, "bank1");
-			program.unmap_write(0x0000, 0x3fff);
-			program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
-			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
+		data = m_rom->base()[0x2000 | (offset & 0x3fff)];
+	}
 
-			membank("bank1")->set_entry(BANK_ROM);
-			membank("bank2")->set_entry(BANK_RAM);
-			membank("bank3")->set_entry(BANK_RAM);
-		}
-		else
-		{
-			/* RAM, RAM, RAM */
-			program.install_readwrite_bank(0x0000, 0x3fff, "bank1");
-			program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
-			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
+	if (prom & VIR)
+	{
+		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
-			membank("bank1")->set_entry(BANK_RAM);
-			membank("bank2")->set_entry(BANK_RAM);
-			membank("bank3")->set_entry(BANK_RAM);
+		data = m_video_ram[addr];
+	}
+
+	if (prom & RAM)
+	{
+		data = m_ram->pointer()[offset];
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( tiki100_state::mrq_w )
+{
+	bool mdis = 1;
+	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
+	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
+
+	if (prom & VIR)
+	{
+		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+
+		m_video_ram[addr] = data;
+	}
+
+	if (prom & RAM)
+	{
+		m_ram->pointer()[offset] = data;
+	}
+
+	m_exp->mrq_w(space, offset, data);
+}
+
+READ8_MEMBER( tiki100_state::iorq_r )
+{
+	UINT8 data = m_exp->iorq_r(space, offset, 0xff);
+
+	switch ((offset & 0xff) >> 2)
+	{
+	case 0x00: // KEYS
+		data = keyboard_r(space, 0);
+		break;
+
+	case 0x01: // SERS
+		data = m_dart->cd_ba_r(space, offset & 0x03);
+		break;
+
+	case 0x02: // PARS
+		data = m_pio->read(space, offset & 0x03);
+		break;
+
+	case 0x04: // FLOP
+		data = m_fdc->read(space, offset & 0x03);
+		break;
+
+	case 0x05: // VIPS
+		switch (offset & 0x03)
+		{
+		case 3:
+			data = m_psg->data_r(space, 0);
+			break;
 		}
+		break;
+
+	case 0x06: // TIMS
+		data = m_ctc->read(space, offset & 0x03);
+		break;
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( tiki100_state::iorq_w )
+{
+	m_exp->iorq_w(space, offset, data);
+
+	switch ((offset & 0xff) >> 2)
+	{
+	case 0x00: // KEYS
+		keyboard_w(space, 0, data);
+		break;
+
+	case 0x01: // SERS
+		m_dart->cd_ba_w(space, offset & 0x03, data);
+		break;
+
+	case 0x02: // PARS
+		m_pio->write(space, offset & 0x03, data);
+		break;
+
+	case 0x03: // VIPB
+		video_mode_w(space, 0, data);
+		break;
+
+	case 0x04: // FLOP
+		m_fdc->write(space, offset & 0x03, data);
+		break;
+
+	case 0x05: // VIPS
+		switch (offset & 0x03)
+		{
+		case 0: case 1:
+			palette_w(space, 0, data);
+			break;
+
+		case 2:
+			m_psg->address_w(space, 0, data);
+			break;
+
+		case 3:
+			m_psg->data_w(space, 0, data);
+			break;
+		}
+		break;
+
+	case 0x06: // TIMS
+		m_ctc->write(space, offset & 0x03, data);
+		break;
+
+	case 0x07: // SYL
+		system_w(space, 0, data);
+		break;
 	}
 }
 
@@ -215,38 +294,18 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	/* bankswitch */
 	m_rome = BIT(data, 2);
 	m_vire = BIT(data, 3);
-
-	bankswitch();
 }
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START( tiki100_mem, AS_PROGRAM, 8, tiki100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrq_r, mrq_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_WRITE(video_mode_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(FD1797_TAG, fd1797_t, read, write)
-	AM_RANGE(0x14, 0x14) AM_MIRROR(0x01) AM_WRITE(palette_w)
-	AM_RANGE(0x16, 0x16) AM_DEVWRITE(AY8912_TAG, ay8910_device, address_w)
-	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE(AY8912_TAG, ay8910_device, data_r, data_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
-//  AM_RANGE(0x20, 0x27) AM_NOP // winchester controller
-//  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
-//  AM_RANGE(0x60, 0x67) digital I/O (RVO)
-//  AM_RANGE(0x70, 0x77) analog/digital I/O
-//  AM_RANGE(0x78, 0x7b) light pen
-//  AM_RANGE(0x7e, 0x7f) 8088/87 processor w/128KB RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -388,6 +447,11 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("ST")
+	PORT_CONFNAME( 0x01, 0x01, "DART TxCA")
+	PORT_CONFSETTING( 0x00, "BAR0" )
+	PORT_CONFSETTING( 0x01, "BAR2" )
 INPUT_PORTS_END
 
 /* Video */
@@ -545,16 +609,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
 	m_ctc->trg1(0);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::ctc_z0_w )
+WRITE_LINE_MEMBER( tiki100_state::bar0_w )
 {
 	m_ctc->trg2(state);
 
 	m_dart->rxca_w(state);
-	m_dart->txca_w(state);
+
+	if (!m_st) m_dart->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::ctc_z2_w )
+WRITE_LINE_MEMBER( tiki100_state::bar2_w )
 {
+	if (m_st) m_dart->txca_w(state);
+
 	m_ctc->trg3(state);
 }
 
@@ -584,14 +651,22 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 	{ Z80CTC_TAG },
 	{ Z80DART_TAG },
 	{ Z80PIO_TAG },
+	{ "slot1" },
+	{ "slot2" },
+	{ "slot3" },
 	{ NULL }
 };
-
-
 
 TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 {
 	m_pio->port_b_write((m_cassette->input() > 0.0) << 7);
+}
+
+WRITE_LINE_MEMBER( tiki100_state::busrq_w )
+{
+	// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_exp->busak_w(state);
 }
 
 /* Machine Start */
@@ -601,20 +676,6 @@ void tiki100_state::machine_start()
 	/* allocate video RAM */
 	m_video_ram.allocate(TIKI100_VIDEORAM_SIZE);
 
-	/* setup memory banking */
-	UINT8 *ram = m_ram->pointer();
-
-	membank("bank1")->configure_entry(BANK_ROM, m_rom->base());
-	membank("bank1")->configure_entry(BANK_RAM, ram);
-	membank("bank1")->configure_entry(BANK_VIDEO_RAM, m_video_ram);
-
-	membank("bank2")->configure_entry(BANK_RAM, ram + 0x4000);
-	membank("bank2")->configure_entry(BANK_VIDEO_RAM, m_video_ram + 0x4000);
-
-	membank("bank3")->configure_entry(BANK_RAM, ram + 0x8000);
-
-	bankswitch();
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -622,6 +683,10 @@ void tiki100_state::machine_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_palette_val));
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_perror));
+	save_item(NAME(m_st));
 }
 
 void tiki100_state::machine_reset()
@@ -629,6 +694,8 @@ void tiki100_state::machine_reset()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	system_w(space, 0, 0);
+
+	m_st = m_st_io->read();
 }
 
 /* Machine Driver */
@@ -642,14 +709,19 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz, 1280, 0, 1024, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(tiki100_state, screen_update)
-	MCFG_SCREEN_SIZE(1024, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
-
 	MCFG_PALETTE_ADD("palette", 16)
-	// pixel clock 20.01782 MHz
+
+	MCFG_TIKI100_BUS_ADD()
+	MCFG_TIKI100_BUS_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_TIKI100_BUS_NMI_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_NMI))
+	MCFG_TIKI100_BUS_BUSRQ_CALLBACK(WRITELINE(tiki100_state, busrq_w))
+	MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(READ8(tiki100_state, mrq_r))
+	MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(WRITE8(tiki100_state, mrq_w))
+	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
+	MCFG_TIKI100_BUS_SLOT_ADD("slot2", "hdc")
+	MCFG_TIKI100_BUS_SLOT_ADD("slot3", NULL)
 
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, 0, 0, 0, 0 )
@@ -670,9 +742,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(tiki100_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(tiki100_state, bar0_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(tiki100_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(tiki100_state, bar2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
 
@@ -718,15 +790,15 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( kontiki )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "tikirom-1.30.u10",  0x0000, 0x2000, CRC(c482dcaf) SHA1(d140706bb7fc8b1fbb37180d98921f5bdda73cf9) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "63ls140.u4", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0x100, "u4", 0 )
+	ROM_LOAD( "53ls140.u4", 0x000, 0x100, CRC(894b756f) SHA1(429e10de0e0e749246895801b18186ff514c12bc) )
 ROM_END
 
 ROM_START( tiki100 )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "v203w" )
 
 	ROM_SYSTEM_BIOS( 0, "v135", "TIKI ROM v1.35" )
@@ -734,8 +806,8 @@ ROM_START( tiki100 )
 	ROM_SYSTEM_BIOS( 1, "v203w", "TIKI ROM v2.03 W" )
 	ROMX_LOAD( "tikirom-2.03w.u10", 0x0000, 0x2000, CRC(79662476) SHA1(96336633ecaf1b2190c36c43295ac9f785d1f83a), ROM_BIOS(2) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "63ls140.u4", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0x100, "u4", 0 )
+	ROM_LOAD( "53ls140.u4", 0x000, 0x100, CRC(894b756f) SHA1(429e10de0e0e749246895801b18186ff514c12bc) )
 ROM_END
 
 /* System Drivers */

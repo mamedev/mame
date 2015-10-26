@@ -14,12 +14,16 @@ pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type 
 	m_mcu(*this, "graphics"),
 	m_crtc(*this, "crtc"),
 	m_palette(*this, "palette"),
-	m_gfxdecode(*this, "gfxdecode")
+	m_gfxdecode(*this, "gfxdecode"),
+	m_pic2(*this, ":pic2")
 {
 }
 
 pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	pcdx_video_device(mconfig, PCD_VIDEO, "Siemens PC-D Video", tag, owner, clock, "pcd_video", __FILE__),
+	m_mouse_btn(*this, "MOUSE"),
+	m_mouse_x(*this, "MOUSEX"),
+	m_mouse_y(*this, "MOUSEY"),
 	m_vram(32*1024),
 	m_charram(8*1024)
 {
@@ -30,7 +34,6 @@ pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *ta
 	device_serial_interface(mconfig, *this),
 	m_vram(4*1024),
 	m_charrom(*this, "char"),
-	m_pic2(*this, ":pic2"),
 	m_txd_handler(*this)
 {
 }
@@ -76,9 +79,32 @@ static GFXDECODE_START( pcx )
 	GFXDECODE_ENTRY( "char", 0x0000, pcd_charlayout, 0, 1 )
 GFXDECODE_END
 
+static INPUT_PORTS_START( pcd_mouse )
+	PORT_START("MOUSE")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Mouse Button")   PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Left Mouse Button")    PORT_CODE(MOUSECODE_BUTTON2)
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xfff, 0x000, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xfff, 0x000, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0)
+INPUT_PORTS_END
+
+ioport_constructor pcd_video_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(pcd_mouse);
+}
+
+static ADDRESS_MAP_START( pcd_vid_io, AS_IO, 8, pcd_video_device )
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(p1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_FRAGMENT( pcd_video )
 	MCFG_CPU_ADD("graphics", I8741, XTAL_16MHz/2)
-	MCFG_DEVICE_DISABLE()
+	MCFG_CPU_IO_MAP(pcd_vid_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -96,6 +122,7 @@ static MACHINE_CONFIG_FRAGMENT( pcd_video )
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(16)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcd_video_device, display_pixels)
 	MCFG_VIDEO_SET_SCREEN("screen")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
 MACHINE_CONFIG_END
 
 machine_config_constructor pcd_video_device::device_mconfig_additions() const
@@ -154,25 +181,33 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 	if(lg)
 	{
 		UINT16 data = m_vram[address + 1] | (m_vram[address] << 8);
+		if(m_p2 & 8)
+			data = ~data;
 		for(int i = 0; i < 16; i++)
 			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (15 - i))) ? 1 : 0);
 	}
 	else
 	{
 		UINT8 data, attr;
-		int bgnd = 0;
+		int bgnd = 0, fgnd = 1;
 		data = m_charram[m_vram[address] * 16 + linecount];
 		attr = m_vram[address + 1];
 		if(cursor && blink)
 			data = 0xff;
 		if(ul && (attr & 0x20))
 			data = 0xff;
-		if(attr & 8)
-			bgnd = 2;
+
 		if(attr & 0x10)
 			data = ~data;
+		if(m_p2 & 8)
+		{
+			fgnd = 0;
+			bgnd = (attr & 8) ? 2 : 1;
+		}
+		else if(attr & 8)
+			bgnd = 2;
 		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : bgnd);
+			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? fgnd : bgnd);
 	}
 }
 
@@ -194,6 +229,43 @@ PALETTE_INIT_MEMBER(pcdx_video_device, pcdx)
 	palette.set_pen_color(0,rgb_t::black);
 	palette.set_pen_color(1,rgb_t::white);
 	palette.set_pen_color(2,rgb_t(128,128,128));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(pcd_video_device::mouse_timer)
+{
+	m_t1 = (m_t1 == CLEAR_LINE) ? ASSERT_LINE : CLEAR_LINE;
+	if(m_t1)
+	{
+		switch(m_mouse.phase)
+		{
+		case 0:
+			m_mouse.xa = m_mouse.x > m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+			m_mouse.xb = m_mouse.x < m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+			m_mouse.ya = m_mouse.y > m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+			m_mouse.yb = m_mouse.y < m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+			break;
+		case 1:
+			m_mouse.xa = m_mouse.xb = m_mouse.x != m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+			m_mouse.ya = m_mouse.yb = m_mouse.y != m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+			break;
+		case 2:
+			m_mouse.xa = m_mouse.x < m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+			m_mouse.xb = m_mouse.x > m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+			m_mouse.ya = m_mouse.y < m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+			m_mouse.yb = m_mouse.y > m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+			break;
+		case 3:
+			m_mouse.xa = m_mouse.xb = ASSERT_LINE;
+			m_mouse.ya = m_mouse.yb = ASSERT_LINE;
+			m_mouse.prev_x = m_mouse.x;
+			m_mouse.prev_y = m_mouse.y;
+			m_mouse.x = m_mouse_x->read();
+			m_mouse.y = m_mouse_y->read();
+			break;
+		}
+
+		m_mouse.phase = (m_mouse.phase + 1) & 3;
+	}
 }
 
 WRITE8_MEMBER(pcd_video_device::vram_w)
@@ -218,14 +290,26 @@ WRITE8_MEMBER(pcd_video_device::vram_sw_w)
 	m_vram_sw = data & 1;
 }
 
-
-READ8_MEMBER(pcd_video_device::mcu_r)
+READ8_MEMBER(pcd_video_device::t1_r)
 {
-	return 0x20;
+	return m_t1;
 }
 
-WRITE8_MEMBER(pcd_video_device::mcu_w)
+READ8_MEMBER(pcd_video_device::p1_r)
 {
+	UINT8 data = (m_mouse_btn->read() & 0x30) | 0x80; // char ram/rom jumper?
+	data |= (m_mouse.xa != CLEAR_LINE ? 0 : 1);
+	data |= (m_mouse.xb != CLEAR_LINE ? 0 : 2);
+	data |= (m_mouse.ya != CLEAR_LINE ? 0 : 4);
+	data |= (m_mouse.yb != CLEAR_LINE ? 0 : 8);
+
+	return data;
+}
+
+WRITE8_MEMBER(pcd_video_device::p2_w)
+{
+	m_p2 = data;
+	m_pic2->ir7_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ8_MEMBER(pcx_video_device::term_r)
@@ -326,19 +410,25 @@ void pcd_video_device::device_start()
 {
 	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, 0, 0, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0xff00);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, 0, 0, read8_delegate(FUNC(pcd_video_device::vram_r), this), write8_delegate(FUNC(pcd_video_device::vram_w), this), 0xffff);
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), pcd_charlayout, &m_charram[0], 0, 1, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, pcd_charlayout, &m_charram[0], 0, 1, 0)));
 }
 
 void pcd_video_device::device_reset()
 {
+	m_mouse.phase = 0;
+	m_mouse.xa = m_mouse.xb = ASSERT_LINE;
+	m_mouse.ya = m_mouse.yb = ASSERT_LINE;
+	m_mouse.x = m_mouse.y = 0;
+	m_mouse.prev_x = m_mouse.prev_y = 0;
 	m_vram_sw = 1;
+	m_t1 = CLEAR_LINE;
 }
 
 DEVICE_ADDRESS_MAP_START(map, 16, pcd_video_device)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE8("crtc", scn2674_device, write, 0x00ff)
 	AM_RANGE(0x00, 0x0f) AM_DEVREAD8("crtc", scn2674_device, read, 0xff00)
 	AM_RANGE(0x20, 0x21) AM_WRITE8(vram_sw_w, 0x00ff)
-	AM_RANGE(0x30, 0x33) AM_READWRITE8(mcu_r, mcu_w, 0x00ff)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE8("graphics", i8741_device, upi41_master_r, upi41_master_w, 0x00ff)
 ADDRESS_MAP_END
 
 void pcx_video_device::device_start()

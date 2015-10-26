@@ -1236,6 +1236,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	UINT32 w;
 	UINT16 *artifact_map_ptr;
 	int mon_type = m_sysconfig & 0x03;
+	int begincol = 0, endcol = 40;
 
 	/* sanity checks */
 	if (beginrow < cliprect.min_y)
@@ -1245,6 +1246,18 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	if (endrow < beginrow)
 		return;
 
+	// we generate 2 pixels per "column" so adjust
+	if (begincol < (cliprect.min_x/14))
+		begincol = (cliprect.min_x/14);
+	if (endcol > (cliprect.max_x/14))
+		endcol = (cliprect.max_x/14);
+	if (cliprect.max_x > 39*14)
+		endcol = 40;
+	if (endcol < begincol)
+		return;
+
+	//printf("HGR draw: page %c, rows %d-%d cols %d-%d\n", m_page2 ? '2' : '1', beginrow, endrow, begincol, endcol);
+
 	vram = &m_ram_ptr[(m_page2 ? 0x4000 : 0x2000)];
 
 	vram_row[0] = 0;
@@ -1252,7 +1265,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	for (row = beginrow; row <= endrow; row++)
 	{
-		for (col = 0; col < 40; col++)
+		for (col = begincol; col < endcol; col++)
 		{
 			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			vram_row[1+col] = vram[offset];
@@ -1266,18 +1279,20 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
 				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
 
+
+			// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
+			if (m_dhires)
+			{
+				artifact_map_ptr = m_hires_artifact_map;
+			}
+			else
+			{
+				artifact_map_ptr = &m_hires_artifact_map[((vram_row[col + 1] & 0x80) >> 7) * 16];
+			}
+
 			switch (mon_type)
 			{
 				case 0:
-					// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
-					if (m_dhires)
-					{
-						artifact_map_ptr = m_hires_artifact_map;
-					}
-					else
-					{
-						artifact_map_ptr = &m_hires_artifact_map[((vram_row[col + 1] & 0x80) >> 7) * 16];
-					}
 					for (b = 0; b < 7; b++)
 					{
 						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
@@ -1302,7 +1317,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
-						w >>= 1;
+						w >>= 1;									
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}

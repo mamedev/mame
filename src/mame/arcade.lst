@@ -193,8 +193,8 @@ phoenxp2        // bootleg
 atlantisb       // bootleg
 tenspot         // (c) 1982 Thomas Automatics
 devilfsg        // (c) 1984 Vision / Artic (bootleg?)
-zigzag          // (c) 1982 LAX
-zigzag2         // (c) 1982 LAX
+zigzagb         // (c) 1982 LAX (bootleg)
+zigzagb2        // (c) 1982 LAX (bootleg)
 jumpbug         // (c) 1981 Rock-ola
 jumpbugb        // (c) 1981 Sega
 levers          // (c) 1983 Rock-ola
@@ -1826,6 +1826,7 @@ rtypej          // (c) 1987 (Japan)
 rtypejp         // (c) 1987 (Japan)
 rtypeu          // (c) 1987 + Nintendo USA license (US)
 rtypeb          // bootleg
+rtypem82b		// bootleg
 bchopper        // (c) 1987
 mrheli          // (c) 1987 (Japan)
 nspirit         // (c) 1988
@@ -1843,6 +1844,7 @@ dbreedm72       // (c) 1989
 rtype2          // (c) 1989
 rtype2j         // (c) 1989 (Japan)
 rtype2jc        // (c) 1989 (Japan)
+rtype2m82b		// bootleg
 majtitle        // (c) 1990 (World)
 majtitlej       // (c) 1990 (Japan)
 hharry          // (c) 1990 (World)
@@ -1852,10 +1854,13 @@ dkgensanm72     // (c) 1990 (Japan)
 poundfor        // (c) 1990 (World)
 poundforj       // (c) 1990 (Japan)
 poundforu       // (c) 1990 Irem America (US)
-airduel         // (c) 1990 (Japan)
+airduelm72      // (c) 1990 (Japan)
+airduel			// (c) 1990 (World)
 cosmccop        // (c) 1991 (World)
 gallop          // (c) 1991 (Japan)
-kengo           // (c) 1991
+ltswords        // (c) 1991 (World)
+kengo           // (c) 1991 (Japan)
+kengoa			// (c) 1991 (Japan)
 // not M72, but same sound hardware
 sichuan2        // (c) 1989 Tamtex
 sichuan2a       // (c) 1989 Tamtex
@@ -3090,7 +3095,8 @@ lastduelb       // bootleg
 madgear         //  2/1989 (c) 1989 (US)
 madgearj        //  2/1989 (c) 1989 (Japan)
 ledstorm        //  1988 (c) 1988 (US)
-ledstorm2       //  1988 (c) 1988 (US)
+leds2011        //  1988 (c) 1988 (World)
+leds2011u		//  1988 (c) 1988 (US)
 //  3/1989 Dokaben (baseball) - see below among "Mitchell" games
 //  8/1989 Dokaben 2 (baseball) - see below among "Mitchell" games
 // 10/1989 Capcom Baseball - see below among "Mitchell" games
@@ -3859,7 +3865,7 @@ soulclbrjb      // 1998.?? Soul Calibur (Japan, SOC11/VER.B)
 soulclbrja      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
 technodr        // 1998.07 Techno Drive
 mdhorse         // 1998.11 Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)
-				// 1998.12 Attack Pla Rail
+aplarail		// 1998.12 Attack Pla Rail
 tenkomor        // 1998.?? Tenkomori Shooting (Asia, TKM2/VER.A1)
 tenkomorja      // 1998.12 Tenkomori Shooting (Japan, TKM1/VER.A1)
 pacapp          // 1998.12 Paca Paca Passion (Japan, PPP1/VER.A2)
@@ -4495,6 +4501,7 @@ wboyub          // bootleg of wboyu
 wbdeluxe        // (c) 1986 + Escape license (S1)
 wboysys2        // 834-5984  (c) 1986 + Escape license (S1)
 gardia          // 834-6119 (S2?)
+gardiaj			//
 gardiab         // bootleg
 nob             // (c) Data East
 nobb            // bootleg
@@ -4679,6 +4686,11 @@ riotcity        // (c) 1991 Sega / Westone (Unprotected)
 ryukyu          // (c) 1990 (FD1094)
 sdib            // (c) 1987 (FD1089A)
 sdibl           // (c) 1987 bootleg
+sdibl2			// bootleg
+sdibl3			// bootleg
+sdibl4			// bootleg
+sdibl5			// bootleg
+sdibl6			// bootleg
 defense         // (c) 1987 (FD1094)
 shinobi5        // (c) 1987 (Unprotected)
 shinobi4        // (c) 1987 (MC-8123B)
@@ -5325,6 +5337,7 @@ tfrceacj        // (c) 1990 Sega / Technosoft
 tfrceacb        // bootleg
 twinsqua        // (c) 1991 Sega
 soniccar        // (c) 1991 Sega
+sonicpop
 ribbit          // (c) 1991 Sega
 tantr           // (c) 1992 Sega
 tantrkor        // (c) 1992 Sega
@@ -6281,8 +6294,9 @@ nslasheru       // MBH (c) 1993 Data East Corporation (US)
 lockload        // MBM (c) 1994 Data East Corporation (World)
 lockloadu       // MBM (c) 1994 Data East Corporation (US)
 gunhard         // MBM (c) 1994 Data East Corporation (Japan)
-joemacr         // MBN (c) 1994
-joemacra        // MBN (c) 1994
+joemacr         // MBN (c) 1994 Data East Corporation (World)
+joemacra        // MBN (c) 1994 Data East Corporation (World)
+joemacrj        // MBN (c) 1994 Data East Corporation (Japan)
 				// MBO ??
 				// MBP ??
 				// MBQ ??
@@ -6611,7 +6625,8 @@ vendetta2pd     // GX081 (c) 1991 (Asia)
 vendettaj       // GX081 (c) 1991 (Japan)
 mogura          // GX141 (c) 1991
 wecleman        // GX602 (c) 1986
-wecleman2       // GX602?(c) 1988
+weclemana       // GX602?(c) 1988
+weclemanb		// GX602 (c) 1986
 hotchase        // GX763 (c) 1988
 hotchasea
 chqflag         // GX717 (c) 1988
@@ -6925,6 +6940,8 @@ popn6           // GQA16 (c) 2001 (Japan)
 popn7           // GCB00 (c) 2001 (Japan)
 popnanm2        // GEA02 (c) 2001 (Japan)
 popn8           // GQB30 (c) 2002 (Japan)
+bm3core         // GCA05 (c) 2000 (Japan)
+bm36th          // GCA21 (c) 2001 (Japan)
 bm37th          // GCB07 (c) 2002 (Japan JCA)
 bm3final        // GCC01 (c) 2003 (Japan JCA)
 
@@ -7962,6 +7979,7 @@ fatfurwa        // 006 1999/01/28 Fatal Fury: Wild Ambition / Garou Densetsu: Wi
 buriki          // 007 1999/05/21 Buriki One
 
 // Neo Print
+neoprint
 npcartv1
 98best44
 nprsp
@@ -9060,6 +9078,7 @@ vastar4         // (c) 1983 Sesame Japan
 // Gaelco 2D games
 mastboy         // (c) 1987 - No Ref on the PCB
 mastboyi        // (c) 1987 - No Ref on the PCB
+mastboyia		// (c) 1987 - No Ref on the PCB
 xorworld        // (c) 1990 - prototype
 bigkarnk        // (c) 1991 - Ref 901112-1
 // Master Boy 2 // (c) 1991 - Ref ???
@@ -9701,6 +9720,7 @@ pclubysa        // (c) 2000 Yun Sung
 garogun         // (c) 2000 Yun Sung
 7ordi           // (c) 2002 Yun Sung
 wondstck        // (c) ???? Yun Sung
+wondstcka		// (c) ???? Yun Sung
 
 // Zilec games
 blueprnt        // (c) 1982 Bally Midway (Zilec in ROM 3U, and the programmer names)
@@ -11152,6 +11172,7 @@ lastfght        // (c) 2000 Subsino
 xplan           // (c) 2006 Subsino
 
 sliver          // (c) 1996 Hollow Corp
+slivera			//
 intrscti        // ????
 pasha2          // (c) 1998 Dong Sung
 trvmadns        // (c) 1985 Thunderhead Inc.
@@ -11353,10 +11374,14 @@ pepp0040a       // (c) 1987 IGT - International Game Technology
 pepp0040b       // (c) 1987 IGT - International Game Technology
 pepp0041        // (c) 1987 IGT - International Game Technology
 pepp0042        // (c) 1987 IGT - International Game Technology
+pepp0042a       // (c) 1987 IGT - International Game Technology
 pepp0043        // (c) 1987 IGT - International Game Technology
 pepp0043a       // (c) 1987 IGT - International Game Technology
 pepp0043b       // (c) 1987 IGT - International Game Technology
 pepp0045        // (c) 1987 IGT - International Game Technology
+pepp0045a       // (c) 1987 IGT - International Game Technology
+pepp0045b       // (c) 1987 IGT - International Game Technology
+pepp0045c       // (c) 1987 IGT - International Game Technology
 pepp0046        // (c) 1987 IGT - International Game Technology
 pepp0046a       // (c) 1987 IGT - International Game Technology
 pepp0046b       // (c) 1987 IGT - International Game Technology
@@ -11366,6 +11391,7 @@ pepp0053        // (c) 1987 IGT - International Game Technology
 pepp0055        // (c) 1987 IGT - International Game Technology
 pepp0055a       // (c) 1987 IGT - International Game Technology
 pepp0055b       // (c) 1987 IGT - International Game Technology
+pepp0055c       // (c) 1987 IGT - International Game Technology
 pepp0057        // (c) 1987 IGT - International Game Technology
 pepp0057a       // (c) 1987 IGT - International Game Technology
 pepp0059        // (c) 1987 IGT - International Game Technology
@@ -11449,6 +11475,7 @@ pepp0426        // (c) 1987 IGT - International Game Technology
 pepp0428        // (c) 1987 IGT - International Game Technology
 pepp0429        // (c) 1987 IGT - International Game Technology
 pepp0429a       // (c) 1987 IGT - International Game Technology
+pepp0430        // (c) 1987 IGT - International Game Technology
 pepp0431        // (c) 1987 IGT - International Game Technology
 pepp0434        // (c) 1987 IGT - International Game Technology
 pepp0447        // (c) 1987 IGT - International Game Technology
@@ -11459,6 +11486,7 @@ pepp0452        // (c) 1987 IGT - International Game Technology
 pepp0454        // (c) 1987 IGT - International Game Technology
 pepp0455        // (c) 1987 IGT - International Game Technology
 pepp0458        // (c) 1987 IGT - International Game Technology
+pepp0459        // (c) 1987 IGT - International Game Technology
 pepp0467        // (c) 1987 IGT - International Game Technology
 pepp0488        // (c) 1987 IGT - International Game Technology
 pepp0508        // (c) 1987 IGT - International Game Technology
@@ -11470,6 +11498,7 @@ pepp0514b       // (c) 1987 IGT - International Game Technology
 pepp0515        // (c) 1987 IGT - International Game Technology
 pepp0515a       // (c) 1987 IGT - International Game Technology
 pepp0515b       // (c) 1987 IGT - International Game Technology
+pepp0515c       // (c) 1987 IGT - International Game Technology
 pepp0516        // (c) 1987 IGT - International Game Technology
 pepp0516a       // (c) 1987 IGT - International Game Technology
 pepp0516b       // (c) 1987 IGT - International Game Technology
@@ -11520,10 +11549,13 @@ pemg0183        // (c) 1994 IGT - International Game Technology
 pemg0252        // (c) 1994 IGT - International Game Technology
 pebe0014        // (c) 1994 IGT - International Game Technology
 pebe0014a       // (c) 1994 IGT - International Game Technology
+peke0004        // (c) 1994 IGT - International Game Technology
 peke0017        // (c) 1994 IGT - International Game Technology
+peke1006        // (c) 1994 IGT - International Game Technology
 peke1012        // (c) 1994 IGT - International Game Technology
 peke1012a       // (c) 1994 IGT - International Game Technology
 peke1013        // (c) 1994 IGT - International Game Technology
+peke1013a       // (c) 1994 IGT - International Game Technology
 peps0014        // (c) 1996 IGT - International Game Technology
 peps0021        // (c) 1996 IGT - International Game Technology
 peps0022        // (c) 1996 IGT - International Game Technology
@@ -11591,6 +11623,7 @@ pex0242p        // (c) 1995 IGT - International Game Technology
 pex0265p        // (c) 1995 IGT - International Game Technology
 pex0291p        // (c) 1995 IGT - International Game Technology
 pex0417p        // (c) 1995 IGT - International Game Technology
+pex0426p        // (c) 1995 IGT - International Game Technology
 pex0430p        // (c) 1995 IGT - International Game Technology
 pex0434p        // (c) 1995 IGT - International Game Technology
 pex0447p        // (c) 1995 IGT - International Game Technology
@@ -11654,6 +11687,7 @@ pex2150p        // (c) 1995 IGT - International Game Technology
 pex2172p        // (c) 1995 IGT - International Game Technology
 pex2172pa       // (c) 1995 IGT - International Game Technology
 pex2173p        // (c) 1995 IGT - International Game Technology
+pex2179p        // (c) 1995 IGT - International Game Technology
 pex2180p        // (c) 1995 IGT - International Game Technology
 pex2241p        // (c) 1995 IGT - International Game Technology
 pex2244p        // (c) 1995 IGT - International Game Technology
@@ -11667,6 +11701,7 @@ pex2275p        // (c) 1995 IGT - International Game Technology
 pex2276p        // (c) 1995 IGT - International Game Technology
 pex2283p        // (c) 1995 IGT - International Game Technology
 pex2284p        // (c) 1995 IGT - International Game Technology
+pex2287p        // (c) 1995 IGT - International Game Technology
 pex2297p        // (c) 1995 IGT - International Game Technology
 pex2302p        // (c) 1995 IGT - International Game Technology
 pex2303p        // (c) 1995 IGT - International Game Technology
@@ -11710,6 +11745,7 @@ pexm003p        // (c) 1997 IGT - International Game Technology
 pexm004p        // (c) 1997 IGT - International Game Technology
 pexm005p        // (c) 1997 IGT - International Game Technology
 pexm006p        // (c) 1997 IGT - International Game Technology
+pexm006pa       // (c) 1997 IGT - International Game Technology
 pexm007p        // (c) 1997 IGT - International Game Technology
 pexm008p        // (c) 1997 IGT - International Game Technology
 pexm009p        // (c) 1997 IGT - International Game Technology
@@ -12018,18 +12054,29 @@ coralr2         // (c) 2002
 aristmk5        // (c) 1995, USA platform set chips
 swthrt2v        // (c) 1995
 enchfrst        // (c) 1995
+minemine        // (c) 1996
 dolphntr        // (c) 1996
 dolphtra        // (c) 1996
-dmdtouch        // (c) 1997
+dolphtre        // (c) 1996
 goldprmd        // (c) 1997
 qotn            // (c) 1997
+dmdtouch        // (c) 1997
+wldcougr        // (c) 1997
+bumblbug        // (c) 1997
+pengpays        // (c) 1997
 adonis          // (c) 1998
+adonisa         // (c) 1998
 reelrock        // (c) 1998
 indiandr        // (c) 1998
+wtiger          // (c) 1999
+bootsctn        // (c) 1999
+cuckoo          // (c) 2000
 magicmsk        // (c) 2000
+magicmska       // (c) 2000
 margmgc         // (c) 2000
 geishanz        // (c) 2001
-wtiger          // (c) 2001
+adonise         // (c) 2001
+partygrs        // (c) 2001
 
 // Aristocrat Mk6 hardware
 aristmk6

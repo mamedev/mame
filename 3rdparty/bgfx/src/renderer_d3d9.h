@@ -245,7 +245,7 @@ namespace bgfx { namespace d3d9
 		{
 			if (NULL != m_constantBuffer)
 			{
-				ConstantBuffer::destroy(m_constantBuffer);
+				UniformBuffer::destroy(m_constantBuffer);
 				m_constantBuffer = NULL;
 			}
 			m_numPredefined = 0;
@@ -263,7 +263,7 @@ namespace bgfx { namespace d3d9
 			IDirect3DVertexShader9* m_vertexShader;
 			IDirect3DPixelShader9*  m_pixelShader;
 		};
-		ConstantBuffer* m_constantBuffer;
+		UniformBuffer* m_constantBuffer;
 		PredefinedUniform m_predefined[PredefinedUniform::Count];
 		uint8_t m_numPredefined;
 		uint8_t m_type;
@@ -334,7 +334,7 @@ namespace bgfx { namespace d3d9
 		void updateBegin(uint8_t _side, uint8_t _mip);
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void updateEnd();
-		void commit(uint8_t _stage, uint32_t _flags = BGFX_SAMPLER_DEFAULT_FLAGS);
+		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
 		void resolve() const;
 
 		void preReset();

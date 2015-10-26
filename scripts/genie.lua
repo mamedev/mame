@@ -44,8 +44,8 @@ function findfunction(x)
 end
 
 function layoutbuildtask(_folder, _name)
-	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",   
-		{  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
+	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",
+		{  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
 end
 
 CPUS = {}
@@ -370,8 +370,8 @@ newoption {
 }
 
 newoption {
-	trigger = "DRIVERS",
-	description = "List of drivers to compile.",
+	trigger = "SOURCES",
+	description = "List of sources to compile.",
 }
 
 newoption {
@@ -428,7 +428,7 @@ else
 		solution (_OPTIONS["subtarget"])
 	else
 		solution (_OPTIONS["target"] .. _OPTIONS["subtarget"])
-	end	
+	end
 end
 
 configurations {
@@ -466,7 +466,7 @@ configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
 	}
-	
+
 configuration { "Release", "vs*" }
 	flags {
 		"Optimize",
@@ -516,15 +516,15 @@ msgarchiving ("Archiving $(notdir $@)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["SOURCES"] == nil) then
 	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 else
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "src/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " target " .. _OPTIONS["subtarget"])
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "src/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.c")
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.c")
 end
 configuration { "gmake" }
 	flags {
@@ -579,7 +579,7 @@ if _OPTIONS["FASTDEBUG"]=="1" then
 	}
 end
 
-configuration { }	
+configuration { }
 
 if _OPTIONS["PROFILER"]=="1" then
 	defines{
@@ -723,15 +723,15 @@ if (_OPTIONS["targetos"]=="solaris") then
 else
 	buildoptions_c {
 --		"-std=gnu99",
-		"-std=gnu89",		
+		"-std=gnu89",
 --		"-Wpedantic",
 --		"-pedantic",
 --		"-Wno-variadic-macros",
 --		"-Wno-long-long",
 	}
-end	
+end
 
-	
+
 if _OPTIONS["CPP11"]=="1" then
 	buildoptions_cpp {
 		"-x c++",
@@ -850,27 +850,32 @@ if _OPTIONS["OPTIMIZE"] then
 	end
 	if _OPTIONS["LTO"]=="1" then
 		buildoptions {
-			"-flto=2",
--- these next flags allow MAME to compile in linux GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
-			"-fno-fat-lto-objects",	"-Wodr",
-			"-flto-compression-level=9", -- lto didn't work with anything less on linux with < 12G RAM
+-- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this date
+			"-flto=1",
+			"-fuse-linker-plugin",
+-- these next flags allow MAME to compile in GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
+-- some GCC 4.9.x on Windows do not have -Wodr and -flto-odr-type-merging enabled. adjust accordingly...
+-- -ffat-lto-objects lets you link non-lto version without rebuilding all .o/.a
+			"-ffat-lto-objects",
 			"-flto-odr-type-merging",
-			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
-			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report","-fuse-linker-plugin",
-			
+			"-Wodr",
+			"-flto-compression-level=9", -- lto didn't work with anything <9  on linux with < 12G RAM
+--			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
+--			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
 		}
 -- same flags are needed by linker
 		linkoptions {
-			"-flto=2",
--- these next flags allow MAME to compile in linux GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
-			"-fno-fat-lto-objects",	"-Wodr",
-			"-flto-compression-level=9", -- lto didn't work with anything less on linux with < 12G RAM
+			"-Wl,-no-keep-memory",
+			"-flto=1",
+			"-fuse-linker-plugin",
+			"-ffat-lto-objects",
 			"-flto-odr-type-merging",
-			"-flto-report", -- if you get an error in lto after [WPA] stage printout, but before any [LTRANS] section printout, you need more memory!
-			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report","-fuse-linker-plugin",
+			"-Wodr",
+			"-flto-compression-level=9", -- lto didn't work with anything < 9 on linux with < 12G RAM
+--			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
+--			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
 		}
-		
-		
+
 	end
 end
 
@@ -906,7 +911,7 @@ if _OPTIONS["OPENMP"]=="1" then
 	defines {
 		"USE_OPENMP=1",
 	}
-	
+
 else
 	buildoptions {
 		"-Wno-unknown-pragmas",
@@ -948,7 +953,7 @@ end
 		"-Wpointer-arith",
 		"-Wstrict-prototypes",
 	}
-	
+
 if _OPTIONS["targetos"]~="freebsd" then
 	buildoptions_c {
 		"-Wbad-function-cast",
@@ -1000,11 +1005,11 @@ end
 					"-Wno-extern-c-compat",
 				}
 			end
-      if (version >= 70000) then
-        buildoptions {
-          "-Wno-tautological-undefined-compare",
-        }
-      end
+ 			if (version >= 70000) then
+				buildoptions {
+					"-Wno-tautological-undefined-compare",
+				}
+			end
 		else
 			if (version == 40201) then
 				buildoptions {
@@ -1041,13 +1046,12 @@ end
 -- next two should work, but compiler complains about end conditions that are int when loop variable is unsigned. maybe these can be fixed
 --					"-funsafe-loop-optimizations",
 --					"-Wunsafe-loop-optimizations",
--- this six flag combo lets MAME compile with LTO=1 on linux with no errors (whew!--Cowering)  someone should probably pretty this up as you can't really debug with them enabled
-					"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
-					"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
+-- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
+--					"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+--					"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
 
 				}
 			end
-			
 		end
 	end
 --ifeq ($(findstring arm,$(UNAME)),arm)
@@ -1158,7 +1162,7 @@ configuration { "vs*" }
 		buildoptions {
 			"/wd4025", -- warning C4025: 'number' : based pointer passed to function with variable arguments: parameter number
 			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
-			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch 
+			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
 			"/wd4061", -- warning C4061: enumerator 'xxx' in switch of enum 'xxx' is not explicitly handled by a case label
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4127", -- warning C4127: conditional expression is constant
@@ -1202,7 +1206,7 @@ configuration { "vs*" }
 			"/wd4365", -- warning C4365: 'action' : conversion from 'type_1' to 'type_2', signed/unsigned mismatch
 			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
-			"/wd4388", -- warning C4388: 
+			"/wd4388", -- warning C4388:
 			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
 			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
 			"/wd4350", -- warning C4350: behavior change: 'member1' called instead of 'member2'
@@ -1211,10 +1215,10 @@ configuration { "vs*" }
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
 			"/wd4640", -- warning C4640: 'instance' : construction of local static object is not thread-safe
-			"/wd4290", -- warning C4290: 
+			"/wd4290", -- warning C4290:
 			"/wd4355", -- warning C4355: 'this' : used in base member initializer list
 			"/wd4800", -- warning C4800: 'type' : forcing value to bool 'true' or 'false' (performance warning)
-			"/wd4371", -- warning C4371: 
+			"/wd4371", -- warning C4371:
 			"/wd4548", -- warning C4548: expression before comma has no effect; expected expression with side-effect
 		}
 if _OPTIONS["vs"]=="intel-15" then

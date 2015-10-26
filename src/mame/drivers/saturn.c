@@ -2,15 +2,402 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /**************************************************************************************************
 
-    Sega Saturn & Sega ST-V (Sega Titan Video) HW (c) 1994 Sega
-
     Driver by David Haywood, Angelo Salese, Olivier Galibert & Mariusz Wojcieszek
     SCSP driver provided by R. Belmont, based on ElSemi's SCSP sound chip emulator
     Many thanks to Guru, Fabien, Runik and Charles MacDonald for the help given.
 
-===================================================================================================
+***************************************************************************************************
 
+Sega Saturn
+(C) Sega 1994/1995/1996/1997
+
+The Sega Saturn is a 32-bit 5th-generation home video game console that was developed by Sega and released
+on November 22nd 1994 in Japan, May 11th 1995 in North America, and July 8th 1995 in Europe as the successor
+to the Sega Genesis. The Saturn has a dual-CPU architecture and a total of eight processors.
+The games are on CD-ROM.
+
+Basic Hardware:
+
+Processors (8)
+----------
+Two Hitachi SH2 32-bit RISC @ 28.63636MHz
+One Hitachi SH1 32-bit RISC @ 20.0MHz
+Two 32-bit video display processors (VDP 1 / VDP 2)
+One Saturn Control Unit processor (SCU) @ 14.31818MHz
+One Motorola 68EC000 sound processor @ 11.2896MHz
+One Yamaha YMF292-F DSP sound processor @ 28.63636MHz
+
+Memory
+------
+16 Megabits DRAM
+12 Megabits VRAM (Video RAM)
+4 Megabits Audio DRAM
+4 Megabits CD-ROM Cache DRAM
+256 Kbits battery-backed SRAM
+
+Video
+-----
+VDP 1
+- 32-bit video display processor
+- Sprite, polygon, and geometry engine
+- Dual 256Kb frame buffers for rotation and scaling effects
+- Texture Mapping
+- Goraud Shading
+- 512Kb cache for textures
+VDP 2
+- 32-bit background and scroll plane video display processor
+- Background engine
+- 5 simulataneous scrolling backgrounds
+- 2 simultaneous rotating playfields
+- 200,000 Texture Mapped Polygons/Second
+- 500,000 Flat Shaded Polygons/Second
+- Up to 60 frames per second animation
+- 24-bit True Color Graphics
+- 16 Million Available Colors
+- 320x224, 640x224, and 720x576 Resolution
+
+Audio
+-----
+Motorola 68EC000 sound processor @ 11.2896MHz
+Yamaha 24-bit Digital Signal Processor @ 28.63636MHz
+- 32 PCM (Pulse Code Modulation) Channels
+- 8 FM (Frequency Modulation) Channels
+- 44.1 kHz Sampling Rate
+
+Storage
+-------
+CD-ROM (2X)
+- 320 Kb/Second transfer speed
+- Compatible with Audio CD, CD+G, CD+EG, CD Single (8cm)
+  and with optional hardware; Video CD, Photo CD & Digital Karaoke
+- Optional additional memory cartridge
+
+Input/Output
+------------
+High speed serial communications port
+Internal 32-bit expansion port
+Internal Multi AV port for optional Video CD (MPEG) decoder board
+Composite video & stereo audio (Standard)
+Optional RF(TV), S-Video & RGB outputs
+2 ports for analog control pad, light gun or other controllers
+
+
+PCB Layouts
+-----------
+There were *many* main board revisions. The two general 'sizes' are documented here.
+
+Small board (VA revision documented)
+-----------
+Main board with a separate small sub-board for the controller ports, power LED and reset button.
+The power supply is slightly longer than the main board, has a 5 pin connector and outputs 9VDC, 5VDC and 3.3VDC
+
+837-12126 IC BD SATURN MAIN VA SG
+171-7128B (C) SEGA 1995 PC BD SATURN MAIN VA SG
+(This PCB was found in a USA Saturn, Model MK-80000, also known as Saturn model 1 with BIOS MPR-17941)
+
+837-12135 IC BD SATURN MAIN VA PAL SD
+171-7131A (C) SEGA 1995 PC BD SATURN MAIN VA PAL SD
+(This PCB was found in a PAL Saturn, Model MK-80200-50, also known as Saturn model 1 PAL with BIOS MPR-17942)
+
+(note both of these PCBs listed above are almost identical)
+
+|VIDEO--COMM-----------------------------------------------|
+|                        CART_SLOT            SW1 BATTERY  |
+|ADAC         CXA1645M   |--------| |-------|    20MHz     |
+|     SW2                |315-5688| |YGR019B|   TC514260   |
+| ^4502161               |        | |       |   |-------|  |
+| ^4502161    |--------| |--------| |-------|   |HD6437097 |
+| |--------|  |315-5890|   *D489020             |       |  |
+| |315-5883|  |        |    81141625 81141625   |-------|  |
+| |        |  |--------|                        CARD_SLOT  |
+| |--------|  ^4502161                    HC08             |
+| ^5241605    ^4502161          |----| |----|   |--------| |
+|  514270 |--------|HC04        |SH-2| |SH-2|   |315-5914| |
+| |-----| |315-5687|HC04        |----| |----|   |--------| |
+| |68000| |        |      |------|32.768kHz                |
+| |-----| |--------|      315-5744       LS245  TC514260   |
+|       ^74HC157 315-5746 |------|        ^62257  ^ROM  CN4|
+|  CN3      CN7  &14.31818MHz  CN2       LS245  TC514260   |
+|----------------------------------------------------------|
+Notes: (all IC's shown. ^ denotes these parts are on the other side of the PCB)
+             ROM - SOP40 mask ROM for BIOS.
+                   Chip is pin-compatible with Toshiba TC574200 or MX27C4100 and can be read with a simple 1:1 DIP40 to SOP40 adapter
+                   JAPAN BIOS marked 'MPR-17940-MX' or 'MPR-17940-T'
+                   USA BIOS   marked 'MPR-17941-MX' or 'MPR-17941-T'
+                   PAL BIOS   marked 'MPR-17942-MX' or 'MPR-17942-T'
+                   T = Toshiba, MX = Macronix. Both contain identical data
+                   Other BIOSes known to exist include:
+                   (These are mainly on the very       MPR-16605-T
+                    early version main boards VA0/VA1  MPR-16606-T
+                    and are all DIP chips)             MPR-16606A-T
+                                                       MPR-17577-T
+                                                       EPR-17578 HI-SATURN BOOT ROM VER 1.01 SUM AA44 '95 1/27 (EPROM)
+        81141625 - Fujitsu 81141625-017 128k x16-bit x 2 banks (4Mbit) SDRAM                     \ compatible
+         5241605 - Hitachi HM5241605TT17S or HM524165CTT17S 128k x16-bit x 2 banks (4Mbit) SDRAM /
+                   The two 81141625 are the WORK RAM HIGH and the two TC514260 (near the ROM) make up the WORK RAM LOW
+                   The 5241605 is the VDP1 Sprite RAM
+         D489020 - NEC D489020GF-A15 SGRAM (probably 8Mbit). *- This single chip is replaced by two 81141625 IC's on some boards
+         4502161 - NEC D4502161G5-A12 or Sanyo LC382161T-17 64k x16-bit x 2 banks (2Mbit) SDRAM
+                   Two chips are used for the VDP1 Frame RAM, the other two are for the VDP2 Video RAM
+        TC514260 - 256k x16-bit (4Mbit) DRAM. Any of the following compatible chips are used....
+                   Hitachi HM514260AJ7 / HM514260CJ7
+                   Toshiba TC514260BJ-70
+                   Fujitsu 814260-70
+                   Mitsubishi M5M44260CJ
+                   Samsung KM416C256BJ-7
+                   Hyundai HY514260B JC-70
+                   Vanguard VG264260AJ
+                   Panasonic MN414260CSJ-07
+        HM514270 - Hitachi HM514270 256k x16-bit (4Mbit) DRAM, used for the sound WORK RAM
+           62257 - Epson SRM20257LLM10 32k x8-bit (256kbit) battery-backed SRAM (also used SONY CXK58257AM-10L, NEC UPD43257B-10LL, UM62257AM-70LL)
+            ADAC - Dual CMOS Audio DAC. Either Burr-Brown BBPCM1710U or Philips TDA1386T
+        CXA1645M - Sony CXA1645M RGB to Composite Video Encoder
+            SH-2 - Hitachi HD6417095 SH-2 CPU. Clock input 28.63636MHz (14.31818*2)
+           68000 - Motorola MC68EC000FN12 CPU. Clock input 11.2896MHz
+               & - Master Clock. 14.31818MHz for USA revision or 17.7344MHz for PAL revision
+        315-5744 - Sega 315-5744 Hitachi HD404920 microcontroller used as the System Manager and Peripheral Controller (SMPC)
+        315-5746 - Sega 315-5746 Phase-locked Loop (PLL) clock generator IC
+        315-5883 - Sega 315-5883 Hitachi HD64440 Video Display Processor 1 (VDP1). Earliest revision is 315-5689
+        315-5687 - Sega 315-5687 Yamaha YMF292-F Saturn Custom Sound Processor (SCSP). Clock input 28.63636MHz (14.31818*2)
+        315-5688 - Sega 315-5688 System Control Unit (SCU). Clock input 14.31818MHz
+        315-5890 - Sega 315-5890 Video Display Processor 2 (VDP2)
+        315-5914 - Sega 315-5914 DRAM controller. Earliest revision is 315-5778. Later revision is 315-5963
+       HD6437097 - Hitachi HD6437097F20 SH1 (SH7034 family) microcontroller with 64k internal ROM. Clock input 20.000MHz
+         YGR019B - Hitachi YGR019B CD-Subsystem LSI. Earlier revision is YGR019A. Later revision combines this IC and the SH1 together
+                   into one IC (YGR022 315-5962). The SH1 and the YGR019B make up the 'CD Block' CD Authentication and CD I/O data controller.
+                   Another of it's functions is to prevent copied CDs from being played
+           VIDEO - 10-pin Mini-DIN video output port
+            COMM - Communication port
+       CARD_SLOT - Expansion slot for MPEG decoder card and other optional expansions
+       CART_SLOT - Expansion slot for plug-in RAM or ROM carts
+             SW1 - Master reset switch accessible behind the card slot/battery cover. Pressing this clears the battery-backed SRAM, resets the system
+                   and the user has to set the language, date and time
+         BATTERY - CR2032 3V lithium coin battery. When the system is off the battery provides power to the backup SRAM and SMPC which contains an RTC
+             SW2 - CDROM cover open/close detection switch
+             CN2 - 24-pin flat cable connector for control port board
+             CN3 - 5-pin power connector
+             CN4 - Flat cable connector for CDROM data cable. On some main board revisions the connector is reversed and the cable is folded so it
+                   is also reversed/flipped 180 degrees at the other end
+             CN7 - 5-pin connector for CDROM power
+
+
+Control Port board
+------------------
+839-0820 EXPORT
+839-0821 PAL
+PC BD SATURN PIO VA EXPORT 171-7112A (C) SEGA 1995 CSPD CAD-TEAM
+|---------------------------------|
+|               FLAT-CABLE        |
+|                                 |
+| GREEN-LED         RED-LED  RESET|
+|--PORT1-----PORT2----------------|
 Notes:
+      PORT1/2 - Controller ports for controller/joystick/lightgun etc
+    GREEN-LED - Power LED
+      RED-LED - CDROM drive access LED
+        RESET - Push-button reset switch
+   FLAT-CABLE - 24-pin flat cable joined to main board CN2
+
+
+Large board (VA7 revision documented)
+-----------
+This is a single main board containing everything.
+
+837-12643 IC BD SATURN MAIN VA7 USA SD
+171-7208C (C) SEGA 1996 PC BD SATURN MAIN VA7 USA SD
+(This PCB was found in a USA Saturn, Model MK-80000A, also known as Saturn model 2 with BIOS MPR-17941)
+
+837-12992 IC BD SATURN MAIN VA7 PAL
+171-7424A (C) SEGA 1996 PC BD SATURN MAIN VA7 PAL
+(This PCB was found in a PAL Saturn, Model MK-80200A-50, also known as Saturn model 2 PAL with BIOS MPR-17942)
+
+(note both of these PCBs listed above are almost identical)
+
+|VIDEO--COMM-----------------------------------------------|
+|                        CART_SLOT                BATTERY  |
+|     SW2                |--------|                        |
+|ADAC       RGB          |315-5966|   |--------| ^TC514260 |
+|                        |        |   |YGR022  |           |
+|                        |--------|   |315-5962|           |
+|                                     |--------|           |
+| |--------|  |--------|                   20MHz           |
+| |315-5687|  |315-5964|                        CARD_SLOT  |
+| |        |  |        |                                   |
+| |--------|  |--------|           |----|   LS245 HC08     |
+| ^HM514270  ^524165     HC04      |SH-2|                  |
+| ^5221605   ^5221605              |----|         TC514260 |
+| ^5221605   ^5221605                                      |
+|           |--------|                            TC514260 |
+|  |-----|  |315-5883|   HC04                              |
+|  |68000|  |        |&14.31818MHz |----|  |--------|      |
+|  |-----|  |--------|  %CY2292    |SH-2|  |315-5977-01    |
+|CN3             |------|          |----|  |--------|      |
+|                315-5744                         62257 CN4|
+|            CN7 |------|                                  |
+|--|             32.768kHz LS245 81141625 81141625  ROM |--|
+   |            GREEN-LED                  RESET        |
+   |-------------------PORT1-----PORT2------------------|
+Notes: (all IC's shown. ^ denotes these parts are on the other side of the PCB)
+             ROM - SOP40 mask ROM for BIOS.
+                   Chip is pin-compatible with Toshiba TC574200 or MX27C4100 and can be read with a simple 1:1 DIP40 to SOP40 adapter
+                   JAPAN BIOS marked 'MPR-17940-MX' or 'MPR-17940-T'
+                   USA BIOS   marked 'MPR-17941-MX' or 'MPR-17941-T'
+                   PAL BIOS   marked 'MPR-17942-MX' or 'MPR-17942-T'
+                   T = Toshiba, MX = Macronix. Both contain identical data
+        81141625 - Fujitsu 81141625-017 128k x16-bit x 2 banks (4Mbit) SDRAM
+                   The two 81141625 are the WORK RAM HIGH and two TC514260 (near the SH-2) make up the WORK RAM LOW
+          524165 - Hitachi HM524165CTT17S 128k x16-bit x 2 banks (4Mbit) SDRAM. This is the VDP1 Sprite RAM
+         5221605 - Hitachi HM5221605TT17S 64k x16-bit x 2 banks (2Mbit) SDRAM
+                   Two chips are used for the VDP1 Frame RAM, the other two are for the VDP2 Video RAM
+        TC514260 - 256k x16-bit (4Mbit) DRAM. Any of the following compatible chips are used....
+                   Hitachi HM514260AJ7 / HM514260CJ7
+                   Toshiba TC514260BJ-70
+                   Fujitsu 814260-70
+                   Mitsubishi M5M44260CJ
+                   Samsung KM416C256BJ-7
+                   Hyundai HY514260B JC-70
+                   Vanguard VG264260AJ
+                   Panasonic MN414260CSJ-07
+        HM514270 - Hitachi HM514270 256k x16-bit (4Mbit) DRAM, used for the sound WORK RAM
+           62257 - Epson SRM20257LLM10 32k x8-bit (256kbit) battery-backed SRAM (also used SONY CXK58257AM-10L, NEC UPD43257B-10LL, UM62257AM-70LL)
+            ADAC - Dual CMOS Audio DAC. Either Burr-Brown BBPCM1710U or Philips TDA1386T
+             RGB - RGB to Composite Video Encoder with PAL & NTSC output capability. IC is either Fujitsu MB3516A or ROHM BH7236AF
+            SH-2 - Hitachi HD6417095 SH-2 CPU. Clock input 28.63636MHz (14.31818*2)
+           68000 - Motorola MC68EC000FN12 CPU. Clock input 11.2896MHz
+          CY2292 - Cypress CY2292SC-04 PLL clock generator IC. % = On the VA7 PAL version this chip is replaced with the older Sega PLL (315-5746)
+               & - Master Clock. 14.31818MHz for USA revision or 17.7344MHz for PAL revision
+        315-5744 - Sega 315-5744 Hitachi HD404920 microcontroller used as the System Manager and Peripheral Controller (SMPC)
+        315-5883 - Sega 315-5883 Hitachi HD64440 Video Display Processor 1 (VDP1).
+        315-5687 - Sega 315-5687 Yamaha YMF292-F Saturn Custom Sound Processor (SCSP). Clock input 28.63636MHz (14.31818*2)
+        315-5964 - Sega 315-5964 Video Display Processor 2 (VDP2)
+        315-5966 - Sega 315-5966 System Control Unit (SCU). Clock input 14.31818MHz
+     315-5977-01 - Sega 315-5977-01 DRAM controller
+          YGR022 - Hitachi YGR022 Sega 315-5962 single IC containing CD-Subsystem LSI and Hitachi SH-1 microcontroller with 64k internal ROM. Clock input 20.000MHz
+           VIDEO - 10-pin Mini-DIN video output port
+            COMM - Communication port
+       CARD_SLOT - Expansion slot for MPEG decoder card and other optional expansions
+       CART_SLOT - Expansion slot for plug-in RAM or ROM carts
+         BATTERY - CR2032 3V lithium coin battery. When the system is off the battery provides power to the backup SRAM and SMPC which contains an RTC
+             SW2 - CDROM cover open/close detection switch
+             CN3 - 4-pin or 5-pin power connector
+             CN4 - Flat cable connector for CDROM data cable
+             CN7 - 5-pin connector for CDROM power
+         PORT1/2 - Controller ports for controller/joystick/lightgun etc
+       GREEN-LED - Power LED
+           RESET - Push-button reset switch
+
+
+Motherboard List
+----------------
+Board types used in Model 1: VA0 to VA3
+Board types used in Model 2: VA2 to VA15
+If the VA-number is an even number the board uses a single 8Mbit SGRAM for some of the work RAM, if an odd number it uses two 4Mbit SDRAMs.
+Note there are MANY missing. Please help to update this list if you have info for others not listed here.
+
+837-11076    IC BD SATURN MAIN VA0.5        171-6874E PC BD SATURN MAIN VA0.5      (C) SEGA 1994
+837-11076-01 IC BD SATURN MAIN VA0 CCI      171-6874D PC BD SATURN MAIN VA0.5      (C) SEGA 1994
+837-11491    IC BD SATURN MAIN VA0          171-6962A PC BD SATURN MAIN VA0 USA    (C) SEGA 1995
+837-11493    IC BD SATURN MAIN VA0 PAL      171-6963B PC BD SATURN MAIN VA0 PAL    (C) SEGA 1995
+837-11613-01 IC BD SATURN MAIN VA1          171-7006C PC BD SATURN MAIN VA1        (C) SEGA 1995
+837-11892-01 PAL                            171-7069B MAIN                         (C) SEGA 1995
+837-12126    IC BD SATURN MAIN VA SG        171-7128B PC BD SATURN MAIN VA SG      (C) SEGA 1995
+837-12126    IC BD SATURN MAIN VA SG        171-7128C PC BD SATURN MAIN VA SG      (C) SEGA 1995
+837-12133    IC BD SATURN MAIN VA SD        171-7130C PC BD SATURN MAIN VA SD      (C) SEGA 1995
+837-12134    IC BD SATURN MAIN VA USA SD    171-7130C PC BD SATURN MAIN VA USA SD  (C) SEGA 1995
+837-12135    IC BD SATURN MAIN VA PAL SD    171-7131A PC BD SATURN MAIN VA PAL SD  (C) SEGA 1995
+837-12459    IC BD SATURN MAIN VA6 JPN SG   171-7207A PC BD SATURN MAIN VA6 SG     (C) SEGA 1996
+837-12468    IC BD SATURN MAIN VA8 JPN OCU  171-7209C PC BD SATURN MAIN VA8 OCU    (C) SEGA 1996
+837-12643    IC BD SATURN MAIN VA7 USA SD   171-7208C PC BD SATURN MAIN VA7 USA SD (C) SEGA 1996
+(none)                                      171-7291B PC BD SATURN MAIN VA9 PAL    (C) SEGA 1996
+(none)                                      171-7291C PC BD SATURN MAIN VA9        (C) SEGA 1996
+837-12650    IC BD SATURN MAIN VA13 JPN     171-7???? PC BD SATURN MAIN VA13       (C) SEGA 1996
+837-12845    IC BD SATURN MAIN VA13 USA     171-7???? PC BD SATURN MAIN VA13       (C) SEGA 1996
+837-12992    IC BD SATURN MAIN VA7 PAL      171-7424A PC BD SATURN MAIN VA7 PAL    (C) SEGA 1996
+837-13100    IC BD SATURN MAIN VA13 PAL     171-7455D PC BD SATURN MAIN VA13 PAL   (C) SEGA 1997
+837-13137    IC BD SATURN MAIN VA15 JPN     171-7462B PC BD SATURN MAIN VA15       (C) SEGA 1997
+
+
+Motherboard Variations Summary
+------------------------------
+
+NTSC
+----
+- VA0: First revision. CD Block (YGR019A & HD6437097) is on a daughterboard. Power supply mounted on top casing.
+  Has 40 pin DIP EPROM or mask ROM for BIOS. Larger board with control ports on the main board. Uses JVC CD drive units ENR-007B/ENR-007D.
+- VA1: marked as 'VA' on the main board. Power supply is now bottom mounted and plugs in on top into 5 pins on the main board. Most sub boards
+  integrated into the main board except the controller ports which are on a small sub board. BIOS is SOP40 mask ROM located on the bottom side of
+  the main board. Battery-backup RAM and the VRAM are also on the bottom side of the main board. Uses ENR-007D CD drive units.
+- VA2 & VA3: Mostly same as VA1. VA2 is marked as 'VA SG' (uses SGRAM), and VA3 is marked as VA SD (uses SDRAM). Uses ENR-011A CD drive units.
+- VA4 & VA5: Same as VA2 and VA3 but in a cheaper model 2 case. Uses ENR-011A CD drive units.
+- VA6: One single PCB for everything. Uses an off-the-shelf PLL chip (CY2292). Some custom chips have been revised and have different 315-xxxx numbers.
+  BIOS and battery-backed RAM moved to the top side of the main board. Power supply has 4 pins and generates only +5VDC. Uses ENR-013A CD drive unit
+  or Sanyo 610-6185-30 CD drive unit.
+- VA6 & VA7 has the CD Block reduced to a single IC (YGR022). Some custom chips have been revised and have different 315-xxxx numbers.
+- VA8 & VA9 still has the CD Block ICs separated. VA9 uses the old type PLL chip (315-5746).
+- VA10 to VA15: uses HQA-001A CD drive unit or Sanyo 610-6294-30 / 610-6473-30 CD drive unit. 68000 & YMF292 integrated into a single IC (315-5965).
+  The integrated sound IC has a bug with certain 68000 commands.
+- VA11 has a small daughter board mounted on the main board to fix a design fault (possibly to fix the above sound IC problem?)
+- VA11+ boards use a smaller TSSOP20 audio DAC, VA10 uses the old one.
+- VA12, VA14 and VA16 might not exist.
+- VA13 fixes the design fault on VA11 so the patch board is no longer needed.
+- VA15 integrates the two SH-2 main CPUs into a larger single IC (HD6417098 / 315-6018).
+
+PAL (only the main differences to the above are listed)
+---
+- No PAL board ever used SGRAM.
+- All PAL boards have an odd VA-number.
+- All PAL boards have a 5 pin power connector and use a 5 pin power supply.
+- All PAL boards use different region & video output jumpers when compared to NTSC machines.
+- All PAL boards use a 17.7344MHz master clock (NTSC units use 14.31818MHz).
+- All PAL boards replace the composite sync output on the A/V OUT connector with 9VDC which is used for SCART auto switching. The 9VDC power comes from
+  pin 5 of the power supplies with a 5 pin connector. Composite sync is still there at TP4 on the bottom of the board but not wired into the A/V OUT port.
+- VA0 PAL - has extra jumpers to set the master clock divider (JP18 & 19), functional but unpopulated 50/60Hz switch on the back (SW4).
+- VA1 PAL - unpopulated 50/60Hz switch on the back (SW4). There is a design fault as it is still connected to the master clock divider select pin.
+  Therefore the switch does not work on its own, you have to cut or raise & ground the PLL pin 1 for the switch to work.
+- VA3 PAL - has extra jumpers to set the master clock divider (JP20 & 21), functional but unpopulated 50/60Hz switch on the back (SW4).
+- VA5 PAL - same as VA3 PAL.
+- VA7 PAL - Unlike NTSC boards, this still uses the old PLL (315-5746) and pin 1 is connected to the PAL/NTSC and 50/60Hz selection pins on the video
+            encoder and the VDP2.
+- VA9 - same as VA7 PAL.
+- VA13 PAL - Other than a 5 pin power connector it's identical to the NTSC VA13 board.
+- VA17 PAL - probably the final revision specifically for EU/PAL regions. Differences are unknown.
+
+Power supplies
+--------------
+Type A is used on VA0 main boards and is mounted to the top casing. Pinout is GND, GND, 3.3V, 5V, (empty pin), 9V. (5 pins total)
+Type B is used on VA1 to VA5 main boards and is bottom mounted. Pinout is GND, GND, 3.3V, 5V, 9V. (5 pins total)
+Type C is used on VA6+ main boards and is bottom mounted. Pinout is GND, GND, 5V, 5V (4 pins total).
+PAL units use either Type B or a 5-pin version of Type C power supplies. On earlier boards such as 'VA' the 9V pin is connected to pin 1 of the CD ROM
+unit power supply cable connector on the main board. On later boards it's also connected to the A/V OUT port for SCART auto switching.
+
+CD Drives
+---------
+With 20 pin flat cable connector, VA0-VA1:
+- JVC ENR-007B EMW10447-003E
+- JVC ENR-007B EMW10447-004E
+- JVC ENR-007D EMW10447-005E
+- JVC ENR-007D EMW10447-006E
+- Hitachi JA00292
+
+With 21 pin flat cable connector, VA2-VA5:
+- JVC ENR-011A EMW10589-002
+- JVC ENR-011A EMW10589-003
+
+With 21 pin flat cable connector, VA6-VA9:
+- JVC ENR-013A EMW20035-002 610-6185-20
+- Sanyo 610-6185-30 (sometimes with an extra protection board where the flat cable plugs in)
+
+With 21 pin flat cable connector, VA10-VA15:
+- JVC HQA-001A HQ100002-002 610-6294-20
+- Sanyo 610-6294-30 \
+- Sanyo 610-6473-30 / (sometimes with an extra protection board where the flat cable plugs in)
+These are the same as the VA6-VA9 units but lack an oscillator and have a white border on the edges of the PCB.
+
+Optical pickups used - JVC drive: Optima-6, Hitachi drive: HOP-6, Sanyo drive: SF-P101 is used in the 610-6185-30
+
+****************************************************************************************************
+
+Emulation Notes:
 -To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
 -Memo: Some tests done on the original & working PCB,to be implemented:
  -The AD-Stick returns 0x00 or a similar value.

@@ -274,11 +274,11 @@ WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
 	case 0:
 		if( ACCESSING_BITS_0_7 )
 		{
-			/* command register */
+			/* Bus Master IDE Command register */
 			UINT8 old = m_bus_master_command;
 			UINT8 val = data & 0xff;
 
-			/* save the read/write bit and the start/stop bit */
+			/* save the "Read or Write Control" bit 3 and the "Start/Stop Bus Master" bit 0 */
 			m_bus_master_command = (old & 0xf6) | (val & 0x09);
 
 			if ((old ^ m_bus_master_command) & 1)
@@ -306,7 +306,7 @@ WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
 
 		if( ACCESSING_BITS_16_23 )
 		{
-			/* status register */
+			/* Bus Master IDE Status register */
 			UINT8 old = m_bus_master_status;
 			UINT8 val = data >> 16;
 
@@ -334,7 +334,7 @@ void bus_master_ide_controller_device::execute_dma()
 
 	while (m_dmarq && (m_bus_master_status & IDE_BUSMASTER_STATUS_ACTIVE))
 	{
-		/* if we're out of space, grab the next descriptor */
+		/* if we're out of space, grab the next Physical Region Descriptor */
 		if (m_dma_bytes_left == 0)
 		{
 			/* fetch the address */

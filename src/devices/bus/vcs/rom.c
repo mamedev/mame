@@ -41,6 +41,7 @@ const device_type A26_ROM_JVP = &device_creator<a26_rom_jvp_device>;
 const device_type A26_ROM_4IN1 = &device_creator<a26_rom_4in1_device>;
 const device_type A26_ROM_8IN1 = &device_creator<a26_rom_8in1_device>;
 const device_type A26_ROM_32IN1 = &device_creator<a26_rom_32in1_device>;
+const device_type A26_ROM_X07 = &device_creator<a26_rom_x07_device>;
 
 
 a26_rom_2k_device::a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -176,6 +177,11 @@ a26_rom_8in1_device::a26_rom_8in1_device(const machine_config &mconfig, const ch
 
 a26_rom_32in1_device::a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: a26_rom_f6_device(mconfig, A26_ROM_32IN1, "Atari VCS 2600 ROM Cart 32 in 1", tag, owner, clock, "vcs_32in1", __FILE__)
+{
+}
+
+a26_rom_x07_device::a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a26_rom_f6_device(mconfig, A26_ROM_X07, "Atari VCS 2600 ROM Carts w/X07 bankswitch", tag, owner, clock, "vcs_x07", __FILE__)
 {
 }
 
@@ -1047,4 +1053,53 @@ READ8_MEMBER(a26_rom_8in1_device::read_rom)
 READ8_MEMBER(a26_rom_32in1_device::read_rom)
 {
 	return m_rom[(offset & 0x7ff) + (m_base_bank * 0x800)];
+}
+
+
+/*-------------------------------------------------
+ "X07 Bankswitch" Carts:
+ banking done with a PALC22V10B
+ implementation based on information at
+ http://blog.kevtris.org/blogfiles/Atari%202600%20Mappers.txt
+ --------------------------------------------------*/
+
+READ8_MEMBER(a26_rom_x07_device::read_rom)
+{
+	return m_rom[offset + (m_base_bank * 0x1000)];
+}
+
+WRITE8_MEMBER(a26_rom_x07_device::write_bank)
+{
+	/*
+	A13           A0
+	----------------
+	0 1xxx nnnn 1101
+	*/
+
+	if ((offset & 0x180f) == 0x080d)
+	{
+		m_base_bank = (offset & 0x00f0) >> 4;
+	}
+	/*
+	A13           A0
+	----------------
+	0 0xxx 0nxx xxxx
+	*/
+
+	if ((offset & 0x1880) == 0x0000)
+	{
+		// only has an effect if bank is already 14 or 15
+		if (m_base_bank == 14 || m_base_bank == 15)
+		{
+			if (offset & 0x0040)
+			{
+				m_base_bank = 15;
+			}
+			else
+			{
+				m_base_bank = 14;
+			}
+
+		}
+	}
 }

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- ARM Evaluation System Discs -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<softwarelist name="bbc_arm_flop" description="ARM Evaluation System Discs">
+
+	<software name="armeval1" supported="no">
+		<description>ARM Evaluation System Disc 1</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS" />
+		<info name="compatibility" value="ARM co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc1.adl" size="655360" crc="c8d6fd8d" sha1="fad5516b2407279c68bca0d21cda1a5880a22248" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armeval2" supported="no">
+		<description>ARM Evaluation System Disc 2</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS" />
+		<info name="compatibility" value="ARM co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc2.adl" size="655360" crc="5fee623f" sha1="ef084f6bac30471e9cbb06a498901e92b858bffa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armeval3" supported="no">
+		<description>ARM Evaluation System Disc 3</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS" />
+		<info name="compatibility" value="ARM co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc3.adl" size="655360" crc="8511d59e" sha1="be855b2a96c165cf1c76d9128edafb6df5ba47ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armeval4" supported="no">
+		<description>ARM Evaluation System Disc 4</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS" />
+		<info name="compatibility" value="ARM co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc4.adl" size="655360" crc="78dce270" sha1="4a6974193c1cefe2b7c21d06be33da9e32eea793" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armeval5" supported="no">
+		<description>ARM Evaluation System Disc 5</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS" />
+		<info name="compatibility" value="ARM co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc5.adl" size="655360" crc="c77d9325" sha1="9ac7e92916a0f69214208d06ae22a285cf3e46d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

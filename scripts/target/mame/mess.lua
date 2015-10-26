@@ -645,6 +645,7 @@ BUSES["SNES_CTRL"] = true
 BUSES["SPC1000"] = true
 BUSES["TI99PEB"] = true
 BUSES["TI99X"] = true
+BUSES["TIKI100"] = true
 BUSES["TVC"] = true
 BUSES["VBOY"] = true
 BUSES["VC4000"] = true
@@ -1228,12 +1229,13 @@ files {
 createMESSProjects(_target, _subtarget, "camputers")
 files {
 	MAME_DIR .. "src/mame/drivers/camplynx.c",
+	MAME_DIR .. "src/lib/formats/camplynx_dsk.c",
 }
 
 createMESSProjects(_target, _subtarget, "canon")
-files {             
-	MAME_DIR .. "src/mame/drivers/cat.c",       
-	MAME_DIR .. "src/mame/drivers/x07.c",       
+files {
+	MAME_DIR .. "src/mame/drivers/cat.c",
+	MAME_DIR .. "src/mame/drivers/x07.c",
 	MAME_DIR .. "src/mame/drivers/canon_s80.c",
 }
 
@@ -1640,8 +1642,8 @@ files {
 }
 
 createMESSProjects(_target, _subtarget, "heurikon")
-files {          
-	MAME_DIR .. "src/mame/drivers/hk68v10.c",  
+files {
+	MAME_DIR .. "src/mame/drivers/hk68v10.c",
 }
 
 createMESSProjects(_target, _subtarget, "intel")
@@ -1803,8 +1805,8 @@ files {
 }
 
 createMESSProjects(_target, _subtarget, "mizar")
-files {          
-	MAME_DIR .. "src/mame/drivers/mzr8105.c",  
+files {
+	MAME_DIR .. "src/mame/drivers/mzr8105.c",
 }
 
 createMESSProjects(_target, _subtarget, "morrow")
@@ -2582,7 +2584,7 @@ dependency {
 	{ MAME_DIR .. "src/mame/drivers/ymmu100.c",    GEN_DIR .. "mame/drivers/ymmu100.inc" },
 }
 custombuildtask {
-	{ MAME_DIR .. "src/mame/drivers/ymmu100.ppm", GEN_DIR .. "mame/drivers/ymmu100.inc",  {  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/drivers/ymmu100.ppm...", PYTHON .. " $(1) $(<) $(@) ymmu100_bkg UINT8" }},
+	{ MAME_DIR .. "src/mame/drivers/ymmu100.ppm", GEN_DIR .. "mame/drivers/ymmu100.inc",  {  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/drivers/ymmu100.ppm...", PYTHON .. " $(1) $(<) $(@) ymmu100_bkg UINT8" }},
 }
 
 createMESSProjects(_target, _subtarget, "zenith")
@@ -2706,6 +2708,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/plan80.c",
 	MAME_DIR .. "src/mame/drivers/pm68k.c",
 	MAME_DIR .. "src/mame/drivers/poly.c",
+	MAME_DIR .. "src/mame/drivers/proteus3.c",
 	MAME_DIR .. "src/mame/drivers/pt68k4.c",
 	MAME_DIR .. "src/mame/drivers/ptcsol.c",
 	MAME_DIR .. "src/mame/drivers/pulsar.c",
@@ -2720,6 +2723,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/softbox.c",
 	MAME_DIR .. "src/mame/drivers/squale.c",
 	MAME_DIR .. "src/mame/drivers/swtpc.c",
+	MAME_DIR .. "src/mame/drivers/swyft.c",
 	MAME_DIR .. "src/mame/drivers/sys2900.c",
 	MAME_DIR .. "src/mame/drivers/systec.c",
 	MAME_DIR .. "src/mame/drivers/tavernie.c",

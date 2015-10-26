@@ -64,23 +64,30 @@ private:
  Address Maps
 ******************************************************************************/
 
+/*  a15 a14 a13 a12   a11 a10  a9  a8    a7  a6  a5  a4    a3  a2  a1  a0
+      x   0   0   x     x   x   *   *     *   *   *   *     *   *   *   *    RW  RAM (2x 2114 1kx4 SRAM, wired in parallel)
+      x   0   1   x     x   x   x   x     x   x   x   x     x   x   x   0    RW  6850 Status(R)/Control(W)
+      x   0   1   x     x   x   x   x     x   x   x   x     x   x   x   1    RW  6850 Data(R)/Data(W)
+      x   1   0   x     x   x   x   x     x   x   x   x     x   x   x   x    W   SC-01 Data(W)
+      x   1   1   x     *   *   *   *     *   *   *   *     *   *   *   *    R   ROM (2332 4kx8 Mask ROM, inside potted brick)
+*/
+
 static ADDRESS_MAP_START(6802_mem, AS_PROGRAM, 8, votrtnt_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x6fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0xc00)/* RAM, 2114*2 (0x400 bytes) mirrored 4x */
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0xffe) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0xffe) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
-	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("votrax", votrax_sc01_device, write) /* low 6 bits write to 6 bit input of sc-01-a; high 2 bits are ignored (but by adding a buffer chip could be made to control the inflection bits of the sc-01-a which are normally grounded on the tnt) */
-	AM_RANGE(0x6000, 0x6fff) AM_ROM /* ROM in potted block */
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x9c00) AM_RAM /* RAM, 2114*2 (0x400 bytes) mirrored 4x */
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x9ffe) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x9fff) AM_DEVWRITE("votrax", votrax_sc01_device, write) /* low 6 bits write to 6 bit input of sc-01-a; high 2 bits are ignored (but by adding a buffer chip could be made to control the inflection bits of the sc-01-a which are normally grounded on the TNT); upon any access to this area (even reads, which count effectively as a 'write of open bus value') the /STB line of the sc-01 is pulsed low using a 74123 monostable multivibrator with a capacitor of 120pf and a resistor to vcc of 22Kohm */
+	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x9000) AM_ROM /* ROM in potted block */
 ADDRESS_MAP_END
 
 
 /******************************************************************************
  Input Ports
 ******************************************************************************/
-
+/** TODO: actually hook this up to the ACIA */
 static INPUT_PORTS_START(votrtnt)
-	PORT_START("DSW1") /* not connected to cpu, each switch is connected directly to the output of a 4040 counter dividing the cpu m1? clock to feed the 6850 ACIA. Setting more than one switch on is a bad idea. see tnt_schematic.jpg */
+	PORT_START("DSW1") /* not connected to cpu, each switch is connected directly to the output of a 4040 counter dividing the cpu m1? clock to feed the 6850 ACIA. Setting more than one switch on (downward is on, upward is off) is a bad idea, as it will short together outputs of the 4040, possibly damaging it. see tnt_schematic.jpg */
 	PORT_DIPNAME( 0xFF, 0x80, "Baud Rate" ) PORT_DIPLOCATION("SW1:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0x01, "75" )
 	PORT_DIPSETTING(    0x02, "150" )

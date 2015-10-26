@@ -63,6 +63,9 @@ public:
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
+	// used by m92.c until we can figure out how to hook it up in a way that doesn't break nbbatman (probably need correct IRQ timing / clears for the sprites IRQs
+	int HACK_get_base_vector() { return m_base;  }
+
 protected:
 	// device-level overrides
 	virtual void device_start();

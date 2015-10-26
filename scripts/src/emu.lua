@@ -79,6 +79,8 @@ files {
 	MAME_DIR .. "src/emu/dinvram.h",
 	MAME_DIR .. "src/emu/dioutput.c",
 	MAME_DIR .. "src/emu/dioutput.h",
+	MAME_DIR .. "src/emu/dipty.c",
+	MAME_DIR .. "src/emu/dipty.h",
 	MAME_DIR .. "src/emu/dirtc.c",
 	MAME_DIR .. "src/emu/dirtc.h",
 	MAME_DIR .. "src/emu/diserial.c",
@@ -192,6 +194,8 @@ files {
 	MAME_DIR .. "src/emu/ui/imgcntrl.h",
 	MAME_DIR .. "src/emu/ui/info.c",
 	MAME_DIR .. "src/emu/ui/info.h",
+	MAME_DIR .. "src/emu/ui/info_pty.c",
+	MAME_DIR .. "src/emu/ui/info_pty.h",
 	MAME_DIR .. "src/emu/ui/inputmap.c",
 	MAME_DIR .. "src/emu/ui/inputmap.h",
 	MAME_DIR .. "src/emu/ui/selgame.c",
@@ -342,7 +346,7 @@ dependency {
 }
 
 custombuildtask {
-	{ MAME_DIR .. "src/emu/uismall.png"         , GEN_DIR .. "emu/uismall.fh",  {  MAME_DIR.. "src/build/png2bdc.py",  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting uismall.png...", PYTHON .. " $(1) $(<) temp.bdc", PYTHON .. " $(2) temp.bdc $(@) font_uismall UINT8" }},
+	{ MAME_DIR .. "src/emu/uismall.png"         , GEN_DIR .. "emu/uismall.fh",  {  MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting uismall.png...", PYTHON .. " $(1) $(<) temp.bdc", PYTHON .. " $(2) temp.bdc $(@) font_uismall UINT8" }},
 
 	layoutbuildtask("emu/layout", "dualhovu"),
 	layoutbuildtask("emu/layout", "dualhsxs"),

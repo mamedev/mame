@@ -239,6 +239,8 @@ public:
 	layout_view *next() const { return m_next; }
 	item *first_item(item_layer layer) const;
 	const char *name() const { return m_name.c_str(); }
+	const render_bounds &bounds() const { return m_bounds; }
+	const render_bounds &screen_bounds() const { return m_scrbounds; }
 	const render_screen_list &screens() const { return m_screens; }
 	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
 

@@ -1,19 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Palindrome
-/*
+/****************************************************************************************************************
 
     Aristocrat MK5 / MKV hardware
     possibly 'Acorn Archimedes on a chip' hardware
 
     Note: ARM250 mapping is not identical to plain AA
 
-    BIOS ROMs are actually nowhere to be found on a regular MK5 system. They can be used to change the system configurations on a PCB board
-    by swapping them with the game ROMs u7/u11 locations.
+    BIOS ROMs are actually nowhere to be found on a regular MK5 system. They can be used
+    to change the system configurations on a PCB board by swapping them with the game ROMs
+    u7/u11 locations.
 
     TODO (MK-5 specific):
     - Fix remaining errors
     - If all tests passes, this msg is printed on the keyboard serial port:
-    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n Unrecoverable error occurred. System will now restart"
+    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n
+    Unrecoverable error occurred. System will now restart"
     Apparently it looks like some sort of protection device ...
 
     code DASMing of POST (adonis):
@@ -49,15 +51,117 @@
         bp 3400640: checks 2MByte DRAM
             - writes from 0x1000 to 0x100000, with 0x400 bytes index increment and 0xfb data increment
             - writes from 0x100000 to 0x200000, with 0x400 bytes index increment and 0xfb data increment
-            - bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check at 0x1000, it returns the
-              value that actually should be at 0x141000)
+            - bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check
+              at 0x1000, it returns the value that actually should be at 0x141000)
         bp 340064c: if R0 == 0 2MB DRAM is ok, otherwise there's an error
 
     set chip (BIOS):
         same as goldprmd (serial + ext video crystal check)
         bp 3400110: External Video Crystal test
 
-*/
+*****************************************************************************************************************
+
+  MKV S2 Mainboard, PCB Layout:
+
+  +--------------------------------------------------------------------------------------------------------+
+  |   |    96-pin male connector     |  |    96-pin male connector     |  |    96-pin male connector     | |
+  |   +------------------------------+  +------------------------------+  +------------------------------+ |
+  |            +---+       +--+                                                          +---+ +---+ +---+ |
+  +-+          |VR1|       |  |U89              +------+        +------+                 |AA | |AB | |AC | |
+  | |          |   |       |  |                 |AMP   |        |U35   |                 +---+ +---+ +---+ |
+  |S|          |   |       |  |                 +------+        +------+                 +---+ +---+ +---+ |
+  |I|          +---+       +--+ +--+                                                     |U46| |U21| |U66| |
+  |M|                           |  |U52                  ARISTOCRAT                      +---+ +---+ +---+ |
+  |M|                    +----+ |  |                     MKV S2 MAINBOARD                   +------------+ |
+  | |    +---------+     |U47 | |  |                     PCB 0801-410091                    | 3V BATTERY | |
+  |S|    |U72      |     +----+ +--+                     ASSY 2501-410389                   |            | |
+  |O|    |         |       +-----+                       ISSUE A01                          +------------+ |
+  |C|    |         |       |U23  |                                                                  +----+ |
+  |K|    |         |       |     |                                                                  |U53 | |
+  |E|    +---------+       +-----+       +------------+                                             +----+ |
+  |T|                                    |U85         |    +----+ +----+ +--+ +--+ +----+ +----+ +--+ +--+ |
+  | |    +---------+                     |            |    |U58 | |U54 | |U | |U | |U59 | |U61 | |U | |U | |
+  | |    |U71      |                     |    CPU     |    +----+ +----+ |1 | |4 | +----+ +----+ |1 | |4 | |
+  | |    |         |                     |            |           +----+ |4 | |8 |  +------+     |5 | |9 | |
+  | |    |         |  +-----+            |            |           |U56 | |9 | |  |  |U36   |     |2 | |  | |
+  | |    |         |  |U65  |            |            |           +----+ +--+ +--+  |      |     +--+ +--+ |
+  | |    +---------+  |     |            +------------+                             +------+               |
+  | |                 +-----+     +-----+ +---+                                                            |
+  +-+    +---+                    |U73  | |X2 |                    +----------------+   +----------------+ |
+  |      |U26|                    |     | +---+   +---+            |U14             |   |U10             | |
+  |      +---+                    +-----+         |U50|            |                |   |                | |
+  |      |U27|                       +-----+      +---+            +----------------+   +----------------+ |
+  |      +---+                       |U5   |      |U40|            |U13             |   |U9              | |
+  |                                  |     |      +---+            |                |   |                | |
+  |                                  +-----+      |U41|            +----------------+   +----------------+ |
+  |                                               +---+            |U12             |   |U8              | |
+  |          +---+                                                 |                |   |                | |
+  |          |VR2|                         +-----+         +-----+ +----------------+   +----------------+ |
+  |          |   |                         |U24  |         |U22  | |U11             |   |U7              | |
+  |          |   |                         |     |         |     | |                |   |                | |
+  |          |   |                         +-----+         +-----+ +----------------+   +----------------+ |
+  |          +---+                                            +----------------------------------+         |
+  |                                                           |     96-pin female connector      |         |
+  +--------------------------------------------------------------------------------------------------------+
+
+  U5: 48 MHz crystal (unpopulated from factory).
+
+  U7:  27C4096 ROM socket (bank 0).
+  U8:  27C4096 ROM socket (bank 1).
+  U9:  27C4096 ROM socket (bank 2).
+  U10: 27C4096 ROM socket (bank 3).
+
+  U11: 27C4096 ROM socket (bank 0).
+  U12: 27C4096 ROM socket (bank 1).
+  U13: 27C4096 ROM socket (bank 2).
+  U14: 27C4096 ROM socket (bank 3).
+
+  U21: NEC D43256BGU-70LL (32k x 8bit CMOS Static RAM).
+  U22: LATTICE GAL20V8B-15LJ (High Performance E2CMOS PLD Generic Array Logic, 28-Lead PLCC).
+  U23: LATTICE GAL16V8D-25LJ (High Performance E2CMOS PLD Generic Array Logic, 20-Lead PLCC).
+  U24: LATTICE GAL16V8D-25LJ (High Performance E2CMOS PLD Generic Array Logic, 20-Lead PLCC).
+  U26: SGS THOMSON ST93C46 (1K (64 x 16 or 128 x 8) Serial EEPROM).
+  U27: SGS THOMSON ST93C46 (1K (64 x 16 or 128 x 8) Serial EEPROM).
+
+  U35: PHILIPS 74HC2...
+  U36: LATTICE GAL20V8B-15LJ (High Performance E2CMOS PLD Generic Array Logic, 28-Lead PLCC).
+  U40: Dallas Semiconductor DS1202S (Serial Timekeeping Chip).
+  U41: Maxim Integrated MAX705CSA (MPU Supervisory Circuits).
+  U46: NEC D43256BGU-70LL (32k x 8bit CMOS Static RAM).
+  U47: Maxim Integrated MAX202CWE (RS-232 Interface IC).
+  U48: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+  U49: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+  U50: Dallas Semiconductor DS1620 (Digital Thermometer and Thermostat).
+  U52: Allegro MicroSystems UDN2543B (Protected quad power driver).
+  U53: SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  U54: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U56: SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  U58: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U59: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U61: Motorola AC244 (Octal Buffer/Line Driver with 3-State Outputs).
+  U65: LATTICE GAL20V8B-15LJ (High Performance E2CMOS PLD Generic Array Logic, 28-Lead PLCC).
+  U66: NEC D43256BGU-70LL (32k x 8bit CMOS Static RAM).
+  U71: Texas Instruments TL16C452FN (UART Interface IC Dual UART w/Prl Port & w/o FIFO).
+  U72: Texas Instruments TL16C452FN (UART Interface IC Dual UART w/Prl Port & w/o FIFO).
+  U73: CX0826 72 MHz crystal.
+  U89: Allegro MicroSystems UDN2543B (Protected quad power driver).
+  U149: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+  U152: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
+
+  AA:  SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  AB:  SGS THOMSON 74HC244 (Octal buffer/line driver, 3-state).
+  AC:  PHILIPS 74HC245D (Octal bus transceiver, 3-state).
+
+  AMP: TDA 2006 (12W Audio Amplifier).
+
+  VR1: Motorola 7805 (3-Terminal 1A Positive Voltage Regulator).
+  VR2: SGS THOMSON L4975A (5A stepdown monolithic power switching regulator at 5.1V-40V).
+
+  X2:  Unpopulated crystal (from factory).
+
+*****************************************************************************************************************/
+
+#define MASTER_CLOCK        XTAL_72MHz      /* confirmed */
 
 #include "emu.h"
 #include "cpu/arm/arm.h"
@@ -418,7 +522,7 @@ void aristmk5_state::machine_reset()
 
 
 static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
-	MCFG_CPU_ADD("maincpu", ARM, 12000000)
+	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)	// 12000000
 	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
@@ -464,7 +568,7 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
-	MCFG_CPU_ADD("maincpu", ARM, 12000000)
+	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)	// 12000000
 	MCFG_CPU_PROGRAM_MAP(aristmk5_map)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
@@ -648,6 +752,8 @@ ROM_START( margmgc )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// 0200751V - 10 Credit Multiplier / 20 Line Multiline.
+// ADONIS - NSW/ACT A - 25/05/98  Revision: 10  602/9.
 ROM_START( adonis )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200751v.u7",  0x000000, 0x80000, CRC(ab386ab0) SHA1(56c5baea4272866a9fe18bdc371a49f155251f86) )
@@ -660,6 +766,44 @@ ROM_START( adonis )
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100, "eeproms", 0 )
+	ROM_LOAD( "st93c46.u26", 0x0000, 0x0080, NO_DUMP )
+	ROM_LOAD( "st93c46.u27", 0x0080, 0x0080, NO_DUMP )
+
+	ROM_REGION( 0x0005, "plds", 0 )
+	ROM_LOAD( "gal20v8b.u22", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal16v8d.u23", 0x0000, 0x0001, NO_DUMP ) /* 20-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal16v8d.u24", 0x0000, 0x0001, NO_DUMP ) /* 20-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal20v8b.u36", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal20v8b.u65", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
+ROM_END
+
+// 0100751V - 10 Credit Multiplier / 20 Line Multiline.
+// ADONIS - NSW/ACT A - 25/05/98  Revision: 9  602/9.
+ROM_START( adonisa )
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0100751v.u7",  0x000000, 0x80000, CRC(ca3e97db) SHA1(bd0a4402e57891899d92ea85a87fb8925a44f706) )
+	ROM_LOAD32_WORD( "0100751v.u11", 0x000002, 0x80000, CRC(cfe3f792) SHA1(aa1bf77101404c2018a5e5b808f1d683e29ae942) )
+	ROM_LOAD32_WORD( "0100751v.u8",  0x100000, 0x80000, CRC(d55204bd) SHA1(208c089d435ea4af25d0b9b3d5e79fea397bc885) )
+	ROM_LOAD32_WORD( "0100751v.u12", 0x100002, 0x80000, CRC(77090858) SHA1(76ebc15b26f378ac95276f0aa26d077e3646a6f1) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100, "eeproms", 0 )
+	ROM_LOAD( "st93c46.u27", 0x0000, 0x0080, CRC(115c305a) SHA1(684a70d74ec92564e17c4292cd357e603842c485) )
+	ROM_LOAD( "st93c46.u26", 0x0080, 0x0080, CRC(652d544c) SHA1(cd5bd20e9a0f22d7367cc169e2844a02751c7c91) )	// blank... all 0xff's
+
+	ROM_REGION( 0x0005, "plds", 0 )
+	ROM_LOAD( "gal20v8b.u22", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal16v8d.u23", 0x0000, 0x0001, NO_DUMP ) /* 20-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal16v8d.u24", 0x0000, 0x0001, NO_DUMP ) /* 20-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal20v8b.u36", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
+	ROM_LOAD( "gal20v8b.u65", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
 ROM_END
 
 ROM_START( wtiger )
@@ -706,7 +850,43 @@ ROM_START( geishanz )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-/*********************** US games (requires set chips) ***********************/
+/*********************** US and Export games (requires set chips) ***********************/
+
+// 559/2 - 10 Credit Multiplier / 9 Line Multiline.
+// Mine, Mine, Mine - Export E - 14/02/96.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( minemine )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "mine_export.u7",  0x000000, 0x80000, CRC(41bc3714) SHA1(5a8f7d24a6a697524af7997dcedd214fcaf48768) )
+	ROM_LOAD32_WORD( "mine_export.u11", 0x000002, 0x80000, CRC(75803b10) SHA1(2ff3d966da2992ddcc7e229d979cc1ee623b4900) )
+	ROM_LOAD32_WORD( "mine_export.u8",  0x100000, 0x80000, CRC(0a3e2baf) SHA1(b9ab989cf383cd6ea0aa1ead137558a1a6f5901d) )
+	ROM_LOAD32_WORD( "mine_export.u12", 0x100002, 0x80000, CRC(26c01532) SHA1(ec68ad44b703609c7bc27275f8d9250a16d9067c) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// 602/1 - 10 Credit Multiplier / 9 Line Multiline.
+// Dolphin Treasure - Export B - 06/12/96.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( dolphtre )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u7",  0x000000, 0x80000, CRC(97e3e4d0) SHA1(211b9b9e0f25dfaf9d1dfe1d3d88592522aa6f07) )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u11", 0x000002, 0x80000, CRC(de221eb5) SHA1(0e550e90b7fd5670f3f3a8589239c342ed70dc3d) )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u8",  0x100000, 0x80000, CRC(cb3ca8b6) SHA1(dba8bdaa406c07870f95241466359e39a012a70b) )
+	ROM_LOAD32_WORD( "dolphin_treasure_export.u12", 0x100002, 0x80000, CRC(8ee1c2d3) SHA1(e6ecaaac0cb4518ecc0d36532ab532f46e3e628b) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START( goldprmd )
 	ARISTOCRAT_MK5_BIOS
@@ -723,6 +903,103 @@ ROM_START( goldprmd )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// 569/8 - 10 Credit Multiplier / 9 Line Multiline.
+// Wild Cougar - Export D - 19/05/97.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( wldcougr )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "wild_cougar_export.u7",  0x000000, 0x80000, CRC(7ada053f) SHA1(5102b0b9db505454624750a3fd6db455682538f3) )
+	ROM_LOAD32_WORD( "wild_cougar_export.u11", 0x000002, 0x80000, CRC(69a78695) SHA1(1ed89cf38dc85f752449a858cd9558bed235af58) )
+	ROM_LOAD32_WORD( "wild_cougar_export.u8",  0x100000, 0x80000, CRC(496b0295) SHA1(237183a192ad9b4bc133014cc83149d4a7062785) )
+	ROM_LOAD32_WORD( "wild_cougar_export.u12", 0x100002, 0x80000, CRC(fe2bafdc) SHA1(e8b454db44a532d75b3aff323855340695688f0f) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// 593 - 10 Credit Multiplier / 9 Line Multiline.
+// Bumble Bugs - Export D - 05/07/97.
+// All devices are 27c4002 instead of 27c4096.
+// Marked as CHG029604 and 92.691%
+ROM_START( bumblbug )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "bumble_bugs_export.u7",  0x000000, 0x80000, CRC(ec605a36) SHA1(114e0840cfbd0c64645a5a33065db85462a0ba2d) )	// 92.691%
+	ROM_LOAD32_WORD( "bumble_bugs_export.u11", 0x000002, 0x80000, CRC(17b154bd) SHA1(efdf307670a3d74f7980fec2d2197d837d4c26e2) )	// 92.691%
+	ROM_LOAD32_WORD( "bumble_bugs_export.u8",  0x100000, 0x80000, CRC(e0c01d01) SHA1(9153129fd348a97da7cccf002e5d03e4b4db9264) )	// base
+	ROM_LOAD32_WORD( "bumble_bugs_export.u12", 0x100002, 0x80000, CRC(28700d5d) SHA1(87a583cd487da6cb4c2da5f62297f0e577269fae) )	// base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// 586/7(b) - 10 Credit Multiplier / 9 Line Multiline.
+// Penguin Pays - Export B - 14/07/97.       
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( pengpays )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "penguin_pays_export.u7",  0x000000, 0x80000, CRC(19d75260) SHA1(798472b1b5d8f5ca99d8bfe57e99a76686f0aa3f) )
+	ROM_LOAD32_WORD( "penguin_pays_export.u11", 0x000002, 0x80000, CRC(2b010813) SHA1(a383997308881a3ac35de56fe10e3852fa89fdf6) )
+	ROM_LOAD32_WORD( "penguin_pays_export.u8",  0x100000, 0x80000, CRC(6aeaebc8) SHA1(6f70b14e9f4e9940512bd6e89bc9ccbfe1f4a81f) )
+	ROM_LOAD32_WORD( "penguin_pays_export.u12", 0x100002, 0x80000, CRC(d959a048) SHA1(92f69090d599f95b48e79213e5b7d486e083d8f4) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// MV4098 - 10 Credit Multiplier / 9 Line Multiline.
+// BOOT SCOOTIN' - Export A - 25/08/99.
+// All devices are 27c4002 instead of 27c4096.
+// Marked as GHG1012 and 92.767%
+ROM_START( bootsctn )
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u7",  0x000000, 0x80000, CRC(ca26f31e) SHA1(e8da31cc8d12bf8a28f1ca4d796259ae9010f8af) )	// 92.767%
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u11", 0x000002, 0x80000, CRC(61da1767) SHA1(83d4df1060975f03f291b9119c0d2b8debb0fb60) )	// 92.767%
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u8",  0x100000, 0x80000, CRC(9ae4d616) SHA1(60d4d36f75685dfe21f914fa4682cd6a64fcfa58) )	// base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u12", 0x100002, 0x80000, CRC(2c50c083) SHA1(ae3b01200d152df9b2966b5308c71e9d1ad43d78) )	// base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u9",  0x200000, 0x80000, CRC(c0a4920d) SHA1(d2c6d259d2e067b6e5ad72a6ef164aac7d72bc5a) )	// base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u13", 0x200002, 0x80000, CRC(55716d82) SHA1(5b9982a49201842e9551a9c763a6babbb47a863e) )	// base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u10", 0x300000, 0x80000, CRC(3ecdf7ee) SHA1(9d658a22da737daafdf6cb0d49009796036d04b1) )	// base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u14", 0x300002, 0x80000, CRC(18934c51) SHA1(f7c9c95c687dbfe89747e7877157fde37bc1119e) )	// base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// MV4104  3,5,10,20,25,50 Credit Multiplier / 9-20 Line Multiline. 
+// CUCKOO - Export C - 02/02/00.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( cuckoo )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u7",  0x000000, 0x80000, CRC(0bd17338) SHA1(b8f467bdf8d76533a2b7d44fe93be414f25a3c31) )	// 
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u11", 0x000002, 0x80000, CRC(4c407deb) SHA1(57589e61a376ddff99cd420eb47bf8c902c6a249) )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u8",  0x100000, 0x80000, CRC(33f52052) SHA1(89cbfe588d91244adff4c520fa94962d69ff20bf) )
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u12", 0x100002, 0x80000, CRC(00bb7597) SHA1(f4d6b21091e320a82d59477469340633b001ed0d) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// MV4115 - 5,10,20 Credit Multiplier / 9 Line Multiline.
+// Magic Mask [Reel Game] - Export A - 09/05/2000.   
 ROM_START( magicmsk )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -738,20 +1015,100 @@ ROM_START( magicmsk )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 1995, aristmk5, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "MKV Set/Clear Chips (USA)", MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+// MV4115 - 5,10,20 Credit Multiplier / 9 Line Multiline.
+// Magic Mask [Reel Game] - Export A - 09/05/2000.   
+// Alternate set with identical description, but way different
+// than the parent. All devices are 27c4002 instead of 27c4096.
+//
+// romcmp magicmsk.zip magicmska.zip
+// 4 and 4 files
+// magicmsk.u12    mv4115_magic_mask.u12    21.547699%
+// magicmsk.u8     mv4115_magic_mask.u8     21.138954%
+// magicmsk.u11    mv4115_magic_mask.u11    17.786026%
+// magicmsk.u7     mv4115_magic_mask.u7     16.893578%
+ROM_START( magicmska )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "mv4115_magic_mask.u7",  0x000000, 0x80000, CRC(452a19c9) SHA1(aab1f4ccfc6cdb382f7a0e85491614cc58811a08) )
+	ROM_LOAD32_WORD( "mv4115_magic_mask.u11", 0x000002, 0x80000, CRC(c57601f3) SHA1(1616a424b41ad6fea6383a08d5352e8240433374) )
+	ROM_LOAD32_WORD( "mv4115_magic_mask.u8",  0x100000, 0x80000, CRC(607d7447) SHA1(064dbfe8b52eebe1be7a41735da3fa01eacd1686) )
+	ROM_LOAD32_WORD( "mv4115_magic_mask.u12", 0x100002, 0x80000, CRC(cf4cd569) SHA1(408edcd746587d249c4286f7a99f33ad94214f7c) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// MV4124/1 - 5,10,25,50 Credit Multiplier / 20 Line Multiline.
+// Adonis [Reel Game] - Export B - 31/07/01.
+// Marked as BHG1284.
+ROM_START( adonise )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "bhg1284_mv4124_adonis.u7",  0x000000, 0x80000, CRC(ed6254d7) SHA1(d2b790fdd7f5fc7b78fcfc4c96d0fc272ccf8da6) )
+	ROM_LOAD32_WORD( "bhg1284_mv4124_adonis.u11", 0x000002, 0x80000, CRC(1f629286) SHA1(bce380a6a76c77bc790436bd6f94474a1db0c231) )
+	ROM_LOAD32_WORD( "bhg1284_mv4124_adonis.u8",  0x100000, 0x80000, CRC(b756c96d) SHA1(494df20090d415e83d599023203c13273e7925ad) )
+	ROM_LOAD32_WORD( "bhg1284_mv4124_adonis.u12", 0x100002, 0x80000, CRC(1d3b6b8f) SHA1(1ddcfd7323cc7e79d3e39d913fdb5cf5cd53d56d) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+// MV4115/6 - 9/20 Line Multiline Multiplier.
+// Party Gras [Reel Game] - Export A - 10/11/2001.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( partygrs )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "mv4115-6_party_gras.u7",  0x000000, 0x80000, CRC(53047385) SHA1(efe50e8785047986513f2de63d2425ba80417481) )
+	ROM_LOAD32_WORD( "mv4115-6_party_gras.u11", 0x000002, 0x80000, CRC(f8bd9f7f) SHA1(a8c67a644f9090890e8f33e620fe0bb4633bd6e8) )
+	ROM_LOAD32_WORD( "mv4115-6_party_gras.u8",  0x100000, 0x80000, CRC(0b98a0fa) SHA1(c9ada21e39472f28cd9b8ec19be7235410ad3e7a) )
+	ROM_LOAD32_WORD( "mv4115-6_party_gras.u12", 0x100002, 0x80000, CRC(00d1395c) SHA1(d9a66d6cdb5aa4f583d8c23306b1416646cbde93) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
+/*************************
+*      Game Drivers      *
+*************************/
+
+//    YEAR  NAME       PARENT    MACHINE       INPUT     STATE           INIT      ROT     COMPANY       FULLNAME                                       FLAGS
+GAME( 1995, aristmk5,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "MKV Set/Clear Chips (USA)",                    MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 
 // Dates listed below are for the combination (reel layout), not release dates
-GAME( 1995, enchfrst, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (0400122V, Local)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 570/3,  E - 23/06/95
-GAME( 1995, swthrt2v, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 577/1,  C - 07/09/95
-GAME( 1996, dolphntr, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96
-GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96
-GAME( 1997, goldprmd, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (MV4091, USA)",                        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4091, B - 13/05/97
-GAME( 1997, qotn,     0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/4,  B - 13/05/97
-GAME( 1997, dmdtouch, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (0400433V, Local)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 604,    E - 30/06/97
-GAME( 1998, adonis,   0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0200751V, NSW/ACT)",                           MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,  A - 25/05/98
-GAME( 1998, reelrock, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628,    A - 13/07/98
-GAME( 1998, indiandr, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (0100845V, Local)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628/1,  B - 15/12/98
-GAME( 1999, wtiger,   0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 638/1,  B - 08/07/99
-GAME( 2000, magicmsk, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export)",                          MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115, A - 09/05/2000
-GAME( 2000, margmgc,  0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // JB005,  A - 07/07/2000
-GAME( 2001, geishanz, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4127, A - 05/03/01
+GAME( 1995, enchfrst,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (0400122V, Local)",           MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 570/3,    E - 23/06/95
+GAME( 1995, swthrt2v,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 577/1,    C - 07/09/95
+GAME( 1996, minemine,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Mine, Mine, Mine (Export)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 559/2,    E - 14/02/96
+GAME( 1996, dolphntr,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,    B - 06/12/96, Rev 3
+GAME( 1996, dolphtra,  dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,    B - 06/12/96, Rev 1.24.4.0
+GAME( 1996, dolphtre,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (Export)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,    B - 06/12/96
+GAME( 1997, goldprmd,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (MV4091, USA)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4091,   B - 13/05/97
+GAME( 1997, qotn,      0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/4,    B - 13/05/97
+GAME( 1997, wldcougr,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Wild Cougar (Export)",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 569/8,    D - 19/05/97
+GAME( 1997, dmdtouch,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (0400433V, Local)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 604,      E - 30/06/97
+GAME( 1997, bumblbug,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Bumble Bugs (Export, 92.691%)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 593,      D - 05/07/97
+GAME( 1997, pengpays,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Penguin Pays (Export)",                        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 586/7(b)  B - 14/07/97
+GAME( 1998, adonis,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0200751V, NSW/ACT)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 10
+GAME( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0100751V, NSW/ACT)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 9
+GAME( 1998, reelrock,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628,      A - 13/07/98
+GAME( 1998, indiandr,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (0100845V, Local)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628/1,    B - 15/12/98
+GAME( 1999, wtiger,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 638/1,    B - 08/07/99
+GAME( 1999, bootsctn,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Boot Scootin' (Export, 92.767%)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4098,   A - 25/08/99
+GAME( 2000, cuckoo,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Cuckoo (MV4104, Export)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4104,   C - 02/02/00
+GAME( 2000, magicmsk,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export, set 1)",           MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115,   A - 09/05/00
+GAME( 2000, magicmska, magicmsk, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export, set 2)",           MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115,   A - 09/05/00
+GAME( 2000, margmgc,   0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",          MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // JB005,    A - 07/07/00
+GAME( 2001, geishanz,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",               MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4127,   A - 05/03/01
+GAME( 2001, adonise,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (MV4124/1, Export)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4124/1, B - 31/07/01
+GAME( 2001, partygrs,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Party Gras (MV4115/6, Export)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115/6, A - 10/11/01
+

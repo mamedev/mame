@@ -47,7 +47,6 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 Unused : TEXCOORD1;
 };
 
 struct PS_INPUT
@@ -62,25 +61,27 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-
 uniform float2 TargetDims;
 
-uniform float Passthrough;
+uniform bool Passthrough;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
-	Output.Color = Input.Color;
-	
-	Output.TexCoord = Input.TexCoord + 0.5f / TargetDims;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
+
+	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
 	Output.PrevCoord = Output.TexCoord;
-	
+
+	Output.Color = Input.Color;
+
 	return Output;
 }
 
@@ -94,12 +95,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 CurrPix = tex2D(DiffuseSampler, Input.TexCoord);
 	float3 PrevPix = tex2D(PreviousSampler, Input.PrevCoord).rgb * float3(Phosphor.r, Phosphor.g, Phosphor.b);
-	
+
 	float RedMax = max(CurrPix.r, PrevPix.r);
 	float GreenMax = max(CurrPix.g, PrevPix.g);
 	float BlueMax = max(CurrPix.b, PrevPix.b);
 
-	return lerp(float4(RedMax, GreenMax, BlueMax, CurrPix.a), CurrPix, Passthrough);
+	return Passthrough
+		? CurrPix
+		: float4(RedMax, GreenMax, BlueMax, CurrPix.a);
 }
 
 //-----------------------------------------------------------------------------

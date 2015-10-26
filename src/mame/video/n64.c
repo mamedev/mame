@@ -168,6 +168,15 @@ void n64_state::screen_eof_n64(screen_device &screen, bool state)
 
 void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 {
+	if(vi_control & 0x40) /* Interlace */
+	{
+		field ^= 1;
+	}
+	else
+	{
+		field = 1;
+	}
+
 	switch(vi_control & 0x3)
 	{
 		case PIXEL_SIZE_16BIT:

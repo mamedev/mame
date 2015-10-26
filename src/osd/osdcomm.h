@@ -225,6 +225,7 @@ typedef UINT32                              FPTR;
 
 #ifdef _MSC_VER
 #include <malloc.h>
+typedef ptrdiff_t ssize_t;
 #if _MSC_VER == 1900 // < VS2015
 #define __LINE__Var 0
 #endif

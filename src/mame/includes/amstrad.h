@@ -30,6 +30,7 @@
 #include "bus/cpc/brunword4.h"
 #include "bus/cpc/hd20.h"
 #include "bus/cpc/magicsound.h"
+#include "bus/cpc/doubler.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"

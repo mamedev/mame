@@ -1101,6 +1101,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/tiki100/exp.h,BUSES["TIKI100"] = true
+---------------------------------------------------
+
+if (BUSES["TIKI100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/tiki100/exp.c",
+		MAME_DIR .. "src/devices/bus/tiki100/exp.h",
+		MAME_DIR .. "src/devices/bus/tiki100/8088.c",
+		MAME_DIR .. "src/devices/bus/tiki100/8088.h",
+		MAME_DIR .. "src/devices/bus/tiki100/hdc.c",
+		MAME_DIR .. "src/devices/bus/tiki100/hdc.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/tvc/tvc.h,BUSES["TVC"] = true
 ---------------------------------------------------
 
@@ -1531,6 +1548,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/printer.h",
 		MAME_DIR .. "src/devices/bus/rs232/rs232.c",
 		MAME_DIR .. "src/devices/bus/rs232/rs232.h",
+		MAME_DIR .. "src/devices/bus/rs232/pty.c",
+		MAME_DIR .. "src/devices/bus/rs232/pty.h",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.c",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.c",
@@ -2018,10 +2037,10 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.h",
 		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.h",
 		MAME_DIR .. "src/devices/bus/ti99x/videowrp.c",
-		MAME_DIR .. "src/devices/bus/ti99x/videowrp.h",		
+		MAME_DIR .. "src/devices/bus/ti99x/videowrp.h",
 	}
 end
-		
+
 ---------------------------------------------------
 --
 --@src/devices/bus/ti99_peb/peribox.h,BUSES["TI99PEB"] = true
@@ -2182,6 +2201,8 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/devices/bus/cpc/ddi1.h",
 		MAME_DIR .. "src/devices/bus/cpc/magicsound.c",
 		MAME_DIR .. "src/devices/bus/cpc/magicsound.h",
+		MAME_DIR .. "src/devices/bus/cpc/doubler.c",
+		MAME_DIR .. "src/devices/bus/cpc/doubler.h",
 	}
 end
 

@@ -62,32 +62,29 @@ CUSTOM: ALPHA 8201 (42 pin DIP)
 DIPSW : 6 position (x1)
        Positions 1, 5 & 6 not used
 
-    4   3   2
-       ------------------------------
-       OFF  OFF OFF 1 minutes (time for the opponent to make his decision)
-       OFF  OFF ON  2
-       OFF  ON  OFF 3
-       OFF  ON  ON  4
-       ON   OFF OFF 5
-       ON   OFF ON  10
-       ON   ON  OFF 20
-       ON   ON  ON  30
+    4    3    2
+    ------------------------------
+    OFF  OFF  OFF  1 minutes (time for the opponent to make his decision)
+    OFF  OFF  ON   2
+    OFF  ON   OFF  3
+    OFF  ON   ON   4
+    ON   OFF  OFF  5
+    ON   OFF  ON   10
+    ON   ON   OFF  20
+    ON   ON   ON   30
 
 ROMs  : All type 2732
 PROM  : Type MB7051
 
-
-
-
 **************************************************************************/
-
-
 
 #include "emu.h"
 #include "cpu/alph8201/alph8201.h"
+//#include "cpu/hmcs40/hmcs40.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 
 class shougi_state : public driver_device
 {
@@ -97,7 +94,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -107,18 +105,8 @@ public:
 
 	int m_nmi_enabled;
 	int m_r;
-	//UINT8 *m_cpu_sharedram;
-	//UINT8 m_cpu_sharedram_control_val;
 
-	DECLARE_WRITE8_MEMBER(cpu_sharedram_sub_w);
-	DECLARE_WRITE8_MEMBER(cpu_sharedram_main_w);
-	DECLARE_READ8_MEMBER(cpu_sharedram_r);
-	DECLARE_WRITE8_MEMBER(cpu_shared_ctrl_sub_w);
-	DECLARE_WRITE8_MEMBER(cpu_shared_ctrl_main_w);
-	DECLARE_WRITE8_MEMBER(mcu_halt_off_w);
-	DECLARE_WRITE8_MEMBER(mcu_halt_on_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_and_clear_line_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(dummy_r);
 
 	DECLARE_PALETTE_INIT(shougi);
@@ -132,15 +120,24 @@ public:
 
 void shougi_state::machine_start()
 {
+	m_nmi_enabled = 0;
+	m_r = 0;
+	
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
 }
 
 
+
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
+
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
-
 
   bit 0 -- 1000 ohm resistor--\
   bit 1 -- 470 ohm resistor --+--+--> RED
@@ -153,22 +150,19 @@ void shougi_state::machine_start()
 
 ***************************************************************************/
 
-
 PALETTE_INIT_MEMBER(shougi_state, shougi)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
 
-
-	compute_resistor_weights(0, 255,    -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3,  resistances_rg, weights_r,  1000, 0,
 			3,  resistances_rg, weights_g,  1000, 0,
 			2,  resistances_b,  weights_b,  1000, 0);
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -194,22 +188,16 @@ PALETTE_INIT_MEMBER(shougi_state, shougi)
 }
 
 
-
-
 UINT32 shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 0;offs <0x4000; offs++)
+	for (int offs = 0; offs < 0x4000; offs++)
 	{
 		int sx, sy, x, data1, data2, color, data;
 
 		sx = offs >> 8;     /*00..0x3f (64*4=256)*/
 		sy = offs & 0xff;   /*00..0xff*/
-		//if (flipscreen[0]) sx = 31 - sx;
-		//if (flipscreen[1]) sy = 31 - sy;
 
-		data1 = m_videoram[offs];               /* color */
+		data1 = m_videoram[offs];           /* color */
 		data2 = m_videoram[0x4000 + offs];  /* pixel data */
 
 		for (x=0; x<4; x++) /*4 pixels per byte (2 bitplanes in 2 nibbles: 1st=bits 7-4, 2nd=bits 3-0)*/
@@ -224,128 +212,94 @@ UINT32 shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-#if 0
 
-//to do:
-// add separate sharedram/r/w() for both CPUs and use control value to verify access
 
-WRITE8_MEMBER(shougi_state::cpu_sharedram_sub_w)
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
+// maincpu side
+
+WRITE8_MEMBER(shougi_state::control_w)
 {
-	if (m_cpu_sharedram_control_val!=0) logerror("sub CPU access to shared RAM when access set for main cpu\n");
-	m_cpu_sharedram[offset] = data;
-}
+	// 4800-480f connected to the 74LS259, A3 is data line
+	// so 4800-4807 write 0, and 4808-480f write 1
+	data = offset >> 3 & 1;
+	offset &= 7;
 
-WRITE8_MEMBER(shougi_state::cpu_sharedram_main_w)
-{
-	if (m_cpu_sharedram_control_val!=1) logerror("main CPU access to shared RAM when access set for sub cpu\n");
-	m_cpu_sharedram[offset] = data;
-}
-
-READ8_MEMBER(shougi_state::cpu_sharedram_r)
-{
-	return m_cpu_sharedram[offset];
-}
-
-#endif
-
-WRITE8_MEMBER(shougi_state::cpu_shared_ctrl_sub_w)
-{
-	//m_cpu_sharedram_control_val = 0;
-	//logerror("cpu_sharedram_ctrl=SUB");
-}
-
-WRITE8_MEMBER(shougi_state::cpu_shared_ctrl_main_w)
-{
-	//m_cpu_sharedram_control_val = 1;
-	//logerror("cpu_sharedram_ctrl=MAIN");
-}
-
-WRITE8_MEMBER(shougi_state::mcu_halt_off_w)
-{
-	/* logerror("mcu HALT OFF"); */
-	m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-}
-
-WRITE8_MEMBER(shougi_state::mcu_halt_on_w)
-{
-	/* logerror("mcu HALT ON"); */
-	m_mcu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
-}
-
-
-WRITE8_MEMBER(shougi_state::nmi_disable_and_clear_line_w)
-{
-	m_nmi_enabled = 0; /* disable NMIs */
-
-	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-WRITE8_MEMBER(shougi_state::nmi_enable_w)
-{
-	m_nmi_enabled = 1; /* enable NMIs */
-}
-
-INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
-{
-	if ( m_nmi_enabled == 1 )
+	switch (offset)
 	{
-		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		case 0:
+			// TODO
+			// 0: sharedram = sub
+			// 1: sharedram = main
+			break;
+		
+		case 1:
+			m_nmi_enabled = data;
+
+			// NMI lines are tied together on both CPUs and connected to the LS74 /Q output
+			if (!m_nmi_enabled)
+			{
+				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+				m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			}
+			break;
+		
+		case 4:
+			m_mcu->set_input_line(INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+			break;
+		
+		default:
+			// 7: ?????? connected to +5v via resistor
+			break;
 	}
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM     /* 2114 x 2 (0x400 x 4bit each) */
-
-	/* 4800-480f connected to the 74LS259, A3 is data line so 4800-4807 write 0, and 4808-480f write 1 */
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(cpu_shared_ctrl_sub_w)
-	AM_RANGE(0x4801, 0x4801) AM_WRITE(nmi_disable_and_clear_line_w)
-	AM_RANGE(0x4802, 0x4802) AM_NOP
-	AM_RANGE(0x4803, 0x4803) AM_NOP
-	AM_RANGE(0x4804, 0x4804) AM_WRITE(mcu_halt_off_w)
-	AM_RANGE(0x4807, 0x4807) AM_WRITENOP    //?????? connected to +5v via resistor
-	AM_RANGE(0x4808, 0x4808) AM_WRITE(cpu_shared_ctrl_main_w)
-	AM_RANGE(0x4809, 0x4809) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x480a, 0x480a) AM_NOP
-	AM_RANGE(0x480b, 0x480b) AM_NOP
-	AM_RANGE(0x480c, 0x480c) AM_WRITE(mcu_halt_on_w)
-	AM_RANGE(0x480f, 0x480f) AM_NOP
-
+	AM_RANGE(0x4000, 0x43ff) AM_RAM /* 2114 x 2 (0x400 x 4bit each) */
+	AM_RANGE(0x4800, 0x480f) AM_WRITE(control_w)
+	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW")
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w)   /* game won't boot if watchdog doesn't work */
+	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w) /* game won't boot if watchdog doesn't work */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
-
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")    /* 4116 x 16 (32K) */
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") /* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
-/* sub */
+
+// subcpu side
+
 READ8_MEMBER(shougi_state::dummy_r)
 {
+	// ?
 	m_r ^= 1;
 
-	if(m_r)
+	if (m_r)
 		return 0xff;
 	else
 		return 0;
 }
 
-static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
-	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x00ff)
+	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
+ADDRESS_MAP_END
+
+
+// mcu side (fake!)
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
@@ -353,26 +307,32 @@ ADDRESS_MAP_END
 
 
 
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
+
 static INPUT_PORTS_START( shougi )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP  ) PORT_PLAYER(2)
 
 	// dip switch order is not sequential. Only 2,3,4, and 5 identified.
 	// 1 and 6 missing, with three possible positions (the third available
@@ -413,23 +373,38 @@ INPUT_PORTS_END
 
 
 
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
+INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
+{
+	if (m_nmi_enabled)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
+
 static MACHINE_CONFIG_START( shougi, shougi_state )
 
-	MCFG_CPU_ADD("maincpu", Z80,10000000/4)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
 
-	MCFG_CPU_ADD("sub", Z80,10000000/4)
+	MCFG_CPU_ADD("sub", Z80, XTAL_10MHz/4)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(readport_sub)
-	/* NMIs triggered in vblank_nmi() */
 
-	/* MCU */
-	MCFG_CPU_ADD("mcu", ALPHA8201, 10000000/4/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_10MHz/4/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-	MCFG_WATCHDOG_VBLANK_INIT(16)   // assuming it's the same as champbas
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_WATCHDOG_VBLANK_INIT(16) // assuming it's the same as champbas
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -446,11 +421,17 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 10000000/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
 
 ROM_START( shougi )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -459,7 +440,7 @@ ROM_START( shougi )
 	ROM_LOAD( "2.3b",    0x2000, 0x1000, CRC(09cb831f) SHA1(5a83a22d9245f980fe6a495433e51437d1f95644) )
 	ROM_LOAD( "4.3d",    0x3000, 0x1000, CRC(ad1a642a) SHA1(d12b10f94a568d1126384e14af4b53c5e5b1a0d0) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "sub", ROMREGION_ERASE00 )
 	ROM_LOAD( "5.3e",    0x0000, 0x1000, CRC(ff1f07d0) SHA1(ae5bab09916b6d4ad8d3568ea39501850bdc6991) )
 	ROM_LOAD( "8.3j",    0x1000, 0x1000, CRC(6230c4c1) SHA1(0b2c81bb02c270ed3bb5b42c4bd4eb25023090cb) )
 	ROM_LOAD( "6.3f",    0x2000, 0x1000, CRC(d5a91b16) SHA1(1d21295667c3eb186f9e7f867763f2f2697fd350) )
@@ -473,6 +454,7 @@ ROM_START( shougi )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )
 ROM_END
+
 
 ROM_START( shougi2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -497,6 +479,6 @@ ROM_START( shougi2 )
 ROM_END
 
 
-
-GAME( 1982, shougi,  0,      shougi, shougi, driver_device,  0, ROT0, "Alpha Denshi Co.", "Shougi", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, shougi2, shougi, shougi, shougi2, driver_device, 0, ROT0, "Alpha Denshi Co.", "Shougi 2", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    INIT              MONITOR, COMPANY, FULLNAME, FLAGS */
+GAME( 1982, shougi,  0,      shougi,  shougi,  driver_device, 0, ROT0, "Alpha Denshi Co. (Tehkan license)", "Shougi", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, shougi2, 0,      shougi,  shougi2, driver_device, 0, ROT0, "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

@@ -49,10 +49,6 @@ int os_uuid(lua_State* L)
 	{
 #if PLATFORM_WINDOWS
 		CoCreateGuid((GUID*)bytes);
-#elif PLATFORM_OS2
-		int i;
-		for (i = 0; i < 16; i++)
-			bytes[i] = (unsigned char)gethrtime();
 #else
 		int result;
 

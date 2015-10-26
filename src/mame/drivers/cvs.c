@@ -460,15 +460,12 @@ static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x6000, 0x73ff) AM_ROM
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
 	AM_RANGE(0x00, 0xff) AM_READ(cvs_input_r) AM_WRITE(cvs_scroll_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITE(audio_command_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
-
-
 
 /*************************************
  *
@@ -1046,7 +1043,6 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 MACHINE_CONFIG_END
 
 
-
 /*************************************
  *
  *  ROM definitions
@@ -1534,6 +1530,8 @@ ROM_START( raidersr3 )
 ROM_END
 
 
+
+
 /*************************************
  *
  *  Game specific initalization
@@ -1662,9 +1660,9 @@ GAME( 1982, goldbug,   0,        cvs,     goldbug, driver_device,  0,        ROT
 GAME( 1982, diggerc,   0,        cvs,     diggerc, driver_device,  0,        ROT90, "Century Electronics", "Digger (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, heartatk,  0,        cvs,     heartatk, driver_device, 0,        ROT90, "Century Electronics", "Heart Attack", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbak,  0,        cvs,     hunchbak, driver_device, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, cvs_state, hunchbaka,ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, superbik, ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raiders,   0,        cvs,     raiders, cvs_state,  raiders,  ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raidersr3, raiders,  cvs,     raiders, cvs_state,  raiders,  ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hero,      0,        cvs,     hero, cvs_state,     hero,     ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
-GAME( 1984, huncholy,  0,        cvs,     huncholy, cvs_state, huncholy, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, cvs_state, hunchbaka,    ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, superbik,     ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raiders,   0,        cvs,     raiders, cvs_state,  raiders,      ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raidersr3, raiders,  cvs,     raiders, cvs_state,  raiders,      ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hero,      0,        cvs,     hero, cvs_state,     hero,         ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
+GAME( 1984, huncholy,  0,        cvs,     huncholy, cvs_state, huncholy,     ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -54,7 +54,7 @@ Stuff that doesn't make sense:
 ------------------------------
 1. To access the screen, it waits for IRQ presumably from sync pulse. It sets INT
 mode 0 which means a page-zero jump, but doesn't write anything to the zero-page ram.
-That's why I added a RETI at 0008 and set the vector to there. A bit later it writes
+That's why I added a RETI at 0038 and set the vector to there. A bit later it writes
 a jump at 0000. Then it sets the interrupting device to the fdc (not sure how yet),
 then proceeds to overwrite all of page-zero with the disk contents. This of course
 kills the jump it just wrote, and my RETI. So it runs into the weeds at high speed.
@@ -198,6 +198,17 @@ SLOT_INTERFACE_END
 
 /* Input ports */
 static INPUT_PORTS_START( amust )
+	PORT_START("P9")
+	// bits 6,7 not used?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // code @ FB83
+	PORT_DIPNAME( 0x10, 0x10, "Boot to Monitor" ) // code @ F895
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f, 0x01, "Unknown" ) // code @ FC99
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
 READ8_MEMBER( amust_state::port00_r )
@@ -215,7 +226,7 @@ READ8_MEMBER( amust_state::port01_r )
 // bodgy
 INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
 {
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xff);
 }
 
 READ8_MEMBER( amust_state::port04_r )
@@ -268,7 +279,7 @@ d7 -
 READ8_MEMBER( amust_state::port09_r )
 {
 	printf("%s\n",machine().describe_context());
-	return 0xff;
+	return ioport("P9")->read();
 }
 
 READ8_MEMBER( amust_state::port0a_r )
@@ -360,8 +371,8 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 	membank("bankw0")->set_entry(0); // always write to ram
 	m_beep->set_frequency(800);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.write_byte(8, 0xed);
-	space.write_byte(9, 0x4d);
+	space.write_byte(0x38, 0xed);
+	space.write_byte(0x39, 0x4d);
 	m_port04 = 0;
 	m_port06 = 0;
 	m_port08 = 0;

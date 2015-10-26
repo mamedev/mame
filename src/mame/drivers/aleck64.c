@@ -164,7 +164,7 @@ Notes:
       - ALL components are listed for completeness. However, many are power or
         logic devices that most people need not be concerned about :-)
 
-      - The Seta/N64 Aleck64 hardware is similar also, but instead of the hich capacity
+      - The Seta/N64 Aleck64 hardware is similar also, but instead of the high capacity
         serial MASKROM being on the main board, it's in a cart that plugs into a slot.
 
 */
@@ -263,7 +263,7 @@ READ32_MEMBER(aleck64_state::aleck_dips_r)
     Some of these are big, every game adds a mapping for 4MB at 0xc0000000 physical.
     Some add more than one 4MB mapping. As some of the boards are only 4MB RAM,
     it seems likely that the programmers expected main RAM to be mirrored at 0xc0000000.
-    Some of the games have a further 4MB mapping to a pgysical segment contiguous with
+    Some of the games have a further 4MB mapping to a physical segment contiguous with
     the first at 0xc0000000, so if these games are on the E92 8MB boards, this would
     add a bit of support to the mirror idea.
 
@@ -1065,7 +1065,7 @@ ROM_START( twrshaft )
 	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
-	ROM_LOAD16_WORD_SWAP( "ua3012--all02.u3", 0x000000, 0x1000000, CRC(904a91a7) SHA1(7dfa3447d2c489c0448c4004dc12d3037c05a0f3) )
+	ROM_LOAD16_WORD_SWAP( "ua3012-all02.u3", 0x000000, 0x1000000, CRC(904a91a7) SHA1(7dfa3447d2c489c0448c4004dc12d3037c05a0f3) )
 
 	ROM_REGION32_BE( 0x800000, "user3", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsij-0.u1", 0x000000, 0x800000, CRC(2389576f) SHA1(dc22b2eab4d7a02cb918827a62e6c120b3a84e6c) )

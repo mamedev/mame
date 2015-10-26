@@ -211,10 +211,35 @@ psoldier dip locations still need verification.
 #include "sound/okim6295.h"
 
 
-#define M92_IRQ_0 ((m_irq_vectorbase+0)/4)  /* VBL interrupt */
-#define M92_IRQ_1 ((m_irq_vectorbase+4)/4)  /* Sprite buffer complete interrupt */
-#define M92_IRQ_2 ((m_irq_vectorbase+8)/4)  /* Raster interrupt */
-#define M92_IRQ_3 ((m_irq_vectorbase+12)/4) /* Sound cpu interrupt */
+// I haven't managed to find a way to keep nbbatman happy when using the proper upd71059c device
+// so we just use an ugly hack and get the vector base from it for now until this is properly resolved.
+#define USE_HACKED_IRQS
+
+#ifdef USE_HACKED_IRQS
+
+#define M92_TRIGGER_IRQ0 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+0 ); /* VBL interrupt */
+#define M92_TRIGGER_IRQ1 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+1 ); /* Sprite buffer complete interrupt */
+#define M92_TRIGGER_IRQ2 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+2 ); /* Raster interrupt */
+#define M92_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
+// not used due to HOLD LINE logic
+#define M92_CLEAR_IRQ0 ;
+#define M92_CLEAR_IRQ1 ; 
+#define M92_CLEAR_IRQ2 ;
+#define M92_CLEAR_IRQ3 ;
+
+#else
+
+#define M92_TRIGGER_IRQ0 m_upd71059c->ir0_w(1); 
+#define M92_TRIGGER_IRQ1 m_upd71059c->ir1_w(1); 
+#define M92_TRIGGER_IRQ2 m_upd71059c->ir2_w(1); 
+#define M92_TRIGGER_IRQ3 m_upd71059c->ir3_w(1); 
+// not sure when these should happen, probably the source of our issues
+#define M92_CLEAR_IRQ0 m_upd71059c->ir0_w(0); 
+#define M92_CLEAR_IRQ1 m_upd71059c->ir1_w(0); 
+#define M92_CLEAR_IRQ2 m_upd71059c->ir2_w(0); 
+#define M92_CLEAR_IRQ3 m_upd71059c->ir3_w(0); 
+
+#endif
 
 
 /*****************************************************************************/
@@ -231,6 +256,7 @@ MACHINE_RESET_MEMBER(m92_state,m92)
 
 /*****************************************************************************/
 
+
 TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 {
 	int scanline = param;
@@ -239,16 +265,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 	if (scanline == m_raster_irq_position)
 	{
 		m_screen->update_partial(scanline);
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_2);
+		M92_TRIGGER_IRQ2
 	}
-
-	/* VBLANK interrupt */
-	else if (scanline == m_screen->visible_area().max_y + 1)
+	else
 	{
-		m_screen->update_partial(scanline);
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_0);
+		M92_CLEAR_IRQ2
+
+		/* VBLANK interrupt */
+		if (scanline == m_screen->visible_area().max_y + 1)
+		{
+			m_screen->update_partial(scanline);
+			M92_TRIGGER_IRQ0
+		}
+		else
+		{
+			M92_CLEAR_IRQ0
+		}
+
 	}
 }
+
+
 
 /*****************************************************************************/
 
@@ -327,7 +364,7 @@ WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)
 WRITE16_MEMBER(m92_state::m92_sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_3);
+	M92_TRIGGER_IRQ3
 
 }
 
@@ -372,7 +409,7 @@ static ADDRESS_MAP_START( m92_portmap, AS_IO, 16, m92_state )
 	AM_RANGE(0x08, 0x09) AM_READ(m92_sound_status_r)    /* answer from sound CPU */
 	AM_RANGE(0x00, 0x01) AM_WRITE(m92_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
-	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
 	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
@@ -394,7 +431,7 @@ static ADDRESS_MAP_START( ppan_portmap, AS_IO, 16, m92_state )
 	AM_RANGE(0x10, 0x11) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
-	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
 	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
@@ -912,8 +949,9 @@ GFXDECODE_END
 
 void m92_state::m92_sprite_interrupt()
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_1);
+	M92_TRIGGER_IRQ1
 }
+
 
 static MACHINE_CONFIG_START( m92, m92_state )
 
@@ -921,9 +959,14 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_CPU_ADD("maincpu",V33,XTAL_18MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m92_map)
 	MCFG_CPU_IO_MAP(m92_portmap)
+#ifndef USE_HACKED_IRQS
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+#endif
 
 	MCFG_CPU_ADD("soundcpu" ,V35, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NULL)
 
 	MCFG_MACHINE_START_OVERRIDE(m92_state,m92)
 	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
@@ -2112,25 +2155,12 @@ DRIVER_INIT_MEMBER(m92_state,m92)
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
 	m_game_kludge = 0;
-	m_irq_vectorbase = 0x80;
 }
 
-/* different vector base */
-DRIVER_INIT_MEMBER(m92_state,m92_alt)
-{
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&ROM[0xa0000]);
-
-	m_game_kludge = 0;
-	m_irq_vectorbase = 0x20;
-}
-
-/* different vector base, different address map (no bank1) */
+/* different address map (no bank1) */
 DRIVER_INIT_MEMBER(m92_state,lethalth)
 {
 	m_game_kludge = 0;
-	m_irq_vectorbase = 0x20;
 }
 
 /* has bankswitching */
@@ -2142,7 +2172,6 @@ DRIVER_INIT_MEMBER(m92_state,m92_bank)
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
 
 	m_game_kludge = 0;
-	m_irq_vectorbase = 0x80;
 }
 
 /* has bankswitching, has eeprom, needs sprite kludge */
@@ -2157,7 +2186,6 @@ DRIVER_INIT_MEMBER(m92_state,majtitl2)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf3fff, read16_delegate(FUNC(m92_state::m92_eeprom_r),this), write16_delegate(FUNC(m92_state::m92_eeprom_w),this));
 
 	m_game_kludge = 2;
-	m_irq_vectorbase = 0x80;
 }
 
 /* TODO: figure out actual address map and other differences from real Irem h/w */
@@ -2167,7 +2195,6 @@ DRIVER_INIT_MEMBER(m92_state,ppan)
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
 	m_game_kludge = 0;
-	m_irq_vectorbase = 0x80;
 }
 
 /***************************************************************************/
@@ -2175,38 +2202,51 @@ DRIVER_INIT_MEMBER(m92_state,ppan)
 GAME( 1991, gunforce, 0,        gunforce,      gunforce, m92_state, m92,      ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, gunforcej,gunforce, gunforce,      gunforce, m92_state, m92,      ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, gunforceu,gunforce, gunforce,      gunforce, m92_state, m92,      ROT0,   "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1991, bmaster,  0,        bmaster,       bmaster, m92_state,  m92,      ROT0,   "Irem",         "Blade Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, crossbld, bmaster,  bmaster,       bmaster, m92_state,  m92,      ROT0,   "Irem",         "Cross Blades! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+
 GAME( 1991, lethalth, 0,        lethalth,      lethalth, m92_state, lethalth, ROT270, "Irem",         "Lethal Thunder (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, thndblst, lethalth, lethalth,      lethalth, m92_state, lethalth, ROT270, "Irem",         "Thunder Blaster (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1992, uccops,   0,        uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, uccopsu,  uccops,   uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, uccopsar, uccops,   uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops - Alpha Renewal Version", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, uccopsj,  uccops,   uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1992, mysticri, 0,        mysticri,      mysticri, m92_state, m92,      ROT0,   "Irem",         "Mystic Riders (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, gunhohki, mysticri, mysticri,      mysticri, m92_state, m92,      ROT0,   "Irem",         "Mahou Keibitai Gun Hohki (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 // cheaply produced Korean board, has original chips, but lacks any proper labels
 // main code is also significantly different to the supported original set, so it might just be a legitimate early revision on a cheap board
 GAME( 1992, mysticrib,mysticri, mysticri,      mysticri, m92_state, m92,      ROT0,   "Irem",         "Mystic Riders (bootleg?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1992, majtitl2, 0,        majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem",         "Major Title 2 (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, majtitl2j,majtitl2, majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+
 GAME( 1992, skingame, majtitl2, majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, skingame2,majtitl2, majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1992, hook,     0,        hook,          hook, m92_state,     m92,      ROT0,   "Irem",         "Hook (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, hooku,    hook,     hook,          hook, m92_state,     m92,      ROT0,   "Irem America", "Hook (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, hookj,    hook,     hook,          hook, m92_state,     m92,      ROT0,   "Irem",         "Hook (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, ppan,     hook,     ppan,          hook, m92_state,     ppan,     ROT0,   "bootleg",      "Peter Pan (bootleg of Hook)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL) // PCB marked 'Peter Pan', no title screen, made in Italy?
-GAME( 1992, rtypeleo, 0,        rtypeleo,      rtypeleo, m92_state, m92_alt,  ROT0,   "Irem",         "R-Type Leo (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, rtypeleoj,rtypeleo, rtypeleo,      rtypeleo, m92_state, m92_alt,  ROT0,   "Irem",         "R-Type Leo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+
+GAME( 1992, rtypeleo, 0,        rtypeleo,      rtypeleo, m92_state, m92,     ROT0,   "Irem",         "R-Type Leo (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, rtypeleoj,rtypeleo, rtypeleo,      rtypeleo, m92_state, m92,     ROT0,   "Irem",         "R-Type Leo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+
 GAME( 1993, inthunt,  0,        inthunt,       inthunt, m92_state,  m92,      ROT0,   "Irem",         "In The Hunt (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1993, inthuntu, inthunt,  inthunt,       inthunt, m92_state,  m92,      ROT0,   "Irem America", "In The Hunt (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1993, kaiteids, inthunt,  inthunt,       inthunt, m92_state,  m92,      ROT0,   "Irem",         "Kaitei Daisensou (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1993, nbbatman, 0,        nbbatman,      nbbatman, m92_state, m92_bank, ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
 GAME( 1993, nbbatmanu,nbbatman, nbbatman,      nbbatman, m92_state, m92_bank, ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)
 GAME( 1993, leaguemn, nbbatman, nbbatman,      nbbatman, m92_state, m92_bank, ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
 GAME( 1993, nbbatman2bl,nbbatman,nbbatman2bl,  nbbatman, m92_state, m92_bank, ROT0,   "bootleg",      "Ninja Baseball Bat Man II (bootleg)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // different sprite system, MCU as soundcpu, OKI samples for music/sound
-GAME( 1993, ssoldier, 0,        psoldier,      psoldier, m92_state, m92_alt,  ROT0,   "Irem America", "Superior Soldiers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, m92_state, m92_alt,  ROT0,   "Irem",         "Perfect Soldiers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
+GAME( 1993, ssoldier, 0,        psoldier,      psoldier, m92_state, m92,      ROT0,   "Irem America", "Superior Soldiers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, m92_state, m92,      ROT0,   "Irem",         "Perfect Soldiers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1994, dsoccr94j,dsoccr94, dsoccr94j,     dsoccr94j, m92_state,m92_bank, ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+
 GAME( 1994, gunforc2, 0,        gunforc2,      gunforc2, m92_state, m92_bank, ROT0,   "Irem",         "Gun Force II (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1994, geostorm, gunforc2, gunforc2,      gunforc2, m92_state, m92_bank, ROT0,   "Irem",         "Geo Storm (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
