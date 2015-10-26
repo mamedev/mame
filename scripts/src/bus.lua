@@ -1161,6 +1161,8 @@ if (BUSES["VCS"]~=null) then
 		MAME_DIR .. "src/devices/bus/vcs/compumat.h",
 		MAME_DIR .. "src/devices/bus/vcs/dpc.c",
 		MAME_DIR .. "src/devices/bus/vcs/dpc.h",
+		MAME_DIR .. "src/devices/bus/vcs/dpcplus.c",
+		MAME_DIR .. "src/devices/bus/vcs/dpcplus.h",
 		MAME_DIR .. "src/devices/bus/vcs/scharger.c",
 		MAME_DIR .. "src/devices/bus/vcs/scharger.h",
 	}

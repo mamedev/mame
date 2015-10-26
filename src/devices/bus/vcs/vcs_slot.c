@@ -157,6 +157,7 @@ static const vcs_slot slot_list[] =
 	{ A26_8IN1, "a26_8in1" },
 	{ A26_32IN1, "a26_32in1" },
 	{ A26_X07, "a26_x07" },
+	{ A26_DPCPLUS, "a26_dpcplus" },
 };
 
 static int vcs_get_pcb_id(const char *slot)
