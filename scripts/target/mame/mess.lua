@@ -849,6 +849,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"trs",
 		"ultimachine",
 		"ultratec",
+		"unisonic",
 		"unisys",
 		"veb",
 		"vidbrain",
@@ -2480,6 +2481,14 @@ createMESSProjects(_target, _subtarget, "ultratec")
 files {
 	MAME_DIR .. "src/mame/drivers/minicom.c",
 }
+
+createMESSProjects(_target, _subtarget, "unisonic")
+files {
+	MAME_DIR .. "src/mame/drivers/unichamp.c",
+	MAME_DIR .. "src/mame/video/gic.c",
+	MAME_DIR .. "src/mame/video/gic.c",
+}
+
 
 createMESSProjects(_target, _subtarget, "unisys")
 files {

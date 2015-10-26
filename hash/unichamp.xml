@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="unichamp" description="Unisonic Champion 2711 cartridges">
+
+	<software name="pac-02">
+		<description>Professional Poker Games</description>
+		<year>1977</year>
+		<publisher>Unisonic</publisher>
+		<info name="serial" value="PAC-02"/>
+		<part name="cart" interface="unichamp_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pac-02.bin" size="0x1000" crc="fe3213be" sha1="5b9c407fe86865f3454d4be824a7f2bf53478f73" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pac-03">
+		<description>Assorted Family Fun</description>
+		<year>1977</year>
+		<publisher>Unisonic</publisher>
+		<info name="serial" value="PAC-03"/>
+		<part name="cart" interface="unichamp_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pac-03.bin" size="0x1000" crc="f81f04bd" sha1="82e2a0fda1787d5835c457ee5745b0db0cebe079" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pac-04">
+		<description>Family Card Games</description>
+		<year>1977</year>
+		<publisher>Unisonic</publisher>
+		<info name="serial" value="PAC-04"/>
+		<part name="cart" interface="unichamp_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pac-04.bin" size="0x1000" crc="cac09841" sha1="bc9db83f26ed0810938156db6b104b4576754225" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="pac-05">
+		<description>Math</description>
+		<year>1977</year>
+		<publisher>Unisonic</publisher>
+		<info name="serial" value="PAC-05"/>
+		<part name="cart" interface="unichamp_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pac-05.bin" size="0x1000" crc="d54a6090" sha1="e85593096f43dcf14b08fd2c9fda277008a8df8b" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>	
+	
+</softwarelist>
