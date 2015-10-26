@@ -17946,7 +17946,7 @@ Info from Atariage and Atarimania
 		<description>Stella's Stocking 2008</description>
 		<year>2008</year>
 		<publisher>AtariAge</publisher>
-    <sharedfeat name="compatibility" value="NTSC" />
+		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_x07" />
 			<dataarea name="rom" size="65536">
