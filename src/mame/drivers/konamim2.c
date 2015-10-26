@@ -191,7 +191,7 @@ Notes:
 #include "emu.h"
 #include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
-
+#include "imagedev/chd_cd.h"
 
 struct CDE_DMA
 {
@@ -1187,6 +1187,11 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
+        /*cd-rom*/
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("3do_m2_cdrom")
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
 
 MACHINE_CONFIG_END
 
