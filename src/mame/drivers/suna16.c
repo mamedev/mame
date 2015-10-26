@@ -939,6 +939,10 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
+	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
+
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
