@@ -41,12 +41,13 @@ void a26_rom_dpcplus_device::device_reset()
 }
 
 static ADDRESS_MAP_START( dpcplus_arm7_map, AS_PROGRAM, 32, a26_rom_dpcplus_device )
-	AM_RANGE(0x00000000, 0x00003fff) AM_RAM
+	//AM_RANGE(0x00000000, 0x00007fff) AM_ROM AM_REGION("flash", 0)
+	AM_RANGE(0x00000000, 0x00007fff) AM_ROM // 32k
+	AM_RANGE(0x00000000, 0x00001fff) AM_RAM // 8k
 ADDRESS_MAP_END
 
-
 static MACHINE_CONFIG_FRAGMENT( a26_dpcplus )
-	MCFG_CPU_ADD("arm", ARM7, 20000000)    // ? type ? speed
+	MCFG_CPU_ADD("arm", ARM7, 70000000)    // ? type
 	MCFG_CPU_PROGRAM_MAP(dpcplus_arm7_map)
 MACHINE_CONFIG_END
 
