@@ -4150,6 +4150,35 @@ ROM_START( gardiab )
 	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+ROM_START( gardiaj )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "epr-10250.ic90",   0x00000, 0x8000, CRC(c97943a7) SHA1(eb201987c7a78f7eb6838211c0af3394c0b2d95f) ) /* encrypted */
+	ROM_LOAD( "epr-10251.ic91",   0x10000, 0x8000, CRC(b2ed05dc) SHA1(c520bf7024c85dc759c27eccb0a31998f4d72b5f) )
+	ROM_LOAD( "epr-10252.ic92",   0x18000, 0x8000, CRC(0a490588) SHA1(18df754ebdf062096f2d631a722b168901610345) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-10243.ic126", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "epr-10240.ic4",   0x00000, 0x8000, CRC(998ce090) SHA1(78929f471c5aa8b32d1693e8af2ef3e86efd3d7d) )
+	ROM_LOAD( "epr-10241.ic5",   0x08000, 0x8000, CRC(81ab0b07) SHA1(7f776dccd66ad097a1a906823786a52d31a8c4e8) )
+	ROM_LOAD( "epr-10242.ic6",   0x10000, 0x8000, CRC(2dc4c4c7) SHA1(0347170b941a5c567eed114833656e8abd16a8ab) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD( "epr-10234.ic87", 0x00000, 0x8000, CRC(8a6aed33) SHA1(044836885ace8294124b1be9b3a4828f772bb9ee) )
+	ROM_LOAD( "epr-10233.ic86", 0x08000, 0x8000, CRC(c52784d3) SHA1(b37d7f261be12616dbe11dfa375eaf6878e4a0f3) )
+	ROM_LOAD( "epr-10236.ic89", 0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
+	ROM_LOAD( "epr-10235.ic88", 0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
+
+	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_LOAD( "pr-7345.ic20",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
+	ROM_LOAD( "pr-7344.ic14",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
+	ROM_LOAD( "pr-7343.ic8",       0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr5317.ic28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
 
 ROM_START( brain )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -5698,6 +5727,7 @@ GAME( 1985, chopliftbl, choplift, sys2row,   choplift,  system1_state, bank0c,  
 GAME( 1985, shtngmst,   0,        sys2m,     shtngmst,  system1_state, shtngmst, ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1985, shtngmste,  shtngmst, sys2m,     shtngmst,  system1_state, shtngmst, ROT0,   "Sega / EVG", "Shooting Master (EVG, 8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiab,    gardia,   sys2x,     gardia,    system1_state, gardiab,  ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gardiaj,    gardia,   sys2x,     gardia,    system1_state, gardia,   ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2x,     wboysys2,  system1_state, wboysys2, ROT0,   "Escape (Sega license)", "Wonder Boy (system 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, tokisens,   0,        sys2,      tokisens,  system1_state, bank0c,   ROT90,  "Sega", "Toki no Senshi - Chrono Soldier", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbml,       0,        sys2xb,    wbml,      system1_state, wbml,     ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
