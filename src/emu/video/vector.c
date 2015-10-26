@@ -149,8 +149,8 @@ int vector_device::m_vector_index;
 void vector_device::device_start()
 {
 	/* Grab the settings for this session */
-	m_beam_width_min = machine().options().beam_min();
-	m_beam_width_max = machine().options().beam_max();
+	m_beam_width_min = machine().options().beam_width_min();
+	m_beam_width_max = machine().options().beam_width_max();
 	m_beam_intensity_weight = machine().options().beam_intensity_weight();
 	m_flicker = machine().options().flicker();
 
@@ -160,9 +160,9 @@ void vector_device::device_start()
 	m_vector_list = auto_alloc_array_clear(machine(), point, MAX_POINTS);
 }
 
-void vector_device::set_flicker(float _flicker)
+void vector_device::set_flicker(float newval)
 {
-	m_flicker = _flicker;
+	m_flicker = newval;
 }
 
 float vector_device::get_flicker()
@@ -170,29 +170,29 @@ float vector_device::get_flicker()
 	return m_flicker;
 }
 
-void vector_device::set_beam_min(float _beam)
+void vector_device::set_beam_width_min(float newval)
 {
-	m_beam_width_min = _beam;
+	m_beam_width_min = newval;
 }
 
-float vector_device::get_beam_min()
+float vector_device::get_beam_width_min()
 {
 	return m_beam_width_min;
 }
 
-void vector_device::set_beam_max(float _beam)
+void vector_device::set_beam_width_max(float newval)
 {
-	m_beam_width_max = _beam;
+	m_beam_width_max = newval;
 }
 
-float vector_device::get_beam_max()
+float vector_device::get_beam_width_max()
 {
 	return m_beam_width_max;
 }
 
-void vector_device::set_beam_intensity_weight(float _beam)
+void vector_device::set_beam_intensity_weight(float newval)
 {
-	m_beam_intensity_weight = _beam;
+	m_beam_intensity_weight = newval;
 }
 
 float vector_device::get_beam_intensity_weight()
