@@ -72,7 +72,7 @@ void subhuntr_state::video_start()
 
 static ADDRESS_MAP_START( subhuntr_map, AS_PROGRAM, 8, subhuntr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subhuntr_io_map, AS_IO, 8, subhuntr_state )
@@ -177,4 +177,4 @@ ROM_START( subhuntr )
 	ROM_LOAD( "82S115.2B",   0x0000, 0x0200, CRC(6946c9de) SHA1(956b4bebe6960a73609deb75e1493c4127fd7f77) ) // ASCII, not much else
 ROM_END
 
-GAME(1979, subhuntr,  0,        subhuntr, subhuntr, driver_device, 0, ROT0, "Model Racing", "Sub Hunter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1979, subhuntr,  0,        subhuntr, subhuntr, driver_device, 0, ROT0, "Model Racing", "Sub Hunter (Model Racing)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
