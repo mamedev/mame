@@ -379,7 +379,7 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "specpls3_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "spectrum_flop")
 MACHINE_CONFIG_END
 
 /***************************************************************************
