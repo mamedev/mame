@@ -762,6 +762,7 @@ mbc16   // Sanyo MBC-16
 ataripc3
 ssam88s
 sicpc1605
+eagle1600
 
 // Non-PC msdos
 pcd     // Siemens PC-D

@@ -323,6 +323,10 @@ static MACHINE_CONFIG_DERIVED(mk88, poisk2)
 	MCFG_SLOT_DEFAULT_OPTION("cga_ec1841")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED(eagle1600, pccga)
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
+MACHINE_CONFIG_END
 
 ROM_START( bw230 )
 	ROM_REGION(0x100000,"maincpu", 0)
@@ -475,6 +479,15 @@ ROM_START( ataripc3 )
 	ROM_LOAD( "c101681 6ffb.u60",0x000, 0x100, NO_DUMP ) // PAL20L10NC
 ROM_END
 
+ROM_START( eagle1600 )
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROMX_LOAD( "eagle 1600 62-2732-001 rev e u403.bin",0xfe000, 0x1000, CRC(3da1e96a) SHA1(77861ba5ebd056da1daf048f5abd459e0528666d), ROM_SKIP(1))
+	ROMX_LOAD( "eagle 1600 62-2732-002 rev e u404.bin",0xfe001, 0x1000, CRC(be6492d4) SHA1(ef25faf33e8336121d030e38e177be39be8afb7a), ROM_SKIP(1))
+
+	ROM_REGION(0x8000,"gfx1", 0)
+	ROM_LOAD("eagle 1600 video char gen u301.bin", 0x00000, 0x2000, CRC(1a7e552f) SHA1(749058783eec9d96a70dc5fdbfccb56196f889dc))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -507,3 +520,4 @@ COMP( 198?, mbc16,      ibm5150,    0,          pccga,      pccga, driver_device
 
 COMP( 198?, ataripc3,   ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Atari", "PC-3" , MACHINE_NOT_WORKING)
 COMP( 1989, ssam88s,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Samsung", "Samtron 88S" , MACHINE_NOT_WORKING)
+COMP( 1983, eagle1600,  ibm5150,    0,          eagle1600,  pccga, driver_device,      0,      "Eagle", "1600" , MACHINE_NOT_WORKING)
