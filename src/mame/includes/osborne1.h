@@ -47,6 +47,7 @@ public:
 		m_row5(*this, "ROW5"),
 		m_row6(*this, "ROW6"),
 		m_row7(*this, "ROW7"),
+		m_cnf(*this, "CNF"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -93,6 +94,8 @@ public:
 	bool m_pia_0_irq_state;
 	bool m_pia_1_irq_state;
 	/* video related */
+	UINT8   m_screen_pac;
+	UINT8   m_resolution;
 	UINT8   m_new_start_x;
 	UINT8   m_new_start_y;
 	emu_timer *m_video_timer;
@@ -115,6 +118,7 @@ protected:
 	required_ioport m_row5;
 	required_ioport m_row6;
 	required_ioport m_row7;
+	required_ioport m_cnf;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
