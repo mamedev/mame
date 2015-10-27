@@ -366,7 +366,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 		UINT16 const col = (m_new_start_x & (hires ? 0x60 : 0x7F)) - ((hires && m_hc_left) ? 8 : 0);
 		UINT16 *p = &m_bitmap.pix16(y);
 
-		for ( UINT16 x = 0; x < ((m_screen_pac && m_resolution) ? 104 : 52); x++ )
+		for ( UINT16 x = 0; x < (hires ? 104 : 52); x++ )
 		{
 			UINT16 offs = row | ((col + x) & 0x7F);
 			UINT8 const chr = m_ram->pointer()[ 0xF000 + offs ];
@@ -376,21 +376,21 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 
 			/* Display a scanline of a character */
 			*p++ = BIT(gfx, 7) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 			*p++ = BIT(gfx, 6) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 			*p++ = BIT(gfx, 5) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 			*p++ = BIT(gfx, 4) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 			*p++ = BIT(gfx, 3) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 			*p++ = BIT(gfx, 2) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 			*p++ = BIT(gfx, 1) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 			*p++ = BIT(gfx, 0) ? ( dim ? 2 : 1 ) : 0;
-			if (!m_screen_pac || !m_resolution) { p[0] = p[-1]; p++; }
+			if (!hires) { p[0] = p[-1]; p++; }
 		}
 	}
 
