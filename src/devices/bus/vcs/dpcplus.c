@@ -58,7 +58,7 @@ void a26_rom_dpcplus_device::device_reset()
 
 static ADDRESS_MAP_START( dpcplus_arm7_map, AS_PROGRAM, 32, a26_rom_dpcplus_device )
 	// todo: implement all this correctly
-	AM_RANGE(0x00000000, 0x00007fff) AM_ROM // flash, 32k
+	//AM_RANGE(0x00000000, 0x00007fff) AM_ROM // flash, 32k
 	AM_RANGE(0x40000000, 0x40001fff) AM_RAM // sram, 8k
 ADDRESS_MAP_END
 
