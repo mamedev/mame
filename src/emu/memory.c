@@ -1929,8 +1929,6 @@ void address_space::populate_from_map(address_map *map)
 void address_space::populate_map_entry(const address_map_entry &entry, read_or_write readorwrite)
 {
 	const map_handler_data &data = (readorwrite == ROW_READ) ? entry.m_read : entry.m_write;
-	std::string fulltag;
-
 	// based on the handler type, alter the bits, name, funcptr, and object
 	switch (data.m_type)
 	{

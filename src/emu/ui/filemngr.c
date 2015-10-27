@@ -104,7 +104,6 @@ void ui_menu_file_manager::populate()
 {
 	std::string buffer, tmp_inst, tmp_name;
 	bool first_entry = true;
-	std::string prev_owner;
 
 	if (!m_warnings.empty())
 	{

@@ -1562,7 +1562,6 @@ void hyperstone_device::init(int scale_mask)
 	m_clock_scale_mask = scale_mask;
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_global_regs[1]).callimport().callexport().formatstr("%40s").noshow();
 	state_add(E132XS_PC,      "PC", m_global_regs[0]).mask(0xffffffff);
