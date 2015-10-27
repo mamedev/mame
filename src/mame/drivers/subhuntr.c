@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( subhuntr_io_map, AS_IO, 8, subhuntr_state )
 //	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( ,  )
 //	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( ,  )
-//	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -109,7 +109,7 @@ void subhuntr_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(subhuntr_state::subhuntr_interrupt)
 {
-//	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 static const gfx_layout tiles8x8_layout =
