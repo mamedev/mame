@@ -758,7 +758,6 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 {
 	std::string locationtag, breakstr("%");
 	const rom_entry *region;
-	std::string regiontag;
 	bool retVal = FALSE;
 	int warningcount = 0;
 	for (region = start; region != NULL; region = rom_next_region(region))

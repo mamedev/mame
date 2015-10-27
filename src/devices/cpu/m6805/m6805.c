@@ -424,7 +424,6 @@ void m6805_base_device::device_start()
 	m_icountptr = &m_icount;
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
 	state_add(M6805_A,         "A",         m_a).mask(0xff);

@@ -582,7 +582,7 @@ const char *emu_options::sub_value(std::string &buffer, const char *name, const 
 {
 	std::string tmp = std::string(",").append(subname).append("=");
 	buffer = value(name);
-	int pos = buffer.find(tmp.c_str());
+	int pos = buffer.find(tmp);
 	if (pos != -1)
 	{
 		int endpos = buffer.find_first_of(',', pos + 1);

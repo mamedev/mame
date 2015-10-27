@@ -158,7 +158,7 @@ bool software_part::is_compatible(const software_list_device &swlistdev) const
 	for (int start = 0, end = filt.find_first_of(',',start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
 	{
 		std::string token(filt, start, end - start + 1);
-		if (comp.find(token.c_str()) != -1)
+		if (comp.find(token) != -1)
 			return true;
 	}
 	return false;
@@ -181,7 +181,7 @@ bool software_part::matches_interface(const char *interface_list) const
 
 	// then add a comma to the end of our interface and return true if we find it in the list string
 	std::string our_interface = std::string(m_interface).append(",");
-	return (interfaces.find(our_interface.c_str()) != -1);
+	return (interfaces.find(our_interface) != -1);
 }
 
 

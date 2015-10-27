@@ -675,7 +675,7 @@ static int open_rom_file(romload_private *romdata, const char *regiontag, const 
 			}
 
 			// prepare locations where we have to load from: list/parentname & list/clonename
-			std::string swlist(tag1.c_str());
+			std::string swlist(tag1);
 			tag2.assign(swlist.append(tag4));
 			if (has_parent)
 			{
@@ -1076,7 +1076,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 			}
 
 			// prepare locations where we have to load from: list/parentname (if any) & list/clonename
-			std::string swlist(tag1.c_str());
+			std::string swlist(tag1);
 			tag2.assign(swlist.append(tag4));
 			if (has_parent)
 			{

@@ -196,7 +196,6 @@ bool validity_checker::check_all()
 	// if we had warnings or errors, output
 	if (m_errors > 0 || m_warnings > 0)
 	{
-		std::string tempstr;
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
 		if (m_errors > 0)
 		{
