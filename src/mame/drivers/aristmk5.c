@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Palindrome
+// copyright-holders:David Haywood, Palindrome, Roberto Fresca
 /****************************************************************************************************************
 
     Aristocrat MK5 / MKV hardware
@@ -712,6 +712,23 @@ ROM_START( qotn )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// MV4091 - 10 Credit Multiplier / 9 Line Multiline.
+// QUEEN OF THE NILE - NSW/ACT  B - 13/05/97.
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( qotna )
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "mv4091_qotn.u7",  0x000000, 0x80000, CRC(a00ab2cf) SHA1(eb3120fe4b1d0554c224c7646e727e86fd35975e) )
+	ROM_LOAD32_WORD( "mv4091_qotn.u11", 0x000002, 0x80000, CRC(c4a35337) SHA1(d469ed154caed1f0a4cf89e67d852924c95172ed) )
+	ROM_LOAD32_WORD( "mv4091_qotn.u8",  0x100000, 0x80000, CRC(16a629e1) SHA1(0dee11a2f1b2068a86b3e0b6c01d115555a657c9) )
+	ROM_LOAD32_WORD( "mv4091_qotn.u12", 0x100002, 0x80000, CRC(7871a846) SHA1(ac1d741092afda842e1864f1a7a14137a9ee46d9) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 ROM_START( swthrt2v )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "01j01986.u7",  0x000000, 0x80000, CRC(f51b2faa) SHA1(dbcfdbee92af5f89a8a2611bbc687ee0cc907642) )
@@ -1130,6 +1147,7 @@ GAME( 1996, dolphtre,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 1996, cashcham,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Cash Chameleon (Export)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 603(a),   B - 06/12/96
 GAME( 1997, goldprmd,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (MV4091, USA)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4091,   B - 13/05/97
 GAME( 1997, qotn,      0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/4,    B - 13/05/97
+GAME( 1997, qotna,     qotn,     aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (MV4091, NSW/ACT)",          MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4091,   B - 13/05/97
 GAME( 1997, wldcougr,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Wild Cougar (Export)",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 569/8,    D - 19/05/97
 GAME( 1997, dmdtouch,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (0400433V, Local)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 604,      E - 30/06/97
 GAME( 1997, bumblbug,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Bumble Bugs (Export, 92.691%)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 593,      D - 05/07/97
