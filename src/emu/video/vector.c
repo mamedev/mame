@@ -35,11 +35,11 @@
 #include "vector.h"
 
 
+#define FLT_EPSILON 1E-5
 
-#define VECTOR_WIDTH_DENOM          512
+#define VECTOR_WIDTH_DENOM 512
 
-
-#define MAX_POINTS  10000
+#define MAX_POINTS 10000
 
 #define VECTOR_TEAM \
 	"-* Vector Heads *-\n" \
@@ -140,17 +140,19 @@ vector_device::vector_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-float vector_device::m_flicker_correction = 0.0f;
-float vector_device::m_beam_width = 0.0f;
-int vector_device::m_flicker;
+float vector_device::m_flicker = 0.0f;
+float vector_device::m_beam_width_min = 0.0f;
+float vector_device::m_beam_width_max = 0.0f;
+float vector_device::m_beam_intensity_weight = 0.0f;
 int vector_device::m_vector_index;
 
 void vector_device::device_start()
 {
-	m_beam_width = machine().options().beam();
-
 	/* Grab the settings for this session */
-	set_flicker(machine().options().flicker());
+	m_beam_width_min = machine().options().beam_width_min();
+	m_beam_width_max = machine().options().beam_width_max();
+	m_beam_intensity_weight = machine().options().beam_intensity_weight();
+	m_flicker = machine().options().flicker();
 
 	m_vector_index = 0;
 
@@ -158,25 +160,54 @@ void vector_device::device_start()
 	m_vector_list = auto_alloc_array_clear(machine(), point, MAX_POINTS);
 }
 
-void vector_device::set_flicker(float _flicker)
+void vector_device::set_flicker(float newval)
 {
-	m_flicker_correction = _flicker;
-	m_flicker = (int)(m_flicker_correction * 2.55f);
+	m_flicker = newval;
 }
 
 float vector_device::get_flicker()
 {
-	return m_flicker_correction;
+	return m_flicker;
 }
 
-void vector_device::set_beam(float _beam)
+void vector_device::set_beam_width_min(float newval)
 {
-	m_beam_width = _beam;
+	m_beam_width_min = newval;
 }
 
-float vector_device::get_beam()
+float vector_device::get_beam_width_min()
 {
-	return m_beam_width;
+	return m_beam_width_min;
+}
+
+void vector_device::set_beam_width_max(float newval)
+{
+	m_beam_width_max = newval;
+}
+
+float vector_device::get_beam_width_max()
+{
+	return m_beam_width_max;
+}
+
+void vector_device::set_beam_intensity_weight(float newval)
+{
+	m_beam_intensity_weight = newval;
+}
+
+float vector_device::get_beam_intensity_weight()
+{
+	return m_beam_intensity_weight;
+}
+
+
+/*
+ * www.dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
+ */
+float vector_device::normalized_sigmoid(float n, float k)
+{
+	// valid for n and k in range of -1.0 and 1.0
+	return (n - n * k) / (k - fabs(n) * 2.0f * k + 1.0f);
 }
 
 
@@ -184,21 +215,30 @@ float vector_device::get_beam()
  * Adds a line end point to the vertices list. The vector processor emulation
  * needs to call this.
  */
-void vector_device::add_point (int x, int y, rgb_t color, int intensity)
+void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
-	if (intensity > 0xff)
-		intensity = 0xff;
+	if (intensity > 255)
+	{
+		intensity = 255;
+	}
 
 	if (m_flicker && (intensity > 0))
 	{
-		intensity += (intensity * (0x80-(machine().rand()&0xff)) * m_flicker)>>16;
+		float random = (float)(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
+		
+		intensity -= (int)(intensity * random * m_flicker);
 		if (intensity < 0)
+		{
 			intensity = 0;
-		if (intensity > 0xff)
-			intensity = 0xff;
+		}		
+		if (intensity > 255)
+		{
+			intensity = 255;
+		}
 	}
+
 	newpoint = &m_vector_list[m_vector_index];
 	newpoint->x = x;
 	newpoint->y = y;
@@ -214,10 +254,11 @@ void vector_device::add_point (int x, int y, rgb_t color, int intensity)
 	}
 }
 
+
 /*
  * Add new clipping info to the list
  */
-void vector_device::add_clip (int x1, int yy1, int x2, int y2)
+void vector_device::add_clip(int x1, int yy1, int x2, int y2)
 {
 	point *newpoint;
 
@@ -241,7 +282,7 @@ void vector_device::add_clip (int x1, int yy1, int x2, int y2)
  * The vector CPU creates a new display list. We save the old display list,
  * but only once per refresh.
  */
-void vector_device::clear_list (void)
+void vector_device::clear_list(void)
 {
 	m_vector_index = 0;
 }
@@ -255,10 +296,15 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	float yscale = 1.0f / (65536 * visarea.height());
 	float xoffs = (float)visarea.min_x;
 	float yoffs = (float)visarea.min_y;
+	float xratio = xscale / yscale;
+	float yratio = yscale / xscale;
+	xratio = (xratio < 1.0f) ? xratio : 1.0f;
+	xratio = (yratio < 1.0f) ? yratio : 1.0f;
+
 	point *curpoint;
 	render_bounds clip;
-	int lastx = 0, lasty = 0;
-	int i;
+	int lastx = 0;
+	int lasty = 0;
 
 	curpoint = m_vector_list;
 
@@ -268,7 +314,7 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	clip.x0 = clip.y0 = 0.0f;
 	clip.x1 = clip.y1 = 1.0f;
 
-	for (i = 0; i < m_vector_index; i++)
+	for (int i = 0; i < m_vector_index; i++)
 	{
 		render_bounds coords;
 
@@ -286,22 +332,42 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else
 		{
+			float intensity = (float)curpoint->intensity / 255.0f;
+			float intensity_weight = normalized_sigmoid(intensity, m_beam_intensity_weight);
+
+			float beam_intensity_width = (m_beam_width_max - m_beam_width_min) * intensity_weight + m_beam_width_min;
+			float beam_width = beam_intensity_width * (1.0f / (float)VECTOR_WIDTH_DENOM);
+
 			coords.x0 = ((float)lastx - xoffs) * xscale;
 			coords.y0 = ((float)lasty - yoffs) * yscale;
 			coords.x1 = ((float)curpoint->x - xoffs) * xscale;
 			coords.y1 = ((float)curpoint->y - yoffs) * yscale;
 
-			if (curpoint->intensity != 0)
-				if (!render_clip_line(&coords, &clip))
-					screen.container().add_line(coords.x0, coords.y0, coords.x1, coords.y1,
-							m_beam_width * (1.0f / (float)VECTOR_WIDTH_DENOM),
-							(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
-							flags);
+			// extend zero-length vector line (vector point) by quarter beam_width on both sides
+			if (fabs(coords.x0 - coords.x1) < FLT_EPSILON && 
+				fabs(coords.y0 - coords.y1) < FLT_EPSILON)
+			{
+				coords.x0 += xratio * beam_width * 0.25f;
+				coords.y0 += yratio * beam_width * 0.25f;
+				coords.x1 -= xratio * beam_width * 0.25f;
+				coords.y1 -= yratio * beam_width * 0.25f;
+			}
+
+			if (curpoint->intensity != 0 && !render_clip_line(&coords, &clip))
+			{
+				screen.container().add_line(
+					coords.x0, coords.y0, coords.x1, coords.y1,
+					beam_width,
+					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
+					flags);
+			}
 
 			lastx = curpoint->x;
 			lasty = curpoint->y;
 		}
+
 		curpoint++;
 	}
+
 	return 0;
 }
