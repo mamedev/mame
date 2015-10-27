@@ -645,7 +645,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 		if (strcmp(exec->device().tag(), device.tag()))
 		{
 			std::string newtag(exec->device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"cpu\"");
@@ -663,7 +663,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 		if (strcmp(sound->device().tag(), device.tag()))
 		{
 			std::string newtag(sound->device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"audio\"");
@@ -691,7 +691,7 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 		if (strcmp(screendev->tag(), device.tag()))
 		{
 			std::string newtag(screendev->tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			fprintf(m_output, "\t\t<display");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
@@ -1097,7 +1097,7 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				std::string output;
 
 				std::string newtag(port->tag()), oldtag(":");
-				newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 				// output the switch name information
 				std::string normalized_field_name(xml_normalize_string(field->name()));
@@ -1228,7 +1228,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 		if (strcmp(imagedev->device().tag(), device.tag()))
 		{
 			std::string newtag(imagedev->device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
 			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev->image_type_name()));
@@ -1286,7 +1286,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 		if (strcmp(slot->device().tag(), device.tag()))
 		{
 			std::string newtag(slot->device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
 			fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(newtag.c_str()));

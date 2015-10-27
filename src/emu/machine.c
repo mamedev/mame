@@ -206,7 +206,7 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 	else if (strlen(options().autoboot_command())!=0) {
 		std::string cmd = std::string(options().autoboot_command());
 		strreplace(cmd, "'", "\\'");
-		std::string val = std::string("emu.keypost('").append(cmd.c_str()).append("')").c_str();
+		std::string val = std::string("emu.keypost('").append(cmd).append("')");
 		manager().lua()->load_string(val.c_str());
 	}
 }
@@ -563,7 +563,7 @@ std::string running_machine::get_statename(const char *option)
 
 	// handle %d in the template (for image devices)
 	std::string statename_dev("%d_");
-	int pos = statename_str.find(statename_dev.c_str());
+	int pos = statename_str.find(statename_dev);
 
 	if (pos != -1)
 	{
