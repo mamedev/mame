@@ -119,7 +119,9 @@ enum
 
 // core vector options
 #define OPTION_ANTIALIAS            "antialias"
-#define OPTION_BEAM                 "beam"
+#define OPTION_BEAM_WIDTH_MIN       "beam_width_min"
+#define OPTION_BEAM_WIDTH_MAX       "beam_width_max"
+#define OPTION_BEAM_INTENSITY_WEIGHT   "beam_intensity_weight"
 #define OPTION_FLICKER              "flicker"
 
 // core sound options
@@ -296,7 +298,9 @@ public:
 
 	// core vector options
 	bool antialias() const { return bool_value(OPTION_ANTIALIAS); }
-	float beam() const { return float_value(OPTION_BEAM); }
+	float beam_width_min() const { return float_value(OPTION_BEAM_WIDTH_MIN); }
+	float beam_width_max() const { return float_value(OPTION_BEAM_WIDTH_MAX); }
+	float beam_intensity_weight() const { return float_value(OPTION_BEAM_INTENSITY_WEIGHT); }
 	float flicker() const { return float_value(OPTION_FLICKER); }
 
 	// core sound options

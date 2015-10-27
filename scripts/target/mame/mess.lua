@@ -2137,6 +2137,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/megadriv.c",
 	MAME_DIR .. "src/mame/drivers/saturn.c",
 	MAME_DIR .. "src/mame/drivers/segapico.c",
+	MAME_DIR .. "src/mame/drivers/sega_sawatte.c",
 	MAME_DIR .. "src/mame/drivers/segapm.c",
 	MAME_DIR .. "src/mame/drivers/sg1000.c",
 	MAME_DIR .. "src/mame/drivers/sms.c",

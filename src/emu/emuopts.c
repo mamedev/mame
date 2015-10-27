@@ -112,7 +112,9 @@ const options_entry emu_options::s_option_entries[] =
 	// vector options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE VECTOR OPTIONS" },
 	{ OPTION_ANTIALIAS ";aa",                            "1",         OPTION_BOOLEAN,    "use antialiasing when drawing vectors" },
-	{ OPTION_BEAM,                                       "1.0",       OPTION_FLOAT,      "set vector beam width" },
+	{ OPTION_BEAM_WIDTH_MIN,                             "1.0",       OPTION_FLOAT,      "set vector beam width minimum" },
+	{ OPTION_BEAM_WIDTH_MAX,                             "1.0",       OPTION_FLOAT,      "set vector beam width maximum" },
+	{ OPTION_BEAM_INTENSITY_WEIGHT,                      "0",         OPTION_FLOAT,      "set vector beam intensity weight " },
 	{ OPTION_FLICKER,                                    "0",         OPTION_FLOAT,      "set vector flicker effect" },
 
 	// sound options

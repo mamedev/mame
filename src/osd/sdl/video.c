@@ -96,7 +96,7 @@ bool sdl_osd_interface::video_init()
 	sdl_monitor_info::init();
 
 	// we need the beam width in a float, contrary to what the core does.
-	video_config.beamwidth = options().beam();
+	video_config.beamwidth = options().beam_width_min();
 
 	// initialize the window system so we can make windows
 	if (!window_init())

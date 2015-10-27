@@ -120,7 +120,19 @@
 		</part>
 	</software>
 
-	<software name="addfam">
+  <software name="actionfgtw" cloneof="actionfg">
+    <description>Action Fighter / Mo zhan che (Taiwan)</description>
+    <year>1986</year>
+    <publisher>&lt;unknown&gt;</publisher>
+    <part name="cart" interface="sms_cart">
+      <dataarea name="rom" size="131072">
+        <rom name="Action Fighter (TW).sms" size="131072" crc="8418f438" sha1="4f514dc568466f6b0424086edeb3fa0014f9c887" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <software name="addfam">
 		<description>The Addams Family (Euro)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
@@ -2091,7 +2103,43 @@
 		</part>
 	</software>
 
-	<software name="excdizzy" supported="no">
+  <software name="eswatp0" cloneof="eswatc"> <!-- early build, alt subtitle -->
+    <description>E-SWAT - The Ultimate Battle In The Factor Against Crime (prototype 0)</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <info name="serial" value="7042"/>
+    <part name="cart" interface="sms_cart">
+      <dataarea name="rom" size="262144">
+        <rom name="E-SWAT [Proto 0].sms" size="262144" crc="4f20694a" sha1="855c2f54b700663cedd6484aab396d849dcb5290" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="eswatp1" cloneof="eswatc">
+    <description>E-SWAT - City Under Siege (prototype 1)</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <info name="serial" value="7042"/>
+    <part name="cart" interface="sms_cart">
+      <dataarea name="rom" size="262144">
+        <rom name="E-SWAT [Proto 1].sms" size="262144" crc="f7ca9801" sha1="12c5005f8a0d78c75704b61bf87961875b9d29d4" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="eswatp2" cloneof="eswatc">
+    <description>E-SWAT - City Under Siege (prototype 2)</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <info name="serial" value="7042"/>
+    <part name="cart" interface="sms_cart">
+      <dataarea name="rom" size="262144">
+        <rom name="E-SWAT [Proto 2].sms" size="262144" crc="fd91cc7e" sha1="63fa1fcbf941b0e0ce601b3094c6c31f997c95d8" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="excdizzy" supported="no">
 		<description>The Excellent Dizzy Collection (Euro, USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
@@ -5681,7 +5729,18 @@
 		</part>
 	</software>
 
-	<software name="smgp">
+  <software name="supcol">
+    <description>Super Columns &amp; Tetris (Kor)</description>
+    <year>1990</year>
+    <publisher>Hi-Com</publisher>
+    <part name="cart" interface="sms_cart">
+      <dataarea name="rom" size="262144">
+        <rom name="Super Columns (KR).sms" size="32768" crc="6ce7f694" sha1="9d696b6eda1d13b8d439509beeb64210987e308e" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="smgp">
 		<description>Super Monaco GP (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>

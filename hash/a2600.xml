@@ -17977,7 +17977,7 @@ Info from Atariage and Atarimania
     <part name="cart" interface="a2600_cart">
       <feature name="slot" value="a26_dpcplus" />
       <dataarea name="rom" size="0x8000">
-        <rom name="SF2_demo_NTSC.bin" size="0x8000" crc="fd850bd6" sha1="bd8166da7777c66e6bb3ab0c77563193d8289f5f)" offset="0" />
+        <rom name="SF2_demo_NTSC.bin" size="0x8000" crc="fd850bd6" sha1="bd8166da7777c66e6bb3ab0c77563193d8289f5f" offset="0" />
       </dataarea>
     </part>
   </software>
@@ -18004,7 +18004,7 @@ Info from Atariage and Atarimania
     <part name="cart" interface="a2600_cart">
       <feature name="slot" value="a26_dpcplus" />
       <dataarea name="rom" size="0x8000">
-        <rom name="SF2_demo_PAL.bin" size="0x8000" crc="b47582f3" sha1="73625429e73f1b354e0cbe6a360d79590032de2b)" offset="0" />
+        <rom name="SF2_demo_PAL.bin" size="0x8000" crc="b47582f3" sha1="73625429e73f1b354e0cbe6a360d79590032de2b" offset="0" />
       </dataarea>
     </part>
   </software>
