@@ -24,7 +24,7 @@ be written to RAM if RAM was switched in.
 WRITE8_MEMBER( osborne1_state::osborne1_0000_w )
 {
 	/* Check whether regular RAM is enabled */
-	if ( ! m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE ) )
+	if ( !m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE) )
 	{
 		m_ram->pointer()[ offset ] = data;
 	}
@@ -34,7 +34,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_0000_w )
 WRITE8_MEMBER( osborne1_state::osborne1_1000_w )
 {
 	/* Check whether regular RAM is enabled */
-	if ( ! m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE ) )
+	if ( !m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE) )
 	{
 		m_ram->pointer()[ 0x1000 + offset ] = data;
 	}
@@ -46,13 +46,16 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 	UINT8   data = 0xFF;
 
 	/* Check whether regular RAM is enabled */
-	if ( ! m_bank2_enabled )
+	if ( !m_bank2_enabled )
 	{
 		data = m_ram->pointer()[ 0x2000 + offset ];
 	}
 	else
 	{
-		switch( offset & 0x0F00 )
+		// This isn't really accurate - bus fighting will occur for many values
+		// since each peripheral only checks two bits.  We just return 0xFF for
+		// any undocumented address.
+		switch ( offset & 0x0F00 )
 		{
 		case 0x100: /* Floppy */
 			data = m_fdc->read( space, offset & 0x03 );
@@ -79,12 +82,12 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 			if (m_screen_pac) data &= 0xFB;
 			break;
 		case 0x900: /* IEEE488 PIA */
-			data = m_pia0->read(space, offset & 0x03 );
+			data = m_pia0->read(space, offset & 0x03);
 			break;
 		case 0xA00: /* Serial */
 			break;
 		case 0xC00: /* Video PIA */
-			data = m_pia1->read(space, offset & 0x03 );
+			data = m_pia1->read(space, offset & 0x03);
 			break;
 		}
 	}
@@ -95,45 +98,26 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 {
 	/* Check whether regular RAM is enabled */
-	if ( ! m_bank2_enabled )
+	if ( !m_bank2_enabled ||  (m_in_irq_handler && m_bankswitch == RAMMODE) )
 	{
 		m_ram->pointer()[ 0x2000 + offset ] = data;
 	}
 	else
 	{
-		if ( m_in_irq_handler && m_bankswitch == RAMMODE )
-		{
-			m_ram->pointer()[ 0x2000 + offset ] = data;
-		}
 		/* Handle writes to the I/O area */
-		switch( offset & 0x0F00 )
+		if ( 0x100 == (offset & 0x900) ) /* Floppy */
+			m_fdc->write(space, offset & 0x03, data);
+		if ( 0x400 == (offset & 0xC00) ) /* SCREEN-PAC */
 		{
-		case 0x100: /* Floppy */
-			m_fdc->write(space, offset & 0x03, data );
-			break;
-		case 0x400: /* SCREEN-PAC */
 			m_resolution = data & 0x01;
 			m_hc_left = (data >> 1) & 0x01;
-			break;
-		case 0x900: /* IEEE488 PIA */
-			m_pia0->write(space, offset & 0x03, data );
-			break;
-		case 0xA00: /* Serial */
-			break;
-		case 0xC00: /* Video PIA */
-			m_pia1->write(space, offset & 0x03, data );
-			break;
 		}
-	}
-}
-
-
-WRITE8_MEMBER( osborne1_state::osborne1_3000_w )
-{
-	/* Check whether regular RAM is enabled */
-	if ( ! m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE ) )
-	{
-		m_ram->pointer()[ 0x3000 + offset ] = data;
+		if ( 0x900 == (offset & 0x900) ) /* IEEE488 PIA */
+			m_pia0->write(space, offset & 0x03, data);
+		if ( 0xA00 == (offset & 0xA00) ) /* Serial */
+			/* not implemented */;
+		if ( 0xC00 == (offset & 0xC00) ) /* Video PIA */
+			m_pia1->write(space, offset & 0x03, data);
 	}
 }
 
@@ -141,49 +125,43 @@ WRITE8_MEMBER( osborne1_state::osborne1_3000_w )
 WRITE8_MEMBER( osborne1_state::osborne1_videoram_w )
 {
 	/* Check whether the video attribute section is enabled */
-	if ( m_bank3_enabled )
+	if ( m_bit_9 )
 		data |= 0x7F;
 
-	m_bank4_ptr[offset] = data;
+	reinterpret_cast<UINT8 *>(m_bank3->base())[offset] = data;
 }
 
 
 WRITE8_MEMBER( osborne1_state::osborne1_bankswitch_w )
 {
-	switch( offset )
+	switch ( offset & 0x03 )
 	{
 	case 0x00:
 		m_bank2_enabled = 1;
-		m_bank3_enabled = 0;
+		m_bankswitch = 0x00;
 		break;
 	case 0x01:
 		m_bank2_enabled = 0;
-		m_bank3_enabled = 0;
+		m_bankswitch = 0x01;
 		break;
 	case 0x02:
-		m_bank2_enabled = 1;
-		m_bank3_enabled = 1;
+		m_bit_9 = 1;
 		break;
 	case 0x03:
-		m_bank2_enabled = 1;
-		m_bank3_enabled = 0;
+		m_bit_9 = 0;
 		break;
 	}
 	if ( m_bank2_enabled )
 	{
-		m_bank1->set_base(m_region_maincpu->base() );
-		m_bank2->set_base(m_empty_4K );
-		m_bank3->set_base(m_empty_4K );
+		m_bank1->set_base(m_region_maincpu->base());
+		m_bank2->set_base(m_region_maincpu->base());
 	}
 	else
 	{
-		m_bank1->set_base(m_ram->pointer() );
-		m_bank2->set_base(m_ram->pointer() + 0x1000 );
-		m_bank3->set_base(m_ram->pointer() + 0x3000 );
+		m_bank1->set_base(m_ram->pointer());
+		m_bank2->set_base(m_ram->pointer() + 0x1000);
 	}
-	m_bank4_ptr = m_ram->pointer() + ( ( m_bank3_enabled ) ? 0x10000 : 0xF000 );
-	m_bank4->set_base(m_bank4_ptr );
-	m_bankswitch = offset;
+	m_bank3->set_base(m_ram->pointer() + (m_bit_9 ? 0x10000 : 0xF000));
 	m_in_irq_handler = 0;
 }
 
@@ -394,7 +372,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 		}
 	}
 
-	if ( (ra==2) || (ra== 6) )
+	if ( (ra==2) || (ra==6) )
 	{
 		m_beep->set_state( m_beep_state );
 	}
@@ -436,9 +414,6 @@ void osborne1_state::machine_reset()
 
 DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 {
-	m_empty_4K = auto_alloc_array(machine(), UINT8, 0x1000 );
-	memset( m_empty_4K, 0xFF, 0x1000 );
-
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
 	m_video_timer = timer_alloc(TIMER_VIDEO);
