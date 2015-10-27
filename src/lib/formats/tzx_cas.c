@@ -296,6 +296,44 @@ static int tzx_cas_handle_block( INT16 **buffer, const UINT8 *bytes, int pause, 
 	return size;
 }
 
+static int tzx_handle_direct(INT16 **buffer, const UINT8 *bytes, int pause, int data_size, int tstates, int bits_in_last_byte)
+{
+	int size = 0;
+	int samples = tcycles_to_samplecount(tstates);
+
+	/* data */
+	for (int data_index = 0; data_index < data_size; data_index++)
+	{
+		UINT8 byte = bytes[data_index];
+		int bits_to_go = (data_index == (data_size - 1)) ? bits_in_last_byte : 8;
+
+		for ( ; bits_to_go > 0; byte <<= 1, bits_to_go--)
+		{
+			if (byte & 0x80) wave_data = WAVE_HIGH;
+			else wave_data = WAVE_LOW;
+
+			tzx_output_wave(buffer, samples);
+			size += samples;
+			
+		}
+	}
+
+	/* pause */
+	if (pause > 0)
+	{
+		int start_pause_samples = millisec_to_samplecount(1);
+		int rest_pause_samples = millisec_to_samplecount(pause - 1);
+
+		tzx_output_wave(buffer, start_pause_samples);
+		size += start_pause_samples;
+		wave_data = WAVE_LOW;
+		tzx_output_wave(buffer, rest_pause_samples);
+		size += rest_pause_samples;
+	}
+	return size;
+}
+
+
 static void ascii_block_common_log( const char *block_type_string, UINT8 block_type )
 {
 	LOG_FORMATS("%s (type %02x) encountered.\n", block_type_string, block_type);
@@ -343,7 +381,7 @@ static int tzx_cas_do_work( INT16 **buffer )
 		int bit0, bit1, bits_in_last_byte;
 		UINT8 *cur_block = blocks[current_block];
 		UINT8 block_type = cur_block[0];
-
+		UINT16 tstates = 0;
 
 	/* Uncomment this to include into error.log a list of the types each block */
 	LOG_FORMATS("tzx_cas_fill_wave: block %d, block_type %02x\n", current_block, block_type);
@@ -516,9 +554,13 @@ static int tzx_cas_do_work( INT16 **buffer )
 			current_block++;
 			break;
 
-		case 0x15:  /* Direct Recording */
+		case 0x15:  /* Direct Recording */ // used on 'bombscar' in the cpc_cass list
 			// having this missing is fatal
-			printf("Unsupported block type (0x15 - Direct Recording) encountered.\n");
+			tstates = cur_block[1] + (cur_block[2] << 8);
+			pause_time= cur_block[3] + (cur_block[4] << 8);
+			bits_in_last_byte = cur_block[5];
+			data_size = cur_block[6] + (cur_block[7] << 8) + (cur_block[8] << 16);
+			size += tzx_handle_direct(buffer, &cur_block[9], pause_time, data_size, tstates, bits_in_last_byte);
 			current_block++;
 			break;
 
