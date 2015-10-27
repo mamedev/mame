@@ -363,7 +363,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 		/* Draw a line of the display */
 		bool const hires = m_screen_pac & m_resolution;
 		UINT16 const row = (m_new_start_y + (y/10)) * 128 & 0xF80;
-		UINT16 const col = (m_new_start_x & (hires ? 0x60 : 0x7F));
+		UINT16 const col = (m_new_start_x & (hires ? 0x60 : 0x7F)) - ((hires && m_hc_left) ? 8 : 0);
 		UINT16 *p = &m_bitmap.pix16(y);
 
 		for ( UINT16 x = 0; x < ((m_screen_pac && m_resolution) ? 104 : 52); x++ )
