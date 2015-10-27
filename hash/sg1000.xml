@@ -1283,7 +1283,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="herot" cloneof="hero">
+	<software name="herot" cloneof="hero"> <!-- Taiwanese logo version -->
 		<description>Qing Feng Xia (Tw)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1296,7 +1296,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="homemj">
+  <software name="herotw" cloneof="hero"> <!-- English logo version -->
+    <description>H.E.R.O. (Tw)</description>
+    <year>1985</year>
+    <publisher>Aaronix</publisher>
+    <part name="cart" interface="sg1000_cart">
+      <dataarea name="rom" size="32768">
+        <rom name="H.E.R.O. [english logo] (TW).sg" size="32768" crc="96f09c6d" sha1="82b530feef7c011361e21b62d2c359c626ab8a9c" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="homemj">
 		<description>Home Mahjong (Jpn, v1)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -1347,7 +1358,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="hyperspt">
+  <software name="hustletw" cloneof="hustle">
+    <description>Hustle Chumy / Wanpi shu (Tw)</description>
+    <year>1984</year>
+    <publisher>Aaronix</publisher>
+    <part name="cart" interface="sg1000_cart">
+      <dataarea name="rom" size="16384">
+        <rom name="Hustle Chumy (TW).sg" size="16384" crc="c4ed1fd9" sha1="e7800d107ef0a7773eea2d482b5db9d866ba74f9" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="hyperspt">
 		<description>Hyper Sports (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Konami</publisher>
@@ -2066,7 +2088,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="motianda" cloneof="rocknbol">
+	<software name="motianda" cloneof="rocknbol"> <!-- Taiwanese logo version -->
 		<description>Mo Tian Da Lou (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -2079,7 +2101,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="safarihu" supported="no">
+  <software name="rocknboltw" cloneof="rocknbol"> <!-- English logo version -->
+    <description>Rock n' Bolt (Tw)</description>
+    <year>1985</year>
+    <publisher>Aaronix</publisher>
+    <part name="cart" interface="sg1000_cart">
+      <dataarea name="rom" size="32768">
+        <rom name="Rock n' Bolt [english logo] (TW).sg" size="32768" crc="09a82af7" sha1="e3be08bda8459fc60836abe332e9864e7c596202" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="safarihu" supported="no">
 		<description>Safari Hunting (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
