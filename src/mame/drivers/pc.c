@@ -485,7 +485,7 @@ ROM_START( eagle1600 )
 	ROMX_LOAD( "eagle 1600 62-2732-002 rev e u404.bin",0xfe001, 0x1000, CRC(be6492d4) SHA1(ef25faf33e8336121d030e38e177be39be8afb7a), ROM_SKIP(1))
 
 	ROM_REGION(0x8000,"gfx1", 0)
-	ROM_LOAD("eagle 1600 video char gen u301.bin", 0x00000, 0x2000, CRC(1a7e552f) SHA1(749058783eec9d96a70dc5fdbfccb56196f889dc))
+	ROM_LOAD("eagle 1600 video char gen u301.bin", 0x00000, 0x1000, CRC(1a7e552f) SHA1(749058783eec9d96a70dc5fdbfccb56196f889dc))
 ROM_END
 
 /***************************************************************************
