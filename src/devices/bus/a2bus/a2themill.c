@@ -255,7 +255,7 @@ READ8_MEMBER( a2bus_themill_device::dma_r )
 		{
 			return slot_dma_read(space, (offset&0xfff) + 0xc000);
 		}
-		else if (offset <= 0xcfff)	// 6809 Cxxx -> 6502 ZP
+		else if (offset <= 0xcfff)  // 6809 Cxxx -> 6502 ZP
 		{
 			return slot_dma_read(space, (offset&0xfff));
 		}

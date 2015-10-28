@@ -1153,22 +1153,22 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 
 		case 0x50:  // graphics mode
 			machine().first_screen()->update_now();
-			m_video->m_graphics = true; 
+			m_video->m_graphics = true;
 			break;
 
 		case 0x51:  // text mode
 			machine().first_screen()->update_now();
-			m_video->m_graphics = false; 
+			m_video->m_graphics = false;
 			break;
 
 		case 0x52:  // no mix
 			machine().first_screen()->update_now();
-			m_video->m_mix = false; 
+			m_video->m_mix = false;
 			break;
 
 		case 0x53:  // mixed mode
 			machine().first_screen()->update_now();
-			m_video->m_mix = true; 
+			m_video->m_mix = true;
 			break;
 
 		case 0x54:  // set page 1

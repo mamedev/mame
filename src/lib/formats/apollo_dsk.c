@@ -53,4 +53,3 @@ int apollo_format::identify(io_generic *io, UINT32 form_factor)
 
 	return ((size == expected_size) || (size == 0)) ? 1 : 0;
 }
-

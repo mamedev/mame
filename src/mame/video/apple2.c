@@ -1317,7 +1317,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
-						w >>= 1;									
+						w >>= 1;
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}

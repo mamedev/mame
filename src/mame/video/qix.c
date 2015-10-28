@@ -99,7 +99,7 @@ WRITE8_MEMBER(qix_state::qix_videoram_w)
 {
 	/* update the screen in case the game is writing "behind" the beam -
 	   Zookeeper likes to do this */
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* add in the upper bit of the address latch */
@@ -114,7 +114,7 @@ WRITE8_MEMBER(qix_state::slither_videoram_w)
 {
 	/* update the screen in case the game is writing "behind" the beam -
 	   Zookeeper likes to do this */
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* add in the upper bit of the address latch */
@@ -152,7 +152,7 @@ READ8_MEMBER(qix_state::qix_addresslatch_r)
 WRITE8_MEMBER(qix_state::qix_addresslatch_w)
 {
 	/* update the screen in case the game is writing "behind" the beam */
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* compute the value at the address latch */
@@ -166,7 +166,7 @@ WRITE8_MEMBER(qix_state::qix_addresslatch_w)
 WRITE8_MEMBER(qix_state::slither_addresslatch_w)
 {
 	/* update the screen in case the game is writing "behind" the beam */
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* compute the value at the address latch */
@@ -196,7 +196,7 @@ WRITE8_MEMBER(qix_state::qix_paletteram_w)
 	if (((offset >> 8) == m_palette_bank) &&
 		(old_data != data))
 	{
-	//	m_screen->update_now();
+	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 

@@ -1177,7 +1177,7 @@ template<typename _BaseType, int _MaxParams>
 struct frustum_clip_vertex
 {
 	_BaseType x, y, z, w;       // A 3d coordinate already transformed by a projection matrix
-    _BaseType p[_MaxParams];    // Additional parameters to clip
+	_BaseType p[_MaxParams];    // Additional parameters to clip
 };
 
 
@@ -1212,11 +1212,11 @@ int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_
 			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
 			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
 			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
-            
-            // Interpolate the rest of the parameters
-            for (int pi = 0; pi < _MaxParams; pi++)
-                clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
-            
+
+			// Interpolate the rest of the parameters
+			for (int pi = 0; pi < _MaxParams; pi++)
+				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+
 			++clip_verts;
 		}
 		if (v1_side > 0)                // current point is inside
@@ -1280,12 +1280,12 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
 			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
 			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
-            
-            // Interpolate the rest of the parameters
-            for (int pi = 0; pi < _MaxParams; pi++)
-                clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
 
-            ++clip_verts;
+			// Interpolate the rest of the parameters
+			for (int pi = 0; pi < _MaxParams; pi++)
+				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+
+			++clip_verts;
 		}
 		if (v1_side > 0)                // current point is inside
 		{
@@ -1304,15 +1304,15 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 template<typename _BaseType, int _MaxParams>
 int frustum_clip_all(frustum_clip_vertex<_BaseType, _MaxParams>* clip_vert, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
 {
-    num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
-    out = clip_vert;
-    return num_vertices;
+	num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+	out = clip_vert;
+	return num_vertices;
 }
 
 

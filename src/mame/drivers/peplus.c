@@ -8880,7 +8880,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
   P435A     1    1    3   4    5   8  50  80 160  50 250    800
   % Range: 90.2-92.2%  Optimum: 94.2%  Hit Frequency: 45.1%
      Programs Available: X002179P
-	 
+
 NOTE: Same as X000726P, except MAX Coin (set to 5) CANNOT be changed - NJ jurisdiction
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8907,7 +8907,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
   P437A     1    1    3   4    5   6  50  80 160  50 250    800
   % Range: 88.0-90.0%  Optimum: 92.0%  Hit Frequency: 45.1%
      Programs Available: X002180P
-	 
+
 NOTE: Same as X000728P, except MAX Coin (set to 5) CANNOT be changed - NJ jurisdiction
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10290,7 +10290,7 @@ Double Bonus Poker   P325A     97.80%
 	ROM_LOAD( "mgo-cg2174.u78",  0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) )
 	ROM_LOAD( "mbo-cg2174.u79",  0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
 	ROM_LOAD( "mxo-cg2174.u80",  0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
-	
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
 ROM_END

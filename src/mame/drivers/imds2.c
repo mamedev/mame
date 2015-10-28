@@ -566,7 +566,7 @@ void imds2_state::driver_start()
 
 void imds2_state::machine_start()
 {
-        m_iocfdc->set_ready_line_connected(true);
+		m_iocfdc->set_ready_line_connected(true);
 }
 
 void imds2_state::video_start()
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_DEVICE_ADD("iocfdc" , I8271 , IOC_XTAL_Y1 / 2)
 		MCFG_I8271_DRQ_CALLBACK(DEVWRITELINE("iocdma" , i8257_device , dreq1_w))
 		MCFG_FLOPPY_DRIVE_ADD("iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
-                MCFG_SLOT_FIXED(true)
+				MCFG_SLOT_FIXED(true)
 
 		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
 		MCFG_CPU_IO_MAP(pio_io_map)

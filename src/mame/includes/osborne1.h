@@ -92,7 +92,7 @@ public:
 	/* video related */
 	UINT8   m_screen_pac;
 	UINT8   m_resolution;
-	UINT8	m_hc_left;
+	UINT8   m_hc_left;
 	UINT8   m_new_start_x;
 	UINT8   m_new_start_y;
 	emu_timer *m_video_timer;

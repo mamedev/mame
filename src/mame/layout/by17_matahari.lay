@@ -185,11 +185,11 @@
 		<disk state="0"><color red="0.15" green="0.15" blue="0.15" /></disk>
 		<disk state="1"><color red="1.00" green="1.00" blue="1.00" /></disk>
 	</element>
-	<element name="Lamp_Red" defstate="0">										<!-- Usually for Specials -->
+	<element name="Lamp_Red" defstate="0">                                      <!-- Usually for Specials -->
 		<disk state="0"><color red="0.15" green="0.00" blue="0.00" /></disk>
 		<disk state="1"><color red="1.00" green="0.00" blue="0.00" /></disk>
 	</element>
-	<element name="Lamp_Amber" defstate="0">									<!-- Usually for Extra Ball-->
+	<element name="Lamp_Amber" defstate="0">                                    <!-- Usually for Extra Ball-->
 		<disk state="0"><color red="0.15" green="0.06" blue="0.00" /></disk>
 		<disk state="1"><color red="1.00" green="0.40" blue="0.00" /></disk>
 	</element>
@@ -384,7 +384,7 @@
 		<text string="3k"><color red="0.0" green="0.0" blue="0.0"  /><bounds x="06" y="08" width="12" height="12" /></text>
 	</element>
 
-	<element name="Lamp_Green_Arrow_04_2x" defstate="1">	<!-- Point at 4 o clock -->
+	<element name="Lamp_Green_Arrow_04_2x" defstate="1">    <!-- Point at 4 o clock -->
 		<rect state="1"><color red="0.00" green="1.00" blue="0.00" /><bounds x="00" y="00" width="08" height="03" /></rect>
 		<rect state="0"><color red="0.00" green="0.15" blue="0.00" /><bounds x="00" y="00" width="08" height="03" /></rect>
 		<rect state="1"><color red="0.00" green="1.00" blue="0.00" /><bounds x="05" y="03" width="08" height="03" /></rect>
@@ -406,7 +406,7 @@
 		<text string="2x"><color red="0.0" green="0.0" blue="0.0"  /><bounds x="18" y="08" width="15" height="15" /></text>
 	</element>
 
-	<element name="Lamp_Yellow_Arrow_04_3x" defstate="1">	<!-- Point at 4 o clock -->
+	<element name="Lamp_Yellow_Arrow_04_3x" defstate="1">   <!-- Point at 4 o clock -->
 		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="00" y="00" width="08" height="03" /></rect>
 		<rect state="0"><color red="0.15" green="0.15" blue="0.00" /><bounds x="00" y="00" width="08" height="03" /></rect>
 		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="05" y="03" width="08" height="03" /></rect>
@@ -428,7 +428,7 @@
 		<text string="3x"><color red="0.0" green="0.0" blue="0.0"  /><bounds x="18" y="08" width="15" height="15" /></text>
 	</element>
 
-	<element name="Lamp_White_Arrow_08_5x" defstate="1">	<!-- Point at 8 o clock -->
+	<element name="Lamp_White_Arrow_08_5x" defstate="1">    <!-- Point at 8 o clock -->
 		<rect state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="28" y="00" width="08" height="03" /></rect>
 		<rect state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="28" y="00" width="08" height="03" /></rect>
 		<rect state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="23" y="03" width="08" height="03" /></rect>
@@ -450,7 +450,7 @@
 		<text string="5x"><color red="0.0" green="0.0" blue="0.0"  /><bounds x="06" y="08" width="15" height="15" /></text>
 	</element>
 
-	<element name="Lamp_Amber_Arrow_08" defstate="1">	<!-- Point at 8 o clock -->
+	<element name="Lamp_Amber_Arrow_08" defstate="1">   <!-- Point at 8 o clock -->
 		<rect state="1"><color red="1.00" green="0.40" blue="0.00" /><bounds x="28" y="00" width="08" height="03" /></rect>
 		<rect state="0"><color red="0.15" green="0.06" blue="0.00" /><bounds x="28" y="00" width="08" height="03" /></rect>
 		<rect state="1"><color red="1.00" green="0.40" blue="0.00" /><bounds x="23" y="03" width="08" height="03" /></rect>
@@ -471,7 +471,7 @@
 		<rect state="0"><color red="0.15" green="0.06" blue="0.00" /><bounds x="00" y="18" width="20" height="03" /></rect>
 	</element>
 
-	<element name="Lamp_White_Arrow_11_A" defstate="1">	<!-- Point at 11 o clock -->
+	<element name="Lamp_White_Arrow_11_A" defstate="1"> <!-- Point at 11 o clock -->
 		<rect state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="00" y="00" width="03" height="20" /></rect>
 		<rect state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="00" y="00" width="03" height="20" /></rect>
 		<rect state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="03" y="02" width="03" height="17" /></rect>
@@ -493,7 +493,7 @@
 		<text string="A"><color red="0.0" green="0.0" blue="0.0"   /><bounds x="-2" y="03" width="18" height="18" /></text>
 	</element>
 
-	<element name="Lamp_White_Arrow_01_B" defstate="1">	<!-- Point at 1 o clock -->
+	<element name="Lamp_White_Arrow_01_B" defstate="1"> <!-- Point at 1 o clock -->
 		<rect state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="18" y="00" width="03" height="20" /></rect>
 		<rect state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="18" y="00" width="03" height="20" /></rect>
 		<rect state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="15" y="02" width="03" height="17" /></rect>
@@ -710,7 +710,7 @@
 
 		<!-- Background -->
 		<backdrop element="Canvas"><bounds x="0" y="0" width="640" height="480" /></backdrop>
-		
+
 		<bezel element="Draw_White"><bounds x="0" y="0" width="640" height="1" /></bezel>
 		<bezel element="Draw_White"><bounds x="0" y="0" width="1" height="480" /></bezel>
 		<bezel element="Draw_White"><bounds x="640" y="0" width="1" height="480" /></bezel>
@@ -735,7 +735,7 @@
 
 
 		<!-- Player 1 Score -->
-		<bezel name="lamp14" element="Lamp_P1"><bounds x="330" y="55" width="15" height="15" /></bezel>			<!-- Backbox ~ 1st Player Up -->
+		<bezel name="lamp14" element="Lamp_P1"><bounds x="330" y="55" width="15" height="15" /></bezel>         <!-- Backbox ~ 1st Player Up -->
 		<bezel name="digit17" element="Digit"><bounds x="360" y="55" width="10" height="15" /></bezel>
 		<bezel name="digit16" element="Digit"><bounds x="374" y="55" width="10" height="15" /></bezel>
 		<bezel name="digit15" element="Digit"><bounds x="388" y="55" width="10" height="15" /></bezel>
@@ -745,7 +745,7 @@
 		<bezel name="digit11" element="Digit"><bounds x="444" y="55" width="10" height="15" /></bezel>
 
 		<!-- Player 2 Score -->
-		<bezel name="lamp29" element="Lamp_P2"><bounds x="615" y="55" width="15" height="15" /></bezel>			<!-- Backbox ~ 2nd Player Up -->
+		<bezel name="lamp29" element="Lamp_P2"><bounds x="615" y="55" width="15" height="15" /></bezel>         <!-- Backbox ~ 2nd Player Up -->
 		<bezel name="digit27" element="Digit"><bounds x="506" y="55" width="10" height="15" /></bezel>
 		<bezel name="digit26" element="Digit"><bounds x="520" y="55" width="10" height="15" /></bezel>
 		<bezel name="digit25" element="Digit"><bounds x="534" y="55" width="10" height="15" /></bezel>
@@ -755,7 +755,7 @@
 		<bezel name="digit21" element="Digit"><bounds x="590" y="55" width="10" height="15" /></bezel>
 
 		<!-- Player 3 Score -->
-		<bezel name="lamp44" element="Lamp_P3"><bounds x="330" y="250" width="15" height="15" /></bezel>		<!-- Backbox ~ 3rd Player Up -->
+		<bezel name="lamp44" element="Lamp_P3"><bounds x="330" y="250" width="15" height="15" /></bezel>        <!-- Backbox ~ 3rd Player Up -->
 		<bezel name="digit37" element="Digit"><bounds x="360" y="250" width="10" height="15" /></bezel>
 		<bezel name="digit36" element="Digit"><bounds x="374" y="250" width="10" height="15" /></bezel>
 		<bezel name="digit35" element="Digit"><bounds x="388" y="250" width="10" height="15" /></bezel>
@@ -765,7 +765,7 @@
 		<bezel name="digit31" element="Digit"><bounds x="444" y="250" width="10" height="15" /></bezel>
 
 		<!-- Player 4 Score -->
-		<bezel name="lamp59" element="Lamp_P4"><bounds x="615" y="250" width="15" height="15" /></bezel>		<!-- Backbox ~ 4th Player Up -->
+		<bezel name="lamp59" element="Lamp_P4"><bounds x="615" y="250" width="15" height="15" /></bezel>        <!-- Backbox ~ 4th Player Up -->
 		<bezel name="digit47" element="Digit"><bounds x="506" y="250" width="10" height="15" /></bezel>
 		<bezel name="digit46" element="Digit"><bounds x="520" y="250" width="10" height="15" /></bezel>
 		<bezel name="digit45" element="Digit"><bounds x="534" y="250" width="10" height="15" /></bezel>
@@ -776,21 +776,21 @@
 
 		<!-- Credits and Ball In Play / Match -->
 		<bezel element="Text_Credit"><bounds x="542" y="142" width="48" height="8" /></bezel>
-		<bezel name="lamp12"  element="Ball_In_Play"><bounds x="586" y="105" width="50" height="11" /></bezel>	<!-- Backbox ~ Ball In Play -->
-		<bezel name="lamp25"  element="Match"><bounds x="596" y="152" width="25" height="11" /></bezel>			<!-- Backbox ~ Match -->
+		<bezel name="lamp12"  element="Ball_In_Play"><bounds x="586" y="105" width="50" height="11" /></bezel>  <!-- Backbox ~ Ball In Play -->
+		<bezel name="lamp25"  element="Match"><bounds x="596" y="152" width="25" height="11" /></bezel>         <!-- Backbox ~ Match -->
 		<bezel name="digit55" element="Digit"><bounds x="554" y="125" width="10" height="15" /></bezel>
 		<bezel name="digit54" element="Digit"><bounds x="568" y="125" width="10" height="15" /></bezel>
 		<bezel name="digit52" element="Digit"><bounds x="596" y="125" width="10" height="15" /></bezel>
 		<bezel name="digit51" element="Digit"><bounds x="610" y="125" width="10" height="15" /></bezel>
 
-		<bezel name="lamp10" element="Shoot_Again"><bounds x="420" y="295" width="60" height="19" /></bezel>	<!-- Backbox ~ Same Player Shoots Again -->
-		<bezel name="lamp13" element="Lamp_1P"><bounds x="345" y="297" width="15" height="15" /></bezel>		<!-- Backbox ~ 1 Player Game -->
-		<bezel name="lamp28" element="Lamp_2P"><bounds x="360" y="297" width="15" height="15" /></bezel>		<!-- Backbox ~ 2 Player Game -->
-		<bezel name="lamp43" element="Lamp_3P"><bounds x="375" y="297" width="15" height="15" /></bezel>		<!-- Backbox ~ 3 Player Game -->
-		<bezel name="lamp58" element="Lamp_4P"><bounds x="390" y="297" width="15" height="15" /></bezel>		<!-- Backbox ~ 4 Player Game -->
-		<bezel name="lamp27" element="High_Score_To_Date"><bounds x="438" y="6" width="90" height="11" /></bezel>	<!-- Backbox ~ High Score To Date -->
-		<bezel name="lamp42" element="Game_Over"><bounds x="580" y="300" width="45" height="11" /></bezel>		<!-- Backbox ~ Game Over -->
-		<bezel name="lamp57" element="Tilt"><bounds x="480" y="297" width="50" height="16" /></bezel>			<!-- Backbox ~ Tilt -->
+		<bezel name="lamp10" element="Shoot_Again"><bounds x="420" y="295" width="60" height="19" /></bezel>    <!-- Backbox ~ Same Player Shoots Again -->
+		<bezel name="lamp13" element="Lamp_1P"><bounds x="345" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 1 Player Game -->
+		<bezel name="lamp28" element="Lamp_2P"><bounds x="360" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 2 Player Game -->
+		<bezel name="lamp43" element="Lamp_3P"><bounds x="375" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 3 Player Game -->
+		<bezel name="lamp58" element="Lamp_4P"><bounds x="390" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 4 Player Game -->
+		<bezel name="lamp27" element="High_Score_To_Date"><bounds x="438" y="6" width="90" height="11" /></bezel>   <!-- Backbox ~ High Score To Date -->
+		<bezel name="lamp42" element="Game_Over"><bounds x="580" y="300" width="45" height="11" /></bezel>      <!-- Backbox ~ Game Over -->
+		<bezel name="lamp57" element="Tilt"><bounds x="480" y="297" width="50" height="16" /></bezel>           <!-- Backbox ~ Tilt -->
 
 
 
@@ -801,72 +801,72 @@
 		<bezel element="Text_60"><bounds x="552" y="418" width="30" height="11" /></bezel>
 
 		<!-- Lamps controlled by U1 on Lamp Driver Board -->
-		<bezel name="lamp0"  element="Lamp_White"><bounds x="330" y="375" width="8" height="8" /></bezel>	<!-- U1 00 -->
-		<bezel name="lamp1"  element="Lamp_White"><bounds x="345" y="375" width="8" height="8" /></bezel>	<!-- U1 01 -->
-		<bezel name="lamp2"  element="Lamp_White"><bounds x="360" y="375" width="8" height="8" /></bezel>	<!-- U1 02 -->
-		<bezel name="lamp3"  element="Lamp_White"><bounds x="375" y="375" width="8" height="8" /></bezel>	<!-- U1 03 -->
-		<bezel name="lamp4"  element="Lamp_White"><bounds x="390" y="375" width="8" height="8" /></bezel>	<!-- U1 04 -->
-		<bezel name="lamp5"  element="Lamp_White"><bounds x="405" y="375" width="8" height="8" /></bezel>	<!-- U1 05 -->
-		<bezel name="lamp6"  element="Lamp_White"><bounds x="420" y="375" width="8" height="8" /></bezel>	<!-- U1 06 -->
-		<bezel name="lamp7"  element="Lamp_White"><bounds x="435" y="375" width="8" height="8" /></bezel>	<!-- U1 07 -->
-		<bezel name="lamp8"  element="Lamp_White"><bounds x="450" y="375" width="8" height="8" /></bezel>	<!-- U1 08 -->
-		<bezel name="lamp9"  element="Lamp_White"><bounds x="465" y="375" width="8" height="8" /></bezel>	<!-- U1 09 -->
-		<bezel name="lamp10" element="Lamp_White"><bounds x="480" y="375" width="8" height="8" /></bezel>	<!-- U1 10 -->
-		<bezel name="lamp11" element="Lamp_White"><bounds x="495" y="375" width="8" height="8" /></bezel>	<!-- U1 11 -->
-		<bezel name="lamp12" element="Lamp_White"><bounds x="510" y="375" width="8" height="8" /></bezel>	<!-- U1 12 -->
-		<bezel name="lamp13" element="Lamp_White"><bounds x="525" y="375" width="8" height="8" /></bezel>	<!-- U1 13 -->
-		<bezel name="lamp14" element="Lamp_White"><bounds x="540" y="375" width="8" height="8" /></bezel>	<!-- U1 14 -->
+		<bezel name="lamp0"  element="Lamp_White"><bounds x="330" y="375" width="8" height="8" /></bezel>   <!-- U1 00 -->
+		<bezel name="lamp1"  element="Lamp_White"><bounds x="345" y="375" width="8" height="8" /></bezel>   <!-- U1 01 -->
+		<bezel name="lamp2"  element="Lamp_White"><bounds x="360" y="375" width="8" height="8" /></bezel>   <!-- U1 02 -->
+		<bezel name="lamp3"  element="Lamp_White"><bounds x="375" y="375" width="8" height="8" /></bezel>   <!-- U1 03 -->
+		<bezel name="lamp4"  element="Lamp_White"><bounds x="390" y="375" width="8" height="8" /></bezel>   <!-- U1 04 -->
+		<bezel name="lamp5"  element="Lamp_White"><bounds x="405" y="375" width="8" height="8" /></bezel>   <!-- U1 05 -->
+		<bezel name="lamp6"  element="Lamp_White"><bounds x="420" y="375" width="8" height="8" /></bezel>   <!-- U1 06 -->
+		<bezel name="lamp7"  element="Lamp_White"><bounds x="435" y="375" width="8" height="8" /></bezel>   <!-- U1 07 -->
+		<bezel name="lamp8"  element="Lamp_White"><bounds x="450" y="375" width="8" height="8" /></bezel>   <!-- U1 08 -->
+		<bezel name="lamp9"  element="Lamp_White"><bounds x="465" y="375" width="8" height="8" /></bezel>   <!-- U1 09 -->
+		<bezel name="lamp10" element="Lamp_White"><bounds x="480" y="375" width="8" height="8" /></bezel>   <!-- U1 10 -->
+		<bezel name="lamp11" element="Lamp_White"><bounds x="495" y="375" width="8" height="8" /></bezel>   <!-- U1 11 -->
+		<bezel name="lamp12" element="Lamp_White"><bounds x="510" y="375" width="8" height="8" /></bezel>   <!-- U1 12 -->
+		<bezel name="lamp13" element="Lamp_White"><bounds x="525" y="375" width="8" height="8" /></bezel>   <!-- U1 13 -->
+		<bezel name="lamp14" element="Lamp_White"><bounds x="540" y="375" width="8" height="8" /></bezel>   <!-- U1 14 -->
 
 		<!-- Lamps controlled by U2 on Lamp Driver Board -->
-		<bezel name="lamp15" element="Lamp_White"><bounds x="330" y="390" width="8" height="8" /></bezel>	<!-- U2 00 -->
-		<bezel name="lamp16" element="Lamp_White"><bounds x="345" y="390" width="8" height="8" /></bezel>	<!-- U2 01 -->
-		<bezel name="lamp17" element="Lamp_White"><bounds x="360" y="390" width="8" height="8" /></bezel>	<!-- U2 02 -->
-		<bezel name="lamp18" element="Lamp_White"><bounds x="375" y="390" width="8" height="8" /></bezel>	<!-- U2 03 -->
-		<bezel name="lamp19" element="Lamp_White"><bounds x="390" y="390" width="8" height="8" /></bezel>	<!-- U2 04 -->
-		<bezel name="lamp20" element="Lamp_White"><bounds x="405" y="390" width="8" height="8" /></bezel>	<!-- U2 05 -->
-		<bezel name="lamp21" element="Lamp_White"><bounds x="420" y="390" width="8" height="8" /></bezel>	<!-- U2 06 -->
-		<bezel name="lamp22" element="Lamp_White"><bounds x="435" y="390" width="8" height="8" /></bezel>	<!-- U2 07 -->
-		<bezel name="lamp23" element="Lamp_White"><bounds x="450" y="390" width="8" height="8" /></bezel>	<!-- U2 08 -->
-		<bezel name="lamp24" element="Lamp_White"><bounds x="465" y="390" width="8" height="8" /></bezel>	<!-- U2 09 -->
-		<bezel name="lamp25" element="Lamp_White"><bounds x="480" y="390" width="8" height="8" /></bezel>	<!-- U2 10 -->
-		<bezel name="lamp26" element="Lamp_White"><bounds x="495" y="390" width="8" height="8" /></bezel>	<!-- U2 11 -->
-		<bezel name="lamp27" element="Lamp_White"><bounds x="510" y="390" width="8" height="8" /></bezel>	<!-- U2 12 -->
-		<bezel name="lamp28" element="Lamp_White"><bounds x="525" y="390" width="8" height="8" /></bezel>	<!-- U2 13 -->
-		<bezel name="lamp29" element="Lamp_White"><bounds x="540" y="390" width="8" height="8" /></bezel>	<!-- U2 14 -->
+		<bezel name="lamp15" element="Lamp_White"><bounds x="330" y="390" width="8" height="8" /></bezel>   <!-- U2 00 -->
+		<bezel name="lamp16" element="Lamp_White"><bounds x="345" y="390" width="8" height="8" /></bezel>   <!-- U2 01 -->
+		<bezel name="lamp17" element="Lamp_White"><bounds x="360" y="390" width="8" height="8" /></bezel>   <!-- U2 02 -->
+		<bezel name="lamp18" element="Lamp_White"><bounds x="375" y="390" width="8" height="8" /></bezel>   <!-- U2 03 -->
+		<bezel name="lamp19" element="Lamp_White"><bounds x="390" y="390" width="8" height="8" /></bezel>   <!-- U2 04 -->
+		<bezel name="lamp20" element="Lamp_White"><bounds x="405" y="390" width="8" height="8" /></bezel>   <!-- U2 05 -->
+		<bezel name="lamp21" element="Lamp_White"><bounds x="420" y="390" width="8" height="8" /></bezel>   <!-- U2 06 -->
+		<bezel name="lamp22" element="Lamp_White"><bounds x="435" y="390" width="8" height="8" /></bezel>   <!-- U2 07 -->
+		<bezel name="lamp23" element="Lamp_White"><bounds x="450" y="390" width="8" height="8" /></bezel>   <!-- U2 08 -->
+		<bezel name="lamp24" element="Lamp_White"><bounds x="465" y="390" width="8" height="8" /></bezel>   <!-- U2 09 -->
+		<bezel name="lamp25" element="Lamp_White"><bounds x="480" y="390" width="8" height="8" /></bezel>   <!-- U2 10 -->
+		<bezel name="lamp26" element="Lamp_White"><bounds x="495" y="390" width="8" height="8" /></bezel>   <!-- U2 11 -->
+		<bezel name="lamp27" element="Lamp_White"><bounds x="510" y="390" width="8" height="8" /></bezel>   <!-- U2 12 -->
+		<bezel name="lamp28" element="Lamp_White"><bounds x="525" y="390" width="8" height="8" /></bezel>   <!-- U2 13 -->
+		<bezel name="lamp29" element="Lamp_White"><bounds x="540" y="390" width="8" height="8" /></bezel>   <!-- U2 14 -->
 
 		<!-- Lamps controlled by U3 on Lamp Driver Board -->
-		<bezel name="lamp30" element="Lamp_White"><bounds x="330" y="405" width="8" height="8" /></bezel>	<!-- U3 00 -->
-		<bezel name="lamp31" element="Lamp_White"><bounds x="345" y="405" width="8" height="8" /></bezel>	<!-- U3 01 -->
-		<bezel name="lamp32" element="Lamp_White"><bounds x="360" y="405" width="8" height="8" /></bezel>	<!-- U3 02 -->
-		<bezel name="lamp33" element="Lamp_White"><bounds x="375" y="405" width="8" height="8" /></bezel>	<!-- U3 03 -->
-		<bezel name="lamp34" element="Lamp_White"><bounds x="390" y="405" width="8" height="8" /></bezel>	<!-- U3 04 -->
-		<bezel name="lamp35" element="Lamp_White"><bounds x="405" y="405" width="8" height="8" /></bezel>	<!-- U3 05 -->
-		<bezel name="lamp36" element="Lamp_White"><bounds x="420" y="405" width="8" height="8" /></bezel>	<!-- U3 06 -->
-		<bezel name="lamp37" element="Lamp_White"><bounds x="435" y="405" width="8" height="8" /></bezel>	<!-- U3 07 -->
-		<bezel name="lamp38" element="Lamp_White"><bounds x="450" y="405" width="8" height="8" /></bezel>	<!-- U3 08 -->
-		<bezel name="lamp39" element="Lamp_White"><bounds x="465" y="405" width="8" height="8" /></bezel>	<!-- U3 09 -->
-		<bezel name="lamp40" element="Lamp_White"><bounds x="480" y="405" width="8" height="8" /></bezel>	<!-- U3 10 -->
-		<bezel name="lamp41" element="Lamp_White"><bounds x="495" y="405" width="8" height="8" /></bezel>	<!-- U3 11 -->
-		<bezel name="lamp42" element="Lamp_White"><bounds x="510" y="405" width="8" height="8" /></bezel>	<!-- U3 12 -->
-		<bezel name="lamp43" element="Lamp_White"><bounds x="525" y="405" width="8" height="8" /></bezel>	<!-- U3 13 -->
-		<bezel name="lamp44" element="Lamp_White"><bounds x="540" y="405" width="8" height="8" /></bezel>	<!-- U3 14 -->
+		<bezel name="lamp30" element="Lamp_White"><bounds x="330" y="405" width="8" height="8" /></bezel>   <!-- U3 00 -->
+		<bezel name="lamp31" element="Lamp_White"><bounds x="345" y="405" width="8" height="8" /></bezel>   <!-- U3 01 -->
+		<bezel name="lamp32" element="Lamp_White"><bounds x="360" y="405" width="8" height="8" /></bezel>   <!-- U3 02 -->
+		<bezel name="lamp33" element="Lamp_White"><bounds x="375" y="405" width="8" height="8" /></bezel>   <!-- U3 03 -->
+		<bezel name="lamp34" element="Lamp_White"><bounds x="390" y="405" width="8" height="8" /></bezel>   <!-- U3 04 -->
+		<bezel name="lamp35" element="Lamp_White"><bounds x="405" y="405" width="8" height="8" /></bezel>   <!-- U3 05 -->
+		<bezel name="lamp36" element="Lamp_White"><bounds x="420" y="405" width="8" height="8" /></bezel>   <!-- U3 06 -->
+		<bezel name="lamp37" element="Lamp_White"><bounds x="435" y="405" width="8" height="8" /></bezel>   <!-- U3 07 -->
+		<bezel name="lamp38" element="Lamp_White"><bounds x="450" y="405" width="8" height="8" /></bezel>   <!-- U3 08 -->
+		<bezel name="lamp39" element="Lamp_White"><bounds x="465" y="405" width="8" height="8" /></bezel>   <!-- U3 09 -->
+		<bezel name="lamp40" element="Lamp_White"><bounds x="480" y="405" width="8" height="8" /></bezel>   <!-- U3 10 -->
+		<bezel name="lamp41" element="Lamp_White"><bounds x="495" y="405" width="8" height="8" /></bezel>   <!-- U3 11 -->
+		<bezel name="lamp42" element="Lamp_White"><bounds x="510" y="405" width="8" height="8" /></bezel>   <!-- U3 12 -->
+		<bezel name="lamp43" element="Lamp_White"><bounds x="525" y="405" width="8" height="8" /></bezel>   <!-- U3 13 -->
+		<bezel name="lamp44" element="Lamp_White"><bounds x="540" y="405" width="8" height="8" /></bezel>   <!-- U3 14 -->
 
 		<!-- Lamps controlled by U4 on Lamp Driver Board -->
-		<bezel name="lamp45" element="Lamp_White"><bounds x="330" y="420" width="8" height="8" /></bezel>	<!-- U4 00 -->
-		<bezel name="lamp46" element="Lamp_White"><bounds x="345" y="420" width="8" height="8" /></bezel>	<!-- U4 01 -->
-		<bezel name="lamp47" element="Lamp_White"><bounds x="360" y="420" width="8" height="8" /></bezel>	<!-- U4 02 -->
-		<bezel name="lamp48" element="Lamp_White"><bounds x="375" y="420" width="8" height="8" /></bezel>	<!-- U4 03 -->
-		<bezel name="lamp49" element="Lamp_White"><bounds x="390" y="420" width="8" height="8" /></bezel>	<!-- U4 04 -->
-		<bezel name="lamp50" element="Lamp_White"><bounds x="405" y="420" width="8" height="8" /></bezel>	<!-- U4 05 -->
-		<bezel name="lamp51" element="Lamp_White"><bounds x="420" y="420" width="8" height="8" /></bezel>	<!-- U4 06 -->
-		<bezel name="lamp52" element="Lamp_White"><bounds x="435" y="420" width="8" height="8" /></bezel>	<!-- U4 07 -->
-		<bezel name="lamp53" element="Lamp_White"><bounds x="450" y="420" width="8" height="8" /></bezel>	<!-- U4 08 -->
-		<bezel name="lamp54" element="Lamp_White"><bounds x="465" y="420" width="8" height="8" /></bezel>	<!-- U4 09 -->
-		<bezel name="lamp55" element="Lamp_White"><bounds x="480" y="420" width="8" height="8" /></bezel>	<!-- U4 10 -->
-		<bezel name="lamp56" element="Lamp_White"><bounds x="495" y="420" width="8" height="8" /></bezel>	<!-- U4 11 -->
-		<bezel name="lamp57" element="Lamp_White"><bounds x="510" y="420" width="8" height="8" /></bezel>	<!-- U4 12 -->
-		<bezel name="lamp58" element="Lamp_White"><bounds x="525" y="420" width="8" height="8" /></bezel>	<!-- U4 13 -->
-		<bezel name="lamp59" element="Lamp_White"><bounds x="540" y="420" width="8" height="8" /></bezel>	<!-- U4 14 -->
+		<bezel name="lamp45" element="Lamp_White"><bounds x="330" y="420" width="8" height="8" /></bezel>   <!-- U4 00 -->
+		<bezel name="lamp46" element="Lamp_White"><bounds x="345" y="420" width="8" height="8" /></bezel>   <!-- U4 01 -->
+		<bezel name="lamp47" element="Lamp_White"><bounds x="360" y="420" width="8" height="8" /></bezel>   <!-- U4 02 -->
+		<bezel name="lamp48" element="Lamp_White"><bounds x="375" y="420" width="8" height="8" /></bezel>   <!-- U4 03 -->
+		<bezel name="lamp49" element="Lamp_White"><bounds x="390" y="420" width="8" height="8" /></bezel>   <!-- U4 04 -->
+		<bezel name="lamp50" element="Lamp_White"><bounds x="405" y="420" width="8" height="8" /></bezel>   <!-- U4 05 -->
+		<bezel name="lamp51" element="Lamp_White"><bounds x="420" y="420" width="8" height="8" /></bezel>   <!-- U4 06 -->
+		<bezel name="lamp52" element="Lamp_White"><bounds x="435" y="420" width="8" height="8" /></bezel>   <!-- U4 07 -->
+		<bezel name="lamp53" element="Lamp_White"><bounds x="450" y="420" width="8" height="8" /></bezel>   <!-- U4 08 -->
+		<bezel name="lamp54" element="Lamp_White"><bounds x="465" y="420" width="8" height="8" /></bezel>   <!-- U4 09 -->
+		<bezel name="lamp55" element="Lamp_White"><bounds x="480" y="420" width="8" height="8" /></bezel>   <!-- U4 10 -->
+		<bezel name="lamp56" element="Lamp_White"><bounds x="495" y="420" width="8" height="8" /></bezel>   <!-- U4 11 -->
+		<bezel name="lamp57" element="Lamp_White"><bounds x="510" y="420" width="8" height="8" /></bezel>   <!-- U4 12 -->
+		<bezel name="lamp58" element="Lamp_White"><bounds x="525" y="420" width="8" height="8" /></bezel>   <!-- U4 13 -->
+		<bezel name="lamp59" element="Lamp_White"><bounds x="540" y="420" width="8" height="8" /></bezel>   <!-- U4 14 -->
 
 
 		<bezel element="Text_Solenoids"><bounds x="382" y="437" width="100" height="11" /></bezel>
@@ -914,45 +914,45 @@
 
 
 		<!-- Misc Lamps -->
-		<bezel name="lamp55" element="Credit_Indicator"><bounds x="23" y="456" width="70" height="21" /></bezel>	<!-- Credit Indicator -->
+		<bezel name="lamp55" element="Credit_Indicator"><bounds x="23" y="456" width="70" height="21" /></bezel>    <!-- Credit Indicator -->
 
-		<bezel name="lamp52" element="Lamp_White_50k"><bounds x="009" y="322" width="09" height="09" /></bezel>		<!-- 50,000 Outlane Left -->
-		<bezel name="lamp37" element="Lamp_White_50k"><bounds x="301" y="322" width="09" height="09" /></bezel>		<!-- 50,000 Outlane Right -->
+		<bezel name="lamp52" element="Lamp_White_50k"><bounds x="009" y="322" width="09" height="09" /></bezel>     <!-- 50,000 Outlane Left -->
+		<bezel name="lamp37" element="Lamp_White_50k"><bounds x="301" y="322" width="09" height="09" /></bezel>     <!-- 50,000 Outlane Right -->
 		<!-- Bonus End of Ball Lamps -->
-		<bezel name="lamp0"  element="Lamp_White_1k"> <bounds x="155" y="413" width="09" height="09" /></bezel>		<!-- Bonus 1000 -->
-		<bezel name="lamp15" element="Lamp_White_2k"> <bounds x="155" y="400" width="09" height="09" /></bezel>		<!-- Bonus 2000 -->
-		<bezel name="lamp30" element="Lamp_White_3k"> <bounds x="155" y="387" width="09" height="09" /></bezel>		<!-- Bonus 3000 -->
-		<bezel name="lamp45" element="Lamp_White_4k"> <bounds x="155" y="374" width="09" height="09" /></bezel>		<!-- Bonus 4000 -->
-		<bezel name="lamp1"  element="Lamp_White_5k"> <bounds x="155" y="361" width="09" height="09" /></bezel>		<!-- Bonus 5000 -->
-		<bezel name="lamp16" element="Lamp_White_6k"> <bounds x="155" y="348" width="09" height="09" /></bezel>		<!-- Bonus 6000 -->
-		<bezel name="lamp31" element="Lamp_White_7k"> <bounds x="155" y="335" width="09" height="09" /></bezel>		<!-- Bonus 7000 -->
-		<bezel name="lamp46" element="Lamp_White_8k"> <bounds x="155" y="322" width="09" height="09" /></bezel>		<!-- Bonus 8000 -->
-		<bezel name="lamp2"  element="Lamp_White_9k"> <bounds x="155" y="309" width="09" height="09" /></bezel>		<!-- Bonus 9000 -->
-		<bezel name="lamp17" element="Lamp_White_10k"><bounds x="140" y="292" width="12" height="12" /></bezel>		<!-- Bonus 10000 -->
-		<bezel name="lamp32" element="Lamp_White_20k"><bounds x="167" y="292" width="12" height="12" /></bezel>		<!-- Bonus 20000 -->
+		<bezel name="lamp0"  element="Lamp_White_1k"> <bounds x="155" y="413" width="09" height="09" /></bezel>     <!-- Bonus 1000 -->
+		<bezel name="lamp15" element="Lamp_White_2k"> <bounds x="155" y="400" width="09" height="09" /></bezel>     <!-- Bonus 2000 -->
+		<bezel name="lamp30" element="Lamp_White_3k"> <bounds x="155" y="387" width="09" height="09" /></bezel>     <!-- Bonus 3000 -->
+		<bezel name="lamp45" element="Lamp_White_4k"> <bounds x="155" y="374" width="09" height="09" /></bezel>     <!-- Bonus 4000 -->
+		<bezel name="lamp1"  element="Lamp_White_5k"> <bounds x="155" y="361" width="09" height="09" /></bezel>     <!-- Bonus 5000 -->
+		<bezel name="lamp16" element="Lamp_White_6k"> <bounds x="155" y="348" width="09" height="09" /></bezel>     <!-- Bonus 6000 -->
+		<bezel name="lamp31" element="Lamp_White_7k"> <bounds x="155" y="335" width="09" height="09" /></bezel>     <!-- Bonus 7000 -->
+		<bezel name="lamp46" element="Lamp_White_8k"> <bounds x="155" y="322" width="09" height="09" /></bezel>     <!-- Bonus 8000 -->
+		<bezel name="lamp2"  element="Lamp_White_9k"> <bounds x="155" y="309" width="09" height="09" /></bezel>     <!-- Bonus 9000 -->
+		<bezel name="lamp17" element="Lamp_White_10k"><bounds x="140" y="292" width="12" height="12" /></bezel>     <!-- Bonus 10000 -->
+		<bezel name="lamp32" element="Lamp_White_20k"><bounds x="167" y="292" width="12" height="12" /></bezel>     <!-- Bonus 20000 -->
 		<!-- Bonus Multiplier Lamps -->
-		<bezel name="lamp56" element="Lamp_Green_Arrow_04_2x"> <bounds x="111" y="317" width="20" height="12.5" /></bezel>		<!-- 2X Bonus -->
-		<bezel name="lamp41" element="Lamp_Yellow_Arrow_04_3x"><bounds x="111" y="337" width="20" height="12.5" /></bezel>		<!-- 3X Bonus -->
-		<bezel name="lamp26" element="Lamp_White_Arrow_08_5x"> <bounds x="188" y="317" width="20" height="12.5" /></bezel>		<!-- 5X Bonus -->
-		<bezel name="lamp40" element="Lamp_Amber_Arrow_08">    <bounds x="188" y="337" width="20" height="12.5" /></bezel>		<!-- Extra Ball -->
+		<bezel name="lamp56" element="Lamp_Green_Arrow_04_2x"> <bounds x="111" y="317" width="20" height="12.5" /></bezel>      <!-- 2X Bonus -->
+		<bezel name="lamp41" element="Lamp_Yellow_Arrow_04_3x"><bounds x="111" y="337" width="20" height="12.5" /></bezel>      <!-- 3X Bonus -->
+		<bezel name="lamp26" element="Lamp_White_Arrow_08_5x"> <bounds x="188" y="317" width="20" height="12.5" /></bezel>      <!-- 5X Bonus -->
+		<bezel name="lamp40" element="Lamp_Amber_Arrow_08">    <bounds x="188" y="337" width="20" height="12.5" /></bezel>      <!-- Extra Ball -->
 
 		<!-- Saucer Lamps -->
-		<bezel name="lamp24" element="Lamp_White_Arrow_Up_5x"> <bounds x="154" y="102" width="11" height="22" /></bezel>	<!-- 5X Bonus Potential -->
-		<bezel name="lamp39" element="Lamp_Yellow_Arrow_Up_3x"><bounds x="154" y="128" width="11" height="22" /></bezel>	<!-- 3X Bonus Potential -->
-		<bezel name="lamp54" element="Lamp_Green_Arrow_Up_2x"> <bounds x="154" y="154" width="11" height="22" /></bezel>	<!-- 2X Bonus Potential -->
-		<bezel               element="Lamp_White_Arrow_Up_3k"> <bounds x="154" y="180" width="11" height="22" /></bezel>	<!-- Upper 3000 -->
+		<bezel name="lamp24" element="Lamp_White_Arrow_Up_5x"> <bounds x="154" y="102" width="11" height="22" /></bezel>    <!-- 5X Bonus Potential -->
+		<bezel name="lamp39" element="Lamp_Yellow_Arrow_Up_3x"><bounds x="154" y="128" width="11" height="22" /></bezel>    <!-- 3X Bonus Potential -->
+		<bezel name="lamp54" element="Lamp_Green_Arrow_Up_2x"> <bounds x="154" y="154" width="11" height="22" /></bezel>    <!-- 2X Bonus Potential -->
+		<bezel               element="Lamp_White_Arrow_Up_3k"> <bounds x="154" y="180" width="11" height="22" /></bezel>    <!-- Upper 3000 -->
 
 		<!-- "A" & "B" Potential Lamps -->
-		<bezel name="lamp5"  element="Lamp_White_1k"><bounds x="095" y="265" width="10" height="10" /></bezel>		<!-- Upper 1000 -->
-		<bezel name="lamp20" element="Lamp_White_2k"><bounds x="115" y="265" width="10" height="10" /></bezel>		<!-- Upper 2000 -->
-		<bezel name="lamp35" element="Lamp_White_3k"><bounds x="135" y="265" width="10" height="10" /></bezel>		<!-- Upper 3000 -->
-		<bezel name="lamp50" element="Lamp_White_4k"><bounds x="155" y="265" width="10" height="10" /></bezel>		<!-- Upper 4000 -->
-		<bezel name="lamp6"  element="Lamp_White_5k"><bounds x="175" y="265" width="10" height="10" /></bezel>		<!-- Upper 5000 -->
-		<bezel name="lamp21" element="Lamp_Amber">   <bounds x="195" y="265" width="10" height="10" /></bezel>		<!-- Extra Ball Potential -->
-		<bezel name="lamp36" element="Lamp_Red">     <bounds x="215" y="265" width="10" height="10" /></bezel>		<!-- Special Potential -->
+		<bezel name="lamp5"  element="Lamp_White_1k"><bounds x="095" y="265" width="10" height="10" /></bezel>      <!-- Upper 1000 -->
+		<bezel name="lamp20" element="Lamp_White_2k"><bounds x="115" y="265" width="10" height="10" /></bezel>      <!-- Upper 2000 -->
+		<bezel name="lamp35" element="Lamp_White_3k"><bounds x="135" y="265" width="10" height="10" /></bezel>      <!-- Upper 3000 -->
+		<bezel name="lamp50" element="Lamp_White_4k"><bounds x="155" y="265" width="10" height="10" /></bezel>      <!-- Upper 4000 -->
+		<bezel name="lamp6"  element="Lamp_White_5k"><bounds x="175" y="265" width="10" height="10" /></bezel>      <!-- Upper 5000 -->
+		<bezel name="lamp21" element="Lamp_Amber">   <bounds x="195" y="265" width="10" height="10" /></bezel>      <!-- Extra Ball Potential -->
+		<bezel name="lamp36" element="Lamp_Red">     <bounds x="215" y="265" width="10" height="10" /></bezel>      <!-- Special Potential -->
 
 		<!-- Drop Target Lamps -->
-		<bezel name="lamp47" element="Lamp_Red"><bounds x="153" y="225" width="14" height="14" /></bezel>			<!-- Special Potential -->
+		<bezel name="lamp47" element="Lamp_Red"><bounds x="153" y="225" width="14" height="14" /></bezel>           <!-- Special Potential -->
 
 		<!-- Outhole -->
 		<bezel name="solenoid6"  element="Solenoid_Outhole">                        <bounds x="150" y="455" width="58" height="22" /></bezel>

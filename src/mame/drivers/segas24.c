@@ -880,7 +880,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 
 	if (irq_tmode == 1 || irq_tmode == 2)
 	{
-	//	m_screen->update_now();
+	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 }

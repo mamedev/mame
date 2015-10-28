@@ -6,15 +6,15 @@
 
    GI AY-3-8800-1 (Datasheet exists as AY-3-8500-1 Graphics Interface Chip)
    For the GIMINI "Challenger" programmable game system.
-   
+
    Really only ever used in the Unisonic Champion 2711
 
    More LA tests made by plgDavid on hardware pretty much confirmed what is found
    in the AY-3-8950-1 datasheet, but with more fine grained detail.
 
-   the GIC does not have internal ram of any sort apart from shift registers, 
+   the GIC does not have internal ram of any sort apart from shift registers,
    instead it relies on the external shared ram, (see page 7-85) Appendix AY-3-8950-1
-   
+
    Unverified on LA (since the video pins are all connected into a composite mix):
    at line 46 it lowers GIC_BUSY, until line 240
 
@@ -22,10 +22,10 @@
    It will read the external ram areas continuously while GIC_BUSY is low (for 12.36ms)
 
    (NOTE: OCTAL)
-   
+
    000,001,002,003,004,005,  110,111,112,113,114,115,116,117,120,121,122,123,124,125 (15 times - No first bg line?)
    006,007,010,011,012,013,  110,111,112,113,114,115,116,117,120,121,122,123,124,125 (16 times)
-   
+
    014,015,016,017,020,021,  125,126,127,130,131,132,133,134,135,136,137,140,141,142 (16 times)
    022,023,024,025,026,027,  125,126,127,130,131,132,133,134,135,136,137,140,141,142 (16 times)
 
@@ -46,15 +46,15 @@
    for a total of (12*20*16) = 3840 RAM reads (3 clocks per read at 1.79MHz)
 
    Then it relingishes control to the CPU by raising BUSREQ.
-   
+
    Cloking in more detail: (in 1.79MHz clocks)
    boot:
-	busy:1  5360 clocks
-	busy:0 22116 clocks
-	busy:1  7752 clocks
-	busy:0 22116 clocks
-	busy:1  7752 clocks	
-	(...)
+    busy:1  5360 clocks
+    busy:0 22116 clocks
+    busy:1  7752 clocks
+    busy:0 22116 clocks
+    busy:1  7752 clocks
+    (...)
 
    There are NO IRQ handshakes, just BUSREQ sync shared RAM
 
@@ -72,7 +72,7 @@ const device_type GIC = &device_creator<gic_device>;
 //A real AY-3-8800-1 (dead) is going to decap for a good dump
 ROM_START( gic_font )
 	ROM_REGION( 0x200, "cgrom", 0 )
-	ROM_LOAD( "ay-3-8800-1.bin", 0x0000, 0x200,  BAD_DUMP CRC(d9f11d2b) SHA1(60ef45d51d102cd3af78787008d9aed848137bee)) 
+	ROM_LOAD( "ay-3-8800-1.bin", 0x0000, 0x200,  BAD_DUMP CRC(d9f11d2b) SHA1(60ef45d51d102cd3af78787008d9aed848137bee))
 ROM_END
 
 
@@ -86,9 +86,9 @@ gic_device::gic_device(const machine_config &mconfig, const char *tag, device_t 
 	, device_video_interface(mconfig, *this)
 	, m_cgrom(0)
 	, m_audiocnt(0)
-	, m_audioval(0)	
-    , m_audioreset(0)
-    , m_ram(0)	
+	, m_audioval(0)
+	, m_audioreset(0)
+	, m_ram(0)
 {
 }
 
@@ -97,11 +97,11 @@ gic_device::gic_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_cgrom(0)	
+	, m_cgrom(0)
 	, m_audiocnt(0)
 	, m_audioval(0)
-    , m_audioreset(0)
-    , m_ram(0)	
+	, m_audioreset(0)
+	, m_ram(0)
 {
 }
 
@@ -126,7 +126,7 @@ void gic_device::device_start()
 	m_vblank_timer->adjust( m_screen->time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, m_screen->scan_period() );
 
 	// allocate the audio stream
-	m_stream = stream_alloc( 0, 1, clock()/(2*228) ); 
+	m_stream = stream_alloc( 0, 1, clock()/(2*228) );
 }
 
 
@@ -137,22 +137,21 @@ void gic_device::device_start()
 void gic_device::device_reset()
 {
 	m_audiocnt=0;
-	m_audioval=0;	
+	m_audioval=0;
 	m_audioreset=0;
 }
 
 #define GIC_CLUB    28
 #define GIC_SPACE    0
-	
+
 void gic_device::draw_char_left(int startx, int starty, UINT8 code, bitmap_ind16 &bitmap){
-	
 	UINT8*ptr = &m_cgrom[code*GIC_CHAR_H];
-		
+
 	for (size_t y=0;y<GIC_CHAR_H;y++){
-		UINT8 current = *ptr++;	
+		UINT8 current = *ptr++;
 		UINT8 nextx=0;
-		UINT8 curry= starty+y;		
-		for(UINT8 x=0x20;x!=0;x=x/2){	
+		UINT8 curry= starty+y;
+		for(UINT8 x=0x20;x!=0;x=x/2){
 			if (current&x)
 				m_bitmap.pix16(curry,startx+nextx) = GIC_WHITE;
 			nextx++;
@@ -161,23 +160,22 @@ void gic_device::draw_char_left(int startx, int starty, UINT8 code, bitmap_ind16
 }
 
 void gic_device::draw_char_right(int startx, int starty, UINT8 code, bitmap_ind16 &bitmap, int bg_col){
-	
 	UINT8*ptr = &m_cgrom[code*GIC_CHAR_H];
-	
+
 	for (size_t y=0;y<GIC_CHAR_H;y++){
-		UINT8 current = *ptr++;	
+		UINT8 current = *ptr++;
 		UINT8 nextx=0;
 		UINT8 curry= starty+y;
 
 		m_bitmap.pix16(curry,startx+nextx) = bg_col;
-		nextx++;	
-		for(UINT8 x=0x20;x!=0;x=x/2){			
-			m_bitmap.pix16(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;	
+		nextx++;
+		for(UINT8 x=0x20;x!=0;x=x/2){
+			m_bitmap.pix16(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;
 			nextx++;
 		}
 		m_bitmap.pix16(curry,startx+nextx) = bg_col;
-		nextx++;		
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;		
+		nextx++;
+		m_bitmap.pix16(curry,startx+nextx) = bg_col;
 	}
 }
 
@@ -187,15 +185,15 @@ UINT32 gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	size_t XSTART = BORDER_SIZE;
 	size_t YSTART = START_ACTIVE_SCAN;
-	
+
 	//left hand side first
 	UINT8 current=0;
 	for(UINT8 cy=0;cy<GIC_LEFT_H;cy++){
 		for(UINT8 cx=0;cx<GIC_LEFT_W;cx++){
 			draw_char_left(XSTART+(cx*GIC_CHAR_W),
-			               YSTART+(cy*GIC_CHAR_H),
-			               m_ram[current],
-				           m_bitmap);
+							YSTART+(cy*GIC_CHAR_H),
+							m_ram[current],
+							m_bitmap);
 			current++;
 		}
 	}
@@ -203,39 +201,39 @@ UINT32 gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	//right hand side is next
 	current=0x48;//110 octal
 	XSTART+=(GIC_LEFT_W*GIC_CHAR_W)+1;
-	
+
 	for(UINT8 cy=0;cy<GIC_RIGHT_H;cy++){
 		for(UINT8 cx=0;cx<GIC_RIGHT_W;cx++){
 			//complex case
 			UINT8 data = m_ram[current++];
-			
+
 			size_t currX   = (XSTART+           (cx*(3+GIC_CHAR_W)));
 			size_t currUP  = (YSTART+           (cy*(2*GIC_CHAR_H)));
 			size_t currLOW = (YSTART+GIC_CHAR_H+(cy*(2*GIC_CHAR_H)));
-			
+
 			switch(data&0xC0){
 				case 0x00:{
 					//lower rectangle only, normal char
 					draw_char_right(currX,currLOW,data,m_bitmap,GIC_GREEN);
 				}break;
-				
+
 				//White block
 				case 0xC0:{
 					//upper rectangle
-					draw_char_right(currX,currUP, GIC_SPACE,m_bitmap,GIC_WHITE);	
-					//lower rectangle						  
+					draw_char_right(currX,currUP, GIC_SPACE,m_bitmap,GIC_WHITE);
+					//lower rectangle
 					draw_char_right(currX,currLOW,GIC_SPACE,m_bitmap,GIC_WHITE);
 				}break;
-				
+
 				//Draw a card
 				case 0x40:{
-					int bgColor = (data&0x10)?GIC_RED:GIC_BLACK;	
+					int bgColor = (data&0x10)?GIC_RED:GIC_BLACK;
 					//upper rectangle
-					draw_char_right(currX,currUP,           (data&0xF)+0x30,m_bitmap,bgColor);					
-					//lower rectangle		
-					draw_char_right(currX,currLOW,GIC_CLUB+((data&0x30)>>4),m_bitmap,bgColor);	
+					draw_char_right(currX,currUP,           (data&0xF)+0x30,m_bitmap,bgColor);
+					//lower rectangle
+					draw_char_right(currX,currLOW,GIC_CLUB+((data&0x30)>>4),m_bitmap,bgColor);
 				}break;
-				
+
 				default:printf("gic unknown char! %02X\n",data); break;
 			}
 		}
@@ -254,7 +252,7 @@ void gic_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		case TIMER_VBLANK:
 			//flag the audio to reset
 			m_audioreset = 1;//phase need to reset! on next clock/228
-		break;	
+		break;
 	}
 }
 
@@ -264,20 +262,20 @@ void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 {
 	stream_sample_t *buffer = outputs[0];
 
-    //Audio is basic and badly implemented (doubt that was the intent)
+	//Audio is basic and badly implemented (doubt that was the intent)
 	//The datasheet list the 3 different frequencies the GIC can generate: 500,1000 and 2000Hz
-	//but it is clear (for an audio guy at least) that the resulting spectrum 
+	//but it is clear (for an audio guy at least) that the resulting spectrum
 	//is not a pure square wav. In fact, the counter is reset on vertical sync!
 	//http://twitter.com/plgDavid/status/527269086016077825
-	//...thus creating a buzzing sound. 
+	//...thus creating a buzzing sound.
 
-	//Dumping the audio pin value each time 
+	//Dumping the audio pin value each time
 	// either (PHI2 made a 0->1 transition (1.789MHz)
 	//     or (PHI1 made a 1->1 transition (1.789MHz)
-	//I found that the granularity of audio transitions 
+	//I found that the granularity of audio transitions
 	//(including phase resets and silences) was 228 clocks
 	//The audio subsystem thus runs at 1.789MHz/228 = 7849.88Hz
-	
+
 	//when 1
 	//normal period:912 clocks (228*4)
 	//hi for 456 clocks
@@ -295,41 +293,41 @@ void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 	//hi for 912   (228*4)
 	//when 4
 	//normal period lasts 3648 clocks (228*16)
-	//hi for 1824(228*8) 
-	//lo for 1824(228*8) 	
+	//hi for 1824(228*8)
+	//lo for 1824(228*8)
 	//Reset period:
-	//lo for 1824(228*8) 
+	//lo for 1824(228*8)
 	//hi for 2508(228*11)
 	//lo for 1824(228*8)
 	//hi for 1824(228*8)
-	
+
 	if(!m_ram) return;
 
 	UINT8 audioByte = m_ram[GIC_AUDIO_BYTE]*2;
-	
+
 	if(!audioByte){
 		for(size_t i = 0; i < samples; i++)
-			*buffer++ = 0;	
+			*buffer++ = 0;
 
-   		m_audioval   = 0;
-		m_audiocnt   = 0;     
-        m_audioreset = 0;
-		return;//early	
+		m_audioval   = 0;
+		m_audiocnt   = 0;
+		m_audioreset = 0;
+		return;//early
 	}
-	
-    //forced resynch @ 59.95Hz
-    if(m_audioreset){
-   		m_audioval   = 0;//forced low
-		m_audiocnt   = 0;     
-        m_audioreset = 0;
-    }
+
+	//forced resynch @ 59.95Hz
+	if(m_audioreset){
+		m_audioval   = 0;//forced low
+		m_audiocnt   = 0;
+		m_audioreset = 0;
+	}
 
 	for(size_t i=0; i < samples; i++){
-        m_audiocnt++;
+		m_audiocnt++;
 		if(m_audiocnt >= audioByte){
 			m_audioval = !m_audioval;
 			m_audiocnt=0;
 		}
 		*buffer++ = m_audioval<<13;
-    }
+	}
 }

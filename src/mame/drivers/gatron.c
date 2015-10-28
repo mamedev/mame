@@ -188,7 +188,7 @@
   Press "BIG BAR TICKET" (key C) to play with Big Bar (right) Ticket.
 
   A curiosity...
-  
+
   The Pull Tabs flyer shows the following paytable:
 
   - Super Star -      - Lady Luck -         - Big Bar -
@@ -199,14 +199,14 @@
    3x Crowns  1     3x Bells         2     3x Bananas   2
 
   ...but the game seems to have inverted objects importance:
- 
+
   - Super Star -      - Lady Luck -         - Big Bar -
    3x Crowns 75     3x Bells       100     3x Bananas  75
    3x Clubs   8     3x Licquors     25     3x Plums    10
    3x Cups    4     3x Horseshoes   10     3x Pears     6
    3x Hearts  3     3x Watermelons   5     3x Cherries  4
    3x Stars   1     3x Oranges       2     3x Bars      2
- 
+
   Can't get an input or combination of them that change this logic.
   Maybe the paytable is different in this set, or just the flyer doesn't
   reflect the real thing.

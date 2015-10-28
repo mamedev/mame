@@ -19,10 +19,10 @@
         - In Back Rotate Test, rotation is tested with the following arrangement (upper bits of rotation parameter):
           04 -> 05 -> 02 -> 03 -> 00 -> 01 -> 06 -> 07 -> 04 and backwards
           Anything with bit 0 set is tested from 0xff to 0, with bit 0 clear that's 0 -> 0xff, fun.
-	- Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol. 
-	  We currently have slave CPU irq hooked up to vblank, might or might not be correct.
-	- invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
-	- understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging, missing video bit or it's actually a RMW thing);
+    - Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol.
+      We currently have slave CPU irq hooked up to vblank, might or might not be correct.
+    - invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
+    - understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging, missing video bit or it's actually a RMW thing);
     cleanup
         - split into driver/video;
 
@@ -633,8 +633,8 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
 	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
 	//       between these operations brings us to this.
 	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
-//	UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);
-//	m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
+//  UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);
+//  m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 

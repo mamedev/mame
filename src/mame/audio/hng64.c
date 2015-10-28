@@ -277,7 +277,7 @@ WRITE16_MEMBER(hng64_state::sound_comms_w)
 			/* correct? */
 			m_audiocpu->set_input_line(5, CLEAR_LINE);
 			//if(data)
-			//	printf("IRQ ACK %02x?\n",data);
+			//  printf("IRQ ACK %02x?\n",data);
 			return;
 	}
 

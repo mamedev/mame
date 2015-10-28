@@ -17941,7 +17941,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-  <!-- The AtariAge logo looks incorrect, but games function, there are probably other version too, YouTube shows a 2007 version. -->
+	<!-- The AtariAge logo looks incorrect, but games function, there are probably other version too, YouTube shows a 2007 version. -->
 	<software name="stelstok">
 		<description>Stella's Stocking 2008</description>
 		<year>2008</year>
@@ -17955,59 +17955,59 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-  <!-- This was released by the author, also available via Atariage, are both versions the same? needs DPC+ emulation -->
-  <software name="stayfr2" supported="no">
-    <description>Stay Frosty 2 (NTSC)</description>
-    <year>2013</year>
-    <publisher>Spiceware</publisher>
-    <sharedfeat name="compatibility" value="NTSC" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_dpcplus" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="SF2_20131217_RC8_NTSC.bin" size="0x8000" crc="4eb739ab" sha1="5eceaf8e90bd9a002f4935f082df7b25716dceb0" offset="0" />
-      </dataarea>
-    </part>
-  </software>
+	<!-- This was released by the author, also available via Atariage, are both versions the same? needs DPC+ emulation -->
+	<software name="stayfr2" supported="no">
+	<description>Stay Frosty 2 (NTSC)</description>
+	<year>2013</year>
+	<publisher>Spiceware</publisher>
+	<sharedfeat name="compatibility" value="NTSC" />
+	<part name="cart" interface="a2600_cart">
+		<feature name="slot" value="a26_dpcplus" />
+		<dataarea name="rom" size="0x8000">
+		<rom name="SF2_20131217_RC8_NTSC.bin" size="0x8000" crc="4eb739ab" sha1="5eceaf8e90bd9a002f4935f082df7b25716dceb0" offset="0" />
+		</dataarea>
+	</part>
+	</software>
 
-  <software name="stayfr2d" cloneof="stayfr2" supported="no">
-    <description>Stay Frosty 2 (NTSC, demo)</description>
-    <year>2013</year>
-    <publisher>Spiceware</publisher>
-    <sharedfeat name="compatibility" value="NTSC" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_dpcplus" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="SF2_demo_NTSC.bin" size="0x8000" crc="fd850bd6" sha1="bd8166da7777c66e6bb3ab0c77563193d8289f5f" offset="0" />
-      </dataarea>
-    </part>
-  </software>
+	<software name="stayfr2d" cloneof="stayfr2" supported="no">
+	<description>Stay Frosty 2 (NTSC, demo)</description>
+	<year>2013</year>
+	<publisher>Spiceware</publisher>
+	<sharedfeat name="compatibility" value="NTSC" />
+	<part name="cart" interface="a2600_cart">
+		<feature name="slot" value="a26_dpcplus" />
+		<dataarea name="rom" size="0x8000">
+		<rom name="SF2_demo_NTSC.bin" size="0x8000" crc="fd850bd6" sha1="bd8166da7777c66e6bb3ab0c77563193d8289f5f" offset="0" />
+		</dataarea>
+	</part>
+	</software>
 
 
-  <software name="stayfr2e" cloneof="stayfr2" supported="no">
-    <description>Stay Frosty 2 (PAL)</description>
-    <year>2013</year>
-    <publisher>Spiceware</publisher>
-    <sharedfeat name="compatibility" value="PAL" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_dpcplus" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="SF2_20131217_RC8_PAL.bin" size="0x8000" crc="7b495dc3" sha1="1625ef74b0a48c2968fad832ab8e2edc8187a53f" offset="0" />
-      </dataarea>
-    </part>
-  </software>
+	<software name="stayfr2e" cloneof="stayfr2" supported="no">
+	<description>Stay Frosty 2 (PAL)</description>
+	<year>2013</year>
+	<publisher>Spiceware</publisher>
+	<sharedfeat name="compatibility" value="PAL" />
+	<part name="cart" interface="a2600_cart">
+		<feature name="slot" value="a26_dpcplus" />
+		<dataarea name="rom" size="0x8000">
+		<rom name="SF2_20131217_RC8_PAL.bin" size="0x8000" crc="7b495dc3" sha1="1625ef74b0a48c2968fad832ab8e2edc8187a53f" offset="0" />
+		</dataarea>
+	</part>
+	</software>
 
-  <software name="stayfr2de" cloneof="stayfr2" supported="no">
-    <description>Stay Frosty 2 (PAL, demo)</description>
-    <year>2013</year>
-    <publisher>Spiceware</publisher>
-    <sharedfeat name="compatibility" value="PAL" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_dpcplus" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="SF2_demo_PAL.bin" size="0x8000" crc="b47582f3" sha1="73625429e73f1b354e0cbe6a360d79590032de2b" offset="0" />
-      </dataarea>
-    </part>
-  </software>
+	<software name="stayfr2de" cloneof="stayfr2" supported="no">
+	<description>Stay Frosty 2 (PAL, demo)</description>
+	<year>2013</year>
+	<publisher>Spiceware</publisher>
+	<sharedfeat name="compatibility" value="PAL" />
+	<part name="cart" interface="a2600_cart">
+		<feature name="slot" value="a26_dpcplus" />
+		<dataarea name="rom" size="0x8000">
+		<rom name="SF2_demo_PAL.bin" size="0x8000" crc="b47582f3" sha1="73625429e73f1b354e0cbe6a360d79590032de2b" offset="0" />
+		</dataarea>
+	</part>
+	</software>
 
 </softwarelist>
 

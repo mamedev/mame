@@ -314,7 +314,7 @@ static int tzx_handle_direct(INT16 **buffer, const UINT8 *bytes, int pause, int 
 
 			tzx_output_wave(buffer, samples);
 			size += samples;
-			
+
 		}
 	}
 

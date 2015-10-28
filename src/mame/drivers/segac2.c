@@ -30,7 +30,7 @@
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2     171-5992A
     1992  Tant-R (Japan)             Sega              317-0211         C2
     1992  Tant-R (Korea)             Sega              ?                C2
-	1993  SegaSonic Popcorn Shop     Sega              317-0140         C2
+    1993  SegaSonic Popcorn Shop     Sega              317-0140         C2
     1994  PotoPoto (Japan)           Sega              317-0218         C2
     1994  Stack Columns (Japan)      Sega              317-0219         C2
     1994  Stack Columns (World)      Sega              317-0223         C2

@@ -18,7 +18,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
 
-#define EC1841_MEMBOARD_SIZE	(512*1024)
+#define EC1841_MEMBOARD_SIZE    (512*1024)
 
 #define VERBOSE_DBG 1       /* general debug messages */
 

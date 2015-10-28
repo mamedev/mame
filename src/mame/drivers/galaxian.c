@@ -5235,7 +5235,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 	// change spriteram base per each 64-line part of the screen
 	if ((split & 0x3f) == 0)
 	{
-//		m_screen->update_now();
+//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 		m_sprites_base = 0x40 | (split << 2 & 0x300);
 	}
@@ -5346,7 +5346,7 @@ static MACHINE_CONFIG_DERIVED( froggermc, galaxian_base )
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mooncrst_map_base)     /* no discrete sound ! */
-	
+
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, galaxian_state, froggermc_audiocpu_irq_ack)
 MACHINE_CONFIG_END

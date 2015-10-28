@@ -91,7 +91,7 @@ private:
 	UINT8 m_segment[6];
 	UINT8 m_lamp_decode;
 	UINT8 m_solenoid_features[20][4];
-	UINT8 m_io_hold_x[5];		// Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
+	UINT8 m_io_hold_x[5];       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
 	required_device<m6800_cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
@@ -125,7 +125,7 @@ static INPUT_PORTS_START( by17 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity")  PORT_CHANGED_MEMBER(DEVICE_SELF, by17_state, activity_button, NULL)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")				PORT_DIPLOCATION("SW0:!1,!2,!3,!4,!5") // same as 03
+	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")                PORT_DIPLOCATION("SW0:!1,!2,!3,!4,!5") // same as 03
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
@@ -157,18 +157,18 @@ static INPUT_PORTS_START( by17 )
 	PORT_DIPSETTING(    0x1d, "2 Coins/14 Credits")
 	PORT_DIPSETTING(    0x1e, "1 Coin/15 Credits")
 	PORT_DIPSETTING(    0x1f, "2 Coins/15 Credits")
-	PORT_DIPNAME( 0x20, 0x20, "Score Level Award")			PORT_DIPLOCATION("SW0:!6")
+	PORT_DIPNAME( 0x20, 0x20, "Score Level Award")          PORT_DIPLOCATION("SW0:!6")
 	PORT_DIPSETTING(    0x00, "Extra Ball")
 	PORT_DIPSETTING(    0x20, "Replay")
-	PORT_DIPNAME( 0x40, 0x00, "S07")						PORT_DIPLOCATION("SW0:!7")
+	PORT_DIPNAME( 0x40, 0x00, "S07")                        PORT_DIPLOCATION("SW0:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, "Play Melodies")				PORT_DIPLOCATION("SW0:!8")
+	PORT_DIPNAME( 0x80, 0x80, "Play Melodies")              PORT_DIPLOCATION("SW0:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 3")				PORT_DIPLOCATION("SW1:!1,!2,!3,!4,!5") // same as 01
+	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 3")                PORT_DIPLOCATION("SW1:!1,!2,!3,!4,!5") // same as 01
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
@@ -200,18 +200,18 @@ static INPUT_PORTS_START( by17 )
 	PORT_DIPSETTING(    0x1d, "2 Coins/14 Credits")
 	PORT_DIPSETTING(    0x1e, "1 Coin/15 Credits")
 	PORT_DIPSETTING(    0x1f, "2 Coins/15 Credits")
-	PORT_DIPNAME( 0x20, 0x00, "S14")								PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, "S14")                                PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, "Award for Beating Highest Score")	PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x40, "Award for Beating Highest Score")    PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Novelty")
 	PORT_DIPSETTING(    0x40, "3 Credits")
-	PORT_DIPNAME( 0x80, 0x80, "Balls per Game")						PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x80, "Balls per Game")                     PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x80, "5")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x01, "Maximum Credits")		PORT_DIPLOCATION("SW2:!1,!2,!3")
+	PORT_DIPNAME( 0x07, 0x01, "Maximum Credits")        PORT_DIPLOCATION("SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x00, "5")
 	PORT_DIPSETTING(    0x01, "10")
 	PORT_DIPSETTING(    0x02, "15")
@@ -220,25 +220,25 @@ static INPUT_PORTS_START( by17 )
 	PORT_DIPSETTING(    0x05, "30")
 	PORT_DIPSETTING(    0x06, "35")
 	PORT_DIPSETTING(    0x07, "40")
-	PORT_DIPNAME( 0x08, 0x08, "Credits Displayed")		PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPNAME( 0x08, 0x08, "Credits Displayed")      PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x08, DEF_STR( On ))
 	PORT_DIPNAME( 0x10, 0x10, "Match")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))			PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))           PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
 	// from here, game-specific options
-	PORT_DIPNAME( 0x20, 0x00, "S22 (game specific)")	PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x20, 0x00, "S22 (game specific)")    PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S23 (game specific)")	PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x40, 0x00, "S23 (game specific)")    PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "No Free Balls or Games")	PORT_DIPLOCATION("SW2:!8")   // night rider
+	PORT_DIPNAME( 0x80, 0x00, "No Free Balls or Games") PORT_DIPLOCATION("SW2:!8")   // night rider
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x0f, 0x00, "Coin Slot 2")			PORT_DIPLOCATION("SW3:!1,!2,!3,!4")
+	PORT_DIPNAME( 0x0f, 0x00, "Coin Slot 2")            PORT_DIPLOCATION("SW3:!1,!2,!3,!4")
 	PORT_DIPSETTING(    0x00, "Same as Slot 1")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ))
@@ -255,16 +255,16 @@ static INPUT_PORTS_START( by17 )
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
 	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits")
-	PORT_DIPNAME( 0x10, 0x00, "S29 (game specific)")	PORT_DIPLOCATION("SW3:!5")
+	PORT_DIPNAME( 0x10, 0x00, "S29 (game specific)")    PORT_DIPLOCATION("SW3:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S30 (game specific)")	PORT_DIPLOCATION("SW3:!6")
+	PORT_DIPNAME( 0x20, 0x00, "S30 (game specific)")    PORT_DIPLOCATION("SW3:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "Awards")					PORT_DIPLOCATION("SW3:!7") // night rider
+	PORT_DIPNAME( 0x40, 0x00, "Awards")                 PORT_DIPLOCATION("SW3:!7") // night rider
 	PORT_DIPSETTING(    0x00, "Conservative")
 	PORT_DIPSETTING(    0x40, "Liberal")
-	PORT_DIPNAME( 0x80, 0x00, "Lane Adjustment")		PORT_DIPLOCATION("SW3:!8") // night rider
+	PORT_DIPNAME( 0x80, 0x00, "Lane Adjustment")        PORT_DIPLOCATION("SW3:!8") // night rider
 	PORT_DIPSETTING(    0x00, "Conservative")
 	PORT_DIPSETTING(    0x80, "Liberal")
 
@@ -278,8 +278,8 @@ static INPUT_PORTS_START( by17 )
 	// standard
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-//	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, outhole_x0, (void *)0x07)	//  PORT_CODE(KEYCODE_BACKSPACE)
+//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, outhole_x0, (void *)0x07)  //  PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -327,105 +327,105 @@ static INPUT_PORTS_START( matahari )
 	PORT_INCLUDE( by17 )
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x60, 0x60, "Award for Beating Highest Score")		PORT_DIPLOCATION("SW0:!6,!7")
+	PORT_DIPNAME( 0x60, 0x60, "Award for Beating Highest Score")        PORT_DIPLOCATION("SW0:!6,!7")
 	PORT_DIPSETTING(    0x00, "Nothing")
 	PORT_DIPSETTING(    0x20, "1 Credit")
 	PORT_DIPSETTING(    0x40, "2 Credits")
 	PORT_DIPSETTING(    0x60, "3 Credits")
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x40, 0x00, "S15")									PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, "S15")                                    PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x40, DEF_STR( On ))
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x20, 0x00, "S22")									PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x20, 0x00, "S22")                                    PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "Saucer Award Feature")					PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Saucer Award Feature")                   PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, "Start at 3000 Points")
 	PORT_DIPSETTING(    0x40, "Start at 2X Bonus")
-	PORT_DIPNAME( 0x80, 0x00, "A & B Special Award Feature Per Ball")	PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "A & B Special Award Feature Per Ball")   PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, "Award Special Once")
 	PORT_DIPSETTING(    0x80, "Award Special Alternates")
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x10, 0x00, "S29")									PORT_DIPLOCATION("SW3:!5")
+	PORT_DIPNAME( 0x10, 0x00, "S29")                                    PORT_DIPLOCATION("SW3:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x60, 0x60, "Extra Ball / Specials Award Mode")		PORT_DIPLOCATION("SW3:!6,!7")
+	PORT_DIPNAME( 0x60, 0x60, "Extra Ball / Specials Award Mode")       PORT_DIPLOCATION("SW3:!6,!7")
 	PORT_DIPSETTING(    0x00, "Novelty / 50,000")
-//	PORT_DIPSETTING(    0x20, "")
+//  PORT_DIPSETTING(    0x20, "")
 	PORT_DIPSETTING(    0x40, "Extra Ball / 50,000")
 	PORT_DIPSETTING(    0x60, "Extra Ball / Replay")
-	PORT_DIPNAME( 0x80, 0x80, "Score Level Award")						PORT_DIPLOCATION("SW3:!8")
+	PORT_DIPNAME( 0x80, 0x80, "Score Level Award")                      PORT_DIPLOCATION("SW3:!8")
 	PORT_DIPSETTING(    0x00, "Extra Ball")
 	PORT_DIPSETTING(    0x80, "Replay")
 
-	PORT_MODIFY("X2")	/* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x20)	// PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x21)	// PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x22)	// PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x23)	// PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x24)	// PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x25)	// PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x26)	// PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x27)	// PORT_CODE(KEYCODE_A)
+	PORT_MODIFY("X2")   /* Drop Target switches */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x20)  // PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x21)  // PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x22)  // PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x23)  // PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x24)  // PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x25)  // PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x26)  // PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x27)  // PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, saucer_x3, (void *)0x37)	// PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, saucer_x3, (void *)0x37)   // PORT_CODE(KEYCODE_Q)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwerplay )
 	PORT_INCLUDE( by17 )
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x60, 0x60, "Award for Beating Highest Score")	PORT_DIPLOCATION("SW0:!6,!7")
+	PORT_DIPNAME( 0x60, 0x60, "Award for Beating Highest Score")    PORT_DIPLOCATION("SW0:!6,!7")
 	PORT_DIPSETTING(    0x00, "Nothing")
 	PORT_DIPSETTING(    0x20, "1 Credit")
 	PORT_DIPSETTING(    0x40, "2 Credits")
 	PORT_DIPSETTING(    0x60, "3 Credits")
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x20, 0x00, "Drop Target Award Sequence")			PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, "Drop Target Award Sequence")         PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "5X then Extra Ball")
 	PORT_DIPSETTING(    0x20, "5X and Extra Ball")
-	PORT_DIPNAME( 0x40, 0x00, "Rollover Button Score")				PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Rollover Button Score")              PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Conservative - 100 Points")
 	PORT_DIPSETTING(    0x40, "Liberal - 1,000 Points")
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x20, 0x00, "Drop Target Bank Reset")				PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x20, 0x00, "Drop Target Bank Reset")             PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x00, "Reset Both Banks")
 	PORT_DIPSETTING(    0x20, "Reset Completed Bank Only")
-	PORT_DIPNAME( 0x40, 0x00, "Pop Bumper Scores")					PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Pop Bumper Scores")                  PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, "Alternate 1,000 Points Top and Bottom")
 	PORT_DIPSETTING(    0x40, "All score 1,000 Points When Lit")
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x30, 0x20, "Top Saucer Specials Feature")		PORT_DIPLOCATION("SW3:!5,!6")
+	PORT_DIPNAME( 0x30, 0x20, "Top Saucer Specials Feature")        PORT_DIPLOCATION("SW3:!5,!6")
 	PORT_DIPSETTING(    0x00, "Outlane Specials do Not Light")
-//	PORT_DIPSETTING(    0x10, "")
+//  PORT_DIPSETTING(    0x10, "")
 	PORT_DIPSETTING(    0x20, "Outlane Specials Alternate")
 	PORT_DIPSETTING(    0x30, "Outlane Specials Both Light")
-	PORT_DIPNAME( 0xc0, 0xc0, "Award Mode")							PORT_DIPLOCATION("SW3:!7,!8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Award Mode")                         PORT_DIPLOCATION("SW3:!7,!8")
 	PORT_DIPSETTING(    0x00, "Novelty / 50,000")
-//	PORT_DIPSETTING(    0x40, "")
+//  PORT_DIPSETTING(    0x40, "")
 	PORT_DIPSETTING(    0x80, "Extra Ball / 50,000")
 	PORT_DIPSETTING(    0xc0, "Extra Ball / Replay")
 
-	PORT_MODIFY("X2")	/* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x20)	// PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x21)	// PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x22)	// PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x23)	// PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x24)	// PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x25)	// PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x26)	// PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x27)	// PORT_CODE(KEYCODE_A)
+	PORT_MODIFY("X2")   /* Drop Target switches */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x20)  // PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x21)  // PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x22)  // PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x23)  // PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x24)  // PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x25)  // PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x26)  // PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x27)  // PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, saucer_x3, (void *)0x37)	// PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, saucer_x3, (void *)0x37)   // PORT_CODE(KEYCODE_Q)
 INPUT_PORTS_END
 
 
@@ -465,28 +465,28 @@ CUSTOM_INPUT_MEMBER( by17_state::drop_target_x2 )
 
 	switch (bit_shift)
 	{
-		case 0:	if (machine().input().code_pressed_once(KEYCODE_K))
+		case 0: if (machine().input().code_pressed_once(KEYCODE_K))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
-		case 1:	if (machine().input().code_pressed_once(KEYCODE_J))
+		case 1: if (machine().input().code_pressed_once(KEYCODE_J))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
-		case 2:	if (machine().input().code_pressed_once(KEYCODE_H))
+		case 2: if (machine().input().code_pressed_once(KEYCODE_H))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
-		case 3:	if (machine().input().code_pressed_once(KEYCODE_G))
+		case 3: if (machine().input().code_pressed_once(KEYCODE_G))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
-		case 4:	if (machine().input().code_pressed_once(KEYCODE_F))
+		case 4: if (machine().input().code_pressed_once(KEYCODE_F))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
-		case 5:	if (machine().input().code_pressed_once(KEYCODE_D))
+		case 5: if (machine().input().code_pressed_once(KEYCODE_D))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
-		case 6:	if (machine().input().code_pressed_once(KEYCODE_S))
+		case 6: if (machine().input().code_pressed_once(KEYCODE_S))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
-		case 7:	if (machine().input().code_pressed_once(KEYCODE_A))
+		case 7: if (machine().input().code_pressed_once(KEYCODE_A))
 						m_io_hold_x[port] |= (1 << bit_shift);
 					break;
 	}
@@ -526,7 +526,7 @@ READ_LINE_MEMBER( by17_state::u10_cb1_r )
 
 WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 {
-#if 0					// Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
+#if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
 	{
 		int digit;
@@ -547,7 +547,7 @@ WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 
 WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 {
-//	logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
+//  logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
 	if (state == TRUE)
 		m_lamp_decode = m_u10a & 0x0f;
@@ -583,20 +583,20 @@ READ8_MEMBER( by17_state::u10_a_r )
 
 WRITE8_MEMBER( by17_state::u10_a_w )
 {
-//	logerror("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
+//  logerror("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
 
 	if (!m_u10_ca2)
 	{
-		if (BIT(data, 0)==0)			// Display 1
+		if (BIT(data, 0)==0)            // Display 1
 			m_segment[1] = data>>4;
 		else
-		if (BIT(data, 1)==0)			// Display 2
+		if (BIT(data, 1)==0)            // Display 2
 			m_segment[2] = data>>4;
 		else
-		if (BIT(data, 2)==0)			// Display 3
+		if (BIT(data, 2)==0)            // Display 3
 			m_segment[3] = data>>4;
 		else
-		if (BIT(data, 3)==0)			// Display 4
+		if (BIT(data, 3)==0)            // Display 4
 			m_segment[4] = data>>4;
 	}
 
@@ -665,7 +665,7 @@ READ8_MEMBER( by17_state::u11_a_r )
 
 WRITE8_MEMBER( by17_state::u11_a_w )
 {
-	if (BIT(data, 0)==0)			// Display Credit/Ball
+	if (BIT(data, 0)==0)            // Display Credit/Ball
 	{
 		m_segment[5] = m_u10a>>4;
 	}
@@ -691,7 +691,7 @@ WRITE8_MEMBER( by17_state::u11_a_w )
 	if BIT(data, 2)
 		m_digit = 6;
 	else
-	if (BIT(data, 2) && BIT(data, 3))	// Aftermarket 7th digit strobe for 6 digit games
+	if (BIT(data, 2) && BIT(data, 3))   // Aftermarket 7th digit strobe for 6 digit games
 		m_digit = 7;
 
 	if ((m_u10_ca2==0) && m_digit)
@@ -713,17 +713,17 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 {
 	if (!m_u11_cb2)
 	{
-		if ((data & 0x0f) < 0x0f)	// Momentary Solenoids
+		if ((data & 0x0f) < 0x0f)   // Momentary Solenoids
 		{
 			output_set_indexed_value( "solenoid", (data & 0x0f), TRUE);
 
-			if (m_solenoid_features[(data & 0x0f)][3])	// Reset/release relevant switch after firing Solenoid
+			if (m_solenoid_features[(data & 0x0f)][3])  // Reset/release relevant switch after firing Solenoid
 				m_io_hold_x[(m_solenoid_features[(data & 0x0f)][2])] &= (m_solenoid_features[(data & 0x0f)][3]);
 
-			if (m_solenoid_features[(data & 0x0f)][0] != 0xff)	// Play solenoid audio sample
+			if (m_solenoid_features[(data & 0x0f)][0] != 0xff)  // Play solenoid audio sample
 				m_samples->start(m_solenoid_features[(data & 0x0f)][0], m_solenoid_features[(data & 0x0f)][1]);
 		}
-		else						// Rest output - all momentary solenoids are off
+		else                        // Rest output - all momentary solenoids are off
 		{
 			for (int i=0; i<15; i++)
 			{
@@ -747,25 +747,25 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 	}
 	if ((m_u11b & 0x20) && ((data & 0x20)==0))
 	{
-		output_set_value("solenoid17", TRUE);					// Coin Lockout Coil engage
+		output_set_value("solenoid17", TRUE);                   // Coin Lockout Coil engage
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][1]);
 	}
 	else if ((data & 0x20) && ((m_u11b & 0x20)==0))
 	{
-		output_set_value("solenoid17", FALSE);					// Coin Lockout Coil release
+		output_set_value("solenoid17", FALSE);                  // Coin Lockout Coil release
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][2]);
 	}
 	if ((m_u11b & 0x40) && ((data & 0x40)==0))
 	{
-		output_set_value("solenoid18", TRUE);					// Flipper Enable Relay engage
+		output_set_value("solenoid18", TRUE);                   // Flipper Enable Relay engage
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][1]);
 	}
 	else if ((data & 0x40) && ((m_u11b & 0x40)==0))
 	{
-		output_set_value("solenoid18", FALSE);					// Flipper Enable Relay release
+		output_set_value("solenoid18", FALSE);                  // Flipper Enable Relay release
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][2]);
 	}
@@ -789,14 +789,13 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 // zero-cross detection
 TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
 {
-
 /*  Zero Crossing Detector - this timing is based on 50Hz AC line power input converted to unregulated DC
 
-	-+                          +---+
+    -+                          +---+
      |                          |   |
      |<-------- 9.30ms -------->|<->|700us
      |                          |   |
-	 +--------------------------+   +-----
+     +--------------------------+   +-----
 */
 
 	timer_device *zero_crossing_active_timer = machine().device<timer_device>("timer_z_pulse");
@@ -825,7 +824,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_pulse )
 // 555 timer for display refresh
 TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
 {
-
 /*   +--------------------------+   +-----
      |                          |   |
      |<-------- 2.85ms -------->|<->|300us
@@ -851,7 +849,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 DRIVER_INIT_MEMBER( by17_state, by17 )
 {
-
 	static const UINT8 solenoid_features_default[20][4] =
 	{
 	// This table serves two functions and is configured on a per game basis:
@@ -860,12 +857,12 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 
 	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
 	/*00*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*01*/  { 0x05, 0x01,  0x00, 0x00 },		// Chime 10
-	/*02*/  { 0x05, 0x02,  0x00, 0x00 },		// Chime 100
-	/*03*/  { 0x05, 0x03,  0x00, 0x00 },		// Chime 1000
-	/*04*/  { 0x05, 0x04,  0x00, 0x00 },		// Chime 10000
-	/*05*/  { 0x04, 0x00,  0x00, 0x00 },		// Knocker
-	/*06*/  { 0x01, 0x09,  0x00, 0x7f },		// Outhole
+	/*01*/  { 0x05, 0x01,  0x00, 0x00 },        // Chime 10
+	/*02*/  { 0x05, 0x02,  0x00, 0x00 },        // Chime 100
+	/*03*/  { 0x05, 0x03,  0x00, 0x00 },        // Chime 1000
+	/*04*/  { 0x05, 0x04,  0x00, 0x00 },        // Chime 10000
+	/*05*/  { 0x04, 0x00,  0x00, 0x00 },        // Knocker
+	/*06*/  { 0x01, 0x09,  0x00, 0x7f },        // Outhole
 	/*07*/  { 0x00, 0x00,  0x00, 0x00 },
 	/*08*/  { 0x02, 0x00,  0x00, 0x00 },
 	/*09*/  { 0x02, 0x00,  0x00, 0x00 },
@@ -874,11 +871,11 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 	/*12*/  { 0x00, 0x00,  0x00, 0x00 },
 	/*13*/  { 0x02, 0x00,  0x00, 0x00 },
 	/*14*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*15*/  { 0xff, 0xff,  0x00, 0x00 },		// None - all momentary solenoids off
+	/*15*/  { 0xff, 0xff,  0x00, 0x00 },        // None - all momentary solenoids off
 	//  { Sound Channel, Sound engage, Sound release, Not Used }
 	/*16*/  { 0xff, 0xff, 0xff,  0x00 },
-	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },		// Coin Lockout coil
-	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },		// Flipper Enable relay
+	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },        // Coin Lockout coil
+	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },        // Flipper Enable relay
 	/*19*/  { 0xff, 0xff, 0xff,  0x00 }
 	};
 
@@ -892,30 +889,29 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 
 DRIVER_INIT_MEMBER( by17_state, matahari )
 {
-
 	static const UINT8 solenoid_features_matahari[20][4] =
 	{
 	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
-	/*00*/  { 0x02, 0x05,  0x03, 0x7f },		// Saucer
-	/*01*/  { 0x05, 0x01,  0x00, 0x00 },		// Chime 10
-	/*02*/  { 0x05, 0x02,  0x00, 0x00 },		// Chime 100
-	/*03*/  { 0x05, 0x03,  0x00, 0x00 },		// Chime 1000
-	/*04*/  { 0x05, 0x04,  0x00, 0x00 },		// Chime 10000
-	/*05*/  { 0x04, 0x06,  0x00, 0x00 },		// Knocker
-	/*06*/  { 0x01, 0x09,  0x00, 0x7f },		// Outhole
-	/*07*/  { 0x02, 0x00,  0x00, 0x00 },		// Pop Bumper Left Bottom
-	/*08*/  { 0x02, 0x00,  0x00, 0x00 },		// Pop Bumper Left Top
-	/*09*/  { 0x02, 0x00,  0x00, 0x00 },		// Pop Bumper Right Top
-	/*10*/  { 0x02, 0x00,  0x00, 0x00 },		// Pop Bumper Right Bottom
-	/*11*/  { 0x02, 0x07,  0x00, 0x00 },		// Slingshot Left
-	/*12*/  { 0x00, 0x0b,  0x02, 0x0f },		// Drop Target Reset Left
-	/*13*/  { 0x02, 0x07,  0x00, 0x00 },		// Slingshot Right
-	/*14*/  { 0x03, 0x0b,  0x02, 0xf0 },		// Drop Target Reset Right
-	/*15*/  { 0xff, 0xff,  0x00, 0x00 },		// None - all momentary solenoids off
+	/*00*/  { 0x02, 0x05,  0x03, 0x7f },        // Saucer
+	/*01*/  { 0x05, 0x01,  0x00, 0x00 },        // Chime 10
+	/*02*/  { 0x05, 0x02,  0x00, 0x00 },        // Chime 100
+	/*03*/  { 0x05, 0x03,  0x00, 0x00 },        // Chime 1000
+	/*04*/  { 0x05, 0x04,  0x00, 0x00 },        // Chime 10000
+	/*05*/  { 0x04, 0x06,  0x00, 0x00 },        // Knocker
+	/*06*/  { 0x01, 0x09,  0x00, 0x7f },        // Outhole
+	/*07*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Left Bottom
+	/*08*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Left Top
+	/*09*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Right Top
+	/*10*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Right Bottom
+	/*11*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Left
+	/*12*/  { 0x00, 0x0b,  0x02, 0x0f },        // Drop Target Reset Left
+	/*13*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Right
+	/*14*/  { 0x03, 0x0b,  0x02, 0xf0 },        // Drop Target Reset Right
+	/*15*/  { 0xff, 0xff,  0x00, 0x00 },        // None - all momentary solenoids off
 	//  { Sound Channel, Sound engage, Sound release, Not Used }
 	/*16*/  { 0xff, 0xff, 0xff,  0x00 },
-	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },		// Coin Lockout coil
-	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },		// Flipper Enable relay
+	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },        // Coin Lockout coil
+	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },        // Flipper Enable relay
 	/*19*/  { 0xff, 0xff, 0xff,  0x00 }
 	};
 
@@ -929,30 +925,29 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 
 DRIVER_INIT_MEMBER( by17_state, pwerplay )
 {
-
 	static const UINT8 solenoid_features_pwerplay[20][4] =
 	{
 	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
-	/*00*/  { 0x00, 0x10,  0x00, 0x00 },		// Post Down
-	/*01*/  { 0x05, 0x01,  0x00, 0x00 },		// Chime 10
-	/*02*/  { 0x05, 0x02,  0x00, 0x00 },		// Chime 100
-	/*03*/  { 0x05, 0x03,  0x00, 0x00 },		// Chime 1000
-	/*04*/  { 0x05, 0x04,  0x00, 0x00 },		// Chime 10000
-	/*05*/  { 0x04, 0x06,  0x00, 0x00 },		// Knocker
-	/*06*/  { 0x01, 0x09,  0x00, 0x7f },		// Outhole
-	/*07*/  { 0x02, 0x05,  0x03, 0x7f },		// Saucer
-	/*08*/  { 0x02, 0x00,  0x00, 0x00 },		// Pop Bumper Left
-	/*09*/  { 0x02, 0x00,  0x00, 0x00 },		// Pop Bumper Right
-	/*10*/  { 0x02, 0x00,  0x00, 0x00 },		// Pop Bumper Bottom
-	/*11*/  { 0x02, 0x07,  0x00, 0x00 },		// Slingshot Left
-	/*12*/  { 0x00, 0x0b,  0x02, 0x0f },		// Drop Target Reset Left
-	/*13*/  { 0x02, 0x07,  0x00, 0x00 },		// Slingshot Right
-	/*14*/  { 0x03, 0x0b,  0x02, 0xf0 },		// Drop Target Reset Right
-	/*15*/  { 0xff, 0xff,  0x00, 0x00 },		// None - all momentary solenoids off
+	/*00*/  { 0x00, 0x10,  0x00, 0x00 },        // Post Down
+	/*01*/  { 0x05, 0x01,  0x00, 0x00 },        // Chime 10
+	/*02*/  { 0x05, 0x02,  0x00, 0x00 },        // Chime 100
+	/*03*/  { 0x05, 0x03,  0x00, 0x00 },        // Chime 1000
+	/*04*/  { 0x05, 0x04,  0x00, 0x00 },        // Chime 10000
+	/*05*/  { 0x04, 0x06,  0x00, 0x00 },        // Knocker
+	/*06*/  { 0x01, 0x09,  0x00, 0x7f },        // Outhole
+	/*07*/  { 0x02, 0x05,  0x03, 0x7f },        // Saucer
+	/*08*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Left
+	/*09*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Right
+	/*10*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Bottom
+	/*11*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Left
+	/*12*/  { 0x00, 0x0b,  0x02, 0x0f },        // Drop Target Reset Left
+	/*13*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Right
+	/*14*/  { 0x03, 0x0b,  0x02, 0xf0 },        // Drop Target Reset Right
+	/*15*/  { 0xff, 0xff,  0x00, 0x00 },        // None - all momentary solenoids off
 	//  { Sound Channel, Sound engage, Sound release, Not Used }
-	/*16*/  { 0x00, 0x11, 0x0f,  0x00 },		// Post Up
-	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },		// Coin Lockout coil
-	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },		// Flipper Enable relay
+	/*16*/  { 0x00, 0x11, 0x0f,  0x00 },        // Post Up
+	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },        // Coin Lockout coil
+	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },        // Flipper Enable relay
 	/*19*/  { 0xff, 0xff, 0xff,  0x00 }
 	};
 
@@ -977,7 +972,7 @@ MACHINE_RESET_MEMBER( by17_state, by17 )
 	m_u11a = 0;
 	m_u11b = 0;
 	m_lamp_decode = 0x0f;
-	m_io_hold_x[0] = 0x80;	// Put ball in Outhole on startup
+	m_io_hold_x[0] = 0x80;  // Put ball in Outhole on startup
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = 0;
 }
 
@@ -985,12 +980,12 @@ MACHINE_RESET_MEMBER( by17_state, by17 )
 
 static MACHINE_CONFIG_START( by17, by17_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 530000)	// No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	MCFG_CPU_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by17_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE( by17_state, by17 )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")	// 'F' filled causes Credit Display to be blank on first startup
+	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_by17)

@@ -105,8 +105,8 @@ public:
 // ======================> tiki100_bus_slot_t
 
 class tiki100_bus_slot_t : public device_t,
-						   public device_slot_interface,
-						   public device_z80daisy_interface
+							public device_slot_interface,
+							public device_z80daisy_interface
 {
 public:
 	// construction/destruction

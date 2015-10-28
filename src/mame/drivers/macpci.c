@@ -111,7 +111,7 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("pippin_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","pippin")	
+	MCFG_SOFTWARE_LIST_ADD("cd_list","pippin")
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32M")

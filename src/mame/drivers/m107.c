@@ -45,21 +45,21 @@ confirmed for m107 games as well.
 #define M107_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
 // not used due to HOLD LINE logic
 #define M107_CLEAR_IRQ0 ;
-#define M107_CLEAR_IRQ1 ; 
+#define M107_CLEAR_IRQ1 ;
 #define M107_CLEAR_IRQ2 ;
 #define M107_CLEAR_IRQ3 ;
 
 #else
 
-#define M107_TRIGGER_IRQ0 m_upd71059c->ir0_w(1); 
-#define M107_TRIGGER_IRQ1 m_upd71059c->ir1_w(1); 
-#define M107_TRIGGER_IRQ2 m_upd71059c->ir2_w(1); 
-#define M107_TRIGGER_IRQ3 m_upd71059c->ir3_w(1); 
+#define M107_TRIGGER_IRQ0 m_upd71059c->ir0_w(1);
+#define M107_TRIGGER_IRQ1 m_upd71059c->ir1_w(1);
+#define M107_TRIGGER_IRQ2 m_upd71059c->ir2_w(1);
+#define M107_TRIGGER_IRQ3 m_upd71059c->ir3_w(1);
 // not sure when these should happen, probably the source of our issues
-#define M107_CLEAR_IRQ0 m_upd71059c->ir0_w(0); 
-#define M107_CLEAR_IRQ1 m_upd71059c->ir1_w(0); 
-#define M107_CLEAR_IRQ2 m_upd71059c->ir2_w(0); 
-#define M107_CLEAR_IRQ3 m_upd71059c->ir3_w(0); 
+#define M107_CLEAR_IRQ0 m_upd71059c->ir0_w(0);
+#define M107_CLEAR_IRQ1 m_upd71059c->ir1_w(0);
+#define M107_CLEAR_IRQ2 m_upd71059c->ir2_w(0);
+#define M107_CLEAR_IRQ3 m_upd71059c->ir3_w(0);
 
 #endif
 

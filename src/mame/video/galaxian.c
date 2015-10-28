@@ -480,7 +480,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
 {
 	UINT8 *videoram = m_videoram;
 	/* update any video up to the current scanline */
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* store the data and mark the corresponding tile dirty */
@@ -492,7 +492,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
 WRITE8_MEMBER(galaxian_state::galaxian_objram_w)
 {
 	/* update any video up to the current scanline */
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* store the data */
@@ -643,7 +643,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
 {
 	if (m_flipscreen_x != (data & 0x01))
 	{
-//		m_screen->update_now();
+//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 
 		/* when the direction changes, we count a different number of clocks */
@@ -660,7 +660,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
 {
 	if (m_flipscreen_y != (data & 0x01))
 	{
-//		m_screen->update_now();
+//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 
 		m_flipscreen_y = data & 0x01;
@@ -686,7 +686,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
 {
 	if ((m_stars_enabled ^ data) & 0x01)
 	{
-//		m_screen->update_now();
+//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 
@@ -706,7 +706,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
 {
 	if ((m_background_enable ^ data) & 0x01)
 	{
-	//	m_screen->update_now();
+	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 
@@ -718,7 +718,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
 {
 	if ((m_background_red ^ data) & 0x01)
 	{
-	//	m_screen->update_now();
+	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 
@@ -730,7 +730,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
 {
 	if ((m_background_green ^ data) & 0x01)
 	{
-	//	m_screen->update_now();
+	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 
@@ -742,7 +742,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
 {
 	if ((m_background_blue ^ data) & 0x01)
 	{
-	//	m_screen->update_now();
+	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 

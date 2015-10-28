@@ -219,7 +219,7 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 	*/
 
 	UINT8 i, data = 0xff;
-	
+
 	for (i = 0; i < 4; i++)
 		if BIT(m_keylatch, i)
 			return m_io_keyboard[i]->read();

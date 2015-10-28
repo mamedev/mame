@@ -58,11 +58,11 @@ WRITE16_MEMBER(hng64_state::dl_w)
 
 WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
-    // Data is:
-    // 00000b50 for the sams64 games
-    // 00000f00 for everything else
-    // TODO: different param for the two sams64 games, less FIFO to process?
-    
+	// Data is:
+	// 00000b50 for the sams64 games
+	// 00000f00 for everything else
+	// TODO: different param for the two sams64 games, less FIFO to process?
+
 	// This is written after the game uploads 16 packets, each 16 words long
 	// We're assuming it to be a 'send to 3d hardware' trigger.
 	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
@@ -73,7 +73,7 @@ g_profiler.start(PROFILER_USER1);
 		hng64_command3d(&m_dl[packetStart]);
 	}
 
-    // Schedule a small amount of time to let the 3d hardware rasterize the display buffer
+	// Schedule a small amount of time to let the 3d hardware rasterize the display buffer
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 g_profiler.stop();
 }
@@ -85,14 +85,14 @@ TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 
 WRITE32_MEMBER(hng64_state::dl_control_w)
 {
-    // This could be a multiple display list thing, but the palette seems to be lost between lists?
-    // Many games briefly set this to 0x4 on startup. Maybe there are 3 display lists?
-    // The sams64 games briefly set this value to 0x0c00 on boot.  Maybe there are 4 lists and they can be combined?
-    if (data & 0x01)
-        m_activeDisplayList = 0;
-    else if (data & 0x02)
-        m_activeDisplayList = 1;
-    
+	// This could be a multiple display list thing, but the palette seems to be lost between lists?
+	// Many games briefly set this to 0x4 on startup. Maybe there are 3 display lists?
+	// The sams64 games briefly set this value to 0x0c00 on boot.  Maybe there are 4 lists and they can be combined?
+	if (data & 0x01)
+		m_activeDisplayList = 0;
+	else if (data & 0x02)
+		m_activeDisplayList = 1;
+
 //  printf("dl_control_w %08x %08x\n", data, mem_mask);
 //
 //  if(data & 2) // swap buffers
@@ -274,8 +274,8 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 	const float top     = uToF(packet[12]);
 	const float bottom  = uToF(packet[13]);
 
-    // TODO: It's unclear how the 3 values combine to make a near clipping plane
-    const float near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
+	// TODO: It's unclear how the 3 values combine to make a near clipping plane
+	const float near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
 	const float far_    = 0.9f;             // uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
 
 	m_projectionMatrix[0]  = (2.0f*near_)/(right-left);
@@ -303,8 +303,8 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 // Polygon rasterization.
 void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 {
-    //printPacket(packet, 1);
-    
+	//printPacket(packet, 1);
+
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
@@ -369,7 +369,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	UINT32 size[4];
 	UINT32 address[4];
 	UINT32 megaOffset;
-    polygon lastPoly = { 0 };
+	polygon lastPoly = { 0 };
 
 
 	//////////////////////////////////////////////////////////
@@ -493,9 +493,9 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 				continue;
 			}
 
-            // Syntactical simplification
-            polygon& currentPoly = m_polys[numPolys];
-            
+			// Syntactical simplification
+			polygon& currentPoly = m_polys[numPolys];
+
 			// Debug - Colors polygons with certain flags bright blue! ajg
 			currentPoly.debugColor = 0;
 			//currentPoly.debugColor = tdColor;
@@ -743,7 +743,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			////////////////////////////////////
 			// Perform the world transformations...
 			// TODO: We can eliminate this step with a matrix stack (maybe necessary?)
-            // Note: fatfurwa's helicopter tracking in scene 3 of its intro shows one of these matrices isn't quite correct
+			// Note: fatfurwa's helicopter tracking in scene 3 of its intro shows one of these matrices isn't quite correct
 			setIdentity(m_modelViewMatrix);
 			if (m_mcu_type != SAMSHO_MCU)
 			{
@@ -798,11 +798,11 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			// Cast a ray out of the camera towards the polygon's point in eyespace.
 			vecmatmul4(cullRay, modelViewMatrix, currentPoly.vert[0].worldCoords);
 			normalize(cullRay);
-            
+
 			// Dot product that with the normal to see if you're negative...
 			vecmatmul4(cullNorm, modelViewMatrix, currentPoly.faceNormal);
-			
-            const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
+
+			const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
 			if (backfaceCullResult < 0.0f)
 				currentPoly.visible = 1;
 			else
@@ -811,7 +811,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 
 
 			// BEHIND-THE-CAMERA CULL //
-            float cullRay[4];
+			float cullRay[4];
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
 			if (cullRay[2] > 0.0f)              // Camera is pointing down -Z
 			{
@@ -822,63 +822,63 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			// TRANSFORM THE TRIANGLE INTO HOMOGENEOUS SCREEN SPACE //
 			if (currentPoly.visible)
 			{
-                hng64_clip_vertex clipVerts[10];
-                
-                // Transform and project each vertex into pre-divided homogeneous coordinates
+				hng64_clip_vertex clipVerts[10];
+
+				// Transform and project each vertex into pre-divided homogeneous coordinates
 				for (int m = 0; m < currentPoly.n; m++)
 				{
-                    float eyeCoords[4];     // World coordinates transformed by the modelViewMatrix
+					float eyeCoords[4];     // World coordinates transformed by the modelViewMatrix
 					vecmatmul4(eyeCoords, m_modelViewMatrix, currentPoly.vert[m].worldCoords);
 					vecmatmul4(currentPoly.vert[m].clipCoords, m_projectionMatrix, eyeCoords);
-                    
-                    clipVerts[m].x = currentPoly.vert[m].clipCoords[0];
-                    clipVerts[m].y = currentPoly.vert[m].clipCoords[1];
-                    clipVerts[m].z = currentPoly.vert[m].clipCoords[2];
-                    clipVerts[m].w = currentPoly.vert[m].clipCoords[3];
-                    clipVerts[m].p[0] = currentPoly.vert[m].texCoords[0];
-                    clipVerts[m].p[1] = currentPoly.vert[m].texCoords[1];
-                    clipVerts[m].p[2] = currentPoly.vert[m].light[0];
-                    clipVerts[m].p[3] = currentPoly.vert[m].light[1];
-                    clipVerts[m].p[4] = currentPoly.vert[m].light[2];
+
+					clipVerts[m].x = currentPoly.vert[m].clipCoords[0];
+					clipVerts[m].y = currentPoly.vert[m].clipCoords[1];
+					clipVerts[m].z = currentPoly.vert[m].clipCoords[2];
+					clipVerts[m].w = currentPoly.vert[m].clipCoords[3];
+					clipVerts[m].p[0] = currentPoly.vert[m].texCoords[0];
+					clipVerts[m].p[1] = currentPoly.vert[m].texCoords[1];
+					clipVerts[m].p[2] = currentPoly.vert[m].light[0];
+					clipVerts[m].p[3] = currentPoly.vert[m].light[1];
+					clipVerts[m].p[4] = currentPoly.vert[m].light[2];
 				}
 
 				if (currentPoly.visible)
 				{
-                    // Clip against all edges of the view frustum
-                    int num_vertices = frustum_clip_all<float, 5>(clipVerts, currentPoly.n, clipVerts);
+					// Clip against all edges of the view frustum
+					int num_vertices = frustum_clip_all<float, 5>(clipVerts, currentPoly.n, clipVerts);
 
-                    // Copy the results of 
-                    currentPoly.n = num_vertices;
-                    for (int m = 0; m < num_vertices; m++)
-                    {
-                        currentPoly.vert[m].clipCoords[0] = clipVerts[m].x;
-                        currentPoly.vert[m].clipCoords[1] = clipVerts[m].y;
-                        currentPoly.vert[m].clipCoords[2] = clipVerts[m].z;
-                        currentPoly.vert[m].clipCoords[3] = clipVerts[m].w;
-                        currentPoly.vert[m].texCoords[0] = clipVerts[m].p[0];
-                        currentPoly.vert[m].texCoords[1] = clipVerts[m].p[1];
-                        currentPoly.vert[m].light[0] = clipVerts[m].p[2];
-                        currentPoly.vert[m].light[1] = clipVerts[m].p[3];
-                        currentPoly.vert[m].light[2] = clipVerts[m].p[4];
-                    }
+					// Copy the results of
+					currentPoly.n = num_vertices;
+					for (int m = 0; m < num_vertices; m++)
+					{
+						currentPoly.vert[m].clipCoords[0] = clipVerts[m].x;
+						currentPoly.vert[m].clipCoords[1] = clipVerts[m].y;
+						currentPoly.vert[m].clipCoords[2] = clipVerts[m].z;
+						currentPoly.vert[m].clipCoords[3] = clipVerts[m].w;
+						currentPoly.vert[m].texCoords[0] = clipVerts[m].p[0];
+						currentPoly.vert[m].texCoords[1] = clipVerts[m].p[1];
+						currentPoly.vert[m].light[0] = clipVerts[m].p[2];
+						currentPoly.vert[m].light[1] = clipVerts[m].p[3];
+						currentPoly.vert[m].light[2] = clipVerts[m].p[4];
+					}
 
-                    const rectangle& visarea = m_screen->visible_area();
+					const rectangle& visarea = m_screen->visible_area();
 					for (int m = 0; m < currentPoly.n; m++)
 					{
 						// Convert into normalized device coordinates...
-                        float ndCoords[4];      // Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
+						float ndCoords[4];      // Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
 						ndCoords[0] = currentPoly.vert[m].clipCoords[0] / currentPoly.vert[m].clipCoords[3];
 						ndCoords[1] = currentPoly.vert[m].clipCoords[1] / currentPoly.vert[m].clipCoords[3];
 						ndCoords[2] = currentPoly.vert[m].clipCoords[2] / currentPoly.vert[m].clipCoords[3];
 						ndCoords[3] = currentPoly.vert[m].clipCoords[3];
 
 						// Final pixel values are garnered here :
-                        float windowCoords[4];  // Mapped ndCoordinates to screen space
+						float windowCoords[4];  // Mapped ndCoordinates to screen space
 						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea.max_x) / 2.0f) + 0.0f;
 						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea.max_y) / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
 
-                        // Flip Y
+						// Flip Y
 						windowCoords[1] = (float)visarea.max_y - windowCoords[1];
 
 						// Store the points in a list for later use...
@@ -899,9 +899,9 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 }
 
 // note 0x0102 packets are only 8 words, it appears they can be in either the upper or lower half of the 16 word packet.
-// We currently only draw 0x0102 packets where both halves contain 0x0102 (2 calls), but this causes graphics to vanish in 
+// We currently only draw 0x0102 packets where both halves contain 0x0102 (2 calls), but this causes graphics to vanish in
 // xrally because in some cases the 0x0102 packet only exists in the upper or lower half with another value (often 0x0000 - NOP) in the other.
-// If we also treat (0x0000 - NOP) as 8 word  instead of 16 so that we can access a 0x0102 in the 2nd half of the 16 word packet 
+// If we also treat (0x0000 - NOP) as 8 word  instead of 16 so that we can access a 0x0102 in the 2nd half of the 16 word packet
 // then we end up with other invalid packets in the 2nd half which should be ignored.
 // This would suggest our processing if flawed in other ways, or there is something else to indicate packet length.
 
@@ -991,7 +991,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 void hng64_state::clear3d()
 {
 	// Reset the buffers...
-    const rectangle& visarea = m_screen->visible_area();
+	const rectangle& visarea = m_screen->visible_area();
 	for (int i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
 		m_poly_renderer->depthBuffer3d()[i] = 100.0f;

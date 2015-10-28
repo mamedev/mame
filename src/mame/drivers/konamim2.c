@@ -1187,7 +1187,7 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-        /*cd-rom*/
+		/*cd-rom*/
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("3do_m2_cdrom")
 

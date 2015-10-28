@@ -3480,7 +3480,7 @@ ROM_END
 
 ROM_START( spcwarp )
 	// conversion of 'cosmos' (cvs.c) to Galaxian hardware
-	// notes: 
+	// notes:
 	// -came out of an unemulated games collection - may or may not be actually spcwarp but it's unique
 	// -uses hunchbkg hardware with a different map
 	// -the game likely calls a checksum check every 10 frames, causes game to freeze (probably because of bad ROM)

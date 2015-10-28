@@ -445,7 +445,7 @@ void emu_options::parse_standard_inis(std::string &error_string)
 		parse_one_ini("computer", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
 	else if (cursystem->flags & MACHINE_TYPE_OTHER)
 		parse_one_ini("othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	
+
 	machine_config config(*cursystem, *this);
 	screen_device_iterator iter(config.root_device());
 	for (const screen_device *device = iter.first(); device != NULL; device = iter.next())

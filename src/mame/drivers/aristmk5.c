@@ -522,7 +522,7 @@ void aristmk5_state::machine_reset()
 
 
 static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
-	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)	// 12000000
+	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
 	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
-	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)	// 12000000
+	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
 	MCFG_CPU_PROGRAM_MAP(aristmk5_map)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
@@ -815,7 +815,7 @@ ROM_START( adonisa )
 
 	ROM_REGION( 0x100, "eeproms", 0 )
 	ROM_LOAD( "st93c46.u27", 0x0000, 0x0080, CRC(115c305a) SHA1(684a70d74ec92564e17c4292cd357e603842c485) )
-	ROM_LOAD( "st93c46.u26", 0x0080, 0x0080, CRC(652d544c) SHA1(cd5bd20e9a0f22d7367cc169e2844a02751c7c91) )	// blank... all 0xff's
+	ROM_LOAD( "st93c46.u26", 0x0080, 0x0080, CRC(652d544c) SHA1(cd5bd20e9a0f22d7367cc169e2844a02751c7c91) ) // blank... all 0xff's
 
 	ROM_REGION( 0x0005, "plds", 0 )
 	ROM_LOAD( "gal20v8b.u22", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
@@ -982,10 +982,10 @@ ROM_END
 ROM_START( bumblbug )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "bumble_bugs_export.u7",  0x000000, 0x80000, CRC(ec605a36) SHA1(114e0840cfbd0c64645a5a33065db85462a0ba2d) )	// 92.691%
-	ROM_LOAD32_WORD( "bumble_bugs_export.u11", 0x000002, 0x80000, CRC(17b154bd) SHA1(efdf307670a3d74f7980fec2d2197d837d4c26e2) )	// 92.691%
-	ROM_LOAD32_WORD( "bumble_bugs_export.u8",  0x100000, 0x80000, CRC(e0c01d01) SHA1(9153129fd348a97da7cccf002e5d03e4b4db9264) )	// base
-	ROM_LOAD32_WORD( "bumble_bugs_export.u12", 0x100002, 0x80000, CRC(28700d5d) SHA1(87a583cd487da6cb4c2da5f62297f0e577269fae) )	// base
+	ROM_LOAD32_WORD( "bumble_bugs_export.u7",  0x000000, 0x80000, CRC(ec605a36) SHA1(114e0840cfbd0c64645a5a33065db85462a0ba2d) )    // 92.691%
+	ROM_LOAD32_WORD( "bumble_bugs_export.u11", 0x000002, 0x80000, CRC(17b154bd) SHA1(efdf307670a3d74f7980fec2d2197d837d4c26e2) )    // 92.691%
+	ROM_LOAD32_WORD( "bumble_bugs_export.u8",  0x100000, 0x80000, CRC(e0c01d01) SHA1(9153129fd348a97da7cccf002e5d03e4b4db9264) )    // base
+	ROM_LOAD32_WORD( "bumble_bugs_export.u12", 0x100002, 0x80000, CRC(28700d5d) SHA1(87a583cd487da6cb4c2da5f62297f0e577269fae) )    // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -995,7 +995,7 @@ ROM_START( bumblbug )
 ROM_END
 
 // 586/7(b) - 10 Credit Multiplier / 9 Line Multiline.
-// Penguin Pays - Export B - 14/07/97.       
+// Penguin Pays - Export B - 14/07/97.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( pengpays )
 	ARISTOCRAT_MK5_BIOS
@@ -1018,14 +1018,14 @@ ROM_END
 // Marked as GHG1012 and 92.767%
 ROM_START( bootsctn )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u7",  0x000000, 0x80000, CRC(ca26f31e) SHA1(e8da31cc8d12bf8a28f1ca4d796259ae9010f8af) )	// 92.767%
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u11", 0x000002, 0x80000, CRC(61da1767) SHA1(83d4df1060975f03f291b9119c0d2b8debb0fb60) )	// 92.767%
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u8",  0x100000, 0x80000, CRC(9ae4d616) SHA1(60d4d36f75685dfe21f914fa4682cd6a64fcfa58) )	// base
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u12", 0x100002, 0x80000, CRC(2c50c083) SHA1(ae3b01200d152df9b2966b5308c71e9d1ad43d78) )	// base
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u9",  0x200000, 0x80000, CRC(c0a4920d) SHA1(d2c6d259d2e067b6e5ad72a6ef164aac7d72bc5a) )	// base
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u13", 0x200002, 0x80000, CRC(55716d82) SHA1(5b9982a49201842e9551a9c763a6babbb47a863e) )	// base
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u10", 0x300000, 0x80000, CRC(3ecdf7ee) SHA1(9d658a22da737daafdf6cb0d49009796036d04b1) )	// base
-	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u14", 0x300002, 0x80000, CRC(18934c51) SHA1(f7c9c95c687dbfe89747e7877157fde37bc1119e) )	// base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u7",  0x000000, 0x80000, CRC(ca26f31e) SHA1(e8da31cc8d12bf8a28f1ca4d796259ae9010f8af) )  // 92.767%
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u11", 0x000002, 0x80000, CRC(61da1767) SHA1(83d4df1060975f03f291b9119c0d2b8debb0fb60) )  // 92.767%
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u8",  0x100000, 0x80000, CRC(9ae4d616) SHA1(60d4d36f75685dfe21f914fa4682cd6a64fcfa58) )  // base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u12", 0x100002, 0x80000, CRC(2c50c083) SHA1(ae3b01200d152df9b2966b5308c71e9d1ad43d78) )  // base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u9",  0x200000, 0x80000, CRC(c0a4920d) SHA1(d2c6d259d2e067b6e5ad72a6ef164aac7d72bc5a) )  // base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u13", 0x200002, 0x80000, CRC(55716d82) SHA1(5b9982a49201842e9551a9c763a6babbb47a863e) )  // base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u10", 0x300000, 0x80000, CRC(3ecdf7ee) SHA1(9d658a22da737daafdf6cb0d49009796036d04b1) )  // base
+	ROM_LOAD32_WORD( "ghg1012_boot_scootin.u14", 0x300002, 0x80000, CRC(18934c51) SHA1(f7c9c95c687dbfe89747e7877157fde37bc1119e) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -1034,13 +1034,13 @@ ROM_START( bootsctn )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-// MV4104  3,5,10,20,25,50 Credit Multiplier / 9-20 Line Multiline. 
+// MV4104  3,5,10,20,25,50 Credit Multiplier / 9-20 Line Multiline.
 // CUCKOO - Export C - 02/02/00.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( cuckoo )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "mv4104_cuckoo.u7",  0x000000, 0x80000, CRC(0bd17338) SHA1(b8f467bdf8d76533a2b7d44fe93be414f25a3c31) )	// 
+	ROM_LOAD32_WORD( "mv4104_cuckoo.u7",  0x000000, 0x80000, CRC(0bd17338) SHA1(b8f467bdf8d76533a2b7d44fe93be414f25a3c31) ) //
 	ROM_LOAD32_WORD( "mv4104_cuckoo.u11", 0x000002, 0x80000, CRC(4c407deb) SHA1(57589e61a376ddff99cd420eb47bf8c902c6a249) )
 	ROM_LOAD32_WORD( "mv4104_cuckoo.u8",  0x100000, 0x80000, CRC(33f52052) SHA1(89cbfe588d91244adff4c520fa94962d69ff20bf) )
 	ROM_LOAD32_WORD( "mv4104_cuckoo.u12", 0x100002, 0x80000, CRC(00bb7597) SHA1(f4d6b21091e320a82d59477469340633b001ed0d) )
@@ -1053,7 +1053,7 @@ ROM_START( cuckoo )
 ROM_END
 
 // MV4115 - 5,10,20 Credit Multiplier / 9 Line Multiline.
-// Magic Mask [Reel Game] - Export A - 09/05/2000.   
+// Magic Mask [Reel Game] - Export A - 09/05/2000.
 ROM_START( magicmsk )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -1070,7 +1070,7 @@ ROM_START( magicmsk )
 ROM_END
 
 // MV4115 - 5,10,20 Credit Multiplier / 9 Line Multiline.
-// Magic Mask [Reel Game] - Export A - 09/05/2000.   
+// Magic Mask [Reel Game] - Export A - 09/05/2000.
 // Alternate set with identical description, but way different
 // than the parent. All devices are 27c4002 instead of 27c4096.
 //
@@ -1168,4 +1168,3 @@ GAME( 2000, margmgc,   0,        aristmk5,     aristmk5, aristmk5_state, aristmk
 GAME( 2001, geishanz,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",               MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4127,   A - 05/03/01
 GAME( 2001, adonise,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (MV4124/1, Export)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4124/1, B - 31/07/01
 GAME( 2001, partygrs,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Party Gras (MV4115/6, Export)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115/6, A - 10/11/01
-

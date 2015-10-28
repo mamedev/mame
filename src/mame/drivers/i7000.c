@@ -389,19 +389,19 @@ ROM_START( i7000 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "i7000_chargen.rom", 0x0000, 0x0800, CRC(fb7383e9) SHA1(71a6561bb9ff3cbf74711fa7ab445f9b43f15626) )
-        /*
-	   The character generator ROM originally dumped had
-	   some corrupt data that was manually fixed:
+		/*
+		The character generator ROM originally dumped had
+		some corrupt data that was manually fixed:
 
-	   ROM address | Originally dumped value | Manually fixed value | Comment
-	        0x06A2 |                    0xF7 | 0xFE                 | This is a fix to the upper right portion of a 2x2 tile image of a big filled circle
-	        0x06A3 |                    0xF7 | 0xFE                 | This is another fix to the same tile (character value: 0xD4)
+		ROM address | Originally dumped value | Manually fixed value | Comment
+		    0x06A2 |                    0xF7 | 0xFE                 | This is a fix to the upper right portion of a 2x2 tile image of a big filled circle
+		    0x06A3 |                    0xF7 | 0xFE                 | This is another fix to the same tile (character value: 0xD4)
 
-	   Also, characters 0x05, 0x06, 0x07 and 0x08
-	   as well as lowercase 'x' (0x78), uppercase 'Y' (0x59)
-	   may contain corrupt data, but we can't be sure,
-	   unless we find another Itautec I7000 computer and
-	   redump it's ROMs to double-check.
+		Also, characters 0x05, 0x06, 0x07 and 0x08
+		as well as lowercase 'x' (0x78), uppercase 'Y' (0x59)
+		may contain corrupt data, but we can't be sure,
+		unless we find another Itautec I7000 computer and
+		redump it's ROMs to double-check.
 	*/
 
 	ROM_REGION( 0x1000, "drive", 0 )

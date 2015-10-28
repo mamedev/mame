@@ -168,8 +168,8 @@ Sticker: 838-14673
 |                  |SLOT     |     IDE40       ATX_POWER     |
 |------------------|---------|-------------------------------|
 Notes:
-           CPU - Lindbergh RED: Intel Celeron D 335 SL8HM 2.8GHz 256k L2 cache, 533MHz FSB. 
-                 Lindbergh YELLOW: Intel Pentium 4 3.00GHz/1M/800 SL8JZ 
+           CPU - Lindbergh RED: Intel Celeron D 335 SL8HM 2.8GHz 256k L2 cache, 533MHz FSB.
+                 Lindbergh YELLOW: Intel Pentium 4 3.00GHz/1M/800 SL8JZ
          SIMM1 - Lindbergh RED: 512M DDR PC3200
                  Lindbergh YELLOW: 1GB DDR PC3200
        82541PI - Intel Gigabit Ethernet Controller

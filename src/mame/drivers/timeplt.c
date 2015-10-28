@@ -452,7 +452,7 @@ static MACHINE_CONFIG_DERIVED( psurge, timeplt )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psurge_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  nmi_line_pulse)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END
 

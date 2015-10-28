@@ -50,7 +50,7 @@ osd_netdev::~osd_netdev()
 {
 	m_stop = true;
 // nasty hack to prevent Segmentation fault on emulation stop
-//	m_timer->reset();
+//  m_timer->reset();
 }
 
 int osd_netdev::send(UINT8 *buf, int len)

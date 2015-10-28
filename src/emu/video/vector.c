@@ -227,12 +227,12 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 	if (m_flicker && (intensity > 0))
 	{
 		float random = (float)(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
-		
+
 		intensity -= (int)(intensity * random * m_flicker);
 		if (intensity < 0)
 		{
 			intensity = 0;
-		}		
+		}
 		if (intensity > 255)
 		{
 			intensity = 255;
@@ -344,7 +344,7 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			coords.y1 = ((float)curpoint->y - yoffs) * yscale;
 
 			// extend zero-length vector line (vector point) by quarter beam_width on both sides
-			if (fabs(coords.x0 - coords.x1) < FLT_EPSILON && 
+			if (fabs(coords.x0 - coords.x1) < FLT_EPSILON &&
 				fabs(coords.y0 - coords.y1) < FLT_EPSILON)
 			{
 				coords.x0 += xratio * beam_width * 0.25f;

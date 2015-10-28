@@ -290,11 +290,11 @@ private:
 
 	sound_stream*   m_sound;
 	bool            m_loaded;
-	bool			m_is525; // true if this is a 5.25" floppy drive
+	bool            m_is525; // true if this is a 5.25" floppy drive
 
-	int				m_sampleindex_motor_start;
-	int				m_sampleindex_motor_loop;
-	int				m_sampleindex_motor_end;
+	int             m_sampleindex_motor_start;
+	int             m_sampleindex_motor_loop;
+	int             m_sampleindex_motor_end;
 	int             m_samplesize_motor_start;
 	int             m_samplesize_motor_loop;
 	int             m_samplesize_motor_end;
@@ -302,8 +302,8 @@ private:
 	int             m_motor_playback_state;
 	bool            m_motor_on;
 
-	int				m_step_samples;
-	int				m_sampleindex_step1;
+	int             m_step_samples;
+	int             m_sampleindex_step1;
 	int             m_samplesize_step[MAX_STEP_SAMPLES];
 	int             m_samplepos_step;
 	int             m_step_playback_state;

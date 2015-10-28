@@ -82,7 +82,7 @@ WRITE8_MEMBER(slotcarn_state::palette_w)
 {
 	int co;
 
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	data &= 0x0f;
 
@@ -158,7 +158,7 @@ MC6845_UPDATE_ROW( slotcarn_state::crtc_update_row )
 WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
 {
 	/* update any video up to the current scanline */
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 }
 

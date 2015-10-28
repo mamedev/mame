@@ -26,7 +26,7 @@ public:
 			m_palette(*this, "palette"),
 			m_spriteram(*this, "spriteram"),
 			m_vram_data(*this, "vram_data"),
-			m_upd71059c(*this, "upd71059c") 	
+			m_upd71059c(*this, "upd71059c")
 			{ }
 
 	required_device<cpu_device> m_maincpu;

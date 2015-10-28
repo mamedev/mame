@@ -37,7 +37,7 @@
 				<rom name="pac-04.bin" size="0x1000" crc="cac09841" sha1="bc9db83f26ed0810938156db6b104b4576754225" offset="0x0000"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="pac-05">
 		<description>Math</description>
@@ -49,6 +49,6 @@
 				<rom name="pac-05.bin" size="0x1000" crc="d54a6090" sha1="e85593096f43dcf14b08fd2c9fda277008a8df8b" offset="0x0000"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 </softwarelist>

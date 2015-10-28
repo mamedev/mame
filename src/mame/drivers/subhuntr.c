@@ -2,19 +2,19 @@
 // copyright-holders:David Haywood
 /*
 
-QTY 	Type 	clock 	position 	function
-2x 	2636 			Programmable Video Interface
-1x 	2650 	OSC/2 = 1.7897725 MHz 		8-bit Microprocessor - main
-1x 	oscillator 	3.579545 MHz 		
+QTY     Type    clock   position    function
+2x  2636            Programmable Video Interface
+1x  2650    OSC/2 = 1.7897725 MHz       8-bit Microprocessor - main
+1x  oscillator  3.579545 MHz
 
 ROMs
-QTY 	Type 	position 	status
-4x 	2708 	6F,6H,6L,6N 	dumped
-1x 	N82S115 	2B 	dumped
+QTY     Type    position    status
+4x  2708    6F,6H,6L,6N     dumped
+1x  N82S115     2B  dumped
 
 RAMs
-QTY 	Type 	position
-2x 	2101 	
+QTY     Type    position
+2x  2101
 
 */
 
@@ -33,7 +33,7 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	INTERRUPT_GEN_MEMBER(subhuntr_interrupt);
 
 	virtual void machine_start();
@@ -76,8 +76,8 @@ static ADDRESS_MAP_START( subhuntr_map, AS_PROGRAM, 8, subhuntr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subhuntr_io_map, AS_IO, 8, subhuntr_state )
-//	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( ,  )
-//	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( ,  )
+//  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( ,  )
+//  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( ,  )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
@@ -136,10 +136,10 @@ static MACHINE_CONFIG_START( subhuntr, subhuntr_state )
 	MCFG_CPU_IO_MAP(subhuntr_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
 
-//	MCFG_DEVICE_ADD("s2636", S2636, 0)
-//	MCFG_S2636_WORKRAM_SIZE(0x100)
-//	MCFG_S2636_OFFSETS(3, -21)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+//  MCFG_DEVICE_ADD("s2636", S2636, 0)
+//  MCFG_S2636_WORKRAM_SIZE(0x100)
+//  MCFG_S2636_OFFSETS(3, -21)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -150,7 +150,7 @@ static MACHINE_CONFIG_START( subhuntr, subhuntr_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subhuntr_state, screen_update_subhuntr)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subhuntr)
 
 	MCFG_PALETTE_ADD("palette", 26)

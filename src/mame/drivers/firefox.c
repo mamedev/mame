@@ -267,7 +267,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 
 TIMER_DEVICE_CALLBACK_MEMBER(firefox_state::video_timer_callback)
 {
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE );

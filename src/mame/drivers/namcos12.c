@@ -966,8 +966,8 @@ Notes:
 
       This PCB was found on the following games (so far)....
       Ghoul Panic (OB2/VER.A)
-      Oh! Bakyuuun (OB1/VER.A) 
-      Gunbarl (GNB4/VER.A) 
+      Oh! Bakyuuun (OB1/VER.A)
+      Gunbarl (GNB4/VER.A)
       Point Blank 2 (GNB5/VER.A)
 
 To connect a normal (i.e. HAPP) light gun only 4 wires are needed.
@@ -990,7 +990,7 @@ JAMMA Harness:
 Pin 1 Parts Side - GND
 Pin 3 Parts Side - +5V
 Pin 22 Parts Side - Gun 1 Trigger
-Pin 22 Solder Side - Gun 2 Trigger 
+Pin 22 Solder Side - Gun 2 Trigger
 
 
 CDXA PCB
@@ -1070,9 +1070,9 @@ Notes:
       J1/2/3/8     - Multi-pin connectors joining to controls and main PCB
       J9           - Power input connector
 
-I/O board (for Attack Pla-Rail)      
+I/O board (for Attack Pla-Rail)
 -------------------------------
-Attack Pla-Rail requires an I/O board to boot. Several I/O boards are accepted including TSS-I/O, FCA, ASCA3, ASCA5 
+Attack Pla-Rail requires an I/O board to boot. Several I/O boards are accepted including TSS-I/O, FCA, ASCA3, ASCA5
 and also the common JVS I/O boards manufactured by Sega.
 The game uses 3 buttons and a 5k potentiometer for the lever. The button signals come from the I/O board.
 The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-way edge connector.
@@ -1527,7 +1527,7 @@ static ADDRESS_MAP_START( s12h8rwjvsmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DIN0")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DIN1")
-	AM_RANGE(0x300010, 0x300011) AM_NOP 
+	AM_RANGE(0x300010, 0x300011) AM_NOP
 	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 ADDRESS_MAP_END
 
@@ -1572,7 +1572,7 @@ READ16_MEMBER(namcos12_state::s12_mcu_p6_r)
 
 READ16_MEMBER(namcos12_state::s12_mcu_jvs_p8_r)
 {
-	return 0x12;	// bit 4 = JVS enable.  aplarail requires it to be on, soulclbr & others will require JVS I/O if it's on
+	return 0x12;    // bit 4 = JVS enable.  aplarail requires it to be on, soulclbr & others will require JVS I/O if it's on
 }
 
 static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
@@ -2017,14 +2017,14 @@ static INPUT_PORTS_START( aplarail )
 	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN01")
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON1 )	// left
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_START1 )	// OK / Start
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 )	// right
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON1 )  // left
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_START1 )   // OK / Start
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 )  // right
 	PORT_BIT( 0xc7ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN23")
 	PORT_BIT( 0xf7ff, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN1 )		// coin
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN1 )        // coin
 
 	PORT_START("DIN0")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -2035,7 +2035,7 @@ static INPUT_PORTS_START( aplarail )
 
 	PORT_START("LEVER")
 	PORT_BIT( 0x07ff, 0x03ff, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Speed Lever") PORT_REVERSE
-	
+
 	PORT_START("SERVICE")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
@@ -3147,7 +3147,7 @@ ROM_START( aplarail )
 	ROM_REGION( 0x40000, "iocpu", 0)  /* Truck K. I/O board */
 	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
-	ROM_REGION( 0x800, "at28c16", 0)	/* pre-calibrated NVRAM */
+	ROM_REGION( 0x800, "at28c16", 0)    /* pre-calibrated NVRAM */
 	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(db1b63c5) SHA1(01fc3386a2d1cb1bed1b7fd9bd2fd59e503832d3) )
 ROM_END
 

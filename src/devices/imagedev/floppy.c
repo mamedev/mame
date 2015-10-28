@@ -415,10 +415,10 @@ bool floppy_image_device::call_load()
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
 
-        if (motor_always_on) {
-                // When disk is inserted, start motor
-                mon_w(0);
-        } else if(!mon)
+		if (motor_always_on) {
+				// When disk is inserted, start motor
+				mon_w(0);
+		} else if(!mon)
 		ready_counter = 2;
 
 	return IMAGE_INIT_PASS;
@@ -446,10 +446,10 @@ void floppy_image_device::call_unload()
 	if (!cur_unload_cb.isnull())
 		cur_unload_cb(this);
 
-        if (motor_always_on) {
-                // When disk is removed, stop motor
-                mon_w(1);
-        } else if(!ready) {
+		if (motor_always_on) {
+				// When disk is removed, stop motor
+				mon_w(1);
+		} else if(!ready) {
 		ready = true;
 		if(!cur_ready_cb.isnull())
 			cur_ready_cb(this, ready);
@@ -497,15 +497,15 @@ void floppy_image_device::mon_w(int state)
 	if (!mon && image)
 	{
 		revolution_start_time = machine().time();
-                if (motor_always_on) {
-                    // Drives with motor that is always spinning are immediately ready when a disk is loaded
-                    // because there is no spin-up time
-                    ready = false;
-                    if(!cur_ready_cb.isnull())
-                        cur_ready_cb(this, ready);
-                } else {
-                    ready_counter = 2;
-                }
+				if (motor_always_on) {
+					// Drives with motor that is always spinning are immediately ready when a disk is loaded
+					// because there is no spin-up time
+					ready = false;
+					if(!cur_ready_cb.isnull())
+						cur_ready_cb(this, ready);
+				} else {
+					ready_counter = 2;
+				}
 		index_resync();
 	}
 

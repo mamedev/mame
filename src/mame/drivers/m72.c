@@ -13,90 +13,90 @@ M72 - 3 board stack, 2 known variants
 
       M72-B-D (bottom) / M72-A-C (middle) / M72-ROM-C (top)
 
-	  This is the original hardware used by R-type
+      This is the original hardware used by R-type
       Z80 program uploaded to RAM rather than having a ROM
       each of the 2 tile layers uses it's own set of ROMs.
-	  Flip bits are with the tile num, so 0x3fff max tiles
-	  per layer
+      Flip bits are with the tile num, so 0x3fff max tiles
+      per layer
 
-	  M72-B-D (bottom) / M72-A-C (middle) / M72-C-A (top)
+      M72-B-D (bottom) / M72-A-C (middle) / M72-C-A (top)
 
-	  This is used by all other M72 games, adds support
-	  for an I8751 MCU and sample playback
+      This is used by all other M72 games, adds support
+      for an I8751 MCU and sample playback
 
 
 M81 - 2 PCB Stack
 
-	  M81-A-B (top board) (seen on Dragon Breed)
-	  CPUs, program roms etc.
+      M81-A-B (top board) (seen on Dragon Breed)
+      CPUs, program roms etc.
 
-	  M81-B-B (bottom board) (seen on Dragon Breed)
-	  supports
-	  8 sprite ROMS
-	  4 tile roms for FG layer (A0-A3) 
-	   (Jumper J3 also allows them to be used for BG)
-	  4 tile roms for BG layer (B0-B3)
+      M81-B-B (bottom board) (seen on Dragon Breed)
+      supports
+      8 sprite ROMS
+      4 tile roms for FG layer (A0-A3)
+       (Jumper J3 also allows them to be used for BG)
+      4 tile roms for BG layer (B0-B3)
 
-	  The Jumper at J3 seems to be an important difference
-	  from M72, it allows both the FG and BG layers to
-	  operate from a single set of ROMs.
-	  W - use both sets of ROMs
-	  S - use a single set of ROMs (A0-A3)
+      The Jumper at J3 seems to be an important difference
+      from M72, it allows both the FG and BG layers to
+      operate from a single set of ROMs.
+      W - use both sets of ROMs
+      S - use a single set of ROMs (A0-A3)
 
 
-	  revised hardware, Z80 uses a ROM, no MCU, same video
+      revised hardware, Z80 uses a ROM, no MCU, same video
       system as M72 (some layer offsets - why?)
 
 
 M82 - board made for Major Title, Z80 has a rom, no MCU
       has an extra sprite layer, rowscroll, and a larger
-	  tilemap.  Tile data from both tile layers now comes
-	  from a single set of ROMs, flip bits moved to 2nd
-	  word meaning max of 0xffff tiles.
+      tilemap.  Tile data from both tile layers now comes
+      from a single set of ROMs, flip bits moved to 2nd
+      word meaning max of 0xffff tiles.
 
-	  * Some games were converted to run on this board,
-	  leaving the extra sprite HW unused.
+      * Some games were converted to run on this board,
+      leaving the extra sprite HW unused.
 
 M84 -   2 PCB stack
         functionally same as M82 but without the extra sprite hw??
-		
-		M84-A-A (bottom board) (most games)
-		supports
-		4 program roms
-		8 tile roms
-		1 snd prg, 1 voice rom
-		CPUs and some customs etc.
 
-		M84-D-B (bottom board) (found on lightning swords / kengo)
-		redesigned version of above but 
-		for V35 CPU? (seems to lack the UPD71059C interrupt
-		controller which isn't needed when with the V35)
+        M84-A-A (bottom board) (most games)
+        supports
+        4 program roms
+        8 tile roms
+        1 snd prg, 1 voice rom
+        CPUs and some customs etc.
 
-		M84-C-A (top board) (listed as for Hammering Harry)
-		4 sprite roms (in a row)
-		6 larger chips with detail removed
-		etc.
+        M84-D-B (bottom board) (found on lightning swords / kengo)
+        redesigned version of above but
+        for V35 CPU? (seems to lack the UPD71059C interrupt
+        controller which isn't needed when with the V35)
 
-		M84-B-A (top board) (found on rytpe 2)
-		M84-B-B (top board) (lightning swords / kengo)
-		these both look very similar, if not the same
+        M84-C-A (top board) (listed as for Hammering Harry)
+        4 sprite roms (in a row)
+        6 larger chips with detail removed
+        etc.
 
-		4 sprite roms (in a square)
-		various NANAO marked customs
-		KNA70H016(12)  NANAO 0201
-		KNA65005 17 NANAO 9048KS
-		KNA71H010(15) NANAO 0X2002
-		KNA72H010(14) NANAO 0Z2001
-		KNA71H009(13) NANAO 122001
-		KNA70H015(11) NANAO 092002
-		KNA91H014 NANAO 0Z2001V
-		etc.
+        M84-B-A (top board) (found on rytpe 2)
+        M84-B-B (top board) (lightning swords / kengo)
+        these both look very similar, if not the same
+
+        4 sprite roms (in a square)
+        various NANAO marked customs
+        KNA70H016(12)  NANAO 0201
+        KNA65005 17 NANAO 9048KS
+        KNA71H010(15) NANAO 0X2002
+        KNA72H010(14) NANAO 0Z2001
+        KNA71H009(13) NANAO 122001
+        KNA70H015(11) NANAO 092002
+        KNA91H014 NANAO 0Z2001V
+        etc.
 
 
 
 M85 - Pound for Pound uses this, possibly just M84 with
       a modified sound section?
-	  - most Jamma inputs not connected, trackball only
+      - most Jamma inputs not connected, trackball only
 
 
                                    Year Board                Protected?
@@ -147,7 +147,7 @@ TODO:
 
 IRQ controller
 --------------
-The IRQ controller is a UPD71059C 
+The IRQ controller is a UPD71059C
 
 The initialization consists of one write to port 0x40 and multiple writes
 (2 or 3) to port 0x42. The first value written to 0x42 is the IRQ vector base.
@@ -212,21 +212,21 @@ other supported games as well.
 #define M72_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
 // not used due to HOLD LINE logic
 #define M72_CLEAR_IRQ0 ;
-#define M72_CLEAR_IRQ1 ; 
+#define M72_CLEAR_IRQ1 ;
 #define M72_CLEAR_IRQ2 ;
 #define M72_CLEAR_IRQ3 ;
 
 #else
 
-#define M72_TRIGGER_IRQ0 m_upd71059c->ir0_w(1); 
-#define M72_TRIGGER_IRQ1 m_upd71059c->ir1_w(1); 
-#define M72_TRIGGER_IRQ2 m_upd71059c->ir2_w(1); 
-#define M72_TRIGGER_IRQ3 m_upd71059c->ir3_w(1); 
+#define M72_TRIGGER_IRQ0 m_upd71059c->ir0_w(1);
+#define M72_TRIGGER_IRQ1 m_upd71059c->ir1_w(1);
+#define M72_TRIGGER_IRQ2 m_upd71059c->ir2_w(1);
+#define M72_TRIGGER_IRQ3 m_upd71059c->ir3_w(1);
 // not sure when these should happen, probably the source of our issues
-#define M72_CLEAR_IRQ0 m_upd71059c->ir0_w(0); 
-#define M72_CLEAR_IRQ1 m_upd71059c->ir1_w(0); 
-#define M72_CLEAR_IRQ2 m_upd71059c->ir2_w(0); 
-#define M72_CLEAR_IRQ3 m_upd71059c->ir3_w(0); 
+#define M72_CLEAR_IRQ0 m_upd71059c->ir0_w(0);
+#define M72_CLEAR_IRQ1 m_upd71059c->ir1_w(0);
+#define M72_CLEAR_IRQ2 m_upd71059c->ir2_w(0);
+#define M72_CLEAR_IRQ3 m_upd71059c->ir3_w(0);
 
 #endif
 
@@ -957,8 +957,7 @@ M72_CPU1_MEMORY( dbreedm72,   0x80000, 0x90000 )
 	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1") \
 	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2") \
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM \
-ADDRESS_MAP_END \
-
+ADDRESS_MAP_END
 /*                         WORKRAM */
 M81_CPU1_MEMORY( xmultipl, 0x9c000 )
 M81_CPU1_MEMORY( dbreed,   0x88000 )
@@ -979,8 +978,7 @@ M81_CPU1_MEMORY( hharry,   0xa0000 )
 	AM_RANGE(PALETTERAM2, PALETTERAM2+0xbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2") \
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */ \
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM \
-ADDRESS_MAP_END \
-
+ADDRESS_MAP_END
 M84_CPU1_MEMORY( rtype2,  0xd0000, 0xc8000, 0xd8000 )
 M84_CPU1_MEMORY( hharryu, 0xd0000, 0xa0000, 0xa8000 )
 M84_CPU1_MEMORY( kengo,   0x80000, 0xa0000, 0xa8000 )
@@ -1988,7 +1986,7 @@ static MACHINE_CONFIG_DERIVED( m81_xmultipl, m81_hharry )
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,xmultipl) // different offsets
 MACHINE_CONFIG_END
- 
+
 static MACHINE_CONFIG_DERIVED( m81_dbreed, m81_xmultipl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dbreed_map)
@@ -2049,7 +2047,7 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 	MCFG_CPU_PROGRAM_MAP(kengo_map)
 	MCFG_CPU_IO_MAP(m84_v33_portmap)
 //#ifndef USE_HACKED_IRQS
-//	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+//  MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 //#endif
 
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK)
@@ -2058,8 +2056,8 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
-//	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NULL)
-								
+//  MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NULL)
+
 	MCFG_MACHINE_START_OVERRIDE(m72_state,kengo)
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,kengo)
 
@@ -2085,7 +2083,7 @@ MACHINE_CONFIG_END
 
 /****************************************** M82 ***********************************************/
 
-/* Major Title uses 
+/* Major Title uses
 
 M82-A-A as the top board
 M82-B-A and as the bottom board
@@ -2123,7 +2121,7 @@ static MACHINE_CONFIG_START( m82, m72_state )
 MACHINE_CONFIG_END
 
 
-/* Pound for Pound uses 
+/* Pound for Pound uses
   M85-A-B / M85-B
 */
 
@@ -2143,7 +2141,7 @@ static MACHINE_CONFIG_START( poundfor, m72_state )
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NULL)
-			
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -3474,7 +3472,7 @@ ROM_START( rtype2j )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-A */
 	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
-	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) 
+	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
 ROM_END
 
 ROM_START( rtype2jc )
@@ -3677,7 +3675,7 @@ ROM_START( kengoa )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-B */
 	ROM_LOAD( "KEN_B-4N-.IC23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
-	ROM_LOAD( "KEN_B-4P-.IC24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // differs from rtype 2 / ninja spirit 
+	ROM_LOAD( "KEN_B-4P-.IC24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // differs from rtype 2 / ninja spirit
 ROM_END
 
 

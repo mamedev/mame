@@ -12,7 +12,7 @@
 
     1) "Challenger Draw Poker", from Bend Electronics Co. Inc.
     2) "VHI Draw Poker", from Video Horizons, Inc.
-  
+
     Both companies shared the same address and phone number:
      63353 Nels Anderson Road. Bend, Oregon 97701.
      Tel: 503-389-7626.

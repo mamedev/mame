@@ -45,7 +45,7 @@ private:
 		SELECT_GAME,
 		BIOS_SELECTION,
 		BARCODE_READ,
-                PTY_INFO
+				PTY_INFO
 	};
 };
 

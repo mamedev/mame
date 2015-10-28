@@ -93,7 +93,7 @@ PALETTE_INIT_MEMBER(gyruss_state, gyruss)
 
 WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
 {
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_spriteram[offset] = data;
 }

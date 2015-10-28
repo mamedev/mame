@@ -122,7 +122,7 @@ void shougi_state::machine_start()
 {
 	m_nmi_enabled = 0;
 	m_r = 0;
-	
+
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
 }
@@ -236,7 +236,7 @@ WRITE8_MEMBER(shougi_state::control_w)
 			// 0: sharedram = sub
 			// 1: sharedram = main
 			break;
-		
+
 		case 1:
 			m_nmi_enabled = data;
 
@@ -247,11 +247,11 @@ WRITE8_MEMBER(shougi_state::control_w)
 				m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			}
 			break;
-		
+
 		case 4:
 			m_mcu->set_input_line(INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 			break;
-		
+
 		default:
 			// 7: ?????? connected to +5v via resistor
 			break;

@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * doubler.c  --  Draysoft Doubler - external cassette interface for the 464 (works on 664/6128 with external cassette?), 
+ * doubler.c  --  Draysoft Doubler - external cassette interface for the 464 (works on 664/6128 with external cassette?),
  *                intended for use in duplicating cassette software
  *
  */
- 
- #include "doubler.h"
- #include "includes/amstrad.h"
 
- //**************************************************************************
+	#include "doubler.h"
+	#include "includes/amstrad.h"
+
+	//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -72,4 +72,3 @@ READ8_MEMBER(cpc_doubler_device::ext_tape_r)
 		data |= 0x20;
 	return data;
 }
-

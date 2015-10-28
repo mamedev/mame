@@ -19,7 +19,7 @@
 
 WRITE8_MEMBER(spacefb_state::port_0_w)
 {
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_port_0 = data;
 }
@@ -27,7 +27,7 @@ WRITE8_MEMBER(spacefb_state::port_0_w)
 
 WRITE8_MEMBER(spacefb_state::port_2_w)
 {
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_port_2 = data;
 }

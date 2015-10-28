@@ -92,7 +92,7 @@ void cloak_state::set_current_bitmap_videoram_pointer()
 
 WRITE8_MEMBER(cloak_state::cloak_clearbmp_w)
 {
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	m_bitmap_videoram_selected = data & 0x01;

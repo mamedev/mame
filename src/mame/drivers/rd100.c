@@ -48,31 +48,31 @@ INPUT_PORTS_END
 
 UINT32 rd100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-//	for (int y = 0; y < 32*8; y++)
-//	{
-//		offs_t offset = (y / 8) * 128;
+//  for (int y = 0; y < 32*8; y++)
+//  {
+//      offs_t offset = (y / 8) * 128;
 
-//		for (int sx = 0; sx < 64; sx++)
-//		{
-//			UINT8 code = m_video_ram[offset++];
-//			UINT8 attr = m_video_ram[offset++];
+//      for (int sx = 0; sx < 64; sx++)
+//      {
+//          UINT8 code = m_video_ram[offset++];
+//          UINT8 attr = m_video_ram[offset++];
 
-//			offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
-//			if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
+//          offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
+//          if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
 
-//			UINT8 data = m_char_rom->base()[char_offs];
+//          UINT8 data = m_char_rom->base()[char_offs];
 
-//			rgb_t fg = m_palette->pen_color(attr & 0x07);
-//			rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
+//          rgb_t fg = m_palette->pen_color(attr & 0x07);
+//          rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
 
-//			for (int x = 0; x < 6; x++)
-//			{
-//				bitmap.pix32(y, (sx * 6) + x) = BIT(data, 7) ? fg : bg;
+//          for (int x = 0; x < 6; x++)
+//          {
+//              bitmap.pix32(y, (sx * 6) + x) = BIT(data, 7) ? fg : bg;
 
-//				data <<= 1;
-//			}
-//		}
-//	}
+//              data <<= 1;
+//          }
+//      }
+//  }
 
 	return 0;
 }

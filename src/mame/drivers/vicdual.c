@@ -207,7 +207,7 @@ int vicdual_state::is_cabinet_color()
 
 WRITE8_MEMBER(vicdual_state::videoram_w)
 {
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_videoram[offset] = data;
 }
@@ -215,7 +215,7 @@ WRITE8_MEMBER(vicdual_state::videoram_w)
 
 WRITE8_MEMBER(vicdual_state::characterram_w)
 {
-//	m_screen->update_now();
+//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_characterram[offset] = data;
 }

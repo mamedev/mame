@@ -1586,7 +1586,7 @@ UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
 
 namcos23_renderer::namcos23_renderer(namcos23_state &state)
 	: poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
-	  m_state(state)
+		m_state(state)
 {
 }
 
@@ -1892,15 +1892,15 @@ void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, 
 	float du = extent.param[1].dpdx;
 	float dv = extent.param[2].dpdx;
 	float dl = extent.param[3].dpdx;
-	
+
 	UINT32 *img = &object.bitmap->pix32(scanline, extent.startx);
-	
+
 	for(int x = extent.startx; x < extent.stopx; x++) {
 		float z = w ? 1/w : 0;
 		UINT32 pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
-		
+
 		w += dw;
 		u += du;
 		v += dv;
@@ -2035,61 +2035,61 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 
 		namcos23_poly_entry *p = render.polys + render.poly_count;
 
-        // Should be unnecessary now that frustum clipping happens, but this still culls polys behind the camera
+		// Should be unnecessary now that frustum clipping happens, but this still culls polys behind the camera
 		p->vertex_count = render.polymgr->zclip_if_less(ne, pv, p->pv, 4, 0.00001f);
-        
-        // Project if you don't clip on the near plane
-		if(p->vertex_count >= 3) {
-            // Project the eye points
-            frustum_clip_vertex<float, 3> clipVerts[10];
-            for(int i=0; i<p->vertex_count; i++) {
-                // Construct a frustum clipping vert from the NDCoords
-                const float Z = p->pv[i].p[0];
-                clipVerts[i].x = p->pv[i].x / Z;
-                clipVerts[i].y = p->pv[i].y / Z;
-                clipVerts[i].z = Z;
-                clipVerts[i].w = Z;
-                clipVerts[i].p[0] = p->pv[i].p[1];
-                clipVerts[i].p[1] = p->pv[i].p[2];
-                clipVerts[i].p[2] = p->pv[i].p[3];
-            }
 
-            // Clip against all edges of the view frustum
-            int num_vertices = frustum_clip_all<float, 3>(clipVerts, p->vertex_count, clipVerts);
-            
-            if (num_vertices != 0)
-            {
-                // Push the results back into the main vertices
-                for (int i=0; i < num_vertices; i++)
-                {
-                    p->pv[i].x = clipVerts[i].x;
-                    p->pv[i].y = clipVerts[i].y;
-                    p->pv[i].p[0] = clipVerts[i].w;
-                    p->pv[i].p[1] = clipVerts[i].p[0];
-                    p->pv[i].p[2] = clipVerts[i].p[1];
-                    p->pv[i].p[3] = clipVerts[i].p[2];
-                }
-                p->vertex_count = num_vertices;
-                
-                // This is our poor-man's projection matrix
-                for(int i=0; i<p->vertex_count; i++) 
-                {
-                    render_project(p->pv[i]);
-                    
-                    float w = p->pv[i].p[0];
-                    p->pv[i].p[1] *= w;
-                    p->pv[i].p[2] *= w;
-                    p->pv[i].p[3] *= w;
-                }
-                
-                // Compute an odd sorta'-Z thing that can situate the polygon wherever you want in Z-depth
-                p->zkey = 0.5f*(minz+maxz);
-                p->front = !(h & 0x00000001);
-                p->rd.machine = &machine();
-                p->rd.texture_lookup = render_texture_lookup_nocache_point;
-                p->rd.pens = m_palette->pens() + (color << 8);
-                render.poly_count++;
-            }
+		// Project if you don't clip on the near plane
+		if(p->vertex_count >= 3) {
+			// Project the eye points
+			frustum_clip_vertex<float, 3> clipVerts[10];
+			for(int i=0; i<p->vertex_count; i++) {
+				// Construct a frustum clipping vert from the NDCoords
+				const float Z = p->pv[i].p[0];
+				clipVerts[i].x = p->pv[i].x / Z;
+				clipVerts[i].y = p->pv[i].y / Z;
+				clipVerts[i].z = Z;
+				clipVerts[i].w = Z;
+				clipVerts[i].p[0] = p->pv[i].p[1];
+				clipVerts[i].p[1] = p->pv[i].p[2];
+				clipVerts[i].p[2] = p->pv[i].p[3];
+			}
+
+			// Clip against all edges of the view frustum
+			int num_vertices = frustum_clip_all<float, 3>(clipVerts, p->vertex_count, clipVerts);
+
+			if (num_vertices != 0)
+			{
+				// Push the results back into the main vertices
+				for (int i=0; i < num_vertices; i++)
+				{
+					p->pv[i].x = clipVerts[i].x;
+					p->pv[i].y = clipVerts[i].y;
+					p->pv[i].p[0] = clipVerts[i].w;
+					p->pv[i].p[1] = clipVerts[i].p[0];
+					p->pv[i].p[2] = clipVerts[i].p[1];
+					p->pv[i].p[3] = clipVerts[i].p[2];
+				}
+				p->vertex_count = num_vertices;
+
+				// This is our poor-man's projection matrix
+				for(int i=0; i<p->vertex_count; i++)
+				{
+					render_project(p->pv[i]);
+
+					float w = p->pv[i].p[0];
+					p->pv[i].p[1] *= w;
+					p->pv[i].p[2] *= w;
+					p->pv[i].p[3] *= w;
+				}
+
+				// Compute an odd sorta'-Z thing that can situate the polygon wherever you want in Z-depth
+				p->zkey = 0.5f*(minz+maxz);
+				p->front = !(h & 0x00000001);
+				p->rd.machine = &machine();
+				p->rd.texture_lookup = render_texture_lookup_nocache_point;
+				p->rd.pens = m_palette->pens() + (color << 8);
+				render.poly_count++;
+			}
 		}
 
 		if(type & 0x000010000)

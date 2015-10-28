@@ -265,7 +265,7 @@ TODO:
 - tokio: sound support is probably incomplete. There are a couple of unknown
   accesses done by the CPU, including to the YM2203 I/O ports. At the
   very least, there should be some filters.
- 
+
  there are also Bubble Bobble bootlegs with a P8749H MCU, however the MCU
  is protected against reading and the main code only differs by 1 byte from
  Bubble Bobble.  If the MCU were to be dumped that would also make for
@@ -1646,7 +1646,7 @@ ROM_START( bublcave )
 	ROM_LOAD( "bublcave-20.35",    0x68000, 0x8000, CRC(64322e24) SHA1(acff8a9fcaf74f198653080759898d15cccf04e8) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing */
+	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )   /* video timing */
 ROM_END
 
 
@@ -1717,7 +1717,7 @@ ROM_START( bublcave11 )
 	ROM_LOAD( "bublcave-20.35",    0x68000, 0x8000, CRC(64322e24) SHA1(acff8a9fcaf74f198653080759898d15cccf04e8) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing */
+	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )   /* video timing */
 ROM_END
 
 ROM_START( bublcave10 )
@@ -1749,7 +1749,7 @@ ROM_START( bublcave10 )
 	ROM_LOAD( "bublcave-20.35",    0x68000, 0x8000, CRC(64322e24) SHA1(acff8a9fcaf74f198653080759898d15cccf04e8) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing */
+	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )   /* video timing */
 ROM_END
 
 ROM_START( bublboblb )
@@ -1874,5 +1874,3 @@ GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave, bublbobl_state, bublbobl, 
 
 GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1", MACHINE_SUPPORTS_SAVE )
 GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0", MACHINE_SUPPORTS_SAVE )
-
-

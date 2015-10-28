@@ -1613,7 +1613,7 @@ void model3_state::draw_model(UINT32 addr)
 			clip_vert[i].z = p[i][2];
 			clip_vert[i].w = p[i][3];
 
-            clip_vert[i].p[0] = vertex[i].u * texture_coord_scale * 256.0f;        // 8 bits of subtexel accuracy for bilinear filtering
+			clip_vert[i].p[0] = vertex[i].u * texture_coord_scale * 256.0f;        // 8 bits of subtexel accuracy for bilinear filtering
 			clip_vert[i].p[1] = vertex[i].v * texture_coord_scale * 256.0f;
 
 			// transform vertex normal
@@ -1656,7 +1656,7 @@ void model3_state::draw_model(UINT32 addr)
 		}
 
 		/* clip against all edges of the view frustum */
-        num_vertices = frustum_clip_all<float, 4>(clip_vert, num_vertices, clip_vert);
+		num_vertices = frustum_clip_all<float, 4>(clip_vert, num_vertices, clip_vert);
 
 		/* divide by W, transform to screen coords */
 		for(i=0; i < num_vertices; i++)
@@ -2038,9 +2038,9 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
 				v[i].p[1] = 1.0f / tri->v[i].w;
-                v[i].p[2] = tri->v[i].p[0];
-                v[i].p[3] = tri->v[i].p[1];
-                v[i].p[4] = tri->v[i].p[2];
+				v[i].p[2] = tri->v[i].p[0];
+				v[i].p[3] = tri->v[i].p[1];
+				v[i].p[4] = tri->v[i].p[2];
 			}
 
 			model3_polydata &extra = object_data_alloc();
@@ -2068,7 +2068,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].x = tri->v[i].x;
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
-                v[i].p[1] = tri->v[i].p[2];
+				v[i].p[1] = tri->v[i].p[2];
 			}
 
 			model3_polydata &extra = object_data_alloc();
@@ -2103,7 +2103,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
 				v[i].p[1] = 1.0f / tri->v[i].w;
-                v[i].p[2] = tri->v[i].p[0];
+				v[i].p[2] = tri->v[i].p[0];
 				v[i].p[3] = tri->v[i].p[1];
 				v[i].p[4] = tri->v[i].p[2];
 			}

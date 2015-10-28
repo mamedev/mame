@@ -970,7 +970,7 @@ bool apollo_ni::call_load()
 	CLOG1(("apollo_ni::call_load: %s", filename()));
 
 	UINT64 size = length();
-	 if (size != 32)
+		if (size != 32)
 	{
 		CLOG(("apollo_ni::call_load: %s has unexpected file size %" I64FMT "d", filename(), size));
 	}
