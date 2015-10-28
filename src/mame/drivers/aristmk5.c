@@ -806,6 +806,23 @@ ROM_START( adonisa )
 	ROM_LOAD( "gal20v8b.u65", 0x0000, 0x0001, NO_DUMP ) /* 28-Lead PLCC package. Unable to read */
 ROM_END
 
+// 630 - 10 Credit Multiplier / 9 Line Multiline.
+// The Chariot Challenge - NSW/ACT - A - 10/08/98.
+// 04J00714
+ROM_START( chariotc )
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "04j00714_chariot_challenge.u7",  0x000000, 0x80000, CRC(2f3a1af7) SHA1(e1448116a81687cb79dd380dfbc8decf1f83e649) )
+	ROM_LOAD32_WORD( "04j00714_chariot_challenge.u11", 0x000002, 0x80000, CRC(ef4f49e8) SHA1(8ff21f679a55cdfebcf22c109dfd3b41773293bd) )
+	ROM_LOAD32_WORD( "04j00714_chariot_challenge.u8",  0x100000, 0x80000, CRC(fa24cfde) SHA1(1725c38a8a15915d8aa8e59afef9ce1d6e8d01c5) )
+	ROM_LOAD32_WORD( "04j00714_chariot_challenge.u12", 0x100002, 0x80000, CRC(b8d4a5ec) SHA1(097e44cdb30b9aafd7f5358c8f0cdd130ec0615e) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 ROM_START( wtiger )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200954v.u7",  0x000000, 0x80000, CRC(752e54c5) SHA1(9317544a7cf2d9bf29347d31fe72331fc3d018ef) )
@@ -1121,6 +1138,7 @@ GAME( 1998, adonis,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk
 GAME( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0100751V, NSW/ACT)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 9
 GAME( 1998, reelrock,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628,      A - 13/07/98
 GAME( 1998, indiandr,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (0100845V, Local)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628/1,    B - 15/12/98
+GAME( 1998, chariotc,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "The Chariot Challenge (04J00714, NSW/ACT)",    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 630,      A - 10/08/98, Rev 12
 GAME( 1999, wtiger,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 638/1,    B - 08/07/99
 GAME( 1999, bootsctn,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Boot Scootin' (Export, 92.767%)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4098,   A - 25/08/99
 GAME( 2000, cuckoo,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Cuckoo (MV4104, Export)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4104,   C - 02/02/00
