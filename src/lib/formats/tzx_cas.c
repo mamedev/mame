@@ -43,7 +43,8 @@ We are currently using the numbers from the TZX specification...
 #include <assert.h>
 
 #include "tzx_cas.h"
-
+#include "formats/imageutl.h"
+#include "emu.h"
 
 #define TZX_WAV_FREQUENCY   44100
 #define WAVE_LOW        -0x5a9e
@@ -334,6 +335,133 @@ static int tzx_handle_direct(INT16 **buffer, const UINT8 *bytes, int pause, int 
 }
 
 
+static int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
+{
+	int size = 0;
+	const UINT8 *cursymb = symtable + (2 * maxp + 1)*symbol;
+
+	UINT8 starttype = cursymb[0];
+
+	printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
+
+	switch (starttype)
+	{
+	case 0x00:
+		toggle_wave_data();
+		break;
+
+	case 0x01:
+		// don't change
+		break;
+
+	case 0x02:
+		// force low
+		wave_data = WAVE_LOW;
+		break;
+
+	case 0x03:
+		// force high
+		wave_data = WAVE_HIGH;
+		break;
+
+	default:
+		printf("SYMDEF invalid - bad starting polarity");
+	}
+
+	for (int i = 0; i < maxp; i++)
+	{
+		UINT16 pulse_length = cursymb[1 + (i*2)] | (cursymb[2 + (i*2)] << 8);
+	//	printf("pulse_length %04x\n", pulse_length);
+
+		// shorter lists can be terminated with a pulse_length of 0
+		if (pulse_length != 0)
+		{
+			int samples = tcycles_to_samplecount(pulse_length);
+			tzx_output_wave(buffer, samples);
+			size += samples;
+			toggle_wave_data();
+
+		}
+		else
+		{
+			toggle_wave_data(); // ?
+			i = maxp;
+			continue;
+		}
+	}
+
+
+	return size;
+}
+
+static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause, int data_size, UINT32 totp, int npp, int asp, UINT32 totd, int npd, int asd )
+{
+	int size = 0;
+
+	if (totp > 0)
+	{
+	//	printf("pilot block table %04x\n", totp);
+
+		const UINT8 *symtable = bytes;
+		const UINT8 *table2 = symtable + (2 * npp + 1)*asp;
+
+		// the Pilot and sync data stream has an RLE encoding
+		for (int i = 0; i < totp; i+=3)
+		{
+			UINT8 symbol = table2[i + 0];
+			UINT16 repetitions = table2[i + 1] + (table2[i + 2] << 8);
+			//printf("symbol %02x repititions %04x\n", symbol, repetitions); // does 1 mean repeat once, or that it only occurs once?
+
+			for (int j = 0; j < repetitions; j++)
+			{
+				size += tzx_handle_symbol(buffer, symtable, symbol, npp);
+			}
+
+
+		}
+
+		// advance to after this data
+		bytes += ((2 * npp + 1)*asp) + totp * 3;
+	}
+	else
+	{
+		printf("no pilot block\n");
+	}
+
+	if (totd > 0)
+	{
+		printf("data block table %04x\n", totd);
+
+	//	const UINT8 *symtable = bytes;
+	//	const UINT8 *table2 = bytes + (2 * npd + 1)*asd;
+
+		int NB = ceil(compute_log2(asd)); // number of bits needed to represent each symbol
+		printf("NB is %d\n", NB);
+	}
+	else
+	{
+		printf("no data block\n");
+	}
+
+
+
+	/* pause */
+	if (pause > 0)
+	{
+		int start_pause_samples = millisec_to_samplecount(1);
+		int rest_pause_samples = millisec_to_samplecount(pause - 1);
+
+		tzx_output_wave(buffer, start_pause_samples);
+		size += start_pause_samples;
+		wave_data = WAVE_LOW;
+		tzx_output_wave(buffer, rest_pause_samples);
+		size += rest_pause_samples;
+	}
+	return size;
+}
+
+
+
 static void ascii_block_common_log( const char *block_type_string, UINT8 block_type )
 {
 	LOG_FORMATS("%s (type %02x) encountered.\n", block_type_string, block_type);
@@ -376,7 +504,8 @@ static int tzx_cas_do_work( INT16 **buffer )
 	while (current_block < block_count)
 	{
 		int pause_time;
-		int data_size, text_size, total_size, i;
+		UINT32 data_size;
+		int text_size, total_size, i;
 		int pilot, pilot_length, sync1, sync2;
 		int bit0, bit1, bits_in_last_byte;
 		UINT8 *cur_block = blocks[current_block];
@@ -571,9 +700,28 @@ static int tzx_cas_do_work( INT16 **buffer )
 			break;
 
 		case 0x19:  /* Generalized Data Block */
-			// having this missing is fatal
-			printf("Unsupported block type (0x19 - Generalized Data Block) encountered.\n");
-			current_block++;
+			{
+				// having this missing is fatal
+				// used crudely by batmanc in spectrum_cass list (which is just a redundant encoding of batmane ?)
+				printf("Unsupported block type (0x19 - Generalized Data Block) encountered.\n");
+
+				data_size = cur_block[1] + (cur_block[2] << 8) + (cur_block[3] << 16) + (cur_block[4] << 24);
+				pause_time= cur_block[5] + (cur_block[6] << 8);
+				
+				UINT32 totp = cur_block[7] + (cur_block[8] << 8) + (cur_block[9] << 16) + (cur_block[10] << 24);
+				int npp = cur_block[11];
+				int asp = cur_block[12];
+				if (asp == 0) asp = 256;
+				
+				UINT32 totd = cur_block[13] + (cur_block[14] << 8) + (cur_block[15] << 16) + (cur_block[16] << 24);
+				int npd = cur_block[17];
+				int asd = cur_block[18];
+				if (asd == 0) asd = 256;
+
+				size += tzx_handle_generalized(buffer, &cur_block[19], pause_time, data_size, totp, npp, asp, totd, npd, asd);
+
+				current_block++;
+			}
 			break;
 
 		}
