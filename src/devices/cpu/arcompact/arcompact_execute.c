@@ -2042,7 +2042,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m0(OPS_32) // Jcc 
 	{
 		// if F isn't set then the destination can't be ILINK1 or ILINK2
 
-		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
 			arcompact_fatal ("fatal arcompact_handle04_20_p11_m0 J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
 		}
@@ -2057,7 +2057,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m0(OPS_32) // Jcc 
 	{
 		// if F is set then the destination MUST be ILINK1 or ILINK2
 
-		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
 			arcompact_log("unimplemented arcompact_handle04_20_p11_m0 J %08x (F set)", op);
 		}
@@ -2163,7 +2163,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m0(OPS_32) // Jcc.
 	{
 		// if F isn't set then the destination can't be ILINK1 or ILINK2
 
-		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
 			arcompact_log("unimplemented Jcc.D (p11_m0 type, illegal) %08x", op);
 		}
@@ -2177,7 +2177,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m0(OPS_32) // Jcc.
 	{
 		// if F is set then the destination MUST be ILINK1 or ILINK2
 
-		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
 			arcompact_log("unimplemented Jcc.D.F (p11_m0 type, unimplemented) %08x", op);
 		}
