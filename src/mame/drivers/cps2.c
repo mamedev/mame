@@ -746,9 +746,9 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 		coin_counter_w(machine(), 0, data & 0x0001);
-		if ((strncmp(machine().system().name, "pzloop2", 8) == 0) ||
+		if ((strncmp(machine().system().name, "pzloop2", 7) == 0) ||
 			(strncmp(machine().system().name, "pzloop2j", 8) == 0) ||
-			(strncmp(machine().system().name, "pzloop2jr1", 8) == 0))
+			(strncmp(machine().system().name, "pzloop2jr1", 10) == 0))
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
 			m_readpaddle = data & 0x0002;
