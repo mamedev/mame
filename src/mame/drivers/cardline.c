@@ -139,7 +139,8 @@ WRITE_LINE_MEMBER(cardline_state::hsync_changed)
 {
 	/* update any video up to the current scanline */
 	m_hsync_q = (state ? 0x00 : 0x10);
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE_LINE_MEMBER(cardline_state::vsync_changed)

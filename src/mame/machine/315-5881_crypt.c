@@ -47,7 +47,7 @@ void sega_315_5881_crypt_device::device_start()
 	save_item(NAME(line_buffer_pos));
 	save_item(NAME(line_buffer_size));
 
-	std::string skey = parameter("key").c_str();
+	std::string skey = parameter("key");
 	if(!skey.empty())
 		key = strtoll(skey.c_str(), 0, 16);
 	else

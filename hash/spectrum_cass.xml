@@ -797,9 +797,53 @@
 			</dataarea>
 		</part>
 	</software>
-  
+
   <!-- V1.0 doesn't exist in Spanish? or Italian (translations were made after the 1.1 release) -->
-  
+
+  <!-- what are these? were there unannounced updates at some point? check data, remove if just duplicate -->
+  <software name="castlvsia" cloneof="castlvsi">
+    <description>Castlevania - Spectral Interlude (alt, English, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="126416">
+        <rom name="castlevania_si_en.tap" size="126416" crc="c7fb2adf" sha1="22fdb537a3e4b3ed05aac82f34103212c179db4a" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsirua" cloneof="castlvsi">
+    <description>Castlevania - Spectral Interlude (alt, Russian, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="127075">
+        <rom name="castlevania_si_ru.tap" size="127075" crc="e4e9bd2a" sha1="8bae5e5d2e310335f3aba96b2a0ed6c5c447eb18" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsipla" cloneof="castlvsi">
+    <description>Castlevania - Spectral Interlude (alt, Polish, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="127413">
+        <rom name="castlevania_si_pl.tap" size="127413" crc="98e2c6a6" sha1="6eb777aa7c0c057cf04f3162e7e80f6c4286e406" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="castlvsiesa" cloneof="castlvsi">
+    <description>Castlevania - Spectral Interlude (alt, Spanish, 128K)</description>
+    <year>2015</year>
+    <publisher>Rewind</publisher>
+    <part name="cass" interface="spectrum_cass">
+      <dataarea name="cass" size="126973">
+        <rom name="castlevania_si_es.tap" size="126973" crc="4479be59" sha1="c5c816d4b02526c37ea44cbac8d1836ca03fd2fe" offset="0"/>
+      </dataarea>
+    </part>
+  </software>  
 </softwarelist>
 
 

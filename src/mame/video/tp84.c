@@ -106,7 +106,8 @@ PALETTE_INIT_MEMBER(tp84_state, tp84)
 WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
 {
 	/* the game multiplexes the sprites, so update now */
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	m_spriteram[offset] = data;
 }
 

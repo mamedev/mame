@@ -101,7 +101,9 @@ void cubeqst_state::video_start()
 
 WRITE16_MEMBER(cubeqst_state::palette_w)
 {
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
+
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 }
 

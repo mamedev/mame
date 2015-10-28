@@ -1126,7 +1126,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 
 	// handle %d in the template (for image devices)
 	std::string snapdev("%d_");
-	int pos = snapstr.find(snapdev.c_str());
+	int pos = snapstr.find(snapdev);
 
 	if (pos != -1)
 	{

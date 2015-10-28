@@ -190,19 +190,22 @@ WRITE8_MEMBER(system1_state::system1_videomode_w)
 
 READ8_MEMBER(system1_state::system1_mixer_collision_r)
 {
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	return m_mix_collide[offset & 0x3f] | 0x7e | (m_mix_collide_summary << 7);
 }
 
 WRITE8_MEMBER(system1_state::system1_mixer_collision_w)
 {
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	m_mix_collide[offset & 0x3f] = 0;
 }
 
 WRITE8_MEMBER(system1_state::system1_mixer_collision_reset_w)
 {
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	m_mix_collide_summary = 0;
 }
 
@@ -216,19 +219,22 @@ WRITE8_MEMBER(system1_state::system1_mixer_collision_reset_w)
 
 READ8_MEMBER(system1_state::system1_sprite_collision_r)
 {
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	return m_sprite_collide[offset & 0x3ff] | 0x7e | (m_sprite_collide_summary << 7);
 }
 
 WRITE8_MEMBER(system1_state::system1_sprite_collision_w)
 {
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	m_sprite_collide[offset & 0x3ff] = 0;
 }
 
 WRITE8_MEMBER(system1_state::system1_sprite_collision_reset_w)
 {
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	m_sprite_collide_summary = 0;
 }
 
@@ -274,7 +280,10 @@ WRITE8_MEMBER(system1_state::system1_videoram_w)
 
 	/* force a partial update if the page is changing */
 	if (m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
-		m_screen->update_now();
+	{
+		//m_screen->update_now();
+		m_screen->update_partial(m_screen->vpos());
+	}
 }
 
 WRITE8_MEMBER(system1_state::system1_videoram_bank_w)

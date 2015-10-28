@@ -537,7 +537,8 @@ WRITE8_MEMBER(itech8_state::grmatch_palette_w)
 WRITE8_MEMBER(itech8_state::grmatch_xscroll_w)
 {
 	/* update the X scroll value */
-	m_screen->update_now();
+	//m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	m_grmatch_xscroll = data;
 }
 

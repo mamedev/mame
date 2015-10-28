@@ -876,7 +876,8 @@ TIMER_CALLBACK_MEMBER(dkong_state::scanline_callback)
 		radarscp_scanline(scanline);
 
 	/* update any video up to the current scanline */
-	m_screen->update_now();
+//	m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 
 	scanline = (scanline+1) % VTOTAL;
 	/* come back at the next appropriate scanline */

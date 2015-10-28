@@ -32,7 +32,7 @@ void naomi_m1_board::device_start()
 {
 	naomi_board::device_start();
 
-	std::string skey = parameter("key").c_str();
+	std::string skey = parameter("key");
 	if(!skey.empty())
 		key = strtoll(skey.c_str(), 0, 16);
 	else

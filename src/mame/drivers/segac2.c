@@ -937,21 +937,21 @@ static INPUT_PORTS_START( sonicpop )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Relay")  // relay (must be ON by default or machine will instantly give an 'assistance' error)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Relay")  // relay (must be ON by default or machine will instantly give an 'assistance' error) - pressing this advances the stages of operation (from type select, and during the turning of the wheel)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Coinblock") // coinblock (inverted)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Sensor") // sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Sensor") // sensor - causes an extra animation to play if you press it during attract and 'Sensor Advertise' dip is on
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Cup Select 1")  // cup select 2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Cup Select 2")  // cup select 2 - pressing Cup Select 1 and 2 registers as 'Cup Select 3', I presume these are lines from the mechanical part.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Cup Select 1") // cup select 1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Handle B")  // handle B
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Handle A")  // handle A
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_NAME("Sold Out LED1") // sold out LED 1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_NAME("Sold Out LED1") // sold out LED 1 - are these actually output lines?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Sold Out LED2") // sold out LED 2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Sold Out LED3") // sold out LED 3
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Sold Out SW2") // sold out SW 2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Sold Out SW2") // sold out SW 2 - holding these while coining up will show popcorn as unavailable, pressing all 3 will fault the machine
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Sold Out SW3") // sold out SW 3
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Sold Out SW1") // sold out SW 1

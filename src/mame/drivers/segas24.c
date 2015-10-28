@@ -878,8 +878,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 	if(irq_allow1 & (1 << IRQ_TIMER))
 		m_subcpu->set_input_line(IRQ_TIMER+1, ASSERT_LINE);
 
-	if(irq_tmode == 1 || irq_tmode == 2)
-		m_screen->update_now();
+	if (irq_tmode == 1 || irq_tmode == 2)
+	{
+	//	m_screen->update_now();
+		m_screen->update_partial(m_screen->vpos());
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)

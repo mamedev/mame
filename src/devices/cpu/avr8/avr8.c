@@ -752,7 +752,6 @@ void avr8_device::device_start()
 	m_io = &space(AS_IO);
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_shifted_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[AVR8_REGIDX_SREG]).callimport().callexport().formatstr("%8s").noshow();
 	state_add(AVR8_SREG,       "STATUS",    m_r[AVR8_REGIDX_SREG]).mask(0xff);

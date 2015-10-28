@@ -470,8 +470,12 @@ void ata_hle_device::read_buffer_empty()
 	if ((multi_word_dma_mode() >= 0) || (ultra_dma_mode() >= 0))
 		set_dmarq(CLEAR_LINE);
 
-	m_buffer_empty_timer->enable(true);
-	m_buffer_empty_timer->adjust(attotime::zero);
+	if (ultra_dma_mode() >= 0) {
+		m_buffer_empty_timer->enable(true);
+		m_buffer_empty_timer->adjust(attotime::zero);
+	}
+	else
+		fill_buffer();
 }
 
 void ata_hle_device::write_buffer_full()

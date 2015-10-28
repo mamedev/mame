@@ -10,28 +10,35 @@ Bank 1 simply consists of 64KB of RAM. The upper 4KB is used for the lower 8
 bit of video RAM entries.
 
 Bank 2 holds the BIOS ROM and I/O area. Only addresses 0000-3FFF are used
-by bank 2. Bank 2 is divided as follows:
-3000-3FFF Unused
+by bank 2 (4000-FFFF mirrors bank 1). Bank 2 is divided as follows:
+3000-3FFF Nominally unused but acts as mirror of 2000-2FFF
 2C00-2C03 Video PIA
 2A00-2A01 Serial interface
 2900-2903 488 PIA
+2400-2400 SCREEN-PAC (if present)
 2201-2280 Keyboard
 2100-2103 Floppy
-1000-1FFF Unused
+1000-1FFF Nominally unused but acts as read mirror of BIOS ROM
 0000-0FFF BIOS ROM
+
+The logic is actually quite sloppy, and will cause bus fighting under many
+circumstances since it doesn't actually check all four bits, just that two
+are in the desired state.
 
 Bank 3 has the ninth bit needed to complete the full Video RAM. These bits
 are stored at F000-FFFF. Only the highest bit is used.
 
 On bootup bank 2 is active.
 
-The actual banking is done through I/O ports 00-03.
-00 - Have both bank 2 and bank 1 active. This seems to be the power up default.
-01 - Only have bank 1 active.
-02 - Have both bank 2 and bank 3 active. (Not 100% sure, also bank 1 from 4000-EFFF?)
-03 - Have both bank 2 and bank 1 active.
+Banking is controlled by writes to I/O space.  Only two low address bits are
+used, and the value on the data bus is completley ignored.
+00 - Activate bank 2 (also triggered by CPU reset)
+01 - Activate bank 1
+02 - Set BIT 9 signal (map bank 3 into F000-FFFF)
+03 - Clear BIT 9 signal (map bank 1/2 into F000-FFFF)
 
 TODO:
+  - Implement serial port
   - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
@@ -45,17 +52,16 @@ TODO:
 static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
 	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank1") AM_WRITE( osborne1_0000_w )
 	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank2") AM_WRITE( osborne1_1000_w )
-	AM_RANGE( 0x2000, 0x2FFF ) AM_READWRITE( osborne1_2000_r, osborne1_2000_w )
-	AM_RANGE( 0x3000, 0x3FFF ) AM_READ_BANK("bank3") AM_WRITE( osborne1_3000_w )
+	AM_RANGE( 0x2000, 0x3FFF ) AM_READWRITE( osborne1_2000_r, osborne1_2000_w )
 	AM_RANGE( 0x4000, 0xEFFF ) AM_RAM
-	AM_RANGE( 0xF000, 0xFFFF ) AM_READ_BANK("bank4") AM_WRITE( osborne1_videoram_w )
+	AM_RANGE( 0xF000, 0xFFFF ) AM_READ_BANK("bank3") AM_WRITE( osborne1_videoram_w )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( osborne1_io, AS_IO, 8, osborne1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_WRITE( osborne1_bankswitch_w )
+	AM_RANGE( 0x00, 0xff ) AM_WRITE( osborne1_bankswitch_w )
 ADDRESS_MAP_END
 
 
