@@ -5101,7 +5101,7 @@
 	</software>
 
 	<software name="gatecras">
-		<description>Gatecrasher </description>
+		<description>Gatecrasher</description>
 		<year>198?</year>
 		<publisher>Quicksilva</publisher>
 		<part name="cass" interface="bbc_cass">

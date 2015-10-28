@@ -13456,7 +13456,7 @@ kept for now until finding out what those bytes affect...
 	<software name="supersyn">
 		<description>Super Synth (Jpn)</description>
 		<year>1984</year>
-		<publisher>Victor </publisher>
+		<publisher>Victor</publisher>
 		<info name="serial" value="M-20001" />
 		<info name="alt_title" value="スーパーシンセ" />
 		<part name="cart" interface="msx_cart">
@@ -13469,7 +13469,7 @@ kept for now until finding out what those bytes affect...
 	<software name="supersyna" cloneof="supersyn">
 		<description>Super Synth (Jpn, Alt)</description>
 		<year>1984</year>
-		<publisher>Victor </publisher>
+		<publisher>Victor</publisher>
 		<info name="serial" value="M-20001" />
 		<info name="alt_title" value="スーパーシンセ" />
 		<part name="cart" interface="msx_cart">

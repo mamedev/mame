@@ -2365,7 +2365,7 @@
 	<software name="finalbb" cloneof="bublbobl">
 		<description>Final Bubble Bobble (Jpn)</description>
 		<year>1988</year>
-		<publisher>Sega </publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="G-1362"/>
 		<info name="release" value="19880702"/>
 		<info name="alt_title" value="ファイナル バブル ボブル" />
