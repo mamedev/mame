@@ -335,14 +335,14 @@ static int tzx_handle_direct(INT16 **buffer, const UINT8 *bytes, int pause, int 
 }
 
 
-static int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
+INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
 {
 	int size = 0;
 	const UINT8 *cursymb = symtable + (2 * maxp + 1)*symbol;
 
 	UINT8 starttype = cursymb[0];
 
-	printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
+//	printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
 
 	switch (starttype)
 	{
@@ -376,6 +376,8 @@ static int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 		// shorter lists can be terminated with a pulse_length of 0
 		if (pulse_length != 0)
 		{
+			
+
 			int samples = tcycles_to_samplecount(pulse_length);
 			tzx_output_wave(buffer, samples);
 			size += samples;
@@ -384,14 +386,37 @@ static int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 		}
 		else
 		{
-			toggle_wave_data(); // ?
+			toggle_wave_data();
 			i = maxp;
 			continue;
 		}
 	}
 
+	//toggle_wave_data();
 
 	return size;
+}
+
+INLINE int stream_get_bit(const UINT8 *bytes, UINT8 &stream_bit, UINT32 &stream_byte)
+{
+	// get bit here
+	UINT8 retbit = 0;
+
+	UINT8 byte = bytes[stream_byte];
+	byte = byte << stream_bit;
+
+	if (byte & 0x80) retbit = 1;
+
+
+	stream_bit++;
+
+	if (stream_bit == 8)
+	{
+		stream_bit = 0;
+		stream_byte++;
+	}
+
+	return retbit;
 }
 
 static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause, int data_size, UINT32 totp, int npp, int asp, UINT32 totd, int npd, int asd )
@@ -415,6 +440,7 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 			for (int j = 0; j < repetitions; j++)
 			{
 				size += tzx_handle_symbol(buffer, symtable, symbol, npp);
+			//	toggle_wave_data();
 			}
 
 
@@ -430,13 +456,30 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 
 	if (totd > 0)
 	{
-		printf("data block table %04x\n", totd);
+		printf("data block table %04x (has %0d symbols, max symbol length is %d)\n", totd, asd, npd);
 
-	//	const UINT8 *symtable = bytes;
-	//	const UINT8 *table2 = bytes + (2 * npd + 1)*asd;
+		const UINT8 *symtable = bytes;
+		const UINT8 *table2 = bytes + (2 * npd + 1)*asd;
 
 		int NB = ceil(compute_log2(asd)); // number of bits needed to represent each symbol
 		printf("NB is %d\n", NB);
+
+		UINT8 stream_bit = 0;
+		UINT32 stream_byte = 0;
+
+		for (int i = 0; i < totd; i++)
+		{
+			UINT8 symbol = 0;
+			
+			for (int j = 0; j < NB; j++)
+			{
+				symbol |= stream_get_bit(table2, stream_bit, stream_byte) << j;
+			}
+
+			size += tzx_handle_symbol(buffer, symtable, symbol, npd);
+
+			//toggle_wave_data();
+		}
 	}
 	else
 	{
