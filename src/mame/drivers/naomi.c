@@ -3,6 +3,7 @@
 /*
 
   Sega Naomi / Naomi 2 / Atomiswave
+  Sega, 1998-2005
 
   Driver by Samuele Zannoli, R. Belmont, ElSemi,
             David Haywood, Angelo Salese and Olivier Galibert
@@ -93,15 +94,11 @@ TODO (game-specific):
     (more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
+Guru's Readmes
+--------------
 
-Guru's Readme
--------------
-
-Sega NAOMI Mainboard
-Sega, 1998-2005
-
-PCB Layout
-----------
+Sega NAOMI Mainboard PCB Layout
+-------------------------------
 837-13544-01
 171-7772F
 837-13707 (sticker)
@@ -114,49 +111,111 @@ PCB Layout
 |ADM485  BIOS.IC27   5264165            5264165     |
 |                    5264165  |-----|   5264165     |
 |    CN2                      | SH4 |               |
-|                             |     | 33.3333MHZ    |
-|CN26                         |-----|          27MHZ|
+|                             |     | 33.3333MHz    |
+|CN26                         |-----|          27MHz|
 |                                         CY2308SC-3|
 |        KM416S4030      |------|     HY57V161610   |
 |                        | POWER|     HY57V161610   |
-| C844G        315-6232  | VR2  |             32MHZ |
-|            33.8688MHZ  |------|     HY57V161610   |
-|                         xMHz        HY57V161610   |
+| C844         315-6232  | VR2  |             32MHz |
+|            33.8688MHz  |------|     HY57V161610   |
+|                         32.768MHz   HY57V161610   |
 |      PCM1725    JP1                    62256      |
 |                     HY57V161610                   |
 |                          HY57V161610              |
 |              315-6145                             |
-|CN25                CY2308SC-1          315-6146   |
+|CN25                CY2308SC-3          315-6146   |
 |          LED1                              93C46  |
-|          LED2                     14.7456MHZ      |
+|          LED2                     14.7456MHz      |
 |---------------------------------------------------|
 Notes:
-      CN1/2/3         - Connectors for ROM cart
-      CN25/26         - Connectors for filter board
-      EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
-      315-6188.IC31   - Altera EPC1064 (DIP8)
-                        According to the datasheet, it's an FPGA Configuration
-                        Device which loads the Altera Flex EPF8452 with some info
-                        on power-up.
-      JP1             - set to 2-3. Alt setting is 1-2
-      JP4             - set to 2-3. Alt setting is 1-2
-      93C46           - 128 bytes serial EEPROM
-      A179B 96K       - TI SN75179B Differential driver and receiver pair (like RS485)
-      ADM485          - Analog Devices ADM485
-      BIOS.IC27       - 27C160 EPROM
-      5264165         - Hitachi 5264165FTTA60 (video RAM)
-      HY57V161610     - Hyundai 57V161610DTC-8 (main program RAM)
-      CY2308SC-3      - Clock generator IC
-      KM416S4030      - Samsung KM416S4030 16MBit SDRAM (sound related RAM?)
-      315-6232        - Sega Custom IC (QFP100)
-      315-6145        - Sega Custom IC (QFP56)
-      315-6146        - Sega Custom IC (QFP176)
-      C844G           - ? (SOIC14)
-      62256           - 32kx8 SRAM
-      PCM1725         - Burr-Brown PCM1725
-      xMHz            - Small round XTAL (possibly 32.768kHz for a clock?)
-      SH4             - Hitachi SH4 CPU (BGAxxx, with heatsink)
-      POWERVR2        - POWERVR2 video generator (BGAxxx, with heatsink and fan)
+            SH4 - Hitachi SH4 CPU (BGAxxx, with heatsink)
+       POWERVR2 - NEC POWERVR2 Video Generator IC (large BGAxxx, with heatsink and fan)
+EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
+          93C46 - 128 bytes serial EEPROM (SOIC8)
+      BIOS.IC27 - 27C160 EPROM (DIP42)
+        5264165 - Hitachi 5264165FTTA60 1M x 16-bit x 4-banks (64Mbit) SDRAM (TSOPII-54)
+    HY57V161610 - Hynix HY57V161610DTC-8 512k x 16-bit x 2-banks (16Mbit) SDRAM (TSOPII-50)
+     KM416S4030 - Samsung KM416S4030 1M x 16-bit x 4 Banks SDRAM (TSOPII-54)
+          62256 - 32k x8-bit SRAM (SOP28)
+       315-6145 - Sega Custom IC (QFP56)
+       315-6146 - Sega Custom IC (QFP176)
+       315-6188 - Altera EPC1064PC8 FPGA Configuration Device with sticker '315-6188' at IC31 (DIP8)
+       315-6232 - Sega Custom IC (QFP100)
+     CY2308SC-3 - Cypress CY2308SC-3 2-Bank 4-Output Tri-state PLL Programmable Clock Generator IC with 2X or 4X outputs and Zero Delay Buffer (SOIC16)
+           C844 - NEC uPC844 Quad Operational Amplifier (SOIC14)
+          A179B - TI SN75179B Differential Driver and Receiver Pair (DIP8)
+         ADM485 - Analog Devices ADM485 +5 V Low Power EIA RS-485 Transceiver (SOIC8)
+        PCM1725 - Burr-Brown PCM1725 Stereo Audio Digital to Analog Converter 16 Bits, 96kHz Sampling (SOIC14)
+            JP1 - set to 2-3. Alt setting is 1-2
+            JP4 - set to 2-3. Alt setting is 1-2
+        CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
+        CN25/26 - Connectors for Filter Board
+
+
+Sega NAOMI 2 Mainboard PCB Layout
+---------------------------------
+837-14009-01
+171-8082C
+837-14123 (sticker)
+(C) SEGA 1999
+|---------------------------------------------------|
+|    CN1  32MHz   BATTERY          CN3              |
+|PC910   315-6146 S-CAP        62256   315-6188.IC31|
+|A179B  62256 *93C46      BIOS.IC27 EPF8452         |
+|   ADM485      14.7456MHz                     D4721|
+|     5264165 315-6232    315-6268  93C46           |
+|PCM1725       33.8688MHz      33.3333MHz           |
+|               32.768kHz                           |
+|    CN2          CY2308  |-----|                   |
+|                         | SH4 |                   |
+|CN26                     |     |                   |
+| C844          *CY2308   |-----|                   |
+| 315-6258             5264165  5264165             |
+|     315-6269        *5264165 *5264165 16M  16M    |
+| 315-6258                             *16M *16M    |
+|       16M|--------|    |--------|    |--------|   |
+|       16M|315-6267|    |315-6289|    |315-6267|16M|
+|      *16M|        |    |        |    |        |16M|
+|      *16M|        |    |        |    |        |*16M
+|MC33470   |--------|    |--------|    |--------|*16M
+|CN25       16M  16M      64M  64M                  |
+|*3771     *16M *16M     *64M *64M             3771 |
+|                                        27MHz 3771 |
+|                  LED2 LED1    *CY2308 CY2292  3773|
+|---------------------------------------------------|
+Notes: (* - these parts on other side of PCB)
+            SH4 - Hitachi SH4 CPU (BGAxxx, with heatsink)
+      BIOS.IC27 - 27C160 EPROM (DIP42)
+        EPF8452 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
+          93C46 - 128 bytes serial EEPROM (SOIC8)
+        5264165 - Hitachi 5264165FTTA60 1M x 16-bit x 4-banks (64Mbit) SDRAM (TSOP-II 54)
+            16M - Hynix HY57V161610DTC-8 512k x 16-bit x 2-banks (16Mbit) SDRAM (TSOP-II 50)
+            64M - NEC D4564323 512k x 32-bit x 4-banks (64Mbit) SDRAM (TSOP-II 86)
+          62256 - 32k x8-bit SRAM (SOP28)
+       315-6146 - Sega Custom IC (QFP176)
+       315-6188 - Altera EPC1064PC8 FPGA Configuration Device with sticker '315-6188' at IC31 (DIP8)
+       315-6232 - Sega Custom IC (QFP100)
+       315-6258 - Sega Custom IC (QFP56)
+       315-6267 - NEC POWER-VR2 Video Generator IC (large BGAxxx, with heatsink and fan, x2)
+       315-6268 - Altera EPM7032AELC44-10 CPLD with sticker '315-6268' (PLCC44)
+       315-6269 - Altera MAX EPM7064AETC100-10 CPLD with sticker '315-6269' (TQFP100)
+       315-6289 - Sega custom IC (large BGAxxx, with heatsink)
+        MC33470 - ON Semiconductor MC33470 Synchronous Rectification DC/DC Converter Programmable Integrated Controller (SOIC20)
+         CY2308 - Cypress CY2308SC-3 2-Bank 4-Output Tri-state PLL Programmable Clock Generator IC with 2X or 4X outputs and Zero Delay Buffer (SOIC16)
+         CY2292 - Cypress CY2292SL Three-PLL General-Purpose EPROM Programmable Clock Generator IC (SOIC16)
+          A179B - TI SN75179B Differential Driver and Receiver Pair (SOIC8)
+         ADM485 - Analog Devices ADM485 +5 V Low Power EIA RS-485 Transceiver (SOIC8)
+          PC910 - Sharp PC910 Ultra-high Speed Response OPIC Photocoupler (DIP8)
+          D4721 - NEC uPD4721GS RS-232 Line Driver/Receiver at 3.3V / 5V (TSSOP20)
+           3771 - Fujitsu MB3771 Power Supply Monitor (i.e. reset) IC (SOIC8)
+           3773 - Fujitsu MB3773 Power Supply Monitor with Watch-Dog Timer (SOIC8)
+           C844 - NEC uPC844 Quad Operational Amplifier (SOIC14)
+        PCM1725 - Burr-Brown PCM1725 Stereo Audio Digital to Analog Converter 16 Bits, 96kHz Sampling (SOIC14)
+        BATTERY - 3v Coin Battery
+          S-CAP - 5.5v 0.1f Supercap
+    LED1 / LED2 - Red LED / Green LED
+        CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
+        CN25/26 - Connectors for Filter Board
 
 
 Filter Board
@@ -173,23 +232,22 @@ Filter Board
 |    CN7     CN6           CN4       CN3    CN2   CN1|
 |----------------------------------------------------|
 Notes:
-      CN1/CN2   - Power input
-      CN3       - HD15 (i.e. VGA connector) RGB Video Output @ 15kHz or 31.5kHz
-      CN4       - RCA Audio Output connectors
-      CN5       - USB connector (connection to I/O board)
-      CN6       - 10 pin connector labelled 'MAPLE 0-1'
-      CN7       - 11 pin connector labelled 'MAPLE 2-3'
-      CN8       - RS422 connector
-      CN9       - Midi connector
-      CNTX/CNRX - Network connectors
-      DIN1/DIN2 - Connectors joining to mainboard CN25/26
-      SW1       - Test Switch
-      SW2       - Service Switch
-      DIPSW     - 4-position DIP switch block
-      CN10      - 12 volt output for internal case exhaust fan
-      CN11      - RGB connector (not populated)
-      CN12      - 5 volt output connector
-
+      CN1/CN2 - Power input
+          CN3 - HD15 (i.e. VGA connector) RGB Video Output @ 15kHz or 31.5kHz
+          CN4 - RCA Audio Output connectors
+          CN5 - USB connector (connection to I/O board)
+          CN6 - 10 pin connector labelled 'MAPLE 0-1'
+          CN7 - 11 pin connector labelled 'MAPLE 2-3'
+          CN8 - RS422 connector
+          CN9 - Midi connector
+    CNTX/CNRX - Network connectors
+    DIN1/DIN2 - Connectors joining to mainboard CN25/26
+          SW1 - Test Switch
+          SW2 - Service Switch
+        DIPSW - 4-position DIP switch block
+         CN10 - 12 volt output for internal case exhaust fan
+         CN11 - RGB connector (not populated)
+         CN12 - 5 volt output connector
 
 
 ---------------------------------------------------------
@@ -209,7 +267,6 @@ Naomi 2 / GD-ROM             |           |              |
     EPR-23605A               |   Yes     |    Yes       |
     EPR-23605B (and newer)   |   Yes     |    Yes       |
 ---------------------------------------------------------
-
 
 
 NAOMI ROM cart usage
@@ -363,7 +420,6 @@ Virtual On Oratorio Tangram M.S.B.S. ver5.66    840-0028C    23198   13 (64Mb)  
 Zombie Revenge                                  840-0003C    21707   19 (64Mb)   ?           315-6213  317-0249-COM   joystick + 3 buttons
 
 
-
 171-7930B (C) Sega 1998
 |------------------------------------------------------------------|
 |        JJJJJJ      SW2                        ----CN2----        -|
@@ -411,7 +467,6 @@ Games known to use this PCB include....
 Game                                  on cart  IC16#        # of SOP56  Notes
 -----------------------------------------------------------------------------------------------------
 Puyo Puyo Fever (prototype ver 0.01)  *        not present  22 (64Mb)   no cart, only development PCB
-
 
 
 837-13801  171-7978B (C) Sega 1999
@@ -474,7 +529,6 @@ SWP Hopper Board                                             840-0130C    24083 
 Touch de UNO! 2                                              840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
 Virtua Fighter 4 Evolution                                   840-0106B    23934   20 (64Mb)   present  317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A)                      840-0084C    22327A  18 (64Mb)   present  317-0320-COM
-
 
 
 837-14114-01  171-8132B (C) Sega 2000
@@ -541,7 +595,6 @@ WWF Royal Rumble                                840-0040C  22261    8 (128Mb)  3
 Zero Gunner 2                                   841-0020C  23689    5 (128Mb)  315-6319A  315-6213  317-5073-COM
 
 
-
 171-8346C (C) Sega 2005
 |---------------------------------------------------------|
 |  IC12          IC8                    ----CN2----       -|
@@ -594,7 +647,6 @@ Rhythm Tengoku                                      841-0177C    not present  4 
 Star Horse Progress Returns (satellite)             840-0186C    not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Shooting Love 2007                                  841-0057C    not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)                              840-0166C    not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18", requires 837-14672 sensor board (SH4 based)
-
 
 
 MASK B (C) Namco 2000
@@ -704,12 +756,9 @@ Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  presen
 
 (1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
-
-
       Note! Generally, games that require a special I/O board or controller will not boot at all with a
             standard NAOMI I/O board. Usually they display a message saying the I/O board is not acceptable
             or not connected properly.
-
 
 
 Sega I/O boards
@@ -717,7 +766,6 @@ Sega I/O boards
 
 These are used on NAOMI and all other Sega games from 1999 onwards.
 Not all I/O boards are listed here. If you know of others, please let us know.
-
 
 838-13683
 838-13683-91 (sticker)
@@ -1200,15 +1248,11 @@ Pin     Function    I/O    Pin   Function  I/O
 The bottom of the PCB contains nothing significant except some connectors. One for the game cart, one for special controls
 or I/O, one for a communication module, one for a cooling fan and one for the serial connection daughterboard.
 
----------------------------------------------------------------------------------------------------------------------------------
-
-
 
 Atomiswave cart PCB layout and game usage (revision 1.0 26/2/2011 5:59pm)
 -----------------------------------------
 
 Type 1 ROM Board:
-
 
 AM3AGB-04
 MROM PCB
@@ -1291,7 +1335,6 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs.
 
 
 Type 2 ROM Board:
-
 
 AM3ALW-02
 MROM2 PCB
@@ -1500,7 +1543,6 @@ Notes:
       RTL8139CL+ - Realtek RTL8139CL+ 3.3 volt Single Chip Fast Ethernet Controller with Power Management (QFP120)
       315-6310   - Sega 315-6310 Custom IC (QFP100)
       CN         - This connector plugs into the main board
-
 
 
 Gun Sub Board
