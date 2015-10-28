@@ -97,6 +97,7 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 
 WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 {
+#if 0
 	/* Check whether regular RAM is enabled */
 	if ( !m_bank2_enabled ||  (m_in_irq_handler && m_bankswitch == RAMMODE) )
 	{
@@ -119,6 +120,40 @@ WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 		if ( 0xC00 == (offset & 0xC00) ) /* Video PIA */
 			m_pia1->write(space, offset & 0x03, data);
 	}
+#else
+	// This code is a nasty hack that doesn't reflect hardware operation,
+	// but it gets us by while the bank selection implementation is inadequate
+	if ( ! m_bank2_enabled )
+	{
+		m_ram->pointer()[ 0x2000 + offset ] = data;
+	}
+	else
+	{
+		if ( m_in_irq_handler && m_bankswitch == RAMMODE )
+		{
+			m_ram->pointer()[ 0x2000 + offset ] = data;
+		}
+		/* Handle writes to the I/O area */
+		switch( offset & 0x1F00 )
+		{
+		case 0x100: /* Floppy */
+			m_fdc->write(space, offset & 0x03, data);
+			break;
+		case 0x400: /* SCREEN-PAC */
+			m_resolution = data & 0x01;
+			m_hc_left = (data >> 1) & 0x01;
+			break;
+		case 0x900: /* IEEE488 PIA */
+			m_pia0->write(space, offset & 0x03, data );
+			break;
+		case 0xA00: /* Serial */
+			break;
+		case 0xC00: /* Video PIA */
+			m_pia1->write(space, offset & 0x03, data );
+			break;
+		}
+	}
+#endif
 }
 
 
@@ -393,9 +428,8 @@ TIMER_CALLBACK_MEMBER(osborne1_state::setup_osborne1)
 
 void osborne1_state::machine_reset()
 {
-	address_space& space = m_maincpu->space(AS_PROGRAM);
 	/* Initialize memory configuration */
-	osborne1_bankswitch_w( space, 0x00, 0 );
+	osborne1_bankswitch_w( m_maincpu->space(AS_IO), 0x00, 0 );
 
 	m_pia_0_irq_state = FALSE;
 	m_pia_1_irq_state = FALSE;
@@ -408,6 +442,7 @@ void osborne1_state::machine_reset()
 
 	memset( m_ram->pointer() + 0x10000, 0xFF, 0x1000 );
 
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 	space.set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), this));
 }
 
@@ -487,9 +522,8 @@ int osborne1_daisy_device::z80daisy_irq_ack()
 	osborne1_state *state = machine().driver_data<osborne1_state>();
 	/* Enable ROM and I/O when IRQ is acknowledged */
 	UINT8 old_bankswitch = state->m_bankswitch;
-	address_space& space = state->m_maincpu->space(AS_PROGRAM);
 
-	state->osborne1_bankswitch_w( space, 0, 0 );
+	state->osborne1_bankswitch_w( state->m_maincpu->space(AS_IO), 0, 0 );
 	state->m_bankswitch = old_bankswitch;
 	state->m_in_irq_handler = 1;
 	return 0xF8;

@@ -38,7 +38,9 @@ used, and the value on the data bus is completley ignored.
 03 - Clear BIT 9 signal (map bank 1/2 into F000-FFFF)
 
 TODO:
+  - Implement ROM/IO bank selection properly
   - Implement serial port
+  - Implement reset key (generates NMI and affects bank selection)
   - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
