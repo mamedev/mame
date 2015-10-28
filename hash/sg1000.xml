@@ -1297,14 +1297,14 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="herotw" cloneof="hero"> <!-- English logo version -->
-	<description>H.E.R.O. (Tw)</description>
-	<year>1985</year>
-	<publisher>Aaronix</publisher>
-	<part name="cart" interface="sg1000_cart">
-		<dataarea name="rom" size="32768">
-		<rom name="H.E.R.O. [english logo] (TW).sg" size="32768" crc="96f09c6d" sha1="82b530feef7c011361e21b62d2c359c626ab8a9c" offset="000000" />
-		</dataarea>
-	</part>
+		<description>H.E.R.O. (Tw)</description>
+		<year>1985</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="H.E.R.O. [english logo] (TW).sg" size="32768" crc="96f09c6d" sha1="82b530feef7c011361e21b62d2c359c626ab8a9c" offset="000000" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="homemj">
@@ -1359,14 +1359,14 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hustletw" cloneof="hustle">
-	<description>Hustle Chumy / Wanpi shu (Tw)</description>
-	<year>1984</year>
-	<publisher>Aaronix</publisher>
-	<part name="cart" interface="sg1000_cart">
-		<dataarea name="rom" size="16384">
-		<rom name="Hustle Chumy (TW).sg" size="16384" crc="c4ed1fd9" sha1="e7800d107ef0a7773eea2d482b5db9d866ba74f9" offset="000000" />
-		</dataarea>
-	</part>
+		<description>Hustle Chumy / Wanpi shu (Tw)</description>
+		<year>1984</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Hustle Chumy (TW).sg" size="16384" crc="c4ed1fd9" sha1="e7800d107ef0a7773eea2d482b5db9d866ba74f9" offset="000000" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="hyperspt">
@@ -2102,14 +2102,14 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="rocknboltw" cloneof="rocknbol"> <!-- English logo version -->
-	<description>Rock n' Bolt (Tw)</description>
-	<year>1985</year>
-	<publisher>Aaronix</publisher>
-	<part name="cart" interface="sg1000_cart">
-		<dataarea name="rom" size="32768">
-		<rom name="Rock n' Bolt [english logo] (TW).sg" size="32768" crc="09a82af7" sha1="e3be08bda8459fc60836abe332e9864e7c596202" offset="000000" />
-		</dataarea>
-	</part>
+		<description>Rock n' Bolt (Tw)</description>
+		<year>1985</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Rock n' Bolt [english logo] (TW).sg" size="32768" crc="09a82af7" sha1="e3be08bda8459fc60836abe332e9864e7c596202" offset="000000" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="safarihu" supported="no">
