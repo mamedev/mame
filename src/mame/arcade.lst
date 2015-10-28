@@ -2870,6 +2870,7 @@ pacslot         // (c) 1996 Namco
 ppsatan         // (c) 1996 <unknown>
 ddonpach        // (c) 1997 Atlus/Cave
 ddonpachj       // (c) 1997 Atlus/Cave
+ddonpacha		// hack
 dfeveron        // (c) 1998 Cave + Nihon System license
 feversos        // (c) 1998 Cave + Nihon System license
 esprade         // (c) 1998 Atlus/Cave
@@ -10185,8 +10186,16 @@ svg             // (c) 2003 Spectral vs Generation
 svgtw
 svgpcb          //
 ket             // (c) 2002 Ketsui
+ket1			//
 keta            //
 ketb            //
+ketarr          // hack
+ketarr151       // hack
+ketarr15        // hack
+ketarr10        // hack
+ketarrs151      // hack
+ketarrs15		// hack
+ketarrf			// hack
 ddpdoj          // (c) 2002 DoDonPachi Dai-Ou-Jou
 ddpdoja         //
 ddpdojb         //
