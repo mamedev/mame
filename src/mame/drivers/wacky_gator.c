@@ -1,9 +1,10 @@
 // license:GPL2+
-// copyright-holders:FelipeSanches
+// copyright-holders:FelipeSanches, Sandro Ronco
 //
 // Wacky Gator
 //
-// Driver by Felipe Correa da Silva Sanches <juca@members.fsf.org>
+// Driver by Sandro Ronco and
+//  Felipe Correa da Silva Sanches <juca@members.fsf.org>
 //
 
 /*
