@@ -31214,7 +31214,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying EXHUMED... -->
 	<software name="exhumed" supported="no">
-		<description>Exhumed (Euro) </description>
+		<description>Exhumed (Euro)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81084-50"/>
@@ -31550,7 +31550,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gun Griffon - The Eurasian Conflict v1.00 (1996)(Sega)(PAL)[!]... -->
 	<software name="gungriff" supported="no">
-		<description>Gungriffon (Euro) </description>
+		<description>Gungriffon (Euro)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81046-50"/>
@@ -31943,7 +31943,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The Lost World Jurassic Park... -->
 	<software name="lostwrld" supported="no">
-		<description>The Lost World - Jurassic Park (Euro) </description>
+		<description>The Lost World - Jurassic Park (Euro)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81065-50"/>
@@ -32509,7 +32509,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying nights... -->
 	<software name="nights" supported="no">
-		<description>NiGHTS - into Dreams... (Euro) </description>
+		<description>NiGHTS - into Dreams... (Euro)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81020-50"/>
@@ -33699,7 +33699,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ultimate Mortal Kombat 3 v1.007 (1996)(GT Interactive)(PAL)[!]... -->
 	<software name="umk3" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Euro) </description>
+		<description>Ultimate Mortal Kombat 3 (Euro)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25403H-50?"/>
@@ -38620,7 +38620,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying vc2alpha... -->
 	<software name="vcop2p" cloneof="vcop2" supported="no">
-		<description>Virtua Cop 2 (Euro, Prototype 19951020) </description>
+		<description>Virtua Cop 2 (Euro, Prototype 19951020)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -38745,7 +38745,7 @@ Olympic Soccer (Fra) T-7904H-09
 	-->
 	<!-- Identifying ejim2beta... -->
 	<software name="ejim2p" cloneof="ejim2" supported="no">
-		<description>Earthworm Jim 2 (Prototype 19951229) </description>
+		<description>Earthworm Jim 2 (Prototype 19951229)</description>
 		<year>1996</year>
 		<publisher>Playmates Interactive</publisher>
 		<part name="cdrom" interface="sat_cdrom">
