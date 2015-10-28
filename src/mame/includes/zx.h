@@ -21,13 +21,6 @@
 class zx_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TAPE_PULSE,
-		TIMER_ULA_NMI,
-		TIMER_ULA_IRQ
-	};
-
 	zx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -49,49 +42,36 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	bitmap_ind16 m_bitmap;
-
-	DECLARE_READ8_MEMBER(zx_ram_r);
+	DECLARE_READ8_MEMBER(ula_high_r);
+	DECLARE_READ8_MEMBER(ula_low_r);
+	DECLARE_WRITE16_MEMBER(refresh_w);
 	DECLARE_READ8_MEMBER(zx80_io_r);
 	DECLARE_READ8_MEMBER(zx81_io_r);
 	DECLARE_READ8_MEMBER(pc8300_io_r);
 	DECLARE_READ8_MEMBER(pow3000_io_r);
 	DECLARE_WRITE8_MEMBER(zx80_io_w);
 	DECLARE_WRITE8_MEMBER(zx81_io_w);
-	emu_timer *m_ula_nmi;
-	int m_ula_irq_active;
-	int m_ula_frame_vsync;
-	int m_ula_scanline_count;
-	UINT8 m_tape_bit;
-	UINT8 m_speaker_state;
-	int m_old_x;
-	int m_old_y;
-	UINT8 m_old_c;
-	UINT8 m_charline[32];
-	UINT8 m_charline_ptr;
-	int m_offs1;
-	void zx_ula_bkgnd(UINT8 color);
-	DECLARE_WRITE8_MEMBER(zx_ram_w);
-	DECLARE_DIRECT_UPDATE_MEMBER(zx_setdirect);
-	DECLARE_DIRECT_UPDATE_MEMBER(pc8300_setdirect);
-	DECLARE_DIRECT_UPDATE_MEMBER(pow3000_setdirect);
 	DECLARE_DRIVER_INIT(zx);
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(zx);
 	DECLARE_PALETTE_INIT(ts1000);
-	DECLARE_MACHINE_RESET(pc8300);
-	DECLARE_MACHINE_RESET(pow3000);
-	void screen_eof_zx(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(zx_tape_pulse);
-	TIMER_CALLBACK_MEMBER(zx_ula_nmi);
-	TIMER_CALLBACK_MEMBER(zx_ula_irq);
+	void zx_tape_input();
+	void zx_ula_hsync();
+
+	UINT32 get_ram_size();
 
 protected:
+	enum
+	{
+		TIMER_TAPE_INPUT,
+		TIMER_ULA_HSYNC
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
-	required_device<speaker_sound_device> m_speaker;
+	optional_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_gfx1;
 	required_ioport m_io_row0;
@@ -105,8 +85,25 @@ protected:
 	optional_ioport m_io_config;
 	required_device<screen_device> m_screen;
 
-	void zx_ula_r(int offs, memory_region *region, const UINT8 param);
+	address_space *m_program;
+	emu_timer *m_tape_input, *m_ula_hsync;
+
+	bool m_vsync_active, m_hsync_active, m_nmi_on, m_nmi_generator_active;
+	UINT64 m_base_vsync_clock, m_vsync_start_time;
+	UINT32 m_ypos;
+
+	UINT8 m_prev_refresh;
+	UINT8 m_speaker_state;
+
+	bitmap_ind16 *m_bitmap_render, *m_bitmap_buffer;
+
+	UINT16 m_ula_char_buffer;
+	double m_cassette_cur_level;
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	void drop_sync();
+	void recalc_hsync();
 };
 
 #endif /* ZX_H_ */

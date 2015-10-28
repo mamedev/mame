@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller, Krzysztof Strzecha, Robbbert
+// copyright-holders: Olivier Galibert, Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /***************************************************************************
     zx.c
 
@@ -9,7 +9,7 @@
     Fixes and additions by Krzysztof Strzecha:
     07.06.2004 Tape loading added. Some cleanups of debug code.
            Fixed stupid bug in timings (vblank duration).
-           MACHINE_NOT_WORKING flag removed.
+           GAME_NOT_WORKING flag removed.
         29.05.2004 CPU clock, number of scanlines, vblank duration corrected.
            Some cleanups. Two non-working TESTDRIVERS added.
         14.05.2004 Finally fixed and readded.
@@ -31,8 +31,8 @@
     - Modernised.
 
     To do / problems:
+    - Halt-on-nmi emulation needs a cycle-exact z80
     - Some memory areas are not mirrored as they should.
-    - Video hardware is not fully emulated, so it does not support pseudo hi-res and hi-res modes.
     - The screen in pc8300/pow3000/lambda jumps when you type something.
     - lambda/pow3000 32k memory pack is unemulated, because where is the upper 16k mirror going to be?
     - h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
@@ -47,8 +47,18 @@
 /* Memory Maps */
 
 static ADDRESS_MAP_START( zx80_map, AS_PROGRAM, 8, zx_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_MIRROR(0x3000)
+	AM_RANGE(0x4000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( zx81_map, AS_PROGRAM, 8, zx_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0x2000)
-	AM_RANGE(0xc000, 0xffff) AM_RAM_READ(zx_ram_r)
+	AM_RANGE(0x4000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ula_map, AS_DECRYPTED_OPCODES, 8, zx_state )
+	AM_RANGE(0x0000, 0x7fff) AM_READ(ula_low_r)
+	AM_RANGE(0x8000, 0xffff) AM_READ(ula_high_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zx80_io_map, AS_IO, 8, zx_state )
@@ -291,38 +301,6 @@ static INPUT_PORTS_START( pow3000 )
 INPUT_PORTS_END
 
 
-/* F4 character display */
-
-static const gfx_layout zx_gfx_layout =
-{
-	8, 8,                              /* 8x8 pixels */
-	64,                                /* 64 codes */
-	1,                                 /* 1 bit per pixel */
-	{0},                               /* no bitplanes */
-	/* x offsets */
-	{0, 1, 2, 3, 4, 5, 6, 7},
-	/* y offsets */
-	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
-	8 * 8                              /* eight bytes per code */
-};
-
-
-/* Graphics Decode Information */
-
-static GFXDECODE_START( zx80 )
-	GFXDECODE_ENTRY( "maincpu", 0x0e00, zx_gfx_layout,  0, 2 )
-GFXDECODE_END
-
-static GFXDECODE_START( zx81 )
-	GFXDECODE_ENTRY( "maincpu", 0x1e00, zx_gfx_layout,  0, 2 )
-GFXDECODE_END
-
-static GFXDECODE_START( pc8300 )
-	GFXDECODE_ENTRY( "gfx1", 0, zx_gfx_layout,  0, 2 )
-GFXDECODE_END
-
-
-
 /* Palette Initialization */
 
 
@@ -330,60 +308,33 @@ PALETTE_INIT_MEMBER(zx_state, zx)
 {
 	palette.set_pen_color(0,rgb_t::white); /* white */
 	palette.set_pen_color(1,rgb_t::black); /* black */
-	palette.set_pen_color(2,rgb_t::black); /* black */
-	palette.set_pen_color(3,rgb_t::white); /* white */
 }
 
 PALETTE_INIT_MEMBER(zx_state,ts1000)
 {
 	palette.set_pen_color(0,rgb_t(64, 244, 244)); /* cyan */
 	palette.set_pen_color(1,rgb_t::black); /* black */
-	palette.set_pen_color(2,rgb_t::black); /* black */
-	palette.set_pen_color(3,rgb_t(64, 244, 244)); /* cyan */
 }
-
-
-#define ZX81_CPU_CLOCK          3250000
-#define ZX81_CYCLES_PER_SCANLINE    207
-#define ZX81_PIXELS_PER_SCANLINE    256
-#define ZX81_CYCLES_PER_VBLANK      1235
-#define ZX81_VBLANK_DURATION        (1.0*ZX81_CYCLES_PER_VBLANK/ZX81_CPU_CLOCK*1000*1000)
-
-#define ZX81_PAL_SCANLINES      304
-#define ZX81_PAL_FRAMES_PER_SECOND  (1.0*ZX81_CPU_CLOCK/(ZX81_PAL_SCANLINES*ZX81_CYCLES_PER_SCANLINE+ZX81_CYCLES_PER_VBLANK))
-
-#define ZX81_NTSC_SCANLINES     256
-#define ZX81_NTSC_FRAMES_PER_SECOND (1.0*ZX81_CPU_CLOCK/(ZX81_NTSC_SCANLINES*ZX81_CYCLES_PER_SCANLINE+ZX81_CYCLES_PER_VBLANK))
-
-/* Machine Drivers */
 
 static MACHINE_CONFIG_START( zx80, zx_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, ZX81_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(zx80_map)
 	MCFG_CPU_IO_MAP(zx80_io_map)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(ZX81_PAL_FRAMES_PER_SECOND)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(ZX81_VBLANK_DURATION))
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(ula_map)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE16(zx_state, refresh_w))
 
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(XTAL_6_5MHz/2/64159.0) // 54223 for NTSC
 
 	/* video hardware */
 	MCFG_SCREEN_UPDATE_DRIVER(zx_state, screen_update)
-	MCFG_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_PAL_SCANLINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_PAL_SCANLINES-1)
-	MCFG_SCREEN_VBLANK_DRIVER(zx_state, screen_eof_zx)
+	MCFG_SCREEN_SIZE(384, 311)
+	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 310)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zx80)
-	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(zx_state,zx)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)   /* Used by pc8300/lambda/pow3000 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(zx80_o_format)
@@ -392,59 +343,51 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
+	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zx81, zx80 )
-
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zx81_map)
 	MCFG_CPU_IO_MAP(zx81_io_map)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", zx81)
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(zx81_p_format)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( zx81_spk, zx81 )
+	/* sound hardware */
+	/* Used by pc8300/lambda/pow3000 */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(zx_state,ts1000)
+	MCFG_PALETTE_INIT_OWNER(zx_state, ts1000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1500, ts1000 )
-
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8300, zx81 )
-
+static MACHINE_CONFIG_DERIVED( pc8300, zx81_spk )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pc8300_io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zx_state,pc8300)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(ZX81_NTSC_FRAMES_PER_SECOND)
-	MCFG_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_NTSC_SCANLINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_NTSC_SCANLINES-1)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc8300)
-
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pow3000, zx81 )
-
+static MACHINE_CONFIG_DERIVED( pow3000, zx81_spk )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pow3000_io_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(zx_state,pow3000)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc8300)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -456,7 +399,7 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START(zx80)
-	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_REGION( 0x1000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "default", "BASIC")
 	ROMX_LOAD( "zx80.rom",   0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "aszmic", "ASZMIC")
@@ -464,7 +407,7 @@ ROM_START(zx80)
 ROM_END
 
 ROM_START(zx81)
-	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "3rd", "3rd rev.")
 	ROMX_LOAD( "zx81b.rom",   0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "1st", "1st rev.")
@@ -478,22 +421,22 @@ ROM_START(zx81)
 ROM_END
 
 ROM_START(ts1000)
-	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_LOAD( "zx81a.rom", 0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc) )
 ROM_END
 
 ROM_START(ts1500)
-	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_LOAD( "d2364c_649.u2", 0x0000, 0x2000, CRC(7dd19c48) SHA1(3eb437359221b4406d236085ec66fa02278e7495) )
 ROM_END
 
 ROM_START(ringo470)
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ringo470.rom", 0x0000, 0x2000, CRC(b9c5abec) SHA1(191c4994adfffe4f83b98dc3959dde2724b1dbac) )
 ROM_END
 
 ROM_START(pc8300)
-	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_LOAD( "8300_org.rom", 0x0000, 0x2000, CRC(a350f2b1) SHA1(6a9be484556cc27a9cd9d71085d2027c6243333f) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
@@ -501,7 +444,7 @@ ROM_START(pc8300)
 ROM_END
 
 ROM_START(pow3000)
-	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_LOAD( "pow3000.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
@@ -509,7 +452,7 @@ ROM_START(pow3000)
 ROM_END
 
 ROM_START(lambda)
-	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_LOAD( "lambda.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
@@ -517,28 +460,26 @@ ROM_START(lambda)
 ROM_END
 
 ROM_START( tk85 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x2800, "maincpu", 0 )
 	ROM_LOAD( "tk85.rom", 0x0000, 0x2800, CRC(8972d756) SHA1(7b961a1733fc047eb682150a32e17bca10a018d2) )
 ROM_END
 
 /* This homebrew has 192k of RAM and 32k of ROM via bankswitching. One of the primary bankswitching lines is /M1,
     which is not emulated by MAME's z80. */
 ROM_START( zx97 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "zx97.rom", 0x0000, 0x2000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd) )
-	ROM_IGNORE( 0x6000 )    /* Unemulated bankswitched part */
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "zx97.rom", 0x0000, 0x8000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd) )
 ROM_END
 
 /* Game Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                     FULLNAME                FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80, zx_state,       zx,     "Sinclair Research Ltd",    "ZX-80",               0 )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81, zx_state,       zx,     "Sinclair Research Ltd",    "ZX-81",               0 )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81, zx_state,       zx,     "Timex Sinclair",           "Timex Sinclair 1000", 0 )
-COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81, zx_state,       zx,     "Timex Sinclair",           "Timex Sinclair 1500", 0 )
-COMP( 1983, tk85,       zx81,   0,      ts1000,     zx81, zx_state,       zx,     "Microdigital",             "TK85",                0 )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81, zx_state,       zx,     "Ritas do Brasil Ltda",     "Ringo 470",           0 )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300, zx_state,     zx,     "Your Computer",            "PC8300",              0 )
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-80",               MACHINE_NO_SOUND )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-81",               MACHINE_NO_SOUND )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1000", MACHINE_NO_SOUND )
+COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1500", MACHINE_NO_SOUND )
+COMP( 1983, tk85,       zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Microdigital",             "TK85",                MACHINE_NO_SOUND )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Ritas do Brasil Ltda",     "Ringo 470",           MACHINE_NO_SOUND )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,  zx_state,    zx,     "Your Computer",            "PC8300",              0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Creon Enterprises",        "Power 3000",          0 )
 COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81, zx_state,       zx,     "Wilf Rigter",              "ZX97", MACHINE_NOT_WORKING | MACHINE_UNOFFICIAL )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    zx_state,    zx,     "Wilf Rigter",              "ZX97", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNOFFICIAL )
