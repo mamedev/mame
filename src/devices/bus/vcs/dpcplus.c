@@ -56,9 +56,23 @@ void a26_rom_dpcplus_device::device_reset()
 	m_base_bank = 0;
 }
 
+READ32_MEMBER(a26_rom_dpcplus_device::armrom_r)
+{
+	UINT32 ret = (a26_rom_f8_device::read_rom(space, offset * 4 + 3) << 24) |
+   		         (a26_rom_f8_device::read_rom(space, offset * 4 + 2) << 16) |
+		         (a26_rom_f8_device::read_rom(space, offset * 4 + 1) << 8) |
+	             (a26_rom_f8_device::read_rom(space, offset * 4 + 0) << 0);
+	return ret;
+}
+
+WRITE32_MEMBER(a26_rom_dpcplus_device::armrom_w)
+{
+
+}
+
 static ADDRESS_MAP_START( dpcplus_arm7_map, AS_PROGRAM, 32, a26_rom_dpcplus_device )
 	// todo: implement all this correctly
-	//AM_RANGE(0x00000000, 0x00007fff) AM_ROM // flash, 32k
+	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(armrom_r,armrom_w)// flash, 32k
 	AM_RANGE(0x40000000, 0x40001fff) AM_RAM // sram, 8k
 ADDRESS_MAP_END
 
