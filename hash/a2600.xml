@@ -18009,6 +18009,32 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
+  <software name="spcrocks" supported="no">
+    <description>Space Rocks (RC7, NTSC)</description>
+    <year>2012</year>
+    <publisher>Spiceware</publisher>
+    <sharedfeat name="compatibility" value="NTSC" />
+    <part name="cart" interface="a2600_cart">
+      <feature name="slot" value="a26_dpcplus" />
+      <dataarea name="rom" size="0x8000">
+        <rom name="spacerocks20121129_NTSC.bin" size="0x8000" crc="c5d8eb83" sha1="bf3af5c76bb4dded5cb9c9b232c369250ad20ac4" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="spcrockse" cloneof="spcrocks" supported="no">
+    <description>Space Rocks (RC7, PAL)</description>
+    <year>2012</year>
+    <publisher>Spiceware</publisher>
+    <sharedfeat name="compatibility" value="PAL" />
+    <part name="cart" interface="a2600_cart">
+      <feature name="slot" value="a26_dpcplus" />
+      <dataarea name="rom" size="0x8000">
+        <rom name="spacerocks20121129_PAL.bin" size="0x8000" crc="133cb923" sha1="0511a35ee435227fbb5665e8488590eb993256f7" offset="0" />
+      </dataarea>
+    </part>
+  </software> 
+
 </softwarelist>
 
 

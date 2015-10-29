@@ -106,14 +106,31 @@ machine_config_constructor a26_rom_dpcplus_device::device_mconfig_additions() co
 	return MACHINE_CONFIG_NAME( a26_dpcplus );
 }
 
+void a26_rom_dpcplus_device::check_bankswitch(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0x0FF6: m_base_bank = 0; break;
+	case 0x0FF7: m_base_bank = 1; break;
+	case 0x0FF8: m_base_bank = 2; break;
+	case 0x0FF9: m_base_bank = 3; break;
+	case 0x0FFa: m_base_bank = 4; break;
+	case 0x0FFb: m_base_bank = 5; break;
+	default: break;
+	}
+}
 
 READ8_MEMBER(a26_rom_dpcplus_device::read_rom)
 {
-	// banks start at 0xc00
-	return read8_r(space, offset+0xc00);
+	UINT8 retvalue = read8_r(space, offset + 0xc00); // banks start at 0xc00
+
+	check_bankswitch(offset);
+
+	return retvalue;
 }
 
 WRITE8_MEMBER(a26_rom_dpcplus_device::write_bank)
 {
+	check_bankswitch(offset);
 //	a26_rom_f8_device::write_bank(space, offset, data);
 }

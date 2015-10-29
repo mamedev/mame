@@ -30,6 +30,9 @@ public:
 	DECLARE_READ8_MEMBER(read8_r);
 
 	DECLARE_READ32_MEMBER(arm_E01FC088_r);
+
+	void check_bankswitch(offs_t offset);
+
 protected:
 };
 
