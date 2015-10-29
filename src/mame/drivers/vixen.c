@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Robbbert
 /*
 
 Osborne 4 Vixen
@@ -47,9 +47,6 @@ Notes:
 
     TODO:
 
-    - video line buffer
-    - floppy
-    - keyboard
     - RS232 RI interrupt
     - PCB layouts
 
@@ -76,17 +73,17 @@ void vixen_state::update_interrupt()
 }
 
 
-//-------------------------------------------------
-//  ctl_w - command write
-//-------------------------------------------------
-
-WRITE8_MEMBER( vixen_state::ctl_w )
+READ8_MEMBER( vixen_state::opram_r )
 {
-	logerror("CTL %u\n", data);
-
-	membank("bank3")->set_entry(BIT(data, 0));
+	membank("bank3")->set_entry(0); // read videoram
+	return m_program->read_byte(offset);
 }
 
+READ8_MEMBER( vixen_state::oprom_r )
+{
+	membank("bank3")->set_entry(1); // read rom
+	return m_rom[offset];
+}
 
 //-------------------------------------------------
 //  status_r - status read
@@ -256,10 +253,18 @@ READ8_MEMBER( vixen_state::port3_r )
 //  ADDRESS_MAP( vixen_mem )
 //-------------------------------------------------
 
+// when M1 is inactive: read and write of data
 static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
+	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_SHARE("video_ram")
+ADDRESS_MAP_END
+
+// when M1 is active: read opcodes
+static ADDRESS_MAP_START( bios_mem, AS_DECRYPTED_OPCODES, 8, vixen_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xefff) AM_READ(opram_r)
+	AM_RANGE(0xf000, 0xffff) AM_READ(oprom_r)
 ADDRESS_MAP_END
 
 
@@ -296,84 +301,84 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( vixen )
 	PORT_START("KEY.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1B)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR(0x09)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(0x0D)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x27) PORT_CHAR(0x22)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR(']')
 
 	PORT_START("KEY.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 
 	PORT_START("KEY.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
 
 	PORT_START("KEY.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k')
 
 	PORT_START("KEY.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
 	PORT_START("KEY.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 
 	PORT_START("KEY.6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
 
 	PORT_START("KEY.7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(127)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) // FUNC key
 INPUT_PORTS_END
 
 
@@ -412,16 +417,17 @@ void vixen_state::video_start()
 UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
+	UINT8 x, y, chr, gfx, inv, ra;
 
-	for (int txadr = 0; txadr < 26; txadr++)
+	for (y = 0; y < 26; y++)
 	{
-		for (int scan = 0; scan < 10; scan++)
+		for (ra = 0; ra < 10; ra++)
 		{
-			for (int chadr = 0; chadr < 128; chadr++)
+			for (x = 0; x < 128; x++)
 			{
-				UINT16 sync_addr = (txadr << 7) | chadr;
-				UINT8 sync_data = m_sync_rom[sync_addr];
-				int blank = BIT(sync_data, 4);
+				UINT16 sync_addr = ((y+1) << 7) + x + 1; // it's out by a row and a column
+				UINT8 sync_data = m_sync_rom[sync_addr & 0xfff];
+				bool blank = BIT(sync_data, 4);
 				/*
 				int clrchadr = BIT(sync_data, 7);
 				int hsync = BIT(sync_data, 6);
@@ -433,30 +439,26 @@ UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				    sync_addr,sync_data,txadr,scan,chadr,comp_sync,vsync,blank,clrtxadr,hsync,clrchadr);
 				*/
 
-				int reverse = 0;
-
-				UINT16 video_addr = (txadr << 7) | chadr;
-				UINT8 video_data = m_video_ram[video_addr];
-				UINT16 char_addr = 0;
+				chr = m_video_ram[(y<<7) + x];
 
 				if (m_256)
 				{
-					char_addr = (BIT(video_data, 7) << 11) | (scan << 7) | (video_data & 0x7f);
-					reverse = m_alt;
+					gfx = m_char_rom[(BIT(chr, 7) << 11) | (ra << 7) | (chr & 0x7f)];
+					inv = m_alt ? 0xff : 0;
 				}
 				else
 				{
-					char_addr = (scan << 7) | (video_data & 0x7f);
-					reverse = BIT(video_data, 7);
+					gfx = m_char_rom[(ra << 7) | (chr & 0x7f)];
+					inv = BIT(chr, 7) ? 0xff : 0;
 				}
 
-				UINT8 char_data = m_char_rom[char_addr];
+				gfx = (blank) ? 0 : (gfx ^ inv);
 
-				for (int x = 0; x < 8; x++)
+				for (int b = 0; b < 8; b++)
 				{
-					int color = (BIT(char_data, 7 - x) ^ reverse) & !blank;
+					int color = BIT(gfx, 7 - b);
 
-					bitmap.pix32((txadr * 10) + scan, (chadr * 8) + x) = pen[color];
+					bitmap.pix32((y * 10) + ra, (x * 8) + b) = pen[color];
 				}
 			}
 		}
@@ -537,11 +539,11 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 	m_fdc->dden_w(BIT(data, 2));
 
 	// charset
-	m_alt = BIT(data, 3);
-	m_256 = BIT(data, 4);
+	m_alt = !BIT(data, 3);
+	m_256 = !BIT(data, 4);
 
 	// beep enable
-	m_discrete->write(space, NODE_01, BIT(data, 5));
+	m_discrete->write(space, NODE_01, !BIT(data, 5));
 }
 
 //-------------------------------------------------
@@ -690,13 +692,6 @@ IRQ_CALLBACK_MEMBER(vixen_state::vixen_int_ack)
 void vixen_state::machine_start()
 {
 	// configure memory banking
-	UINT8 *ram = m_ram->pointer();
-
-	membank("bank1")->configure_entry(0, ram);
-	membank("bank1")->configure_entry(1, m_rom);
-
-	membank("bank2")->configure_entry(0, ram);
-	membank("bank2")->configure_entry(1, m_video_ram);
 
 	membank("bank3")->configure_entry(0, m_video_ram);
 	membank("bank3")->configure_entry(1, m_rom);
@@ -704,7 +699,6 @@ void vixen_state::machine_start()
 	membank("bank4")->configure_entry(0, m_video_ram);
 
 	// register for state saving
-	save_item(NAME(m_reset));
 	save_item(NAME(m_col));
 	save_item(NAME(m_cmd_d0));
 	save_item(NAME(m_cmd_d1));
@@ -714,16 +708,7 @@ void vixen_state::machine_start()
 
 void vixen_state::machine_reset()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
-	program.install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
-
-	membank("bank1")->set_entry(1);
-	membank("bank2")->set_entry(1);
 	membank("bank3")->set_entry(1);
-
-	m_reset = 1;
 
 	m_vsync = 0;
 	m_cmd_d0 = 0;
@@ -733,6 +718,7 @@ void vixen_state::machine_reset()
 	m_fdc->reset();
 	m_io_i8155->reset();
 	m_usart->reset();
+	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 
 
@@ -749,6 +735,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
 	MCFG_CPU_PROGRAM_MAP(vixen_mem)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(bios_mem)
 	MCFG_CPU_IO_MAP(vixen_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
@@ -793,7 +780,9 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_FD1797_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(vixen_state, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(vixen_state, srq_w))
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(vixen_state, atn_w))
@@ -837,34 +826,10 @@ ROM_END
 //  DRIVER_INIT( vixen )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(vixen_state::vixen_direct_update_handler)
-{
-	if (address >= 0xf000)
-	{
-		if (m_reset)
-		{
-			address_space &program = m_maincpu->space(AS_PROGRAM);
-
-			program.install_read_bank(0x0000, 0xefff, "bank1");
-			program.install_write_bank(0x0000, 0xefff, "bank2");
-
-			membank("bank1")->set_entry(0);
-			membank("bank2")->set_entry(0);
-
-			m_reset = 0;
-		}
-
-		direct.explicit_configure(0xf000, 0xffff, 0xfff, m_rom);
-
-		return ~0;
-	}
-
-	return address;
-}
 
 DRIVER_INIT_MEMBER(vixen_state,vixen)
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(vixen_state::vixen_direct_update_handler), this));
+	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
 
@@ -873,5 +838,5 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1984, vixen,  0,       0,     vixen,  vixen, vixen_state,  vixen,  "Osborne",   "Vixen",      MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME       FLAGS
+COMP( 1984, vixen,  0,       0,     vixen,     vixen,   vixen_state,  vixen,  "Osborne",   "Vixen",      0 )
