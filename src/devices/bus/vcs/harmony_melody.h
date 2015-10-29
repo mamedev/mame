@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef __VCS_DPCPLUS_H
-#define __VCS_DPCPLUS_H
+#ifndef __VCS_HARMONY_H
+#define __VCS_HARMONY_H
 
 #include "rom.h"
 #include "cpu/arm7/arm7.h"
 
 
-// ======================> a26_rom_dpcplus_device
+// ======================> a26_rom_harmony_device
 
-class a26_rom_dpcplus_device : public a26_rom_f8_device
+class a26_rom_harmony_device : public a26_rom_f8_device
 {
 public:
 	// construction/destruction
-	a26_rom_dpcplus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
@@ -38,6 +38,6 @@ protected:
 
 
 // device type definition
-extern const device_type A26_ROM_DPCPLUS;
+extern const device_type A26_ROM_HARMONY;
 
 #endif

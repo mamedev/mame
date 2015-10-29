@@ -2,11 +2,34 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-Atari 2600 cart with DPC+
+Harmony / Melody cart for the A2600
 
-the DPC+ adds an ARM CPU, including video improvements plus an extra synthesizer.
+The Harmony cart is a 'modern' A2600 cartridge, used for homebrew etc. It has
+an SD slot and can be connected to a PC, roms can be transfered to it with
+software on the PC side.  It uses an ARM7TDMI-S LPC2103 @ 70 Mhz to emulate
+the mapper behavior of other cartridges.  It has an SD card slot for storing
+game data.
 
-Some info on the DPC+ hardware can be found on Darrell Spice Jr's guides:
+The Melody version of the cartridge has been used for several recent A2600
+commercial releases as well as some reproductions due to it's ability to be
+programmed as any other cartridge type.  This lacks the SD slot?
+
+The 'DPC+' games by SpiceWare run on a Harmony / Melody cart, DPC+ seems to
+be a virtual 'software mapper' programmed on the ARM rather than a real mapper.
+
+
+There is also a 'Harmony Encore' cartridge which adds support for some of the
+games the original couldn't handle due to them having larger ROMs and more
+complex banking schemes (Stella's Stocking etc.)
+
+some Harmony cart details can be found at
+http://atariage.com/forums/topic/156500-latest-harmony-cart-software/
+
+
+DPC+ notes
+----------
+
+Some info on the Harmony / Melody when configured as DPC+ hardware can be found on Darrell Spice Jr's guides:
 http://atariage.com/forums/blog/148/entry-11811-dpcarm-part-6-dpc-cartridge-layout/
 http://atariage.com/forums/blog/148/entry-11883-dpcarm-part-7-6507arm-exchange-of-information/
 http://atariage.com/forums/blog/148/entry-11903-dpcarm-part-8-multiple-functions/
@@ -18,7 +41,7 @@ map:
 	Bankswitching uses addresses $FFF6-$FFFB
 
 	* ARM RAM mapped at $40000000 in this area
-	$0000-$0BFF: DPC+ driver (not accessible by 2600 itself) (copied to $40000000 - $40000bff on startup by ARM)
+	$0000-$0BFF: HARMONY/MELODY driver (not accessible by 2600 itself) (copied to $40000000 - $40000bff on startup by ARM)
 	$0C00-$1BFF: Bank 0 (each bank can map to 0x1000 - 0x1fff in 6507 space, like other carts)
 	$1C00-$2BFF: Bank 1
 	$2C00-$3BFF: Bank 2
@@ -32,7 +55,7 @@ map:
 
 
 #include "emu.h"
-#include "dpcplus.h"
+#include "harmony_melody.h"
 
 
 
@@ -40,11 +63,11 @@ map:
 
 // cart device
 
-const device_type A26_ROM_DPCPLUS = &device_creator<a26_rom_dpcplus_device>;
+const device_type A26_ROM_HARMONY = &device_creator<a26_rom_harmony_device>;
 
 
-a26_rom_dpcplus_device::a26_rom_dpcplus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-						: a26_rom_f8_device(mconfig, A26_ROM_DPCPLUS, "Atari 2600 ROM Cart DPC+", tag, owner, clock, "a2600_dpcplus", __FILE__)
+a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+						: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, "Atari 2600 ROM Cart HARMONY/MELODY", tag, owner, clock, "a2600_harmony", __FILE__)
 {
 }
 
@@ -52,24 +75,24 @@ a26_rom_dpcplus_device::a26_rom_dpcplus_device(const machine_config &mconfig, co
 //  mapper specific start/reset
 //-------------------------------------------------
 
-void a26_rom_dpcplus_device::device_start()
+void a26_rom_harmony_device::device_start()
 {
 	save_item(NAME(m_base_bank));
 }
 
-void a26_rom_dpcplus_device::device_reset()
+void a26_rom_harmony_device::device_reset()
 {
 	m_base_bank = 5;
 }
 
 
-READ8_MEMBER(a26_rom_dpcplus_device::read8_r)
+READ8_MEMBER(a26_rom_harmony_device::read8_r)
 {
 	return m_rom[offset + (m_base_bank * 0x1000)];
 }
 
 
-READ32_MEMBER(a26_rom_dpcplus_device::armrom_r)
+READ32_MEMBER(a26_rom_harmony_device::armrom_r)
 {
 	UINT32 ret = (m_rom[offset * 4 + 3] << 24) |
    		         (m_rom[offset * 4 + 2] << 16) |
@@ -78,17 +101,17 @@ READ32_MEMBER(a26_rom_dpcplus_device::armrom_r)
 	return ret;
 }
 
-WRITE32_MEMBER(a26_rom_dpcplus_device::armrom_w)
+WRITE32_MEMBER(a26_rom_harmony_device::armrom_w)
 {
 
 }
 
-READ32_MEMBER(a26_rom_dpcplus_device::arm_E01FC088_r)
+READ32_MEMBER(a26_rom_harmony_device::arm_E01FC088_r)
 {
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( dpcplus_arm7_map, AS_PROGRAM, 32, a26_rom_dpcplus_device )
+static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_device )
 	// todo: implement all this correctly
 	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(armrom_r,armrom_w) // flash, 32k
 	AM_RANGE(0x40000000, 0x40001fff) AM_RAM // sram, 8k
@@ -96,17 +119,19 @@ static ADDRESS_MAP_START( dpcplus_arm7_map, AS_PROGRAM, 32, a26_rom_dpcplus_devi
 	AM_RANGE(0xE01FC088, 0xE01FC08b) AM_READ(arm_E01FC088_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( a26_dpcplus )
+static MACHINE_CONFIG_FRAGMENT( a26_harmony )
 	MCFG_CPU_ADD("arm", ARM7, 70000000)
-	MCFG_CPU_PROGRAM_MAP(dpcplus_arm7_map)
+	MCFG_CPU_PROGRAM_MAP(harmony_arm7_map)
 MACHINE_CONFIG_END
 
-machine_config_constructor a26_rom_dpcplus_device::device_mconfig_additions() const
+machine_config_constructor a26_rom_harmony_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( a26_dpcplus );
+	return MACHINE_CONFIG_NAME( a26_harmony );
 }
 
-void a26_rom_dpcplus_device::check_bankswitch(offs_t offset)
+// actually if the ARM code is doing this and providing every opcode to the main CPU based
+// on bus activity then we shouldn't be doing this here.
+void a26_rom_harmony_device::check_bankswitch(offs_t offset)
 {
 	switch (offset)
 	{
@@ -120,7 +145,7 @@ void a26_rom_dpcplus_device::check_bankswitch(offs_t offset)
 	}
 }
 
-READ8_MEMBER(a26_rom_dpcplus_device::read_rom)
+READ8_MEMBER(a26_rom_harmony_device::read_rom)
 {
 	UINT8 retvalue = read8_r(space, offset + 0xc00); // banks start at 0xc00
 
@@ -129,7 +154,7 @@ READ8_MEMBER(a26_rom_dpcplus_device::read_rom)
 	return retvalue;
 }
 
-WRITE8_MEMBER(a26_rom_dpcplus_device::write_bank)
+WRITE8_MEMBER(a26_rom_harmony_device::write_bank)
 {
 	check_bankswitch(offset);
 //	a26_rom_f8_device::write_bank(space, offset, data);

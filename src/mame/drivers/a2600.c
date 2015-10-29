@@ -18,7 +18,7 @@ TODO:
 #include "bus/vcs/vcs_slot.h"
 #include "bus/vcs/rom.h"
 #include "bus/vcs/dpc.h"
-#include "bus/vcs/dpcplus.h"
+#include "bus/vcs/harmony_melody.h"
 #include "bus/vcs/scharger.h"
 #include "bus/vcs/compumat.h"
 #include "bus/vcs_ctrl/ctrl.h"
@@ -391,7 +391,7 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(a2600_state::cart_over_all_r), this), write8_delegate(FUNC(a2600_state::cart_over_all_w), this));
 			break;
-		case A26_DPCPLUS:
+		case A26_HARMONY:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
 			break;
 	}
@@ -528,7 +528,7 @@ static SLOT_INTERFACE_START(a2600_cart)
 	SLOT_INTERFACE_INTERNAL("a26_8in1",  A26_ROM_8IN1)
 	SLOT_INTERFACE_INTERNAL("a26_32in1", A26_ROM_32IN1)
 	SLOT_INTERFACE_INTERNAL("a26_x07",    A26_ROM_X07)
-	SLOT_INTERFACE_INTERNAL("a26_dpcplus",   A26_ROM_DPCPLUS)
+	SLOT_INTERFACE_INTERNAL("a26_harmony",   A26_ROM_HARMONY)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)

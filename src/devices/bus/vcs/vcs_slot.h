@@ -36,7 +36,7 @@ enum
 	A26_SS,
 	A26_CM,
 	A26_X07,
-	A26_DPCPLUS,
+	A26_HARMONY,
 };
 
 
