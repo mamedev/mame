@@ -24,6 +24,9 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 
+	DECLARE_READ32_MEMBER(armrom_r);
+	DECLARE_WRITE32_MEMBER(armrom_w);
+
 
 protected:
 };
