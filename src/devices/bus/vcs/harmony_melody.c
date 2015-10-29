@@ -67,7 +67,8 @@ const device_type A26_ROM_HARMONY = &device_creator<a26_rom_harmony_device>;
 
 
 a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-						: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, "Atari 2600 ROM Cart HARMONY/MELODY", tag, owner, clock, "a2600_harmony", __FILE__)
+						: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, "Atari 2600 ROM Cart HARMONY/MELODY", tag, owner, clock, "a2600_harmony", __FILE__),
+						m_cpu(*this, "arm")
 {
 }
 
@@ -80,43 +81,12 @@ void a26_rom_harmony_device::device_start()
 	save_item(NAME(m_base_bank));
 }
 
-void a26_rom_harmony_device::device_reset()
-{
-	m_base_bank = 5;
-}
-
-
-READ8_MEMBER(a26_rom_harmony_device::read8_r)
-{
-	return m_rom[offset + (m_base_bank * 0x1000)];
-}
-
-
-READ32_MEMBER(a26_rom_harmony_device::armrom_r)
-{
-	UINT32 ret = (m_rom[offset * 4 + 3] << 24) |
-   		         (m_rom[offset * 4 + 2] << 16) |
-		         (m_rom[offset * 4 + 1] << 8) |
-	             (m_rom[offset * 4 + 0] << 0);
-	return ret;
-}
-
-WRITE32_MEMBER(a26_rom_harmony_device::armrom_w)
-{
-
-}
-
-READ32_MEMBER(a26_rom_harmony_device::arm_E01FC088_r)
-{
-	return 0xffffffff;
-}
-
 static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_device )
-	// todo: implement all this correctly
-	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(armrom_r,armrom_w) // flash, 32k
-	AM_RANGE(0x40000000, 0x40001fff) AM_RAM // sram, 8k
-
-	AM_RANGE(0xE01FC088, 0xE01FC08b) AM_READ(arm_E01FC088_r)
+	// these are not listed in the ARM manual as internal areas, so probably external? what maps here? 
+	AM_RANGE(0x3FFFC000, 0x3FFFC003) AM_RAM
+	AM_RANGE(0x3FFFC010, 0x3FFFC013) AM_RAM
+	AM_RANGE(0x3FFFC014, 0x3FFFC017) AM_RAM // reads
+	AM_RANGE(0x3FFFC018, 0x3FFFC01b) AM_RAM
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( a26_harmony )
@@ -130,7 +100,27 @@ machine_config_constructor a26_rom_harmony_device::device_mconfig_additions() co
 }
 
 // actually if the ARM code is doing this and providing every opcode to the main CPU based
-// on bus activity then we shouldn't be doing this here.
+// on bus activity then we shouldn't be doing and of this here (if the ROM is actually
+// the internal Flash rom of the ARM CPU then the A2600 CPU won't be able to see it directly
+// at all?)
+//
+// instead we need the ARM monitoring the bus at all times and supplying the code on
+// demand transparent to the main CPU? is this theory correct?
+
+void a26_rom_harmony_device::device_reset()
+{
+	m_base_bank = 5;
+
+	memcpy(m_cpu->m_flash, m_rom, 0x8000);
+	m_cpu->reset();
+}
+
+READ8_MEMBER(a26_rom_harmony_device::read8_r)
+{
+	return m_rom[offset + (m_base_bank * 0x1000)];
+}
+
+
 void a26_rom_harmony_device::check_bankswitch(offs_t offset)
 {
 	switch (offset)
