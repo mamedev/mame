@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_devi
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( a26_harmony )
-	MCFG_CPU_ADD("arm", ARM7, 70000000)
+	MCFG_CPU_ADD("arm", LPC2103, 70000000)
 	MCFG_CPU_PROGRAM_MAP(harmony_arm7_map)
 MACHINE_CONFIG_END
 

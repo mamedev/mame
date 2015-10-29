@@ -4,7 +4,7 @@
 #define __VCS_HARMONY_H
 
 #include "rom.h"
-#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/lpc210x.h"
 
 
 // ======================> a26_rom_harmony_device
