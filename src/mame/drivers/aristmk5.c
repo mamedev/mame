@@ -123,7 +123,7 @@
   U26: SGS THOMSON ST93C46 (1K (64 x 16 or 128 x 8) Serial EEPROM).
   U27: SGS THOMSON ST93C46 (1K (64 x 16 or 128 x 8) Serial EEPROM).
 
-  U35: PHILIPS 74HC2...
+  U35: PHILIPS 74HC273.
   U36: LATTICE GAL20V8B-15LJ (High Performance E2CMOS PLD Generic Array Logic, 28-Lead PLCC).
   U40: Dallas Semiconductor DS1202S (Serial Timekeeping Chip).
   U41: Maxim Integrated MAX705CSA (MPU Supervisory Circuits).
@@ -144,6 +144,7 @@
   U71: Texas Instruments TL16C452FN (UART Interface IC Dual UART w/Prl Port & w/o FIFO).
   U72: Texas Instruments TL16C452FN (UART Interface IC Dual UART w/Prl Port & w/o FIFO).
   U73: CX0826 72 MHz crystal.
+  U85: ARM250: Computer system on a chip. ARM 32bit RISC processor with memory, video, and I/O controllers.
   U89: Allegro MicroSystems UDN2543B (Protected quad power driver).
   U149: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
   U152: ISSI IS41C16257-60K (256K x 16bit (4-MBIT) Dynamic RAM With Fast Page Mode).
@@ -158,6 +159,10 @@
   VR2: SGS THOMSON L4975A (5A stepdown monolithic power switching regulator at 5.1V-40V).
 
   X2:  Unpopulated crystal (from factory).
+
+  The 96-pin female connector at the bottom of the ROM banks is intended for a sub board
+  with two ROM sockets, that once plugged switch the ROM bank 0 with the sub board bank.
+  Just to place the clear chips without removing the U7 & U11 EPROMS.
 
 *****************************************************************************************************************/
 
