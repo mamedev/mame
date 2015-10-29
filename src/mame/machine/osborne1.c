@@ -55,6 +55,8 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 		data = m_pia0->read(space, offset & 0x03);
 		break;
 	case 0xA00: /* Serial */
+		if (offset & 0x01) data = m_acia->data_r(space, 0);
+		else data = m_acia->status_r(space, 0);
 		break;
 	case 0xC00: /* Video PIA */
 		data = m_pia1->read(space, offset & 0x03);
@@ -77,7 +79,10 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 		if ((offset & 0x900) == 0x900) // IEEE488 PIA
 			m_pia0->write(space, offset & 0x03, data);
 		if ((offset & 0xA00) == 0xA00) // Serial
-			/* not implemented */;
+		{
+			if (offset & 0x01) m_acia->data_w(space, 0, data);
+			else m_acia->control_w(space, 0, data);
+		}
 		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 		{
 			m_resolution = data & 0x01;
@@ -195,10 +200,6 @@ WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 }
 
 
-WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
-{
-}
-
 WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 {
 	m_fdc->dden_w(BIT(data, 0));
@@ -235,42 +236,100 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	//logerror("Video pia port b write: %02X\n", data );
 }
 
+WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
+{
+}
+
 WRITE_LINE_MEMBER( osborne1_state::video_pia_irq_a_func )
 {
 	update_irq();
 }
 
 
-//static const struct aica6850_interface osborne1_6850_config =
-//{
-//  10, /* tx_clock */
-//  10, /* rx_clock */
-//  NULL,   /* rx_pin */
-//  NULL,   /* tx_pin */
-//  NULL,   /* cts_pin */
-//  NULL,   /* rts_pin */
-//  NULL,   /* dcd_pin */
-//  NULL    /* int_callback */
-//};
-
-
-void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER( osborne1_state::serial_acia_irq_func )
 {
-	switch (id)
-	{
-	case TIMER_VIDEO:
-		osborne1_video_callback(ptr, param);
-		break;
-	case TIMER_SETUP:
-		setup_osborne1(ptr, param);
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in osborne1_state::device_timer");
-	}
+	m_acia_irq_state = state;
+	update_irq();
 }
 
 
-TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
+DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
+{
+	m_bank_0xxx->configure_entries(0, 1, m_ram->pointer(), 0);
+	m_bank_0xxx->configure_entries(1, 1, m_region_maincpu->base(), 0);
+	m_bank_1xxx->configure_entries(0, 1, m_ram->pointer() + 0x1000, 0);
+	m_bank_1xxx->configure_entries(1, 1, m_region_maincpu->base(), 0);
+	m_bank_fxxx->configure_entries(0, 1, m_ram->pointer() + 0xF000, 0);
+	m_bank_fxxx->configure_entries(1, 1, m_ram->pointer() + 0x10000, 0);
+
+	m_video_timer = timer_alloc(TIMER_VIDEO);
+	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
+
+	m_acia_rxc_txc_timer = timer_alloc(TIMER_ACIA_RXC_TXC);
+
+	timer_set(attotime::zero, TIMER_SETUP);
+}
+
+void osborne1_state::machine_reset()
+{
+	// Refresh configuration
+	m_screen_pac = 0 != (m_cnf->read() & 0x01);
+	switch (m_cnf->read() & 0x06)
+	{
+	case 0x00:
+		m_acia_rxc_txc_div      = 16;
+		m_acia_rxc_txc_p_low    = 23;
+		m_acia_rxc_txc_p_high   = 29;
+		break;
+	case 0x02:
+		m_acia_rxc_txc_div      = 16;
+		m_acia_rxc_txc_p_low    = 9;
+		m_acia_rxc_txc_p_high   = 15;
+		break;
+	case 0x04:
+		m_acia_rxc_txc_div      = 16;
+		m_acia_rxc_txc_p_low    = 5;
+		m_acia_rxc_txc_p_high   = 8;
+		break;
+	case 0x06:
+		m_acia_rxc_txc_div      = 8;
+		m_acia_rxc_txc_p_low    = 5;
+		m_acia_rxc_txc_p_high   = 8;
+		break;
+	}
+
+	// Initialise memory configuration
+	m_rom_mode = 0;
+	m_bit_9 = 1;
+	set_rom_mode(1);
+	set_bit_9(0);
+
+	// Reset serial state
+	m_acia_irq_state = 0;
+	m_acia_rxc_txc_state = 0;
+	update_acia_rxc_txc();
+
+	m_resolution = 0;
+	m_hc_left = 0;
+	m_p_chargen = memregion( "chargen" )->base();
+
+	for (unsigned i = 0; i < 0x1000; i++)
+		m_ram->pointer()[0x10000 + i] |= 0x7F;
+}
+
+void osborne1_state::video_start()
+{
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
+}
+
+UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
+
+TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
 	int const y = machine().first_screen()->vpos();
 	UINT8 ra = 0;
@@ -330,51 +389,31 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
 }
 
-TIMER_CALLBACK_MEMBER(osborne1_state::setup_osborne1)
+TIMER_CALLBACK_MEMBER(osborne1_state::setup_callback)
 {
 	m_beep->set_state( 0 );
 	m_beep->set_frequency( 300 /* 60 * 240 / 2 */ );
 	m_pia1->ca1_w(0);
 }
 
-void osborne1_state::machine_reset()
+
+void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// Initialize memory configuration
-	m_rom_mode = 0;
-	m_bit_9 = 1;
-	set_rom_mode(1);
-	set_bit_9(0);
-
-	m_screen_pac = 0 != (m_cnf->read() & 0x01);
-	m_resolution = 0;
-	m_hc_left = 0;
-	m_p_chargen = memregion( "chargen" )->base();
-
-	memset(m_ram->pointer() + 0x10000, 0xFF, 0x1000);
-}
-
-
-DRIVER_INIT_MEMBER(osborne1_state,osborne1)
-{
-	/* Configure the 6850 ACIA */
-//  acia6850_config( 0, &osborne1_6850_config );
-	m_video_timer = timer_alloc(TIMER_VIDEO);
-	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
-
-	timer_set(attotime::zero, TIMER_SETUP);
-}
-
-
-void osborne1_state::video_start()
-{
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
-}
-
-
-UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	return 0;
+	switch (id)
+	{
+	case TIMER_VIDEO:
+		video_callback(ptr, param);
+		break;
+	case TIMER_ACIA_RXC_TXC:
+		m_acia_rxc_txc_state = m_acia_rxc_txc_state ? 0 : 1;
+		update_acia_rxc_txc();
+		break;
+	case TIMER_SETUP:
+		setup_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in osborne1_state::device_timer");
+	}
 }
 
 
@@ -383,16 +422,8 @@ bool osborne1_state::set_rom_mode(UINT8 value)
 	if (value != m_rom_mode)
 	{
 		m_rom_mode = value;
-		if (m_rom_mode)
-		{
-			m_bank_0xxx->set_base(m_region_maincpu->base());
-			m_bank_1xxx->set_base(m_region_maincpu->base());
-		}
-		else
-		{
-			m_bank_0xxx->set_base(m_ram->pointer());
-			m_bank_1xxx->set_base(m_ram->pointer() + 0x1000);
-		}
+		m_bank_0xxx->set_entry(m_rom_mode);
+		m_bank_1xxx->set_entry(m_rom_mode);
 		return true;
 	}
 	else
@@ -406,7 +437,7 @@ bool osborne1_state::set_bit_9(UINT8 value)
 	if (value != m_bit_9)
 	{
 		m_bit_9 = value;
-		m_bank_fxxx->set_base(m_ram->pointer() + (m_bit_9 ? 0x10000 : 0xF000));
+		m_bank_fxxx->set_entry(m_bit_9);
 		return true;
 	}
 	else
@@ -421,6 +452,17 @@ void osborne1_state::update_irq()
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF0);
 	else if (m_pia1->irq_a_state())
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF8);
+	else if (m_acia_irq_state)
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xFC);
 	else
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, CLEAR_LINE, 0xFE);
+}
+
+void osborne1_state::update_acia_rxc_txc()
+{
+	m_acia->write_rxc(m_acia_rxc_txc_state);
+	m_acia->write_txc(m_acia_rxc_txc_state);
+	attoseconds_t const dividend = (ATTOSECONDS_PER_SECOND / 100) * (m_acia_rxc_txc_state ? m_acia_rxc_txc_p_high : m_acia_rxc_txc_p_low);
+	attoseconds_t const divisor = (15974400 / 100) / m_acia_rxc_txc_div;
+	m_acia_rxc_txc_timer->adjust(attotime(0, dividend / divisor));
 }

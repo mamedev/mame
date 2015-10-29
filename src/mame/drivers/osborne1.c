@@ -47,6 +47,7 @@ TODO:
 ***************************************************************************/
 
 #include "includes/osborne1.h"
+#include "bus/rs232/rs232.h"
 
 
 #define MAIN_CLOCK  15974400
@@ -167,6 +168,11 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("CNF")
+	PORT_CONFNAME(0x06, 0x00, "Serial Speed")
+	PORT_CONFSETTING(0x00, "300/1200")
+	PORT_CONFSETTING(0x02, "600/1200")
+	PORT_CONFSETTING(0x04, "1200/4800")
+	PORT_CONFSETTING(0x06, "2400/9600")
 	PORT_CONFNAME(0x01, 0x00, "Video Output")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x01, "SCREEN-PAC")
@@ -235,11 +241,22 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, ieee_pia_irq_a_func))
 
-	MCFG_DEVICE_ADD( "pia_1", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osborne1_state, video_pia_port_a_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, video_pia_port_b_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(osborne1_state, serial_acia_irq_func))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("pia_1", pia6821_device, ca2_w))
 
 	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/16)
 	MCFG_WD_FDC_FORCE_READY
@@ -250,9 +267,9 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("68K")    /* 64KB Main RAM and 4Kbit video attribute RAM */
+	MCFG_RAM_DEFAULT_SIZE("68K")    // 64bB main RAM and 4kbit video attribute RAM
 MACHINE_CONFIG_END
 
 
