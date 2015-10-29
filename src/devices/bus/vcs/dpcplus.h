@@ -26,8 +26,10 @@ public:
 
 	DECLARE_READ32_MEMBER(armrom_r);
 	DECLARE_WRITE32_MEMBER(armrom_w);
+	
+	DECLARE_READ8_MEMBER(read8_r);
 
-
+	DECLARE_READ32_MEMBER(arm_E01FC088_r);
 protected:
 };
 
