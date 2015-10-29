@@ -37,10 +37,11 @@ used, and the value on the data bus is completley ignored.
 02 - Set BIT 9 signal (map bank 3 into F000-FFFF)
 03 - Clear BIT 9 signal (map bank 1/2 into F000-FFFF)
 
+Selecting between bank 1 and bank 2 is also affected by M1 and IRQACK
+conditions using a set of three flipflops.
+
 TODO:
-  - Implement ROM/IO bank selection properly
   - Implement serial port
-  - Implement reset key (generates NMI and affects bank selection)
   - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
@@ -52,29 +53,34 @@ TODO:
 
 
 static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
-	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank1") AM_WRITE( osborne1_0000_w )
-	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank2") AM_WRITE( osborne1_1000_w )
-	AM_RANGE( 0x2000, 0x3FFF ) AM_READWRITE( osborne1_2000_r, osborne1_2000_w )
+	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank_0xxx") AM_WRITE(bank_0xxx_w)
+	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank_1xxx") AM_WRITE(bank_1xxx_w)
+	AM_RANGE( 0x2000, 0x3FFF ) AM_READWRITE(bank_2xxx_3xxx_r, bank_2xxx_3xxx_w)
 	AM_RANGE( 0x4000, 0xEFFF ) AM_RAM
-	AM_RANGE( 0xF000, 0xFFFF ) AM_READ_BANK("bank3") AM_WRITE( osborne1_videoram_w )
+	AM_RANGE( 0xF000, 0xFFFF ) AM_READ_BANK("bank_fxxx") AM_WRITE(videoram_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( osborne1_op, AS_DECRYPTED_OPCODES, 8, osborne1_state )
+	AM_RANGE( 0x0000, 0xFFFF ) AM_READ(opcode_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( osborne1_io, AS_IO, 8, osborne1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_WRITE( osborne1_bankswitch_w )
+	AM_RANGE( 0x00, 0xff ) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( osborne1 )
 	PORT_START("ROW0")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('[') PORT_CHAR(']')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('[') PORT_CHAR(']')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)       PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)     PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)          PORT_CHAR('\t')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)          PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
@@ -150,19 +156,21 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
+	PORT_START("RESET")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("CNF")
 	PORT_CONFNAME(0x01, 0x00, "Video Output")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x01, "SCREEN-PAC")
 INPUT_PORTS_END
-
-
-static const z80_daisy_config osborne1_daisy_chain[] =
-{
-/*  { osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
-	{ "osborne1_daisy" },
-	{ NULL }
-};
 
 
 /*
@@ -176,37 +184,36 @@ static const z80_daisy_config osborne1_daisy_chain[] =
  */
 
 static SLOT_INTERFACE_START( osborne1_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD ) // Siemens FDD 100-5, custom Osborne electronics
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD ) // MPI 52(?), custom Osborne electronics
+	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD) // Siemens FDD 100-5, custom Osborne electronics
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // MPI 52(?), custom Osborne electronics
 SLOT_INTERFACE_END
 
 
 /* F4 Character Displayer */
 static const gfx_layout osborne1_charlayout =
 {
-	8, 10,                  /* 8 x 10 characters */
-	128,                    /* 128 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
+	8, 10,              // 8 x 10 characters
+	128,                // 128 characters
+	1,                  // 1 bits per pixel
+	{ 0 },              // no bitplanes
+	// x offsets
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
+	// y offsets
 	{ 0*128*8, 1*128*8, 2*128*8, 3*128*8, 4*128*8, 5*128*8, 6*128*8, 7*128*8, 8*128*8, 9*128*8 },
-	8                   /* every char takes 16 x 1 bytes */
+	8                   // every char takes 16 x 1 bytes
 };
 
 static GFXDECODE_START( osborne1 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, osborne1_charlayout, 0, 1 )
+	GFXDECODE_ENTRY("chargen", 0x0000, osborne1_charlayout, 0, 1)
 GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( osborne1, osborne1_state )
-	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP( osborne1_mem)
-	MCFG_CPU_IO_MAP( osborne1_io)
-	MCFG_CPU_CONFIG( osborne1_daisy_chain )
-
-	MCFG_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(osborne1_op)
+	MCFG_CPU_IO_MAP(osborne1_io)
+	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(osborne1_state, irqack_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)

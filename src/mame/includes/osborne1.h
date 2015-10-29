@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
 #include "sound/beep.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -39,18 +38,19 @@ public:
 		m_ieee(*this, IEEE488_TAG),
 		m_floppy0(*this, "mb8877:0:525ssdd"),
 		m_floppy1(*this, "mb8877:1:525ssdd"),
-		m_row0(*this, "ROW0"),
-		m_row1(*this, "ROW1"),
-		m_row2(*this, "ROW2"),
-		m_row3(*this, "ROW3"),
-		m_row4(*this, "ROW4"),
-		m_row5(*this, "ROW5"),
-		m_row6(*this, "ROW6"),
-		m_row7(*this, "ROW7"),
+		m_keyb_row0(*this, "ROW0"),
+		m_keyb_row1(*this, "ROW1"),
+		m_keyb_row2(*this, "ROW2"),
+		m_keyb_row3(*this, "ROW3"),
+		m_keyb_row4(*this, "ROW4"),
+		m_keyb_row5(*this, "ROW5"),
+		m_keyb_row6(*this, "ROW6"),
+		m_keyb_row7(*this, "ROW7"),
+		m_btn_reset(*this, "RESET"),
 		m_cnf(*this, "CNF"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3"),
+		m_bank_0xxx(*this, "bank_0xxx"),
+		m_bank_1xxx(*this, "bank_1xxx"),
+		m_bank_fxxx(*this, "bank_fxxx"),
 		m_region_maincpu(*this, "maincpu") { }
 
 	virtual void video_start();
@@ -69,26 +69,24 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 
-	DECLARE_WRITE8_MEMBER(osborne1_0000_w);
-	DECLARE_WRITE8_MEMBER(osborne1_1000_w);
-	DECLARE_READ8_MEMBER(osborne1_2000_r);
-	DECLARE_WRITE8_MEMBER(osborne1_2000_w);
-	DECLARE_WRITE8_MEMBER(osborne1_videoram_w);
-	DECLARE_WRITE8_MEMBER(osborne1_bankswitch_w);
-	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
+	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
+	DECLARE_WRITE8_MEMBER(bank_1xxx_w);
+	DECLARE_READ8_MEMBER(bank_2xxx_3xxx_r);
+	DECLARE_WRITE8_MEMBER(bank_2xxx_3xxx_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_READ8_MEMBER(opcode_r);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE_LINE_MEMBER(irqack_w);
+
 	DECLARE_READ8_MEMBER(ieee_pia_pb_r);
 	DECLARE_WRITE8_MEMBER(ieee_pia_pb_w);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
+	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
+
 	DECLARE_WRITE8_MEMBER(video_pia_port_a_w);
 	DECLARE_WRITE8_MEMBER(video_pia_port_b_w);
+	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
-	DECLARE_DIRECT_UPDATE_MEMBER(osborne1_opbase);
 
-	bool m_bank2_enabled;
-	UINT8   m_bit_9;
-	/* IRQ states */
-	bool m_pia_0_irq_state;
-	bool m_pia_1_irq_state;
 	/* video related */
 	UINT8   m_screen_pac;
 	UINT8   m_resolution;
@@ -97,9 +95,6 @@ public:
 	UINT8   m_new_start_y;
 	emu_timer *m_video_timer;
 	UINT8   *m_p_chargen;
-	/* bankswitch setting */
-	UINT8   m_bankswitch;
-	bool m_in_irq_handler;
 	bool m_beep_state;
 	DECLARE_DRIVER_INIT(osborne1);
 	virtual void machine_reset();
@@ -107,41 +102,35 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_osborne1);
 
 protected:
-	required_ioport m_row0;
-	required_ioport m_row1;
-	required_ioport m_row2;
-	required_ioport m_row3;
-	required_ioport m_row4;
-	required_ioport m_row5;
-	required_ioport m_row6;
-	required_ioport m_row7;
+	required_ioport m_keyb_row0;
+	required_ioport m_keyb_row1;
+	required_ioport m_keyb_row2;
+	required_ioport m_keyb_row3;
+	required_ioport m_keyb_row4;
+	required_ioport m_keyb_row5;
+	required_ioport m_keyb_row6;
+	required_ioport m_keyb_row7;
+	required_ioport m_btn_reset;
+
 	required_ioport m_cnf;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
+
+	required_memory_bank m_bank_0xxx;
+	required_memory_bank m_bank_1xxx;
+	required_memory_bank m_bank_fxxx;
+
 	required_memory_region m_region_maincpu;
+
+	// bank switch control bits
+	UINT8   m_ub4a_q;
+	UINT8   m_ub6a_q;
+	UINT8   m_rom_mode;
+	UINT8   m_bit_9;
+
+	bool set_rom_mode(UINT8 value);
+	bool set_bit_9(UINT8 value);
+	void update_irq();
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-// ======================> osborne1_daisy_device
-
-class osborne1_daisy_device :   public device_t,
-						public device_z80daisy_interface
-{
-public:
-	// construction/destruction
-	osborne1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-private:
-	virtual void device_start();
-	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
-};
-
-extern const device_type OSBORNE1_DAISY;
 
 #endif /* OSBORNE1_H_ */
