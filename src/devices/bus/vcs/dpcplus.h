@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:David Haywood
 #ifndef __VCS_DPCPLUS_H
 #define __VCS_DPCPLUS_H
 
