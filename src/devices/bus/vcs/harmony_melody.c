@@ -82,11 +82,6 @@ void a26_rom_harmony_device::device_start()
 }
 
 static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_device )
-	// these are not listed in the ARM manual as internal areas, so probably external? what maps here? 
-	AM_RANGE(0x3FFFC000, 0x3FFFC003) AM_RAM
-	AM_RANGE(0x3FFFC010, 0x3FFFC013) AM_RAM
-	AM_RANGE(0x3FFFC014, 0x3FFFC017) AM_RAM // reads
-	AM_RANGE(0x3FFFC018, 0x3FFFC01b) AM_RAM
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( a26_harmony )
