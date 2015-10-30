@@ -12,7 +12,7 @@ TODO:
 
 #include "emu.h"
 #include "machine/mos6530n.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6507.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
 #include "bus/vcs/vcs_slot.h"
@@ -70,7 +70,7 @@ protected:
 	required_device<tia_video_device> m_tia;
 
 	unsigned long detect_2600controllers();
-	required_device<m6502_device> m_maincpu;
+	required_device<m6507_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_ioport m_swb;
 	required_device<mos6532_t> m_riot;
@@ -85,8 +85,7 @@ protected:
 static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
-static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
 	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVICE("riot", mos6532_t, io_map)
@@ -541,7 +540,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( a2600, a2600_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK_NTSC / 3)   /* actually M6507 */
+	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3) 
 	MCFG_M6502_DISABLE_DIRECT()
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
 
@@ -581,7 +580,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( a2600p, a2600_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
+	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3) 
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
 	MCFG_M6502_DISABLE_DIRECT()
 
