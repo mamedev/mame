@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol,Vas Crabb
 /***************************************************************************
 
     Osborne-1 driver file
@@ -40,9 +40,19 @@ used, and the value on the data bus is completley ignored.
 Selecting between bank 1 and bank 2 is also affected by M1 and IRQACK
 conditions using a set of three flipflops.
 
-TODO:
-  - Implement serial port
-  - Verify frequency of the beep/audio alarm.
+The serial speed configuration implements wiring changes recommended in the
+Osborne 1 Technical Manual.  There's no way for software to read the
+selected baud rates, so it will always call the low speed "300" and the high
+speed "1200".  You as the user have to keep this in mind using the system.
+
+Serial communications can be flaky when 600/2400 is selected.  This is not a
+bug in MAME.  I've checked and double-checked the schematics to confirm it's
+an original bug.  The division ratio from the master clock to the baud rates
+in this mode is effectively 16*24*64 or 16*24*16 giving actual data rates of
+650 baud or 2600 baud, about 8.3% too fast (16*26*64 and 16*26*16 would give
+the correct rates).  MAME's bitbanger seems to be able to accept the ACIA
+output at this rate, but the ACIA screws up when consuming data from MAME's
+bitbanger.
 
 ***************************************************************************/
 
@@ -170,7 +180,7 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_START("CNF")
 	PORT_CONFNAME(0x06, 0x00, "Serial Speed")
 	PORT_CONFSETTING(0x00, "300/1200")
-	PORT_CONFSETTING(0x02, "600/1200")
+	PORT_CONFSETTING(0x02, "600/2400")
 	PORT_CONFSETTING(0x04, "1200/4800")
 	PORT_CONFSETTING(0x06, "2400/9600")
 	PORT_CONFNAME(0x01, 0x00, "Video Output")
@@ -228,9 +238,9 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osborne1)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
@@ -240,6 +250,9 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, ieee_pia_irq_a_func))
+
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osborne1_state, video_pia_port_a_w))
@@ -263,13 +276,11 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
-	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
-
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("68K")    // 64bB main RAM and 4kbit video attribute RAM
+	MCFG_RAM_DEFAULT_SIZE("68K")    // 64kB main RAM and 4kbit video attribute RAM
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
 

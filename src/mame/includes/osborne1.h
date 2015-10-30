@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol,Vas Crabb
 /*****************************************************************************
  *
  * includes/osborne1.h
@@ -11,10 +11,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/beep.h"
+#include "sound/speaker.h"
+#include "bus/ieee488/ieee488.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 
@@ -24,23 +24,21 @@ public:
 	enum
 	{
 		TIMER_VIDEO,
-		TIMER_ACIA_RXC_TXC,
-		TIMER_SETUP
+		TIMER_ACIA_RXC_TXC
 	};
 
 	osborne1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, "speaker"),
 		m_pia0(*this, "pia_0"),
 		m_pia1(*this, "pia_1"),
 		m_acia(*this, "acia"),
 		m_fdc(*this, "mb8877"),
-		m_beep(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
 		m_ieee(*this, IEEE488_TAG),
 		m_floppy0(*this, "mb8877:0:525ssdd"),
 		m_floppy1(*this, "mb8877:1:525ssdd"),
-		m_video_timer(NULL),
 		m_keyb_row0(*this, "ROW0"),
 		m_keyb_row1(*this, "ROW1"),
 		m_keyb_row2(*this, "ROW2"),
@@ -55,6 +53,7 @@ public:
 		m_bank_0xxx(*this, "bank_0xxx"),
 		m_bank_1xxx(*this, "bank_1xxx"),
 		m_bank_fxxx(*this, "bank_fxxx"),
+		m_video_timer(NULL),
 		m_acia_rxc_txc_timer(NULL)
 	{ }
 
@@ -84,33 +83,20 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(video_callback);
-	TIMER_CALLBACK_MEMBER(setup_callback);
-
-	bitmap_ind16 m_bitmap;
-
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	required_device<acia6850_device> m_acia;
 	required_device<mb8877_t> m_fdc;
-	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_device<ieee488_device> m_ieee;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 
-	/* video related */
-	UINT8   m_resolution;
-	UINT8   m_hc_left;
-	UINT8   m_new_start_x;
-	UINT8   m_new_start_y;
-	emu_timer *m_video_timer;
-	UINT8   *m_p_chargen;
-	bool m_beep_state;
-
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	TIMER_CALLBACK_MEMBER(video_callback);
 
 	bool set_rom_mode(UINT8 value);
 	bool set_bit_9(UINT8 value);
@@ -138,21 +124,33 @@ protected:
 	required_memory_bank    m_bank_fxxx;
 
 	// configuration (reloaded on reset)
-	UINT8       m_screen_pac;
-	UINT8       m_acia_rxc_txc_div;
-	UINT8	    m_acia_rxc_txc_p_low;
-	UINT8	    m_acia_rxc_txc_p_high;
+	UINT8           m_screen_pac;
+	UINT8           m_acia_rxc_txc_div;
+	UINT8	        m_acia_rxc_txc_p_low;
+	UINT8	        m_acia_rxc_txc_p_high;
 
 	// bank switch control bits
-	UINT8       m_ub4a_q;
-	UINT8       m_ub6a_q;
-	UINT8       m_rom_mode;
-	UINT8       m_bit_9;
+	UINT8           m_ub4a_q;
+	UINT8           m_ub6a_q;
+	UINT8           m_rom_mode;
+	UINT8           m_bit_9;
+
+	// onboard video state
+	UINT8           m_scroll_x;
+	UINT8           m_scroll_y;
+	UINT8           m_beep_state;
+	emu_timer       *m_video_timer;
+	bitmap_ind16    m_bitmap;
+	UINT8           *m_p_chargen;
+
+	// SCREEN-PAC registers
+	UINT8           m_resolution;
+	UINT8           m_hc_left;
 
 	// serial state
-	int         m_acia_irq_state;
-	int         m_acia_rxc_txc_state;
-	emu_timer   *m_acia_rxc_txc_timer;
+	int             m_acia_irq_state;
+	int             m_acia_rxc_txc_state;
+	emu_timer       *m_acia_rxc_txc_timer;
 };
 
 #endif /* OSBORNE1_H_ */
