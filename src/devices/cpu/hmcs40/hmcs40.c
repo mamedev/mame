@@ -178,14 +178,14 @@ void hmcs40_cpu_device::device_start()
 	reset_prescaler();
 
 	// resolve callbacks
-	m_read_r0.resolve_safe(0);
-	m_read_r1.resolve_safe(0);
-	m_read_r2.resolve_safe(0);
-	m_read_r3.resolve_safe(0);
-	m_read_r4.resolve_safe(0);
-	m_read_r5.resolve_safe(0);
-	m_read_r6.resolve_safe(0);
-	m_read_r7.resolve_safe(0);
+	m_read_r0.resolve_safe(m_polarity & 0xf);
+	m_read_r1.resolve_safe(m_polarity & 0xf);
+	m_read_r2.resolve_safe(m_polarity & 0xf);
+	m_read_r3.resolve_safe(m_polarity & 0xf);
+	m_read_r4.resolve_safe(m_polarity & 0xf);
+	m_read_r5.resolve_safe(m_polarity & 0xf);
+	m_read_r6.resolve_safe(m_polarity & 0xf);
+	m_read_r7.resolve_safe(m_polarity & 0xf);
 
 	m_write_r0.resolve_safe();
 	m_write_r1.resolve_safe();
@@ -196,7 +196,7 @@ void hmcs40_cpu_device::device_start()
 	m_write_r6.resolve_safe();
 	m_write_r7.resolve_safe();
 
-	m_read_d.resolve_safe(0);
+	m_read_d.resolve_safe(m_polarity);
 	m_write_d.resolve_safe();
 
 	// zerofill
@@ -293,10 +293,10 @@ void hmcs40_cpu_device::device_reset()
 	// clear i/o
 	m_d = m_polarity;
 	for (int i = 0; i < 16; i++)
-		hmcs40_cpu_device::write_d(i, 0);
+		hmcs40_cpu_device::write_d(i, m_polarity);
 
 	for (int i = 0; i < 8; i++)
-		hmcs40_cpu_device::write_r(i, 0);
+		hmcs40_cpu_device::write_r(i, m_polarity & 0xf);
 }
 
 
@@ -322,13 +322,16 @@ UINT8 hmcs40_cpu_device::read_r(int index)
 		case 7: inp = m_read_r7(index, 0xff); break;
 	}
 
-	return ((inp ^ m_polarity) | m_r[index]) & 0xf;
+	if (m_polarity)
+		return (inp & m_r[index]) & 0xf;
+	else
+		return (inp | m_r[index]) & 0xf;
 }
 
 void hmcs40_cpu_device::write_r(int index, UINT8 data)
 {
 	index &= 7;
-	data = (data ^ m_polarity) & 0xf;
+	data &= 0xf;
 	m_r[index] = data;
 
 	switch (index)
@@ -348,13 +351,16 @@ int hmcs40_cpu_device::read_d(int index)
 {
 	index &= 15;
 
-	return ((m_read_d(index, 0xffff) ^ m_polarity) | m_d) >> index & 1;
+	if (m_polarity)
+		return (m_read_d(index, 0xffff) & m_d) >> index & 1;
+	else
+		return (m_read_d(index, 0xffff) | m_d) >> index & 1;
 }
 
 void hmcs40_cpu_device::write_d(int index, int state)
 {
 	index &= 15;
-	state = (((state) ? 1 : 0) ^ m_polarity) & 1;
+	state = (state) ? 1 : 0;
 
 	m_d = (m_d & ~(1 << index)) | state << index;
 	m_write_d(index, m_d, 0xffff);
