@@ -2,36 +2,24 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
- Super Cobra hardware
+ galaxold.c:
+ -----------
+ MAME driver for special/undocumented games based on Super Cobra (Galaxian) hardware.
+ This goes for special cases such as wiremods, unknown hardware prepherials
+ needed to be figured out, etc.
 
-NOTE:  Eventually to be merged into GALAXIAN.C
+ Games in this driver will eventually be merged into galaxian.c once proper documentation
+ has been found for them.
 
-TODO:
-----
+ TODO:
+ -Merge galaxian.c video with galaxold.c, scramble.c, scobra.c and dambustr.c
+ (should we make it a device?)
+ -Dark Planet background graphics
 
-- Need correct color PROMs for Super Bond
-
-- Dark Planet background graphics
-
-- Explosion sound in Scramble/Super Cobra repeats
-
-- Armored Car probably has some other effect(s) during an explosion.
-  It uses both POUT1 and POUT2.
-
-
-Notes/Tidbits:
--------------
-
-- Armored Car sets Port C as well, but it's input only and the games uses other
-  bits for the 2nd player controls.  Maybe the games was meant to use 2 joysticks
-  at one time.
-
-- Video Hustler and its two bootlegs all have identical code, the only
+ Notes:
+ -Video Hustler and its two bootlegs all have identical code, the only
   differences are the title, copyright removed, different encryptions or
   no encryption, plus hustlerb has a different memory map.
-
-- In Tazmania, when set to Upright mode, player 2 left skips the current
-  level
 
 ***************************************************************************/
 
