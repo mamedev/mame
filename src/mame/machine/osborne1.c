@@ -86,7 +86,7 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 		{
 			m_resolution = data & 0x01;
-			m_hc_left = (data >> 1) & 0x01;
+			m_hc_left = (data & 0x02) ? 0 : 1;
 		}
 		if ((offset & 0xC00) == 0xC00) // Video PIA
 			m_pia1->write(space, offset & 0x03, data);
@@ -202,20 +202,15 @@ WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 
 WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 {
+	m_scroll_x = data >> 1;
+
 	m_fdc->dden_w(BIT(data, 0));
-
-	data -= 0xea; // remove bias
-
-	m_new_start_x = (data >> 1);
-	if (m_new_start_x)
-		m_new_start_x--;
-
-	//logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "FM" : "MFM" );
 }
 
 WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 {
-	m_new_start_y = data & 0x1F;
+	m_scroll_y = data & 0x1F;
+
 	m_beep_state = BIT(data, 5);
 
 	if (BIT(data, 6))
@@ -232,8 +227,6 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	{
 		m_fdc->set_floppy(NULL);
 	}
-
-	//logerror("Video pia port b write: %02X\n", data );
 }
 
 WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
@@ -310,7 +303,7 @@ void osborne1_state::machine_reset()
 	update_acia_rxc_txc();
 
 	m_resolution = 0;
-	m_hc_left = 0;
+	m_hc_left = 1;
 	m_p_chargen = memregion( "chargen" )->base();
 
 	for (unsigned i = 0; i < 0x1000; i++)
@@ -344,10 +337,28 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	{
 		ra = y % 10;
 		// Draw a line of the display
-		bool const hires = m_screen_pac & m_resolution;
-		UINT16 const row = (m_new_start_y + (y/10)) * 128 & 0xF80;
-		UINT16 const col = (m_new_start_x & (hires ? 0x60 : 0x7F)) - ((hires && m_hc_left) ? 8 : 0);
 		UINT16 *p = &m_bitmap.pix16(y);
+		bool const hires = m_screen_pac & m_resolution;
+		UINT16 const row = ((m_scroll_y + (y / 10)) << 7) & 0xF80;
+
+		// The derivation of the initial column is not obvious.  The 7-bit
+		// column counter is preloaded near the beginning of the horizontal
+		// blank period.  The initial column is offset by the number of
+		// character clock periods in the horizontal blank period minus one
+		// because it latches the value before it's displayed.  Using the
+		// standard video display, there are 12 character clock periods in
+		// the horizontal blank period, so subtracting 1 gives 0x0B.  Using
+		// the SCREEN-PAC's high-resolution mode, the character clock is
+		// twice the frequency giving 24 character clock periods in the
+		// horizontal blanking period, so subtracting 1 gives 0x17.  Using
+		// the standard video display, the column counter is preloaded with
+		// the high 7 bits of the value from PIA1 PORTB.  The SCREEN-PAC
+		// takes the two high bits of this value, but sets the low five bits
+		// to a fixed value of 1 or 9 depending on the value of the HC-LEFT
+		// signal (set by bit 1 of the value written to 0x2400).  Of course
+		// it depends on the value wrapping around to zero when it counts
+		// past 0x7F
+		UINT16 const col = hires ? ((m_scroll_x & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17) : (m_scroll_x + 0x0B);
 
 		for ( UINT16 x = 0; x < (hires ? 104 : 52); x++ )
 		{

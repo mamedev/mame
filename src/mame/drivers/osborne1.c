@@ -255,6 +255,9 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, ieee_pia_irq_a_func))
 
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
+
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osborne1_state, video_pia_port_a_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, video_pia_port_b_w))
@@ -277,13 +280,11 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
-	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
-
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("68K")    // 64bB main RAM and 4kbit video attribute RAM
+	MCFG_RAM_DEFAULT_SIZE("68K")    // 64kB main RAM and 4kbit video attribute RAM
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
 

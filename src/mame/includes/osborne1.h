@@ -100,11 +100,6 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 
-	/* video related */
-	UINT8   m_resolution;
-	UINT8   m_hc_left;
-	UINT8   m_new_start_x;
-	UINT8   m_new_start_y;
 	emu_timer *m_video_timer;
 	UINT8   *m_p_chargen;
 	bool m_beep_state;
@@ -148,6 +143,14 @@ protected:
 	UINT8       m_ub6a_q;
 	UINT8       m_rom_mode;
 	UINT8       m_bit_9;
+
+	// video registers
+	UINT8       m_scroll_x;
+	UINT8       m_scroll_y;
+
+	// SCREEN-PAC registers
+	UINT8       m_resolution;
+	UINT8       m_hc_left;
 
 	// serial state
 	int         m_acia_irq_state;
