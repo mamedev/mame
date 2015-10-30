@@ -37,44 +37,65 @@ used, and the value on the data bus is completley ignored.
 02 - Set BIT 9 signal (map bank 3 into F000-FFFF)
 03 - Clear BIT 9 signal (map bank 1/2 into F000-FFFF)
 
+Selecting between bank 1 and bank 2 is also affected by M1 and IRQACK
+conditions using a set of three flipflops.
+
+The serial speed configuration implements wiring changes recommended in the
+Osborne 1 Technical Manual.  There's no way for software to read the
+selected baud rates, so it will always call the low speed "300" and the high
+speed "1200".  You as the user have to keep this in mind using the system.
+
+Serial communications can be flaky when 600/2400 is selected.  This is not a
+bug in MAME.  I've checked and double-checked the schematics to confirm it's
+an original bug.  The division ratio from the master clock to the baud rates
+in this mode is effectively 16*24*64 or 16*24*16 giving actual data rates of
+650 baud or 2600 baud, about 8.3% too fast (16*26*64 and 16*26*16 would give
+the correct rates).  MAME's bitbanger seems to be able to accept the ACIA
+output at this rate, but the ACIA screws up when consuming data from MAME's
+bitbanger.
+
+
 TODO:
-  - Implement ROM/IO bank selection properly
-  - Implement serial port
-  - Implement reset key (generates NMI and affects bank selection)
   - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
 
 #include "includes/osborne1.h"
+#include "bus/rs232/rs232.h"
 
 
 #define MAIN_CLOCK  15974400
 
 
 static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
-	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank1") AM_WRITE( osborne1_0000_w )
-	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank2") AM_WRITE( osborne1_1000_w )
-	AM_RANGE( 0x2000, 0x3FFF ) AM_READWRITE( osborne1_2000_r, osborne1_2000_w )
+	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank_0xxx") AM_WRITE(bank_0xxx_w)
+	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank_1xxx") AM_WRITE(bank_1xxx_w)
+	AM_RANGE( 0x2000, 0x3FFF ) AM_READWRITE(bank_2xxx_3xxx_r, bank_2xxx_3xxx_w)
 	AM_RANGE( 0x4000, 0xEFFF ) AM_RAM
-	AM_RANGE( 0xF000, 0xFFFF ) AM_READ_BANK("bank3") AM_WRITE( osborne1_videoram_w )
+	AM_RANGE( 0xF000, 0xFFFF ) AM_READ_BANK("bank_fxxx") AM_WRITE(videoram_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( osborne1_op, AS_DECRYPTED_OPCODES, 8, osborne1_state )
+	AM_RANGE( 0x0000, 0xFFFF ) AM_READ(opcode_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( osborne1_io, AS_IO, 8, osborne1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_WRITE( osborne1_bankswitch_w )
+	AM_RANGE( 0x00, 0xff ) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( osborne1 )
 	PORT_START("ROW0")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('[') PORT_CHAR(']')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('[') PORT_CHAR(']')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)       PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)     PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)          PORT_CHAR('\t')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)          PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
@@ -150,19 +171,26 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
+	PORT_START("RESET")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("CNF")
+	PORT_CONFNAME(0x06, 0x00, "Serial Speed")
+	PORT_CONFSETTING(0x00, "300/1200")
+	PORT_CONFSETTING(0x02, "600/2400")
+	PORT_CONFSETTING(0x04, "1200/4800")
+	PORT_CONFSETTING(0x06, "2400/9600")
 	PORT_CONFNAME(0x01, 0x00, "Video Output")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x01, "SCREEN-PAC")
 INPUT_PORTS_END
-
-
-static const z80_daisy_config osborne1_daisy_chain[] =
-{
-/*  { osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
-	{ "osborne1_daisy" },
-	{ NULL }
-};
 
 
 /*
@@ -176,37 +204,36 @@ static const z80_daisy_config osborne1_daisy_chain[] =
  */
 
 static SLOT_INTERFACE_START( osborne1_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD ) // Siemens FDD 100-5, custom Osborne electronics
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD ) // MPI 52(?), custom Osborne electronics
+	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD) // Siemens FDD 100-5, custom Osborne electronics
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // MPI 52(?), custom Osborne electronics
 SLOT_INTERFACE_END
 
 
 /* F4 Character Displayer */
 static const gfx_layout osborne1_charlayout =
 {
-	8, 10,                  /* 8 x 10 characters */
-	128,                    /* 128 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
+	8, 10,              // 8 x 10 characters
+	128,                // 128 characters
+	1,                  // 1 bits per pixel
+	{ 0 },              // no bitplanes
+	// x offsets
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
+	// y offsets
 	{ 0*128*8, 1*128*8, 2*128*8, 3*128*8, 4*128*8, 5*128*8, 6*128*8, 7*128*8, 8*128*8, 9*128*8 },
-	8                   /* every char takes 16 x 1 bytes */
+	8                   // every char takes 16 x 1 bytes
 };
 
 static GFXDECODE_START( osborne1 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, osborne1_charlayout, 0, 1 )
+	GFXDECODE_ENTRY("chargen", 0x0000, osborne1_charlayout, 0, 1)
 GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( osborne1, osborne1_state )
-	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP( osborne1_mem)
-	MCFG_CPU_IO_MAP( osborne1_io)
-	MCFG_CPU_CONFIG( osborne1_daisy_chain )
-
-	MCFG_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(osborne1_op)
+	MCFG_CPU_IO_MAP(osborne1_io)
+	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(osborne1_state, irqack_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
@@ -228,11 +255,22 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, ieee_pia_irq_a_func))
 
-	MCFG_DEVICE_ADD( "pia_1", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osborne1_state, video_pia_port_a_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, video_pia_port_b_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(osborne1_state, serial_acia_irq_func))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("pia_1", pia6821_device, ca2_w))
 
 	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/16)
 	MCFG_WD_FDC_FORCE_READY
@@ -243,9 +281,9 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("68K")    /* 64KB Main RAM and 4Kbit video attribute RAM */
+	MCFG_RAM_DEFAULT_SIZE("68K")    // 64bB main RAM and 4kbit video attribute RAM
 MACHINE_CONFIG_END
 
 

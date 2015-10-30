@@ -191,7 +191,8 @@ READ8_MEMBER( super6_state::fdc_r )
 
 	*/
 
-	fatalerror("Z80 WAIT not supported by MAME core\n");
+	// don't crash please... but it's true, WAIT does nothing in our Z80
+	//fatalerror("Z80 WAIT not supported by MAME core\n");
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
 	return !m_fdc->intrq_r() << 7;
@@ -217,13 +218,16 @@ WRITE8_MEMBER( super6_state::fdc_w )
 	    6
 	    7
 
+	    Codes passed to here during boot are 0x00, 0x08, 0x38
 	*/
 
 	// disk drive select
 	floppy_image_device *m_floppy = NULL;
 
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
+	if ((data & 3) == 0)
+		m_floppy = m_floppy0->get_device();
+	if ((data & 3) == 1)
+		m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 	if (m_floppy) m_floppy->mon_w(0);
