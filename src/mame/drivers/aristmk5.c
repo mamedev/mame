@@ -1017,6 +1017,28 @@ ROM_START( pengpays )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// 596 - 10 Credit Multiplier / 9 Line Multiline. (touch)
+// Chicken - Export C - 23/02/98.
+// Marked as RHG0730 and 92.588%
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( chickena )
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "rhg0730_chicken.u7",  0x000000, 0x80000, CRC(ca196b37) SHA1(6b204204c1574439ccea1b6145d867a73bad304f) )  // 92.588%
+	ROM_LOAD32_WORD( "rhg0730_chicken.u11", 0x000002, 0x80000, CRC(b0d7be28) SHA1(6998dce808bf7970500b9e1ce6efed3940ee2d63) )  // 92.588%
+	ROM_LOAD32_WORD( "rhg0730_chicken.u8",  0x100000, 0x80000, CRC(80e3e34c) SHA1(3ad73c5fc21c4d9647ea514bf367073bbeb981a9) )  // base
+	ROM_LOAD32_WORD( "rhg0730_chicken.u12", 0x100002, 0x80000, CRC(63d5ec8e) SHA1(dca76342ecee6843e6fc656aafc8ee2e4d19fd65) )  // base
+	ROM_LOAD32_WORD( "rhg0730_chicken.u9",  0x200000, 0x80000, CRC(662ff210) SHA1(bbd2410fa2cd67e327981c3b2e16342fb9393401) )  // base
+	ROM_LOAD32_WORD( "rhg0730_chicken.u13", 0x200002, 0x80000, CRC(c3cef8ae) SHA1(4e65787d61387b511972e514047528495e1de11c) )  // base
+	ROM_LOAD32_WORD( "rhg0730_chicken.u10", 0x300000, 0x80000, CRC(8b3f7d6b) SHA1(7f1a04556c448976145652b05b690142376764d4) )  // base
+	ROM_LOAD32_WORD( "rhg0730_chicken.u14", 0x300002, 0x80000, CRC(240f7759) SHA1(1fa5ba0185b027101dae207ec5d28b07d3d73fc2) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 // MV4098 - 10 Credit Multiplier / 9 Line Multiline.
 // BOOT SCOOTIN' - Export A - 25/08/99.
 // All devices are 27c4002 instead of 27c4096.
@@ -1159,6 +1181,7 @@ GAME( 1997, wldcougr,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 1997, dmdtouch,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (0400433V, Local)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 604,      E - 30/06/97
 GAME( 1997, bumblbug,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Bumble Bugs (Export, 92.691%)",                MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 593,      D - 05/07/97
 GAME( 1997, pengpays,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Penguin Pays (Export)",                        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 586/7(b)  B - 14/07/97
+GAME( 1998, chickena,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Chicken (RHG0730, Export, 92.588%)",           MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 596,      C - 23/02/98
 GAME( 1998, adonis,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0200751V, NSW/ACT)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 10
 GAME( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0100751V, NSW/ACT)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 9
 GAME( 1998, reelrock,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628,      A - 13/07/98
