@@ -242,8 +242,8 @@ static __inline double fmin(double x, double y){ return (x < y) ? x : y; }
 static __inline double fmax(double x, double y){ return (x > y) ? x : y; }
 static __inline double log2(double x) { return log(x) * M_LOG2E; }
 #define __func__ __FUNCTION__
-#endif // VS2013 or earlier
-#else // #ifndef _MSC_VER
+#endif // VS2012 or earlier
+#else // VS2015
 #define _CRT_STDIO_LEGACY_WIDE_SPECIFIERS
 #endif
 #endif
