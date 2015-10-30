@@ -209,8 +209,6 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 
 WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 {
-	m_scroll_y = data & 0x1F;
-
 	m_beep_state = BIT(data, 5);
 
 	if (BIT(data, 6))
@@ -345,9 +343,14 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 
 	// Check for start/end of visible area and clear/set CA1 on video PIA
 	if (y == 0)
+	{
+		m_scroll_y = m_pia1->b_output() & 0x1F;
 		m_pia1->ca1_w(0);
+	}
 	else if (y == 240)
+	{
 		m_pia1->ca1_w(1);
+	}
 
 	if (y < 240)
 	{
