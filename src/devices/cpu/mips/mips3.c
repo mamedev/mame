@@ -2701,6 +2701,11 @@ void mips3_device::handle_special(UINT32 op)
 	}
 }
 
+void mips3_device::burn_cycles(INT32 cycles)
+{
+	execute_burn(cycles);
+}
+
 void mips3_device::execute_run()
 {
 	if (m_isdrc)
