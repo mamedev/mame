@@ -40,8 +40,22 @@ used, and the value on the data bus is completley ignored.
 Selecting between bank 1 and bank 2 is also affected by M1 and IRQACK
 conditions using a set of three flipflops.
 
+The serial speed configuration implements wiring changes recommended in the
+Osborne 1 Technical Manual.  There's no way for software to read the
+selected baud rates, so it will always call the low speed "300" and the high
+speed "1200".  You as the user have to keep this in mind using the system.
+
+Serial communications can be flaky when 600/2400 is selected.  This is not a
+bug in MAME.  I've checked and double-checked the schematics to confirm it's
+an original bug.  The division ratio from the master clock to the baud rates
+in this mode is effectively 16*24*64 or 16*24*16 giving actual data rates of
+650 baud or 2600 baud, about 8.3% too fast (16*26*64 and 16*26*16 would give
+the correct rates).  MAME's bitbanger seems to be able to accept the ACIA
+output at this rate, but the ACIA screws up when consuming data from MAME's
+bitbanger.
+
+
 TODO:
-  - Implement serial port
   - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
@@ -170,7 +184,7 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_START("CNF")
 	PORT_CONFNAME(0x06, 0x00, "Serial Speed")
 	PORT_CONFSETTING(0x00, "300/1200")
-	PORT_CONFSETTING(0x02, "600/1200")
+	PORT_CONFSETTING(0x02, "600/2400")
 	PORT_CONFSETTING(0x04, "1200/4800")
 	PORT_CONFSETTING(0x06, "2400/9600")
 	PORT_CONFNAME(0x01, 0x00, "Video Output")
