@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol,Vas Crabb
 /***************************************************************************
 
 There are three IRQ sources:
@@ -35,10 +35,10 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	UINT8   data = 0xFF;
 	switch (offset & 0x0F00)
 	{
-	case 0x100: /* Floppy */
+	case 0x100: // Floppy
 		data = m_fdc->read(space, offset & 0x03);
 		break;
-	case 0x200: /* Keyboard */
+	case 0x200: // Keyboard
 		if (offset & 0x01)  data &= m_keyb_row0->read();
 		if (offset & 0x02)  data &= m_keyb_row1->read();
 		if (offset & 0x04)  data &= m_keyb_row3->read();
@@ -48,17 +48,17 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 		if (offset & 0x40)  data &= m_keyb_row6->read();
 		if (offset & 0x80)  data &= m_keyb_row7->read();
 		break;
-	case 0x400: /* SCREEN-PAC */
+	case 0x400: // SCREEN-PAC
 		if (m_screen_pac) data &= 0xFB;
 		break;
-	case 0x900: /* IEEE488 PIA */
+	case 0x900: // IEEE488 PIA
 		data = m_pia0->read(space, offset & 0x03);
 		break;
-	case 0xA00: /* Serial */
+	case 0xA00: // Serial
 		if (offset & 0x01) data = m_acia->data_r(space, 0);
 		else data = m_acia->status_r(space, 0);
 		break;
-	case 0xC00: /* Video PIA */
+	case 0xC00: // Video PIA
 		data = m_pia1->read(space, offset & 0x03);
 		break;
 	}
@@ -255,12 +255,11 @@ DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 	m_bank_fxxx->configure_entries(0, 1, m_ram->pointer() + 0xF000, 0);
 	m_bank_fxxx->configure_entries(1, 1, m_ram->pointer() + 0x10000, 0);
 
+	m_p_chargen = memregion("chargen")->base();
 	m_video_timer = timer_alloc(TIMER_VIDEO);
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
 
 	m_acia_rxc_txc_timer = timer_alloc(TIMER_ACIA_RXC_TXC);
-
-	timer_set(attotime::zero, TIMER_SETUP);
 }
 
 void osborne1_state::machine_reset()
@@ -302,10 +301,11 @@ void osborne1_state::machine_reset()
 	m_acia_rxc_txc_state = 0;
 	update_acia_rxc_txc();
 
+	// Reset video hardware
 	m_resolution = 0;
 	m_hc_left = 1;
-	m_p_chargen = memregion( "chargen" )->base();
 
+	// The low bits of attribute RAM are not physically present and hence always read high
 	for (unsigned i = 0; i < 0x1000; i++)
 		m_ram->pointer()[0x10000 + i] |= 0x7F;
 }
@@ -322,10 +322,26 @@ UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
+void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_VIDEO:
+		video_callback(ptr, param);
+		break;
+	case TIMER_ACIA_RXC_TXC:
+		m_acia_rxc_txc_state = m_acia_rxc_txc_state ? 0 : 1;
+		update_acia_rxc_txc();
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in osborne1_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
 	int const y = machine().first_screen()->vpos();
-	UINT8 ra = 0;
+	UINT8 const ra = y % 10;
 
 	// Check for start/end of visible area and clear/set CA1 on video PIA
 	if (y == 0)
@@ -335,7 +351,6 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 
 	if (y < 240)
 	{
-		ra = y % 10;
 		// Draw a line of the display
 		UINT16 *p = &m_bitmap.pix16(y);
 		bool const hires = m_screen_pac & m_resolution;
@@ -360,9 +375,9 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 		// past 0x7F
 		UINT16 const col = hires ? ((m_scroll_x & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17) : (m_scroll_x + 0x0B);
 
-		for ( UINT16 x = 0; x < (hires ? 104 : 52); x++ )
+		for (UINT16 x = 0; x < (hires ? 104 : 52); x++)
 		{
-			UINT16 offs = row | ((col + x) & 0x7F);
+			UINT16 const offs = row | ((col + x) & 0x7F);
 			UINT8 const chr = m_ram->pointer()[0xF000 + offs];
 			UINT8 const dim = m_ram->pointer()[0x10000 + offs] & 0x80;
 
@@ -388,43 +403,14 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 		}
 	}
 
-	if ((ra == 2) || (ra == 6))
-		m_beep->set_state(m_beep_state);
-	else
-		m_beep->set_state(0);
+	// The beeper is gated so it's active four out of every ten scanlines
+	m_speaker->level_w((m_beep_state && (ra & 0x04)) ? 1 : 0);
 
 	// Check reset key if necessary - it affects NMI
 	if (!m_ub6a_q)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() && 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
-}
-
-TIMER_CALLBACK_MEMBER(osborne1_state::setup_callback)
-{
-	m_beep->set_state( 0 );
-	m_beep->set_frequency( 300 /* 60 * 240 / 2 */ );
-	m_pia1->ca1_w(0);
-}
-
-
-void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_VIDEO:
-		video_callback(ptr, param);
-		break;
-	case TIMER_ACIA_RXC_TXC:
-		m_acia_rxc_txc_state = m_acia_rxc_txc_state ? 0 : 1;
-		update_acia_rxc_txc();
-		break;
-	case TIMER_SETUP:
-		setup_callback(ptr, param);
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in osborne1_state::device_timer");
-	}
 }
 
 

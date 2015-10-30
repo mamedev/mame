@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol,Vas Crabb
 /***************************************************************************
 
     Osborne-1 driver file
@@ -53,10 +53,6 @@ in this mode is effectively 16*24*64 or 16*24*16 giving actual data rates of
 the correct rates).  MAME's bitbanger seems to be able to accept the ACIA
 output at this rate, but the ACIA screws up when consuming data from MAME's
 bitbanger.
-
-
-TODO:
-  - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
 
@@ -242,9 +238,9 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osborne1)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
