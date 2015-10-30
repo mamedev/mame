@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
- galaxold.c:
+ scobra.c:
  -----------
  MAME driver for special/undocumented games based on Super Cobra (Galaxian) hardware.
  This goes for special cases such as wiremods, unknown hardware prepherials
