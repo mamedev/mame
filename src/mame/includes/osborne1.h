@@ -83,16 +83,16 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
-	required_device<acia6850_device> m_acia;
-	required_device<mb8877_t> m_fdc;
-	required_device<ram_device> m_ram;
-	required_device<ieee488_device> m_ieee;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<cpu_device>             m_maincpu;
+	required_device<speaker_sound_device>   m_speaker;
+	required_device<pia6821_device>         m_pia0;
+	required_device<pia6821_device>         m_pia1;
+	required_device<acia6850_device>        m_acia;
+	required_device<mb8877_t>               m_fdc;
+	required_device<ram_device>             m_ram;
+	required_device<ieee488_device>         m_ieee;
+	required_device<floppy_image_device>    m_floppy0;
+	required_device<floppy_image_device>    m_floppy1;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -126,8 +126,8 @@ protected:
 	// configuration (reloaded on reset)
 	UINT8           m_screen_pac;
 	UINT8           m_acia_rxc_txc_div;
-	UINT8	        m_acia_rxc_txc_p_low;
-	UINT8	        m_acia_rxc_txc_p_high;
+	UINT8           m_acia_rxc_txc_p_low;
+	UINT8           m_acia_rxc_txc_p_high;
 
 	// bank switch control bits
 	UINT8           m_ub4a_q;
@@ -148,8 +148,8 @@ protected:
 	UINT8           m_hc_left;
 
 	// serial state
-	int             m_acia_irq_state;
-	int             m_acia_rxc_txc_state;
+	UINT8           m_acia_irq_state;
+	UINT8           m_acia_rxc_txc_state;
 	emu_timer       *m_acia_rxc_txc_timer;
 };
 

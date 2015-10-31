@@ -255,9 +255,28 @@ DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 
 	m_p_chargen = memregion("chargen")->base();
 	m_video_timer = timer_alloc(TIMER_VIDEO);
-	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
 
 	m_acia_rxc_txc_timer = timer_alloc(TIMER_ACIA_RXC_TXC);
+
+	save_item(NAME(m_screen_pac));
+	save_item(NAME(m_acia_rxc_txc_div));
+	save_item(NAME(m_acia_rxc_txc_p_low));
+	save_item(NAME(m_acia_rxc_txc_p_high));
+
+	save_item(NAME(m_ub4a_q));
+	save_item(NAME(m_ub6a_q));
+	save_item(NAME(m_rom_mode));
+	save_item(NAME(m_bit_9));
+
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
+	save_item(NAME(m_beep_state));
+
+	save_item(NAME(m_resolution));
+	save_item(NAME(m_hc_left));
+
+	save_item(NAME(m_acia_irq_state));
+	save_item(NAME(m_acia_rxc_txc_state));
 }
 
 void osborne1_state::machine_reset()
@@ -311,6 +330,7 @@ void osborne1_state::machine_reset()
 void osborne1_state::video_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
 }
 
 UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
