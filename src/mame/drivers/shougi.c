@@ -114,7 +114,6 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
-protected:
 	virtual void machine_start();
 	virtual void machine_reset();
 };

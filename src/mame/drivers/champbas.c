@@ -112,7 +112,7 @@ WRITE8_MEMBER(champbas_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(champbas_state::exctsccr_fm_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
@@ -547,26 +547,25 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(champbas_state,champbas)
+void champbas_state::machine_start()
 {
+	// zerofill
+	m_irq_mask = 0;
+	m_palette_bank = 0;
+	m_gfx_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(champbas_state,exctsccr)
+void champbas_state::machine_reset()
 {
-	// FIXME
-	// I dun wanna
-	machine().scheduler().timer_pulse(attotime::from_hz(75), timer_expired_delegate(FUNC(champbas_state::exctsccr_fm_callback),this)); /* updates fm */
-
-	MACHINE_START_CALL_MEMBER(champbas);
-}
-
-
-MACHINE_RESET_MEMBER(champbas_state,champbas)
-{
+	// 74LS259 is auto CLR on reset
+	m_irq_mask = 0;
 	m_palette_bank = 0;
-	m_gfx_bank = 0; // talbot has only 1 bank
+	m_gfx_bank = 0;
 }
 
 INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
@@ -587,9 +586,6 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_WATCHDOG_VBLANK_INIT(0x10)
-
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -623,9 +619,6 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
 
 	MCFG_WATCHDOG_VBLANK_INIT(0x10)
-
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -675,16 +668,16 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_sub_map)
 	MCFG_CPU_IO_MAP(exctsccr_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
+	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("exc_snd_irq", champbas_state, exctsccr_sound_irq, attotime::from_hz(75)) // irq source unknown, determines music tempo
+	MCFG_TIMER_START_DELAY(attotime::from_hz(75))
 
 	/* MCU */
 	MCFG_CPU_ADD("mcu", ALPHA8301L, XTAL_18_432MHz/6/8)     /* Actually 8302 */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_WATCHDOG_VBLANK_INIT(0x10)
-
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,exctsccr)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -735,9 +728,6 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
 
 	MCFG_WATCHDOG_VBLANK_INIT(0x10)
-
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

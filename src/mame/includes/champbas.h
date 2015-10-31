@@ -65,17 +65,17 @@ public:
 	DECLARE_DRIVER_INIT(champbas);
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
-	DECLARE_MACHINE_START(champbas);
-	DECLARE_MACHINE_RESET(champbas);
 	DECLARE_VIDEO_START(champbas);
 	DECLARE_PALETTE_INIT(champbas);
-	DECLARE_MACHINE_START(exctsccr);
 	DECLARE_VIDEO_START(exctsccr);
 	DECLARE_PALETTE_INIT(exctsccr);
 	UINT32 screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	TIMER_CALLBACK_MEMBER(exctsccr_fm_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
 	void champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+	virtual void machine_start();
+	virtual void machine_reset();
 };
