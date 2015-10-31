@@ -84,8 +84,8 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 	chan.stream->update();
 
 	// update the parameters
-	sample_t &sample = m_sample[samplenum];
-	chan.source = &sample.data[0];
+	sample_t &sample = m_sample[samplenum];	
+	chan.source = (sample.data.size() > 0) ? &sample.data[0] : NULL;
 	chan.source_length = sample.data.size();
 	chan.source_num = (chan.source_length > 0) ? samplenum : -1;
 	chan.pos = 0;
