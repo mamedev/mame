@@ -96,7 +96,10 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 WRITE8_MEMBER( osborne1_state::videoram_w )
 {
 	// Attribute RAM is only one bit wide - low seven bits are discarded and read back high
-	if (m_bit_9) data |= 0x7F;
+	if (m_bit_9)
+		data |= 0x7F;
+	else
+		m_tilemap->mark_tile_dirty(offset);
 	reinterpret_cast<UINT8 *>(m_bank_fxxx->base())[offset] = data;
 }
 
@@ -255,6 +258,10 @@ DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 
 	m_p_chargen = memregion("chargen")->base();
 	m_video_timer = timer_alloc(TIMER_VIDEO);
+	m_tilemap = &machine().tilemap().create(
+			m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(osborne1_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
+			8, 10, 128, 32);
 
 	m_acia_rxc_txc_timer = timer_alloc(TIMER_ACIA_RXC_TXC);
 
@@ -434,6 +441,13 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() && 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
+}
+
+
+TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
+{
+	// The gfxdecode and tilemap aren't actually used for drawing, they just look nice in the F4 GFX viewer
+	tileinfo.set(0, m_ram->pointer()[0xF000 | tile_index] & 0x7F, 0, 0);
 }
 
 
