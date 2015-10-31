@@ -80,7 +80,7 @@ PROM  : Type MB7051
 
 #include "emu.h"
 #include "cpu/alph8201/alph8201.h"
-//#include "cpu/hmcs40/hmcs40.h"
+#include "machine/alpha8201.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
@@ -402,6 +402,8 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 
 	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_10MHz/4/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	
+	MCFG_DEVICE_ADD("prot", ALPHA_8201, XTAL_10MHz/4/8)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_WATCHDOG_VBLANK_INIT(16) // assuming it's the same as champbas
@@ -451,6 +453,9 @@ ROM_START( shougi )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
+	ROM_REGION( 0x2000, "prot:mcu", 0 )
+	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )
 ROM_END
@@ -472,6 +477,9 @@ ROM_START( shougi2 )
 	ROM_LOAD( "10-2.3l",   0x5000, 0x1000, CRC(a26385fd) SHA1(2adb21bb4f67a378014bc1edda48daca349d17e1) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+
+	ROM_REGION( 0x2000, "prot:mcu", 0 )
 	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
