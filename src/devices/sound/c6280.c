@@ -39,6 +39,7 @@
 */
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "c6280.h"
 
 /* only needed for io_buffer */
@@ -149,6 +150,8 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 {
 	m_cpudevice->io_set_buffer(data);
 
+	vgm_write(m_vgm_idx, 0x00, offset, data);
+
 	channel *chan = &m_channel[m_select];
 
 	/* Update stream */
@@ -245,6 +248,7 @@ c6280_device::c6280_device(const machine_config &mconfig, const char *tag, devic
 void c6280_device::device_start()
 {
 	int rate = clock() / 16;
+	m_vgm_idx = vgm_open(VGMC_C6280, clock());
 
 	/* Create stereo stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);

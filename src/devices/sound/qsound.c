@@ -24,6 +24,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "qsound.h"
 
 // device type definition
@@ -120,6 +121,9 @@ void qsound_device::device_start()
 	for (int adr = 0x80; adr < 0x90; adr++)
 		write_data(adr, 0x120);
 
+	m_vgm_idx = vgm_open(VGMC_QSOUND, clock());
+	vgm_write_large_data(m_vgm_idx, 0x01, m_sample_rom_length, 0x00, 0x00, m_sample_rom);
+
 	// state save
 	for (int i = 0; i < 16; i++)
 	{
@@ -204,6 +208,7 @@ WRITE8_MEMBER(qsound_device::qsound_w)
 			break;
 
 		case 2:
+			vgm_write(m_vgm_idx, 0x00, m_data, data);
 			m_stream->update();
 			write_data(data, m_data);
 			break;

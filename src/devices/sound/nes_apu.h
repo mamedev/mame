@@ -73,6 +73,7 @@ private:
 	uint32  m_vbl_times[0x20];       /* VBL durations in samples */
 	uint32  m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	uint32  m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
+	UINT16  m_vgm_idx;               /* VGM index */
 	sound_stream *m_stream;
 
 	const char *m_cpu_tag;

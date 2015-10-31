@@ -86,11 +86,11 @@ private:
 	UINT8                m_wbank;
 	UINT8                m_enable;
 	UINT8                m_data[0x10000];
+	UINT16               m_vgm_idx;
 
 	rf5c68_sample_end_cb_delegate m_sample_end_cb;
 };
 
 extern const device_type RF5C68;
-
 
 #endif /* __RF5C68_H__ */

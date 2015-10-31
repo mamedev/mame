@@ -58,6 +58,7 @@
  *****************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "pokey.h"
 
 #include "debugger.h"
@@ -345,6 +346,8 @@ void pokey_device::device_start()
 	state_add(SEROUT_C, "SEROUT", m_SEROUT);
 	state_add(IRQEN_C, "IRQEN", m_IRQEN);
 	state_add(SKCTL_C, "SKCTL", m_SKCTL);
+
+	m_vgm_idx = vgm_open(VGMC_POKEY, clock());
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -899,6 +902,8 @@ UINT8 pokey_device::read(offs_t offset)
 
 void pokey_device::write(offs_t offset, UINT8 data)
 {
+	vgm_write(m_vgm_idx, 0x00, offset, data);
+
 	synchronize(SYNC_WRITE, (offset<<8) | data);
 }
 

@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "okim6295.h"
 
 
@@ -126,6 +127,10 @@ void okim6295_device::device_start()
 	int divisor = m_pin7_state ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
+	m_vgm_idx = vgm_open(VGMC_OKIM6295, clock());
+	vgm_header_set(m_vgm_idx, 0x00, m_pin7_state);
+	vgm_write_large_data(m_vgm_idx, 0x01, m_region->bytes(), 0x00, 0x00, m_region->base());
+
 	save_item(NAME(m_command));
 	save_item(NAME(m_bank_offs));
 	save_item(NAME(m_pin7_state));
@@ -174,6 +179,13 @@ void okim6295_device::device_post_load()
 void okim6295_device::device_clock_changed()
 {
 	int divisor = m_pin7_state ? 132 : 165;
+	int val = clock() | (m_pin7_state << 31);
+
+	vgm_write(m_vgm_idx, 0x00, 0x08, (val >>  0) & 0xFF);
+	vgm_write(m_vgm_idx, 0x00, 0x09, (val >>  8) & 0xFF);
+	vgm_write(m_vgm_idx, 0x00, 0x0A, (val >> 16) & 0xFF);
+	vgm_write(m_vgm_idx, 0x00, 0x0B, (val >> 24) & 0xFF);
+
 	m_stream->set_sample_rate(clock() / divisor);
 }
 
@@ -218,6 +230,8 @@ void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
 		m_stream->update();
 	}
 
+	vgm_write(m_vgm_idx, 0x00, 0x0F, (base >> 18) & 0xFF);
+	
 	// if we are setting a non-zero base, and we have no bank, allocate one
 	if (!m_bank_installed && base != 0)
 	{
@@ -281,6 +295,8 @@ READ8_MEMBER( okim6295_device::read )
 
 void okim6295_device::write_command(UINT8 command)
 {
+	vgm_write(m_vgm_idx, 0x00, 0x00, command);
+	
 	// if a command is pending, process the second half
 	if (m_command != -1)
 	{

@@ -65,6 +65,7 @@ public:
 	DECLARE_READ8_MEMBER( okim6258_status_r );
 	DECLARE_WRITE8_MEMBER( okim6258_data_w );
 	DECLARE_WRITE8_MEMBER( okim6258_ctrl_w );
+	DECLARE_WRITE8_MEMBER( okim6258_pan_w );
 
 public:
 	void set_divider(int val);
@@ -89,8 +90,10 @@ private:
 	UINT8 m_output_bits;      /* D/A precision is 10-bits but 12-bit data can be
                                output serially to an external DAC */
 
+	UINT8 m_pan;
 	INT32 m_signal;
 	INT32 m_step;
+	UINT16 m_vgm_idx;         /* VGM index */
 };
 
 extern const device_type OKIM6258;

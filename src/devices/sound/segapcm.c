@@ -5,6 +5,7 @@
 /*********************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "segapcm.h"
 
 
@@ -52,6 +53,10 @@ void segapcm_device::device_start()
 	m_bankmask = mask & (rom_mask >> m_bankshift);
 
 	m_stream = stream_alloc(0, 2, clock() / 128);
+
+	m_vgm_idx = vgm_open(VGMC_SEGAPCM, clock());
+	vgm_header_set(m_vgm_idx, 0x01, m_bank);
+	//FIXME: vgm_write_large_data(m_vgm_idx, 0x01, len, 0x00, 0x00, m_rom);
 
 	save_item(NAME(m_low));
 	save_pointer(NAME(m_ram), 0x800);
@@ -140,6 +145,7 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 WRITE8_MEMBER( segapcm_device::sega_pcm_w )
 {
 	m_stream->update();
+	vgm_write(m_vgm_idx, 0x00, offset & 0xFFFF, data);
 	m_ram[offset & 0x07ff] = data;
 }
 

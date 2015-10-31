@@ -34,6 +34,7 @@
  */
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "multipcm.h"
 
 //????
@@ -358,6 +359,7 @@ READ8_MEMBER( multipcm_device::read )
 
 WRITE8_MEMBER( multipcm_device::write )
 {
+	vgm_write(m_vgm_idx, 0x00, offset, data);
 	switch(offset)
 	{
 		case 0:     //Data write
@@ -377,6 +379,15 @@ WRITE8_MEMBER( multipcm_device::write )
 
 void multipcm_device::set_bank(UINT32 leftoffs, UINT32 rightoffs)
 {
+	if (leftoffs == rightoffs)
+	{
+		vgm_write(m_vgm_idx, 0x01, leftoffs >> 16, 0x01 | 0x02);
+	}
+	else
+	{
+		vgm_write(m_vgm_idx, 0x01, leftoffs >> 16, 0x01);
+		vgm_write(m_vgm_idx, 0x01, rightoffs >> 16, 0x02);
+	}
 	m_BankL = leftoffs;
 	m_BankR = rightoffs;
 }
@@ -549,6 +560,9 @@ void multipcm_device::device_start()
 		m_Samples[i].KRS=(ptSample[10]>>4)&0xf;
 		m_Samples[i].AM=ptSample[11];
 	}
+
+	m_vgm_idx = vgm_open(VGMC_MULTIPCM, clock());
+	//FIXME: vgm_write_large_data(m_vgm_idx, 0x01, region()->bytes(), 0x00, 0x00, *region());
 
 	save_item(NAME(m_CurSlot));
 	save_item(NAME(m_Address));

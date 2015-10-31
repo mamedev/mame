@@ -49,6 +49,7 @@ private:
 	devcb_write_line m_ready_handler;
 
 	sound_stream*   m_sound;
+	UINT16          m_vgm_idx;           // VGM index
 
 	const INT32     m_feedback_mask;    // mask for feedback
 	const INT32     m_whitenoise_tap1;  // mask for white noise tap 1 (higher one, usually bit 14)

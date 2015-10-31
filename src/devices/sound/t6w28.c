@@ -32,6 +32,7 @@ Offset 0:
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "t6w28.h"
 
 
@@ -48,6 +49,8 @@ WRITE8_MEMBER( t6w28_device::write )
 	m_channel->update();
 
 	offset &= 1;
+
+	vgm_write(m_vgm_idx, offset, data, 0x00);
 
 	if (data & 0x80)
 	{
@@ -112,7 +115,9 @@ void t6w28_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 
 	/* If the volume is 0, increase the counter */
-	for (i = 0;i < 8;i++)
+	/* Note by Valley Bell: This just introduces a bug, where a tone gets muted
+		when the left channel has volume 0.*/
+	for (i = 0;0 && i < 8;i++)
 	{
 		if (m_volume[i] == 0)
 		{
@@ -329,6 +334,15 @@ void t6w28_device::device_start()
 	m_feedback_mask = 0x8000;
 	m_whitenoise_taps = 0x06;
 	m_whitenoise_invert = FALSE;
+
+	m_vgm_idx = vgm_open(VGMC_T6W28, clock());
+	vgm_header_set(m_vgm_idx, 0x01, m_feedback_mask);
+	vgm_header_set(m_vgm_idx, 0x02, 0x02);	// m_whitenoise_tap1
+	vgm_header_set(m_vgm_idx, 0x03, 0x04);	// m_whitenoise_tap2
+	vgm_header_set(m_vgm_idx, 0x04, 0x00);	// m_negate
+	vgm_header_set(m_vgm_idx, 0x05, 0x00);	// m_stereo
+	vgm_header_set(m_vgm_idx, 0x06, 0x08);	// m_clock_divider
+	vgm_header_set(m_vgm_idx, 0x07, 0x00);	// m_freq0_is_max
 
 	save_item(NAME(m_register));
 	save_item(NAME(m_last_register));

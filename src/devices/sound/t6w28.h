@@ -39,6 +39,7 @@ private:
 	INT32 m_count[8];
 	INT32 m_output[8];
 	bool m_enabled;
+	UINT16 m_vgm_idx;
 };
 
 extern const device_type T6W28;

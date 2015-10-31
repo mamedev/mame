@@ -110,7 +110,8 @@ typedef void (*FM_IRQHANDLER)(void *param,int irq);
 ** return      0 = success
 */
 void * ym2203_init(void *param, device_t *device, int baseclock, int rate,
-				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg,
+				int psg_flags);
 
 /*
 ** shutdown the YM2203 emulators
@@ -154,7 +155,8 @@ void ym2203_postload(void *chip);
 /* -------------------- YM2608(OPNA) Interface -------------------- */
 void * ym2608_init(void *param, device_t *device, int baseclock, int rate,
 				void *pcmroma,int pcmsizea,
-				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg,
+				int psg_flags);
 void ym2608_shutdown(void *chip);
 void ym2608_reset_chip(void *chip);
 void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length);

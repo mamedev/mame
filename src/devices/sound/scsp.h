@@ -87,6 +87,9 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
+	//DECLARE_READ16_MEMBER( scsp_mem_r );
+	DECLARE_WRITE16_MEMBER( scsp_mem_w );
+
 	// MIDI I/O access (used for comms on Model 2/3)
 	DECLARE_WRITE16_MEMBER( midi_in );
 	DECLARE_READ16_MEMBER( midi_out_r );
@@ -104,6 +107,7 @@ private:
 	int m_roffset;                /* offset in the region */
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
+	UINT16  vgm_idx;	/* VGM index */
 
 	union
 	{

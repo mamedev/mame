@@ -47,6 +47,7 @@
  *****************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "nes_apu.h"
 #include "cpu/m6502/n2a03.h"
 
@@ -160,6 +161,8 @@ void nesapu_device::device_start()
 	(m_APU.dpcm).memory = &machine().device(m_cpu_tag)->memory().space(AS_PROGRAM);
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+
+	m_vgm_idx = vgm_open(VGMC_NESAPU, clock());
 
 	/* register for save */
 	for (int i = 0; i < 2; i++)
@@ -421,7 +424,7 @@ int8 nesapu_device::apu_noise(noise_t *chan)
 }
 
 /* RESET DPCM PARAMETERS */
-INLINE void apu_dpcmreset(dpcm_t *chan)
+INLINE void apu_dpcmreset(UINT16 vgm_idx, dpcm_t *chan)
 {
 	chan->address = 0xC000 + (uint16) (chan->regs[2] << 6);
 	chan->length = (uint16) (chan->regs[3] << 4) + 1;
@@ -429,6 +432,7 @@ INLINE void apu_dpcmreset(dpcm_t *chan)
 	chan->irq_occurred = FALSE;
 	chan->enabled = TRUE; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
 	chan->vol = 0; /* Fixed * DPCM DAC resets itself when restarted */
+	vgm_write_large_data(vgm_idx, 0x01, 0x10000, chan->address, chan->length, chan->memory->get_read_ptr(0xC000));
 }
 
 /* OUTPUT DPCM WAVE SAMPLE (VALUES FROM -64 to +63) */
@@ -457,7 +461,7 @@ int8 nesapu_device::apu_dpcm(dpcm_t *chan)
 				chan->enabled = FALSE; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
 				chan->vol=0; /* Fixed * DPCM DAC resets itself when restarted */
 				if (chan->regs[0] & 0x40)
-					apu_dpcmreset(chan);
+					apu_dpcmreset(m_vgm_idx, chan);
 				else
 				{
 					if (chan->regs[0] & 0x80) /* IRQ Generator */
@@ -626,7 +630,7 @@ inline void nesapu_device::apu_regwrite(int address, uint8 value)
 
 	case APU_WRE2:
 		m_APU.dpcm.regs[2] = value;
-		//apu_dpcmreset(m_APU.dpcm);
+		//apu_dpcmreset(m_vgm_idx, m_APU.dpcm);
 		break;
 
 	case APU_WRE3:
@@ -682,7 +686,7 @@ inline void nesapu_device::apu_regwrite(int address, uint8 value)
 			if (FALSE == m_APU.dpcm.enabled)
 			{
 				m_APU.dpcm.enabled = TRUE;
-				apu_dpcmreset(&m_APU.dpcm);
+				apu_dpcmreset(m_vgm_idx, &m_APU.dpcm);
 			}
 		}
 		else
@@ -735,6 +739,7 @@ inline uint8 nesapu_device::apu_read(int address)
 inline void nesapu_device::apu_write(int address, uint8 value)
 {
 	m_APU.regs[address]=value;
+	vgm_write(m_vgm_idx, 0x00, address, value);
 	m_stream->update();
 	apu_regwrite(address,value);
 }

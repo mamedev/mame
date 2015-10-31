@@ -125,6 +125,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "sn76496.h"
 
 #define MAX_OUTPUT 0x7fff
@@ -190,6 +191,15 @@ void sn76496_base_device::device_start()
 
 	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate);
 
+	m_vgm_idx = vgm_open(VGMC_SN76496, clock());
+	vgm_header_set(m_vgm_idx, 0x01, m_feedback_mask);
+	vgm_header_set(m_vgm_idx, 0x02, m_whitenoise_tap1);
+	vgm_header_set(m_vgm_idx, 0x03, m_whitenoise_tap2);
+	vgm_header_set(m_vgm_idx, 0x04, m_negate);
+	vgm_header_set(m_vgm_idx, 0x05, m_stereo);
+	vgm_header_set(m_vgm_idx, 0x06, m_clock_divider);
+//FIXME:	vgm_header_set(m_vgm_idx, 0x07, m_freq0_is_max);
+
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 
 	m_last_register = m_sega_style_psg?3:0; // Sega VDP PSG defaults to selected period reg for 2nd channel
@@ -242,6 +252,7 @@ void sn76496_base_device::device_start()
 WRITE8_MEMBER( sn76496_base_device::stereo_w )
 {
 	m_sound->update();
+	vgm_write(m_vgm_idx, 0x01, data, 0x00);
 	if (m_stereo) m_stereo_mask = data;
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
@@ -256,6 +267,8 @@ void sn76496_base_device::write(UINT8 data)
 	// set number of cycles until READY is active; this is always one
 	// 'sample', i.e. it equals the clock divider exactly
 	m_cycles_to_ready = 1;
+
+	vgm_write(m_vgm_idx, 0x00, data, 0x00);
 
 	if (data & 0x80)
 	{

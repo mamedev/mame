@@ -116,6 +116,8 @@ private:
 	INT16 m_pcmtbl[8];        //2000.06.26 CAB
 
 	C140_VOICE m_voi[C140_MAX_VOICE];
+
+	UINT16 m_vgm_idx;	// VGM index
 };
 
 extern const device_type C140;

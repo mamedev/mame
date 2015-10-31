@@ -152,6 +152,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	int m_flags;          /* Flags */
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -191,12 +192,12 @@ private:
 	INT32 m_vol_table[AY8910_NUM_CHANNELS][16];
 	INT32 m_env_table[AY8910_NUM_CHANNELS][32];
 	INT32 m_vol3d_table[8*32*32*32];
-	int m_flags;          /* Flags */
 	int m_res_load[3];    /* Load on channel in ohms */
 	devcb_read8 m_port_a_read_cb;
 	devcb_read8 m_port_b_read_cb;
 	devcb_write8 m_port_a_write_cb;
 	devcb_write8 m_port_b_write_cb;
+	UINT16 vgm_idx;	/* VGM index */
 };
 
 extern const device_type AY8910;

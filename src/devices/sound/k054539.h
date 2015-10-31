@@ -106,6 +106,8 @@ private:
 
 	channel channels[8];
 	sound_stream *stream;
+	
+	UINT16 vgm_idx;
 
 	emu_timer          *m_timer;
 	UINT32             m_timer_state;
