@@ -3,7 +3,6 @@
 /***************************************************************************
 
 Driver by Jarek Burczynski, started by Tomasz Slanina  dox@space.pl
-ALPHA 8201 MCU handling by Tatsuyuki satoh
 Lots of hardware info from Guru
 
 memory map :
@@ -103,11 +102,12 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 
-	int m_nmi_enabled;
+	UINT8 m_control[8];
+	UINT8 m_nmi_enabled;
 	int m_r;
 
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(dummy_r);
+	DECLARE_READ8_MEMBER(semaphore_r);
 
 	DECLARE_PALETTE_INIT(shougi);
 
@@ -116,16 +116,28 @@ public:
 
 protected:
 	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
 void shougi_state::machine_start()
 {
+	// zerofill
+	memset(m_control, 0, sizeof(m_control));
 	m_nmi_enabled = 0;
 	m_r = 0;
 
+	// register for savestates
+	save_item(NAME(m_control));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
+}
+
+void shougi_state::machine_reset()
+{
+	// 74LS259 is auto CLR on reset
+	for (int i = 0; i < 8; i++)
+		control_w(m_maincpu->space(), i, 0);
 }
 
 
@@ -232,12 +244,6 @@ WRITE8_MEMBER(shougi_state::control_w)
 
 	switch (offset)
 	{
-		case 0:
-			// TODO
-			// 0: sharedram = sub
-			// 1: sharedram = main
-			break;
-
 		case 1:
 			m_nmi_enabled = data;
 
@@ -260,9 +266,13 @@ WRITE8_MEMBER(shougi_state::control_w)
 			break;
 
 		default:
-			// 7: ?????? connected to +5v via resistor
+			// 0: 0: sharedram = sub, 1: sharedram = main (TODO!)
+			// 2: ?
+			// 7: nothing? connected to +5v via resistor
 			break;
 	}
+	
+	m_control[offset] = data;
 }
 
 
@@ -275,7 +285,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w) /* game won't boot if watchdog doesn't work */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x7000, 0x73ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, main_ram_r, main_ram_w) /* 2114 x 2 (0x400 x 4bit each) */
+	AM_RANGE(0x7000, 0x73ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") /* 4116 x 16 (32K) */
 ADDRESS_MAP_END
@@ -283,15 +293,12 @@ ADDRESS_MAP_END
 
 // subcpu side
 
-READ8_MEMBER(shougi_state::dummy_r)
+READ8_MEMBER(shougi_state::semaphore_r)
 {
-	// ?
+	// d0: waits for it to be set before handling NMI routine
+	// hmm it must be a signal from maincpu, but what?
 	m_r ^= 1;
-
-	if (m_r)
-		return 0xff;
-	else
-		return 0;
+	return m_r;
 }
 
 
@@ -302,7 +309,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x00ff)
-	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
+	AM_RANGE(0x00, 0x00) AM_READ(semaphore_r)
 ADDRESS_MAP_END
 
 

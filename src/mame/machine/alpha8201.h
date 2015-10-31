@@ -24,8 +24,8 @@ public:
 	// external I/O
 	DECLARE_WRITE_LINE_MEMBER(bus_dir_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
-	DECLARE_READ8_MEMBER(main_ram_r);
-	DECLARE_WRITE8_MEMBER(main_ram_w);
+	DECLARE_READ8_MEMBER(ext_ram_r);
+	DECLARE_WRITE8_MEMBER(ext_ram_w);
 
 protected:
 	// device-level overrides
@@ -38,7 +38,7 @@ private:
 	required_device<cpu_device> m_mcu;
 
 	// internal state
-	int m_dir;                      // shared RAM bus direction
+	int m_bus;                      // shared RAM bus direction
 	UINT16 m_mcu_address;           // MCU side RAM address
 	UINT16 m_mcu_d;                 // MCU D output data
 	UINT8 m_mcu_r[4];               // MCU R0-R3 output data

@@ -62,6 +62,7 @@ pin    HD44801  Alpha
 
 TODO:
 - bus conflicts?
+- support larger RAM size, if any game uses it
 
 
 ----------------------------------------------------------------------------
@@ -297,14 +298,14 @@ void alpha_8201_device::device_start()
 	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
 	
 	// zerofill
-	m_dir = 0;
+	m_bus = 0;
 	m_mcu_address = 0;
 	m_mcu_d = 0;
 	memset(m_mcu_r, 0, sizeof(m_mcu_r));
 
 	// register for savestates
 	save_pointer(NAME(m_shared_ram), 0x400);
-	save_item(NAME(m_dir));
+	save_item(NAME(m_bus));
 	save_item(NAME(m_mcu_address));
 	save_item(NAME(m_mcu_d));
 	save_item(NAME(m_mcu_r));
@@ -335,7 +336,7 @@ machine_config_constructor alpha_8201_device::device_mconfig_additions() const
 
 void alpha_8201_device::device_reset()
 {
-	m_dir = 0;
+	m_bus = 0;
 	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -350,7 +351,7 @@ void alpha_8201_device::device_reset()
 void alpha_8201_device::mcu_writeram()
 {
 	// RAM WR is level-triggered
-	if (m_dir && (m_mcu_d & 0xc) == 0xc)
+	if (m_bus && (m_mcu_d & 0xc) == 0xc)
 		m_shared_ram[m_mcu_address] = m_mcu_r[0] << 4 | m_mcu_r[1];
 }
 
@@ -365,7 +366,7 @@ READ8_MEMBER(alpha_8201_device::mcu_data_r)
 {
 	UINT8 ret = 0;
 	
-	if (m_dir && ~m_mcu_d & 4)
+	if (m_bus && ~m_mcu_d & 4)
 		ret = m_shared_ram[m_mcu_address];
 	else
 		logerror("%s: MCU side invalid read\n", tag());
@@ -403,7 +404,9 @@ WRITE16_MEMBER(alpha_8201_device::mcu_d_w)
 WRITE_LINE_MEMBER(alpha_8201_device::bus_dir_w)
 {
 	// set bus direction to 0: external, 1: MCU side
-	m_dir = (state) ? 1 : 0;
+	// selects one of two 74LS245 (octal bus transceiver) for databus, addressbus via
+	// a couple of 74LS157 (2-input multiplexer)
+	m_bus = (state) ? 1 : 0;
 	mcu_writeram();
 }
 
@@ -413,17 +416,17 @@ WRITE_LINE_MEMBER(alpha_8201_device::mcu_start_w)
 	m_mcu->set_input_line(0, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(alpha_8201_device::main_ram_r)
+READ8_MEMBER(alpha_8201_device::ext_ram_r)
 {
-	if (m_dir)
+	if (m_bus)
 		logerror("%s: EXT side read bus conflict\n", tag());
 
 	return m_shared_ram[offset & 0x3ff];
 }
 
-WRITE8_MEMBER(alpha_8201_device::main_ram_w)
+WRITE8_MEMBER(alpha_8201_device::ext_ram_w)
 {
-	if (!m_dir)
+	if (!m_bus)
 		m_shared_ram[offset & 0x3ff] = data;
 	else
 		logerror("%s: EXT side write bus conflict\n", tag());
