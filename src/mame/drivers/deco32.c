@@ -22,7 +22,7 @@
 	
 	For version information:
 	 Captain America   - Reset with Player 1 start held
-	 Fighter's History - Resest with Player 1 button 1 & 2 held
+	 Fighter's History - Reset with Player 1 button 1 & 2 held
 	 Night Slashers    - Reset with Player 1 & 2 start held
 	 Locked 'N Loaded  - Reset with Player 1 & 2 start held
 
