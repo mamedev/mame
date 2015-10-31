@@ -658,6 +658,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
+	update_tx_ready();
 
         // Store state of tx enable when writing to DB buffer
         if (is_tx_enabled()) {
