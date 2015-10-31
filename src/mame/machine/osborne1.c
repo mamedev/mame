@@ -212,7 +212,7 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 
 WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 {
-	m_beep_state = BIT(data, 5);
+	m_speaker->level_w((BIT(data, 5) && m_beep_state) ? 1 : 0);
 
 	if (BIT(data, 6))
 	{
@@ -367,11 +367,12 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
 	int const y = machine().first_screen()->vpos();
 	UINT8 const ra = y % 10;
+	UINT8 const port_b = m_pia1->b_output();
 
 	// Check for start/end of visible area and clear/set CA1 on video PIA
 	if (y == 0)
 	{
-		m_scroll_y = m_pia1->b_output() & 0x1F;
+		m_scroll_y = port_b & 0x1F;
 		m_pia1->ca1_w(0);
 	}
 	else if (y == 240)
@@ -434,7 +435,8 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	}
 
 	// The beeper is gated so it's active four out of every ten scanlines
-	m_speaker->level_w((m_beep_state && (ra & 0x04)) ? 1 : 0);
+	m_beep_state = (ra & 0x04) ? 1 : 0;
+	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
 
 	// Check reset key if necessary - it affects NMI
 	if (!m_ub6a_q)
