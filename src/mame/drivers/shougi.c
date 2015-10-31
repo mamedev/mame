@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(readport_sub)
 
-	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_10MHz/4/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_10MHz/4/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

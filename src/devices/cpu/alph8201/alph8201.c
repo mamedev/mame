@@ -154,8 +154,8 @@ Timming
 #include "alph8201.h"
 
 
-const device_type ALPHA8201 = &device_creator<alpha8201_cpu_device>;
-const device_type ALPHA8301 = &device_creator<alpha8301_cpu_device>;
+const device_type ALPHA8201L = &device_creator<alpha8201_cpu_device>;
+const device_type ALPHA8301L = &device_creator<alpha8301_cpu_device>;
 
 
 /* instruction cycle count */
@@ -174,7 +174,7 @@ const device_type ALPHA8301 = &device_creator<alpha8301_cpu_device>;
 
 
 alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, ALPHA8201, "ALPHA-8201", tag, owner, clock, "alpha8201", __FILE__)
+	: cpu_device(mconfig, ALPHA8201L, "ALPHA-8201L", tag, owner, clock, "alpha8201l", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
 	, m_opmap(opcode_8201)
@@ -191,7 +191,7 @@ alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device
 }
 
 alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: alpha8201_cpu_device(mconfig, ALPHA8301, "ALPHA-8301", tag, owner, clock, "alpha8301", __FILE__)
+	: alpha8201_cpu_device(mconfig, ALPHA8301L, "ALPHA-8301L", tag, owner, clock, "alpha8301l", __FILE__)
 {
 	m_opmap = opcode_8301;
 }

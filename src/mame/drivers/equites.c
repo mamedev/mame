@@ -1212,7 +1212,7 @@ static MACHINE_CONFIG_START( equites, equites_state )
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
-	MCFG_CPU_ADD("mcu", ALPHA8301, 4000000/8)
+	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
@@ -1252,7 +1252,7 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
-	MCFG_CPU_ADD("mcu", ALPHA8301, 4000000/8)
+	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
