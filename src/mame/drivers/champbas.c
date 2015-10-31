@@ -704,7 +704,7 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse,  4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
-	MCFG_CPU_ADD("mcu", ALPHA8301, XTAL_18_432MHz/6/8)     /* Actually 8302 */
+	MCFG_CPU_ADD("mcu", ALPHA8301L, XTAL_18_432MHz/6/8)     /* Actually 8302 */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,exctsccr)
