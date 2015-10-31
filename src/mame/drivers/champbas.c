@@ -610,7 +610,7 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
 
 	/* MCU */
-	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_18_432MHz/6/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
@@ -683,7 +683,7 @@ static MACHINE_CONFIG_DERIVED( champmcu, champbas )
 	/* basic machine hardware */
 
 	/* MCU */
-	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_18_432MHz/6/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* to MCU timeout champbbj */
