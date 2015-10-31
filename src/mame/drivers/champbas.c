@@ -9,7 +9,6 @@ Exciting Soccer            - (c) 1983 Alpha Denshi Co.
 Exciting Soccer II         - (c) 1984 Alpha Denshi Co.
 
 driver by Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
-ALPHA 8201 MCU handling by Tatsuyuki satoh
 
 Note: the Champion Baseball II unofficial schematics show a 8302 instead of
 the 8201, however the MCU is used like a plain 8201, 830x extra instructions
@@ -92,24 +91,6 @@ TODO:
 #include "includes/champbas.h"
 
 
-/*************************************
- *
- *  Watchdog
- *
- *************************************/
-
-void champbas_state::screen_eof_champbas(screen_device &screen, bool state)
-{
-	// rising edge
-	if (state)
-	{
-		m_watchdog_count++;
-
-		if (m_watchdog_count == 0x10)
-			machine().schedule_soft_reset();
-	}
-}
-
 
 /*************************************
  *
@@ -117,14 +98,9 @@ void champbas_state::screen_eof_champbas(screen_device &screen, bool state)
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::champbas_watchdog_reset_w)
-{
-	m_watchdog_count = 0;
-}
-
 CUSTOM_INPUT_MEMBER(champbas_state::champbas_watchdog_bit2)
 {
-	return BIT(m_watchdog_count, 2);
+	return (0x10 - machine().get_vblank_watchdog_counter()) >> 2 & 1;
 }
 
 
@@ -244,7 +220,7 @@ static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
 
 	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram_2")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 
@@ -274,7 +250,7 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_SHARE("spriteram_2")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
 /*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 
 	/* champbja only */
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_alt_protection_r)
@@ -378,20 +354,20 @@ static INPUT_PORTS_START( talbot )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -409,7 +385,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -426,16 +402,16 @@ static INPUT_PORTS_START( champbas )
 	PORT_INCLUDE( talbot )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    // throw (red)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // throw (red)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    // changes (blue)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )    // steal (yellow)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // changes (blue)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) // steal (yellow)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // steal (yellow)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL  // changes (blue)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // steal (yellow)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // changes (blue)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL  // throw (red)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // throw (red)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )
@@ -456,7 +432,7 @@ static INPUT_PORTS_START( champbas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exctsccr )
@@ -482,7 +458,7 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_DIPSETTING(    0x00, "2 Min." )
 	PORT_DIPSETTING(    0x60, "3 Min." )
 	PORT_DIPSETTING(    0x40, "4 Min." )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 
@@ -523,7 +499,6 @@ static GFXDECODE_START( champbas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 0x200>>2 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x200>>2 )
 GFXDECODE_END
-
 
 
 static const gfx_layout charlayout_3bpp =
@@ -574,7 +549,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(champbas_state,champbas)
 {
-	save_item(NAME(m_watchdog_count));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_gfx_bank));
 }
@@ -607,11 +581,12 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(talbot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
-	/* MCU */
 	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
+
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
 	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
@@ -622,7 +597,6 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", talbot)
@@ -641,13 +615,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( champbas, champbas_state )
 
 	/* basic machine hardware */
-	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
+
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
 	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
@@ -658,7 +633,6 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbas)
@@ -696,16 +670,18 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_sub_map)
 	MCFG_CPU_IO_MAP(exctsccr_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse,  4000) /* 4 kHz, updates the dac */
+	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
 	MCFG_CPU_ADD("mcu", ALPHA8301L, XTAL_18_432MHz/6/8)     /* Actually 8302 */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
+
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,exctsccr)
 	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
@@ -716,7 +692,6 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
@@ -754,10 +729,12 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(exctsccrb_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
+
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
 	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
@@ -768,7 +745,6 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
