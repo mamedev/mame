@@ -29,39 +29,36 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	if (!m_rom_mode)
 		return m_ram->pointer()[0x2000 + offset];
 
-	// This isn't really accurate - bus fighting will occur for many values
-	// since each peripheral only checks two bits.  We just return 0xFF for
-	// any undocumented address.
-	UINT8   data = 0xFF;
-	switch (offset & 0x0F00)
+	// Since each peripheral only checks two bits, many addresses will
+	// result in multiple peripherals attempting to drive the bus.  This is
+	// simulated by ANDing all the values together.
+	UINT8 data = 0xFF;
+	if ((offset & 0x900) == 0x100) // Floppy
+		data &= m_fdc->read(space, offset & 0x03);
+	if ((offset & 0x900) == 0x900) // IEEE488 PIA
+		data &= m_pia0->read(space, offset & 0x03);
+	if ((offset & 0xA00) == 0x200) // Keyboard
 	{
-	case 0x100: // Floppy
-		data = m_fdc->read(space, offset & 0x03);
-		break;
-	case 0x200: // Keyboard
-		if (offset & 0x01)  data &= m_keyb_row0->read();
-		if (offset & 0x02)  data &= m_keyb_row1->read();
-		if (offset & 0x04)  data &= m_keyb_row3->read();
-		if (offset & 0x08)  data &= m_keyb_row4->read();
-		if (offset & 0x10)  data &= m_keyb_row5->read();
-		if (offset & 0x20)  data &= m_keyb_row2->read();
-		if (offset & 0x40)  data &= m_keyb_row6->read();
-		if (offset & 0x80)  data &= m_keyb_row7->read();
-		break;
-	case 0x400: // SCREEN-PAC
-		if (m_screen_pac) data &= 0xFB;
-		break;
-	case 0x900: // IEEE488 PIA
-		data = m_pia0->read(space, offset & 0x03);
-		break;
-	case 0xA00: // Serial
-		if (offset & 0x01) data = m_acia->data_r(space, 0);
-		else data = m_acia->status_r(space, 0);
-		break;
-	case 0xC00: // Video PIA
-		data = m_pia1->read(space, offset & 0x03);
-		break;
+		if (offset & 0x01) data &= m_keyb_row0->read();
+		if (offset & 0x02) data &= m_keyb_row1->read();
+		if (offset & 0x04) data &= m_keyb_row3->read();
+		if (offset & 0x08) data &= m_keyb_row4->read();
+		if (offset & 0x10) data &= m_keyb_row5->read();
+		if (offset & 0x20) data &= m_keyb_row2->read();
+		if (offset & 0x40) data &= m_keyb_row6->read();
+		if (offset & 0x80) data &= m_keyb_row7->read();
 	}
+	if ((offset & 0xA00) == 0xA00) // Serial
+	{
+		if (offset & 0x01) data &= m_acia->data_r(space, 0);
+		else data &= m_acia->status_r(space, 0);
+	}
+	if ((offset & 0xC00) == 0x400) // SCREEN-PAC
+	{
+		if (m_screen_pac) data &= 0xFB;
+	}
+	if ((offset & 0xC00) == 0xC00) // Video PIA
+		data &= m_pia1->read(space, offset & 0x03);
 	return data;
 }
 

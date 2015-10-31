@@ -58,6 +58,14 @@ Schematics specify a WD1793 floppy controller, but we're using the Fujitsu
 equivalent MB8877 here.  Is it known that the original machines used one or
 the other exclusively?  In any case MAME emulates them identically.
 
+
+TODO:
+
+* Hook up the port direction control bits in the IEEE488 interface properly
+  and test it with some emulated peripheral.  Also the BIOS can speak
+  Centronics parallel over the same physical interface, so this should be
+  tested, too.
+
 ***************************************************************************/
 
 #include "includes/osborne1.h"
