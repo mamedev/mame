@@ -181,9 +181,9 @@ WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 	/*
 	    bit     description
 
-	    0
-	    1
-	    2
+	    0       0 = DATAn as output, 1 = DATAn as input
+	    1       0 = NDAC/NRFD as output, 1 = NDAC/NRFD as input; also gates SRQ
+	    2       0 = EOI/DAV as output, 1 = EOI/DAV as input
 	    3       EOI
 	    4       ATN
 	    5       DAV
