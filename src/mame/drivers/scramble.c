@@ -2,29 +2,24 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
- Scramble hardware
+ scramble.c:
+ -----------
+ MAME driver for special/undocumented games based on Scramble (Galaxian) hardware.
+ This goes for special cases such as wiremods, unknown hardware prepherials
+ needed to be figured out, etc.
 
-NOTE:  Eventually to be merged into GALAXIAN.C
+ Games in this driver will eventually be merged into galaxian.c once proper documentation
+ has been found for them.
 
-Interesting tidbit:
-
-There is a bug in Amidars and Triple Punch. Look at the loop at 0x2715.
-It expects DE to be saved during the call to 0x2726, but it can be destroyed,
-causing the loop to read all kinds of bogus memory locations.
-
-
-To Do:
-
-- Mariner has discrete sound circuits connected to the 8910's output ports
+ TODO:
+ -Merge galaxian.c video with galaxold.c, scramble.c, scobra.c and dambustr.c
+ (should we make it a device?)
+ -mariner and 800fath have discrete sound attached to the AY8910 GPIO pins.
+ emulate if possible then hook it up.
 
 
-Notes:
-
-- While Atlantis has a cabinet switch, it doesn't use the 2nd player controls
-  in cocktail mode.
-- DIP locations have been verified from manuals for:
-  800fath
-  scramble
+ Notes:
+ -DIP locations have been verified from manuals for 800fath
 
 ***************************************************************************/
 

@@ -2,18 +2,22 @@
 // copyright-holders:Norbert Kehrer
 /***************************************************************************
 
-Dambusters
-(c) 1981 South West Research Ltd. (Bristol, UK)
+ Dambusters (Galaxian-based hardware)
+ (c) 1981 South West Research Ltd. (Bristol, UK)
 
-Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
+ Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
 
-NOTE:  Eventually to be merged into GALAXIAN.C
+ NOTE: To be eventually merged into galaxian.c, schematics were found.
+
+ TODO:
+ -Merge galaxian.c video with galaxold.c, scramble.c, scobra.c and dambustr.c
+ (should we make it a device?)
 
 2008-08
 Dip locations verified with manual
 
 
-Stephh's notes (based on the games Z80 code and some tests) :
+Stephh's notes on games included in this driver :
 
 1) 'dambustr'
 
