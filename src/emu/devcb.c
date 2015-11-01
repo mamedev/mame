@@ -518,7 +518,8 @@ void devcb_write_base::write64_adapter(address_space &space, offs_t offset, UINT
 
 void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
 {
-	m_target.ioport->write_safe(unshift_mask_xor(data));
+	if (m_target.ioport)
+		m_target.ioport->write(unshift_mask_xor(data));
 }
 
 

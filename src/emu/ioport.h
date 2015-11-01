@@ -1206,7 +1206,6 @@ public:
 	ioport_value read();
 	ioport_value read_safe(ioport_value defval) { return (this == NULL) ? defval : read(); }
 	void write(ioport_value value, ioport_value mask = ~0);
-	void write_safe(ioport_value value, ioport_value mask = ~0) { if (this != NULL) write(value, mask); }
 
 	// other operations
 	ioport_field *field(ioport_value mask);
