@@ -793,13 +793,13 @@ static void UpdateChangeCountCallback(void                      *userData,
 	newEffectMenu = [[NSMenu allocWithZone:[NSMenu zone]] initWithTitle:@"New"];
 	[menu setSubmenu:newEffectMenu forItem:item];
 	[newEffectMenu release];
-	item = [menu addItemWithTitle:@"Open…" action:@selector(openDocument:) keyEquivalent:@"o"];
+	item = [menu addItemWithTitle:[NSString stringWithFormat:@"Open%C", (unichar)0x2026] action:@selector(openDocument:) keyEquivalent:@"o"];
 	
 	[menu addItem:[NSMenuItem separatorItem]];
 	
 	item = [menu addItemWithTitle:@"Close" action:@selector(performClose:) keyEquivalent:@"w"];
 	item = [menu addItemWithTitle:@"Save" action:@selector(saveDocument:) keyEquivalent:@"s"];
-	item = [menu addItemWithTitle:@"Save As…" action:@selector(saveDocumentAs:) keyEquivalent:@"S"];
+	item = [menu addItemWithTitle:[NSString stringWithFormat:@"Save As%C", (unichar)0x2026] action:@selector(saveDocumentAs:) keyEquivalent:@"S"];
 	item = [menu addItemWithTitle:@"Save All" action:@selector(saveAllDocuments:) keyEquivalent:@""];
 	item = [menu addItemWithTitle:@"Revert to Saved" action:@selector(revertDocumentToSaved:) keyEquivalent:@"u"];
 }

@@ -5733,7 +5733,7 @@ initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2003.05 Initial D Arcade Stage Ver. 2 (Japan) (Rev A)
 initdv2j        // 2003.05.27 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 				// 2003.09 World Club Champion Football Serie A 2002-2003
-				// 2003.?? Club Kart Cycraft Edition
+clubkcyc  		// 2003.?? Club Kart Cycraft Edition
 clubk2k3        // 2003.?? Club Kart: European Session (2003, Rev A)
 clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 clubkprz        // 2003.?? Club Kart Prize
@@ -5760,6 +5760,7 @@ vf4tuned        // 2004.12 Virtua Fighter 4 Final Tuned (Rev F)
 				// 2006.09 Mobile Suit Gundam 0079 Card Builder Ver.2.01
 				// 2006.10 World Club Champion Football European Clubs 2005-2006 bugfix
 				// 2006.11 Mobile Suit Gundam 0079 Card Builder Ver.2.02
+inidv3ca        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A)
 inidv3cy        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B)
 				// 2007.03 Mobile Suit Gundam 0083 Card Builder
 				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
@@ -6281,8 +6282,9 @@ boogwinga       // MBD (c) 1992 (Asia, v1.5)
 ragtime         // MBD (c) 1992 (Japan, v1.5)
 ragtimea        // MBD (c) 1992 (Japan, v1.3)
 dblewing        // MBE (c) 1993 Mitchell
-fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
+fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0395-1 PCB
 fghthista       // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
+fghthistb       // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
 fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0396-0 PCB
 fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
 fghthistub      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB

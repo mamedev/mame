@@ -396,7 +396,8 @@ e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t 
 		m_fdc_irq(CLEAR_LINE),
 		m_fdc_drq(CLEAR_LINE),
 		m_adlc_irq(CLEAR_LINE),
-		m_clk_en(0)
+		m_clk_en(0),
+		m_variant(TYPE_E01)
 {
 }
 
@@ -425,7 +426,8 @@ e01_device::e01_device(const machine_config &mconfig, device_type type, const ch
 		m_fdc_irq(CLEAR_LINE),
 		m_fdc_drq(CLEAR_LINE),
 		m_adlc_irq(CLEAR_LINE),
-		m_clk_en(0)
+		m_clk_en(0),
+		m_variant(TYPE_E01)
 {
 }
 

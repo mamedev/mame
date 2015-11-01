@@ -838,6 +838,7 @@ files {
 	MAME_DIR .. "src/mame/video/equites.c",
 	MAME_DIR .. "src/mame/drivers/meijinsn.c",
 	MAME_DIR .. "src/mame/drivers/shougi.c",
+	MAME_DIR .. "src/mame/machine/alpha8201.c",
 }
 
 createMAMEProjects(_target, _subtarget, "amiga")

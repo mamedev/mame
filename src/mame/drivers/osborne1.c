@@ -54,6 +54,18 @@ the correct rates).  MAME's bitbanger seems to be able to accept the ACIA
 output at this rate, but the ACIA screws up when consuming data from MAME's
 bitbanger.
 
+Schematics specify a WD1793 floppy controller, but we're using the Fujitsu
+equivalent MB8877 here.  Is it known that the original machines used one or
+the other exclusively?  In any case MAME emulates them identically.
+
+
+TODO:
+
+* Hook up the port direction control bits in the IEEE488 interface properly
+  and test it with some emulated peripheral.  Also the BIOS can speak
+  Centronics parallel over the same physical interface, so this should be
+  tested, too.
+
 ***************************************************************************/
 
 #include "includes/osborne1.h"
@@ -178,6 +190,7 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("CNF")
+	PORT_BIT(0xF8, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_CONFNAME(0x06, 0x00, "Serial Speed")
 	PORT_CONFSETTING(0x00, "300/1200")
 	PORT_CONFSETTING(0x02, "600/2400")
@@ -307,4 +320,4 @@ ROM_START( osborne1 )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1, osborne1_state,   osborne1,   "Osborne",  "Osborne-1",    0 )
+COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1, osborne1_state,   osborne1,   "Osborne",  "Osborne-1",    MACHINE_SUPPORTS_SAVE )

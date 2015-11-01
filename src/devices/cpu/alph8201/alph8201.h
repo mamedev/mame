@@ -401,8 +401,8 @@ public:
 };
 
 
-extern const device_type ALPHA8201;
-extern const device_type ALPHA8301;
+extern const device_type ALPHA8201L;
+extern const device_type ALPHA8301L;
 
 
 #endif  /* __ALPH8201_H__ */

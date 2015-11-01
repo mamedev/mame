@@ -3,7 +3,6 @@
 /***************************************************************************
 
 Driver by Jarek Burczynski, started by Tomasz Slanina  dox@space.pl
-ALPHA 8201 MCU handling by Tatsuyuki satoh
 Lots of hardware info from Guru
 
 memory map :
@@ -79,8 +78,7 @@ PROM  : Type MB7051
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/alph8201/alph8201.h"
-//#include "cpu/hmcs40/hmcs40.h"
+#include "machine/alpha8201.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
@@ -93,38 +91,52 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_mcu(*this, "mcu"),
+		m_alpha_8201(*this, "alpha_8201"),
 		m_videoram(*this, "videoram")
 	{ }
 
+	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_mcu;
+	required_device<alpha_8201_device> m_alpha_8201;
 
 	required_shared_ptr<UINT8> m_videoram;
 
-	int m_nmi_enabled;
+	UINT8 m_control[8];
+	UINT8 m_nmi_enabled;
 	int m_r;
 
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(dummy_r);
+	DECLARE_READ8_MEMBER(semaphore_r);
 
 	DECLARE_PALETTE_INIT(shougi);
-	virtual void machine_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
+
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
 void shougi_state::machine_start()
 {
+	// zerofill
+	memset(m_control, 0, sizeof(m_control));
 	m_nmi_enabled = 0;
 	m_r = 0;
 
+	// register for savestates
+	save_item(NAME(m_control));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
+}
+
+void shougi_state::machine_reset()
+{
+	// 74LS259 is auto CLR on reset
+	for (int i = 0; i < 8; i++)
+		control_w(m_maincpu->space(), i, 0);
 }
 
 
@@ -231,12 +243,6 @@ WRITE8_MEMBER(shougi_state::control_w)
 
 	switch (offset)
 	{
-		case 0:
-			// TODO
-			// 0: sharedram = sub
-			// 1: sharedram = main
-			break;
-
 		case 1:
 			m_nmi_enabled = data;
 
@@ -248,14 +254,24 @@ WRITE8_MEMBER(shougi_state::control_w)
 			}
 			break;
 
+		case 3:
+			// start/halt ALPHA-8201
+			m_alpha_8201->mcu_start_w(data);
+			break;
+
 		case 4:
-			m_mcu->set_input_line(INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+			// ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+			m_alpha_8201->bus_dir_w(!data);
 			break;
 
 		default:
-			// 7: ?????? connected to +5v via resistor
+			// 0: 0: sharedram = sub, 1: sharedram = main (TODO!)
+			// 2: ?
+			// 7: nothing? connected to +5v via resistor
 			break;
 	}
+	
+	m_control[offset] = data;
 }
 
 
@@ -268,41 +284,31 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w) /* game won't boot if watchdog doesn't work */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
-	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
+	AM_RANGE(0x7000, 0x73ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
+	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") /* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
 
 // subcpu side
 
-READ8_MEMBER(shougi_state::dummy_r)
+READ8_MEMBER(shougi_state::semaphore_r)
 {
-	// ?
+	// d0: waits for it to be set before handling NMI routine
+	// hmm it must be a signal from maincpu, but what?
 	m_r ^= 1;
-
-	if (m_r)
-		return 0xff;
-	else
-		return 0;
+	return m_r;
 }
 
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x00ff)
-	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
-ADDRESS_MAP_END
-
-
-// mcu side (fake!)
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, shougi_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x00, 0x00) AM_READ(semaphore_r)
 ADDRESS_MAP_END
 
 
@@ -400,11 +406,10 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(readport_sub)
 
-	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_10MHz/4/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_10MHz/4/8)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_WATCHDOG_VBLANK_INIT(16) // assuming it's the same as champbas
+	MCFG_WATCHDOG_VBLANK_INIT(0x10) // assuming it's the same as champbas
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -448,8 +453,8 @@ ROM_START( shougi )
 	ROM_LOAD( "7.3h",    0x4000, 0x1000, CRC(7ea8ec4a) SHA1(d3b999a683f49c911871d0ae6bb2022e73e3cfb8) )
 	/* shougi has one socket empty */
 
-	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
+	ROM_LOAD( "alpha-8201_44801a75_2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )
@@ -471,8 +476,8 @@ ROM_START( shougi2 )
 	ROM_LOAD( "7-2.3h",    0x4000, 0x1000, CRC(5f37ebc6) SHA1(2e5c4c2f455979e2ad2c66c5aa9f4d92194796af) )
 	ROM_LOAD( "10-2.3l",   0x5000, 0x1000, CRC(a26385fd) SHA1(2adb21bb4f67a378014bc1edda48daca349d17e1) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
+	ROM_LOAD( "alpha-8201_44801a75_2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )

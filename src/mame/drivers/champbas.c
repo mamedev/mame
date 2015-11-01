@@ -9,7 +9,6 @@ Exciting Soccer            - (c) 1983 Alpha Denshi Co.
 Exciting Soccer II         - (c) 1984 Alpha Denshi Co.
 
 driver by Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
-ALPHA 8201 MCU handling by Tatsuyuki satoh
 
 Note: the Champion Baseball II unofficial schematics show a 8302 instead of
 the 8201, however the MCU is used like a plain 8201, 830x extra instructions
@@ -68,7 +67,7 @@ Notes:
   and crashes if the bit doesn't match bit 2 of RAM location 0x8c00.
 
 - The Exciting Soccer bootleg runs on a modified Champion Baseball board. The
-  original board has vastly improved sound hardware which is thereforew missing
+  original board has vastly improved sound hardware which is therefore missing
   from the bootleg.
 
 TODO:
@@ -92,24 +91,6 @@ TODO:
 #include "includes/champbas.h"
 
 
-/*************************************
- *
- *  Watchdog
- *
- *************************************/
-
-void champbas_state::screen_eof_champbas(screen_device &screen, bool state)
-{
-	// rising edge
-	if (state)
-	{
-		m_watchdog_count++;
-
-		if (m_watchdog_count == 0x10)
-			machine().schedule_soft_reset();
-	}
-}
-
 
 /*************************************
  *
@@ -117,14 +98,9 @@ void champbas_state::screen_eof_champbas(screen_device &screen, bool state)
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::champbas_watchdog_reset_w)
-{
-	m_watchdog_count = 0;
-}
-
 CUSTOM_INPUT_MEMBER(champbas_state::champbas_watchdog_bit2)
 {
-	return BIT(m_watchdog_count, 2);
+	return (0x10 - machine().get_vblank_watchdog_counter()) >> 2 & 1;
 }
 
 
@@ -136,7 +112,7 @@ WRITE8_MEMBER(champbas_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(champbas_state::exctsccr_fm_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
@@ -244,7 +220,7 @@ static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
 
 	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram_2")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 
@@ -274,7 +250,7 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_SHARE("spriteram_2")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
 /*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 
 	/* champbja only */
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_alt_protection_r)
@@ -378,20 +354,20 @@ static INPUT_PORTS_START( talbot )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -409,7 +385,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -426,16 +402,16 @@ static INPUT_PORTS_START( champbas )
 	PORT_INCLUDE( talbot )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    // throw (red)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // throw (red)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    // changes (blue)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )    // steal (yellow)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // changes (blue)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) // steal (yellow)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // steal (yellow)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL  // changes (blue)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // steal (yellow)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // changes (blue)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL  // throw (red)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // throw (red)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )
@@ -456,7 +432,7 @@ static INPUT_PORTS_START( champbas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exctsccr )
@@ -482,7 +458,7 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_DIPSETTING(    0x00, "2 Min." )
 	PORT_DIPSETTING(    0x60, "3 Min." )
 	PORT_DIPSETTING(    0x40, "4 Min." )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 
@@ -523,7 +499,6 @@ static GFXDECODE_START( champbas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 0x200>>2 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x200>>2 )
 GFXDECODE_END
-
 
 
 static const gfx_layout charlayout_3bpp =
@@ -572,27 +547,25 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(champbas_state,champbas)
+void champbas_state::machine_start()
 {
-	save_item(NAME(m_watchdog_count));
+	// zerofill
+	m_irq_mask = 0;
+	m_palette_bank = 0;
+	m_gfx_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(champbas_state,exctsccr)
+void champbas_state::machine_reset()
 {
-	// FIXME
-	// I dun wanna
-	machine().scheduler().timer_pulse(attotime::from_hz(75), timer_expired_delegate(FUNC(champbas_state::exctsccr_fm_callback),this)); /* updates fm */
-
-	MACHINE_START_CALL_MEMBER(champbas);
-}
-
-
-MACHINE_RESET_MEMBER(champbas_state,champbas)
-{
+	// 74LS259 is auto CLR on reset
+	m_irq_mask = 0;
 	m_palette_bank = 0;
-	m_gfx_bank = 0; // talbot has only 1 bank
+	m_gfx_bank = 0;
 }
 
 INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
@@ -607,14 +580,12 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(talbot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
-	/* MCU */
-	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_18_432MHz/6/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -622,7 +593,6 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", talbot)
@@ -641,16 +611,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( champbas, champbas_state )
 
 	/* basic machine hardware */
-	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
 
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -658,7 +626,6 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbas)
@@ -683,7 +650,7 @@ static MACHINE_CONFIG_DERIVED( champmcu, champbas )
 	/* basic machine hardware */
 
 	/* MCU */
-	MCFG_CPU_ADD("mcu", ALPHA8201, XTAL_18_432MHz/6/8)
+	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* to MCU timeout champbbj */
@@ -696,19 +663,21 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_sub_map)
 	MCFG_CPU_IO_MAP(exctsccr_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse,  4000) /* 4 kHz, updates the dac */
+	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("exc_snd_irq", champbas_state, exctsccr_sound_irq, attotime::from_hz(75)) // irq source unknown, determines music tempo
+	MCFG_TIMER_START_DELAY(attotime::from_hz(75))
 
 	/* MCU */
-	MCFG_CPU_ADD("mcu", ALPHA8301, XTAL_18_432MHz/6/8)     /* Actually 8302 */
+	MCFG_CPU_ADD("mcu", ALPHA8301L, XTAL_18_432MHz/6/8)     /* Actually 8302 */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,exctsccr)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -716,7 +685,6 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
@@ -754,13 +722,12 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(exctsccrb_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
 
-	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
-	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
+	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -768,7 +735,6 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
-	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
@@ -805,7 +771,7 @@ ROM_START( talbot )
 	ROM_LOAD( "16.11i", 0x5000, 0x1000, CRC(1612adf5) SHA1(9adeb21d5d1692f6e31460062f03f2008076b307) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_LOAD( "alpha-8201_44801a75_2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "7.6a", 0x0000, 0x1000, CRC(bde14194) SHA1(f8f569342a3094eb5450a30b8ab87901b98e6061) )
@@ -852,7 +818,7 @@ ROM_START( champbasj )
 	ROM_LOAD( "18.2n", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_LOAD( "alpha-8201_44801a75_2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "14.5e", 0x0000, 0x2000, CRC(1b8202b3) SHA1(889b77fc3d0cb029baf8c47be260f513f3ed59bd) )
@@ -901,7 +867,7 @@ ROM_START( champbb2 )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8302__44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
@@ -929,7 +895,7 @@ ROM_START( champbb2a )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8302__44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
@@ -957,7 +923,7 @@ ROM_START( champbb2j )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8302__44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4.6a", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
@@ -982,6 +948,9 @@ ROM_START( exctsccr ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_LOAD( "8_d6.bin",     0x4000, 0x2000, CRC(88651ee1) SHA1(2052e1b3f9784439369f464e31f4a2b0d1bb0565) )
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
@@ -1013,6 +982,9 @@ ROM_START( exctsccra ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+
 	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
 	ROM_LOAD( "6_c5.bin",     0x2000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) ) /* plane 3 */
@@ -1042,6 +1014,9 @@ ROM_START( exctsccru ) /* Teams: ITA USA GBR FRA FRG BRA */
 	ROM_LOAD( "8_d6.bin",     0x4000, 0x2000, CRC(88651ee1) SHA1(2052e1b3f9784439369f464e31f4a2b0d1bb0565) )
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "vr4u.a5",     0x0000, 0x2000, CRC(103bb739) SHA1(335d89b3a374daa3fd1bd3fd66a82e7310303051) ) /* planes 0,1 */
@@ -1073,6 +1048,9 @@ ROM_START( exctsccrj ) /* Teams: JPN USA GBR FRA FRG BRA */
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+
 	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_5a.bin",     0x0000, 0x2000, CRC(74cc71d6) SHA1(ff3d59845bc66ec3335eadf81d799a684182c66f) ) /* planes 0,1 */
 	ROM_LOAD( "6_5c.bin",     0x2000, 0x2000, CRC(7c4cd1b6) SHA1(141e67fec9b6d6b4380cb941b4d79341787680e3) ) /* plane 3 */
@@ -1101,6 +1079,9 @@ ROM_START( exctsccrjo ) /* Teams: JPN USA ENG FRA GFR BRA */
 	ROM_LOAD( "9.f6",     0x2000, 0x2000, CRC(639998f5) SHA1(c4ff5e5e75d53dea38449f323186d08d5b57bf90) )
 	ROM_LOAD( "8.6d",     0x4000, 0x2000, CRC(b6b209a5) SHA1(e49a0db65b29337ac6b919237067b1990f2233ab) )
 	ROM_LOAD( "7.6c",     0x6000, 0x2000, CRC(8856452a) SHA1(4494c225c9df97da09c180caadb4dda49d0d5392) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4.5a",     0x0000, 0x2000, CRC(c4259307) SHA1(7bd4e229a5e1a5136826a57aa61810fcdf9c5027) ) /* planes 0,1 */
@@ -1147,6 +1128,9 @@ ROM_START( exctsccrb )
 	ROM_LOAD( "es-b.l2",      0x2000, 0x2000, CRC(8b3db794) SHA1(dbfed2357c7631bfca6bbd63a23617bc3abf6ca3) )
 	ROM_LOAD( "es-c.m2",      0x4000, 0x2000, CRC(7bed2f81) SHA1(cbbb0480519cc04a99e8983228b18c9e49a9985d) )
 
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8201_44801a75_2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+
 	/* the national flags are wrong. This happens on the real board */
 	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
@@ -1179,7 +1163,7 @@ ROM_START( exctscc2 )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )    /* vr.7k */
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "vr.5a",        0x0000, 0x2000, CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c) ) /* planes 0,1 */
@@ -1211,9 +1195,8 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 	UINT8 *rom1 = memregion("gfx1")->base();
 	UINT8 *rom2 = memregion("gfx2")->base();
 	int len = memregion("gfx1")->bytes();
-	int i;
 
-	for (i = 0; i < len/2; ++i)
+	for (int i = 0; i < len/2; i++)
 	{
 		UINT8 t = rom1[i + len/2];
 		rom1[i + len/2] = rom2[i];
@@ -1227,10 +1210,9 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	UINT8 *rom1 = memregion("gfx1")->base();
 	UINT8 *rom2 = memregion("gfx2")->base();
-	int i;
 
 	// planes 0,1
-	for (i = 0; i < 0x1000; ++i)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		UINT8 t = rom1[i + 0x1000];
 		rom1[i + 0x1000] = rom2[i];
@@ -1238,12 +1220,12 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
 	}
 
 	// plane 3
-	for (i = 0; i < 0x1000; ++i)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		rom2[i + 0x3000] = rom1[i + 0x3000] >> 4;
 		rom2[i + 0x2000] = rom1[i + 0x3000] & 0x0f;
 	}
-	for (i = 0; i < 0x1000; ++i)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		rom1[i + 0x3000] = rom1[i + 0x2000] >> 4;
 		rom1[i + 0x2000] &= 0x0f;
@@ -1257,7 +1239,7 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
  *
  *************************************/
 
-GAME( 1982, talbot,     0,        talbot,   talbot, driver_device,   0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, talbot,     0,        talbot,   talbot,   driver_device,  0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, champbas,   0,        champbas, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, champbasj,  champbas, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
@@ -1271,5 +1253,5 @@ GAME( 1983, exctsccru,  exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, 
 GAME( 1983, exctsccra,  exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccrj,  exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccrjo, exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrb,  exctsccr, exctsccrb,exctsccr, champbas_state, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrb,  exctsccr, exctsccrb,exctsccr, champbas_state, exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, exctscc2,   0,        exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )

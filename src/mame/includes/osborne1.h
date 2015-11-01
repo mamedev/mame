@@ -30,6 +30,7 @@ public:
 	osborne1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_speaker(*this, "speaker"),
 		m_pia0(*this, "pia_0"),
 		m_pia1(*this, "pia_1"),
@@ -54,6 +55,8 @@ public:
 		m_bank_1xxx(*this, "bank_1xxx"),
 		m_bank_fxxx(*this, "bank_fxxx"),
 		m_video_timer(NULL),
+		m_p_chargen(NULL),
+		m_tilemap(NULL),
 		m_acia_rxc_txc_timer(NULL)
 	{ }
 
@@ -83,20 +86,23 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
-	required_device<acia6850_device> m_acia;
-	required_device<mb8877_t> m_fdc;
-	required_device<ram_device> m_ram;
-	required_device<ieee488_device> m_ieee;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<cpu_device>             m_maincpu;
+	required_device<gfxdecode_device>       m_gfxdecode;
+	required_device<speaker_sound_device>   m_speaker;
+	required_device<pia6821_device>         m_pia0;
+	required_device<pia6821_device>         m_pia1;
+	required_device<acia6850_device>        m_acia;
+	required_device<mb8877_t>               m_fdc;
+	required_device<ram_device>             m_ram;
+	required_device<ieee488_device>         m_ieee;
+	required_device<floppy_image_device>    m_floppy0;
+	required_device<floppy_image_device>    m_floppy1;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	TIMER_CALLBACK_MEMBER(video_callback);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	bool set_rom_mode(UINT8 value);
 	bool set_bit_9(UINT8 value);
@@ -126,8 +132,8 @@ protected:
 	// configuration (reloaded on reset)
 	UINT8           m_screen_pac;
 	UINT8           m_acia_rxc_txc_div;
-	UINT8	        m_acia_rxc_txc_p_low;
-	UINT8	        m_acia_rxc_txc_p_high;
+	UINT8           m_acia_rxc_txc_p_low;
+	UINT8           m_acia_rxc_txc_p_high;
 
 	// bank switch control bits
 	UINT8           m_ub4a_q;
@@ -142,14 +148,15 @@ protected:
 	emu_timer       *m_video_timer;
 	bitmap_ind16    m_bitmap;
 	UINT8           *m_p_chargen;
+	tilemap_t       *m_tilemap;
 
 	// SCREEN-PAC registers
 	UINT8           m_resolution;
 	UINT8           m_hc_left;
 
 	// serial state
-	int             m_acia_irq_state;
-	int             m_acia_rxc_txc_state;
+	UINT8           m_acia_irq_state;
+	UINT8           m_acia_rxc_txc_state;
 	emu_timer       *m_acia_rxc_txc_timer;
 };
 
