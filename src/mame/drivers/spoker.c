@@ -139,10 +139,10 @@ CUSTOM_INPUT_MEMBER(spoker_state::hopper_r)
 	return machine().input().code_pressed(KEYCODE_H);
 }
 
-static void show_out(UINT8 *out)
+static void show_out(running_machine &machine,  UINT8 *out)
 {
 #ifdef MAME_DEBUG
-	popmessage("%02x %02x %02x", out[0], out[1], out[2]);
+	machine.popmessage("%02x %02x %02x", out[0], out[1], out[2]);
 #endif
 }
 
@@ -167,7 +167,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 	m_nmi_ack = data & 0x80;     // nmi acknowledge, 0 -> 1
 
 	m_out[0] = data;
-	show_out(m_out);
+	show_out(machine(), m_out);
 }
 
 WRITE8_MEMBER(spoker_state::video_and_leds_w)
@@ -179,7 +179,7 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 	m_hopper            =   (~data)& 0x80;
 
 	m_out[1] = data;
-	show_out(m_out);
+	show_out(machine(), m_out);
 }
 
 WRITE8_MEMBER(spoker_state::leds_w)
@@ -191,7 +191,7 @@ WRITE8_MEMBER(spoker_state::leds_w)
 	// data & 0x10?
 
 	m_out[2] = data;
-	show_out(m_out);
+	show_out(machine(), m_out);
 }
 
 WRITE8_MEMBER(spoker_state::magic_w)
