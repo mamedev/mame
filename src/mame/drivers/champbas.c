@@ -103,7 +103,6 @@ CUSTOM_INPUT_MEMBER(champbas_state::champbas_watchdog_bit2)
 	return (0x10 - machine().get_vblank_watchdog_counter()) >> 2 & 1;
 }
 
-
 WRITE8_MEMBER(champbas_state::irq_enable_w)
 {
 	m_irq_mask = data & 1;
@@ -117,21 +116,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-// Champion Baseball has only one DAC
-WRITE8_MEMBER(champbas_state::champbas_dac_w)
-{
-	m_dac->write_signed8(data << 2);
-}
-
-WRITE8_MEMBER(champbas_state::champbas_dac1_w)
+WRITE8_MEMBER(champbas_state::dac1_w)
 {
 	m_dac1->write_signed8(data << 2);
 }
 
-WRITE8_MEMBER(champbas_state::champbas_dac2_w)
+WRITE8_MEMBER(champbas_state::dac2_w)
 {
 	m_dac2->write_signed8(data << 2);
 }
+
 
 /*************************************
  *
@@ -157,7 +151,7 @@ WRITE8_MEMBER(champbas_state::champbas_mcu_halt_w)
 
 
 /* champbja another protection */
-READ8_MEMBER(champbas_state::champbja_alt_protection_r)
+READ8_MEMBER(champbas_state::champbja_protection_r)
 {
 	UINT8 data = 0;
 	/*
@@ -253,7 +247,7 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 
 	/* champbja only */
-	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_alt_protection_r)
+	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
@@ -313,7 +307,7 @@ static ADDRESS_MAP_START( champbas_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x6000, 0x7fff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITENOP    // 4-bit return code to main CPU (not used)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(champbas_dac_w)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(dac1_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -321,8 +315,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccr_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc008, 0xc008) AM_WRITE(champbas_dac1_w)
-	AM_RANGE(0xc009, 0xc009) AM_WRITE(champbas_dac2_w)
+	AM_RANGE(0xc008, 0xc008) AM_WRITE(dac1_w)
+	AM_RANGE(0xc009, 0xc009) AM_WRITE(dac2_w)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_byte_r)
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP /* ??? */
@@ -432,7 +426,6 @@ static INPUT_PORTS_START( champbas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exctsccr )
@@ -458,7 +451,6 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_DIPSETTING(    0x00, "2 Min." )
 	PORT_DIPSETTING(    0x60, "3 Min." )
 	PORT_DIPSETTING(    0x40, "4 Min." )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 
@@ -640,7 +632,7 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_DAC_ADD("dac")
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -749,7 +741,7 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_DAC_ADD("dac")
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

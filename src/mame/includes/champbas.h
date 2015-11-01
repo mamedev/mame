@@ -17,7 +17,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
-		m_dac(*this, "dac"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -31,7 +30,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
-	optional_device<dac_device> m_dac;
 	optional_device<dac_device> m_dac1;
 	optional_device<dac_device> m_dac2;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -52,15 +50,14 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(champbas_mcu_switch_w);
 	DECLARE_WRITE8_MEMBER(champbas_mcu_halt_w);
-	DECLARE_READ8_MEMBER(champbja_alt_protection_r);
+	DECLARE_READ8_MEMBER(champbja_protection_r);
 	DECLARE_WRITE8_MEMBER(champbas_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(champbas_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(champbas_palette_bank_w);
 	DECLARE_WRITE8_MEMBER(champbas_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(champbas_watchdog_bit2);
-	DECLARE_WRITE8_MEMBER(champbas_dac_w);
-	DECLARE_WRITE8_MEMBER(champbas_dac1_w);
-	DECLARE_WRITE8_MEMBER(champbas_dac2_w);
+	DECLARE_WRITE8_MEMBER(dac1_w);
+	DECLARE_WRITE8_MEMBER(dac2_w);
 	DECLARE_DRIVER_INIT(exctsccr);
 	DECLARE_DRIVER_INIT(champbas);
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);

@@ -168,6 +168,7 @@ WRITE8_MEMBER(champbas_state::champbas_bg_videoram_w)
 WRITE8_MEMBER(champbas_state::champbas_gfxbank_w)
 {
 	data &= 1;
+
 	if (m_gfx_bank != data)
 	{
 		m_gfx_bank = data;
