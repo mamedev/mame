@@ -1,4 +1,4 @@
-// ImGui library v1.46 WIP
+// ImGui library v1.47 WIP
 // Demo code
 
 // Don't remove this file from your project! It is useful reference code that you can execute.
@@ -423,7 +423,18 @@ void ImGui::ShowTestWindow(bool* opened)
         if (ImGui::TreeNode("Multi-line Text Input"))
         {
             static bool read_only = false;
-            static char text[1024*16] = "// F00F bug\nlabel:\n\tlock cmpxchg8b eax\n";
+            static char text[1024*16] = 
+                "/*\n"
+                " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
+                " the hexadecimal encoding of one offending instruction,\n"
+                " more formally, the invalid operand with locked CMPXCHG8B\n"
+                " instruction bug, is a design flaw in the majority of\n"
+                " Intel Pentium, Pentium MMX, and Pentium OverDrive\n"
+                " processors (all in the P5 microarchitecture).\n"
+                "*/\n\n"
+                "label:\n"
+                "\tlock cmpxchg8b eax\n";
+
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
             ImGui::Checkbox("Read-only", &read_only);
             ImGui::PopStyleVar();
@@ -1724,7 +1735,7 @@ static void ShowExampleAppCustomRendering(bool* opened)
     if (ImGui::IsItemHovered())
     {
         ImVec2 mouse_pos_in_canvas = ImVec2(ImGui::GetIO().MousePos.x - canvas_pos.x, ImGui::GetIO().MousePos.y - canvas_pos.y);
-        if (!adding_line && ImGui::GetIO().MouseClicked[0])
+        if (!adding_line && ImGui::IsMouseClicked(0))
         {
             points.push_back(mouse_pos_in_canvas);
             adding_line = true;
@@ -1736,9 +1747,9 @@ static void ShowExampleAppCustomRendering(bool* opened)
             if (!ImGui::GetIO().MouseDown[0])
                 adding_line = adding_preview = false;
         }
-        if (ImGui::GetIO().MouseClicked[1] && !points.empty())
+        if (ImGui::IsMouseClicked(1) && !points.empty())
         {
-            adding_line = false;
+            adding_line = adding_preview = false;
             points.pop_back();
             points.pop_back();
         }

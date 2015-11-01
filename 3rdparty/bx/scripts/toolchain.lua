@@ -170,26 +170,26 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
 
 		elseif "ios-arm" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "clang"
-			premake.gcc.cxx = "clang++"
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-arm"))
 
 		elseif "ios-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "clang"
-			premake.gcc.cxx = "clang++"
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
 
 		elseif "tvos-arm64" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "clang"
-			premake.gcc.cxx = "clang++"
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-arm64"))
 
 		elseif "tvos-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "clang"
-			premake.gcc.cxx = "clang++"
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-simulator"))
 
@@ -489,6 +489,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
+			"-static",
 			"-static-libgcc",
 			"-static-libstdc++",
 		}

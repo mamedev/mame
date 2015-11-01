@@ -81,8 +81,11 @@ function bgfxProject(_name, _kind, _defines)
 			}
 
 		configuration { "osx" }
-			links {
-				"Cocoa.framework",
+			linkoptions {
+				"-framework Cocoa",
+				"-framework Metal",
+				"-framework QuartzCore",
+				"-framework OpenGL",
 			}
 
 		configuration { "not nacl" }
@@ -129,7 +132,7 @@ function bgfxProject(_name, _kind, _defines)
 				path.join(BGFX_DIR, "src/vertexdecl.cpp"),
 			}
 
-			configuration { "xcode4 or osx or ios*" }
+			configuration { "xcode* or osx or ios*" }
 				files {
 					path.join(BGFX_DIR, "src/amalgamated.mm"),
 				}
@@ -144,7 +147,7 @@ function bgfxProject(_name, _kind, _defines)
 			configuration {}
 
 		else
-			configuration { "xcode4 or osx or ios*" }
+			configuration { "xcode* or osx or ios*" }
 				files {
 					path.join(BGFX_DIR, "src/glcontext_eagl.mm"),
 					path.join(BGFX_DIR, "src/glcontext_nsgl.mm"),

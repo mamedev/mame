@@ -441,6 +441,7 @@ namespace bgfx { namespace gl
 
 			ARB_compute_shader,
 			ARB_conservative_depth,
+			ARB_copy_image,
 			ARB_debug_label,
 			ARB_debug_output,
 			ARB_depth_buffer_float,
@@ -499,6 +500,7 @@ namespace bgfx { namespace gl
 			EXT_blend_subtract,
 			EXT_color_buffer_half_float,
 			EXT_color_buffer_float,
+			EXT_copy_image,
 			EXT_compressed_ETC1_RGB8_sub_texture,
 			EXT_debug_label,
 			EXT_debug_marker,
@@ -554,10 +556,12 @@ namespace bgfx { namespace gl
 			MOZ_WEBGL_compressed_texture_s3tc,
 			MOZ_WEBGL_depth_texture,
 
-			NV_texture_border_clamp,
+			NV_copy_image,
 			NV_draw_buffers,
+			NV_texture_border_clamp,
 			NVX_gpu_memory_info,
 
+			OES_copy_image,
 			OES_compressed_ETC1_RGB8_texture,
 			OES_depth24,
 			OES_depth32,
@@ -640,6 +644,7 @@ namespace bgfx { namespace gl
 
 		{ "ARB_compute_shader",                    BGFX_CONFIG_RENDERER_OPENGL >= 43, true  },
 		{ "ARB_conservative_depth",                BGFX_CONFIG_RENDERER_OPENGL >= 42, true  },
+		{ "ARB_copy_image",                        BGFX_CONFIG_RENDERER_OPENGL >= 42, true  },
 		{ "ARB_debug_label",                       false,                             true  },
 		{ "ARB_debug_output",                      BGFX_CONFIG_RENDERER_OPENGL >= 43, true  },
 		{ "ARB_depth_buffer_float",                BGFX_CONFIG_RENDERER_OPENGL >= 33, true  },
@@ -698,6 +703,7 @@ namespace bgfx { namespace gl
 		{ "EXT_blend_subtract",                    BGFX_CONFIG_RENDERER_OPENGL >= 14, true  },
 		{ "EXT_color_buffer_half_float",           false,                             true  }, // GLES2 extension.
 		{ "EXT_color_buffer_float",                false,                             true  }, // GLES2 extension.
+		{ "EXT_copy_image",                        false,                             true  }, // GLES2 extension.
 		{ "EXT_compressed_ETC1_RGB8_sub_texture",  false,                             true  }, // GLES2 extension.
 		{ "EXT_debug_label",                       false,                             true  },
 		{ "EXT_debug_marker",                      false,                             true  },
@@ -753,10 +759,12 @@ namespace bgfx { namespace gl
 		{ "MOZ_WEBGL_compressed_texture_s3tc",     false,                             true  },
 		{ "MOZ_WEBGL_depth_texture",               false,                             true  },
 
-		{ "NV_texture_border_clamp",               false,                             true  }, // GLES2 extension.
+		{ "NV_copy_image",                         false,                             true  },
 		{ "NV_draw_buffers",                       false,                             true  }, // GLES2 extension.
+		{ "NV_texture_border_clamp",               false,                             true  }, // GLES2 extension.
 		{ "NVX_gpu_memory_info",                   false,                             true  },
 
+		{ "OES_copy_image",                        false,                             true  },
 		{ "OES_compressed_ETC1_RGB8_texture",      false,                             true  },
 		{ "OES_depth24",                           false,                             true  },
 		{ "OES_depth32",                           false,                             true  },
@@ -1195,6 +1203,8 @@ namespace bgfx { namespace gl
 			, m_maxAnisotropyDefault(0.0f)
 			, m_maxMsaa(0)
 			, m_vao(0)
+			, m_blitSupported(false)
+			, m_readBackSupported(BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
 			, m_vaoSupport(false)
 			, m_samplerObjectSupport(false)
 			, m_shadowSamplersSupport(false)
@@ -1584,12 +1594,16 @@ namespace bgfx { namespace gl
 			{
 				uint8_t supported = 0;
 				supported |= s_textureFormat[ii].m_supported
-					? BGFX_CAPS_FORMAT_TEXTURE_COLOR
+					? BGFX_CAPS_FORMAT_TEXTURE_2D
+					| BGFX_CAPS_FORMAT_TEXTURE_3D
+					| BGFX_CAPS_FORMAT_TEXTURE_CUBE
 					: BGFX_CAPS_FORMAT_TEXTURE_NONE
 					;
 
 				supported |= isTextureFormatValid(TextureFormat::Enum(ii), true)
-					? BGFX_CAPS_FORMAT_TEXTURE_COLOR_SRGB
+					? BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB
+					| BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB
+					| BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB
 					: BGFX_CAPS_FORMAT_TEXTURE_NONE
 					;
 
@@ -1694,6 +1708,23 @@ namespace bgfx { namespace gl
 
 			g_caps.supported |= drawIndirectSupported
 				? BGFX_CAPS_DRAW_INDIRECT
+				: 0
+				;
+
+			if (s_extension[Extension::ARB_copy_image].m_supported
+			||  s_extension[Extension::EXT_copy_image].m_supported
+			||  s_extension[Extension:: NV_copy_image].m_supported
+			||  s_extension[Extension::OES_copy_image].m_supported)
+			{
+				m_blitSupported   = NULL != glCopyImageSubData;
+				g_caps.supported |= m_blitSupported
+					? BGFX_CAPS_TEXTURE_BLIT
+					: 0
+					;
+			}
+
+			g_caps.supported |= m_readBackSupported
+				? BGFX_CAPS_TEXTURE_READ_BACK
 				: 0
 				;
 
@@ -2072,6 +2103,36 @@ namespace bgfx { namespace gl
 		{
 		}
 
+		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		{
+			if (m_readBackSupported)
+			{
+				const TextureGL& texture = m_textures[_handle.idx];
+				const bool compressed    = isCompressed(TextureFormat::Enum(texture.m_textureFormat) );
+
+				GL_CHECK(glBindTexture(texture.m_target, texture.m_id) );
+
+				if (compressed)
+				{
+					GL_CHECK(glGetCompressedTexImage(texture.m_target
+						, 0
+						, _data
+						) );
+				}
+				else
+				{
+					GL_CHECK(glGetTexImage(texture.m_target
+						, 0
+						, texture.m_fmt
+						, texture.m_type
+						, _data
+						) );
+				}
+
+				GL_CHECK(glBindTexture(texture.m_target, 0) );
+			}
+		}
+
 		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height) BX_OVERRIDE
 		{
 			TextureGL& texture = m_textures[_handle.idx];
@@ -2289,11 +2350,13 @@ namespace bgfx { namespace gl
 			||  m_resolution.m_height != _resolution.m_height
 			||  m_resolution.m_flags  != flags)
 			{
-				m_textVideoMem.resize(false, _resolution.m_width, _resolution.m_height);
-				m_textVideoMem.clear();
+				flags &= ~BGFX_RESET_FORCE;
 
 				m_resolution = _resolution;
 				m_resolution.m_flags = flags;
+
+				m_textVideoMem.resize(false, _resolution.m_width, _resolution.m_height);
+				m_textVideoMem.clear();
 
 				if ( (flags & BGFX_RESET_HMD)
 				&&  m_ovr.isInitialized() )
@@ -3084,6 +3147,8 @@ namespace bgfx { namespace gl
 		float m_maxAnisotropyDefault;
 		int32_t m_maxMsaa;
 		GLuint m_vao;
+		bool m_blitSupported;
+		bool m_readBackSupported;
 		bool m_vaoSupport;
 		bool m_samplerObjectSupport;
 		bool m_shadowSamplersSupport;
@@ -4882,9 +4947,14 @@ namespace bgfx { namespace gl
 					}
 					else
 					{
+						GLenum target = GL_TEXTURE_CUBE_MAP == texture.m_target
+							? GL_TEXTURE_CUBE_MAP_POSITIVE_X
+							: texture.m_target
+							;
+
 						GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER
 							, attachment
-							, texture.m_target
+							, target
 							, texture.m_id
 							, 0
 							) );
@@ -5105,7 +5175,13 @@ namespace bgfx { namespace gl
 		SortKey key;
 		uint16_t view = UINT16_MAX;
 		FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
-		int32_t height = hmdEnabled
+
+		BlitKey blitKey;
+		blitKey.decode(_render->m_blitKeys[0]);
+		uint16_t numBlitItems = _render->m_numBlitItems;
+		uint16_t blitItem = 0;
+
+		int32_t resolutionHeight = hmdEnabled
 					? _render->m_hmd.height
 					: _render->m_resolution.m_height
 					;
@@ -5177,11 +5253,11 @@ namespace bgfx { namespace gl
 					if (_render->m_fb[view].idx != fbh.idx)
 					{
 						fbh = _render->m_fb[view];
-						height = hmdEnabled
+						resolutionHeight = hmdEnabled
 							? _render->m_hmd.height
 							: _render->m_resolution.m_height
 							;
-						height = setFrameBuffer(fbh, height, discardFlags);
+						resolutionHeight = setFrameBuffer(fbh, resolutionHeight, discardFlags);
 					}
 
 					viewRestart = ( (BGFX_VIEW_STEREO == (_render->m_viewFlags[view] & BGFX_VIEW_STEREO) ) );
@@ -5239,7 +5315,7 @@ namespace bgfx { namespace gl
 					viewScissorRect = viewHasScissor ? scissorRect : viewState.m_rect;
 
 					GL_CHECK(glViewport(viewState.m_rect.m_x
-						, height-viewState.m_rect.m_height-viewState.m_rect.m_y
+						, resolutionHeight-viewState.m_rect.m_height-viewState.m_rect.m_y
 						, viewState.m_rect.m_width
 						, viewState.m_rect.m_height
 						) );
@@ -5249,7 +5325,7 @@ namespace bgfx { namespace gl
 
 					if (BGFX_CLEAR_NONE != (clear.m_flags & BGFX_CLEAR_MASK) )
 					{
-						clearQuad(_clearQuad, viewState.m_rect, clear, height, _render->m_colorPalette);
+						clearQuad(_clearQuad, viewState.m_rect, clear, resolutionHeight, _render->m_colorPalette);
 					}
 
 					GL_CHECK(glDisable(GL_STENCIL_TEST) );
@@ -5257,6 +5333,45 @@ namespace bgfx { namespace gl
 					GL_CHECK(glDepthFunc(GL_LESS) );
 					GL_CHECK(glEnable(GL_CULL_FACE) );
 					GL_CHECK(glDisable(GL_BLEND) );
+
+					if (m_blitSupported)
+					{
+						for (; blitItem < numBlitItems && blitKey.m_view <= view; blitItem++)
+						{
+							const BlitItem& bi = _render->m_blitItem[blitItem];
+							blitKey.decode(_render->m_blitKeys[blitItem + 1]);
+
+							const TextureGL& src = m_textures[bi.m_src.idx];
+							const TextureGL& dst = m_textures[bi.m_dst.idx];
+
+							uint32_t srcWidth  = bx::uint32_min(src.m_width,  bi.m_srcX + bi.m_width)  - bi.m_srcX;
+							uint32_t srcHeight = bx::uint32_min(src.m_height, bi.m_srcY + bi.m_height) - bi.m_srcY;
+							uint32_t srcDepth  = bx::uint32_min(src.m_depth,  bi.m_srcZ + bi.m_depth)  - bi.m_srcZ;
+							uint32_t dstWidth  = bx::uint32_min(dst.m_width,  bi.m_dstX + bi.m_width)  - bi.m_dstX;
+							uint32_t dstHeight = bx::uint32_min(dst.m_height, bi.m_dstY + bi.m_height) - bi.m_dstY;
+							uint32_t dstDepth  = bx::uint32_min(dst.m_depth,  bi.m_dstZ + bi.m_depth)  - bi.m_dstZ;
+							uint32_t width     = bx::uint32_min(srcWidth,  dstWidth);
+							uint32_t height    = bx::uint32_min(srcHeight, dstHeight);
+							uint32_t depth     = bx::uint32_min(srcDepth,  dstDepth);
+
+							GL_CHECK(glCopyImageSubData(src.m_id
+								, src.m_target
+								, bi.m_srcMip
+								, bi.m_srcX
+								, bi.m_srcY
+								, bi.m_srcZ
+								, dst.m_id
+								, dst.m_target
+								, bi.m_dstMip
+								, bi.m_dstX
+								, bi.m_dstY
+								, bi.m_dstZ
+								, width
+								, height
+								, bx::uint32_imax(depth, 1)
+								) );
+						}
+					}
 				}
 
 				if (isCompute)
@@ -5419,7 +5534,7 @@ namespace bgfx { namespace gl
 						{
 							GL_CHECK(glEnable(GL_SCISSOR_TEST) );
 							GL_CHECK(glScissor(viewScissorRect.m_x
-								, height-viewScissorRect.m_height-viewScissorRect.m_y
+								, resolutionHeight-viewScissorRect.m_height-viewScissorRect.m_y
 								, viewScissorRect.m_width
 								, viewScissorRect.m_height
 								) );
@@ -5435,7 +5550,7 @@ namespace bgfx { namespace gl
 						scissorRect.intersect(viewScissorRect, _render->m_rectCache.m_cache[scissor]);
 						GL_CHECK(glEnable(GL_SCISSOR_TEST) );
 						GL_CHECK(glScissor(scissorRect.m_x
-							, height-scissorRect.m_height-scissorRect.m_y
+							, resolutionHeight-scissorRect.m_height-scissorRect.m_y
 							, scissorRect.m_width
 							, scissorRect.m_height
 							) );
