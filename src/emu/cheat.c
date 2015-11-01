@@ -834,7 +834,7 @@ bool cheat_entry::activate()
 	{
 		execute_on_script();
 		changed = true;
-		popmessage("Activated %s", m_description.c_str());
+		manager().machine().popmessage("Activated %s", m_description.c_str());
 	}
 
 	// if we're a oneshot parameter cheat and we're active, execute the "state change" script and indicate change
@@ -842,7 +842,7 @@ bool cheat_entry::activate()
 	{
 		execute_change_script();
 		changed = true;
-		popmessage("Activated\n %s = %s", m_description.c_str(), m_parameter->text());
+		manager().machine().popmessage("Activated\n %s = %s", m_description.c_str(), m_parameter->text());
 	}
 
 	return changed;
@@ -1097,7 +1097,7 @@ void cheat_manager::set_enable(bool enable)
 		for (cheat_entry *cheat = m_cheatlist.first(); cheat != NULL; cheat = cheat->next())
 			if (cheat->state() == SCRIPT_STATE_RUN)
 				cheat->execute_off_script();
-		popmessage("Cheats Disabled");
+		machine().popmessage("Cheats Disabled");
 		m_disabled = true;
 	}
 
@@ -1109,7 +1109,7 @@ void cheat_manager::set_enable(bool enable)
 		for (cheat_entry *cheat = m_cheatlist.first(); cheat != NULL; cheat = cheat->next())
 			if (cheat->state() == SCRIPT_STATE_RUN)
 				cheat->execute_on_script();
-		popmessage("Cheats Enabled");
+		machine().popmessage("Cheats Enabled");
 	}
 }
 

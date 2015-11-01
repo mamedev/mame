@@ -98,7 +98,7 @@ INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 			state->m_aga_sprdatb[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			state->m_aga_sprite_fetched_words = 1;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, state->m_aga_sprdata[sprite][0], state->m_aga_sprdatb[sprite][0]);
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, state->m_aga_sprdata[sprite][0], state->m_aga_sprdatb[sprite][0]);
 			break;
 		case 1:
 		case 2:
@@ -109,7 +109,7 @@ INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 			state->m_aga_sprdatb[sprite][1] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			state->m_aga_sprite_fetched_words = 2;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X\n", scanline, sprite, state->m_aga_sprdata[sprite][0], state->m_aga_sprdatb[sprite][0], state->m_aga_sprdata[sprite][1], state->m_aga_sprdatb[sprite][1] );
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X\n", scanline, sprite, state->m_aga_sprdata[sprite][0], state->m_aga_sprdatb[sprite][0], state->m_aga_sprdata[sprite][1], state->m_aga_sprdatb[sprite][1] );
 			break;
 		case 3:
 			state->m_aga_sprdata[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
@@ -125,7 +125,7 @@ INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 			state->m_aga_sprdatb[sprite][3] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			state->m_aga_sprite_fetched_words = 4;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n",
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n",
 										scanline, sprite,
 										state->m_aga_sprdata[sprite][0], state->m_aga_sprdatb[sprite][0],
 										state->m_aga_sprdata[sprite][1], state->m_aga_sprdatb[sprite][1],
@@ -176,7 +176,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 					CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 3*4;
 					break;
 			}
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
 
 		/* compute vstart/vstop */
@@ -187,7 +187,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 		if (scanline == vstart)
 		{
 			state->m_sprite_comparitor_enable_mask |= 1 << num;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor enable\n", scanline, num);
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d comparitor enable\n", scanline, num);
 		}
 
 		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
@@ -198,7 +198,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 			state->m_sprite_dma_reload_mask |= 1 << num;
 			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
 			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
 		}
 
 		/* fetch data if this sprite is enabled */

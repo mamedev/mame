@@ -898,7 +898,7 @@ void natural_keyboard::post(unicode_char ch)
 	{
 		const keycode_map_entry *code = find_code(ch);
 		std::string tempstr;
-		logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(tempstr, ch), (code != NULL && code->field[0] != NULL) ? code->field[0]->name() : "<null>");
+		machine().logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(tempstr, ch), (code != NULL && code->field[0] != NULL) ? code->field[0]->name() : "<null>");
 	}
 
 	// can we post this key in the queue directly?
@@ -1102,7 +1102,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 							if (LOG_NATURAL_KEYBOARD)
 							{
 								std::string tempstr;
-								logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(tempstr, code), (void *)port, field->name());
+								machine().logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(tempstr, code), (void *)port, field->name());
 							}
 						}
 					}
@@ -3421,7 +3421,7 @@ void ioport_manager::playback_end(const char *message)
 
 		// pop a message
 		if (message != NULL)
-			popmessage("Playback Ended\nReason: %s", message);
+			machine().popmessage("Playback Ended\nReason: %s", message);
 
 		// display speed stats
 		m_playback_accumulated_speed /= m_playback_accumulated_frames;
@@ -3567,7 +3567,7 @@ void ioport_manager::record_end(const char *message)
 
 		// pop a message
 		if (message != NULL)
-			popmessage("Recording Ended\nReason: %s", message);
+			machine().popmessage("Recording Ended\nReason: %s", message);
 	}
 }
 

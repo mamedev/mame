@@ -693,6 +693,7 @@ struct YM2612
 	/* dac output (YM2612) */
 	int         dacen;
 	INT32       dacout;
+	device_t	*device;
 };
 
 /* log output level */
@@ -702,7 +703,7 @@ struct YM2612
 #define LOG_LEVEL LOG_INF
 
 #ifndef __RAINE__
-#define LOG(n,x) do { if( (n)>=LOG_LEVEL ) logerror x; } while (0)
+#define LOG(d,n,x) do { if( (n)>=LOG_LEVEL ) d->logerror x; } while (0)
 #endif
 
 /* limitter */
@@ -2375,6 +2376,7 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 	/* allocate total level table (128kb space) */
 	init_tables();
 
+	F2612->device = device;
 	F2612->OPN.ST.param = param;
 	F2612->OPN.type = TYPE_YM2612;
 	F2612->OPN.P_CH = F2612->CH;
@@ -2528,7 +2530,7 @@ UINT8 ym2612_read(void *chip,int a)
 	case 1:
 	case 2:
 	case 3:
-		LOG(LOG_WAR,("YM2612 #%p:A=%d read unmapped area\n",F2612->OPN.ST.param,a));
+		LOG(F2612->device,LOG_WAR,("YM2612 #%p:A=%d read unmapped area\n",F2612->OPN.ST.param,a));
 		return FM_STATUS_FLAG(&F2612->OPN.ST);
 	}
 	return 0;

@@ -158,12 +158,12 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 #endif
 	if(!m_p)
 	{
-		logerror("Unable to open %s: %s\n", name, errbuf);
+		osd_printf_error("Unable to open %s: %s\n", name, errbuf);
 		return;
 	}
 	if(pcap_set_datalink_dl(m_p, DLT_EN10MB) == -1)
 	{
-		logerror("Unable to set %s to ethernet", name);
+		osd_printf_error("Unable to set %s to ethernet", name);
 		pcap_close_dl(m_p);
 		m_p = NULL;
 		return;
@@ -189,10 +189,10 @@ void netdev_pcap::set_mac(const char *mac)
 	sprintf(filter, "ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
 #endif
 	if(pcap_compile_dl(m_p, &fp, filter, 1, 0) == -1) {
-		logerror("Error with pcap_compile\n");
+		osd_printf_error("Error with pcap_compile\n");
 	}
 	if(pcap_setfilter_dl(m_p, &fp) == -1) {
-		logerror("Error with pcap_setfilter\n");
+		osd_printf_error("Error with pcap_setfilter\n");
 	}
 }
 
@@ -289,13 +289,13 @@ int pcap_module::init(const osd_options &options)
 	catch (except_type e)
 	{
 		FreeLibrary(handle);
-		logerror(LIB_ERROR_STR, e);
+		osd_printf_error(LIB_ERROR_STR, e);
 		return 1;
 	}
 	if(pcap_findalldevs_dl(&devs, errbuf) == -1)
 	{
 		FreeLibrary(handle);
-		logerror("Unable to get network devices: %s\n", errbuf);
+		osd_printf_error("Unable to get network devices: %s\n", errbuf);
 		return 1;
 	}
 

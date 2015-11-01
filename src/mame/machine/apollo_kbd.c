@@ -15,7 +15,7 @@
 #include "machine/apollo_kbd.h"
 #include "sound/beep.h"
 
-#define LOG(x)  { logerror ("%s apollo_kbd: ", m_device->cpu_context()); logerror x; logerror ("\n"); }
+#define LOG(x)  { m_device->logerror ("%s apollo_kbd: ", m_device->cpu_context()); m_device->logerror x; m_device->logerror ("\n"); }
 #define LOG1(x) { if (VERBOSE > 0) LOG(x)}
 #define LOG2(x) { if (VERBOSE > 1) LOG(x)}
 

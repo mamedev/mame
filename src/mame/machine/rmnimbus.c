@@ -116,7 +116,7 @@ enum
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 
-#define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
+#define OUTPUT_SEGOFS(mess,seg,ofs)  device->logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
 
 #define LOG_SIO             0
 #define LOG_DISK_HDD        0
@@ -310,8 +310,8 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 
 	if(!raw_flag)
 	{
-		logerror("=======================================================================\n");
-		logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
+		device->logerror("=======================================================================\n");
+		device->logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
 	}
 
 	set_type("invalid");
@@ -619,11 +619,11 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 	}
 	else
 	{
-		logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
+		device->logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
 
 		if(dump_dssi!=NULL)
 			dump_dssi(device,ds,si,raw_flag);
-		logerror("=======================================================================\n");
+		device->logerror("=======================================================================\n");
 	}
 }
 
@@ -650,9 +650,9 @@ static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 ra
 	params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
 	for(count=0; count<10; count++)
-		logerror("%04X ",params[count]);
+		device->logerror("%04X ",params[count]);
 
-	logerror("\n");
+	device->logerror("\n");
 }
 
 
@@ -675,18 +675,18 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 
 	if(raw_flag)
 	{
-		logerror("\tdw\t%04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, ",
+		device->logerror("\tdw\t%04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, ",
 					brush->style,brush->style_index,brush->colour1,brush->colour2,
 					brush->transparency,brush->boundary_spec,brush->boundary_colour,brush->save_colour,
 					area_params->count);
 	}
 	else
 	{
-		logerror("Brush params\n");
-		logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
-		logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
-		logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
-		logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
+		device->logerror("Brush params\n");
+		device->logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
+		device->logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
+		device->logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
+		device->logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
 
 
 		OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
@@ -698,16 +698,16 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 		if(raw_flag)
 		{
 			if(cocount!=(area_params->count-1))
-				logerror("%04X, %04X, ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
+				device->logerror("%04X, %04X, ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
 			else
-				logerror("%04X, %04X ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
+				device->logerror("%04X, %04X ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
 		}
 		else
-			logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
+			device->logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
 	}
 
 	if(raw_flag)
-		logerror("\n");
+		device->logerror("\n");
 }
 
 static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
@@ -727,17 +727,17 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 	OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
 	OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
 
-	logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
+	device->logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
 
 	char_ptr=(UINT8*)space.get_read_ptr(LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
 
 	if (plot_string_params->length==0xFFFF)
-		logerror("%s",char_ptr);
+		device->logerror("%s",char_ptr);
 	else
 		for(charno=0;charno<plot_string_params->length;charno++)
-			logerror("%c",char_ptr[charno]);
+			device->logerror("%c",char_ptr[charno]);
 
-	logerror("\n");
+	device->logerror("\n");
 }
 
 static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
@@ -754,7 +754,7 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UI
 	OUTPUT_SEGOFS("SegColours:OfsColours",ds,si);
 
 	for(colour=0;colour<16;colour++)
-		logerror("colour #%02X=%04X\n",colour,new_colours[colour]);
+		device->logerror("colour #%02X=%04X\n",colour,new_colours[colour]);
 
 }
 
@@ -770,7 +770,7 @@ static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UIN
 
 	OUTPUT_SEGOFS("SegParams:OfsParams",ds,si);
 
-	logerror("plonked_char=%c\n",params[0]);
+	device->logerror("plonked_char=%c\n",params[0]);
 }
 
 static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
@@ -786,9 +786,9 @@ static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UIN
 	params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
 	for(param_no=0;param_no<16;param_no++)
-		logerror("%04X ",params[param_no]);
+		device->logerror("%04X ",params[param_no]);
 
-	logerror("\n");
+	device->logerror("\n");
 }
 
 static void decode_dos21(device_t *device,offs_t pc)
@@ -808,12 +808,12 @@ static void decode_dos21(device_t *device,offs_t pc)
 	UINT16  di = cpu->state().state_int(I8086_DI);
 	UINT16  bp = cpu->state().state_int(I8086_BP);
 
-	logerror("=======================================================================\n");
-	logerror("DOS Int 0x21 call at %05X\n",pc);
-	logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
-	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
-	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
-	logerror("=======================================================================\n");
+	device->logerror("=======================================================================\n");
+	device->logerror("DOS Int 0x21 call at %05X\n",pc);
+	device->logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
+	device->logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
+	device->logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
+	device->logerror("=======================================================================\n");
 }
 
 

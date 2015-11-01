@@ -1452,7 +1452,7 @@ protected:
 
 #define VERBOSE_LEVEL ( 5 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char* s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -1461,8 +1461,8 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context(), buf );
-		//printf( "%s: %s", machine.describe_context(), buf );
+		device.logerror( "%s: %s", device.machine().describe_context(), buf );
+		//printf( "%s: %s", device.machine().describe_context(), buf );
 	}
 }
 
@@ -1515,33 +1515,33 @@ READ32_MEMBER(zaurus_state::pxa255_ostimer_r)
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", ostimer_regs->osmr[0], mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", ostimer_regs->osmr[0], mem_mask );
 			return ostimer_regs->osmr[0];
 		case PXA255_OSMR1:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 1: %08x & %08x\n", ostimer_regs->osmr[1], mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 1: %08x & %08x\n", ostimer_regs->osmr[1], mem_mask );
 			return ostimer_regs->osmr[1];
 		case PXA255_OSMR2:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 2: %08x & %08x\n", ostimer_regs->osmr[2], mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 2: %08x & %08x\n", ostimer_regs->osmr[2], mem_mask );
 			return ostimer_regs->osmr[2];
 		case PXA255_OSMR3:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 3: %08x & %08x\n", ostimer_regs->osmr[3], mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 3: %08x & %08x\n", ostimer_regs->osmr[3], mem_mask );
 			return ostimer_regs->osmr[3];
 		case PXA255_OSCR:
-			if (0) verboselog( machine(), 4, "pxa255_ostimer_r: OS Timer Count Register: %08x & %08x\n", ostimer_regs->oscr, mem_mask );
+			if (0) verboselog(*this, 4, "pxa255_ostimer_r: OS Timer Count Register: %08x & %08x\n", ostimer_regs->oscr, mem_mask );
 			// free-running 3.something MHz counter.  this is a complete hack.
 			ostimer_regs->oscr += 0x300;
 			return ostimer_regs->oscr;
 		case PXA255_OSSR:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_r: OS Timer Status Register: %08x & %08x\n", ostimer_regs->ossr, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Status Register: %08x & %08x\n", ostimer_regs->ossr, mem_mask );
 			return ostimer_regs->ossr;
 		case PXA255_OWER:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_r: OS Timer Watchdog Match Enable Register: %08x & %08x\n", ostimer_regs->ower, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Watchdog Match Enable Register: %08x & %08x\n", ostimer_regs->ower, mem_mask );
 			return ostimer_regs->ower;
 		case PXA255_OIER:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_r: OS Timer Interrupt Enable Register: %08x & %08x\n", ostimer_regs->oier, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Interrupt Enable Register: %08x & %08x\n", ostimer_regs->oier, mem_mask );
 			return ostimer_regs->oier;
 		default:
-			if (0) verboselog( machine(), 0, "pxa255_ostimer_r: Unknown address: %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2));
+			if (0) verboselog(*this, 0, "pxa255_ostimer_r: Unknown address: %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -1554,7 +1554,7 @@ WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 0: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 0: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[0] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E0)
 			{
@@ -1565,7 +1565,7 @@ WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
 			}
 			break;
 		case PXA255_OSMR1:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 1: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 1: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[1] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E1)
 			{
@@ -1575,7 +1575,7 @@ WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
 			}
 			break;
 		case PXA255_OSMR2:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 2: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 2: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[2] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E2)
 			{
@@ -1585,7 +1585,7 @@ WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
 			}
 			break;
 		case PXA255_OSMR3:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 3: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 3: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[3] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E3)
 			{
@@ -1595,22 +1595,22 @@ WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
 			}
 			break;
 		case PXA255_OSCR:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Count Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Count Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->oscr = data;
 			break;
 		case PXA255_OSSR:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Status Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Status Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->ossr &= ~data;
 			pxa255_ostimer_irq_check();
 			break;
 		case PXA255_OWER:
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Watchdog Enable Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Watchdog Enable Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->ower = data & 0x00000001;
 			break;
 		case PXA255_OIER:
 		{
 			int index = 0;
-			if (0) verboselog( machine(), 3, "pxa255_ostimer_w: OS Timer Interrupt Enable Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Interrupt Enable Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->oier = data & 0x0000000f;
 			for(index = 0; index < 4; index++)
 			{
@@ -1625,7 +1625,7 @@ WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
 			break;
 		}
 		default:
-			verboselog( machine(), 0, "pxa255_ostimer_w: Unknown address: %08x = %08x & %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog(*this, 0, "pxa255_ostimer_w: Unknown address: %08x = %08x & %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -1637,25 +1637,25 @@ READ32_MEMBER(zaurus_state::pxa255_intc_r)
 	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_ICIP:
-			if (0) verboselog( machine(), 3, "pxa255_intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", intc_regs->icip, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", intc_regs->icip, mem_mask );
 			return intc_regs->icip;
 		case PXA255_ICMR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_r: Interrupt Controller Mask Register: %08x & %08x\n", intc_regs->icmr, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Mask Register: %08x & %08x\n", intc_regs->icmr, mem_mask );
 			return intc_regs->icmr;
 		case PXA255_ICLR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_r: Interrupt Controller Level Register: %08x & %08x\n", intc_regs->iclr, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Level Register: %08x & %08x\n", intc_regs->iclr, mem_mask );
 			return intc_regs->iclr;
 		case PXA255_ICFP:
-			if (0) verboselog( machine(), 3, "pxa255_intc_r: Interrupt Controller FIQ Pending Register: %08x & %08x\n", intc_regs->icfp, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller FIQ Pending Register: %08x & %08x\n", intc_regs->icfp, mem_mask );
 			return intc_regs->icfp;
 		case PXA255_ICPR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_r: Interrupt Controller Pending Register: %08x & %08x\n", intc_regs->icpr, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Pending Register: %08x & %08x\n", intc_regs->icpr, mem_mask );
 			return intc_regs->icpr;
 		case PXA255_ICCR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_r: Interrupt Controller Control Register: %08x & %08x\n", intc_regs->iccr, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Control Register: %08x & %08x\n", intc_regs->iccr, mem_mask );
 			return intc_regs->iccr;
 		default:
-			verboselog( machine(), 0, "pxa255_intc_r: Unknown address: %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2));
+			verboselog(*this, 0, "pxa255_intc_r: Unknown address: %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -1668,28 +1668,28 @@ WRITE32_MEMBER(zaurus_state::pxa255_intc_w)
 	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_ICIP:
-			verboselog( machine(), 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller IRQ Pending Register: %08x & %08x\n", data, mem_mask );
+			verboselog(*this, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller IRQ Pending Register: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_ICMR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_w: Interrupt Controller Mask Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_w: Interrupt Controller Mask Register: %08x & %08x\n", data, mem_mask );
 			intc_regs->icmr = data & 0xfffe7f00;
 			break;
 		case PXA255_ICLR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_w: Interrupt Controller Level Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_w: Interrupt Controller Level Register: %08x & %08x\n", data, mem_mask );
 			intc_regs->iclr = data & 0xfffe7f00;
 			break;
 		case PXA255_ICFP:
-			if (0) verboselog( machine(), 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller FIQ Pending Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller FIQ Pending Register: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_ICPR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller Pending Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller Pending Register: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_ICCR:
-			if (0) verboselog( machine(), 3, "pxa255_intc_w: Interrupt Controller Control Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog(*this, 3, "pxa255_intc_w: Interrupt Controller Control Register: %08x & %08x\n", data, mem_mask );
 			intc_regs->iccr = data & 0x00000001;
 			break;
 		default:
-			verboselog( machine(), 0, "pxa255_intc_w: Unknown address: %08x = %08x & %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog(*this, 0, "pxa255_intc_w: Unknown address: %08x = %08x & %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }

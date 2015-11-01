@@ -101,7 +101,7 @@ static const UINT16 m_p_n_prevpointlist3[] = { 2, 0, 1 };
 #define TEXTURE_V( a ) ( a.b.h )
 #define TEXTURE_U( a ) ( a.b.l )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -110,7 +110,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context(), buf );
+		device.logerror( "%s: %s", device.machine().describe_context(), buf );
 	}
 }
 
@@ -790,11 +790,11 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 		n_ti = 0;
 		if( ( tpage & ~0x39ff ) != 0 )
 		{
-			verboselog( machine(), 1, "not handled: draw mode %08x\n", tpage & ~0x39ff );
+			verboselog( *this, 1, "not handled: draw mode %08x\n", tpage & ~0x39ff );
 		}
 		if( n_tp == 3 )
 		{
-			verboselog( machine(), 0, "not handled: tp == 3\n" );
+			verboselog( *this, 0, "not handled: tp == 3\n" );
 		}
 	}
 	else
@@ -810,15 +810,15 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 		n_iy = 0;
 		if( ( tpage & ~0x27ef ) != 0 )
 		{
-			verboselog( machine(), 1, "not handled: draw mode %08x\n", tpage & ~0x27ef );
+			verboselog( *this, 1, "not handled: draw mode %08x\n", tpage & ~0x27ef );
 		}
 		if( n_tp == 3 )
 		{
-			verboselog( machine(), 0, "not handled: tp == 3\n" );
+			verboselog( *this, 0, "not handled: tp == 3\n" );
 		}
 		else if( n_tp == 2 && n_ti != 0 )
 		{
-			verboselog( machine(), 0, "not handled: interleaved 15 bit texture\n" );
+			verboselog( *this, 0, "not handled: interleaved 15 bit texture\n" );
 		}
 	}
 }
@@ -863,7 +863,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 			p_n_redtrans = p_n_redaddtrans; \
 			p_n_greentrans = p_n_greenaddtrans; \
 			p_n_bluetrans = p_n_blueaddtrans; \
-			verboselog( machine(), 2, "Transparency Mode: 0.5*B + 0.5*F\n" ); \
+			verboselog( *this, 2, "Transparency Mode: 0.5*B + 0.5*F\n" ); \
 			break; \
 		case 0x01: \
 			p_n_f = p_n_f1; \
@@ -873,7 +873,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 			p_n_redtrans = p_n_redaddtrans; \
 			p_n_greentrans = p_n_greenaddtrans; \
 			p_n_bluetrans = p_n_blueaddtrans; \
-			verboselog( machine(), 2, "Transparency Mode: 1.0*B + 1.0*F\n" ); \
+			verboselog( *this, 2, "Transparency Mode: 1.0*B + 1.0*F\n" ); \
 			break; \
 		case 0x02: \
 			p_n_f = p_n_f1; \
@@ -883,7 +883,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 			p_n_redtrans = p_n_redsubtrans; \
 			p_n_greentrans = p_n_greensubtrans; \
 			p_n_bluetrans = p_n_bluesubtrans; \
-			verboselog( machine(), 2, "Transparency Mode: 1.0*B - 1.0*F\n" ); \
+			verboselog( *this, 2, "Transparency Mode: 1.0*B - 1.0*F\n" ); \
 			break; \
 		case 0x03: \
 			p_n_f = p_n_f025; \
@@ -893,7 +893,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 			p_n_redtrans = p_n_redaddtrans; \
 			p_n_greentrans = p_n_greenaddtrans; \
 			p_n_bluetrans = p_n_blueaddtrans; \
-			verboselog( machine(), 2, "Transparency Mode: 1.0*B + 0.25*F\n" ); \
+			verboselog( *this, 2, "Transparency Mode: 1.0*B + 0.25*F\n" ); \
 			break; \
 		} \
 		break; \
@@ -3046,15 +3046,15 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 	{
 		UINT32 data = *( p_ram );
 
-		verboselog( machine(), 2, "PSX Packet #%u %08x\n", n_gpu_buffer_offset, data );
+		verboselog( *this, 2, "PSX Packet #%u %08x\n", n_gpu_buffer_offset, data );
 		m_packet.n_entry[ n_gpu_buffer_offset ] = data;
 		switch( m_packet.n_entry[ 0 ] >> 24 )
 		{
 		case 0x00:
-			verboselog( machine(), 1, "not handled: GPU Command 0x00: (%08x)\n", data );
+			verboselog( *this, 1, "not handled: GPU Command 0x00: (%08x)\n", data );
 			break;
 		case 0x01:
-			verboselog( machine(), 1, "not handled: clear cache\n" );
+			verboselog( *this, 1, "not handled: clear cache\n" );
 			break;
 		case 0x02:
 			if( n_gpu_buffer_offset < 2 )
@@ -3063,7 +3063,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: frame buffer rectangle %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( *this, 1, "%02x: frame buffer rectangle %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 1 ] & 0xffff, m_packet.n_entry[ 1 ] >> 16, m_packet.n_entry[ 2 ] & 0xffff, m_packet.n_entry[ 2 ] >> 16 );
 				FrameBufferRectangleDraw();
 				n_gpu_buffer_offset = 0;
@@ -3079,7 +3079,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: monochrome 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: monochrome 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatPolygon( 3 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3094,7 +3094,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatTexturedPolygon( 3 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3109,7 +3109,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: monochrome 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: monochrome 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatPolygon( 4 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3124,7 +3124,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatTexturedPolygon( 4 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3139,7 +3139,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: gouraud 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: gouraud 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudPolygon( 3 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3154,7 +3154,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: gouraud textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: gouraud textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudTexturedPolygon( 3 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3169,7 +3169,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: gouraud 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: gouraud 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudPolygon( 4 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3184,7 +3184,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: gouraud textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: gouraud textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudTexturedPolygon( 4 );
 				n_gpu_buffer_offset = 0;
 			}
@@ -3198,7 +3198,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: monochrome line\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: monochrome line\n", m_packet.n_entry[ 0 ] >> 24 );
 				MonochromeLine();
 				n_gpu_buffer_offset = 0;
 			}
@@ -3213,7 +3213,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: monochrome polyline\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: monochrome polyline\n", m_packet.n_entry[ 0 ] >> 24 );
 				MonochromeLine();
 				if( ( m_packet.n_entry[ 3 ] & 0xf000f000 ) != 0x50005000 )
 				{
@@ -3237,7 +3237,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: gouraud line\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: gouraud line\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudLine();
 				n_gpu_buffer_offset = 0;
 			}
@@ -3253,7 +3253,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: gouraud polyline\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: gouraud polyline\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudLine();
 				if( ( m_packet.n_entry[ 4 ] & 0xf000f000 ) != 0x50005000 )
 				{
@@ -3279,7 +3279,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: rectangle %d,%d %d,%d\n",
+				verboselog( *this, 1, "%02x: rectangle %d,%d %d,%d\n",
 					m_packet.n_entry[ 0 ] >> 24,
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					(INT16)( m_packet.n_entry[ 2 ] & 0xffff ), (INT16)( m_packet.n_entry[ 2 ] >> 16 ) );
@@ -3297,7 +3297,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: sprite %d,%d %u,%u %08x, %08x\n",
+				verboselog( *this, 1, "%02x: sprite %d,%d %u,%u %08x, %08x\n",
 					m_packet.n_entry[ 0 ] >> 24,
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					m_packet.n_entry[ 3 ] & 0xffff, m_packet.n_entry[ 3 ] >> 16,
@@ -3314,7 +3314,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: dot %d,%d %08x\n",
+				verboselog( *this, 1, "%02x: dot %d,%d %08x\n",
 					m_packet.n_entry[ 0 ] >> 24,
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					m_packet.n_entry[ 0 ] & 0xffffff );
@@ -3331,7 +3331,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( *this, 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ] );
 				FlatRectangle8x8();
 				n_gpu_buffer_offset = 0;
@@ -3347,7 +3347,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: 8x8 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( *this, 1, "%02x: 8x8 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ] );
 				Sprite8x8();
 				n_gpu_buffer_offset = 0;
@@ -3362,7 +3362,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( *this, 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ] );
 				FlatRectangle16x16();
 				n_gpu_buffer_offset = 0;
@@ -3378,7 +3378,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: 16x16 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( *this, 1, "%02x: 16x16 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ] );
 				Sprite16x16();
 				n_gpu_buffer_offset = 0;
@@ -3391,7 +3391,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "move image in frame buffer %08x %08x %08x %08x\n", m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ], m_packet.n_entry[ 3 ] );
+				verboselog( *this, 1, "move image in frame buffer %08x %08x %08x %08x\n", m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ], m_packet.n_entry[ 3 ] );
 				MoveImage();
 				n_gpu_buffer_offset = 0;
 			}
@@ -3408,7 +3408,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 				{
 					UINT16 *p_vram;
 
-					verboselog( machine(), 2, "send image to framebuffer ( pixel %u,%u = %u )\n",
+					verboselog( *this, 2, "send image to framebuffer ( pixel %u,%u = %u )\n",
 						( n_vramx + m_packet.n_entry[ 1 ] ) & 1023,
 						( n_vramy + ( m_packet.n_entry[ 1 ] >> 16 ) ) & 1023,
 						data & 0xffff );
@@ -3422,7 +3422,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 						n_vramy++;
 						if( n_vramy >= ( m_packet.n_entry[ 2 ] >> 16 ) )
 						{
-							verboselog( machine(), 1, "%02x: send image to framebuffer %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
+							verboselog( *this, 1, "%02x: send image to framebuffer %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
 								m_packet.n_entry[ 1 ] & 0xffff, ( m_packet.n_entry[ 1 ] >> 16 ),
 								m_packet.n_entry[ 2 ] & 0xffff, ( m_packet.n_entry[ 2 ] >> 16 ) );
 							n_gpu_buffer_offset = 0;
@@ -3442,12 +3442,12 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( machine(), 1, "%02x: copy image from frame buffer\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( *this, 1, "%02x: copy image from frame buffer\n", m_packet.n_entry[ 0 ] >> 24 );
 				n_gpustatus |= ( 1L << 0x1b );
 			}
 			break;
 		case 0xe1:
-			verboselog( machine(), 1, "%02x: draw mode %06x\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( *this, 1, "%02x: draw mode %06x\n", m_packet.n_entry[ 0 ] >> 24,
 				m_packet.n_entry[ 0 ] & 0xffffff );
 			decode_tpage( m_packet.n_entry[ 0 ] & 0xffffff );
 			break;
@@ -3456,7 +3456,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			n_twx = ( ( ( m_packet.n_entry[ 0 ] >> 10 ) & 0x1f ) << 3 );
 			n_twh = 255 - ( ( ( m_packet.n_entry[ 0 ] >> 5 ) & 0x1f ) << 3 );
 			n_tww = 255 - ( ( m_packet.n_entry[ 0 ] & 0x1f ) << 3 );
-			verboselog( machine(), 1, "%02x: texture window %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( *this, 1, "%02x: texture window %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
 				n_twx, n_twy, n_tww, n_twh );
 			break;
 		case 0xe3:
@@ -3469,7 +3469,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				n_drawarea_y1 = ( m_packet.n_entry[ 0 ] >> 12 ) & 1023;
 			}
-			verboselog( machine(), 1, "%02x: drawing area top left %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( *this, 1, "%02x: drawing area top left %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
 				n_drawarea_x1, n_drawarea_y1 );
 			break;
 		case 0xe4:
@@ -3482,7 +3482,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				n_drawarea_y2 = ( m_packet.n_entry[ 0 ] >> 12 ) & 1023;
 			}
-			verboselog( machine(), 1, "%02x: drawing area bottom right %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( *this, 1, "%02x: drawing area bottom right %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
 				n_drawarea_x2, n_drawarea_y2 );
 			break;
 		case 0xe5:
@@ -3495,7 +3495,7 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				n_drawoffset_y = SINT11( ( m_packet.n_entry[ 0 ] >> 12 ) & 2047 );
 			}
-			verboselog( machine(), 1, "%02x: drawing offset %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( *this, 1, "%02x: drawing offset %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
 				n_drawoffset_x, n_drawoffset_y );
 			break;
 		case 0xe6:
@@ -3503,18 +3503,18 @@ void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 			n_gpustatus |= ( data & 0x03 ) << 0xb;
 			if( ( m_packet.n_entry[ 0 ] & 3 ) != 0 )
 			{
-				verboselog( machine(), 1, "not handled: mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
+				verboselog( *this, 1, "not handled: mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
 			}
 			else
 			{
-				verboselog( machine(), 1, "mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
+				verboselog( *this, 1, "mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
 			}
 			break;
 		default:
 #if defined( MAME_DEBUG )
 			popmessage( "unknown GPU packet %08x", m_packet.n_entry[ 0 ] );
 #endif
-			verboselog( machine(), 0, "unknown GPU packet %08x (%08x)\n", m_packet.n_entry[ 0 ], data );
+			verboselog( *this, 0, "unknown GPU packet %08x (%08x)\n", m_packet.n_entry[ 0 ], data );
 #if ( STOP_ON_ERROR )
 			n_gpu_buffer_offset = 1;
 #endif
@@ -3539,18 +3539,18 @@ WRITE32_MEMBER( psxgpu_device::write )
 			gpu_reset();
 			break;
 		case 0x01:
-			verboselog( machine(), 1, "not handled: reset command buffer\n" );
+			verboselog( *this, 1, "not handled: reset command buffer\n" );
 			n_gpu_buffer_offset = 0;
 			break;
 		case 0x02:
-			verboselog( machine(), 1, "not handled: reset irq\n" );
+			verboselog( *this, 1, "not handled: reset irq\n" );
 			break;
 		case 0x03:
 			n_gpustatus &= ~( 1L << 0x17 );
 			n_gpustatus |= ( data & 0x01 ) << 0x17;
 			break;
 		case 0x04:
-			verboselog( machine(), 1, "dma setup %d\n", data & 3 );
+			verboselog( *this, 1, "dma setup %d\n", data & 3 );
 			n_gpustatus &= ~( 3L << 0x1d );
 			n_gpustatus |= ( data & 0x03 ) << 0x1d;
 			n_gpustatus &= ~( 1L << 0x19 );
@@ -3569,20 +3569,20 @@ WRITE32_MEMBER( psxgpu_device::write )
 			{
 				n_displaystarty = ( data >> 12 ) & 1023;
 			}
-			verboselog( machine(), 1, "start of display area %d %d\n", m_n_displaystartx, n_displaystarty );
+			verboselog( *this, 1, "start of display area %d %d\n", m_n_displaystartx, n_displaystarty );
 			break;
 		case 0x06:
 			n_horiz_disstart = data & 4095;
 			n_horiz_disend = ( data >> 12 ) & 4095;
-			verboselog( machine(), 1, "horizontal display range %d %d\n", n_horiz_disstart, n_horiz_disend );
+			verboselog( *this, 1, "horizontal display range %d %d\n", n_horiz_disstart, n_horiz_disend );
 			break;
 		case 0x07:
 			n_vert_disstart = data & 1023;
 			n_vert_disend = ( data >> 10 ) & 2047;
-			verboselog( machine(), 1, "vertical display range %d %d\n", n_vert_disstart, n_vert_disend );
+			verboselog( *this, 1, "vertical display range %d %d\n", n_vert_disstart, n_vert_disend );
 			break;
 		case 0x08:
-			verboselog( machine(), 1, "display mode %02x\n", data & 0xff );
+			verboselog( *this, 1, "display mode %02x\n", data & 0xff );
 			n_gpustatus &= ~( 127L << 0x10 );
 			n_gpustatus |= ( data & 0x3f ) << 0x11; /* width 0 + height + videmode + isrgb24 + isinter */
 			n_gpustatus |= ( ( data & 0x40 ) >> 0x06 ) << 0x10; /* width 1 */
@@ -3593,10 +3593,10 @@ WRITE32_MEMBER( psxgpu_device::write )
 			updatevisiblearea();
 			break;
 		case 0x09:
-			verboselog( machine(), 1, "not handled: GPU Control 0x09: %08x\n", data );
+			verboselog( *this, 1, "not handled: GPU Control 0x09: %08x\n", data );
 			break;
 		case 0x0d:
-			verboselog( machine(), 1, "reset lightgun coordinates %08x\n", data );
+			verboselog( *this, 1, "reset lightgun coordinates %08x\n", data );
 			n_lightgun_x = 0;
 			n_lightgun_y = 0;
 			break;
@@ -3612,7 +3612,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 				{
 					n_gpuinfo = n_drawarea_x1 | ( n_drawarea_y1 << 12 );
 				}
-				verboselog( machine(), 1, "GPU Info - Draw area top left %08x\n", n_gpuinfo );
+				verboselog( *this, 1, "GPU Info - Draw area top left %08x\n", n_gpuinfo );
 				break;
 			case 0x04:
 				if( m_n_gputype == 2 )
@@ -3623,7 +3623,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 				{
 					n_gpuinfo = n_drawarea_x2 | ( n_drawarea_y2 << 12 );
 				}
-				verboselog( machine(), 1, "GPU Info - Draw area bottom right %08x\n", n_gpuinfo );
+				verboselog( *this, 1, "GPU Info - Draw area bottom right %08x\n", n_gpuinfo );
 				break;
 			case 0x05:
 				if( m_n_gputype == 2 )
@@ -3634,35 +3634,35 @@ WRITE32_MEMBER( psxgpu_device::write )
 				{
 					n_gpuinfo = ( n_drawoffset_x & 2047 ) | ( ( n_drawoffset_y & 2047 ) << 12 );
 				}
-				verboselog( machine(), 1, "GPU Info - Draw offset %08x\n", n_gpuinfo );
+				verboselog( *this, 1, "GPU Info - Draw offset %08x\n", n_gpuinfo );
 				break;
 			case 0x07:
 				n_gpuinfo = m_n_gputype;
-				verboselog( machine(), 1, "GPU Info - GPU Type %08x\n", n_gpuinfo );
+				verboselog( *this, 1, "GPU Info - GPU Type %08x\n", n_gpuinfo );
 				break;
 			case 0x08:
 				n_gpuinfo = n_lightgun_x | ( n_lightgun_y << 16 );
-				verboselog( machine(), 1, "GPU Info - lightgun coordinates %08x\n", n_gpuinfo );
+				verboselog( *this, 1, "GPU Info - lightgun coordinates %08x\n", n_gpuinfo );
 				break;
 			default:
-				verboselog( machine(), 0, "GPU Info - unknown request (%08x)\n", data );
+				verboselog( *this, 0, "GPU Info - unknown request (%08x)\n", data );
 				n_gpuinfo = 0;
 				break;
 			}
 			break;
 		case 0x20:
-			verboselog( machine(), 1, "not handled: GPU Control 0x20: %08x\n", data );
+			verboselog( *this, 1, "not handled: GPU Control 0x20: %08x\n", data );
 			break;
 		default:
 #if defined( MAME_DEBUG )
 			popmessage( "unknown GPU command %08x", data );
 #endif
-			verboselog( machine(), 0, "gpu_w( %08x ) unknown GPU command\n", data );
+			verboselog( *this, 0, "gpu_w( %08x ) unknown GPU command\n", data );
 			break;
 		}
 		break;
 	default:
-		verboselog( machine(), 0, "gpu_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
+		verboselog( *this, 0, "gpu_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
 		break;
 	}
 }
@@ -3682,7 +3682,7 @@ void psxgpu_device::gpu_read( UINT32 *p_ram, INT32 n_size )
 			UINT32 n_pixel;
 			PAIR data;
 
-			verboselog( machine(), 2, "copy image from frame buffer ( %d, %d )\n", n_vramx, n_vramy );
+			verboselog( *this, 2, "copy image from frame buffer ( %d, %d )\n", n_vramx, n_vramy );
 			data.d = 0;
 			for( n_pixel = 0; n_pixel < 2; n_pixel++ )
 			{
@@ -3695,7 +3695,7 @@ void psxgpu_device::gpu_read( UINT32 *p_ram, INT32 n_size )
 					n_vramy++;
 					if( n_vramy >= ( m_packet.n_entry[ 2 ] >> 16 ) )
 					{
-						verboselog( machine(), 1, "copy image from frame buffer end\n" );
+						verboselog( *this, 1, "copy image from frame buffer end\n" );
 						n_gpustatus &= ~( 1L << 0x1b );
 						n_gpu_buffer_offset = 0;
 						n_vramx = 0;
@@ -3713,7 +3713,7 @@ void psxgpu_device::gpu_read( UINT32 *p_ram, INT32 n_size )
 		}
 		else
 		{
-			verboselog( machine(), 2, "read GPU info (%08x)\n", n_gpuinfo );
+			verboselog( *this, 2, "read GPU info (%08x)\n", n_gpuinfo );
 			*( p_ram ) = n_gpuinfo;
 		}
 		p_ram++;
@@ -3732,10 +3732,10 @@ READ32_MEMBER( psxgpu_device::read )
 		break;
 	case 0x01:
 		data = n_gpustatus;
-		verboselog( machine(), 1, "read GPU status (%08x)\n", data );
+		verboselog( *this, 1, "read GPU status (%08x)\n", data );
 		break;
 	default:
-		verboselog( machine(), 0, "gpu_r( %08x, %08x ) unknown register\n", offset, mem_mask );
+		verboselog( *this, 0, "gpu_r( %08x, %08x ) unknown register\n", offset, mem_mask );
 		data = 0;
 		break;
 	}
@@ -3757,7 +3757,7 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 
 void psxgpu_device::gpu_reset( void )
 {
-	verboselog( machine(), 1, "reset gpu\n" );
+	verboselog( *this, 1, "reset gpu\n" );
 	n_gpu_buffer_offset = 0;
 	n_gpustatus = 0x14802000;
 	n_drawarea_x1 = 0;

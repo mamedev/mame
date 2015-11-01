@@ -144,7 +144,7 @@ class running_machine
 	friend void debugger_init(running_machine &machine);
 	friend class sound_manager;
 
-	typedef void (*logerror_callback)(running_machine &machine, const char *string);
+	typedef void (*logerror_callback)(const running_machine &machine, const char *string);
 
 	// must be at top of member variables
 	resource_pool           m_respool;              // pool of resources for this machine
@@ -229,7 +229,9 @@ public:
 	INT32 get_vblank_watchdog_counter() { return m_watchdog_counter; }
 
 	// misc
-	void CLIB_DECL vlogerror(const char *format, va_list args);
+	void popmessage(const char *format, ...) const;
+	void logerror(const char *format, ...) const;
+	void vlogerror(const char *format, va_list args) const;
 	UINT32 rand();
 	const char *describe_context();
 
@@ -266,7 +268,7 @@ private:
 	void nvram_save();
 
 	// internal callbacks
-	static void logfile_callback(running_machine &machine, const char *buffer);
+	static void logfile_callback(const running_machine &machine, const char *buffer);
 
 	// internal device helpers
 	void start_all_devices();

@@ -939,8 +939,8 @@ int gte::docop2( UINT32 pc, int gteop )
 		return 1;
 	}
 
-	popmessage( "unknown GTE op %08x", gteop );
-	logerror( "%08x: unknown GTE op %08x\n", pc, gteop );
+	//popmessage( "unknown GTE op %08x", gteop );
+	//logerror( "%08x: unknown GTE op %08x\n", pc, gteop );
 
 	return 0;
 }

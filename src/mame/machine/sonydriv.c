@@ -334,7 +334,7 @@ int sony_read_status(device_t *device)
 			}
 			break;
 		case 0x0a:  /* At track 0: 0=track zero 1=not track zero */
-			logerror("%s sony.status(): reading Track 0\n", device->machine().describe_context());
+			device->logerror("%s sony.status(): reading Track 0\n", device->machine().describe_context());
 			if (cur_image)
 				result = cur_image->floppy_tk00_r();
 			else
@@ -389,7 +389,7 @@ int sony_read_status(device_t *device)
 			break;
 		default:
 			if (LOG_SONY)
-				logerror("sony_status(): unknown action\n");
+				device->logerror("sony_status(): unknown action\n");
 			break;
 		}
 	}
@@ -407,7 +407,7 @@ static void sony_doaction(device_t *device)
 
 	if (LOG_SONY)
 	{
-		logerror("%s sony_doaction(): action=%d %s\n",
+		device->logerror("%s sony_doaction(): action=%d %s\n",
 			device->machine().describe_context(), action, (sony.floppy_enable) ? "" : " (MOTOR OFF)");
 	}
 
@@ -456,7 +456,7 @@ static void sony_doaction(device_t *device)
 			break;
 		default:
 			if (LOG_SONY)
-				logerror("sony_doaction(): unknown action %d\n", action);
+				device->logerror("sony_doaction(): unknown action %d\n", action);
 			break;
 		}
 	}
@@ -481,7 +481,7 @@ void sony_set_lines(device_t *device,UINT8 lines)
 	}
 
 	if (LOG_SONY_EXTRA)
-		logerror("sony.set_lines(): %d\n", lines);
+		device->logerror("sony.set_lines(): %d\n", lines);
 }
 
 void sony_set_enable_lines(device_t *device,int enable_mask)
@@ -503,7 +503,7 @@ void sony_set_enable_lines(device_t *device,int enable_mask)
 	}
 
 	if (LOG_SONY_EXTRA)
-		logerror("sony.set_enable_lines(): %d\n", enable_mask);
+		device->logerror("sony.set_enable_lines(): %d\n", enable_mask);
 }
 
 void sony_set_sel_line(device_t *device,int sel)
@@ -516,7 +516,7 @@ void sony_set_sel_line(device_t *device,int sel)
 	}
 
 	if (LOG_SONY_EXTRA)
-		logerror("sony.set_sel_line(): %s line IWM_SEL\n", sony.sel_line ? "setting" : "clearing");
+		device->logerror("sony.set_sel_line(): %s line IWM_SEL\n", sony.sel_line ? "setting" : "clearing");
 }
 
 void sony_set_speed(int speed)

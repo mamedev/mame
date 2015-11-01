@@ -31,6 +31,7 @@ protected:
 	UINT32 m_blocks;
 
 	hard_disk_file *m_disk;
+	device_t *m_device;
 };
 
 #endif

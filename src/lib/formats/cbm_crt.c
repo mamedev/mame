@@ -159,11 +159,11 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 
 	if (LOG)
 	{
-		logerror("Name: %s\n", header.name);
-		logerror("Hardware: %04x\n", hardware);
-		logerror("Slot device: %s\n", CRT_C64_SLOT_NAMES[hardware]);
-		logerror("EXROM: %u\n", header.exrom);
-		logerror("GAME: %u\n", header.game);
+		osd_printf_verbose("Name: %s\n", header.name);
+		osd_printf_verbose("Hardware: %04x\n", hardware);
+		osd_printf_verbose("Slot device: %s\n", CRT_C64_SLOT_NAMES[hardware]);
+		osd_printf_verbose("EXROM: %u\n", header.exrom);
+		osd_printf_verbose("GAME: %u\n", header.game);
 	}
 
 	// determine ROM region lengths
@@ -178,9 +178,9 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 
 		if (LOG)
 		{
-			logerror("CHIP Address: %04x\n", address);
-			logerror("CHIP Size: %04x\n", size);
-			logerror("CHIP Type: %04x\n", type);
+			osd_printf_verbose("CHIP Address: %04x\n", address);
+			osd_printf_verbose("CHIP Size: %04x\n", size);
+			osd_printf_verbose("CHIP Type: %04x\n", type);
 		}
 
 		switch (address)
@@ -188,7 +188,7 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 		case 0x8000: *roml_size += size; break;
 		case 0xa000: *romh_size += size; break;
 		case 0xe000: *romh_size += size; break;
-		default: logerror("Invalid CHIP loading address!\n"); break;
+		default: osd_printf_verbose("Invalid CHIP loading address!\n"); break;
 		}
 
 		core_fseek(file, size, SEEK_CUR);

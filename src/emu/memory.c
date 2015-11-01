@@ -676,7 +676,7 @@ private:
 			if (m_space.device().interface(intf))
 				is_octal = intf->is_octal();
 
-			logerror("%s: unmapped %s memory read from %s & %s\n",
+			m_space.device().logerror("%s: unmapped %s memory read from %s & %s\n",
 						m_space.machine().describe_context(), m_space.name(),
 						core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),is_octal),
 						core_i64_format(mask, 2 * sizeof(_UintType),is_octal));
@@ -749,7 +749,7 @@ private:
 			if (m_space.device().interface(intf))
 				is_octal = intf->is_octal();
 
-			logerror("%s: unmapped %s memory write to %s = %s & %s\n",
+			m_space.device().logerror("%s: unmapped %s memory write to %s = %s & %s\n",
 					m_space.machine().describe_context(), m_space.name(),
 					core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),is_octal),
 					core_i64_format(data, 2 * sizeof(_UintType),is_octal),
@@ -2963,9 +2963,9 @@ void address_table::verify_reference_counts()
 
 	if (memcmp(actual_refcounts, handler_refcount, sizeof(handler_refcount)))
 	{
-		logerror("Refcount failure:\n");
+		osd_printf_error("Refcount failure:\n");
 		for(int i = STATIC_COUNT; i != SUBTABLE_BASE; i++)
-			logerror("%02x: %4x .. %4x\n", i, handler_refcount[i-STATIC_COUNT], actual_refcounts[i-STATIC_COUNT]);
+			osd_printf_error("%02x: %4x .. %4x\n", i, handler_refcount[i-STATIC_COUNT], actual_refcounts[i-STATIC_COUNT]);
 		throw emu_fatalerror("memory.c: refcounts are fucked.\n");
 	}
 }

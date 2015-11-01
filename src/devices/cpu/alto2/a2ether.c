@@ -207,35 +207,35 @@ static const UINT16 breath_of_life_data[BREATHLEN] =
 };
 
 #if DEBUG_PACKETS
-static void dump_ascii(const UINT16 *src, size_t size)
+static void dump_ascii(device_t *device, const UINT16 *src, size_t size)
 {
-	logerror(" [");
+	device->logerror(" [");
 	for (size_t offs = 0; offs < size; offs++) {
 		char ch1 = src[offs] / 256;
 		char ch2 = src[offs] % 256;
-		logerror("%c", ch1 < 32 || ch1 > 126 ? '.' : ch1);
-		logerror("%c", ch2 < 32 || ch2 > 126 ? '.' : ch2);
+		device->logerror("%c", ch1 < 32 || ch1 > 126 ? '.' : ch1);
+		device->logerror("%c", ch2 < 32 || ch2 > 126 ? '.' : ch2);
 	}
-	logerror("]\n");
+	device->logerror("]\n");
 }
 
-static void dump_packet(const char* name, const UINT16 *src, size_t addr, size_t size)
+static void dump_packet(device_t *device, const char* name, const UINT16 *src, size_t addr, size_t size)
 {
 	size_t offs;
 	for (offs = 0; offs < size; offs++) {
 		UINT16 word = src[offs];
 		if (offs % 8) {
-			logerror(" %06o", word);
+			device->logerror(" %06o", word);
 		} else {
 			if (offs > 0)
-				dump_ascii(&src[offs-8], 8);
-			logerror("%s\t%05o: %06o", name, static_cast<unsigned>(addr + offs), word);
+				dump_ascii(device, &src[offs-8], 8);
+			device->logerror("%s\t%05o: %06o", name, static_cast<unsigned>(addr + offs), word);
 		}
 	}
 	if (offs % 8) {
-		dump_ascii(&src[offs - (offs % 8)], offs % 8);
+		dump_ascii(device, &src[offs - (offs % 8)], offs % 8);
 	} else if (offs > 0) {
-		dump_ascii(&src[offs - 8], 8);
+		dump_ascii(device, &src[offs - 8], 8);
 	}
 }
 #endif
@@ -246,7 +246,7 @@ static void dump_packet(const char* name, const UINT16 *src, size_t addr, size_t
 void alto2_cpu_device::eth_wakeup()
 {
 	register int st = m_eth.status;
-	LOG((LOG_ETH,0,"IBUSY=%d OBUSY=%d ", GET_ETH_IBUSY(st), GET_ETH_OBUSY(st)));
+	LOG((this,LOG_ETH,0,"IBUSY=%d OBUSY=%d ", GET_ETH_IBUSY(st), GET_ETH_OBUSY(st)));
 	UINT8 busy = GET_ETH_IBUSY(st) | GET_ETH_OBUSY(st);
 	if (0 == busy) {
 		// if not busy, reset the FIFO read and write counters
@@ -263,27 +263,27 @@ void alto2_cpu_device::eth_wakeup()
 	 *  input gone
 	 */
 	if (GET_ETH_IDL(st)) {
-		LOG((LOG_ETH,0,"POST (input data late)\n"));
+		LOG((this,LOG_ETH,0,"POST (input data late)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
 	if (GET_ETH_OCMD(st)) {
-		LOG((LOG_ETH,0,"POST (output command)\n"));
+		LOG((this,LOG_ETH,0,"POST (output command)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
 	if (GET_ETH_ICMD(st)) {
-		LOG((LOG_ETH,0,"POST (input command)\n"));
+		LOG((this,LOG_ETH,0,"POST (input command)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
 	if (GET_ETH_OGONE(st)) {
-		LOG((LOG_ETH,0,"POST (output gone)\n"));
+		LOG((this,LOG_ETH,0,"POST (output gone)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
 	if (GET_ETH_IGONE(st)) {
-		LOG((LOG_ETH,0,"POST (input gone)\n"));
+		LOG((this,LOG_ETH,0,"POST (input gone)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
@@ -319,7 +319,7 @@ void alto2_cpu_device::eth_wakeup()
 	UINT8 IDR = ~(GET_ETH_IBUSY(st) & i2);
 	if (0 == IDR) {
 		m_task_wakeup |= 1 << task_ether;
-		LOG((LOG_ETH,0,"IDR (input data ready)\n"));
+		LOG((this,LOG_ETH,0,"IDR (input data ready)\n"));
 		return;
 	}
 
@@ -350,7 +350,7 @@ void alto2_cpu_device::eth_wakeup()
 	UINT8 ODR = ~(GET_ETH_OBUSY(st) & ~GET_ETH_OEOT(st) & o1);
 	if (0 == ODR) {
 		m_task_wakeup |= 1 << task_ether;
-		LOG((LOG_ETH,0,"ODR (output data ready)\n"));
+		LOG((this,LOG_ETH,0,"ODR (output data ready)\n"));
 		return;
 	}
 
@@ -362,12 +362,12 @@ void alto2_cpu_device::eth_wakeup()
 	 */
 	if (m_ewfct) {
 		m_task_wakeup |= 1 << task_ether;
-		LOG((LOG_ETH,0,"EWFCT (ether wake function)\n"));
+		LOG((this,LOG_ETH,0,"EWFCT (ether wake function)\n"));
 		return;
 	}
 
 	// otherwise no more wakeups for the ether task
-	LOG((LOG_ETH,0,"stop wake\n"));
+	LOG((this,LOG_ETH,0,"stop wake\n"));
 	m_task_wakeup &= ~(1 << task_ether);
 }
 
@@ -539,7 +539,7 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 	// the last word sent is the CRC
 	if (-1 == arg) {
 		m_eth.tx_timer->reset();
-		LOG((LOG_ETH,0," CRC:%06o\n", m_eth.tx_crc));
+		LOG((this,LOG_ETH,0," CRC:%06o\n", m_eth.tx_crc));
 		// TODO: send the CRC as final word of the packet
 		m_eth.tx_crc = 0;
 		PUT_ETH_OGONE(m_eth.status, 1);     // set the OGONE flip flop
@@ -578,7 +578,7 @@ void alto2_cpu_device::eth_startf()
 	PUT_ETH_ICMD(m_eth.status, X_BIT(m_bus,16,14));
 	PUT_ETH_OCMD(m_eth.status, X_BIT(m_bus,16,15));
 #endif
-	LOG((LOG_ETH,3, "   STARTF; ICMD=%u OCMD=%u\n", GET_ETH_ICMD(m_eth.status), GET_ETH_ICMD(m_eth.status)));
+	LOG((this,LOG_ETH,3, "   STARTF; ICMD=%u OCMD=%u\n", GET_ETH_ICMD(m_eth.status), GET_ETH_ICMD(m_eth.status)));
 	eth_wakeup();
 }
 
@@ -591,7 +591,7 @@ void alto2_cpu_device::eth_startf()
 void alto2_cpu_device::bs_early_eidfct()
 {
 	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
-	LOG((LOG_ETH,3, "   <-EIDFCT; pull %06o from FIFO[%02o]\n", r, m_eth.fifo_rd));
+	LOG((this,LOG_ETH,3, "   <-EIDFCT; pull %06o from FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
 	m_bus &= r;
 
@@ -600,7 +600,7 @@ void alto2_cpu_device::bs_early_eidfct()
 		m_eth.rx_packet[m_eth.rx_count] = r;
 	m_eth.rx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.rx_count) {
-		dump_packet("RX", m_eth.rx_packet, 0, m_eth.rx_count);
+		dump_packet(this,"RX", m_eth.rx_packet, 0, m_eth.rx_count);
 		m_eth.rx_count = 0;
 	}
 #endif
@@ -612,7 +612,7 @@ void alto2_cpu_device::bs_early_eidfct()
  */
 void alto2_cpu_device::f1_early_eth_block()
 {
-	LOG((LOG_ETH,2,"    BLOCK %s\n", task_name(m_task)));
+	LOG((this,LOG_ETH,2,"    BLOCK %s\n", task_name(m_task)));
 	m_task_wakeup &= ~(1 << task_ether);
 }
 
@@ -625,7 +625,7 @@ void alto2_cpu_device::f1_early_eth_block()
 void alto2_cpu_device::f1_early_eilfct()
 {
 	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
-	LOG((LOG_ETH,3, "   <-EILFCT; %06o at FIFO[%02o]\n", r, m_eth.fifo_rd));
+	LOG((this,LOG_ETH,3, "   <-EILFCT; %06o at FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_bus &= r;
 }
 
@@ -658,13 +658,13 @@ void alto2_cpu_device::f1_early_epfct()
 	X_WRBITS(r,16,15,15,~GET_ETH_IT(st));       // BUS[13] = IT (input ???)
 	m_bus &= r;
 
-	LOG((LOG_ETH,3, "   <-EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
-	LOG((LOG_ETH,5, "       IDL'    : %u\n", GET_ETH_IDL(r)));
-	LOG((LOG_ETH,5, "       COLL'   : %u\n", GET_ETH_COLL(r)));
-	LOG((LOG_ETH,5, "       CRC'    : %u\n", GET_ETH_CRC(r)));
-	LOG((LOG_ETH,5, "       ICMD'   : %u\n", GET_ETH_ICMD(r)));
-	LOG((LOG_ETH,5, "       OCMD'   : %u\n", GET_ETH_OCMD(r)));
-	LOG((LOG_ETH,5, "       IT'     : %u\n", GET_ETH_IT(r)));
+	LOG((this,LOG_ETH,3, "   <-EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
+	LOG((this,LOG_ETH,5, "       IDL'    : %u\n", GET_ETH_IDL(r)));
+	LOG((this,LOG_ETH,5, "       COLL'   : %u\n", GET_ETH_COLL(r)));
+	LOG((this,LOG_ETH,5, "       CRC'    : %u\n", GET_ETH_CRC(r)));
+	LOG((this,LOG_ETH,5, "       ICMD'   : %u\n", GET_ETH_ICMD(r)));
+	LOG((this,LOG_ETH,5, "       OCMD'   : %u\n", GET_ETH_OCMD(r)));
+	LOG((this,LOG_ETH,5, "       IT'     : %u\n", GET_ETH_IT(r)));
 	eth_wakeup();
 }
 
@@ -700,7 +700,7 @@ void alto2_cpu_device::f1_late_ewfct()
  */
 void alto2_cpu_device::f2_late_eodfct()
 {
-	LOG((LOG_ETH,3, "   EODFCT<-; push %06o into FIFO[%02o]\n", m_bus, m_eth.fifo_wr));
+	LOG((this,LOG_ETH,3, "   EODFCT<-; push %06o into FIFO[%02o]\n", m_bus, m_eth.fifo_wr));
 	m_eth.fifo[m_eth.fifo_wr] = m_bus;
 	m_eth.fifo_wr = (m_eth.fifo_wr + 1) % ALTO2_ETHER_FIFO_SIZE;
 
@@ -709,7 +709,7 @@ void alto2_cpu_device::f2_late_eodfct()
 		m_eth.tx_packet[m_eth.tx_count] = m_bus;
 	m_eth.tx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.tx_count) {
-		dump_packet("TX", m_eth.tx_packet, 0, m_eth.tx_count);
+		dump_packet(this,"TX", m_eth.tx_packet, 0, m_eth.tx_count);
 		m_eth.tx_count = 0;
 	}
 #endif
@@ -735,7 +735,7 @@ void alto2_cpu_device::f2_late_eodfct()
  */
 void alto2_cpu_device::f2_late_eosfct()
 {
-	LOG((LOG_ETH,3, "   EOSFCT\n"));
+	LOG((this,LOG_ETH,3, "   EOSFCT\n"));
 	PUT_ETH_WLF(m_eth.status, 1);
 	PUT_ETH_OBUSY(m_eth.status, 1);
 	eth_wakeup();
@@ -756,7 +756,7 @@ void alto2_cpu_device::f2_late_erbfct()
 	UINT16 r = 0;
 	X_WRBITS(r,10,6,6,GET_ETH_ICMD(m_eth.status));
 	X_WRBITS(r,10,7,7,GET_ETH_OCMD(m_eth.status));
-	LOG((LOG_ETH,3, "   ERBFCT; NEXT[6-7] = ICMD,OCMD (%#o | %#o)\n", m_next2, r));
+	LOG((this,LOG_ETH,3, "   ERBFCT; NEXT[6-7] = ICMD,OCMD (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 	eth_wakeup();
 }
@@ -797,7 +797,7 @@ void alto2_cpu_device::f2_late_ebfct()
 				GET_ETH_OCMD(m_eth.status) |
 				GET_ETH_IGONE(m_eth.status) |
 				GET_ETH_OGONE(m_eth.status));
-	LOG((LOG_ETH,3, "   EBFCT; NEXT ... (%#o | %#o)\n", m_next2, r));
+	LOG((this,LOG_ETH,3, "   EBFCT; NEXT ... (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -812,7 +812,7 @@ void alto2_cpu_device::f2_late_ecbfct()
 	UINT16 r = 0;
 	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
 	X_WRBITS(r,10,7,7,~BE(a49));
-	LOG((LOG_ETH,3, "   ECBFCT; NEXT[7] = FIFO %sempty (%#o | %#o)\n", r ? "not " : "is ", m_next2, r));
+	LOG((this,LOG_ETH,3, "   ECBFCT; NEXT[7] = FIFO %sempty (%#o | %#o)\n", r ? "not " : "is ", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -826,7 +826,7 @@ void alto2_cpu_device::f2_late_ecbfct()
  */
 void alto2_cpu_device::f2_late_eisfct()
 {
-	LOG((LOG_ETH,3, "   EISFCT\n"));
+	LOG((this,LOG_ETH,3, "   EISFCT\n"));
 	PUT_ETH_IBUSY(m_eth.status, 1);
 	eth_wakeup();
 }

@@ -302,7 +302,7 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 	if(obs.sector_count) {
 		wd_sect_info *last = sect_infos + obs.sector_count-1;
 		if(last->dend != -1 && last->dend < last->hstart) {
-			logerror("pasti: Unsupported sector header/data over index, track %d head %d\n", track, head);
+			osd_printf_error("pasti: Unsupported sector header/data over index, track %d head %d\n", track, head);
 			return;
 		}
 
@@ -313,7 +313,7 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 			wd_sect_info *s = sect_infos + i;
 			if(i+1 != obs.sector_count) {
 				if(s->dstart != -1 && s[1].hstart < s->dend) {
-					logerror("pasti: Unsupported sector overlap, track %d head %d\n", track, head);
+					osd_printf_error("pasti: Unsupported sector overlap, track %d head %d\n", track, head);
 					return;
 				}
 			}
@@ -365,7 +365,7 @@ void pasti_format::wd_generate_track_from_sectors_only(int track, int head, flop
 	for(int i=0; i != obs.sector_count; i++) {
 		const wd_sect &s = obs.sectors[i];
 		if(i+1 != obs.sector_count && obs.sectors[i+1].position < s.position+10+44+4+(128 << (s.id[3] & 3))) {
-			logerror("pasti: Unsupported sector data sharing, track %d head %d\n", track, head);
+			osd_printf_error("pasti: Unsupported sector data sharing, track %d head %d\n", track, head);
 			return;
 		}
 		if(tdata.size() >> 4 < s.position - 12) {

@@ -169,7 +169,7 @@ void filter2_setup(device_t *device, int type, double fc, double d, double gain,
 			filter2->b1 = -2.0*(filter2->b0);
 			break;
 		default:
-			logerror("filter2_setup() - Invalid filter type for 2nd order filter.");
+			device->logerror("filter2_setup() - Invalid filter type for 2nd order filter.");
 			break;
 	}
 
@@ -211,7 +211,7 @@ void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2, doubl
 
 	if (r1 == 0)
 	{
-		logerror("filter_opamp_m_bandpass_setup() - r1 can not be 0");
+		device->logerror("filter_opamp_m_bandpass_setup() - r1 can not be 0");
 		return; /* Filter can not be setup.  Undefined results. */
 	}
 

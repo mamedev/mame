@@ -1705,9 +1705,9 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	{
 		// display a popup indicating things were cancelled
 		if (state == LOADSAVE_SAVE)
-			popmessage("Save cancelled");
+			machine.popmessage("Save cancelled");
 		else
-			popmessage("Load cancelled");
+			machine.popmessage("Load cancelled");
 
 		// reset the state
 		machine.resume();
@@ -1733,12 +1733,12 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	sprintf(filename, "%c", file);
 	if (state == LOADSAVE_SAVE)
 	{
-		popmessage("Save to position %c", file);
+		machine.popmessage("Save to position %c", file);
 		machine.schedule_save(filename);
 	}
 	else
 	{
-		popmessage("Load from position %c", file);
+		machine.popmessage("Load from position %c", file);
 		machine.schedule_load(filename);
 	}
 

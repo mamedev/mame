@@ -14,7 +14,7 @@ void alto2_cpu_device::f1_early_curt_block()
 {
 	m_dsp.curt_blocks = true;
 	m_task_wakeup &= ~(1 << m_task);
-	LOG((LOG_CURT,2,"   BLOCK %s\n", task_name(m_task)));
+	LOG((this,LOG_CURT,2,"   BLOCK %s\n", task_name(m_task)));
 }
 
 /**
@@ -23,7 +23,7 @@ void alto2_cpu_device::f1_early_curt_block()
 void alto2_cpu_device::f2_late_load_xpreg()
 {
 	m_dsp.xpreg = X_RDBITS(m_bus,16,6,15);
-	LOG((LOG_CURT, 9,"  XPREG<- BUS[6-15] (%#o)\n", m_dsp.xpreg));
+	LOG((this,LOG_CURT, 9,"  XPREG<- BUS[6-15] (%#o)\n", m_dsp.xpreg));
 }
 
 /**
@@ -46,7 +46,7 @@ void alto2_cpu_device::f2_late_load_xpreg()
 void alto2_cpu_device::f2_late_load_csr()
 {
 	m_dsp.csr = m_bus;
-	LOG((LOG_CURT, m_dsp.csr ? 2 : 9,"  CSR<- BUS (%#o)\n", m_dsp.csr));
+	LOG((this,LOG_CURT, m_dsp.csr ? 2 : 9,"  CSR<- BUS (%#o)\n", m_dsp.csr));
 }
 
 /**

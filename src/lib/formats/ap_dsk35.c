@@ -1287,7 +1287,7 @@ bool dc42_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 format = h[0x51];
 
 	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || format != 0x22)) {
-		logerror("dc42: Unsupported encoding/format combination %02x/%02x\n", encoding, format);
+		osd_printf_error("dc42: Unsupported encoding/format combination %02x/%02x\n", encoding, format);
 		return false;
 	}
 

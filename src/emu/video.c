@@ -767,7 +767,7 @@ void video_manager::update_throttle(attotime emutime)
 		if (emu_delta_attoseconds < 0 || emu_delta_attoseconds > ATTOSECONDS_PER_SECOND / 10)
 		{
 			if (LOG_THROTTLE)
-				logerror("Resync due to weird emutime delta: %s\n", attotime(0, emu_delta_attoseconds).as_string(18));
+				machine().logerror("Resync due to weird emutime delta: %s\n", attotime(0, emu_delta_attoseconds).as_string(18));
 			break;
 		}
 
@@ -782,7 +782,7 @@ void video_manager::update_throttle(attotime emutime)
 		if (diff_ticks >= ticks_per_second)
 		{
 			if (LOG_THROTTLE)
-				logerror("Resync due to real time advancing by more than 1 second\n");
+				machine().logerror("Resync due to real time advancing by more than 1 second\n");
 			break;
 		}
 
@@ -808,7 +808,7 @@ void video_manager::update_throttle(attotime emutime)
 			(real_is_ahead_attoseconds < 0 && popcount[m_throttle_history & 0xff] < 6))
 		{
 			if (LOG_THROTTLE)
-				logerror("Resync due to being behind: %s (history=%08X)\n", attotime(0, -real_is_ahead_attoseconds).as_string(18), m_throttle_history);
+				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(0, -real_is_ahead_attoseconds).as_string(18), m_throttle_history);
 			break;
 		}
 
@@ -879,7 +879,7 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 				m_average_oversleep = (m_average_oversleep * 99 + oversleep_milliticks) / 100;
 
 				if (LOG_THROTTLE)
-					logerror("Slept for %d ticks, got %d ticks, avgover = %d\n", (int)delta, (int)actual_ticks, (int)m_average_oversleep);
+					machine().logerror("Slept for %d ticks, got %d ticks, avgover = %d\n", (int)delta, (int)actual_ticks, (int)m_average_oversleep);
 			}
 		}
 		current_ticks = new_ticks;
@@ -1326,11 +1326,11 @@ void video_manager::toggle_record_movie()
 	if (!is_recording())
 	{
 		begin_recording(NULL, MF_MNG);
-		popmessage("REC START");
+		machine().popmessage("REC START");
 	}
 	else
 	{
 		end_recording(MF_MNG);
-		popmessage("REC STOP");
+		machine().popmessage("REC STOP");
 	}
 }

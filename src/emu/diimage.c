@@ -970,7 +970,7 @@ done:
 		if (!m_init_phase)
 		{
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-				popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
+				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
 				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 		}
@@ -985,7 +985,7 @@ done:
 			if (!m_init_phase)
 			{
 				if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-					popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
+					device().popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
 				else
 					osd_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
 			}

@@ -466,7 +466,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 	{
 		time = get_profile_ticks() - time;
 		if (time > LOG_WAIT_THRESHOLD)
-			logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
+			machine().logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
 	}
 
 	// reset the state

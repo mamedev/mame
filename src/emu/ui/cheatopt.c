@@ -30,7 +30,7 @@ void ui_menu_cheat::handle()
 		bool changed = false;
 
 		/* clear cheat comment on any movement or keypress */
-		popmessage(NULL);
+		machine().popmessage(NULL);
 
 		/* handle reset all + reset all cheats for reload all option */
 		if ((FPTR)menu_event->itemref < 3 && menu_event->iptkey == IPT_UI_SELECT)
@@ -74,7 +74,7 @@ void ui_menu_cheat::handle()
 				case IPT_UI_DOWN:
 					string = curcheat->comment();
 					if (string != NULL && string[0] != 0)
-						popmessage("Cheat Comment:\n%s", string);
+						machine().popmessage("Cheat Comment:\n%s", string);
 					break;
 			}
 		}
@@ -87,7 +87,7 @@ void ui_menu_cheat::handle()
 
 			/* display the reloaded cheats */
 			reset(UI_MENU_RESET_REMEMBER_REF);
-			popmessage("All cheats reloaded");
+			machine().popmessage("All cheats reloaded");
 		}
 
 		/* if things changed, update */

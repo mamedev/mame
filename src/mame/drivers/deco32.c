@@ -3966,7 +3966,7 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 	save_item(NAME(m_irq_source));
 }
 
-extern void process_dvi_data(UINT8* dvi_data, int offset, int regionsize);
+extern void process_dvi_data(device_t *device,UINT8* dvi_data, int offset, int regionsize);
 
 void dragngun_state::dragngun_init_common()
 {
@@ -4001,11 +4001,11 @@ void dragngun_state::dragngun_init_common()
 	save_item(NAME(m_irq_source));
 
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-//  process_dvi_data(memregion("dvi")->base(),0x000000, 0x1000000);
-//  process_dvi_data(memregion("dvi")->base(),0x580000, 0x1000000);
-//  process_dvi_data(memregion("dvi")->base(),0x800000, 0x1000000);
-//  process_dvi_data(memregion("dvi")->base(),0xB10000, 0x1000000);
-//  process_dvi_data(memregion("dvi")->base(),0xB80000, 0x1000000);
+//  process_dvi_data(this,memregion("dvi")->base(),0x000000, 0x1000000);
+//  process_dvi_data(this,memregion("dvi")->base(),0x580000, 0x1000000);
+//  process_dvi_data(this,memregion("dvi")->base(),0x800000, 0x1000000);
+//  process_dvi_data(this,memregion("dvi")->base(),0xB10000, 0x1000000);
+//  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
 DRIVER_INIT_MEMBER(dragngun_state,dragngun)

@@ -219,7 +219,7 @@ void apollo_csr_set_status_register(UINT16 mask, UINT16 data)
 	if (new_value != cpu_status_register)
 	{
 		cpu_status_register = new_value;
-		LOG1(("#### setting CPU Status Register with data=%04x & %04x to %04x", data, mask, cpu_status_register));
+		//LOG1(("#### setting CPU Status Register with data=%04x & %04x to %04x", data, mask, cpu_status_register));
 	}
 }
 
@@ -590,7 +590,7 @@ IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
 		apollo_csr_set_status_register(APOLLO_CSR_SR_INTERRUPT_PENDING, 0);
 	} else {
 		// clear bit Interrupt Pending in Cache Status Register
-		apollo_set_cache_status_register(0x10, 0x00);
+		apollo_set_cache_status_register(this,0x10, 0x00);
 	}
 	return vector;
 }
@@ -619,7 +619,7 @@ WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_master_set_int_line ) {
 				state ? APOLLO_CSR_SR_INTERRUPT_PENDING : 0);
 	} else {
 		// set bit Interrupt Pending in Cache Status Register
-		apollo_set_cache_status_register(0x10, state ? 0x10 : 0x00);
+		apollo_set_cache_status_register(this,0x10, state ? 0x10 : 0x00);
 	}
 
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);

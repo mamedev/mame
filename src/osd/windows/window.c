@@ -967,7 +967,7 @@ void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause)
 	}
 
 	if (LOG_TEMP_PAUSE)
-		logerror("winwindow_ui_pause_from_main_thread(): %d --> %d\n", old_temp_pause, ui_temp_pause);
+		machine.logerror("winwindow_ui_pause_from_main_thread(): %d --> %d\n", old_temp_pause, ui_temp_pause);
 }
 
 
@@ -1858,7 +1858,7 @@ void win_window_info::adjust_window_position_after_major_change()
 	{
 		win_physical_width = newrect.width();
 		win_physical_height = newrect.height();
-		logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
+		machine().logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
 	}
 }
 

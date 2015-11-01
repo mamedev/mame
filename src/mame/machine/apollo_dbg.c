@@ -1131,7 +1131,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 		else if ((ir & 0xff00) == 0xf200 && (apollo_config( APOLLO_CONF_FPU_TRACE)))
 		{
 			char sb[256];
-			LOG(("%s sp=%08x FPU: %x %s", apollo_cpu_context(device->machine().firstcpu),
+			DLOG(("%s sp=%08x FPU: %x %s", apollo_cpu_context(device->machine().firstcpu),
 					REG_A(m68k)[7], ir, disassemble(m68k, REG_PC(m68k), sb)));
 		}
 		else if (!m68k->pmmu_enabled)
@@ -1142,7 +1142,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 		{
 			const UINT16 *data = get_data(m68k, REG_A(m68k)[7]);
 			if ( REG_USP(m68k) == 0 && (data[0] & 0x2000) == 0) {
-				LOG(("%s sp=%08x RTE: sr=%04x pc=%04x%04x v=%04x usp=%08x",
+				DLOG(("%s sp=%08x RTE: sr=%04x pc=%04x%04x v=%04x usp=%08x",
 					apollo_cpu_context(device->machine().firstcpu),
 					REG_A(m68k)[7], data[0], data[1], data[2], data[3], REG_USP(m68k)));
 			}
@@ -1156,7 +1156,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 			trap.trap_code = REG_D(m68k)[0] & 0xffff;
 
 			char sb[1000];
-			LOG(("%s sp=%08x Domain/OS SVC: trap %x 0x%02x: %s",
+			DLOG(("%s sp=%08x Domain/OS SVC: trap %x 0x%02x: %s",
 					apollo_cpu_context(device->machine().firstcpu), trap.sp,
 					trap.trap_no, trap.trap_code,
 					get_svc_call(m68k, trap.trap_no, trap.trap_code, sb)));
@@ -1166,7 +1166,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 		{
 			// rte
 			char sb[1000];
-			LOG(("%s sp=%08x Domain/OS SVC:              %s D0=0x%x",
+			DLOG(("%s sp=%08x Domain/OS SVC:              %s D0=0x%x",
 					apollo_cpu_context(device->machine().firstcpu), trap.sp,
 					get_svc_call(m68k, trap.trap_no, trap.trap_code, sb), REG_D(m68k)[0]));
 

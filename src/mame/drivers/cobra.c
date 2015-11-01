@@ -2268,7 +2268,7 @@ void cobra_renderer::gfx_fifo_exec()
 				}
 				else
 				{
-					logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
+					cobra->logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2289,7 +2289,7 @@ void cobra_renderer::gfx_fifo_exec()
 
 				if (w1 != 0x0f600000 && w1 != 0xf0600000)
 				{
-					logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
+					cobra->logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
 				}
 
 				//printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
@@ -2640,7 +2640,7 @@ void cobra_renderer::gfx_fifo_exec()
 
 				if (w1 != 0x8fff0000 || w2 != 0x00000000)
 				{
-					logerror("gfxfifo_exec: buf_flush: %08X %08X\n", w1, w2);
+					cobra->logerror("gfxfifo_exec: buf_flush: %08X %08X\n", w1, w2);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2847,7 +2847,7 @@ void cobra_renderer::gfx_fifo_exec()
 					}
 					k++;
 				};
-				logerror("\n");
+				cobra->logerror("\n");
 			}
 		}
 

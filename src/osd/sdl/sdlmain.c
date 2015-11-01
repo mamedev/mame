@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
 //  output_oslog
 //============================================================
 
-static void output_oslog(running_machine &machine, const char *buffer)
+static void output_oslog(const running_machine &machine, const char *buffer)
 {
 	fputs(buffer, stderr);
 }

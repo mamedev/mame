@@ -739,9 +739,9 @@ static UINT32 blit_line(amiga_state *state)
 
 	/* see if folks are breaking the rules */
 	if (CUSTOM_REG(REG_BLTSIZH) != 0x0002)
-		logerror("Blitter: Blit width != 2 in line mode!\n");
+		state->logerror("Blitter: Blit width != 2 in line mode!\n");
 	if ((CUSTOM_REG(REG_BLTCON0) & 0x0a00) != 0x0a00)
-		logerror("Blitter: Channel selection incorrect in line mode!\n" );
+		state->logerror("Blitter: Channel selection incorrect in line mode!\n" );
 
 	/* extract the length of the line */
 	height = CUSTOM_REG(REG_BLTSIZV);
@@ -951,7 +951,7 @@ static void blitter_setup(address_space &space)
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("%s - This program is playing tricks with the blitter\n", space.machine().describe_context() );
+		state->logerror("%s - This program is playing tricks with the blitter\n", space.machine().describe_context() );
 		return;
 	}
 

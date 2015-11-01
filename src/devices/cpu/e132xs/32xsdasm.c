@@ -1646,7 +1646,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned
 
 			default:
 				sprintf(buffer, "Ext. OP $%X @ %X\n", extended_op, pc);
-				logerror(buffer, "Illegal Extended Opcode: %X @ %X\n", extended_op, pc);
+				osd_printf_verbose(buffer, "Illegal Extended Opcode: %X @ %X\n", extended_op, pc);
 				break;
 			}
 

@@ -414,7 +414,7 @@ void poly_wait(legacy_poly_manager *poly, const char *debug_reason)
 	{
 		time = get_profile_ticks() - time;
 		if (time > LOG_WAIT_THRESHOLD)
-			logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
+			osd_printf_verbose("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
 	}
 
 	/* reset the state */

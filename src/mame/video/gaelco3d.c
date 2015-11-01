@@ -133,7 +133,7 @@ void gaelco3d_renderer::render_poly(screen_device &screen, UINT32 *polydata)
 	if (LOG_POLYGONS)
 	{
 		int t;
-		logerror("poly: %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %08X %08X (%4d,%4d) %08X",
+		m_state.logerror("poly: %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %08X %08X (%4d,%4d) %08X",
 				(double)tms3203x_device::fp_to_float(polydata[0]),
 				(double)tms3203x_device::fp_to_float(polydata[1]),
 				(double)tms3203x_device::fp_to_float(polydata[2]),
@@ -148,10 +148,10 @@ void gaelco3d_renderer::render_poly(screen_device &screen, UINT32 *polydata)
 				polydata[11],
 				(INT16)(polydata[12] >> 16), (INT16)(polydata[12] << 2) >> 2, polydata[12]);
 
-		logerror(" (%4d,%4d) %08X %08X", (INT16)(polydata[13] >> 16), (INT16)(polydata[13] << 2) >> 2, polydata[13], polydata[14]);
+		m_state.logerror(" (%4d,%4d) %08X %08X", (INT16)(polydata[13] >> 16), (INT16)(polydata[13] << 2) >> 2, polydata[13], polydata[14]);
 		for (t = 15; !IS_POLYEND(polydata[t - 2]); t += 2)
-			logerror(" (%4d,%4d) %08X %08X", (INT16)(polydata[t] >> 16), (INT16)(polydata[t] << 2) >> 2, polydata[t], polydata[t+1]);
-		logerror("\n");
+			m_state.logerror(" (%4d,%4d) %08X %08X", (INT16)(polydata[t] >> 16), (INT16)(polydata[t] << 2) >> 2, polydata[t], polydata[t+1]);
+		m_state.logerror("\n");
 	}
 
 	/* fill in object data */

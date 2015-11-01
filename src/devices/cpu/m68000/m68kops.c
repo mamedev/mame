@@ -8676,7 +8676,7 @@ void m68000_base_device_ops::m68k_op_callm_32_ai(m68000_base_device* mc68kcpu)
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
-		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -8694,7 +8694,7 @@ void m68000_base_device_ops::m68k_op_callm_32_di(m68000_base_device* mc68kcpu)
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
-		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -8712,7 +8712,7 @@ void m68000_base_device_ops::m68k_op_callm_32_ix(m68000_base_device* mc68kcpu)
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
-		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -8730,7 +8730,7 @@ void m68000_base_device_ops::m68k_op_callm_32_aw(m68000_base_device* mc68kcpu)
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
-		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -8748,7 +8748,7 @@ void m68000_base_device_ops::m68k_op_callm_32_al(m68000_base_device* mc68kcpu)
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
-		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -8766,7 +8766,7 @@ void m68000_base_device_ops::m68k_op_callm_32_pcdi(m68000_base_device* mc68kcpu)
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
-		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -8784,7 +8784,7 @@ void m68000_base_device_ops::m68k_op_callm_32_pcix(m68000_base_device* mc68kcpu)
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
-		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -12455,7 +12455,7 @@ void m68000_base_device_ops::m68k_op_cpbcc_32(m68000_base_device* mc68kcpu)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -12467,7 +12467,7 @@ void m68000_base_device_ops::m68k_op_cpdbcc_32(m68000_base_device* mc68kcpu)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -12479,7 +12479,7 @@ void m68000_base_device_ops::m68k_op_cpgen_32(m68000_base_device* mc68kcpu)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) && (mc68kcpu->has_fpu || mc68kcpu->has_pmmu))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -12491,7 +12491,7 @@ void m68000_base_device_ops::m68k_op_cpscc_32(m68000_base_device* mc68kcpu)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -12503,7 +12503,7 @@ void m68000_base_device_ops::m68k_op_cptrapcc_32(m68000_base_device* mc68kcpu)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -26508,7 +26508,7 @@ void m68000_base_device_ops::m68k_op_pflusha_32(m68000_base_device* mc68kcpu)
 {
 	if ((CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type)) && ((mc68kcpu)->has_pmmu))
 	{
-		logerror("68040: unhandled PFLUSHA (ir=%04x)\n", mc68kcpu->ir);
+		mc68kcpu->logerror("68040: unhandled PFLUSHA (ir=%04x)\n", mc68kcpu->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -26519,7 +26519,7 @@ void m68000_base_device_ops::m68k_op_pflushan_32(m68000_base_device* mc68kcpu)
 {
 	if ((CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type)) && ((mc68kcpu)->has_pmmu))
 	{
-		logerror("68040: unhandled PFLUSHAN (ir=%04x)\n", mc68kcpu->ir);
+		mc68kcpu->logerror("68040: unhandled PFLUSHAN (ir=%04x)\n", mc68kcpu->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -26543,7 +26543,7 @@ void m68000_base_device_ops::m68k_op_ptest_32(m68000_base_device* mc68kcpu)
 {
 	if ((CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type)) && ((mc68kcpu)->has_pmmu))
 	{
-		logerror("68040: unhandled PTEST\n");
+		mc68kcpu->logerror("68040: unhandled PTEST\n");
 		return;
 	}
 	else
@@ -27808,7 +27808,7 @@ void m68000_base_device_ops::m68k_op_rtm_32(m68000_base_device* mc68kcpu)
 	if(CPU_TYPE_IS_020_VARIANT((mc68kcpu)->cpu_type))
 	{
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
-		logerror("%s at %08x: called unimplemented instruction %04x (rtm)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (rtm)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
@@ -32746,7 +32746,7 @@ void m68000_base_device_ops::m68k_op_cpush_32(m68000_base_device* mc68kcpu)
 {
 	if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
+		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}

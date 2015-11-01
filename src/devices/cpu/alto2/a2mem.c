@@ -446,20 +446,20 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 			PUT_MESR_BANK(m_mem.mesr, (dw_addr >> 15));
 			/* latch memory address register */
 			m_mem.mear = m_mem.mar & 0177777;
-			LOG((LOG_MEM,5,"    memory error at dword addr:%07o data:%011o check:%03o\n", dw_addr * 2, dw_data, hpb));
-			LOG((LOG_MEM,6,"    MEAR: %06o\n", m_mem.mear));
-			LOG((LOG_MEM,6,"    MESR: %06o\n", m_mem.mesr ^ 0177777));
-			LOG((LOG_MEM,7,"        Hamming code read    : %#o\n", GET_MESR_HAMMING(m_mem.mesr)));
-			LOG((LOG_MEM,7,"        Parity error         : %o\n", GET_MESR_PERR(m_mem.mesr)));
-			LOG((LOG_MEM,7,"        Memory parity bit    : %o\n", GET_MESR_PARITY(m_mem.mesr)));
-			LOG((LOG_MEM,7,"        Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(m_mem.mesr), hamming_lut[GET_MESR_SYNDROME(m_mem.mesr)]));
-			LOG((LOG_MEM,7,"        Memory bank          : %#o\n", GET_MESR_BANK(m_mem.mesr)));
-			LOG((LOG_MEM,6,"    MECR: %06o\n", m_mem.mecr ^ 0177777));
-			LOG((LOG_MEM,7,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
-			LOG((LOG_MEM,7,"        Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
-			LOG((LOG_MEM,7,"        INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
-			LOG((LOG_MEM,7,"        INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
-			LOG((LOG_MEM,7,"        Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
+			LOG((this,LOG_MEM,5,"    memory error at dword addr:%07o data:%011o check:%03o\n", dw_addr * 2, dw_data, hpb));
+			LOG((this,LOG_MEM,6,"    MEAR: %06o\n", m_mem.mear));
+			LOG((this,LOG_MEM,6,"    MESR: %06o\n", m_mem.mesr ^ 0177777));
+			LOG((this,LOG_MEM,7,"        Hamming code read    : %#o\n", GET_MESR_HAMMING(m_mem.mesr)));
+			LOG((this,LOG_MEM,7,"        Parity error         : %o\n", GET_MESR_PERR(m_mem.mesr)));
+			LOG((this,LOG_MEM,7,"        Memory parity bit    : %o\n", GET_MESR_PARITY(m_mem.mesr)));
+			LOG((this,LOG_MEM,7,"        Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(m_mem.mesr), hamming_lut[GET_MESR_SYNDROME(m_mem.mesr)]));
+			LOG((this,LOG_MEM,7,"        Memory bank          : %#o\n", GET_MESR_BANK(m_mem.mesr)));
+			LOG((this,LOG_MEM,6,"    MECR: %06o\n", m_mem.mecr ^ 0177777));
+			LOG((this,LOG_MEM,7,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
+			LOG((this,LOG_MEM,7,"        Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
+			LOG((this,LOG_MEM,7,"        INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
+			LOG((this,LOG_MEM,7,"        INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
+			LOG((this,LOG_MEM,7,"        Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
 		}
 		if (-1 == hamming_lut[syndrome]) {
 			/* double-bit error: wake task_part, if we're told so */
@@ -471,7 +471,7 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 				m_task_wakeup |= 1 << task_part;
 			/* should we correct the single bit error ? */
 			if (0 == GET_MECR_ERRCORR(m_mem.mecr)) {
-				LOG((LOG_MEM,0,"    correct bit #%d addr:%07o data:%011o check:%03o\n", hamming_lut[syndrome], dw_addr * 2, dw_data, hpb));
+				LOG((this,LOG_MEM,0,"    correct bit #%d addr:%07o data:%011o check:%03o\n", hamming_lut[syndrome], dw_addr * 2, dw_data, hpb));
 				dw_data ^= 1ul << hamming_lut[syndrome];
 			}
 		}
@@ -493,7 +493,7 @@ READ16_MEMBER( alto2_cpu_device::mear_r )
 {
 	int data = m_mem.error ? m_mem.mear : m_mem.mar;
 	if (!space.debugger_access()) {
-		LOG((LOG_MEM,2,"    MEAR read %07o\n", data));
+		LOG((this,LOG_MEM,2,"    MEAR read %07o\n", data));
 	}
 	return data;
 }
@@ -518,16 +518,16 @@ READ16_MEMBER( alto2_cpu_device::mesr_r )
 {
 	UINT16 data = m_mem.mesr ^ 0177777;
 	if (!space.debugger_access()) {
-		LOG((LOG_MEM,2,"    MESR read %07o\n", data));
-		LOG((LOG_MEM,6,"        Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
-		LOG((LOG_MEM,6,"        Parity error         : %o\n", GET_MESR_PERR(data)));
-		LOG((LOG_MEM,6,"        Memory parity bit    : %o\n", GET_MESR_PARITY(data)));
+		LOG((this,LOG_MEM,2,"    MESR read %07o\n", data));
+		LOG((this,LOG_MEM,6,"        Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
+		LOG((this,LOG_MEM,6,"        Parity error         : %o\n", GET_MESR_PERR(data)));
+		LOG((this,LOG_MEM,6,"        Memory parity bit    : %o\n", GET_MESR_PARITY(data)));
 #if USE_HAMMING_CHECK
-		LOG((LOG_MEM,6,"        Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(data), hamming_lut[GET_MESR_SYNDROME(data)]));
+		LOG((this,LOG_MEM,6,"        Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(data), hamming_lut[GET_MESR_SYNDROME(data)]));
 #else
-		LOG((LOG_MEM,6,"        Hamming syndrome     : %#o\n", GET_MESR_SYNDROME(data)));
+		LOG((this,LOG_MEM,6,"        Hamming syndrome     : %#o\n", GET_MESR_SYNDROME(data)));
 #endif
-		LOG((LOG_MEM,6,"        Memory bank          : %#o\n", GET_MESR_BANK(data)));
+		LOG((this,LOG_MEM,6,"        Memory bank          : %#o\n", GET_MESR_BANK(data)));
 	}
 	return data;
 }
@@ -535,7 +535,7 @@ READ16_MEMBER( alto2_cpu_device::mesr_r )
 WRITE16_MEMBER( alto2_cpu_device::mesr_w )
 {
 	if (!space.debugger_access()) {
-		LOG((LOG_MEM,2,"    MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
+		LOG((this,LOG_MEM,2,"    MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
 	}
 	m_mem.mesr = 0;     // set all bits to 0
 	m_mem.error = 0;    // reset the error flag
@@ -569,12 +569,12 @@ WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 	X_WRBITS(m_mem.mecr,16, 0, 3,0);
 	X_WRBITS(m_mem.mecr,16,15,15,0);
 	if (!space.debugger_access()) {
-		LOG((LOG_MEM,2,"    MECR write %07o\n", data));
-		LOG((LOG_MEM,6,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
-		LOG((LOG_MEM,6,"        Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
-		LOG((LOG_MEM,6,"        INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
-		LOG((LOG_MEM,6,"        INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
-		LOG((LOG_MEM,6,"        Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
+		LOG((this,LOG_MEM,2,"    MECR write %07o\n", data));
+		LOG((this,LOG_MEM,6,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
+		LOG((this,LOG_MEM,6,"        Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
+		LOG((this,LOG_MEM,6,"        INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
+		LOG((this,LOG_MEM,6,"        INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
+		LOG((this,LOG_MEM,6,"        Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
 	}
 }
 
@@ -586,12 +586,12 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
 	UINT16 data = m_mem.mecr ^ 0177777;
 	/* set all spare bits */
 	if (!space.debugger_access()) {
-		LOG((LOG_MEM,2,"    MECR read %07o\n", data));
-		LOG((LOG_MEM,6,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(data)));
-		LOG((LOG_MEM,6,"        Test mode            : %s\n", GET_MECR_TEST_MODE(data) ? "on" : "off"));
-		LOG((LOG_MEM,6,"        INT on single-bit err: %s\n", GET_MECR_INT_SBERR(data) ? "on" : "off"));
-		LOG((LOG_MEM,6,"        INT on double-bit err: %s\n", GET_MECR_INT_DBERR(data) ? "on" : "off"));
-		LOG((LOG_MEM,6,"        Error correction     : %s\n", GET_MECR_ERRCORR(data) ? "off" : "on"));
+		LOG((this,LOG_MEM,2,"    MECR read %07o\n", data));
+		LOG((this,LOG_MEM,6,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(data)));
+		LOG((this,LOG_MEM,6,"        Test mode            : %s\n", GET_MECR_TEST_MODE(data) ? "on" : "off"));
+		LOG((this,LOG_MEM,6,"        INT on single-bit err: %s\n", GET_MECR_INT_SBERR(data) ? "on" : "off"));
+		LOG((this,LOG_MEM,6,"        INT on double-bit err: %s\n", GET_MECR_INT_DBERR(data) ? "on" : "off"));
+		LOG((this,LOG_MEM,6,"        Error correction     : %s\n", GET_MECR_ERRCORR(data) ? "off" : "on"));
 	}
 	return data;
 }
@@ -626,7 +626,7 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		 * starting a memory refresh cycle
 		 * currently we don't do anything special
 		 */
-		LOG((LOG_MEM,5, "   MAR<-; refresh cycle @ %#o\n", addr));
+		LOG((this,LOG_MEM,5, "   MAR<-; refresh cycle @ %#o\n", addr));
 		m_mem.mar = addr;
 		m_mem.access = ALTO2_MEM_REFRESH;
 		m_mem.cycle = cycle();
@@ -635,7 +635,7 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 
 	m_mem.mar = addr;
 	if (addr < m_mem.size) {
-		LOG((LOG_MEM,2, "   MAR<-; mar = %#o\n", addr));
+		LOG((this,LOG_MEM,2, "   MAR<-; mar = %#o\n", addr));
 		m_mem.access = ALTO2_MEM_RAM;
 		// fetch the memory double-word to the read/write latches
 		m_mem.rmdd = m_mem.wmdd = m_mem.ram[m_mem.mar/2];
@@ -657,12 +657,12 @@ UINT16 alto2_cpu_device::read_mem()
 	UINT32 base_addr;
 
 	if (ALTO2_MEM_NONE == m_mem.access) {
-		LOG((LOG_MEM,0,"    fatal: mem read with no preceding address\n"));
+		LOG((this,LOG_MEM,0,"    fatal: mem read with no preceding address\n"));
 		return 0177777;
 	}
 
 	if (cycle() > m_mem.cycle + 4) {
-		LOG((LOG_MEM,0,"    fatal: mem read (MAR %#o) too late (+%lld cyc)\n", m_mem.mar, cycle() - m_mem.cycle));
+		LOG((this,LOG_MEM,0,"    fatal: mem read (MAR %#o) too late (+%lld cyc)\n", m_mem.mar, cycle() - m_mem.cycle));
 		m_mem.access = ALTO2_MEM_NONE;
 		return 0177777;
 	}
@@ -670,7 +670,7 @@ UINT16 alto2_cpu_device::read_mem()
 	base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && m_mem.mar < ALTO2_RAM_SIZE) {
 		m_mem.md = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
-		LOG((LOG_MEM,6,"    MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
+		LOG((this,LOG_MEM,6,"    MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
 		m_mem.access = ALTO2_MEM_NONE;
 #if ALTO2_DEBUG
 		watch_read(m_mem.mar, m_mem.md);
@@ -684,7 +684,7 @@ UINT16 alto2_cpu_device::read_mem()
 		m_mem.rmdd = hamming_code(0, m_mem.mar/2, m_mem.rmdd);
 #endif
 	m_mem.md = (m_mem.mar & ALTO2_MEM_ODD) ? GET_ODD(m_mem.rmdd) : GET_EVEN(m_mem.rmdd);
-	LOG((LOG_MEM,6,"    MD = RAM[%#o] (%#o)\n", m_mem.mar, m_mem.md));
+	LOG((this,LOG_MEM,6,"    MD = RAM[%#o] (%#o)\n", m_mem.mar, m_mem.md));
 
 #if ALTO2_DEBUG
 	watch_read(m_mem.mar, m_mem.md);
@@ -714,12 +714,12 @@ void alto2_cpu_device::write_mem(UINT16 data)
 
 	m_mem.md = data & 0177777;
 	if (ALTO2_MEM_NONE == m_mem.access) {
-		LOG((LOG_MEM,0,"    fatal: mem write with no preceding address\n"));
+		LOG((this,LOG_MEM,0,"    fatal: mem write with no preceding address\n"));
 		return;
 	}
 
 	if (cycle() > m_mem.cycle + 4) {
-		LOG((LOG_MEM,0,"    fatal: mem write (MAR %#o, data %#o) too late (+%lld cyc)\n", m_mem.mar, data, cycle() - m_mem.cycle));
+		LOG((this,LOG_MEM,0,"    fatal: mem write (MAR %#o, data %#o) too late (+%lld cyc)\n", m_mem.mar, data, cycle() - m_mem.cycle));
 		m_mem.access = ALTO2_MEM_NONE;
 		return;
 	}
@@ -727,7 +727,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
 	base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && m_mem.mar < ALTO2_RAM_SIZE) {
 		m_iomem->write_word(m_iomem->address_to_byte(base_addr), m_mem.md);
-		LOG((LOG_MEM,6, "   MMIO[%#o] = MD (%#o)\n", base_addr, m_mem.md));
+		LOG((this,LOG_MEM,6, "   MMIO[%#o] = MD (%#o)\n", base_addr, m_mem.md));
 		m_mem.access = ALTO2_MEM_NONE;
 #if ALTO2_DEBUG
 		watch_write(m_mem.mar, m_mem.md);
@@ -735,7 +735,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
 		return;
 	}
 
-	LOG((LOG_MEM,6, "   RAM[%#o] = MD (%#o)\n", m_mem.mar, m_mem.md));
+	LOG((this,LOG_MEM,6, "   RAM[%#o] = MD (%#o)\n", m_mem.mar, m_mem.md));
 	if (m_mem.mar & ALTO2_MEM_ODD)
 		PUT_ODD(m_mem.wmdd, m_mem.md);
 	else

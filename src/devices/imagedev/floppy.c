@@ -942,7 +942,7 @@ void ui_menu_control_floppy_image::do_load_create()
 	if(input_filename.compare("")==0) {
 		int err = fd->create(output_filename.c_str(), 0, NULL);
 		if (err != 0) {
-			popmessage("Error: %s", fd->error());
+			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
 		fd->setup_write(output_format);
@@ -951,7 +951,7 @@ void ui_menu_control_floppy_image::do_load_create()
 		if (!err && output_filename.compare("") != 0)
 			err = fd->reopen_for_write(output_filename.c_str());
 		if(err != 0) {
-			popmessage("Error: %s", fd->error());
+			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
 		if(output_format)
@@ -963,7 +963,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 {
 	if (softlist)
 	{
-		popmessage("When loaded from software list, the disk is Read-only.\n");
+		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
 		image->load(filename.c_str());
 		ui_menu::stack_pop(machine());
 		return;
@@ -974,7 +974,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 
 	if (!input_format)
 	{
-		popmessage("Error: %s\n", image->error());
+		machine().popmessage("Error: %s\n", image->error());
 		ui_menu::stack_pop(machine());
 		return;
 	}
@@ -1049,7 +1049,7 @@ void ui_menu_control_floppy_image::handle()
 			break;
 
 		case ui_menu_select_rw::WRITE_DIFF:
-			popmessage("Sorry, diffs are not supported yet\n");
+			machine().popmessage("Sorry, diffs are not supported yet\n");
 			ui_menu::stack_pop(machine());
 			break;
 

@@ -40,7 +40,7 @@
 #include <time.h>
 #include <assert.h>
 
-#include "emu.h" // logerror
+#include "emu.h" // osd_printf_verbose
 #include "imageutl.h"
 #include "ti99_dsk.h"
 
@@ -113,17 +113,17 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 	int track_size = get_track_size(cell_size, sector_count);
 	int track_count = file_size / (track_size*heads);
 
-	if (TRACE) logerror("ti99_dsk: track count = %d\n", track_count);
+	if (TRACE) osd_printf_verbose("ti99_dsk: track count = %d\n", track_count);
 
 	if (track_count > maxtrack)
 	{
-		logerror("ti99_dsk: Floppy disk has too many tracks for this drive.\n");
+		osd_printf_verbose("ti99_dsk: Floppy disk has too many tracks for this drive.\n");
 		return false;
 	}
 
 	bool doubletracks = (track_count * 2 <= maxtrack);
 
-	if (doubletracks) logerror("ti99_dsk: 40-track image in an 80-track drive. On save, image size will double.\n");
+	if (doubletracks) osd_printf_verbose("ti99_dsk: 40-track image in an 80-track drive. On save, image size will double.\n");
 
 	// Read the image
 	for(int head=0; head < heads; head++)
@@ -224,7 +224,7 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 							else maxsect = 9;
 						}
 					}
-					if (TRACE) logerror("ti99_dsk: Sectors/track: %d\n", maxsect);
+					if (TRACE) osd_printf_verbose("ti99_dsk: Sectors/track: %d\n", maxsect);
 
 					// We try different cell sizes until we find a fitting size.
 					// If this fails, we fall back to a size of 2000 ns
@@ -233,7 +233,7 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 					// to find so many marks with a wrong cell size.
 					if (marks < 6 && attempt < 4)
 					{
-						if (TRACE) logerror("ti99_dsk: Decoding with cell size %d failed.\n", cell_size);
+						if (TRACE) osd_printf_verbose("ti99_dsk: Decoding with cell size %d failed.\n", cell_size);
 						attempt++;
 						write = false;
 					}
@@ -245,12 +245,12 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 					{
 						if (min_heads()==1)
 						{
-							if (TRACE) logerror("ti99_dsk: We don't have a second side and the format allows for single-sided recording.\n");
+							if (TRACE) osd_printf_verbose("ti99_dsk: We don't have a second side and the format allows for single-sided recording.\n");
 							return true;
 						}
 						else
 						{
-							logerror("ti99_dsk: No second side, but this format requires two-sided recording. Saving empty tracks.\n");
+							osd_printf_verbose("ti99_dsk: No second side, but this format requires two-sided recording. Saving empty tracks.\n");
 						}
 					}
 				}
@@ -262,8 +262,8 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 				{
 					if (head == 0 && track == 0)
 					{
-						if (marks >=6) { if (TRACE) logerror("ti99_dsk: Decoding with cell size %d successful.\n", cell_size); }
-						else logerror("ti99_dsk: No address marks found on track 0. Assuming MFM format.\n");
+						if (marks >=6) { if (TRACE) osd_printf_verbose("ti99_dsk: Decoding with cell size %d successful.\n", cell_size); }
+						else osd_printf_verbose("ti99_dsk: No address marks found on track 0. Assuming MFM format.\n");
 					}
 				}
 				// Save to the file
@@ -299,7 +299,7 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 
 	if (check_for_address_marks(trackdata, floppy_image::FM)==false)
 	{
-		if (head==0 && track==0) logerror("ti99_dsk: Cannot find FM address marks on track %d, head %d; likely broken or unformatted.\n", track, head);
+		if (head==0 && track==0) osd_printf_verbose("ti99_dsk: Cannot find FM address marks on track %d, head %d; likely broken or unformatted.\n", track, head);
 		return;
 	}
 
@@ -336,14 +336,14 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 					{
 						// PC99 format: no real CRC; replace it
 						// Also, when converting from SDF we let this method create the proper CRC.
-						// logerror("Warning: PC99 format using pseudo CRC1; replace by %04x\n", crc1);
+						// osd_printf_verbose("Warning: PC99 format using pseudo CRC1; replace by %04x\n", crc1);
 						trackdata[i] = (crc1 >> 8) & 0xff;
 						trackdata[i+1] = crc1 & 0xff;
 						found_crc = crc1;
 					}
 					if (crc1 != found_crc)
 					{
-						logerror("ti99_dsk: Warning: CRC1 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff, crc1& 0xffff);
+						osd_printf_verbose("ti99_dsk: Warning: CRC1 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff, crc1& 0xffff);
 					}
 				}
 				else
@@ -356,14 +356,14 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 						if ((found_crc & 0xffff) == 0xf7f7)
 						{
 							// PC99 format: no real CRC; replace it
-							// logerror("Warning: PC99 format using pseudo CRC2; replace by %04x\n", crc2);
+							// osd_printf_verbose("Warning: PC99 format using pseudo CRC2; replace by %04x\n", crc2);
 							trackdata[i] = (crc2 >> 8) & 0xff;
 							trackdata[i+1] = crc2 & 0xff;
 							found_crc = crc2;
 						}
 						if (crc2 != found_crc)
 						{
-							logerror("ti99_dsk: Warning: CRC2 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff, crc2& 0xffff);
+							osd_printf_verbose("ti99_dsk: Warning: CRC2 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff, crc2& 0xffff);
 						}
 					}
 				}
@@ -391,7 +391,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 
 	if (check_for_address_marks(trackdata, floppy_image::MFM)==false)
 	{
-		if (track==0 && head==0) logerror("ti99_dsk: Cannot find MFM address marks on track %d, head %d; likely broken or unformatted.\n", track, head);
+		if (track==0 && head==0) osd_printf_verbose("ti99_dsk: Cannot find MFM address marks on track %d, head %d; likely broken or unformatted.\n", track, head);
 		return;
 	}
 
@@ -432,14 +432,14 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 					if ((found_crc & 0xffff) == 0xf7f7)
 					{
 						// PC99 format: pseudo CRC; replace it
-						// logerror("Warning: PC99 format using pseudo CRC1; replace by %04x\n", crc1);
+						// osd_printf_verbose("Warning: PC99 format using pseudo CRC1; replace by %04x\n", crc1);
 						trackdata[i] = (crc1 >> 8) & 0xff;
 						trackdata[i+1] = crc1 & 0xff;
 						found_crc = crc1;
 					}
 					if (crc1 != found_crc)
 					{
-						logerror("ti99_dsk: Warning: CRC1 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc & 0xffff, crc1& 0xffff);
+						osd_printf_verbose("ti99_dsk: Warning: CRC1 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc & 0xffff, crc1& 0xffff);
 					}
 				}
 				else
@@ -452,14 +452,14 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 						if ((found_crc & 0xffff) == 0xf7f7)
 						{
 							// PC99 format: pseudo CRC; replace it
-							// logerror("Warning: PC99 format using pseudo CRC2; replace by %04x\n", crc2);
+							// osd_printf_verbose("Warning: PC99 format using pseudo CRC2; replace by %04x\n", crc2);
 							trackdata[i] = (crc2 >> 8) & 0xff;
 							trackdata[i+1] = crc2 & 0xff;
 							found_crc = crc2;
 						}
 						if (crc2 != found_crc)
 						{
-							logerror("ti99_dsk: Warning: CRC2 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff,  crc2& 0xffff);
+							osd_printf_verbose("ti99_dsk: Warning: CRC2 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff,  crc2& 0xffff);
 						}
 					}
 				}
@@ -735,7 +735,7 @@ int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
 	// as a bad sector map
 	if ((file_size / SECTOR_SIZE) % 10 == 3)
 	{
-		if (TRACE) logerror("ti99_dsk: Stripping map of bad sectors at image end\n");
+		if (TRACE) osd_printf_verbose("ti99_dsk: Stripping map of bad sectors at image end\n");
 		file_size -= SECTOR_SIZE*3;
 	}
 
@@ -772,15 +772,15 @@ int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
 		// Check from contents
 		if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
 		{
-			if (TRACE) logerror("ti99_dsk: Found formatted SDF disk medium\n");
+			if (TRACE) osd_printf_verbose("ti99_dsk: Found formatted SDF disk medium\n");
 			vote = 100;
 		}
 		else
 		{
-			if (TRACE) logerror("ti99_dsk: No valid VIB found; disk may be unformatted\n");
+			if (TRACE) osd_printf_verbose("ti99_dsk: No valid VIB found; disk may be unformatted\n");
 		}
 	}
-	else if (TRACE) logerror("ti99_dsk: Disk image is not a SDF image\n");
+	else if (TRACE) osd_printf_verbose("ti99_dsk: Disk image is not a SDF image\n");
 	return vote;
 }
 
@@ -816,7 +816,7 @@ void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 			if (vib.density < 4) cell_size = 2000;
 			else cell_size = 1000;
 		}
-		if (TRACE) logerror("ti99_dsk: VIB says that this disk is %s density with %d sectors per track, %d tracks, and %d heads\n", (cell_size==4000)? "single": ((cell_size==2000)? "double" : "high"), sector_count, vib.tracksperside, heads);
+		if (TRACE) osd_printf_verbose("ti99_dsk: VIB says that this disk is %s density with %d sectors per track, %d tracks, and %d heads\n", (cell_size==4000)? "single": ((cell_size==2000)? "double" : "high"), sector_count, vib.tracksperside, heads);
 		have_vib = true;
 	}
 
@@ -855,13 +855,13 @@ void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 	{
 		if (sector_count == 16 && sector_count1 == 18)
 		{
-			logerror("ti99_dsk: Warning: Invalid 16-sector format. Assuming 18 sectors.\n");
+			osd_printf_verbose("ti99_dsk: Warning: Invalid 16-sector format. Assuming 18 sectors.\n");
 			sector_count = 18;
 		}
 		else
 		{
 			if (heads == 2 && ((cell_size1 != cell_size) || (sector_count1 != sector_count)))
-				logerror("ti99_dsk: Warning: Disk image size does not correspond with format information in VIB.\n");
+				osd_printf_verbose("ti99_dsk: Warning: Disk image size does not correspond with format information in VIB.\n");
 		}
 	}
 	else
@@ -975,19 +975,19 @@ void ti99_floppy_format::showtrack(UINT8* trackdata, int length)
 {
 	for (int i=0; i < length; i+=16)
 	{
-		logerror("%07x: ", i);
+		osd_printf_verbose("%07x: ", i);
 		for (int j=0; j < 16; j++)
 		{
-			logerror("%02x", trackdata[i+j]);
-			if ((j&1)==1) logerror(" ");
+			osd_printf_verbose("%02x", trackdata[i+j]);
+			if ((j&1)==1) osd_printf_verbose(" ");
 		}
-		logerror(" ");
+		osd_printf_verbose(" ");
 		for (int j=0; j < 16; j++)
 		{
-			if (trackdata[i+j] >= 32 && trackdata[i+j]<128) logerror("%c", trackdata[i+j]);
-			else logerror(".");
+			if (trackdata[i+j] >= 32 && trackdata[i+j]<128) osd_printf_verbose("%c", trackdata[i+j]);
+			else osd_printf_verbose(".");
 		}
-		logerror("\n");
+		osd_printf_verbose("\n");
 	}
 }
 
@@ -1075,7 +1075,7 @@ int ti99_tdf_format::identify(io_generic *io, UINT32 form_factor)
 
 	if (vote > 0)
 	{
-		if (TRACE) logerror("ti99_dsk: Image looks like a TDF image\n");
+		if (TRACE) osd_printf_error("ti99_dsk: Image looks like a TDF image\n");
 
 		// Get some bytes from track 0
 		io_generic_read(io, trackdata, 0, 2000);
@@ -1083,10 +1083,10 @@ int ti99_tdf_format::identify(io_generic *io, UINT32 form_factor)
 		if (check_for_address_marks(trackdata, floppy_image::FM)==true || check_for_address_marks(trackdata, floppy_image::MFM)==true) vote=100;
 		else
 		{
-			if (TRACE) logerror("ti99_dsk: Image does not comply with TDF; may be broken or unformatted\n");
+			if (TRACE) osd_printf_error("ti99_dsk: Image does not comply with TDF; may be broken or unformatted\n");
 		}
 	}
-	else if (TRACE) logerror("ti99_dsk: Disk image is not a TDF image\n");
+	else if (TRACE) osd_printf_error("ti99_dsk: Disk image is not a TDF image\n");
 	return vote;
 }
 

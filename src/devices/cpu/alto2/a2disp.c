@@ -291,13 +291,13 @@ void alto2_cpu_device::unload_word()
 	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_MBEMPTY(a38))
 	{
-		LOG((LOG_DISPL,1, " DSP FIFO underrun y:%d x:%d\n", y, x));
+		LOG((this,LOG_DISPL,1, " DSP FIFO underrun y:%d x:%d\n", y, x));
 	}
 	else
 	{
 		word ^= m_dsp.fifo[m_dsp.ra];
 		m_dsp.ra = (m_dsp.ra + 1) % ALTO2_DISPLAY_FIFO;
-		LOG((LOG_DISPL,3, " DSP pull %04x from FIFO[%02o] y:%d x:%d\n",
+		LOG((this,LOG_DISPL,3, " DSP pull %04x from FIFO[%02o] y:%d x:%d\n",
 				word, (m_dsp.ra - 1) & (ALTO2_DISPLAY_FIFO - 1), y, x));
 	}
 
@@ -334,10 +334,10 @@ void alto2_cpu_device::unload_word()
  */
 void alto2_cpu_device::display_state_machine()
 {
-	LOG((LOG_DISPL,5,"DSP%03o:", m_dsp.state));
+	LOG((this,LOG_DISPL,5,"DSP%03o:", m_dsp.state));
 	if (020 == m_dsp.state)
 	{
-		LOG((LOG_DISPL,2," HLC=%d", m_dsp.hlc));
+		LOG((this,LOG_DISPL,2," HLC=%d", m_dsp.hlc));
 	}
 
 	UINT8 a63 = m_disp_a63[m_dsp.state];
@@ -361,14 +361,14 @@ void alto2_cpu_device::display_state_machine()
 		// Rising edge of VBLANK: remember HLC[1-10] where the VBLANK starts
 		m_dsp.vblank = m_dsp.hlc & ~02000;
 
-		LOG((LOG_DISPL,1, " VBLANK"));
+		LOG((this,LOG_DISPL,1, " VBLANK"));
 
 		// VSYNC is always within VBLANK, thus we handle it only here
 		if (A66_VSYNC(a66))
 		{
 			if (!A66_VSYNC(m_dsp.a66))
 			{
-				LOG((LOG_DISPL,1, " VSYNC/ (wake DVT)"));
+				LOG((this,LOG_DISPL,1, " VSYNC/ (wake DVT)"));
 				/*
 				 * The display vertical task DVT is woken once per field
 				 * at the beginning of vertical retrace.
@@ -393,7 +393,7 @@ void alto2_cpu_device::display_state_machine()
 			 * the word task can be woken until the start of the
 			 * next field.
 			 */
-			LOG((LOG_DISPL,1, " VBLANKPULSE (wake DHT)"));
+			LOG((this,LOG_DISPL,1, " VBLANKPULSE (wake DHT)"));
 			m_dsp.dht_blocks = false;
 			m_dsp.dwt_blocks = false;
 			m_task_wakeup |= 1 << task_dht;
@@ -406,7 +406,7 @@ void alto2_cpu_device::display_state_machine()
 		if (!A63_HBLANK(a63) && A63_HBLANK(m_dsp.a63))
 		{
 			// Falling edge of a63 HBLANK starts unloading of FIFO words
-			LOG((LOG_DISPL,1, " HBLANK\\ UNLOAD"));
+			LOG((this,LOG_DISPL,1, " HBLANK\\ UNLOAD"));
 			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
 			m_unload_word = 0;
 		}
@@ -422,17 +422,17 @@ void alto2_cpu_device::display_state_machine()
 	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && !FIFO_STOPWAKE(a38))
 	{
 		m_task_wakeup |= 1 << task_dwt;
-		LOG((LOG_DISPL,1, " (wake DWT)"));
+		LOG((this,LOG_DISPL,1, " (wake DWT)"));
 	}
 
 	// Stop waking up the DWT when SCANEND is active
 	if (A63_SCANEND(a63))
 	{
 		m_task_wakeup &= ~(1 << task_dwt);
-		LOG((LOG_DISPL,1, " SCANEND"));
+		LOG((this,LOG_DISPL,1, " SCANEND"));
 	}
 
-	LOG((LOG_DISPL,1, "%s", A63_HBLANK(a63) ? " HBLANK": ""));
+	LOG((this,LOG_DISPL,1, "%s", A63_HBLANK(a63) ? " HBLANK": ""));
 
 	if (A63_HSYNC(a63))
 	{
@@ -440,7 +440,7 @@ void alto2_cpu_device::display_state_machine()
 		if (!A63_HSYNC(m_dsp.a63))
 		{
 			// Rising edge of HSYNC => CLRBUF
-			LOG((LOG_DISPL,1, " HSYNC/ (CLRBUF)"));
+			LOG((this,LOG_DISPL,1, " HSYNC/ (CLRBUF)"));
 			/*
 			 * The hardware sets the buffer empty and clears the DWT block
 			 * flip-flop at the beginning of horizontal retrace for
@@ -457,7 +457,7 @@ void alto2_cpu_device::display_state_machine()
 		}
 		else
 		{
-			LOG((LOG_DISPL,1, " HSYNC"));
+			LOG((this,LOG_DISPL,1, " HSYNC"));
 		}
 	}
 	else
@@ -475,7 +475,7 @@ void alto2_cpu_device::display_state_machine()
 			m_task_wakeup |= 1 << task_curt;
 	}
 
-	LOG((LOG_DISPL,1, " NEXT:%03o\n", next));
+	LOG((this,LOG_DISPL,1, " NEXT:%03o\n", next));
 
 	m_dsp.a63 = a63;
 	m_dsp.a66 = a66;
@@ -491,7 +491,7 @@ void alto2_cpu_device::display_state_machine()
 void alto2_cpu_device::f2_late_evenfield()
 {
 	UINT16 r = HLC1024 ^ 1;
-	LOG((LOG_DISPL,2,"  EVENFIELD branch (%#o | %#o)\n", m_next2, r));
+	LOG((this,LOG_DISPL,2,"  EVENFIELD branch (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }
 

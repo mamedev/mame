@@ -835,7 +835,7 @@ static void execute_logerror(running_machine &machine, int ref, int params, cons
 
 	/* then do a printf */
 	if (mini_printf(machine, buffer, param[0], params - 1, &values[1]))
-		logerror("%s", buffer);
+		machine.logerror("%s", buffer);
 }
 
 

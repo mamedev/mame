@@ -228,7 +228,7 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 			/* if yes, then let's check if ADPCM memory is mapped and big enough */
 			if(DELTAT->memory == 0)
 			{
-				logerror("YM Delta-T ADPCM rom not mapped\n");
+				DELTAT->device->logerror("YM Delta-T ADPCM rom not mapped\n");
 				DELTAT->portstate = 0x00;
 				DELTAT->PCM_BSY = 0;
 			}
@@ -236,12 +236,12 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 			{
 				if( DELTAT->end >= DELTAT->memory_size )    /* Check End in Range */
 				{
-					logerror("YM Delta-T ADPCM end out of range: $%08x\n", DELTAT->end);
+					DELTAT->device->logerror("YM Delta-T ADPCM end out of range: $%08x\n", DELTAT->end);
 					DELTAT->end = DELTAT->memory_size - 1;
 				}
 				if( DELTAT->start >= DELTAT->memory_size )  /* Check Start in Range */
 				{
-					logerror("YM Delta-T ADPCM start out of range: $%08x\n", DELTAT->start);
+					DELTAT->device->logerror("YM Delta-T ADPCM start out of range: $%08x\n", DELTAT->start);
 					DELTAT->portstate = 0x00;
 					DELTAT->PCM_BSY = 0;
 				}
@@ -411,8 +411,9 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 	}
 }
 
-void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode)
+void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode,device_t *device)
 {
+	DELTAT->device 	  = device;
 	DELTAT->now_addr  = 0;
 	DELTAT->now_step  = 0;
 	DELTAT->step      = 0;

@@ -45,7 +45,7 @@
 
 #define LOG_SOUND   0
 
-#define LOG(x)      do { if (LOG_SOUND) logerror x; } while(0)
+#define LOG(x)      do { if (LOG_SOUND) osd_printf_verbose x; } while(0)
 
 
 class sound_direct_sound : public osd_module, public sound_module

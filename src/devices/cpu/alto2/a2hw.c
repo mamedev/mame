@@ -242,7 +242,7 @@ READ16_MEMBER( alto2_cpu_device::utilin_r )
 	data = m_hw.utilin;
 
 	if (!space.debugger_access()) {
-		LOG((LOG_HW,2," UTILIN rd %#o (%#o)\n", offset, data));
+		LOG((this,LOG_HW,2," UTILIN rd %#o (%#o)\n", offset, data));
 	}
 	return data;
 }
@@ -258,7 +258,7 @@ READ16_MEMBER( alto2_cpu_device::xbus_r )
 	UINT16 data = m_hw.xbus[offset & 3];
 
 	if (!space.debugger_access()) {
-		LOG((LOG_HW,2," XBUS[%d] rd %#o (%#o)\n", offset & 3, offset, data));
+		LOG((this,LOG_HW,2," XBUS[%d] rd %#o (%#o)\n", offset & 3, offset, data));
 	}
 	return data;
 }
@@ -274,7 +274,7 @@ READ16_MEMBER( alto2_cpu_device::xbus_r )
 WRITE16_MEMBER( alto2_cpu_device::xbus_w )
 {
 	if (!space.debugger_access()) {
-		LOG((LOG_HW,2," XBUS[%d] wr %#o (%#o)\n", offset & 3, offset, data));
+		LOG((this,LOG_HW,2," XBUS[%d] wr %#o (%#o)\n", offset & 3, offset, data));
 	}
 	m_hw.xbus[offset&3] = data;
 }
@@ -289,7 +289,7 @@ READ16_MEMBER( alto2_cpu_device::utilout_r )
 {
 	UINT16 data = m_hw.utilout ^ 0177777;
 	if (!space.debugger_access()) {
-		LOG((0,2,"  UTILOUT rd %#o (%#o)\n", offset, data));
+		LOG((this,0,2,"  UTILOUT rd %#o (%#o)\n", offset, data));
 	}
 	return data;
 }
@@ -305,7 +305,7 @@ READ16_MEMBER( alto2_cpu_device::utilout_r )
 WRITE16_MEMBER( alto2_cpu_device::utilout_w )
 {
 	if (!space.debugger_access()) {
-		LOG((LOG_HW,2," UTILOUT wr %#o (%#o)\n", offset, data));
+		LOG((this,LOG_HW,2," UTILOUT wr %#o (%#o)\n", offset, data));
 	}
 	m_hw.utilout = data ^ 0177777;
 

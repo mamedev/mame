@@ -402,12 +402,12 @@ static void decode_dos21(device_t *device,offs_t pc)
 	UINT16  di = state->m_maincpu->state_int(I8086_DI);
 	UINT16  bp = state->m_maincpu->state_int(I8086_BP);
 
-	logerror("=======================================================================\n");
-	logerror("DOS Int 0x21 call at %05X\n",pc);
-	logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
-	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
-	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
-	logerror("=======================================================================\n");
+	device->logerror("=======================================================================\n");
+	device->logerror("DOS Int 0x21 call at %05X\n",pc);
+	device->logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
+	device->logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
+	device->logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
+	device->logerror("=======================================================================\n");
 
 	if((ax & 0xff00)==0x0900)
 		debugger_break(device->machine());

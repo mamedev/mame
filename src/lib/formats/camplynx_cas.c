@@ -116,7 +116,7 @@ static int camplynx_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 			pgmname[0] = (char)0x4D;
 
 		// Tell user how to load the tape
-		popmessage("%s",pgmname.c_str());
+		osd_printf_info("%s",pgmname.c_str());
 
 		/* data zeroes */
 		for (i=0; i<555; i++)

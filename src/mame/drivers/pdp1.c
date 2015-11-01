@@ -983,7 +983,7 @@ static void iot_rpa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	state->begin_tape_read(0, nac);
 }
@@ -1021,7 +1021,7 @@ static void iot_rpb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	state->begin_tape_read(1, nac);
 }
@@ -1033,7 +1033,7 @@ static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	*io = state->m_tape_reader.rb;
 	state->m_io_status &= ~io_st_ptr;
@@ -1098,7 +1098,7 @@ static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	state->tape_write(*io & 0377);
 	state->m_io_status &= ~io_st_ptp;
@@ -1106,7 +1106,7 @@ static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (state->m_tape_puncher.timer->enable(0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+			device->logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 	}
 
 	state->m_tape_puncher.timer->adjust(attotime::from_usec(15800), nac);
@@ -1127,7 +1127,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	state->tape_write((*io >> 12) | 0200);
 	state->m_io_status &= ~io_st_ptp;
@@ -1135,7 +1135,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (state->m_tape_puncher.timer->enable(0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+			device->logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 	}
 	state->m_tape_puncher.timer->adjust(attotime::from_usec(15800), nac);
 }
@@ -1297,7 +1297,7 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	int ch, delay;
 
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYO instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("Warning, TYO instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	ch = (*io) & 077;
 
@@ -1325,7 +1325,7 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (state->m_typewriter.tyo_timer->enable(0))
-			logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+			device->logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 	}
 
 	state->m_typewriter.tyo_timer->adjust(attotime::from_msec(delay), nac);
@@ -1349,7 +1349,7 @@ static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	*io = state->m_typewriter.tb;
 	if (! (state->m_io_status & io_st_tyi))
@@ -1440,7 +1440,7 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 			/* note that overlap detection is incomplete: it will only work if both DPY
 			instructions require a completion pulse */
 			if (state->m_dpy_timer->enable(0))
-				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+				device->logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 		}
 		state->m_dpy_timer->adjust(attotime::from_usec(50));
 	}
@@ -1658,7 +1658,7 @@ static void iot_cks(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
+		device->logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	*io = state->m_io_status;
 }

@@ -24,7 +24,7 @@ int g_log_types = LOG_DISK | LOG_ETH;
 int g_log_level = 8;
 bool g_log_newline = true;
 
-void logprintf(int type, int level, const char* format, ...)
+void logprintf(device_t *device, int type, int level, const char* format, ...)
 {
 	static const char* type_name[] = {
 		"[CPU]",
@@ -61,11 +61,11 @@ void logprintf(int type, int level, const char* format, ...)
 		// last line had a \n - print type name
 		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
 			if (type & (1 << i))
-				logerror("%-7s ", type_name[i]);
+				device->logerror("%-7s ", type_name[i]);
 	}
 	va_list ap;
 	va_start(ap, format);
-	vlogerror(format, ap);
+	device->vlogerror(format, ap);
 	va_end(ap);
 	g_log_newline = format[strlen(format) - 1] == '\n';
 }
@@ -1271,12 +1271,12 @@ const char* alto2_cpu_device::f2_name(UINT8 f2)
 #if ALTO2_DEBUG
 void alto2_cpu_device::watch_read(UINT32 addr, UINT32 data)
 {
-	LOG((LOG_MEM,0,"mem: rd[%06o] = %06o\n", addr, data));
+	LOG((this,LOG_MEM,0,"mem: rd[%06o] = %06o\n", addr, data));
 }
 
 void alto2_cpu_device::watch_write(UINT32 addr, UINT32 data)
 {
-	LOG((LOG_MEM,0,"mem: wr[%06o] = %06o\n", addr, data));
+	LOG((this,LOG_MEM,0,"mem: wr[%06o] = %06o\n", addr, data));
 }
 #endif
 
@@ -1389,7 +1389,7 @@ static const char* memory_range_name(offs_t offset)
  */
 READ16_MEMBER( alto2_cpu_device::noop_r )
 {
-	LOG((LOG_CPU,0,"    MMIO rd %s\n", memory_range_name(offset)));
+	LOG((this,LOG_CPU,0,"    MMIO rd %s\n", memory_range_name(offset)));
 	return 0177777;
 }
 
@@ -1398,7 +1398,7 @@ READ16_MEMBER( alto2_cpu_device::noop_r )
  */
 WRITE16_MEMBER( alto2_cpu_device::noop_w )
 {
-	LOG((LOG_CPU,0,"    MMIO wr %s\n", memory_range_name(offset)));
+	LOG((this,LOG_CPU,0,"    MMIO wr %s\n", memory_range_name(offset)));
 }
 
 /**
@@ -1422,7 +1422,7 @@ WRITE16_MEMBER( alto2_cpu_device::bank_reg_w )
 {
 	int task = offset & 017;
 	m_bank_reg[task] = data & 017;
-	LOG((LOG_CPU,0,"    write bank[%02o]=%#o normal:%o extended:%o (%s)\n",
+	LOG((this,LOG_CPU,0,"    write bank[%02o]=%#o normal:%o extended:%o (%s)\n",
 		task, data,
 		GET_BANK_NORMAL(data),
 		GET_BANK_EXTENDED(data),
@@ -1435,7 +1435,7 @@ WRITE16_MEMBER( alto2_cpu_device::bank_reg_w )
 void alto2_cpu_device::bs_early_read_r()
 {
 	UINT16 r = m_r[m_rsel];
-	LOG((LOG_CPU,2,"    <-R%02o; %s (%#o)\n", m_rsel, r_name(m_rsel), r));
+	LOG((this,LOG_CPU,2,"    <-R%02o; %s (%#o)\n", m_rsel, r_name(m_rsel), r));
 	m_bus &= r;
 }
 
@@ -1445,7 +1445,7 @@ void alto2_cpu_device::bs_early_read_r()
 void alto2_cpu_device::bs_early_load_r()
 {
 	UINT16 r = 0;
-	LOG((LOG_CPU,2,"    R%02o<-; %s (BUS&=0)\n", m_rsel, r_name(m_rsel)));
+	LOG((this,LOG_CPU,2,"    R%02o<-; %s (BUS&=0)\n", m_rsel, r_name(m_rsel)));
 	m_bus &= r;
 }
 
@@ -1456,7 +1456,7 @@ void alto2_cpu_device::bs_late_load_r()
 {
 	if (m_d_f2 != f2_emu_load_dns) {
 		m_r[m_rsel] = m_shifter;
-		LOG((LOG_CPU,2,"    R%02o<-; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
+		LOG((this,LOG_CPU,2,"    R%02o<-; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
 #if 0
 		/* HACK: programs writing r37 with xxx3 make the cursor
 		 * display go nuts. Until I found the real reason for this
@@ -1480,7 +1480,7 @@ void alto2_cpu_device::bs_early_read_md()
 	UINT32 mar = m_mem.mar;
 #endif
 	UINT16 md = read_mem();
-	LOG((LOG_CPU,2,"    <-MD; BUS&=MD (%#o=[%#o])\n", md, mar));
+	LOG((this,LOG_CPU,2,"    <-MD; BUS&=MD (%#o=[%#o])\n", md, mar));
 	m_bus &= md;
 }
 
@@ -1490,7 +1490,7 @@ void alto2_cpu_device::bs_early_read_md()
 void alto2_cpu_device::bs_early_mouse()
 {
 	UINT16 r = mouse_read();
-	LOG((LOG_CPU,2,"    <-MOUSE; BUS&=MOUSE (%#o)\n", r));
+	LOG((this,LOG_CPU,2,"    <-MOUSE; BUS&=MOUSE (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -1500,8 +1500,8 @@ void alto2_cpu_device::bs_early_mouse()
 void alto2_cpu_device::bs_early_disp()
 {
 	UINT16 r = 0177777;
-	LOG((LOG_CPU,0,"BS <-DISP not handled by task %s mpc:%04x\n", task_name(m_task), m_mpc));
-	LOG((LOG_CPU,2,"    <-DISP; BUS&=DISP ?? (%#o)\n", r));
+	LOG((this,LOG_CPU,0,"BS <-DISP not handled by task %s mpc:%04x\n", task_name(m_task), m_mpc));
+	LOG((this,LOG_CPU,2,"    <-DISP; BUS&=DISP ?? (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -1517,7 +1517,7 @@ void alto2_cpu_device::f1_late_load_mar()
 	UINT32 msb;
 	if (m_d_f2 == f2_load_md) {
 		msb = GET_BANK_EXTENDED(bank) << 16;
-		LOG((LOG_CPU,7, "   XMAR %#o\n", msb | m_alu));
+		LOG((this,LOG_CPU,7, "   XMAR %#o\n", msb | m_alu));
 	} else {
 		msb = GET_BANK_NORMAL(bank) << 16;
 
@@ -1593,60 +1593,60 @@ static __inline f9318_out_t f9318(f9318_in_t in)
 
 	if (in & PRIO_IN_EI) {
 		out = PRIO_OUT_EO | PRIO_OUT_GS | PRIO_OUT_QZ;
-		LOG((LOG_CPU,2,"    f9318 case (a) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (a) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (0 == (in & PRIO_I7)) {
 		out = PRIO_OUT_EO;
-		LOG((LOG_CPU,2,"    f9318 case (c) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (c) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (PRIO_I7 == (in & PRIO_I6_I7)) {
 		out = PRIO_OUT_EO | PRIO_OUT_Q0;
-		LOG((LOG_CPU,2,"    f9318 case (d) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (d) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (PRIO_I6_I7 == (in & PRIO_I5_I7)) {
 		out = PRIO_OUT_EO | PRIO_OUT_Q1;
-		LOG((LOG_CPU,2,"    f9318 case (e) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (e) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (PRIO_I5_I7 == (in & PRIO_I4_I7)) {
 		out = PRIO_OUT_EO | PRIO_OUT_Q0 | PRIO_OUT_Q1;
-		LOG((LOG_CPU,2,"    f9318 case (f) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (f) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (PRIO_I4_I7 == (in & PRIO_I3_I7)) {
 		out = PRIO_OUT_EO | PRIO_OUT_Q2;
-		LOG((LOG_CPU,2,"    f9318 case (g) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (g) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (PRIO_I3_I7 == (in & PRIO_I2_I7)) {
 		out = PRIO_OUT_EO | PRIO_OUT_Q0 | PRIO_OUT_Q2;
-		LOG((LOG_CPU,2,"    f9318 case (h) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (h) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (PRIO_I2_I7 == (in & PRIO_I1_I7)) {
 		out = PRIO_OUT_EO | PRIO_OUT_Q1 | PRIO_OUT_Q2;
-		LOG((LOG_CPU,2,"    f9318 case (i) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (i) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	if (PRIO_I1_I7 == (in & PRIO_I0_I7)) {
 		out = PRIO_OUT_EO | PRIO_OUT_Q0 | PRIO_OUT_Q1 | PRIO_OUT_Q2;
-		LOG((LOG_CPU,2,"    f9318 case (j) in:%#o out:%#o\n", in, out));
+		LOG((this,LOG_CPU,2,"    f9318 case (j) in:%#o out:%#o\n", in, out));
 		return out;
 	}
 
 	out = PRIO_OUT_QZ | PRIO_OUT_GS;
-	LOG((LOG_CPU,2,"    f9318 case (b) in:%#o out:%#o\n", in, out));
+	LOG((this,LOG_CPU,2,"    f9318 case (b) in:%#o out:%#o\n", in, out));
 	return out;
 }
 #endif
@@ -1734,11 +1734,11 @@ void alto2_cpu_device::f1_early_task()
 	register int ct1, ct2, ct4, ct8;
 	register int wakeup, ct;
 
-	LOG((LOG_CPU,2, "   TASK %02o:%s\n", m_task, task_name(m_task)));
+	LOG((this,LOG_CPU,2, "   TASK %02o:%s\n", m_task, task_name(m_task)));
 
 	if (m_task > task_emu && (m_task_wakeup & (1 << m_task)))
 		addr = m_task;
-	LOG((LOG_CPU,2,"    ctl2k_u38[%02o] = %04o\n", addr, ctl2k_u38[addr] & 017));
+	LOG((this,LOG_CPU,2,"    ctl2k_u38[%02o] = %04o\n", addr, ctl2k_u38[addr] & 017));
 
 	rdct1 = (ctl2k_u38[addr] >> U38_RDCT1) & 1;
 	rdct2 = (ctl2k_u38[addr] >> U38_RDCT2) & 1;
@@ -1766,38 +1766,38 @@ void alto2_cpu_device::f1_early_task()
 
 	/* CT1 = (U1.Q0' & U2.Q0' & RDCT1')' */
 	ct1 = !((u1 & PRIO_OUT_Q0) && (u2 & PRIO_OUT_Q0) && rdct1);
-	LOG((LOG_CPU,2,"      CT1:%o U1.Q0':%o U2.Q0':%o RDCT1':%o\n",
+	LOG((this,LOG_CPU,2,"      CT1:%o U1.Q0':%o U2.Q0':%o RDCT1':%o\n",
 		ct1, (u1 & PRIO_OUT_Q0)?1:0, (u2 & PRIO_OUT_Q0)?1:0, rdct1));
 	/* CT2 = (U1.Q1' & U2.Q1' & RDCT2')' */
 	ct2 = !((u1 & PRIO_OUT_Q1) && (u2 & PRIO_OUT_Q1) && rdct2);
-	LOG((LOG_CPU,2,"      CT2:%o U1.Q1':%o U2.Q1':%o RDCT2':%o\n",
+	LOG((this,LOG_CPU,2,"      CT2:%o U1.Q1':%o U2.Q1':%o RDCT2':%o\n",
 		ct2, (u1 & PRIO_OUT_Q1)?1:0, (u2 & PRIO_OUT_Q1)?1:0, rdct2));
 	/* CT4 = (U1.Q2' & U2.Q2' & RDCT4')' */
 	ct4 = !((u1 & PRIO_OUT_Q2) && (u2 & PRIO_OUT_Q2) && rdct4);
-	LOG((LOG_CPU,2,"      CT4:%o U1.Q2':%o U2.Q2':%o RDCT4':%o\n",
+	LOG((this,LOG_CPU,2,"      CT4:%o U1.Q2':%o U2.Q2':%o RDCT4':%o\n",
 		ct4, (u1 & PRIO_OUT_Q2)?1:0, (u2 & PRIO_OUT_Q2)?1:0, rdct4));
 	/* CT8 */
 	ct8 = !((u1 & PRIO_OUT_GS) && rdct8);
-	LOG((LOG_CPU,2,"      CT8:%o U1.GS':%o RDCT8':%o\n",
+	LOG((this,LOG_CPU,2,"      CT8:%o U1.GS':%o RDCT8':%o\n",
 		ct8, (u1 & PRIO_OUT_GS)?1:0, rdct8));
 
 	ct = 8*ct8 + 4*ct4 + 2*ct2 + ct1;
 
 	if (ct != m_next_task) {
-		LOG((LOG_CPU,2, "       switch to %02o\n", ct));
+		LOG((this,LOG_CPU,2, "       switch to %02o\n", ct));
 		m_next2_task = ct;
 	} else {
-		LOG((LOG_CPU,2, "       no switch\n"));
+		LOG((this,LOG_CPU,2, "       no switch\n"));
 	}
 #else   /* USE_PRIO_F9318 */
-	LOG((LOG_CPU,2, "   TASK %02o:%s", m_task, task_name(m_task)));
+	LOG((this,LOG_CPU,2, "   TASK %02o:%s", m_task, task_name(m_task)));
 	for (int i = 15; i >= 0; i--) {
 		if (m_task_wakeup & (1 << i)) {
 			m_next2_task = i;
 			if (m_next2_task != m_next_task) {
-				LOG((LOG_CPU,2, " switch to %02o:%s\n", m_next2_task, task_name(m_next2_task)));
+				LOG((this,LOG_CPU,2, " switch to %02o:%s\n", m_next2_task, task_name(m_next2_task)));
 			} else {
-				LOG((LOG_CPU,2, " no switch\n"));
+				LOG((this,LOG_CPU,2, " no switch\n"));
 			}
 			return;
 		}
@@ -1814,7 +1814,7 @@ void alto2_cpu_device::f1_early_task()
 void alto2_cpu_device::f1_early_block()
 {
 	m_task_wakeup &= ~(1 << m_task);
-	LOG((LOG_CPU,2, "   BLOCK %02o:%s\n", m_task, task_name(m_task)));
+	LOG((this,LOG_CPU,2, "   BLOCK %02o:%s\n", m_task, task_name(m_task)));
 }
 
 /**
@@ -1823,7 +1823,7 @@ void alto2_cpu_device::f1_early_block()
 void alto2_cpu_device::f1_late_l_lsh_1()
 {
 	m_shifter = m_l << 1;
-	LOG((LOG_CPU,2,"    SHIFTER <-L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
+	LOG((this,LOG_CPU,2,"    SHIFTER <-L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
 }
 
 /**
@@ -1832,7 +1832,7 @@ void alto2_cpu_device::f1_late_l_lsh_1()
 void alto2_cpu_device::f1_late_l_rsh_1()
 {
 	m_shifter = m_l >> 1;
-	LOG((LOG_CPU,2,"    SHIFTER <-L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
+	LOG((this,LOG_CPU,2,"    SHIFTER <-L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
 }
 
 /**
@@ -1841,7 +1841,7 @@ void alto2_cpu_device::f1_late_l_rsh_1()
 void alto2_cpu_device::f1_late_l_lcy_8()
 {
 	m_shifter = (m_l >> 8) | (m_l << 8);
-	LOG((LOG_CPU,2,"    SHIFTER <-L LCY 8 (%#o := bswap %#o)\n", m_shifter, m_l));
+	LOG((this,LOG_CPU,2,"    SHIFTER <-L LCY 8 (%#o := bswap %#o)\n", m_shifter, m_l));
 }
 
 /**
@@ -1850,7 +1850,7 @@ void alto2_cpu_device::f1_late_l_lcy_8()
 void alto2_cpu_device::f2_late_bus_eq_zero()
 {
 	UINT16 r = m_bus == 0 ? 1 : 0;
-	LOG((LOG_CPU,2, "   BUS=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
+	LOG((this,LOG_CPU,2, "   BUS=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -1860,7 +1860,7 @@ void alto2_cpu_device::f2_late_bus_eq_zero()
 void alto2_cpu_device::f2_late_shifter_lt_zero()
 {
 	UINT16 r = (m_shifter & 0100000) ? 1 : 0;
-	LOG((LOG_CPU,2, "   SH<0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
+	LOG((this,LOG_CPU,2, "   SH<0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -1870,7 +1870,7 @@ void alto2_cpu_device::f2_late_shifter_lt_zero()
 void alto2_cpu_device::f2_late_shifter_eq_zero()
 {
 	UINT16 r = m_shifter == 0 ? 1 : 0;
-	LOG((LOG_CPU,2, "   SH=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
+	LOG((this,LOG_CPU,2, "   SH=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -1880,7 +1880,7 @@ void alto2_cpu_device::f2_late_shifter_eq_zero()
 void alto2_cpu_device::f2_late_bus()
 {
 	UINT16 r = X_RDBITS(m_bus,16,6,15);
-	LOG((LOG_CPU,2, "   BUS; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
+	LOG((this,LOG_CPU,2, "   BUS; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -1890,7 +1890,7 @@ void alto2_cpu_device::f2_late_bus()
 void alto2_cpu_device::f2_late_alucy()
 {
 	UINT16 r = m_laluc0;
-	LOG((LOG_CPU,2, "   ALUCY; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
+	LOG((this,LOG_CPU,2, "   ALUCY; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -1906,10 +1906,10 @@ void alto2_cpu_device::f2_late_load_md()
 #endif
 	if (m_d_f1 == f1_load_mar) {
 		/* part of an XMAR */
-		LOG((LOG_CPU,2, "   XMAR %#o (%#o)\n", mar, m_bus));
+		LOG((this,LOG_CPU,2, "   XMAR %#o (%#o)\n", mar, m_bus));
 	} else {
 		write_mem(m_bus);
-		LOG((LOG_CPU,2, "   MD<- BUS ([%#o]=%#o)\n", mar, m_bus));
+		LOG((this,LOG_CPU,2, "   MD<- BUS ([%#o]=%#o)\n", mar, m_bus));
 	}
 }
 
@@ -2320,11 +2320,11 @@ void alto2_cpu_device::execute_run()
 
 
 		if (m_d_f1 == f1_load_mar && check_mem_load_mar_stall(m_rsel)) {
-			LOG((LOG_CPU,3, "   MAR<- stall\n"));
+			LOG((this,LOG_CPU,3, "   MAR<- stall\n"));
 			continue;
 		}
 		if (m_d_f2 == f2_load_md && check_mem_write_stall()) {
-			LOG((LOG_CPU,3, "   MD<- stall\n"));
+			LOG((this,LOG_CPU,3, "   MD<- stall\n"));
 			continue;
 		}
 		/*
@@ -2334,14 +2334,14 @@ void alto2_cpu_device::execute_run()
 		 */
 		do_bs = !(m_d_f1 == f1_const || m_d_f2 == f2_const);
 		if (do_bs && m_d_bs == bs_read_md && check_mem_read_stall()) {
-			LOG((LOG_CPU,3, "   <-MD stall\n"));
+			LOG((this,LOG_CPU,3, "   <-MD stall\n"));
 			continue;
 		}
 		// now read the next instruction field from the MIR and modify it
 		m_next = X_RDBITS(m_mir, 32, NEXT0, NEXT9) | m_next2;
 		// prefetch the next instruction's next field as next2
 		m_next2 = X_RDBITS(RD_UCODE(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
-		LOG((LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
+		LOG((this,LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
 			task_name(m_task), m_mpc, m_mir, m_rsel, m_d_aluf, m_d_bs, m_d_f1, m_d_f2, m_d_loadt, m_d_loadl, m_next, m_next2));
 
 		// BUS is all ones at the start of each cycle
@@ -2356,7 +2356,7 @@ void alto2_cpu_device::execute_run()
 			// FIXME: is the format of m_const_data endian safe?
 			UINT16 data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
-			LOG((LOG_CPU,2,"    %#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
+			LOG((this,LOG_CPU,2,"    %#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
 		}
 
 		/*
@@ -2402,7 +2402,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus;
 			m_aluc0 = 1;
 			flags = ALUM;
-			LOG((LOG_CPU,2,"    ALU<- BUS (%#o := %#o)\n", alu, m_bus));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS (%#o := %#o)\n", alu, m_bus));
 			break;
 
 		/**
@@ -2415,7 +2415,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_t;
 			m_aluc0 = 1;
 			flags = ALUM;
-			LOG((LOG_CPU,2,"    ALU<- T (%#o := %#o)\n", alu, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- T (%#o := %#o)\n", alu, m_t));
 			break;
 
 		/**
@@ -2428,7 +2428,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus | m_t;
 			m_aluc0 = 1;
 			flags = ALUM | TSELECT;
-			LOG((LOG_CPU,2,"    ALU<- BUS OR T (%#o := %#o | %#o)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS OR T (%#o := %#o | %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2441,7 +2441,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus & m_t;
 			m_aluc0 = 1;
 			flags = ALUM;
-			LOG((LOG_CPU,2,"    ALU<- BUS AND T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS AND T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2454,7 +2454,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus ^ m_t;
 			m_aluc0 = 1;
 			flags = ALUM;
-			LOG((LOG_CPU,2,"    ALU<- BUS XOR T (%#o := %#o ^ %#o)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS XOR T (%#o := %#o ^ %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2467,7 +2467,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus + 1;
 			m_aluc0 = (alu >> 16) & 1;
 			flags = TSELECT;
-			LOG((LOG_CPU,2,"    ALU<- BUS + 1 (%#o := %#o + 1)\n", alu, m_bus));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS + 1 (%#o := %#o + 1)\n", alu, m_bus));
 			break;
 
 		/**
@@ -2480,7 +2480,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus + 0177777;
 			m_aluc0 = (~alu >> 16) & 1;
 			flags = TSELECT;
-			LOG((LOG_CPU,2,"    ALU<- BUS - 1 (%#o := %#o - 1)\n", alu, m_bus));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS - 1 (%#o := %#o - 1)\n", alu, m_bus));
 			break;
 
 		/**
@@ -2493,7 +2493,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus + m_t;
 			m_aluc0 = (alu >> 16) & 1;
 			flags = 0;
-			LOG((LOG_CPU,2,"    ALU<- BUS + T (%#o := %#o + %#o)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS + T (%#o := %#o + %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2506,7 +2506,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus + ~m_t + 1;
 			m_aluc0 = (~alu >> 16) & 1;
 			flags = 0;
-			LOG((LOG_CPU,2,"    ALU<- BUS - T (%#o := %#o - %#o)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS - T (%#o := %#o - %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2519,7 +2519,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus + ~m_t;
 			m_aluc0 = (~alu >> 16) & 1;
 			flags = 0;
-			LOG((LOG_CPU,2,"    ALU<- BUS - T - 1 (%#o := %#o - %#o - 1)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS - T - 1 (%#o := %#o - %#o - 1)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2532,7 +2532,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus + m_t + 1;
 			m_aluc0 = (alu >> 16) & 1;
 			flags = TSELECT;
-			LOG((LOG_CPU,2,"    ALU<- BUS + T + 1 (%#o := %#o + %#o + 1)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS + T + 1 (%#o := %#o + %#o + 1)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2545,7 +2545,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus + m_emu.skip;
 			m_aluc0 = (alu >> 16) & 1;
 			flags = TSELECT;
-			LOG((LOG_CPU,2,"    ALU<- BUS + SKIP (%#o := %#o + %#o)\n", alu, m_bus, m_emu.skip));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS + SKIP (%#o := %#o + %#o)\n", alu, m_bus, m_emu.skip));
 			break;
 
 		/**
@@ -2558,7 +2558,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus & m_t;
 			m_aluc0 = 1;
 			flags = ALUM | TSELECT;
-			LOG((LOG_CPU,2,"    ALU<- BUS,T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS,T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2571,7 +2571,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus & ~m_t;
 			m_aluc0 = 1;
 			flags = ALUM;
-			LOG((LOG_CPU,2,"    ALU<- BUS AND NOT T (%#o := %#o & ~%#o)\n", alu, m_bus, m_t));
+			LOG((this,LOG_CPU,2,"    ALU<- BUS AND NOT T (%#o := %#o & ~%#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
@@ -2584,7 +2584,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus;
 			m_aluc0 = 1;
 			flags = ALUM | TSELECT;
-			LOG((LOG_CPU,0,"    ALU<- 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, m_d_aluf));
+			LOG((this,LOG_CPU,0,"    ALU<- 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, m_d_aluf));
 			break;
 
 		/**
@@ -2598,7 +2598,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus;
 			m_aluc0 = 1;
 			flags = ALUM | TSELECT;
-			LOG((LOG_CPU,0,"    ALU<- 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, m_d_aluf));
+			LOG((this,LOG_CPU,0,"    ALU<- 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, m_d_aluf));
 		}
 		m_alu = static_cast<UINT16>(alu);
 #endif
@@ -2625,10 +2625,10 @@ void alto2_cpu_device::execute_run()
 			m_cram_addr = m_alu;    // latch CRAM address
 			if (flags & TSELECT) {
 				m_t = m_alu;        // T source is ALU
-				LOG((LOG_CPU,2, "   T<- ALU (%#o)\n", m_alu));
+				LOG((this,LOG_CPU,2, "   T<- ALU (%#o)\n", m_alu));
 			} else {
 				m_t = m_bus;        // T source is BUS
-				LOG((LOG_CPU,2, "   T<- BUS (%#o)\n", m_bus));
+				LOG((this,LOG_CPU,2, "   T<- BUS (%#o)\n", m_bus));
 			}
 		}
 
@@ -2637,16 +2637,16 @@ void alto2_cpu_device::execute_run()
 			m_l = m_alu;            // load L from ALU
 			if (flags & ALUM) {
 				m_laluc0 = 0;       // logic operation - put 0 into latched carry
-				LOG((LOG_CPU,2, "   L<- ALU (%#o); LALUC0<- %o\n", m_alu, 0));
+				LOG((this,LOG_CPU,2, "   L<- ALU (%#o); LALUC0<- %o\n", m_alu, 0));
 			} else {
 				m_laluc0 = m_aluc0; // arithmethic operation - put ALU carry into latched carry
-				LOG((LOG_CPU,2, "   L<- ALU (%#o); LALUC0<- ALUC0 (%o)\n", m_alu, m_aluc0));
+				LOG((this,LOG_CPU,2, "   L<- ALU (%#o); LALUC0<- ALUC0 (%o)\n", m_alu, m_aluc0));
 			}
 			// update M (MYL) register, if a RAM related task is active
 			if (m_ram_related[m_task]) {
 				m_m = m_alu;        // load M from ALU, if 'GOODTASK'
 				m_s[m_s_reg_bank[m_task]][0] = m_alu;   // also writes to S[bank][0], which can't be read
-				LOG((LOG_CPU,2, "   M<- ALU (%#o)\n", m_alu));
+				LOG((this,LOG_CPU,2, "   M<- ALU (%#o)\n", m_alu));
 			}
 		}
 
@@ -2661,7 +2661,7 @@ void alto2_cpu_device::execute_run()
 				m_task_mpc[m_task] = m_next;
 				m_task_next2[m_task] = m_next2;
 				m_task = m_next_task;
-				LOG((LOG_CPU,1, "task switch to %02o:%s (cycle %lld)\n", m_task, task_name(m_task), cycle()));
+				LOG((this,LOG_CPU,1, "task switch to %02o:%s (cycle %lld)\n", m_task, task_name(m_task), cycle()));
 				m_next = m_task_mpc[m_task];    // get new task's mpc
 				m_next2 = m_task_next2[m_task]; // get address modifier after task switch (needed?)
 

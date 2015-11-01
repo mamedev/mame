@@ -2290,7 +2290,7 @@ int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_dev
 		if(counter & 0x800)
 			break;
 	}
-	if (TRACE_TRANSITION) logerror("first transition, time=%03x, inc=%3d\n", transition_time, increment);
+	//if (TRACE_TRANSITION) logerror("first transition, time=%03x, inc=%3d\n", transition_time, increment);
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {

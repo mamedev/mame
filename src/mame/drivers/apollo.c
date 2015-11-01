@@ -313,11 +313,11 @@ READ8_MEMBER(apollo_state::cache_status_register_r){
 	return data;
 }
 
-void apollo_set_cache_status_register(UINT8 mask, UINT8 data) {
+void apollo_set_cache_status_register(device_t *device,UINT8 mask, UINT8 data) {
 	UINT16 new_value = (cache_status_register & ~mask) | (data & mask);
 	if (new_value != cache_status_register) {
 		cache_status_register = new_value;
-		LOG2(("setting Cache Status Register with data=%02x and mask=%02x to %02x",
+		DLOG2(("setting Cache Status Register with data=%02x and mask=%02x to %02x",
 				data, mask, cache_status_register));
 	}
 }
@@ -328,7 +328,7 @@ void apollo_set_cache_status_register(UINT8 mask, UINT8 data) {
 
 WRITE8_MEMBER(apollo_state::task_alias_register_w){
 	task_alias_register = data;
-	apollo_set_cache_status_register(0x07,  data);
+	apollo_set_cache_status_register(this,0x07,  data);
 	SLOG(("writing Task Alias Register at offset %02x = %02x",offset, data));
 }
 

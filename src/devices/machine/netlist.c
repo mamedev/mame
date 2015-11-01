@@ -234,19 +234,19 @@ void netlist_mame_t::vlog(const plog_level &l, const pstring &ls) const
 	switch (l)
 	{
 		case plog_level::DEBUG:
-			logerror("netlist DEBUG: %s\n", errstr.cstr());
+			m_parent.logerror("netlist DEBUG: %s\n", errstr.cstr());
 			break;
 		case plog_level::INFO:
-			logerror("netlist INFO: %s\n", errstr.cstr());
+			m_parent.logerror("netlist INFO: %s\n", errstr.cstr());
 			break;
 		case plog_level::VERBOSE:
-			logerror("netlist VERBOSE: %s\n", errstr.cstr());
+			m_parent.logerror("netlist VERBOSE: %s\n", errstr.cstr());
 			break;
 		case plog_level::WARNING:
-			logerror("netlist WARNING: %s\n", errstr.cstr());
+			m_parent.logerror("netlist WARNING: %s\n", errstr.cstr());
 			break;
 		case plog_level::ERROR:
-			logerror("netlist ERROR: %s\n", errstr.cstr());
+			m_parent.logerror("netlist ERROR: %s\n", errstr.cstr());
 			break;
 		case plog_level::FATAL:
 			emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());

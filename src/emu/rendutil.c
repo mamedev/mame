@@ -554,19 +554,19 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	// verify we can handle this PNG
 	if (png.bit_depth > 8)
 	{
-		logerror("%s: Unsupported bit depth %d (8 bit max)\n", filename, png.bit_depth);
+		osd_printf_error("%s: Unsupported bit depth %d (8 bit max)\n", filename, png.bit_depth);
 		png_free(&png);
 		return false;
 	}
 	if (png.interlace_method != 0)
 	{
-		logerror("%s: Interlace unsupported\n", filename);
+		osd_printf_error("%s: Interlace unsupported\n", filename);
 		png_free(&png);
 		return false;
 	}
 	if (png.color_type != 0 && png.color_type != 3 && png.color_type != 2 && png.color_type != 6)
 	{
-		logerror("%s: Unsupported color type %d\n", filename, png.color_type);
+		osd_printf_error("%s: Unsupported color type %d\n", filename, png.color_type);
 		png_free(&png);
 		return false;
 	}

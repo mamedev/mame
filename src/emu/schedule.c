@@ -25,7 +25,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) machine().logerror x; } while (0)
 #define PRECISION
 
 
@@ -300,11 +300,11 @@ inline void emu_timer::schedule_next_period()
 
 void emu_timer::dump() const
 {
-	logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_ptr);
+	machine().logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_ptr);
 	if (m_device == NULL)
-		logerror(" cb=%s\n", m_callback.name());
+		machine().logerror(" cb=%s\n", m_callback.name());
 	else
-		logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
+		machine().logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
 }
 
 
@@ -379,7 +379,7 @@ bool device_scheduler::can_save() const
 	for (emu_timer *timer = m_timer_list; timer != NULL; timer = timer->next())
 		if (timer->m_temporary && !timer->expire().is_never())
 		{
-			logerror("Failed save state attempt due to anonymous timers:\n");
+			machine().logerror("Failed save state attempt due to anonymous timers:\n");
 			dump_timers();
 			return false;
 		}
@@ -658,7 +658,7 @@ void device_scheduler::timed_trigger(void *ptr, INT32 param)
 void device_scheduler::presave()
 {
 	// report the timer state after a log
-	logerror("Prior to saving state:\n");
+	machine().logerror("Prior to saving state:\n");
 	dump_timers();
 }
 
@@ -693,7 +693,7 @@ void device_scheduler::postload()
 	rebuild_execute_list();
 
 	// report the timer state after a log
-	logerror("After resetting/reordering timers:\n");
+	machine().logerror("After resetting/reordering timers:\n");
 	dump_timers();
 }
 
@@ -984,11 +984,11 @@ void device_scheduler::add_scheduling_quantum(const attotime &quantum, const att
 
 void device_scheduler::dump_timers() const
 {
-	logerror("=============================================\n");
-	logerror("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
+	machine().logerror("=============================================\n");
+	machine().logerror("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
 	for (emu_timer *timer = first_timer(); timer != NULL; timer = timer->next())
 		timer->dump();
-	logerror("=============================================\n");
+	machine().logerror("=============================================\n");
 }
 
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))

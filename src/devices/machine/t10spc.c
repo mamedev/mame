@@ -4,6 +4,7 @@
 
 void t10spc::t10_start(device_t &device)
 {
+	m_device = &device;
 	device.save_item(NAME(command));
 	device.save_item(NAME(commandLength));
 	device.save_item(NAME(m_transfer_length));
@@ -72,7 +73,7 @@ void t10spc::ExecCommand()
 		break;
 
 	default:
-		logerror( "SCSIDEV unknown command %02x\n", command[ 0 ] );
+		m_device->logerror( "SCSIDEV unknown command %02x\n", command[ 0 ] );
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
@@ -117,7 +118,7 @@ void t10spc::ReadData( UINT8 *data, int dataLength )
 		break;
 
 	default:
-		logerror( "SCSIDEV unknown read %02x\n", command[ 0 ] );
+		m_device->logerror( "SCSIDEV unknown read %02x\n", command[ 0 ] );
 		break;
 	}
 }
@@ -130,7 +131,7 @@ void t10spc::WriteData( UINT8 *data, int dataLength )
 		break;
 
 	default:
-		logerror( "SCSIDEV unknown write %02x\n", command[ 0 ] );
+		m_device->logerror( "SCSIDEV unknown write %02x\n", command[ 0 ] );
 		break;
 	}
 }

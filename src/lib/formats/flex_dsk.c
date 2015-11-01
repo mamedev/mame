@@ -39,7 +39,7 @@ int flex_format::identify(io_generic *io, UINT32 form_factor)
 
 	if(((info.last_trk+1) * info.last_sec) * 256 == io_generic_size(io))
 	{
-		logerror("flex_dsk: %i tracks, %i sectors\n",info.last_trk+1,info.last_sec);
+		osd_printf_verbose("flex_dsk: %i tracks, %i sectors\n",info.last_trk+1,info.last_sec);
 		return 100;
 	}
 	return 0;
