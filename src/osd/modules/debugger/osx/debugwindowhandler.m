@@ -8,6 +8,7 @@
 
 #import "debugwindowhandler.h"
 
+#import "debugconsole.h"
 #import "debugcommandhistory.h"
 #import "debugview.h"
 

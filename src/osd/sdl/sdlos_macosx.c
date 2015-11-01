@@ -28,95 +28,74 @@
 
 char *osd_get_clipboard_text(void)
 {
-	char *result = NULL; /* core expects a malloced C string of uft8 data */
+	OSStatus err;
 
 	PasteboardRef pasteboard_ref;
-	OSStatus err;
-	PasteboardSyncFlags sync_flags;
-	PasteboardItemID item_id;
-	CFIndex flavor_count;
-	CFArrayRef flavor_type_array;
-	CFIndex flavor_index;
-	ItemCount item_count;
-	UInt32 item_index;
-	Boolean success = false;
-
 	err = PasteboardCreate(kPasteboardClipboard, &pasteboard_ref);
+	if (err)
+		return NULL;
 
-	if (!err)
+	PasteboardSynchronize(pasteboard_ref);
+
+	ItemCount item_count;
+	err = PasteboardGetItemCount(pasteboard_ref, &item_count);
+
+	char *result = NULL; // core expects a malloced C string of uft8 data
+	for (UInt32 item_index = 1; (item_index <= item_count) && !result; item_index++)
 	{
-		sync_flags = PasteboardSynchronize( pasteboard_ref );
+		PasteboardItemID item_id;
+		err = PasteboardGetItemIdentifier(pasteboard_ref, item_index, &item_id);
+		if (err)
+			continue;
 
-		err = PasteboardGetItemCount(pasteboard_ref, &item_count );
+		CFArrayRef flavor_type_array;
+		err = PasteboardCopyItemFlavors(pasteboard_ref, item_id, &flavor_type_array);
+		if (err)
+			continue;
 
-		for (item_index=1; item_index<=item_count; item_index++)
+		CFIndex const flavor_count = CFArrayGetCount(flavor_type_array);
+		for (CFIndex flavor_index = 0; (flavor_index < flavor_count) && !result; flavor_index++)
 		{
-			err = PasteboardGetItemIdentifier(pasteboard_ref, item_index, &item_id);
+			CFStringRef const flavor_type = (CFStringRef)CFArrayGetValueAtIndex(flavor_type_array, flavor_index);
+
+			CFStringEncoding encoding;
+			if (UTTypeConformsTo(flavor_type, kUTTypeUTF16PlainText))
+				encoding = kCFStringEncodingUTF16;
+			else if (UTTypeConformsTo (flavor_type, kUTTypeUTF8PlainText))
+				encoding = kCFStringEncodingUTF8;
+			else if (UTTypeConformsTo (flavor_type, kUTTypePlainText))
+				encoding = kCFStringEncodingMacRoman;
+			else
+				continue;
+
+			CFDataRef flavor_data;
+			err = PasteboardCopyItemFlavorData(pasteboard_ref, item_id, flavor_type, &flavor_data);
 
 			if (!err)
 			{
-				err = PasteboardCopyItemFlavors(pasteboard_ref, item_id, &flavor_type_array);
+				CFStringRef string_ref = CFStringCreateFromExternalRepresentation(kCFAllocatorDefault, flavor_data, encoding);
+				CFDataRef data_ref = CFStringCreateExternalRepresentation (kCFAllocatorDefault, string_ref, kCFStringEncodingUTF8, '?');
+				CFRelease(string_ref);
+				CFRelease(flavor_data);
 
-				if (!err)
+				CFIndex const length = CFDataGetLength(data_ref);
+				CFRange const range = CFRangeMake(0, length);
+
+				result = reinterpret_cast<char *>(osd_malloc_array(length + 1));
+				if (result)
 				{
-					flavor_count = CFArrayGetCount(flavor_type_array);
-
-					for (flavor_index = 0; flavor_index < flavor_count; flavor_index++)
-					{
-						CFStringRef flavor_type;
-						CFDataRef flavor_data;
-						CFStringEncoding encoding;
-						CFStringRef string_ref;
-						CFDataRef data_ref;
-						CFIndex length;
-						CFRange range;
-
-						flavor_type = (CFStringRef)CFArrayGetValueAtIndex(flavor_type_array, flavor_index);
-
-						if (UTTypeConformsTo (flavor_type, kUTTypeUTF16PlainText))
-							encoding = kCFStringEncodingUTF16;
-						else if (UTTypeConformsTo (flavor_type, kUTTypeUTF8PlainText))
-							encoding = kCFStringEncodingUTF8;
-						else if (UTTypeConformsTo (flavor_type, kUTTypePlainText))
-							encoding = kCFStringEncodingMacRoman;
-						else
-							continue;
-
-						err = PasteboardCopyItemFlavorData(pasteboard_ref, item_id, flavor_type, &flavor_data);
-
-						if( !err )
-						{
-							string_ref = CFStringCreateFromExternalRepresentation (kCFAllocatorDefault, flavor_data, encoding);
-							data_ref = CFStringCreateExternalRepresentation (kCFAllocatorDefault, string_ref, kCFStringEncodingUTF8, '?');
-
-							length = CFDataGetLength (data_ref);
-							range = CFRangeMake (0,length);
-
-							result = (char *)osd_malloc_array (length+1);
-							if (result != NULL)
-							{
-								CFDataGetBytes (data_ref, range, (unsigned char *)result);
-								result[length] = 0;
-								success = true;
-								break;
-							}
-
-							CFRelease(data_ref);
-							CFRelease(string_ref);
-							CFRelease(flavor_data);
-						}
-					}
-
-					CFRelease(flavor_type_array);
+					CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(result));
+					result[length] = 0;
 				}
-			}
 
-			if (success)
-				break;
+				CFRelease(data_ref);
+			}
 		}
 
-		CFRelease(pasteboard_ref);
+		CFRelease(flavor_type_array);
 	}
+
+	CFRelease(pasteboard_ref);
 
 	return result;
 }
