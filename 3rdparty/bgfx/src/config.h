@@ -44,7 +44,6 @@
 #	ifndef BGFX_CONFIG_RENDERER_METAL
 #		define BGFX_CONFIG_RENDERER_METAL (0 \
 					|| BX_PLATFORM_IOS \
-					|| BX_PLATFORM_OSX \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_METAL
 
