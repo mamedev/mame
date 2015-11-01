@@ -407,26 +407,26 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 		{
 			UINT16 const offs = row | ((col + x) & 0x7F);
 			UINT8 const chr = m_ram->pointer()[0xF000 + offs];
-			UINT8 const dim = m_ram->pointer()[0x10000 + offs] & 0x80;
+			UINT8 const clr = (m_ram->pointer()[0x10000 + offs] & 0x80) ? 2 : 1;
 
 			UINT8 const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)];
 
 			// Display a scanline of a character
-			*p++ = BIT(gfx, 7) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 7) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 6) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 6) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 5) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 5) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 4) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 4) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 3) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 3) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 2) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 2) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 1) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 1) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 0) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 0) ? clr : 0;
 			if (!hires) { p[0] = p[-1]; p++; }
 		}
 	}
