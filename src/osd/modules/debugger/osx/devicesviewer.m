@@ -153,7 +153,7 @@
 	// set default state
 	[devicesView expandItem:root expandChildren:YES];
 	[window makeFirstResponder:devicesView];
-	[window setTitle:[NSString stringWithFormat:@"All Devices"]];
+	[window setTitle:@"All Devices"];
 
 	// calculate the optimal size for everything
 	NSSize const desired = [NSScrollView frameSizeForContentSize:NSMakeSize(480, 320)
