@@ -1179,6 +1179,27 @@ ROM_START( adonise )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// MV4137 - 5,10,25,50 Credit Multiplier / 20 Line Multiline.
+// Koala Mint [Reel Game] - Export A - 12/09/01.
+// Marked as CHG1573.
+ROM_START( koalamnt )
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u7",  0x000000, 0x80000, CRC(fa690af0) SHA1(9e1e5171e9da602c025bfb2aefad397a537794cb) )
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u11", 0x000002, 0x80000, CRC(c33bed43) SHA1(2c8f35ca08b4d6ac56de5ab7c2515f34e04cf6c8) )
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u8",  0x100000, 0x80000, CRC(4aeb2e54) SHA1(74002cd12d93352310a864a2ed434c7f43d26534) )  // base
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u12", 0x100002, 0x80000, CRC(2bf5786f) SHA1(f0693bbd2e6d2e110535205a1ad0b73a0ebd2f53) )  // base
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u9",  0x200000, 0x80000, CRC(1a2650e7) SHA1(55a8604ef19836880f53d44a035a49b009acbb5a) )  // base
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u13", 0x200002, 0x80000, CRC(51c78f63) SHA1(ef51e45d67a5684c35150747c186493258cb4549) )  // base
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u10", 0x300000, 0x80000, CRC(a0fb61fe) SHA1(2a77ed082bc6829905f83a3cb3c4c120fa4ba0f9) )  // base
+	ROM_LOAD32_WORD( "chg1573_koala_mint.u14", 0x300002, 0x80000, CRC(5e4776e9) SHA1(d44851cbfaa054cd5675a841a3089a8f4fdc8421) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 // MV4115/6 - 9/20 Line Multiline Multiplier.
 // Party Gras [Reel Game] - Export A - 10/11/2001.
 // All devices are 27c4002 instead of 27c4096.
@@ -1236,4 +1257,5 @@ GAME( 2000, magicmska, magicmsk, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 2000, margmgc,   0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // JB005,    A - 07/07/00
 GAME( 2001, geishanz,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4127,   A - 05/03/01
 GAME( 2001, adonise,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (MV4124/1, Export)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4124/1, B - 31/07/01
+GAME( 2001, koalamnt,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Koala Mint (MV4137, Export)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4137,   A - 12/09/01
 GAME( 2001, partygrs,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Party Gras (MV4115/6, Export)",                  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115/6, A - 10/11/01
