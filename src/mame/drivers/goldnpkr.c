@@ -9746,6 +9746,35 @@ ROM_START( pokersis )
 ROM_END
 
 
+/*
+  Unknown poker entitled 'Super 98 ICP-1',
+  running in the ICP-1 boardset.
+
+  Program seems to fill some zeropage registers
+  and check for existent values and changes...
+  Maybe an external device is writting them.
+  This is NVRAM zone, so some values could be
+  previously harcoded.
+*/
+
+ROM_START( super98 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c256.17a",   0x0000, 0x8000, CRC(dfa319c5) SHA1(e1b2ef40350ee1f40272604cbe33b245210de003) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "2732.9a",    0x2000, 0x1000, CRC(9a478c39) SHA1(614171fa3184f6ceb663d5650d05fac4d4025c9f) )    /* char ROM */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "2732.4a",  0x0000, 0x1000, CRC(733b72f0) SHA1(b9255b9de24d9bd7277b18d8d1e12c7cdd3813fb) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2732.6a",  0x1000, 0x1000, CRC(02595bcf) SHA1(5d01baed66152cca4b7a14fdfee83f31304e3be3) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "2732.7a",  0x2000, 0x1000, CRC(42072981) SHA1(1cfbbfe33afc6f147ce5828d96455f5aeb090cd3) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "bipolar_prom.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/
@@ -10304,3 +10333,5 @@ GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   
 GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW)", MACHINE_NOT_WORKING, layout_goldnpkr )
 GAME(  1987, pokermon,  0,        mondial,  mondial,  driver_device,  0,        ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                  // banked selectable program
 GAME(  198?, pokersis,  0,        bchancep, goldnpkr, driver_device,  0,        ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            MACHINE_NOT_WORKING )   // fix banking (4 prgs?)...
+
+GAMEL( 198?, super98,   bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Super 98 (ICP-1)",                        MACHINE_NOT_WORKING, layout_goldnpkr )  // program checks zeropage registers for changes...
