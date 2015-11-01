@@ -116,7 +116,7 @@ SLOT_INTERFACE_END
 
 coco_rtc_type_t coco_fdc_device::real_time_clock()
 {
-	coco_rtc_type_t result = (coco_rtc_type_t) machine().root_device().ioport("real_time_clock")->read_safe(RTC_NONE);
+	coco_rtc_type_t result = coco_rtc_type_t(read_safe(machine().root_device().ioport("real_time_clock"), RTC_NONE));
 
 	/* check to make sure we don't have any invalid values */
 	if (((result == RTC_DISTO) && (m_disto_msm6242 == NULL))

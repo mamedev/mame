@@ -696,7 +696,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 
 		case 0x30/2:
 		{
-			return m_adc_ports[m_adc_select]->read_safe(0x0010);
+			return read_safe(m_adc_ports[m_adc_select], 0x0010);
 		}
 
 		case 0x60/2:
@@ -782,7 +782,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 
 		case 0x3020/2:
 		{
-			return m_adc_ports[m_adc_select]->read_safe(0x0010);
+			return read_safe(m_adc_ports[m_adc_select], 0x0010);
 		}
 
 		default:

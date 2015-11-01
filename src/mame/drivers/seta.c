@@ -1962,7 +1962,7 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 
 READ16_MEMBER(seta_state::extra_r)
 {
-	return ioport("EXTRA")->read_safe(0xff);
+	return read_safe(ioport("EXTRA"), 0xff);
 }
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )

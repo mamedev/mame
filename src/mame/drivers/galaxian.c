@@ -688,7 +688,7 @@ INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
 {
 	interrupt_gen(device);
 
-	if (ioport("FAKE_SELECT")->read_safe(0x00))
+	if (read_safe(ioport("FAKE_SELECT"), 0x00))
 	{
 		m_tenspot_current_game++;
 		m_tenspot_current_game%=10;
@@ -6299,7 +6299,7 @@ READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 {
 	char tmp[64];
 	sprintf(tmp,"IN2_GAME%d", m_tenspot_current_game);
-	return ioport(tmp)->read_safe(0x00);
+	return read_safe(ioport(tmp), 0x00);
 }
 
 

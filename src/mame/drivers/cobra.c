@@ -516,11 +516,11 @@ bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switc
 
 	static const char* player_ports[2] = { ":P1", ":P2" };
 
-	*buf++ = ioport(":TEST")->read_safe(0);
+	*buf++ = read_safe(ioport(":TEST"), 0);
 
 	for (int i=0; i < count_players; i++)
 	{
-		UINT32 pval = ioport(player_ports[i])->read_safe(0);
+		UINT32 pval = read_safe(ioport(player_ports[i]), 0);
 		for (int j=0; j < bytes_per_switch; j++)
 		{
 			*buf++ = (UINT8)(pval >> ((1-j) * 8));

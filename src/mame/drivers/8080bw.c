@@ -2936,8 +2936,8 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 		    ana  a
 		    rz
 		*/
-		UINT8 gunx = ioport("GUNX")->read_safe(0x00);
-		UINT8 guny = ioport("GUNY")->read_safe(0x20);
+		UINT8 const gunx = read_safe(ioport("GUNX"), 0x00);
+		UINT8 const guny = read_safe(ioport("GUNY"), 0x20);
 		m_claybust_gun_pos = ((gunx >> 3) | (guny << 5)) + 2;
 		m_claybust_gun_on->adjust(attotime::from_msec(250)); // timing is a guess
 	}

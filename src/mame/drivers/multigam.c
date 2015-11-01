@@ -337,7 +337,7 @@ WRITE8_MEMBER(multigam_state::multigam_IN0_w)
 	m_in_1 = ioport("P2")->read();
 
 	m_in_dsw_shift = 0;
-	m_in_dsw = ioport("DSW")->read_safe(0);
+	m_in_dsw = read_safe(ioport("DSW"), 0);
 }
 
 READ8_MEMBER(multigam_state::multigam_IN1_r)

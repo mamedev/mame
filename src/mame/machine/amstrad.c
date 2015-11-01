@@ -1836,7 +1836,7 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 //  m6845_personality_t crtc_type;
 	int page;
 
-//  crtc_type = ioport("crtc"->read_safe(0));
+//  crtc_type = read_safe(ioport("crtc"), 0);
 //  m6845_set_personality(crtc_type);
 
 	if(m_aleste_mode & 0x04)

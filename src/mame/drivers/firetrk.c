@@ -230,8 +230,8 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
-		UINT32 new_dial = ioport((i ? "STEER_2" : "STEER_1"))->read_safe(0);
-		INT32 delta = new_dial - m_dial[i];
+		UINT32 const new_dial = read_safe(ioport(i ? "STEER_2" : "STEER_1"), 0);
+		INT32 const delta = new_dial - m_dial[i];
 
 		if (delta != 0)
 		{
@@ -242,9 +242,9 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 		}
 	}
 
-	return ((ioport("BIT_0")->read_safe(0) & (1 << offset)) ? 0x01 : 0) |
-			((ioport("BIT_6")->read_safe(0) & (1 << offset)) ? 0x40 : 0) |
-			((ioport("BIT_7")->read_safe(0) & (1 << offset)) ? 0x80 : 0);
+	return ((read_safe(ioport("BIT_0"), 0) & (1 << offset)) ? 0x01 : 0) |
+			((read_safe(ioport("BIT_6"), 0) & (1 << offset)) ? 0x40 : 0) |
+			((read_safe(ioport("BIT_7"), 0) & (1 << offset)) ? 0x80 : 0);
 }
 
 

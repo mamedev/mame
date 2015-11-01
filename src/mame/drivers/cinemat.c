@@ -150,8 +150,8 @@ READ8_MEMBER(cinemat_state::joystick_read)
 		return 0;
 	else
 	{
-		int xval = (INT16)(m_maincpu->state_int(CCPU_X) << 4) >> 4;
-		return (ioport(m_mux_select ? "ANALOGX" : "ANALOGY")->read_safe(0) - xval) < 0x800;
+		int const xval = INT16(m_maincpu->state_int(CCPU_X) << 4) >> 4;
+		return (read_safe(ioport(m_mux_select ? "ANALOGX" : "ANALOGY"), 0) - xval) < 0x800;
 	}
 }
 
@@ -169,7 +169,7 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 	int delta_wheel;
 
 	/* the shift register is cleared once per 'frame' */
-	delta_wheel = (INT8)ioport("WHEEL")->read() / 8;
+	delta_wheel = INT8(ioport("WHEEL")->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
 	else if (delta_wheel < -3)

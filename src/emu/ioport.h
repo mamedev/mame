@@ -1204,7 +1204,6 @@ public:
 
 	// read/write to the port
 	ioport_value read();
-	ioport_value read_safe(ioport_value defval) { return (this == NULL) ? defval : read(); }
 	void write(ioport_value value, ioport_value mask = ~0);
 
 	// other operations
@@ -1225,6 +1224,9 @@ private:
 	ioport_value                m_active;       // mask of active bits in the port
 	auto_pointer<ioport_port_live> m_live;      // live state of port (NULL if not live)
 };
+
+inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == NULL) ? defval : port->read(); }
+
 
 
 // ======================> analog_field

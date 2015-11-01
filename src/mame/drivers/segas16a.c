@@ -924,12 +924,12 @@ READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (ioport(portname[m_mj_input_num])->read_safe(0xff) != 0xff)
+					if (read_safe(ioport(portname[m_mj_input_num]), 0xff) != 0xff)
 						return 0xff & ~(1 << m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return ioport(portname[m_mj_input_num])->read_safe(0xff);
+					return read_safe(ioport(portname[m_mj_input_num]), 0xff);
 			}
 			break;
 	}

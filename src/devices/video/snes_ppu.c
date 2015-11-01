@@ -1818,7 +1818,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, UINT16 curline )
 	struct SNES_SCANLINE *scanline1, *scanline2;
 	UINT16 c;
 	UINT16 prev_colour = 0;
-	int blurring = machine().root_device().ioport("OPTIONS")->read_safe(0) & 0x01;
+	int blurring = read_safe(machine().root_device().ioport("OPTIONS"), 0) & 0x01;
 
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -2828,13 +2828,13 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 UINT8 snes_ppu_device::dbg_video( UINT16 curline )
 {
 	int i;
-	UINT8 toggles = machine().root_device().ioport("DEBUG1")->read_safe(0);
+	UINT8 toggles = read_safe(machine().root_device().ioport("DEBUG1"), 0);
 	m_debug_options.select_pri[SNES_BG1] = (toggles & 0x03);
 	m_debug_options.select_pri[SNES_BG2] = (toggles & 0x0c) >> 2;
 	m_debug_options.select_pri[SNES_BG3] = (toggles & 0x30) >> 4;
 	m_debug_options.select_pri[SNES_BG4] = (toggles & 0xc0) >> 6;
 
-	toggles = machine().root_device().ioport("DEBUG2")->read_safe(0);
+	toggles = read_safe(machine().root_device().ioport("DEBUG2"), 0);
 	for (i = 0; i < 4; i++)
 		DEBUG_TOGGLE(i, m_debug_options.bg_disabled[i], ("Debug: Disabled BG%d.\n", i + 1), ("Debug: Enabled BG%d.\n", i + 1))
 	DEBUG_TOGGLE(4, m_debug_options.bg_disabled[SNES_OAM], ("Debug: Disabled OAM.\n"), ("Debug: Enabled OAM.\n"))
@@ -2842,11 +2842,11 @@ UINT8 snes_ppu_device::dbg_video( UINT16 curline )
 	DEBUG_TOGGLE(6, m_debug_options.colormath_disabled, ("Debug: Disabled Color Math.\n"), ("Debug: Enabled Color Math.\n"))
 	DEBUG_TOGGLE(7, m_debug_options.windows_disabled, ("Debug: Disabled Window Masks.\n"), ("Debug: Enabled Window Masks.\n"))
 
-	toggles = machine().root_device().ioport("DEBUG4")->read_safe(0);
+	toggles = read_safe(machine().root_device().ioport("DEBUG4"), 0);
 	for (i = 0; i < 8; i++)
 		DEBUG_TOGGLE(i, m_debug_options.mode_disabled[i], ("Debug: Disabled Mode %d drawing.\n", i), ("Debug: Enabled Mode %d drawing.\n", i))
 
-	toggles = machine().root_device().ioport("DEBUG3")->read_safe(0);
+	toggles = read_safe(machine().root_device().ioport("DEBUG3"), 0);
 	DEBUG_TOGGLE(2, m_debug_options.mosaic_disabled, ("Debug: Disabled Mosaic.\n"), ("Debug: Enabled Mosaic.\n"))
 	m_debug_options.sprite_reversed = BIT(toggles, 7);
 	m_debug_options.select_pri[SNES_OAM] = (toggles & 0x70) >> 4;

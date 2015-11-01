@@ -323,7 +323,7 @@ READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 
 READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 {
-	return (ioport("DSW")->read_safe(0) & (1 << (7 - offset))) ? 0 : 1;
+	return (read_safe(ioport("DSW"), 0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 

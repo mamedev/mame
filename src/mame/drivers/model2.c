@@ -539,7 +539,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 	if(m_analog_channel < 4)
 	{
 		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
-		iptval = ioport(ports[m_analog_channel])->read_safe(0);
+		iptval = read_safe(ioport(ports[m_analog_channel]), 0);
 		++m_analog_channel;
 	}
 	return iptval;
@@ -557,7 +557,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 /* Used specifically by Sega Rally, others might be different */
 CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 {
-	UINT8 res = ioport("GEARS")->read_safe(0);
+	UINT8 res = read_safe(ioport("GEARS"), 0);
 	int i;
 	const UINT8 gearvalue[5] = { 0, 2, 1, 6, 5 };
 
@@ -1049,17 +1049,17 @@ READ32_MEMBER(model2_state::hotd_lightgun_r)
 	UINT16 res = 0xffff;
 
 	if(m_lightgun_mux < 8)
-		res = (ioport(ports[m_lightgun_mux >> 1])->read_safe(0) >> ((m_lightgun_mux & 1)*8)) & 0xff;
+		res = (read_safe(ioport(ports[m_lightgun_mux >> 1]), 0) >> ((m_lightgun_mux & 1)*8)) & 0xff;
 	else
 	{
 		UINT16 p1x,p1y,p2x,p2y;
 
 		res = 0xfffc;
 
-		p1x = ioport("P1_X")->read_safe(0);
-		p1y = ioport("P1_Y")->read_safe(0);
-		p2x = ioport("P2_X")->read_safe(0);
-		p2y = ioport("P2_Y")->read_safe(0);
+		p1x = read_safe(ioport("P1_X"), 0);
+		p1y = read_safe(ioport("P1_Y"), 0);
+		p2x = read_safe(ioport("P2_X"), 0);
+		p2y = read_safe(ioport("P2_Y"), 0);
 
 		/* TODO: might be better, supposedly user has to calibrate guns in order to make these settings to work ... */
 		if(p1x <= 0x28 || p1x >= 0x3e0 || p1y <= 0x40 || p1y >= 0x3c0)
@@ -1526,7 +1526,7 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_r)
 	static const char *const ports[] = { "P1_Y", "P1_X", "P2_Y", "P2_X" };
 	UINT8 res;
 
-	res = (ioport(ports[offset >> 1])->read_safe(0) >> ((offset & 1)*8)) & 0xff;
+	res = (read_safe(ioport(ports[offset >> 1]), 0) >> ((offset & 1)*8)) & 0xff;
 
 	return res;
 }
@@ -1537,10 +1537,10 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
 	UINT16 special_res = 0xfffc;
 	UINT16 p1x,p1y,p2x,p2y;
 
-	p1x = ioport("P1_X")->read_safe(0);
-	p1y = ioport("P1_Y")->read_safe(0);
-	p2x = ioport("P2_X")->read_safe(0);
-	p2y = ioport("P2_Y")->read_safe(0);
+	p1x = read_safe(ioport("P1_X"), 0);
+	p1y = read_safe(ioport("P1_Y"), 0);
+	p2x = read_safe(ioport("P2_X"), 0);
+	p2y = read_safe(ioport("P2_Y"), 0);
 
 	/* TODO: might be better, supposedly user has to calibrate guns in order to make these settings to work ... */
 	if(p1x <= 0x28 || p1x >= 0x3e0 || p1y <= 0x40 || p1y >= 0x3c0)

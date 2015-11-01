@@ -522,7 +522,7 @@ UINT8 segas24_state::hotrod_io_r(UINT8 port)
 	case 1:
 		return ioport("P2")->read();
 	case 2:
-		return ioport("P3")->read_safe(0xff);
+		return read_safe(ioport("P3"), 0xff);
 	case 3:
 		return 0xff;
 	case 4:
@@ -629,7 +629,7 @@ WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
-		hotrod_ctrl_cur = ioport(portnames[data])->read_safe(0);
+		hotrod_ctrl_cur = read_safe(ioport(portnames[data]), 0);
 	}
 }
 
@@ -641,21 +641,21 @@ READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
 		{
 			// Steering dials
 			case 0:
-				return ioport("DIAL1")->read_safe(0) & 0xff;
+				return read_safe(ioport("DIAL1"), 0) & 0xff;
 			case 1:
-				return ioport("DIAL1")->read_safe(0) >> 8;
+				return read_safe(ioport("DIAL1"), 0) >> 8;
 			case 2:
-				return ioport("DIAL2")->read_safe(0) & 0xff;
+				return read_safe(ioport("DIAL2"), 0) & 0xff;
 			case 3:
-				return ioport("DIAL2")->read_safe(0) >> 8;
+				return read_safe(ioport("DIAL2"), 0) >> 8;
 			case 4:
-				return ioport("DIAL3")->read_safe(0) & 0xff;
+				return read_safe(ioport("DIAL3"), 0) & 0xff;
 			case 5:
-				return ioport("DIAL3")->read_safe(0) >> 8;
+				return read_safe(ioport("DIAL3"), 0) >> 8;
 			case 6:
-				return ioport("DIAL4")->read_safe(0) & 0xff;
+				return read_safe(ioport("DIAL4"), 0) & 0xff;
 			case 7:
-				return ioport("DIAL4")->read_safe(0) >> 8;
+				return read_safe(ioport("DIAL4"), 0) >> 8;
 
 			case 8:
 			{

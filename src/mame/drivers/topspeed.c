@@ -188,7 +188,7 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 {
 	// Read port number
 	UINT8 port = m_tc0220ioc->port_r(space, 0);
-	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0);
+	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0);
 
 	switch (port)
 	{
@@ -207,7 +207,7 @@ CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
 	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
 	const char *tag = (const char *)param;
-	return retval[ioport(tag)->read_safe(0) & 7];
+	return retval[read_safe(ioport(tag), 0) & 7];
 }
 
 READ16_MEMBER(topspeed_state::motor_r)

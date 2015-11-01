@@ -198,7 +198,7 @@ void astrof_state::astrof_get_pens( pen_t *pens )
 {
 	offs_t i;
 	UINT8 bank = (m_astrof_palette_bank ? 0x10 : 0x00);
-	UINT8 config = ioport("FAKE")->read_safe(0x00);
+	UINT8 config = read_safe(ioport("FAKE"), 0x00);
 	UINT8 *prom = memregion("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
@@ -234,7 +234,7 @@ void astrof_state::tomahawk_get_pens( pen_t *pens )
 {
 	offs_t i;
 	UINT8 *prom = memregion("proms")->base();
-	UINT8 config = ioport("FAKE")->read_safe(0x00);
+	UINT8 config = read_safe(ioport("FAKE"), 0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{

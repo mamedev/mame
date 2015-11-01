@@ -388,8 +388,8 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void peplus_state::handle_lightpen()
 {
-	int x_val = ioport("TOUCH_X")->read_safe(0x00);
-	int y_val = ioport("TOUCH_Y")->read_safe(0x00);
+	int x_val = read_safe(ioport("TOUCH_X"), 0x00);
+	int y_val = read_safe(ioport("TOUCH_Y"), 0x00);
 	const rectangle &vis_area = m_screen->visible_area();
 	int xt, yt;
 
@@ -563,7 +563,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	UINT64 curr_cycles = m_maincpu->total_cycles();
 
 	// Allow Bill Insert if DBV Enabled
-	if (m_bv_enable_state == 0x01 && ((ioport("DBV")->read_safe(0xff) & 0x01) == 0x00)) {
+	if (m_bv_enable_state == 0x01 && ((read_safe(ioport("DBV"), 0xff) & 0x01) == 0x00)) {
 		// If not busy
 		if (m_bv_busy == 0) {
 			m_bv_busy = 1;
@@ -786,7 +786,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 		sda = m_i2cmem->read_sda();
 	}
 
-	if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
+	if ((read_safe(ioport("SENSOR"), 0x00) & 0x01) == 0x01 && m_coin_state == 0) {
 		m_coin_state = 1; // Start Coin Cycle
 		m_last_cycles = m_maincpu->total_cycles();
 	} else {
@@ -822,7 +822,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 	}
 
 	if (curr_cycles - m_last_door > door_wait) {
-		if ((ioport("DOOR")->read_safe(0xff) & 0x01) == 0x01) {
+		if ((read_safe(ioport("DOOR"), 0xff) & 0x01) == 0x01) {
 			if (m_doorcycle) {
 				m_door_open = (m_door_open ^ 0x01) & 0x01;
 			} else {

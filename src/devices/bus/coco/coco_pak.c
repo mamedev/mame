@@ -89,7 +89,7 @@ void coco_pak_device::device_reset()
 	if (m_cart->exists()) {
 		cococart_line_value cart_line;
 
-		cart_line = machine().root_device().ioport(CART_AUTOSTART_TAG)->read_safe(0x01)
+		cart_line = read_safe(machine().root_device().ioport(CART_AUTOSTART_TAG), 0x01)
 			? COCOCART_LINE_VALUE_Q
 			: COCOCART_LINE_VALUE_CLEAR;
 

@@ -180,7 +180,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 		case 0x3020/2: // ADC0804 data output
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return ioport(adcports[m_adc_select])->read_safe(0);
+			return read_safe(ioport(adcports[m_adc_select]), 0);
 		}
 	}
 
@@ -241,7 +241,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 		case 0x0030/2: // ADC0804 data output
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return ioport(adcports[m_adc_select])->read_safe(0);
+			return read_safe(ioport(adcports[m_adc_select]), 0);
 		}
 	}
 
