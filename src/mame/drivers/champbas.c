@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
+// copyright-holders:Ernesto Corvi, Jarek Parchanski, Nicola Salmoria, hap
 /***************************************************************************
 
 Talbot                     - (c) 1982 Alpha Denshi Co.
@@ -7,8 +7,6 @@ Champion Base Ball         - (c) 1983 Alpha Denshi Co.
 Champion Base Ball Part-2  - (c) 1983 Alpha Denshi Co.
 Exciting Soccer            - (c) 1983 Alpha Denshi Co.
 Exciting Soccer II         - (c) 1984 Alpha Denshi Co.
-
-driver by Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
 
 Note: the Champion Baseball II unofficial schematics show a 8302 instead of
 the 8201, however the MCU is used like a plain 8201, 830x extra instructions
@@ -405,6 +403,7 @@ static INPUT_PORTS_START( exctsccr )
 INPUT_PORTS_END
 
 
+
 /*************************************
  *
  *  Graphics definitions
@@ -482,6 +481,7 @@ static GFXDECODE_START( exctsccr )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_3bpp, 0x080, 0x080>>3 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_4bpp, 0x100, 0x100>>4 ) /* sprites */
 GFXDECODE_END
+
 
 
 /*************************************
@@ -1138,6 +1138,7 @@ ROM_START( exctscc2 )
 ROM_END
 
 
+
 /*************************************
  *
  *  Driver initialization
@@ -1186,6 +1187,7 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
 		rom1[i + 0x2000] &= 0x0f;
 	}
 }
+
 
 
 /*************************************
