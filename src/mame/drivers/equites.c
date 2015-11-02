@@ -371,8 +371,6 @@ D                                                                               
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
-#include "sound/samples.h"
 #include "machine/nvram.h"
 #include "includes/equites.h"
 
@@ -652,7 +650,6 @@ WRITE16_MEMBER(equites_state::gekisou_unknown_1_w)
 /******************************************************************************/
 // Main CPU Memory Map
 
-
 READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 {
 	if (m_spriteram[0] == 0x5555)
@@ -661,30 +658,41 @@ READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 		return m_spriteram[0];
 }
 
-READ16_MEMBER(equites_state::mcu_r)
+READ8_MEMBER(equites_state::mcu_ram_r)
 {
-	return 0xff00 | m_mcu_ram[offset];
+	if (m_fakemcu == NULL)
+		return m_alpha_8201->ext_ram_r(space, offset);
+	else
+		return m_mcuram[offset];
 }
 
-WRITE16_MEMBER(equites_state::mcu_w)
+WRITE8_MEMBER(equites_state::mcu_ram_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_mcu_ram[offset] = data & 0xff;
+	if (m_fakemcu == NULL)
+		m_alpha_8201->ext_ram_w(space, offset, data);
+	else
+		m_mcuram[offset] = data;
 }
 
-WRITE16_MEMBER(equites_state::mcu_halt_assert_w)
+WRITE16_MEMBER(equites_state::mcu_start_w)
 {
-	m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	// data bit is A16 (offset)
+	if (m_fakemcu == NULL)
+		m_alpha_8201->mcu_start_w(offset != 0);
+	else
+		m_fakemcu->set_input_line(INPUT_LINE_HALT, (offset != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(equites_state::mcu_halt_clear_w)
+WRITE16_MEMBER(equites_state::mcu_switch_w)
 {
-	m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	// data bit is A16 (offset)
+	if (m_fakemcu == NULL)
+		m_alpha_8201->bus_dir_w(offset == 0);
 }
-
 
 
 static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM // ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")   // nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w) // 8-bit
@@ -692,14 +700,12 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(mcu_r, mcu_w) // 8-bit
+	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE(soundlatch_word_w) // LSB: sound latch
 	AM_RANGE(0x184000, 0x184001) AM_WRITE(equites_flip0_w)
-	AM_RANGE(0x188000, 0x188001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
-	AM_RANGE(0x18c000, 0x18c001) AM_WRITENOP // 8404 control port2
+	AM_RANGE(0x188000, 0x188001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_start_w)
+	AM_RANGE(0x18c000, 0x18c001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
 	AM_RANGE(0x1a4000, 0x1a4001) AM_WRITE(equites_flip1_w)
-	AM_RANGE(0x1a8000, 0x1a8001) AM_WRITE(mcu_halt_assert_w) // 8404 control port3
-	AM_RANGE(0x1ac000, 0x1ac001) AM_WRITENOP // 8404 control port4
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w) // scroll register[XXYY]
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(equites_bgcolor_w) // bg color register[CC--]
 	// 580000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
@@ -708,21 +714,20 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("workram") // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE(splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
-	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
-	AM_RANGE(0x0c8000, 0x0c8001) AM_WRITENOP // 8404 control port2
+	AM_RANGE(0x0c4000, 0x0c4001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_start_w)
+	AM_RANGE(0x0c8000, 0x0c8001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
 	AM_RANGE(0x0cc000, 0x0cc001) AM_WRITE(splndrbt_selchar0_w) // select active char map
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(splndrbt_flip1_w) // [MMLL] MM: not used, LL: flip screen
-	AM_RANGE(0x0e4000, 0x0e4001) AM_WRITE(mcu_halt_assert_w) // 8404 control port3
-	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITENOP // 8404 control port4
 	AM_RANGE(0x0ec000, 0x0ec001) AM_WRITE(splndrbt_selchar1_w) // select active char map
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(soundlatch_word_w) // LSB: sound command
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
-	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(mcu_r, mcu_w) // 8-bit
+	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)   // 8-bit
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x400800, 0x400fff) AM_RAM
@@ -749,7 +754,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, equites_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("mcu_ram") /* main CPU shared RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("mcuram") /* main CPU shared RAM */
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1212,8 +1217,8 @@ static MACHINE_CONFIG_START( equites, equites_state )
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
-	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
+	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1234,12 +1239,14 @@ static MACHINE_CONFIG_START( equites, equites_state )
 	MCFG_MACHINE_RESET_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( gekisou, equites )
+
+	// mcu not dumped, so add simulated mcu
+	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	// gekisou has battery-backed RAM to store settings
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
 MACHINE_CONFIG_END
 
 
@@ -1252,8 +1259,8 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
-	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
+	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1272,6 +1279,13 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 
 	MCFG_MACHINE_START_OVERRIDE(equites_state,equites)
 	MCFG_MACHINE_RESET_OVERRIDE(equites_state,equites)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( hvoltage, splndrbt )
+
+	// mcu not dumped, so add simulated mcu
+	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 MACHINE_CONFIG_END
 
 
@@ -1311,7 +1325,7 @@ ROM_START( equites )
 	ROM_LOAD( "ev3.1k", 0x04000, 0x2000, CRC(10ff140b) SHA1(7c28f988a9c8b2a702d007096199e67b447a183c) )
 	ROM_LOAD( "ev4.1h", 0x06000, 0x2000, CRC(b7917264) SHA1(e58345fda088b171fd348959de15082f3cb42514) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
@@ -1375,7 +1389,7 @@ ROM_START( equitess )
 	ROM_LOAD( "ev3.1k", 0x04000, 0x2000, CRC(10ff140b) SHA1(7c28f988a9c8b2a702d007096199e67b447a183c) )
 	ROM_LOAD( "ev4.1h", 0x06000, 0x2000, CRC(b7917264) SHA1(e58345fda088b171fd348959de15082f3cb42514) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
@@ -1433,7 +1447,7 @@ ROM_START( bullfgtr )
 	ROM_LOAD( "hv3vr.bin", 0x04000, 0x2000, CRC(51ee751c) SHA1(60bf848dfdfe313ab05df5a5c05819b0fa87ca50) )
 	ROM_LOAD( "hv4vr.bin", 0x06000, 0x2000, CRC(62c7a25b) SHA1(237d3cbdfbf45b33c2f65d30faba151380866a93) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
@@ -1515,7 +1529,7 @@ ROM_START( bullfgtrs )
 	ROM_LOAD( "hv3vr.bin", 0x04000, 0x2000, CRC(51ee751c) SHA1(60bf848dfdfe313ab05df5a5c05819b0fa87ca50) )
 	ROM_LOAD( "hv4vr.bin", 0x06000, 0x2000, CRC(62c7a25b) SHA1(237d3cbdfbf45b33c2f65d30faba151380866a93) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
@@ -1585,7 +1599,7 @@ ROM_START( kouyakyu )
 	ROM_LOAD( "epr-6699.bin", 0x08000, 0x2000, CRC(9bfa4a72) SHA1(8ac4d308dab0d67a26b4e3550c2e8064aaf36a74) )
 	ROM_LOAD( "epr-6698.bin", 0x0a000, 0x2000, CRC(7adfd1ff) SHA1(b543dd6734a681a187dabf602bea390de663039c) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8304_44801bxx.bin", 0x0000, 0x2000, BAD_DUMP CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) ) // 8304 is not dumped yet, using 8303 instead
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
@@ -1650,7 +1664,7 @@ ROM_START( gekisou )
 	ROM_LOAD( "v2.1h", 0x04000, 0x4000, CRC(cb12582e) SHA1(ef378232e2744540cc4c9187cfb36d780dadc962) )
 	ROM_LOAD( "v3.1e", 0x08000, 0x4000, CRC(0ab5e777) SHA1(9177c42418f022a65d73c3302873b894c5a137a4) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8304_44801bxx.bin", 0x0000, 0x2000, BAD_DUMP CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) ) // 8304 is not dumped yet, using 8303 instead
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
@@ -1719,7 +1733,7 @@ ROM_START( splndrbt )
 	ROM_LOAD( "3_v.1k", 0x04000, 0x2000, CRC(bbee5346) SHA1(753cb784b04f081fa1f8590dc28056d9918f313b) )
 	ROM_LOAD( "4_v.1h", 0x06000, 0x2000, CRC(10f45af4) SHA1(00fa599bad8bf3ba6deee54165f381403096e8f9) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
@@ -1785,7 +1799,7 @@ ROM_START( hvoltage )
 	ROM_LOAD( "6_v.1h", 0x04000, 0x4000, CRC(e9542211) SHA1(482f2c90e842fe5cc31cc6a39025adf65ba47ce9) )
 	ROM_LOAD( "7_v.1e", 0x08000, 0x4000, CRC(44d38554) SHA1(6765971376eafa218fda1accb1e173a7c1850cc8) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8304_44801bxx.bin", 0x0000, 0x2000, BAD_DUMP CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) ) // 8304 is not dumped yet, using 8303 instead
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
@@ -1891,13 +1905,13 @@ DRIVER_INIT_MEMBER(equites_state,hvoltage)
 // Game Entries
 
 // Equites Hardware
-GAME( 1984, equites,  0,        equites,  equites, equites_state,  equites,  ROT90, "Alpha Denshi Co.", "Equites", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, equitess, equites,  equites,  equites, equites_state,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, equites,  0,        equites,  equites,  equites_state, equites,  ROT90, "Alpha Denshi Co.", "Equites", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, equitess, equites,  equites,  equites,  equites_state, equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, equites_state, bullfgtr, ROT90, "Alpha Denshi Co.", "Bull Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgtrs,bullfgtr, equites,  bullfgtr, equites_state, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, equites_state, kouyakyu, ROT0,  "Alpha Denshi Co.", "The Koukouyakyuh", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gekisou,  0,        gekisou,  gekisou, equites_state,  gekisou,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekisou,  0,        gekisou,  gekisou,  equites_state, gekisou,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, hvoltage, 0,        splndrbt, hvoltage, equites_state, hvoltage, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hvoltage, 0,        hvoltage, hvoltage, equites_state, hvoltage, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
