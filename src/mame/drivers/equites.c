@@ -1585,6 +1585,9 @@ ROM_START( kouyakyu )
 	ROM_LOAD( "epr-6699.bin", 0x08000, 0x2000, CRC(9bfa4a72) SHA1(8ac4d308dab0d67a26b4e3550c2e8064aaf36a74) )
 	ROM_LOAD( "epr-6698.bin", 0x0a000, 0x2000, CRC(7adfd1ff) SHA1(b543dd6734a681a187dabf602bea390de663039c) )
 
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8304_44801bxx.bin", 0x0000, 0x2000, BAD_DUMP CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) ) // 8304 is not dumped yet, using 8303 instead
+
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "epr-6710.bin", 0x00000, 0x1000, CRC(accda190) SHA1(265d2fd92574d65e7890e48d5f305bf903a67bc8) )
 
@@ -1646,6 +1649,9 @@ ROM_START( gekisou )
 	ROM_LOAD( "v1.1l", 0x00000, 0x4000, CRC(dc6af437) SHA1(77112fec51343d8e73765b2a342a888612813c3b) )
 	ROM_LOAD( "v2.1h", 0x04000, 0x4000, CRC(cb12582e) SHA1(ef378232e2744540cc4c9187cfb36d780dadc962) )
 	ROM_LOAD( "v3.1e", 0x08000, 0x4000, CRC(0ab5e777) SHA1(9177c42418f022a65d73c3302873b894c5a137a4) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8304_44801bxx.bin", 0x0000, 0x2000, BAD_DUMP CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) ) // 8304 is not dumped yet, using 8303 instead
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "0.5c",  0x00000, 0x1000, CRC(7e8bf4d1) SHA1(8abb82be006e8d1df449a5f83d59637314405119) )
@@ -1780,7 +1786,7 @@ ROM_START( hvoltage )
 	ROM_LOAD( "7_v.1e", 0x08000, 0x4000, CRC(44d38554) SHA1(6765971376eafa218fda1accb1e173a7c1850cc8) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "alpha-8304_44801bxx.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "alpha-8304_44801bxx.bin", 0x0000, 0x2000, BAD_DUMP CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) ) // 8304 is not dumped yet, using 8303 instead
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
 	ROM_LOAD( "5.8c",   0x00000, 0x2000, CRC(656d53cd) SHA1(9971ed7e7da0e8bf46e97e8f75a2c2201b33fc2f) )
@@ -1885,12 +1891,12 @@ DRIVER_INIT_MEMBER(equites_state,hvoltage)
 // Game Entries
 
 // Equites Hardware
-GAME( 1984, equites,  0,        equites,  equites, equites_state,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, equites,  0,        equites,  equites, equites_state,  equites,  ROT90, "Alpha Denshi Co.", "Equites", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, equitess, equites,  equites,  equites, equites_state,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, equites_state, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, equites_state, bullfgtr, ROT90, "Alpha Denshi Co.", "Bull Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgtrs,bullfgtr, equites,  bullfgtr, equites_state, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, equites_state, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gekisou,  0,        gekisou,  gekisou, equites_state,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, equites_state, kouyakyu, ROT0,  "Alpha Denshi Co.", "The Koukouyakyuh", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekisou,  0,        gekisou,  gekisou, equites_state,  gekisou,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
