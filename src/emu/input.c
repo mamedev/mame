@@ -1581,7 +1581,7 @@ input_code input_manager::code_from_token(const char *_token)
 	// first token should be the devclass
 	int curtok = 0;
 	input_device_class devclass = input_device_class((*devclass_token_table)[token[curtok++].c_str()]);
-	if (devclass == ~0)
+	if (devclass == ~input_device_class(0))
 		return INPUT_CODE_INVALID;
 
 	// second token might be index; look for number
@@ -1596,7 +1596,7 @@ input_code input_manager::code_from_token(const char *_token)
 
 	// next token is the item ID
 	input_item_id itemid = input_item_id((*itemid_token_table)[token[curtok].c_str()]);
-	bool standard = (itemid != ~0);
+	bool standard = (itemid != ~input_item_id(0));
 
 	// if we're a standard code, default the itemclass based on it
 	input_item_class itemclass = ITEM_CLASS_INVALID;
@@ -1634,7 +1634,7 @@ input_code input_manager::code_from_token(const char *_token)
 	if (curtok < numtokens)
 	{
 		modifier = input_item_modifier((*modifier_token_table)[token[curtok].c_str()]);
-		if (modifier != ~0)
+		if (modifier != ~input_item_modifier(0))
 			curtok++;
 		else
 			modifier = ITEM_MODIFIER_NONE;
