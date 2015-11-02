@@ -131,16 +131,16 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 
 TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 {
-	int code = m_bg_videoram[tile_index] | (m_gfx_bank << 8);
-	int color = (m_bg_videoram[tile_index + 0x400] & 0x1f) | 0x20;
+	int code = m_vram[tile_index] | (m_gfx_bank << 8);
+	int color = (m_vram[tile_index + 0x400] & 0x1f) | 0x20;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
 {
-	int code = m_bg_videoram[tile_index] | (m_gfx_bank << 8);
-	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
+	int code = m_vram[tile_index] | (m_gfx_bank << 8);
+	int color = m_vram[tile_index + 0x400] & 0x0f;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -159,13 +159,13 @@ VIDEO_START_MEMBER(champbas_state,exctsccr)
 
 
 
-WRITE8_MEMBER(champbas_state::champbas_bg_videoram_w)
+WRITE8_MEMBER(champbas_state::tilemap_w)
 {
-	m_bg_videoram[offset] = data;
+	m_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(champbas_state::champbas_gfxbank_w)
+WRITE8_MEMBER(champbas_state::gfxbank_w)
 {
 	data &= 1;
 
@@ -176,40 +176,45 @@ WRITE8_MEMBER(champbas_state::champbas_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(champbas_state::champbas_palette_bank_w)
+WRITE8_MEMBER(champbas_state::palette_bank_w)
 {
 	m_palette_bank = data & 1;
 	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
 }
 
-WRITE8_MEMBER(champbas_state::champbas_flipscreen_w)
+WRITE8_MEMBER(champbas_state::flipscreen_w)
 {
 	flip_screen_set(~data & 1);
 }
 
 
 
-void champbas_state::champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void champbas_state::champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element* const gfx = m_gfxdecode->gfx(1);
+	assert (m_spriteram.bytes() == 0x10);
 
-	for (int offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
+	for (int offs = 0x10-2; offs >= 0; offs -= 2)
 	{
-		int code = (m_spriteram[offs] >> 2) | (m_gfx_bank << 6);
-		int color = (m_spriteram[offs + 1] & 0x1f) | (m_palette_bank << 6);
-		int flipx = ~m_spriteram[offs] & 0x01;
-		int flipy = ~m_spriteram[offs] & 0x02;
-		int sx = m_spriteram_2[offs + 1] - 16;
-		int sy = 255 - m_spriteram_2[offs];
+		// spriteram holds x/y data
+		int sx = m_spriteram[offs + 1] - 16;
+		int sy = 255 - m_spriteram[offs];
 
-		gfx->transmask(bitmap,cliprect,
+		// attribute data is from last section of mainram
+		UINT8 *attr = &(m_mainram[0x7f0]);
+		int code = (attr[offs] >> 2 & 0x3f) | (m_gfx_bank << 6);
+		int color = (attr[offs + 1] & 0x1f) | (m_palette_bank << 6);
+		int flipx = ~attr[offs] & 1;
+		int flipy = ~attr[offs] & 2;
+
+		gfx->transmask(bitmap, cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy,
 			m_palette->transpen_mask(*gfx, color, 0));
 
 		// wraparound
-		gfx->transmask(bitmap,cliprect,
+		gfx->transmask(bitmap, cliprect,
 			code, color,
 			flipx, flipy,
 			sx + 256, sy,
@@ -217,54 +222,47 @@ void champbas_state::champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 	}
 }
 
-void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void champbas_state::exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *obj1, *obj2;
+	gfx_element* const gfx1 = m_gfxdecode->gfx(1);
+	gfx_element* const gfx2 = m_gfxdecode->gfx(2);
+	assert (m_spriteram.bytes() == 0x10);
 
-	obj1 = m_bg_videoram;
-	obj2 = &(m_spriteram[0x20]);
-
-	for (int offs = 0x0e; offs >= 0; offs -= 2)
+	for (int offs = 0x10-2; offs >= 0; offs -= 2)
 	{
-		int sx, sy, code, bank, flipx, flipy, color;
+		// spriteram holds x/y data
+		int sx = m_spriteram[offs + 1] - 16;
+		int sy = 255 - m_spriteram[offs];
 
-		sx = obj2[offs + 1] - 16;
-		sy = 255 - obj2[offs];
+		// attribute data is from videoram
+		int code = (m_vram[offs] >> 2 & 0x3f) | (m_vram[offs + 1] << 2 & 0x40);
+		int flipx = ~m_vram[offs] & 1;
+		int flipy = ~m_vram[offs] & 2;
+		int color = m_vram[offs + 1] & 0xf;
 
-		code = (obj1[offs] >> 2) & 0x3f;
-		flipx = (~obj1[offs]) & 0x01;
-		flipy = (~obj1[offs]) & 0x02;
-		color = (obj1[offs + 1]) & 0x0f;
-		bank = ((obj1[offs + 1] >> 4) & 1);
-
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-			code + (bank << 6),
-			color,
+		gfx1->transpen(bitmap, cliprect,
+			code, color,
 			flipx, flipy,
-			sx,sy,0);
+			sx, sy, 0);
 	}
 
-	obj1 = m_spriteram_2;
-	obj2 = m_spriteram;
-
-	for (int offs = 0x0e; offs >= 0; offs -= 2)
+	for (int offs = 0x10-2; offs >= 0; offs -= 2)
 	{
-		int sx, sy, code, flipx, flipy, color;
+		// spriteram2 holds x/y data
+		int sx = m_spriteram2[offs + 1] - 16;
+		int sy = 255 - m_spriteram2[offs];
 
-		sx = obj2[offs + 1] - 16;
-		sy = 255 - obj2[offs];
+		// attribute data is from mainram
+		int code = m_mainram[offs] >> 2 & 0x3f;
+		int flipx = ~m_mainram[offs] & 1;
+		int flipy = ~m_mainram[offs] & 2;
+		int color = m_mainram[offs + 1] & 0xf;
 
-		code = (obj1[offs] >> 2) & 0x3f;
-		flipx = (~obj1[offs]) & 0x01;
-		flipy = (~obj1[offs]) & 0x02;
-		color = (obj1[offs + 1]) & 0x0f;
-
-		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
-			code,
-			color,
+		gfx2->transmask(bitmap, cliprect,
+			code, color,
 			flipx, flipy,
-			sx,sy,
-			m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0x10));
+			sx, sy,
+			m_palette->transpen_mask(*gfx2, color, 0x10));
 	}
 }
 

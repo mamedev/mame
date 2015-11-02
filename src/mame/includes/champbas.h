@@ -21,9 +21,10 @@ public:
 		m_dac2(*this, "dac2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_bg_videoram(*this, "bg_videoram"),
+		m_mainram(*this, "mainram"),
+		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram_2(*this, "spriteram_2")
+		m_spriteram2(*this, "spriteram2")
 	{ }
 
 	// devices, memory pointers
@@ -35,9 +36,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram_2;
+	optional_shared_ptr<UINT8> m_spriteram2;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -51,10 +53,10 @@ public:
 	DECLARE_WRITE8_MEMBER(champbas_mcu_switch_w);
 	DECLARE_WRITE8_MEMBER(champbas_mcu_halt_w);
 	DECLARE_READ8_MEMBER(champbja_protection_r);
-	DECLARE_WRITE8_MEMBER(champbas_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(champbas_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(champbas_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(champbas_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(tilemap_w);
+	DECLARE_WRITE8_MEMBER(gfxbank_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(champbas_watchdog_bit2);
 	DECLARE_WRITE8_MEMBER(dac1_w);
 	DECLARE_WRITE8_MEMBER(dac2_w);
@@ -70,8 +72,8 @@ public:
 	UINT32 screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
-	void champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start();
 	virtual void machine_reset();
