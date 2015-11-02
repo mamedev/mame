@@ -418,16 +418,12 @@ WRITE_LINE_MEMBER(alpha_8201_device::mcu_start_w)
 
 READ8_MEMBER(alpha_8201_device::ext_ram_r)
 {
-	if (m_bus)
-		logerror("%s: EXT side read bus conflict\n", tag());
-
+	// going by exctsccr, m_bus has no effect here
 	return m_shared_ram[offset & 0x3ff];
 }
 
 WRITE8_MEMBER(alpha_8201_device::ext_ram_w)
 {
-	if (!m_bus)
-		m_shared_ram[offset & 0x3ff] = data;
-	else
-		logerror("%s: EXT side write bus conflict\n", tag());
+	// going by exctsccr, m_bus has no effect here
+	m_shared_ram[offset & 0x3ff] = data;
 }

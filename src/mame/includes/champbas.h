@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/alpha8201.h"
 #include "sound/dac.h"
 
 
@@ -16,7 +17,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		m_alpha_8201(*this, "alpha_8201"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -30,7 +31,7 @@ public:
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<alpha_8201_device> m_alpha_8201;
 	optional_device<dac_device> m_dac1;
 	optional_device<dac_device> m_dac2;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -51,7 +52,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(mcu_switch_w);
-	DECLARE_WRITE8_MEMBER(mcu_halt_w);
+	DECLARE_WRITE8_MEMBER(mcu_start_w);
 	DECLARE_READ8_MEMBER(champbja_protection_r);
 	DECLARE_WRITE8_MEMBER(tilemap_w);
 	DECLARE_WRITE8_MEMBER(gfxbank_w);
