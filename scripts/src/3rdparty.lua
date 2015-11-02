@@ -615,7 +615,7 @@ project "bgfx"
 
 	if _OPTIONS["targetos"]=="windows" then
 		local version = str_to_version(_OPTIONS["gcc_version"])
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
