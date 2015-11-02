@@ -171,7 +171,6 @@ end
 
 links {
 	"dasm",
-	"emu",
 	"utils",
 	"expat",
 	"7z",	
@@ -207,6 +206,7 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/unidasm.c",
+	MAME_DIR .. "src/emu/emucore.c",
 }
 
 

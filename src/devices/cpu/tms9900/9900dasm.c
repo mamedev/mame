@@ -347,7 +347,7 @@ static int print_arg (char *dest, int mode, int arg, const UINT8 *opram, unsigne
 /*****************************************************************************
  *  Disassemble a single command and return the number of bytes it uses.
  *****************************************************************************/
-unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram, device_t *device)
+unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram)
 {
 	int OP, OP2, opc;
 	int sarg, darg, smode, dmode;
@@ -787,7 +787,7 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 	}
 
 	default:
-		device->logerror("debbugger internal error, file %s, line %d\n", __FILE__, __LINE__);
+		osd_printf_error("debbugger internal error, file %s, line %d\n", __FILE__, __LINE__);
 	case illegal:
 		sprintf (buffer, "data >%04x", OP);
 		break;
@@ -798,15 +798,15 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 
 CPU_DISASSEMBLE( tms9900 )
 {
-	return Dasm9900(buffer, pc, TMS9900_ID, oprom, opram, device);
+	return Dasm9900(buffer, pc, TMS9900_ID, oprom, opram);
 }
 
 CPU_DISASSEMBLE( tms9980 )
 {
-	return Dasm9900(buffer, pc, TMS9980_ID, oprom, opram, device);
+	return Dasm9900(buffer, pc, TMS9980_ID, oprom, opram);
 }
 
 CPU_DISASSEMBLE( tms9995 )
 {
-	return Dasm9900(buffer, pc, TMS9995_ID, oprom, opram, device);
+	return Dasm9900(buffer, pc, TMS9995_ID, oprom, opram);
 }

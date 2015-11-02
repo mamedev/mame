@@ -355,17 +355,6 @@ static const dasm_table_entry dasm_table[] =
 //  { "z8000",      _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
 };
 
-void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
-{
-	/* silent logerrors are allowed in disassemblers */
-}
-
-
-void CLIB_DECL ATTR_PRINTF(1,2) osd_printf_debug(const char *format, ...)
-{
-	/* silent osd_printf_debugs are allowed in disassemblers */
-}
-
 
 static int parse_options(int argc, char *argv[], options *opts)
 {
