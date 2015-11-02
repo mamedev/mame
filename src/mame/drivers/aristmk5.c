@@ -966,6 +966,24 @@ ROM_START( enchfore )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// MV4033 - 10 Credit Multiplier / 9 Line Multiline.
+// Magic Garden - Export B - 10/02/97.
+// Marked as AHG1211 and 88.26%
+ROM_START( mgarden )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ahg1211-99_magic_garden.u7",  0x000000, 0x80000, CRC(4fe50505) SHA1(6cde87a8a6748af792a1fb101829491367bd4487) )
+	ROM_LOAD32_WORD( "ahg1211-99_magic_garden.u11", 0x000002, 0x80000, CRC(723ffeee) SHA1(9eab33c9dbf656489914e539a28da5ae289e8df7) )
+	ROM_LOAD32_WORD( "ahg1211-99_magic_garden.u8",  0x100000, 0x80000, CRC(a315ca28) SHA1(0309789362a945d592ee2eda912e4fc2e6ea5be6) )
+	ROM_LOAD32_WORD( "ahg1211-99_magic_garden.u12", 0x100002, 0x80000, CRC(4b252c2c) SHA1(8be41fb2b8f8d2829c18ea123a02f3e61c136206) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 ROM_START( goldprmd )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -1235,6 +1253,7 @@ GAME( 1996, dolphtra,  dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk
 GAME( 1996, dolphtre,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (Export)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/1,    B - 06/12/96
 GAME( 1996, cashcham,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Cash Chameleon (Export)",                        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 603(a),   B - 06/12/96
 GAME( 1997, enchfore,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (MV4033, Export, 94.97%)",      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4033,   B - 10/02/97
+GAME( 1997, mgarden,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Garden (AHG1211, Export, 88.26%)",         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4033,   B - 10/02/97
 GAME( 1997, goldprmd,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (MV4091, USA)",                  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4091,   B - 13/05/97
 GAME( 1997, goldpyra,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (AHG1206-99, NSW/ACT, 87.928%)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/2,    B - 13/05/97
 GAME( 1997, qotn,      0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",          MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/4,    B - 13/05/97
