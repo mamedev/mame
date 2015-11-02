@@ -599,7 +599,7 @@ void segaybd_state::pdrift_output_cb1(UINT16 data)
 			// normalize the data and subtract the vibration value from it*/
 
 			m_pdrift_bank = data - (data & 7);
-			output_set_value("bank_data_raw", m_pdrift_bank);
+			output_set_value("bank_data_raw", m_pdrift_bank & 0xFF);
 
 			// position values from left to right
 			// 56 48 40 120 72 80 88
@@ -607,7 +607,7 @@ void segaybd_state::pdrift_output_cb1(UINT16 data)
 			// the normalized values we'll use
 			//   1  2  3   4  5  6  7
 
-			switch (m_pdrift_bank)
+			switch (m_pdrift_bank & 0xFF)
 			{
 				case 56:
 					// all left
