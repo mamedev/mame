@@ -1283,7 +1283,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="herot" cloneof="hero">
+	<software name="herot" cloneof="hero"> <!-- Taiwanese logo version -->
 		<description>Qing Feng Xia (Tw)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1292,6 +1292,17 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="h.e.r.o. (tw).bin" size="32768" crc="83958998" sha1="3b2d3dfe948a734c3d18b504c89c61b7b1f3d81b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="herotw" cloneof="hero"> <!-- English logo version -->
+		<description>H.E.R.O. (Tw)</description>
+		<year>1985</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="H.E.R.O. [english logo] (TW).sg" size="32768" crc="96f09c6d" sha1="82b530feef7c011361e21b62d2c359c626ab8a9c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1343,6 +1354,17 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="hustle chumy (japan).bin" size="16384" crc="a627d440" sha1="1f1bad94b2d869c10a2373ca40d4076d227cc302" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hustletw" cloneof="hustle">
+		<description>Hustle Chumy / Wanpi shu (Tw)</description>
+		<year>1984</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Hustle Chumy (TW).sg" size="16384" crc="c4ed1fd9" sha1="e7800d107ef0a7773eea2d482b5db9d866ba74f9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2066,7 +2088,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="motianda" cloneof="rocknbol">
+	<software name="motianda" cloneof="rocknbol"> <!-- Taiwanese logo version -->
 		<description>Mo Tian Da Lou (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -2075,6 +2097,17 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="rock n' bolt (tw).bin" size="32768" crc="4eacb981" sha1="18a6b34d071feaad416704d5e6fd7680374dd669" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocknboltw" cloneof="rocknbol"> <!-- English logo version -->
+		<description>Rock n' Bolt (Tw)</description>
+		<year>1985</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Rock n' Bolt [english logo] (TW).sg" size="32768" crc="09a82af7" sha1="e3be08bda8459fc60836abe332e9864e7c596202" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

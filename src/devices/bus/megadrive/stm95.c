@@ -96,7 +96,7 @@ void stm95_eeprom_device::set_sck_line(int state)
 								WEL = 1;
 								break;
 							default:
-								logerror("STM95 EEPROM: unknown cmd %02X\n", stream_data&0xff);
+								machine().logerror("STM95 EEPROM: unknown cmd %02X\n", stream_data&0xff);
 						}
 					}
 					break;

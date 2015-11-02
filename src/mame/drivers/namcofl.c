@@ -302,17 +302,17 @@ READ8_MEMBER(namcofl_state::port7_r)
 
 READ8_MEMBER(namcofl_state::dac7_r)
 {
-	return ioport("ACCEL")->read_safe(0xff);
+	return read_safe(ioport("ACCEL"), 0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac6_r)
 {
-	return ioport("BRAKE")->read_safe(0xff);
+	return read_safe(ioport("BRAKE"), 0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac5_r)
 {
-	return ioport("WHEEL")->read_safe(0xff);
+	return read_safe(ioport("WHEEL"), 0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }

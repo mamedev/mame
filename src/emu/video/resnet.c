@@ -203,25 +203,25 @@ double compute_resistor_weights(
 /* debug code */
 if (VERBOSE)
 {
-	logerror("compute_resistor_weights():  scaler = %15.10f\n",scale);
-	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
+	osd_printf_info("compute_resistor_weights():  scaler = %15.10f\n",scale);
+	osd_printf_info("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
 	for(i = 0; i < networks_no;i++)
 	{
 		double sum = 0.0;
 
-		logerror(" Network no.%i=>  resistances: %i", i, rescount[i] );
+		osd_printf_info(" Network no.%i=>  resistances: %i", i, rescount[i] );
 		if (r_pu[i] != 0)
-			logerror(", pullup resistor: %i Ohms",r_pu[i]);
+			osd_printf_info(", pullup resistor: %i Ohms",r_pu[i]);
 		if (r_pd[i] != 0)
-			logerror(", pulldown resistor: %i Ohms",r_pd[i]);
-		logerror("\n  maximum output of this network:%10.5f (scaled to %15.10f)\n", max_out[i], max_out[i]*scale );
+			osd_printf_info(", pulldown resistor: %i Ohms",r_pd[i]);
+		osd_printf_info("\n  maximum output of this network:%10.5f (scaled to %15.10f)\n", max_out[i], max_out[i]*scale );
 		for (n = 0; n < rescount[i]; n++)
 		{
-			logerror("   res %2i:%9.1f Ohms  weight=%10.5f (scaled = %15.10f)\n", n, r[i][n], w[i][n], ws[i][n] );
+			osd_printf_info("   res %2i:%9.1f Ohms  weight=%10.5f (scaled = %15.10f)\n", n, r[i][n], w[i][n], ws[i][n] );
 			sum += ws[i][n];
 		}
-		logerror("                              sum of scaled weights = %15.10f\n", sum  );
+		osd_printf_info("                              sum of scaled weights = %15.10f\n", sum  );
 	}
 }
 /* debug end */
@@ -393,25 +393,25 @@ double compute_resistor_net_outputs(
 /* debug code */
 if (VERBOSE)
 {
-	logerror("compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
-	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
+	osd_printf_info("compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
+	osd_printf_info("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
 	for(i = 0; i < networks_no;i++)
 	{
-		logerror(" Network no.%i=>  resistances: %i", i, rescount[i] );
+		osd_printf_info(" Network no.%i=>  resistances: %i", i, rescount[i] );
 		if (r_pu[i] != 0)
-			logerror(", pullup resistor: %i Ohms",r_pu[i]);
+			osd_printf_info(", pullup resistor: %i Ohms",r_pu[i]);
 		if (r_pd[i] != 0)
-			logerror(", pulldown resistor: %i Ohms",r_pd[i]);
-		logerror("\n  maximum output of this network:%10.5f", max_out[i] );
-		logerror("\n  minimum output of this network:%10.5f\n", min_out[i] );
+			osd_printf_info(", pulldown resistor: %i Ohms",r_pd[i]);
+		osd_printf_info("\n  maximum output of this network:%10.5f", max_out[i] );
+		osd_printf_info("\n  minimum output of this network:%10.5f\n", min_out[i] );
 		for (n = 0; n < rescount[i]; n++)
 		{
-			logerror("   res %2i:%9.1f Ohms\n", n, r[i][n]);
+			osd_printf_info("   res %2i:%9.1f Ohms\n", n, r[i][n]);
 		}
 		for (n = 0; n < (1<<rescount[i]); n++)
 		{
-			logerror("   combination %2i  out=%10.5f (scaled = %15.10f)\n", n, o[i*(1<<MAX_RES_PER_NET)+n], os[i*(1<<MAX_RES_PER_NET)+n] );
+			osd_printf_info("   combination %2i  out=%10.5f (scaled = %15.10f)\n", n, o[i*(1<<MAX_RES_PER_NET)+n], os[i*(1<<MAX_RES_PER_NET)+n] );
 		}
 	}
 }

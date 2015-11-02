@@ -22,9 +22,9 @@
 
 static int verbose = VERBOSE;
 
-#define LOG(x)  { logerror ("%s: ", cpu_context()); logerror x; logerror ("\n"); }
-#define LOG1(x) { if (verbose > 0) LOG(x)}
-#define LOG2(x) { if (verbose > 1) LOG(x)}
+#define LOG(d,x)  { d->logerror ("%s: ", cpu_context()); d->logerror x; d->logerror ("\n"); }
+#define LOG1(d,x) { if (verbose > 0) LOG(d,x)}
+#define LOG2(d,x) { if (verbose > 1) LOG(d,x)}
 
 #define  MAINCPU "maincpu"
 
@@ -341,7 +341,7 @@ void threecom3c505_device::device_start()
 {
 	set_isa_device();
 
-	LOG1(("start 3COM 3C505"));
+	LOG1(this,("start 3COM 3C505"));
 
 	m_installed = false;
 
@@ -359,7 +359,7 @@ void threecom3c505_device::device_start()
 
 void threecom3c505_device::device_reset()
 {
-	LOG1(("reset 3COM 3C505"));
+	LOG1(this,("reset 3COM 3C505"));
 
 	m_rx_fifo.reset();
 	m_rx_data_buffer.reset();
@@ -454,13 +454,13 @@ threecom3c505_device::data_buffer::data_buffer() :
 void threecom3c505_device::data_buffer::start(threecom3c505_device *device, INT32 size)
 {
 	m_device = device;
-	LOG2(("start threecom3c505_device::data_buffer with size %0x", size));
+	LOG2(device,("start threecom3c505_device::data_buffer with size %0x", size));
 	m_data.resize(size);
 }
 
 void threecom3c505_device::data_buffer::reset()
 {
-	LOG2(("reset threecom3c505_device::data_buffer"));
+	LOG2(m_device,("reset threecom3c505_device::data_buffer"));
 	m_length = 0;
 }
 
@@ -489,17 +489,17 @@ void threecom3c505_device::data_buffer::log(const char * title) const
 	if (verbose > 0)
 	{
 		int i;
-		logerror("%s: %s (length=%02x)", m_device->cpu_context(), title, m_length);
+		m_device->logerror("%s: %s (length=%02x)", m_device->cpu_context(), title, m_length);
 		for (i = 0; i < m_length; i++)
 		{
-			logerror(" %02x", m_data[i]);
+			m_device->logerror(" %02x", m_data[i]);
 			if (i >= 1023)
 			{
-				logerror(" ...");
+				m_device->logerror(" ...");
 				break;
 			}
 		}
-		logerror("\n");
+		m_device->logerror("\n");
 	}
 }
 
@@ -517,7 +517,7 @@ void threecom3c505_device::data_buffer_fifo::start(
 		threecom3c505_device *device, INT32 size, INT32 db_size)
 {
 	m_device = device;
-	LOG2(("start threecom3c505_device::data_buffer_fifo"));
+	LOG2(m_device,("start threecom3c505_device::data_buffer_fifo"));
 
 	int i;
 	// FIXME: fifo size is hardcoded
@@ -531,7 +531,7 @@ void threecom3c505_device::data_buffer_fifo::start(
 
 void threecom3c505_device::data_buffer_fifo::reset()
 {
-	LOG2(("reset threecom3c505_device::data_buffer_fifo"));
+	LOG2(m_device,("reset threecom3c505_device::data_buffer_fifo"));
 	m_get_index = m_put_index = 0;
 	m_count = 0;
 }
@@ -548,7 +548,7 @@ int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int le
 {
 	UINT16 next_index = (m_put_index + 1) % m_size;
 
-	LOG2(("threecom3c505_device::data_buffer_fifo::put %d", m_count));
+	LOG2(m_device,("threecom3c505_device::data_buffer_fifo::put %d", m_count));
 
 	if (next_index == m_get_index)
 	{
@@ -558,7 +558,7 @@ int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int le
 	else if (length > ETH_BUFFER_SIZE)
 	{
 		// data size exceeds buffer size
-		LOG(("threecom3c505_device::data_buffer_fifo::put %d: data size (%d) exceeds buffer size (%d)!!!", m_count, length,ETH_BUFFER_SIZE));
+		LOG(m_device,("threecom3c505_device::data_buffer_fifo::put %d: data size (%d) exceeds buffer size (%d)!!!", m_count, length,ETH_BUFFER_SIZE));
 		return 0;
 	}
 	else
@@ -573,7 +573,7 @@ int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int le
 
 int threecom3c505_device::data_buffer_fifo::get(data_buffer *db)
 {
-	LOG2(("threecom3c505_device::data_buffer_fifo::get %d", m_count));
+	LOG2(m_device,("threecom3c505_device::data_buffer_fifo::get %d", m_count));
 
 	if (m_get_index == m_put_index)
 	{
@@ -601,7 +601,7 @@ void threecom3c505_device::set_filter_list()
 	memcpy(m_filter_list + ETHERNET_ADDR_SIZE * 2, m_multicast_list, sizeof(m_multicast_list));
 
 	int node_id = (((m_station_address[3] << 8) + m_station_address[4]) << 8) + m_station_address[5];
-	LOG2(("set_filter_list node_id=%x",node_id));
+	LOG2(this,("set_filter_list node_id=%x",node_id));
 
 	setfilter(this, node_id);
 }
@@ -614,7 +614,7 @@ void threecom3c505_device::set_interrupt(enum line_state state)
 {
 	if (state != irq_state)
 	{
-		LOG2(("set_interrupt(%d)",state));
+		LOG2(this,("set_interrupt(%d)",state));
 		switch (m_irq)
 		{
 			case 3: m_isa->irq3_w(state); break;
@@ -802,7 +802,7 @@ void threecom3c505_device::do_receive_command()
 		// receive data available ?
 		if (m_rx_data_buffer.get_length() > 0)
 		{
-			LOG2(("do_receive_command - data_length=%x rx_pending=%d",
+			LOG2(this,("do_receive_command - data_length=%x rx_pending=%d",
 							m_rx_data_buffer.get_length(), m_rx_pending));
 
 			m_rx_pending--;
@@ -827,7 +827,7 @@ void threecom3c505_device::do_receive_command()
 			UINT16 buf_len = uint16_from_le(m_response.data.rcv_resp.buf_len) & ~1;
 			if (m_rx_data_buffer.get_length() > buf_len)
 			{
-				LOG1(("do_receive_command !!! buffer size too small (%d < %d)", buf_len, m_rx_data_buffer.get_length()));
+				LOG1(this,("do_receive_command !!! buffer size too small (%d < %d)", buf_len, m_rx_data_buffer.get_length()));
 				m_response.data.rcv_resp.pkt_len = uint16_to_le(buf_len);
 				m_response.data.rcv_resp.status = 0xffff;
 			}
@@ -855,7 +855,7 @@ void threecom3c505_device::do_receive_command()
 
 void threecom3c505_device::set_command_pending(int state)
 {
-	LOG2(("set_command_pending %d -> %d m_wait_for_ack=%d m_wait_for_nak=%d m_rx_pending=%d%s",
+	LOG2(this,("set_command_pending %d -> %d m_wait_for_ack=%d m_wait_for_nak=%d m_rx_pending=%d%s",
 					m_command_pending, state, m_wait_for_ack, m_wait_for_nak, m_rx_pending, state ? "" :"\n"));
 
 //- verbose = onoff ? 1 : 2;
@@ -890,7 +890,7 @@ void threecom3c505_device::set_command_pending(int state)
 		}
 		break;
 	default:
-		LOG(("set_command_pending %d unexpected" , state));
+		LOG(this,("set_command_pending %d unexpected" , state));
 		break;
 	}
 
@@ -990,7 +990,7 @@ void threecom3c505_device::do_command()
 		if (command_pcp.length > sizeof(m_multicast_list)
 				|| (command_pcp.length % ETHERNET_ADDR_SIZE) != 0)
 		{
-			LOG(("CMD_LOAD_MULTICAST_LIST - unexpected data size %d", command_pcp.length));
+			LOG(this,("CMD_LOAD_MULTICAST_LIST - unexpected data size %d", command_pcp.length));
 		}
 		else
 		{
@@ -1003,7 +1003,7 @@ void threecom3c505_device::do_command()
 	case CMD_SET_STATION_ADDRESS: // 0x10
 		if (command_pcp.length != sizeof(m_station_address))
 		{
-			LOG(("CMD_SET_STATION_ADDRESS - unexpected data size %d", command_pcp.length));
+			LOG(this,("CMD_SET_STATION_ADDRESS - unexpected data size %d", command_pcp.length));
 			memset(m_station_address, 0, sizeof(m_station_address));
 		}
 		else
@@ -1028,7 +1028,7 @@ void threecom3c505_device::do_command()
 			break;
 		default:
 			m_microcode_version = 0;
-			LOG(("CMD_DOWNLOAD_PROGRAM - unexpected microcode version %04x", mc_version));
+			LOG(this,("CMD_DOWNLOAD_PROGRAM - unexpected microcode version %04x", mc_version));
 			break;
 		}
 		// return microcode version as program id
@@ -1111,13 +1111,13 @@ void threecom3c505_device::recv_cb(UINT8 *data, int length)
 		m_netstat.tot_recv++;
 		m_netstat.err_ovrrun++;
 		// fifo overrun
-		LOG1(("recv_cb: data_length=%x !!! RX FIFO OVERRUN !!!", length));
+		LOG1(this,("recv_cb: data_length=%x !!! RX FIFO OVERRUN !!!", length));
 
 	}
 	else
 	{
 		m_netstat.tot_recv++;
-		LOG2(("recv_cb: data_length=%x m_rx_pending=%d", length, m_rx_pending));
+		LOG2(this,("recv_cb: data_length=%x m_rx_pending=%d", length, m_rx_pending));
 
 		do_receive_command();
 	}
@@ -1129,7 +1129,7 @@ void threecom3c505_device::recv_cb(UINT8 *data, int length)
 
 void threecom3c505_device::write_command_port(UINT8 data)
 {
-	LOG2(("writing 3C505 command port %02x - m_status=%02x m_control=%02x m_command_index=%02x",
+	LOG2(this,("writing 3C505 command port %02x - m_status=%02x m_control=%02x m_command_index=%02x",
 			data, m_status, m_control, m_command_index));
 
 	if (m_command_index == 0)
@@ -1137,7 +1137,7 @@ void threecom3c505_device::write_command_port(UINT8 data)
 		switch (data)
 		{
 		case 0:
-			LOG2(("!!! writing 3C505 Command Register = %02x", data));
+			LOG2(this,("!!! writing 3C505 Command Register = %02x", data));
 			// spurious data; reset?
 			break;
 
@@ -1240,7 +1240,7 @@ UINT8 threecom3c505_device::read_command_port()
 
 		m_status &= ~ACRF; /* the adapter command register is no longer full */
 
-		LOG2(("read_command_port: !!! reading 3C505 Command Register = %02x - m_status=%02x m_control=%02x",
+		LOG2(this,("read_command_port: !!! reading 3C505 Command Register = %02x - m_status=%02x m_control=%02x",
 						data, m_status, m_control));
 
 		// wait for nak in control register
@@ -1250,7 +1250,7 @@ UINT8 threecom3c505_device::read_command_port()
 	{
 		// should never happen
 		data = 0; // 0xff;
-		LOG(("read_command_port: unexpected reading Command Register at index %04x", m_response_index));
+		LOG(this,("read_command_port: unexpected reading Command Register at index %04x", m_response_index));
 	}
 
 	if (m_response_index <= m_response_length + 1)
@@ -1283,13 +1283,13 @@ UINT8 threecom3c505_device::read_command_port()
 				if (!send(m_tx_data_buffer.get_data(),  m_tx_data_buffer.get_length()))
 				{
 					// FIXME: failed to send the Ethernet packet
-					LOG(("read_command_port(): !!! failed to send Ethernet packet"));
+					LOG(this,("read_command_port(): !!! failed to send Ethernet packet"));
 				}
 
 				if (!tx_data(this, m_tx_data_buffer.get_data(), m_tx_data_buffer.get_length()))
 				{
 					// FIXME: failed to transmit the Ethernet packet
-					LOG(("read_command_port(): !!! failed to transmit Ethernet packet"));
+					LOG(this,("read_command_port(): !!! failed to transmit Ethernet packet"));
 				}
 
 				m_tx_data_buffer.reset();
@@ -1326,7 +1326,7 @@ void threecom3c505_device::write_data_port(UINT8 data)
 	else if ((m_status & HRDY) == 0)
 	{
 		// this happened in ether.dex Test 20/1
-		LOG(("write_data_port: failed to write tx data (data register not ready), data length=%x status=%x",
+		LOG(this,("write_data_port: failed to write tx data (data register not ready), data length=%x status=%x",
 						m_tx_data_buffer.get_length(), m_status));
 	}
 
@@ -1334,7 +1334,7 @@ void threecom3c505_device::write_data_port(UINT8 data)
 	else if (m_command_buffer[0] == CMD_MC_F8)
 	{
 		// FIXME: what does it do?
-		LOG(("write_data_port: !!! TODO: CMD_MC_F8 !!! command=%x data=%02x", m_command_buffer[0], data));
+		LOG(this,("write_data_port: !!! TODO: CMD_MC_F8 !!! command=%x data=%02x", m_command_buffer[0], data));
 	}
 #endif
 
@@ -1353,7 +1353,7 @@ void threecom3c505_device::write_data_port(UINT8 data)
 		default:
 			if (!m_tx_data_buffer.append(data))
 			{
-				LOG(("write_data_port: failed to write tx data (buffer size exceeded), data length=%x",
+				LOG(this,("write_data_port: failed to write tx data (buffer size exceeded), data length=%x",
 								m_tx_data_buffer.get_length()));
 			}
 			if (m_tx_data_buffer.get_length() == m_tx_data_length)
@@ -1370,7 +1370,7 @@ void threecom3c505_device::write_data_port(UINT8 data)
 	{
 		if (!m_tx_data_buffer.append(data))
 		{
-			LOG(("write_data_port: failed to write tx data (buffer size exceeded), data length=%x",
+			LOG(this,("write_data_port: failed to write tx data (buffer size exceeded), data length=%x",
 							m_tx_data_buffer.get_length()));
 		}
 
@@ -1385,7 +1385,7 @@ void threecom3c505_device::write_data_port(UINT8 data)
 	{
 		if (!m_program_buffer.append(data))
 		{
-			LOG(("write_data_port: failed to write program data (buffer size exceeded), data length=%x",
+			LOG(this,("write_data_port: failed to write program data (buffer size exceeded), data length=%x",
 							m_program_buffer.get_length()));
 		}
 
@@ -1400,13 +1400,13 @@ void threecom3c505_device::write_data_port(UINT8 data)
 		// write to data fifo
 		if (!m_tx_data_buffer.append(data))
 		{
-			LOG(("write_data_port: failed to write tx data (buffer size exceeded), data length=%x",
+			LOG(this,("write_data_port: failed to write tx data (buffer size exceeded), data length=%x",
 							m_tx_data_buffer.get_length()));
 		}
 	}
 	else
 	{
-		LOG(("write_data_port: unexpected command %02x data=%02x", m_command_buffer[0], data));
+		LOG(this,("write_data_port: unexpected command %02x data=%02x", m_command_buffer[0], data));
 	}
 
 	if (m_command_buffer[0] != CMD_DOWNLOAD_PROGRAM &&
@@ -1417,7 +1417,7 @@ void threecom3c505_device::write_data_port(UINT8 data)
 		if (m_tx_data_buffer.get_length() > PORT_DATA_FIFO_SIZE
 				&& m_tx_data_buffer.get_length() > m_tx_data_length)
 		{
-			LOG(("write_data_port: port_data tx fifo exhausted, data length=%x status=%x",
+			LOG(this,("write_data_port: port_data tx fifo exhausted, data length=%x status=%x",
 							m_tx_data_buffer.get_length(), m_status));
 		}
 	}
@@ -1455,7 +1455,7 @@ UINT8 threecom3c505_device::read_data_port()
 	{
 		// FIXME: should never happen
 		data = 0xff;
-		LOG(("read_data_port: unexpected reading data at index %04x)", m_rx_data_index));
+		LOG(this,("read_data_port: unexpected reading data at index %04x)", m_rx_data_index));
 	}
 	return data;
 }
@@ -1469,12 +1469,12 @@ void threecom3c505_device::write_control_port(UINT8 data)
 	switch (data & (ATTN | FLSH))
 	{
 	case ATTN:
-		LOG2(("write_control_port %02x - Soft Reset", data));
+		LOG2(this,("write_control_port %02x - Soft Reset", data));
 		// TODO: soft reset
 		break;
 
 	case FLSH:
-		LOG2(("write_control_port %02x - Flush Data Register", data));
+		LOG2(this,("write_control_port %02x - Flush Data Register", data));
 		// flush data register
 		if (data & DIR_)
 		{
@@ -1492,12 +1492,12 @@ void threecom3c505_device::write_control_port(UINT8 data)
 		break;
 
 	case ATTN | FLSH:
-		LOG2(("write_control_port %02x - Reset Adapter", data));
+		LOG2(this,("write_control_port %02x - Reset Adapter", data));
 		device_reset();
 		break;
 
 	case 0:
-		LOG2(("write_control_port %02x", data));
+		LOG2(this,("write_control_port %02x", data));
 
 		// end reset
 		if ((m_control & (ATTN | FLSH)) == (ATTN | FLSH))
@@ -1579,7 +1579,7 @@ WRITE16_MEMBER(threecom3c505_device::write)
 	offset *= 2;
 
 	m_reg[offset & 0x0f] = data;
-	LOG2(("writing 3C505 Register at offset=%02x with mem_mask=%04x = %04x", offset, mem_mask, data));
+	LOG2(this,("writing 3C505 Register at offset=%02x with mem_mask=%04x = %04x", offset, mem_mask, data));
 
 	switch (offset)
 	{
@@ -1645,7 +1645,7 @@ READ16_MEMBER(threecom3c505_device::read)
 		break;
 	}
 
-	LOG2(("reading 3C505 Register at offset=%02x with mem_mask=%04x = %04x", offset, mem_mask, data));
+	LOG2(this,("reading 3C505 Register at offset=%02x with mem_mask=%04x = %04x", offset, mem_mask, data));
 
 	return data;
 }
@@ -1657,7 +1657,7 @@ void threecom3c505_device::set_verbose(int on_off)
 
 int threecom3c505_device::tx_data(device_t *device, const UINT8 data[], int length)
 {
-	LOG1(("threecom3c505_device::tx_data length=%d", length));
+	LOG1(device,("threecom3c505_device::tx_data length=%d", length));
 	return 1;
 }
 

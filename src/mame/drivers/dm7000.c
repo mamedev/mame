@@ -43,7 +43,7 @@
 
 #define VERBOSE_LEVEL ( 9 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -52,32 +52,32 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 		va_start( v, s_fmt);
 		vsprintf( buf, s_fmt, v);
 		va_end( v);
-		logerror( "%s: %s", machine.describe_context( ), buf);
+		device.logerror( "%s: %s", device.machine().describe_context( ), buf);
 	}
 }
 
 READ8_MEMBER( dm7000_state::dm7000_iic0_r )
 {
 	UINT8 data = 0; // dummy
-	verboselog( machine(), 9, "(IIC0) %08X -> %08X\n", 0x40030000 + offset, data);
+	verboselog(*this, 9, "(IIC0) %08X -> %08X\n", 0x40030000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_iic0_w )
 {
-	verboselog( machine(), 9, "(IIC0) %08X <- %08X\n", 0x40030000 + offset, data);
+	verboselog(*this, 9, "(IIC0) %08X <- %08X\n", 0x40030000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_iic1_r )
 {
 	UINT8 data = 0; // dummy
-	verboselog( machine(), 9, "(IIC1) %08X -> %08X\n", 0x400b0000 + offset, data);
+	verboselog(*this, 9, "(IIC1) %08X -> %08X\n", 0x400b0000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_iic1_w )
 {
-	verboselog( machine(), 9, "(IIC1) %08X <- %08X\n", 0x400b0000 + offset, data);
+	verboselog(*this, 9, "(IIC1) %08X <- %08X\n", 0x400b0000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_scc0_r )
@@ -97,7 +97,7 @@ READ8_MEMBER( dm7000_state::dm7000_scc0_r )
 			data = UART_LSR_THRE | UART_LSR_TEMT | m_scc0_lsr;
 			break;
 	}
-	verboselog( machine(), 9, "(SCC0) %08X -> %08X\n", 0x40040000 + offset, data);
+	verboselog(*this, 9, "(SCC0) %08X -> %08X\n", 0x40040000 + offset, data);
 	return data;
 }
 
@@ -114,19 +114,19 @@ WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
 			m_scc0_lcr = data;
 			break;
 	}
-	verboselog( machine(), 9, "(SCC0) %08X <- %08X\n", 0x40040000 + offset, data);
+	verboselog(*this, 9, "(SCC0) %08X <- %08X\n", 0x40040000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_gpio0_r )
 {
 	UINT8 data = 0; // dummy
-	verboselog( machine(), 9, "(GPIO0) %08X -> %08X\n", 0x40060000 + offset, data);
+	verboselog(*this, 9, "(GPIO0) %08X -> %08X\n", 0x40060000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_gpio0_w )
 {
-	verboselog( machine(), 9, "(GPIO0) %08X <- %08X\n", 0x40060000 + offset, data);
+	verboselog(*this, 9, "(GPIO0) %08X <- %08X\n", 0x40060000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_scp0_r )
@@ -137,13 +137,13 @@ READ8_MEMBER( dm7000_state::dm7000_scp0_r )
 			data = SCP_STATUS_RXRDY;
 			break;
 	}
-	verboselog( machine(), 9, "(SCP0) %08X -> %08X\n", 0x400c0000 + offset, data);
+	verboselog(*this, 9, "(SCP0) %08X -> %08X\n", 0x400c0000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
 {
-	verboselog( machine(), 9, "(SCP0) %08X <- %08X\n", 0x400c0000 + offset, data);
+	verboselog(*this, 9, "(SCP0) %08X <- %08X\n", 0x400c0000 + offset, data);
 	switch(offset) {
 		case SCP_TXDATA:
 			//printf("%02X ", data);
@@ -168,13 +168,13 @@ READ16_MEMBER( dm7000_state::dm7000_enet_r )
 			data = m_enet_regs[offset];
 			break;
 	}
-	verboselog( machine(), 9, "(ENET) %08X -> %08X\n", 0x72000600 + (offset), data);
+	verboselog(*this, 9, "(ENET) %08X -> %08X\n", 0x72000600 + (offset), data);
 	return data;
 }
 
 WRITE16_MEMBER( dm7000_state::dm7000_enet_w )
 {
-	verboselog( machine(), 9, "(ENET) %08X <- %08X\n", 0x72000600 + (offset), data);
+	verboselog(*this, 9, "(ENET) %08X <- %08X\n", 0x72000600 + (offset), data);
 	COMBINE_DATA(&m_enet_regs[offset]);
 }
 

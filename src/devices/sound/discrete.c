@@ -436,7 +436,7 @@ void discrete_base_node::resolve_input_nodes(void)
 			{
 				m_device->discrete_log("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  index(), inputnum);
 				/* also report it in the error log so it is not missed */
-				logerror("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  index(), inputnum);
+				m_device->logerror("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  index(), inputnum);
 			}
 			else
 			{

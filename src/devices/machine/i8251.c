@@ -109,8 +109,6 @@ void i8251_device::device_start()
 	save_item(NAME(m_br_factor));
 	save_item(NAME(m_rx_data));
 	save_item(NAME(m_tx_data));
-	save_item(NAME(m_tx_busy));
-	save_item(NAME(m_disable_tx_pending));
 	device_serial_interface::register_save_state(machine().save(), this);
 }
 
@@ -166,7 +164,33 @@ void i8251_device::receive_clock()
 	}
 }
 
+/*-------------------------------------------------
+    is_tx_enabled
+-------------------------------------------------*/
+bool i8251_device::is_tx_enabled(void) const
+{
+        return BIT(m_command , 0) != 0 && m_cts == 0;
+}
 
+/*-------------------------------------------------
+    check_for_tx_start
+-------------------------------------------------*/
+void i8251_device::check_for_tx_start(void)
+{
+        if (is_tx_enabled() && (m_status & (I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY)) == I8251_STATUS_TX_EMPTY) {
+                start_tx();
+        }
+}
+
+/*-------------------------------------------------
+    start_tx
+-------------------------------------------------*/
+void i8251_device::start_tx(void)
+{
+    transmit_register_setup(m_tx_data);
+    m_status &= ~I8251_STATUS_TX_EMPTY;
+    m_status |= I8251_STATUS_TX_READY;
+}
 
 /*-------------------------------------------------
     transmit_clock
@@ -181,50 +205,21 @@ void i8251_device::transmit_clock()
 	else
 		return;
 
-	/* transmit enabled? */
-	if (m_command & (1<<0))
-	{
-		/* do we have a character to send? */
-		if ((m_status & I8251_STATUS_TX_READY)==0)
-		{
-			/* is diserial ready for it? */
-			if (is_transmit_register_empty())
-			{
-				/* set it up */
-				transmit_register_setup(m_tx_data);
-				/* i8251 transmit reg now empty */
-				m_status |=I8251_STATUS_TX_EMPTY;
-				/* ready for next transmit */
-				m_status |=I8251_STATUS_TX_READY;
-
-				update_tx_empty();
-				update_tx_ready();
-			}
-		}
-
-		/* if diserial has bits to send, make them so */
-		if (!is_transmit_register_empty())
-		{
-			UINT8 data = transmit_register_get_data_bit();
-			m_tx_busy = true;
-			m_txd_handler(data);
-		}
-
-		// is transmitter totally done?
-		if ((m_status & I8251_STATUS_TX_READY) && is_transmit_register_empty())
-		{
-			m_tx_busy = false;
-
-			if (m_disable_tx_pending)
-			{
-				LOG(("Applying pending disable\n"));
-				m_disable_tx_pending = false;
-				m_command &= ~(1<<0);
-				m_txd_handler(1);
-				update_tx_ready();
-			}
-		}
-	}
+        if (is_transmit_register_empty()) {
+                if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || (m_flags & I8251_DELAYED_TX_EN) != 0)) {
+                        start_tx();
+                } else {
+                        m_status |= I8251_STATUS_TX_EMPTY;
+                }
+                update_tx_ready();
+                update_tx_empty();
+        }
+        /* if diserial has bits to send, make them so */
+        if (!is_transmit_register_empty())
+            {
+                UINT8 data = transmit_register_get_data_bit();
+                m_txd_handler(data);
+            }
 
 #if 0
 	/* hunt mode? */
@@ -271,21 +266,7 @@ void i8251_device::update_tx_ready()
 	    Transmit enable is 1
 	*/
 
-	tx_ready = 0;
-
-	/* transmit enable? */
-	if ((m_command & (1<<0))!=0)
-	{
-		/* other side has rts set (comes in as CTS at this side) */
-		if (!m_cts)
-		{
-			if (m_status & I8251_STATUS_TX_EMPTY)
-			{
-				/* enable transfer */
-				tx_ready = 1;
-			}
-		}
-	}
+	tx_ready = is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
 
 	m_txrdy_handler(tx_ready);
 }
@@ -344,7 +325,6 @@ void i8251_device::device_reset()
 	m_tx_data = 0;
 	m_rxc_count = m_txc_count = 0;
 	m_br_factor = 1;
-	m_tx_busy = m_disable_tx_pending = false;
 
 	/* update tx empty pin output */
 	update_tx_empty();
@@ -404,30 +384,10 @@ WRITE8_MEMBER(i8251_device::command_w)
 	if (data & (1<<0))
 	{
 		LOG(("transmit enable\n"));
-
-		/* if we get a tx enable with a disable pending, cancel the disable */
-		m_disable_tx_pending = false;
 	}
 	else
 	{
-		if (m_tx_busy)
-		{
-			if (!m_disable_tx_pending)
-			{
-				LOG(("Tx busy, set pending disable\n"));
-			}
-			m_disable_tx_pending = true;
-			m_command |= (1<<0);
-		}
-		else
-		{
-			LOG(("transmit disable\n"));
-			if ((data & (1<<0))==0)
-			{
-				/* held in high state when transmit disable */
-				m_txd_handler(1);
-			}
-		}
+                LOG(("transmit disable\n"));
 	}
 
 
@@ -473,8 +433,10 @@ WRITE8_MEMBER(i8251_device::command_w)
 		m_flags |= I8251_EXPECTING_MODE;
 	}
 
+        check_for_tx_start();
 	update_rx_ready();
 	update_tx_ready();
+        update_tx_empty();
 }
 
 WRITE8_MEMBER(i8251_device::mode_w)
@@ -692,12 +654,20 @@ WRITE8_MEMBER(i8251_device::data_w)
 {
 	m_tx_data = data;
 
-		LOG(("data_w %02x\n" , data));
-//  printf("i8251 transmit char: %02x\n",data);
+        LOG(("data_w %02x\n" , data));
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
-	m_status &=~I8251_STATUS_TX_EMPTY;
+	update_tx_ready();
+
+        // Store state of tx enable when writing to DB buffer
+        if (is_tx_enabled()) {
+                m_flags |= I8251_DELAYED_TX_EN;
+        } else {
+                m_flags &= ~I8251_DELAYED_TX_EN;
+        }
+
+        check_for_tx_start();
 
 	/* if transmitter is active, then tx empty will be signalled */
 
@@ -758,6 +728,10 @@ WRITE_LINE_MEMBER(i8251_device::write_rxd)
 WRITE_LINE_MEMBER(i8251_device::write_cts)
 {
 	m_cts = state;
+
+        check_for_tx_start();
+        update_tx_ready();
+        update_tx_empty();
 }
 
 WRITE_LINE_MEMBER(i8251_device::write_dsr)

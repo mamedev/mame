@@ -69,7 +69,6 @@ void necdsp_device::device_start()
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
 	state_add(UPD7725_PC, "PC", regs.pc);
 	state_add(UPD7725_RP, "RP", regs.rp);

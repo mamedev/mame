@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro Model B Disks - Z80 co-processor required -->
+
+<!-- Loading CP/M:
+
+      Reset with Z80 co-processor enabled and Acorn CP/M System Disc 1 in drive 0.
+-->
+
+<softwarelist name="bbc_z80_flop" description="BBC Micro Model B disks - Z80">
+
+	<software name="cpmsys1" supported="no">
+		<description>Acorn CP/M System Disc 1</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="serial" value="CP2-884-003481" />
+		<info name="format" value="CP/M" />
+		<info name="usage" value="Hard reset with Z80 co-processor enabled" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="acorn_cpm_system_disk1.ssd" size="409600" crc="78686d61" sha1="28f33e5e356d307d7e35714b34c18e672aec0031" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmsys2" supported="no">
+		<description>Acorn CP/M System Disc 2</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="acorn_cpm_system_disk2.ssd" size="409600" crc="afeaa342" sha1="e4b838dae211317c8ccadf47a17fa2ab5aa436a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmsys3" supported="no">
+		<description>Acorn CP/M System Disc 3</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="acorn_cpm_system_disk3.ssd" size="409600" crc="edc26e0e" sha1="7650ecbd02ee0a9f3e986c96719c791db5505de6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmsys4" supported="no">
+		<description>Acorn CP/M System Disc 4</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="acorn_cpm_system_disk4.ssd" size="409600" crc="53dbea69" sha1="1ab9fe7f7ea7b69e6dd1a1ebccd24eae9677b749" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmsys5" supported="no">
+		<description>Acorn CP/M System Disc 5</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="serial" value="A02 AC UK0013257" />
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="acorn_cpm_system_disk5.ssd" size="409600" crc="cf426f1c" sha1="7e336b8ae82138b7c6e19c59ba20c0664b4c8a77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmsys6" supported="no">
+		<description>Acorn CP/M System Disc 6</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="serial" value="A02 AG UK0013440" />
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="acorn_cpm_system_disk6.ssd" size="409600" crc="03575faa" sha1="f568a23ae3b0d17866f55bf16ca29a351850167c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmsys7" supported="no">
+		<description>Acorn CP/M System Disc 7</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="serial" value="BQ03261BC" />
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="acorn_cpm_system_disk7.ssd" size="409600" crc="8ae52625" sha1="23c102b852eab471a45fac588c8e326cc96e1368" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmutils" supported="no">
+		<description>CP/M Utilities Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="cpm_utilities_disc.dsd" size="409600" crc="1afbcc5f" sha1="ec4cf1810d43e0000b92943204dfd593bec883f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicprg" supported="no">
+		<description>BASIC Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="basic_program_disc.dsd" size="409600" crc="827304e7" sha1="76b808b059982ad6f1ab3454b745f83f2fc6ab1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cobolprg" supported="no">
+		<description>CIS COBOL Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="cis_cobol_program_disc.dsd" size="409600" crc="a7b8d740" sha1="f2d6cb366d00031958f1da774bc61521f61f86fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memoprg" supported="no">
+		<description>MemoPlan Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="memoplan_program_disc.dsd" size="409600" crc="1a3eaf3e" sha1="87c047857e0bcd4abf6fc1c785e0e0035147fd0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphprg" supported="no">
+		<description>GraphPlan Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="graphplan_program_disc.dsd" size="409600" crc="015eca7c" sha1="c18216ca44bfd21d2119a33630691363b22c32b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fileprg" supported="no">
+		<description>FilePlan Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="fileplan_program_disc.dsd" size="409600" crc="8b832b7e" sha1="9d3f9401e098b8ab50c842552eb6ac98195647f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="accntprg" supported="no">
+		<description>Accountant Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="accountant_program_disc.dsd" size="409600" crc="02a76ee8" sha1="3119b294f63c6beb7726c6a5c73065a130efc8e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="accntdat" supported="no">
+		<description>Accountant Data Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="accountant_data_disc.dsd" size="409600" crc="d2b4c506" sha1="875e123044c9dee63c9c1f2b1fa8f248125f3dc7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nucldef" supported="no">
+		<description>Nucleus Definitions Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="nucleus_definitions_program_disc.dsd" size="409600" crc="447e8629" sha1="2e39dfdae5aebaa7719e35499b13d5e6ac445f03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nuclrpt" supported="no">
+		<description>Nucleus Report Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="nucleus_reporter_program_disc.dsd" size="409600" crc="c2e51084" sha1="62117dde924b10c7af241e640e468c3ca35db016" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nuclparm" supported="no">
+		<description>Nucleus Parameter File Program Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="nucleus_parameter_file_program_disc.dsd" size="409600" crc="2c81fc08" sha1="b60bbfac15aab888c5be5e03b5977419b0e61903" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startday" supported="no">
+		<description>Start Of Day Disc</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="start_of_day_disc.dsd" size="409600" crc="f85aa0f5" sha1="4221d8c64dba5e44acd770effbce7fe2bc0da77e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colcave" supported="no">
+		<description>Colossal Cave</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="colossal_cave.ssd" size="409600" crc="95094ab0" sha1="0d213680b2934c42b821cfd3796219775780cdc8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -100,7 +100,6 @@ void ssem_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_halt).callimport().callexport().formatstr("%1s").noshow();
 	state_add(SSEM_PC,         "PC",        m_shifted_pc).mask(0xffff);

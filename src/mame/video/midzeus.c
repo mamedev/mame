@@ -1193,7 +1193,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UI
 
 		if (logit)
 		{
-			logerror("\t\t(%f,%f,%f) UV:(%02X,%02X) UV_SCALE:(%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
+			m_state.logerror("\t\t(%f,%f,%f) UV:(%02X,%02X) UV_SCALE:(%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
 					(double) vert[i].x * (1.0 / 65536.0), (double) vert[i].y * (1.0 / 65536.0), (double) vert[i].p[0] * (1.0 / 65536.0),
 					(iuvz >> 16) & 0xff, (iuvz >> 24) & 0xff,
 					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f),
@@ -1220,7 +1220,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UI
 		maxy = MAX(maxy, clipvert[i].y);
 
 		if (logit)
-			logerror("\t\t\tTranslated=(%f,%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y, (double) clipvert[i].p[0]);
+			m_state.logerror("\t\t\tTranslated=(%f,%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y, (double) clipvert[i].p[0]);
 	}
 	for (UINT32 i = 0; i < numverts; i++)
 	{

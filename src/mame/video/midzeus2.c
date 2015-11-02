@@ -1069,7 +1069,7 @@ void midzeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs
 	int texmode = texoffs & 0xffff;
 
 	if (logit)
-		logerror("quad\n");
+		m_state.logerror("quad\n");
 
 if (machine().input().code_pressed(KEYCODE_Q) && (texoffs & 0xffff) == 0x119) return;
 if (machine().input().code_pressed(KEYCODE_E) && (texoffs & 0xffff) == 0x01d) return;
@@ -1188,7 +1188,7 @@ In memory:
 
 		if (logit)
 		{
-			logerror("\t\t(%f,%f,%f) (%02X,%02X)\n",
+			m_state.logerror("\t\t(%f,%f,%f) (%02X,%02X)\n",
 					(double) vert[i].x, (double) vert[i].y, (double) vert[i].p[0],
 					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f));
 		}
@@ -1215,7 +1215,7 @@ In memory:
 		maxx = MAX(maxx, clipvert[i].x);
 		maxy = MAX(maxy, clipvert[i].y);
 		if (logit)
-			logerror("\t\t\tTranslated=(%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y);
+			m_state.logerror("\t\t\tTranslated=(%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y);
 	}
 	for (i = 0; i < numverts; i++)
 	{

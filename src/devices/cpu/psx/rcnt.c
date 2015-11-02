@@ -11,7 +11,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -20,7 +20,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context(), buf );
+		device.logerror( "%s: %s", device.machine().describe_context(), buf );
 	}
 }
 
@@ -74,7 +74,7 @@ WRITE32_MEMBER( psxrcnt_device::write )
 	int n_counter = offset / 4;
 	psx_root *root = &root_counter[ n_counter ];
 
-	verboselog( machine(), 1, "psx_counter_w ( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( *this, 1, "psx_counter_w ( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	switch( offset % 4 )
 	{
@@ -107,7 +107,7 @@ WRITE32_MEMBER( psxrcnt_device::write )
 		root->n_target = data;
 		break;
 	default:
-		verboselog( machine(), 0, "psx_counter_w( %08x, %08x, %08x ) unknown register\n", offset, mem_mask, data );
+		verboselog( *this, 0, "psx_counter_w( %08x, %08x, %08x ) unknown register\n", offset, mem_mask, data );
 		return;
 	}
 
@@ -132,10 +132,10 @@ READ32_MEMBER( psxrcnt_device::read )
 		data = root->n_target;
 		break;
 	default:
-		verboselog( machine(), 0, "psx_counter_r( %08x, %08x ) unknown register\n", offset, mem_mask );
+		verboselog( *this, 0, "psx_counter_r( %08x, %08x ) unknown register\n", offset, mem_mask );
 		return 0;
 	}
-	verboselog( machine(), 1, "psx_counter_r ( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( *this, 1, "psx_counter_r ( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -231,7 +231,7 @@ void psxrcnt_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	int n_counter = id;
 	psx_root *root = &root_counter[ n_counter ];
 
-	verboselog( machine(), 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );
+	verboselog( *this, 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );
 	//if( ( root->n_mode & PSX_RC_COUNTTARGET ) != 0 )
 	{
 		/* TODO: wrap should be handled differently as PSX_RC_COUNTTARGET & PSX_RC_IRQTARGET don't have to be the same. */

@@ -289,7 +289,7 @@ JAMMA Harness:
 Pin 1 Parts Side - GND
 Pin 3 Parts Side - +5V
 Pin 22 Parts Side - Gun 1 Trigger
-Pin 22 Solder Side - Gun 2 Trigger 
+Pin 22 Solder Side - Gun 2 Trigger
 
 ***************************************************************************/
 

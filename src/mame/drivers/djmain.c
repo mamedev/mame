@@ -231,7 +231,7 @@ READ32_MEMBER(djmain_state::turntable_r)
 		UINT8 pos;
 		int delta;
 
-		pos = ioport(ttnames[m_turntable_select])->read_safe(0);
+		pos = read_safe(ioport(ttnames[m_turntable_select]), 0);
 		delta = pos - m_turntable_last_pos[m_turntable_select];
 		if (delta < -128)
 			delta += 256;

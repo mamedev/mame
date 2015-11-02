@@ -413,7 +413,7 @@ int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &clipr
 
 	/* display stats */
 	if (v->stats.display)
-		popmessage(v->stats.buffer, 0, 0);
+		device->popmessage(v->stats.buffer, 0, 0);
 
 	/* update render override */
 	v->stats.render_override = device->machine().input().code_pressed(KEYCODE_ENTER);
@@ -457,7 +457,7 @@ void voodoo_set_init_enable(device_t *device, UINT32 newval)
 	voodoo_state *v = get_safe_token(device);
 	v->pci.init_enable = newval;
 	if (LOG_REGISTERS)
-		logerror("VOODOO.%d.REG:initEnable write = %08X\n", v->index, newval);
+		device->logerror("VOODOO.%d.REG:initEnable write = %08X\n", v->index, newval);
 }
 
 
@@ -844,7 +844,7 @@ static void swap_buffers(voodoo_state *v)
 {
 	int count;
 
-	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", v->screen->vpos());
+	if (LOG_VBLANK_SWAP) v->device->logerror("--- swap_buffers @ %d\n", v->screen->vpos());
 
 	/* force a partial update */
 	v->screen->update_partial(v->screen->vpos());
@@ -968,7 +968,7 @@ static TIMER_CALLBACK( vblank_off_callback )
 {
 	voodoo_state *v = (voodoo_state *)ptr;
 
-	if (LOG_VBLANK_SWAP) logerror("--- vblank end\n");
+	if (LOG_VBLANK_SWAP) v->device->logerror("--- vblank end\n");
 
 	/* set internal state and call the client */
 	v->fbi.vblank = FALSE;
@@ -1000,24 +1000,24 @@ static TIMER_CALLBACK( vblank_callback )
 {
 	voodoo_state *v = (voodoo_state *)ptr;
 
-	if (LOG_VBLANK_SWAP) logerror("--- vblank start\n");
+	if (LOG_VBLANK_SWAP) v->device->logerror("--- vblank start\n");
 
 	/* flush the pipes */
 	if (v->pci.op_pending)
 	{
-		if (LOG_VBLANK_SWAP) logerror("---- vblank flush begin\n");
+		if (LOG_VBLANK_SWAP) v->device->logerror("---- vblank flush begin\n");
 		flush_fifos(v, machine.time());
-		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");
+		if (LOG_VBLANK_SWAP) v->device->logerror("---- vblank flush end\n");
 	}
 
 	/* increment the count */
 	v->fbi.vblank_count++;
 	if (v->fbi.vblank_count > 250)
 		v->fbi.vblank_count = 250;
-	if (LOG_VBLANK_SWAP) logerror("---- vblank count = %d", v->fbi.vblank_count);
+	if (LOG_VBLANK_SWAP) v->device->logerror("---- vblank count = %d", v->fbi.vblank_count);
 	if (v->fbi.vblank_swap_pending)
-		if (LOG_VBLANK_SWAP) logerror(" (target=%d)", v->fbi.vblank_swap);
-	if (LOG_VBLANK_SWAP) logerror("\n");
+		if (LOG_VBLANK_SWAP) v->device->logerror(" (target=%d)", v->fbi.vblank_swap);
+	if (LOG_VBLANK_SWAP) v->device->logerror("\n");
 
 	/* if we're past the swap count, do the swap */
 	if (v->fbi.vblank_swap_pending && v->fbi.vblank_count >= v->fbi.vblank_swap)
@@ -1119,7 +1119,7 @@ static void recompute_video_memory(voodoo_state *v)
 	switch (memory_config)
 	{
 		case 3: /* reserved */
-			logerror("VOODOO.%d.ERROR:Unexpected memory configuration in recompute_video_memory!\n", v->index);
+			v->device->logerror("VOODOO.%d.ERROR:Unexpected memory configuration in recompute_video_memory!\n", v->index);
 
 		case 0: /* 2 color buffers, 1 aux buffer */
 			v->fbi.rgboffs[2] = ~0;
@@ -1651,26 +1651,26 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			switch ((command >> 3) & 7)
 			{
 				case 0:     /* NOP */
-					if (LOG_CMDFIFO) logerror("  NOP\n");
+					if (LOG_CMDFIFO) v->device->logerror("  NOP\n");
 					break;
 
 				case 1:     /* JSR */
-					if (LOG_CMDFIFO) logerror("  JSR $%06X\n", target);
+					if (LOG_CMDFIFO) v->device->logerror("  JSR $%06X\n", target);
 					osd_printf_debug("JSR in CMDFIFO!\n");
 					src = &fifobase[target / 4];
 					break;
 
 				case 2:     /* RET */
-					if (LOG_CMDFIFO) logerror("  RET $%06X\n", target);
+					if (LOG_CMDFIFO) v->device->logerror("  RET $%06X\n", target);
 					fatalerror("RET in CMDFIFO!\n");
 
 				case 3:     /* JMP LOCAL FRAME BUFFER */
-					if (LOG_CMDFIFO) logerror("  JMP LOCAL FRAMEBUF $%06X\n", target);
+					if (LOG_CMDFIFO) v->device->logerror("  JMP LOCAL FRAMEBUF $%06X\n", target);
 					src = &fifobase[target / 4];
 					break;
 
 				case 4:     /* JMP AGP */
-					if (LOG_CMDFIFO) logerror("  JMP AGP $%06X\n", target);
+					if (LOG_CMDFIFO) v->device->logerror("  JMP AGP $%06X\n", target);
 					fatalerror("JMP AGP in CMDFIFO!\n");
 					src = &fifobase[target / 4];
 					break;
@@ -1698,7 +1698,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			inc = (command >> 15) & 1;
 			target = (command >> 3) & 0xfff;
 
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 1: count=%d inc=%d reg=%04X\n", count, inc, target);
+			if (LOG_CMDFIFO) v->device->logerror("  PACKET TYPE 1: count=%d inc=%d reg=%04X\n", count, inc, target);
 
 			if (v->type >= TYPE_VOODOO_BANSHEE && (target & 0x800))
 			{
@@ -1729,7 +1729,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 		        1  31:0  = Data word
 		*/
 		case 2:
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 2: mask=%X\n", (command >> 3) & 0x1ffffff);
+			if (LOG_CMDFIFO) v->device->logerror("  PACKET TYPE 2: mask=%X\n", (command >> 3) & 0x1ffffff);
 
 			/* loop over all registers and write them one at a time */
 			for (i = 3; i <= 31; i++)
@@ -1766,7 +1766,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			count = (command >> 6) & 15;
 			code = (command >> 3) & 7;
 
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 3: count=%d code=%d mask=%03X smode=%02X pc=%d\n", count, code, (command >> 10) & 0xfff, (command >> 22) & 0x3f, (command >> 28) & 1);
+			if (LOG_CMDFIFO) v->device->logerror("  PACKET TYPE 3: count=%d code=%d mask=%03X smode=%02X pc=%d\n", count, code, (command >> 10) & 0xfff, (command >> 22) & 0x3f, (command >> 28) & 1);
 
 			/* copy relevant bits into the setup mode register */
 			v->reg[sSetupMode].u = ((command >> 10) & 0xff) | ((command >> 6) & 0xf0000);
@@ -1876,7 +1876,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			/* extract parameters */
 			target = (command >> 3) & 0xfff;
 
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 4: mask=%X reg=%04X pad=%d\n", (command >> 15) & 0x3fff, target, command >> 29);
+			if (LOG_CMDFIFO) v->device->logerror("  PACKET TYPE 4: mask=%X reg=%04X pad=%d\n", (command >> 15) & 0x3fff, target, command >> 29);
 
 			if (v->type >= TYPE_VOODOO_BANSHEE && (target & 0x800))
 			{
@@ -1930,7 +1930,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			{
 				case 0:     // Linear FB
 				{
-					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
+					if (LOG_CMDFIFO) v->device->logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
 					UINT32 addr = target * 4;
 					for (i=0; i < count; i++)
@@ -1948,7 +1948,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 				}
 				case 2:     // 3D LFB
 				{
-					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
+					if (LOG_CMDFIFO) v->device->logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
 					/* loop over words */
 					for (i = 0; i < count; i++)
@@ -1973,7 +1973,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 				case 3:     // Texture Port
 				{
-					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
+					if (LOG_CMDFIFO) v->device->logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
 					/* loop over words */
 					for (i = 0; i < count; i++)
@@ -2036,7 +2036,7 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 	UINT32 addr = f->base + offset * 4;
 	UINT32 *fifobase = (UINT32 *)v->fbi.ram;
 
-	if (LOG_CMDFIFO_VERBOSE) logerror("CMDFIFO_w(%04X) = %08X\n", offset, data);
+	if (LOG_CMDFIFO_VERBOSE) v->device->logerror("CMDFIFO_w(%04X) = %08X\n", offset, data);
 
 	/* write the data */
 	if (addr < f->end)
@@ -2056,7 +2056,7 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 		else if (addr < f->amin)
 		{
 			if (f->holes != 0)
-				logerror("Unexpected CMDFIFO: AMin=%08X AMax=%08X Holes=%d WroteTo:%08X\n",
+				v->device->logerror("Unexpected CMDFIFO: AMin=%08X AMax=%08X Holes=%d WroteTo:%08X\n",
 						f->amin, f->amax, f->holes, addr);
 			//f->amin = f->amax = addr;
 			f->holes += (addr - f->base) / 4;
@@ -2094,7 +2094,7 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 			v->pci.op_pending = TRUE;
 			v->pci.op_end_time = v->device->machine().time() + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
-			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
+			if (LOG_FIFO_VERBOSE) v->device->logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
 				v->device->machine().time().seconds(), (UINT32)(v->device->machine().time().attoseconds() >> 32), (UINT32)v->device->machine().time().attoseconds(),
 				v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 		}
@@ -2152,7 +2152,7 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 	/* resume if necessary */
 	if (resume || !v->pci.op_pending)
 	{
-		if (LOG_FIFO) logerror("VOODOO.%d.FIFO:Stall condition cleared; resuming\n", v->index);
+		if (LOG_FIFO) v->device->logerror("VOODOO.%d.FIFO:Stall condition cleared; resuming\n", v->index);
 		v->pci.stall_state = NOT_STALLED;
 
 		/* either call the callback, or trigger the trigger */
@@ -2223,7 +2223,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 	/* first make sure this register is readable */
 	if (!(v->regaccess[regnum] & REGISTER_WRITE))
 	{
-		logerror("VOODOO.%d.ERROR:Invalid attempt to write %s\n", v->index, v->regnames[regnum]);
+		v->device->logerror("VOODOO.%d.ERROR:Invalid attempt to write %s\n", v->index, v->regnames[regnum]);
 		return 0;
 	}
 
@@ -2557,7 +2557,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					}
 				}
 				else
-					logerror("clutData ignored because video timing reset = 1\n");
+					v->device->logerror("clutData ignored because video timing reset = 1\n");
 			}
 			break;
 
@@ -2925,9 +2925,9 @@ default_case:
 	if (LOG_REGISTERS)
 	{
 		if (regnum < fvertexAx || regnum > fdWdY)
-			logerror("VOODOO.%d.REG:%s(%d) write = %08X\n", v->index, (regnum < 0x384/4) ? v->regnames[regnum] : "oob", chips, origdata);
+			v->device->logerror("VOODOO.%d.REG:%s(%d) write = %08X\n", v->index, (regnum < 0x384/4) ? v->regnames[regnum] : "oob", chips, origdata);
 		else
-			logerror("VOODOO.%d.REG:%s(%d) write = %f\n", v->index, (regnum < 0x384/4) ? v->regnames[regnum] : "oob", chips, (double) u2f(origdata));
+			v->device->logerror("VOODOO.%d.REG:%s(%d) write = %f\n", v->index, (regnum < 0x384/4) ? v->regnames[regnum] : "oob", chips, (double) u2f(origdata));
 	}
 
 	return cycles;
@@ -2974,14 +2974,14 @@ static INT32 lfb_direct_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 me
 	destmax = (v->fbi.mask + 1 - v->fbi.lfb_base*4) / 2;
 	bufoffs = y * v->fbi.rowpixels + x;
 	if (bufoffs >= destmax) {
-		logerror("lfb_direct_w: Buffer offset out of bounds x=%i y=%i offset=%08X bufoffs=%08X data=%08X\n", x, y, offset, (UINT32) bufoffs, data);
+		v->device->logerror("lfb_direct_w: Buffer offset out of bounds x=%i y=%i offset=%08X bufoffs=%08X data=%08X\n", x, y, offset, (UINT32) bufoffs, data);
 		return 0;
 	}
 	if (ACCESSING_BITS_0_15)
 		dest[bufoffs + 0] = data&0xffff;
 	if (ACCESSING_BITS_16_31)
 		dest[bufoffs + 1] = data>>16;
-	if (LOG_LFB) logerror("VOODOO.%d.LFB:write direct (%d,%d) = %08X & %08X\n", v->index, x, y, data, mem_mask);
+	if (LOG_LFB) v->device->logerror("VOODOO.%d.LFB:write direct (%d,%d) = %08X & %08X\n", v->index, x, y, data, mem_mask);
 	return 0;
 }
 
@@ -3182,7 +3182,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 			break;
 
 		default:            /* reserved */
-			logerror("lfb_w: Unknown format\n");
+			v->device->logerror("lfb_w: Unknown format\n");
 			return 0;
 	}
 
@@ -3223,7 +3223,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 		DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
 		UINT32 bufoffs;
 
-		if (LOG_LFB) logerror("VOODOO.%d.LFB:write raw mode %X (%d,%d) = %08X & %08X\n", v->index, LFBMODE_WRITE_FORMAT(v->reg[lfbMode].u), x, y, data, mem_mask);
+		if (LOG_LFB) v->device->logerror("VOODOO.%d.LFB:write raw mode %X (%d,%d) = %08X & %08X\n", v->index, LFBMODE_WRITE_FORMAT(v->reg[lfbMode].u), x, y, data, mem_mask);
 
 		/* determine the screen Y */
 		scry = y;
@@ -3281,7 +3281,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 	{
 		DECLARE_DITHER_POINTERS;
 
-		if (LOG_LFB) logerror("VOODOO.%d.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", v->index, LFBMODE_WRITE_FORMAT(v->reg[lfbMode].u), x, y, data, mem_mask);
+		if (LOG_LFB) v->device->logerror("VOODOO.%d.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", v->index, LFBMODE_WRITE_FORMAT(v->reg[lfbMode].u), x, y, data, mem_mask);
 
 		/* determine the screen Y */
 		scry = y;
@@ -3489,13 +3489,13 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 			tbaseaddr = t->lodoffset[lod];
 			tbaseaddr += tt * ((t->wmask >> lod) + 1) + ts;
 
-			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
+			if (LOG_TEXTURE_RAM) v->device->logerror("Texture 8-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
 		}
 		else
 		{
 			tbaseaddr = t->lodoffset[0] + offset*4;
 
-			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: offset=%X data=%08X\n", offset*4, data);
+			if (LOG_TEXTURE_RAM) v->device->logerror("Texture 8-bit w: offset=%X data=%08X\n", offset*4, data);
 		}
 
 		/* write the four bytes in little-endian order */
@@ -3529,13 +3529,13 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 			tbaseaddr = t->lodoffset[lod];
 			tbaseaddr += 2 * (tt * ((t->wmask >> lod) + 1) + ts);
 
-			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
+			if (LOG_TEXTURE_RAM) v->device->logerror("Texture 16-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
 		}
 		else
 		{
 			tbaseaddr = t->lodoffset[0] + offset*4;
 
-			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: offset=%X data=%08X\n", offset*4, data);
+			if (LOG_TEXTURE_RAM) v->device->logerror("Texture 16-bit w: offset=%X data=%08X\n", offset*4, data);
 		}
 
 		/* write the two words in little-endian order */
@@ -3568,7 +3568,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 
 	if (!v->pci.op_pending) fatalerror("flush_fifos called with no pending operation\n");
 
-	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos start -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
+	if (LOG_FIFO_VERBOSE) v->device->logerror("VOODOO.%d.FIFO:flush_fifos start -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
 		v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds(),
 		current_time.seconds(), (UINT32)(current_time.attoseconds() >> 32), (UINT32)current_time.attoseconds());
 
@@ -3594,7 +3594,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 				{
 					v->pci.op_pending = FALSE;
 					in_flush = FALSE;
-					if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos end -- CMDFIFO empty\n", v->index);
+					if (LOG_FIFO_VERBOSE) v->device->logerror("VOODOO.%d.FIFO:flush_fifos end -- CMDFIFO empty\n", v->index);
 					return;
 				}
 			}
@@ -3606,7 +3606,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 				{
 					v->pci.op_pending = FALSE;
 					in_flush = FALSE;
-					if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos end -- CMDFIFO empty\n", v->index);
+					if (LOG_FIFO_VERBOSE) v->device->logerror("VOODOO.%d.FIFO:flush_fifos end -- CMDFIFO empty\n", v->index);
 					return;
 				}
 			}
@@ -3623,7 +3623,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 				{
 					v->pci.op_pending = FALSE;
 					in_flush = FALSE;
-					if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos end -- FIFOs empty\n", v->index);
+					if (LOG_FIFO_VERBOSE) v->device->logerror("VOODOO.%d.FIFO:flush_fifos end -- FIFOs empty\n", v->index);
 					return;
 				}
 
@@ -3666,12 +3666,12 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 		/* account for those cycles */
 		v->pci.op_end_time += attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
-		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:update -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
+		if (LOG_FIFO_VERBOSE) v->device->logerror("VOODOO.%d.FIFO:update -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
 			v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds(),
 			current_time.seconds(), (UINT32)(current_time.attoseconds() >> 32), (UINT32)current_time.attoseconds());
 	}
 
-	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos end -- pending command complete at %d.%08X%08X\n", v->index,
+	if (LOG_FIFO_VERBOSE) v->device->logerror("VOODOO.%d.FIFO:flush_fifos end -- pending command complete at %d.%08X%08X\n", v->index,
 		v->pci.op_end_time.seconds(), (UINT32)(v->pci.op_end_time.attoseconds() >> 32), (UINT32)v->pci.op_end_time.attoseconds());
 
 	in_flush = FALSE;
@@ -3873,7 +3873,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 	/* first make sure this register is readable */
 	if (!(v->regaccess[regnum] & REGISTER_READ))
 	{
-		logerror("VOODOO.%d.ERROR:Invalid attempt to read %s\n", v->index, regnum < 225 ? v->regnames[regnum] : "unknown register");
+		v->device->logerror("VOODOO.%d.ERROR:Invalid attempt to read %s\n", v->index, regnum < 225 ? v->regnames[regnum] : "unknown register");
 		return 0xffffffff;
 	}
 
@@ -4029,7 +4029,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			logit = FALSE;
 
 		if (logit)
-			logerror("VOODOO.%d.REG:%s read = %08X\n", v->index, v->regnames[regnum], result);
+			v->device->logerror("VOODOO.%d.REG:%s read = %08X\n", v->index, v->regnames[regnum], result);
 	}
 
 	return result;
@@ -4100,7 +4100,7 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, bool lfb_3d)
 	/* advance pointers to the proper row */
 	bufoffs = scry * v->fbi.rowpixels + x;
 	if (bufoffs >= bufmax) {
-		logerror("LFB_R: Buffer offset out of bounds x=%i y=%i lfb_3d=%i offset=%08X bufoffs=%08X\n", x, y, lfb_3d, offset, (UINT32) bufoffs);
+		v->device->logerror("LFB_R: Buffer offset out of bounds x=%i y=%i lfb_3d=%i offset=%08X bufoffs=%08X\n", x, y, lfb_3d, offset, (UINT32) bufoffs);
 		return 0xffffffff;
 	}
 
@@ -4118,7 +4118,7 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, bool lfb_3d)
 	if (LFBMODE_BYTE_SWIZZLE_READS(v->reg[lfbMode].u))
 		data = FLIPENDIAN_INT32(data);
 
-	if (LOG_LFB) logerror("VOODOO.%d.LFB:read (%d,%d) = %08X\n", v->index, x, y, data);
+	if (LOG_LFB) v->device->logerror("VOODOO.%d.LFB:read (%d,%d) = %08X\n", v->index, x, y, data);
 	return data;
 }
 
@@ -5396,7 +5396,7 @@ static INT32 triangle(voodoo_state *v)
 	g_profiler.stop();
 
 	/* 1 pixel per clock, plus some setup time */
-	if (LOG_REGISTERS) logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + pixels);
+	if (LOG_REGISTERS) v->device->logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + pixels);
 	return TRIANGLE_SETUP_CLOCKS + pixels;
 }
 

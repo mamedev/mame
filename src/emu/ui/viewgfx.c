@@ -1089,15 +1089,15 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 		state.tilemap.zoom--;
 		state.bitmap_dirty = true;
 		if (state.tilemap.zoom != 0)
-			popmessage("Zoom = %d", state.tilemap.zoom);
+			machine.popmessage("Zoom = %d", state.tilemap.zoom);
 		else
-			popmessage("Zoom Auto");
+			machine.popmessage("Zoom Auto");
 	}
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN) && state.tilemap.zoom < 8)
 	{
 		state.tilemap.zoom++;
 		state.bitmap_dirty = true;
-		popmessage("Zoom = %d", state.tilemap.zoom);
+		machine.popmessage("Zoom = %d", state.tilemap.zoom);
 	}
 
 	// handle rotation (R)

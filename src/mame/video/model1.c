@@ -8,6 +8,7 @@
 #define LOG_TGP_VIDEO 0
 
 #define LOG_TGP(x)  do { if (LOG_TGP_VIDEO) logerror x; } while (0)
+#define LOG_TGP_DEV(d,x)  do { if (LOG_TGP_VIDEO) d->logerror x; } while (0)
 
 
 // Model 1 geometrizer TGP and rasterizer simulation
@@ -237,7 +238,7 @@ static void fill_line(bitmap_rgb32 &bitmap, struct view *view, int color, INT32 
 	}
 }
 
-static void fill_quad(bitmap_rgb32 &bitmap, struct view *view, const struct quad_m1 *q)
+static void fill_quad(device_t *device,bitmap_rgb32 &bitmap, struct view *view, const struct quad_m1 *q)
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -246,7 +247,7 @@ static void fill_quad(bitmap_rgb32 &bitmap, struct view *view, const struct quad
 
 	if(color < 0) {
 		color = -1-color;
-		LOG_TGP(("VIDEOD: Q (%d, %d)-(%d, %d)-(%d, %d)-(%d, %d)\n",
+		LOG_TGP_DEV(device,("VIDEOD: Q (%d, %d)-(%d, %d)-(%d, %d)-(%d, %d)\n",
 					q->p[0]->s.x, q->p[0]->s.y,
 					q->p[1]->s.x, q->p[1]->s.y,
 					q->p[2]->s.x, q->p[2]->s.y,
@@ -454,7 +455,7 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	for(i=0; i<count; i++) {
 		struct quad_m1 *q = m_quadind[i];
 
-		fill_quad(bitmap, view, q);
+		fill_quad(this, bitmap, view, q);
 #if 0
 		draw_line(bitmap, m_palette->black_pen(), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
 		draw_line(bitmap, m_palette->black_pen(), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);

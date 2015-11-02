@@ -388,8 +388,8 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void peplus_state::handle_lightpen()
 {
-	int x_val = ioport("TOUCH_X")->read_safe(0x00);
-	int y_val = ioport("TOUCH_Y")->read_safe(0x00);
+	int x_val = read_safe(ioport("TOUCH_X"), 0x00);
+	int y_val = read_safe(ioport("TOUCH_Y"), 0x00);
 	const rectangle &vis_area = m_screen->visible_area();
 	int xt, yt;
 
@@ -563,7 +563,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	UINT64 curr_cycles = m_maincpu->total_cycles();
 
 	// Allow Bill Insert if DBV Enabled
-	if (m_bv_enable_state == 0x01 && ((ioport("DBV")->read_safe(0xff) & 0x01) == 0x00)) {
+	if (m_bv_enable_state == 0x01 && ((read_safe(ioport("DBV"), 0xff) & 0x01) == 0x00)) {
 		// If not busy
 		if (m_bv_busy == 0) {
 			m_bv_busy = 1;
@@ -786,7 +786,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 		sda = m_i2cmem->read_sda();
 	}
 
-	if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
+	if ((read_safe(ioport("SENSOR"), 0x00) & 0x01) == 0x01 && m_coin_state == 0) {
 		m_coin_state = 1; // Start Coin Cycle
 		m_last_cycles = m_maincpu->total_cycles();
 	} else {
@@ -822,7 +822,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 	}
 
 	if (curr_cycles - m_last_door > door_wait) {
-		if ((ioport("DOOR")->read_safe(0xff) & 0x01) == 0x01) {
+		if ((read_safe(ioport("DOOR"), 0xff) & 0x01) == 0x01) {
 			if (m_doorcycle) {
 				m_door_open = (m_door_open ^ 0x01) & 0x01;
 			} else {
@@ -1946,7 +1946,7 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0045_a45-a74.u68",   0x00000, 0x10000, CRC(9c7cf6d7) SHA1(3da9829678b853d85146b66b40800257a8eaa151) ) /* Game Version: A45, Library Version: A74 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1072.u72",  0x00000, 0x8000, CRC(8e5cf3bf) SHA1(a8c2fde9105a37eddc218ae1476cdbfb0271e314) ) /* Custom Annie Oakely's Central City graphics */
+	ROM_LOAD( "mro-cg1072.u72",  0x00000, 0x8000, CRC(8e5cf3bf) SHA1(a8c2fde9105a37eddc218ae1476cdbfb0271e314) ) /* Custom Annie Oakley's Central City graphics */
 	ROM_LOAD( "mgo-cg1072.u73",  0x08000, 0x8000, CRC(a3c85c1b) SHA1(9b810c5779dde21db6da5bac5cf797bad65c2c1b) )
 	ROM_LOAD( "mbo-cg1072.u74",  0x10000, 0x8000, CRC(833371e1) SHA1(5d7a994aee61a751f89171885423276b86e872b6) ) /* These graphics will work for many other standard poker sets */
 	ROM_LOAD( "mxo-cg1072.u75",  0x18000, 0x8000, CRC(0df703b3) SHA1(2042251cc9c11687ff7fd920213a448974ff3050) ) /* However there is no support for Deuces Wild sets */
@@ -1954,6 +1954,27 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap1072.u50", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+ROM_END
+
+ROM_START( pepp0045d ) /* Normal board : 10's or Better (PP0045) */
+/*
+PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  P8A      1     1    3    4    5   8  25  50 300    800
+  % Range: 84.6-86.6%  Optimum: 88.6%  Hit Frequency: 49.2%
+     Programs Available: PP0045, X000045P
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0045_a45-a74.u68",   0x00000, 0x10000, CRC(9c7cf6d7) SHA1(3da9829678b853d85146b66b40800257a8eaa151) ) /* Game Version: A45, Library Version: A74 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg881.u72",   0x00000, 0x8000, CRC(282a029f) SHA1(42b35761839d6379ddfb4eed20f90d9f7b145e64) ) /* Custom Las Vegas Rio graphics */
+	ROM_LOAD( "mgo-cg881.u73",   0x08000, 0x8000, CRC(af433702) SHA1(fbd877c06eaab433332c94f135e13a8c041fa1a2) )
+	ROM_LOAD( "mbo-cg881.u74",   0x10000, 0x8000, CRC(c5b0a0b3) SHA1(a989d21f4b10a09d3cfd0bbb9f53b4ad326561b9) ) /* These graphics will work for many other standard poker sets */
+	ROM_LOAD( "mxo-cg881.u75",   0x18000, 0x8000, CRC(6a78bc1d) SHA1(7861465ab98df5219330d58a3e5a4bd37a393534) ) /* However there is no support for Deuces Wild sets */
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap881.u50", 0x0000, 0x0100, CRC(e51990d5) SHA1(41946722b61e955d37808761d451fc894e6adc8a) )
 ROM_END
 
 ROM_START( pepp0046 ) /* Normal board : 10's or Better (PP0046) */
@@ -8880,7 +8901,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
   P435A     1    1    3   4    5   8  50  80 160  50 250    800
   % Range: 90.2-92.2%  Optimum: 94.2%  Hit Frequency: 45.1%
      Programs Available: X002179P
-	 
+
 NOTE: Same as X000726P, except MAX Coin (set to 5) CANNOT be changed - NJ jurisdiction
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8907,7 +8928,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
   P437A     1    1    3   4    5   6  50  80 160  50 250    800
   % Range: 88.0-90.0%  Optimum: 92.0%  Hit Frequency: 45.1%
      Programs Available: X002180P
-	 
+
 NOTE: Same as X000728P, except MAX Coin (set to 5) CANNOT be changed - NJ jurisdiction
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10290,7 +10311,7 @@ Double Bonus Poker   P325A     97.80%
 	ROM_LOAD( "mgo-cg2174.u78",  0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) )
 	ROM_LOAD( "mbo-cg2174.u79",  0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
 	ROM_LOAD( "mxo-cg2174.u80",  0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
-	
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
 ROM_END
@@ -10832,6 +10853,7 @@ GAMEL(1987, pepp0045,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0045a, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Gambler Downtown Reno)", 0, layout_pe_poker )
 GAMEL(1987, pepp0045b, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Par-A-Dice Riverboat Casino)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1150 not dumped */
 GAMEL(1987, pepp0045c, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Annie Oakley's Central City)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1072 not dumped */
+GAMEL(1987, pepp0045d, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Las Vegas Rio)", 0, layout_pe_poker )
 GAMEL(1987, pepp0046,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (set 1)",        0, layout_pe_poker )
 GAMEL(1987, pepp0046a, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (International)",0, layout_pe_poker )
 GAMEL(1987, pepp0046b, pepp0002, peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (set 2)",        0, layout_pe_poker )

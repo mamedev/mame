@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /******************************************************************************
-    Acorn Electron driver 
+    Acorn Electron driver
     By Wilbert Pol
-    
+
 Hardware Overview
 -----------------
 The Acorn Electron is a budget version of the BBC Micro home computer
@@ -18,7 +18,7 @@ Internal ports for cassette storage, RGB/CVBS monitors and TV output
 Various expansions can be added via the rear expansion port
 
 PCB Layout
-----------                           |-------------------|   
+----------                           |-------------------|
                             |--------|  EXPANSION PORT   |
 |-----|---------------------|                            |---||---------|
 |MOD  | SPKR     16MHz                            LS169 18VAC||         []18VAC INPUT
@@ -33,7 +33,7 @@ PCB Layout
 Notes: (all IC's shown. Only 16 ICs are used)
      6502 - 6502 CPU, clock input 2.000MHz [16/8]
       ULA - Custom logic chip 12CO21, also containing most of the BBC Micro circuitry
-            Early PCB revisions used a PLCC68 chip in a socket. Later revisions used a 
+            Early PCB revisions used a PLCC68 chip in a socket. Later revisions used a
             PGA68 chip soldered directly into the motherboard
      4164 - 4164 64k x4-bit DRAM (4 chips for 32kbytes total)
       ROM - Hitachi HN613256 32k x8-bit MASK ROM containing OS & BASIC
@@ -45,10 +45,10 @@ Notes: (all IC's shown. Only 16 ICs are used)
       PWR - 3-pin power input from internal power supply
  KBD_CONN - 22-pin keyboard connector
      SPKR - 2-pin internal speaker connector
-     
+
 ******************************************************************************
 Emulation notes:
- 
+
 I don't have a real system to verify the behaviour of the emulation. The things
 that can be done through BASIC programs seem to behave properly (most of the time :).
 

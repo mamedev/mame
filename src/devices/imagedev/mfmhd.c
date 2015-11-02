@@ -346,7 +346,7 @@ void mfm_harddisk_device::device_start()
 	m_current_cylinder = m_landing_zone; // Park position
 	m_spinup_timer->adjust(attotime::from_msec(m_spinupms));
 
-	m_cache = global_alloc(mfmhd_trackimage_cache);
+	m_cache = global_alloc(mfmhd_trackimage_cache(machine()));
 
 	// In 5 second periods, check whether the cache has dirty lines
 	m_cache_timer->adjust(attotime::from_msec(5000), 0, attotime::from_msec(5000));
@@ -952,15 +952,16 @@ const device_type MFMHD_ST251 = &device_creator<mfm_hd_st251_device>;
 //   This is a write-back LRU cache.
 // ===========================================================
 
-mfmhd_trackimage_cache::mfmhd_trackimage_cache():
-	m_tracks(NULL)
+mfmhd_trackimage_cache::mfmhd_trackimage_cache(running_machine &machine):
+	m_tracks(NULL),
+	m_machine(machine)
 {
 }
 
 mfmhd_trackimage_cache::~mfmhd_trackimage_cache()
 {
 	mfmhd_trackimage* current = m_tracks;
-	if (TRACE_CACHE) logerror("%s: MFM HD cache destroy\n", m_mfmhd->tag());
+	if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache destroy\n", m_mfmhd->tag());
 
 	while (current != NULL)
 	{
@@ -991,12 +992,12 @@ void mfmhd_trackimage_cache::write_back_one()
 void mfmhd_trackimage_cache::cleanup()
 {
 	mfmhd_trackimage* current = m_tracks;
-	if (TRACE_CACHE) logerror("%s: MFM HD cache cleanup\n", m_mfmhd->tag());
+	if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache cleanup\n", m_mfmhd->tag());
 
 	// Still dirty?
 	while (current != NULL)
 	{
-		if (TRACE_CACHE) logerror("%s: MFM HD cache: evict line cylinder=%d head=%d\n", m_mfmhd->tag(), current->cylinder, current->head);
+		if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache: evict line cylinder=%d head=%d\n", m_mfmhd->tag(), current->cylinder, current->head);
 		if (current->dirty)
 		{
 			m_mfmhd->write_track(current->encdata, current->cylinder, current->head);
@@ -1023,7 +1024,7 @@ const char *encnames[] = { "MFM_BITS","MFM_BYTE","SEPARATE","SSIMPLE " };
 */
 void mfmhd_trackimage_cache::init(mfm_harddisk_device* mfmhd, int tracksize, int trackslots)
 {
-	if (TRACE_CACHE) logerror("%s: MFM HD cache init; cache size is %d tracks\n", mfmhd->tag(), trackslots);
+	if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache init; cache size is %d tracks\n", mfmhd->tag(), trackslots);
 
 	chd_error state = CHDERR_NONE;
 
@@ -1039,7 +1040,7 @@ void mfmhd_trackimage_cache::init(mfm_harddisk_device* mfmhd, int tracksize, int
 
 	while (track < trackslots)
 	{
-		if (TRACE_CACHE && TRACE_DETAIL) logerror("%s: MFM HD allocate cache slot\n", mfmhd->tag());
+		if (TRACE_CACHE && TRACE_DETAIL) m_machine.logerror("%s: MFM HD allocate cache slot\n", mfmhd->tag());
 		previous = current;
 		current = global_alloc(mfmhd_trackimage);
 		current->encdata = global_alloc_array(UINT16, tracksize);
@@ -1118,7 +1119,7 @@ UINT16* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 
 		// previous points to the second to last element
 		current = previous->next;
-		if (TRACE_CACHE) logerror("%s: MFM HD cache: evict line (c=%d,h=%d)\n", m_mfmhd->tag(), current->cylinder, current->head);
+		if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache: evict line (c=%d,h=%d)\n", m_mfmhd->tag(), current->cylinder, current->head);
 
 		if (current->dirty)
 		{

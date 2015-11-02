@@ -394,7 +394,7 @@ void external_p_wait_states_set(dsp56k_core* cpustate, UINT16 value)
 void PBC_set(dsp56k_core* cpustate, UINT16 value)
 {
 	if (value & 0xfffe)
-		logerror("Dsp56k : Attempting to set reserved bits in the PBC.  Ignoring.\n");
+		cpustate->device->logerror("Dsp56k : Attempting to set reserved bits in the PBC.  Ignoring.\n");
 
 	value = value & 0x0001;
 	PBC &= ~(0x0001);
@@ -413,7 +413,7 @@ int host_interface_active(dsp56k_core* cpustate)
 void PBDDR_set(dsp56k_core* cpustate, UINT16 value)
 {
 	if (value & 0x8000)
-		logerror("Dsp56k : Attempting to set reserved bits in the PBDDR.  Ignoring.\n");
+		cpustate->device->logerror("Dsp56k : Attempting to set reserved bits in the PBDDR.  Ignoring.\n");
 
 	value = value & 0x7fff;
 	PBDDR &= ~(0x7fff);
@@ -426,7 +426,7 @@ void PBDDR_set(dsp56k_core* cpustate, UINT16 value)
 void PBD_set(dsp56k_core* cpustate, UINT16 value)
 {
 	if (value & 0x8000)
-		logerror("Dsp56k : Attempting to set reserved bits in the PBD.  Ignoring.\n");
+		cpustate->device->logerror("Dsp56k : Attempting to set reserved bits in the PBD.  Ignoring.\n");
 
 	value = value & 0x7fff;
 	PBD &= ~(0x7fff);
@@ -439,7 +439,7 @@ void PBD_set(dsp56k_core* cpustate, UINT16 value)
 void PCC_set(dsp56k_core* cpustate, UINT16 value)
 {
 	if (value & 0xf000)
-		logerror("Dsp56k : Attempting to set reserved bits in the PCC.  Ignoring.\n");
+		cpustate->device->logerror("Dsp56k : Attempting to set reserved bits in the PCC.  Ignoring.\n");
 
 	value = value & 0x0fff;
 	PCC &= ~(0x0fff);
@@ -452,7 +452,7 @@ void PCC_set(dsp56k_core* cpustate, UINT16 value)
 void PCDDR_set(dsp56k_core* cpustate, UINT16 value)
 {
 	if (value & 0xf000)
-		logerror("Dsp56k : Attempting to set reserved bits in the PCDDR.  Ignoring.\n");
+		cpustate->device->logerror("Dsp56k : Attempting to set reserved bits in the PCDDR.  Ignoring.\n");
 
 	value = value & 0x0fff;
 	PCDDR &= ~(0x0fff);
@@ -465,10 +465,10 @@ void PCDDR_set(dsp56k_core* cpustate, UINT16 value)
 void PCD_set(dsp56k_core* cpustate, UINT16 value)
 {
 	if (value & 0xf000)
-		logerror("Dsp56k : Attempting to set reserved bits in the PCD.  Ignoring.\n");
+		cpustate->device->logerror("Dsp56k : Attempting to set reserved bits in the PCD.  Ignoring.\n");
 
 	/* TODO: Temporary */
-	logerror("Dsp56k : Setting general output port C data to 0x%04x\n", value);
+	cpustate->device->logerror("Dsp56k : Setting general output port C data to 0x%04x\n", value);
 
 	value = value & 0x0fff;
 	PCD &= ~(0x0fff);
@@ -492,7 +492,7 @@ void dsp56k_io_reset(dsp56k_core* cpustate)
 READ16_MEMBER( dsp56k_device::peripheral_register_r )
 {
 	dsp56k_core* cpustate = &m_dsp56k_core;
-	// (printf) logerror("Peripheral read 0x%04x\n", O2A(offset));
+	// (printf) cpustate->device->logerror("Peripheral read 0x%04x\n", O2A(offset));
 
 	switch (O2A(offset))
 	{
@@ -630,7 +630,7 @@ WRITE16_MEMBER( dsp56k_device::peripheral_register_w )
 	// Its primary behavior is RAM
 	// COMBINE_DATA(&cpustate->peripheral_ram[offset]);
 
-	// (printf) logerror("Peripheral write 0x%04x = %04x\n", O2A(offset), data);
+	// (printf) cpustate->device->logerror("Peripheral write 0x%04x = %04x\n", O2A(offset), data);
 
 	// 4-8
 	switch (O2A(offset))
@@ -665,7 +665,7 @@ WRITE16_MEMBER( dsp56k_device::peripheral_register_w )
 
 		// reserved for test
 		case 0xffc9:
-			logerror("DSP56k : Warning write to 0xffc9 reserved for test.\n");
+			cpustate->device->logerror("DSP56k : Warning write to 0xffc9 reserved for test.\n");
 			break;
 
 		// CRA-SSI0 Control Register A
@@ -685,7 +685,7 @@ WRITE16_MEMBER( dsp56k_device::peripheral_register_w )
 
 		// reserved for future use
 		case 0xffdd:
-			logerror("DSP56k : Warning write to 0xffdd reserved for future use.\n");
+			cpustate->device->logerror("DSP56k : Warning write to 0xffdd reserved for future use.\n");
 			break;
 
 		// BCR: Bus Control Register
@@ -773,7 +773,7 @@ WRITE16_MEMBER( dsp56k_device::peripheral_register_w )
 
 		// Reserved for on-chip emulation
 		case 0xffff:
-			logerror("DSP56k : Warning write to 0xffff reserved for on-chip emulation.\n");
+			cpustate->device->logerror("DSP56k : Warning write to 0xffff reserved for on-chip emulation.\n");
 			break;
 	}
 }
@@ -787,7 +787,7 @@ void dsp56k_device::host_interface_write(UINT8 offset, UINT8 data)
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
 	if (!host_interface_active())
-	    logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
+	    cpustate->device->logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
 	*/
 
 	switch (offset)
@@ -817,7 +817,7 @@ void dsp56k_device::host_interface_write(UINT8 offset, UINT8 data)
 
 		// Interrupt status register (ISR) - Read only!
 		case 0x02:
-			logerror("DSP56k : Interrupt status register is read only.\n");
+			cpustate->device->logerror("DSP56k : Interrupt status register is read only.\n");
 			break;
 
 		// Interrupt vector register (IVR)
@@ -825,12 +825,12 @@ void dsp56k_device::host_interface_write(UINT8 offset, UINT8 data)
 
 		// Not used
 		case 0x04:
-			logerror("DSP56k : Address 0x4 on the host side of the host interface is not used.\n");
+			cpustate->device->logerror("DSP56k : Address 0x4 on the host side of the host interface is not used.\n");
 			break;
 
 		// Reserved
 		case 0x05:
-			logerror("DSP56k : Address 0x5 on the host side of the host interface is reserved.\n");
+			cpustate->device->logerror("DSP56k : Address 0x5 on the host side of the host interface is reserved.\n");
 			break;
 
 		// Transmit byte register - high byte (TXH)
@@ -872,7 +872,7 @@ void dsp56k_device::host_interface_write(UINT8 offset, UINT8 data)
 			}
 			break;
 
-		default: logerror("DSP56k : dsp56k_host_interface_write called with invalid address 0x%02x.\n", offset);
+		default: cpustate->device->logerror("DSP56k : dsp56k_host_interface_write called with invalid address 0x%02x.\n", offset);
 	}
 }
 
@@ -883,7 +883,7 @@ UINT8 dsp56k_device::host_interface_read(UINT8 offset)
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
 	if (!host_interface_active())
-	    logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
+	    cpustate->device->logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
 	*/
 
 	switch (offset)
@@ -910,7 +910,7 @@ UINT8 dsp56k_device::host_interface_read(UINT8 offset)
 
 		// Reserved
 		case 0x05:
-			logerror("DSP56k : Address 0x5 on the host side of the host interface is reserved.\n");
+			cpustate->device->logerror("DSP56k : Address 0x5 on the host side of the host interface is reserved.\n");
 			break;
 
 		// Receive byte register - high byte (RXH)
@@ -933,7 +933,7 @@ UINT8 dsp56k_device::host_interface_read(UINT8 offset)
 				return value;
 			}
 
-		default: logerror("DSP56k : dsp56k_host_interface_read called with invalid address 0x%02x.\n", offset);
+		default: cpustate->device->logerror("DSP56k : dsp56k_host_interface_read called with invalid address 0x%02x.\n", offset);
 	}
 
 	/* Shouldn't get here */

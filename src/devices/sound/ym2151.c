@@ -1197,7 +1197,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			break;
 
 		default:
-			logerror("YM2151 Write %02x to undocumented register #%02x\n",v,r);
+			chip->device->logerror("YM2151 Write %02x to undocumented register #%02x\n",v,r);
 			break;
 		}
 		break;
@@ -1548,7 +1548,7 @@ void * ym2151_init(device_t *device, int clock, int rate)
 		if (cymfile)
 			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
-			logerror("Could not create file 2151_.cym\n");
+			device->logerror("Could not create file 2151_.cym\n");
 	}
 
 	return PSG;

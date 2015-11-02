@@ -172,7 +172,7 @@ WRITE8_MEMBER(uzebox_state::port_d_w)
 	//  ---- --xx   UART MIDI
 	if ((m_port_d ^ data) & 0x80)
 	{
-		m_speaker->level_w(data & 0x80);
+		m_speaker->level_w((data & 0x80) ? 1 : 0);
 	}
 	m_port_d = data;
 }

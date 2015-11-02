@@ -11,7 +11,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -20,7 +20,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context(), buf );
+		device.logerror( "%s: %s", device.machine().describe_context(), buf );
 	}
 }
 
@@ -88,7 +88,7 @@ void psxsio_device::device_start()
 
 void psxsio_device::sio_interrupt()
 {
-	verboselog( machine(), 1, "sio_interrupt( %s )\n", tag() );
+	verboselog( *this, 1, "sio_interrupt( %s )\n", tag() );
 	m_status |= SIO_STATUS_IRQ;
 	m_irq_handler(1);
 }
@@ -120,18 +120,18 @@ void psxsio_device::sio_timer_adjust()
 		if( m_baud != 0 && n_prescaler != 0 )
 		{
 			n_time = attotime::from_hz(33868800) * (n_prescaler * m_baud);
-			verboselog( machine(), 2, "sio_timer_adjust( %s ) = %s ( %d x %d )\n", tag(), n_time.as_string(), n_prescaler, m_baud );
+			verboselog( *this, 2, "sio_timer_adjust( %s ) = %s ( %d x %d )\n", tag(), n_time.as_string(), n_prescaler, m_baud );
 		}
 		else
 		{
 			n_time = attotime::never;
-			verboselog( machine(), 0, "sio_timer_adjust( %s ) invalid baud rate ( %d x %d )\n", tag(), n_prescaler, m_baud );
+			verboselog( *this, 0, "sio_timer_adjust( %s ) invalid baud rate ( %d x %d )\n", tag(), n_prescaler, m_baud );
 		}
 	}
 	else
 	{
 		n_time = attotime::never;
-		verboselog( machine(), 2, "sio_timer_adjust( %s ) finished\n", tag() );
+		verboselog( *this, 2, "sio_timer_adjust( %s ) finished\n", tag() );
 	}
 
 	m_timer->adjust( n_time );
@@ -139,7 +139,7 @@ void psxsio_device::sio_timer_adjust()
 
 void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	verboselog( machine(), 2, "sio tick\n" );
+	verboselog( *this, 2, "sio tick\n" );
 
 	if( m_tx_bits == 0 &&
 		( m_control & SIO_CONTROL_TX_ENA ) != 0 &&
@@ -213,29 +213,29 @@ WRITE32_MEMBER( psxsio_device::write )
 	switch( offset % 4 )
 	{
 	case 0:
-		verboselog( machine(), 1, "psx_sio_w %s data %02x (%08x)\n", tag(), data, mem_mask );
+		verboselog( *this, 1, "psx_sio_w %s data %02x (%08x)\n", tag(), data, mem_mask );
 		m_tx_data = data;
 		m_status &= ~( SIO_STATUS_TX_RDY );
 		m_status &= ~( SIO_STATUS_TX_EMPTY );
 		sio_timer_adjust();
 		break;
 	case 1:
-		verboselog( machine(), 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+		verboselog( *this, 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		break;
 	case 2:
 		if( ACCESSING_BITS_0_15 )
 		{
 			m_mode = data & 0xffff;
-			verboselog( machine(), 1, "psx_sio_w %s mode %04x\n", tag(), data & 0xffff );
+			verboselog( *this, 1, "psx_sio_w %s mode %04x\n", tag(), data & 0xffff );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( machine(), 1, "psx_sio_w %s control %04x\n", tag(), data >> 16 );
+			verboselog( *this, 1, "psx_sio_w %s control %04x\n", tag(), data >> 16 );
 			m_control = data >> 16;
 
 			if( ( m_control & SIO_CONTROL_RESET ) != 0 )
 			{
-				verboselog( machine(), 1, "psx_sio_w reset\n" );
+				verboselog( *this, 1, "psx_sio_w reset\n" );
 				m_status |= SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY;
 				m_status &= ~( SIO_STATUS_RX_RDY | SIO_STATUS_OVERRUN | SIO_STATUS_IRQ );
 				m_irq_handler(0);
@@ -252,7 +252,7 @@ WRITE32_MEMBER( psxsio_device::write )
 			}
 			if( ( m_control & SIO_CONTROL_IACK ) != 0 )
 			{
-				verboselog( machine(), 1, "psx_sio_w iack\n" );
+				verboselog( *this, 1, "psx_sio_w iack\n" );
 				m_status &= ~( SIO_STATUS_IRQ );
 				m_control &= ~( SIO_CONTROL_IACK );
 				m_irq_handler(0);
@@ -270,16 +270,16 @@ WRITE32_MEMBER( psxsio_device::write )
 	case 3:
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( machine(), 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+			verboselog( *this, 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
 			m_baud = data >> 16;
-			verboselog( machine(), 1, "psx_sio_w %s baud %04x\n", tag(), data >> 16 );
+			verboselog( *this, 1, "psx_sio_w %s baud %04x\n", tag(), data >> 16 );
 		}
 		break;
 	default:
-		verboselog( machine(), 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+		verboselog( *this, 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		break;
 	}
 }
@@ -294,44 +294,44 @@ READ32_MEMBER( psxsio_device::read )
 		data = m_rx_data;
 		m_status &= ~( SIO_STATUS_RX_RDY );
 		m_rx_data = 0xff;
-		verboselog( machine(), 1, "psx_sio_r %s data %02x (%08x)\n", tag(), data, mem_mask );
+		verboselog( *this, 1, "psx_sio_r %s data %02x (%08x)\n", tag(), data, mem_mask );
 		break;
 	case 1:
 		data = m_status;
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( machine(), 1, "psx_sio_r %s status %04x\n", tag(), data & 0xffff );
+			verboselog( *this, 1, "psx_sio_r %s status %04x\n", tag(), data & 0xffff );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( machine(), 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+			verboselog( *this, 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		}
 		break;
 	case 2:
 		data = ( m_control << 16 ) | m_mode;
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( machine(), 1, "psx_sio_r %s mode %04x\n", tag(), data & 0xffff );
+			verboselog( *this, 1, "psx_sio_r %s mode %04x\n", tag(), data & 0xffff );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( machine(), 1, "psx_sio_r %s control %04x\n", tag(), data >> 16 );
+			verboselog( *this, 1, "psx_sio_r %s control %04x\n", tag(), data >> 16 );
 		}
 		break;
 	case 3:
 		data = m_baud << 16;
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( machine(), 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+			verboselog( *this, 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( machine(), 1, "psx_sio_r %s baud %04x\n", tag(), data >> 16 );
+			verboselog( *this, 1, "psx_sio_r %s baud %04x\n", tag(), data >> 16 );
 		}
 		break;
 	default:
 		data = 0;
-		verboselog( machine(), 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+		verboselog( *this, 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		break;
 	}
 	return data;

@@ -13,7 +13,7 @@
 void alto2_cpu_device::f1_early_dvt_block()
 {
 //  m_task_wakeup &= ~(1 << m_task);
-	LOG((LOG_DVT,2,"    BLOCK %s\n", task_name(m_task)));
+	LOG((this,LOG_DVT,2,"    BLOCK %s\n", task_name(m_task)));
 }
 
 

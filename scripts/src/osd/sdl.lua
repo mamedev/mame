@@ -55,6 +55,9 @@ function maintargetosdoptions(_target,_subtarget)
 				"SDL.dll",
 			}
 		end
+		links {
+			"psapi",
+		}
 
 		configuration { "mingw*-gcc" }
 			linkoptions{
@@ -467,6 +470,9 @@ if _OPTIONS["with-tools"] then
 					"SDL.dll",
 				}
 			end
+			links {
+				"psapi",
+			}
 			linkoptions{
 				"-municode",
 			}

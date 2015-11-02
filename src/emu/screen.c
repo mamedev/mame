@@ -63,6 +63,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_curtexture(0),
 		m_changed(true),
 		m_last_partial_scan(0),
+		m_partial_scan_hpos(0),
 		m_color(rgb_t(0xff, 0xff, 0xff, 0xff)),
 		m_brightness(0xff),
 		m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds()),
@@ -661,21 +662,121 @@ bool screen_device::update_partial(int scanline)
 
 void screen_device::update_now()
 {
+	// these two checks only apply if we're allowed to skip frames
+	if (!(m_video_attributes & VIDEO_ALWAYS_UPDATE))
+	{
+		// if skipping this frame, bail
+		if (machine().video().skip_this_frame())
+		{
+			LOG_PARTIAL_UPDATES(("skipped due to frameskipping\n"));
+			return;
+		}
+
+		// skip if this screen is not visible anywhere
+		if (!machine().render().is_live(*this))
+		{
+			LOG_PARTIAL_UPDATES(("skipped because screen not live\n"));
+			return;
+		}
+	}
+
 	int current_vpos = vpos();
 	int current_hpos = hpos();
+	rectangle clip = m_visarea;
 
-	// since we can currently update only at the scanline
-	// level, we are trying to do the right thing by
-	// updating including the current scanline, only if the
-	// beam is past the halfway point horizontally.
-	// If the beam is in the first half of the scanline,
-	// we only update up to the previous scanline.
-	// This minimizes the number of pixels that might be drawn
-	// incorrectly until we support a pixel level granularity
-	if (current_hpos < (m_width / 2) && current_vpos > 0)
-		current_vpos = current_vpos - 1;
+	LOG_PARTIAL_UPDATES(("update_now(): Y=%d, X=%d, last partial %d, partial hpos %d  (vis %d %d)\n", current_vpos, current_hpos, m_last_partial_scan, m_partial_scan_hpos, m_visarea.max_x, m_visarea.max_y));
 
-	update_partial(current_vpos);
+	// start off by doing a partial update up to the line before us, in case that was necessary
+	if (current_vpos > m_last_partial_scan)
+	{
+		// if the line before us was incomplete, we must do it in two pieces
+		if (m_partial_scan_hpos > 0)
+		{
+			INT32 save_scan = m_partial_scan_hpos;
+			update_partial(current_vpos - 2);
+			m_partial_scan_hpos = save_scan;
+
+			// now finish the previous partial scanline
+			int scanline = current_vpos - 1;
+			if (m_partial_scan_hpos > clip.min_x)
+				clip.min_x = m_partial_scan_hpos;
+			if (current_hpos < clip.max_x)
+				clip.max_x = current_hpos;
+			if (m_last_partial_scan > clip.min_y)
+				clip.min_y = m_last_partial_scan;
+			if (scanline < clip.max_y)
+				clip.max_y = scanline;
+
+			// if there's something to draw, do it
+			if ((clip.min_x <= clip.max_x) && (clip.min_y <= clip.max_y))
+			{
+				g_profiler.start(PROFILER_VIDEO);
+
+				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+				switch (curbitmap.format())
+				{
+					default:
+					case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+					case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+				}
+
+				m_partial_updates_this_frame++;
+				g_profiler.stop();
+				m_partial_scan_hpos = 0;
+				m_last_partial_scan = current_vpos + 1;
+			}
+		}
+		else
+		{
+			update_partial(current_vpos - 1);
+		}
+	}
+
+	// now draw this partial scanline
+	clip = m_visarea;
+
+	if (m_partial_scan_hpos > clip.min_x)
+		clip.min_x = m_partial_scan_hpos;
+	if (current_hpos < clip.max_x)
+		clip.max_x = current_hpos;
+	if (current_vpos > clip.min_y)
+		clip.min_y = current_vpos;
+	if (current_vpos < clip.max_y)
+		clip.max_y = current_vpos;
+
+	// and if there's something to draw, do it
+	if ((clip.min_x <= clip.max_x) && (clip.min_y <= clip.max_y))
+	{
+		g_profiler.start(PROFILER_VIDEO);
+
+		LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.max_y, clip.min_x, clip.max_x));
+
+		UINT32 flags = UPDATE_HAS_NOT_CHANGED;
+		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+		switch (curbitmap.format())
+		{
+			default:
+			case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+			case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+		}
+
+		m_partial_updates_this_frame++;
+		g_profiler.stop();
+
+		// if we modified the bitmap, we have to commit
+		m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
+
+		// remember where we left off
+		m_partial_scan_hpos = current_hpos;
+		m_last_partial_scan = current_vpos;
+
+		// if we completed the line, mark it so
+		if (current_hpos >= m_visarea.max_x)
+		{
+			m_partial_scan_hpos = 0;
+			m_last_partial_scan = current_vpos + 1;
+		}
+	}
 }
 
 
@@ -687,6 +788,7 @@ void screen_device::update_now()
 void screen_device::reset_partial_updates()
 {
 	m_last_partial_scan = 0;
+	m_partial_scan_hpos = 0;
 	m_partial_updates_this_frame = 0;
 	m_scanline0_timer->adjust(time_until_pos(0));
 }

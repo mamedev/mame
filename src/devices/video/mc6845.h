@@ -39,6 +39,9 @@
 #define MCFG_MC6845_CHAR_WIDTH(_pixels) \
 	mc6845_device::set_char_width(*device, _pixels);
 
+#define MCFG_MC6845_RECONFIGURE_CB(_class, _method) \
+	mc6845_device::set_reconfigure_callback(*device, mc6845_reconfigure_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
 #define MCFG_MC6845_BEGIN_UPDATE_CB(_class, _method) \
 	mc6845_device::set_begin_update_callback(*device, mc6845_begin_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
@@ -65,6 +68,9 @@
 
 
 /* callback definitions */
+typedef device_delegate<void (int width, int height, const rectangle &visarea, attoseconds_t frame_period)> mc6845_reconfigure_delegate;
+#define MC6845_RECONFIGURE(name)  void name(int width, int height, const rectangle &visarea, attoseconds_t frame_period)
+
 typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> mc6845_begin_update_delegate;
 #define MC6845_BEGIN_UPDATE(name)  void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
@@ -110,6 +116,7 @@ public:
 	}
 	static void set_char_width(device_t &device, int pixels) { downcast<mc6845_device &>(device).m_hpixels_per_column = pixels; }
 
+	static void set_reconfigure_callback(device_t &device, mc6845_reconfigure_delegate callback) { downcast<mc6845_device &>(device).m_reconfigure_cb = callback; }
 	static void set_begin_update_callback(device_t &device, mc6845_begin_update_delegate callback) { downcast<mc6845_device &>(device).m_begin_update_cb = callback; }
 	static void set_update_row_callback(device_t &device, mc6845_update_row_delegate callback) { downcast<mc6845_device &>(device).m_update_row_cb = callback; }
 	static void set_end_update_callback(device_t &device, mc6845_end_update_delegate callback) { downcast<mc6845_device &>(device).m_end_update_cb = callback; }
@@ -285,6 +292,8 @@ protected:
 	int m_visarea_adjust_max_y;
 
 	int m_hpixels_per_column;       /* number of pixels per video memory address */
+
+	mc6845_reconfigure_delegate m_reconfigure_cb;
 
 	/* if specified, this gets called before any pixel update,
 	 optionally return a pointer that will be passed to the

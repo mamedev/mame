@@ -1514,7 +1514,7 @@ WRITE8_MEMBER(ti99_cartridge_pcb::write)
 		gromwrite(space, offset, data, mem_mask);
 	else
 	{
-		if (TRACE_ILLWRITE) logerror("%s: Cannot write to ROM space at %04x\n", tag(), offset);
+		if (TRACE_ILLWRITE) space.device().logerror("%s: Cannot write to ROM space at %04x\n", tag(), offset);
 	}
 }
 
@@ -1601,7 +1601,7 @@ WRITE8_MEMBER(ti99_minimem_cartridge::write)
 	{
 		if ((offset & 0x1000)==0x0000)
 		{
-			if (TRACE_ILLWRITE) logerror("%s: Write access to cartridge ROM at address %04x ignored", tag(), offset);
+			if (TRACE_ILLWRITE) space.device().logerror("%s: Write access to cartridge ROM at address %04x ignored", tag(), offset);
 		}
 		else
 		{
@@ -1683,7 +1683,7 @@ READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) logerror("%s: CRU accessed at %04x\n", tag(), offset);
+		if (TRACE_CRU) space.device().logerror("%s: CRU accessed at %04x\n", tag(), offset);
 		UINT8 val = 0x02 << (m_ram_page << 1);
 		*value = (val >> ((offset - 0x0800)>>1)) & 0xff;
 	}
@@ -1693,7 +1693,7 @@ WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
 {
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) logerror("%s: CRU accessed at %04x\n", tag(), offset);
+		if (TRACE_CRU) space.device().logerror("%s: CRU accessed at %04x\n", tag(), offset);
 		if (data != 0)
 			m_ram_page = (offset-0x0802)>>2;
 	}
@@ -2051,7 +2051,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
 			// Accept low address byte (second write)
 			m_grom_address = (m_grom_address & 0xff00) | data;
 			m_waddr_LSB = false;
-			if (TRACE_GROM) logerror("%s: Set grom address %04x\n", tag(), m_grom_address);
+			if (TRACE_GROM) space.device().logerror("%s: Set grom address %04x\n", tag(), m_grom_address);
 		}
 		else
 		{
@@ -2061,7 +2061,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
 		}
 	}
 	else {
-		if (TRACE_ILLWRITE) logerror("%s: Ignoring write to GROM area at address %04x\n", tag(), m_grom_address);
+		if (TRACE_ILLWRITE) space.device().logerror("%s: Ignoring write to GROM area at address %04x\n", tag(), m_grom_address);
 	}
 }
 
@@ -2130,7 +2130,7 @@ rpk::rpk(emu_options& options, const char* sysname)
 
 rpk::~rpk()
 {
-	if (TRACE_RPK) logerror("gromport/RPK: Destroy RPK\n");
+	//if (TRACE_RPK) logerror("gromport/RPK: Destroy RPK\n");
 }
 
 /*
@@ -2238,7 +2238,7 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 	file = xml_get_attribute_string(rom_resource_node, "file", NULL);
 	if (file == NULL) throw rpk_exception(RPK_INVALID_LAYOUT, "<rom> must have a 'file' attribute");
 
-	if (TRACE_RPK) logerror("gromport/RPK: Loading ROM contents for socket '%s' from file %s\n", socketname, file);
+	//if (TRACE_RPK) logerror("gromport/RPK: Loading ROM contents for socket '%s' from file %s\n", socketname, file);
 
 	// check for crc
 	crcstr = xml_get_attribute_string(rom_resource_node, "crc", NULL);
@@ -2326,7 +2326,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 	contents = global_alloc_array_clear(UINT8, length);
 	if (contents==NULL) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
-	if (TRACE_RPK) logerror("gromport/RPK: Allocating RAM buffer (%d bytes) for socket '%s'\n", length, socketname);
+	//if (TRACE_RPK) logerror("gromport/RPK: Allocating RAM buffer (%d bytes) for socket '%s'\n", length, socketname);
 
 	ram_pname = NULL;
 
@@ -2348,7 +2348,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 			std::string ram_pathname = std::string(system_name).append(PATH_SEPARATOR).append(ram_filename);
 			ram_pname = core_strdup(ram_pathname.c_str());
 			// load, and fill rest with 00
-			if (TRACE_RPK) logerror("gromport/RPK: Loading NVRAM contents from '%s'\n", ram_pname);
+			//if (TRACE_RPK) logerror("gromport/RPK: Loading NVRAM contents from '%s'\n", ram_pname);
 			image_battery_load_by_name(options, ram_pname, contents, length, 0x00);
 		}
 	}
@@ -2438,7 +2438,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		// We'll try to find the PCB type on the provided type list.
 		pcb_type = xml_get_attribute_string(pcb_node, "type", NULL);
 		if (pcb_type==NULL) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> must have a 'type' attribute");
-		if (TRACE_RPK) logerror("gromport/RPK: Cartridge says it has PCB type '%s'\n", pcb_type);
+		//if (TRACE_RPK) logerror("gromport/RPK: Cartridge says it has PCB type '%s'\n", pcb_type);
 
 		i=0;
 		do

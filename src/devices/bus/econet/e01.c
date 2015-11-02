@@ -4,9 +4,9 @@
 
     Acorn FileStore E01/E01S network hard disk emulation
 
-    http://acorn.chriswhy.co.uk/Network/Econet.html
-    http://acorn.chriswhy.co.uk/Network/Pics/Acorn_FileStoreE01.html
-    http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_FileStoreE01S.html
+    http://chrisacorns.computinghistory.org.uk/Network/Econet.html
+    http://chrisacorns.computinghistory.org.uk/Network/Pics/Acorn_FileStoreE01.html
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Acorn_FileStoreE01S.html
     http://www.heyrick.co.uk/econet/fs/emulator.html
     http://www.pdfio.com/k-1019481.html#
 
@@ -396,7 +396,8 @@ e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t 
 		m_fdc_irq(CLEAR_LINE),
 		m_fdc_drq(CLEAR_LINE),
 		m_adlc_irq(CLEAR_LINE),
-		m_clk_en(0)
+		m_clk_en(0),
+		m_variant(TYPE_E01)
 {
 }
 
@@ -425,7 +426,8 @@ e01_device::e01_device(const machine_config &mconfig, device_type type, const ch
 		m_fdc_irq(CLEAR_LINE),
 		m_fdc_drq(CLEAR_LINE),
 		m_adlc_irq(CLEAR_LINE),
-		m_clk_en(0)
+		m_clk_en(0),
+		m_variant(TYPE_E01)
 {
 }
 

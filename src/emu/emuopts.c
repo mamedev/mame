@@ -445,7 +445,7 @@ void emu_options::parse_standard_inis(std::string &error_string)
 		parse_one_ini("computer", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
 	else if (cursystem->flags & MACHINE_TYPE_OTHER)
 		parse_one_ini("othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
-	
+
 	machine_config config(*cursystem, *this);
 	screen_device_iterator iter(config.root_device());
 	for (const screen_device *device = iter.first(); device != NULL; device = iter.next())
@@ -582,7 +582,7 @@ const char *emu_options::sub_value(std::string &buffer, const char *name, const 
 {
 	std::string tmp = std::string(",").append(subname).append("=");
 	buffer = value(name);
-	int pos = buffer.find(tmp.c_str());
+	int pos = buffer.find(tmp);
 	if (pos != -1)
 	{
 		int endpos = buffer.find_first_of(',', pos + 1);

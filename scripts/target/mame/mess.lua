@@ -849,6 +849,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"trs",
 		"ultimachine",
 		"ultratec",
+		"unisonic",
 		"unisys",
 		"veb",
 		"vidbrain",
@@ -1229,6 +1230,7 @@ files {
 createMESSProjects(_target, _subtarget, "camputers")
 files {
 	MAME_DIR .. "src/mame/drivers/camplynx.c",
+	MAME_DIR .. "src/lib/formats/camplynx_dsk.c",
 }
 
 createMESSProjects(_target, _subtarget, "canon")
@@ -2135,6 +2137,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/megadriv.c",
 	MAME_DIR .. "src/mame/drivers/saturn.c",
 	MAME_DIR .. "src/mame/drivers/segapico.c",
+	MAME_DIR .. "src/mame/drivers/sega_sawatte.c",
 	MAME_DIR .. "src/mame/drivers/segapm.c",
 	MAME_DIR .. "src/mame/drivers/sg1000.c",
 	MAME_DIR .. "src/mame/drivers/sms.c",
@@ -2480,6 +2483,14 @@ files {
 	MAME_DIR .. "src/mame/drivers/minicom.c",
 }
 
+createMESSProjects(_target, _subtarget, "unisonic")
+files {
+	MAME_DIR .. "src/mame/drivers/unichamp.c",
+	MAME_DIR .. "src/mame/video/gic.c",
+	MAME_DIR .. "src/mame/video/gic.c",
+}
+
+
 createMESSProjects(_target, _subtarget, "unisys")
 files {
 	MAME_DIR .. "src/mame/drivers/univac.c",
@@ -2722,6 +2733,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/softbox.c",
 	MAME_DIR .. "src/mame/drivers/squale.c",
 	MAME_DIR .. "src/mame/drivers/swtpc.c",
+	MAME_DIR .. "src/mame/drivers/swyft.c",
 	MAME_DIR .. "src/mame/drivers/sys2900.c",
 	MAME_DIR .. "src/mame/drivers/systec.c",
 	MAME_DIR .. "src/mame/drivers/tavernie.c",

@@ -1,4 +1,4 @@
-// ImGui library v1.46 WIP
+// ImGui library v1.47 WIP
 // Internals
 // You may use this file to debug, understand or extend ImGui features but we don't provide any guarantee of forward compatibility!
 
@@ -39,6 +39,7 @@ struct ImGuiWindow;
 typedef int ImGuiLayoutType;      // enum ImGuiLayoutType_
 typedef int ImGuiButtonFlags;     // enum ImGuiButtonFlags_
 typedef int ImGuiTreeNodeFlags;   // enum ImGuiTreeNodeFlags_
+typedef int ImGuiSliderFlags;     // enum ImGuiSliderFlags_
 
 //-------------------------------------------------------------------------
 // STB libraries
@@ -148,13 +149,19 @@ enum ImGuiButtonFlags_
     ImGuiButtonFlags_FlattenChilds      = 1 << 3,
     ImGuiButtonFlags_DontClosePopups    = 1 << 4,
     ImGuiButtonFlags_Disabled           = 1 << 5,
-    ImGuiButtonFlags_AlignTextBaseLine  = 1 << 6
+    ImGuiButtonFlags_AlignTextBaseLine  = 1 << 6,
+    ImGuiButtonFlags_NoKeyModifiers     = 1 << 7
 };
 
 enum ImGuiTreeNodeFlags_
 {
     ImGuiTreeNodeFlags_DefaultOpen          = 1 << 0,
     ImGuiTreeNodeFlags_NoAutoExpandOnLog    = 1 << 1
+};
+
+enum ImGuiSliderFlags_
+{
+    ImGuiSliderFlags_Vertical               = 1 << 0,
 };
 
 enum ImGuiSelectableFlagsPrivate_
@@ -270,24 +277,25 @@ struct IMGUI_API ImGuiSimpleColumns
 // Internal state of the currently focused/edited text input box
 struct IMGUI_API ImGuiTextEditState
 {
-    ImGuiID             Id;                             // widget id owning the text state
-    ImVector<ImWchar>   Text;                           // edit buffer, we need to persist but can't guarantee the persistence of the user-provided buffer. so we copy into own buffer.
-    ImVector<char>      InitialText;                    // backup of end-user buffer at the time of focus (in UTF-8, unaltered)
+    ImGuiID             Id;                         // widget id owning the text state
+    ImVector<ImWchar>   Text;                       // edit buffer, we need to persist but can't guarantee the persistence of the user-provided buffer. so we copy into own buffer.
+    ImVector<char>      InitialText;                // backup of end-user buffer at the time of focus (in UTF-8, unaltered)
     ImVector<char>      TempTextBuffer;
-    int                 CurLenA, CurLenW;               // we need to maintain our buffer length in both UTF-8 and wchar format.
-    int                 BufSizeA;                       // end-user buffer size
+    int                 CurLenA, CurLenW;           // we need to maintain our buffer length in both UTF-8 and wchar format.
+    int                 BufSizeA;                   // end-user buffer size
     float               ScrollX;
     ImGuiStb::STB_TexteditState   StbState;
     float               CursorAnim;
     bool                CursorFollow;
-    ImVec2              InputCursorScreenPos;           // Cursor position in screen space to be used by IME callback.
+    ImVec2              InputCursorScreenPos;       // Cursor position in screen space to be used by IME callback.
     bool                SelectedAllMouseLock;
 
-    ImGuiTextEditState()                                { memset(this, 0, sizeof(*this)); }
-    void                CursorAnimReset()               { CursorAnim = -0.30f; }                                   // After a user-input the cursor stays on for a while without blinking
-    bool                HasSelection() const            { return StbState.select_start != StbState.select_end; }
-    void                ClearSelection()                { StbState.select_start = StbState.select_end = StbState.cursor; }
-    void                SelectAll()                     { StbState.select_start = 0; StbState.select_end = CurLenW; StbState.cursor = StbState.select_end; StbState.has_preferred_x = false; }
+    ImGuiTextEditState()                            { memset(this, 0, sizeof(*this)); }
+    void                CursorAnimReset()           { CursorAnim = -0.30f; }                                   // After a user-input the cursor stays on for a while without blinking
+    void                CursorClamp()               { StbState.cursor = ImMin(StbState.cursor, CurLenW); StbState.select_start = ImMin(StbState.select_start, CurLenW); StbState.select_end = ImMin(StbState.select_end, CurLenW); }
+    bool                HasSelection() const        { return StbState.select_start != StbState.select_end; }
+    void                ClearSelection()            { StbState.select_start = StbState.select_end = StbState.cursor; }
+    void                SelectAll()                 { StbState.select_start = 0; StbState.select_end = CurLenW; StbState.cursor = StbState.select_end; StbState.has_preferred_x = false; }
     void                OnKeyPressed(int key);
 };
 
@@ -598,7 +606,7 @@ struct IMGUI_API ImGuiWindow
     ImVector<ImGuiID>       IDStack;                            // ID stack. ID are hashes seeded with the value at the top of the stack
     ImRect                  ClipRect;                           // = DrawList->clip_rect_stack.back(). Scissoring / clipping rectangle. x1, y1, x2, y2.
     ImRect                  ClippedWindowRect;                  // = ClipRect just after setup in Begin()
-    int                     LastFrameDrawn;
+    int                     LastFrameActive;
     float                   ItemWidthDefault;
     ImGuiSimpleColumns      MenuColumns;                        // Simplified columns storage for menu items
     ImGuiStorage            StateStorage;
@@ -672,10 +680,10 @@ namespace ImGui
     IMGUI_API void          RenderCollapseTriangle(ImVec2 p_min, bool opened, float scale = 1.0f, bool shadow = false);
     IMGUI_API void          RenderCheckMark(ImVec2 pos, ImU32 col);
 
-    IMGUI_API bool          ButtonBehavior(const ImRect& bb, ImGuiID id, bool* out_hovered, bool* out_held, bool allow_key_modifiers, ImGuiButtonFlags flags = 0);
+    IMGUI_API bool          ButtonBehavior(const ImRect& bb, ImGuiID id, bool* out_hovered, bool* out_held, ImGuiButtonFlags flags = 0);
     IMGUI_API bool          ButtonEx(const char* label, const ImVec2& size_arg = ImVec2(0,0), ImGuiButtonFlags flags = 0);
 
-    IMGUI_API bool          SliderBehavior(const ImRect& frame_bb, ImGuiID id, float* v, float v_min, float v_max, float power, int decimal_precision, bool horizontal);
+    IMGUI_API bool          SliderBehavior(const ImRect& frame_bb, ImGuiID id, float* v, float v_min, float v_max, float power, int decimal_precision, ImGuiSliderFlags flags = 0);
     IMGUI_API bool          SliderFloatN(const char* label, float* v, int components, float v_min, float v_max, const char* display_format, float power);
     IMGUI_API bool          SliderIntN(const char* label, int* v, int components, int v_min, int v_max, const char* display_format);
 

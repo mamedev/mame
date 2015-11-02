@@ -354,7 +354,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
  * F->A                    128/256 byte CKS   bad sector table
  *
  *****************************************************************************/
-static void make_chksum(UINT8 * chksum, UINT8 data)
+static void make_chksum(device_t *device,UINT8 * chksum, UINT8 data)
 {
 	UINT8 newone;
 	newone= *chksum + data;
@@ -362,7 +362,7 @@ static void make_chksum(UINT8 * chksum, UINT8 data)
 		newone++;
 
 	if (VERBOSE_CHKSUM)
-		logerror("atari chksum old $%02x + data $%02x -> new $%02x\n", *chksum, data, newone);
+		device->logerror("atari chksum old $%02x + data $%02x -> new $%02x\n", *chksum, data, newone);
 
 	*chksum = newone;
 }
@@ -393,7 +393,7 @@ void atari_fdc_device::add_serin(UINT8 data, int with_checksum)
 {
 	m_serin_buff[m_serin_count++] = data;
 	if (with_checksum)
-		make_chksum(&m_serin_chksum, data);
+		make_chksum(this,&m_serin_chksum, data);
 }
 
 static void ATTR_PRINTF(1,2) atari_set_frame_message(const char *fmt, ...)
@@ -712,7 +712,7 @@ WRITE8_MEMBER( atari_fdc_device::serout_w )
 		}
 		else
 		{
-			make_chksum(&m_serout_chksum, data);
+			make_chksum(this,&m_serout_chksum, data);
 		}
 	}
 }

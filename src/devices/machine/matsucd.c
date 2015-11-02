@@ -94,7 +94,7 @@ void matsucd_set_subcode_ready_callback( void (*scor_cb)( running_machine &machi
 	cd.scor_cb = scor_cb;
 }
 
-static int matsucd_getsector_type( void )
+static int matsucd_getsector_type( running_machine &machine )
 {
 	switch( cd.sector_size )
 	{
@@ -103,13 +103,13 @@ static int matsucd_getsector_type( void )
 		case 2336: return CD_TRACK_MODE2;
 		case 2352: return CD_TRACK_MODE2_RAW;
 
-		default: logerror( "MATSUCD: Sector size %d unsupported!\n", cd.sector_size ); break;
+		default: machine.logerror( "MATSUCD: Sector size %d unsupported!\n", cd.sector_size ); break;
 	}
 
 	return CD_TRACK_RAW_DONTCARE;
 }
 
-void matsucd_read_next_block( void )
+void matsucd_read_next_block( running_machine &machine )
 {
 	cd.xfer_offset = 0;
 
@@ -118,9 +118,9 @@ void matsucd_read_next_block( void )
 		cd.lba++;
 		cd.num_blocks--;
 
-		if (!cdrom_read_data(cd.cdrom, cd.lba, cd.sector_buffer, matsucd_getsector_type()))
+		if (!cdrom_read_data(cd.cdrom, cd.lba, cd.sector_buffer, matsucd_getsector_type(machine)))
 		{
-			logerror( "MATSUCD - Warning: Read error on CD!\n" );
+			machine.logerror( "MATSUCD - Warning: Read error on CD!\n" );
 		}
 	}
 }
@@ -409,9 +409,9 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 			cd.xfer_offset = 0;
 
 			/* go ahead and cache the first block */
-			if (!cdrom_read_data(cd.cdrom, cd.lba, cd.sector_buffer, matsucd_getsector_type()))
+			if (!cdrom_read_data(cd.cdrom, cd.lba, cd.sector_buffer, matsucd_getsector_type(machine)))
 			{
-				logerror( "MATSUCD - Warning: Read error on CD!\n" );
+				machine.logerror( "MATSUCD - Warning: Read error on CD!\n" );
 				matsucd_command_error( machine );
 				return;
 			}
@@ -696,14 +696,14 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 
 			if ( cd.cdrom == NULL )
 			{
-				logerror( "MATSUCD - Warning: Reading TOC without a CD!\n" );
+				machine.logerror( "MATSUCD - Warning: Reading TOC without a CD!\n" );
 				matsucd_command_error( machine );
 				return;
 			}
 
 			if ( track > cdrom_get_last_track(cd.cdrom) )
 			{
-				logerror( "MATSUCD - Warning: Reading invalid track entry from TOC!\n" );
+				machine.logerror( "MATSUCD - Warning: Reading invalid track entry from TOC!\n" );
 				matsucd_command_error( machine );
 				return;
 			}
@@ -751,7 +751,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		break;
 
 		default:
-			logerror( "MATSUCD: Unknown/inimplemented command %08x\n", cmd );
+			machine.logerror( "MATSUCD: Unknown/inimplemented command %08x\n", cmd );
 		break;
 	}
 }

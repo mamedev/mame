@@ -11,7 +11,7 @@
 
 
 //#define dviprintf printf
-#define dviprintf logerror
+#define dviprintf device->logerror
 
 
 struct DVI_Header
@@ -169,7 +169,7 @@ static UINT8 R8(UINT8 **currptr)
 	return ret;
 }
 
-void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
+void process_dvi_data(device_t *device,UINT8* dvi_data, int baseoffset, int regionsize)
 {
 	DVI_Header DVI;
 

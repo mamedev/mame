@@ -758,7 +758,6 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 {
 	std::string locationtag, breakstr("%");
 	const rom_entry *region;
-	std::string regiontag;
 	bool retVal = FALSE;
 	int warningcount = 0;
 	for (region = start; region != NULL; region = rom_next_region(region))
@@ -971,7 +970,7 @@ done:
 		if (!m_init_phase)
 		{
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-				popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
+				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
 				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 		}
@@ -986,7 +985,7 @@ done:
 			if (!m_init_phase)
 			{
 				if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-					popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
+					device().popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
 				else
 					osd_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
 			}

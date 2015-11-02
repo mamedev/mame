@@ -787,7 +787,7 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 	}
 
 	default:
-		logerror("debbugger internal error, file %s, line %d\n", __FILE__, __LINE__);
+		osd_printf_error("debbugger internal error, file %s, line %d\n", __FILE__, __LINE__);
 	case illegal:
 		sprintf (buffer, "data >%04x", OP);
 		break;

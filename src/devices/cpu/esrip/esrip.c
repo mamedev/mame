@@ -193,7 +193,6 @@ void esrip_device::device_start()
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_status).callimport().callexport().formatstr("%8s").noshow();
 	state_add(ESRIP_PC,        "PC:",       m_rip_pc).mask(0xffff);

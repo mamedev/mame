@@ -273,7 +273,7 @@ READ8_MEMBER(combatsc_state::trackball_r)
 		{
 			UINT8 curr;
 
-			curr = ioport(tracknames[i])->read_safe(0xff);
+			curr = read_safe(ioport(tracknames[i]), 0xff);
 
 			dir[i] = curr - m_pos[i];
 			m_sign[i] = dir[i] & 0x80;

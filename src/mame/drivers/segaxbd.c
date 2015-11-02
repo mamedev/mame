@@ -468,7 +468,7 @@ READ16_MEMBER( segaxbd_state::adc_r )
 
 	// on the write, latch the selected input port and stash the value
 	int which = (m_iochip_regs[0][2] >> 2) & 7;
-	int value = ioport(ports[which])->read_safe(0x0010);
+	int value = read_safe(ioport(ports[which]), 0x0010);
 
 	// reverse some port values
 	if (m_adc_reverse[which])
@@ -929,7 +929,7 @@ void segaxbd_state::smgp_iochip0_motor_w(UINT8 data)
 UINT8 segaxbd_state::lastsurv_iochip1_port_r(UINT8 data)
 {
 	static const char * const port_names[] = { "MUX0", "MUX1", "MUX2", "MUX3" };
-	return ioport(port_names[m_lastsurv_mux])->read_safe(0xff);
+	return read_safe(ioport(port_names[m_lastsurv_mux]), 0xff);
 }
 
 

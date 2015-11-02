@@ -6,7 +6,7 @@
 #include "machine/pic8259.h"
 #include "includes/chihiro.h"
 
-//#define LOG_NV2A
+// #define LOG_NV2A
 
 const char *vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
 const char *vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
@@ -2335,6 +2335,8 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 {
 	int m;
 
+	if (what == 0)
+		return;
 	m = antialias_control;
 	if (antialiasing_rendertarget != 0)
 		m = 2;
@@ -2487,7 +2489,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			logerror("Unsupported primitive %d for method 0x1810\n", type);
+			machine().logerror("Unsupported primitive %d for method 0x1810\n", type);
 		}
 		countlen--;
 	}
@@ -2608,7 +2610,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			logerror("Unsupported primitive %d for method 0x1800/8\n", type);
+			machine().logerror("Unsupported primitive %d for method 0x1800/8\n", type);
 			countlen = 0;
 		}
 		while (countlen > 0) {
@@ -2656,7 +2658,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			convert_vertices_poly(vert, xy, 2);
 			countlen = countlen - c;
 			if (countlen < 0) {
-				logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+				machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 				countlen = 0;
 				return 0;
 			}
@@ -2665,7 +2667,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				c = read_vertices_0x1818(space, vert + ((n & 1) + 1), address, 1);
 				countlen = countlen - c;
 				if (countlen < 0) {
-					logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 					countlen = 0;
 					break;
 				}
@@ -2685,7 +2687,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				convert_vertices_poly(vert, xy, 3);
 				countlen = countlen - c;
 				if (countlen < 0) {
-					logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 					countlen = 0;
 					break;
 				}
@@ -2703,7 +2705,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			convert_vertices_poly(vert, xy, 2);
 			countlen = countlen - c;
 			if (countlen < 0) {
-				logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+				machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 				countlen = 0;
 				return 0;
 			}
@@ -2713,7 +2715,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
 				countlen = countlen - c;
 				if (countlen < 0) {
-					logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 					countlen = 0;
 					break;
 				}
@@ -2732,7 +2734,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				convert_vertices_poly(vert, xy, 4);
 				countlen = countlen - c;
 				if (countlen < 0) {
-					logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 					countlen = 0;
 					break;
 				}
@@ -2750,7 +2752,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			convert_vertices_poly(vert, xy, 2);
 			countlen = countlen - c;
 			if (countlen < 0) {
-				logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+				machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 				countlen = 0;
 				return 0;
 			}
@@ -2760,7 +2762,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 2);
 				countlen = countlen - c;
 				if (countlen < 0) {
-					logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 					countlen = 0;
 					return 0;
 				}
@@ -2771,7 +2773,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			logerror("Unsupported primitive %d for method 0x1818\n", type);
+			machine().logerror("Unsupported primitive %d for method 0x1818\n", type);
 			countlen = 0;
 		}
 	}
@@ -2920,7 +2922,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			bytespixel_rendertarget = 1;
 			break;
 		default:
-			logerror("Unknown render target color format %d\n\r", colorformat_rendertarget);
+			machine().logerror("Unknown render target color format %d\n\r", colorformat_rendertarget);
 			bytespixel_rendertarget = 4;
 			break;
 		}
@@ -3124,10 +3126,10 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				if (f) {
 					written = (int)fwrite(texture[unit].buffer, texture[unit].sizeu*texture[unit].sizev * 4, 1, f);
 					fclose(f);
-					logerror("Written %d bytes of texture to specified file\n", written);
+					machine().logerror("Written %d bytes of texture to specified file\n", written);
 				}
 				else
-					logerror("Unable to save texture to specified file\n");
+					machine().logerror("Unable to save texture to specified file\n");
 			}
 		}
 		if (maddress == 0x1b0c) {
@@ -3179,42 +3181,42 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	// Vertex program (shader)
 	if (maddress == 0x1e94) {
 		/*if (data == 2)
-		logerror("Enabled vertex program\n");
+		machine().logerror("Enabled vertex program\n");
 		else if (data == 4)
-		logerror("Enabled fixed function pipeline\n");
+		machine().logerror("Enabled fixed function pipeline\n");
 		else if (data == 6)
-		logerror("Enabled both fixed function pipeline and vertex program ?\n");
+		machine().logerror("Enabled both fixed function pipeline and vertex program ?\n");
 		else
-		logerror("Unknown value %d to method 0x1e94\n",data);*/
+		machine().logerror("Unknown value %d to method 0x1e94\n",data);*/
 		vertex_pipeline = data & 6;
 		countlen--;
 	}
 	if (maddress == 0x1e9c) {
-		//logerror("VP_UPLOAD_FROM_ID %d\n",data);
+		//machine().logerror("VP_UPLOAD_FROM_ID %d\n",data);
 		vertexprogram.upload_instruction_index = data;
 		vertexprogram.upload_instruction_component = 0;
 		countlen--;
 	}
 	if (maddress == 0x1ea0) {
-		//logerror("VP_START_FROM_ID %d\n",data);
+		//machine().logerror("VP_START_FROM_ID %d\n",data);
 		vertexprogram.instructions = vertexprogram.upload_instruction_index;
 		vertexprogram.start_instruction = data;
 		countlen--;
 	}
 	if (maddress == 0x1ea4) {
-		//logerror("VP_UPLOAD_CONST_ID %d\n",data);
+		//machine().logerror("VP_UPLOAD_CONST_ID %d\n",data);
 		vertexprogram.upload_parameter_index = data;
 		vertexprogram.upload_parameter_component = 0;
 		countlen--;
 	}
 	if ((maddress >= 0x0b00) && (maddress < 0x0b80)) {
-		//logerror("VP_UPLOAD_INST\n");
+		//machine().logerror("VP_UPLOAD_INST\n");
 		if (vertexprogram.upload_instruction_index < 192) {
 			vertexprogram.exec.op[vertexprogram.upload_instruction_index].i[vertexprogram.upload_instruction_component] = data;
 			vertexprogram.exec.op[vertexprogram.upload_instruction_index].modified |= (1 << vertexprogram.upload_instruction_component);
 		}
 		else
-			logerror("Need to increase size of vertexprogram.instruction to %d\n\r", vertexprogram.upload_instruction_index);
+			machine().logerror("Need to increase size of vertexprogram.instruction to %d\n\r", vertexprogram.upload_instruction_index);
 		if (vertexprogram.exec.op[vertexprogram.upload_instruction_index].modified == 15) {
 			vertexprogram.exec.op[vertexprogram.upload_instruction_index].modified = 0;
 			vertexprogram.exec.decode_instruction(vertexprogram.upload_instruction_index);
@@ -3226,11 +3228,11 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		}
 	}
 	if ((maddress >= 0x0b80) && (maddress < 0x0c00)) {
-		//logerror("VP_UPLOAD_CONST\n");
+		//machine().logerror("VP_UPLOAD_CONST\n");
 		if (vertexprogram.upload_parameter_index < 256)
 			vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].iv[vertexprogram.upload_parameter_component] = data;
 		else
-			logerror("Need to increase size of vertexprogram.parameter to %d\n\r", vertexprogram.upload_parameter_index);
+			machine().logerror("Need to increase size of vertexprogram.parameter to %d\n\r", vertexprogram.upload_parameter_index);
 		vertexprogram.upload_parameter_component++;
 		if (vertexprogram.upload_parameter_component >= 4) {
 			vertexprogram.upload_parameter_component = 0;
@@ -4025,16 +4027,12 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	int countlen;
 	int ret;
 	address_space *space = puller_space;
-#ifdef LOG_NV2A
 	UINT32 subch;
-#endif
 
 	chanel = puller_channel;
 	subchannel = puller_subchannel;
 	dmaput = &channel[chanel][subchannel].regs[0x40 / 4];
 	dmaget = &channel[chanel][subchannel].regs[0x44 / 4];
-	chanel = puller_channel;
-	subchannel = puller_subchannel;
 	while (*dmaget != *dmaput) {
 		cmd = space->read_dword(*dmaget);
 		*dmaget += 4;
@@ -4052,30 +4050,31 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 0: // increasing method
 			method = (cmd >> 2) & 2047; // method*4 is address // if method >= 0x40 send it to assigned object
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				machine().logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				machine().logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
 #ifdef LOG_NV2A
-				logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
+				machine().logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
 #endif
 				ret = 0;
 				while (count > 0) {
 					countlen = 1;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					count--;
 					method++;
 					*dmaget += 4;
@@ -4091,32 +4090,30 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 5: // non-increasing method
 			method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
-#ifdef LOG_NV2A
-				logerror("  assign channel %d\n", subch);
-#endif
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				machine().logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				machine().logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
 #ifdef LOG_NV2A
-				logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
+				machine().logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
 #endif
 				while (count > 0) {
 					countlen = count;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					*dmaget += 4 * (count - countlen);
 					count = countlen;
 				}
@@ -4124,37 +4121,38 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			break;
 		case 3: // long non-increasing method
 			method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
 			subch = (cmd >> 13) & 7;
-#endif
 			count = space->read_dword(*dmaget);
 			*dmaget += 4;
 			if ((method == 0) && (count == 1)) {
 				handle = space->read_dword(*dmaget);
 				handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+				machine().logerror("  assign to subchannel %d object at %d", subch, handle);
 #endif
-				channel[chanel][subchannel].object.objhandle = handle;
+				channel[chanel][subch].object.objhandle = handle;
 				handle = ramin[handle / 4];
 				objclass = handle & 0xff;
-				channel[chanel][subchannel].object.objclass = objclass;
+#ifdef LOG_NV2A
+				machine().logerror(" class %03X\n", objclass);
+#endif
+				channel[chanel][subch].object.objclass = objclass;
 				*dmaget += 4;
 			}
 			else {
 #ifdef LOG_NV2A
-				logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
+				machine().logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
 #endif
 				while (count > 0) {
 					countlen = count;
-					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					ret=geforce_exec_method(*space, chanel, subch, method, *dmaget, countlen);
 					*dmaget += 4 * (count - countlen);
 					count = countlen;
 				}
 			}
 			break;
 		default:
-			logerror("  unimplemented command %08X\n", cmd);
+			machine().logerror("  unimplemented command %08X\n", cmd);
 		}
 	}
 }
@@ -4169,30 +4167,30 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		ret = x;
 	}
 	if ((offset >= 0x00101000 / 4) && (offset < 0x00102000 / 4)) {
-		//logerror("NV_2A: read STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
+		//machine().logerror("NV_2A: read STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
 	}
 	else if ((offset >= 0x00002000 / 4) && (offset < 0x00004000 / 4)) {
 		ret = pfifo[offset - 0x00002000 / 4];
 		// PFIFO.CACHE1.STATUS or PFIFO.RUNOUT_STATUS
 		if ((offset == 0x3214 / 4) || (offset == 0x2400 / 4))
 			ret = 0x10;
-		//logerror("NV_2A: read PFIFO[%06X] value %08X\n",offset*4-0x00002000,ret);
+		//machine().logerror("NV_2A: read PFIFO[%06X] value %08X\n",offset*4-0x00002000,ret);
 	}
 	else if ((offset >= 0x00700000 / 4) && (offset < 0x00800000 / 4)) {
 		ret = ramin[offset - 0x00700000 / 4];
-		//logerror("NV_2A: read PRAMIN[%06X] value %08X\n",offset*4-0x00700000,ret);
+		//machine().logerror("NV_2A: read PRAMIN[%06X] value %08X\n",offset*4-0x00700000,ret);
 	}
 	else if ((offset >= 0x00400000 / 4) && (offset < 0x00402000 / 4)) {
 		ret = pgraph[offset - 0x00400000 / 4];
-		//logerror("NV_2A: read PGRAPH[%06X] value %08X\n",offset*4-0x00400000,ret);
+		//machine().logerror("NV_2A: read PGRAPH[%06X] value %08X\n",offset*4-0x00400000,ret);
 	}
 	else if ((offset >= 0x00600000 / 4) && (offset < 0x00601000 / 4)) {
 		ret = pcrtc[offset - 0x00600000 / 4];
-		//logerror("NV_2A: read PCRTC[%06X] value %08X\n",offset*4-0x00600000,ret);
+		//machine().logerror("NV_2A: read PCRTC[%06X] value %08X\n",offset*4-0x00600000,ret);
 	}
 	else if ((offset >= 0x00000000 / 4) && (offset < 0x00001000 / 4)) {
 		ret = pmc[offset - 0x00000000 / 4];
-		//logerror("NV_2A: read PMC[%06X] value %08X\n",offset*4-0x00000000,ret);
+		//machine().logerror("NV_2A: read PMC[%06X] value %08X\n",offset*4-0x00000000,ret);
 	}
 	else if ((offset >= 0x00800000 / 4) && (offset < 0x00900000 / 4)) {
 		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each
@@ -4204,10 +4202,10 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		suboffset = suboffset & 0x7ff;
 		if (suboffset < 0x80 / 4)
 			ret = channel[chanel][subchannel].regs[suboffset];
-		//logerror("NV_2A: read channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,ret);
+		//machine().logerror("NV_2A: read channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,ret);
 		return ret;
 	}
-	//logerror("NV_2A: read at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,ret);
+	//machine().logerror("NV_2A: read at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,ret);
 	return ret;
 }
 
@@ -4218,21 +4216,21 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 
 	update_int = false;
 	if ((offset >= 0x00101000 / 4) && (offset < 0x00102000 / 4)) {
-		//logerror("NV_2A: write STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,data);
+		//machine().logerror("NV_2A: write STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,data);
 	}
 	else if ((offset >= 0x00002000 / 4) && (offset < 0x00004000 / 4)) {
 		int e = offset - 0x00002000 / 4;
 		if (e >= (sizeof(pfifo) / sizeof(UINT32)))
 			return;
 		COMBINE_DATA(pfifo + e);
-		//logerror("NV_2A: read PFIFO[%06X]=%08X\n",offset*4-0x00002000,data & mem_mask); // 2210 pfifo ramht & 1f0 << 12
+		//machine().logerror("NV_2A: read PFIFO[%06X]=%08X\n",offset*4-0x00002000,data & mem_mask); // 2210 pfifo ramht & 1f0 << 12
 	}
 	else if ((offset >= 0x00700000 / 4) && (offset < 0x00800000 / 4)) {
 		int e = offset - 0x00700000 / 4;
 		if (e >= (sizeof(ramin) / sizeof(UINT32)))
 			return;
 		COMBINE_DATA(ramin + e);
-		//logerror("NV_2A: write PRAMIN[%06X]=%08X\n",offset*4-0x00700000,data & mem_mask);
+		//machine().logerror("NV_2A: write PRAMIN[%06X]=%08X\n",offset*4-0x00700000,data & mem_mask);
 	}
 	else if ((offset >= 0x00400000 / 4) && (offset < 0x00402000 / 4)) {
 		int e = offset - 0x00400000 / 4;
@@ -4257,7 +4255,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		}
 		if ((e >= 0x900 / 4) && (e < 0xa00 / 4))
 			pgraph[e] = 0;
-		//logerror("NV_2A: write PGRAPH[%06X]=%08X\n",offset*4-0x00400000,data & mem_mask);
+		//machine().logerror("NV_2A: write PGRAPH[%06X]=%08X\n",offset*4-0x00400000,data & mem_mask);
 	}
 	else if ((offset >= 0x00600000 / 4) && (offset < 0x00601000 / 4)) {
 		int e = offset - 0x00600000 / 4;
@@ -4277,14 +4275,14 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 			printf("crtc buffer %08X\n\r", data);
 #endif
 		}
-		//logerror("NV_2A: write PCRTC[%06X]=%08X\n",offset*4-0x00600000,data & mem_mask);
+		//machine().logerror("NV_2A: write PCRTC[%06X]=%08X\n",offset*4-0x00600000,data & mem_mask);
 	}
 	else if ((offset >= 0x00000000 / 4) && (offset < 0x00001000 / 4)) {
 		int e = offset - 0x00000000 / 4;
 		if (e >= (sizeof(pmc) / sizeof(UINT32)))
 			return;
 		COMBINE_DATA(pmc + e);
-		//logerror("NV_2A: write PMC[%06X]=%08X\n",offset*4-0x00000000,data & mem_mask);
+		//machine().logerror("NV_2A: write PMC[%06X]=%08X\n",offset*4-0x00000000,data & mem_mask);
 	}
 	else if ((offset >= 0x00800000 / 4) && (offset < 0x00900000 / 4)) {
 		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each
@@ -4295,7 +4293,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		chanel = (suboffset >> (16 - 2)) & 31;
 		subchannel = (suboffset >> (13 - 2)) & 7;
 		suboffset = suboffset & 0x7ff;
-		//logerror("NV_2A: write channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,data & mem_mask);
+		//machine().logerror("NV_2A: write channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,data & mem_mask);
 		if (suboffset >= 0x80 / 4)
 			return;
 		COMBINE_DATA(&channel[chanel][subchannel].regs[suboffset]);
@@ -4323,7 +4321,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		}
 	}
 	//else
-	//      logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
+	//      machine().logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
 	if (update_int == true) {
 		if (update_interrupts() == true)
 			interruptdevice->ir3_w(1); // IRQ 3

@@ -512,11 +512,14 @@ void tms32082_mp_device::execute_run()
 		m_ir = fetch();
 		execute();
 
-		m_tcount--;
-		if (m_tcount < 0)
+		if (m_tcount == 0)
 		{
 			// TODO: timer interrupt
 			m_tcount = m_tscale;
+		}
+		else
+		{
+			m_tcount--;
 		}
 
 		m_icount--;

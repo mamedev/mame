@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller, Krzysztof Strzecha, Robbbert
+// copyright Olivier Galibert, Buchmueller, Krzysztof Strzecha, Robbbert
 /***************************************************************************
     zx.c
 
@@ -10,102 +10,112 @@
 
 #include "includes/zx.h"
 
-#define video_screen_get_refresh(screen)    (((screen_config *)(screen)->inline_config)->refresh)
-
-#define DEBUG_ZX81_PORTS    1
-#define DEBUG_ZX81_VSYNC    1
-
-#define LOG_ZX81_IOR(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space.machine().first_screen()->vpos(), _comment); } while (0)
-#define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space.machine().first_screen()->vpos(), _comment); } while (0)
-#define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space.machine().first_screen()->vpos()); } while (0)
-
-
-WRITE8_MEMBER(zx_state::zx_ram_w)
-{
-	UINT8 *RAM = m_region_maincpu->base();
-	RAM[offset + 0x4000] = data;
-
-	if (data & 0x40)
-	{
-		space.write_byte(offset | 0xc000, data);
-		RAM[offset | 0xc000] = data;
-	}
-	else
-	{
-		space.write_byte(offset | 0xc000, 0);
-		RAM[offset | 0xc000] = 0;
-	}
-}
-
-/* I know this looks really pointless... but it has to be here */
-READ8_MEMBER( zx_state::zx_ram_r )
-{
-	UINT8 *RAM = m_region_maincpu->base();
-	return RAM[offset | 0xc000];
-}
-
 DRIVER_INIT_MEMBER(zx_state,zx)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_program = &m_maincpu->space(AS_PROGRAM);
+	m_tape_input = timer_alloc(TIMER_TAPE_INPUT);
 
-	space.install_read_bank(0x4000, 0x4000 + m_ram->size() - 1, "bank1");
-	space.install_write_handler(0x4000, 0x4000 + m_ram->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),this));
-	membank("bank1")->set_base(m_region_maincpu->base() + 0x4000);
-}
-
-DIRECT_UPDATE_MEMBER(zx_state::zx_setdirect)
-{
-	if (address & 0xc000)
-		zx_ula_r(address, m_region_maincpu, 0);
-	return address;
-}
-
-DIRECT_UPDATE_MEMBER(zx_state::pc8300_setdirect)
-{
-	if (address & 0xc000)
-		zx_ula_r(address, m_region_gfx1, 0);
-	return address;
-}
-
-DIRECT_UPDATE_MEMBER(zx_state::pow3000_setdirect)
-{
-	if (address & 0xc000)
-		zx_ula_r(address, m_region_gfx1, 1);
-	return address;
+	if(m_ram->size() == 32768)
+		m_program->unmap_readwrite(0x8000, 0xbfff);
+	else if(m_ram->size() == 16384)
+		m_program->unmap_readwrite(0x8000, 0xffff);
+	else if(m_ram->size() < 16384)
+		m_program->unmap_readwrite(0x4000 + m_ram->size(), 0xffff);
 }
 
 void zx_state::machine_reset()
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(zx_state::zx_setdirect), this));
-	m_tape_bit = 0x80;
+	m_prev_refresh = 0xff;
+
+	m_vsync_active = false;
+	m_base_vsync_clock = 0;
+	m_ypos = 0;
+
+	m_nmi_on = false;
+	m_nmi_generator_active = false;
+
+	m_cassette_cur_level = 0;
+
+	m_tape_input->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 }
 
-MACHINE_RESET_MEMBER(zx_state,pow3000)
+void zx_state::zx_tape_input()
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pow3000_setdirect), this));
-	m_tape_bit = 0x80;
+	m_cassette_cur_level = m_cassette->input();
 }
 
-MACHINE_RESET_MEMBER(zx_state,pc8300)
+void zx_state::drop_sync()
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pc8300_setdirect), this));
-	m_tape_bit = 0x80;
-}
+	if (m_vsync_active) {
+		UINT64 time = m_maincpu->total_cycles();
+		m_vsync_active = false;
+		m_cassette->output(-1.0);
 
-TIMER_CALLBACK_MEMBER(zx_state::zx_tape_pulse)
-{
-	m_tape_bit = 0x80;
+		int xs = 2*((m_vsync_start_time - m_base_vsync_clock) % 207);
+		int ys = (m_vsync_start_time - m_base_vsync_clock) / 207;
+		int xe = 2*((time - m_base_vsync_clock) % 207);
+		int ye = (time - m_base_vsync_clock) / 207;
+		if(xs >= 384) {
+			xs = 0;
+			ys++;
+		}
+		if(xe >= 384) {
+			xe = 0;
+			ye++;
+		}
+		if(ys < 311) {
+			if(ye > 310) {
+				ye = 311;
+				xe = 0;
+			}
+			if(ys == ye) {
+				UINT16 *dest = &m_bitmap_render->pix16(ys, xs);
+				for(int x = xs; x < xe; x++)
+					*dest++ = 1;
+			} else {
+				UINT16 *dest = &m_bitmap_render->pix16(ys, xs);
+				for(int x = xs; x < 384; x++)
+					*dest++ = 1;
+				for(int y = ys+1; y < ye; y++) {
+					dest = &m_bitmap_render->pix16(y, 0);
+					for(int x = 0; x<384; x++)
+						*dest++ = 1;
+				}
+				dest = &m_bitmap_render->pix16(ye, 0);
+				for(int x = 0; x < xe; x++)
+					*dest++ = 1;
+			}
+		}
+
+		// Short is hsync
+		if(time - m_vsync_start_time > 1000) {
+			// Ignore too short frame times, they're cassette output
+			if(time - m_base_vsync_clock > 52000) {
+				logerror("frame time %d\n", int(time - m_base_vsync_clock));
+				
+				rectangle rect(0, 383, 0, 310);
+				copybitmap(*m_bitmap_buffer, *m_bitmap_render, 0, 0, 0, 0, rect);
+				m_bitmap_render->fill(0);			
+				m_base_vsync_clock = time;
+				m_ypos = 0;
+			}
+			if(m_nmi_on)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			m_nmi_on = m_hsync_active = false;
+			recalc_hsync();
+		} else
+			m_ypos = ((time-m_base_vsync_clock)%207) < 192 ? 0 : -1;
+	}
 }
 
 READ8_MEMBER( zx_state::zx80_io_r )
 {
-/* port FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
-    The upper 8 bits are used to select a keyboard scan line */
+	/* port FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
+	    The upper 8 bits are used to select a keyboard scan line */
 
 	UINT8 data = 0xff;
-	UINT8 offs = offset & 0xff;
 
-	if (offs == 0xfe)
+	if (!(offset & 0x01))
 	{
 		if ((offset & 0x0100) == 0)
 			data &= m_io_row0->read();
@@ -129,25 +139,13 @@ READ8_MEMBER( zx_state::zx80_io_r )
 
 		m_cassette->output(+1.0);
 
-		if (m_ula_irq_active)
-		{
-			zx_ula_bkgnd(0);
-			m_ula_irq_active = 0;
+		if (!m_vsync_active && !m_nmi_generator_active) {
+			m_vsync_active = true;
+			m_vsync_start_time = m_maincpu->total_cycles();
 		}
-//      else
-//      {
-			if ((m_cassette->input() < -0.75) && m_tape_bit)
-			{
-				m_tape_bit = 0x00;
-				timer_set(attotime::from_usec(362), TIMER_TAPE_PULSE);
-			}
 
-			data &= ~m_tape_bit;
-//      }
-		if (m_ula_frame_vsync == 3)
-		{
-			m_ula_frame_vsync = 2;
-		}
+		if(m_cassette_cur_level <= 0)
+			data &= 0x7f;
 	}
 
 	return data;
@@ -160,9 +158,8 @@ READ8_MEMBER( zx_state::zx81_io_r )
     The upper 8 bits are used to select a keyboard scan line */
 
 	UINT8 data = 0xff;
-	UINT8 offs = offset & 0xff;
 
-	if (offs == 0xfe)
+	if (!(offset & 0x01))
 	{
 		if ((offset & 0x0100) == 0)
 			data &= m_io_row0->read();
@@ -186,25 +183,13 @@ READ8_MEMBER( zx_state::zx81_io_r )
 
 		m_cassette->output(+1.0);
 
-		if (m_ula_irq_active)
-		{
-			zx_ula_bkgnd(0);
-			m_ula_irq_active = 0;
+		if (!m_vsync_active && !m_nmi_generator_active) {
+			m_vsync_active = true;
+			m_vsync_start_time = m_maincpu->total_cycles();
 		}
-		else
-		{
-			if ((m_cassette->input() < -0.75) && m_tape_bit)
-			{
-				m_tape_bit = 0x00;
-				timer_set(attotime::from_usec(362), TIMER_TAPE_PULSE);
-			}
 
-			data &= ~m_tape_bit;
-		}
-		if (m_ula_frame_vsync == 3)
-		{
-			m_ula_frame_vsync = 2;
-		}
+		if(m_cassette_cur_level <= 0)
+			data &= 0x7f;
 	}
 
 	return data;
@@ -248,26 +233,8 @@ READ8_MEMBER( zx_state::pc8300_io_r )
 			data &= m_io_row7->read();
 
 		m_cassette->output(+1.0);
-
-		if (m_ula_irq_active)
-		{
-			zx_ula_bkgnd(0);
-			m_ula_irq_active = 0;
-		}
-		else
-		{
-			if ((m_cassette->input() < -0.75) && m_tape_bit)
-			{
-				m_tape_bit = 0x00;
-				timer_set(attotime::from_usec(362), TIMER_TAPE_PULSE);
-			}
-
-			data &= ~m_tape_bit;
-		}
-		if (m_ula_frame_vsync == 3)
-		{
-			m_ula_frame_vsync = 2;
-		}
+		if(m_cassette_cur_level <= 0)
+			data &= 0x7f;
 	}
 
 	return data;
@@ -316,26 +283,8 @@ READ8_MEMBER( zx_state::pow3000_io_r )
 			data &= m_io_row7->read();
 
 		m_cassette->output(+1.0);
-
-		if (m_ula_irq_active)
-		{
-			zx_ula_bkgnd(0);
-			m_ula_irq_active = 0;
-		}
-		else
-		{
-			if ((m_cassette->input() < -0.75) && m_tape_bit)
-			{
-				m_tape_bit = 0x00;
-				timer_set(attotime::from_usec(362), TIMER_TAPE_PULSE);
-			}
-
-			data &= ~m_tape_bit;
-		}
-		if (m_ula_frame_vsync == 3)
-		{
-			m_ula_frame_vsync = 2;
-		}
+		if(m_cassette_cur_level <= 0)
+			data &= 0x7f;
 	}
 
 	return data;
@@ -360,31 +309,20 @@ WRITE8_MEMBER( zx_state::zx81_io_w )
     FE = turn on NMI generator
     FF = write HSYNC and cass data */
 
-	int height = m_screen->height();
-	UINT8 offs = offset & 0xff;
-
-	if (offs == 0xfd)
-	{
-		m_ula_nmi->reset();
+	if (!(offset & 0x01) && !m_nmi_generator_active) {
+		m_nmi_generator_active = true;
+		m_nmi_on = m_hsync_active;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_on ? ASSERT_LINE : CLEAR_LINE);
+		recalc_hsync();
 	}
-	else
-	if (offs == 0xfe)
-	{
-		m_ula_nmi->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(207));
 
-		/* remove the IRQ */
-		m_ula_irq_active = 0;
-	}
-	else
-	if (offs == 0xff)
-	{
-		m_cassette->output(-1.0);
-		zx_ula_bkgnd(1);
-		if (m_ula_frame_vsync == 2)
-		{
-			m_maincpu->spin_until_time(m_screen->time_until_pos(height - 1, 0));
-			m_ula_scanline_count = height - 1;
-			logerror ("S: %d B: %d\n", m_screen->vpos(), m_screen->hpos());
+	if (!(offset & 0x02) && m_nmi_generator_active) {
+		m_nmi_generator_active = false;
+		if(m_nmi_on) {
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			m_nmi_on = false;
 		}
 	}
+
+	drop_sync();
 }

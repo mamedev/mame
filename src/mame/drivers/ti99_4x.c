@@ -468,7 +468,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 			// the line enough to make the TMS9901 sense the low level.
 			// A reported, feasible fix was to cut the line and insert a diode
 			// below the Alphalock key.
-			if ((ioport("ALPHABUG")!=0) && (m_model!=MODEL_4)) answer |= (ioport("ALPHA")->read() | ioport("ALPHA1")->read());
+			if ((m_model!=MODEL_4) && (ioport("ALPHABUG")->read()!=0) ) answer |= (ioport("ALPHA")->read() | ioport("ALPHA1")->read());
 		}
 		else
 		{

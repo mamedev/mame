@@ -205,6 +205,6 @@ WRITE8_MEMBER(beckerport_device::write)
 void beckerport_device::update_port(void)
 {
 	device_stop();
-	m_dwtcpport = m_dwconfigport->read_safe(65504);
+	m_dwtcpport = read_safe(m_dwconfigport, 65504);
 	device_start();
 }

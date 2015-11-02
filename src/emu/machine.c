@@ -206,7 +206,7 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 	else if (strlen(options().autoboot_command())!=0) {
 		std::string cmd = std::string(options().autoboot_command());
 		strreplace(cmd, "'", "\\'");
-		std::string val = std::string("emu.keypost('").append(cmd.c_str()).append("')").c_str();
+		std::string val = std::string("emu.keypost('").append(cmd).append("')");
 		manager().lua()->load_string(val.c_str());
 	}
 }
@@ -256,6 +256,7 @@ void running_machine::start()
 	m_memory.initialize();
 
 	// initialize the watchdog
+	m_watchdog_counter = 0;
 	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
 	if (config().m_watchdog_vblank_count != 0 && primary_screen != NULL)
 		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
@@ -562,7 +563,7 @@ std::string running_machine::get_statename(const char *option)
 
 	// handle %d in the template (for image devices)
 	std::string statename_dev("%d_");
-	int pos = statename_str.find(statename_dev.c_str());
+	int pos = statename_str.find(statename_dev);
 
 	if (pos != -1)
 	{
@@ -807,12 +808,52 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 	m_logerror_list.append(*global_alloc(logerror_callback_item(callback)));
 }
 
+/*-------------------------------------------------
+    popmessage - pop up a user-visible message
+-------------------------------------------------*/
+
+void running_machine::popmessage(const char *format, ...) const
+{
+	// if the format is NULL, it is a signal to clear the popmessage
+	if (format == NULL)
+		ui().popup_time(0, " ");
+
+	// otherwise, generate the buffer and call the UI to display the message
+	else
+	{
+		std::string temp;
+		va_list arg;
+
+		// dump to the buffer
+		va_start(arg, format);
+		strvprintf(temp,format, arg);
+		va_end(arg);
+
+		// pop it in the UI
+		ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
+	}
+}
+
+
+/*-------------------------------------------------
+    logerror - log to the debugger and any other
+    OSD-defined output streams
+-------------------------------------------------*/
+
+void running_machine::logerror(const char *format, ...) const
+{
+	va_list arg;
+	va_start(arg, format);
+	vlogerror(format, arg);
+	va_end(arg);
+}
+
 
 //-------------------------------------------------
 //  vlogerror - vprintf-style error logging
 //-------------------------------------------------
 
-void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
+void running_machine::vlogerror(const char *format, va_list args) const
 {
 	// process only if there is a target
 	if (m_logerror_list.first() != NULL)
@@ -1072,7 +1113,7 @@ void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
 //  logfile
 //-------------------------------------------------
 
-void running_machine::logfile_callback(running_machine &machine, const char *buffer)
+void running_machine::logfile_callback(const running_machine &machine, const char *buffer)
 {
 	if (machine.m_logfile != NULL)
 		machine.m_logfile->puts(buffer);
@@ -1269,7 +1310,6 @@ void running_machine::nvram_save()
 		}
 	}
 }
-
 //**************************************************************************
 //  CALLBACK ITEMS
 //**************************************************************************

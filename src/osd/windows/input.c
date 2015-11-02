@@ -1826,13 +1826,13 @@ static device_info *rawinput_device_create(running_machine &machine, device_info
 {
 	device_info *devinfo = NULL;
 	TCHAR *tname = NULL;
-	INT name_length;
+	INT name_length = 0;
 
-	// determine the length of the device name, allocate it, and fetch it
+	// determine the length of the device name, allocate it, and fetch it if not nameless
 	if ((*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, NULL, &name_length) != 0)
 		goto error;
-	tname = global_alloc_array(TCHAR, name_length);
-	if ((*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, tname, &name_length) == -1)
+	tname = global_alloc_array_clear(TCHAR, name_length+1);
+	if (name_length > 1 && (*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, tname, &name_length) == -1)
 		goto error;
 
 	// if this is an RDP name, skip it

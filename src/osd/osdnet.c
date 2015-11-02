@@ -49,7 +49,8 @@ osd_netdev::osd_netdev(class device_network_interface *ifdev, int rate)
 osd_netdev::~osd_netdev()
 {
 	m_stop = true;
-	m_timer->reset();
+// nasty hack to prevent Segmentation fault on emulation stop
+//  m_timer->reset();
 }
 
 int osd_netdev::send(UINT8 *buf, int len)

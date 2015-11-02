@@ -142,7 +142,7 @@ void ui_menu_control_device_image::load_software_part()
 		hook_load(temp_name, true);
 	else
 	{
-		popmessage("The selected game is missing one or more required ROM or CHD images. Please select a different game.");
+		machine().popmessage("The selected game is missing one or more required ROM or CHD images. Please select a different game.");
 		state = SELECT_SOFTLIST;
 	}
 }
@@ -334,7 +334,7 @@ void ui_menu_control_device_image::handle()
 		zippath_combine(path, current_directory.c_str(), current_file.c_str());
 		int err = image->create(path.c_str(), 0, NULL);
 		if (err != 0)
-			popmessage("Error: %s", image->error());
+			machine().popmessage("Error: %s", image->error());
 		ui_menu::stack_pop(machine());
 		break;
 	}

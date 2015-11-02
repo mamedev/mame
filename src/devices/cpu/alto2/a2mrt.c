@@ -12,7 +12,7 @@ void alto2_cpu_device::f1_early_mrt_block()
 {
 	/* clear the wakeup for the memory refresh task */
 	m_task_wakeup &= ~(1 << m_task);
-	LOG((LOG_MRT,2,"    BLOCK %s\n", task_name(m_task)));
+	LOG((this,LOG_MRT,2,"    BLOCK %s\n", task_name(m_task)));
 }
 
 //! called by the CPU when MRT becomes active

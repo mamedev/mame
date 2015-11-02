@@ -149,8 +149,10 @@ WRITE8_MEMBER(cpc_ddi1_device::rombank_w)
 	m_slot->rom_select(space,0,data);
 }
 
-void cpc_ddi1_device::set_mapping()
+void cpc_ddi1_device::set_mapping(UINT8 type)
 {
+	if(type != MAP_UPPER)
+		return;
 	if(m_rom_active)
 	{
 		UINT8* ROM = memregion("disc_rom")->base();

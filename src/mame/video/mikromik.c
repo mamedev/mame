@@ -12,15 +12,15 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 {
 	UINT8 romdata = m_char_rom->base()[(charcode << 4) | linecount];
 
-	int gpa0 = BIT(gpa, 0);		// general purpose attribute 0
-	int llen = m_llen;			// light enable
-	int compl_in = rvv;			// reverse video
-	int hlt_in = hlgt;			// highlight;
-	int color;					// 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
+	int gpa0 = BIT(gpa, 0);     // general purpose attribute 0
+	int llen = m_llen;          // light enable
+	int compl_in = rvv;         // reverse video
+	int hlt_in = hlgt;          // highlight;
+	int color;                  // 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
 	int i, qh, video_in;
 
-	int d7 = BIT(romdata, 7);	// save MSB (1 indicates that this is a Visual Attribute or Special Code instead of a normal display character)
-	int d6 = BIT(romdata, 6);	// save also first and last char bitmap bits before shifting out the MSB
+	int d7 = BIT(romdata, 7);   // save MSB (1 indicates that this is a Visual Attribute or Special Code instead of a normal display character)
+	int d6 = BIT(romdata, 6);   // save also first and last char bitmap bits before shifting out the MSB
 	int d0 = BIT(romdata, 0);
 	UINT8 data = (romdata << 1) | (d7 & d0); // get rid of MSB, duplicate LSB for special characters
 
@@ -29,7 +29,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 		if (HORIZONTAL_CHARACTER_PIXELS == 10)
 		{
 			// Hack to stretch 8 pixels wide character bitmap to 10 pixels on screen.
-			// This was needed because high res graphics use 800 pixels wide bitmap but 
+			// This was needed because high res graphics use 800 pixels wide bitmap but
 			// 80 chars * 8 pixels is only 640 -> characters would cover only 80% of the screen width.
 			// Step 1: Instead of 8, set MCFG_I8275_CHARACTER_WIDTH(10) at the end of this file
 			// Step 2: Make sure i8275_device::recompute_parameters() is called in i8275_device::device_start()

@@ -332,7 +332,6 @@ namespace bgfx { namespace mtl
 			, m_rtMsaa(false)
 			, m_drawable(NULL)
 		{
-			m_fbh.idx = invalidHandle;
 		}
 
 		~RendererContextMtl()
@@ -342,6 +341,10 @@ namespace bgfx { namespace mtl
 		bool init()
 		{
 			BX_TRACE("Init.");
+
+			m_fbh.idx = invalidHandle;
+			memset(m_uniforms, 0, sizeof(m_uniforms) );
+			memset(&m_resolution, 0, sizeof(m_resolution) );
 
 			if (NULL != NSClassFromString(@"CAMetalLayer") )
 			{
@@ -397,8 +400,6 @@ namespace bgfx { namespace mtl
 			m_uniformBufferVertexOffset = 0;
 			m_uniformBufferFragmentOffset = 0;
 
-			memset(m_uniforms, 0, sizeof(m_uniforms) );
-
 			g_caps.supported |= (0
 								 | BGFX_CAPS_TEXTURE_COMPARE_LEQUAL
 								 | BGFX_CAPS_TEXTURE_3D
@@ -429,9 +430,21 @@ namespace bgfx { namespace mtl
 
 			for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
 			{
-				uint8_t support = (s_textureFormat[ii].m_fmt != MTLPixelFormatInvalid) ? BGFX_CAPS_FORMAT_TEXTURE_COLOR : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+				uint8_t support = 0;
 
-				support |= (s_textureFormat[ii].m_fmtSrgb != MTLPixelFormatInvalid) ? BGFX_CAPS_FORMAT_TEXTURE_COLOR_SRGB : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+				support |= MTLPixelFormatInvalid != s_textureFormat[ii].m_fmt
+					? BGFX_CAPS_FORMAT_TEXTURE_2D
+					| BGFX_CAPS_FORMAT_TEXTURE_3D
+					| BGFX_CAPS_FORMAT_TEXTURE_CUBE
+					: BGFX_CAPS_FORMAT_TEXTURE_NONE
+					;
+
+				support |= MTLPixelFormatInvalid != s_textureFormat[ii].m_fmtSrgb
+					? BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB
+					| BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB
+					| BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB
+					: BGFX_CAPS_FORMAT_TEXTURE_NONE
+					;
 
 					//TODO: additional caps flags
 //				support |= BGFX_CAPS_FORMAT_TEXTURE_VERTEX : BGFX_CAPS_FORMAT_TEXTURE_NONE;
@@ -439,6 +452,29 @@ namespace bgfx { namespace mtl
 //				support |= BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER : BGFX_CAPS_FORMAT_TEXTURE_NONE;
 
 				g_caps.formats[ii] = support;
+			}
+
+			if (BX_ENABLED(BX_PLATFORM_OSX) )
+			{
+				g_caps.formats[TextureFormat::ETC1  ] =
+				g_caps.formats[TextureFormat::ETC2  ] =
+				g_caps.formats[TextureFormat::ETC2A ] =
+				g_caps.formats[TextureFormat::ETC2A1] =
+				g_caps.formats[TextureFormat::PTC12 ] =
+				g_caps.formats[TextureFormat::PTC14 ] =
+				g_caps.formats[TextureFormat::PTC12A] =
+				g_caps.formats[TextureFormat::PTC14A] =
+				g_caps.formats[TextureFormat::PTC22 ] =
+				g_caps.formats[TextureFormat::PTC24 ] = BGFX_CAPS_FORMAT_TEXTURE_NONE;
+			}
+
+			for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
+			{
+				if (BGFX_CAPS_FORMAT_TEXTURE_NONE == g_caps.formats[ii])
+				{
+					s_textureFormat[ii].m_fmt     = MTLPixelFormatInvalid;
+					s_textureFormat[ii].m_fmtSrgb = MTLPixelFormatInvalid;
+				}
 			}
 
 			// Init reserved part of view name.
@@ -587,6 +623,10 @@ namespace bgfx { namespace mtl
 	}
 
 	void updateTextureEnd() BX_OVERRIDE
+	{
+	}
+
+	void readTexture(TextureHandle /*_handle*/, void* /*_data*/) BX_OVERRIDE
 	{
 	}
 
@@ -752,9 +792,11 @@ namespace bgfx { namespace mtl
 		rce.setScissorRect(rc);
 		rce.setCullMode(MTLCullModeNone);
 
-		uint64_t state = BGFX_STATE_RGB_WRITE
-						| BGFX_STATE_ALPHA_WRITE
-						| BGFX_STATE_DEPTH_TEST_ALWAYS;
+		uint64_t state = 0
+			| BGFX_STATE_RGB_WRITE
+			| BGFX_STATE_ALPHA_WRITE
+			| BGFX_STATE_DEPTH_TEST_ALWAYS
+			;
 
 		setDepthStencilState(state);
 
@@ -858,10 +900,16 @@ namespace bgfx { namespace mtl
 
 		//TODO: there should be a way to specify if backbuffer needs stencil/depth.
 		//TODO: support msaa
-		if (NULL == m_backBufferDepth
+		if (NULL   == m_backBufferDepth
 		||  width  != m_backBufferDepth.width()
-		||  height != m_backBufferDepth.height() )
+		||  height != m_backBufferDepth.height()
+		||  m_resolution.m_width  != _resolution.m_width
+		||  m_resolution.m_height != _resolution.m_height
+		||  m_resolution.m_flags  != _resolution.m_flags)
 		{
+			m_resolution = _resolution;
+			m_resolution.m_flags &= ~BGFX_RESET_FORCE;
+
 			m_textureDescriptor.textureType = MTLTextureType2D;
 
 			m_textureDescriptor.pixelFormat = MTLPixelFormatDepth32Float_Stencil8;
@@ -1191,6 +1239,8 @@ namespace bgfx { namespace mtl
 
 	FrameBufferHandle m_fbh;
 	bool m_rtMsaa;
+
+	Resolution m_resolution;
 
 	// descriptors
 	RenderPipelineDescriptor m_renderPipelineDescriptor;
@@ -1697,13 +1747,11 @@ namespace bgfx { namespace mtl
 								}
 								else if (arg.type == MTLArgumentTypeTexture)
 								{
-									const char* name = utf8String(arg.name);
-									BX_TRACE("texture: %s index:%d", name, arg.index);
+									BX_TRACE("texture: %s index:%d", utf8String(arg.name), arg.index);
 								}
 								else if (arg.type == MTLArgumentTypeSampler)
 								{
-									const char* name = utf8String(arg.name);
-									BX_TRACE("sampler: %s index:%d", name, arg.index);
+									BX_TRACE("sampler: %s index:%d", utf8String(arg.name), arg.index);
 								}
 							}
 						}
@@ -1774,10 +1822,12 @@ namespace bgfx { namespace mtl
 
 			m_flags = _flags;
 			m_requestedFormat = (uint8_t)imageContainer.m_format;
-			m_textureFormat   = (uint8_t)imageContainer.m_format;
+			m_textureFormat   = MTLPixelFormatInvalid == s_textureFormat[m_requestedFormat].m_fmt
+				? uint8_t(TextureFormat::BGRA8)
+				: m_requestedFormat
+				;
 
-			const TextureFormatInfo& tfi = s_textureFormat[m_requestedFormat];
-			const bool convert = MTLPixelFormatInvalid == tfi.m_fmt;
+			const bool convert = m_requestedFormat != m_textureFormat;
 
 			uint8_t bpp = getBitsPerPixel(TextureFormat::Enum(m_textureFormat) );
 			if (convert)
@@ -1815,9 +1865,8 @@ namespace bgfx { namespace mtl
 					 , 0 != (_flags&BGFX_TEXTURE_RT_MASK) ? " (render target)" : ""
 					 );
 
-
 			const bool bufferOnly   = 0 != (_flags&BGFX_TEXTURE_RT_BUFFER_ONLY);
-			const bool computeWrite = 0 != (_flags&BGFX_TEXTURE_COMPUTE_WRITE);
+//			const bool computeWrite = 0 != (_flags&BGFX_TEXTURE_COMPUTE_WRITE);
 //			const bool renderTarget = 0 != (_flags&BGFX_TEXTURE_RT_MASK);
 			const bool srgb			= 0 != (_flags&BGFX_TEXTURE_SRGB) || imageContainer.m_srgb;
 //			const uint32_t msaaQuality = bx::uint32_satsub( (_flags&BGFX_TEXTURE_RT_MSAA_MASK)>>BGFX_TEXTURE_RT_MSAA_SHIFT, 1);
@@ -1826,14 +1875,17 @@ namespace bgfx { namespace mtl
 			MTLPixelFormat format = MTLPixelFormatInvalid;
 			if (srgb)
 			{
-				format      = s_textureFormat[m_textureFormat].m_fmtSrgb;
-				BX_WARN(format != MTLPixelFormatInvalid, "sRGB not supported for texture format %d", m_textureFormat);
+				format = s_textureFormat[m_textureFormat].m_fmtSrgb;
+				BX_WARN(format != MTLPixelFormatInvalid
+					, "sRGB not supported for texture format %d"
+					, m_textureFormat
+					);
 			}
 
 			if (format == MTLPixelFormatInvalid)
 			{
 				// not swizzled and not sRGB, or sRGB unsupported
-				format		= s_textureFormat[m_textureFormat].m_fmt;
+				format = s_textureFormat[m_textureFormat].m_fmt;
 			}
 
 			desc.pixelFormat = format;
@@ -1844,8 +1896,15 @@ namespace bgfx { namespace mtl
 			desc.sampleCount      = 1; //TODO: set samplecount -  If textureType is not MTLTextureType2DMultisample, the value must be 1.
 			desc.resourceOptions  = MTLResourceStorageModePrivate;
 			desc.cpuCacheMode     = MTLCPUCacheModeDefaultCache;
-			desc.storageMode      = bufferOnly ? 1 /*MTLStorageModeManaged*/ : 2 /*MTLStorageModePrivate*/;
-			desc.usage = MTLTextureUsageShaderRead;
+
+			desc.storageMode = bufferOnly
+				? 2 /*MTLStorageModePrivate*/
+				: 1 /*MTLStorageModeManaged*/
+				;
+			desc.usage       = bufferOnly
+				? MTLTextureUsageShaderWrite
+				: MTLTextureUsageShaderRead
+				;
 
 			//TODO: set resource flags depending on usage(renderTarget/computeWrite/etc) on iOS9/OSX
 
@@ -1883,45 +1942,47 @@ namespace bgfx { namespace mtl
 						if (convert)
 						{
 							imageDecodeToRgba8(temp
-											   , mip.m_data
-											   , mip.m_width
-											   , mip.m_height
-											   , mip.m_width*4
-											   , mip.m_format
-											   );
+								, mip.m_data
+								, mip.m_width
+								, mip.m_height
+								, mip.m_width*4
+								, mip.m_format
+								);
 							data = temp;
 						}
 
 						MTLRegion region = { { 0, 0, 0 }, { width, height, depth } };
 
-						uint32_t bytesPerRow;
-						uint32_t bytesPerImage;
+						uint32_t bytesPerRow   = 0;
+						uint32_t bytesPerImage = 0;
 
 						if (compressed && !convert)
 						{
 							if (format >= 160 /*MTLPixelFormatPVRTC_RGB_2BPP*/
 							&&  format <= 167 /*MTLPixelFormatPVRTC_RGBA_4BPP_sRGB*/)
 							{
-								bytesPerRow = 0;
+								bytesPerRow   = 0;
 								bytesPerImage = 0;
 							}
 							else
 							{
-								bytesPerRow = (mip.m_width / blockInfo.blockWidth )*mip.m_blockSize;
-								bytesPerImage = (desc.textureType == MTLTextureType3D) ? (mip.m_height/blockInfo.blockHeight)*bytesPerRow : 0;
+								bytesPerRow   = (mip.m_width / blockInfo.blockWidth)*mip.m_blockSize;
+								bytesPerImage = desc.textureType == MTLTextureType3D
+									? (mip.m_height/blockInfo.blockHeight)*bytesPerRow
+									: 0
+									;
 							}
 						}
 						else
 						{
-							bytesPerRow = width * bpp / 8;
-							bytesPerImage = (desc.textureType == MTLTextureType3D) ? width * height * bpp / 8 : 0;
+							bytesPerRow   = width * bpp / 8;
+							bytesPerImage = desc.textureType == MTLTextureType3D
+								? bytesPerRow * height
+								: 0
+								;
 						}
 
 						m_ptr.replaceRegion(region, lod, side, data, bytesPerRow, bytesPerImage);
-					}
-					else if (!computeWrite)
-					{
-						//TODO: do we need to clear to zero??
 					}
 
 					width  >>= 1;
@@ -1939,9 +2000,13 @@ namespace bgfx { namespace mtl
 
 	void TextureMtl::update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem)
 	{
-		MTLRegion region = { { _rect.m_x, _rect.m_y, _z }, { _rect.m_width, _rect.m_height, _depth } };
+		MTLRegion region =
+		{
+			{ _rect.m_x,     _rect.m_y,      _z     },
+			{ _rect.m_width, _rect.m_height, _depth },
+		};
 
-		const uint32_t bpp    = getBitsPerPixel(TextureFormat::Enum(m_textureFormat) );
+		const uint32_t bpp       = getBitsPerPixel(TextureFormat::Enum(m_textureFormat) );
 		const uint32_t rectpitch = _rect.m_width*bpp/8;
 		const uint32_t srcpitch  = UINT16_MAX == _pitch ? rectpitch : _pitch;
 

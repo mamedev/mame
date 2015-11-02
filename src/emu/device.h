@@ -205,6 +205,11 @@ public:
 	void set_system_bios(UINT8 bios) { m_system_bios = bios; }
 	bool findit(bool isvalidation = false) const;
 
+	// misc
+	void popmessage(const char *format, ...) const;
+	void logerror(const char *format, ...) const;
+	void vlogerror(const char *format, va_list args) const;
+
 protected:
 	// miscellaneous helpers
 	void set_machine(running_machine &machine);

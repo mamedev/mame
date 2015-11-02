@@ -93,7 +93,8 @@ WRITE16_MEMBER( btoads_state::display_control_w )
 WRITE16_MEMBER( btoads_state::scroll0_w )
 {
 	/* allow multiple changes during display */
-	m_screen->update_now();
+//  m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -106,7 +107,8 @@ WRITE16_MEMBER( btoads_state::scroll0_w )
 WRITE16_MEMBER( btoads_state::scroll1_w )
 {
 	/* allow multiple changes during display */
-	m_screen->update_now();
+//  m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)

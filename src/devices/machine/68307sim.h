@@ -65,10 +65,10 @@ class m68307_sim
 
 
 
-	void write_licr1(UINT16 data, UINT16 mem_mask);
-	void write_licr2(UINT16 data, UINT16 mem_mask);
-	void write_picr(UINT16 data, UINT16 mem_mask);
-	void write_pivr(UINT16 data, UINT16 mem_mask);
+	void write_licr1(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
+	void write_licr2(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
+	void write_picr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
+	void write_pivr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
 
 	void reset(void);
 };

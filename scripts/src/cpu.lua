@@ -132,6 +132,8 @@ if (CPUS["ARM7"]~=null) then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7thmb.c",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7ops.c",
+		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.c",
+		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.h",
 	}
 end
 
@@ -1134,6 +1136,7 @@ end
 --@src/devices/cpu/m6502/r65c02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m65sc02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6504.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m6507.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6509.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6510.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6510t.h,CPUS["M6502"] = true
@@ -1162,6 +1165,8 @@ if (CPUS["M6502"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.c",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m6507.c",
+		MAME_DIR .. "src/devices/cpu/m6502/m6507.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6509.c",
 		MAME_DIR .. "src/devices/cpu/m6502/m6509.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6510.c",

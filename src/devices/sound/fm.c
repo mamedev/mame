@@ -683,7 +683,7 @@ struct FM_OPN
 #define LOG_LEVEL LOG_INF
 
 #ifndef __RAINE__
-#define LOG(n,x) do { if( (n)>=LOG_LEVEL ) logerror x; } while (0)
+#define LOG(d,n,x) do { if( (n)>=LOG_LEVEL ) d->logerror x; } while (0)
 #endif
 
 /* limitter */
@@ -2422,6 +2422,8 @@ struct YM2610
 
 	UINT8       flagmask;           /* YM2608 only */
 	UINT8       irqmask;            /* YM2608 only */
+	
+	device_t	*device;
 };
 
 /* here is the virtual YM2608 */
@@ -2558,19 +2560,19 @@ static void FM_ADPCMAWrite(YM2610 *F2610,int r,int v)
 
 					if(F2610->pcmbuf==NULL)
 					{                   /* Check ROM Mapped */
-						logerror("YM2608-YM2610: ADPCM-A rom not mapped\n");
+						F2610->device->logerror("YM2608-YM2610: ADPCM-A rom not mapped\n");
 						adpcm[c].flag = 0;
 					}
 					else
 					{
 						if(adpcm[c].end >= F2610->pcm_size)
 						{   /* Check End in Range */
-							logerror("YM2610: ADPCM-A end out of range: $%08x\n",adpcm[c].end);
+							F2610->device->logerror("YM2610: ADPCM-A end out of range: $%08x\n",adpcm[c].end);
 							/*adpcm[c].end = F2610->pcm_size-1;*/ /* JB: DO NOT uncomment this, otherwise you will break the comparison in the ADPCM_CALC_CHA() */
 						}
 						if(adpcm[c].start >= F2610->pcm_size)   /* Check Start in Range */
 						{
-							logerror("YM2608-YM2610: ADPCM-A start out of range: $%08x\n",adpcm[c].start);
+							F2610->device->logerror("YM2608-YM2610: ADPCM-A start out of range: $%08x\n",adpcm[c].start);
 							adpcm[c].flag = 0;
 						}
 					}
@@ -3070,7 +3072,7 @@ void ym2608_reset_chip(void *chip)
 	DELTAT->output_pointer = OPN->out_delta;
 	DELTAT->portshift = 5;      /* always 5bits shift */ /* ASG */
 	DELTAT->output_range = 1<<23;
-	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_NORMAL);
+	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_NORMAL,DELTAT->device);
 }
 
 /* YM2608 write */
@@ -3153,7 +3155,7 @@ int ym2608_write(void *chip, int a,UINT8 v)
 			switch( addr )
 			{
 			case 0x0e:  /* DAC data */
-				logerror("YM2608: write to DAC data (unimplemented) value=%02x\n",v);
+				F2608->device->logerror("YM2608: write to DAC data (unimplemented) value=%02x\n",v);
 				break;
 			default:
 				/* 0x00-0x0d */
@@ -3205,7 +3207,7 @@ UINT8 ym2608_read(void *chip,int a)
 		{
 			if(addr == 0x0f)
 			{
-				logerror("YM2608 A/D convertion is accessed but not implemented !\n");
+				F2608->device->logerror("YM2608 A/D convertion is accessed but not implemented !\n");
 				ret = 0x80; /* 2's complement PCM data - result from A/D convertion */
 			}
 		}
@@ -3283,9 +3285,9 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 #define FM_MSG_YM2610B "YM2610-%p.CH%d is playing,Check whether the type of the chip is YM2610B\n"
 	/* Check YM2610B warning message */
 	if( FM_KEY_IS(&F2610->CH[0].SLOT[3]) )
-		LOG(LOG_WAR,(FM_MSG_YM2610B,F2610->OPN.ST.param,0));
+		LOG(F2610->device,LOG_WAR,(FM_MSG_YM2610B,F2610->OPN.ST.param,0));
 	if( FM_KEY_IS(&F2610->CH[3].SLOT[3]) )
-		LOG(LOG_WAR,(FM_MSG_YM2610B,F2610->OPN.ST.param,3));
+		LOG(F2610->device,LOG_WAR,(FM_MSG_YM2610B,F2610->OPN.ST.param,3));
 #endif
 
 	/* refresh PG and EG */
@@ -3628,6 +3630,7 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 		return NULL;
 	}
 
+	F2610->device = device;
 	/* FM */
 	F2610->OPN.ST.param = param;
 	F2610->OPN.type = TYPE_YM2610;
@@ -3744,7 +3747,7 @@ void ym2610_reset_chip(void *chip)
 	DELTAT->output_pointer = OPN->out_delta;
 	DELTAT->portshift = 8;      /* allways 8bits shift */
 	DELTAT->output_range = 1<<23;
-	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_YM2610);
+	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_YM2610,F2610->device);
 }
 
 /* YM2610 write */
@@ -3817,7 +3820,7 @@ int ym2610_write(void *chip, int a, UINT8 v)
 				break;
 
 			default:
-				logerror("YM2610: write to unknown deltat register %02x val=%02x\n",addr,v);
+				F2610->device->logerror("YM2610: write to unknown deltat register %02x val=%02x\n",addr,v);
 				break;
 			}
 

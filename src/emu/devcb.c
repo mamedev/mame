@@ -310,7 +310,7 @@ UINT64 devcb_read_base::read_ioport_adapter(address_space &space, offs_t offset,
 
 UINT64 devcb_read_base::read_logged_adapter(address_space &space, offs_t offset, UINT64 mask)
 {
-	logerror("%s: read %s\n", m_device.machine().describe_context(), m_target_tag);
+	m_device.logerror("%s: read %s\n", m_device.machine().describe_context(), m_target_tag);
 	return shift_mask_xor(m_target_int);
 }
 
@@ -518,7 +518,8 @@ void devcb_write_base::write64_adapter(address_space &space, offs_t offset, UINT
 
 void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
 {
-	m_target.ioport->write_safe(unshift_mask_xor(data));
+	if (m_target.ioport)
+		m_target.ioport->write(unshift_mask_xor(data));
 }
 
 
@@ -529,7 +530,7 @@ void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset,
 
 void devcb_write_base::write_logged_adapter(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
 {
-	logerror("%s: unresolved devcb write\n", m_device.machine().describe_context());
+	m_device.logerror("%s: unresolved devcb write\n", m_device.machine().describe_context());
 }
 
 

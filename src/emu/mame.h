@@ -121,19 +121,4 @@ private:
 extern const char build_version[];
 extern const char bare_build_version[];
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* ----- miscellaneous bits & pieces ----- */
-
-// pop-up a user visible message
-void CLIB_DECL popmessage(const char *format, ...) ATTR_PRINTF(1,2);
-
-// log to the standard error.log file
-void CLIB_DECL logerror(const char *format, ...) ATTR_PRINTF(1,2);
-void CLIB_DECL vlogerror(const char *format, va_list arg);
-
-
 #endif  /* __MAME_H__ */

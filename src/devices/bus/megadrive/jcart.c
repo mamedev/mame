@@ -180,14 +180,14 @@ READ16_MEMBER(md_jcart_device::read)
 
 		if (m_jcart_io_data[0] & 0x40)
 		{
-			joy[0] = m_jcart3->read_safe(0);
-			joy[1] = m_jcart4->read_safe(0);
+			joy[0] = read_safe(m_jcart3, 0);
+			joy[1] = read_safe(m_jcart4, 0);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 		else
 		{
-			joy[0] = ((m_jcart3->read_safe(0) & 0xc0) >> 2) | (m_jcart3->read_safe(0) & 0x03);
-			joy[1] = ((m_jcart4->read_safe(0) & 0xc0) >> 2) | (m_jcart4->read_safe(0) & 0x03);
+			joy[0] = ((read_safe(m_jcart3, 0) & 0xc0) >> 2) | (read_safe(m_jcart3, 0) & 0x03);
+			joy[1] = ((read_safe(m_jcart4, 0) & 0xc0) >> 2) | (read_safe(m_jcart4, 0) & 0x03);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
@@ -223,14 +223,14 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 
 		if (m_jcart_io_data[0] & 0x40)
 		{
-			joy[0] = m_jcart3->read_safe(0);
-			joy[1] = m_jcart4->read_safe(0);
+			joy[0] = read_safe(m_jcart3, 0);
+			joy[1] = read_safe(m_jcart4, 0);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 		else
 		{
-			joy[0] = ((m_jcart3->read_safe(0) & 0xc0) >> 2) | (m_jcart3->read_safe(0) & 0x03);
-			joy[1] = ((m_jcart4->read_safe(0) & 0xc0) >> 2) | (m_jcart4->read_safe(0) & 0x03);
+			joy[0] = ((read_safe(m_jcart3, 0) & 0xc0) >> 2) | (read_safe(m_jcart3, 0) & 0x03);
+			joy[1] = ((read_safe(m_jcart4, 0) & 0xc0) >> 2) | (read_safe(m_jcart4, 0) & 0x03);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}

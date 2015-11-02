@@ -249,7 +249,7 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 		{
 		/* GUESS
 		 * the Advanced Users manual says this is the correct algorithm
-		 * but the divider is wrong(?), says 16 but results in high pitch, 
+		 * but the divider is wrong(?), says 16 but results in high pitch,
 		 * 32 is more close
 		 */
 			m_beeper->set_frequency( 1000000 / ( 32 * ( data + 1 ) ) );

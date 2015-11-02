@@ -1,11 +1,16 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+newoption {
+    trigger = 'build-dir',
+    description = 'Build directory name',
+}
+
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 MAME_DIR = (path.getabsolute("..") .. "/")
 MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
-local MAME_BUILD_DIR = (MAME_DIR .. "build/")
+local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
 local naclToolchain = ""
 
 

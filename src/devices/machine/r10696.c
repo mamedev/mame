@@ -154,7 +154,7 @@ READ8_MEMBER( r10696_device::io_r )
 		io_a = m_iord(0);
 		io_b = m_iord(1);
 		io_c = m_iord(2);
-		data = (io_a | io_b | io_a) & 0x0f;
+		data = (io_a | io_b | io_c) & 0x0f;
 		break;
 	case 0x01: // Read Groups B | C
 		io_b = m_iord(1);

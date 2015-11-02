@@ -1396,7 +1396,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 		uPD71054->timer[no]->adjust( period, no );
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
-		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
+		state->logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				(cpu != NULL) ? cpu->safe_pc() : -1, no );
 	}
 }
@@ -1962,7 +1962,7 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 
 READ16_MEMBER(seta_state::extra_r)
 {
-	return ioport("EXTRA")->read_safe(0xff);
+	return read_safe(ioport("EXTRA"), 0xff);
 }
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )

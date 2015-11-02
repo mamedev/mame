@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0" />
+			<bounds x="0" y="0"  width="1" height="1" />
+		</disk>
+		<disk state="1">
+			<color red="1" green="1" blue="0" />
+			<bounds x="0" y="0"  width="1" height="1" />
+		</disk>
+	</element>
+
+	<element name="rect" defstate="0">
+		<rect state="0">
+			<color red="1" green="1" blue="0" />
+			<bounds x="0" y="0"  width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="alligator" defstate="0">
+		<rect state="0">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="2" />
+		</rect>
+		<disk state="0">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="4" />
+		</disk>
+
+		<rect state="1">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="5" />
+		</rect>
+		<disk state="1">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="10" />
+		</disk>
+
+		<rect state="2">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="8" />
+		</rect>
+		<disk state="2">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="16" />
+		</disk>
+
+		<rect state="3">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="13" />
+		</rect>
+		<disk state="3">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="5"  width="10" height="16" />
+		</disk>
+
+		<rect state="4">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="18" />
+		</rect>
+		<disk state="4">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="10"  width="10" height="16" />
+		</disk>
+
+		<rect state="5">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="0"  width="10" height="23" />
+		</rect>
+		<disk state="5">
+			<color red="0" green="1" blue="0" />
+			<bounds x="0" y="15"  width="10" height="16" />
+		</disk>
+	</element>
+
+	<view name="Default Layout">
+
+		<!-- wacks -->
+		<bezel name="digit5" element="digit">
+			<bounds x="25" y="10"  width="8" height="10" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds x="35" y="10"  width="8" height="10" />
+		</bezel>
+
+		<!-- bites -->
+		<bezel name="digit3" element="digit">
+			<bounds x="25" y="25"  width="8" height="10" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="35" y="25"  width="8" height="10" />
+		</bezel>
+
+		<!-- score -->
+		<bezel name="digit1" element="digit">
+			<bounds x="25" y="40"  width="8" height="10" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="35" y="40"  width="8" height="10" />
+		</bezel>
+
+		<!-- high score -->
+		<bezel name="digit7" element="digit">
+			<bounds x="55" y="25"  width="8" height="10" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds x="65" y="25"  width="8" height="10" />
+		</bezel>
+
+		<!-- shadow box lamps -->
+		<bezel name="lamp4" element="lamp">
+			<bounds x="10" y="10"  width="10" height="4" />
+		</bezel>
+		<bezel name="lamp3" element="lamp">
+			<bounds x="10" y="18"  width="10" height="4" />
+		</bezel>
+		<bezel name="lamp2" element="lamp">
+			<bounds x="10" y="26"  width="10" height="4" />
+		</bezel>
+		<bezel name="lamp1" element="lamp">
+			<bounds x="10" y="34"  width="10" height="4" />
+		</bezel>
+		<bezel name="lamp0" element="lamp">
+			<bounds x="10" y="42"  width="10" height="4" />
+		</bezel>
+
+		<!-- game over lamp -->
+		<bezel name="lamp5" element="lamp">
+			<bounds x="35" y="55"  width="9" height="4" />
+		</bezel>
+
+		<!-- left timing lamps -->
+		<bezel name="lamp8" element="lamp">
+			<bounds x="25" y="0"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp9" element="lamp">
+			<bounds x="15" y="0"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp11" element="lamp">
+			<bounds x="5" y="2"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp10" element="lamp">
+			<bounds x="0" y="10"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp12" element="lamp">
+			<bounds x="0" y="21"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp13" element="lamp">
+			<bounds x="0" y="33"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp15" element="lamp">
+			<bounds x="0" y="45"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp14" element="lamp">
+			<bounds x="5" y="53"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp16" element="lamp">
+			<bounds x="15" y="55"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp17" element="lamp">
+			<bounds x="25" y="55"  width="4" height="4" />
+		</bezel>
+
+		<!-- right timing lamps -->
+		<bezel name="lamp27" element="lamp">
+			<bounds x="50" y="0"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp26" element="lamp">
+			<bounds x="60" y="0"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp24" element="lamp">
+			<bounds x="70" y="2"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp25" element="lamp">
+			<bounds x="75" y="10"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp23" element="lamp">
+			<bounds x="75" y="21"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp22" element="lamp">
+			<bounds x="75" y="33"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp20" element="lamp">
+			<bounds x="75" y="45"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp21" element="lamp">
+			<bounds x="70" y="53"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp19" element="lamp">
+			<bounds x="60" y="55"  width="4" height="4" />
+		</bezel>
+		<bezel name="lamp18" element="lamp">
+			<bounds x="50" y="55"  width="4" height="4" />
+		</bezel>
+
+		<!-- alligators -->
+		<bezel name="alligator0" element="alligator" inputtag="IN2" inputmask="0x01">
+			<bounds x="5" y="65"  width="10" height="40" />
+		</bezel>
+		<bezel name="alligator1" element="alligator" inputtag="IN2" inputmask="0x02">
+			<bounds x="20" y="65"  width="10" height="40" />
+		</bezel>
+		<bezel name="alligator2" element="alligator" inputtag="IN2" inputmask="0x04">
+			<bounds x="35" y="65"  width="10" height="40" />
+		</bezel>
+		<bezel name="alligator3" element="alligator" inputtag="IN2" inputmask="0x08">
+			<bounds x="50" y="65"  width="10" height="40" />
+		</bezel>
+		<bezel name="alligator4" element="alligator" inputtag="IN2" inputmask="0x10">
+			<bounds x="65" y="65"  width="10" height="40" />
+		</bezel>
+		<bezel name="cave" element="rect">
+			<bounds x="0" y="65"  width="80" height="4" />
+		</bezel>
+
+	</view>
+</mamelayout>

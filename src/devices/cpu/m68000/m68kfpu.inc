@@ -1681,7 +1681,7 @@ static void fmove_fpcr(m68000_base_device *m68k, UINT16 w2)
 		int rnd = (REG_FPCR(m68k) >> 4) & 3;
 		int prec = (REG_FPCR(m68k) >> 6) & 3;
 
-		logerror("m68k_fpsp:fmove_fpcr fpcr=%04x prec=%d rnd=%d\n", REG_FPCR(m68k), prec, rnd);
+		m68k->logerror("m68k_fpsp:fmove_fpcr fpcr=%04x prec=%d rnd=%d\n", REG_FPCR(m68k), prec, rnd);
 
 #ifdef FLOATX80
 		switch (prec)

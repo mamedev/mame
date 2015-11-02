@@ -10,7 +10,7 @@
 //! f1_ksec_block early: block the disk sector task
 void alto2_cpu_device::f1_early_ksec_block()
 {
-	LOG((LOG_KSEC,2,"   BLOCK %s\n", task_name(m_task)));
+	LOG((this,LOG_KSEC,2,"   BLOCK %s\n", task_name(m_task)));
 	disk_block(m_task);
 }
 

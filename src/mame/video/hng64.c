@@ -168,8 +168,8 @@ WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 	{
 		hng64_mark_tile_dirty(3, offset&0x3fff);
 	}
-    // Offsets 0x40000 - 0x58000 are for "floor" scanline control
-    
+	// Offsets 0x40000 - 0x58000 are for "floor" scanline control
+
 	/* 400000 - 7fffff is scroll regs etc. */
 }
 
@@ -435,9 +435,9 @@ void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_r
 {
 	blit_parameters blit;
 
-    // notes:
-    // - startx and starty MUST be UINT32 for calculations to work correctly
-    // - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
+	// notes:
+	// - startx and starty MUST be UINT32 for calculations to work correctly
+	// - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
 
 	// skip if disabled
 	//if (!tmap->enable)
@@ -474,7 +474,7 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ---- -Cdd ---- -??Z ---- ---- ---- ---- |  C = global complex zoom
           | 0000 0011  - road edge alt 1            | dd = global tilemap dimension selector
-          | 0000 0111  - road edge alt 2            |  ? = Always Set? 
+          | 0000 0111  - road edge alt 2            |  ? = Always Set?
           |                                         |  Z = Global Zoom Disable?
  *   1    | oooo oooo oooo oooo ---- ---- ---- ---- | unknown - 0001 is a popular value.  Explore.
  *   1    | ---- ---- ---- ---- oooo oooo oooo oooo | unknown - untouched in sams64 games, initialized elsewhere
@@ -514,21 +514,21 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
     // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
     // r = tile size (seems correct)
     // e = tilemap enable bit according to sams64_2
-    // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere? 
+    // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
     //              (debug layer on buriki has priority 0x020, which would be highest)
  */
 
 
 void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm)
 {
-    // Useful bits from the global tilemap flags
-    const UINT32& global_tileregs = m_videoregs[0x00];
+	// Useful bits from the global tilemap flags
+	const UINT32& global_tileregs = m_videoregs[0x00];
 	const int global_dimensions = (global_tileregs & 0x03000000) >> 24;
-    const int global_alt_scroll_register_format = global_tileregs & 0x04000000;
-    const int global_zoom_disable = global_tileregs & 0x00010000;
-    
-    // Debug blending on/off based on m_additive_tilemap_debug
-    int debug_blend_enabled = 0;
+	const int global_alt_scroll_register_format = global_tileregs & 0x04000000;
+	const int global_zoom_disable = global_tileregs & 0x00010000;
+
+	// Debug blending on/off based on m_additive_tilemap_debug
+	int debug_blend_enabled = 0;
 	if ((m_additive_tilemap_debug&(1 << tm)))
 		debug_blend_enabled = 1;
 
@@ -537,9 +537,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		popmessage("unsupported global_dimensions on tilemaps");
 #endif
 
-    // Determine which tilemap registers and scroll base this tilemap uses
-    UINT16 tileregs = 0;
-    UINT16 scrollbase = 0;
+	// Determine which tilemap registers and scroll base this tilemap uses
+	UINT16 tileregs = 0;
+	UINT16 scrollbase = 0;
 	if (tm==0)
 	{
 		scrollbase = (m_videoregs[0x04]&0x3fff0000)>>16;
@@ -561,21 +561,21 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		tileregs   = (m_videoregs[0x03]&0x0000ffff)>>0;
 	}
 
-    // Useful bits from the tilemap registers
-    const UINT8 mosaicValueBits  = (tileregs & 0xf000) >> 12; (void)mosaicValueBits;
-    const UINT8 floorModeBit     = (tileregs & 0x0800) >> 11;
-    const UINT8 bppBit           = (tileregs & 0x0400) >> 10;
-    const UINT8 bigTilemapBit    = (tileregs & 0x0200) >>  9;
-    const UINT8 tilemapEnableBit = (tileregs & 0x0040) >>  6; (void)tilemapEnableBit;
-    
-    // Tilemap drawing enable (sams64_2 demo mode says this is legit)
-    //if (!tilemapEnableBit)
-    //{
-    //    return;
-    //}
-    
-    // Select the proper tilemap size
-    tilemap_t* tilemap = NULL;
+	// Useful bits from the tilemap registers
+	const UINT8 mosaicValueBits  = (tileregs & 0xf000) >> 12; (void)mosaicValueBits;
+	const UINT8 floorModeBit     = (tileregs & 0x0800) >> 11;
+	const UINT8 bppBit           = (tileregs & 0x0400) >> 10;
+	const UINT8 bigTilemapBit    = (tileregs & 0x0200) >>  9;
+	const UINT8 tilemapEnableBit = (tileregs & 0x0040) >>  6; (void)tilemapEnableBit;
+
+	// Tilemap drawing enable (sams64_2 demo mode says this is legit)
+	//if (!tilemapEnableBit)
+	//{
+	//    return;
+	//}
+
+	// Select the proper tilemap size
+	tilemap_t* tilemap = NULL;
 	if (global_dimensions==0)
 	{
 		if (bigTilemapBit) tilemap = m_tilemap[tm].m_tilemap_16x16;
@@ -588,7 +588,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	// Set the transmask so our manual copy is correct
-    int transmask = 0x00;
+	int transmask = 0x00;
 	if (bppBit)
 		transmask = 0xff;
 	else
@@ -596,53 +596,53 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	if (floorModeBit == 0x0000)
 	{
-        // floor mode
-        // life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
+		// floor mode
+		// life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
 
-        // fprintf(stderr, "Tilemap %d is a floor using :\n", tm);
-        const UINT32 floorAddress = 0x40000 + (scrollbase << 4);
+		// fprintf(stderr, "Tilemap %d is a floor using :\n", tm);
+		const UINT32 floorAddress = 0x40000 + (scrollbase << 4);
 
-        // TODO: The row count is correct, but how is this layer clipped? m_tcram?
-        
-        // See how many lines we have in the data region
-        // DEBUG: Change this to a loop that goes over each line and draws them - it's just for visualization now
-        //int lineCount = 0;
-        //for (int ii = 0; ii < 0x2000/4; ii += 4)
-        //{
-        //    const int realAddress = floorAddress/4;
-        //    if (m_videoram[realAddress+ii] == 0xffffff00 && m_videoram[realAddress+ii+1] == 0xffffff00)
-        //        continue;
-        //    if (m_videoram[realAddress+ii] == 0x00000000 && m_videoram[realAddress+ii+1] == 0x00000000)
-        //        continue;
-        //    
-        //    lineCount++;
-        //}
-        //printf("lines %d\n", lineCount);
+		// TODO: The row count is correct, but how is this layer clipped? m_tcram?
 
-        // Buriki uses a 2x mosaic effect on its floor, so its line count is half
-        // (but so does fatfurwa - maybe it overdraws a bunch of pixels?)
-        //if (m_mcu_type == BURIKI_MCU)
-        //    lineCount *= 2;
+		// See how many lines we have in the data region
+		// DEBUG: Change this to a loop that goes over each line and draws them - it's just for visualization now
+		//int lineCount = 0;
+		//for (int ii = 0; ii < 0x2000/4; ii += 4)
+		//{
+		//    const int realAddress = floorAddress/4;
+		//    if (m_videoram[realAddress+ii] == 0xffffff00 && m_videoram[realAddress+ii+1] == 0xffffff00)
+		//        continue;
+		//    if (m_videoram[realAddress+ii] == 0x00000000 && m_videoram[realAddress+ii+1] == 0x00000000)
+		//        continue;
+		//
+		//    lineCount++;
+		//}
+		//printf("lines %d\n", lineCount);
 
-        // DEBUG - draw a horizontal green line where the uppermost line of the floor is drawn
-        const rectangle &visarea = screen.visible_area();
-        //if (lineCount < visarea.height())
-        //{
-        //    for (int ii = 0; ii < visarea.width(); ii++)
-        //        bitmap.pix32((visarea.height()-lineCount), ii) = 0xff00ff00;
-        //}
-        
-        // HACK : Clear RAM - this is "needed" in fatfurwa since it doesn't clear its own ram (buriki does)
-        //        Figure out what the difference between the two programs is.  It's possible writing to
-        //        the linescroll ram fills a buffer and it's cleared automatically between frames?
-        for (int ii = 0; ii < 0x2000/4; ii++)
-        {
-            const int realAddress = floorAddress/4;
-            m_videoram[realAddress+ii] = 0x00000000;
-        }
-        
-        
-        // Floor mode - per pixel simple / complex modes? -- every other line?
+		// Buriki uses a 2x mosaic effect on its floor, so its line count is half
+		// (but so does fatfurwa - maybe it overdraws a bunch of pixels?)
+		//if (m_mcu_type == BURIKI_MCU)
+		//    lineCount *= 2;
+
+		// DEBUG - draw a horizontal green line where the uppermost line of the floor is drawn
+		const rectangle &visarea = screen.visible_area();
+		//if (lineCount < visarea.height())
+		//{
+		//    for (int ii = 0; ii < visarea.width(); ii++)
+		//        bitmap.pix32((visarea.height()-lineCount), ii) = 0xff00ff00;
+		//}
+
+		// HACK : Clear RAM - this is "needed" in fatfurwa since it doesn't clear its own ram (buriki does)
+		//        Figure out what the difference between the two programs is.  It's possible writing to
+		//        the linescroll ram fills a buffer and it's cleared automatically between frames?
+		for (int ii = 0; ii < 0x2000/4; ii++)
+		{
+			const int realAddress = floorAddress/4;
+			m_videoram[realAddress+ii] = 0x00000000;
+		}
+
+
+		// Floor mode - per pixel simple / complex modes? -- every other line?
 		//  (there doesn't seem to be enough data in Buriki for every line at least)
 		rectangle clip = visarea;
 
@@ -650,16 +650,16 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			// Logic would dictate that this should be the 'complex' scroll register layout,
 			// but per-line.  That doesn't work however.
-            //
+			//
 			// You only have line data for the number of lines on the screen, not enough for
 			// the complex register layout
-            //
+			//
 			// HOWEVER, using the code below doesn't work either.  This might be because
 			// they have mosaic turned on, and it adopts a new meaning in linescroll modes?
-            //
+			//
 			// The code below could also be wrong, and rowscroll simply acts the same in all
 			// modes, this is hard to know because ss64_2 barely uses it.
-            //
+			//
 			// buriki line data is at 20146000 (physical)
 
 #if HNG64_VIDEO_DEBUG
@@ -668,9 +668,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
 		{
-            INT32 xtopleft, xmiddle;
-            INT32 ytopleft, ymiddle;
-            
+			INT32 xtopleft, xmiddle;
+			INT32 ytopleft, ymiddle;
+
 			for (int line=0; line < 448; line++)
 			{
 				clip.min_y = clip.max_y = line;
@@ -913,7 +913,6 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 #if 1
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
@@ -939,16 +938,16 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 #endif
 
 
-    // Initialize some buffers
+	// Initialize some buffers
 	bitmap.fill(m_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
 	screen.priority().fill(0x00, cliprect);
 
-    // If the screen is disabled, don't draw anything (m_screen_dis is a shady variable at best)
+	// If the screen is disabled, don't draw anything (m_screen_dis is a shady variable at best)
 	if (m_screen_dis)
 		return 0;
 
 	// If the auto-animation mask or bits have changed search for tiles using them and mark as dirty
-    const UINT32 animmask = m_videoregs[0x0b];
+	const UINT32 animmask = m_videoregs[0x0b];
 	const UINT32 animbits = m_videoregs[0x0c];
 	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
 	{
@@ -977,13 +976,13 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		m_old_animbits = animbits;
 	}
 
-    // If any magic bits have been touched, mark every tilemap dirty
-    UINT16 tileflags[4];
-    tileflags[0] = m_videoregs[0x02] >> 16;
+	// If any magic bits have been touched, mark every tilemap dirty
+	UINT16 tileflags[4];
+	tileflags[0] = m_videoregs[0x02] >> 16;
 	tileflags[1] = m_videoregs[0x02] & 0xffff;
 	tileflags[2] = m_videoregs[0x03] >> 16;
 	tileflags[3] = m_videoregs[0x03] & 0xffff;
-    const UINT16 IMPORTANT_DIRTY_TILEFLAG_MASK = 0x0600;
+	const UINT16 IMPORTANT_DIRTY_TILEFLAG_MASK = 0x0600;
 	for (int i = 0; i < 4; i++)
 	{
 		if ((m_old_tileflags[i] & IMPORTANT_DIRTY_TILEFLAG_MASK) != (tileflags[i] & IMPORTANT_DIRTY_TILEFLAG_MASK))
@@ -993,7 +992,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-    // Draw the four tilemaps
+	// Draw the four tilemaps
 	hng64_drawtilemap(screen,bitmap,cliprect, 3);
 	hng64_drawtilemap(screen,bitmap,cliprect, 2);
 	hng64_drawtilemap(screen,bitmap,cliprect, 1);
@@ -1021,13 +1020,13 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-    // Draw the sprites on top of everything
+	// Draw the sprites on top of everything
 	draw_sprites(screen, bitmap, cliprect);
 
-    // Layer the global frame buffer operations on top of everything
-    // transition_control(bitmap, cliprect);
+	// Layer the global frame buffer operations on top of everything
+	// transition_control(bitmap, cliprect);
 
-    
+
 #if HNG64_VIDEO_DEBUG
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
@@ -1036,14 +1035,14 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
 		m_videoregs[0x00],
 		m_videoregs[0x01],
-        (m_videoregs[0x02]>>16)&0xffff,
-        (m_videoregs[0x02]>>0)&0xffff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
-        (m_videoregs[0x03]>>16)&0xffff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
-        (m_videoregs[0x03]>>0)&0xffff,  //       fatal fury doesn't (all backgrounds have it set) joy
-        (m_videoregs[0x04]>>16)&0xffff,
-        (m_videoregs[0x04]>>0)&0xffff,
-        (m_videoregs[0x05]>>16)&0xffff,
-        (m_videoregs[0x05]>>0)&0xffff,
+		(m_videoregs[0x02]>>16)&0xffff,
+		(m_videoregs[0x02]>>0)&0xffff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
+		(m_videoregs[0x03]>>16)&0xffff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
+		(m_videoregs[0x03]>>0)&0xffff,  //       fatal fury doesn't (all backgrounds have it set) joy
+		(m_videoregs[0x04]>>16)&0xffff,
+		(m_videoregs[0x04]>>0)&0xffff,
+		(m_videoregs[0x05]>>16)&0xffff,
+		(m_videoregs[0x05]>>0)&0xffff,
 		m_videoregs[0x06],
 		m_videoregs[0x07],
 		m_videoregs[0x08],
@@ -1107,7 +1106,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
 #endif
-    
+
 	return 0;
 }
 

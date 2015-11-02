@@ -1184,6 +1184,7 @@ struct geo_state
 	texture_parameter   texture_parameters[32]; /* Texture parameters */
 	UINT32          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
 	UINT32          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
+	model2_state	*state;
 };
 
 
@@ -1197,6 +1198,7 @@ static void geo_init( running_machine &machine, UINT32 *polygon_rom )
 {
 	model2_state *state = machine.driver_data<model2_state>();
 	state->m_geo = auto_alloc_clear(machine, geo_state);
+	state->m_geo->state = state;
 
 	state->m_geo->raster = state->m_raster;
 	state->m_geo->polygon_rom = polygon_rom;
@@ -2283,7 +2285,7 @@ static UINT32 * geo_data_mem_push( geo_state *geo, UINT32 opcode, UINT32 *input 
 	/* read in the count */
 	count = *input++;
 
-	logerror( "SEGA GEO: Executing unsupported geo_data_mem_push (address = %08x, count = %08x)\n", address, count );
+	geo->state->logerror( "SEGA GEO: Executing unsupported geo_data_mem_push (address = %08x, count = %08x)\n", address, count );
 
 	(void)i;
 /*
@@ -2309,7 +2311,7 @@ static UINT32 * geo_test( geo_state *geo, UINT32 opcode, UINT32 *input )
 		if ( *input++ != data )
 		{
 			/* TODO: Set Red LED on */
-			logerror( "SEGA GEO: FIFO Test failed\n" );
+			geo->state->logerror( "SEGA GEO: FIFO Test failed\n" );
 		}
 
 		data <<= 1;
@@ -2357,7 +2359,7 @@ static UINT32 * geo_test( geo_state *geo, UINT32 opcode, UINT32 *input )
 		if ( sum_even != 0 || sum_odd != 0 )
 		{
 			/* TODO: Set Green LED on */
-			logerror( "SEGA GEO: Polygon ROM Test failed\n" );
+			geo->state->logerror( "SEGA GEO: Polygon ROM Test failed\n" );
 		}
 	}
 
@@ -2446,7 +2448,7 @@ static UINT32 * geo_code_upload( geo_state *geo, UINT32 opcode, UINT32 *input )
 	    No games are known to use this command yet.
 	*/
 
-	logerror( "SEGA GEO: Uploading debug code (unimplemented)\n" );
+	geo->state->logerror( "SEGA GEO: Uploading debug code (unimplemented)\n" );
 
 	(void)opcode;
 
@@ -2496,7 +2498,7 @@ static UINT32 * geo_code_jump( geo_state *geo, UINT32 opcode, UINT32 *input )
 	    No games are known to use this command yet.
 	*/
 
-	logerror( "SEGA GEO: Jumping to debug code (unimplemented)\n" );
+	geo->state->logerror( "SEGA GEO: Jumping to debug code (unimplemented)\n" );
 
 	(void)opcode;
 

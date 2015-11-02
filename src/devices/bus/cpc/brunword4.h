@@ -20,7 +20,7 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
-	virtual void set_mapping();
+	virtual void set_mapping(UINT8 type);
 
 protected:
 	// device-level overrides

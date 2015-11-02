@@ -58,7 +58,7 @@ Notes:
       6116.56 & 54 - Sprite attribute/enable RAM, tied to TC0320OBR
       Other 6116 RAM - Sprite RAM, connected to TC0020VAR & TC0050VDZ
       6264.73 & 74 - Color RAM
-      
+
       Taito Custom ICs -
                          TC0220IOC
                          TC0110PCR
@@ -67,7 +67,7 @@ Notes:
                          TC0320OBR
                          TC0020VAR
                          TC0050VDZ (x3)
-                         TC0070RGB (ceramic module) 
+                         TC0070RGB (ceramic module)
                          TC0310FAM (ceramic module)
       VSync: 60.0552Hz
       HSync: 15.4938kHz
@@ -75,7 +75,7 @@ Notes:
       Note: The hardware outputs reversed video because the cabinet uses a mirror.
       The video can't be flipped/reversed with the DIPs, it's fixed in hardware.
 
-      PCB edge connector is 28-way non-JAMMA. 
+      PCB edge connector is 28-way non-JAMMA.
       The gun is NOT a light gun, it uses two 5k-ohm potentiometers for the X-Y position
 
                Solder | Parts

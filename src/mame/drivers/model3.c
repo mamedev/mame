@@ -1367,7 +1367,7 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 			if (ACCESSING_BITS_24_31)       /* ADC Data read */
 			{
 				static const char *const adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-				UINT8 adc_data = ioport(adcnames[m_adc_channel])->read_safe(0);
+				const UINT8 adc_data = read_safe(ioport(adcnames[m_adc_channel]), 0);
 				m_adc_channel++;
 				m_adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;

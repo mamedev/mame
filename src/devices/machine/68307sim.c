@@ -86,22 +86,22 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_sim_w )
 
 			case m68307SIM_LICR1:
 				logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Latched Interrupt Control Register 1 - LICR1)\n", pc, offset*2,data,mem_mask);
-				sim->write_licr1(data,mem_mask);
+				sim->write_licr1(this,data,mem_mask);
 				break;
 
 			case m68307SIM_LICR2:
 				logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Latched Interrupt Control Register 2 - LICR2)\n", pc, offset*2,data,mem_mask);
-				sim->write_licr2(data,mem_mask);
+				sim->write_licr2(this,data,mem_mask);
 				break;
 
 			case m68307SIM_PICR:
 				logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Control Register - PICR)\n", pc, offset*2,data,mem_mask);
-				sim->write_picr(data,mem_mask);
+				sim->write_picr(this,data,mem_mask);
 				break;
 
 			case m68307SIM_PIVR:
 				logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Vector Register - PIVR)\n", pc, offset*2,data,mem_mask);
-				sim->write_pivr(data,mem_mask);
+				sim->write_pivr(this,data,mem_mask);
 				break;
 
 			case m68307SIM_BR0:
@@ -171,7 +171,7 @@ UINT16 m68307_sim::read_padat(m68307cpu_device* m68k, address_space &space, UINT
 	}
 	else
 	{
-		logerror("%08x m68307_internal_sim_r (%04x) (Port A (8-bit) Data Register - PADAT)\n", pc, mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_r (%04x) (Port A (8-bit) Data Register - PADAT)\n", pc, mem_mask);
 	}
 	return 0xffff;
 }
@@ -188,7 +188,7 @@ void m68307_sim::write_padat(m68307cpu_device* m68k, address_space &space, UINT1
 	}
 	else
 	{
-		logerror("%08x m68307_internal_sim_w %04x (%04x) (Port A (8-bit) Data Register - PADAT)\n", pc, data,mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_w %04x (%04x) (Port A (8-bit) Data Register - PADAT)\n", pc, data,mem_mask);
 	}
 }
 
@@ -222,7 +222,7 @@ UINT16 m68307_sim::read_pbdat(m68307cpu_device* m68k, address_space &space, UINT
 	}
 	else
 	{
-		logerror("%08x m68307_internal_sim_r (%04x) (Port B (16-bit) Data Register - PBDAT)\n", pc, mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_r (%04x) (Port B (16-bit) Data Register - PBDAT)\n", pc, mem_mask);
 	}
 	return 0xffff;
 }
@@ -239,40 +239,40 @@ void m68307_sim::write_pbdat(m68307cpu_device* m68k, address_space &space, UINT1
 	}
 	else
 	{
-		logerror("%08x m68307_internal_sim_w %04x (%04x) (Port B (16-bit) Data Register - PBDAT)\n", pc, data,mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_w %04x (%04x) (Port B (16-bit) Data Register - PBDAT)\n", pc, data,mem_mask);
 	}
 }
 
-void m68307_sim::write_licr1(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_licr1(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&m_licr1);
 	data = m_licr1;
-	logerror("m_licr1 value %04x : Details :\n", data);
-	logerror("int4ipl %01x\n", (data>>0)&7);
-	logerror("pir4    %01x\n", (data>>3)&1);
-	logerror("int3ipl %01x\n", (data>>4)&7);
-	logerror("pir3    %01x\n", (data>>7)&1);
-	logerror("int2ipl %01x\n", (data>>8)&7);
-	logerror("pir2    %01x\n", (data>>11)&1);
-	logerror("int1ipl %01x\n", (data>>12)&7);
-	logerror("pir1    %01x\n", (data>>15)&1);
-	logerror("\n");
+	m68k->logerror("m_licr1 value %04x : Details :\n", data);
+	m68k->logerror("int4ipl %01x\n", (data>>0)&7);
+	m68k->logerror("pir4    %01x\n", (data>>3)&1);
+	m68k->logerror("int3ipl %01x\n", (data>>4)&7);
+	m68k->logerror("pir3    %01x\n", (data>>7)&1);
+	m68k->logerror("int2ipl %01x\n", (data>>8)&7);
+	m68k->logerror("pir2    %01x\n", (data>>11)&1);
+	m68k->logerror("int1ipl %01x\n", (data>>12)&7);
+	m68k->logerror("pir1    %01x\n", (data>>15)&1);
+	m68k->logerror("\n");
 }
 
-void m68307_sim::write_licr2(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_licr2(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&m_licr2);
 	UINT16 newdata = m_licr2;
-	logerror("m_licr2 value %04x : Details :\n", newdata);
-	logerror("int8ipl %01x\n", (newdata>>0)&7);
-	logerror("pir8    %01x\n", (newdata>>3)&1);
-	logerror("int7ipl %01x\n", (newdata>>4)&7);
-	logerror("pir7    %01x\n", (newdata>>7)&1);
-	logerror("int6ipl %01x\n", (newdata>>8)&7);
-	logerror("pir6    %01x\n", (newdata>>11)&1);
-	logerror("int5ipl %01x\n", (newdata>>12)&7);
-	logerror("pir5    %01x\n", (newdata>>15)&1);
-	logerror("\n");
+	m68k->logerror("m_licr2 value %04x : Details :\n", newdata);
+	m68k->logerror("int8ipl %01x\n", (newdata>>0)&7);
+	m68k->logerror("pir8    %01x\n", (newdata>>3)&1);
+	m68k->logerror("int7ipl %01x\n", (newdata>>4)&7);
+	m68k->logerror("pir7    %01x\n", (newdata>>7)&1);
+	m68k->logerror("int6ipl %01x\n", (newdata>>8)&7);
+	m68k->logerror("pir6    %01x\n", (newdata>>11)&1);
+	m68k->logerror("int5ipl %01x\n", (newdata>>12)&7);
+	m68k->logerror("pir5    %01x\n", (newdata>>15)&1);
+	m68k->logerror("\n");
 
 	if (data & 0x0008) m_licr2 = m_licr2 & ~0x0008;
 	if (data & 0x0080) m_licr2 = m_licr2 & ~0x0080;
@@ -283,25 +283,25 @@ void m68307_sim::write_licr2(UINT16 data, UINT16 mem_mask)
 }
 
 
-void m68307_sim::write_picr(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_picr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&m_picr);
 	data = m_picr;
-	logerror("picr value %04x : Details :\n", data);
-	logerror("mbipl %01x\n", (data>>0)&7);
-	logerror("uaipl %01x\n", (data>>4)&7);
-	logerror("t2ipl %01x\n", (data>>8)&7);
-	logerror("t1ipl %01x\n", (data>>12)&7);
-	logerror("\n");
+	m68k->logerror("picr value %04x : Details :\n", data);
+	m68k->logerror("mbipl %01x\n", (data>>0)&7);
+	m68k->logerror("uaipl %01x\n", (data>>4)&7);
+	m68k->logerror("t2ipl %01x\n", (data>>8)&7);
+	m68k->logerror("t1ipl %01x\n", (data>>12)&7);
+	m68k->logerror("\n");
 }
 
-void m68307_sim::write_pivr(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pivr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&m_pivr);
 	data = m_pivr;
-	logerror("pivr value %04x : Details :\n", data);
-	logerror("unused %01x\n", (data>>0)&0xf);
-	logerror("high vector %01x\n", (data>>4)&0xf);
+	m68k->logerror("pivr value %04x : Details :\n", data);
+	m68k->logerror("unused %01x\n", (data>>0)&0xf);
+	m68k->logerror("high vector %01x\n", (data>>4)&0xf);
 }
 
 void m68307_sim::reset(void)

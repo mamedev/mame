@@ -473,7 +473,11 @@ inline UINT8 z80_device::rop()
 {
 	unsigned pc = PCD;
 	PC++;
-	return m_decrypted_opcodes_direct->read_byte(pc);
+	UINT8 res = m_decrypted_opcodes_direct->read_byte(pc);
+	m_icount -= 2;
+	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f));
+	m_icount += 2;
+	return res;
 }
 
 /****************************************************************
@@ -3141,6 +3145,9 @@ void z80_device::take_interrupt()
 	else
 		irq_vector = m_irq_callback(*this, 0);
 
+	/* Say hi */
+	m_irqack_cb(true);
+
 	LOG(("Z80 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
 
 	/* Interrupt mode 2. Call [i:databyte] */
@@ -3429,6 +3436,9 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
+
+	m_irqack_cb.resolve_safe();
+	m_refresh_cb.resolve_safe();
 }
 
 void nsc800_device::device_start()
@@ -3705,7 +3715,9 @@ z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t 
 	cpu_device(mconfig, Z80, "Z80", tag, owner, clock, "z80", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
-	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
+	m_irqack_cb(*this),
+	m_refresh_cb(*this)
 {
 }
 
@@ -3713,7 +3725,9 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
-	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
+	m_irqack_cb(*this),
+	m_refresh_cb(*this)
 {
 }
 

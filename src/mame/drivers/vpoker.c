@@ -8,6 +8,22 @@
   Notes:
   - Looks like the 2nd generation of Noraut Poker / Draw Poker Hi-Lo HW.
 
+  - I found two companies that sold the same game with different name...
+
+    1) "Challenger Draw Poker", from Bend Electronics Co. Inc.
+    2) "VHI Draw Poker", from Video Horizons, Inc.
+
+    Both companies shared the same address and phone number:
+     63353 Nels Anderson Road. Bend, Oregon 97701.
+     Tel: 503-389-7626.
+
+    Bend Electronics Co. Inc. claims that they are worldwide distributors for Videotronics, Inc.
+
+    There are some legal issues between all these companies...
+    https://scholar.google.com/scholar_case?case=7993095852400122011
+    http://www.plainsite.org/dockets/201rtodjb/nevada-district-court/videotronics-inc-v-bend-electronics/
+
+
   TODO:
   - Understand how the 6840PTM hooks up, needed to let it work properly;
   - I/Os;
@@ -51,7 +67,6 @@
   4.000 Mhz crystal
   MC6840P
   mm74c920J/mmc6551j-9    x2
-
 
 **************************************************************************************************************
 
@@ -686,6 +701,6 @@ ROM_START( 5acespkr )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT     STATE          INIT  ROT    COMPANY         FULLNAME             FLAGS... */
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics", "Videotronics Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",    "5-Aces Poker",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT     STATE          INIT  ROT    COMPANY               FULLNAME                  FLAGS... */
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -263,7 +263,7 @@ void ui_menu_software_list::handle()
 
 			// reload the menu with the new order
 			reset(UI_MENU_RESET_REMEMBER_REF);
-			popmessage("Switched Order: entries now ordered by %s", m_ordered_by_shortname ? "shortname" : "description");
+			machine().popmessage("Switched Order: entries now ordered by %s", m_ordered_by_shortname ? "shortname" : "description");
 		}
 		// handle selections
 		else if (event->iptkey == IPT_UI_SELECT)

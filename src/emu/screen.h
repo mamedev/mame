@@ -285,6 +285,7 @@ private:
 	UINT8               m_curtexture;               // current texture index
 	bool                m_changed;                  // has this bitmap changed?
 	INT32               m_last_partial_scan;        // scanline of last partial update
+	INT32               m_partial_scan_hpos;        // horizontal pixel last rendered on this partial scanline
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
 	UINT32              m_unique_id;                // unique id for this screen_device
 	rgb_t               m_color;                    // render color

@@ -69,13 +69,9 @@ UINT8 sc4_state::read_input_matrix(int row)
 	UINT8 value;
 
 	if (row<4)
-	{
-		value = ((portnames[row])->read_safe(0x00) & 0x1f) + (((portnames[row+8])->read_safe(0x00) & 0x07) << 5);
-	}
+		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+8], 0x00) & 0x07) << 5);
 	else
-	{
-		value = ((portnames[row])->read_safe(0x00) & 0x1f) + (((portnames[row+4])->read_safe(0x00) & 0x18) << 2);
-	}
+		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+4], 0x00) & 0x18) << 2);
 
 	return value;
 }

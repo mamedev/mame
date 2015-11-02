@@ -127,7 +127,7 @@ void pcu_reset(dsp56k_core* cpustate)
 	switch(dsp56k_operating_mode(cpustate))
 	{
 		case 0x00:
-			logerror("Dsp56k in Special Bootstrap Mode 1\n");
+			cpustate->device->logerror("Dsp56k in Special Bootstrap Mode 1\n");
 
 			/* HACK - We don't need to put the bootstrap mode on here since */
 			/*        we'll simulate it entirely in this function */
@@ -160,7 +160,7 @@ void pcu_reset(dsp56k_core* cpustate)
 			break;
 
 		case 0x01:
-			logerror("Dsp56k in Special Bootstrap Mode 2\n");
+			cpustate->device->logerror("Dsp56k in Special Bootstrap Mode 2\n");
 
 			/* HACK - Turn bootstrap mode on.  This hijacks the CPU execute loop and lets */
 			/*        Either the host interface or the SSIO interface suck in all the data */
@@ -170,12 +170,12 @@ void pcu_reset(dsp56k_core* cpustate)
 			if (cpustate->program->read_word(0xc000<<1) & 0x8000)
 			{
 				cpustate->bootstrap_mode = BOOTSTRAP_SSIX;
-				logerror("DSP56k : Currently in (hacked) bootstrap mode - reading from SSIx.\n");
+				cpustate->device->logerror("DSP56k : Currently in (hacked) bootstrap mode - reading from SSIx.\n");
 			}
 			else
 			{
 				cpustate->bootstrap_mode = BOOTSTRAP_HI;
-				logerror("DSP56k : Currently in (hacked) bootstrap mode - reading from Host Interface.\n");
+				cpustate->device->logerror("DSP56k : Currently in (hacked) bootstrap mode - reading from Host Interface.\n");
 			}
 
 			/* HACK - Set the PC to 0x0000 as per the boot ROM. */
@@ -188,13 +188,13 @@ void pcu_reset(dsp56k_core* cpustate)
 			break;
 
 		case 0x02:
-			logerror("Dsp56k in Normal Expanded Mode\n");
+			cpustate->device->logerror("Dsp56k in Normal Expanded Mode\n");
 			PC = 0xe000;
 			cpustate->PCU.reset_vector = 0xe000;
 			break;
 
 		case 0x03:
-			logerror("Dsp56k in Development Expanded Mode\n");
+			cpustate->device->logerror("Dsp56k in Development Expanded Mode\n");
 			/* TODO: Disable internal ROM, etc.  Likely a tricky thing for MAME? */
 			PC = 0x0000;
 			cpustate->PCU.reset_vector = 0x0000;

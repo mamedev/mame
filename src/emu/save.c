@@ -32,7 +32,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x) do { if (VERBOSE) machine().logerror x; } while (0)
 
 
 
@@ -153,7 +153,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	// check for invalid timing
 	if (!m_reg_allowed)
 	{
-		logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
+		machine().logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		if (machine().system().flags & MACHINE_SUPPORTS_SAVE)
 			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		m_illegal_regs++;
@@ -244,7 +244,7 @@ save_error save_manager::read_file(emu_file &file)
 
 	// verify the header and report an error if it doesn't match
 	UINT32 sig = signature();
-	if (validate_header(header, machine().system().name, sig, popmessage, "Error: ")  != STATERR_NONE)
+	if (validate_header(header, machine().system().name, sig, NULL, "Error: ")  != STATERR_NONE)
 		return STATERR_INVALID_HEADER;
 
 	// determine whether or not to flip the data when done

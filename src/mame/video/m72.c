@@ -12,7 +12,7 @@
 inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
-	
+
 	// word 0               word 1
 	// fftt tttt tttt tttt  ---- ---- zz-? pppp
 
@@ -149,7 +149,7 @@ VIDEO_START_MEMBER(m72_state,xmultipl)
 
 	m_fg_tilemap->set_scrolldx(4,64);
 	m_fg_tilemap->set_scrolldy(-128, 0);
-	
+
 	m_bg_tilemap->set_scrolldx(6,0);
 	m_bg_tilemap->set_scrolldy(-128,-128);
 
@@ -202,7 +202,7 @@ VIDEO_START_MEMBER(m72_state,m82)
 
 	m_fg_tilemap->set_scrolldx(4,0);
 	m_fg_tilemap->set_scrolldy(-128,-128);
-	
+
 	m_bg_tilemap->set_scrolldx(6-256,0);
 	m_bg_tilemap->set_scrolldy(-128,-128);
 
@@ -345,7 +345,7 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 WRITE16_MEMBER(m72_state::irq_line_w)
 {
 	COMBINE_DATA(&m_raster_irq_position);
-//	printf("m_raster_irq_position %04x\n", m_raster_irq_position);
+//  printf("m_raster_irq_position %04x\n", m_raster_irq_position);
 }
 
 WRITE16_MEMBER(m72_state::scrollx1_w)
@@ -435,14 +435,14 @@ WRITE16_MEMBER(m72_state::m82_gfx_ctrl_w)
 		if (data & 0xff00) m_m82_rowscroll = 1;
 		else m_m82_rowscroll = 0;
 	}
-//	printf("m82_gfx_ctrl_w %04x\n", data);
+//  printf("m82_gfx_ctrl_w %04x\n", data);
 
 }
 
 WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
 {
 	COMBINE_DATA(&m_m82_tmcontrol);
-//	printf("tmcontrol %04x\n", m_m82_tmcontrol);
+//  printf("tmcontrol %04x\n", m_m82_tmcontrol);
 }
 
 

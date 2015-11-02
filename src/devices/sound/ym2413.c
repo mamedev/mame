@@ -1689,7 +1689,7 @@ static void OPLLWriteReg(YM2413 *chip, int r, int v)
 				if ((chip->rhythm&0x20)==0)
 				/*rhythm off to on*/
 				{
-					logerror("YM2413: Rhythm mode enable\n");
+					chip->device->logerror("YM2413: Rhythm mode enable\n");
 
 	/* Load instrument settings for channel seven(chan=6 since we're zero based). (Bass drum) */
 					chan = 6;
@@ -1751,7 +1751,7 @@ static void OPLLWriteReg(YM2413 *chip, int r, int v)
 				if (chip->rhythm&0x20)
 				/*rhythm on to off*/
 				{
-					logerror("YM2413: Rhythm mode disable\n");
+					chip->device->logerror("YM2413: Rhythm mode disable\n");
 	/* Load instrument settings for channel seven(chan=6 since we're zero based).*/
 					chan = 6;
 					inst = &chip->inst_tab[chip->instvol_r[chan]>>4][0];
@@ -1825,7 +1825,7 @@ static void OPLLWriteReg(YM2413 *chip, int r, int v)
 
 
 			if (CH->sus!=(v&0x20))
-				logerror("chan=%i sus=%2x\n",chan,v&0x20);
+				chip->device->logerror("chan=%i sus=%2x\n",chan,v&0x20);
 
 			CH->sus = v & 0x20;
 		}
@@ -1939,7 +1939,7 @@ static int OPLL_LockTable(device_t *device)
 		if (cymfile)
 			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
-			logerror("Could not create file 2413_.cym\n");
+			device->logerror("Could not create file 2413_.cym\n");
 	}
 
 	return 0;

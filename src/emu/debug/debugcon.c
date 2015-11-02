@@ -544,7 +544,7 @@ text_buffer *debug_console_get_textbuf(void)
     the errorlog ring buffer
 -------------------------------------------------*/
 
-void debug_errorlog_write_line(running_machine &machine, const char *line)
+void debug_errorlog_write_line(const running_machine &machine, const char *line)
 {
 	if (errorlog_textbuf)
 		text_buffer_print(errorlog_textbuf, line);

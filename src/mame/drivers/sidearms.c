@@ -68,7 +68,7 @@ READ8_MEMBER(sidearms_state::turtship_ports_r)
 {
 	int res = 0;
 	for (int i = 0; i < 5;i++)
-		res |= ((m_ports[i]->read_safe(0) >> offset) & 1) << i;
+		res |= ((read_safe(m_ports[i], 0) >> offset) & 1) << i;
 
 	return res;
 }

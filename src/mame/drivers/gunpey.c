@@ -334,7 +334,7 @@ UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int 
 		unused = m_wram[count+6]&~0x00ff; if (unused) printf("unused bits set in word 6 - %04x\n", unused);
 		unused = m_wram[count+7]&~0xff00; if (unused) printf("unused bits set in word 7 - %04x\n", unused);
 
-		if ((zoomwidth != sourcewidth) || (zoomheight!= zoomheight))
+		if ((zoomwidth != sourcewidth) || (zoomheight != sourceheight))
 		{
 			//printf("zoomed widths %02x %02x heights %02x %02x\n", sourcewidth, zoomwidth, sourceheight, zoomheight);
 		}

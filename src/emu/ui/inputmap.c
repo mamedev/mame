@@ -91,7 +91,6 @@ void ui_menu_input_general::populate()
 {
 	input_item_data *itemlist = NULL;
 	int suborder[SEQ_TYPE_TOTAL];
-	std::string tempstring;
 	int sortorder = 1;
 
 	/* create a mini lookup table for sort order based on sequence type */
@@ -154,7 +153,6 @@ void ui_menu_input_specific::populate()
 {
 	input_item_data *itemlist = NULL;
 	int suborder[SEQ_TYPE_TOTAL];
-	std::string tempstring;
 	int port_count = 0;
 
 	/* create a mini lookup table for sort order based on sequence type */

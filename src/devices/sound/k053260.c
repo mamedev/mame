@@ -383,10 +383,10 @@ void k053260_device::KDSC_Voice::update_pan_volume()
 void k053260_device::KDSC_Voice::key_on()
 {
 	if (m_start >= m_device->m_rom_size)
-		logerror("K053260: Attempting to start playing past the end of the ROM ( start = %06x, length = %06x )\n", m_start, m_length);
+		m_device->logerror("K053260: Attempting to start playing past the end of the ROM ( start = %06x, length = %06x )\n", m_start, m_length);
 
 	else if (m_start + m_length >= m_device->m_rom_size)
-		logerror("K053260: Attempting to play past the end of the ROM ( start = %06x, length = %06x )\n",
+		m_device->logerror("K053260: Attempting to play past the end of the ROM ( start = %06x, length = %06x )\n",
 					m_start, m_length);
 
 	else
@@ -395,7 +395,7 @@ void k053260_device::KDSC_Voice::key_on()
 		m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
 		m_output = 0;
 		m_playing = true;
-		if (LOG) logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x, loop = %s, %s\n",
+		if (LOG) m_device->logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x, loop = %s, %s\n",
 						m_start, m_length, m_pitch, m_volume, m_loop ? "yes" : "no", m_kadpcm ? "KADPCM" : "PCM" );
 	}
 }
@@ -465,7 +465,7 @@ UINT8 k053260_device::KDSC_Voice::read_rom()
 
 	if (offs >= m_device->m_rom_size)
 	{
-		logerror("%s: K053260: Attempting to read past the end of the ROM (offs = %06x, size = %06x)\n",
+		m_device->logerror("%s: K053260: Attempting to read past the end of the ROM (offs = %06x, size = %06x)\n",
 					m_device->machine().describe_context(), offs, m_device->m_rom_size);
 		return 0;
 	}

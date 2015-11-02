@@ -161,7 +161,7 @@ Interpolation is inhibited (i.e. interpolation at IP frames will not happen
     x100aaaa: LOAD ADDRESS (LA) Send a load address command (M0 low M1 high) to VSM with the 4 'a' bits; Note you need to send four or five of these in sequence to actually specify an address to the vsm.
     TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
 
-    x101xxxx: SPEAK (SPK) Begins speaking, pulling spech data from the current address pointer location of the VSM modules.
+    x101xxxx: SPEAK (SPK) Begins speaking, pulling speech data from the current address pointer location of the VSM modules.
 
     x110xxxx: SPEAK EXTERNAL (SPKEXT) Clears the FIFO using SPKEE line, then sets TALKD (TALKST remains zero) until 8 bytes have been written to the FIFO, at which point it begins speaking, pulling data from the 16 byte fifo.
     The patent implies TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP, but the decap shows that this is not true, and is an error on the patent diagram.
@@ -575,7 +575,8 @@ void tms5220_device::update_fifo_status_and_ints()
 		if (!m_buffer_empty)
 			set_interrupt_state(1);
 		m_buffer_empty = 1;
-		m_TALK = m_SPEN = 0; // /BE being active clears the TALK status via TCON, which in turn clears SPEN
+		if (m_DDIS)
+			m_TALK = m_SPEN = 0; // /BE being active clears the TALK status via TCON, which in turn clears SPEN, but ONLY if m_DDIS is set! See patent page 16, gate 232b
 	}
 	else
 		m_buffer_empty = 0;
@@ -1181,7 +1182,7 @@ void tms5220_device::process_command(unsigned char cmd)
 					m_data_register = m_speechrom->read(8);    /* read one byte from speech ROM... */
 				m_RDB_flag = TRUE;
 			}
-			break;
+		break;
 
 		case 0x00: case 0x20: /* set rate (tms5220c and cd2501ecd only), otherwise NOP */
 			if (TMS5220_HAS_RATE_CONTROL)
@@ -1601,6 +1602,9 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				/* bring up to date first */
 				m_stream->update();
 				m_read_latch = status_read();
+#ifdef DEBUG_IO_READY
+				fprintf(stderr,"Serviced read, returning %02x\n", m_read_latch);
+#endif
 				break;
 			case 0x03:
 				/* High Impedance */

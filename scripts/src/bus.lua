@@ -1161,6 +1161,8 @@ if (BUSES["VCS"]~=null) then
 		MAME_DIR .. "src/devices/bus/vcs/compumat.h",
 		MAME_DIR .. "src/devices/bus/vcs/dpc.c",
 		MAME_DIR .. "src/devices/bus/vcs/dpc.h",
+		MAME_DIR .. "src/devices/bus/vcs/harmony_melody.c",
+		MAME_DIR .. "src/devices/bus/vcs/harmony_melody.h",
 		MAME_DIR .. "src/devices/bus/vcs/scharger.c",
 		MAME_DIR .. "src/devices/bus/vcs/scharger.h",
 	}
@@ -2201,6 +2203,8 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/devices/bus/cpc/ddi1.h",
 		MAME_DIR .. "src/devices/bus/cpc/magicsound.c",
 		MAME_DIR .. "src/devices/bus/cpc/magicsound.h",
+		MAME_DIR .. "src/devices/bus/cpc/doubler.c",
+		MAME_DIR .. "src/devices/bus/cpc/doubler.h",
 	}
 end
 

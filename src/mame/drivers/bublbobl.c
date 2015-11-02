@@ -266,6 +266,11 @@ TODO:
   accesses done by the CPU, including to the YM2203 I/O ports. At the
   very least, there should be some filters.
 
+ there are also Bubble Bobble bootlegs with a P8749H MCU, however the MCU
+ is protected against reading and the main code only differs by 1 byte from
+ Bubble Bobble.  If the MCU were to be dumped that would also make for
+ interesting comparisons.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -554,6 +559,19 @@ static INPUT_PORTS_START( boblbobl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( boblcave )
+	PORT_INCLUDE( boblbobl )
+
+	PORT_MODIFY( "DSW1" ) // not monster speed on this, causes startup hangs just like original bublbobl
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW-B:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )              // must be off (see notes)
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "ROM Type" )                  PORT_DIPLOCATION("DSW-B:8")
+	PORT_DIPSETTING(    0x80, "IC52=512kb, IC53=none" )     // will hang on startup if set to wrong type
+	PORT_DIPSETTING(    0x00, "IC52=256kb, IC53=256kb" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sboblboblb )
@@ -1359,6 +1377,44 @@ ROM_START( boblbobl )
 	ROM_LOAD( "pal16l8.u4",  0x0400, 0x0104, CRC(077d20a8) SHA1(8e568ffd6f66c3dd61708dd0f3be9c2ed488ae4b) )
 ROM_END
 
+ROM_START( bbredux )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "redux_bb3",          0x00000, 0x8000, CRC(d51de9f3) SHA1(dc6bc93692145563a88c146eeb1d0361e25af840) )
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "redux_bb5",          0x10000, 0x8000, CRC(d29d3444) SHA1(3db694a6ba2ba2ed85d31c2bc4c7c94911b99b85) )
+	ROM_LOAD( "redux_bb4",          0x18000, 0x8000, CRC(984149bd) SHA1(9a0f96eee038712277f652545a343587f711b9aa) )
+
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the second CPU */
+	ROM_LOAD( "a78-08.37",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
+	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
+	ROM_LOAD( "a78-10.13",    0x08000, 0x8000, CRC(930168a9) SHA1(fd358c3c3b424bca285f67a1589eb98a345ff670) )
+	ROM_LOAD( "a78-11.14",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "a78-12.15",    0x18000, 0x8000, CRC(d045549b) SHA1(0c12077d3ddc2ce6aa45a0224ad5540f3f218446) )
+	ROM_LOAD( "a78-13.16",    0x20000, 0x8000, CRC(d0af35c5) SHA1(c5a89f4d73acc0db86654540b3abfd77b3757db5) )
+	ROM_LOAD( "a78-14.17",    0x28000, 0x8000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9) )
+	/* 0x30000-0x3ffff empty */
+	ROM_LOAD( "a78-15.30",    0x40000, 0x8000, CRC(6b61a413) SHA1(44eddf12fb46fceca2addbe6da929aaea7636b13) )    /* 2nd plane */
+	ROM_LOAD( "a78-16.31",    0x48000, 0x8000, CRC(b5492d97) SHA1(d5b045e3ebaa44809757a4220cefb3c6815470da) )
+	ROM_LOAD( "a78-17.32",    0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "a78-18.33",    0x58000, 0x8000, CRC(9f243b68) SHA1(32dce8d311a4be003693182a999e4053baa6bb0a) )
+	ROM_LOAD( "a78-19.34",    0x60000, 0x8000, CRC(66e9438c) SHA1(b94e62b6fbe7f4e08086d0365afc5cff6e0ccafd) )
+	ROM_LOAD( "a78-20.35",    0x68000, 0x8000, CRC(9ef863ad) SHA1(29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8) )
+	/* 0x70000-0x7ffff empty */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16r4.u36", 0x0000, 0x0104, CRC(22fe26ac) SHA1(bbbfcbe6faded4af7ceec57b800297c054a997da) )
+	ROM_LOAD( "pal16l8.u38", 0x0200, 0x0104, CRC(c02d9663) SHA1(5d23cfd96f072981fd5fcf0dd7e98459da58b662) )
+	ROM_LOAD( "pal16l8.u4",  0x0400, 0x0104, CRC(077d20a8) SHA1(8e568ffd6f66c3dd61708dd0f3be9c2ed488ae4b) )
+ROM_END
+
 ROM_START( sboblbobl )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "cpu2-3.bin",   0x00000, 0x08000, CRC(2d9107b6) SHA1(ab1a4a20f4b533cd06cc458668f407a8a14c9d70) )
@@ -1459,6 +1515,41 @@ ROM_END
 
 
 
+ROM_START( sboblboblc )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "3",    0x00000, 0x08000, CRC(f2d44846) SHA1(dd1a29f2ff1938c31d4c6199cf970483ceb52485) )
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "5",          0x10000, 0x08000, CRC(3c5e4441) SHA1(b85da9d7e0148e950b76036d3f9a3d4a9dfa039c) )
+	ROM_LOAD( "4",          0x18000, 0x08000, CRC(1f29b5c0) SHA1(c15c84ca11cc10edac6340468bca463ecb2d89e6) )
+	/* 20000-2ffff empty */
+
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the second CPU */
+	ROM_LOAD( "1",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
+	ROM_LOAD( "2",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
+	ROM_LOAD( "13",    0x08000, 0x8000, CRC(930168a9) SHA1(fd358c3c3b424bca285f67a1589eb98a345ff670) )
+	ROM_LOAD( "14",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "15",    0x18000, 0x8000, CRC(d045549b) SHA1(0c12077d3ddc2ce6aa45a0224ad5540f3f218446) )
+	ROM_LOAD( "16",    0x20000, 0x8000, CRC(d0af35c5) SHA1(c5a89f4d73acc0db86654540b3abfd77b3757db5) )
+	ROM_LOAD( "17",    0x28000, 0x8000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9) )
+	/* 0x30000-0x3ffff empty */
+	ROM_LOAD( "6",     0x40000, 0x8000, CRC(6b61a413) SHA1(44eddf12fb46fceca2addbe6da929aaea7636b13) )    /* 2nd plane */
+	ROM_LOAD( "7",     0x48000, 0x8000, CRC(b5492d97) SHA1(d5b045e3ebaa44809757a4220cefb3c6815470da) )
+	ROM_LOAD( "8",     0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "9",     0x58000, 0x8000, CRC(9f243b68) SHA1(32dce8d311a4be003693182a999e4053baa6bb0a) )
+	ROM_LOAD( "10",    0x60000, 0x8000, CRC(66e9438c) SHA1(b94e62b6fbe7f4e08086d0365afc5cff6e0ccafd) )
+	ROM_LOAD( "11",    0x68000, 0x8000, CRC(9ef863ad) SHA1(29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8) )
+	/* 0x70000-0x7ffff empty */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
+
+ROM_END
+
 ROM_START( bub68705 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Program roms match Bubble Bobble (older) */
 	ROM_LOAD( "2.bin",    0x00000, 0x08000, CRC(32c8305b) SHA1(6bf69b3edfbefd33cd670a762b4bf0b39629a220) )
@@ -1526,6 +1617,178 @@ ROM_START( dland )
 ROM_END
 
 
+ROM_START( bublcave )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "bublcave-06.51",    0x00000, 0x08000, CRC(e8b9af5e) SHA1(dec44e47634a402df212806e84e3a810f8442776) )
+	ROM_LOAD( "bublcave-05.52",    0x10000, 0x10000, CRC(cfe14cb8) SHA1(17d463c755f630ae9d05943515fa4828972bd7b0) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "bublcave-08.37",    0x0000, 0x08000, CRC(a9384086) SHA1(26e686671d6d3ba3759716bf46e7f951bbb8a291) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
+	ROM_LOAD( "bublcave-10.13",    0x08000, 0x8000, CRC(4fb22f05) SHA1(880104e86dbd00ae657cbc768722427503b6a59f) )
+	ROM_LOAD( "bublcave-11.14",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "bublcave-12.15",    0x18000, 0x8000, CRC(e49eb49e) SHA1(2e05dc8833e10bef1a317d238c39fb9f362e9997) )
+	ROM_LOAD( "bublcave-13.16",    0x20000, 0x8000, CRC(61919734) SHA1(2c07e29f3dcc972d5eb47679ad81a0d7656b0cb2) )
+	ROM_LOAD( "bublcave-14.17",    0x28000, 0x8000, CRC(7e3a13bd) SHA1(bd4dba799340fa599f11cc68e03efe70ba6ba99b) )
+	ROM_LOAD( "bublcave-15.30",    0x40000, 0x8000, CRC(c253c73a) SHA1(3e187f6b9ca769772990068abe7b309417147d39) )    /* 2nd plane */
+	ROM_LOAD( "bublcave-16.31",    0x48000, 0x8000, CRC(e66c92ee) SHA1(12ea193c54121d08ad110c94cc075e29fef3ff85) )
+	ROM_LOAD( "bublcave-17.32",    0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "bublcave-18.33",    0x58000, 0x8000, CRC(47ee2544) SHA1(c6946e824043a312ed437e548a64ef599effbd42) )
+	ROM_LOAD( "bublcave-19.34",    0x60000, 0x8000, CRC(1ceeb1fa) SHA1(eb29ff896d149f7ab4cf38a338df39df14ccc20c) )
+	ROM_LOAD( "bublcave-20.35",    0x68000, 0x8000, CRC(64322e24) SHA1(acff8a9fcaf74f198653080759898d15cccf04e8) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )   /* video timing */
+ROM_END
+
+
+ROM_START( boblcave )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "lc12_bb3",          0x00000, 0x08000, CRC(dddc9a24) SHA1(c0b31dd64d7359ae0ea5067db6ac8b54f9415e5a) )
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "lc12_bb5",          0x10000, 0x08000, CRC(0bc4de52) SHA1(55581a557dfd60d93642b89eb702c7170458b826) )
+	ROM_LOAD( "lc12_bb4",          0x18000, 0x08000, CRC(bd7afdf4) SHA1(a9bcdc857b1f252c36a5a70f5027a11737f8dd59) )
+	/* 20000-2ffff empty */
+
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the second CPU */
+	ROM_LOAD( "bublcave-08.37",    0x0000, 0x08000, CRC(a9384086) SHA1(26e686671d6d3ba3759716bf46e7f951bbb8a291) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
+	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
+	ROM_LOAD( "bublcave-10.13",    0x08000, 0x8000, CRC(4fb22f05) SHA1(880104e86dbd00ae657cbc768722427503b6a59f) )
+	ROM_LOAD( "bublcave-11.14",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "bublcave-12.15",    0x18000, 0x8000, CRC(e49eb49e) SHA1(2e05dc8833e10bef1a317d238c39fb9f362e9997) )
+	ROM_LOAD( "bublcave-13.16",    0x20000, 0x8000, CRC(61919734) SHA1(2c07e29f3dcc972d5eb47679ad81a0d7656b0cb2) )
+	ROM_LOAD( "bublcave-14.17",    0x28000, 0x8000, CRC(7e3a13bd) SHA1(bd4dba799340fa599f11cc68e03efe70ba6ba99b) )
+	ROM_LOAD( "bublcave-15.30",    0x40000, 0x8000, CRC(c253c73a) SHA1(3e187f6b9ca769772990068abe7b309417147d39) )    /* 2nd plane */
+	ROM_LOAD( "bublcave-16.31",    0x48000, 0x8000, CRC(e66c92ee) SHA1(12ea193c54121d08ad110c94cc075e29fef3ff85) )
+	ROM_LOAD( "bublcave-17.32",    0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "bublcave-18.33",    0x58000, 0x8000, CRC(47ee2544) SHA1(c6946e824043a312ed437e548a64ef599effbd42) )
+	ROM_LOAD( "bublcave-19.34",    0x60000, 0x8000, CRC(1ceeb1fa) SHA1(eb29ff896d149f7ab4cf38a338df39df14ccc20c) )
+	ROM_LOAD( "bublcave-20.35",    0x68000, 0x8000, CRC(64322e24) SHA1(acff8a9fcaf74f198653080759898d15cccf04e8) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16r4.u36", 0x0000, 0x0104, CRC(22fe26ac) SHA1(bbbfcbe6faded4af7ceec57b800297c054a997da) )
+	ROM_LOAD( "pal16l8.u38", 0x0200, 0x0104, CRC(c02d9663) SHA1(5d23cfd96f072981fd5fcf0dd7e98459da58b662) )
+	ROM_LOAD( "pal16l8.u4",  0x0400, 0x0104, CRC(077d20a8) SHA1(8e568ffd6f66c3dd61708dd0f3be9c2ed488ae4b) )
+ROM_END
+
+
+ROM_START( bublcave11 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "bublcave10-06.51",  0x00000, 0x08000, CRC(185cc219) SHA1(dfb312f144fb01c07581cb8ea55ab0dc92ccd5b2) )
+	ROM_LOAD( "bublcave11-05.52",  0x10000, 0x10000, CRC(b6b02df3) SHA1(542589544216a54f84c213b161d7145934875d2b) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "bublcave11-08.37",  0x0000, 0x08000, CRC(c5d14e62) SHA1(b32b1ca76b54755a69a7a346d01545f2699e1363) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
+	ROM_LOAD( "bublcave-10.13",    0x08000, 0x8000, CRC(4fb22f05) SHA1(880104e86dbd00ae657cbc768722427503b6a59f) )
+	ROM_LOAD( "bublcave-11.14",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "bublcave-12.15",    0x18000, 0x8000, CRC(e49eb49e) SHA1(2e05dc8833e10bef1a317d238c39fb9f362e9997) )
+	ROM_LOAD( "bublcave-13.16",    0x20000, 0x8000, CRC(61919734) SHA1(2c07e29f3dcc972d5eb47679ad81a0d7656b0cb2) )
+	ROM_LOAD( "bublcave-14.17",    0x28000, 0x8000, CRC(7e3a13bd) SHA1(bd4dba799340fa599f11cc68e03efe70ba6ba99b) )
+	ROM_LOAD( "bublcave-15.30",    0x40000, 0x8000, CRC(c253c73a) SHA1(3e187f6b9ca769772990068abe7b309417147d39) )    /* 2nd plane */
+	ROM_LOAD( "bublcave-16.31",    0x48000, 0x8000, CRC(e66c92ee) SHA1(12ea193c54121d08ad110c94cc075e29fef3ff85) )
+	ROM_LOAD( "bublcave-17.32",    0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "bublcave-18.33",    0x58000, 0x8000, CRC(47ee2544) SHA1(c6946e824043a312ed437e548a64ef599effbd42) )
+	ROM_LOAD( "bublcave-19.34",    0x60000, 0x8000, CRC(1ceeb1fa) SHA1(eb29ff896d149f7ab4cf38a338df39df14ccc20c) )
+	ROM_LOAD( "bublcave-20.35",    0x68000, 0x8000, CRC(64322e24) SHA1(acff8a9fcaf74f198653080759898d15cccf04e8) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )   /* video timing */
+ROM_END
+
+ROM_START( bublcave10 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "bublcave10-06.51",  0x00000, 0x08000, CRC(185cc219) SHA1(dfb312f144fb01c07581cb8ea55ab0dc92ccd5b2) )
+	ROM_LOAD( "bublcave10-05.52",  0x10000, 0x10000, CRC(381cdde7) SHA1(0c9de44d7dbad754e873af8ddb5a2736f5ec2096) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "bublcave10-08.37",  0x0000, 0x08000, CRC(026a68e1) SHA1(9e54310a9f1f5187ea6eb49d9189865b44708a7e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
+	ROM_LOAD( "bublcave-10.13",    0x08000, 0x8000, CRC(4fb22f05) SHA1(880104e86dbd00ae657cbc768722427503b6a59f) )
+	ROM_LOAD( "bublcave-11.14",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "bublcave-12.15",    0x18000, 0x8000, CRC(e49eb49e) SHA1(2e05dc8833e10bef1a317d238c39fb9f362e9997) )
+	ROM_LOAD( "bublcave-13.16",    0x20000, 0x8000, CRC(61919734) SHA1(2c07e29f3dcc972d5eb47679ad81a0d7656b0cb2) )
+	ROM_LOAD( "bublcave-14.17",    0x28000, 0x8000, CRC(7e3a13bd) SHA1(bd4dba799340fa599f11cc68e03efe70ba6ba99b) )
+	ROM_LOAD( "bublcave-15.30",    0x40000, 0x8000, CRC(c253c73a) SHA1(3e187f6b9ca769772990068abe7b309417147d39) )    /* 2nd plane */
+	ROM_LOAD( "bublcave-16.31",    0x48000, 0x8000, CRC(e66c92ee) SHA1(12ea193c54121d08ad110c94cc075e29fef3ff85) )
+	ROM_LOAD( "bublcave-17.32",    0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "bublcave-18.33",    0x58000, 0x8000, CRC(47ee2544) SHA1(c6946e824043a312ed437e548a64ef599effbd42) )
+	ROM_LOAD( "bublcave-19.34",    0x60000, 0x8000, CRC(1ceeb1fa) SHA1(eb29ff896d149f7ab4cf38a338df39df14ccc20c) )
+	ROM_LOAD( "bublcave-20.35",    0x68000, 0x8000, CRC(64322e24) SHA1(acff8a9fcaf74f198653080759898d15cccf04e8) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.41",         0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )   /* video timing */
+ROM_END
+
+ROM_START( bublboblb )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "bbaladar.3",   0x00000, 0x8000, CRC(31bfc6fb) SHA1(6a72086d415a69b9e5c003ec6cf7858e8c4b346f) )
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "bbaladar.5",   0x10000, 0x8000, CRC(16386e9a) SHA1(77fa3f5ecce5c79ba52098c0870482459926b415) )
+	ROM_LOAD( "bbaladar.4",   0x18000, 0x8000, CRC(0c4bcb07) SHA1(3e3f7fa098d6be61d265cab5258dbd0e279bd8ed) )
+
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the second CPU */
+	ROM_LOAD( "a78-08.37",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
+	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
+	ROM_LOAD( "a78-10.13",    0x08000, 0x8000, CRC(930168a9) SHA1(fd358c3c3b424bca285f67a1589eb98a345ff670) )
+	ROM_LOAD( "a78-11.14",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "a78-12.15",    0x18000, 0x8000, CRC(d045549b) SHA1(0c12077d3ddc2ce6aa45a0224ad5540f3f218446) )
+	ROM_LOAD( "a78-13.16",    0x20000, 0x8000, CRC(d0af35c5) SHA1(c5a89f4d73acc0db86654540b3abfd77b3757db5) )
+	ROM_LOAD( "a78-14.17",    0x28000, 0x8000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9) )
+	/* 0x30000-0x3ffff empty */
+	ROM_LOAD( "a78-15.30",    0x40000, 0x8000, CRC(6b61a413) SHA1(44eddf12fb46fceca2addbe6da929aaea7636b13) )    /* 2nd plane */
+	ROM_LOAD( "a78-16.31",    0x48000, 0x8000, CRC(b5492d97) SHA1(d5b045e3ebaa44809757a4220cefb3c6815470da) )
+	ROM_LOAD( "a78-17.32",    0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "a78-18.33",    0x58000, 0x8000, CRC(9f243b68) SHA1(32dce8d311a4be003693182a999e4053baa6bb0a) )
+	ROM_LOAD( "a78-19.34",    0x60000, 0x8000, CRC(66e9438c) SHA1(b94e62b6fbe7f4e08086d0365afc5cff6e0ccafd) )
+	ROM_LOAD( "a78-20.35",    0x68000, 0x8000, CRC(9ef863ad) SHA1(29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8) )
+	/* 0x70000-0x7ffff empty */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16r4.u36", 0x0000, 0x0104, CRC(22fe26ac) SHA1(bbbfcbe6faded4af7ceec57b800297c054a997da) )
+	ROM_LOAD( "pal16l8.u38", 0x0200, 0x0104, CRC(c02d9663) SHA1(5d23cfd96f072981fd5fcf0dd7e98459da58b662) )
+	ROM_LOAD( "pal16l8.u4",  0x0400, 0x0104, CRC(077d20a8) SHA1(8e568ffd6f66c3dd61708dd0f3be9c2ed488ae4b) )
+ROM_END
 
 /*************************************
  *
@@ -1598,6 +1861,16 @@ GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl
 GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, bublbobl, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bubble Bobble (bootleg)", MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
 GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, dland,      bublbobl, boblbobl, dland,      bublbobl_state, dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 2013, bbredux,    bublbobl, boblbobl, boblbobl, bublbobl_state, bublbobl, ROT0, "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
+GAME( 2013, bublboblb,  bublbobl, boblbobl, boblcave, bublbobl_state, bublbobl, ROT0, "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
+
+GAME( 2013, bublcave,   bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2", MACHINE_SUPPORTS_SAVE )
+GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0, "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0", MACHINE_SUPPORTS_SAVE )

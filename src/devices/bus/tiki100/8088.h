@@ -24,7 +24,7 @@
 // ======================> tiki100_8088_t
 
 class tiki100_8088_t : public device_t,
-					   public device_tiki100bus_card_interface
+						public device_tiki100bus_card_interface
 {
 public:
 	// construction/destruction

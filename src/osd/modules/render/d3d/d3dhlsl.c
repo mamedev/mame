@@ -2266,9 +2266,9 @@ static void get_vector(const char *data, int count, float *out, int report_error
 
 
 /*-------------------------------------------------
-	slider_alloc - allocate a new slider entry
-	currently duplicated from ui.c, this could
-	be done in a more ideal way.
+    slider_alloc - allocate a new slider entry
+    currently duplicated from ui.c, this could
+    be done in a more ideal way.
 -------------------------------------------------*/
 
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)

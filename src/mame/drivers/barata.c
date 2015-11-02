@@ -153,26 +153,26 @@ const char* mode_strings[] = {
 "Set counter values"
 };
 
-static void fpga_send(unsigned char cmd){
+static void fpga_send(device_t *device, unsigned char cmd){
 	static unsigned char byte = 0;
 	static unsigned char mode = FPGA_WAITING_FOR_NEW_CMD;
 	static unsigned char lamp_data = 0;
 
-	logerror("FPGA CMD: %d\n", cmd);
+	device->logerror("FPGA CMD: %d\n", cmd);
 
 	if (mode == FPGA_WAITING_FOR_NEW_CMD){
 		if (cmd < FPGA_WAITING_FOR_NEW_CMD){
 			mode = cmd;
 			byte=1;
-			logerror("SET FPGA MODE: %s\n", mode_strings[mode]);
+			device->logerror("SET FPGA MODE: %s\n", mode_strings[mode]);
 
 			if (mode == FPGA_PLAY_BGM){
-				logerror("PLAY_BGM.\n");
+				device->logerror("PLAY_BGM.\n");
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 			}
 
 			if (mode == FPGA_STOP_BGM){
-				logerror("STOP_BGM.\n");
+				device->logerror("STOP_BGM.\n");
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 			}
 		}
@@ -248,7 +248,7 @@ static void fpga_send(unsigned char cmd){
 				break;
 			case 2:
 				sample_index = (sample_index << 3) | cmd;
-				logerror("PLAY_SAMPLE #%d.\n", sample_index);
+				device->logerror("PLAY_SAMPLE #%d.\n", sample_index);
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 				break;
@@ -263,7 +263,7 @@ WRITE8_MEMBER(barata_state::fpga_w)
 	static unsigned char old_data = 0;
 	if (!BIT(old_data, 5) && BIT(data, 5)){
 		//process the command sent to the FPGA
-		fpga_send((data >> 2) & 7);
+		fpga_send(this, (data >> 2) & 7);
 	}
 	old_data = data;
 }

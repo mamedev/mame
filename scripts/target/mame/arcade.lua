@@ -838,6 +838,7 @@ files {
 	MAME_DIR .. "src/mame/video/equites.c",
 	MAME_DIR .. "src/mame/drivers/meijinsn.c",
 	MAME_DIR .. "src/mame/drivers/shougi.c",
+	MAME_DIR .. "src/mame/machine/alpha8201.c",
 }
 
 createMAMEProjects(_target, _subtarget, "amiga")
@@ -3546,6 +3547,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/stellafr.c",
 	MAME_DIR .. "src/mame/drivers/stuntair.c",
 	MAME_DIR .. "src/mame/drivers/su2000.c",
+	MAME_DIR .. "src/mame/drivers/subhuntr.c",
 	MAME_DIR .. "src/mame/drivers/summit.c",
 	MAME_DIR .. "src/mame/drivers/sumt8035.c",
 	MAME_DIR .. "src/mame/drivers/supercrd.c",

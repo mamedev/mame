@@ -231,10 +231,10 @@ READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 	UINT8 ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~m_common & 1) ret &= ioport("C0")->read_safe(0); // bit switches
-	if (~m_common & 2) ret &= ioport("C1")->read_safe(0); // control switches
-	if (~m_common & 4) ret &= ioport("C2")->read_safe(0); // light switches
-	if (~m_common & 8) ret &= ioport("C3")->read_safe(0); // light switches
+	if (~m_common & 1) ret &= read_safe(ioport("C0"), 0); // bit switches
+	if (~m_common & 2) ret &= read_safe(ioport("C1"), 0); // control switches
+	if (~m_common & 4) ret &= read_safe(ioport("C2"), 0); // light switches
+	if (~m_common & 8) ret &= read_safe(ioport("C3"), 0); // light switches
 
 	return ret;
 }

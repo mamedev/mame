@@ -483,7 +483,7 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point(const sam_bank *bank
 {
 	if (LOG_SAM)
 	{
-		logerror("sam6883_device::sam_space::point():  addrstart=0x%04X addrend=0x%04X offset=0x%04X mask=0x%04X bank->m_memory=0x%p bank->m_memory_read_only=%s\n",
+		m_owner.logerror("sam6883_device::sam_space::point():  addrstart=0x%04X addrend=0x%04X offset=0x%04X mask=0x%04X bank->m_memory=0x%p bank->m_memory_read_only=%s\n",
 			(unsigned) _addrstart,
 			(unsigned) _addrend,
 			(unsigned) offset,

@@ -323,7 +323,7 @@ static void execute_one(dsp56k_core* cpustate)
 
 		/* Now evaluate the parallel data move */
 		/* TODO // decode_x_memory_data_write_and_register_data_move(op, parallel_move_str, parallel_move_str2); */
-		logerror("DSP56k: Unemulated Dual X Memory Data And Register Data Move @ 0x%x\n", PC);
+		cpustate->device->logerror("DSP56k: Unemulated Dual X Memory Data And Register Data Move @ 0x%x\n", PC);
 	}
 
 	/* Handle Other parallel types */
@@ -1088,7 +1088,7 @@ static void execute_one(dsp56k_core* cpustate)
 	/* Not recognized?  Nudge debugger onto the next word */
 	if (size == 0x1337)
 	{
-		logerror("DSP56k: Unimplemented opcode at 0x%04x : %04x\n", PC, op);
+		cpustate->device->logerror("DSP56k: Unimplemented opcode at 0x%04x : %04x\n", PC, op);
 		size = 1 ;                      /* Just to get the debugger past the bad opcode */
 	}
 
@@ -2865,17 +2865,17 @@ static size_t dsp56k_op_do_2(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	/* HACK */
 	if (lValue >= 0xfff0)
 	{
-		logerror("Dsp56k : DO_2 operation changed %04x to 0000.\n", lValue);
+		cpustate->device->logerror("Dsp56k : DO_2 operation changed %04x to 0000.\n", lValue);
 		lValue = 0x0000;
 	}
 
 	/* TODO: Fix for special cased SP S */
 	if (S.addr == &SP)
-		logerror("DSP56k: do with SP as the source not properly implemented yet.\n");
+		cpustate->device->logerror("DSP56k: do with SP as the source not properly implemented yet.\n");
 
 	/* TODO: Fix for special cased SSSL S */
 	if (S.addr == &SSL)
-		logerror("DSP56k: do with SP as the source not properly implemented yet.\n");
+		cpustate->device->logerror("DSP56k: do with SP as the source not properly implemented yet.\n");
 
 	/* Don't execute if the loop counter == 0 */
 	if (lValue != 0x00)
@@ -3429,7 +3429,7 @@ static size_t dsp56k_op_movec_3(dsp56k_core* cpustate, const UINT16 op, const UI
 		if (t)
 		{
 			/* 16-bit long data */
-			logerror("DSP56k: Movec - I don't think this exists?");
+			cpustate->device->logerror("DSP56k: Movec - I don't think this exists?");
 		}
 		else
 		{
@@ -3812,7 +3812,7 @@ static size_t dsp56k_op_rep_2(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 
 	/* TODO: handle special A&B source cases */
 	if (D.addr == &A || D.addr == &B)
-		logerror("DSP56k ERROR : Rep with A or B instruction not implemented yet!\n");
+		cpustate->device->logerror("DSP56k ERROR : Rep with A or B instruction not implemented yet!\n");
 
 	repValue = *((UINT16*)D.addr);
 

@@ -159,7 +159,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 	</software>
 
 	<software name="bjack">
-		<description>TV Casino I: Blackjack </description>
+		<description>TV Casino I: Blackjack</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V600" />

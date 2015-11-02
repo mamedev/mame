@@ -43,6 +43,9 @@
 #define MCFG_MC146818_EPOCH(_epoch) \
 	downcast<mc146818_device *>(device)->set_epoch(_epoch);
 
+#define MCFG_MC146818_BINARY_YEAR(_bin) \
+	downcast<mc146818_device *>(device)->set_binary_year(_bin);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -64,6 +67,7 @@ public:
 	void set_binary(bool binary) { m_binary = binary; }
 	void set_hour(bool hour) { m_hour = hour; }
 	void set_epoch(int epoch) { m_epoch = epoch; }
+	void set_binary_year(int bin) { m_binyear = bin; }
 
 	// read/write access
 	DECLARE_READ8_MEMBER( read );
@@ -178,7 +182,7 @@ private:
 
 	devcb_write_line m_write_irq;
 	int m_century_index, m_epoch;
-	bool m_use_utc, m_binary, m_hour;
+	bool m_use_utc, m_binary, m_hour, m_binyear;
 };
 
 

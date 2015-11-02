@@ -1593,7 +1593,7 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					m_hwc_input_value = ioport(portname[offset & 3])->read_safe(0xff);
+					m_hwc_input_value = read_safe(ioport(portname[offset & 3]), 0xff);
 					break;
 
 				case 0x30/2:
@@ -1672,12 +1672,12 @@ READ16_MEMBER( segas16b_state::sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (ioport(portname[m_mj_input_num])->read_safe(0xff) != 0xff)
+					if (read_safe(ioport(portname[m_mj_input_num]), 0xff) != 0xff)
 						return 0xff & ~(1 << m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return ioport(portname[m_mj_input_num])->read_safe(0xff);
+					return read_safe(ioport(portname[m_mj_input_num]), 0xff);
 			}
 			break;
 	}

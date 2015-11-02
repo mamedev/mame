@@ -529,7 +529,7 @@ void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitm
 		temp = bottommax;
 		bottommax = topmin;
 		topmin = temp;
-	
+
 		if (leftmin != -1) leftmin = width - 1 - leftmin;
 		if (leftmax != -1) leftmax = width - 1 - leftmax;
 		if (rightmin != -1) rightmin = width - 1 - rightmin;

@@ -365,6 +365,21 @@ public:
 };
 
 
+// ======================> a26_rom_x07_device
+
+class a26_rom_x07_device : public a26_rom_f6_device
+{
+public:
+	// construction/destruction
+	a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+};
+
+
+
 // device type definition
 extern const device_type A26_ROM_2K;
 extern const device_type A26_ROM_4K;
@@ -386,6 +401,7 @@ extern const device_type A26_ROM_JVP;
 extern const device_type A26_ROM_4IN1;
 extern const device_type A26_ROM_8IN1;
 extern const device_type A26_ROM_32IN1;
+extern const device_type A26_ROM_X07;
 
 
 #endif

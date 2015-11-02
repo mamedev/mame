@@ -47,7 +47,7 @@
                   3- trigger
                   4- +5v
                   5- reload (see below)
-                 
+
                   The Crypt Killer shotguns have 6 wires coming out of the gun.
                   The wire colors and connections are....
                   Black  - Ground; joined to CN6/7/8 pin 2
@@ -56,7 +56,7 @@
                   White  - Trigger; joined to CN6/7/8 pin 3
                   Purple - Reload; joined to CN6/7/8 pin 5
                   Grey   - Reload ground; this wire must be joined to any ground for the reload to work
-                 
+
         CN3     - For connection of extra controls/buttons (e.g. player 3 start etc)
         CN14    - For connection of additional speaker for stereo output
         68000   - Clock input 8.000MHz [32/4]

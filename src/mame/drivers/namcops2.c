@@ -538,7 +538,7 @@ Notes:
         J9 - 6-pin connector (not used)
        J10 - 80-pin Namco connector (not used, probably for an add-on PCB with ROMs for diagnostics)
 
-This PCB is used with Cobra The Arcade. The game will boot with several I/O boards but in the test mode in 'I/O TEST' 
+This PCB is used with Cobra The Arcade. The game will boot with several I/O boards but in the test mode in 'I/O TEST'
 the I/O board is only reported as good with the RAYS PCB, otherwise it reports 'NG'.
 This same PCB is also used with the DX rear-projection-screen version of Crisis Zone (on System 23 Evolution 2 hardware).
 Note this board requires a CCD camera and infrared guns and infrared sensors.
@@ -599,7 +599,7 @@ Notes:
       J101 - 6 pin connector for power input
       J102 - 60 pin flat cable connector
       J104 - 5 pin connector (not populated)
-      J204 - USB-B connector (also wired in-line with J104. Note the signal is still the 
+      J204 - USB-B connector (also wired in-line with J104. Note the signal is still the
              normal Namco communication signal; i.e. RS485)
       J106 - 30 pin flat cable connector
       J108 - 4 pin connector
@@ -613,9 +613,9 @@ Notes:
 
 V290 FCB PCB is almost identical to FCA PCB. The main differences are changed internal MCU code & PIC code,
 some extra/different connectors, less D1017 driver transistors and an added RS-232 IC.
-The V290 FCB PCB is used with touchscreen games such as Dragon Chronicles, Druaga Online, Idol Master etc. 
+The V290 FCB PCB is used with touchscreen games such as Dragon Chronicles, Druaga Online, Idol Master etc.
 It supports a serial touchscreen interface, card readers and buttons.
-The additional devices are supported via J108 which connects to another PCB 'XOU020-A' which contains a 
+The additional devices are supported via J108 which connects to another PCB 'XOU020-A' which contains a
 Texas Instruments TMS32VC540x DSP, TSOP32 flash ROM and other components.
 
 
@@ -738,15 +738,15 @@ System246 PMOTHER PCB
 |        |EP20K100E   LC35256     RS5C348       J14           |
 |        |QC208   |            32.768kHz BR9080F              |
 | 16M    |--------|                                |----------|
-| 16M            66.666MHz               C807U-1V86|                            
-|                                              4MHz|                       
-|                                    J11     MM1537|                       
-|   |------|         J10                           |             
-|   | C448 |  61C256    EPM3128                    |                       
-|   |      |                                       |                             
-|   |------|                                       |                             
-|                                       J9         |                             
-|    TMP95C061                                     |                             
+| 16M            66.666MHz               C807U-1V86|
+|                                              4MHz|
+|                                    J11     MM1537|
+|   |------|         J10                           |
+|   | C448 |  61C256    EPM3128                    |
+|   |      |                                       |
+|   |------|                                       |
+|                                       J9         |
+|    TMP95C061                                     |
 J8               CXA2055P                          |
 |  MAX232    ADM485       6358N                   J7
 |             J3                                   |
@@ -764,7 +764,7 @@ Notes:
        J10 - 6-pin connector for programming EPM3128 CPLD (not populated)
        J11 - Flat cable connector joining to PS2 main board
        J12 - 40-pin IDE connector for CD/DVD/HDD drives
-       J13 - 4-pin power input connector (+5V/GND) 
+       J13 - 4-pin power input connector (+5V/GND)
        J14 - 34-pin connector plugged directly into PS2 main board
        J15 - 4-pin power output connector plugged directly into PS2 main board (the PS2 main board PSU is not populated)
 C807U-1V86 - Toshiba TMP87PH47U microcontroller with 16k x8-bit OTP EPROM re-badged as 'SONY C8707U-1V86 (C)2000 SCEI'
@@ -783,14 +783,14 @@ C807U-1V86 - Toshiba TMP87PH47U microcontroller with 16k x8-bit OTP EPROM re-bad
    RS5C348 - Ricoh RS5C348 RTC
    BR9080F - ROHN BR9080F 512 word x16-bit serial EEPROM
     MM1537 - Mitsumi MM1537 reset chip. No info available but pin 2 of MM1537 tied to TMP87PH47 reset pin 14 so it's a reset chip
-    MAX232 - Maxim MAX232 dual serial to TTL logic level driver/receiver 
+    MAX232 - Maxim MAX232 dual serial to TTL logic level driver/receiver
    BATTERY - CR2032 3.0V battery
-   
+
 This revision was initially used with Tekken 4, Time Crisis 3, Battle Gear 3 and Soul Calibur II. There are reports
 that the DVD-based games on this system are fussy about the model of DVD-ROM drive used. Powering the drive from an
 external PSU will help in some cases.
 
-A PS2 main board (such as GH-006) is required and plugs into J14 & J15 directly and two flat cables 
+A PS2 main board (such as GH-006) is required and plugs into J14 & J15 directly and two flat cables
 from J9 & J11 also connect to the PS2 main board.
 The board documented here is green. A blue PCB has been seen used in Time Crisis 3. It's not known if the PCB
 is different to this one.

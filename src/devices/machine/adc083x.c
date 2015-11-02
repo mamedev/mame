@@ -13,7 +13,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, running_machine &machine, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, device_t &device, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -22,7 +22,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, running_machine &machin
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context( ), buf );
+		device.logerror( "%s: %s", device.machine().describe_context( ), buf );
 	}
 }
 
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER( adc083x_device::cs_write )
 {
 	if( m_cs != state )
 	{
-		verboselog( 2, machine(), "adc083x_cs_write( %s, %d )\n", tag(), state );
+		verboselog( 2, *this, "adc083x_cs_write( %s, %d )\n", tag(), state );
 	}
 
 	if( m_cs == 0 && state != 0 )
@@ -259,7 +259,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 {
 	if( m_clk != state )
 	{
-		verboselog( 2, machine(), "adc083x_clk_write( %s, %d )\n", tag(), state );
+		verboselog( 2, *this, "adc083x_clk_write( %s, %d )\n", tag(), state );
 	}
 
 	if( m_cs == 0 )
@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 			case STATE_WAIT_FOR_START:
 				if( m_di != 0 )
 				{
-					verboselog( 1, machine(), "adc083x %s got start bit\n", tag() );
+					verboselog( 1, *this, "adc083x %s got start bit\n", tag() );
 					m_state = STATE_SHIFT_MUX;
 					m_sars = 0;
 					m_sgl = 0;
@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 				}
 				else
 				{
-					verboselog( 1, machine(), "adc083x %s not start bit\n", tag() );
+					verboselog( 1, *this, "adc083x %s not start bit\n", tag() );
 				}
 				break;
 
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_sgl = 1;
 					}
-					verboselog( 1, machine(), "adc083x %s sgl <- %d\n", tag(), m_sgl );
+					verboselog( 1, *this, "adc083x %s sgl <- %d\n", tag(), m_sgl );
 					break;
 
 				case 1:
@@ -302,7 +302,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_odd = 1;
 					}
-					verboselog( 1, machine(), "adc083x %s odd <- %d\n", tag(), m_odd );
+					verboselog( 1, *this, "adc083x %s odd <- %d\n", tag(), m_odd );
 					break;
 
 				case 2:
@@ -310,7 +310,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_sel1 = 1;
 					}
-					verboselog( 1, machine(), "adc083x %s sel1 <- %d\n", tag(), m_sel1 );
+					verboselog( 1, *this, "adc083x %s sel1 <- %d\n", tag(), m_sel1 );
 					break;
 
 				case 3:
@@ -318,7 +318,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_sel0 = 1;
 					}
-					verboselog( 1, machine(), "adc083x %s sel0 <- %d\n", tag(), m_sel0 );
+					verboselog( 1, *this, "adc083x %s sel0 <- %d\n", tag(), m_sel0 );
 					break;
 				}
 
@@ -334,11 +334,11 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 				m_sars = 0;
 				if( type() == ADC0838 && m_se != 0 )
 				{
-					verboselog( 1, machine(), "adc083x %s not se\n", tag() );
+					verboselog( 1, *this, "adc083x %s not se\n", tag() );
 				}
 				else
 				{
-					verboselog( 1, machine(), "adc083x %s got se\n", tag() );
+					verboselog( 1, *this, "adc083x %s got se\n", tag() );
 					m_state = STATE_OUTPUT_LSB_FIRST;
 					m_bit = 1;
 				}
@@ -351,7 +351,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 			switch( m_state )
 			{
 			case STATE_MUX_SETTLE:
-				verboselog( 1, machine(), "adc083x %s mux settle\n", tag() );
+				verboselog( 1, *this, "adc083x %s mux settle\n", tag() );
 				m_output = conversion();
 				m_state = STATE_OUTPUT_MSB_FIRST;
 				m_bit = 7;
@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 
 			case STATE_OUTPUT_MSB_FIRST:
 				m_do = ( m_output >> m_bit ) & 1;
-				verboselog( 1, machine(), "adc083x %s msb %d -> %d\n", tag(), m_bit, m_do );
+				verboselog( 1, *this, "adc083x %s msb %d -> %d\n", tag(), m_bit, m_do );
 
 				m_bit--;
 				if( m_bit < 0 )
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 
 			case STATE_OUTPUT_LSB_FIRST:
 				m_do = ( m_output >> m_bit ) & 1;
-				verboselog( 1, machine(), "adc083x %s lsb %d -> %d\n", tag(), m_bit, m_do );
+				verboselog( 1, *this, "adc083x %s lsb %d -> %d\n", tag(), m_bit, m_do );
 
 				m_bit++;
 				if( m_bit == 8 )
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER( adc083x_device::di_write )
 {
 	if( m_di != state )
 	{
-		verboselog( 2, machine(), "adc083x_di_write( %s, %d )\n", tag(), state );
+		verboselog( 2, *this, "adc083x_di_write( %s, %d )\n", tag(), state );
 	}
 
 	m_di = state;
@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER( adc083x_device::se_write )
 {
 	if( m_se != state )
 	{
-		verboselog( 2, machine(), "adc083x_se_write( %s, %d )\n", tag(), state );
+		verboselog( 2, *this, "adc083x_se_write( %s, %d )\n", tag(), state );
 	}
 
 	m_se = state;
@@ -433,7 +433,7 @@ WRITE_LINE_MEMBER( adc083x_device::se_write )
 
 READ_LINE_MEMBER( adc083x_device::sars_read )
 {
-	verboselog( 1, machine(), "adc083x_sars_read( %s ) %d\n", tag(), m_sars );
+	verboselog( 1, *this, "adc083x_sars_read( %s ) %d\n", tag(), m_sars );
 	return m_sars;
 }
 
@@ -443,6 +443,6 @@ READ_LINE_MEMBER( adc083x_device::sars_read )
 
 READ_LINE_MEMBER( adc083x_device::do_read )
 {
-	verboselog( 1, machine(), "adc083x_do_read( %s ) %d\n", tag(), m_do );
+	verboselog( 1, *this, "adc083x_do_read( %s ) %d\n", tag(), m_do );
 	return m_do;
 }

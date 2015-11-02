@@ -125,6 +125,15 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
 void timeplt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_video_enable = 0;
+
+	save_item(NAME(m_video_enable));
+}
+
+VIDEO_START_MEMBER(timeplt_state,psurge)
+{
+	video_start();
+	m_video_enable = 1; //psurge doesn't seem to have the video enable
 }
 
 VIDEO_START_MEMBER(timeplt_state,chkun)
@@ -140,27 +149,31 @@ VIDEO_START_MEMBER(timeplt_state,chkun)
  *
  *************************************/
 
-WRITE8_MEMBER(timeplt_state::timeplt_videoram_w)
+WRITE8_MEMBER(timeplt_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(timeplt_state::timeplt_colorram_w)
+WRITE8_MEMBER(timeplt_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(timeplt_state::timeplt_flipscreen_w)
+WRITE8_MEMBER(timeplt_state::flipscreen_w)
 {
 	flip_screen_set(~data & 1);
 }
 
+WRITE8_MEMBER(timeplt_state::video_enable_w)
+{
+	m_video_enable = data & 1;
+}
 
-READ8_MEMBER(timeplt_state::timeplt_scanline_r)
+READ8_MEMBER(timeplt_state::scanline_r)
 {
 	return m_screen->vpos();
 }
@@ -175,19 +188,15 @@ READ8_MEMBER(timeplt_state::timeplt_scanline_r)
 
 void timeplt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *spriteram_2 = m_spriteram2;
-	int offs;
-
-	for (offs = 0x3e;offs >= 0x10;offs -= 2)
+	for (int offs = 0x3e;offs >= 0x10;offs -= 2)
 	{
-		int sx = spriteram[offs];
-		int sy = 241 - spriteram_2[offs + 1];
+		int sx = m_spriteram[offs];
+		int sy = 241 - m_spriteram2[offs + 1];
 
-		int code = spriteram[offs + 1];
-		int color = spriteram_2[offs] & 0x3f;
-		int flipx = ~spriteram_2[offs] & 0x40;
-		int flipy = spriteram_2[offs] & 0x80;
+		int code = m_spriteram[offs + 1];
+		int color = m_spriteram2[offs] & 0x3f;
+		int flipx = ~m_spriteram2[offs] & 0x40;
+		int flipy = m_spriteram2[offs] & 0x80;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
@@ -205,10 +214,13 @@ void timeplt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-UINT32 timeplt_state::screen_update_timeplt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 timeplt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+	if (m_video_enable)
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+	}
 	return 0;
 }

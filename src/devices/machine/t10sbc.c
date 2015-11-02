@@ -4,6 +4,7 @@
 
 void t10sbc::t10_start(device_t &device)
 {
+	m_device = &device;
 	t10spc::t10_start(device);
 
 	device.save_item( NAME( m_lba ) );
@@ -21,7 +22,7 @@ void t10sbc::t10_reset()
 	m_disk = m_image->get_hard_disk_file();
 	if (!m_disk)
 	{
-		logerror("T10SBC %s: no HD found!\n", m_image->owner()->tag());
+		m_device->logerror("T10SBC %s: no HD found!\n", m_image->owner()->tag());
 	}
 	else
 	{
@@ -45,7 +46,7 @@ void t10sbc::ExecCommand()
 	case T10SBC_CMD_SEEK_6:
 		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
 
-		logerror("S1410: SEEK to LBA %x\n", m_lba);
+		m_device->logerror("S1410: SEEK to LBA %x\n", m_lba);
 
 		m_phase = SCSI_PHASE_STATUS;
 		m_transfer_length = 0;
@@ -55,7 +56,7 @@ void t10sbc::ExecCommand()
 		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
 		m_blocks = SCSILengthFromUINT8( &command[4] );
 
-		logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
+		m_device->logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
 
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -66,7 +67,7 @@ void t10sbc::ExecCommand()
 		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
 		m_blocks = SCSILengthFromUINT8( &command[4] );
 
-		logerror("T10SBC: WRITE to LBA %x for %x blocks\n", m_lba, m_blocks);
+		m_device->logerror("T10SBC: WRITE to LBA %x for %x blocks\n", m_lba, m_blocks);
 
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -80,7 +81,7 @@ void t10sbc::ExecCommand()
 		break;
 
 	case T10SPC_CMD_MODE_SELECT_6:
-		logerror("T10SBC: MODE SELECT length %x control %x\n", command[4], command[5]);
+		m_device->logerror("T10SBC: MODE SELECT length %x control %x\n", command[4], command[5]);
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
@@ -102,7 +103,7 @@ void t10sbc::ExecCommand()
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
-		logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
+		m_device->logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
 
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -113,7 +114,7 @@ void t10sbc::ExecCommand()
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
-		logerror("T10SBC: WRITE to LBA %x for %x blocks\n", m_lba, m_blocks);
+		m_device->logerror("T10SBC: WRITE to LBA %x for %x blocks\n", m_lba, m_blocks);
 
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -124,7 +125,7 @@ void t10sbc::ExecCommand()
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
 
-		logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
+		m_device->logerror("T10SBC: READ at LBA %x for %x blocks\n", m_lba, m_blocks);
 
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -181,7 +182,7 @@ void t10sbc::ReadData( UINT8 *data, int dataLength )
 			{
 				if (!hard_disk_read(m_disk, m_lba,  data))
 				{
-					logerror("T10SBC: HD read error!\n");
+					m_device->logerror("T10SBC: HD read error!\n");
 				}
 				m_lba++;
 				m_blocks--;
@@ -198,7 +199,7 @@ void t10sbc::ReadData( UINT8 *data, int dataLength )
 
 			info = hard_disk_get_info(m_disk);
 
-			logerror("T10SBC: READ CAPACITY\n");
+			m_device->logerror("T10SBC: READ CAPACITY\n");
 
 			// get # of sectors
 			temp = info->cylinders * info->heads * info->sectors;
@@ -241,7 +242,7 @@ void t10sbc::WriteData( UINT8 *data, int dataLength )
 			{
 				if (!hard_disk_write(m_disk, m_lba, data))
 				{
-					logerror("T10SBC: HD write error!\n");
+					m_device->logerror("T10SBC: HD write error!\n");
 				}
 				m_lba++;
 				m_blocks--;

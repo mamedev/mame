@@ -415,7 +415,10 @@ bool floppy_image_device::call_load()
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
 
-	if(!mon)
+		if (motor_always_on) {
+				// When disk is inserted, start motor
+				mon_w(0);
+		} else if(!mon)
 		ready_counter = 2;
 
 	return IMAGE_INIT_PASS;
@@ -442,7 +445,11 @@ void floppy_image_device::call_unload()
 
 	if (!cur_unload_cb.isnull())
 		cur_unload_cb(this);
-	if(!ready) {
+
+		if (motor_always_on) {
+				// When disk is removed, stop motor
+				mon_w(1);
+		} else if(!ready) {
 		ready = true;
 		if(!cur_ready_cb.isnull())
 			cur_ready_cb(this, ready);
@@ -490,7 +497,15 @@ void floppy_image_device::mon_w(int state)
 	if (!mon && image)
 	{
 		revolution_start_time = machine().time();
-		ready_counter = 2;
+				if (motor_always_on) {
+					// Drives with motor that is always spinning are immediately ready when a disk is loaded
+					// because there is no spin-up time
+					ready = false;
+					if(!cur_ready_cb.isnull())
+						cur_ready_cb(this, ready);
+				} else {
+					ready_counter = 2;
+				}
 		index_resync();
 	}
 
@@ -927,7 +942,7 @@ void ui_menu_control_floppy_image::do_load_create()
 	if(input_filename.compare("")==0) {
 		int err = fd->create(output_filename.c_str(), 0, NULL);
 		if (err != 0) {
-			popmessage("Error: %s", fd->error());
+			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
 		fd->setup_write(output_format);
@@ -936,7 +951,7 @@ void ui_menu_control_floppy_image::do_load_create()
 		if (!err && output_filename.compare("") != 0)
 			err = fd->reopen_for_write(output_filename.c_str());
 		if(err != 0) {
-			popmessage("Error: %s", fd->error());
+			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
 		if(output_format)
@@ -948,7 +963,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 {
 	if (softlist)
 	{
-		popmessage("When loaded from software list, the disk is Read-only.\n");
+		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
 		image->load(filename.c_str());
 		ui_menu::stack_pop(machine());
 		return;
@@ -959,7 +974,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 
 	if (!input_format)
 	{
-		popmessage("Error: %s\n", image->error());
+		machine().popmessage("Error: %s\n", image->error());
 		ui_menu::stack_pop(machine());
 		return;
 	}
@@ -1034,7 +1049,7 @@ void ui_menu_control_floppy_image::handle()
 			break;
 
 		case ui_menu_select_rw::WRITE_DIFF:
-			popmessage("Sorry, diffs are not supported yet\n");
+			machine().popmessage("Sorry, diffs are not supported yet\n");
 			ui_menu::stack_pop(machine());
 			break;
 

@@ -18,7 +18,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) m_execute->device().logerror x; } while (0)
 
 #define TEMPLOG 0
 
@@ -615,7 +615,8 @@ int device_execute_interface::standard_irq_callback(int irqline)
 {
 	// get the default vector and acknowledge the interrupt if needed
 	int vector = m_input[irqline].default_irq_callback();
-	LOG(("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector));
+	
+	if (VERBOSE) device().logerror("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector);
 
 	// if there's a driver callback, run it to get the vector
 	if (!m_driver_irq.isnull())
@@ -783,7 +784,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 		m_qindex--;
 		empty_event_queue();
 		event_index = m_qindex++;
-		logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
+		m_execute->device().logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
 	}
 
 	// enqueue the event
@@ -867,7 +868,7 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 					break;
 
 				default:
-					logerror("empty_event_queue device '%s', line %d, unknown state %d\n", m_execute->device().tag(), m_linenum, m_curstate);
+					m_execute->device().logerror("empty_event_queue device '%s', line %d, unknown state %d\n", m_execute->device().tag(), m_linenum, m_curstate);
 					break;
 			}
 

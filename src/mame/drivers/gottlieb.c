@@ -283,8 +283,8 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
 WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
 {
 	/* reset the trackball counters */
-	m_track[0] = ioport("TRACKX")->read_safe(0);
-	m_track[1] = ioport("TRACKY")->read_safe(0);
+	m_track[0] = read_safe(ioport("TRACKX"), 0);
+	m_track[1] = read_safe(ioport("TRACKY"), 0);
 }
 
 

@@ -15,7 +15,7 @@
 
 #define VERBOSE_LEVEL   (0)
 
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -24,7 +24,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.driver_data<gba_state>()->m_maincpu->pc(), buf );
+		device.logerror( "%08x: %s", device.machine().driver_data<gba_state>()->m_maincpu->pc(), buf );
 	}
 }
 
@@ -820,7 +820,7 @@ void gba_state::draw_gba_oam_window(UINT32 *scanline, int y)
 					default:
 						width = 0;
 						height = 0;
-						verboselog(machine(), 0, "OAM error: Trying to draw OBJ with OBJ_SHAPE = 3!\n" );
+						verboselog(*this, 0, "OAM error: Trying to draw OBJ with OBJ_SHAPE = 3!\n" );
 						break;
 				}
 
@@ -1259,7 +1259,7 @@ void gba_state::draw_gba_oam(UINT32 *scanline, int y)
 					default:
 						width = 0;
 						height = 0;
-						verboselog(machine(), 0, "OAM error: Trying to draw OBJ with OBJ_SHAPE = 3!\n" );
+						verboselog(*this, 0, "OAM error: Trying to draw OBJ with OBJ_SHAPE = 3!\n" );
 						break;
 				}
 

@@ -44,7 +44,7 @@
 #define ABC806_ATTR_RAM_SIZE    0x800
 #define ABC806_VIDEO_RAM_SIZE   0x20000
 
-#define ABC800_CHAR_WIDTH   6
+#define ABC800_CHAR_WIDTH   12
 #define ABC800_CCLK         ABC800_X01/ABC800_CHAR_WIDTH
 
 #define SCREEN_TAG          "screen"

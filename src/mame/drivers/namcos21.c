@@ -294,6 +294,229 @@ CPU68 PCB:
 
   JP2          /D-ST           /VBL
   JP3
+  
+*****************************  
+
+Winning Run / Winning Run Suzuka GP/ Winning Run 91
+Namco 1988-91
+
+These games run on Namco System 21 hardware. Note each set of PCBs for System 21 games are slightly different,
+with some common PCBs and some unique-to-that-game PCBs. This covers the Winning Run series.
+The PCBs are housed in a metal box. The front has a small filter board containing a 60-pin flat cable connector. 
+Underneath is a connector that plugs into PCB #3. 
+Inside at the bottom is a small MOTHER PCB containing 8 connectors where the PCBs plug in and the power input connector. 
+On Winning Run there is an additional PCB for the controls and cabinet motion. 
+The PAL labels suggest it was originally used with Metal Hawk. It may be used with other games too.
+
+
+PCB Layouts
+-----------
+
+In the layouts below, the jumpers set the ROM type.
+If horizontally shorted the ROM type is 27C101
+If vertically shorted the ROM type is 27C301/27C1001
+ROM labels/locations shown are printed on the PCB. Not all ROM positions are used.
+See the ROM loading below (per game) for ROM usage and actual label names.
+
+PCB#1 (top):
+
+2252960601
+(2252970601)
+|--------------------------------------------------------------|
+|            POINT3L.7P  POINT3U.5P   DIP28_SOCKET(2P)         |
+|            POINT2L.7N  POINT2U.5N       |-------|            |
+|                 JP5 O=O   JP6 O=O       |  TMS  |    40MHz   |
+|                     O=O       0=0       |320C25 |            |
+|  POINT1U.8L  MB8422                     |-------|            |
+|                          PAL16L8         MB81C69   MB81C69   |
+|  POINT0U.8J  MB8422      (WR-D2.4J)                          |
+|                                          MB81C69   MB81C69   |
+|                                                              |
+|                                                              |
+|JP3 O=O                                                       |
+|    O=O                                                       |
+|  POINT1L.2E  MB8422   62256     62256                        |
+|                                                              |
+|  POINT0L.8D  MB8422                                          |
+|JP4 O=O                                                       |
+|    O=O                                                       |
+|                                                              |
+|                                                              |
+|                                    PAL16L8                   |
+|                                    (WR-D1.3B)                |
+|                                                              |
+|                                                              |
+|----|----------------------|----|------------------------|----|
+     |----------------------|    |------------------------|
+
+
+PCB#2 (2nd down):
+
+2252960701
+(2252970701)
+|--------------------------------------------------------------|
+|                                                              |
+|  62256  62256  C157  C157  M5M5178                           |
+|                                                              |
+|  62256  62256  C157  C157  M5M5178                           |
+|                                                              |
+|  62256  62256  C157  C157                      62256         |
+|                             C150                             |
+|  62256  62256  C157  C157                      62256         |
+|                                                              |
+|  C157   C157                                                 |
+|                                                              |
+|  C157   C157                             62256               |
+| |-------| |-------| |-------|                                |
+| |L7A0080| |L7A0080| |L7A0081|   M5M5178  62256               |
+| |110FAI | |110FAI | |111MUR |                                |
+| |-------| |-------| |-------|   M5M5178  62256               |
+|                                                              |
+|   2018  2018              |---------|    62256               |
+|                   20MHz   |         |                        |
+|   2018  2018  2018        |  C167   |                        |
+|        C157  C157         |         |               PAL16L8  |
+|        C157  C157         |---------|              (WR-P1.1B)|
+|                                                              |
+|----|----------------------|----|------------------------|----|
+     |----------------------|    |------------------------|
+
+
+PCB#3 (3rd down):
+
+2252960101
+(2252970101)       RGB_CABLE     |------------------------|
+|--------------------||||||------|------------------------|----|
+|              TL084C             |---|              MB3771    |
+|      MB87077           LB1760   |C65|  PAL16L8    PC910 PC900|
+|MB87077   34063                  |---|  (SYS87B-2.3W)         |
+|TL084C  TL084C                               DSW1(8) M5M5179  |
+|LC7880  YM3012          PAL12L10  SYS2C65C.5P          |----| |
+|MB8464  YM2151           (WR-C1.5P)                    |C139| |
+|   |----|          C137          3.579545MHz   HN58C65 |----| |
+|   |C121| 49.152MHz       8422    C149                        |
+|   |----|          PAL12L10                65256     65256    |
+|                   (WR-C2.8K)                                 |
+|     2018     2018           62256  62256  MPRU.3K   MPRL.1K  |
+|                                                              |
+| VOI3.11E          MB8464                       68000         |
+|                                                              |
+| VOI2.11D |------| SND1.7D   C148    C148  DATA3U.3D DATA3L.1D|
+|          | C140 |                                            |
+| VOI1.11C |------| SND0.7C   65256  65256  DATA2U.3C DATA2L.1C|
+|                                                              |
+| VOI0.11B          6809   SPRU.6B  SPRL.4B DATA1U.3B DATA1L.1B|
+|             JP3                       JP1                    |
+|             O=O               68000   OO  DATA0U.3A DATAOL.1A|
+|             O=O                       ||                     |
+|                                       OO                     |
+|----|----------------------|----|------------------------|----|
+     |----------------------|    |------------------------|
+
+
+PCB#4 (bottom):
+
+2252960401
+(2252970401)       RGB_CABLE
+|--------------------||||||------------------------------------|
+|                                                              |
+| |----|                                 |----|                |
+| |C164|                                 |C148|     68000      |
+| |----|                                 |----|                |
+|                                MB3771                        |
+|                                PAL20V8    62256    62256     |
+|                               (WR-G3.4S)                     |
+|                           62256         GDT1L.3S  GDT1U.1S   |
+| MB81461  MB81461               JP10 O-O                JP9 OO|
+|                           62256 PAL16L8 GDT0L.3P  GDT0U.1P |||
+| MB81461  MB81461               (WR-G2.4P)                  OO|
+|                           62256         GPR1L.3L  GPR1U.1L   |
+| MB81461  MB81461                 J J J                 JP8 OO|
+|                                  P P P  GPR0L.3J  GPR0U.1J |||
+| MB81461  MB81461         |----|  6 5 4                     OO|
+|                          |C138|  O|O|O|  JP12                |
+| MB81461  MB81461         |----|  O|O|O|    O|          JP7 OO|
+|                   PAL16L8        O O O     O|     MB8422   |||
+| MB81461  MB81461 (WR-G4.7L)      49.152MHz O               OO|
+|                                          C165     MB8422     |
+| MB81461  MB81461                       38.808MHz             |
+|                                            PAL16L8           |
+| MB81461  MB81461                          (WR-G1.3A)         |
+|----|----------------------|----|------------------------|----|
+     |----------------------|    |------------------------|
+
+
+I/O & Drive Board For Motion Cabinet
+------------------------------------
+
+2286964100 (2286974100)
+|--------------------------------|
+|SW2 SW1  8255   8251     TLP521 |
+|DSW(6)         EMPTY_SOCKET     |
+| 4.9152MHz                      |
+|RESET MB3773    ADC0809     J201|
+|  68B09   EMPTY_SOCKET          |
+| WR_DR1.5A                S1WB  |
+|  8464                  LM324   |
+|                        TLP521  |
+| PAL20L10                 S2VB  |
+|(MH1-DR2)             A490  J205|
+|                      A490      |
+|J206                   TLP511   |
+|       8253     PAL14H8   TLP511|
+|TLP511         (MH1-DR3)        |
+|      J204 J202 J203            |
+|TLP511                          |
+|BCR16DM BCR16DM BCR16DM BCR16DM |
+|--------------------------------|
+Notes:
+      J201 - 50 pin flat cable connector for controls
+      J202 - 6 pin Power connector
+      J203 - 2-pin Power connector
+      J204 - 3-pin Power connector
+      J205 - 4-pin connector for DC feedback motor
+      J206 - 5-pin connector for main board communication
+      S1WB - Bridge Rectifier
+      S2VB - Bridge Rectifier
+      A490 - Transistor
+   BCR16DM - Transistor
+    TLP511 - Toshiba TLP511 GAAS Infrared & Photo Thyristor
+    TLP521 - Toshiba TLP521 Programmable Controller AC/DC-Input Module Solid State Relay
+      8255 - Mitsubishi M5L8255AP-5 Programmable Peripheral Interface
+      8251 - Mitsubishi M5L8251AP-5 Programmable Communication Interface
+      8253 - Mitsubishi M5L8253P-5 Programmable Interval Timer
+   ADC0809 - National Semiconductor ADC0809CCN 8-Bit Microprocessor Compatible A/D Converters with 8-Channel Multiplexer
+     68B09 - Hitachi HD68B09EP CPU
+      8464 - 8k x8-bit SRAM
+     LM324 - National Semiconductor LM324 General Purpose Operational Amplifier
+    MB3773 - Fujitsu MB3773 Power Supply Monitor with Watch-Dog Timer
+
+
+Slot PCB
+--------
+2252960502 (2252970502)
+V21 MOTHER PCB
+|--------------------------------------------------------------|
+|                                  PWR_CONN                    |
+|    |--------SLOT1---------|    |---------SLOT5----------|    |
+|    |--------SLOT2---------|    |---------SLOT6----------|    |
+|    |--------SLOT3---------|    |---------SLOT7----------|    |
+|    |--------SLOT4---------|    |---------SLOT8----------|    |
+|--------------------------------------------------------------|
+
+
+Filter Board
+------------
+2252960801 (2252970801)
+|--------------------------------|
+|    |----------------------|    |
+|    |----------------------|    |
+|                                |
+|-------|60-PIN FLAT CABLE|------|
+        |-------CONN------|
+        
+****************************  
+ 
 */
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

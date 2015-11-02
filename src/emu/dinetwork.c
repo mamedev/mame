@@ -42,7 +42,7 @@ void device_network_interface::set_interface(int id)
 {
 	m_dev.reset(open_netdev(id, this, (int)(m_bandwidth*1000000/8.0f/1500)));
 	if(!m_dev) {
-		logerror("Network interface %d not found\n", id);
+		device().logerror("Network interface %d not found\n", id);
 		id = -1;
 	}
 	m_intf = id;

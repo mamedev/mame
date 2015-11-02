@@ -120,7 +120,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 	int scanline = param;
 
 	/* update the video */
-	m_screen->update_now();
+//  m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)

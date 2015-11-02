@@ -97,7 +97,7 @@
                                        zone.
 */
 
-#include "emu.h" // logerror, BIT, emu_fatalerror
+#include "emu.h" // osd_printf_verbose, BIT, emu_fatalerror
 #include "formats/victor9k_dsk.h"
 
 victor9k_format::victor9k_format()
@@ -143,66 +143,66 @@ int victor9k_format::identify(io_generic *io, UINT32 form_factor)
 void victor9k_format::log_boot_sector(UINT8 *data)
 {
 	// System disc ID
-	logerror("System disc: %s\n", ((data[0] == 0xff) && (data[1] == 0x00)) ? "yes" : "no");
+	osd_printf_verbose("System disc: %s\n", ((data[0] == 0xff) && (data[1] == 0x00)) ? "yes" : "no");
 
 	// Load address
-	logerror("Load address: %04x\n", (data[1] << 8) | data[2]);
+	osd_printf_verbose("Load address: %04x\n", (data[1] << 8) | data[2]);
 
 	// Length
-	logerror("Length: %04x\n", (data[3] << 8) | data[4]);
+	osd_printf_verbose("Length: %04x\n", (data[3] << 8) | data[4]);
 
 	// Entry offset
-	logerror("Entry offset: %04x\n", (data[5] << 8) | data[6]);
+	osd_printf_verbose("Entry offset: %04x\n", (data[5] << 8) | data[6]);
 
 	// Entry segment
-	logerror("Entry segment: %04x\n", (data[7] << 8) | data[8]);
+	osd_printf_verbose("Entry segment: %04x\n", (data[7] << 8) | data[8]);
 
 	// I.D.
-	//logerror("I.D.: %s\n", data[10]);
+	//osd_printf_verbose("I.D.: %s\n", data[10]);
 
 	// Part number
-	//logerror("Part number: %s\n", data[18]);
+	//osd_printf_verbose("Part number: %s\n", data[18]);
 
 	// Sector size
-	logerror("Sector size: %04x\n", (data[25] << 8) | data[26]);
+	osd_printf_verbose("Sector size: %04x\n", (data[25] << 8) | data[26]);
 
 	// Data start
-	logerror("Data start: %04x\n", (data[27] << 8) | data[28]);
+	osd_printf_verbose("Data start: %04x\n", (data[27] << 8) | data[28]);
 
 	// Boot start
-	logerror("Boot start: %04x\n", (data[29] << 8) | data[30]);
+	osd_printf_verbose("Boot start: %04x\n", (data[29] << 8) | data[30]);
 
 	// Flags
-	logerror("%s sided\n", BIT(data[33], 0) ? "Double" : "Single");
-	logerror("Interleave factor: %u\n", data[32] >> 4);
+	osd_printf_verbose("%s sided\n", BIT(data[33], 0) ? "Double" : "Single");
+	osd_printf_verbose("Interleave factor: %u\n", data[32] >> 4);
 
 	// Disc type
 	switch (data[34]) {
-	case 0x00: logerror("Disc type: CP/M\n"); break;
-	case 0x01: logerror("Disc type: MS-DOS\n"); break;
-	default: logerror("Disc type: unknown\n"); break;
+	case 0x00: osd_printf_verbose("Disc type: CP/M\n"); break;
+	case 0x01: osd_printf_verbose("Disc type: MS-DOS\n"); break;
+	default: osd_printf_verbose("Disc type: unknown\n"); break;
 	}
 
 	// Speed table
-	logerror("Speed table:  ");
+	osd_printf_verbose("Speed table:  ");
 	for (int i = 38; i < 56; i++) {
-		logerror("%02x ", data[i]);
+		osd_printf_verbose("%02x ", data[i]);
 	}
-	logerror("\n");
+	osd_printf_verbose("\n");
 
 	// Zone table
-	logerror("Zone table:            ");
+	osd_printf_verbose("Zone table:            ");
 	for (int i = 56; i < 71; i++) {
-		logerror("%02x ", data[i]);
+		osd_printf_verbose("%02x ", data[i]);
 	}
-	logerror("\n");
+	osd_printf_verbose("\n");
 
 	// Sector/track
-	logerror("Sector/track:          ");
+	osd_printf_verbose("Sector/track:          ");
 	for (int i = 71; i < 86; i++) {
-		logerror("%02x ", data[i]);
+		osd_printf_verbose("%02x ", data[i]);
 	}
-	logerror("\n");
+	osd_printf_verbose("\n");
 }
 
 floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f, int &current_size, int sector_count)

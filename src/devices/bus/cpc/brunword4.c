@@ -98,8 +98,10 @@ WRITE8_MEMBER(cpc_brunword4_device::rombank_w)
 	m_slot->rom_select(space,0,data & 0x3f);  // repeats every 64 ROMs, this breaks upper cart ROM selection on the Plus
 }
 
-void cpc_brunword4_device::set_mapping()
+void cpc_brunword4_device::set_mapping(UINT8 type)
 {
+	if(type != MAP_OTHER)
+		return;
 	if(m_rombank_active)
 	{
 		UINT8* ROM = memregion("mk4_roms")->base();

@@ -4,7 +4,8 @@
 
       Camputers Lynx
 
-      05/2009 Skeleton driver.
+      2009-05 Skeleton driver.
+      2015-10-23 Working
 
       The Lynx was an 8-bit British home computer that was first released
       in early 1983 as a 48 kB model.
@@ -62,7 +63,8 @@
 
 
 
-    48k and 96k are basically the same machine. 128k is different.
+    48k and 96k are basically the same machine. 128k is different. Most software for
+    one won't work properly on the other, due to major hardware differences.
 
     This computer is weird, because it allows reads and writes from multiple banks
     at the same time. We can write to multiple banks, but we must limit ourselves
@@ -81,24 +83,36 @@
     - Cassette tapes made on 128k are a different speed to 48k tapes. To load a 128k
       tape on a 48k system, enter TAPE 3 before loading. (2,3,4,5 all seem to work).
     - When loading, there's no wildcard; you must specify the name.
-    - INT should be activated by the MC6845 CURS pin (inverted), or by holding down
-      the BREAK key. However, the rom leaves interrupts disabled, so none of this works.
+    - INT should be activated by the MC6845 CURS pin, but this doesn't happen. Using
+      VSYNC instead. Required for CP/M to boot.
+    - Info about disks:
+      - You must firstly do XROM to initialise the DOS ROM.
+      - Then do EXT DIR with a Lynx-formatted disk, or EXT BOOT with a CP/M disk.
+      - Then, on a Lynx-formatted disk, do EXT LOAD "name" or EXT MLOAD "name".
 
     To Do:
-    - Need disk-based software (only ones found are LDF format)
-    - finish memory banking
-    - disk (only partially done)
     - printer
     - joysticks
-    - UART type COM8017
-    Bugs:
-    - YNXVADERS: Top row of invaders is missing and can't be killed, but they
-      continue to fire at you. This makes the game unwinnable.
+    - UART type COM8017 (48k,96k only) (not used by any programs)
+    - There's a few games that are not perfectly perfect, but it runs at least
+      as well as any other Lynx emulator.
+
     Game bugs (reproducible in Jynx):
     - 3D Monster Craze: When attacked, garbage on screen
     - 3D Monster Craze: When you find the key, the game freezes
-    - LogiChess: unable to enter an acceptable move
-    - Power Blaster: Bad Tape
+    - YNXVADERS: Colours of top 2 rows of invaders should be white and yellow
+      but they show as magenta and red. After game ends, title screen has wrong
+      colours.
+
+      Game Hints:
+      Most games have instructions or are quite obvious.
+      - Power Blaster. Using debug.exe, change byte 1965 from FE to F2 to fix
+        the loading. Then, arrows to turn, Shift to clean out a whole row of dots.
+        You can then move into the vacated areas. Even though it says you have
+        3 lives, you actually only have 1.
+      - Backgammon. This is just the instructions. The game is missing.
+      - LogiChess. The page at http://www.nascomhomepage.com/games/logichess.html
+        should provide enough clues to enable you to work out how to play.
 
 ****************************************************************************/
 
@@ -110,6 +124,7 @@
 #include "sound/wave.h"
 #include "formats/camplynx_cas.h"
 #include "machine/wd_fdc.h"
+#include "formats/camplynx_dsk.h"
 
 class camplynx_state : public driver_device
 {
@@ -127,12 +142,8 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	// 48k
 	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank5_w);
 	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(bank7_w);
-	DECLARE_WRITE8_MEMBER(bank8_w);
 	DECLARE_WRITE8_MEMBER(port58_w); // drive select etc
 	DECLARE_WRITE8_MEMBER(port7f_w); // banking 48k
 	DECLARE_READ8_MEMBER(port80_r); // cassin for 48k
@@ -140,10 +151,12 @@ public:
 	DECLARE_READ8_MEMBER(port82_r); // cassin for 128k
 	DECLARE_WRITE8_MEMBER(port82_w); // banking 128k
 	DECLARE_WRITE8_MEMBER(port84_w); // dac port 48k
+	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
 	DECLARE_MACHINE_RESET(lynx48k);
 	DECLARE_MACHINE_RESET(lynx128k);
 	DECLARE_DRIVER_INIT(lynx48k);
 	DECLARE_DRIVER_INIT(lynx128k);
+	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
 	required_device<palette_device> m_palette;
@@ -200,7 +213,7 @@ d7 = read from bank 4 */
 			membank("bankr5")->set_entry(0);
 			membank("bankr6")->set_entry(1);
 			membank("bankr7")->set_entry(2);
-			membank("bankr8")->set_entry(3);
+			membank("bankr8")->set_entry(7);
 			break;
 		case 0x20:
 		case 0x24:
@@ -213,7 +226,7 @@ d7 = read from bank 4 */
 			membank("bankr5")->set_entry(12);
 			membank("bankr6")->set_entry(13);
 			membank("bankr7")->set_entry(14);
-			membank("bankr8")->set_entry(15);
+			membank("bankr8")->set_entry(BIT(m_port58, 4) ? 15 : 7);
 			break;
 		case 0x30:
 		case 0x34:
@@ -235,9 +248,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(26);
 			membank("bankr4")->set_entry(27);
 			membank("bankr5")->set_entry(28);
-			membank("bankr6")->set_entry(28);
+			membank("bankr6")->set_entry(29);
 			membank("bankr7")->set_entry(30);
-			membank("bankr8")->set_entry(30);
+			membank("bankr8")->set_entry(31);
 			break;
 		case 0x40:
 		case 0x60:
@@ -250,9 +263,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(18);
 			membank("bankr4")->set_entry(19);
 			membank("bankr5")->set_entry(20);
-			membank("bankr6")->set_entry(20);
+			membank("bankr6")->set_entry(21);
 			membank("bankr7")->set_entry(22);
-			membank("bankr8")->set_entry(22);
+			membank("bankr8")->set_entry(23);
 			break;
 		case 0x54:
 		case 0x74:
@@ -261,9 +274,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(2);
 			membank("bankr4")->set_entry(27);
 			membank("bankr5")->set_entry(28);
-			membank("bankr6")->set_entry(28);
+			membank("bankr6")->set_entry(29);
 			membank("bankr7")->set_entry(30);
-			membank("bankr8")->set_entry(30);
+			membank("bankr8")->set_entry(31);
 			break;
 		case 0x50:
 		case 0x70:
@@ -276,9 +289,9 @@ d7 = read from bank 4 */
 			membank("bankr3")->set_entry(2);
 			membank("bankr4")->set_entry(19);
 			membank("bankr5")->set_entry(20);
-			membank("bankr6")->set_entry(20);
+			membank("bankr6")->set_entry(21);
 			membank("bankr7")->set_entry(22);
-			membank("bankr8")->set_entry(22);
+			membank("bankr8")->set_entry(23);
 			break;
 		default:
 			printf("Banking code %X not handled\n", m_bankdata);
@@ -319,9 +332,7 @@ d0 = read from bank 4 */
 			membank("bankr8")->set_entry(7);
 			break;
 		case 0x02:
-		case 0x06:
 		case 0x0a:
-		case 0x0e:
 			membank("bankr1")->set_entry(8);
 			membank("bankr2")->set_entry(9);
 			membank("bankr3")->set_entry(10);
@@ -345,7 +356,9 @@ d0 = read from bank 4 */
 			membank("bankr8")->set_entry(BIT(m_port58, 4) ? 15 : 7);
 			break;
 		case 0x04:
+		case 0x06:
 		case 0x0c:
+		case 0x0e:
 			membank("bankr1")->set_entry(16);
 			membank("bankr2")->set_entry(17);
 			membank("bankr3")->set_entry(18);
@@ -397,11 +410,11 @@ static ADDRESS_MAP_START( lynx48k_mem, AS_PROGRAM, 8, camplynx_state )
 	AM_RANGE(0x2000,0x3fff) AM_READ_BANK("bankr2")
 	AM_RANGE(0x4000,0x5fff) AM_READ_BANK("bankr3")
 	AM_RANGE(0x6000,0x7fff) AM_READ_BANK("bankr4")
-	AM_RANGE(0x8000,0x9fff) AM_READ_BANK("bankr5") AM_WRITE(bank5_w)
-	AM_RANGE(0xa000,0xbfff) AM_READ_BANK("bankr6") AM_WRITE(bank6_w)
-	AM_RANGE(0xc000,0xdfff) AM_READ_BANK("bankr7") AM_WRITE(bank7_w)
-	AM_RANGE(0xe000,0xffff) AM_READ_BANK("bankr8") AM_WRITE(bank8_w)
-	AM_RANGE(0x0000,0x7fff) AM_WRITE(bank1_w)
+	AM_RANGE(0x8000,0x9fff) AM_READ_BANK("bankr5")
+	AM_RANGE(0xa000,0xbfff) AM_READ_BANK("bankr6")
+	AM_RANGE(0xc000,0xdfff) AM_READ_BANK("bankr7")
+	AM_RANGE(0xe000,0xffff) AM_READ_BANK("bankr8")
+	AM_RANGE(0x0000,0xffff) AM_WRITE(bank6_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lynx128k_mem, AS_PROGRAM, 8, camplynx_state )
@@ -473,7 +486,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( lynx48k )
 	PORT_START("LINE0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) PORT_CHANGED_MEMBER(DEVICE_SELF, camplynx_state, brk_key, 0)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -549,6 +562,11 @@ static INPUT_PORTS_START( lynx48k )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER( camplynx_state::brk_key )
+{
+	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 WRITE8_MEMBER( camplynx_state::bank1_w )
 {
 	if BIT(m_wbyte, 0)
@@ -561,44 +579,28 @@ WRITE8_MEMBER( camplynx_state::bank1_w )
 		m_p_ram[offset+0x40000] = data;
 }
 
-WRITE8_MEMBER( camplynx_state::bank5_w )
-{
-	if BIT(m_wbyte, 0)
-		m_p_ram[offset+0x18000] = data;
-	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x28000] = data;
-	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x38000] = data;
-}
-
 WRITE8_MEMBER( camplynx_state::bank6_w )
 {
 	if BIT(m_wbyte, 0)
-		m_p_ram[offset+0x1a000] = data;
-	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x28000] = data;
-	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x38000] = data;
-}
+		m_p_ram[offset+0x10000] = data;
 
-WRITE8_MEMBER( camplynx_state::bank7_w )
-{
-	if BIT(m_wbyte, 0)
-		m_p_ram[offset+0x1c000] = data;
-	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x2c000] = data;
-	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x3c000] = data;
-}
+	offset &= 0x5fff;
 
-WRITE8_MEMBER( camplynx_state::bank8_w )
-{
-	if BIT(m_wbyte, 0)
-		m_p_ram[offset+0x1e000] = data;
 	if ((m_wbyte & 0x22) == 0x02)
-		m_p_ram[offset+0x2c000] = data;
+	{
+		m_p_ram[offset | 0x20000] = data;
+		m_p_ram[offset | 0x22000] = data;
+		m_p_ram[offset | 0x28000] = data;
+		m_p_ram[offset | 0x2a000] = data;
+	}
+
 	if ((m_wbyte & 0x44) == 0x04)
-		m_p_ram[offset+0x3c000] = data;
+	{
+		m_p_ram[offset | 0x30000] = data;
+		m_p_ram[offset | 0x32000] = data;
+		m_p_ram[offset | 0x38000] = data;
+		m_p_ram[offset | 0x3a000] = data;
+	}
 }
 
 READ8_MEMBER( camplynx_state::port80_r )
@@ -757,7 +759,6 @@ d7 = 125ns or 250ns */
 		else
 			port7f_w(space, 0, m_bankdata);
 	}
-	m_fdc->dden_w(BIT(data, 7));
 
 	floppy_image_device *floppy = NULL;
 	if ((data & 3) == 0) floppy = m_floppy0->get_device();
@@ -773,6 +774,9 @@ d7 = 125ns or 250ns */
 	m_floppy1->get_device()->mon_w(BIT(data, 3));
 }
 
+FLOPPY_FORMATS_MEMBER( camplynx_state::camplynx_floppy_formats )
+	FLOPPY_CAMPLYNX_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( camplynx_floppies )
 	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
@@ -791,10 +795,10 @@ static MACHINE_CONFIG_FRAGMENT( lynx_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( lynx_disk )
-	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 3) // no idea what crystal, no schematic of fdc found
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "drive1", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -827,7 +831,7 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
-	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lynx96k, lynx48k )
@@ -867,7 +871,7 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
-	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
 
 	MCFG_FRAGMENT_ADD(lynx_disk)
 MACHINE_CONFIG_END
@@ -932,5 +936,5 @@ ROM_END
 /* Driver */
 /*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT    CLASS            INIT         COMPANY     FULLNAME     FLAGS */
 COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k", 0 )
-COMP( 1983, lynx96k,   lynx48k,   0,       lynx96k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",   MACHINE_NOT_WORKING)
-COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, camplynx_state,  lynx128k, "Camputers",  "Lynx 128k",  MACHINE_NOT_WORKING)
+COMP( 1983, lynx96k,   lynx48k,   0,       lynx96k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k", 0 )
+COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, camplynx_state,  lynx128k, "Camputers",  "Lynx 128k", 0 )

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Olivetti Prodest PC 128S Disks -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+
+     Most of the dumps in this list were obtained from http://hierax.altervista.org/prodest/adfs.htm, covers and screenshots can also be found at http://pc128s.altervista.org/software.html.
+-->
+
+<softwarelist name="pro128s_flop" description="Olivetti Prodest PC 128S disks">
+
+	<!-- Games -->
+
+	<software name="aviator">
+		<description>Aviator</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="aviator.adm" size="327680" crc="98f1d06d" sha1="c8614cd080991d19cbf40ef205d049343d738a5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bribbon1">
+		<description>Blue Ribbon 1</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="blueribbon1.adm" size="327680" crc="4bda3704" sha1="2c23d43f01d35fc1397377d8317b148be804cc72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bribbon2">
+		<description>Blue Ribbon 2</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="blueribbon2.adm" size="327680" crc="9cf20547" sha1="3e490286c043b3066a05785cc217b0b0866ffc09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carambol">
+		<description>Carambola</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="biliardo.adm" size="327680" crc="741ade8a" sha1="304d90b8fbd5c8fbbe77f9ba28708e4fe6196594" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futuresh">
+		<description>Future Shock</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9960" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="futureshock.ads" size="163840" crc="8a57f63a" sha1="b22b82181f9a59c468cf7f438105663ec5a34def" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goal">
+		<description>Goal!</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9950" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="goal.ads" size="163840" crc="d01bfcb5" sha1="1e047405cf875f5849101807fa579a1df186847d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf">
+		<description>Golf</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9610" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="birdie.adm" size="327680" crc="a63260d0" sha1="613aceab8d31e38fa762dd3d10c39d58856a7f30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetsetw2">
+		<description>Jet Set Willy II</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF1050" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="jetsetwilly2.ads" size="163840" crc="c87fdbbd" sha1="c84573f6cc7a24d4c7f0206efc0ce8506abf7d02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modemsec">
+		<description>Modem's Secret</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="modemssecret.adm" size="327680" crc="c08cd3b7" sha1="ae2ae68fe505d9180dcf85827feeae777c0535e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="overdriv">
+		<description>Overdrive &amp; Centibug</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="overdrive_centibug.adm" size="327680" crc="a99d9e29" sha1="e44116199ae711131937a5de010bdcab541a87b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revs">
+		<description>Revs</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="revs.adm" size="327680" crc="c445ec45" sha1="4bef4edf44a727c0b36d81cf5ddd8064a13eb039" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sarcade1">
+		<description>Super Arcade 1</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9560" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="superarcade1.ads" size="163840" crc="893e6201" sha1="16da10a80ea6bf53b13d1d4225dd86e2801ab3e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sarcade2">
+		<description>Super Arcade 2</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9570" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="superarcade2.adm" size="327680" crc="23a176fc" sha1="95652e6d587873a4b71c2ac6acb5c339c27c8f6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sarcade3">
+		<description>Super Arcade 3</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="superarcade3.adm" size="327680" crc="c34681e0" sha1="2c3cb301ecb1fbd5b2cedd1d12385ed263c39cfd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sarcade4">
+		<description>Super Arcade 4</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="superarcade4.adm" size="327680" crc="3b4510ab" sha1="058e56ac99fc8af81c05cefb8bf8954c5fa0d7e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sarcade5">
+		<description>Super Arcade 5</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9850" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="superarcade5.ads" size="163840" crc="c588888e" sha1="9ce948ef458a3a74e89d8cc94ff0f292d8ae8989" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scacchi">
+		<description>Scacchi (Ita)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="scacchi.adl" size="655360" crc="08a45c85" sha1="a0b38359657c6df80f58e00578ad961a316d2385" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smashgra">
+		<description>Smash &amp; Grab &amp; Mr Wiz</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="smash_mrwiz.adm" size="327680" crc="2fba2c48" sha1="2e9c5ce65da83c2ac0b59f387ebe4fbd171d93c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starstri">
+		<description>Star Striker &amp; Wallaby</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="starstriker_wallaby.adm" size="327680" crc="7768d196" sha1="f76cf06efc9c9b6ce01d5d6e9c656bdc034236c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1991</year>
+		<publisher>ConcaSoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="tetris.adl" size="655360" crc="eca99e42" sha1="5ec5ea8674a9c43df249b2d74095a979b5346ff4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thebigko">
+		<description>The Big KO!</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="thebigko.ads" size="163840" crc="503066e5" sha1="a3315e6d4f4afa49838f1a1223a9c37192d5db32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vindaloo">
+		<description>Vindaloo</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9930" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="vindaloo.ads" size="163840" crc="3eca401d" sha1="b5a244ba57977a78e00dbead0e6dcb6e46af9823" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winter">
+		<description>Olimpiadi Invernali</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="winter.ads" size="163840" crc="32d023b5" sha1="4d3fdc630e6170ca9b7b72386047be34aaaf98f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xor">
+		<description>XOR (Ita)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="xor.adm" size="327680" crc="71aef802" sha1="c13637b53a1043558febbc0ca9821f9467f02122" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Business -->
+
+	<software name="artista">
+		<description>Artista</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="artista.adm" size="327680" crc="dbf18b92" sha1="90c595f2fe80d0729c02a5a80c07a28e374f06b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="betabase">
+		<description>Beta-Base (Ita)</description>
+		<year>1987</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="betabase.ads" size="163840" crc="8351f1f4" sha1="e015c41a93bf36b681d8fa7f1a18f324e789e554" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mod740">
+		<description>Mod. 740 S</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="mod740.adm" size="327680" crc="8433c242" sha1="dea4dc35a4bdbe087ec2a711869a924788b47a13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewindx">
+		<description>ViewIndex</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="viewindex.adm" size="327680" crc="6e780731" sha1="8dfaddaa238e5f3db0b9dcbbc7ef06f4fa52102a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewplot">
+		<description>ViewPlot</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="viewplot.adm" size="327680" crc="2ca1eade" sha1="12eaa4ac1c6a6484a886f313bb793a2c4537eb91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewstor">
+		<description>ViewStore</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="viewstore.adm" size="327680" crc="c6a08aba" sha1="a8041767230cc029f0d48e9b7aa5bb8131817441" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="podd">
+		<description>Podd (Ita)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="podd.ads" size="163840" crc="53f25c1f" sha1="38269a36fd55625bde32cd24f2c90024f8d52bfe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmagico">
+		<description>Puzzle Magico (Ita)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9830" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="puzzlemagico.ads" size="163840" crc="f0ac8983" sha1="58a0ad38b57ca176d69e91e3e249c885800f0f80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spingi">
+		<description>Spingi (Ita)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="release" value="SF9840" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="spingi.ads" size="163840" crc="c5efa2cb" sha1="1518a33169fefbb6e3659561179a9296b4413f97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Languages -->
+
+	<software name="basic">
+		<description>Introduzione al BASIC</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="basic.adm" size="327680" crc="c8c8f4ff" sha1="aed619692c40344563fba61a4324b4eeac78c11f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

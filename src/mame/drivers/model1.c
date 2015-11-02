@@ -642,7 +642,7 @@ READ16_MEMBER(model1_state::io_r)
 	static const char *const inputnames[] = { "IN0", "IN1", "IN2" };
 
 	if(offset < 0x8)
-		return ioport(analognames[offset])->read_safe(0x00);
+		return read_safe(ioport(analognames[offset]), 0x00);
 
 	if(offset == 0x0f)
 		return m_lamp_state;

@@ -45,3 +45,11 @@ const apollo_format::format apollo_format::formats[] = {
 };
 
 const floppy_format_type FLOPPY_APOLLO_FORMAT = &floppy_image_format_creator<apollo_format>;
+
+int apollo_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT64 size = io_generic_size(io);
+	UINT32 expected_size = 77*2*8*1024;
+
+	return ((size == expected_size) || (size == 0)) ? 1 : 0;
+}

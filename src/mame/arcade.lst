@@ -1232,6 +1232,7 @@ dkongj          // (c) 1981 Nintendo
 dkongjo         // (c) 1981 Nintendo
 dkongjo1        // (c) 1981 Nintendo
 dkongf          // hack from Jeff's Romhack
+dkongpe         // hack Pauline Edition
 dkongx          // hack
 dkongx11        // hack
 dkongjr         // (c) 1982 Nintendo of America
@@ -1826,7 +1827,7 @@ rtypej          // (c) 1987 (Japan)
 rtypejp         // (c) 1987 (Japan)
 rtypeu          // (c) 1987 + Nintendo USA license (US)
 rtypeb          // bootleg
-rtypem82b		// bootleg
+rtypem82b       // bootleg
 bchopper        // (c) 1987
 mrheli          // (c) 1987 (Japan)
 nspirit         // (c) 1988
@@ -1844,7 +1845,7 @@ dbreedm72       // (c) 1989
 rtype2          // (c) 1989
 rtype2j         // (c) 1989 (Japan)
 rtype2jc        // (c) 1989 (Japan)
-rtype2m82b		// bootleg
+rtype2m82b      // bootleg
 majtitle        // (c) 1990 (World)
 majtitlej       // (c) 1990 (Japan)
 hharry          // (c) 1990 (World)
@@ -1855,12 +1856,12 @@ poundfor        // (c) 1990 (World)
 poundforj       // (c) 1990 (Japan)
 poundforu       // (c) 1990 Irem America (US)
 airduelm72      // (c) 1990 (Japan)
-airduel			// (c) 1990 (World)
+airduel         // (c) 1990 (World)
 cosmccop        // (c) 1991 (World)
 gallop          // (c) 1991 (Japan)
 ltswords        // (c) 1991 (World)
 kengo           // (c) 1991 (Japan)
-kengoa			// (c) 1991 (Japan)
+kengoa          // (c) 1991 (Japan)
 // not M72, but same sound hardware
 sichuan2        // (c) 1989 Tamtex
 sichuan2a       // (c) 1989 Tamtex
@@ -2096,8 +2097,15 @@ boblbobl        // bootleg
 sboblbobl       // bootleg
 sboblbobla      // bootleg
 sboblboblb      // bootleg
+sboblboblc      // bootleg
+bublboblb       // bootleg
 bub68705        // bootleg
 dland           // bootleg
+bbredux         // bootleg / hack
+bublcave        // hack
+boblcave        // hack
+bublcave11      // hack
+bublcave10      // hack
 missb2          // bootleg on enhanced hardware
 bublpong        // bootleg on enhanced hardware
 kikikai         // A85 (c) 1986 Taito Corporation
@@ -2863,6 +2871,7 @@ pacslot         // (c) 1996 Namco
 ppsatan         // (c) 1996 <unknown>
 ddonpach        // (c) 1997 Atlus/Cave
 ddonpachj       // (c) 1997 Atlus/Cave
+ddonpacha       // hack
 dfeveron        // (c) 1998 Cave + Nihon System license
 feversos        // (c) 1998 Cave + Nihon System license
 esprade         // (c) 1998 Atlus/Cave
@@ -3096,7 +3105,7 @@ madgear         //  2/1989 (c) 1989 (US)
 madgearj        //  2/1989 (c) 1989 (Japan)
 ledstorm        //  1988 (c) 1988 (US)
 leds2011        //  1988 (c) 1988 (World)
-leds2011u		//  1988 (c) 1988 (US)
+leds2011u       //  1988 (c) 1988 (US)
 //  3/1989 Dokaben (baseball) - see below among "Mitchell" games
 //  8/1989 Dokaben 2 (baseball) - see below among "Mitchell" games
 // 10/1989 Capcom Baseball - see below among "Mitchell" games
@@ -3111,6 +3120,7 @@ leds2011u		//  1988 (c) 1988 (US)
 
 // Capcom CPS1 games
 forgottn        //  7/1988 (c) 1988 (World)
+forgottna       //  7/1988 (c) 1988 (World)
 forgottnu       //  7/1988 (c) 1988 (USA)
 forgottnu1      //  7/1988 (c) 1988 (USA)
 forgottnua      //  7/1988 (c) 1988 (USA)
@@ -3865,7 +3875,7 @@ soulclbrjb      // 1998.?? Soul Calibur (Japan, SOC11/VER.B)
 soulclbrja      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
 technodr        // 1998.07 Techno Drive
 mdhorse         // 1998.11 Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)
-aplarail		// 1998.12 Attack Pla Rail
+aplarail        // 1998.12 Attack Pla Rail
 tenkomor        // 1998.?? Tenkomori Shooting (Asia, TKM2/VER.A1)
 tenkomorja      // 1998.12 Tenkomori Shooting (Japan, TKM1/VER.A1)
 pacapp          // 1998.12 Paca Paca Passion (Japan, PPP1/VER.A2)
@@ -4501,6 +4511,7 @@ wboyub          // bootleg of wboyu
 wbdeluxe        // (c) 1986 + Escape license (S1)
 wboysys2        // 834-5984  (c) 1986 + Escape license (S1)
 gardia          // 834-6119 (S2?)
+gardiaj         //
 gardiab         // bootleg
 nob             // (c) Data East
 nobb            // bootleg
@@ -4685,11 +4696,11 @@ riotcity        // (c) 1991 Sega / Westone (Unprotected)
 ryukyu          // (c) 1990 (FD1094)
 sdib            // (c) 1987 (FD1089A)
 sdibl           // (c) 1987 bootleg
-sdibl2			// bootleg
-sdibl3			// bootleg
-sdibl4			// bootleg
-sdibl5			// bootleg
-sdibl6			// bootleg
+sdibl2          // bootleg
+sdibl3          // bootleg
+sdibl4          // bootleg
+sdibl5          // bootleg
+sdibl6          // bootleg
 defense         // (c) 1987 (FD1094)
 shinobi5        // (c) 1987 (Unprotected)
 shinobi4        // (c) 1987 (MC-8123B)
@@ -4879,7 +4890,7 @@ toutrund        // bootleg
 toutrunjd       // bootleg
 toutrun3d       // bootleg
 toutrunj1d      // bootleg
-toutrun2d		// bootleg
+toutrun2d       // bootleg
 shangon3d       // bootleg
 
 // X Board
@@ -5336,6 +5347,7 @@ tfrceacj        // (c) 1990 Sega / Technosoft
 tfrceacb        // bootleg
 twinsqua        // (c) 1991 Sega
 soniccar        // (c) 1991 Sega
+sonicpop
 ribbit          // (c) 1991 Sega
 tantr           // (c) 1992 Sega
 tantrkor        // (c) 1992 Sega
@@ -5583,8 +5595,8 @@ shaktamb        // 2001.10.17 Shakatto Tambourine Cho Powerup Chu (2K1 AUT)
 keyboard        // 2001.11 La Keyboard
 ikaruga         // 2001.12 Ikaruga
 lupinsho        // 2001.12 Lupin the Third: the Shooting
-drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
-derbyocw        // 2001.?? Derby Owners Club World Edition (Rev. D)
+drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev C)
+derbyocw        // 2001.?? Derby Owners Club World Edition (Rev D)
 				// 2001.?? Star Horse 2001
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
 mok             // 2002.03.06 The Maze of the Kings
@@ -5721,7 +5733,7 @@ initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2003.05 Initial D Arcade Stage Ver. 2 (Japan) (Rev A)
 initdv2j        // 2003.05.27 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 				// 2003.09 World Club Champion Football Serie A 2002-2003
-				// 2003.?? Club Kart Cycraft Edition
+clubkcyc  		// 2003.?? Club Kart Cycraft Edition (Rev A)
 clubk2k3        // 2003.?? Club Kart: European Session (2003, Rev A)
 clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 clubkprz        // 2003.?? Club Kart Prize
@@ -5748,6 +5760,7 @@ vf4tuned        // 2004.12 Virtua Fighter 4 Final Tuned (Rev F)
 				// 2006.09 Mobile Suit Gundam 0079 Card Builder Ver.2.01
 				// 2006.10 World Club Champion Football European Clubs 2005-2006 bugfix
 				// 2006.11 Mobile Suit Gundam 0079 Card Builder Ver.2.02
+inidv3ca        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A)
 inidv3cy        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B)
 				// 2007.03 Mobile Suit Gundam 0083 Card Builder
 				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
@@ -5798,7 +5811,7 @@ airtrix         // 2001.02 Air Trix
 triforce        // 2002.?? Triforce BIOS
 vs2002ex        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j         // 2002.10 Virtua Striker 2002 (Japan)
-fzeroaxc        // 2003.06.11 F-Zero AX (Rev. C)
+fzeroaxc        // 2003.06.11 F-Zero AX (Rev C)
 avalonsc        // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
 avalonse        // 2003.08 The Key Of Avalon: The Wizard Master (server) (Rev E)
 avalonce        // 2003.08 The Key Of Avalon: The Wizard Master (client) (Rev E)
@@ -5809,7 +5822,7 @@ gekpurya        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro
 				// 2003.10 The Key Of Avalon 1.01
 avalons         // 2003.11 The Key Of Avalon: The Wizard Master (server) (Rev G)
 avalonc         // 2003.11 The Key Of Avalon: The Wizard Master (client) (Rev G)
-fzeroax         // 2003.12 F-Zero AX (Rev. E)
+fzeroax         // 2003.12 F-Zero AX (Rev E)
 				// 2003.12 The Key Of Avalon 1.10
 avalns12        // 2004.03 The Key Of Avalon 1.20 - Summon The New Monsters (server) (Rev A)
 avalnc12        // 2004.03 The Key Of Avalon 1.20 - Summon The New Monsters (client) (Rev A)
@@ -6269,8 +6282,9 @@ boogwinga       // MBD (c) 1992 (Asia, v1.5)
 ragtime         // MBD (c) 1992 (Japan, v1.5)
 ragtimea        // MBD (c) 1992 (Japan, v1.3)
 dblewing        // MBE (c) 1993 Mitchell
-fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
+fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0395-1 PCB
 fghthista       // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
+fghthistb       // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
 fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0396-0 PCB
 fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
 fghthistub      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
@@ -6624,7 +6638,7 @@ vendettaj       // GX081 (c) 1991 (Japan)
 mogura          // GX141 (c) 1991
 wecleman        // GX602 (c) 1986
 weclemana       // GX602?(c) 1988
-weclemanb		// GX602 (c) 1986
+weclemanb       // GX602 (c) 1986
 hotchase        // GX763 (c) 1988
 hotchasea
 chqflag         // GX717 (c) 1988
@@ -9076,7 +9090,7 @@ vastar4         // (c) 1983 Sesame Japan
 // Gaelco 2D games
 mastboy         // (c) 1987 - No Ref on the PCB
 mastboyi        // (c) 1987 - No Ref on the PCB
-mastboyia		// (c) 1987 - No Ref on the PCB
+mastboyia       // (c) 1987 - No Ref on the PCB
 xorworld        // (c) 1990 - prototype
 bigkarnk        // (c) 1991 - Ref 901112-1
 // Master Boy 2 // (c) 1991 - Ref ???
@@ -9718,7 +9732,7 @@ pclubysa        // (c) 2000 Yun Sung
 garogun         // (c) 2000 Yun Sung
 7ordi           // (c) 2002 Yun Sung
 wondstck        // (c) ???? Yun Sung
-wondstcka		// (c) ???? Yun Sung
+wondstcka       // (c) ???? Yun Sung
 
 // Zilec games
 blueprnt        // (c) 1982 Bally Midway (Zilec in ROM 3U, and the programmer names)
@@ -9967,7 +9981,7 @@ pyenaget        // (c) 2000 Sammy
 tdoboon         // (c) 2000 Sammy
 haekaka         // (c) 2001 Sammy
 
-// IGS games ( www.igs.com.tw
+// IGS games (www.igs.com.tw)
 goldstar        // (c) 198? IGS
 goldstbl        // (c) 198? IGS
 moonlght        // bootleg
@@ -10176,8 +10190,16 @@ svg             // (c) 2003 Spectral vs Generation
 svgtw
 svgpcb          //
 ket             // (c) 2002 Ketsui
+ket1            //
 keta            //
 ketb            //
+ketarr          // hack
+ketarr151       // hack
+ketarr15        // hack
+ketarr10        // hack
+ketarrs151      // hack
+ketarrs15       // hack
+ketarrf         // hack
 ddpdoj          // (c) 2002 DoDonPachi Dai-Ou-Jou
 ddpdoja         //
 ddpdojb         //
@@ -11170,7 +11192,7 @@ lastfght        // (c) 2000 Subsino
 xplan           // (c) 2006 Subsino
 
 sliver          // (c) 1996 Hollow Corp
-slivera			//
+slivera         //
 intrscti        // ????
 pasha2          // (c) 1998 Dong Sung
 trvmadns        // (c) 1985 Thunderhead Inc.
@@ -11305,12 +11327,15 @@ brasil89a       // 1989, Unknown
 brasil93        // 1993, Unknown
 poker91         // 1991, Unknown
 genie           // (c) 198? Video Fun Games Ltd.
+geniea          // 198?, Unknown
 silverga        // 1983, Unknown
 pokerdub        // 198?, Unknown
 pokerduc        // 198?, Unknown
 bchancep        // 198?, Unknown
 pokermon        // 1987, Unknown
 pokersis        // 198?, Sisteme France.
+super98
+
 
 // Cal Omega
 comg074         // (c) 1981 Cal Omega Inc.
@@ -11380,6 +11405,7 @@ pepp0045        // (c) 1987 IGT - International Game Technology
 pepp0045a       // (c) 1987 IGT - International Game Technology
 pepp0045b       // (c) 1987 IGT - International Game Technology
 pepp0045c       // (c) 1987 IGT - International Game Technology
+pepp0045d       // (c) 1987 IGT - International Game Technology
 pepp0046        // (c) 1987 IGT - International Game Technology
 pepp0046a       // (c) 1987 IGT - International Game Technology
 pepp0046b       // (c) 1987 IGT - International Game Technology
@@ -11996,6 +12022,7 @@ cmasterf        // (c) 1991 Dyna Electronics
 cmast91         // (c) 1991 Dyna Electronics
 cmast92         // (c) 1992 Dyna Electronics
 cmast97         // (c) 1996 Dyna Electronics
+cmast99         // 1999?
 
 tonypok         // (c) 1991 Corsica
 jkrmast         // (c) 199? unknown
@@ -12052,18 +12079,37 @@ coralr2         // (c) 2002
 aristmk5        // (c) 1995, USA platform set chips
 swthrt2v        // (c) 1995
 enchfrst        // (c) 1995
+minemine        // (c) 1996
 dolphntr        // (c) 1996
 dolphtra        // (c) 1996
-dmdtouch        // (c) 1997
+dolphtre        // (c) 1996
+cashcham        // (c) 1996
+enchfore        // (c) 1997
+mgarden         // (c) 1997
 goldprmd        // (c) 1997
 qotn            // (c) 1997
+qotna           // (c) 1997
+goldpyra        // (c) 1997
+dmdtouch        // (c) 1997
+wldcougr        // (c) 1997
+bumblbug        // (c) 1997
+pengpays        // (c) 1997
+chickena        // (c) 1998
 adonis          // (c) 1998
+adonisa         // (c) 1998
 reelrock        // (c) 1998
 indiandr        // (c) 1998
+chariotc        // (c) 1998
+wtiger          // (c) 1999
+bootsctn        // (c) 1999
+cuckoo          // (c) 2000
 magicmsk        // (c) 2000
+magicmska       // (c) 2000
 margmgc         // (c) 2000
 geishanz        // (c) 2001
-wtiger          // (c) 2001
+adonise         // (c) 2001
+koalamnt        // (c) 2001
+partygrs        // (c) 2001
 
 // Aristocrat Mk6 hardware
 aristmk6
@@ -13179,6 +13225,7 @@ tmspoker
 kas89           // 1989, SFC S.R.L.
 caspoker        // 1987, PM / Beck Elektronik.
 wildpkr         // 199?, TAB Austria.
+subhuntr        // 1979 Model Racing
 
 manohman        // 199?, Merkur.
 

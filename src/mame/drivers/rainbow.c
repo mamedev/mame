@@ -1188,7 +1188,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 }
 
 // LBA sector from CHS
-static UINT32 get_and_print_lbasector(hard_disk_info *info, UINT16 cylinder, UINT8 head, UINT8 sector_number)
+static UINT32 get_and_print_lbasector(device_t *device,hard_disk_info *info, UINT16 cylinder, UINT8 head, UINT8 sector_number)
 {
 	if (info == NULL)
 		return 0;
@@ -1199,7 +1199,7 @@ static UINT32 get_and_print_lbasector(hard_disk_info *info, UINT16 cylinder, UIN
 	lbasector *= info->sectors;   // LBA : ( x 16 )
 	lbasector += (sector_number - 1); // + (sector number - 1)
 
-	logerror(" CYLINDER %u - HEAD %u - SECTOR NUMBER %u (LBA-SECTOR %u) ", cylinder, head, sector_number, lbasector);
+	device->logerror(" CYLINDER %u - HEAD %u - SECTOR NUMBER %u (LBA-SECTOR %u) ", cylinder, head, sector_number, lbasector);
 	return lbasector;
 }
 
@@ -1239,7 +1239,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 					output_set_value("led1", 1);
 
 					// Pointer to info + C + H + S
-					UINT32 lbasector = get_and_print_lbasector(info, cylinder, SDH & 0x07, sector_number);
+					UINT32 lbasector = get_and_print_lbasector(this, info, cylinder, SDH & 0x07, sector_number);
 
 					if ((cylinder <= info->cylinders) &&                          // filter invalid ranges
 						(SECTOR_SIZES[(SDH >> 5) & 0x03] == info->sectorbytes)    // may not vary in image!
@@ -1361,7 +1361,7 @@ int rainbow_state::do_write_sector()
 				return 50;
 			}
 			// Pointer to info + C + H + S
-			UINT32 lbasector = get_and_print_lbasector(info, cylinder, SDH & 0x07, sector_number);
+			UINT32 lbasector = get_and_print_lbasector(this,info, cylinder, SDH & 0x07, sector_number);
 
 			if (sector_count != 1) // ignore all SECTOR_COUNTS != 1
 			{

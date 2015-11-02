@@ -13,7 +13,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -22,7 +22,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("%s: %s", machine.describe_context(), buf);
+		device.logerror("%s: %s", device.machine().describe_context(), buf);
 	}
 }
 
@@ -125,7 +125,7 @@ READ32_MEMBER( gf4500_device::read )
 	}
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))
 	{
-		verboselog(machine(), 9, "(GFO) %08X -> %08X\n", 0x34000000 + (offset << 2), data);
+		verboselog( *this, 9, "(GFO) %08X -> %08X\n", 0x34000000 + (offset << 2), data);
 	}
 	return data;
 }
@@ -135,7 +135,7 @@ WRITE32_MEMBER( gf4500_device::write )
 	COMBINE_DATA(&m_data[offset]);
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))
 	{
-		verboselog(machine(), 9, "(GFO) %08X <- %08X\n", 0x34000000 + (offset << 2), data);
+		verboselog( *this, 9, "(GFO) %08X <- %08X\n", 0x34000000 + (offset << 2), data);
 	}
 	switch (offset)
 	{

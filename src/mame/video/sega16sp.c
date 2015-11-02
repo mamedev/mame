@@ -1041,7 +1041,6 @@ sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconf
 sega_xboard_sprite_device::sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_outrun_sprite_device(mconfig, tag, owner, clock, true, "sega_xboard_sprite", __FILE__)
 {
-
 }
 
 
@@ -1086,7 +1085,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//            ----cccc cccc----  Sprite color palette
 	//            -------- ----llll  4-bit pixel data
 	//
-	
+
 	set_origin(m_xoffs, m_yoffs);
 
 	// render the sprites in order

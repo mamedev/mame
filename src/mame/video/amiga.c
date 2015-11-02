@@ -189,7 +189,7 @@ void amiga_copper_setpc(running_machine &machine, UINT32 pc)
 	amiga_state *state = machine.driver_data<amiga_state>();
 
 	if (LOG_COPPER)
-		logerror("copper_setpc(%06x)\n", pc);
+		state->logerror("copper_setpc(%06x)\n", pc);
 
 	state->m_copper_pc = pc;
 	state->m_copper_waiting = FALSE;
@@ -210,7 +210,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 	if (state->m_copper_pending_offset)
 	{
 		if (LOG_COPPER)
-			logerror("%02X.%02X: Write to %s = %04x\n", state->m_last_scanline, xpos / 2, amiga_custom_names[state->m_copper_pending_offset & 0xff], state->m_copper_pending_data);
+			state->logerror("%02X.%02X: Write to %s = %04x\n", state->m_last_scanline, xpos / 2, amiga_custom_names[state->m_copper_pending_offset & 0xff], state->m_copper_pending_data);
 		state->custom_chip_w(state->m_copper_pending_offset, state->m_copper_pending_data);
 		state->m_copper_pending_offset = 0;
 	}
@@ -252,7 +252,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	if (LOG_COPPER)
-		logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", state->m_last_scanline, xpos / 2, state->m_copper_pc, word0, word1);
+		state->logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", state->m_last_scanline, xpos / 2, state->m_copper_pc, word0, word1);
 
 	/* handle a move */
 	if ((word0 & 1) == 0)
@@ -266,7 +266,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 			if (delay[word0] == 0)
 			{
 				if (LOG_COPPER)
-					logerror("%02X.%02X: Write to %s = %04x\n", state->m_last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
+					state->logerror("%02X.%02X: Write to %s = %04x\n", state->m_last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
 				state->custom_chip_w(word0, word1);
 			}
 			else    // additional 2 cycles needed for non-Agnus registers
@@ -280,7 +280,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 		else
 		{
 			if (LOG_COPPER)
-				logerror("%02X.%02X: Aborting copper on illegal write\n", state->m_last_scanline, xpos / 2);
+				state->logerror("%02X.%02X: Aborting copper on illegal write\n", state->m_last_scanline, xpos / 2);
 
 			state->m_copper_waitval = 0xffff;
 			state->m_copper_waitmask = 0xffff;
@@ -307,7 +307,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 		if ((word1 & 1) == 0)
 		{
 			if (LOG_COPPER)
-				logerror("  Waiting for %04x & %04x (currently %04x)\n", state->m_copper_waitval, state->m_copper_waitmask, (state->m_last_scanline << 8) | (xpos >> 1));
+				state->logerror("  Waiting for %04x & %04x (currently %04x)\n", state->m_copper_waitval, state->m_copper_waitmask, (state->m_last_scanline << 8) | (xpos >> 1));
 
 			state->m_copper_waiting = TRUE;
 		}
@@ -318,14 +318,14 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 			int curpos = (ypos << 8) | (xpos >> 1);
 
 			if (LOG_COPPER)
-				logerror("  Skipping if %04x & %04x (currently %04x)\n", state->m_copper_waitval, state->m_copper_waitmask, (state->m_last_scanline << 8) | (xpos >> 1));
+				state->logerror("  Skipping if %04x & %04x (currently %04x)\n", state->m_copper_waitval, state->m_copper_waitmask, (state->m_last_scanline << 8) | (xpos >> 1));
 
 			/* if we're past the wait time, stop it and hold up 2 cycles */
 			if ((curpos & state->m_copper_waitmask) >= (state->m_copper_waitval & state->m_copper_waitmask) &&
 				(!state->m_copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
 			{
 				if (LOG_COPPER)
-					logerror("  Skipped\n");
+					state->logerror("  Skipped\n");
 
 				/* count the cycles it out have taken to fetch the next instruction */
 				state->m_copper_pc += 4;
@@ -350,7 +350,7 @@ void amiga_sprite_dma_reset(running_machine &machine, int which)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 
-	if (LOG_SPRITE_DMA) logerror("sprite %d dma reset\n", which );
+	if (LOG_SPRITE_DMA) state->logerror("sprite %d dma reset\n", which );
 	state->m_sprite_dma_reload_mask |= 1 << which;
 	state->m_sprite_dma_live_mask |= 1 << which;
 }
@@ -360,7 +360,7 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 
-	if (LOG_SPRITE_DMA) logerror("sprite %d comparitor %sable\n", which, enable ? "en" : "dis" );
+	if (LOG_SPRITE_DMA) state->logerror("sprite %d comparitor %sable\n", which, enable ? "en" : "dis" );
 	if (enable)
 	{
 		state->m_sprite_comparitor_enable_mask |= 1 << which;
@@ -386,7 +386,7 @@ INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
 	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 	CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-	if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
+	if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
 }
 
 static void update_sprite_dma(amiga_state *state, int scanline)
@@ -416,7 +416,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 			CUSTOM_REG(REG_SPR0POS + 4 * num) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
 			CUSTOM_REG(REG_SPR0CTL + 4 * num) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
 
 		/* compute vstart/vstop */
@@ -427,7 +427,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 		if (scanline == vstart)
 		{
 			state->m_sprite_comparitor_enable_mask |= 1 << num;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor enable\n", scanline, num);
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d comparitor enable\n", scanline, num);
 		}
 
 		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
@@ -438,7 +438,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 			state->m_sprite_dma_reload_mask |= 1 << num;
 			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
 			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
+			if (LOG_SPRITE_DMA) state->logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
 		}
 
 		/* fetch data if this sprite is enabled */

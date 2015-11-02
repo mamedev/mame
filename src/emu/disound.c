@@ -408,7 +408,7 @@ void device_mixer_interface::interface_pre_start()
 	// no inputs? that's weird
 	if (m_auto_allocated_inputs == 0)
 	{
-		logerror("Warning: mixer \"%s\" has no inputs\n", device().tag());
+		device().logerror("Warning: mixer \"%s\" has no inputs\n", device().tag());
 		return;
 	}
 

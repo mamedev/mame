@@ -613,6 +613,16 @@ project "bgfx"
 			
 	configuration { }
 
+	if _OPTIONS["targetos"]=="windows" then
+		local version = str_to_version(_OPTIONS["gcc_version"])
+		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+			buildoptions {
+				"-Wno-unknown-attributes",
+				"-Wno-missing-braces",
+			}
+		end
+	end
+	
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",

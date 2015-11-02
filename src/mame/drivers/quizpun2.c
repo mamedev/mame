@@ -214,7 +214,7 @@ static void log_protection( address_space &space, const char *warning )
 {
 	quizpun2_state *state = space.machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->m_prot;
-	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", space.device().safe_pc(), warning,
+	state->logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", space.device().safe_pc(), warning,
 		prot.state,
 		prot.wait_param,
 		prot.param,

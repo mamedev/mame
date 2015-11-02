@@ -64,7 +64,8 @@ WRITE8_MEMBER(meadows_state::meadows_videoram_w)
 
 WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
 {
-	m_screen->update_now();
+//  m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
 	m_spriteram[offset] = data;
 }
 

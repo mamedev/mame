@@ -466,7 +466,7 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 /* This determines if a cart is in Mode 20, 21, 22 or 25; sets state->m_cart[0].mode and
  state->m_cart[0].sram accordingly; and returns the offset of the internal header (needed to
  detect BSX and ST carts) */
-static UINT32 snes_find_hilo_mode( UINT8 *buffer, UINT32 buf_len )
+static UINT32 snes_find_hilo_mode(device_t *device, UINT8 *buffer, UINT32 buf_len )
 {
 	UINT8 valid_mode20 = 0;
 	UINT8 valid_mode21 = 0;
@@ -492,7 +492,7 @@ static UINT32 snes_find_hilo_mode( UINT8 *buffer, UINT32 buf_len )
 	else
 		retvalue = 0x40ffc0;
 
-	logerror( "\t HiROM/LoROM id: %s (LoROM: %d , HiROM: %d, ExHiROM: %d)\n",
+	device->logerror( "\t HiROM/LoROM id: %s (LoROM: %d , HiROM: %d, ExHiROM: %d)\n",
 				(retvalue == 0x007fc0) ? "LoROM" :
 				(retvalue == 0x00ffc0) ? "HiROM" :
 				(retvalue == 0x40ffc0) ? "ExHiROM" : "Other",
@@ -847,7 +847,7 @@ void base_sns_cart_slot_device::setup_nvram()
 	UINT32 size = 0;
 	if (software_entry() == NULL)
 	{
-		int hilo_mode = snes_find_hilo_mode(ROM, m_cart->get_rom_size());
+		int hilo_mode = snes_find_hilo_mode(this, ROM, m_cart->get_rom_size());
 		UINT8 sram_size = (m_type == SNES_SFX) ? (ROM[0x00ffbd] & 0x07) : (ROM[hilo_mode + 0x18] & 0x07);
 		if (sram_size)
 		{
@@ -893,7 +893,7 @@ bool base_sns_cart_slot_device::call_softlist_load(software_list_device &swlist,
 void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon)
 {
 	// First, look if the cart is HiROM or LoROM (and set snes_cart accordingly)
-	int hilo_mode = snes_find_hilo_mode(ROM, len);
+	int hilo_mode = snes_find_hilo_mode(this,ROM, len);
 
 	switch (hilo_mode)
 	{
@@ -1244,7 +1244,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		/*f8*/  UNK, "Cybersoft", UNK, "Psygnosis", UNK, UNK, "Davidson", UNK,
 	};
 
-	int hilo_mode = snes_find_hilo_mode(ROM, len);
+	int hilo_mode = snes_find_hilo_mode(this,ROM, len);
 	char title[21], rom_id[4], company_id[2];
 	int type = 0, company, addon, has_ram = 0, has_sram = 0;
 	switch (hilo_mode)

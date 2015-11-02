@@ -8,7 +8,7 @@
 #include "emu.h"
 
 //#define sc45helperlog printf
-#define sc45helperlog logerror
+#define sc45helperlog machine.logerror
 
 // addrxor used for endianness stuff, mode used for when we have a missing pair half
 int find_project_string(running_machine &machine, int addrxor, int mode)

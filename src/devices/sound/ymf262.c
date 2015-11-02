@@ -1701,7 +1701,7 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 
 		default:
 			if (r < 0x120)
-				logerror("YMF262: write to unknown register (set#2): %03x value=%02x\n",r,v);
+				chip->device->logerror("YMF262: write to unknown register (set#2): %03x value=%02x\n",r,v);
 		break;
 		}
 
@@ -1761,7 +1761,7 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 		break;
 
 		default:
-			logerror("YMF262: write to unknown register: %02x value=%02x\n",r,v);
+			chip->device->logerror("YMF262: write to unknown register: %02x value=%02x\n",r,v);
 		break;
 		}
 		break;
@@ -2271,7 +2271,7 @@ static int OPL3_LockTable(device_t *device)
 		if (cymfile)
 			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
-			logerror("Could not create ymf262_.cym file\n");
+			device->logerror("Could not create ymf262_.cym file\n");
 	}
 
 	return 0;

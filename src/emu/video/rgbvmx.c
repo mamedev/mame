@@ -175,46 +175,14 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 {
 	mul(scale);
 	sra_imm(8);
-	max(0);
-	min(255);
+	clamp_to_uint8();
 }
 
 void rgbaint_t::scale_imm_and_clamp(const INT32 scale)
 {
 	mul_imm(scale);
 	sra_imm(8);
-	max(0);
-	min(255);
-}
-
-void rgbaint_t::scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
-{
-	rgbaint_t color2(other);
-	color2.mul(scale2);
-
-	mul(scale);
-	add(color2);
-	sra_imm(8);
-	max(0);
-	min(255);
-}
-
-void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
-{
-	mul_imm(scale);
-	sra_imm(8);
-	add(other);
-	max(0);
-	min(255);
-}
-
-void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
-{
-	mul(scale);
-	sra_imm(8);
-	add(other);
-	max(0);
-	min(255);
+	clamp_to_uint8();
 }
 
 #endif // defined(__ALTIVEC__)

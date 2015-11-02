@@ -19,11 +19,20 @@
 
 class rgbaint_t
 {
+protected:
+	typedef __vector signed char    VECS8;
+	typedef __vector unsigned char  VECU8;
+	typedef __vector signed short   VECS16;
+	typedef __vector unsigned short VECU16;
+	typedef __vector signed int     VECS32;
+	typedef __vector unsigned int   VECU32;
+
 public:
 	inline rgbaint_t() { }
 	inline rgbaint_t(UINT32 rgba) { set(rgba); }
 	inline rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
 	inline rgbaint_t(rgb_t& rgb) { set(rgb); }
+	inline rgbaint_t(VECS32 rgba) { m_value = rgba; }
 
 	inline void set(rgbaint_t& other) { m_value = other.m_value; }
 
@@ -49,8 +58,8 @@ public:
 
 	inline rgb_t to_rgba()
 	{
-		VECU32 temp = vec_pack(m_value, m_value);
-		temp = vec_pack((VECU16)temp, (VECU16)temp);
+		VECU32 temp = vec_packs(m_value, m_value);
+		temp = vec_packsu((VECS16)temp, (VECS16)temp);
 		UINT32 result;
 		vec_ste(temp, 0, &result);
 		return result;
@@ -59,7 +68,7 @@ public:
 	inline rgb_t to_rgba_clamp()
 	{
 		VECU32 temp = vec_packs(m_value, m_value);
-		temp = vec_packsu((VECU16)temp, (VECU16)temp);
+		temp = vec_packsu((VECS16)temp, (VECS16)temp);
 		UINT32 result;
 		vec_ste(temp, 0, &result);
 		return result;
@@ -222,8 +231,7 @@ public:
 	inline void shl(const rgbaint_t& shift)
 	{
 		const VECU32 limit = { 32, 32, 32, 32 };
-		const VECU32 temp = vec_splat(shift.m_value, 3);
-		m_value = vec_and(vec_sl(m_value, temp), vec_cmpgt(limit, temp));
+		m_value = vec_and(vec_sl(m_value, (VECU32)shift.m_value), vec_cmpgt(limit, (VECU32)shift.m_value));
 	}
 
 	inline void shl_imm(const UINT8 shift)
@@ -235,8 +243,7 @@ public:
 	inline void shr(const rgbaint_t& shift)
 	{
 		const VECU32 limit = { 32, 32, 32, 32 };
-		const VECU32 temp = vec_splat(shift.m_value, 3);
-		m_value = vec_and(vec_sr(m_value, temp), vec_cmpgt(limit, temp));
+		m_value = vec_and(vec_sr(m_value, (VECU32)shift.m_value), vec_cmpgt(limit, (VECU32)shift.m_value));
 	}
 
 	inline void shr_imm(const UINT8 shift)
@@ -248,7 +255,7 @@ public:
 	inline void sra(const rgbaint_t& shift)
 	{
 		const VECU32 limit = { 31, 31, 31, 31 };
-		m_value = vec_sra(m_value, vec_min((VECU32)vec_splat(shift.m_value, 3), limit));
+		m_value = vec_sra(m_value, vec_min((VECU32)shift.m_value, limit));
 	}
 
 	inline void sra_imm(const UINT8 shift)
@@ -277,6 +284,11 @@ public:
 	inline void and_reg(const rgbaint_t& color)
 	{
 		m_value = vec_and(m_value, color.m_value);
+	}
+
+	inline void andnot_reg(const rgbaint_t& color)
+	{
+		m_value = vec_andc(m_value, color.m_value);
 	}
 
 	inline void and_imm(const INT32 value)
@@ -318,6 +330,15 @@ public:
 		m_value = vec_or(vec_and(vsign, mask), vec_and(m_value, vec_nor(mask, vzero)));
 	}
 
+	inline void clamp_to_uint8()
+	{
+		const VECU32 zero = { 0, 0, 0, 0 };
+		m_value = vec_packs(m_value, m_value);
+		m_value = vec_packsu((VECS16)m_value, (VECS16)m_value);
+		m_value = vec_mergeh((VECU8)zero, (VECU8)m_value);
+		m_value = vec_mergeh((VECS16)zero, (VECS16)m_value);
+	}
+
 	inline void sign_extend(const UINT32 compare, const UINT32 sign)
 	{
 		const VECS32 compare_vec = { compare, compare, compare, compare };
@@ -342,9 +363,33 @@ public:
 
 	void scale_and_clamp(const rgbaint_t& scale);
 	void scale_imm_and_clamp(const INT32 scale);
-	void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
-	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
-	void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other);
+
+	void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
+	{
+		mul_imm(scale);
+		sra_imm(8);
+		add(other);
+		clamp_to_uint8();
+	}
+
+	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
+	{
+		mul(scale);
+		sra_imm(8);
+		add(other);
+		clamp_to_uint8();
+	}
+
+	void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
+	{
+		rgbaint_t color2(other);
+		color2.mul(scale2);
+
+		mul(scale);
+		add(color2);
+		sra_imm(8);
+		clamp_to_uint8();
+	}
 
 	inline void cmpeq(const rgbaint_t& value)
 	{
@@ -480,14 +525,30 @@ public:
 		return result;
 	}
 
-protected:
-	typedef __vector signed char    VECS8;
-	typedef __vector unsigned char  VECU8;
-	typedef __vector signed short   VECS16;
-	typedef __vector unsigned short VECU16;
-	typedef __vector signed int     VECS32;
-	typedef __vector unsigned int   VECU32;
+	inline void bilinear_filter_rgbaint(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	{
+		const VECS32 zero = vec_splat_s32(0);
 
+		VECS32 color00 = vec_perm((VECS32)vec_lde(0, &rgb00), zero, vec_lvsl(0, &rgb00));
+		VECS32 color01 = vec_perm((VECS32)vec_lde(0, &rgb01), zero, vec_lvsl(0, &rgb01));
+		VECS32 color10 = vec_perm((VECS32)vec_lde(0, &rgb10), zero, vec_lvsl(0, &rgb10));
+		VECS32 color11 = vec_perm((VECS32)vec_lde(0, &rgb11), zero, vec_lvsl(0, &rgb11));
+
+		/* interleave color01 and color00 at the byte level */
+		color01 = vec_mergeh((VECU8)color01, (VECU8)color00);
+		color11 = vec_mergeh((VECU8)color11, (VECU8)color10);
+		color01 = vec_mergeh((VECU8)zero, (VECU8)color01);
+		color11 = vec_mergeh((VECU8)zero, (VECU8)color11);
+		color01 = vec_msum((VECS16)color01, scale_table[u], zero);
+		color11 = vec_msum((VECS16)color11, scale_table[u], zero);
+		color01 = vec_sl(color01, vec_splat_u32(15));
+		color11 = vec_sr(color11, vec_splat_u32(1));
+		color01 = vec_max((VECS16)color01, (VECS16)color11);
+		color01 = vec_msum((VECS16)color01, scale_table[v], zero);
+		m_value = vec_sr(color01, vec_splat_u32(15));
+	}
+
+protected:
 	VECS32                          m_value;
 
 	static const VECU8              alpha_perm;

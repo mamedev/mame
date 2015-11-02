@@ -22,6 +22,7 @@
 #define VERBOSE     0
 
 #define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
+#define VPRINTF_CHANNEL(x) do { if (VERBOSE) m_device->logerror x; } while (0)
 
 
 
@@ -339,7 +340,7 @@ attotime z80ctc_device::ctc_channel::period() const
 	// if counter mode, no real period
 	if ((m_mode & MODE) == MODE_COUNTER)
 	{
-		logerror("CTC %d is CounterMode : Can't calculate period\n", m_index);
+		m_device->logerror("CTC %d is CounterMode : Can't calculate period\n", m_index);
 		return attotime::zero;
 	}
 
@@ -364,7 +365,7 @@ UINT8 z80ctc_device::ctc_channel::read()
 	{
 		attotime period = ((m_mode & PRESCALER) == PRESCALER_16) ? m_device->m_period16 : m_device->m_period256;
 
-		VPRINTF(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds())));
+		VPRINTF_CHANNEL(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds())));
 
 		if (m_timer != NULL)
 			return ((int)(m_timer->remaining().as_double() / period.as_double()) + 1) & 0xff;
@@ -383,7 +384,7 @@ void z80ctc_device::ctc_channel::write(UINT8 data)
 	// if we're waiting for a time constant, this is it
 	if ((m_mode & CONSTANT) == CONSTANT_LOAD)
 	{
-		VPRINTF(("CTC ch.%d constant = %02x\n", m_index, data));
+		VPRINTF_CHANNEL(("CTC ch.%d constant = %02x\n", m_index, data));
 
 		// set the time constant (0 -> 0x100)
 		m_tconst = data ? data : 0x100;
@@ -423,7 +424,7 @@ void z80ctc_device::ctc_channel::write(UINT8 data)
 #endif
 	{
 		m_device->m_vector = data & 0xf8;
-		logerror("CTC Vector = %02x\n", m_device->m_vector);
+		VPRINTF_CHANNEL(("CTC Vector = %02x\n", m_device->m_vector));
 	}
 
 	// this must be a control word
@@ -431,7 +432,7 @@ void z80ctc_device::ctc_channel::write(UINT8 data)
 	{
 		// set the new mode
 		m_mode = data;
-		VPRINTF(("CTC ch.%d mode = %02x\n", m_index, data));
+		VPRINTF_CHANNEL(("CTC ch.%d mode = %02x\n", m_index, data));
 
 		// if we're being reset, clear out any pending timers for this channel
 		if ((data & RESET) == RESET_ACTIVE)
@@ -465,7 +466,7 @@ void z80ctc_device::ctc_channel::trigger(UINT8 data)
 			if ((m_mode & WAITING_FOR_TRIG) && (m_mode & MODE) == MODE_TIMER)
 			{
 				attotime curperiod = period();
-				VPRINTF(("CTC period %s\n", curperiod.as_string()));
+				VPRINTF_CHANNEL(("CTC period %s\n", curperiod.as_string()));
 				m_timer->adjust(curperiod, m_index, curperiod);
 			}
 
@@ -495,7 +496,7 @@ void z80ctc_device::ctc_channel::timer_callback()
 	if ((m_mode & INTERRUPT) == INTERRUPT_ON)
 	{
 		m_int_state |= Z80_DAISY_INT;
-		VPRINTF(("CTC timer ch%d\n", m_index));
+		VPRINTF_CHANNEL(("CTC timer ch%d\n", m_index));
 		m_device->interrupt_check();
 	}
 

@@ -157,7 +157,7 @@ private:
 
 
 #if LOG_SPG290_REGISTER_ACCESS
-static void log_spg290_regs(UINT8 module, UINT16 reg, UINT32 mem_mask, bool write, UINT32 data=0)
+static void log_spg290_regs(device_t *device,UINT8 module, UINT16 reg, UINT32 mem_mask, bool write, UINT32 data=0)
 {
 	static const char *const modules_name[] =
 	{
@@ -168,19 +168,19 @@ static void log_spg290_regs(UINT8 module, UINT16 reg, UINT32 mem_mask, bool writ
 	};
 
 	if (module < 0x25)
-		logerror("SPG: %-10s", modules_name[module]);
+		device->logerror("SPG: %-10s", modules_name[module]);
 	else
-		logerror("SPG: mod 0x%02x  ", module);
+		device->logerror("SPG: mod 0x%02x  ", module);
 
 	if (!write)
-		logerror(" R 0x%04x", reg);
+		device->logerror(" R 0x%04x", reg);
 	else
-		logerror(" W 0x%04x = 0x%08x", reg, data);
+		device->logerror(" W 0x%04x = 0x%08x", reg, data);
 
 	if (mem_mask != 0xffffffffu)
-		logerror(" (0x%08x)\n",  mem_mask);
+		device->logerror(" (0x%08x)\n",  mem_mask);
 	else
-		logerror("\n");
+		device->logerror("\n");
 }
 #endif
 
@@ -224,7 +224,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 	//else
 	{
 		if (!space.debugger_access())
-			log_spg290_regs((offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
+			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
 	}
 #endif
 
@@ -387,7 +387,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 	//else
 	{
 		if (!space.debugger_access())
-			log_spg290_regs((offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
+			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
 	}
 #endif
 }

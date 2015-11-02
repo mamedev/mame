@@ -738,7 +738,7 @@ READ8_MEMBER(namconb1_state::port7_r)
 	switch (m_nbx_port6 & 0xf0)
 	{
 		case 0x00:
-			return ioport("P4")->read_safe(0xff);
+			return read_safe(ioport("P4"), 0xff);
 
 		case 0x20:
 			return ioport("MISC")->read();
@@ -761,42 +761,42 @@ READ8_MEMBER(namconb1_state::port7_r)
 // register full scale, so it works...
 READ8_MEMBER(namconb1_state::dac7_r)// bit 7
 {
-	return ioport("P3")->read_safe(0xff)&0x80;
+	return read_safe(ioport("P3"), 0xff)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac6_r)// bit 3
 {
-	return (ioport("P3")->read_safe(0xff)<<1)&0x80;
+	return (read_safe(ioport("P3"), 0xff)<<1)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac5_r)// bit 2
 {
-	return (ioport("P3")->read_safe(0xff)<<2)&0x80;
+	return (read_safe(ioport("P3"), 0xff)<<2)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac4_r)// bit 1
 {
-	return (ioport("P3")->read_safe(0xff)<<3)&0x80;
+	return (read_safe(ioport("P3"), 0xff)<<3)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac3_r)// bit 0
 {
-	return (ioport("P3")->read_safe(0xff)<<4)&0x80;
+	return (read_safe(ioport("P3"), 0xff)<<4)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac2_r)// bit 4
 {
-	return (ioport("P3")->read_safe(0xff)<<5)&0x80;
+	return (read_safe(ioport("P3"), 0xff)<<5)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac1_r)// bit 5
 {
-	return (ioport("P3")->read_safe(0xff)<<6)&0x80;
+	return (read_safe(ioport("P3"), 0xff)<<6)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac0_r)// bit 6
 {
-	return (ioport("P3")->read_safe(0xff)<<7)&0x80;
+	return (read_safe(ioport("P3"), 0xff)<<7)&0x80;
 }
 
 static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8, namconb1_state )
