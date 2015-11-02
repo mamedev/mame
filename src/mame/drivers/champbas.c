@@ -98,7 +98,7 @@ TODO:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(champbas_state::champbas_watchdog_bit2)
+CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
 {
 	return (0x10 - machine().get_vblank_watchdog_counter()) >> 2 & 1;
 }
@@ -133,13 +133,13 @@ WRITE8_MEMBER(champbas_state::dac2_w)
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::champbas_mcu_switch_w)
+WRITE8_MEMBER(champbas_state::mcu_switch_w)
 {
 	// switch shared RAM between CPU and MCU bus
 	// FIXME not implemented
 }
 
-WRITE8_MEMBER(champbas_state::champbas_mcu_halt_w)
+WRITE8_MEMBER(champbas_state::mcu_halt_w)
 {
 	// MCU not present/not used in champbas
 	if (m_mcu == NULL)
@@ -191,10 +191,12 @@ READ8_MEMBER(champbas_state::champbja_protection_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
+// maincpu
+
+// base map
+static ADDRESS_MAP_START( champbas_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") /* MCU shared RAM */
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(tilemap_w) AM_SHARE("vram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("mainram")
 
@@ -204,105 +206,61 @@ static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITENOP    // !WORK board output (no use?)
-	AM_RANGE(0xa002, 0xa002) AM_WRITENOP
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITENOP
-	AM_RANGE(0xa005, 0xa005) AM_WRITENOP
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
-
-	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(tilemap_w) AM_SHARE("vram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("mainram")
-
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
-	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
-
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITENOP    // !WORK board output (no use?)
+	AM_RANGE(0xa001, 0xa001) AM_WRITENOP // !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(palette_bank_w)
-	AM_RANGE(0xa005, 0xa005) AM_WRITENOP    // n.c.
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)  // MCU not present/not used in champbas
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)    // MCU not present/not used in champbas
+	AM_RANGE(0xa005, 0xa005) AM_WRITENOP // n.c.
+	AM_RANGE(0xa006, 0xa006) AM_WRITENOP // no MCU
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP // no MCU
 
 	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
-/*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
-
-	/* champbja only */
-	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-//  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // MCU not used (though it's present on the board)
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-//  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(tilemap_w) AM_SHARE("vram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("mainram")
-
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
-	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
-
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITENOP    /* MCU is not used, but some leftover code still writes here */
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP    /* MCU is not used, but some leftover code still writes here */
-
-	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
+//  AM_RANGE(0xa0a0, 0xa0a0) AM_NOP // ?
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( exctsccr_main_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
+// base map + ALPHA-8x0x protection
+static ADDRESS_MAP_START( champbasj_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(mcu_halt_w)
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(mcu_switch_w)
+	AM_IMPORT_FROM( champbas_map )
+ADDRESS_MAP_END
+
+// different protection for champbasja
+static ADDRESS_MAP_START( champbasja_map, AS_PROGRAM, 8, champbas_state )
+	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
+	AM_IMPORT_FROM( champbas_map )
+ADDRESS_MAP_END
+
+// champbb2
+static ADDRESS_MAP_START( champbb2_map, AS_PROGRAM, 8, champbas_state )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
+	AM_IMPORT_FROM( champbasj_map )
+ADDRESS_MAP_END
+
+// talbot
+static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
+	AM_RANGE(0xa002, 0xa002) AM_WRITENOP // no gfxbank
+	AM_RANGE(0xa004, 0xa004) AM_WRITENOP // no palettebank
+	AM_IMPORT_FROM( champbasj_map )
+ADDRESS_MAP_END
+
+// more sprites in exctsccr
+static ADDRESS_MAP_START( exctsccr_map, AS_PROGRAM, 8, champbas_state )
+	AM_RANGE(0x7000, 0x7001) AM_UNMAP // aysnd is controlled by audiocpu
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(tilemap_w) AM_SHARE("vram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("mainram")
-
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
-	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
-
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-//  AM_RANGE(0xa001, 0xa001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but I don't need it */
-
+	AM_RANGE(0xa004, 0xa004) AM_WRITENOP // no palettebank
 	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
+	AM_IMPORT_FROM( champbasj_map )
 ADDRESS_MAP_END
 
 
+// audiocpu
 
-static ADDRESS_MAP_START( champbas_sub_map, AS_PROGRAM, 8, champbas_state )
+// champbas/champbb2 (note: talbot doesn't have audiocpu)
+static ADDRESS_MAP_START( champbas_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITENOP // 4-bit return code to main CPU (not used)
@@ -311,15 +269,15 @@ static ADDRESS_MAP_START( champbas_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( exctsccr_sub_map, AS_PROGRAM, 8, champbas_state )
+// exctsccr
+static ADDRESS_MAP_START( exctsccr_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc008, 0xc008) AM_WRITE(dac1_w)
 	AM_RANGE(0xc009, 0xc009) AM_WRITE(dac2_w)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_byte_r)
-//  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP /* ??? */
+//  AM_RANGE(0xc00f, 0xc00f) AM_NOP // ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_sound_io_map, AS_IO, 8, champbas_state )
@@ -329,6 +287,7 @@ static ADDRESS_MAP_START( exctsccr_sound_io_map, AS_IO, 8, champbas_state )
 	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay4", ay8910_device, data_address_w)
 ADDRESS_MAP_END
+
 
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, champbas_state )
@@ -379,7 +338,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, champbas_watchdog_bit2, NULL) // bit 2 of the watchdog counter
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, watchdog_bit2, NULL) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -594,7 +553,7 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -603,11 +562,11 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(champbas_main_map)
+	MCFG_CPU_PROGRAM_MAP(champbas_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
 
 	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
@@ -628,17 +587,18 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_DERIVED( champmcu, champbas )
+static MACHINE_CONFIG_DERIVED( champbasj, champbas )
 
 	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(champbasj_map)
 
 	/* MCU */
 	MCFG_CPU_ADD("mcu", ALPHA8201L, XTAL_18_432MHz/6/8)
@@ -648,16 +608,30 @@ static MACHINE_CONFIG_DERIVED( champmcu, champbas )
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( champbasja, champbas )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(champbasja_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( champbb2, champbasj )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(champbb2_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( exctsccr, champbas_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
-	MCFG_CPU_PROGRAM_MAP(exctsccr_main_map)
+	MCFG_CPU_PROGRAM_MAP(exctsccr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
-	MCFG_CPU_PROGRAM_MAP(exctsccr_sub_map)
+	MCFG_CPU_PROGRAM_MAP(exctsccr_sound_map)
 	MCFG_CPU_IO_MAP(exctsccr_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
 
@@ -712,11 +686,11 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(exctsccrb_main_map)
+	MCFG_CPU_PROGRAM_MAP(exctsccr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
 
 	MCFG_WATCHDOG_VBLANK_INIT(0x10)
 
@@ -737,7 +711,7 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DAC_ADD("dac1")
@@ -781,7 +755,7 @@ ROM_START( champbas )
 	ROM_LOAD( "champbb.2", 0x2000, 0x2000, CRC(5ddd872e) SHA1(68e21572e27707c991180b1bd0a6b31f7b64abf6) )
 	ROM_LOAD( "champbb.3", 0x4000, 0x2000, CRC(f39a7046) SHA1(3097bffe84ac74ce9e6481028a0ebbe8b1d6eaf9) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "champbb.6", 0x0000, 0x2000, CRC(26ab3e16) SHA1(019b9d34233a6b7a53e204154b782ceb42915d2b) )
 	ROM_LOAD( "champbb.7", 0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "champbb.8", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
@@ -803,7 +777,7 @@ ROM_START( champbasj )
 	ROM_LOAD( "12.2g", 0x2000, 0x2000, CRC(7b4e5faa) SHA1(b7201816a819ef313ddc81f312d26982b83ef1c7) )
 	ROM_LOAD( "13.2h", 0x4000, 0x2000, CRC(b201e31f) SHA1(bba3b611ff60ad8d5dd8484df4cfc2026f4fd344) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "16.2k", 0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
 	ROM_LOAD( "17.2l", 0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
 	ROM_LOAD( "18.2n", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
@@ -828,7 +802,7 @@ ROM_START( champbasja )
 	ROM_LOAD( "09", 0x2000, 0x2000, CRC(9d39e5b3) SHA1(11c1a1d2296c0bf16d7610eaa79b034bfd813740) )
 	ROM_LOAD( "08", 0x4000, 0x2000, CRC(53468a0f) SHA1(d4b5ea48b27754eebe593c8b4fcf5bf117f27ae4) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "16.2k", 0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
 	ROM_LOAD( "17.2l", 0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
 	ROM_LOAD( "18.2n", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
@@ -851,7 +825,7 @@ ROM_START( champbb2 )
 	ROM_LOAD( "epr5930", 0x4000, 0x2000, CRC(b6570a90) SHA1(5a2651aeac986000913b5854792b2d81df6b2fc6) )
 	ROM_LOAD( "epr5931", 0x7800, 0x0800, CRC(0592434d) SHA1(a7f61546c39ffdbff46c4db485c9b3f6eefcf1ac) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "epr5933", 0x0000, 0x2000, CRC(26ab3e16) SHA1(019b9d34233a6b7a53e204154b782ceb42915d2b) )
 	ROM_LOAD( "epr5934", 0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "epr5935", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
@@ -879,7 +853,7 @@ ROM_START( champbb2a )
 	ROM_LOAD( "4.bin", 0x7800, 0x0800, NO_DUMP )
 
 	/* not in this set, but probably the same */
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "epr5933", 0x0000, 0x2000, CRC(26ab3e16) SHA1(019b9d34233a6b7a53e204154b782ceb42915d2b) )
 	ROM_LOAD( "epr5934", 0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "epr5935", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
@@ -907,7 +881,7 @@ ROM_START( champbb2j )
 	ROM_LOAD( "0.11g", 0x7800, 0x0800, CRC(be0e180d) SHA1(7a8915e00920faa08344d752404a6f98d8fb303b) )
 
 	/* not in this set, but probably the same */
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "6.15c", 0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
 	ROM_LOAD( "7.15d", 0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
 	ROM_LOAD( "8.15e", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
@@ -1114,7 +1088,7 @@ ROM_START( exctsccrb )
 	ROM_LOAD( "es-2.g2",      0x2000, 0x2000, CRC(5c66e792) SHA1(f7a7f32806965fa926261217cee3159ccd198d49) )
 	ROM_LOAD( "es-3.h2",      0x4000, 0x2000, CRC(e0d504c0) SHA1(d9a9f37b3a44a05a3f3389aa9617c419a2cee661) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound */
 	ROM_LOAD( "es-a.k2",      0x0000, 0x2000, CRC(99e87b78) SHA1(f12006ff3f6f3c706e06288c97a1446141373432) )
 	ROM_LOAD( "es-b.l2",      0x2000, 0x2000, CRC(8b3db794) SHA1(dbfed2357c7631bfca6bbd63a23617bc3abf6ca3) )
 	ROM_LOAD( "es-c.m2",      0x4000, 0x2000, CRC(7bed2f81) SHA1(cbbb0480519cc04a99e8983228b18c9e49a9985d) )
@@ -1230,19 +1204,20 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
  *
  *************************************/
 
-GAME( 1982, talbot,     0,        talbot,   talbot,   driver_device,  0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR, COMPANY, FULLNAME, FLAGS */
+GAME( 1982, talbot,     0,        talbot,     talbot,   driver_device,  0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, champbas,   0,        champbas, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbasj,  champbas, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbasja, champbas, champbas, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbb2,   0,        champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbb2a,  champbb2, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no dump
-GAME( 1983, champbb2j,  champbb2, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbb2a,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no dump
+GAME( 1983, champbb2j,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, exctsccr,   0,        exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccru,  exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccra,  exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrj,  exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrjo, exctsccr, exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrb,  exctsccr, exctsccrb,exctsccr, champbas_state, exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, exctscc2,   0,        exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccra,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrj,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrjo, exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrb,  exctsccr, exctsccrb,  exctsccr, champbas_state, exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, exctscc2,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )

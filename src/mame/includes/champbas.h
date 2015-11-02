@@ -50,14 +50,14 @@ public:
 	UINT8 m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(champbas_mcu_switch_w);
-	DECLARE_WRITE8_MEMBER(champbas_mcu_halt_w);
+	DECLARE_WRITE8_MEMBER(mcu_switch_w);
+	DECLARE_WRITE8_MEMBER(mcu_halt_w);
 	DECLARE_READ8_MEMBER(champbja_protection_r);
 	DECLARE_WRITE8_MEMBER(tilemap_w);
 	DECLARE_WRITE8_MEMBER(gfxbank_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(champbas_watchdog_bit2);
+	DECLARE_CUSTOM_INPUT_MEMBER(watchdog_bit2);
 	DECLARE_WRITE8_MEMBER(dac1_w);
 	DECLARE_WRITE8_MEMBER(dac2_w);
 	DECLARE_DRIVER_INIT(exctsccr);
