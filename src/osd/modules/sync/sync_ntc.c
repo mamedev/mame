@@ -133,10 +133,9 @@ INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock)
 		"   nop                           \n"
 		"   b       2b                    \n"
 		"3: li      %[tmp], 0             \n"
-		"   sync                          \n"
 		"   stwcx.  %[tmp], 0, %[haslock] \n"
 		"   bne-    1b                    \n"
-		"   eieio                         \n"
+		"   lwsync                        \n"
 		: [tmp]     "=&r" (tmp)
 		: [haslock] "r"   (&lock->slot[myslot].haslock)
 		: "cr0"
@@ -167,7 +166,7 @@ void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot)
 	);
 #elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
 	lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock = TRUE;
-	__asm__ __volatile__ ( " eieio " : : );
+	__asm__ __volatile__ ( " lwsync " : : );
 #else
 	osd_exchange32(&lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock, TRUE);
 #endif
@@ -319,7 +318,7 @@ void osd_lock_release(osd_lock *lock)
 		if (--lock->count == 0)
 #if defined(__ppc__) || defined(__PPC__) || defined(__ppc64__) || defined(__PPC64__)
 		lock->holder = 0;
-		__asm__ __volatile__( " eieio " : : );
+		__asm__ __volatile__( " lwsync " : : );
 #else
 		osd_exchange_pthread_t(&lock->holder, 0);
 #endif
