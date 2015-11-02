@@ -69,6 +69,7 @@
 # MACOSX_USE_LIBSDL = 1
 # CYGWIN_BUILD = 1
 
+# BUILDDIR = build
 # TARGETOS = windows
 # CROSS_BUILD = 1
 # OVERRIDE_CC = cc
@@ -94,7 +95,11 @@
 
 # FORCE_VERSION_COMPILE = 1
 
+ifdef PREFIX_MAKEFILE
+include $(PREFIX_MAKEFILE)
+else
 -include useroptions.mak
+endif
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -180,6 +185,10 @@ MAKEPARAMS += verbose=1
 else
 SILENT := @
 MAKEPARAMS += --no-print-directory
+endif
+
+ifndef BUILDDIR
+BUILDDIR := build
 endif
 
 #-------------------------------------------------
@@ -504,6 +513,10 @@ ifdef OSD
 PARAMS += --osd='$(OSD)'
 endif
 
+ifdef BUILDDIR
+PARAMS += --build-dir='$(BUILDDIR)'
+endif
+
 ifdef TARGETOS
 PARAMS += --targetos='$(TARGETOS)'
 endif
@@ -702,7 +715,7 @@ else
   COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))"
 endif
 
-GENDIR = build/generated
+GENDIR = $(BUILDDIR)/generated
 
 # all sources are under the src/ directory
 SRC = src
@@ -743,7 +756,7 @@ SUBDIR := $(OSD)/$(TARGET)
 else
 SUBDIR := $(OSD)/$(TARGET)$(SUBTARGET)
 endif
-PROJECTDIR := build/projects/$(SUBDIR)
+PROJECTDIR := $(BUILDDIR)/projects/$(SUBDIR)
 
 .PHONY: all clean regenie generate
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
@@ -1074,7 +1087,7 @@ $(GENIE): $(GENIE_SRC)
 
 clean:
 	@echo Cleaning...
-	-@rm -rf build
+	-@rm -rf $(BUILDDIR)
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
@@ -1167,13 +1180,13 @@ ifndef USE_SYSTEM_LIB_LUA
 CPPCHECK_PARAMS += -I3rdparty/lua/src
 endif
 ifndef USE_SYSTEM_LIB_ZLIB
-CPPCHECK_PARAMS += -I3rdparty/zlib 
+CPPCHECK_PARAMS += -I3rdparty/zlib
 endif
 CPPCHECK_PARAMS += -I3rdparty/bgfx/include
 CPPCHECK_PARAMS += -I3rdparty/bx/include
-CPPCHECK_PARAMS += -Ibuild/generated/emu 
-CPPCHECK_PARAMS += -Ibuild/generated/emu/layout
-CPPCHECK_PARAMS += -Ibuild/generated/mame/layout 
+CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/emu
+CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/emu/layout
+CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/mame/layout
 CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
 CPPCHECK_PARAMS += -DPTR64=1
 CPPCHECK_PARAMS += -DMAME_DEBUG
