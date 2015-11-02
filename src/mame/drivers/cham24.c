@@ -58,8 +58,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
-#include "sound/dac.h"
-#include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
 
@@ -69,11 +67,9 @@ public:
 	cham24_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nesapu(*this, "nesapu"),
 		m_ppu(*this, "ppu") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<nesapu_device> m_nesapu;
 	required_device<ppu2c0x_device> m_ppu;
 
 	UINT8* m_nt_ram;
@@ -89,9 +85,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cham24_IN0_w);
 	DECLARE_READ8_MEMBER(cham24_IN1_r);
 	DECLARE_WRITE8_MEMBER(cham24_mapper_w);
-	DECLARE_READ8_MEMBER(psg_4015_r);
-	DECLARE_WRITE8_MEMBER(psg_4015_w);
-	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	DECLARE_DRIVER_INIT(cham24);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -154,22 +147,6 @@ WRITE8_MEMBER(cham24_state::sprite_dma_w)
 	int source = (data & 7);
 	m_ppu->spriteram_dma(space, source);
 }
-
-READ8_MEMBER(cham24_state::psg_4015_r)
-{
-	return m_nesapu->read(space,0x15);
-}
-
-WRITE8_MEMBER(cham24_state::psg_4015_w)
-{
-	m_nesapu->write(space,0x15, data);
-}
-
-WRITE8_MEMBER(cham24_state::psg_4017_w)
-{
-	m_nesapu->write(space,0x17, data);
-}
-
 
 READ8_MEMBER(cham24_state::cham24_IN0_r)
 {
@@ -244,11 +221,9 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 static ADDRESS_MAP_START( cham24_map, AS_PROGRAM, 8, cham24_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)            /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)           /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(cham24_IN0_r,        cham24_IN0_w)            /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r) AM_WRITE(psg_4017_w)     /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r)    /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(cham24_mapper_w)
 ADDRESS_MAP_END
 
@@ -356,13 +331,6 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_NES_APU_CPU("maincpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( cham24 )

@@ -118,7 +118,6 @@ DIP locations verified for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/n2a03.h"
-#include "sound/nes_apu.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
 #include "includes/punchout.h"
@@ -271,7 +270,6 @@ static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -674,11 +672,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("nesapu", NES_APU, XTAL_21_4772MHz/12)
-	MCFG_NES_APU_CPU("audiocpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "mono")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

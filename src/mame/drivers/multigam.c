@@ -109,7 +109,6 @@ Eproms are 27512,27010,274001
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "sound/dac.h"
-#include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
 
@@ -119,11 +118,9 @@ public:
 	multigam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nesapu(*this, "nesapu"),
 		m_ppu(*this, "ppu") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<nesapu_device> m_nesapu;
 	required_device<ppu2c0x_device> m_ppu;
 
 	UINT8* m_nt_ram;
@@ -179,9 +176,6 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	DECLARE_READ8_MEMBER(psg_4015_r);
-	DECLARE_WRITE8_MEMBER(psg_4015_w);
-	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	DECLARE_DRIVER_INIT(multigmt);
 	DECLARE_DRIVER_INIT(multigam);
 	DECLARE_DRIVER_INIT(multigm3);
@@ -296,20 +290,6 @@ WRITE8_MEMBER(multigam_state::sprite_dma_w)
 	m_ppu->spriteram_dma(space, source);
 }
 
-READ8_MEMBER(multigam_state::psg_4015_r)
-{
-	return m_nesapu->read(space, 0x15);
-}
-
-WRITE8_MEMBER(multigam_state::psg_4015_w)
-{
-	m_nesapu->write(space, 0x15, data);
-}
-
-WRITE8_MEMBER(multigam_state::psg_4017_w)
-{
-	m_nesapu->write(space, 0x17, data);
-}
 
 /******************************************************
 
@@ -411,11 +391,9 @@ static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)            /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)           /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)       /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
@@ -431,11 +409,9 @@ static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
 	AM_RANGE(0x3fff, 0x3fff) AM_WRITE(multigam_switch_gfx_rom)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)            /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)           /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)       /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)     /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
@@ -694,11 +670,9 @@ static ADDRESS_MAP_START( multigm3_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)            /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)           /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)       /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(multigm3_switch_prg_rom)
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(multigm3_switch_gfx_rom)
@@ -996,11 +970,9 @@ static ADDRESS_MAP_START( supergm3_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)            /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)           /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)       /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x4fff, 0x4fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x5000, 0x5fff) AM_ROM
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
@@ -1257,13 +1229,6 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_NES_APU_CPU("maincpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( multigm3, multigam )

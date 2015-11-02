@@ -16,20 +16,6 @@
 #include "includes/nes.h"
 #include "cpu/m6502/n2a03.h"
 
-READ8_MEMBER(nes_state::psg_4015_r)
-{
-	return m_sound->read(space, 0x15);
-}
-
-WRITE8_MEMBER(nes_state::psg_4015_w)
-{
-	m_sound->write(space, 0x15, data);
-}
-
-WRITE8_MEMBER(nes_state::psg_4017_w)
-{
-	m_sound->write(space, 0x17, data);
-}
 
 WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 {
@@ -39,12 +25,9 @@ WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nessound", nesapu_device, read, write)       /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(nes_vh_sprite_dma_w)              /* stupid address space hole */
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)       /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)         /* IN0 - input port 1 */
 	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r)                         /* IN1 - input port 2 */
-	AM_RANGE(0x4017, 0x4017) AM_WRITE(psg_4017_w)       /* PSG second control register */
 	// 0x4100-0x5fff -> LOW HANDLER defined on a pcb base
 	// 0x6000-0x7fff -> MID HANDLER defined on a pcb base
 	// 0x8000-0xffff -> HIGH HANDLER defined on a pcb base
@@ -108,9 +91,8 @@ static MACHINE_CONFIG_START( nes, nes_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("nessound", NES_APU, NTSC_CLOCK)
-	MCFG_NES_APU_CPU("maincpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	// note APU sound level here was specified as 0.90, not 0.50 like the others
+	// not sure how to adjust it when it's inside the CPU?
 
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", nes_control_port1_devices, "joypad")
 	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
@@ -128,8 +110,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nespal, nes )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(PAL_CLOCK)
+//	MCFG_CPU_MODIFY("maincpu")
+//	MCFG_CPU_CLOCK(PAL_CLOCK) // this doesn't get inherited by the APU with DERIVED_CLOCK!
+
+	MCFG_CPU_REPLACE("maincpu", N2A03, PAL_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(nes_map)
+
 
 	MCFG_DEVICE_REMOVE("ppu")
 	MCFG_PPU2C07_ADD("ppu")
@@ -143,17 +129,17 @@ static MACHINE_CONFIG_DERIVED( nespal, nes )
 	MCFG_SCREEN_SIZE(32*8, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 
-	/* sound hardware */
-	MCFG_SOUND_REPLACE("nessound", NES_APU, PAL_CLOCK)
-	MCFG_NES_APU_CPU("maincpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dendy, nes )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK( 26601712/15 ) /* 26.601712MHz / 15 == 1.77344746666... MHz */
+//	MCFG_CPU_MODIFY( "maincpu" )
+//	MCFG_CPU_CLOCK( 26601712/15 )  // this doesn't get inherited by the APU with DERIVED_CLOCK!
+
+	MCFG_CPU_REPLACE("maincpu", N2A03, 26601712/15 )/* 26.601712MHz / 15 == 1.77344746666... MHz */
+	MCFG_CPU_PROGRAM_MAP(nes_map)
 
 	MCFG_DEVICE_REMOVE("ppu")
 	MCFG_PPU2C07_ADD("ppu")
@@ -165,10 +151,6 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 	MCFG_SCREEN_REFRESH_RATE(50.00697796827)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
 
-	/* sound hardware */
-	MCFG_SOUND_REPLACE("nessound", NES_APU, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
-	MCFG_NES_APU_CPU("maincpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( famicom, nes )

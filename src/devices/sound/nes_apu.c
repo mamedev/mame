@@ -134,6 +134,13 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	}
 }
 
+void nesapu_device::set_tag_memory(const char *tag)
+{
+	/* Initialize individual chips */
+	if (tag)
+		(m_APU.dpcm).memory = &machine().device(tag)->memory().space(AS_PROGRAM);
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -156,8 +163,7 @@ void nesapu_device::device_start()
 	/* Adjust buffer size if 16 bits */
 	m_buffer_size+=m_samps_per_sync;
 
-	/* Initialize individual chips */
-	(m_APU.dpcm).memory = &machine().device(m_cpu_tag)->memory().space(AS_PROGRAM);
+	set_tag_memory(m_cpu_tag);
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
 

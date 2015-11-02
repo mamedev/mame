@@ -346,20 +346,6 @@ WRITE8_MEMBER(playch10_state::time_w)
 	popmessage("Time: %d%d%d%d",m_timedata[3],m_timedata[2],m_timedata[1],m_timedata[0]);
 }
 
-READ8_MEMBER(playch10_state::psg_4015_r)
-{
-	return m_nesapu->read(space, 0x15);
-}
-
-WRITE8_MEMBER(playch10_state::psg_4015_w)
-{
-	m_nesapu->write(space, 0x15, data);
-}
-
-WRITE8_MEMBER(playch10_state::psg_4017_w)
-{
-	m_nesapu->write(space, 0x17, data);
-}
 
 /******************************************************************************/
 
@@ -393,12 +379,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac", dac_device, write_unsigned8)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)  /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(pc10_in0_r, pc10_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r) AM_WRITE(psg_4017_w) /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r)  /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -698,15 +681,8 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_PPU2C0X_CPU("cart")
 	MCFG_PPU2C0X_COLORBASE(256)
 	MCFG_PPU2C0X_SET_NMI(playch10_state, ppu_irq)
-
-	// sound hardware
+	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_NES_APU_CPU("cart")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END

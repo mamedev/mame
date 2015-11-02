@@ -2,7 +2,6 @@
 // copyright-holders:Couriersud
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/nes_apu.h"
 #include "sound/discrete.h"
 
 #include "sound/tms5110.h"
@@ -1317,16 +1316,12 @@ static ADDRESS_MAP_START( dkong3_sound1_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch1")       /* overwrite default */
 	AM_RANGE(0x4017, 0x4017) AM_LATCH8_READ("latch2")
-	AM_RANGE(0x4000, 0x4017) AM_DEVREAD("nesapu1", nesapu_device, read)
-	AM_RANGE(0x4000, 0x4017) AM_DEVWRITE("nesapu1", nesapu_device, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_sound2_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch3")       /* overwrite default */
-	AM_RANGE(0x4000, 0x4017) AM_DEVREAD("nesapu2", nesapu_device, read)
-	AM_RANGE(0x4000, 0x4017) AM_DEVWRITE("nesapu2", nesapu_device, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1454,12 +1449,4 @@ MACHINE_CONFIG_FRAGMENT( dkong3_audio )
 	MCFG_LATCH8_ADD( "latch3")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_NES_APU_CPU("n2a03a")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("nesapu2", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_NES_APU_CPU("n2a03b")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
 MACHINE_CONFIG_END

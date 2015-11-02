@@ -466,7 +466,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 	if ((offset >= 0x1000) && (offset <= 0x1015))
 	{
 		// SOUND
-		nesapu_device *m_sound = machine().device<nesapu_device>("nessound");
+		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu::nessound");
 		m_sound->write(space, offset & 0x1f, data);
 		return;
 	}
