@@ -5595,8 +5595,8 @@ shaktamb        // 2001.10.17 Shakatto Tambourine Cho Powerup Chu (2K1 AUT)
 keyboard        // 2001.11 La Keyboard
 ikaruga         // 2001.12 Ikaruga
 lupinsho        // 2001.12 Lupin the Third: the Shooting
-drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
-derbyocw        // 2001.?? Derby Owners Club World Edition (Rev. D)
+drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev C)
+derbyocw        // 2001.?? Derby Owners Club World Edition (Rev D)
 				// 2001.?? Star Horse 2001
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
 mok             // 2002.03.06 The Maze of the Kings
@@ -5733,7 +5733,7 @@ initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2003.05 Initial D Arcade Stage Ver. 2 (Japan) (Rev A)
 initdv2j        // 2003.05.27 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 				// 2003.09 World Club Champion Football Serie A 2002-2003
-clubkcyc  		// 2003.?? Club Kart Cycraft Edition
+clubkcyc  		// 2003.?? Club Kart Cycraft Edition (Rev A)
 clubk2k3        // 2003.?? Club Kart: European Session (2003, Rev A)
 clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 clubkprz        // 2003.?? Club Kart Prize
@@ -5811,7 +5811,7 @@ airtrix         // 2001.02 Air Trix
 triforce        // 2002.?? Triforce BIOS
 vs2002ex        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j         // 2002.10 Virtua Striker 2002 (Japan)
-fzeroaxc        // 2003.06.11 F-Zero AX (Rev. C)
+fzeroaxc        // 2003.06.11 F-Zero AX (Rev C)
 avalonsc        // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
 avalonse        // 2003.08 The Key Of Avalon: The Wizard Master (server) (Rev E)
 avalonce        // 2003.08 The Key Of Avalon: The Wizard Master (client) (Rev E)
@@ -5822,7 +5822,7 @@ gekpurya        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro
 				// 2003.10 The Key Of Avalon 1.01
 avalons         // 2003.11 The Key Of Avalon: The Wizard Master (server) (Rev G)
 avalonc         // 2003.11 The Key Of Avalon: The Wizard Master (client) (Rev G)
-fzeroax         // 2003.12 F-Zero AX (Rev. E)
+fzeroax         // 2003.12 F-Zero AX (Rev E)
 				// 2003.12 The Key Of Avalon 1.10
 avalns12        // 2004.03 The Key Of Avalon 1.20 - Summon The New Monsters (server) (Rev A)
 avalnc12        // 2004.03 The Key Of Avalon 1.20 - Summon The New Monsters (client) (Rev A)
