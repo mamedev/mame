@@ -183,7 +183,7 @@ A Note about Best Bet Products.
    Double Double Bonus Poker with Three Aces, Faces 'n' Deuces, Joker's Revenge, No Faces Pay the Aces, Platinum
    Deuces, "Your Property" Royals, Four to a Royal Flush, One Eyed Jacks, Queens Follow Kings, Bonus Poker with 7's,
    Double Bonus Poker with 7's, Looney Twos, Hopscotch Poker, FreeBee Poker, Royal Boat Launch, Mega Royals, Stop
-   Sign Poker, Curved Straight, Relay Pair, Best Bet Royals, Double Action Pairs, Read Coats are Coming, Waden n'
+   Sign Poker, Curved Straight, Relay Pair, Best Bet Royals, Double Action Pairs, Red Coats are Coming, Waden n'
    Jokers and Million Coin Poker.
 
 ***********************************************************************************/
@@ -9228,7 +9228,7 @@ Bonus "Dealt" payouts per Coin In are:
  Dealt 4 Deuces .....  300
  Dealt 4 Deuces + Ace 1600
 
-Belly glass could ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
+Belly glass could be ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
 
 Designed and co-created by Best Bet Products
 
@@ -9264,7 +9264,7 @@ Bonus "Dealt" payouts per Coin In are:
  Dealt 4 Deuces .....  300
  Dealt 4 Deuces + Ace 1600
 
-Belly glass could ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
+Belly glass could be ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
 
 Designed and co-created by Best Bet Products
 
