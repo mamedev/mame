@@ -176,6 +176,16 @@ NOTE:  The Door Open cycling is currently not fully understood. Non Plus program
        expect the Door Open bit to cycle. Later versions, Superboard & Wingboards require the Door Open cycling but
        at different rates. It's currently not know what if any universal value will work for all sets.
 
+A Note about Best Bet Products.
+  Best Bet Products holds 2 US patents (5,882,259 & 5,957,774) which covers the mid hand dealt bonus payout.
+  Games that feature the dealt bonus include (but not limited to):
+   Barbaric Deuces Wild (AKA Dealt Deuces Wild Bonus Poker), Blackjack Poker, Double Bonus Poker with Three Aces,
+   Double Double Bonus Poker with Three Aces, Faces 'n' Deuces, Joker's Revenge, No Faces Pay the Aces, Platinum
+   Deuces, "Your Property" Royals, Four to a Royal Flush, One Eyed Jacks, Queens Follow Kings, Bonus Poker with 7's,
+   Double Bonus Poker with 7's, Looney Twos, Hopscotch Poker, FreeBee Poker, Royal Boat Launch, Mega Royals, Stop
+   Sign Poker, Curved Straight, Relay Pair, Best Bet Royals, Double Action Pairs, Read Coats are Coming, Waden n'
+   Jokers and Million Coin Poker.
+
 ***********************************************************************************/
 
 #include "emu.h"
@@ -9218,7 +9228,7 @@ Bonus "Dealt" payouts per Coin In are:
  Dealt 4 Deuces .....  300
  Dealt 4 Deuces + Ace 1600
 
-Belly glass can ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
+Belly glass could ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
 
 Designed and co-created by Best Bet Products
 
@@ -9254,7 +9264,7 @@ Bonus "Dealt" payouts per Coin In are:
  Dealt 4 Deuces .....  300
  Dealt 4 Deuces + Ace 1600
 
-Belly glass can ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
+Belly glass could ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
 
 Designed and co-created by Best Bet Products
 
@@ -9276,7 +9286,7 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Wrong!! Should be CAPX2325 */
 ROM_END
 
-ROM_START( pex2287p ) /* Superboard : Pay the Aces NO Faces Bonus (X002287P+XP000057) */
+ROM_START( pex2287p ) /* Superboard : No Faces Pay the Aces (X002287P+XP000057) */
 /*
 
                                        5-K 2-4
@@ -9300,7 +9310,7 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "xp000057.u67",   0x00000, 0x10000, CRC(a1186020) SHA1(d42823aac1cb16521ecc0a09cba694374642cff7) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002287p.u66",   0x00000, 0x10000, CRC(f5a8f485) SHA1(4bf9ad2a75acd5445e97661efe8a39ceb8b97549) ) /* Pay the Acse NO Faces Bonus */
+	ROM_LOAD( "x002287p.u66",   0x00000, 0x10000, CRC(f5a8f485) SHA1(4bf9ad2a75acd5445e97661efe8a39ceb8b97549) ) /* No Faces Pay the Aces */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) )
@@ -11189,7 +11199,7 @@ GAMEL(1995, pex2275p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex2276p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002276P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2283p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
 GAMEL(1995, pex2284p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
-GAMEL(1995, pex2287p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002287P+XP000057) Pay the Aces NO Faces Bonus Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
+GAMEL(1995, pex2287p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002287P+XP000057) No Faces Pay the Aces Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
 GAMEL(1995, pex2297p,  0,         peplus,  peplus_poker, peplus_state, pepluss64,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002297P+XP000053) Jackpot Poker",       0, layout_pe_poker )
 GAMEL(1995, pex2302p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002302P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
 GAMEL(1995, pex2303p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002303P+XP000112) White Hot Aces Poker", 0, layout_pe_poker )
