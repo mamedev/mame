@@ -1179,6 +1179,27 @@ ROM_START( magicmska )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// US003 - Multi credit / Multi line.
+// Margarita Magic [Reel Game] - NSW/ACT - A - 07/07/2000.
+// EHG1559 - This is a twenty-line game.
+// The playlines are 1, 5, 10, 15 and 20.
+// For 20 credit per line the max bet is 400
+ROM_START( marmagic )
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ehg1559_margarita_magic.u7",  0x000000, 0x80000, CRC(eab62e8f) SHA1(b125f9a9dc1c82886490d3807e883a7b4e1453a5) )
+	ROM_LOAD32_WORD( "ehg1559_margarita_magic.u11", 0x000002, 0x80000, CRC(0b3c6a11) SHA1(05be4a4d070358600273d5dd4f6b4b37fee47105) )
+	ROM_LOAD32_WORD( "ehg1559_margarita_magic.u8",  0x100000, 0x80000, CRC(db05591e) SHA1(8af241bbd4f744c66fb78fdaf739d9c8bc2580c0) )
+	ROM_LOAD32_WORD( "ehg1559_margarita_magic.u12", 0x100002, 0x80000, CRC(b4458167) SHA1(d1e2040910ad748e58eaccd18ab0569b794b4d97) )
+	ROM_LOAD32_WORD( "ehg1559_margarita_magic.u9",  0x200000, 0x80000, CRC(fc69523a) SHA1(c01b3c905b01671307bc5439d00f4454d0286b20) )
+	ROM_LOAD32_WORD( "ehg1559_margarita_magic.u13", 0x200002, 0x80000, CRC(0cd174df) SHA1(707168fc3bef6c200ae6455c170b7c3e73502965) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 // MV4124/1 - 5,10,25,50 Credit Multiplier / 20 Line Multiline.
 // Adonis [Reel Game] - Export B - 31/07/01.
 // Marked as BHG1284.
@@ -1274,6 +1295,7 @@ GAME( 2000, cuckoo,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 2000, magicmsk,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export, set 1)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115,   A - 09/05/00
 GAME( 2000, magicmska, magicmsk, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export, set 2)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115,   A - 09/05/00
 GAME( 2000, margmgc,   0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // JB005,    A - 07/07/00
+GAME( 2000, marmagic,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (EHG1559, NSW/ACT)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // US003,    A - 07/07/00
 GAME( 2001, geishanz,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4127,   A - 05/03/01
 GAME( 2001, adonise,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (MV4124/1, Export)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4124/1, B - 31/07/01
 GAME( 2001, koalamnt,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Koala Mint (MV4137, Export)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4137,   A - 12/09/01
