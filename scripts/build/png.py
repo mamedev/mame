@@ -152,7 +152,6 @@ try:
     from itertools import imap
 except ImportError:
     imap = map
-from itertools import starmap
 import math
 # http://www.python.org/doc/2.4.4/lib/module-operator.html
 import operator
