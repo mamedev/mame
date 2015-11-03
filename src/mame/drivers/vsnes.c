@@ -214,9 +214,7 @@ static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-// likely doesn't have the PSGs
-// they wait on 0x2002 to change, if you toggle that the game runs with no sprites, it does still play music tho
-// but I think the real bootleg board uses the z80 and alt sound hardware instead?
+// the bootleg still makes writes to the PSG addresses but doesn't have the N2A03 so they likely go unused with the Z80 side providing sound instead
 static ADDRESS_MAP_START( vsnes_cpu1_bootleg_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
@@ -1780,13 +1778,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,N2A03_DEFAULTCLOCK) // R6502AP
+	MCFG_CPU_ADD("maincpu", M6502,XTAL_16MHz/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	MCFG_CPU_ADD("subcpu", Z80,4000000)         /* ? MHz */ // Z8400APS-Z80CPU
+	MCFG_CPU_ADD("subcpu", Z80,XTAL_16MHz/4)         /* ? MHz */ // Z8400APS-Z80CPU
 	MCFG_CPU_PROGRAM_MAP(vsnes_bootleg_z80_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
 
@@ -1807,6 +1805,7 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1891,8 +1890,8 @@ ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set unknown, possibly operator 
 	PALETTE_2C04_0004
 ROM_END
 
-/* I don't know what the Z80 is for on these (located top-left of the PCB with rom 1) */
-/* PCB is also marked for a plain 6502, I can't see from the image what is there tho */
+
+
 ROM_START( suprmriobl2 )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "4-27256.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
@@ -2747,8 +2746,8 @@ GAME( 1986, rbibb,    0,        vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, 
 GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
 GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
-GAME( 1986, suprmriobl,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",             "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING )
-GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",            "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING )
+GAME( 1986, suprmriobl,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",             "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING ) // timer starts at 200(!)
+GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",            "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING ) // timer starts at 300
 GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, vsnes_state, MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid" , 0 )
 GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, vsnes_state, tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )

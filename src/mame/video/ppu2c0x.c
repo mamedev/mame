@@ -141,7 +141,8 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 					m_color_base(0),
 					m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
 					m_tilecount(0),
-					m_draw_phase(0)
+					m_draw_phase(0),
+					m_use_sprite_write_limitation(true)
 {
 	for (int i = 0; i < PPU_MAX_REG; i++)
 		m_regs[i] = 0;
@@ -1186,8 +1187,9 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 
 		case PPU_SPRITE_DATA: /* 4 */
 			// If the PPU is currently rendering the screen, 0xff is written instead of the desired data.
-			if (m_scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
-				data = 0xff;
+			if (m_use_sprite_write_limitation)
+				if (m_scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
+					data = 0xff;
 			m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
 			m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
 			break;
