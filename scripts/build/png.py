@@ -2778,4 +2778,5 @@ if __name__ == '__main__':
     try:
         _main(sys.argv)
     except Error:
-        print (sys.exc_info()[1], file=e)
+        e = sys.exc_info()[1]
+        print(e, file=sys.stderr)
