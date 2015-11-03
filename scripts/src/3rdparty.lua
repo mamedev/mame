@@ -10,6 +10,18 @@ project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
 
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+		}
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+	configuration { }
+		
 	options {
 		"ForceCPP",
 	}
@@ -38,6 +50,13 @@ if _OPTIONS["with-bundled-zlib"] then
 project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4131", -- warning C4131: 'xxx' : uses old-style declarator
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+		}
 
 	configuration "Debug"
 		defines {
@@ -86,6 +105,26 @@ project "softfloat"
 	uuid "04fbf89e-4761-4cf2-8a12-64500cf0c5c5"
 	kind "StaticLib"
 
+	configuration { "vs*" }
+		buildoptions {
+			-- from lib section
+			"/wd4290", -- warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			-- from emu section
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter	
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4800", -- warning C4800: 'type' : forcing value to bool 'true' or 'false' (performance warning)
+			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
+			"/wd4150", -- warning C4150: deletion of pointer to incomplete type 'xxx'; no destructor called
+
+			-- in softfloat
+			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned			
+		}
+
+	configuration { }
+
 	options {
 		"ForceCPP",
 	}
@@ -122,6 +161,15 @@ if _OPTIONS["with-bundled-jpeg"] then
 project "jpeg"
 	uuid "447c6800-dcfd-4c48-b72a-a8223bb409ca"
 	kind "StaticLib"
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter	
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+		}
+
+	configuration { }
 
 	files {
 		MAME_DIR .. "3rdparty/libjpeg/jaricom.c",
@@ -191,6 +239,19 @@ project "flac"
 	uuid "b6fc19e8-073a-4541-bb7b-d24b548d424a"
 	kind "StaticLib"
 
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter	
+			"/wd4702", -- warning C4702: unreachable code
+		}
+
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+
 	configuration { }
 		defines {
 			"WORDS_BIGENDIAN=0",
@@ -250,6 +311,16 @@ project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
 	kind "StaticLib"
 
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+		}
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
+		}
+		
 	configuration { }
 		defines {
 			"_7ZIP_PPMD_SUPPPORT",
@@ -299,6 +370,13 @@ project "lua"
 	--options {
 	--	"ForceCPP",
 	--}
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4702", -- warning C4702: unreachable code
+			"/wd4310", -- warning C4310: cast truncates constant value
+		}
 
 	configuration { }
 		defines {
@@ -379,6 +457,11 @@ project "lsqlite3"
 	--	"ForceCPP",
 	-- }
 
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+		}
+
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -410,6 +493,22 @@ project "mongoose"
 	uuid "ff05b529-2b6f-4166-9dff-5fe2aef89c40"
 	kind "StaticLib"
 
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4996", -- warning C4996: 'function': was declared deprecated
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch			
+			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+		}
+	
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+	}
+	
+	configuration { }
+
 	options {
 		"ForceCPP",
 	}
@@ -438,6 +537,13 @@ project "mongoose"
 project "jsoncpp"
 	uuid "ae023ff3-d712-4e54-adc5-3b56a148650f"
 	kind "StaticLib"
+
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+	}
+	
+	configuration { }
 
 	options {
 		"ForceCPP",
@@ -468,6 +574,21 @@ project "sqllite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
 
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4232", -- warning C4232: nonstandard extension used : 'xxx' : address of dllimport 'xxx' is not static, identity not guaranteed
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4706", -- warning C4706: assignment within conditional expression
+		}
+
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+	
+	
 	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-bad-function-cast",
@@ -504,6 +625,19 @@ project "portmidi"
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
 		
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4706", -- warning C4706: assignment within conditional expression
+		}
+
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+	
 	configuration { "linux*" }
 		defines {
 			"PMALSA=1",
@@ -569,6 +703,16 @@ if (USE_BGFX == 1) then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
 	kind "StaticLib"
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4324", -- warning C4324: 'xxx' : structure was padded due to __declspec(align())
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
+			"/wd4310", -- warning C4310: cast truncates constant value			
+		}
+
+	configuration { }
 
 	includedirs {		
 		MAME_DIR .. "3rdparty/bgfx/include",
@@ -681,6 +825,21 @@ if _OPTIONS["with-bundled-portaudio"] then
 project "portaudio"
 	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
 	kind "StaticLib"
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch			
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
+			"/wd4189", -- warning C4189: 'xxx' : local variable is initialized but not referenced
+			"/wd4127", -- warning C4127: conditional expression is constant
+		}
+
+	configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
 
 	configuration { "gmake" }
 		buildoptions_c {
