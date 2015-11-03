@@ -106,7 +106,7 @@ end
 
 function sdlconfigcmd()
 	if not _OPTIONS["SDL_INSTALL_ROOT"] then
-		return _OPTIONS["SDL_LIBVER"] .. "-config"
+		return _OPTIONS['TOOLCHAIN'] .. "pkg-config " .. _OPTIONS["SDL_LIBVER"]
 	else
 		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin",_OPTIONS["SDL_LIBVER"]) .. "-config"
 	end

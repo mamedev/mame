@@ -75,6 +75,7 @@
 # BUILDDIR = build
 # TARGETOS = windows
 # CROSS_BUILD = 1
+# TOOLCHAIN =
 # OVERRIDE_CC = cc
 # OVERRIDE_CXX = c++
 # OVERRIDE_LD = ld
@@ -270,9 +271,9 @@ WINDRES  := $(MINGW32)/bin/windres
 endif
 else
 ifeq ($(ARCHITECTURE),_x64)
-WINDRES  := x86_64-w64-mingw32-windres
+WINDRES  := $(word 1,$(TOOLCHAIN) x86_64-w64-mingw32-)windres
 else
-WINDRES  := i686-w64-mingw32-windres
+WINDRES  := $(word 1,$(TOOLCHAIN) i686-w64-mingw32-)windres
 endif
 endif
 
@@ -407,6 +408,9 @@ endif
 
 PARAMS+= --distro=$(DISTRO)
 
+ifdef TOOLCHAIN
+PARAMS += --TOOLCHAIN='$(TOOLCHAIN)'
+endif
 ifdef OVERRIDE_CC
 PARAMS += --CC='$(OVERRIDE_CC)'
 ifndef CROSS_BUILD
@@ -777,12 +781,12 @@ endif
 
 ifeq ($(OS),windows)
 ifeq (posix,$(SHELLTYPE))
-GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
-CLANG_VERSION    := $(shell $(subst @,,$(CC)) --version 2> /dev/null| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) --version 2> /dev/null| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 else
-GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> NUL)
-CLANG_VERSION    := $(shell $(subst @,,$(CC)) --version 2> NUL| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> NUL)
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) --version 2> NUL| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
 endif
 ifdef MSBUILD
@@ -799,9 +803,9 @@ MSBUILD_PARAMS += /p:Platform=win32
 endif
 endif
 else
-GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
 ifneq ($(OS),solaris)
-CLANG_VERSION    := $(shell $(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 endif
