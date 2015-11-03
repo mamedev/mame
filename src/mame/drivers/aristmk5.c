@@ -1096,6 +1096,25 @@ ROM_START( chickena )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// MV4061 - 5 Credit Multiplier / 5 Line Multiline.
+// Sweethearts II - Export - A - 29/06/98.
+// Marked as PHG0742 and 92.252%
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( swheart2 )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "phg0742_sweet_heart_2.u7",  0x000000, 0x80000, CRC(d6f83014) SHA1(7c6902d67157a04bdbbfc7c7d8ae1e22befd840f) )
+	ROM_LOAD32_WORD( "phg0742_sweet_heart_2.u11", 0x000002, 0x80000, CRC(3fa6e538) SHA1(958461a54e57c4622151bbcde3de8f4ff3f9ec0a) )
+	ROM_LOAD32_WORD( "phg0742_sweet_heart_2.u8",  0x100000, 0x80000, CRC(916409f7) SHA1(d5c3cb7afac14a27f4722528a3dac4b4f2d41580) )
+	ROM_LOAD32_WORD( "phg0742_sweet_heart_2.u12", 0x100002, 0x80000, CRC(92f92875) SHA1(bdb24974c2bf7bfb772c34a02a20e97df9293c0c) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 // MV4098 - 10 Credit Multiplier / 9 Line Multiline.
 // BOOT SCOOTIN' - Export A - 25/08/99.
 // All devices are 27c4002 instead of 27c4096.
@@ -1286,6 +1305,7 @@ GAME( 1997, pengpays,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 1998, chickena,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Chicken (RHG0730, Export, 92.588%)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 596,      C - 23/02/98
 GAME( 1998, adonis,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0200751V, NSW/ACT)",                     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 10
 GAME( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0100751V, NSW/ACT)",                     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 9
+GAME( 1998, swheart2,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (PHG0742, Export, 92.252%)",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4061,   A - 29/06/98
 GAME( 1998, reelrock,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628,      A - 13/07/98
 GAME( 1998, indiandr,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (0100845V, Local)",              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 628/1,    B - 15/12/98
 GAME( 1998, chariotc,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "The Chariot Challenge (04J00714, NSW/ACT)",      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 630,      A - 10/08/98, Rev 12
