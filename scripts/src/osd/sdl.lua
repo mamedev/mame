@@ -566,6 +566,11 @@ if _OPTIONS["with-tools"] then
 			}
 		end
 
+		configuration { "mingw*" or "vs*" }
+			targetextension ".exe"
+
+		configuration { }
+
 		strip()
 end
 
