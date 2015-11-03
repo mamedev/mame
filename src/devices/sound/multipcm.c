@@ -254,7 +254,7 @@ void multipcm_device::lfo_init()
 			m_pitch_scale_tables[table][i + 128] = value_to_fixed(LFO_SHIFT, converted);
 		}
 
-		limit =- AMPLITUDE_SCALE_LIMIT[table];
+		limit = -AMPLITUDE_SCALE_LIMIT[table];
 		m_amplitude_scale_tables[table] = auto_alloc_array_clear(machine(), INT32, 256);
 		for(INT32 i = 0; i < 256; ++i)
 		{
