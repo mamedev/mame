@@ -5791,7 +5791,7 @@ ROM_START( peke0017 ) /* Normal board : Keno 1-10 Spot (KE0017) */
 	ROM_LOAD( "cap1016.u50", 0x0000, 0x0100, CRC(12e1be25) SHA1(501487bc729eb80fcf9e61705d3546de5e0d7cde) )
 ROM_END
 
-ROM_START( peke1006 ) /* Normal board : Keno 1-10 Spot (KE1006) - Payout 87.61%, Paytable 87-C */
+ROM_START( peke1006 ) /* Normal board : Keno 2-10 Spot (KE1006) - Payout 87.61%, Paytable 87-C */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1006_590-a77.u68",   0x00000, 0x10000, CRC(5f2a9aac) SHA1(67d24e376d0dcea30d68c3019919e02261c38d7d) ) /* Game Version: 590, Library Version: A77 */
 
