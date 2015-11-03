@@ -12,6 +12,7 @@
  Knockout (1975)
  Pace Car Pro (1975)                          EG-1000
  Pace Race (1974?)
+ RTH (1976)
  UFO Chase (1975)                             EG-1010
  Wings / Wings Cocktail (1976)
 
