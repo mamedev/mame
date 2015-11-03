@@ -119,4 +119,10 @@ public:
 	void ppu_irq_2(int *ppu_regs);
 
 	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
+	DECLARE_WRITE8_MEMBER(bootleg_sound_write);
+	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_data_r);
+	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_address_r);
+	UINT8 m_bootleg_sound_offset;
+	UINT8 m_bootleg_sound_data;
+
 };

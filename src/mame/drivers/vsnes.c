@@ -214,13 +214,42 @@ static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-// the bootleg still makes writes to the PSG addresses but doesn't have the N2A03 so they likely go unused with the Z80 side providing sound instead
+
+
+READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_address_r)
+{
+	// NMI routine uses the value read here as the low part of an offset from 0x2000 to store a value read at 0x4000
+	// before reading 0x6000 and returning
+
+	// can't really see how to get sound this way tho, maybe the unused rom is acting as lookup table to convert
+	// PSG write offsets to addresses to offsets for use here?
+
+	return m_bootleg_sound_offset;
+}
+
+WRITE8_MEMBER(vsnes_state::bootleg_sound_write)
+{
+	m_bootleg_sound_offset = offset;
+	m_bootleg_sound_data = data;
+	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
+{
+	return m_bootleg_sound_data;
+}
+
+
+// the bootleg still makes writes to the PSG addresses, it seems the Z80 should interpret them to play the sounds
 static ADDRESS_MAP_START( vsnes_cpu1_bootleg_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) /* IN1 - input port 2 / PSG second control register */
+
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(bootleg_sound_write)
+
 	AM_RANGE(0x4020, 0x4020) AM_READWRITE(vsnes_coin_counter_r, vsnes_coin_counter_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -228,15 +257,23 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
 {
-	return 0x00;
+	return 0x00;// rand();
 }
 
 static ADDRESS_MAP_START( vsnes_bootleg_z80_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 
-	AM_RANGE(0x4000, 0x4000) AM_READ( vsnes_bootleg_z80_latch_r )
+	AM_RANGE(0x4000, 0x4000) AM_READ( vsnes_bootleg_z80_data_r ) // read in IRQ & NMI
 
+	AM_RANGE(0x6000, 0x6000) AM_READ( vsnes_bootleg_z80_latch_r ) // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
+	AM_RANGE(0x6000, 0x6001) AM_READ( vsnes_bootleg_z80_address_r ) // ^
+
+
+	AM_RANGE(0x60FA, 0x60FA) AM_DEVWRITE("sn1", sn76489_device, write)
+	AM_RANGE(0x60F9, 0x60F9) AM_DEVWRITE("sn2", sn76489_device, write)
+	AM_RANGE(0x60FF, 0x60FF) AM_DEVWRITE("sn3", sn76489_device, write)
+	
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1784,9 +1821,10 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	MCFG_CPU_ADD("subcpu", Z80,XTAL_16MHz/4)         /* ? MHz */ // Z8400APS-Z80CPU
+	MCFG_CPU_ADD("sub", Z80,XTAL_16MHz/4)         /* ? MHz */ // Z8400APS-Z80CPU
 	MCFG_CPU_PROGRAM_MAP(vsnes_bootleg_z80_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
+//	MCFG_CPU_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse) 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen1", RASTER)
@@ -1810,9 +1848,15 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	// instead of the above?
-	MCFG_SOUND_ADD("sn1", SN76489A, 4000000) // ?? Mhz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	// PCB has 2, code accesses 3? which 2 really exist?
+	MCFG_SOUND_ADD("sn1", SN76489, XTAL_16MHz/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("sn2", SN76489, XTAL_16MHz/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("sn3", SN76489, XTAL_16MHz/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -1896,7 +1940,7 @@ ROM_START( suprmriobl2 )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "4-27256.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
 
-	ROM_REGION( 0x10000,"subcpu", 0 ) /* Z80 memory */
+	ROM_REGION( 0x10000,"sub", 0 ) /* Z80 memory */
 	ROM_LOAD( "1-2764.bin",  0x0000, 0x2000, CRC(95856e07) SHA1(c681cfdb656e687bc59080df56c9c38e13be4bb8) )
 
 	ROM_REGION( 0x10000,"unk", 0 ) /* first half is some sort of table */
@@ -1913,7 +1957,7 @@ ROM_START( suprmriobl )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "4.bin",  0x8000, 0x8000, CRC(6f857416) SHA1(05e2df8ac01a03bf09b73e34c30aaf5bf4715809) )
 
-	ROM_REGION( 0x10000,"subcpu", 0 ) /* Z80 memory */
+	ROM_REGION( 0x10000,"sub", 0 ) /* Z80 memory */
 	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(9e3557f2) SHA1(11a0de2c0154f7ac120d9774cb5d1051e0156822) )
 
 	ROM_REGION( 0x10000,"unk", 0 ) /* first half is some sort of table */
