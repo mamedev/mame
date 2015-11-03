@@ -920,6 +920,16 @@ function toolchain(_buildDir, _subDir)
 end
 
 function strip()
+	if not _OPTIONS["STRIP_SYMBOLS"]=="1" then
+		return true
+	end
+
+	configuration { "osx-*", "Release" }
+		postbuildcommands {
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix) .. "strip \"$(TARGET)\"",
+		}
+
 	configuration { "android-arm", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",

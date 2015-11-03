@@ -565,6 +565,8 @@ if _OPTIONS["with-tools"] then
 				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.mm",
 			}
 		end
+
+		strip()
 end
 
 
@@ -606,4 +608,6 @@ if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
 		files {
 			MAME_DIR .. "src/osd/sdl/aueffectutil.mm",
 		}
+
+		strip()
 end

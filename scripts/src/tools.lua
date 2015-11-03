@@ -50,6 +50,8 @@ files {
 	MAME_DIR .. "src/tools/romcmp.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- chdman
 --------------------------------------------------
@@ -104,6 +106,8 @@ files {
 	MAME_DIR .. "src/version.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- jedutil
 --------------------------------------------------
@@ -144,6 +148,8 @@ includedirs {
 files {
 	MAME_DIR .. "src/tools/jedutil.cpp",
 }
+
+strip()
 
 --------------------------------------------------
 -- unidasm
@@ -201,6 +207,7 @@ files {
 	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
+strip()
 
 --------------------------------------------------
 -- ldresample
@@ -255,6 +262,8 @@ files {
 	MAME_DIR .. "src/tools/ldresample.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- ldverify
 --------------------------------------------------
@@ -308,6 +317,8 @@ files {
 	MAME_DIR .. "src/tools/ldverify.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- regrep
 --------------------------------------------------
@@ -348,6 +359,8 @@ includedirs {
 files {
 	MAME_DIR .. "src/tools/regrep.cpp",
 }
+
+strip()
 
 --------------------------------------------------
 -- srcclean
@@ -390,6 +403,8 @@ files {
 	MAME_DIR .. "src/tools/srcclean.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- src2html
 --------------------------------------------------
@@ -430,6 +445,8 @@ includedirs {
 files {
 	MAME_DIR .. "src/tools/src2html.cpp",
 }
+
+strip()
 
 --------------------------------------------------
 -- split
@@ -483,6 +500,8 @@ files {
 	MAME_DIR .. "src/tools/split.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- pngcmp
 --------------------------------------------------
@@ -523,6 +542,8 @@ includedirs {
 files {
 	MAME_DIR .. "src/tools/pngcmp.cpp",
 }
+
+strip()
 
 --------------------------------------------------
 -- nltool
@@ -578,6 +599,8 @@ files {
 	MAME_DIR .. "src/lib/netlist/prg/nltool.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- nlwav
 --------------------------------------------------
@@ -609,6 +632,8 @@ includedirs {
 files {
   MAME_DIR .. "src/lib/netlist/prg/nlwav.cpp",
 }
+
+strip()
 
 --------------------------------------------------
 -- castool
@@ -664,6 +689,8 @@ files {
 	MAME_DIR .. "src/tools/castool.cpp",
 }
 
+strip()
+
 --------------------------------------------------
 -- floptool
 --------------------------------------------------
@@ -718,6 +745,8 @@ includedirs {
 files {
 	MAME_DIR .. "src/tools/floptool.cpp",
 }
+
+strip()
 
 --------------------------------------------------
 -- imgtool
@@ -822,3 +851,5 @@ files {
 	MAME_DIR .. "src/tools/imgtool/modules/bml3.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/hp48.cpp",
 }
+
+strip()
