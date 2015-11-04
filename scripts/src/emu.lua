@@ -245,8 +245,6 @@ files {
 	MAME_DIR .. "src/emu/debug/textbuf.h",
 	MAME_DIR .. "src/emu/profiler.c",
 	MAME_DIR .. "src/emu/profiler.h",
-	MAME_DIR .. "src/emu/webengine.c",
-	MAME_DIR .. "src/emu/webengine.h",
 	MAME_DIR .. "src/emu/sound/filter.c",
 	MAME_DIR .. "src/emu/sound/filter.h",
 	MAME_DIR .. "src/devices/sound/flt_vol.c",

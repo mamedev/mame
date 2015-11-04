@@ -117,7 +117,6 @@ machine_manager* machine_manager::instance()
 machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 		: m_osd(osd),
 		m_options(options),
-		m_web(options),
 		m_new_driver_pending(NULL),
 		m_machine(NULL)
 {
@@ -155,8 +154,6 @@ void machine_manager::schedule_new_driver(const game_driver &driver)
 void machine_manager::update_machine()
 {
 	m_lua.set_machine(m_machine);
-	m_web.set_machine(m_machine);
-	if (m_machine!=NULL) m_web.push_message("update_machine");
 }
 
 /*-------------------------------------------------
@@ -175,9 +172,6 @@ int machine_manager::execute()
 	int error = MAMERR_NONE;
 
 	m_lua.initialize();
-	if (m_options.console()) {
-		m_lua.start_console();
-	}
 	while (error == MAMERR_NONE && !exit_pending)
 	{
 		m_new_driver_pending = NULL;

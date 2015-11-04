@@ -1931,8 +1931,6 @@ void device_debug::instruction_hook(offs_t curpc)
 			// flush any pending updates before waiting again
 			machine.debug_view().flush_osd_updates();
 
-			machine.manager().web()->serve();
-
 			// clear the memory modified flag and wait
 			global->memory_modified = false;
 			if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)

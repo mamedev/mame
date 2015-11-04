@@ -374,7 +374,6 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 		// loop while we have a handler
 		while (m_handler_callback != handler_ingame && !machine().scheduled_event_pending() && !ui_menu::stack_has_special_main_menu())
 		{
-			machine().manager().web()->serve();
 			machine().video().frame_update();
 		}
 

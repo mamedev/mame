@@ -185,10 +185,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_AUTOBOOT_COMMAND ";ab",                     NULL,        OPTION_STRING,     "command to execute after machine boot" },
 	{ OPTION_AUTOBOOT_DELAY,                             "2",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
 	{ OPTION_AUTOBOOT_SCRIPT ";script",                  NULL,        OPTION_STRING,     "lua script to execute after machine boot" },
-	{ OPTION_HTTP,                                       "0",         OPTION_BOOLEAN,    "enable local http server" },
-	{ OPTION_HTTP_PORT,                                  "8080",      OPTION_STRING,     "http server listener port" },
-	{ OPTION_HTTP_PATH,                                  "web",       OPTION_STRING,     "path to web files" },
-	{ OPTION_CONSOLE,                                    "0",         OPTION_BOOLEAN,    "enable emulator LUA console" },
 	{ NULL }
 };
 

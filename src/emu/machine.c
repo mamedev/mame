@@ -393,8 +393,6 @@ int running_machine::run(bool firstrun)
 			js_set_main_loop(this);
 #endif
 
-			manager().web()->serve();
-
 			// execute CPUs if not paused
 			if (!m_paused)
 				m_scheduler.timeslice();

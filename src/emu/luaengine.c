@@ -17,7 +17,6 @@
 #include "osdepend.h"
 #include "drivenum.h"
 #include "ui/ui.h"
-#include "mongoose/mongoose.h"
 
 //**************************************************************************
 //  LUA ENGINE
@@ -862,13 +861,14 @@ void lua_engine::serve_lua()
 	} while (1);
 }
 
+/*
 static void *serve_lua(void *param)
 {
 	lua_engine *engine = (lua_engine *)param;
 	engine->serve_lua();
 	return NULL;
 }
-
+*/
 
 //-------------------------------------------------
 //  lua_engine - constructor
@@ -1025,7 +1025,6 @@ void lua_engine::initialize()
 
 void lua_engine::start_console()
 {
-	mg_start_thread(::serve_lua, this);
 }
 
 //-------------------------------------------------

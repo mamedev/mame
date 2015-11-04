@@ -116,7 +116,6 @@ end
 		"lua",
 		"lsqlite3",
 		"jsoncpp",
-		"mongoose",
 	}
 
 	if _OPTIONS["with-bundled-zlib"] then
