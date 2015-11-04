@@ -64,22 +64,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     settings (code at 0x5805 for player 1 and player 2 in "Upright" cabinet, or
     0x5563 for player 2 in "Cocktail" cabinet).
 
-5) 'bongo'
-
-  - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
-    there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
-    (unmapped memory) if it pressed (HIGH).
-  - IN0 bit 7 is tested on startup (code at 0x0048) in combinaison with bits 0 and 1
-    (which are supposed to be COIN1 and COIN2). If all of them are pressed (HIGH),
-    the game displays a "CREDIT FAULT" message then jumps back to 0x0048.
-  - IN0 bit 4 and IN1 bit 4 should have been IPT_JOYSTICK_DOWN (Upright and Cocktail)
-    but their status is discarded with 3 'NOP' instructions at 0x06ca.
-  - IN0 bit 7 and IN0 bit 6 should have been IPT_BUTTON1 (Upright and Cocktail)
-    but their status is discarded with 3 'NOP' instructions at 0x06d1.
-  - DSW0 is read via code at 0x2426, but its contents is directly overwritten
-    with value read from DSW1 (AY port A) via code at 0x3647.
-
-4) 'ozon1'
+5) 'ozon1'
 
   - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch
     (check code at 0x03c6 which changes player and routines that handle players inputs :
@@ -557,32 +542,6 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8, galaxold_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8400, 0x87ff) AM_WRITENOP // not used
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_WRITENOP // not used
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_WRITENOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bongo_io, AS_IO, 8, galaxold_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -1678,52 +1637,6 @@ INPUT_PORTS_END
 
 
 /* verified from Z80 code */
-static INPUT_PORTS_START( bongo )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* see notes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("DSW0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-
-	PORT_START("DSW1")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x06, "5" )
-	PORT_DIPNAME( 0x08, 0x00, "Infinite Lives (Cheat)" )    /* always gives 3 lives */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )            /* also 1C_3C for Coin B if it existed */
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )            /* also 1C_6C for Coin B if it existed */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-INPUT_PORTS_END
-
-
-/* verified from Z80 code */
 static INPUT_PORTS_START( ozon1 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2460,25 +2373,6 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bongo, galaxold_base )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bongo)
-	MCFG_CPU_IO_MAP(bongo_io)
-
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,bongo)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
-
-	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 
 	/* basic machine hardware */
@@ -3142,24 +3036,6 @@ ROM_START( tazzmang2 )  // Original Sparcade set
 	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-
-ROM_START( bongo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bg1.bin",    0x0000, 0x1000, CRC(de9a8ec6) SHA1(b5ee99b26d1a39e31b643ad0f5723ee8e364023e) )
-	ROM_LOAD( "bg2.bin",    0x1000, 0x1000, CRC(a19da662) SHA1(a2674392d489c5e5eeb9abc51572a37cc6045220) )
-	ROM_LOAD( "bg3.bin",    0x2000, 0x1000, CRC(9f6f2150) SHA1(26a1f872686ddddcdb690d7b826ba26c20cdec35) )
-	ROM_LOAD( "bg4.bin",    0x3000, 0x1000, CRC(f80372d2) SHA1(078e2c8b947103c168c0c85430f8ebc9d09f8ba7) )
-	ROM_LOAD( "bg5.bin",    0x4000, 0x1000, CRC(fc92eade) SHA1(f4012a1c4631388a3e8109a8381bc4084ddc8757) )
-	ROM_LOAD( "bg6.bin",    0x5000, 0x1000, CRC(561d9e5d) SHA1(68d7fab3cfb5b3360fe8064c70bf21bb1341032f) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "b-h.bin",    0x0000, 0x1000, CRC(fc79d103) SHA1(dac1152221ebdc4cd9bf353b4cc5d45021ca5d9e) )
-	ROM_LOAD( "b-k.bin",    0x1000, 0x1000, CRC(94d17bf3) SHA1(2a70968249946de52c5a4cfabafbbf4ecda844a8) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "b-clr.bin",  0x0000, 0x0020, CRC(c4761ada) SHA1(067d12b2d3635ffa6337ed234ba42717447bea00) )
-ROM_END
-
 ROM_START( ozon1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1.bin",     0x0000, 0x1000, CRC(54899e8b) SHA1(270af76ae4396ebda767f160535fa77c0b49726a) )
@@ -3507,7 +3383,6 @@ GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  driver_device,  0,       
 GAME( 1982, porter,    dockman,  porter,    porter,    driver_device,  0,         ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  driver_device,  0,         ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  driver_device,  0,         ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bongo,     0,        bongo,     bongo,     driver_device,  0,         ROT90,  "Jetsoft", "Bongo", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ozon1,     0,        ozon1,     ozon1,     driver_device,  0,         ROT90,  "Proma", "Ozon I", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ladybugg,  ladybug,  batman2,   ladybugg,  galaxold_state, ladybugg,  ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, guttangt,  locomotn, guttang,   guttangt,  galaxold_state, guttangt,  ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?

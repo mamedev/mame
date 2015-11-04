@@ -108,13 +108,6 @@ Notes about 'azurian' :
     - alien 3 moves when 0x4064 != 0 else contents of 0x40f4 is stored at 0x4064
 
 
-Notes about 'smooncrs' :
-------------------------
-
-  Due to code at 0x2b1c and 0x3306, the game ALWAYS checks the inputs for player 1
-  (even for player 2 when "Cabinet" Dip Switch is set to "Cocktail")
-
-
 Notes about 'scorpnmc' :
 -----------------------
 
@@ -631,12 +624,32 @@ p) 'mooncrgx'
     for hi-score table when screen not is flipped
 
 
+Stephh's notes (based on the games Z80 code and some tests) for other games :
+
+1) 'bongo'
+
+  - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
+    there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
+    (unmapped memory) if it pressed (HIGH).
+  - IN0 bit 7 is tested on startup (code at 0x0048) in combinaison with bits 0 and 1
+    (which are supposed to be COIN1 and COIN2). If all of them are pressed (HIGH),
+    the game displays a "CREDIT FAULT" message then jumps back to 0x0048.
+  - IN0 bit 4 and IN1 bit 4 should have been IPT_JOYSTICK_DOWN (Upright and Cocktail)
+    but their status is discarded with 3 'NOP' instructions at 0x06ca.
+  - IN0 bit 7 and IN0 bit 6 should have been IPT_BUTTON1 (Upright and Cocktail)
+    but their status is discarded with 3 'NOP' instructions at 0x06d1.
+  - IN2 is read via code at 0x2426, but its contents is directly overwritten
+    with value read from IN3 (AY port A) via code at 0x3647.
+
+
+Some notes on real Galaxian hardware based on observation:
+  - A lot of PCBs tend to use leftover components causing variatons of sound circuitry, mainly in
+    the humming speeds. We follow the general circuit setup from the schematics.
+  - Explosion sound is much softer.  Filter involved?
 
 TODO:
 ----
-- Problems with Galaxian based on the observation of a real machine:
-  - Background humming is incorrect.  It's faster on a real machine
-  - Explosion sound is much softer.  Filter involved?
+- merge all of the deprecated galaxian drivers (galaxold.c, scobra.c, scramble.c, dambustr.c)
 - streakng/ghostmun: $4800-4bff
 - smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode) + fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
 - timefgtr : missing player bullets, sprite ROM extend(see later levels), sound is too slow, some sprites missing
@@ -656,7 +669,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/s2650/s2650.h"
+//#include "cpu/s2650/s2650.h"
 #include "machine/i8255.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
@@ -2065,6 +2078,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sfx_sample_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(sfx_sample_io_r, sfx_sample_io_w)
+ADDRESS_MAP_END
+
+
+/* Bongo with 1 x AY-8910A */
+static ADDRESS_MAP_START( bongo_sound_portmap, AS_IO, 8, galaxian_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("8910.0", ay8910_device, address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("8910.0", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -3923,6 +3944,52 @@ static INPUT_PORTS_START( thepitm )
 INPUT_PORTS_END
 
 
+/* verified from Z80 code */
+static INPUT_PORTS_START( bongo )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* see notes */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+
+	PORT_START("IN3")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPNAME( 0x08, 0x00, "Infinite Lives (Cheat)" )    /* always gives 3 lives */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )            /* also 1C_3C for Coin B if it existed */
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )            /* also 1C_6C for Coin B if it existed */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
+
+
 
 /*************************************
  *
@@ -5577,6 +5644,20 @@ static MACHINE_CONFIG_DERIVED( kingball, mooncrst )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( bongo, galaxian_base )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mooncrst_map_base)  /* no discrete sound */
+	MCFG_CPU_IO_MAP(bongo_sound_portmap)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN3"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( frogger, konami_base )
 	MCFG_FRAGMENT_ADD(konami_sound_1x_ay8910)
 
@@ -6705,6 +6786,28 @@ DRIVER_INIT_MEMBER(galaxian_state,thepitm)
 
 	/* extend ROM */
 	space.install_rom(0x0000, 0x47ff, memregion("maincpu")->base());
+}
+
+DRIVER_INIT_MEMBER(galaxian_state,bongo)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	/* video extensions */
+	/* batman part 2 sprite banking */
+	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
+
+	/* move the interrupt enable from $b000 to $b001 */
+	space.unmap_write(0xb000, 0xb000, 0, 0x07f8);
+	space.install_write_handler(0xb001, 0xb001, 0, 0x07f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
+
+	/* disable gfxbank write */
+	space.unmap_write(0xa000, 0xa002, 0, 0x07f8);
+
+	/* disable coin counter write */
+	space.unmap_write(0xa003, 0xa003, 0, 0x07f8);
+
+	/* extend ROM */
+	space.install_rom(0x0000, 0x5fff, memregion("maincpu")->base());
 }
 
 /*************************************
@@ -9575,6 +9678,24 @@ ROM_START( kingballj )
 ROM_END
 
 
+ROM_START( bongo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bg1.bin",    0x0000, 0x1000, CRC(de9a8ec6) SHA1(b5ee99b26d1a39e31b643ad0f5723ee8e364023e) )
+	ROM_LOAD( "bg2.bin",    0x1000, 0x1000, CRC(a19da662) SHA1(a2674392d489c5e5eeb9abc51572a37cc6045220) )
+	ROM_LOAD( "bg3.bin",    0x2000, 0x1000, CRC(9f6f2150) SHA1(26a1f872686ddddcdb690d7b826ba26c20cdec35) )
+	ROM_LOAD( "bg4.bin",    0x3000, 0x1000, CRC(f80372d2) SHA1(078e2c8b947103c168c0c85430f8ebc9d09f8ba7) )
+	ROM_LOAD( "bg5.bin",    0x4000, 0x1000, CRC(fc92eade) SHA1(f4012a1c4631388a3e8109a8381bc4084ddc8757) )
+	ROM_LOAD( "bg6.bin",    0x5000, 0x1000, CRC(561d9e5d) SHA1(68d7fab3cfb5b3360fe8064c70bf21bb1341032f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "b-h.bin",    0x0000, 0x1000, CRC(fc79d103) SHA1(dac1152221ebdc4cd9bf353b4cc5d45021ca5d9e) )
+	ROM_LOAD( "b-k.bin",    0x1000, 0x1000, CRC(94d17bf3) SHA1(2a70968249946de52c5a4cfabafbbf4ecda844a8) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "b-clr.bin",  0x0000, 0x0020, CRC(c4761ada) SHA1(067d12b2d3635ffa6337ed234ba42717447bea00) )
+ROM_END
+
+
 /*************************************
  *
  *  ROM definitions
@@ -11175,6 +11296,8 @@ GAME( 1980, moonal2b,    galaxian, mooncrst,   moonal2,    galaxian_state, galax
 
 /* larger romspace, interrupt enable moved */
 GAME( 198?, thepitm,     thepit,   mooncrst,   thepitm,    galaxian_state, thepitm,    ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
+// AY8910, no gfx bank management, different coin management and sprite banking
+GAME( 1983, bongo,       0,        bongo,      bongo,      galaxian_state, bongo,      ROT90,  "Jetsoft", "Bongo", MACHINE_SUPPORTS_SAVE )
 
 /* other games on basic mooncrst hardware */
 GAME( 1982, skybase,     0,        mooncrst,   skybase,    galaxian_state, skybase,    ROT90,  "Omori Electric Co., Ltd.", "Sky Base", MACHINE_SUPPORTS_SAVE )
