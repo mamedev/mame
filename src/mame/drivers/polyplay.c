@@ -76,7 +76,8 @@ mark system works.
 
 Uniquely the Poly-Play has a light organ which totally confuses you whilst
 playing the automaton. Bits 1-5 of PORTB control the organ but it's not
-emulated now. ;)
+emulated now. ;) (An external artwork file could be created that simulates
+this.)
 
 ***************************************************************************/
 
