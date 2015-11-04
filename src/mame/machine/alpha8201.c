@@ -24,8 +24,8 @@ Equites                   1984   8303 (post)
 Bull Fighter              1984   8303 (post)
 Splendor Blast            1985   8303 (post)
 Gekisou                   1985   8304 (post)
-The Koukouyakyuh          1985   8304 (post)
-High Voltage              1985   8404?(post says 8404, but readme says 8304)
+The Koukou Yakyuu         1985   8304 (post)
+High Voltage              1985   8304?(post says 8404, but readme says 8304)
 
 ALPHA-8201: "44801A75" -> HD44801, ROM code = A75
 ALPHA-8302: "44801B35" -> HD44801, ROM code = B35
