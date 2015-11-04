@@ -1855,7 +1855,12 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 		switch(r1r0)
 		{
 		case 0x02:
-			data = m_crtc->status_r( space, 0 );
+			// CRTC Type 1 (UM6845R) only!!
+			//data = m_crtc->status_r( space, 0 );
+			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // All Plus systems are Type 3 (AMS40489)
+				data = m_crtc->register_r( space, 0 );
+			else
+				data = 0xff;  // Type 0 (HD6845S/UM6845) and Type 2 (MC6845) return 0xff
 #if 0
 			/* CRTC Type 1 : Read Status Register
 			   CRTC Type 3 or 4 : Read from selected internal 6845 register */
@@ -1874,7 +1879,7 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 			break;
 		case 0x03:
 			/* All CRTC type : Read from selected internal 6845 register Read only */
-			data = m_crtc->register_r( space, (offs_t)0 );
+			data = m_crtc->register_r( space, 0 );
 			break;
 		}
 	}
