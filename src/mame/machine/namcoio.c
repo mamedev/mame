@@ -285,8 +285,8 @@ void namco56xx_device::customio_run()
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			m_out_0_cb((offs_t)0, IORAM_READ(9) & 0x0f);   // output to pins 13-16 (motos, pacnpal, gaplus)
-			m_out_1_cb((offs_t)0, IORAM_READ(10) & 0x0f);  // output to pins 17-20 (gaplus)
+			m_out_0_cb((offs_t)0, IORAM_READ(9));   // output to pins 13-16 (motos, pacnpal, gaplus)
+			m_out_1_cb((offs_t)0, IORAM_READ(10));  // output to pins 17-20 (gaplus)
 			break;
 
 		case 2: // initialize coinage settings
@@ -388,8 +388,8 @@ void namco58xx_device::customio_run()
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			m_out_0_cb((offs_t)0, IORAM_READ(9) & 0x0f);   // output to pins 13-16 (toypop)
-			m_out_1_cb((offs_t)0, IORAM_READ(10) & 0x0f);  // output to pins 17-20 (toypop)
+			m_out_0_cb((offs_t)0, IORAM_READ(9));   // output to pins 13-16 (toypop)
+			m_out_1_cb((offs_t)0, IORAM_READ(10));  // output to pins 17-20 (toypop)
 			break;
 
 		case 2: // initialize coinage settings

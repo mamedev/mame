@@ -324,11 +324,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 	{
 		case 0:
 			logerror("%06x read version register\n", space.device().safe_pc());
-			retdata = m_version_hi_nibble |
-						0x00 | // Bit 3 of Version Number
-						0x00 | // Bit 2 of Version Number
-						0x00 | // Bit 1 of Version Number
-						0x01 ; // Bit 0 of Version Number
+			retdata = m_version_hi_nibble | 0x01; // Version number contained in bits 3-0
 			break;
 
 		/* Joystick Port Registers */

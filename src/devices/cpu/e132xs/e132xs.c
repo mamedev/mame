@@ -3141,7 +3141,7 @@ void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *
 
 			case 2:
 
-				load = READ_HW(EXTRA_S & ~1);
+				load = READ_HW(EXTRA_S);
 
 				if( EXTRA_S & 1 ) // LDHS.A
 				{
@@ -3417,7 +3417,7 @@ void hyperstone_device::hyperstone_stxx1(struct hyperstone_device::regs_decode *
 
 			case 2:
 
-				WRITE_HW(EXTRA_S & ~1, SREG & 0xffff);
+				WRITE_HW(EXTRA_S, SREG & 0xffff);
 
 				/*
 				if( EXTRA_S & 1 ) // STHS.A

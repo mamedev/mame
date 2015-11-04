@@ -1452,7 +1452,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 
 							xxx = (xpos+xtile*8)&0x1ff;
 
-							gfxdata = MEGADRIV_VDP_VRAM((base_addr+1)&0x7fff) | (MEGADRIV_VDP_VRAM((base_addr+0)&0x7fff)<<16);
+							gfxdata = MEGADRIV_VDP_VRAM(base_addr+1) | (MEGADRIV_VDP_VRAM(base_addr)<<16);
 
 							for(loopcount=0;loopcount<8;loopcount++)
 							{

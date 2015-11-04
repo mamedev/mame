@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(mcr3_state::mcrmono_get_bg_tile_info)
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = ((data >> 12) & 3) ^ 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 10));
 }
 
 

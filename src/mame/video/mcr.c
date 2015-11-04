@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x1ff;
 	int color = (data >> 11) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 9) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 9));
 
 	/* sprite color base comes from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 10));
 
 	/* sprite color base might come from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;

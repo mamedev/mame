@@ -592,28 +592,28 @@ CPU_DISASSEMBLE( avr8 )
 					switch(op & 0x0007)
 					{
 						case 0x0000:
-							output += sprintf( output, "BRLO    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRLO    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0001:
-							output += sprintf( output, "BREQ    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BREQ    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0002:
-							output += sprintf( output, "BRMI    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRMI    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0003:
-							output += sprintf( output, "BRVS    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRVS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0004:
-							output += sprintf( output, "BRLT    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRLT    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0005:
-							output += sprintf( output, "BRHS    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRHS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0006:
-							output += sprintf( output, "BRTS    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRTS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0007:
-							output += sprintf( output, "BRIE    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRIE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 					}
 					break;
@@ -621,28 +621,28 @@ CPU_DISASSEMBLE( avr8 )
 					switch(op & 0x0007)
 					{
 						case 0x0000:
-							output += sprintf( output, "BRSH    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRSH    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0001:
-							output += sprintf( output, "BRNE    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRNE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0002:
-							output += sprintf( output, "BRPL    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRPL    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0003:
-							output += sprintf( output, "BRVC    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRVC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0004:
-							output += sprintf( output, "BRGE    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRGE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0005:
-							output += sprintf( output, "BRHC    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRHC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0006:
-							output += sprintf( output, "BRTC    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRTC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 						case 0x0007:
-							output += sprintf( output, "BRID    %08x", (((op & 0x0200) ? ((KCONST7(op) & 0x007f) | 0xff80) : KCONST7(op)) << 1) );
+							output += sprintf( output, "BRID    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1) );
 							break;
 					}
 					break;

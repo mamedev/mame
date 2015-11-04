@@ -54,7 +54,7 @@ inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory
 {
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
+	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX(attr >> 6));
 }
 
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_0){ get_tile_info8bpp(tileinfo, tile_index, 0); }
@@ -64,7 +64,7 @@ inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory
 {
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX(attr >> 6));
 }
 
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }

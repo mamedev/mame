@@ -224,7 +224,7 @@ char *score7_cpu_device::disasm16(char *buffer, offs_t pc, UINT16 opcode)
 			buffer += sprintf(buffer, "j%s! 0x%08x", GET_J_LK(opcode) ? "l": "", (pc & 0xfffff000) | (GET_J_DISP11(opcode) << 1));
 			break;
 		case 0x04:
-			buffer += sprintf(buffer, "b%s! 0x%08x", m_cond[GET_BX_EC(opcode) & 0x0f], pc + sign_extend(GET_BX_DISP8(opcode) << 1, 9));
+			buffer += sprintf(buffer, "b%s! 0x%08x", m_cond[GET_BX_EC(opcode)], pc + sign_extend(GET_BX_DISP8(opcode) << 1, 9));
 			break;
 		case 0x05:
 			buffer += sprintf(buffer, "ldiu! r%d, 0x%02x", GET_I2_RD(opcode), GET_I2_IMM8(opcode));

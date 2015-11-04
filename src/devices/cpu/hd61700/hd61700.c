@@ -508,7 +508,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x15:  //psr
 					{
 						UINT8 arg = read_op();
-						WRITE_SREG(arg, READ_REG(arg)&0x1f);
+						WRITE_SREG(arg, READ_REG(arg));
 
 						check_optional_jr(arg);
 						m_icount -= 3;
@@ -1038,7 +1038,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x55:  //psr
 					{
 						UINT8 arg = read_op();
-						WRITE_SREG(arg, arg&0x1f);
+						WRITE_SREG(arg, arg);
 
 						m_icount -= 3;
 					}
@@ -2893,7 +2893,7 @@ inline UINT8 hd61700_cpu_device::get_sir_im8(UINT8 arg)
 	}
 	else
 	{
-		return READ_SREG(arg)&0x1f;
+		return READ_SREG(arg);
 	}
 }
 
@@ -2905,7 +2905,7 @@ inline UINT8 hd61700_cpu_device::get_sir_im8(UINT8 arg, UINT8 arg1)
 	}
 	else
 	{
-		return READ_SREG(arg)&0x1f;
+		return READ_SREG(arg);
 	}
 }
 
