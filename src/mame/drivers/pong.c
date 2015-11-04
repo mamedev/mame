@@ -3,12 +3,35 @@
 /***************************************************************************
 
 Pong (c) 1972 Atari
+Pong Doubles (c) 1973 Atari
+Breakout (c) 1976 Atari
 
 driver by Couriersud
 
+ Atari Pong Games List and Data based, in part from:
+ - Andy's collection of Bronzeage Atari Video Arcade PCB's"
+ http://www.andysarcade.net/personal/bronzeage/index.htm
+ - "Atari's Technical Manual Log"
+ http://www.atarigames.com/manuals.txt
+ Suspected "same games" are grouped together.  These are usually the exact same game but different cabinet/name.
+
+ Technical Manual #s  Game Name(s)                                               Atari Part #'s                     Data
+ -------------------+----------------------------------------------------------+----------------------------------+---------+
+ TM-058               Breakout/Breakout Cocktail/Consolette (1976)               A004533                            NO
+ TM-015               Cocktail Pong/Coup Franc (1974)                            A001433?                           NO
+ TM-0??               Dr. Pong/Puppy Pong/Snoopy Pong (1974)                     A001433?                           NO
+ TM-013               Pong (1972)                                                A001433                            NO
+ TM-014               Pong Doubles/Coupe Davis (1973)                            A000785                            NO
+ 422                  Superpong (1974)                                           A000423                            NO
+ 
 Notes:
 
-TODO: please see netlist include files
+TODO: Please see netlist include files
+TODO: Breakout Cocktail and Consolette are believed to use the Breakout PCB with different cabinet designs, this needs to be verified.
+TODO: Coupe Davis is believed to use the Pong Doubles PCB, just a different cabinet design, this needs to be verified.
+TODO: Dr. Pong, Puppy Pong, Snoopy Pong, Cocktail Pong and Coup Franc are all believed to use the Pong (Rev E) PCB, but
+      different cabinet designs; this needs to be verified.
+TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifications, this needs to be verified.
 
 ***************************************************************************/
 
@@ -490,7 +513,57 @@ ROM_START( pongd ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
+/*   // 100% TTL - NO ROMS
+
+ROM_START( coupedav ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( coupfran ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( cktpong ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( drpong ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( pupppong ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( snoopong ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( suprpong ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( cktbreak ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( consolet ) // dummy to satisfy game entry
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+*/
+
 GAME( 1972, pong,      0, pong,     pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) external [TTL]", MACHINE_SUPPORTS_SAVE)
-GAME( 1972, pongf,     0, pongf,    pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE )
-GAME( 1974, pongd,     0, pongd,    pongd,     driver_device,  0, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE )
+GAME( 1972, pongf,     0, pongf,    pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
+GAME( 1973, pongd,     0, pongd,    pongd,     driver_device,  0, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)
 GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)
+
+// 100% TTL
+//GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device,  0, ROT0,  "Atari", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, coupfran,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Coup Franc [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, drpong,     pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, snoopong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, suprpong,   0,        pong,     pong,      driver_device,  0, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAMEL( 1976, cktbreak,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_cktbreak)
+//GAMEL( 1976, consolet,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
