@@ -13239,50 +13239,59 @@ manohman        // 199?, Merkur.
 // Atari TTL logic games + roms
 antiairc        // (c) 1975 Atari
 crashnsc        // (c) 1975 Atari
-indy4           // (c) 1976 Atari
+indy4           // (c) 1976 Atari / Kee
 indy800         // (c) 1975 Atari / Kee
 jetfight        // (c) 1975 Atari
 jetfighta       // (c) 1975 Atari
 outlaw          // (c) 1976 Atari
-sharkjaw        // (c) 1975 Atari
+sharkjaw        // (c) 1975 Atari / Horror Games
 steeplec        // (c) 1975 Atari
 stuntcyc        // (c) 1976 Atari
-tank            // (c) 1974 Atari
+tank            // (c) 1974 Atari / Kee
+tankii          // (c) 1975 Atari / Kee
 
 // Atari TTL Missing Rom Dumps
-//astrotrf
-//lemans
-//gtrak10
-//gtrak20
-//quack
+//astrotrf      // (c) 1975 Atari
+//lemans        // (c) 1974 Atari
+//gtrak10       // (c) 1974 Atari / Kee
+//gtrak20       // (c) 1976 Atari / Kee
+//qwak          // (c) 1974 Atari
 
 // Atari 100% TTL
 pong            // (c) 1972 Atari
-pongd           // (c) 1975 Atari
 pongf           // (c) 1972 Atari
+pongd           // (c) 1973 Atari
 breakout        // (c) 1976 Atari
-//coupedem
-//goal4
-//gotchaat
-//gotchaatc
-//highway
-//pinpong
-//pursuit
-//quadpong
-//rebound
-//spacrace
-//touchme
+//cktpong       // (c) 1974 Atari / National Entertainment Co.
+//coupedav      // (c) 1973 Atari France
+//coupfran      // (c) 1974 Atari Europe
+//drpong        // (c) 1974 Atari
+//pupppong      // (c) 1974 Atari
+//snoopong      // (c) 1974 Atari
+//suprpong      // (c) 1974 Atari
+//breakckt      // (c) 1976 Atari
+//consolet      // (c) 1976 Atari Europe
+//crossfir      // (c) 1975 Atari / Kee
+//eliminat      // (c) 1973 Atari / Kee
+//goaliv        // (c) 1975 Atari
+//gotchaat      // (c) 1973 Atari
+//gotchaatc     // (c) 1973 Atari
+//hiway         // (c) 1975 Atari
+//pinpong       // (c) 1974 Atari
+//pursuit       // (c) 1975 Atari / Kee
+//quadpong      // (c) 1974 Atari
+//rebound       // (c) 1974 Atari / Kee
+//spacrace      // (c) 1973 Atari
+//touchme       // (c) 1974 Atari
+//worldcup      // (c) 1974 Atari
 
 // Meadows TTL
-bombaway
-ckidzo
-cgunship
-mead4in1
+bombaway      // (c) 1976 Meadows
+ckidzo        // (c) 1976 Meadows
+cgunship      // (c) 1976 Meadows
+mead4in1      // (c) 197? Meadows
 
 // Misc TTL + roms
-tv21          // (c) 197? A-1 Supply
-tv21_3        // (c) 197? A-1 Supply
-tvpoker       // (c) 197? A-1 Supply
 sburners      // (c) 1975 Allied Leisure
 fun4          // (c) 1976 Bailey
 fun4a         // (c) 1976 Bailey
@@ -13294,6 +13303,8 @@ deathrac      // (c) 1976 Exidy
 biplane4      // (c) 1976 Fun Games
 take5         // (c) 1975 Fun Games
 dpatrol       // (c) 1977 PSE
+//knightar    // (c) 1976 PSE
+//gametree    // (c) 1978 PSE
 vollyrmt      // (c) 1973 Ramtek
 hockyrmt      // (c) 1973 Ramtek
 soccrrmt      // (c) 1973 Ramtek
@@ -13309,6 +13320,11 @@ bazookabr     // (c) 1977 Taito do Brasil
 missilex      // (c) 1977 Taito
 ttblock       // (c) 1977 Taito
 zzblock       // (c) 1979 Taito
+
+// A-1 Supply
+tv21          // (c) 197? A-1 Supply
+tv21_3        // (c) 197? A-1 Supply
+tvpoker       // (c) 197? A-1 Supply
 
 // JPM System 5 + Video Expansion 2
 monopoly    // Monopoly (JPM)
