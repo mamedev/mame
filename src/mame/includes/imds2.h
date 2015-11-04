@@ -16,6 +16,7 @@
 #include "machine/i8271.h"
 #include "imagedev/flopdrv.h"
 #include "bus/centronics/ctronics.h"
+#include "machine/i8251.h"
 
 class imds2_state : public driver_device
 {
@@ -30,6 +31,8 @@ class imds2_state : public driver_device
 	DECLARE_READ8_MEMBER(imds2_ipclocpic_r);
 	DECLARE_WRITE8_MEMBER(imds2_ipcsyspic_w);
 	DECLARE_WRITE8_MEMBER(imds2_ipclocpic_w);
+	DECLARE_WRITE_LINE_MEMBER(imds2_baud_clk_0_w);
+	DECLARE_WRITE_LINE_MEMBER(imds2_baud_clk_1_w);
 
 	DECLARE_WRITE8_MEMBER(imds2_miscout_w);
 	DECLARE_READ8_MEMBER(imds2_miscin_r);
@@ -73,6 +76,9 @@ class imds2_state : public driver_device
 	required_device<i8085a_cpu_device> m_ipccpu;
 	required_device<pic8259_device> m_ipcsyspic;
 	required_device<pic8259_device> m_ipclocpic;
+	required_device<pit8253_device> m_ipctimer;
+        required_device<i8251_device> m_ipcusart0;
+        required_device<i8251_device> m_ipcusart1;
 	required_device<i8080a_cpu_device> m_ioccpu;
 	required_device<i8257_device> m_iocdma;
 	required_device<i8275_device> m_ioccrtc;
