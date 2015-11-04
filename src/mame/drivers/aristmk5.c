@@ -1258,6 +1258,24 @@ ROM_START( koalamnt )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+// MV4115/3 - 20 Line Multiline / 3,5,10,20,25,50 Credit Multiplier.
+// Party Gras - Export  B - 06/02/2001.
+// Marked as BHG1284 and touch.
+ROM_START( prtygras )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "bhg1284_party_grass.u7",  0x000000, 0x80000, CRC(02ed0631) SHA1(ae2c89c876a030d325ec94490d293deba772630e) )
+	ROM_LOAD32_WORD( "bhg1284_party_grass.u11", 0x000002, 0x80000, CRC(7ac80cd9) SHA1(70e910784a1e1ea8820005082e76223a85a3c346) )
+	ROM_LOAD32_WORD( "bhg1284_party_grass.u8",  0x100000, 0x80000, CRC(28774b9a) SHA1(ebdd738a73ffa7c5238640f4d7956751f7bb6243) )
+	ROM_LOAD32_WORD( "bhg1284_party_grass.u12", 0x100002, 0x80000, CRC(942835c1) SHA1(fefc509311716559ac6b836a56b2c981907d499b) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 // MV4115/6 - 9/20 Line Multiline Multiplier.
 // Party Gras [Reel Game] - Export A - 10/11/2001.
 // All devices are 27c4002 instead of 27c4096.
@@ -1316,6 +1334,7 @@ GAME( 2000, magicmsk,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 2000, magicmska, magicmsk, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export, set 2)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115,   A - 09/05/00
 GAME( 2000, margmgc,   0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // JB005,    A - 07/07/00
 GAME( 2000, marmagic,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (EHG1559, NSW/ACT)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // US003,    A - 07/07/00
+GAME( 2001, prtygras,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Party Gras (MV4115/3, Export, touch)",           MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4115/3, B - 06/02/01
 GAME( 2001, geishanz,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",                 MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4127,   A - 05/03/01
 GAME( 2001, adonise,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (MV4124/1, Export)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4124/1, B - 31/07/01
 GAME( 2001, koalamnt,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Koala Mint (MV4137, Export)",                    MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4137,   A - 12/09/01
