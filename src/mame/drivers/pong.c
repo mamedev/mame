@@ -543,7 +543,7 @@ ROM_START( suprpong ) // dummy to satisfy game entry
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( cktbreak ) // dummy to satisfy game entry
+ROM_START( breakckt ) // dummy to satisfy game entry
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -565,5 +565,5 @@ GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari
 //GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, snoopong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, suprpong,   0,        pong,     pong,      driver_device,  0, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAMEL( 1976, cktbreak,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_cktbreak)
+//GAMEL( 1976, breakckt,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_cktbreak)
 //GAMEL( 1976, consolet,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
