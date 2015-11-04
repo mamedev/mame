@@ -118,7 +118,7 @@ project "softfloat"
 			"-Wno-sign-compare",
 		}
 
-	if string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 		buildoptions {
 			"-Wno-tautological-compare",
 		}	
@@ -258,7 +258,7 @@ project "flac"
 			"-Wno-unused-function",
 			"-O0",
 		}
-	if string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 		buildoptions {
 			"-Wno-enum-conversion",
 		}
