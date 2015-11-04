@@ -558,12 +558,12 @@ GAME( 1973, pongd,     0, pongd,    pongd,     driver_device,  0, ROT0,  "Atari"
 GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)
 
 // 100% TTL
-//GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device,  0, ROT0,  "Atari", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, coupfran,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Coup Franc [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device,  0, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, coupfran,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari Europe", "Coup Franc [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, drpong,     pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, snoopong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, suprpong,   0,        pong,     pong,      driver_device,  0, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAMEL( 1976, breakckt,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_cktbreak)
-//GAMEL( 1976, consolet,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
+//GAMEL( 1976, consolet,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari Europe", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
