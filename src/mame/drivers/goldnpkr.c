@@ -464,6 +464,41 @@
   the driver init till we can get more evidence about.
 
 
+  * Super 98
+
+  This game looks like a Golden Poker / Potten's Poker set, but could be set to play
+  2 or 3 deals per hand. It's running in a ICP-1 PCB.
+
+  Entering the service mode (key 0), you can enter to a submenu for settings pressing
+  DEAL (key 2). Use HOLD keys (keys ZXCVB) to navigate through the menu and change
+  the values. Press CANCEL to exit the settings menu.
+
+  Program is currently not working because seems to fill some zeropage registers and
+  check for existent values and changes... Maybe an external device is writting them.
+  This is NVRAM zone, so some values could be previously harcoded.
+
+  Also seems to expect some inputs combination entered to boot.
+
+  To run...
+  1) Start the game.
+  2) Break into debugger and do a pc=cfa1
+    
+  Debug notes...
+
+  From interrupts routine:
+
+  CF99: LDA $0846    ; load from PIA
+  CF9C: TSX          ; transfer stack pointer to X
+  CF9D: CPX #$C8     ; compare with 0xC8
+  CF9F: BCS $CFA4    ; not?... branch to $CFA4
+  CFA1: JMP $CEC6    ; yes?... jump to $CEC6
+  CFA4: JSR $C0E1    ; continue...
+  ...
+  
+  Forcing the first time the comparation at $CF9D --> true, the game boots and is
+  fully working.
+
+  
 ************************************************************************************
 
 
@@ -997,6 +1032,18 @@
   - Added a new Videotron set with cards selector.
   - Mundial/Mondial (Italian/French): Implemented the program banking
      properly. Now you can choose the program through a DIP switch.
+
+
+  [2015-11-04]
+
+  - Added new sets:
+     * Genie (ICP-1, set 2).
+     * Super 98 (ICP-1).
+     * Jack Potten's Poker (set 8, Australian).
+
+  - Derived a new machine with improved memory map for this new Genie set.
+  - Minor fixes and clean-ups.
+  - Added games & technical notes.
 
 
   TODO:
@@ -9955,17 +10002,8 @@ ROM_END
   Super 98',
   running in the ICP-1 boardset.
 
-  Program seems to fill some zeropage registers
-  and check for existent values and changes...
-  Maybe an external device is writting them.
-  This is NVRAM zone, so some values could be
-  previously harcoded.
-
-  Also seems to expect some inputs combination entered to boot.
-
-  To run...
-  1) Start the game.
-  2) Break into debugger and do a pc=cfa1
+  Please read the 'Games Notes' section
+  for game and debug notes / issues...
 */
 
 ROM_START( super98 )
