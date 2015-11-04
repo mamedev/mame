@@ -218,6 +218,7 @@ ADDRESS_MAP_END
 
 // different protection for champbasja
 static ADDRESS_MAP_START( champbasja_map, AS_PROGRAM, 8, champbas_state )
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
 	AM_IMPORT_FROM( champbas_map )
 ADDRESS_MAP_END
