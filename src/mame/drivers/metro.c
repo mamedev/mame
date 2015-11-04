@@ -5011,37 +5011,57 @@ ROM_END
 /***************************************************************************
 
 Karate Tournament
+Mitchell 1992
 
-68000-12
-NEC D78C10ACN
-OKI6295
-YM2413
-OSC:  24.000MHz,  20.000MHz,   XTAL 3579545
+Note: This identical PCB with ROM and PAL swap is used by Moeyo Gonta!! (Lady Killer)
 
-On board, location for but unused things...
-Unused DIP#3
-Unused BAT1
-
-I can see a large square surface-mounted chip with
-these markings...
-
-ImageTek Inc.
-I4100
-052
-9227KK702
-
-Filename    Type        Location
-KT001.1i    27C010      1I
-KT002.8g    27C2001     8G
-KT003.10g   27C2001     10G
-KT008.1d    27C2001     1D
-
-Filename   Chip Markings   Location
-361a04.15f 361A04 9241D    15F
-361a05.17f 361A05 9239D    17F
-361a06.15d 361A06 9239D    15D
-361a07.17d 361A07 9239D    17D
-
+VG460-(A)
+|----------------------------------------------|
+|TA7222       YM2413  KT008  D78C10      KT001 |
+|VOLUME UPC3403 3.579545MHz M6295         6116 |
+|       UPC3403 *YM2151                        |
+|*UPC3403       *YM3012              24MHz     |
+|                                              |
+|M54532          62256 20MHz             MM1035|
+|                62256         460A24  460A21  |
+|J  HE-2         |--------|    460A23  460A22  |
+|A  HE-2  6264   |IMAGETEK|                    |
+|M  HE-2         |I4100   |                    |
+|M               |        |  6264 KT002  |---| |
+|A               |--------|  6264 KT003  | 6 | |
+|                                        | 8 | |
+|                                        | 0 | |
+|                                        | 0 | |
+|SW1                                     | 0 | |
+|SW2          361A06    361A04           |---| |
+|             361A07    361A05                 |
+|----------------------------------------------|
+Notes: 
+           * - Not populated
+       68000 - Clock input 12.000MHz [24/2]
+      D78C10 - NEC D78C10 8-bit CPU with A/D Converter. Clock input 12.000MHz [24/2]
+       M6295 - OKI M6295 4-Channel Mixing ADPCM Voice Synthesis LSI. Clock input 1.200MHz [24/20]. Pin 7 HIGH
+      YM2413 - Yamaha YM2413 FM Operator TYPE-LL sound IC. Clock input 3.579545MHz
+       I4100 - ImageTek Inc. I4100 052 9227KK702 graphics chip
+       KT001 - 27C010 EPROM at location 1I
+       KT002 - 27C2001 EPROM at location 8G
+       KT003 - 27C2001 EPROM at location 10G
+       KT008 - 27C2001 EPROM at location 1D
+      361A0* - 42 pin 1M x8-bit (8Mbit) mask ROM
+460A24/23/22 - AMI PAL18CV8
+      460A21 - AMI PAL22CV10
+       SW1/2 - 8-position DIP switch
+        HE-2 - Resistor array
+     UPC3403 - NEC uPC3403C Quad Operational Amplifier
+        6116 - 2k x8-bit SRAM
+       62256 - 32k x8-bit SRAM
+        6264 - 8k x8-bit SRAM
+      M54532 - Mitsubishi M54532P Quad 1.5A Darlington Transistor Array with Clamp Diode
+      MM1035 - Mitsumi System Reset IC with Built-in Watchdog Timer (==Fujitsu MB3773)
+      TA7222 - Toshiba TA7222 5.8w Audio Power Amplifier
+       HSync - 14.9505kHz 
+       VSync - 57.1556Hz
+     
 ***************************************************************************/
 
 ROM_START( karatour )
