@@ -20,7 +20,7 @@
 
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_COMPATIBLE)
 
-delegate_mfp::raw_mfp_data delegate_mfp::s_null_mfp = { 0 };
+delegate_mfp::raw_mfp_data delegate_mfp::s_null_mfp = { {0 }};
 
 #endif
 
