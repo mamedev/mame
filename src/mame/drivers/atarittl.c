@@ -5,7 +5,7 @@
  Atari / Kee Games Driver - Discrete Games made in the 1970's
 
 
- Atari / Kee Games List and Data based, in part from:
+ Atari / Kee Games List (except for most Pong games) - Data based, in part from:
 
  - Andy's collection of Bronzeage Atari Video Arcade PCB's"
  http://www.andysarcade.net/personal/bronzeage/index.htm
@@ -19,36 +19,31 @@
  Technical Manual #s  Game Name(s)                                               Atari Part #'s                     Data      PROM/ROM Chip Numbers
  -------------------+----------------------------------------------------------+----------------------------------+---------+---------------------------------------
  TM-025               Anti-Aircraft (1975)                                       A000951                            YES       003127
- TM-058               Breakout/Breakout Cocktail/Consolette (1976)               A004533                            NO
- TM-015               Cocktail Pong/Coup Franc (1974)                            ???????                            NO
  TM-048               Crash 'N Score/Stock Car (1975)                            A004256                            YES       003186(x2), 003187(x2), 004248, 004247
  TM-030               Crossfire (1975)                                           ???????                            NO?
- TM-0??               Dr. Pong/Puppy Pong/Snoopy Pong (1974)                     ???????                            NO
- TM-035               Goal IV/Goal/4 (1975)                                      A000823                            NO
+ TM-022               Elimination! (1973)                                        A000845                            NO
+ TM-035               Goal IV (1975)                                             A000823                            NO
  TM-016               Gotcha/Gotcha Color? (1973)                                A000816                            NO
  TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K (1974)                      A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
  TM-004,021           Gran Trak 20/Trak 20/Twin Racer (1974)                     A001791(RT20),A001793(A20-K4DRTA)  YES       74186 Racetrack prom (K5)
- TM-028               Highway/Hi-Way (1975)                                      A003211                            NO
+ TM-028               Hi-Way/Highway (1975)                                      A003211                            NO
  TM-055               Indy 4 (1976)                                              A003000,A006268,A006270            YES       003186, 003187, 005502-01, 05503-01
  TM-026               Indy 800 (1975)                                            A003000,A003170,A003182            YES       003186-003189 (4)
                                                                                  A003184,A003191,A003198,A003199
  TM-027,052           Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (1975)    A004254,A004255                    YES       004250-004252, 004253-01 to 03 (3)
- TM-077               LeMans (1976)                                              A005844,A005845                    YES       005837-01, 005838-01, 005839-01
+ TM-077               Le Mans (1976)                                              A005844,A005845                    YES       005837-01, 005838-01, 005839-01
  TM-040               Outlaw (1976)                                              A003213                            YES       003323 - ROM (8205 @ J4)
  TM-007               Pin Pong (1974)                                            A001660                            NO
- TM-013               Pong (1972)                                                A001433                            NO
- TM-014               Pong Doubles/Coupe Davis (1974)                            A000785                            NO
  TM-019               Pursuit (1975)                                             K8P-B 90128                        NO
- TM-012,022,034       Quadrapong/Elimination (1974)                              A000845                            NO
+ TM-012,034           Quadrapong (1974)                                          A000845                            NO
  TM-009               Qwak!/Quack (1974)                                         A000937,A000953                    YES       72074/37-2530N (K9)
- TM-001,032           Rebound/Volleyball (1974)                                  A000517,A000846                    NO
+ TM-001,023,032       Rebound/Spike/Volleyball (1974)                            A000517,A000846,SPIKE-(A or B)     NO
  TM-047               Shark JAWS (1975)                                          A003806                            YES       004182, 004183
- TM-008               Space Race (1974)                                          A000803                            NO
- TM-023               Spike  (1974)                                              SPIKE-(A or B)                     NO
+ TM-008               Space Race (1973)                                          A000803                            NO
  TM-046               Steeplechase/Astroturf (1975)                              A003750                            YES       003774 ROM Bugle (C8), 003773-01 "A" Horse (C4), 003773-02 "B" Horse (D4)
  TM-057               Stunt Cycle (1976)                                         A004128                            YES       004275 ROM Motorcycle/Bus (1F), 004811 ROM Score Translator (D7)
- 422                  Superpong (1974)                                           A000423                            NO
- TM-010,036,049       Tank/Tank Cocktail/Tank II (1974/1975)                     A003111 (K5T-F 90124)              YES       90-2006
+ TM-010,036           Tank/Tank Cocktail (1974)                                  A003111 (K5T-F 90124)              YES       90-2006 004800SD Tank Rom (K10)
+ TM-049               Tank II (1975)                                             K5T-F 90124                        YES       90-2006
  TM-002               Touch-Me (1974)                                            ???????                            NO
  TM-006,017           World Cup/World Cup Football/Coupe du Monde (1974)         A000823                            NO
  
@@ -309,10 +304,16 @@ ROM_START( tank )
 	ROM_LOAD( "90-2006.k10" ,0x0000, 0x0801, CRC(c25f6014) SHA1(7bd3fca5f64c928a645ca27c643b736667cef216) )
 ROM_END
 
+ROM_START( tankii )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	/* The "custom" 24-pin ROM used in Atari/Kee Games "Tank" is known as a MOSTEK MK28000P. */
+	ROM_REGION( 0x0801, "gfx", ROMREGION_ERASE00 ) // 2049 Byte Size?
+	ROM_LOAD( "90-2006.k10" ,0x0000, 0x0801, CRC(c25f6014) SHA1(7bd3fca5f64c928a645ca27c643b736667cef216) )
+ROM_END
 
 /*  // NO DUMPED ROMS
 
-// Astroturf (1975)
 ROM_START( astrotrf )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -321,7 +322,6 @@ ROM_START( astrotrf )
     ROM_LOAD( "003773-02.c4",  0x0100, 0x0100, NO_DUMP ) // Graphics (Astroturf - Rev.A)
 ROM_END
 
-// Gran Trak 10 / Trak 10 / Formula K / Race Circuit (1974)
 ROM_START( gtrak10 )  // Unknown size, assumed 2K Bytes
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -329,7 +329,6 @@ ROM_START( gtrak10 )  // Unknown size, assumed 2K Bytes
     ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
 ROM_END
 
-// Gran Trak 20 / Trak 20 / Twin Racer (1974)
 ROM_START( gtrak20 )  // Unknown size, assumed 2K Bytes
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -337,7 +336,6 @@ ROM_START( gtrak20 )  // Unknown size, assumed 2K Bytes
     ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
 ROM_END
 
-// LeMans (1976)
 ROM_START( lemans )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -347,7 +345,6 @@ ROM_START( lemans )
     ROM_LOAD( "005839-01.n6",  0x0200, 0x0100, NO_DUMP ) // Rom 3
 ROM_END
 
-// Qwak! / Quack (1974)
 ROM_START( qwak )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -370,19 +367,23 @@ ROM_START ( crossfir )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( goal4 )
+ROM_START( eliminat )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( gotcha )
+ROM_START( goaliv )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( gotchac )
+ROM_START( gotchaat )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( highway )
+ROM_START( gotchaatc )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( hiway )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -414,13 +415,17 @@ ROM_START( touchme )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( worldcup )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
 */
 
 
 
 GAME(1975,  antiairc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
 GAME(1975,  crashnsc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
-GAME(1976,  indy4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
+GAME(1976,  indy4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
 GAME(1975,  indy800,   0,         atarikee,   0,  driver_device, 0,  ROT90, "Atari/Kee",  "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
 GAME(1975,  jetfight,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
 GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
@@ -428,25 +433,27 @@ GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",  "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
 GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
 GAME(1976,  stuntcyc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
-GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank/Tank Cocktail/Tank II [TTL]",     MACHINE_IS_SKELETON)
+GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  tankii,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank II [TTL]",          MACHINE_IS_SKELETON)
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Astroturf [TTL]",        MACHINE_IS_SKELETON)
 //GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON) //?
 //GAME(1974,  gtrak20,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON) //?
-//GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "LeMans [TTL]",           MACHINE_IS_SKELETON)
-//GAME(1974,  quack,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
+//GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Le Mans [TTL]",          MACHINE_IS_SKELETON)
+//GAME(1974,  qwak,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
 
 // 100% TTL
-//GAME(1975,  crossfir,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crossfire [TTL]",        MACHINE_IS_SKELETON)
+//GAME(1975,  crossfir,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Crossfire [TTL]",        MACHINE_IS_SKELETON)
+//GAME(1973,  eliminat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Elimination! [TTL]",     MACHINE_IS_SKELETON)
 //GAME(1975,  goaliv,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Goal IV [TTL]",          MACHINE_IS_SKELETON)
 //GAME(1973,  gotchaat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha [TTL]",           MACHINE_IS_SKELETON) //?
 //GAME(1973,  gotchaatc, 0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha Color [TTL]",     MACHINE_IS_SKELETON) //?
-//GAME(1975,  highway,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Highway/Hi-Way [TTL]",   MACHINE_IS_SKELETON)
+//GAME(1975,  hiway,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Hi-Way/Highway [TTL]",   MACHINE_IS_SKELETON)
 //GAME(1974,  pinpong,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pin Pong [TTL]",         MACHINE_IS_SKELETON)
 //GAME(1975,  pursuit,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pursuit [TTL]",          MACHINE_IS_SKELETON)
-//GAME(1973,  quadpong,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Quadrapong/Elimination [TTL]",     MACHINE_IS_SKELETON)
+//GAME(1974,  quadpong,  eliminat,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Quadrapong [TTL]",       MACHINE_IS_SKELETON)
 //GAME(1974,  rebound,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Rebound/Spike/Volleyball [TTL]",   MACHINE_IS_SKELETON)
-//GAME(1974,  spacrace,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Space Race [TTL]",       MACHINE_IS_SKELETON)
+//GAME(1973,  spacrace,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Space Race [TTL]",       MACHINE_IS_SKELETON)
 //GAME(1974,  touchme,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Touch-Me [TTL]",         MACHINE_IS_SKELETON) //?
 //GAME(1974,  worldcup,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "World Cup/World Cup Football/Coupe du Monde [TTL]",   MACHINE_IS_SKELETON)
