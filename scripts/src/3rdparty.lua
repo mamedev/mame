@@ -31,11 +31,6 @@ project "expat"
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 else
 links {
 	"expat",
@@ -86,11 +81,6 @@ project "zlib"
 		MAME_DIR .. "3rdparty/zlib/uncompr.c",
 		MAME_DIR .. "3rdparty/zlib/zutil.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 else
 links {
 	"z",
@@ -123,6 +113,17 @@ project "softfloat"
 			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned			
 		}
 
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-sign-compare",
+		}
+
+	if string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions {
+			"-Wno-tautological-compare",
+		}	
+	end
+	
 	configuration { }
 
 	options {
@@ -147,11 +148,6 @@ project "softfloat"
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 
 --------------------------------------------------
 -- libJPEG library objects
@@ -219,11 +215,6 @@ project "jpeg"
 		MAME_DIR .. "3rdparty/libjpeg/jmemmgr.c",
 		MAME_DIR .. "3rdparty/libjpeg/jmemansi.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 else
 links {
 	"jpeg",
@@ -267,7 +258,11 @@ project "flac"
 			"-Wno-unused-function",
 			"-O0",
 		}
-
+	if string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions {
+			"-Wno-enum-conversion",
+		}
+	end
 	configuration { }
 
 	includedirs {
@@ -292,11 +287,6 @@ project "flac"
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 else
 links {
 	"FLAC",
@@ -347,11 +337,6 @@ project "7z"
 			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Dec.c",
 			MAME_DIR .. "3rdparty/lzma/C/7zStream.c",
 		}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 
 --------------------------------------------------
 -- LUA library objects
@@ -434,11 +419,6 @@ project "lua"
 		MAME_DIR .. "3rdparty/lua/src/linit.c",
 		MAME_DIR .. "3rdparty/lua/src/lutf8lib.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 else
 links {
 	"lua",
@@ -479,11 +459,6 @@ project "lsqlite3"
 	files {
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 
 --------------------------------------------------
 -- mongoose library objects
@@ -524,11 +499,6 @@ project "mongoose"
 	files {
 		MAME_DIR .. "3rdparty/mongoose/mongoose.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 
 --------------------------------------------------
 -- jsoncpp library objects
@@ -559,11 +529,6 @@ project "jsoncpp"
 		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
 		
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 
 --------------------------------------------------
 -- SQLite3 library objects
@@ -594,17 +559,21 @@ project "sqllite3"
 			"-Wno-bad-function-cast",
 			"-Wno-undef",
 		}
+	
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and not string.find(_OPTIONS["gcc"], "clang") then
+		if (version >= 40800) then
+			buildoptions_c {
+				"-Wno-array-bounds",
+			}
+		end
+	end
 
 	configuration { }
 
 	files {
 		MAME_DIR .. "3rdparty/sqlite3/sqlite3.c",
 	}
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 else
 links {
 	"sqlite3",
@@ -682,11 +651,6 @@ project "portmidi"
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/readbinaryplist.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/osxsupport.m",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
-		}
-	end
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
 		}
 	end
 else
@@ -808,11 +772,6 @@ project "bgfx"
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
-		}
-	end
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
 		}
 	end
 end
@@ -957,11 +916,6 @@ project "portaudio"
 		}		
 	end
 	
-	if (_OPTIONS["SHADOW_CHECK"]=="1") then
-		removebuildoptions {
-			"-Wshadow"
-		}
-	end
 else
 links {
 	"portaudio",
