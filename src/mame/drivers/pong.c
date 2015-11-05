@@ -8,11 +8,15 @@ Breakout (c) 1976 Atari
 
 driver by Couriersud
 
- Atari Pong Games List and Data based, in part from:
- - Andy's collection of Bronzeage Atari Video Arcade PCB's"
+
+ Atari Pong Games List - Data based, in part from:
+ 
+ - "Andy's collection of Bronzeage Atari Video Arcade PCBs"
  http://www.andysarcade.net/personal/bronzeage/index.htm
+ 
  - "Atari's Technical Manual Log"
  http://www.atarigames.com/manuals.txt
+ 
  Suspected "same games" are grouped together.  These are usually the exact same game but different cabinet/name.
 
  Technical Manual #s  Game Name(s)                                               Atari Part #'s                     Data
@@ -564,6 +568,6 @@ GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari
 //GAME( 1974, drpong,     pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, snoopong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, suprpong,   0,        pong,     pong,      driver_device,  0, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAMEL( 1976, breakckt,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_cktbreak)
+//GAME( 1974, suprpong,   0,        suprpong, pong,      driver_device,  0, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAMEL( 1976, breakckt,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakckt)
 //GAMEL( 1976, consolet,  breakout, breakout, breakout,  driver_device,  0, ROT90, "Atari Europe", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
