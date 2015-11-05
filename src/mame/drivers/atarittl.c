@@ -7,7 +7,7 @@
 
  Atari / Kee Games List (except for most Pong games) - Data based, in part from:
 
- - Andy's collection of Bronzeage Atari Video Arcade PCB's"
+ - "Andy's collection of Bronzeage Atari Video Arcade PCBs"
  http://www.andysarcade.net/personal/bronzeage/index.htm
 
  - "Atari's Technical Manual Log"
@@ -20,7 +20,7 @@
  -------------------+----------------------------------------------------------+----------------------------------+---------+---------------------------------------
  TM-025               Anti-Aircraft (1975)                                       A000951                            YES       003127
  TM-048               Crash 'N Score/Stock Car (1975)                            A004256                            YES       003186(x2), 003187(x2), 004248, 004247
- TM-030               Crossfire (1975)                                           ???????                            NO?
+ TM-030               Crossfire (1975)                                           A003022                            NO?
  TM-022               Elimination! (1973)                                        A000845                            NO
  TM-035               Goal IV (1975)                                             A000823                            NO
  TM-016               Gotcha/Gotcha Color? (1973)                                A000816                            NO
@@ -31,7 +31,7 @@
  TM-026               Indy 800 (1975)                                            A003000,A003170,A003182            YES       003186-003189 (4)
                                                                                  A003184,A003191,A003198,A003199
  TM-027,052           Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (1975)    A004254,A004255                    YES       004250-004252, 004253-01 to 03 (3)
- TM-077               Le Mans (1976)                                              A005844,A005845                    YES       005837-01, 005838-01, 005839-01
+ TM-077               Le Mans (1976)                                             A005844,A005845                    YES       005837-01, 005838-01, 005839-01
  TM-040               Outlaw (1976)                                              A003213                            YES       003323 - ROM (8205 @ J4)
  TM-007               Pin Pong (1974)                                            A001660                            NO
  TM-019               Pursuit (1975)                                             K8P-B 90128                        NO
