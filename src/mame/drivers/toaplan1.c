@@ -2509,6 +2509,59 @@ ROM_START( samesame2 )
 	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
+/*
+Fire Shark
+Toaplan 1990
+
+PCB Layout
+----------
+
+TOAPLAN Co., Ltd.
+TP-O17
+|---------------------------------------------------------|
+|MB3730 YM3812 10MHz                     O17_01           |
+| YM3014                    MN53007      O17_02      6264 |
+|VOL  LM358 |---------------|            O17_03           |
+|           |    68000      |            O17_04      6264 |
+|  647180   |---------------|                             |
+|            O17_12   O17_11                         6264 |
+|            O17_10   O17_09    2018  2018                |
+|J           6264       6264    2018  2018           6264 |
+|A           O17_07   O17_05                              |
+|M           O17_08   O17_06                         6264 |
+|M                                              |------|  |
+|A           DSW1    |------|                   |FOU-2 |  |
+|                    |BCU-2 |   8464            |      |  |
+|            DSW2    |      |   8464            |------|  |
+|                    |------|   8464        PROM15        |
+|            D65024             8464               6116   |
+|                               8464               6116   |
+|                     BCU       8464               6116   |
+|            6116               8464              PROM14  |
+|            6116               8464         28MHz        |
+|---------------------------------------------------------|
+Notes:
+        68000 - Motorola MC68000P10 CPU. Clock input 10.000MHz
+       647180 - Hitachi HD647180XOFS6 micro-controller with 16k internal OTP EPROM and 512 bytes internal RAM. Clock input 10.000MHz on pin 75
+       YM3812 - Yamaha YM3812 FM operator type-L II (OPL II) LSI (DIP24). Clock input 3.500MHz [28/8]
+       YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter (DIP8)
+         2018 - Motorola MCM2018AN45 2kx8 SRAM (NDIP24)
+         8464 - Fujitsu MB8464A-10L 8kx8 SRAM (NDIP28)
+         6464 - Hyundai HY6264LP-10 8kx8 SRAM (DIP28)
+         6116 - Hyundai HY6116AP-15 2kx8 SRAM (DIP24)
+        BCU-2 - Custom graphics IC (QFP160)
+        FOU-2 - Custom graphics IC (QFP136)
+        LM358 - National Semiconductor LM358 Dual Operational Amplifier (DIP8)
+       D65024 - NEC D65024GF035 uPD65000-series CMOS Gate Array (QFP100)
+      MN53007 - Panasonic MN53007 CMOS Gate Array {732 gates} (DIP42)
+    PROM14/15 - Philips/Signetics N82S123 Bipolar PROM (DIP16)
+       MB3730 - Fujitsu MB3730 14W BTL Audio Power Amplifier
+       DSW1/2 - 8-position DIP switch
+          BCU - Unpopulated position for PGA177 IC
+        HSYNC - 14.86496kHz
+        VSYNC - 57.61308Hz
+*/
+
 ROM_START( fireshrk )
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "09.8j",       0x000000, 0x08000, CRC(f0c70e6f) SHA1(037690448786d61aa116b24b638430c577ea78e2) )
