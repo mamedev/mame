@@ -1245,6 +1245,12 @@ ROM_START( robokid )
 	ROM_LOAD( "robokid3.15k", 0x30000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x40000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
 
+	// Atomic Robokid's Z80 is inside a module with a PROM, replacing the module with a plain Z80 does not work.
+	// this PROM is from a bootleg, but appears to be an exact clone of the one found in the original module
+	// see http://blog.system11.org/?p=1687 for details.  Until the original is verified it's marked as BAD_DUMP
+	ROM_REGION( 0x100, "maincpu_prom", 0 )
+	ROM_LOAD( "prom82s129.cpu", 0x000, 0x100, BAD_DUMP CRC(4dd96f67) SHA1(01b415d9e86ff0c5aad7cfe81e903f2c202bb541))
+
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
@@ -1294,6 +1300,10 @@ ROM_START( robokidj )
 	ROM_LOAD( "robokid3.15k", 0x30000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x40000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
 
+	// see note in above set
+	ROM_REGION( 0x100, "maincpu_prom", 0 )
+	ROM_LOAD( "prom82s129.cpu", 0x000, 0x100, BAD_DUMP CRC(4dd96f67) SHA1(01b415d9e86ff0c5aad7cfe81e903f2c202bb541))
+
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
@@ -1342,6 +1352,10 @@ ROM_START( robokidj2 )
 	ROM_LOAD( "2_rom30.18k",  0x20000, 0x10000, CRC(c0228b63) SHA1(8f7e3a29a35723abc8b10bf511fc8611e31a2961) )
 	ROM_LOAD( "robokid3.15k", 0x30000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x40000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
+
+	// see note in above set
+	ROM_REGION( 0x100, "maincpu_prom", 0 )
+	ROM_LOAD( "prom82s129.cpu", 0x000, 0x100, BAD_DUMP CRC(4dd96f67) SHA1(01b415d9e86ff0c5aad7cfe81e903f2c202bb541))
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
