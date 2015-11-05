@@ -1192,6 +1192,10 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("3do_m2_cdrom")
 
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED_CLASS ( 3do_m2, m2, konamim2_state )
+
 	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
 
 MACHINE_CONFIG_END
@@ -1318,8 +1322,6 @@ ROM_START( totlvicj )
 	DISK_IMAGE( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
 ROM_END
 
-
-
 ROM_START(3do_m2)
 	ROM_REGION64_BE( 0x100000, "boot", 0 )
 	ROM_SYSTEM_BIOS( 0, "panafz35", "Panasonic FZ-35S (3DO M2)" )
@@ -1344,4 +1346,4 @@ GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Evi
 GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
