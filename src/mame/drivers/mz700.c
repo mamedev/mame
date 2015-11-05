@@ -59,6 +59,25 @@
  *  D000-DFFF   videoram or RAM
  *  E000-FFFF   memory mapped IO or RAM
  *
+ *  ToDo:
+    - slows down while making sound
+    - MZ800:
+      - Had to patch the rom to load cassettes
+      - Port CF not done.
+      - Dips not connected.
+      - MZ800-mode display not working /Hi-res not coded.
+      - The CRTC is a very complex custom device, mostly unemulated.
+    - MZ1500:
+      - Various ports not done.
+      - Floppy disk and quick disk not done.
+      - F4 display is blank.
+      - Need manuals.
+
+  Note: MZ800 hardware starts in memory map (mode A), but switches to MZ700
+  compatibility mode (mode B) as soon as it starts up. We start in Mode B
+  because it helps MZ1500 get started and it doesn't break anything.
+
+*
  *****************************************************************************/
 
 #include "emu.h"
@@ -97,6 +116,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_other_callback)
 ***************************************************************************/
 
 static ADDRESS_MAP_START( mz700_mem, AS_PROGRAM, 8, mz_state )
+	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
+	AM_RANGE(0x1000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bankd")
+	AM_RANGE(0xe000, 0xffff) AM_DEVICE("banke", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mz700_banke, AS_PROGRAM, 8, mz_state )
+	// bank 0: ram (mz700_bank1)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	// bank 1: devices (mz700_bank3)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x2004, 0x2007) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	AM_RANGE(0x2008, 0x200b) AM_MIRROR(0x1ff0) AM_READWRITE(mz700_e008_r,mz700_e008_w)
+	AM_RANGE(0x200c, 0x200f) AM_MIRROR(0x1ff0) AM_NOP
+	// bank 2: switched out (mz700_bank5)
+	AM_RANGE(0x4000, 0x5fff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz700_io, AS_IO, 8, mz_state )
@@ -111,6 +146,26 @@ static ADDRESS_MAP_START( mz700_io, AS_IO, 8, mz_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz800_mem, AS_PROGRAM, 8, mz_state )
+	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
+	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("banka")
+	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bankc")
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bankd")
+	AM_RANGE(0xe000, 0xffff) AM_DEVICE("bankf", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mz800_bankf, AS_PROGRAM, 8, mz_state )
+	// bank 0: ram (mz700_bank1)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	// bank 1: devices (mz700_bank3)
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x2004, 0x2007) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	AM_RANGE(0x2008, 0x200b) AM_READWRITE(mz700_e008_r,mz700_e008_w)
+	AM_RANGE(0x200c, 0x200f) AM_NOP
+	AM_RANGE(0x2010, 0x3fff) AM_ROM AM_REGION("monitor", 0x2010)
+	// bank 2: switched out (mz700_bank5)
+	AM_RANGE(0x4000, 0x5fff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz800_io, AS_IO, 8, mz_state )
@@ -303,12 +358,11 @@ static const gfx_layout mz700_layout =
 };
 
 static GFXDECODE_START( mz700 )
-	GFXDECODE_ENTRY("cgrom", 0, mz700_layout, 0, 256)
+	GFXDECODE_ENTRY("cgrom", 0, mz700_layout, 0, 4)
 GFXDECODE_END
 
 static GFXDECODE_START( mz800 )
-	GFXDECODE_ENTRY(NULL, 0, mz700_layout, 0, 256)
-	GFXDECODE_ENTRY("monitor", 0x1000, mz700_layout, 0, 256)    // for mz800 viewer only
+	GFXDECODE_ENTRY("monitor", 0x1000, mz700_layout, 0, 4)    // for mz800 viewer only
 GFXDECODE_END
 
 
@@ -321,23 +375,28 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
 	MCFG_CPU_PROGRAM_MAP(mz700_mem)
 	MCFG_CPU_IO_MAP(mz700_io)
+	MCFG_DEVICE_ADD("banke", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(mz700_banke)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
+	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz700)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz700)
-	MCFG_PALETTE_ADD("palette", 256*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(mz_state, mz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -376,15 +435,21 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mz800, mz700 )
+	MCFG_DEVICE_REMOVE("banke")
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mz800_mem)
 	MCFG_CPU_IO_MAP(mz800_io)
+	MCFG_DEVICE_ADD("bankf", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(mz800_bankf)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
+	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
 	MCFG_GFXDECODE_MODIFY("gfxdecode",mz800)
-
-	MCFG_VIDEO_START_OVERRIDE(mz_state,mz800)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)
@@ -435,14 +500,23 @@ ROM_END
 ROM_START( mz800 )
 	ROM_REGION( 0x4000, "monitor", 0 )
 	ROM_LOAD( "mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4) )
+	// fix cassette loading
+	ROM_FILL(0x761,1,0x13)
+	ROM_FILL(0xA4B,1,0x45)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) // ramdisk
 ROM_END
 
 ROM_START( mz1500 )
 	ROM_REGION( 0x4000, "monitor", 0 )
-	ROM_LOAD( "9z-502m.rom",  0x0000, 0x2800, CRC(643db428) SHA1(c2ad8af2ef00db32afde54d5741b07de5d4da16a))
+	ROM_LOAD( "9z-502m.rom",  0x0000, 0x1000, CRC(643db428) SHA1(c2ad8af2ef00db32afde54d5741b07de5d4da16a))
+	ROM_CONTINUE(0x2800, 0x1800)
+
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	//ROM_LOAD( "mz700fon.jp", 0x0000, 0x1000, CRC(697ec121) SHA1(5eb1d42d273b1fd2cab120486279ab8ff6c85dc7))
 	ROM_LOAD( "mz700fon.jpn", 0x0000, 0x1000, CRC(425eedf5) SHA1(bd2cc750f2d2f63e50a59786668509e81a276e32) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) // ramdisk
 ROM_END
 
 /***************************************************************************

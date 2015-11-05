@@ -42,16 +42,24 @@ DRIVER_INIT_MEMBER(mz_state,mz700)
 	m_mz700 = TRUE;
 	m_mz700_mode = TRUE;
 
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x800);
-	memset(m_videoram, 0, sizeof(UINT8) * 0x800);
-	m_colorram = auto_alloc_array(machine(), UINT8, 0x800);
-	memset(m_colorram, 0, sizeof(UINT8) * 0x800);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
+	memset(m_videoram, 0, sizeof(UINT8) * 0x1000);
+	m_colorram = m_videoram + 0x800;
+
+	m_p_chargen = memregion("cgrom")->base();
+	UINT8 *rom = memregion("monitor")->base();
+	UINT8 *ram = m_ram->pointer();
+	membank("bankr0")->configure_entry(0, &ram[0]); // ram
+	membank("bankr0")->configure_entry(1, &rom[0]); // rom
+	membank("bankw0")->configure_entry(0, &ram[0]); // ram
+	membank("bankd")->configure_entry(0, &ram[0xd000]); // ram
+	membank("bankd")->configure_entry(1, m_videoram); // vram
 }
 
 DRIVER_INIT_MEMBER(mz_state,mz800)
 {
 	m_mz700 = FALSE;
-	m_mz700_mode = FALSE;
+	m_mz700_mode = true;//FALSE;
 
 	/* video ram */
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x4000);
@@ -61,12 +69,50 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 	/* character generator ram */
 	m_cgram = auto_alloc_array(machine(), UINT8, 0x1000);
 	memset(m_cgram, 0, sizeof(UINT8) * 0x1000);
+
+	m_p_chargen = memregion("cgrom")->base();
+	if (!m_p_chargen)
+		m_p_chargen = m_cgram;
+	UINT8 *rom = memregion("monitor")->base();
+	UINT8 *ram = m_ram->pointer();
+	// configure banks (0 = RAM in all cases)
+	membank("bankr0")->configure_entry(0, &ram[0]); // ram
+	membank("bankr0")->configure_entry(1, &rom[0]); // rom
+	membank("bankw0")->configure_entry(0, &ram[0]); // ram
+	membank("bank1")->configure_entry(0, &ram[0x1000]); // ram
+	membank("bank1")->configure_entry(1, &rom[0x1000]); // chargen
+	membank("banka")->configure_entry(0, &ram[0x8000]); // ram
+	membank("banka")->configure_entry(1, m_videoram); // vram in mz800 mode
+	membank("bankc")->configure_entry(0, &ram[0xc000]); // ram
+	membank("bankc")->configure_entry(1, m_cgram); // cgram in mz800 mode
+	membank("bankd")->configure_entry(0, &ram[0xd000]); // ram
+	membank("bankd")->configure_entry(1, m_videoram); // vram in mz700 mode
 }
 
 void mz_state::machine_start()
 {
 	/* reset memory map to defaults */
-	mz700_bank_4_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	mz700_bank_4_w(m_maincpu->space(AS_IO), 0, 0);
+}
+
+MACHINE_RESET_MEMBER( mz_state, mz700 )
+{
+	membank("bankr0")->set_entry(1); //rom
+	membank("bankw0")->set_entry(0); //ram
+	membank("bankd")->set_entry(1); //vram
+	m_banke->set_bank(1); //devices
+}
+
+MACHINE_RESET_MEMBER( mz_state, mz800 )
+{
+	// default to mz700 mode or mz1500 won't start.
+	membank("bankr0")->set_entry(1); //rom
+	membank("bankw0")->set_entry(0); //ram
+	membank("bank1")->set_entry(0); //ram
+	membank("banka")->set_entry(0); //ram
+	membank("bankc")->set_entry(0); //ram
+	membank("bankd")->set_entry(1); //vram
+	m_bankf->set_bank(1); //devices
 }
 
 
@@ -99,38 +145,41 @@ WRITE8_MEMBER(mz_state::mz700_e008_w)
 
 READ8_MEMBER(mz_state::mz800_bank_0_r)
 {
-	UINT8 *videoram = m_videoram;
 	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	/* switch in cgrom */
-	spc.install_read_bank(0x1000, 0x1fff, "bank2");
-	spc.nop_write(0x1000, 0x1fff);
-	membank("bank2")->set_base(memregion("monitor")->base() + 0x1000);
+	//spc.install_read_bank(0x1000, 0x1fff, "bank2");
+	//spc.nop_write(0x1000, 0x1fff);
+	//membank("bank2")->set_base(memregion("monitor")->base() + 0x1000);
+	membank("bank1")->set_entry(1);
 
 	if (m_mz700_mode)
 	{
 		/* cgram from 0xc000 to 0xcfff */
-		spc.install_read_bank(0xc000, 0xcfff, "bank6");
-		spc.install_write_handler(0xc000, 0xcfff, write8_delegate(FUNC(mz_state::mz800_cgram_w),this));
-		membank("bank6")->set_base(m_cgram);
+		//spc.install_read_bank(0xc000, 0xcfff, "bank6");
+		//spc.install_write_handler(0xc000, 0xcfff, write8_delegate(FUNC(mz_state::mz800_cgram_w),this));
+		//membank("bank6")->set_base(m_cgram);
+		membank("bankc")->set_entry(1);
 	}
 	else
 	{
 		if (m_hires_mode)
 		{
 			/* vram from 0x8000 to 0xbfff */
-			spc.install_readwrite_bank(0x8000, 0xbfff, "bank4");
-			membank("bank4")->set_base(videoram);
+			//spc.install_readwrite_bank(0x8000, 0xbfff, "bank4");
+			//membank("bank4")->set_base(m_videoram);
+			membank("banka")->set_entry(1);
 		}
 		else
 		{
 			/* vram from 0x8000 to 0x9fff */
-			spc.install_readwrite_bank(0x8000, 0x9fff, "bank4");
-			membank("bank4")->set_base(videoram);
+			//spc.install_readwrite_bank(0x8000, 0x9fff, "bank4");
+			//membank("bank4")->set_base(m_videoram);
 
 			/* ram from 0xa000 to 0xbfff */
-			spc.install_readwrite_bank(0xa000, 0xbfff, "bank5");
-			membank("bank5")->set_base(m_ram->pointer() + 0xa000);
+			//spc.install_readwrite_bank(0xa000, 0xbfff, "bank5");
+			//membank("bank5")->set_base(m_ram->pointer() + 0xa000);
+			membank("bank1")->set_entry(1);
 		}
 	}
 
@@ -141,16 +190,19 @@ WRITE8_MEMBER(mz_state::mz700_bank_0_w)
 {
 	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
-	spc.install_readwrite_bank(0x0000, 0x0fff, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	//spc.install_readwrite_bank(0x0000, 0x0fff, "bank1a");
+	//membank("bank1a")->set_base(m_ram->pointer());
+	membank("bankr0")->set_entry(0); // ram
 }
 
 WRITE8_MEMBER(mz_state::mz800_bank_0_w)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
-	spc.install_readwrite_bank(0x0000, 0x7fff, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	//spc.install_readwrite_bank(0x0000, 0x7fff, "bank1a");
+	//membank("bank1a")->set_base(m_ram->pointer());
+	membank("bank1")->set_entry(0); // ram
+	membank("bankr0")->set_entry(0); // ram
 }
 
 READ8_MEMBER(mz_state::mz800_bank_1_r)
@@ -158,20 +210,23 @@ READ8_MEMBER(mz_state::mz800_bank_1_r)
 	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	/* switch in ram from 0x1000 to 0x1fff */
-	spc.install_readwrite_bank(0x1000, 0x1fff, "bank2");
-	membank("bank2")->set_base(m_ram->pointer() + 0x1000);
+	//spc.install_readwrite_bank(0x1000, 0x1fff, "bank2");
+	//membank("bank2")->set_base(m_ram->pointer() + 0x1000);
+	membank("bank1")->set_entry(0); // ram
 
 	if (m_mz700_mode)
 	{
 		/* ram from 0xc000 to 0xcfff */
-		spc.install_readwrite_bank(0xc000, 0xcfff, "bank6");
-		membank("bank6")->set_base(m_ram->pointer() + 0xc000);
+		//spc.install_readwrite_bank(0xc000, 0xcfff, "bank6");
+		//membank("bank6")->set_base(m_ram->pointer() + 0xc000);
+		membank("bankc")->set_entry(0); // ram
 	}
 	else
 	{
 		/* ram from 0x8000 to 0xbfff */
-		spc.install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		membank("bank4")->set_base(m_ram->pointer() + 0x8000);
+		//spc.install_readwrite_bank(0x8000, 0xbfff, "bank4");
+		//membank("bank4")->set_base(m_ram->pointer() + 0x8000);
+		membank("banka")->set_entry(0); // ram
 	}
 
 	return 0xff;
@@ -180,14 +235,25 @@ READ8_MEMBER(mz_state::mz800_bank_1_r)
 WRITE8_MEMBER(mz_state::mz700_bank_1_w)
 {
 	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	membank("bankd")->set_entry(0); // ram
 
 	if (m_mz700_mode)
 	{
 		/* switch in ram when not locked */
 		if (!m_mz700_ram_lock)
 		{
-			spc.install_readwrite_bank(0xd000, 0xffff, "bank7");
-			membank("bank7")->set_base(m_ram->pointer() + 0xd000);
+			if (m_mz700)
+			{
+				//membank("bankd")->set_entry(0); // ram
+				m_banke->set_bank(0); //ram
+			}
+			else
+			{
+				//spc.install_readwrite_bank(0xd000, 0xffff, "bank7");
+				//spc.install_readwrite_bank(0xd000, 0xdfff, "bank7");
+				//membank("bank7")->set_base(m_ram->pointer() + 0xd000);
+				m_bankf->set_bank(0); //ram
+			}
 			m_mz700_ram_vram = FALSE;
 		}
 	}
@@ -196,8 +262,9 @@ WRITE8_MEMBER(mz_state::mz700_bank_1_w)
 		/* switch in ram when not locked */
 		if (!m_mz800_ram_lock)
 		{
-			spc.install_readwrite_bank(0xe000, 0xffff, "bank8");
-			membank("bank8")->set_base(m_ram->pointer() + 0xe000);
+			//spc.install_readwrite_bank(0xe000, 0xffff, "bank8");
+			//membank("bank8")->set_base(m_ram->pointer() + 0xe000);
+			m_bankf->set_bank(0); //ram
 			m_mz800_ram_monitor = FALSE;
 		}
 	}
@@ -205,44 +272,46 @@ WRITE8_MEMBER(mz_state::mz700_bank_1_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_2_w)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
-	spc.install_read_bank(0x0000, 0x0fff, "bank1");
-	spc.nop_write(0x0000, 0x0fff);
-	membank("bank1")->set_base(memregion("monitor")->base());
+	//spc.install_read_bank(0x0000, 0x0fff, "bank1a");
+	//spc.nop_write(0x0000, 0x0fff);
+	//membank("bank1a")->set_base(memregion("monitor")->base());
+	membank("bankr0")->set_entry(1); // rom
+
 }
 
 WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 {
-	UINT8 *videoram = m_videoram;
 	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
 		if (!m_mz700_ram_lock)
 		{
-			/* switch in videoram */
-			spc.install_readwrite_bank(0xd000, 0xd7ff, "bank7");
-			membank("bank7")->set_base(videoram);
+			if (m_mz700)
+				membank("bankd")->set_entry(1);
+			else
+			{
+				/* switch in videoram */
+				//spc.install_readwrite_bank(0xd000, 0xd7ff, "bank7");
+				//membank("bank7")->set_base(m_videoram);
 
-			/* switch in colorram */
-			spc.install_readwrite_bank(0xd800, 0xdfff, "bank9");
-			membank("bank9")->set_base(m_colorram);
-
+				/* switch in colorram */
+				//spc.install_readwrite_bank(0xd800, 0xdfff, "bank9");
+				//membank("bank9")->set_base(m_colorram);
+				membank("bankd")->set_entry(1);
+			}
 			m_mz700_ram_vram = TRUE;
 
 			/* switch in memory mapped i/o devices */
 			if (m_mz700)
 			{
-				spc.install_readwrite_handler(0xe000, 0xfff3, 0, 0x1ff0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
-				spc.install_readwrite_handler(0xe004, 0xfff7, 0, 0x1ff0, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit));
-				spc.install_readwrite_handler(0xe008, 0xfff8, 0, 0x1ff0, read8_delegate(FUNC(mz_state::mz700_e008_r),this), write8_delegate(FUNC(mz_state::mz700_e008_w),this));
+				m_banke->set_bank(1); //devices
 			}
 			else
 			{
-				spc.install_readwrite_handler(0xe000, 0xe003, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
-				spc.install_readwrite_handler(0xe004, 0xe007, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit));
-				spc.install_readwrite_handler(0xe008, 0xe008, read8_delegate(FUNC(mz_state::mz700_e008_r),this), write8_delegate(FUNC(mz_state::mz700_e008_w),this));
+				m_bankf->set_bank(1); //devices
 			}
 		}
 	}
@@ -251,9 +320,10 @@ WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 		if (!m_mz800_ram_lock)
 		{
 			/* switch in mz800 monitor rom if not locked */
-			spc.install_read_bank(0xe000, 0xffff, "bank8");
-			spc.nop_write(0xe000, 0xffff);
-			membank("bank8")->set_base(memregion("monitor")->base() + 0x2000);
+			//spc.install_read_bank(0xe000, 0xffff, "bank8");
+			//spc.nop_write(0xe000, 0xffff);
+			//membank("bank8")->set_base(memregion("monitor")->base() + 0x2000);
+			m_bankf->set_bank(1); // devices + rom
 			m_mz800_ram_monitor = TRUE;
 		}
 	}
@@ -261,7 +331,6 @@ WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 {
-	UINT8 *videoram = m_videoram;
 	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
@@ -270,46 +339,58 @@ WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 		mz700_bank_2_w(space, 0, 0);    /* switch in monitor rom */
 		mz700_bank_3_w(space, 0, 0);    /* switch in videoram, colorram, and mmio */
 
-		/* rest is ram is always ram in mz700 mode */
-		spc.install_readwrite_bank(0x1000, 0xcfff, "bank2");
-		membank("bank2")->set_base(m_ram->pointer() + 0x1000);
+		if (!m_mz700)
+		{
+			/* rest is ram is always ram in mz700 mode */
+			//spc.install_readwrite_bank(0x1000, 0xcfff, "bank2");
+			//membank("bank2")->set_base(m_ram->pointer() + 0x1000);
+			membank("bankr0")->set_entry(1); // rom
+			membank("bank1")->set_entry(0); // ram
+			membank("bankc")->set_entry(0); // ram
+		}
 	}
 	else
 	{
 		/* monitor rom and cgrom */
-		spc.install_read_bank(0x0000, 0x1fff, "bank1");
-		spc.nop_write(0x0000, 0x1fff);
-		membank("bank1")->set_base(memregion("monitor")->base());
+		//spc.install_read_bank(0x0000, 0x1fff, "bank1a");
+		//spc.nop_write(0x0000, 0x1fff);
+		//membank("bank1a")->set_base(memregion("monitor")->base());
+		membank("bankr0")->set_entry(1); // rom
+		membank("bank1")->set_entry(1); // rom
 
 		/* ram from 0x2000 to 0x7fff */
-		spc.install_readwrite_bank(0x2000, 0x7fff, "bank3");
-		membank("bank3")->set_base(m_ram->pointer());
+		//spc.install_readwrite_bank(0x2000, 0x7fff, "bank3");
+		//membank("bank3")->set_base(m_ram->pointer());
 
 		if (m_hires_mode)
 		{
 			/* vram from 0x8000 to 0xbfff */
-			spc.install_readwrite_bank(0x8000, 0xbfff, "bank4");
-			membank("bank4")->set_base(videoram);
+			//spc.install_readwrite_bank(0x8000, 0xbfff, "bank4");
+			//membank("bank4")->set_base(m_videoram);
+			membank("banka")->set_entry(1); // vram
 		}
 		else
 		{
 			/* vram from 0x8000 to 0x9fff */
-			spc.install_readwrite_bank(0x8000, 0x9fff, "bank4");
-			membank("bank4")->set_base(videoram);
+			//spc.install_readwrite_bank(0x8000, 0x9fff, "bank4");
+			//membank("bank4")->set_base(m_videoram);
+			membank("banka")->set_entry(1); // vram
 
 			/* ram from 0xa000 to 0xbfff */
-			spc.install_readwrite_bank(0xa000, 0xbfff, "bank5");
-			membank("bank5")->set_base(m_ram->pointer() + 0xa000);
+			//spc.install_readwrite_bank(0xa000, 0xbfff, "bank5");
+			//membank("bank5")->set_base(m_ram->pointer() + 0xa000);
 		}
 
 		/* ram from 0xc000 to 0xdfff */
-		spc.install_readwrite_bank(0xc000, 0xdfff, "bank6");
-		membank("bank6")->set_base(m_ram->pointer() + 0xc000);
+		//spc.install_readwrite_bank(0xc000, 0xdfff, "bank6");
+		//membank("bank6")->set_base(m_ram->pointer() + 0xc000);
+		membank("bankd")->set_entry(0); // ram
 
 		/* mz800 monitor rom from 0xe000 to 0xffff */
-		spc.install_read_bank(0xe000, 0xffff, "bank8");
-		spc.nop_write(0xe000, 0xffff);
-		membank("bank8")->set_base(memregion("monitor")->base() + 0x2000);
+		//spc.install_read_bank(0xe000, 0xffff, "bank8");
+		//spc.nop_write(0xe000, 0xffff);
+		//membank("bank8")->set_base(memregion("monitor")->base() + 0x2000);
+		m_bankf->set_bank(1); // devices + rom
 		m_mz800_ram_monitor = TRUE;
 
 		m_mz800_ram_lock = FALSE; /* reset lock? */
@@ -324,13 +405,19 @@ WRITE8_MEMBER(mz_state::mz700_bank_5_w)
 	{
 		/* prevent access from 0xd000 to 0xffff */
 		m_mz700_ram_lock = TRUE;
-		spc.nop_readwrite(0xd000, 0xffff);
+		if (m_mz700)
+			m_banke->set_bank(2);
+		else
+			//spc.nop_readwrite(0xd000, 0xdfff);
+			//spc.nop_readwrite(0xd000, 0xffff);
+			m_bankf->set_bank(2);
 	}
 	else
 	{
 		/* prevent access from 0xe000 to 0xffff */
 		m_mz800_ram_lock = TRUE;
-		spc.nop_readwrite(0xe000, 0xffff);
+		//spc.nop_readwrite(0xe000, 0xffff);
+		m_bankf->set_bank(2);
 	}
 }
 
@@ -435,7 +522,7 @@ WRITE8_MEMBER(mz_state::pio_port_a_w)
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),machine());
 
 	/* the ls145 is connected to PA0-PA3 */
-	dynamic_cast<ttl74145_device *>(device)->write(data & 0x07);
+	dynamic_cast<ttl74145_device *>(device)->write(data & 0x0f);
 
 	/* ne556 reset is connected to PA7 */
 	timer->enable(BIT(data, 7));
