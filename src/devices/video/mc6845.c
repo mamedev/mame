@@ -1032,7 +1032,7 @@ void mc6845_device::device_start()
 	m_max_ras_addr = 0x1f;
 	m_vert_char_total = 0x7f;
 
-	m_supports_disp_start_addr_r = true;
+	m_supports_disp_start_addr_r = false;  // MC6845 can not read Display Start (double checked on datasheet)
 	m_supports_vert_sync_width = false;
 	m_supports_status_reg_d5 = false;
 	m_supports_status_reg_d6 = false;
@@ -1168,7 +1168,7 @@ void hd6845_device::device_start()
 {
 	mc6845_device::device_start();
 
-	m_supports_disp_start_addr_r = false;
+	m_supports_disp_start_addr_r = true;  // HD6845S can definitely read Display Start (double checked on datasheet)
 	m_supports_vert_sync_width = true;
 	m_supports_status_reg_d5 = false;
 	m_supports_status_reg_d6 = false;
