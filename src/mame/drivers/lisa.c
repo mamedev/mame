@@ -15,7 +15,7 @@
 #include "cpu/cop400/cop400.h"
 #include "includes/lisa.h"
 #include "formats/ap_dsk35.h"
-
+#include "softlist.h"
 
 /***************************************************************************
     ADDRESS MAP

@@ -61,7 +61,7 @@ Notes:
 #include "includes/bullet.h"
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/scsihd.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

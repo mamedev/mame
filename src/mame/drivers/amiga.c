@@ -23,7 +23,7 @@
 #include "machine/amigakbd.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

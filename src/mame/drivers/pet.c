@@ -152,7 +152,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "includes/pet.h"
 #include "bus/ieee488/c2040.h"
 #include "machine/cbm_snqk.h"
-
+#include "softlist.h"
 
 
 static void cbm_pet_quick_sethiaddress( address_space &space, UINT16 hiaddress )

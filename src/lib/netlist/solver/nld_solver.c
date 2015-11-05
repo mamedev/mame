@@ -163,10 +163,10 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 				case terminal_t::INPUT:
 					{
 						analog_output_t *net_proxy_output = NULL;
-						for (std::size_t i = 0; i < m_inps.size(); i++)
-							if (m_inps[i]->m_proxied_net == &p->net().as_analog())
+						for (std::size_t j = 0; j < m_inps.size(); j++)
+							if (m_inps[j]->m_proxied_net == &p->net().as_analog())
 							{
-								net_proxy_output = m_inps[i];
+								net_proxy_output = m_inps[j];
 								break;
 							}
 
@@ -641,8 +641,8 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 			net_t *n = groups[i][j];
 			for (std::size_t k = 0; k < n->m_core_terms.size(); k++)
 			{
-				const core_terminal_t *p = n->m_core_terms[k];
-				netlist().log().verbose("   {1}", p->name());
+				const core_terminal_t *pcore = n->m_core_terms[k];
+				netlist().log().verbose("   {1}", pcore->name());
 			}
 		}
 	}

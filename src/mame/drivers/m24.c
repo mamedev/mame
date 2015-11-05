@@ -13,6 +13,7 @@
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
+#include "softlist.h"
 
 class m24_state : public driver_device
 {

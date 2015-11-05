@@ -23,6 +23,7 @@
 */
 
 #include "includes/tiki100.h"
+#include "softlist.h"
 
 /* Memory Banking */
 

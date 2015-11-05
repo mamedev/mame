@@ -149,6 +149,8 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
 
+#include "softlist.h"
+
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
 #define A2_BUS_TAG "a2bus"

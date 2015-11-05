@@ -18,7 +18,7 @@
 #include "video/ef9340_1.h"
 
 #include "bus/odyssey2/slot.h"
-
+#include "softlist.h"
 
 class odyssey2_state : public driver_device
 {

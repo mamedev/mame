@@ -210,7 +210,7 @@ PCB - LEAPSTER-TV:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arcompact/arcompact.h"
-
+#include "softlist.h"
 
 class leapster_state : public driver_device
 {

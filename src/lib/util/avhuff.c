@@ -834,7 +834,7 @@ avhuff_error avhuff_decoder::decode_data(const UINT8 *source, UINT32 complength,
 			return err;
 
 		// advance the pointers past the data
-		UINT32 treesize = (source[8] << 8) + source[9];
+		treesize = (source[8] << 8) + source[9];
 		if (treesize != 0xffff)
 			srcoffs += treesize;
 		for (int chnum = 0; chnum < channels; chnum++)

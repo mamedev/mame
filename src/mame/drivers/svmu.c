@@ -17,6 +17,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
 #include "sound/speaker.h"
+#include "softlist.h"
 #include "svmu.lh"
 
 #define     PIXEL_SIZE          7

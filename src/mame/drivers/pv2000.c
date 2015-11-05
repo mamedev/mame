@@ -37,7 +37,7 @@ For BIOS CRC confirmation
 #include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class pv2000_state : public driver_device
 {

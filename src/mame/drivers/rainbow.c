@@ -245,6 +245,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "machine/nvram.h"
 
 #include "machine/ds1315.h"
+#include "softlist.h"
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
 

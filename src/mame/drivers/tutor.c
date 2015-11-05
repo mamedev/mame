@@ -177,7 +177,7 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class tutor_state : public driver_device
 {

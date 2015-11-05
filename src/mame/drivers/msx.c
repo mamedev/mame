@@ -532,6 +532,7 @@ PCB Layouts missing
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
+#include "softlist.h"
 
 
 static ADDRESS_MAP_START ( msx_memory_map, AS_PROGRAM, 8, msx_state )

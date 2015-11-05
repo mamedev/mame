@@ -61,7 +61,7 @@ ToDo:
 #include "bus/iq151/video32.h"
 #include "bus/iq151/video64.h"
 
-
+#include "softlist.h"
 
 class iq151_state : public driver_device
 {

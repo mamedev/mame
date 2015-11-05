@@ -15,6 +15,7 @@
 #include "imagedev/cassette.h"
 #include "formats/smx_dsk.h"
 #include "formats/rk_cas.h"
+#include "softlist.h"
 
 /* Address maps */
 

@@ -439,7 +439,7 @@ test1f diagnostic hacks:
 #include "bus/saturn/rom.h"
 #include "bus/saturn/dram.h"
 #include "bus/saturn/bram.h"
-
+#include "softlist.h"
 
 class sat_console_state : public saturn_state
 {

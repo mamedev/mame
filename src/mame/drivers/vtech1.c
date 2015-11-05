@@ -41,7 +41,7 @@ Todo:
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "formats/vt_cas.h"
-
+#include "softlist.h"
 
 /***************************************************************************
     CONSTANTS & MACROS

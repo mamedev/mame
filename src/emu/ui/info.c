@@ -12,6 +12,7 @@
 #include "ui/menu.h"
 #include "ui/info.h"
 #include "ui/ui.h"
+#include "softlist.h"
 
 /*-------------------------------------------------
   menu_game_info - handle the game information

@@ -21,6 +21,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "coreutil.h"
+#include "softlist.h"
 #include "px4.lh"
 
 

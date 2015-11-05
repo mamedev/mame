@@ -181,7 +181,7 @@ I/O ports
 #include "machine/i8251.h"
 #include "formats/pmd_cas.h"
 #include "machine/ram.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  VIDEO EMULATION

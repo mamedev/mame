@@ -13,10 +13,12 @@
 
 #include "emu.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "ui/swlist.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/miscmenu.h"
+#include "softlist.h"
 
 
 /***************************************************************************

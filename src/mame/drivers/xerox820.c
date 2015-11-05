@@ -48,7 +48,7 @@
 
 
 #include "includes/xerox820.h"
-
+#include "softlist.h"
 /* Read/Write Handlers */
 
 void xerox820_state::bankswitch(int bank)

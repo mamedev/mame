@@ -36,6 +36,7 @@
 /* devices */
 #include "formats/tzx_cas.h"
 #include "formats/coupedsk.h"
+#include "softlist.h"
 
 /***************************************************************************
     CONSTANTS

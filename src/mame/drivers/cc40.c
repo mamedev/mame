@@ -79,6 +79,7 @@
 #include "machine/nvram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist.h"
 
 #include "cc40.lh"
 

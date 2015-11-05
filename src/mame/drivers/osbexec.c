@@ -15,7 +15,7 @@
 #include "machine/z80dart.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-
+#include "softlist.h"
 
 #define MAIN_CLOCK  23961600
 

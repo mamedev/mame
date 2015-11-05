@@ -35,6 +35,7 @@
 #include "bus/snes/snes_slot.h"
 #include "bus/snes/snes_carts.h"
 #include "bus/snes_ctrl/ctrl.h"
+#include "softlist.h"
 
 class snes_console_state : public snes_state
 {

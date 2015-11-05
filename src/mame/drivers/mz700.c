@@ -94,7 +94,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "formats/mz_cas.h"
-
+#include "softlist.h"
 
 /***************************************************************************
     TIMER DEVICE CALLBACKS

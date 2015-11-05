@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 // PV-1000 Sound device
 
 class pv1000_sound_device : public device_t,

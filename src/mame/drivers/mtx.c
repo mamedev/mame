@@ -33,6 +33,7 @@
 #include "machine/z80dart.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
+#include "softlist.h"
 
 /***************************************************************************
     MEMORY MAPS

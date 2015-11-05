@@ -41,6 +41,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
+#include "softlist.h"
 
 READ64_MEMBER( macpci_state::unk1_r )
 {

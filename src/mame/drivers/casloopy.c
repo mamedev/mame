@@ -154,7 +154,7 @@ PCB 'Z545-1 A240570-1'
 //#include "cpu/v60/v60.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class casloopy_state : public driver_device
 {

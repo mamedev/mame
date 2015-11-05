@@ -27,7 +27,7 @@
 
 #include "includes/bw12.h"
 #include "bus/rs232/rs232.h"
-
+#include "softlist.h"
 /*
 
     TODO:

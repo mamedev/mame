@@ -104,6 +104,7 @@ the Neogeo Pocket.
 #include "sound/dac.h"
 #include "video/k1ge.h"
 #include "rendlay.h"
+#include "softlist.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

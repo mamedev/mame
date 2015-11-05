@@ -89,7 +89,7 @@ ToDo:
 #include "sound/wave.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class pencil2_state : public driver_device
 {

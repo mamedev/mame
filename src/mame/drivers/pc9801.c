@@ -430,6 +430,7 @@ Keyboard TX commands:
 #include "machine/idehd.h"
 
 #include "debugger.h"
+#include "softlist.h"
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"

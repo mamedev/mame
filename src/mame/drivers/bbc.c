@@ -54,7 +54,7 @@
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 #include "includes/bbc.h"
-
+#include "softlist.h"
 
 /******************************************************************************
 A  = BBC Model A

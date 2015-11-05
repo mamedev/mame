@@ -427,7 +427,7 @@ space. This mapper uses 32KB sized banks.
 #include "includes/gb.h"
 #include "bus/gameboy/rom.h"
 #include "bus/gameboy/mbc.h"
-
+#include "softlist.h"
 
 READ8_MEMBER(gb_state::gb_cart_r)
 {

@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "ui/swlist.h"
+#include "softlist.h"
 
 
 /***************************************************************************

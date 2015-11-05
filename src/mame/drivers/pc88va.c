@@ -36,7 +36,7 @@
 #include "formats/xdf_dsk.h"
 //#include "machine/upd71071.h"
 #include "machine/am9517a.h"
-
+#include "softlist.h"
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */
 #define TEST_SUBFDC 0

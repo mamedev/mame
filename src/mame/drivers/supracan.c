@@ -80,6 +80,7 @@ DEBUG TRICKS:
 #include "cpu/m6502/m6502.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist.h"
 
 #define SOUNDCPU_BOOT_HACK      (1)
 

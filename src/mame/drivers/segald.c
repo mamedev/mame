@@ -21,7 +21,6 @@ Todo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "render.h"
 #include "machine/ldv1000.h"
 
 #define SCHEMATIC_CLOCK (20000000)

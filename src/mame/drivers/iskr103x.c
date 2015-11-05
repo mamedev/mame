@@ -25,6 +25,7 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 #define DBG_LOG(a,b,c)
 

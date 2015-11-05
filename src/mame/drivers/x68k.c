@@ -133,6 +133,7 @@
 #include "bus/x68k/x68k_scsiext.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+#include "softlist.h"
 #include "x68000.lh"
 
 

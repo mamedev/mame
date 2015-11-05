@@ -64,7 +64,7 @@
 */
 
 #include "includes/coleco.h"
-
+#include "softlist.h"
 
 /* Read/Write Handlers */
 

@@ -8,10 +8,12 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "ui/menu.h"
+#include "ui/filesel.h"
 #include "zippath.h"
 #include "floppy.h"
 #include "formats/imageutl.h"
-#include "ui/filesel.h"
+#include "image.h"
 
 /*
     Debugging flags. Set to 0 or 1.

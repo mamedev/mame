@@ -32,7 +32,7 @@ Looking at the code of the cartridges it seems there is:
 #include "video/mc6847.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class sv8000_state : public driver_device
 {

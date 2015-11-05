@@ -42,7 +42,7 @@
 */
 
 #include "includes/mpz80.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS

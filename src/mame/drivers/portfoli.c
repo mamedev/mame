@@ -80,7 +80,7 @@
 #include "includes/portfoli.h"
 #include "bus/rs232/rs232.h"
 #include "rendlay.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

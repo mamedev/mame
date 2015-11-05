@@ -14,7 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/cbm_snqk.h"
 #include "sound/dac.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

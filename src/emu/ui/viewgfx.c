@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "uiinput.h"
 #include "render.h"
 #include "rendfont.h"

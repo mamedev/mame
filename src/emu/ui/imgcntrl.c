@@ -16,6 +16,7 @@
 #include "ui/swlist.h"
 #include "zippath.h"
 #include "audit.h"
+#include "softlist.h"
 
 
 /***************************************************************************

@@ -13,7 +13,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "includes/super6.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  MEMORY BANKING

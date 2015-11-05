@@ -70,7 +70,7 @@ TODO:
 
 #include "includes/osborne1.h"
 #include "bus/rs232/rs232.h"
-
+#include "softlist.h"
 
 #define MAIN_CLOCK  15974400
 

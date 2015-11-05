@@ -17,6 +17,7 @@
 #include "formats/pk8020_dsk.h"
 #include "includes/pk8020.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pk8020_mem, AS_PROGRAM, 8, pk8020_state )

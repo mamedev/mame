@@ -14,6 +14,7 @@
 #include "sound/wave.h"
 #include "machine/ram.h"
 #include "includes/pecom.h"
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8, pecom_state )

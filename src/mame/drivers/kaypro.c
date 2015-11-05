@@ -43,7 +43,7 @@
 
 #include "includes/kaypro.h"
 #include "formats/kaypro_dsk.h"
-
+#include "softlist.h"
 
 READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
 

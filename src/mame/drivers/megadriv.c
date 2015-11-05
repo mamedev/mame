@@ -11,7 +11,7 @@
 #include "bus/generic/carts.h"
 
 #include "formats/imageutl.h"
-
+#include "softlist.h"
 
 /*************************************
  *

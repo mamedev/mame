@@ -27,7 +27,7 @@ ToDo:
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
-
+#include "softlist.h"
 
 class ampro_state : public driver_device
 {

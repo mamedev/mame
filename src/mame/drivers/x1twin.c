@@ -19,7 +19,7 @@
 #include "includes/pce.h"
 //#include "cpu/h6280/h6280.h"
 //#include "sound/c6280.h"
-
+#include "softlist.h"
 #include "rendlay.h"
 
 class x1twin_state : public x1_state

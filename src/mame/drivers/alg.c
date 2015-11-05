@@ -24,7 +24,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "render.h"
 #include "includes/amiga.h"
 #include "machine/ldstub.h"
 #include "machine/nvram.h"

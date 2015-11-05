@@ -18,7 +18,7 @@
 #include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
-
+#include "softlist.h"
 
 class apogee_state : public radio86_state
 {

@@ -16,7 +16,7 @@
 #include "imagedev/printer.h"
 #include "formats/coco_cas.h"
 #include "machine/ram.h"
-
+#include "softlist.h"
 
 //printer state
 enum

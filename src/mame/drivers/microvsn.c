@@ -23,7 +23,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 #define LOG 0
 

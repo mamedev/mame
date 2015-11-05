@@ -103,7 +103,7 @@
 #include "emu.h"
 #include "disk.h"
 #include "formats/msx_dsk.h"
-
+#include "softlist.h"
 
 const device_type MSX_CART_VY0010 = &device_creator<msx_cart_vy0010>;
 const device_type MSX_CART_FSFD1 = &device_creator<msx_cart_fsfd1>;

@@ -17,6 +17,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "imagedev/snapquik.h"
+#include "softlist.h"
 
 class n64_mess_state : public n64_state
 {

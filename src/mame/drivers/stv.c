@@ -50,7 +50,7 @@
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
-
+#include "softlist.h"
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 

@@ -107,7 +107,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "machine/bankdev.h"
 #include "includes/genpc.h"
-
+#include "softlist.h"
 
 /*
   rtc interrupt irq 2

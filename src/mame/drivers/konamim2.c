@@ -192,6 +192,7 @@ Notes:
 #include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
+#include "softlist.h"
 
 struct CDE_DMA
 {

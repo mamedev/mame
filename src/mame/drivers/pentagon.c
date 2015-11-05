@@ -9,6 +9,7 @@
 #include "formats/tzx_cas.h"
 #include "machine/beta.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 class pentagon_state : public spectrum_state
 {

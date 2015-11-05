@@ -13,6 +13,7 @@
 #include "audit.h"
 #include "chd.h"
 #include "sound/samples.h"
+#include "softlist.h"
 
 // for now, make buggy GCC/Mingw STFU about I64FMT
 #if (defined(__MINGW32__) && (__GNUC__ >= 5))

@@ -49,6 +49,7 @@
 #include "machine/i8279.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
+#include "softlist.h"
 
 class i7000_state : public driver_device
 {

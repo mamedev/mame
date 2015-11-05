@@ -17,6 +17,7 @@
 #include "osdepend.h"
 #include "drivenum.h"
 #include "ui/ui.h"
+#include "luaengine.h"
 
 //**************************************************************************
 //  LUA ENGINE

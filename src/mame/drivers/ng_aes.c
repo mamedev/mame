@@ -58,7 +58,7 @@
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/megacdcd.h"
-
+#include "softlist.h"
 
 extern const char layout_neogeo[];
 

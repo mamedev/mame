@@ -28,6 +28,7 @@ Game Status:
 ***************************************************************************/
 
 #include "includes/gamecom.h"
+#include "softlist.h"
 #include "gamecom.lh"
 
 static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)

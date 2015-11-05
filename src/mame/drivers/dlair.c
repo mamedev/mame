@@ -36,7 +36,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "render.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ldv1000.h"
 #include "machine/ldstub.h"

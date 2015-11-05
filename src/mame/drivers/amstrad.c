@@ -109,6 +109,7 @@ Some bugs left :
 #include "formats/msx_dsk.h"
 
 #include "machine/ram.h"
+#include "softlist.h"
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10

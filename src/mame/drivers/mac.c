@@ -84,6 +84,7 @@
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "includes/mac.h"
+#include "softlist.h"
 #include "mac.lh"
 
 #define C7M (7833600)

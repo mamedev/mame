@@ -16,6 +16,7 @@
 #include "machine/kb_7007_3.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
+#include "softlist.h"
 
 #define VERBOSE_DBG 0
 

@@ -45,6 +45,7 @@
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 #define MAIN_CLOCK XTAL_4MHz
 

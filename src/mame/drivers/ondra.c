@@ -15,6 +15,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "includes/ondra.h"
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(ondra_mem, AS_PROGRAM, 8, ondra_state )

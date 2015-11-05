@@ -150,7 +150,7 @@ Notes: (All IC's shown)
 */
 
 #include "includes/ep64.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

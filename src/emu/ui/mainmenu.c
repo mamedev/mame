@@ -17,6 +17,7 @@
 #include "cheat.h"
 #include "uiinput.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/barcode.h"

@@ -137,6 +137,8 @@ When the prompt returns, press Stop.
 #include "bus/a1bus/a1cassette.h"
 #include "bus/a1bus/a1cffa.h"
 
+#include "softlist.h"
+
 /* port i/o functions */
 
 /* memory w/r functions */

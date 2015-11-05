@@ -348,7 +348,7 @@ Notes:
 #include "imagedev/chd_cd.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 #define COJAG_CLOCK         XTAL_52MHz
 #define R3000_CLOCK         XTAL_40MHz

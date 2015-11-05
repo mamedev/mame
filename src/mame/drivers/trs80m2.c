@@ -22,6 +22,7 @@
 */
 
 #include "includes/trs80m2.h"
+#include "softlist.h"
 
 #define KEYBOARD_TAG "keyboard"
 

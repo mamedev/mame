@@ -59,7 +59,7 @@
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "machine/upd765.h" /* for floppy disc controller */
-
+#include "softlist.h"
 #include "includes/hec2hrp.h"
 
 

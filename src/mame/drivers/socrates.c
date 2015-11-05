@@ -87,6 +87,7 @@ TODO:
 #include "audio/socrates.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist.h"
 
 class socrates_state : public driver_device
 {

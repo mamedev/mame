@@ -51,6 +51,7 @@ E I1     Vectored interrupt error
 #include "machine/m20_kbd.h"
 #include "bus/rs232/rs232.h"
 #include "machine/m20_8086.h"
+#include "softlist.h"
 
 class m20_state : public driver_device
 {

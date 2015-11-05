@@ -16,7 +16,7 @@
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "sound/speaker.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

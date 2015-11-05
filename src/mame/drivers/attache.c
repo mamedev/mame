@@ -64,6 +64,7 @@
 #include "video/tms9927.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "softlist.h"
 
 class attache_state : public driver_device
 {

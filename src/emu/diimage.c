@@ -12,10 +12,13 @@
 #include "emuopts.h"
 #include "drivenum.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "zippath.h"
 #include "ui/filesel.h"
 #include "ui/swlist.h"
 #include "ui/imgcntrl.h"
+#include "softlist.h"
+#include "image.h"
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE

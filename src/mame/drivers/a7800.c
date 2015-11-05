@@ -103,7 +103,7 @@
 #include "machine/mos6530n.h"
 #include "video/maria.h"
 #include "bus/a7800/a78_carts.h"
-
+#include "softlist.h"
 
 #define A7800_NTSC_Y1   XTAL_14_31818MHz
 #define CLK_PAL 1773447

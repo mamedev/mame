@@ -82,6 +82,7 @@ ToDo:
 #include "bus/apf/slot.h"
 #include "bus/apf/rom.h"
 
+#include "softlist.h"
 
 class apf_state : public driver_device
 {

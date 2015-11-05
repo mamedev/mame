@@ -29,6 +29,7 @@
 #include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"
 #include "includes/prof180x.h"
+#include "softlist.h"
 
 UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

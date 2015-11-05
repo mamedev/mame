@@ -14,6 +14,7 @@
 #include "cheat.h"
 #include "uiinput.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "ui/mainmenu.h"
 #include "ui/cheatopt.h"
 

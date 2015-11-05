@@ -81,6 +81,8 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/ramcard128k.h"
 #include "bus/a2bus/ezcgi.h"
 
+#include "softlist.h"
+
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
 #define A2_BUS_TAG "a2bus"

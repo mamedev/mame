@@ -32,6 +32,7 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
+#include "softlist.h"
 
 class ht68k_state : public driver_device
 {

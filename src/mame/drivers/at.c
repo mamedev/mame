@@ -14,6 +14,7 @@
 
 #include "includes/at.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "softlist.h"
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")

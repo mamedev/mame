@@ -111,6 +111,8 @@
 
 ***************************************************************************/
 #include "gromport.h"
+#include "image.h"
+#include "softlist.h"
 
 #define TRACE_RPK 0
 #define TRACE_CHANGE 0

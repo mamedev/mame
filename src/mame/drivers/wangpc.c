@@ -21,7 +21,7 @@
 
 #include "includes/wangpc.h"
 #include "bus/rs232/rs232.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  MACROS/CONSTANTS

@@ -11,7 +11,7 @@
 
 
 #include "includes/special.h"
-
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )

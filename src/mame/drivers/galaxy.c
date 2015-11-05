@@ -32,6 +32,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "sound/ay8910.h"
 #include "formats/gtp_cas.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 static ADDRESS_MAP_START (galaxyp_io, AS_IO, 8, galaxy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x01)

@@ -53,6 +53,7 @@
 #include "bus/ti99x/joyport.h"
 
 #include "bus/ti99_peb/peribox.h"
+#include "softlist.h"
 
 // Debugging
 #define TRACE_READY 0

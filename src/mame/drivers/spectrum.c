@@ -281,7 +281,7 @@ SamRam
 #include "includes/spectrum.h"
 #include "formats/tzx_cas.h"
 #include "machine/spec_snqk.h"
-
+#include "softlist.h"
 
 /****************************************************************************************************/
 /* Spectrum 48k functions */

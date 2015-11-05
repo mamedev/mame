@@ -17,7 +17,7 @@
 /* Core includes */
 #include "emu.h"
 #include "includes/kc.h"
-
+#include "softlist.h"
 
 static ADDRESS_MAP_START(kc85_4_io, AS_IO, 8, kc85_4_state)
 	ADDRESS_MAP_UNMAP_HIGH

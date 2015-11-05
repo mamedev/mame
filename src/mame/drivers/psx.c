@@ -19,6 +19,7 @@
 #include "debugger.h"
 #include "machine/psxcd.h"
 #include "bus/psx/ctlrport.h"
+#include "softlist.h"
 
 #define PSXCD_TAG   "psxcd"
 

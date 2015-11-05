@@ -24,6 +24,7 @@ Paste facility was tested but doesn't work, so all code remnants removed.
 
 #include "includes/ut88.h"
 #include "formats/rk_cas.h"
+#include "softlist.h"
 #include "ut88mini.lh"
 
 static GFXDECODE_START( ut88 )

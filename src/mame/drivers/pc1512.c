@@ -89,7 +89,7 @@ This is done by following steps 11 and 12.
 #include "includes/pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

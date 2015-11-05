@@ -31,6 +31,7 @@
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "softlist.h"
 
 class compucolor2_state : public driver_device
 {

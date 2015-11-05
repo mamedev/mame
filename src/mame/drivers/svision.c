@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/svision.h"
+#include "softlist.h"
 
 #include "svision.lh"
 

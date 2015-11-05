@@ -25,7 +25,7 @@ http://mamedev.emulab.it/haze/reference/sawatte/cartridge_example.jpg
 */
 
 #include "emu.h"
-
+#include "softlist.h"
 
 
 class sawatte_state : public driver_device

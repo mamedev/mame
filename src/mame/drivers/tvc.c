@@ -27,6 +27,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "softlist.h"
+
 #define TVC_RAM_BANK    1
 #define TVC_ROM_BANK    2
 

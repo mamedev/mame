@@ -31,6 +31,7 @@
 #include "audio/vboy.h"
 #include "bus/vboy/slot.h"
 #include "bus/vboy/rom.h"
+#include "softlist.h"
 #include "vboy.lh"
 
 #define READ_BGMAP(bgoffs) m_bgmap[(bgoffs) & 0xffff]

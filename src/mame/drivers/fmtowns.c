@@ -179,6 +179,7 @@ Notes:
 #include "includes/fmtowns.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+#include "softlist.h"
 
 // CD controller IRQ types
 #define TOWNS_CD_IRQ_MPU 1

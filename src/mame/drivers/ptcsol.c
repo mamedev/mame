@@ -107,7 +107,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 #include "formats/sol_cas.h"
-
+#include "softlist.h"
 
 struct cass_data_t {
 	struct {

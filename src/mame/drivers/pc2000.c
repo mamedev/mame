@@ -20,6 +20,7 @@
 #include "video/sed1520.h"
 #include "sound/beep.h"
 #include "rendlay.h"
+#include "softlist.h"
 #include "gl3000s.lh"
 
 #include "bus/generic/slot.h"

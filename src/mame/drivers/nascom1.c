@@ -18,7 +18,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  CONSTANTS/MACROS

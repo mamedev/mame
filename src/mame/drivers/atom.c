@@ -115,6 +115,7 @@ Hardware:   PPIA 8255
 
 #include "includes/atom.h"
 #include "formats/imageutl.h"
+#include "softlist.h"
 
 /***************************************************************************
     PARAMETERS

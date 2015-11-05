@@ -18,6 +18,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/snes_ctrl/ctrl.h"
+#include "softlist.h"
 
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180

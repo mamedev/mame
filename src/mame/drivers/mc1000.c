@@ -23,6 +23,7 @@
 */
 
 #include "includes/mc1000.h"
+#include "softlist.h"
 
 /* Memory Banking */
 

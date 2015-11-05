@@ -12,7 +12,7 @@
 
 #include "includes/cbm2.h"
 #include "bus/rs232/rs232.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

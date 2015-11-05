@@ -10,7 +10,7 @@
 
 #include "includes/vector06.h"
 #include "formats/vector06_dsk.h"
-
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)

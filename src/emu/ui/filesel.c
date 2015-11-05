@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "zippath.h"
 #include "ui/menu.h"
 #include "ui/filesel.h"

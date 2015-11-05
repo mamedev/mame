@@ -19,6 +19,7 @@
 #include "bus/isa/fdc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/rmnkbd.h"
+#include "softlist.h"
 
 static SLOT_INTERFACE_START(rmnimbus_floppies)
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )

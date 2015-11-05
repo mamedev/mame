@@ -156,7 +156,7 @@ http://www.z88forever.org.uk/zxplus3e/
 
 /* +3 hardware */
 #include "machine/ram.h"
-
+#include "softlist.h"
 
 /****************************************************************************************************/
 /* Spectrum + 3 specific functions */

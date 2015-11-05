@@ -42,6 +42,7 @@ Tandy 1000 (80386) variations:
 #include "cpu/i86/i286.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "softlist.h"
 
 class tandy1000_state : public driver_device
 {

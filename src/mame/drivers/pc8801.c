@@ -266,6 +266,7 @@
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/beep.h"
+#include "softlist.h"
 //#include "includes/pc8801.h"
 
 //#define USE_PROPER_I8214

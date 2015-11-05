@@ -80,6 +80,7 @@
 #include "formats/cd90_640_dsk.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 
 /**************************** common *******************************/

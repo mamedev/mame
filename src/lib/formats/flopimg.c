@@ -1046,12 +1046,12 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 	int elen = strlen(ext);
 	const char *rext = extensions();
 	for(;;) {
-		const char *next = strchr(rext, ',');
-		int rlen = next ? next - rext : strlen(rext);
+		const char *next_ext = strchr(rext, ',');
+		int rlen = next_ext ? next_ext - rext : strlen(rext);
 		if(rlen == elen && !memcmp(ext, rext, rlen))
 			return true;
-		if(next)
-			rext = next+1;
+		if(next_ext)
+			next_ext = next_ext +1;
 		else
 			break;
 	}

@@ -19,6 +19,7 @@
 #include "formats/td0_dsk.h"
 #include "formats/cqm_dsk.h"
 #include "formats/dsk_dsk.h"
+#include "ui/menu.h"
 #include "ui/imgcntrl.h"
 #include "sound/samples.h"
 

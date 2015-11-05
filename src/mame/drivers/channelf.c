@@ -15,6 +15,7 @@
  ******************************************************************/
 
 #include "includes/channelf.h"
+#include "softlist.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0

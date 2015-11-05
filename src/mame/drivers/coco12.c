@@ -33,6 +33,7 @@
 #include "bus/coco/coco_multi.h"
 #include "bus/coco/coco_dwsock.h"
 #include "formats/coco_cas.h"
+#include "softlist.h"
 
 //**************************************************************************
 //  ADDRESS MAPS

@@ -8,7 +8,7 @@
 #include "bus/generic/carts.h"
 #include "includes/gamepock.h"
 #include "rendlay.h"
-
+#include "softlist.h"
 
 static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	ADDRESS_MAP_UNMAP_HIGH

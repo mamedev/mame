@@ -85,6 +85,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist.h"
 
 #define LOG(x) x
 

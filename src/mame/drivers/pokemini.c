@@ -16,7 +16,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "rendlay.h"
-
+#include "softlist.h"
 
 struct PRC
 {

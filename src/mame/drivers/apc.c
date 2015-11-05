@@ -62,7 +62,7 @@
 #include "machine/upd1990a.h"
 #include "machine/nvram.h"
 #include "video/upd7220.h"
-
+#include "softlist.h"
 //#include "sound/ay8910.h"
 
 #define MAIN_CLOCK XTAL_5MHz

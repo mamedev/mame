@@ -257,6 +257,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sound/2413intf.h"
 #include "video/315_5124.h"
 #include "includes/sms.h"
+#include "softlist.h"
 
 #include "sms1.lh"
 

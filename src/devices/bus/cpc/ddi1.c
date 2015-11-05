@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "ddi1.h"
 #include "includes/amstrad.h"
+#include "softlist.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

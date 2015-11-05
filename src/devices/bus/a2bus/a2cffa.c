@@ -15,7 +15,7 @@
 #include "includes/apple2.h"
 #include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
-
+#include "softlist.h"
 
 /***************************************************************************
     PARAMETERS

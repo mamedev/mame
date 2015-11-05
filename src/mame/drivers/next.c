@@ -30,6 +30,7 @@
 #include "formats/mfi_dsk.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
+#include "softlist.h"
 
 UINT32 next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

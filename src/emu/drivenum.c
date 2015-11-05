@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "drivenum.h"
+#include "softlist.h"
 #include <ctype.h>
 
 

@@ -82,6 +82,7 @@
 #include "crsshair.h"
 #include "validity.h"
 #include "debug/debugcon.h"
+#include "luaengine.h"
 #include <time.h>
 
 //**************************************************************************
@@ -117,6 +118,7 @@ machine_manager* machine_manager::instance()
 machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 		: m_osd(osd),
 		m_options(options),
+		m_lua(global_alloc(lua_engine)),
 		m_new_driver_pending(NULL),
 		m_machine(NULL)
 {
@@ -153,7 +155,7 @@ void machine_manager::schedule_new_driver(const game_driver &driver)
 ***************************************************************************/
 void machine_manager::update_machine()
 {
-	m_lua.set_machine(m_machine);
+	m_lua->set_machine(m_machine);
 }
 
 /*-------------------------------------------------
@@ -171,7 +173,7 @@ int machine_manager::execute()
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
 
-	m_lua.initialize();
+	m_lua->initialize();
 	while (error == MAMERR_NONE && !exit_pending)
 	{
 		m_new_driver_pending = NULL;

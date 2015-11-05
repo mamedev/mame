@@ -16,6 +16,7 @@
 #include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8, radio86_state )

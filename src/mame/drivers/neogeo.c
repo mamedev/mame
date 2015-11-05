@@ -456,6 +456,7 @@
 #include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "softlist.h"
 #include "neogeo.lh"
 
 

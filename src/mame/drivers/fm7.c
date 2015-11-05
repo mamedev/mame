@@ -51,6 +51,7 @@
 #include "imagedev/flopdrv.h"
 #include "bus/centronics/dsjoy.h"
 #include "includes/fm7.h"
+#include "softlist.h"
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or

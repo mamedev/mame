@@ -75,6 +75,7 @@
 #include "machine/nvram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist.h"
 
 #include "ti74.lh"
 #include "ti95.lh"

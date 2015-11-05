@@ -151,6 +151,7 @@ Notes:
 
 #include "includes/v1050.h"
 #include "bus/rs232/rs232.h"
+#include "softlist.h"
 
 void v1050_state::set_interrupt(UINT8 mask, int state)
 {

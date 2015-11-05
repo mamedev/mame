@@ -12,6 +12,7 @@
 #include "osdnet.h"
 #include "emuopts.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"

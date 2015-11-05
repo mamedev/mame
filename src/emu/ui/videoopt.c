@@ -13,6 +13,7 @@
 
 #include "uiinput.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "ui/videoopt.h"
 
 /*-------------------------------------------------

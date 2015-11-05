@@ -55,7 +55,7 @@ Ports:
 #include "sound/sp0256.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-
+#include "softlist.h"
 
 #define Z80_TAG         "z0"
 #define AY8910_TAG      "ay8910"

@@ -18,7 +18,7 @@ Bruce Tomlin (hardware info)
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
-
+#include "softlist.h"
 
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP // cart area, handled at machine_start

@@ -31,6 +31,7 @@
 #include "bus/dmv/k806.h"
 #include "bus/dmv/ram.h"
 
+#include "softlist.h"
 
 #include "dmv.lh"
 

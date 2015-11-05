@@ -15,6 +15,7 @@
 #include "includes/mikro80.h"
 #include "formats/rk_cas.h"
 #include "sound/dac.h"
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8, mikro80_state )

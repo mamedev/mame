@@ -26,7 +26,7 @@
 
 
 #include "includes/tek405x.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS

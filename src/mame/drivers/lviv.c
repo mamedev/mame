@@ -292,6 +292,7 @@ Timings:
 #include "imagedev/cassette.h"
 #include "formats/lviv_lvt.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 /* I/O ports */
 

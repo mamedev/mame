@@ -128,6 +128,7 @@ CN1     - main board connector (17x2 pin header)
 */
 
 #include "includes/crvision.h"
+#include "softlist.h"
 
 /***************************************************************************
     MEMORY MAPS

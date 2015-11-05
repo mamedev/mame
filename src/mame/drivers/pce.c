@@ -65,6 +65,7 @@ Super System Card:
 #include "sound/msm5205.h"
 #include "video/huc6270.h"
 #include "video/huc6202.h"
+#include "softlist.h"
 
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )

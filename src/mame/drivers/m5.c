@@ -38,7 +38,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "includes/m5.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

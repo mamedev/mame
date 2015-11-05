@@ -30,6 +30,7 @@
 #include "imagedev/flopdrv.h"
 #include "formats/2d_dsk.h"
 #include "formats/mz_cas.h"
+#include "softlist.h"
 
 #define MASTER_CLOCK XTAL_17_73447MHz/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 

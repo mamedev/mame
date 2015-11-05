@@ -163,6 +163,7 @@
 #include "machine/z80dart.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
+#include "softlist.h"
 
 #define CARDSLOT 0
 

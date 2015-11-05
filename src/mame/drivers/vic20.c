@@ -10,7 +10,7 @@
 */
 
 #include "includes/vic20.h"
-
+#include "softlist.h"
 
 
 QUICKLOAD_LOAD_MEMBER( vic20_state, cbm_vc20 )

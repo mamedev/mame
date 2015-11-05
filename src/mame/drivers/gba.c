@@ -18,6 +18,7 @@
 #include "includes/gba.h"
 #include "bus/gba/rom.h"
 #include "rendlay.h"
+#include "softlist.h"
 
 #define VERBOSE_LEVEL   (0)
 

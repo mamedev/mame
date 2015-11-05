@@ -34,6 +34,7 @@ video HW too.
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "includes/genpc.h"
+#include "softlist.h"
 
 class pc_state : public driver_device
 {

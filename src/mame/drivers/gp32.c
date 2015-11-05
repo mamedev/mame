@@ -21,6 +21,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "includes/gp32.h"
 #include "rendlay.h"
+#include "softlist.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

@@ -13,6 +13,7 @@
 #include "png.h"
 #include "chd.h"
 #include "config.h"
+#include "softlist.h"
 #include "ui/ui.h"
 
 

@@ -17,6 +17,7 @@
 #include "crsshair.h"
 #include "rendersw.inc"
 #include "output.h"
+#include "luaengine.h"
 
 #include "snap.lh"
 

@@ -27,7 +27,7 @@ TODO:
 #include "bus/vcs/scharger.h"
 #include "bus/vcs/compumat.h"
 #include "bus/vcs_ctrl/ctrl.h"
-
+#include "softlist.h"
 
 
 #if USE_NEW_RIOT

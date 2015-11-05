@@ -15,6 +15,7 @@
 #include "includes/bk.h"
 #include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
+#include "softlist.h"
 
 	/* Address maps */
 static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16, bk_state )

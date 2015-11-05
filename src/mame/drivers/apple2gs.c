@@ -78,6 +78,8 @@
 //#include "bus/a2bus/a2udrive.h"
 #include "bus/a2bus/a2hsscsi.h"
 
+#include "softlist.h"
+
 static const gfx_layout apple2gs_text_layout =
 {
 		14,8,       /* 14*8 characters */

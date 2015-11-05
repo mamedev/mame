@@ -77,6 +77,7 @@ Detailed list of bugs:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "softlist.h"
 
 #define PAGE_ENABLE_MASK        0x0008
 

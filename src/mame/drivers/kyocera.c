@@ -67,6 +67,7 @@
 
 
 #include "includes/kyocera.h"
+#include "softlist.h"
 
 /* Read/Write Handlers */
 

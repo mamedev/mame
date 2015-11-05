@@ -25,7 +25,7 @@
 
 #include "includes/sage2.h"
 #include "bus/rs232/rs232.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  MEMORY MANAGEMENT UNIT

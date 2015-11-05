@@ -349,6 +349,7 @@ Language Tutor modules:
 #include "machine/tms6100.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist.h"
 
 // internal artwork
 #include "lantutor.lh"

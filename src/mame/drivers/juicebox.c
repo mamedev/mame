@@ -14,6 +14,7 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "rendlay.h"
+#include "softlist.h"
 
 //#define JUICEBOX_ENTER_DEBUG_MENU
 //#define JUICEBOX_DISPLAY_ROM_ID

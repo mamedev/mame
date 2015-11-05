@@ -17,7 +17,7 @@ ToDo:
 
 
 #include "includes/mbc55x.h"
-
+#include "softlist.h"
 
 const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 {

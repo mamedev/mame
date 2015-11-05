@@ -11,6 +11,7 @@
 #include "emu.h"
 
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "ui/slotopt.h"
 #include "ui/devopt.h"
 

@@ -95,6 +95,7 @@
 
 #include "includes/softbox.h"
 #include "bus/rs232/rs232.h"
+#include "softlist.h"
 
 
 //**************************************************************************

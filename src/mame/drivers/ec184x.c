@@ -17,6 +17,7 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 #define EC1841_MEMBOARD_SIZE    (512*1024)
 

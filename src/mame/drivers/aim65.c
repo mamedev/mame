@@ -25,6 +25,7 @@ Bugs
 ******************************************************************************/
 
 #include "includes/aim65.h"
+#include "softlist.h"
 #include "aim65.lh"
 
 

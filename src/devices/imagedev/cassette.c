@@ -12,6 +12,7 @@
 #include "formats/imageutl.h"
 #include "cassette.h"
 #include "ui/ui.h"
+#include "image.h"
 
 
 #define ANIMATION_FPS       1

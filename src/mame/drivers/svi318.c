@@ -16,6 +16,7 @@
 #include "imagedev/flopdrv.h"
 #include "formats/svi_dsk.h"
 #include "formats/svi_cas.h"
+#include "softlist.h"
 #include "rendlay.h"
 
 static ADDRESS_MAP_START( svi318_mem, AS_PROGRAM, 8, svi318_state )

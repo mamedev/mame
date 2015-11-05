@@ -12,6 +12,7 @@
 #include "cpu/m6502/m65sc02.h"
 #include "audio/lynx.h"
 #include "includes/lynx.h"
+#include "softlist.h"
 
 #include "lynx.lh"
 

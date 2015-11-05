@@ -4,6 +4,7 @@
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
 #include "video/atarist.h"
+#include "softlist.h"
 
 /*
 

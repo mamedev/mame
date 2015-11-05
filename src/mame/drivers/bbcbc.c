@@ -18,7 +18,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class bbcbc_state : public driver_device
 {

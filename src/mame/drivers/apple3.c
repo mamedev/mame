@@ -27,6 +27,8 @@
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/mouse.h"
 
+#include "softlist.h"
+
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
 ADDRESS_MAP_END

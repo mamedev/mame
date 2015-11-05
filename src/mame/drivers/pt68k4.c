@@ -65,6 +65,7 @@ TODO: 68230 device
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "sound/speaker.h"
+#include "softlist.h"
 
 #define M68K_TAG "maincpu"
 #define DUART1_TAG  "duart1"

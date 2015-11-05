@@ -26,6 +26,7 @@
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
+#include "softlist.h"
 
 #define MASTER_CLOCK XTAL_4_028MHz
 

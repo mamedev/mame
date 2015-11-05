@@ -28,7 +28,7 @@ is very likely that they point to code in the internal bios.
 #include "cpu/m6502/m65ce02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class gameking_state : public driver_device
 {

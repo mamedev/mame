@@ -60,7 +60,7 @@ TODO:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 //#include "imagedev/cassette.h"
-
+#include "softlist.h"
 
 class exelv_state : public driver_device
 {

@@ -24,7 +24,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "render.h"
 #include "sound/sn76496.h"
 #include "machine/ldv1000.h"
 #include "video/resnet.h"

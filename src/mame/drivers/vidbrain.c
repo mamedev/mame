@@ -36,6 +36,7 @@
 */
 
 #include "includes/vidbrain.h"
+#include "softlist.h"
 #include "vidbrain.lh"
 
 

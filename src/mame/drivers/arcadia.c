@@ -120,6 +120,7 @@ anything in hardware. No cartridge has been found which uses them.
 ******************************************************************************/
 
 #include "includes/arcadia.h"
+#include "softlist.h"
 
 static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8, arcadia_state )
 	AM_RANGE( 0x0000, 0x0fff) AM_DEVREAD("cartslot", arcadia_cart_slot_device, read_rom)

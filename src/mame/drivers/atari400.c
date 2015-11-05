@@ -51,7 +51,7 @@
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
 #include "bus/a800/a8sio.h"
-
+#include "softlist.h"
 
 /******************************************************************************
     Atari 800 memory map (preliminary)

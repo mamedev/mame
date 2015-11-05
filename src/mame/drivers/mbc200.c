@@ -42,7 +42,7 @@
 #include "machine/i8251.h"
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
-
+#include "softlist.h"
 
 class mbc200_state : public driver_device
 {

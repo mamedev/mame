@@ -157,6 +157,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "machine/spec_snqk.h"
 #include "machine/beta.h"
 #include "machine/ram.h"
+#include "softlist.h"
 
 /****************************************************************************************************/
 /* TS2048 specific functions */

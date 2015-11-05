@@ -54,6 +54,7 @@
 #include "sound/2203intf.h"
 #include "sound/beep.h"
 #include "machine/rp5c15.h"
+#include "softlist.h"
 
 //#include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"

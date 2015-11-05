@@ -24,6 +24,7 @@
 
 #include "includes/tandy2k.h"
 #include "machine/pckeybrd.h"
+#include "softlist.h"
 
 #define LOG 1
 

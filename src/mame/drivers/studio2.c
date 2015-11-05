@@ -192,6 +192,7 @@ Notes:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist.h"
 
 #define CDP1802_TAG     "ic1"
 #define CDP1861_TAG     "ic2"

@@ -82,7 +82,8 @@
 #include "unzip.h"
 #include "debug/debugcon.h"
 #include "debug/debugvw.h"
-
+#include "image.h"
+#include "luaengine.h"
 #include <time.h>
 
 #if defined(EMSCRIPTEN)

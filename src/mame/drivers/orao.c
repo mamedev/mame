@@ -19,6 +19,7 @@
 #include "includes/orao.h"
 #include "imagedev/cassette.h"
 #include "formats/orao_cas.h"
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(orao_mem, AS_PROGRAM, 8, orao_state )

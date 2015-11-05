@@ -53,7 +53,7 @@
 */
 
 #include "includes/mikromik.h"
-
+#include "softlist.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS

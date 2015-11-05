@@ -41,7 +41,7 @@
 #include "formats/pyldin_dsk.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
-
+#include "softlist.h"
 
 class pyl601_state : public driver_device
 {

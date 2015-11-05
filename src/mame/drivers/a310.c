@@ -68,7 +68,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "formats/applix_dsk.h"
-
+#include "softlist.h"
 
 class a310_state : public archimedes_state
 {

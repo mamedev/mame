@@ -15,6 +15,7 @@
 #include "bus/astrocde/rom.h"
 #include "bus/astrocde/exp.h"
 #include "bus/astrocde/ram.h"
+#include "softlist.h"
 
 class astrocde_mess_state : public astrocde_state
 {

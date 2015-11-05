@@ -76,6 +76,7 @@
 #include "emuopts.h"
 #include "xmlfile.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "cheat.h"
 #include "debug/debugcpu.h"
 

@@ -33,7 +33,7 @@
 #include "sound/sn76496.h"
 #include "machine/wd_fdc.h"
 #include "formats/guab_dsk.h"
-
+#include "softlist.h"
 
 /*************************************
  *

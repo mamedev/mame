@@ -61,6 +61,7 @@
 #include "sound/ay8910.h"
 #include "rendlay.h"
 #include "includes/einstein.h"
+#include "softlist.h"
 
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0

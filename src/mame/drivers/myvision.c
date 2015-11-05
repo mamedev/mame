@@ -29,7 +29,7 @@
 #include "sound/ay8910.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "softlist.h"
 
 class myvision_state : public driver_device
 {

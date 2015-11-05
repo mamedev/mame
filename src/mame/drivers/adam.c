@@ -300,7 +300,7 @@ Mark Gordon
 */
 
 #include "includes/adam.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************

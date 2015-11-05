@@ -19,6 +19,7 @@
 #include "includes/radio86.h"
 #include "machine/ram.h"
 #include "includes/partner.h"
+#include "softlist.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8, partner_state )

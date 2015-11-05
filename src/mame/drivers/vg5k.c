@@ -57,7 +57,7 @@
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "formats/vg5k_cas.h"
-
+#include "softlist.h"
 
 class vg5k_state : public driver_device
 {

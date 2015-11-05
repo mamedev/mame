@@ -34,6 +34,7 @@
 ***************************************************************************/
 
 #include "includes/wswan.h"
+#include "softlist.h"
 #include "wswan.lh"
 
 static ADDRESS_MAP_START (wswan_mem, AS_PROGRAM, 8, wswan_state)

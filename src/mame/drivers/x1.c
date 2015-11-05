@@ -207,6 +207,7 @@
 
 #include "includes/x1.h"
 #include "formats/2d_dsk.h"
+#include "softlist.h"
 
 #define MAIN_CLOCK XTAL_16MHz
 #define VDP_CLOCK  XTAL_42_9545MHz

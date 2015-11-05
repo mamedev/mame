@@ -16,6 +16,7 @@
 
 #include "sc499.h"
 #include "formats/ioprocs.h"
+#include "image.h"
 
 #define VERBOSE 0
 

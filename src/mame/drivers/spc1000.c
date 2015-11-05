@@ -147,6 +147,7 @@ IMPORTANT NOTE for tape usage: you *FIRST* press PLAY on the tape drive
 #include "bus/spc1000/fdd.h"
 #include "bus/spc1000/vdp.h"
 
+#include "softlist.h"
 
 class spc1000_state : public driver_device
 {

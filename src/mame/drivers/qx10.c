@@ -43,6 +43,7 @@
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "machine/qx10kbd.h"
+#include "softlist.h"
 
 #define MAIN_CLK    15974400
 

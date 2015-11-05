@@ -71,6 +71,7 @@ public:
 	static void printf_usage(const char *par1, const char *par2);
 };
 
+class lua_engine;
 
 // ======================> machine_manager
 
@@ -87,7 +88,7 @@ public:
 
 	osd_interface &osd() const;
 	emu_options &options() const { return m_options; }
-	lua_engine *lua() { return &m_lua; }
+	lua_engine *lua() { return m_lua; }
 
 	running_machine *machine() { return m_machine; }
 
@@ -102,7 +103,7 @@ private:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
 
-	lua_engine              m_lua;
+	lua_engine *            m_lua;
 
 	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
 

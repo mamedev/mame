@@ -9,7 +9,6 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "render.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "sound/beep.h"
