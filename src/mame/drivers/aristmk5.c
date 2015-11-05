@@ -1095,7 +1095,7 @@ ROM_END
 
 // 596 - 10 Credit Multiplier / 9 Line Multiline. (touch)
 // Chicken - Export C - 23/02/98.
-// Marked as RHG0730 and 92.588%
+// Marked as RHG0730, 92.588% and 'touch'
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( chickena )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -1298,7 +1298,7 @@ ROM_END
 
 // MV4115/3 - 20 Line Multiline / 3,5,10,20,25,50 Credit Multiplier.
 // Party Gras - Export  B - 06/02/2001.
-// Marked as BHG1284 and touch.
+// Marked as BHG1284 and 'touch'.
 ROM_START( prtygras )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -1359,7 +1359,7 @@ GAME( 1997, dmdtouch,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk
 GAME( 1997, bumblbug,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Bumble Bugs (Export, 92.691%)",                  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 593,      D - 05/07/97
 GAME( 1997, pengpays,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Penguin Pays (Export)",                          MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 586/7(b)  B - 14/07/97
 GAME( 1997, trpdlght,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Tropical Delight (PHG0625-02, Export, 92.25%)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 577/3,    D - 24/09/97
-GAME( 1998, chickena,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Chicken (RHG0730, Export, 92.588%)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 596,      C - 23/02/98
+GAME( 1998, chickena,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Chicken (RHG0730, Export, 92.588%, touch)",      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 596,      C - 23/02/98
 GAME( 1998, adonis,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0200751V, NSW/ACT)",                     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 10
 GAME( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0100751V, NSW/ACT)",                     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // 602/9,    A - 25/05/98, Rev 9
 GAME( 1998, swheart2,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (PHG0742, Export, 92.252%)",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  // MV4061,   A - 29/06/98
