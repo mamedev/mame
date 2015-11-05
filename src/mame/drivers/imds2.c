@@ -26,9 +26,9 @@
 // A82 2732     EPROM with monitor & boot firmware (assembly source of this ROM is in [4])
 // A66 8259A    System PIC
 // A89 8259A    Local PIC
-//*A86 8253     PIT
-//*A91 8251A    Serial channel #0
-//*A90 8251A    Serial channel #1
+// A86 8253     PIT
+// A91 8251A    Serial channel #0
+// A90 8251A    Serial channel #1
 //
 // **********
 // I/O Controller (IOC)
@@ -60,8 +60,6 @@
 //
 // A3 8741      CPU @ 3.58 MHz
 //
-// ICs that are not emulated yet are marked with "*"
-//
 // NOTE:
 // Firmware running on PIO is NOT original because a dump is not available at the moment.
 // Emulator runs a version of PIO firmware that was specifically developped by me to implement
@@ -69,8 +67,6 @@
 //
 // TODO:
 // - Find a dump of the original PIO firmware
-// - Emulate serial channels on IPC
-// - Emulate PIT on IPC
 // - Adjust speed of processors. Wait states are not accounted for yet.
 //
 // Huge thanks to Dave Mabry for dumping IOC firmware, KB firmware and character generator. This driver would not
@@ -176,6 +172,8 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
         m_ipctimer(*this , "ipctimer"),
         m_ipcusart0(*this , "ipcusart0"),
         m_ipcusart1(*this , "ipcusart1"),
+        m_serial0(*this , "serial0"),
+        m_serial1(*this , "serial1"),
 	m_ioccpu(*this , "ioccpu"),
 	m_iocdma(*this , "iocdma"),
 	m_ioccrtc(*this , "ioccrtc"),
@@ -787,10 +785,23 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
                 MCFG_I8251_RTS_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_cts))
                 MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir0_w))
                 MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir1_w))
+                MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial0" , rs232_port_device , write_txd))
 
                 MCFG_DEVICE_ADD("ipcusart1" , I8251 , 0)
                 MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir2_w))
                 MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir3_w))
+                MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_txd))
+                MCFG_I8251_RTS_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_rts))
+                MCFG_I8251_DTR_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_dtr))
+
+		MCFG_RS232_PORT_ADD("serial0" , default_rs232_devices , NULL)
+                MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_rxd))
+                MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_dsr))
+
+		MCFG_RS232_PORT_ADD("serial1" , default_rs232_devices , NULL)
+                MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_rxd))
+                MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_cts))
+                MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_dsr))
 
 		MCFG_CPU_ADD("ioccpu" , I8080A , IOC_XTAL_Y2 / 18)     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
 		MCFG_CPU_PROGRAM_MAP(ioc_mem_map)

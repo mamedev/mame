@@ -17,6 +17,7 @@
 #include "imagedev/flopdrv.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
+#include "bus/rs232/rs232.h"
 
 class imds2_state : public driver_device
 {
@@ -79,6 +80,8 @@ class imds2_state : public driver_device
 	required_device<pit8253_device> m_ipctimer;
         required_device<i8251_device> m_ipcusart0;
         required_device<i8251_device> m_ipcusart1;
+	required_device<rs232_port_device> m_serial0;
+	required_device<rs232_port_device> m_serial1;
 	required_device<i8080a_cpu_device> m_ioccpu;
 	required_device<i8257_device> m_iocdma;
 	required_device<i8275_device> m_ioccrtc;
