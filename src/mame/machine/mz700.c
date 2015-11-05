@@ -145,7 +145,7 @@ WRITE8_MEMBER(mz_state::mz700_e008_w)
 
 READ8_MEMBER(mz_state::mz800_bank_0_r)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	/* switch in cgrom */
 	//spc.install_read_bank(0x1000, 0x1fff, "bank2");
@@ -188,7 +188,7 @@ READ8_MEMBER(mz_state::mz800_bank_0_r)
 
 WRITE8_MEMBER(mz_state::mz700_bank_0_w)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	//spc.install_readwrite_bank(0x0000, 0x0fff, "bank1a");
 	//membank("bank1a")->set_base(m_ram->pointer());
@@ -207,7 +207,7 @@ WRITE8_MEMBER(mz_state::mz800_bank_0_w)
 
 READ8_MEMBER(mz_state::mz800_bank_1_r)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	/* switch in ram from 0x1000 to 0x1fff */
 	//spc.install_readwrite_bank(0x1000, 0x1fff, "bank2");
@@ -234,7 +234,7 @@ READ8_MEMBER(mz_state::mz800_bank_1_r)
 
 WRITE8_MEMBER(mz_state::mz700_bank_1_w)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 	membank("bankd")->set_entry(0); // ram
 
 	if (m_mz700_mode)
@@ -283,7 +283,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_2_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
@@ -331,7 +331,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
@@ -399,7 +399,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_5_w)
 {
-	address_space &spc = m_maincpu->space(AS_PROGRAM);
+	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
