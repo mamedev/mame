@@ -58,10 +58,10 @@ ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( io_map, 8, mos6532_t )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(pa_data_r, pa_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(pa_ddr_r, pa_ddr_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_READWRITE(pb_data_r, pb_data_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_READWRITE(pb_ddr_r, pb_ddr_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(pa_data_r, pa_data_w)  // SWCHA
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(pa_ddr_r, pa_ddr_w)    // SWACNT
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_READWRITE(pb_data_r, pb_data_w)  // SWCHB
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_READWRITE(pb_ddr_r, pb_ddr_w)    // SWBCNT 
 	AM_RANGE(0x14, 0x17) AM_WRITE(timer_off_w)
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(timer_on_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x12) AM_READ(timer_off_r)
@@ -276,9 +276,9 @@ void mos6532_t::device_start()
 
 void mos6530_base_t::device_reset()
 {
-	m_pa_out = 0;
+	m_pa_out = 0xff;
 	m_pa_ddr = 0;
-	m_pb_out = 0;
+	m_pb_out = 0xff; // a7800 One-On-One Basketball (1on1u) needs this or you can't start a game, it doesn't initialize it.  (see MT6060)
 	m_pb_ddr = 0;
 
 	m_ie_timer = false;
