@@ -54,7 +54,7 @@ REGTESTS += \
 
 jedutiltest:
 	@echo Running jedutil unittest
-	$(PYTHON) $(SRC)/regtests/jedutil/jedtest.py
+	$(PYTHON) regtests/jedutil/jedtest.py
 
 
 
@@ -64,4 +64,4 @@ jedutiltest:
 
 chdmantest:
 	@echo Running chdman unittest
-	$(PYTHON) $(SRC)/regtests/chdman/chdtest.py
+	$(PYTHON) regtests/chdman/chdtest.py

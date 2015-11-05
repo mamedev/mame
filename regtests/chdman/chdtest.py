@@ -130,9 +130,9 @@ inputPath = os.path.join(currentDirectory, 'input')
 outputPath = os.path.join(currentDirectory, "output")
 tempPath = os.path.join(currentDirectory, "temp")
 if os.name == 'nt':
-	chdmanBin = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "chdman.exe"))
+	chdmanBin = os.path.normpath(os.path.join(currentDirectory, "..", "..", "chdman.exe"))
 else:		
-	chdmanBin = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "chdman"))
+	chdmanBin = os.path.normpath(os.path.join(currentDirectory, "..", "..", "chdman"))
 
 if not os.path.exists(chdmanBin):
 	sys.stderr.write(chdmanBin + " does not exist\n")
