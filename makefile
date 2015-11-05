@@ -1119,7 +1119,7 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py
 # Regression tests
 #-------------------------------------------------
 
-include $(SRC)/regtests/regtests.mak
+include regtests/regtests.mak
 
 .PHONY: tests
 

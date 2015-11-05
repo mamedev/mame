@@ -80,9 +80,9 @@ def main():
     baselinePath = os.path.join(currentDirectory, "baseline")
     outputPath = os.path.join(currentDirectory, "output")
     if os.name == 'nt':
-        jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "jedutil.exe"))
+        jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "jedutil.exe"))
     else:		
-        jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "jedutil"))
+        jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "jedutil"))
 
     if VERBOSE:
         print("JED Path:      %s" % jedsPath)
