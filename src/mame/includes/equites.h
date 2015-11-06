@@ -85,7 +85,6 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_portb_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_w);
-	DECLARE_READ16_MEMBER(hvoltage_debug_r);
 	DECLARE_WRITE16_MEMBER(gekisou_unknown_0_w);
 	DECLARE_WRITE16_MEMBER(gekisou_unknown_1_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
@@ -111,7 +110,6 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
 	DECLARE_DRIVER_INIT(bullfgtr);
 	DECLARE_DRIVER_INIT(kouyakyu);
-	DECLARE_DRIVER_INIT(hvoltage);
 	DECLARE_DRIVER_INIT(gekisou);
 	DECLARE_DRIVER_INIT(splndrbt);
 	DECLARE_DRIVER_INIT(equites);
