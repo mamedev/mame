@@ -14,6 +14,7 @@
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
+#include "rendlay.h"
 #include "fb01.lh"
 
 

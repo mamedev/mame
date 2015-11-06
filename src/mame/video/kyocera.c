@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "includes/kyocera.h"
+#include "rendlay.h"
 
 PALETTE_INIT_MEMBER(kc85_state,kc85)
 {

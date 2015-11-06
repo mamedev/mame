@@ -173,7 +173,7 @@ Rowscroll style:
 #include "emu.h"
 #include "video/deco16ic.h"
 #include "ui/ui.h"
-
+#include "render.h"
 
 const device_type DECO16IC = &device_creator<deco16ic_device>;
 

@@ -18,6 +18,7 @@ TODO:
 ***************************************************************************/
 
 #include "includes/wswan.h"
+#include "render.h"
 
 #define INTERNAL_EEPROM_SIZE    1024
 

@@ -2,6 +2,7 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "wpc_dmd.h"
+#include "rendlay.h"
 
 const device_type WPC_DMD = &device_creator<wpc_dmd_device>;
 

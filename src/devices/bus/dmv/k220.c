@@ -55,7 +55,7 @@
 
 #include "emu.h"
 #include "k220.h"
-
+#include "render.h"
 
 /***************************************************************************
     IMPLEMENTATION

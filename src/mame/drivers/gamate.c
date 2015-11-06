@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "includes/gamate.h"
 #include "ui/ui.h"
+#include "rendlay.h"
 #include "softlist.h"
 
 class gamate_state : public driver_device

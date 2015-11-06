@@ -57,6 +57,7 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "sound/asc.h"
 #include "includes/mac.h"
 #include "machine/ram.h"
+#include "render.h"
 
 PALETTE_INIT_MEMBER(mac_state,mac)
 {

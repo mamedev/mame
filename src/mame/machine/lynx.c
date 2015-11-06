@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/lynx.h"
 #include "cpu/m6502/m65sc02.h"
-
+#include "render.h"
 
 #define PAD_UP      0x80
 #define PAD_DOWN    0x40

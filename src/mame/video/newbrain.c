@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "includes/newbrain.h"
+#include "rendlay.h"
 #include "newbrain.lh"
 
 void newbrain_state::video_start()

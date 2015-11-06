@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "includes/pc8401a.h"
+#include "rendlay.h"
 #include "pc8500.lh"
 
 /* PC-8401A */

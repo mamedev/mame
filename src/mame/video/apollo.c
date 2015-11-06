@@ -16,7 +16,7 @@
 #define VERBOSE 0
 
 #include "includes/apollo.h"
-
+#include "rendlay.h"
 #include "apollo.lh"
 #include "apollo_15i.lh"
 

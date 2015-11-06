@@ -24,6 +24,7 @@
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "includes/fromanc2.h"
+#include "rendlay.h"
 
 
 /*************************************

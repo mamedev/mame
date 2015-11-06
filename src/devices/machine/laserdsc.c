@@ -13,6 +13,7 @@
 #include "avhuff.h"
 #include "vbiparse.h"
 #include "config.h"
+#include "render.h"
 #include "chd.h"
 
 

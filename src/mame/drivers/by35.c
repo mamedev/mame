@@ -72,7 +72,7 @@ ToDo:
 #include "by35.lh"
 #include "by35_playboy.lh"
 #include "sound/discrete.h"
-
+#include "render.h"
 
 class by35_state : public genpin_class
 {

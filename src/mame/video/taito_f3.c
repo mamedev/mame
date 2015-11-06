@@ -209,6 +209,7 @@ Playfield tile info:
 #include "emu.h"
 #include "includes/taito_f3.h"
 #include "ui/ui.h"
+#include "render.h"
 
 #define VERBOSE 0
 #define DARIUSG_KLUDGE

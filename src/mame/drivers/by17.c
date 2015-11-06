@@ -24,7 +24,7 @@ ToDo:
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"
-
+#include "render.h"
 
 class by17_state : public genpin_class
 {

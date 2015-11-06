@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "st0020.h"
+#include "render.h"
 
 const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 
