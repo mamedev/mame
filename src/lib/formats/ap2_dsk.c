@@ -1626,7 +1626,7 @@ bool a2_edd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 				odd = !odd;
 
 		int splice_byte = spos;
-		while(splice_byte < spos+delta && (npos[splice_byte+1] - npos[splice_byte] != 8 || npos[splice_byte+2] - npos[splice_byte+1] == 8 || npos[splice_byte+2] - npos[splice_byte+2] == 8))
+		while(splice_byte < spos+delta && (npos[splice_byte+1] - npos[splice_byte] != 8 || npos[splice_byte+2] - npos[splice_byte+1] == 8 || npos[splice_byte+3] - npos[splice_byte+2] == 8))
 			splice_byte++;
 		int splice = (npos[splice_byte+2]-1) % len;
 		if(odd)

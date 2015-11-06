@@ -69,7 +69,7 @@ int gl_shader_loadExtention(osd_gl_context *gl_ctx)
 
 	if ( pfn_glGetObjectParameterivARB && pfn_glGetInfoLogARB && pfn_glDeleteObjectARB && pfn_glCreateShaderObjectARB &&
 			pfn_glShaderSourceARB && pfn_glCompileShaderARB && pfn_glCreateProgramObjectARB && pfn_glAttachObjectARB &&
-			pfn_glLinkProgramARB && pfn_glValidateProgramARB && pfn_glUseProgramObjectARB && pfn_glGetUniformLocationARB &&
+			pfn_glLinkProgramARB && pfn_glValidateProgramARB && pfn_glUseProgramObjectARB &&
 			pfn_glGetUniformLocationARB && pfn_glUniform1fARB && pfn_glUniform1iARB &&
 			pfn_glUniform1fvARB && pfn_glUniform2fvARB && pfn_glUniform3fvARB && pfn_glUniform4fvARB &&
 			pfn_glUniform1ivARB && pfn_glUniform2ivARB && pfn_glUniform3ivARB && pfn_glUniform4ivARB

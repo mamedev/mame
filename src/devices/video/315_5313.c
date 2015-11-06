@@ -1022,11 +1022,8 @@ UINT16 sega315_5313_device::ctrl_port_r()
  d0  - PAL mode flag
 */
 
-	return (0<<15) | // ALWAYS 0
-			(0<<14) | // ALWAYS 0
-			(1<<13) | // ALWAYS 1
+	return (1<<13) | // ALWAYS 1
 			(1<<12) | // ALWAYS 1
-			(0<<11) | // ALWAYS 0
 			(1<<10) | // ALWAYS 1
 			(fifo_empty<<9 ) | // FIFO EMPTY
 			(fifo_full<<8 ) | // FIFO FULL
