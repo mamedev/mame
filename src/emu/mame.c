@@ -131,6 +131,7 @@ machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 
 machine_manager::~machine_manager()
 {
+	global_free(m_lua);
 	m_manager = NULL;
 }
 
