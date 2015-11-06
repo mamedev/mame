@@ -153,32 +153,29 @@ VIDEO_START_MEMBER(equites_state,splndrbt)
  *
  *************************************/
 
-READ16_MEMBER(equites_state::equites_fg_videoram_r)
+READ8_MEMBER(equites_state::equites_fg_videoram_r)
 {
-	return 0xff00 | m_fg_videoram[offset];
+	// 8-bit
+	return m_fg_videoram[offset];
 }
 
-WRITE16_MEMBER(equites_state::equites_fg_videoram_w)
+WRITE8_MEMBER(equites_state::equites_fg_videoram_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_fg_videoram[offset] = data & 0xff;
-
-		m_fg_tilemap->mark_tile_dirty(offset >> 1);
-	}
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(equites_state::equites_bg_videoram_w)
 {
 	COMBINE_DATA(m_bg_videoram + offset);
-
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(equites_state::equites_bgcolor_w)
+WRITE8_MEMBER(equites_state::equites_bgcolor_w)
 {
-	if (ACCESSING_BITS_8_15)
-		m_bgcolor = data >> 8;
+	// bg color register
+	if (offset == 0)
+		m_bgcolor = data;
 }
 
 WRITE16_MEMBER(equites_state::equites_scrollreg_w)
@@ -190,47 +187,29 @@ WRITE16_MEMBER(equites_state::equites_scrollreg_w)
 		m_bg_tilemap->set_scrollx(0, data >> 8);
 }
 
-WRITE16_MEMBER(equites_state::splndrbt_selchar0_w)
+WRITE16_MEMBER(equites_state::splndrbt_selchar_w)
 {
-	if (m_fg_char_bank != 0)
+	// data bit is A16 (offset)
+	data = (offset == 0) ? 0 : 1;
+	
+	// select active char map
+	if (m_fg_char_bank != data)
 	{
-		m_fg_char_bank = 0;
+		m_fg_char_bank = data;
 		m_fg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE16_MEMBER(equites_state::splndrbt_selchar1_w)
+WRITE16_MEMBER(equites_state::equites_flipw_w)
 {
-	if (m_fg_char_bank != 1)
-	{
-		m_fg_char_bank = 1;
-		m_fg_tilemap->mark_all_dirty();
-	}
+	// data bit is A16 (offset)
+	flip_screen_set(offset != 0);
 }
 
-WRITE16_MEMBER(equites_state::equites_flip0_w)
+WRITE8_MEMBER(equites_state::equites_flipb_w)
 {
-	flip_screen_set(0);
-}
-
-WRITE16_MEMBER(equites_state::equites_flip1_w)
-{
-	flip_screen_set(1);
-}
-
-WRITE16_MEMBER(equites_state::splndrbt_flip0_w)
-{
-	if (ACCESSING_BITS_0_7)
-		flip_screen_set(0);
-
-	if (ACCESSING_BITS_8_15)
-		m_bgcolor = data >> 8;
-}
-
-WRITE16_MEMBER(equites_state::splndrbt_flip1_w)
-{
-	if (ACCESSING_BITS_0_7)
-		flip_screen_set(1);
+	// data bit is A16 (offset)
+	flip_screen_set(offset != 0);
 }
 
 WRITE16_MEMBER(equites_state::splndrbt_bg_scrollx_w)
@@ -253,9 +232,7 @@ WRITE16_MEMBER(equites_state::splndrbt_bg_scrolly_w)
 
 void equites_state::equites_draw_sprites_block( bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end )
 {
-	int offs;
-
-	for (offs = end - 2; offs >= start; offs -= 2)
+	for (int offs = end - 2; offs >= start; offs -= 2)
 	{
 		int attr = m_spriteram[offs + 1];
 		if (!(attr & 0x800))    // disable or x MSB?
@@ -329,11 +306,10 @@ void equites_state::splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 	const UINT8 * const xrom = memregion("user2")->base();
 	const UINT8 * const yrom = xrom + 0x100;
 	gfx_element* gfx = m_gfxdecode->gfx(2);
-	int offs;
 
 	// note that sprites are actually 30x30, contained in 32x32 squares. The outer edge is not used.
 
-	for (offs = 0x3f; offs < 0x6f; offs += 2)   // 24 sprites
+	for (int offs = 0x3f; offs < 0x6f; offs += 2)   // 24 sprites
 	{
 		int data = m_spriteram[offs];
 		int fx = (data & 0x2000) >> 13;
