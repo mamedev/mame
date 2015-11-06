@@ -11,8 +11,6 @@
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 
-#define POPDRUMKIT 0
-
 
 class equites_state : public driver_device
 {
@@ -68,10 +66,6 @@ public:
 	float     m_hihatvol;
 	int       m_timer_count;
 	int       m_unknown_bit;    // Gekisou special handling
-#if POPDRUMKIT
-	int       m_hihat;
-	int       m_cymbal;
-#endif
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

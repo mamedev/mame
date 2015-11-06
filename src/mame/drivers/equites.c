@@ -465,19 +465,10 @@ WRITE8_MEMBER(equites_state::equites_8910porta_w)
 		m_samples->start(1, 1);
 
 	m_ay_port_a = data;
-
-#if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)", m_hihat, BIT(m_ay_port_b, 6), m_cymbal, m_ay_port_b & 3);
-#endif
 }
 
 WRITE8_MEMBER(equites_state::equites_8910portb_w)
 {
-#if POPDRUMKIT
-if (data & ~m_ay_port_b & 0x08) m_cymbal++;
-if (data & ~m_ay_port_b & 0x04) m_hihat++;
-#endif
-
 	// bongo 3
 	m_samples->set_volume(2, ((data & 0x30)>>4) * 0.33);
 	if (data & ~m_ay_port_b & 0x80)
@@ -500,10 +491,6 @@ if (data & ~m_ay_port_b & 0x04) m_hihat++;
 		m_hihatvol = 0.0f;
 
 	m_ay_port_b = data;
-
-#if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)",m_hihat,BIT(m_ay_port_b,6),m_cymbal,m_ay_port_b & 3);
-#endif
 }
 
 WRITE8_MEMBER(equites_state::equites_cymbal_ctrl_w)
@@ -1163,10 +1150,6 @@ MACHINE_START_MEMBER(equites_state,equites)
 	save_item(NAME(m_hihatvol));
 	save_item(NAME(m_timer_count));
 	save_item(NAME(m_unknown_bit));
-#if POPDRUMKIT
-	save_item(NAME(m_hihat));
-	save_item(NAME(m_cymbal));
-#endif
 
 	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback), this));
 
@@ -1194,9 +1177,6 @@ MACHINE_RESET_MEMBER(equites_state,equites)
 	m_hihatvol = 0.0;
 	m_timer_count = 0;
 	m_unknown_bit = 0;
-#if POPDRUMKIT
-	m_hihat = m_cymbal = 0;
-#endif
 }
 
 
