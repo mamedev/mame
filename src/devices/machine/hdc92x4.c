@@ -1911,7 +1911,10 @@ bool hdc92x4_device::found_mark(int state)
 	bool ismark = false;
 	if (using_floppy())
 	{
-		if (state==SEARCH_IDAM) ismark = (m_live_state.shift_reg == fm_mode() ? 0xf57e : 0x4489);
+		if (state == SEARCH_IDAM)
+        {
+            ismark = (m_live_state.shift_reg == (fm_mode() ? 0xf57e : 0x4489));
+        }
 		else
 		{
 			// f56a    1x1x
