@@ -23,9 +23,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 0) all games
 
-  - To enter sort of "test mode", bits 0 and 1 need to be ON when the game is reset.
-    Acho said that it could be a switch (but I'm not sure of that), and that's why
-    I've added a EASY_TEST_MODE compilation switch.
+  - To enter sort of "test mode", COIN switches 0 and 1 need to be ON when the game is reset.
 
 
 1) 'equites'
@@ -367,7 +365,6 @@ D                                                                               
 #include "includes/equites.h"
 
 #define HVOLTAGE_DEBUG  0
-#define EASY_TEST_MODE  0
 
 #define FRQ_ADJUSTER_TAG    "FRQ"
 
@@ -384,8 +381,6 @@ D                                                                               
 
 /******************************************************************************/
 // Sound
-
-/******************************************************************************/
 
 TIMER_CALLBACK_MEMBER(equites_state::equites_nmi_callback)
 {
@@ -530,6 +525,8 @@ WRITE_LINE_MEMBER(equites_state::equites_msm5232_gate)
 {
 }
 
+
+
 /******************************************************************************/
 // Local Functions
 
@@ -600,6 +597,8 @@ WRITE8_MEMBER(equites_state::equites_8155_w)
 	}
 }
 
+
+
 /******************************************************************************/
 // Main CPU Handlers
 
@@ -625,6 +624,8 @@ WRITE16_MEMBER(equites_state::gekisou_unknown_1_w)
 {
 	m_unknown_bit = 1;
 }
+
+
 
 /******************************************************************************/
 // Main CPU Memory Map
@@ -736,6 +737,8 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("mcuram") /* main CPU shared RAM */
 ADDRESS_MAP_END
 
+
+
 /******************************************************************************/
 // Common Port Map
 
@@ -770,9 +773,6 @@ static INPUT_PORTS_START( equites )
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 )
-#if EASY_TEST_MODE
-	PORT_SERVICE( 0x0300, IP_ACTIVE_HIGH )
-#endif
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:!6")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
@@ -807,9 +807,6 @@ static INPUT_PORTS_START( gekisou )
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 )
-#if EASY_TEST_MODE
-	PORT_SERVICE( 0x0300, IP_ACTIVE_HIGH )
-#endif
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Settings") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -833,9 +830,6 @@ static INPUT_PORTS_START( bullfgtr )
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 )
-#if EASY_TEST_MODE
-	PORT_SERVICE( 0x0300, IP_ACTIVE_HIGH )
-#endif
 	PORT_DIPNAME( 0x0c00, 0x0000, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW:!6,!5")
 	PORT_DIPSETTING(      0x0c00, "3:00" )
 	PORT_DIPSETTING(      0x0800, "2:00" )
@@ -867,12 +861,8 @@ static INPUT_PORTS_START( kouyakyu )
 	EQUITES_PLAYER_INPUT_MSB( IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3, IPT_START2 )
 
 	PORT_START("IN1")
-//  PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
-//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0300, IP_ACTIVE_HIGH, IPT_COIN1 )
-#if EASY_TEST_MODE
-	PORT_SERVICE( 0x0300, IP_ACTIVE_HIGH )
-#endif
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) // only used to access testmode!
 	PORT_DIPNAME( 0x0c00, 0x0000, "Game Points" ) PORT_DIPLOCATION("SW:!6,!5")
 	PORT_DIPSETTING(      0x0800, "3000" )
 	PORT_DIPSETTING(      0x0400, "4000" )
@@ -906,9 +896,6 @@ static INPUT_PORTS_START( splndrbt )
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 )
-#if EASY_TEST_MODE
-	PORT_SERVICE( 0x0300, IP_ACTIVE_HIGH )
-#endif
 	PORT_DIPNAME( 0x0c00, 0x0000, DEF_STR ( Difficulty ) ) PORT_DIPLOCATION("SW:!6,!5")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
@@ -958,9 +945,6 @@ static INPUT_PORTS_START( hvoltage )
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 )
-#if EASY_TEST_MODE
-	PORT_SERVICE( 0x0300, IP_ACTIVE_HIGH )
-#endif
 #if HVOLTAGE_DEBUG
 	PORT_DIPNAME( 0x0400, 0x0000, "Invulnerability" ) PORT_DIPLOCATION("SW:!6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -999,6 +983,8 @@ static INPUT_PORTS_START( hvoltage )
 	PORT_START(FRQ_ADJUSTER_TAG)
 	PORT_ADJUSTER(27, "MSM5232 Clock")
 INPUT_PORTS_END
+
+
 
 /******************************************************************************/
 // Graphics Layouts
@@ -1259,6 +1245,7 @@ static MACHINE_CONFIG_DERIVED( hvoltage, splndrbt )
 	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 MACHINE_CONFIG_END
+
 
 
 /******************************************************************************/
@@ -1808,6 +1795,8 @@ ROM_START( hvoltage )
 	ROM_LOAD( "3.8l",   0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
 
+
+
 /******************************************************************************/
 // Initializations
 
@@ -1871,6 +1860,8 @@ DRIVER_INIT_MEMBER(equites_state,hvoltage)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),this));
 #endif
 }
+
+
 
 /******************************************************************************/
 
