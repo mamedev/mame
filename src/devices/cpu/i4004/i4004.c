@@ -526,4 +526,3 @@ offs_t i4004_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	return CPU_DISASSEMBLE_NAME(i4004)(this, buffer, pc, oprom, opram, options);
 }
 
-//      case CPUINFO_IS_OCTAL:                      info->i = true;                         break;

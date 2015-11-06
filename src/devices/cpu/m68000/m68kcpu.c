@@ -2157,39 +2157,6 @@ void m68000_base_device::init_cpu_coldfire(void)
 	define_state();
 }
 
-
-
-
-
-
-/*
-        case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-        case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-
-        case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 24;                           break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 0;                            break;
-
-        case CPUINFO_INT_INPUT_STATE + 0:               info->i = 0;  // there is no level 0
-        case CPUINFO_INT_INPUT_STATE + 1:               info->i = (m68k->virq_state >> 1) & 1;  break;
-        case CPUINFO_INT_INPUT_STATE + 2:               info->i = (m68k->virq_state >> 2) & 1;  break;
-        case CPUINFO_INT_INPUT_STATE + 3:               info->i = (m68k->virq_state >> 3) & 1;  break;
-        case CPUINFO_INT_INPUT_STATE + 4:               info->i = (m68k->virq_state >> 4) & 1;  break;
-        case CPUINFO_INT_INPUT_STATE + 5:               info->i = (m68k->virq_state >> 5) & 1;  break;
-        case CPUINFO_INT_INPUT_STATE + 6:               info->i = (m68k->virq_state >> 6) & 1;  break;
-        case CPUINFO_INT_INPUT_STATE + 7:               info->i = (m68k->virq_state >> 7) & 1;  break;
-
-        case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Motorola 68K");        break;
-        case CPUINFO_STR_VERSION:                   strcpy(info->s, "4.95");                break;
-        case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-        case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO+OG)"); break;
-
-
-*/
-
-
-
-
-
 CPU_DISASSEMBLE( dasm_m68000 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68000);
