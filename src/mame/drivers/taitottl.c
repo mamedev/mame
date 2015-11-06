@@ -5,57 +5,61 @@
  Taito Discrete Hardware Games
 
 
- Game Name(s)                                                      Part #'s       Data      PROM/ROM Chip Numbers
- ----------------------------------------------------------------+--------------+---------+---------------------------------------
- Anti-Aircraft (1975) (clone of Atari's Anti-Aircraft)                            YES
- Astro Race (11/1973) (clone of Atari's Space Race)                               UNKNOWN
- Attack (09/1976)                                                                 UNKNOWN
- Attack UFO (08/1974)                                                             UNKNOWN
- Avenger (??/1976) (clone of Electra's Avenger)                                   YES
- Ball Park/TT Ball Park (??/1974) (clone of Midway's Ball Park)                   YES
- Basketball (04/1974) (clone of Midway's TV Basketball)                           NO
- Bombs Away (??/1977) (clone of Meadows' Bombs Away)                              YES
- Cisco/Fisco 400 (04/1977)                                                        UNKNOWN
- Clean Sweep (??/1976) (clone of Ramtek's Clean Sweep)                            YES
- Clean Sweep II (??/1976) (clone of Ramtek's Clean Sweep)                         YES
- Crashing Race (06/1976) (clone of Atari's Crash'n Score?)                        UNKNOWN
- Cross Fire (08/1977) (clone of PSE's Bazooka)                                    YES
- Davis Cup (12/1973) (clone of Atari's Coupe Davis / Pong Doubles?)               NO
- Dead Heat (??/1975)                                                              UNKNOWN
- Elepong (07/1973)                                                                UNKNOWN
- Flying Fortress (??/1977) (clone of Electra's Flying Fortress?)                  YES
- Flying Fortress II (06/1977)                                                     UNKNOWN
- Gunman (10/1977)                                                                 YES        8 x 32bytes (or 11? )
- Interceptor (03/1976)                                                            UNKNOWN
- Missile-X (??/1977)                                                              YES        10 - (5 x 512bytes, 5x32bytes)
- Pro Hockey (11/1973)                                                             UNKNOWN
- Road Champion (04/1977) (clone of Williams' Road Champion?)                      YES
- Road Champion S (06/1977)                                                        UNKNOWN
- Soccer (11/1973)                                                                 UNKNOWN
- Soccer DX (??/1977)                                                              UNKNOWN
- Speed Race (11/1974)                                                             UNKNOWN
- Speed Race CL-5 (10/1978)                                                        UNKNOWN
- Speed Race Color (10/1978)                                                       UNKNOWN
- Speed Race DX (08/1975)                                                          UNKNOWN
- Speed Race Twin (04/1976)                                                        UNKNOWN
- Speed Race GP-5 (??/1980)                                                        UNKNOWN
- Super Block (02/1978)                                                            UNKNOWN
- Super High-Way (10/1977)?                                                        UNKNOWN
- Super Speed Race (12/1977)                                                       UNKNOWN
- Super Speed Race V (07/1978)                                                     UNKNOWN
- Super Speed Race GP-V (??/1980)                                                  UNKNOWN
- Table Football (??/1977) (clone of Exidy's Table Football?)                      UNKNOWN
- Tahitian (??/1975)                                                               UNKNOWN
- Tennis (??/1977)                                                                 UNKNOWN
- T. T. Ball Park (??/1974) (clone of Midway's Ball Park)                          YES
- T. T. Block (08/1977)                                                            YES        1 x 2048bytes
- T. T. Block C (05/1978)                                                          UNKNOWN
- T. T. Block CU (08/1978)                                                         UNKNOWN
- T. T. Speed Race (??/1978)                                                       UNKNOWN
- Wall Block (08/1978)                                                             UNKNOWN
- Wall Break (01/1977)                                                             UNKNOWN
- Western Gun (09/1975)                                                            UNKNOWN
- Zun Zun Block (04/1979)                                                          YES        3 - (2 x 512bytes, 1 x 32bytes)
+ Game Name(s)                                                        Part #'s       Data      PROM/ROM Chip Numbers
+ ------------------------------------------------------------------+--------------+---------+---------------------------------
+ Anti-Aircraft (1975) (clone of Atari's Anti-Aircraft)                              YES
+ Astro Race (11/1973) (clone of Atari's Space Race)                                 UNKNOWN
+ Attack (09/1976)                                                                   UNKNOWN
+ Attack UFO (08/1974)                                                               UNKNOWN
+ Avenger (??/1976) (clone of Electra's Avenger)                                     YES
+ Ball Park (??/1974) (clone of Midway's Ball Park)                                  YES
+ Basketball (04/1974) (clone of Midway's TV Basketball)                             NO
+ Bombs Away (??/1977) (clone of Meadows' Bombs Away)                                YES
+ Cisco/Fisco 400 (04/1977)                                                          UNKNOWN
+ Clean Sweep (??/1976) (clone of Ramtek's Clean Sweep)                              YES
+ Clean Sweep II (??/1976) (clone of Ramtek's Clean Sweep)                           YES
+ Crashing Race (06/1976) (clone of Atari's Crash'n Score?)                          UNKNOWN
+ Cross Fire (08/1977) (clone of PSE's Bazooka)                                      YES
+ Davis Cup (12/1973) (clone of Atari's Coupe Davis / Pong Doubles?)                 NO
+ Dead Heat (??/1975)                                                                UNKNOWN
+ Elepong (07/1973)                                                                  UNKNOWN
+ Flying Fortress (??/1977) (clone of Electra's Flying Fortress?)                    YES
+ Flying Fortress II (06/1977)                                                       UNKNOWN
+ Gunman (10/1977)                                                                   YES        8 x 32bytes (or 11? )
+ Interceptor (03/1976)                                                              UNKNOWN
+ Missile-X (??/1977)                                                                YES        10 - (5 x 512bytes, 5x32bytes)
+ Pro Hockey (11/1973)                                                               UNKNOWN
+ Road Champion (04/1977) (clone of Williams' Road Champion?)                        YES
+ Road Champion S (06/1977)                                                          UNKNOWN
+ Safari (??/1977) (original of Gremlin's Safari?)                                   UNKNOWN
+ Soccer (11/1973)                                                                   UNKNOWN
+ Soccer DX (??/1977)                                                                UNKNOWN
+ Speed Race (11/1974)                                                               UNKNOWN
+ Speed Race CL-5 (10/1978)                                                          UNKNOWN
+ Speed Race Deluxe (08/1975)                                                        UNKNOWN
+ Speed Race Twin (04/1976)                                                          UNKNOWN
+ Speed Race GP-5 (03/1980)                                                          UNKNOWN
+ Super Block (02/1978)                                                              UNKNOWN
+ Super High-Way (10/1977)?                                                          UNKNOWN
+ Super Speed Race (12/1977)                                                         UNKNOWN
+ Super Speed Race V (07/1978)                                                       UNKNOWN
+ Super Speed Race GP-V (??/1980)                                                    UNKNOWN
+ Table Football (??/1977) (clone of Exidy's Table Football?)                        UNKNOWN
+ Tahitian (??/1975)                                                                 UNKNOWN
+ Tennis (??/1977)                                                                   UNKNOWN
+ Top Bowler (06/1978)                                                               UNKNOWN
+ T. T. Ball Park (??/1974) (clone of Midway's Ball Park)                            YES
+ T. T. Block (08/1977)                                                              YES        1 x 2048bytes
+ T. T. Block C (05/1978)                                                            UNKNOWN
+ T. T. Block CU (08/1978)                                                           UNKNOWN
+ T. T. Speed Race (06/1978)                                                         UNKNOWN
+ T. T. Speed Race CL (??/1978)                                                      UNKNOWN
+ T. T. Top Bowler (??/1978)                                                         UNKNOWN
+ T. T. Zun Zun Block (??/1979)                                                      YES        3 - (2 x 512bytes, 1 x 32bytes)
+ Wall Block (08/1978)                                                       \       UNKNOWN
+ Wall Break (01/1977)                                                               UNKNOWN
+ Western Gun (09/1975)                                                              UNKNOWN
+ Zun Zun Block (04/1979)                                                            YES        3 - (2 x 512bytes, 1 x 32bytes)
 
 ***************************************************************************/
 
