@@ -33,7 +33,7 @@
  Road Champion S (06/1977)                                                          UNKNOWN
  Safari (??/1977) (clone of Gremlin's Safari?)                                      UNKNOWN
  Soccer (11/1973)                                                                   UNKNOWN
- Soccer DX (??/1977)                                                                UNKNOWN
+ Soccer Deluxe (??/1977)                                                            UNKNOWN
  Speed Race (11/1974)                                                               UNKNOWN
  Speed Race CL-5 (10/1978)                                                          UNKNOWN
  Speed Race Deluxe (08/1975)                                                        UNKNOWN
@@ -56,7 +56,7 @@
  T. T. Speed Race CL (??/1978)                                                      UNKNOWN
  T. T. Top Bowler (??/1978)                                                         UNKNOWN
  T. T. Zun Zun Block (??/1979)                                                      YES        3 - (2 x 512bytes, 1 x 32bytes)
- Wall Block (08/1978)                                                       \       UNKNOWN
+ Wall Block (08/1978)                                                               UNKNOWN
  Wall Break (01/1977)                                                               UNKNOWN
  Western Gun (09/1975)                                                              UNKNOWN
  Zun Zun Block (04/1979)                                                            YES        3 - (2 x 512bytes, 1 x 32bytes)
