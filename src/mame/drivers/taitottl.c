@@ -31,7 +31,7 @@
  Pro Hockey (11/1973)                                                               UNKNOWN
  Road Champion (04/1977) (clone of Williams' Road Champion?)                        YES
  Road Champion S (06/1977)                                                          UNKNOWN
- Safari (??/1977) (original of Gremlin's Safari?)                                   UNKNOWN
+ Safari (??/1977) (clone of Gremlin's Safari?)                                      UNKNOWN
  Soccer (11/1973)                                                                   UNKNOWN
  Soccer DX (??/1977)                                                                UNKNOWN
  Speed Race (11/1974)                                                               UNKNOWN
