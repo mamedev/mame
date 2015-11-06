@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Acho A. Tang, Nicola Salmoria
+/*************************************************************************
+
+    Equites, Splendor Blast driver
+
+*************************************************************************/
+
 #include "machine/alpha8201.h"
 #include "sound/samples.h"
 #include "sound/msm5232.h"

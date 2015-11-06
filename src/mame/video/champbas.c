@@ -129,6 +129,12 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 
 
 
+/*************************************
+ *
+ *  Callbacks for the TileMap code
+ *
+ *************************************/
+
 TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 {
 	int code = m_vram[tile_index] | (m_gfx_bank << 8);
@@ -147,6 +153,12 @@ TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
 
 
 
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
 VIDEO_START_MEMBER(champbas_state,champbas)
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -158,6 +170,12 @@ VIDEO_START_MEMBER(champbas_state,exctsccr)
 }
 
 
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 WRITE8_MEMBER(champbas_state::tilemap_w)
 {
@@ -188,6 +206,12 @@ WRITE8_MEMBER(champbas_state::flipscreen_w)
 }
 
 
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
 
 void champbas_state::champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -265,7 +289,6 @@ void champbas_state::exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			m_palette->transpen_mask(*gfx2, color, 0x10));
 	}
 }
-
 
 
 UINT32 champbas_state::screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

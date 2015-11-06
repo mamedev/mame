@@ -1,5 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Acho A. Tang, Nicola Salmoria
+/*************************************************************************
+
+    Equites, Splendor Blast driver
+    
+    functions to emulate the video hardware
+
+*************************************************************************/
+
 #include "emu.h"
 #include "includes/equites.h"
 
@@ -234,6 +242,7 @@ WRITE16_MEMBER(equites_state::splndrbt_bg_scrolly_w)
 {
 	COMBINE_DATA(&m_splndrbt_bg_scrolly);
 }
+
 
 
 /*************************************
