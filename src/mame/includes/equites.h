@@ -20,7 +20,6 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram_2(*this, "spriteram_2"),
-		m_workram(*this, "workram"),
 		m_mcuram(*this, "mcuram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -40,7 +39,6 @@ public:
 	UINT8 *m_fg_videoram;    // 8bits
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram_2;
-	optional_shared_ptr<UINT16> m_workram;
 	optional_shared_ptr<UINT8> m_mcuram;
 
 	/* video-related */
@@ -65,7 +63,7 @@ public:
 	float     m_cymvol;
 	float     m_hihatvol;
 	int       m_timer_count;
-	int       m_unknown_bit;    // Gekisou special handling
+	int       m_gekisou_unknown_bit;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -85,8 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_portb_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_w);
-	DECLARE_WRITE16_MEMBER(gekisou_unknown_0_w);
-	DECLARE_WRITE16_MEMBER(gekisou_unknown_1_w);
+	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
 	DECLARE_READ8_MEMBER(mcu_ram_r);
 	DECLARE_WRITE8_MEMBER(mcu_ram_w);
@@ -102,20 +99,15 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_flipb_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
 	DECLARE_WRITE8_MEMBER(equites_8910porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
-	DECLARE_DRIVER_INIT(bullfgtr);
-	DECLARE_DRIVER_INIT(kouyakyu);
-	DECLARE_DRIVER_INIT(gekisou);
 	DECLARE_DRIVER_INIT(splndrbt);
 	DECLARE_DRIVER_INIT(equites);
 	TILE_GET_INFO_MEMBER(equites_fg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
-	DECLARE_MACHINE_START(equites);
-	DECLARE_MACHINE_RESET(equites);
 	DECLARE_VIDEO_START(equites);
 	DECLARE_PALETTE_INIT(equites);
 	DECLARE_VIDEO_START(splndrbt);
@@ -127,11 +119,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
 	DECLARE_WRITE_LINE_MEMBER(equites_msm5232_gate);
-	void equites_draw_sprites_block( bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end );
+	void equites_draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end);
 	void equites_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void splndrbt_copy_bg( bitmap_ind16 &dst_bitmap, const rectangle &cliprect );
-	void equites_update_dac(  );
-	void unpack_block( const char *region, int offset, int size );
-	void unpack_region( const char *region );
+	void splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
+	void equites_update_dac();
+	void unpack_block(const char *region, int offset, int size);
+	void unpack_region(const char *region);
+
+	virtual void machine_start();
+	virtual void machine_reset();
 };

@@ -524,12 +524,8 @@ WRITE_LINE_MEMBER(equites_state::equites_msm5232_gate)
 
 
 /******************************************************************************/
-// Local Functions
-
-/******************************************************************************/
 // Interrupt Handlers
 
-// Equites Hardware
 TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
 {
 	int scanline = param;
@@ -596,27 +592,19 @@ WRITE8_MEMBER(equites_state::equites_8155_w)
 
 
 /******************************************************************************/
-// Main CPU Handlers
+// CPU Handlers
 
-CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_status)
+CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_bit_r)
 {
-	return m_unknown_bit;
+	return m_gekisou_unknown_bit;
 }
 
-WRITE16_MEMBER(equites_state::gekisou_unknown_0_w)
+WRITE16_MEMBER(equites_state::gekisou_unknown_bit_w)
 {
-	m_unknown_bit = 0;
+	// data bit is A16 (offset)
+	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
 }
 
-WRITE16_MEMBER(equites_state::gekisou_unknown_1_w)
-{
-	m_unknown_bit = 1;
-}
-
-
-
-/******************************************************************************/
-// Main CPU Memory Map
 
 READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 {
@@ -659,10 +647,14 @@ WRITE16_MEMBER(equites_state::mcu_switch_w)
 }
 
 
+
+/******************************************************************************/
+// CPU Memory Maps
+
 static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM // ROM area is written several times (dev system?)
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")   // nvram is for gekisou only
+	AM_RANGE(0x040000, 0x040fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE8(equites_fg_videoram_r, equites_fg_videoram_w, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
@@ -675,15 +667,20 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x18c000, 0x18c001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
-	// 580000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
-	// 5a0000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
 	AM_RANGE(0x780000, 0x780001) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gekisou_map, AS_PROGRAM, 16, equites_state )
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram") // mainram is battery-backed
+	AM_RANGE(0x580000, 0x580001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(gekisou_unknown_bit_w)
+	AM_IMPORT_FROM( equites_map )
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("workram")
+	AM_RANGE(0x040000, 0x040fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00) // note: addressmask does not apply here
@@ -701,6 +698,7 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_SHARE("spriteram")   // sprite RAM 0,1
 	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_SHARE("spriteram_2") // sprite RAM 2 (8-bit)
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -780,7 +778,7 @@ static INPUT_PORTS_START( equites )
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
-	PORT_ADJUSTER(25, "MSM5232 Clock")
+	PORT_ADJUSTER(25, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -799,11 +797,11 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, equites_state,gekisou_unknown_status, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, equites_state, gekisou_unknown_bit_r, NULL)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
-	PORT_ADJUSTER(24, "MSM5232 Clock")
+	PORT_ADJUSTER(24, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -836,7 +834,7 @@ static INPUT_PORTS_START( bullfgtr )
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
-	PORT_ADJUSTER(33, "MSM5232 Clock")
+	PORT_ADJUSTER(33, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -869,7 +867,7 @@ static INPUT_PORTS_START( kouyakyu )
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
-	PORT_ADJUSTER(33, "MSM5232 Clock")
+	PORT_ADJUSTER(33, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -902,7 +900,7 @@ static INPUT_PORTS_START( splndrbt )
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
-	PORT_ADJUSTER(28, "MSM5232 Clock")
+	PORT_ADJUSTER(28, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -951,7 +949,7 @@ static INPUT_PORTS_START( hvoltage )
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
-	PORT_ADJUSTER(27, "MSM5232 Clock")
+	PORT_ADJUSTER(27, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
 
@@ -1088,35 +1086,9 @@ MACHINE_CONFIG_END
 
 /******************************************************************************/
 
-MACHINE_START_MEMBER(equites_state,equites)
+void equites_state::machine_start()
 {
-	save_item(NAME(m_fg_char_bank));
-	save_item(NAME(m_bgcolor));
-	save_item(NAME(m_splndrbt_bg_scrollx));
-	save_item(NAME(m_splndrbt_bg_scrolly));
-	save_item(NAME(m_sound_prom_address));
-	save_item(NAME(m_dac_latch));
-	save_item(NAME(m_eq8155_port_b));
-	save_item(NAME(m_eq8155_port_a));
-	save_item(NAME(m_eq8155_port_c));
-	save_item(NAME(m_ay_port_a));
-	save_item(NAME(m_ay_port_b));
-	save_item(NAME(m_eq_cymbal_ctrl));
-	save_item(NAME(m_cymvol));
-	save_item(NAME(m_hihatvol));
-	save_item(NAME(m_timer_count));
-	save_item(NAME(m_unknown_bit));
-
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback), this));
-
-	m_adjuster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback), this));
-	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
-}
-
-MACHINE_RESET_MEMBER(equites_state,equites)
-{
-	flip_screen_set(0);
-
+	// zerofill
 	m_fg_char_bank = 0;
 	m_bgcolor = 0;
 	m_splndrbt_bg_scrollx = 0;
@@ -1132,7 +1104,35 @@ MACHINE_RESET_MEMBER(equites_state,equites)
 	m_cymvol = 0.0;
 	m_hihatvol = 0.0;
 	m_timer_count = 0;
-	m_unknown_bit = 0;
+	m_gekisou_unknown_bit = 0;
+
+	// register for savestates
+	save_item(NAME(m_fg_char_bank));
+	save_item(NAME(m_bgcolor));
+	save_item(NAME(m_splndrbt_bg_scrollx));
+	save_item(NAME(m_splndrbt_bg_scrolly));
+	save_item(NAME(m_sound_prom_address));
+	save_item(NAME(m_dac_latch));
+	save_item(NAME(m_eq8155_port_b));
+	save_item(NAME(m_eq8155_port_a));
+	save_item(NAME(m_eq8155_port_c));
+	save_item(NAME(m_ay_port_a));
+	save_item(NAME(m_ay_port_b));
+	save_item(NAME(m_eq_cymbal_ctrl));
+	save_item(NAME(m_cymvol));
+	save_item(NAME(m_hihatvol));
+	save_item(NAME(m_timer_count));
+	save_item(NAME(m_gekisou_unknown_bit));
+
+	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback), this));
+
+	m_adjuster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback), this));
+	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+}
+
+void equites_state::machine_reset()
+{
+	flip_screen_set(0);
 }
 
 
@@ -1162,12 +1162,13 @@ static MACHINE_CONFIG_START( equites, equites_state )
 	MCFG_PALETTE_INIT_OWNER(equites_state,equites)
 
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
-
-	MCFG_MACHINE_START_OVERRIDE(equites_state,equites)
-	MCFG_MACHINE_RESET_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gekisou, equites )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(gekisou_map)
 
 	// mcu not dumped, so add simulated mcu
 	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
@@ -1204,9 +1205,6 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 	MCFG_PALETTE_INIT_OWNER(equites_state,splndrbt)
 
 	MCFG_VIDEO_START_OVERRIDE(equites_state,splndrbt)
-
-	MCFG_MACHINE_START_OVERRIDE(equites_state,equites)
-	MCFG_MACHINE_RESET_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hvoltage, splndrbt )
@@ -1770,19 +1768,18 @@ ROM_END
 /******************************************************************************/
 // Initializations
 
-void equites_state::unpack_block( const char *region, int offset, int size )
+void equites_state::unpack_block(const char *region, int offset, int size)
 {
 	UINT8 *rom = memregion(region)->base();
-	int i;
 
-	for (i = 0; i < size; ++i)
+	for (int i = 0; i < size; i++)
 	{
 		rom[(offset + i + size)] = (rom[(offset + i)] >> 4);
 		rom[(offset + i)] &= 0x0f;
 	}
 }
 
-void equites_state::unpack_region( const char *region )
+void equites_state::unpack_region(const char *region)
 {
 	unpack_block(region, 0x0000, 0x2000);
 	unpack_block(region, 0x4000, 0x2000);
@@ -1793,28 +1790,6 @@ DRIVER_INIT_MEMBER(equites_state,equites)
 {
 	unpack_region("gfx2");
 	unpack_region("gfx3");
-}
-
-DRIVER_INIT_MEMBER(equites_state,bullfgtr)
-{
-	unpack_region("gfx2");
-	unpack_region("gfx3");
-}
-
-DRIVER_INIT_MEMBER(equites_state,kouyakyu)
-{
-	unpack_region("gfx2");
-	unpack_region("gfx3");
-}
-
-DRIVER_INIT_MEMBER(equites_state,gekisou)
-{
-	unpack_region("gfx2");
-	unpack_region("gfx3");
-
-	// install special handlers for unknown device (protection?)
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x580000, 0x580001, write16_delegate(FUNC(equites_state::gekisou_unknown_0_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5a0000, 0x5a0001, write16_delegate(FUNC(equites_state::gekisou_unknown_1_w),this));
 }
 
 DRIVER_INIT_MEMBER(equites_state,splndrbt)
@@ -1829,13 +1804,13 @@ DRIVER_INIT_MEMBER(equites_state,splndrbt)
 // Game Entries
 
 // Equites Hardware
-GAME( 1984, equites,  0,        equites,  equites,  equites_state, equites,  ROT90, "Alpha Denshi Co.", "Equites", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, equitess, equites,  equites,  equites,  equites_state, equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, equites_state, bullfgtr, ROT90, "Alpha Denshi Co.", "Bull Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bullfgtrs,bullfgtr, equites,  bullfgtr, equites_state, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, equites_state, kouyakyu, ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gekisou,  0,        gekisou,  gekisou,  equites_state, gekisou,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, equites,   0,        equites,  equites,  equites_state, equites,  ROT90, "Alpha Denshi Co.", "Equites", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, equitess,  equites,  equites,  equites,  equites_state, equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state, equites,  ROT90, "Alpha Denshi Co.", "Bull Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state, equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state, equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekisou,   0,        gekisou,  gekisou,  equites_state, equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
-GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, hvoltage, 0,        hvoltage, hvoltage, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hvoltage,  0,        hvoltage, hvoltage, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

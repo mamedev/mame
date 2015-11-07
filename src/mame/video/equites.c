@@ -230,7 +230,7 @@ WRITE16_MEMBER(equites_state::splndrbt_bg_scrolly_w)
  *
  *************************************/
 
-void equites_state::equites_draw_sprites_block( bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end )
+void equites_state::equites_draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end)
 {
 	for (int offs = end - 2; offs >= start; offs -= 2)
 	{
@@ -301,7 +301,7 @@ Also, note that sprites are 30x30, not 32x32.
 03020303 03030303 03030303 03030303
 */
 
-void equites_state::splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void equites_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const UINT8 * const xrom = memregion("user2")->base();
 	const UINT8 * const yrom = xrom + 0x100;
@@ -360,7 +360,7 @@ void equites_state::splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 						if (bx >= cliprect.min_x && bx <= cliprect.max_x)
 						{
 							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;   // FIXME This is wrong. Should use the PROM.
-							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line) ) * gfx->rowbytes();
+							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line)) * gfx->rowbytes();
 
 							int pen = srcgfx[offset];
 
@@ -375,7 +375,7 @@ void equites_state::splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 }
 
 
-void equites_state::splndrbt_copy_bg( bitmap_ind16 &dst_bitmap, const rectangle &cliprect )
+void equites_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &src_bitmap = m_bg_tilemap->pixmap();
 	bitmap_ind8 &flags_bitmap = m_bg_tilemap->flagsmap();
