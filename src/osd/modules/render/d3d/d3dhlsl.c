@@ -182,10 +182,8 @@ shaders::shaders()
 {
 	master_enable = false;
 	vector_enable = true;
-	prescale_size_x = 1;
-	prescale_size_y = 1;
-	prescale_force_x = 0;
-	prescale_force_y = 0;
+	hlsl_prescale_x = 1;
+	hlsl_prescale_x = 1;
 	preset = -1;
 	shadow_texture = NULL;
 	options = NULL;
@@ -754,29 +752,25 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	this->machine = machine;
 	this->d3d = renderer;
 
-	master_enable = downcast<windows_options &>(machine->options()).d3d_hlsl_enable();
-	prescale_size_x = 1;
-	prescale_size_y = 1;
-	preset = downcast<windows_options &>(machine->options()).d3d_hlsl_preset();
+	windows_options &winoptions = downcast<windows_options &>(machine->options());
+
+	master_enable = winoptions.d3d_hlsl_enable();
+	hlsl_prescale_x = winoptions.d3d_hlsl_prescale_x();
+	hlsl_prescale_y = winoptions.d3d_hlsl_prescale_y();
+	snap_width = winoptions.d3d_snap_width();
+	snap_height = winoptions.d3d_snap_height();
+	preset = winoptions.d3d_hlsl_preset();
+
 	if (preset < -1 || preset > 3)
 	{
 		preset = -1;
 	}
 
-	snap_width = downcast<windows_options &>(machine->options()).d3d_snap_width();
-	snap_height = downcast<windows_options &>(machine->options()).d3d_snap_height();
-	prescale_force_x = 0;
-	prescale_force_y = 0;
-
-	windows_options &winoptions = downcast<windows_options &>(machine->options());
-
 	options = (hlsl_options*)global_alloc_clear(hlsl_options);
 
-	options->params_dirty = true;
-	strcpy(options->shadow_mask_texture, downcast<windows_options &>(machine->options()).screen_shadow_mask_texture()); // unsafe
+	// unsafe
+	strcpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture()); 
 
-	prescale_force_x = winoptions.d3d_hlsl_prescale_x();
-	prescale_force_y = winoptions.d3d_hlsl_prescale_y();
 	if (preset == -1)
 	{
 		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
@@ -1456,7 +1450,9 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	texture_info *texture = poly->get_texture();
 
 	bool prepare_vector =
-		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
+		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
+	bool prepare_raster =
+		(machine->first_screen()->screen_type() &  SCREEN_TYPE_RASTER) == SCREEN_TYPE_RASTER;
 	bool orientation_swap_xy =
 		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 	bool rotation_swap_xy =
@@ -1481,6 +1477,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_int("RotationType", rotation_type); // backward compatibility
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
+	curr_effect->set_bool("PrepareRaster", prepare_raster);
 
 	next_index = rt->next_index(next_index);
 	blit(prepare_bloom ? rt->native_target[next_index] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
@@ -1493,7 +1490,7 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 	int next_index = source_index;
 
 	bool prepare_vector =
-		PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
+		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
 	float bloom_rescale = options->bloom_scale;
 
 	// skip downsample if no influencing settings
@@ -1697,7 +1694,8 @@ int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, i
 {
 	int next_index = source_index;
 
-	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
+	bool prepare_vector =
+		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
 
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
@@ -2057,9 +2055,6 @@ bool shaders::register_texture(texture_info *texture)
 	}
 
 	enumerate_screens();
-
-	hlsl_prescale_x = prescale_force_x;
-	hlsl_prescale_y = prescale_force_y;
 
 	// Find the nearest prescale factor that is over our screen size
 	if (hlsl_prescale_x == 0)
@@ -2776,81 +2771,81 @@ static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::
 
 shaders::slider_desc shaders::s_sliders[] =
 {
-	{ "Shadow Mask Darkness",                0,     0,   100, 1, slider_shadow_mask_alpha },
-	{ "Shadow Mask X Count",                 1,     6,  1024, 1, slider_shadow_mask_x_count },
-	{ "Shadow Mask Y Count",                 1,     6,  1024, 1, slider_shadow_mask_y_count },
-	{ "Shadow Mask Pixel Count X",           1,     6,    64, 1, slider_shadow_mask_usize },
-	{ "Shadow Mask Pixel Count Y",           1,     6,    64, 1, slider_shadow_mask_vsize },
-	{ "Shadow Mask Offset X",             -100,     0,   100, 1, slider_shadow_mask_uoffset },
-	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, slider_shadow_mask_voffset },
-	{ "Screen Curvature",                    0,     0,   100, 1, slider_curvature },
-	{ "Screen Round Corner",                 0,     0,   100, 1, slider_round_corner },
-	{ "Screen Smooth Border",                0,     0,   100, 1, slider_smooth_border },
-	{ "Screen Reflection",                   0,     0,   100, 1, slider_reflection },
-	{ "Image Vignetting",                    0,     0,   100, 1, slider_vignetting },
-	{ "Scanline Darkness",                   0,   100,   100, 1, slider_scanline_alpha },
-	{ "Scanline Screen Height",              1,    20,    80, 1, slider_scanline_scale },
-	{ "Scanline Indiv. Height",              1,    20,    80, 1, slider_scanline_height },
-	{ "Scanline Brightness",                 0,    20,    40, 1, slider_scanline_bright_scale },
-	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, slider_scanline_bright_offset },
-	{ "Scanline Jitter",                     0,     0,    40, 1, slider_scanline_offset },
-	{ "Defocus X",                           0,     0,    64, 1, slider_defocus_x },
-	{ "Defocus Y",                           0,     0,    64, 1, slider_defocus_y },
-	{ "Red Position Offset X",           -1500,     3,  1500, 1, slider_red_converge_x },
-	{ "Red Position Offset Y",           -1500,     0,  1500, 1, slider_red_converge_y },
-	{ "Green Position Offset X",         -1500,     0,  1500, 1, slider_green_converge_x },
-	{ "Green Position Offset Y",         -1500,     3,  1500, 1, slider_green_converge_y },
-	{ "Blue Position Offset X",          -1500,     3,  1500, 1, slider_blue_converge_x },
-	{ "Blue Position Offset Y",          -1500,     3,  1500, 1, slider_blue_converge_y },
-	{ "Red Convergence X",               -1500,     0,  1500, 1, slider_red_radial_converge_x },
-	{ "Red Convergence Y",               -1500,     0,  1500, 1, slider_red_radial_converge_y },
-	{ "Green Convergence X",             -1500,     0,  1500, 1, slider_green_radial_converge_x },
-	{ "Green Convergence Y",             -1500,     0,  1500, 1, slider_green_radial_converge_y },
-	{ "Blue Convergence X",              -1500,     0,  1500, 1, slider_blue_radial_converge_x },
-	{ "Blue Convergence Y",              -1500,     0,  1500, 1, slider_blue_radial_converge_y },
-	{ "Red Output from Red Input",        -400,     0,   400, 5, slider_red_from_r },
-	{ "Red Output from Green Input",      -400,     0,   400, 5, slider_red_from_g },
-	{ "Red Output from Blue Input",       -400,     0,   400, 5, slider_red_from_b },
-	{ "Green Output from Red Input",      -400,     0,   400, 5, slider_green_from_r },
-	{ "Green Output from Green Input",    -400,     0,   400, 5, slider_green_from_g },
-	{ "Green Output from Blue Input",     -400,     0,   400, 5, slider_green_from_b },
-	{ "Blue Output from Red Input",       -400,     0,   400, 5, slider_blue_from_r },
-	{ "Blue Output from Green Input",     -400,     0,   400, 5, slider_blue_from_g },
-	{ "Blue Output from Blue Input",      -400,     0,   400, 5, slider_blue_from_b },
-	{ "Saturation",                          0,   140,   400, 1, slider_saturation },
-	{ "Red DC Offset",                    -100,     0,   100, 1, slider_red_offset },
-	{ "Green DC Offset",                  -100,     0,   100, 1, slider_green_offset },
-	{ "Blue DC Offset",                   -100,     0,   100, 1, slider_blue_offset },
-	{ "Red Scale",                        -200,    95,   200, 1, slider_red_scale },
-	{ "Green Scale",                      -200,    95,   200, 1, slider_green_scale },
-	{ "Blue Scale",                       -200,    95,   200, 1, slider_blue_scale },
-	{ "Red Gamma",                         -80,    16,    80, 1, slider_red_power },
-	{ "Green Gamma",                       -80,    16,    80, 1, slider_green_power },
-	{ "Blue Gamma",                        -80,    16,    80, 1, slider_blue_power },
-	{ "Red Floor",                           0,     5,   100, 1, slider_red_floor },
-	{ "Green Floor",                         0,     5,   100, 1, slider_green_floor },
-	{ "Blue Floor",                          0,     5,   100, 1, slider_blue_floor },
-	{ "Red Phosphor Life",                   0,    40,   100, 1, slider_red_phosphor_life },
-	{ "Green Phosphor Life",                 0,    40,   100, 1, slider_green_phosphor_life },
-	{ "Blue Phosphor Life",                  0,    40,   100, 1, slider_blue_phosphor_life },
-	{ "Vector Length Attenuation",           0,    80,   100, 1, slider_vector_attenuation },
-	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, slider_vector_length_max },
-	{ "Bloom Scale",                         0,   250,  2000, 5, slider_bloom_scale },
-	{ "Bloom Red Overdrive",                 0,   250,  2000, 5, slider_bloom_red_overdrive },
-	{ "Bloom Green Overdrive",               0,   250,  2000, 5, slider_bloom_green_overdrive },
-	{ "Bloom Blue Overdrive",                0,   250,  2000, 5, slider_bloom_blue_overdrive },
-	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, slider_bloom_lvl0_scale },
-	{ "Bloom Level 1 Scale",                 0,    21,   100, 1, slider_bloom_lvl1_scale },
-	{ "Bloom Level 2 Scale",                 0,    19,   100, 1, slider_bloom_lvl2_scale },
-	{ "Bloom Level 3 Scale",                 0,    17,   100, 1, slider_bloom_lvl3_scale },
-	{ "Bloom Level 4 Scale",                 0,    15,   100, 1, slider_bloom_lvl4_scale },
-	{ "Bloom Level 5 Scale",                 0,    14,   100, 1, slider_bloom_lvl5_scale },
-	{ "Bloom Level 6 Scale",                 0,    13,   100, 1, slider_bloom_lvl6_scale },
-	{ "Bloom Level 7 Scale",                 0,    12,   100, 1, slider_bloom_lvl7_scale },
-	{ "Bloom Level 8 Scale",                 0,    11,   100, 1, slider_bloom_lvl8_scale },
-	{ "Bloom Level 9 Scale",                 0,    10,   100, 1, slider_bloom_lvl9_scale },
-	{ "Bloom Level 10 Scale",                0,     9,   100, 1, slider_bloom_lvl10_scale },
-	{ NULL, 0, 0, 0, 0, NULL },
+	{ "Vector Length Attenuation",           0,    80,   100, 1, 2, slider_vector_attenuation },
+	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, 2, slider_vector_length_max },
+	{ "Shadow Mask Darkness",                0,     0,   100, 1, 7, slider_shadow_mask_alpha },
+	{ "Shadow Mask X Count",                 1,     6,  1024, 1, 7, slider_shadow_mask_x_count },
+	{ "Shadow Mask Y Count",                 1,     6,  1024, 1, 7, slider_shadow_mask_y_count },
+	{ "Shadow Mask Pixel Count X",           1,     6,    64, 1, 7, slider_shadow_mask_usize },
+	{ "Shadow Mask Pixel Count Y",           1,     6,    64, 1, 7, slider_shadow_mask_vsize },
+	{ "Shadow Mask Offset X",             -100,     0,   100, 1, 7, slider_shadow_mask_uoffset },
+	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, 7, slider_shadow_mask_voffset },
+	{ "Screen Curvature",                    0,     0,   100, 1, 7, slider_curvature },
+	{ "Screen Round Corner",                 0,     0,   100, 1, 7, slider_round_corner },
+	{ "Screen Smooth Border",                0,     0,   100, 1, 7, slider_smooth_border },
+	{ "Screen Reflection",                   0,     0,   100, 1, 7, slider_reflection },
+	{ "Image Vignetting",                    0,     0,   100, 1, 7, slider_vignetting },
+	{ "Scanline Darkness",                   0,   100,   100, 1, 1, slider_scanline_alpha },
+	{ "Scanline Screen Height",              1,    20,    80, 1, 1, slider_scanline_scale },
+	{ "Scanline Indiv. Height",              1,    20,    80, 1, 1, slider_scanline_height },
+	{ "Scanline Brightness",                 0,    20,    40, 1, 1, slider_scanline_bright_scale },
+	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 1, slider_scanline_bright_offset },
+	{ "Scanline Jitter",                     0,     0,    40, 1, 1, slider_scanline_offset },
+	{ "Defocus X",                           0,     0,    64, 1, 3, slider_defocus_x },
+	{ "Defocus Y",                           0,     0,    64, 1, 3, slider_defocus_y },
+	{ "Red Position Offset X",           -1500,     3,  1500, 1, 3, slider_red_converge_x },
+	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 3, slider_red_converge_y },
+	{ "Green Position Offset X",         -1500,     0,  1500, 1, 3, slider_green_converge_x },
+	{ "Green Position Offset Y",         -1500,     3,  1500, 1, 3, slider_green_converge_y },
+	{ "Blue Position Offset X",          -1500,     3,  1500, 1, 3, slider_blue_converge_x },
+	{ "Blue Position Offset Y",          -1500,     3,  1500, 1, 3, slider_blue_converge_y },
+	{ "Red Convergence X",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_x },
+	{ "Red Convergence Y",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_y },
+	{ "Green Convergence X",             -1500,     0,  1500, 1, 3, slider_green_radial_converge_x },
+	{ "Green Convergence Y",             -1500,     0,  1500, 1, 3, slider_green_radial_converge_y },
+	{ "Blue Convergence X",              -1500,     0,  1500, 1, 3, slider_blue_radial_converge_x },
+	{ "Blue Convergence Y",              -1500,     0,  1500, 1, 3, slider_blue_radial_converge_y },
+	{ "Red Output from Red Input",        -400,     0,   400, 5, 7, slider_red_from_r },
+	{ "Red Output from Green Input",      -400,     0,   400, 5, 7, slider_red_from_g },
+	{ "Red Output from Blue Input",       -400,     0,   400, 5, 7, slider_red_from_b },
+	{ "Green Output from Red Input",      -400,     0,   400, 5, 7, slider_green_from_r },
+	{ "Green Output from Green Input",    -400,     0,   400, 5, 7, slider_green_from_g },
+	{ "Green Output from Blue Input",     -400,     0,   400, 5, 7, slider_green_from_b },
+	{ "Blue Output from Red Input",       -400,     0,   400, 5, 7, slider_blue_from_r },
+	{ "Blue Output from Green Input",     -400,     0,   400, 5, 7, slider_blue_from_g },
+	{ "Blue Output from Blue Input",      -400,     0,   400, 5, 7, slider_blue_from_b },
+	{ "Saturation",                          0,   140,   400, 1, 7, slider_saturation },
+	{ "Red DC Offset",                    -100,     0,   100, 1, 7, slider_red_offset },
+	{ "Green DC Offset",                  -100,     0,   100, 1, 7, slider_green_offset },
+	{ "Blue DC Offset",                   -100,     0,   100, 1, 7, slider_blue_offset },
+	{ "Red Scale",                        -200,    95,   200, 1, 7, slider_red_scale },
+	{ "Green Scale",                      -200,    95,   200, 1, 7, slider_green_scale },
+	{ "Blue Scale",                       -200,    95,   200, 1, 7, slider_blue_scale },
+	{ "Red Gamma",                         -80,    16,    80, 1, 7, slider_red_power },
+	{ "Green Gamma",                       -80,    16,    80, 1, 7, slider_green_power },
+	{ "Blue Gamma",                        -80,    16,    80, 1, 7, slider_blue_power },
+	{ "Red Floor",                           0,     5,   100, 1, 7, slider_red_floor },
+	{ "Green Floor",                         0,     5,   100, 1, 7, slider_green_floor },
+	{ "Blue Floor",                          0,     5,   100, 1, 7, slider_blue_floor },
+	{ "Red Phosphor Life",                   0,    40,   100, 1, 7, slider_red_phosphor_life },
+	{ "Green Phosphor Life",                 0,    40,   100, 1, 7, slider_green_phosphor_life },
+	{ "Blue Phosphor Life",                  0,    40,   100, 1, 7, slider_blue_phosphor_life },
+	{ "Bloom Scale",                         0,   250,  2000, 5, 7, slider_bloom_scale },
+	{ "Bloom Red Overdrive",                 0,   250,  2000, 5, 7, slider_bloom_red_overdrive },
+	{ "Bloom Green Overdrive",               0,   250,  2000, 5, 7, slider_bloom_green_overdrive },
+	{ "Bloom Blue Overdrive",                0,   250,  2000, 5, 7, slider_bloom_blue_overdrive },
+	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, 7, slider_bloom_lvl0_scale },
+	{ "Bloom Level 1 Scale",                 0,    21,   100, 1, 7, slider_bloom_lvl1_scale },
+	{ "Bloom Level 2 Scale",                 0,    19,   100, 1, 7, slider_bloom_lvl2_scale },
+	{ "Bloom Level 3 Scale",                 0,    17,   100, 1, 7, slider_bloom_lvl3_scale },
+	{ "Bloom Level 4 Scale",                 0,    15,   100, 1, 7, slider_bloom_lvl4_scale },
+	{ "Bloom Level 5 Scale",                 0,    14,   100, 1, 7, slider_bloom_lvl5_scale },
+	{ "Bloom Level 6 Scale",                 0,    13,   100, 1, 7, slider_bloom_lvl6_scale },
+	{ "Bloom Level 7 Scale",                 0,    12,   100, 1, 7, slider_bloom_lvl7_scale },
+	{ "Bloom Level 8 Scale",                 0,    11,   100, 1, 7, slider_bloom_lvl8_scale },
+	{ "Bloom Level 9 Scale",                 0,    10,   100, 1, 7, slider_bloom_lvl9_scale },
+	{ "Bloom Level 10 Scale",                0,     9,   100, 1, 7, slider_bloom_lvl10_scale },
+	{ NULL, 0, 0, 0, 0, 0, NULL },
 };
 
 slider_state *shaders::init_slider_list()
@@ -2867,8 +2862,15 @@ slider_state *shaders::init_slider_list()
 	for (int index = 0; s_sliders[index].name != NULL; index++)
 	{
 		slider_desc *slider = &s_sliders[index];
-		*tailptr = slider_alloc(*machine, slider->name, slider->minval, slider->defval, slider->maxval, slider->step, slider->adjustor, (void*)options);
-		tailptr = &(*tailptr)->next;
+
+		int screen_type = machine->first_screen()->screen_type();
+		if ((screen_type == SCREEN_TYPE_VECTOR && (slider->screen_type & SLIDER_SCREEN_TYPE_VECTOR) == SLIDER_SCREEN_TYPE_VECTOR) ||
+			(screen_type == SCREEN_TYPE_RASTER && (slider->screen_type & SLIDER_SCREEN_TYPE_RASTER) == SLIDER_SCREEN_TYPE_RASTER) ||
+			(screen_type == SCREEN_TYPE_LCD    && (slider->screen_type & SLIDER_SCREEN_TYPE_LCD)    == SLIDER_SCREEN_TYPE_LCD))
+		{
+			*tailptr = slider_alloc(*machine, slider->name, slider->minval, slider->defval, slider->maxval, slider->step, slider->adjustor, (void*)options);
+			tailptr = &(*tailptr)->next;
+		}
 	}
 
 	return listhead;

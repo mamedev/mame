@@ -87,6 +87,7 @@ uniform bool RotationSwapXY = false; // swapped default screen orientation due t
 
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures
 uniform bool PrepareVector = false;
+uniform bool PrepareRaster = false;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -204,8 +205,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Scanline Simulation (may not affect bloom)
 	if (!PrepareBloom)
 	{
-		// Scanline Simulation (disabled for vector)
-		if (!PrepareVector)
+		// Scanline Simulation (only for raster screen)
+		if (PrepareRaster)
 		{
 			float InnerSine = BaseCoord.y * ScanlineScale * SourceDims.y;
 			float ScanJitter = ScanlineOffset * SourceDims.y;
