@@ -168,7 +168,10 @@ enum ioport_type
 
 	IPT_DIGITAL_JOYSTICK_LAST,
 
-	// action buttons
+	// face buttons.  The order goes like this:
+	// 4 Buttons or less:  1 is left, 2 bottom, 3 right, 4 top
+	// 6 buttons: 1 is bottom-left, 2 bottom center, 3 top center, 4 top left, 5 top right, 6 bottom right.
+	// Using this system, 4-button controllers with two shoulder buttons can include 6-button games while still supporting 3-button and 4-button games without missing any buttons.
 	IPT_BUTTON1,
 	IPT_BUTTON2,
 	IPT_BUTTON3,
@@ -185,6 +188,22 @@ enum ioport_type
 	IPT_BUTTON14,
 	IPT_BUTTON15,
 	IPT_BUTTON16,
+
+	// hat button (4-way directional digital pad)
+	IPT_HAT_UP,
+	IPT_HAT_DOWN,
+	IPT_HAT_LEFT,
+	IPT_HAT_RIGHT,
+
+	// shoulder buttons
+	IPT_SHOULDER_BUTTON_L1,
+	IPT_SHOULDER_BUTTON_L2,
+	IPT_SHOULDER_BUTTON_R1,
+	IPT_SHOULDER_BUTTON_R2,
+
+	// joystick buttons (caused by pressing the joystick down)
+	IPT_JOYSTICK_BUTTON1,
+	IPT_JOYSTICK_BUTTON2,
 
 	// mahjong inputs
 	IPT_MAHJONG_FIRST,

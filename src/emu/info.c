@@ -928,6 +928,16 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_BUTTON14:
 				case IPT_BUTTON15:
 				case IPT_BUTTON16:
+				case IPT_HAT_UP:
+				case IPT_HAT_DOWN:
+				case IPT_HAT_LEFT:
+				case IPT_HAT_RIGHT:
+				case IPT_SHOULDER_BUTTON_L1:
+				case IPT_SHOULDER_BUTTON_L2:
+				case IPT_SHOULDER_BUTTON_R1:
+				case IPT_SHOULDER_BUTTON_R2:
+				case IPT_JOYSTICK_BUTTON1:
+				case IPT_JOYSTICK_BUTTON2:
 					nbutton = MAX(nbutton, field->type() - IPT_BUTTON1 + 1);
 					break;
 
