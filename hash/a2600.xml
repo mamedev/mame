@@ -18009,72 +18009,72 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-  <software name="spcrocks" supported="no">
-    <description>Space Rocks (RC7, NTSC)</description>
-    <year>2012</year>
-    <publisher>Spiceware</publisher>
-    <sharedfeat name="compatibility" value="NTSC" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_harmony" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="spacerocks20121129_NTSC.bin" size="0x8000" crc="c5d8eb83" sha1="bf3af5c76bb4dded5cb9c9b232c369250ad20ac4" offset="0" />
-      </dataarea>
-    </part>
-  </software>
+	<software name="spcrocks" supported="no">
+		<description>Space Rocks (RC7, NTSC)</description>
+		<year>2012</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="spacerocks20121129_NTSC.bin" size="0x8000" crc="c5d8eb83" sha1="bf3af5c76bb4dded5cb9c9b232c369250ad20ac4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-  <software name="spcrockse" cloneof="spcrocks" supported="no">
-    <description>Space Rocks (RC7, PAL)</description>
-    <year>2012</year>
-    <publisher>Spiceware</publisher>
-    <sharedfeat name="compatibility" value="PAL" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_harmony" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="spacerocks20121129_PAL.bin" size="0x8000" crc="133cb923" sha1="0511a35ee435227fbb5665e8488590eb993256f7" offset="0" />
-      </dataarea>
-    </part>
-  </software>
+	<software name="spcrockse" cloneof="spcrocks" supported="no">
+		<description>Space Rocks (RC7, PAL)</description>
+		<year>2012</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="spacerocks20121129_PAL.bin" size="0x8000" crc="133cb923" sha1="0511a35ee435227fbb5665e8488590eb993256f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-  <software name="frantic" supported="no">
-    <description>Frantic (20140305, NTSC)</description>
-    <year>2014</year>
-    <publisher>Spiceware</publisher>
-    <sharedfeat name="compatibility" value="NTSC" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_harmony" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="frantic20140305.bin" size="0x8000" crc="04d0f558" sha1="ee2a004a50861c5fdfbdabfa5ed4bf825333ec43" offset="0" />
-      </dataarea>
-    </part>
-  </software>
+	<software name="frantic" supported="no">
+		<description>Frantic (20140305, NTSC)</description>
+		<year>2014</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="frantic20140305.bin" size="0x8000" crc="04d0f558" sha1="ee2a004a50861c5fdfbdabfa5ed4bf825333ec43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
   <software name="harmbios" supported="no">  <!-- I think these are the bios roms if you're using it as a multi-game cart? -->
-    <description>Harmony Bios Updater</description>
-    <year>2014</year>
-    <publisher>Harmony</publisher>
-    <sharedfeat name="compatibility" value="NTSC" />
-    <part name="cart" interface="a2600_cart">
-      <feature name="slot" value="a26_harmony" />
-      <dataarea name="rom" size="0x8000">
-        <rom name="bios_updater_NTSC.cu" size="0x8000" crc="03153eb2" sha1="cd9ee1d820737b3887ebe5fc6fe96a2a043ab009" offset="0" />
-      </dataarea>
-      <dataarea name="bios" size="0x21400">
-        <rom name="hbios_106_NTSC_official_beta.bin" size="0x21400" crc="1e1d237b" sha1="8fd74e0119bce43a89bcc4998b750bc6884971da" offset="0" />
-        <rom name="hbios_106_NTSC_beta_2.bin"        size="0x21400" crc="807b86bd" sha1="633960295c30e7430b3ce58f6244495f4b708e9d" offset="0" />
-        <rom name="hbios_106_NTSC.bin"               size="0x21400" crc="48664301" sha1="aaa5e839f307734306c2a9ccbe38482579c70391" offset="0" />
+		<description>Harmony Bios Updater</description>
+		<year>2014</year>
+		<publisher>Harmony</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="bios_updater_NTSC.cu" size="0x8000" crc="03153eb2" sha1="cd9ee1d820737b3887ebe5fc6fe96a2a043ab009" offset="0" />
+			</dataarea>
+			<dataarea name="bios" size="0x21400">
+				<rom name="hbios_106_NTSC_official_beta.bin" size="0x21400" crc="1e1d237b" sha1="8fd74e0119bce43a89bcc4998b750bc6884971da" offset="0" />
+				<rom name="hbios_106_NTSC_beta_2.bin"        size="0x21400" crc="807b86bd" sha1="633960295c30e7430b3ce58f6244495f4b708e9d" offset="0" />
+				<rom name="hbios_106_NTSC.bin"               size="0x21400" crc="48664301" sha1="aaa5e839f307734306c2a9ccbe38482579c70391" offset="0" />
 
-        <rom name="hbios_105_NTSC.bin"  size="0x19400" crc="c0b8aae9" sha1="68b10153695da505756eb7dc7cc4a7e93fe68860" offset="0" />
-        <rom name="hbios_105_PAL50.bin" size="0x19400" crc="fb942c80" sha1="81bba9d9c245d23cc4b9503180ebe2d67bf1e117" offset="0" />
-        <rom name="hbios_105_PAL60.bin" size="0x19400" crc="b59ebe6d" sha1="873830286c66935fd23e3ea7c192e6573e056cbd" offset="0" />
+				<rom name="hbios_105_NTSC.bin"  size="0x19400" crc="c0b8aae9" sha1="68b10153695da505756eb7dc7cc4a7e93fe68860" offset="0" />
+				<rom name="hbios_105_PAL50.bin" size="0x19400" crc="fb942c80" sha1="81bba9d9c245d23cc4b9503180ebe2d67bf1e117" offset="0" />
+				<rom name="hbios_105_PAL60.bin" size="0x19400" crc="b59ebe6d" sha1="873830286c66935fd23e3ea7c192e6573e056cbd" offset="0" />
 
-        <rom name="eeloader_104e_NTSC.bin"  size="0x36f8" crc="ad04a8d9" sha1="c83d724299875cd5ea8d6be05db12d688ce8eff1" offset="0" />
-        <rom name="eeloader_104e_PAL50.bin" size="0x36f8" crc="4868ba51" sha1="e6a65523824ecf4f2a5145e2c5118cfb4bee059d" offset="0" />
-        <rom name="eeloader_104e_PAL60.bin" size="0x36f8" crc="58845532" sha1="255b5c9f4f2f7322c20d2619126cd150a1b8f71c" offset="0" />
+				<rom name="eeloader_104e_NTSC.bin"  size="0x36f8" crc="ad04a8d9" sha1="c83d724299875cd5ea8d6be05db12d688ce8eff1" offset="0" />
+				<rom name="eeloader_104e_PAL50.bin" size="0x36f8" crc="4868ba51" sha1="e6a65523824ecf4f2a5145e2c5118cfb4bee059d" offset="0" />
+				<rom name="eeloader_104e_PAL60.bin" size="0x36f8" crc="58845532" sha1="255b5c9f4f2f7322c20d2619126cd150a1b8f71c" offset="0" />
 
-      </dataarea>
+			</dataarea>
 
-    </part>
-  </software>
+		</part>
+	</software>
 
 </softwarelist>
 
