@@ -765,7 +765,7 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
 // fc4003da bit 3 is VBL
 	AM_RANGE(0xfcff8000, 0xfcffffff) AM_ROM AM_REGION("vrom", 0x0000)
 ADDRESS_MAP_END
-#if 0
+
 static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
@@ -784,7 +784,7 @@ static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
-#endif
+
 static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
@@ -1672,7 +1672,7 @@ static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
-#if 0
+
 static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpd210_map)
@@ -1681,7 +1681,7 @@ static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M")
 MACHINE_CONFIG_END
-#endif
+
 static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
@@ -2430,12 +2430,11 @@ ROM_START( maccclas )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
 ROM_END
-/*
+
 ROM_START( macpd210 )
-    ROM_REGION32_BE(0x100000, "bootrom", 0)
-    ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) )
 ROM_END
-*/
 
 ROM_START( maclc520 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
@@ -2473,7 +2472,7 @@ COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb, mac_state,   macpb140,    
 COMP( 1992, macpb160, 0,        0,  macpb160, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
 COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
 COMP( 1992, macpb180c,macpb160, 0,  macpb180c,macadb, mac_state,   macpb160,     "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
-//COMP( 1992, macpd210, 0,        0,  macpd210, macadb, mac_state,   macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
+COMP( 1992, macpd210, 0,        0,  macpd210, macadb, mac_state,   macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
 COMP( 1993, maccclas, 0,        0,  maccclas, macadb, mac_state,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
 COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
 COMP( 1993, maclc3,   0,        0,  maclc3,   maciici, mac_state,  maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
