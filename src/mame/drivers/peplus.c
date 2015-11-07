@@ -2353,8 +2353,9 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "mbo-cg2002.u74",  0x10000, 0x8000, CRC(7362f7f3) SHA1(fce4ce2cdd836e37382d39d8b167019cfc4c6166) )
 	ROM_LOAD( "mxo-cg2002.u75",  0x18000, 0x8000, CRC(4560fdec) SHA1(63ec67afd378a06d74084bba72fbbe9be12e24d3) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx770.u50", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "capx904.u50", 0x0000, 0x0200, CRC(c4b8e04c) SHA1(5565777b5fb2029a3bde6adca379631766bcd156) )
 ROM_END
 
 ROM_START( pepp0063 ) /* Normal board : 10's or Better (PP0063) */
