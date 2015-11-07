@@ -25,8 +25,8 @@ driver by Couriersud
  TM-0??               Pong In-A-Barrel (1973)                                    A001433?                           NO
  TM-015               Cocktail Pong/Coup Franc (1974)                            A001433?                           NO
  TM-0??               Dr. Pong/Puppy Pong/Snoopy Pong (1974)                     A001433?                           NO
- TM-014               Pong Doubles/Coupe Davis (1973)                            A000785                            NO
  422                  Superpong (1974)                                           A000423                            NO
+ TM-014               Pong Doubles/Coupe Davis (1973)                            A000785                            NO
  TM-058               Breakout/Breakout Cocktail/Consolette (1976)               A004533                            NO
  
 Notes:
@@ -34,7 +34,7 @@ Notes:
 TODO: Please see netlist include files
 TODO: Breakout Cocktail and Consolette are believed to use the Breakout PCB with different cabinet designs, this needs to be verified.
 TODO: Coupe Davis is believed to use the Pong Doubles PCB, just a different cabinet design, this needs to be verified.
-TODO: Dr. Pong, Puppy Pong, Snoopy Pong, Cocktail Pong and Coup Franc are all believed to use the Pong (Rev E) PCB, but
+TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, Cocktail Pong and Coup Franc are all believed to use the Pong (Rev E) PCB, but
       different cabinet designs; this needs to be verified.
 TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifications, this needs to be verified.
 
