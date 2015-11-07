@@ -572,7 +572,7 @@ GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari
 
 // 100% TTL
 //GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device,  0, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1973, pongbarl,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari Europe", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1973, pongbarl,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, coupfran,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari Europe", "Coup Franc [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, drpong,     pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
