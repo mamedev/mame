@@ -6,18 +6,19 @@
 
         22/11/2008 Preliminary driver.
 
-MZ80K Monitor - no commands seem to do anything
+MZ80K Monitor:
+LOAD - load a cassette
 
 MZ80A Monitor Commands:
 B - turn key beep on/off
 F - boot from Floppy (press enter at the question)
+J - jump (goto)
 L - load a cassette
-could be more
 
 MZ80A ToDo:
 - System writes CF to D800-DFFF
 - System uses E200-E2FF (contents are read then discarded)
-- SYstem uses E800
+- System uses E800
 - Disk uses ports D8-DC
 - Keyboard issues listed below
 
@@ -28,6 +29,7 @@ MZ80B
 ****************************************************************************/
 
 #include "includes/mz80.h"
+#include "formats/mz_cas.h"
 
 
 /* Note about natural keyboard support:
@@ -290,7 +292,7 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -311,6 +313,7 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
 	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
 
@@ -345,7 +348,7 @@ ROM_END
 ROM_START( mz80kj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c) )
-	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowecase, but japanese letters
+	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowercase, but japanese letters
 	ROM_LOAD( "mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )

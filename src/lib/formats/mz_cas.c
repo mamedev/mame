@@ -307,7 +307,7 @@ static const struct CassetteLegacyWaveFiller mz700_legacy_fill_wave =
 	1,                          /* chunk_size */
 	2 * BYTE_SAMPLES,           /* chunk_samples */
 	NULL,                       /* chunk_sample_calc */
-	5120,                       /* sample_frequency */
+	4400,                       // sample_frequency (tested ok with MZ-80K, MZ-80A, MZ-700, MZ-800, MZ-1500)
 	MZ700_WAVESAMPLES_HEADER,   /* header_samples */
 	1                           /* trailer_samples */
 };

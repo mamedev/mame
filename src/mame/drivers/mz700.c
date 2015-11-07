@@ -62,7 +62,6 @@
  *  ToDo:
     - slows down while making sound
     - MZ800:
-      - Had to patch the rom to load cassettes
       - Port CF not done.
       - Dips not connected.
       - MZ800-mode display not working /Hi-res not coded.
@@ -500,9 +499,6 @@ ROM_END
 ROM_START( mz800 )
 	ROM_REGION( 0x4000, "monitor", 0 )
 	ROM_LOAD( "mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4) )
-	// fix cassette loading
-	ROM_FILL(0x761,1,0x13)
-	ROM_FILL(0xA4B,1,0x45)
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) // ramdisk
 ROM_END
