@@ -273,7 +273,7 @@ ROMs:
 const device_type SEGA_XBD_PCB = &device_creator<segaxbd_state>;
 
 segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, SEGA_XBD_PCB, "Sega System 32 PCB", tag, owner, clock, "segas32_pcb", __FILE__),
+		: device_t(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__),
 			m_maincpu(*this, "maincpu"),
 			m_subcpu(*this, "subcpu"),
 			m_soundcpu(*this, "soundcpu"),
