@@ -16,14 +16,14 @@
 
 /* step 1: declare all external references */
 #define MODULE(name)    extern void name##_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info);
-#include "modules.c"
+#include "modules.cpp"
 #undef MODULE
 
 /* step 2: define the modules[] array */
 #define MODULE(name)    name##_get_info,
 static void (*const modules[])(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info) =
 {
-#include "modules.c"
+#include "modules.cpp"
 };
 
 /* step 3: declare imgtool_create_cannonical_library() */
