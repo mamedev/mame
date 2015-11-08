@@ -1079,8 +1079,13 @@ os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
 #-------------------------------------------------
 cmake: generate
 	$(SILENT) $(GENIE) $(PARAMS) cmake
+ifeq ($(OS),windows)
 	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt 
 	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt 
+else
+	$(SILENT)echo "cmake_minimum_required(VERSION 2.8.4)" > CMakeLists.txt 
+	$(SILENT)echo "add_subdirectory($(PROJECTDIR)/cmake)" >> CMakeLists.txt 
+endif
 
 	
 #-------------------------------------------------
