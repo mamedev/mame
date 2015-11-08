@@ -91,53 +91,13 @@ project "softfloat"
 	uuid "04fbf89e-4761-4cf2-8a12-64500cf0c5c5"
 	kind "StaticLib"
 
-	configuration { "vs*" }
-		buildoptions {
-			-- from lib section
-			"/wd4290", -- warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
-			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
-			-- from emu section
-			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter	
-			"/wd4127", -- warning C4127: conditional expression is constant
-			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
-			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
-			"/wd4800", -- warning C4800: 'type' : forcing value to bool 'true' or 'false' (performance warning)
-			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
-			"/wd4150", -- warning C4150: deletion of pointer to incomplete type 'xxx'; no destructor called
-
-			-- in softfloat
-			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned			
-		}
-
-	configuration { "gmake" }
-		buildoptions {
-			"-Wno-sign-compare",
-		}
-
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
-		buildoptions {
-			"-Wno-tautological-compare",
-		}	
-	end
-	
-	configuration { }
-
 	options {
 		"ForceCPP",
 	}
 
 	includedirs {
 		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/emu",
-		MAME_DIR .. "src/lib",
-		MAME_DIR .. "src/lib/util",
-		MAME_DIR .. "3rdparty",
 	}
-	if _OPTIONS["with-bundled-expat"] then
-	    includedirs {
-			MAME_DIR .. "3rdparty/expat/lib/",
-		}
-	end
 	
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
