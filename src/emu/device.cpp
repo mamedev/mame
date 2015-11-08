@@ -866,7 +866,7 @@ void device_t::popmessage(const char *format, ...) const
 		va_end(arg);
 
 		// pop it in the UI
-		machine().ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
+		if (m_machine!=NULL) machine().ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
 	}
 }
 
@@ -881,7 +881,7 @@ void device_t::vlogerror(const char *format, va_list args) const
 {
 	std::string fmt("[");
 	fmt += tag() + std::string("] ") + format;
-	machine().vlogerror(fmt.c_str(), args);
+	if (m_machine!=NULL) machine().vlogerror(fmt.c_str(), args);
 }
 
 //**************************************************************************
