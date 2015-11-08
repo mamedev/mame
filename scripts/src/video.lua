@@ -506,7 +506,7 @@ if (VIDEOS["PC_VGA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/trident.cpp",
 		MAME_DIR .. "src/devices/bus/isa/trident.h",
 		MAME_DIR .. "src/devices/video/clgd542x.cpp",
-		MAME_DIR .. "src/devices/video/blgd542x.h",
+		MAME_DIR .. "src/devices/video/clgd542x.h",
 	}
 end
 
