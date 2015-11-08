@@ -81,10 +81,6 @@ function createProjects_mame_tiny(_target, _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-tiny"))
 	
-	options {
-		"ForceCPP",
-	}
-	
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",

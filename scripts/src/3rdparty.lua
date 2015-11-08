@@ -22,10 +22,6 @@ project "expat"
 		}
 	configuration { }
 		
-	options {
-		"ForceCPP",
-	}
-
 	files {
 		MAME_DIR .. "3rdparty/expat/lib/xmlparse.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
@@ -474,10 +470,6 @@ project "jsoncpp"
 	}
 	
 	configuration { }
-
-	options {
-		"ForceCPP",
-	}
 
 	includedirs {
 		MAME_DIR .. "3rdparty/jsoncpp/include",

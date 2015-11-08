@@ -13,10 +13,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		"SingleOutputDir",
 	}
 	
-	options {
-		"ForceCPP",
-	}
-
 	dofile("osdmini_cfg.lua")
 	
 	includedirs {
@@ -55,10 +51,6 @@ project ("osd_" .. _OPTIONS["osd"])
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
-
-	options {
-		"ForceCPP",
-	}
 
 	removeflags {
 		"SingleOutputDir",	

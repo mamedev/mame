@@ -57,10 +57,6 @@ function createProjects_ldplayer_ldplayer(_target, _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drvldplayer"))
 	
-	options {
-		"ForceCPP",
-	}
-	
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",

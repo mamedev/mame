@@ -5,10 +5,6 @@ project "utils"
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
 	kind (LIBTYPE)
 
-	options {
-		"ForceCPP",
-	}
-
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
@@ -102,7 +98,6 @@ project "formats"
 	kind (LIBTYPE)
 
 	options {
-		"ForceCPP",
 		"ArchiveSplit",
 	}
 

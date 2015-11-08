@@ -160,9 +160,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
-	options {
-		"ForceCPP",
-	}
 	removeflags {
 		"SingleOutputDir",
 	}
@@ -220,10 +217,6 @@ if _OPTIONS["with-tools"] then
 	project("ledutil")
 		uuid ("061293ca-7290-44ac-b2b5-5913ae8dc9c0")
 		kind "ConsoleApp"
-
-		options {
-			"ForceCPP",
-		}
 
 		flags {
 			"Symbols", -- always include minimum symbols for executables 	

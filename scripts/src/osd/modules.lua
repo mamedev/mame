@@ -33,10 +33,6 @@ function osdmodulesbuild()
 		"SingleOutputDir",
 	}
 
-	options {
-		"ForceCPP",
-	}
-
 	files {
 		MAME_DIR .. "src/osd/osdnet.cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.cpp",

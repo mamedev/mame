@@ -85,10 +85,6 @@ function createProjects_mame_nl(_target, _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-nl"))
 	
-	options {
-		"ForceCPP",
-	}
-	
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",

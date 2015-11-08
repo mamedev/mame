@@ -18,10 +18,6 @@ function createProjects_mame_dummy(_target, _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame_dummy"))
 	
-	options {
-		"ForceCPP",
-	}
-	
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",

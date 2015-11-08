@@ -18,9 +18,6 @@ end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
-	options {
-		"ForceCPP",
-	}
 	flags {
 		"NoManifest",
 		"Symbols", -- always include minimum symbols for executables 
