@@ -71,7 +71,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct1.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct2.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor.h",
-		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor_math.h",
+		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor_mat.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_gmres.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.c",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.h",
