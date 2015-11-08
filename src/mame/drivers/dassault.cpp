@@ -12,21 +12,98 @@
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
-PCB DE-0344-3 (Main board)
- Data East 59 (68000 Main CPU)
- Data East 55 x 2
- Data East 45 (H6280 Sound CPU)
-   YM2203C + YM3014B
-   YM2151 + YM3012
-   OKI M6295 x 2
- 32.220MHz OSC
- DSW 8-switch (2 populated, 1 unpopulated)
+***************************************************************************
 
-PCB DE-0345-1 (Sub board)
- Data East 59 (68000 Sub CPU)
- Data East 55 x 2
- 28MHz OSC
+Thunder Zone / Desert Assault
+Data East 1991
 
+PCB Layout
+----------
+
+Main PCB:
+
+DE-0344-3
+|--------------------------------------------------------|
+|TA8205      YM3012   YM2151    GT04         MAJ-01  GZ03|
+| VOL VOL    YM3014   YM2203    6264   |---| MAJ-00  GT02|
+|  3403 3403  M6295(1) MAJ-03          |45 |         GZ01|
+|  3403 3403  M6295(2) GT07     32MHz  |---|         GT00|
+|                      MAJ-02                            |
+|  SW3 SW2 SW1         GT06                     6264     |
+|J                     GT05            |-----|  6264     |
+|A       MB7128                        | 55  |      6264 |
+|M                                     |     |      6264 |
+|M                                     |-----|           |
+|A                                                       |
+| RCDM-I111                                          77  |
+| RCDM-I111                            |-----| 6264      |
+| RCDM-I111                            | 55  | 6264      |
+| RCDM-I111       6116                 |     |    |---|  |
+|                 6116                 |-----|    |59 |  |
+| CN4             6116                            |---|  |
+| CN3                                                    |
+|--------------------------------------------------------|
+Notes:
+            (some PCBs may use a 32.22MHz oscillator)
+       59 - 68000-based CPU (in custom QFP64 package) disguised as Data East chip 59. Clock input 14.161MHz [28.322/2] (QFP64)
+       45 - Hudson/NEC HuC6280 disguised as Data East chip 45. Clock input 8.000MHz on pin 10 [32/4] (QFP80)
+       55 - Data East custom chip 55 graphic generator IC (QFP160)
+       77 - Data East custom chip 77 (SOP28)
+ M6295(1) - OKI M6295 4-Channel Mixing ADPCM Voice Synthesis LSI. Clock input 2.000MHz [32/16]. Pin 7 HIGH (QFP44)
+ M6295(2) - OKI M6295 4-Channel Mixing ADPCM Voice Synthesis LSI. Clock input 1.000MHz [32/32]. Pin 7 HIGH (QFP44)
+   YM2203 - Yamaha YM2203C FM Operator Type-N(OPN). Clock input 4.000MHz [32/8] (DIP40)
+   YM2151 - Yamaha YM2151 FM Operator Type-M(OPM). Clock input 3.55556MHz comes from a 74F163 on pin 12. F163 input pin 2 is 32MHz (DIP24)
+   YM3012 - Yamaha YM3012 2-Channel Serial Input Floating D/A Converter (DIP16) 
+   YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter (DIP8)
+     6116 - 2kx8 SRAM (DIP24)
+     6264 - 8kx8 SRAM (DIP28)
+     MAJ* - Mask ROMs
+GT* & GZ* - EPROMs
+   MB7128 - Fujitsu MB7128 Bi-Polar PROM marked 'GR-0' (DIP18)
+    CN3/4 - Connector for extra joystick & buttons for player 3 and player 4
+   TA8205 - Toshiba TA8205AH 18W BTL 2 Channel Audio Power Amplifier
+     3403 - NEC uPC3403C Quad Operational Amplifier (DIP14)
+RCDM-I111 - Custom Data East resistor array
+  SW1/2/3 - 8-position DIP switch (2 populated, SW3 unpopulated)
+    HSYNC - 15.80464kHz 
+    VSYNC - 58.1052Hz
+
+Sub PCB:
+
+DE-0345-1
+|--------------------------------------------------------|
+|                       28.322MHz         GT12           |
+|            6116                         GT13    MAJ-04 |
+|6116        6116            |-----|      GT14    MAJ-05 |
+|6116                        | 52  |      GT15    MAJ-06 |
+|                            |     |              MAJ-07 |
+|      |---|                 |-----|                     |
+|      |59 |                                      MAJ-08 |
+|      |---|                 |-----|              MAJ-09 |
+|                            | 52  |              MAJ-10 |
+|              6116          |     |              MAJ-11 |
+|GZ08          6116          |-----|                     |
+|GT09                                                    |
+|GZ10  6264                         6116                 |
+|GT11  6264    6116                 6116                 |
+|              6116                                      |
+|MB8421 MB8431                                           |
+|                                               MB7138   |
+|                                       MB7138  MB7138   |
+|--------------------------------------------------------|
+Notes:
+            (some PCBs may use a 28.0MHz oscillator)
+       59 - 68000-based CPU (in custom QFP64 package) disguised as Data East chip 59. Clock input 14.161MHz [28.322/2] (QFP64)
+       52 - Data East custom chip 52 graphic generator IC (QFP128)
+   MB7138 - Fujitsu MB7138 Bi-Polar PROM marked 'GR-1' (DIP24)  
+     6116 - 2kx8 SRAM (DIP24)
+     6264 - 8kx8 SRAM (DIP28)
+     MAJ* - Mask ROMs
+GT* & GZ* - EPROMs
+   MB8421 - Fujitsu MB8421 CMOS 16k-bit Dual-port SRAM (SDIP52)
+   MB8431 - Fujitsu MB8431 CMOS 16k-bit Dual-port SRAM (SDIP52)
+ 
+***************************************************************************   
 
 Stephh's notes (based on the games M68000 code and some tests) :
 
