@@ -164,7 +164,7 @@ void datapack_device::update()
 		else if (!(m_control & DP_LINE_OUTPUT_ENABLE) && (m_control & DP_LINE_RESET))
 		{
 			// read datapack ID
-			if (m_id & DP_ID_EPROM)
+			if ((m_id & DP_ID_EPROM) || software_entry() != NULL)
 				m_data = m_id;
 			else
 				m_data = 0x01;      // for identify RAM pack
