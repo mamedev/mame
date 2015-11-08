@@ -458,14 +458,14 @@ UINT32 tms340x0_device::raster_op_21(UINT32 newpix, UINT32 oldpix) { return (old
     OPCODE TABLE & IMPLEMENTATIONS
 ***************************************************************************/
 
-#include "34010fld.c"
+#include "34010fld.cpp"
 
 /* includes the static function prototypes and the master opcode table */
-#include "34010tbl.c"
+#include "34010tbl.cpp"
 
 /* includes the actual opcode implementations */
-#include "34010ops.c"
-#include "34010gfx.c"
+#include "34010ops.cpp"
+#include "34010gfx.cpp"
 
 
 

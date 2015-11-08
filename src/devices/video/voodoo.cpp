@@ -251,7 +251,7 @@ static void raster_generic_2tmu(void *dest, INT32 scanline, const poly_extent *e
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, (((tex0) == 0xffffffff) ? 0 : ((tex1) == 0xffffffff) ? 1 : 2), fbzcp, fbz, alpha, fog, tex0, tex1)
 
-#include "voodoo.c"
+#include "voodoo.cpp"
 
 #undef RASTERIZER_ENTRY
 
@@ -268,7 +268,7 @@ static void raster_generic_2tmu(void *dest, INT32 scanline, const poly_extent *e
 
 static const raster_info predef_raster_table[] =
 {
-#include "voodoo.c"
+#include "voodoo.cpp"
 	{ 0 }
 };
 

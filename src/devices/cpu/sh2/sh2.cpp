@@ -2681,5 +2681,5 @@ void sh2_device::execute_set_input(int irqline, int state)
 	}
 }
 
-#include "sh2comn.c"
-#include "sh2drc.c"
+#include "sh2comn.cpp"
+#include "sh2drc.cpp"
