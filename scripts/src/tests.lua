@@ -43,7 +43,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "tests/main.c",
-	MAME_DIR .. "tests/lib/util/corestr.c",
+	MAME_DIR .. "tests/main.cpp",
+	MAME_DIR .. "tests/lib/util/corestr.cpp",
 }
 

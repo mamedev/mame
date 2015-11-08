@@ -34,8 +34,8 @@ function createProjects_mame_dummy(_target, _subtarget)
 	}
 
 	files{
-		MAME_DIR .. "src/mame/drivers/coleco.c",
-		MAME_DIR .. "src/mame/machine/coleco.c",
+		MAME_DIR .. "src/mame/drivers/coleco.cpp",
+		MAME_DIR .. "src/mame/machine/coleco.cpp",
 	}
 end
 
