@@ -1605,6 +1605,22 @@ ioport_type_class ioport_field::type_class() const
 		case IPT_BUTTON8:
 		case IPT_BUTTON9:
 		case IPT_BUTTON10:
+		case IPT_BUTTON11:
+		case IPT_BUTTON12:
+		case IPT_BUTTON13:
+		case IPT_BUTTON14:
+		case IPT_BUTTON15:
+		case IPT_BUTTON16:
+		case IPT_HAT_UP:
+		case IPT_HAT_DOWN:
+		case IPT_HAT_LEFT:
+		case IPT_HAT_RIGHT:
+		case IPT_SHOULDER_BUTTON_L1:
+		case IPT_SHOULDER_BUTTON_L2:
+		case IPT_SHOULDER_BUTTON_R1:
+		case IPT_SHOULDER_BUTTON_R2:
+		case IPT_JOYSTICK_BUTTON1:
+		case IPT_JOYSTICK_BUTTON2:
 		case IPT_AD_STICK_X:
 		case IPT_AD_STICK_Y:
 		case IPT_AD_STICK_Z:
