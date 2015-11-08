@@ -274,34 +274,33 @@ const options_entry windows_options::s_option_entries[] =
 	// performance options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
 	{ WINOPTION_PRIORITY "(-15-1)",                   "0",        OPTION_INTEGER,    "thread priority for the main game thread; range from -15 to 1" },
-	{ WINOPTION_PROFILE,                              "0",        OPTION_INTEGER,    "enable profiling, specifying the stack depth to track" },
+	{ WINOPTION_PROFILE,                              "0",        OPTION_INTEGER,    "enables profiling, specifying the stack depth to track" },
 
 	// video options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
-	{ WINOPTION_MENU,                                 "0",        OPTION_BOOLEAN,    "enable menu bar if available by UI implementation" },
+	{ WINOPTION_MENU,                                 "0",        OPTION_BOOLEAN,    "enables menu bar if available by UI implementation" },
 
 	// DirectDraw-specific options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },
-	{ WINOPTION_HWSTRETCH ";hws",                     "1",        OPTION_BOOLEAN,    "enable hardware stretching" },
+	{ WINOPTION_HWSTRETCH ";hws",                     "1",        OPTION_BOOLEAN,    "enables hardware stretching" },
 
 	// post-processing options
 	{ NULL,                                                     NULL,        OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
-	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",         OPTION_BOOLEAN,    "enable HLSL post-processing (PS3.0 required)" },
+	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",         OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
 	{ WINOPTION_HLSLPATH,                                       "hlsl",      OPTION_STRING,     "path to hlsl files" },
 	{ WINOPTION_HLSL_PRESCALE_X,                                "0",         OPTION_INTEGER,    "HLSL pre-scale override factor for X (0 for auto)" },
 	{ WINOPTION_HLSL_PRESCALE_Y,                                "0",         OPTION_INTEGER,    "HLSL pre-scale override factor for Y (0 for auto)" },
-	{ WINOPTION_HLSL_PRESET";(-1-3)",                           "-1",        OPTION_INTEGER,    "HLSL preset to use (0-3)" },
-	{ WINOPTION_HLSL_WRITE,                                     NULL,        OPTION_STRING,     "enable HLSL AVI writing (huge disk bandwidth suggested)" },
+	{ WINOPTION_HLSL_WRITE,                                     NULL,        OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",      OPTION_STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",      OPTION_STRING,     "HLSL upscaled-snapshot height" },
 	{ WINOPTION_SHADOW_MASK_ALPHA";fs_shadwa(0.0-1.0)",         "0.0",       OPTION_FLOAT,      "shadow mask alpha-blend value (1.0 is fully blended, 0.0 is no mask)" },
 	{ WINOPTION_SHADOW_MASK_TEXTURE";fs_shadwt(0.0-1.0)",       "aperture.png", OPTION_STRING,  "shadow mask texture name" },
-	{ WINOPTION_SHADOW_MASK_COUNT_X";fs_shadww",                "6",         OPTION_INTEGER,    "shadow mask width, in phosphor dots" },
-	{ WINOPTION_SHADOW_MASK_COUNT_Y";fs_shadwh",                "6",         OPTION_INTEGER,    "shadow mask height, in phosphor dots" },
-	{ WINOPTION_SHADOW_MASK_USIZE";fs_shadwu(0.0-1.0)",         "0.1875",    OPTION_FLOAT,      "shadow mask texture size in U direction" },
-	{ WINOPTION_SHADOW_MASK_VSIZE";fs_shadwv(0.0-1.0)",         "0.1875",    OPTION_FLOAT,      "shadow mask texture size in V direction" },
-	{ WINOPTION_SHADOW_MASK_UOFFSET";fs_shadwou(-1.0-1.0)",     "0.0",       OPTION_FLOAT,      "shadow mask texture offset in U direction" },
-	{ WINOPTION_SHADOW_MASK_VOFFSET";fs_shadwov(-1.0-1.0)",     "0.0",       OPTION_FLOAT,      "shadow mask texture offset in V direction" },
+	{ WINOPTION_SHADOW_MASK_COUNT_X";fs_shadww",                "6",         OPTION_INTEGER,    "shadow mask tile width, in screen dimensions" },
+	{ WINOPTION_SHADOW_MASK_COUNT_Y";fs_shadwh",                "6",         OPTION_INTEGER,    "shadow mask tile height, in screen dimensions" },
+	{ WINOPTION_SHADOW_MASK_USIZE";fs_shadwu(0.0-1.0)",         "0.1875",    OPTION_FLOAT,      "shadow mask texture width, in U/V dimensions" },
+	{ WINOPTION_SHADOW_MASK_VSIZE";fs_shadwv(0.0-1.0)",         "0.1875",    OPTION_FLOAT,      "shadow mask texture height, in U/V dimensions" },
+	{ WINOPTION_SHADOW_MASK_UOFFSET";fs_shadwou(-1.0-1.0)",     "0.0",       OPTION_FLOAT,      "shadow mask texture offset, in U direction" },
+	{ WINOPTION_SHADOW_MASK_VOFFSET";fs_shadwov(-1.0-1.0)",     "0.0",       OPTION_FLOAT,      "shadow mask texture offset, in V direction" },
 	{ WINOPTION_CURVATURE";fs_curv(0.0-1.0)",                   "0.0",       OPTION_FLOAT,      "screen curvature amount" },
 	{ WINOPTION_ROUND_CORNER";fs_rndc(0.0-1.0)",                "0.0",       OPTION_FLOAT,      "screen round corner amount" },
 	{ WINOPTION_SMOOTH_BORDER";fs_smob(0.0-1.0)",               "0.0",       OPTION_FLOAT,      "screen smooth border amount" },
@@ -331,7 +330,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_PHOSPHOR";fs_phosphor",                         "0.4,0.4,0.4",OPTION_STRING,    "phosphorescence decay rate (0.0 is instant, 1.0 is forever)" },
 	/* NTSC simulation below this line */
 	{ NULL,                                                     NULL,        OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
-	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",         OPTION_BOOLEAN,    "enable YIQ-space HLSL post-processing" },
+	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",         OPTION_BOOLEAN,    "enables YIQ-space HLSL post-processing" },
 	{ WINOPTION_YIQ_CCVALUE";yiqcc",                            "3.59754545",OPTION_FLOAT,      "Color Carrier frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_AVALUE";yiqa",                              "0.5",       OPTION_FLOAT,      "A value for NTSC signal processing" },
 	{ WINOPTION_YIQ_BVALUE";yiqb",                              "0.5",       OPTION_FLOAT,      "B value for NTSC signal processing" },
@@ -367,15 +366,15 @@ const options_entry windows_options::s_option_entries[] =
 
 	// full screen options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
-	{ WINOPTION_TRIPLEBUFFER ";tb",                   "0",        OPTION_BOOLEAN,    "enable triple buffering" },
+	{ WINOPTION_TRIPLEBUFFER ";tb",                   "0",        OPTION_BOOLEAN,    "enables triple buffering" },
 	{ WINOPTION_FULLSCREENBRIGHTNESS ";fsb(0.1-2.0)", "1.0",      OPTION_FLOAT,      "brightness value in full screen mode" },
 	{ WINOPTION_FULLSCREENCONTRAST ";fsc(0.1-2.0)",   "1.0",      OPTION_FLOAT,      "contrast value in full screen mode" },
 	{ WINOPTION_FULLSCREENGAMMA ";fsg(0.1-3.0)",      "1.0",      OPTION_FLOAT,      "gamma value in full screen mode" },
 
 	// input options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enable global inputs" },
-	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
+	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enables global inputs" },
+	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enables dual lightgun input" },
 
 	{ NULL }
 };

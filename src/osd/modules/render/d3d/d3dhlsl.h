@@ -184,6 +184,7 @@ class renderer;
 /* in the future this will be moved into an OSD/emu shared buffer */
 struct hlsl_options
 {
+	bool                    params_init;
 	bool                    params_dirty;
 	float                   shadow_mask_alpha;
 	char                    shadow_mask_texture[1024];
@@ -376,7 +377,7 @@ private:
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
-	hlsl_options *          options;                    // current uniform state
+	hlsl_options *          options;                    // current options
 	D3DPRIMITIVETYPE        vecbuf_type;
 	UINT32                  vecbuf_index;
 	UINT32                  vecbuf_count;
@@ -427,13 +428,10 @@ private:
 	texture_info *          curr_texture;
 	render_target *         curr_render_target;
 	poly_info *             curr_poly;
-
-public:
 	render_target *         targethead;
 	cache_target *          cachehead;
 
 	static slider_desc      s_sliders[];
-	static hlsl_options     s_hlsl_presets[4];
 };
 
 }

@@ -808,7 +808,15 @@ int renderer::device_create(HWND device_hwnd)
 {
 	// if a device exists, free it
 	if (m_device != NULL)
+	{
 		device_delete();
+	}
+
+	// create shader options only once
+	if (m_shaders_options == NULL)
+	{
+		m_shaders_options = (hlsl_options*)global_alloc_clear(hlsl_options);
+	}
 
 	// verify the caps
 	int verify = device_verify_caps();
@@ -818,7 +826,9 @@ int renderer::device_create(HWND device_hwnd)
 		return 1;
 	}
 	if (verify == 1)
+	{
 		osd_printf_warning("Warning: Device may not perform well for Direct3D rendering\n");
+	}
 
 	// verify texture formats
 	HRESULT result = (*d3dintf->d3d.check_device_format)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, 0, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8);
@@ -999,6 +1009,12 @@ int renderer::device_create_resources()
 
 renderer::~renderer()
 {
+	if (m_shaders_options != NULL)
+	{
+		global_free(m_shaders_options);
+	}
+	m_shaders_options = NULL;
+
 	device_delete();
 }
 
@@ -1055,8 +1071,7 @@ int renderer::device_verify_caps()
 {
 	int retval = 0;
 
-	m_shaders = global_alloc_clear(shaders);
-	// FIXME: Dynamic cast
+	m_shaders = (shaders*)global_alloc_clear(shaders);
 	m_shaders->init(d3dintf, &window().machine(), this);
 
 	DWORD tempcaps;

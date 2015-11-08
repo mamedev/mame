@@ -54,116 +54,12 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 
 namespace d3d
 {
-hlsl_options shaders::s_hlsl_presets[4] =
-{
-	{   // 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
-		true,
-		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.03f, 0.0f, 0.0f, 0.0f, 0.0f,
-		0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
-		{ 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
-		{ 0.9f, 0.9f, 0.9f },
-		{ 0.05f,0.05f,0.05f},
-		{ 0.25f,0.25f,0.25f},
-		1.2f,
-		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-		0.9f, 4.0f,
-		1.0f,
-		{ 0.0f, 0.0f, 0.0f },
-		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
-	},
-	{   // 25% Shadow mask, 0% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
-		true,
-		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.03f, 0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
-		{ 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
-		{ 0.9f, 0.9f, 0.9f },
-		{ 0.05f,0.05f,0.05f},
-		{ 0.25f,0.25f,0.25f},
-		1.2f,
-		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-		0.9f, 4.0f,
-		1.0f,
-		{ 0.0f, 0.0f, 0.0f },
-		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
-	},
-	{   // 25% Shadow mask, 0% Scanlines, 0% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
-		true,
-		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
-		{ 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
-		{ 0.9f, 0.9f, 0.9f },
-		{ 0.05f,0.05f,0.05f},
-		{ 0.25f,0.25f,0.25f},
-		1.2f,
-		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-		0.9f, 4.0f,
-		1.0f,
-		{ 0.0f, 0.0f, 0.0f },
-		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
-	},
-	{   // 25% Shadow mask, 100% Scanlines, 15% Pincushion, 3 defocus, 24-degree Tint Out, 1.5 Exponent, 5% Floor, 70% Phosphor Return, 80% Saturation, Bad Convergence
-		true,
-		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
-		0.15f, 0.0f, 0.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.5f,
-		{ 3.0f, 3.0f },
-		{ 0.5f,-0.33f,0.7f },
-		{ 0.0f,-1.0f, 0.5f },
-		{ 0.0f, 0.2f, 0.3f },
-		{ 0.0f, 0.2f, 0.0f },
-		{ 0.8f, 0.2f, 0.0f },
-		{ 0.0f, 0.8f, 0.2f},
-		{ 0.2f, 0.0f, 0.8f},
-		{ 0.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
-		{ 1.5f, 1.5f, 1.5f },
-		{ 0.05f,0.05f,0.05f},
-		{ 0.7f, 0.7f, 0.7f},
-		0.8f,
-		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-		0.9f, 4.0f,
-		1.0f,
-		{ 0.0f, 0.0f, 0.0f },
-		0.21f, 0.19f, 0.17f, 0.15f, 0.14f, 0.13f, 0.12f, 0.11f, 0.10f, 0.09f
-	},
-};
-
 
 //============================================================
 //  PROTOTYPES
 //============================================================
 
-static void get_vector(const char *data, int count, float *out, int report_error);
+static void get_vector(const char *data, int count, float *out, bool report_error);
 
 
 //============================================================
@@ -201,7 +97,6 @@ shaders::shaders()
 
 shaders::~shaders()
 {
-	global_free(options);
 	cache_target *currcache = cachehead;
 	while(cachehead != NULL)
 	{
@@ -751,6 +646,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	this->d3dintf = d3dintf;
 	this->machine = machine;
 	this->d3d = renderer;
+	this->options = renderer->get_shaders_options();
 
 	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
@@ -759,20 +655,10 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	hlsl_prescale_y = winoptions.d3d_hlsl_prescale_y();
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
-	preset = winoptions.d3d_hlsl_preset();
 
-	if (preset < -1 || preset > 3)
+	if (!options->params_init)
 	{
-		preset = -1;
-	}
-
-	options = (hlsl_options*)global_alloc_clear(hlsl_options);
-
-	// unsafe
-	strcpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture()); 
-
-	if (preset == -1)
-	{
+		strncpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture(), sizeof(options->shadow_mask_texture));
 		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
 		options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
 		options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
@@ -805,39 +691,36 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		get_vector(winoptions.screen_floor(), 3, options->floor, TRUE);
 		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, TRUE);
 		options->saturation = winoptions.screen_saturation();
-	}
-	else
-	{
-		options = &s_hlsl_presets[preset];
-	}
+		options->yiq_enable = winoptions.screen_yiq_enable();
+		options->yiq_cc = winoptions.screen_yiq_cc();
+		options->yiq_a = winoptions.screen_yiq_a();
+		options->yiq_b = winoptions.screen_yiq_b();
+		options->yiq_o = winoptions.screen_yiq_o();
+		options->yiq_p = winoptions.screen_yiq_p();
+		options->yiq_n = winoptions.screen_yiq_n();
+		options->yiq_y = winoptions.screen_yiq_y();
+		options->yiq_i = winoptions.screen_yiq_i();
+		options->yiq_q = winoptions.screen_yiq_q();
+		options->yiq_scan_time = winoptions.screen_yiq_scan_time();
+		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
+		options->vector_length_scale = winoptions.screen_vector_length_scale();
+		options->vector_length_ratio = winoptions.screen_vector_length_ratio();
+		options->bloom_scale = winoptions.screen_bloom_scale();
+		get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, TRUE);
+		options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
+		options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
+		options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
+		options->bloom_level3_weight = winoptions.screen_bloom_lvl3_weight();
+		options->bloom_level4_weight = winoptions.screen_bloom_lvl4_weight();
+		options->bloom_level5_weight = winoptions.screen_bloom_lvl5_weight();
+		options->bloom_level6_weight = winoptions.screen_bloom_lvl6_weight();
+		options->bloom_level7_weight = winoptions.screen_bloom_lvl7_weight();
+		options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
+		options->bloom_level9_weight = winoptions.screen_bloom_lvl9_weight();
+		options->bloom_level10_weight = winoptions.screen_bloom_lvl10_weight();
 
-	options->yiq_enable = winoptions.screen_yiq_enable();
-	options->yiq_cc = winoptions.screen_yiq_cc();
-	options->yiq_a = winoptions.screen_yiq_a();
-	options->yiq_b = winoptions.screen_yiq_b();
-	options->yiq_o = winoptions.screen_yiq_o();
-	options->yiq_p = winoptions.screen_yiq_p();
-	options->yiq_n = winoptions.screen_yiq_n();
-	options->yiq_y = winoptions.screen_yiq_y();
-	options->yiq_i = winoptions.screen_yiq_i();
-	options->yiq_q = winoptions.screen_yiq_q();
-	options->yiq_scan_time = winoptions.screen_yiq_scan_time();
-	options->yiq_phase_count = winoptions.screen_yiq_phase_count();
-	options->vector_length_scale = winoptions.screen_vector_length_scale();
-	options->vector_length_ratio = winoptions.screen_vector_length_ratio();
-	options->bloom_scale = winoptions.screen_bloom_scale();
-	get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, TRUE);
-	options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
-	options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
-	options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
-	options->bloom_level3_weight = winoptions.screen_bloom_lvl3_weight();
-	options->bloom_level4_weight = winoptions.screen_bloom_lvl4_weight();
-	options->bloom_level5_weight = winoptions.screen_bloom_lvl5_weight();
-	options->bloom_level6_weight = winoptions.screen_bloom_lvl6_weight();
-	options->bloom_level7_weight = winoptions.screen_bloom_lvl7_weight();
-	options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
-	options->bloom_level9_weight = winoptions.screen_bloom_lvl9_weight();
-	options->bloom_level10_weight = winoptions.screen_bloom_lvl10_weight();
+		options->params_init = true;
+	}
 
 	options->params_dirty = true;
 
@@ -2104,6 +1987,8 @@ void shaders::delete_resources(bool reset)
 
 	initialized = false;
 
+	options = NULL;
+
 	cache_target *currcache = cachehead;
 	while(cachehead != NULL)
 	{
@@ -2235,7 +2120,7 @@ void shaders::delete_resources(bool reset)
 //  get_vector
 //============================================================
 
-static void get_vector(const char *data, int count, float *out, int report_error)
+static void get_vector(const char *data, int count, float *out, bool report_error)
 {
 	if (count > 3 &&
 		sscanf(data, "%f,%f,%f,%f", &out[0], &out[1], &out[2], &out[3]) < 4 && report_error)
