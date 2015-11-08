@@ -26,9 +26,9 @@
 // A82 2732     EPROM with monitor & boot firmware (assembly source of this ROM is in [4])
 // A66 8259A    System PIC
 // A89 8259A    Local PIC
-//*A86 8253     PIT
-//*A91 8251A    Serial channel #0
-//*A90 8251A    Serial channel #1
+// A86 8253     PIT
+// A91 8251A    Serial channel #0
+// A90 8251A    Serial channel #1
 //
 // **********
 // I/O Controller (IOC)
@@ -60,8 +60,6 @@
 //
 // A3 8741      CPU @ 3.58 MHz
 //
-// ICs that are not emulated yet are marked with "*"
-//
 // NOTE:
 // Firmware running on PIO is NOT original because a dump is not available at the moment.
 // Emulator runs a version of PIO firmware that was specifically developped by me to implement
@@ -69,8 +67,6 @@
 //
 // TODO:
 // - Find a dump of the original PIO firmware
-// - Emulate serial channels on IPC
-// - Emulate PIT on IPC
 // - Adjust speed of processors. Wait states are not accounted for yet.
 //
 // Huge thanks to Dave Mabry for dumping IOC firmware, KB firmware and character generator. This driver would not
@@ -96,6 +92,9 @@
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     XTAL_8MHz
 
+// Y1 oscillator of IPC board: 19.6608 MHz
+#define IPC_XTAL_Y1     XTAL_19_6608MHz
+
 // Main oscillator of IOC board: 22.032 MHz
 #define IOC_XTAL_Y2     22032000
 
@@ -116,6 +115,11 @@ static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0xc0 , 0xc0) AM_READWRITE(imds2_ipc_dbbout_r , imds2_ipc_dbbin_data_w)
 	AM_RANGE(0xc1 , 0xc1) AM_READWRITE(imds2_ipc_status_r , imds2_ipc_dbbin_cmd_w)
+        AM_RANGE(0xf0 , 0xf3) AM_DEVREADWRITE("ipctimer" , pit8253_device , read , write)
+        AM_RANGE(0xf4 , 0xf4) AM_DEVREADWRITE("ipcusart0" , i8251_device , data_r , data_w)
+        AM_RANGE(0xf5 , 0xf5) AM_DEVREADWRITE("ipcusart0" , i8251_device , status_r , control_w)
+        AM_RANGE(0xf6 , 0xf6) AM_DEVREADWRITE("ipcusart1" , i8251_device , data_r , data_w)
+        AM_RANGE(0xf7 , 0xf7) AM_DEVREADWRITE("ipcusart1" , i8251_device , status_r , control_w)
 	AM_RANGE(0xf8 , 0xf9) AM_DEVREADWRITE("iocpio" , i8041_device , upi41_master_r , upi41_master_w)
 	AM_RANGE(0xfa , 0xfb) AM_READWRITE(imds2_ipclocpic_r , imds2_ipclocpic_w)
 	AM_RANGE(0xfc , 0xfd) AM_READWRITE(imds2_ipcsyspic_r , imds2_ipcsyspic_w)
@@ -165,6 +169,11 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipccpu(*this , "ipccpu"),
 	m_ipcsyspic(*this , "ipcsyspic"),
 	m_ipclocpic(*this , "ipclocpic"),
+        m_ipctimer(*this , "ipctimer"),
+        m_ipcusart0(*this , "ipcusart0"),
+        m_ipcusart1(*this , "ipcusart1"),
+        m_serial0(*this , "serial0"),
+        m_serial1(*this , "serial1"),
 	m_ioccpu(*this , "ioccpu"),
 	m_iocdma(*this , "iocdma"),
 	m_ioccrtc(*this , "ioccrtc"),
@@ -243,6 +252,18 @@ WRITE8_MEMBER(imds2_state::imds2_ipcsyspic_w)
 WRITE8_MEMBER(imds2_state::imds2_ipclocpic_w)
 {
 	m_ipclocpic->write(space , offset == 0 , data);
+}
+
+WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_0_w)
+{
+        m_ipcusart0->write_txc(state);
+        m_ipcusart0->write_rxc(state);
+}
+
+WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_1_w)
+{
+        m_ipcusart1->write_txc(state);
+        m_ipcusart1->write_rxc(state);
 }
 
 WRITE8_MEMBER(imds2_state::imds2_miscout_w)
@@ -752,7 +773,37 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_PIC8259_ADD("ipcsyspic" , WRITELINE(imds2_state , imds2_ipc_intr) , VCC , NULL)
 		MCFG_PIC8259_ADD("ipclocpic" , DEVWRITELINE("ipcsyspic" , pic8259_device , ir7_w) , VCC  , NULL)
 
-		MCFG_CPU_ADD("ioccpu" , I8080A , IOC_XTAL_Y2 / 9)     // 2.448 MHz
+		MCFG_DEVICE_ADD("ipctimer" , PIT8253 , 0)
+		MCFG_PIT8253_CLK0(IPC_XTAL_Y1 / 16)
+		MCFG_PIT8253_CLK1(IPC_XTAL_Y1 / 16)
+		MCFG_PIT8253_CLK2(IPC_XTAL_Y1 / 16)
+		MCFG_PIT8253_OUT0_HANDLER(WRITELINE(imds2_state , imds2_baud_clk_0_w))
+		MCFG_PIT8253_OUT1_HANDLER(WRITELINE(imds2_state , imds2_baud_clk_1_w))
+		MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir4_w))
+
+                MCFG_DEVICE_ADD("ipcusart0" , I8251 , 0)
+                MCFG_I8251_RTS_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_cts))
+                MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir0_w))
+                MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir1_w))
+                MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial0" , rs232_port_device , write_txd))
+
+                MCFG_DEVICE_ADD("ipcusart1" , I8251 , 0)
+                MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir2_w))
+                MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir3_w))
+                MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_txd))
+                MCFG_I8251_RTS_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_rts))
+                MCFG_I8251_DTR_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_dtr))
+
+		MCFG_RS232_PORT_ADD("serial0" , default_rs232_devices , NULL)
+                MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_rxd))
+                MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_dsr))
+
+		MCFG_RS232_PORT_ADD("serial1" , default_rs232_devices , NULL)
+                MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_rxd))
+                MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_cts))
+                MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_dsr))
+
+		MCFG_CPU_ADD("ioccpu" , I8080A , IOC_XTAL_Y2 / 18)     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
 		MCFG_CPU_PROGRAM_MAP(ioc_mem_map)
 		MCFG_CPU_IO_MAP(ioc_io_map)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
@@ -812,7 +863,7 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_DEVICE_ADD("iocfdc" , I8271 , IOC_XTAL_Y1 / 2)
 		MCFG_I8271_DRQ_CALLBACK(DEVWRITELINE("iocdma" , i8257_device , dreq1_w))
 		MCFG_FLOPPY_DRIVE_ADD("iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
-				MCFG_SLOT_FIXED(true)
+		MCFG_SLOT_FIXED(true)
 
 		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
 		MCFG_CPU_IO_MAP(pio_io_map)
