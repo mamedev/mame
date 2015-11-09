@@ -9,10 +9,6 @@ project("tests")
 uuid ("66d4c639-196b-4065-a411-7ee9266564f5")
 kind "ConsoleApp"	
 
-options {
-	"ForceCPP",
-}
-
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
 }
@@ -43,7 +39,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "tests/main.c",
-	MAME_DIR .. "tests/lib/util/corestr.c",
+	MAME_DIR .. "tests/main.cpp",
+	MAME_DIR .. "tests/lib/util/corestr.cpp",
 }
 

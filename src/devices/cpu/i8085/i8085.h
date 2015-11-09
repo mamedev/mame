@@ -116,7 +116,7 @@ private:
 	UINT8               m_trap_im_copy;   /* copy of IM register when TRAP was taken */
 	UINT8               m_sod_state;      /* state of the SOD line */
 
-	UINT8               m_ietemp;         /* import/export temp space */
+	bool                m_ietemp;         /* import/export temp space */
 
 	address_space *m_program;
 	direct_read_data *m_direct;

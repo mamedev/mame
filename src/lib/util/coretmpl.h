@@ -339,7 +339,7 @@ public:
 	void reclaim(_ItemType &item) { m_freelist.append(item); }
 
 	// reclaim all items from a list
-	void reclaim_all(simple_list<_ItemType> &list) { m_freelist.append_list(list); }
+	void reclaim_all(simple_list<_ItemType> &_list) { m_freelist.append_list(_list); }
 
 private:
 	// internal state

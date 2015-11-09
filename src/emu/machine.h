@@ -215,7 +215,6 @@ public:
 	void schedule_exit();
 	void schedule_hard_reset();
 	void schedule_soft_reset();
-	void schedule_new_driver(const game_driver &driver);
 	void schedule_save(const char *filename);
 	void schedule_load(const char *filename);
 
@@ -257,7 +256,6 @@ private:
 	void start();
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt);
-	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
 	void watchdog_fired(void *ptr = NULL, INT32 param = 0);

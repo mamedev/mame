@@ -9,10 +9,6 @@ project("romcmp")
 uuid ("1b40275b-194c-497b-8abd-9338775a21b8")
 kind "ConsoleApp"	
 
-options {
-	"ForceCPP",
-}
-
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
 }
@@ -43,7 +39,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/romcmp.c",
+	MAME_DIR .. "src/tools/romcmp.cpp",
 }
 
 --------------------------------------------------
@@ -53,10 +49,6 @@ files {
 project("chdman")
 uuid ("7d948868-42db-432a-9bb5-70ce5c5f4620")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -100,8 +92,8 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/chdman.c",
-	MAME_DIR .. "src/version.c",
+	MAME_DIR .. "src/tools/chdman.cpp",
+	MAME_DIR .. "src/version.cpp",
 }
 
 --------------------------------------------------
@@ -111,10 +103,6 @@ files {
 project("jedutil")
 uuid ("bda60edb-f7f5-489f-b232-23d33c43dda1")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -146,7 +134,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/jedutil.c",
+	MAME_DIR .. "src/tools/jedutil.cpp",
 }
 
 --------------------------------------------------
@@ -156,10 +144,6 @@ files {
 project("unidasm")
 uuid ("65f81d3b-299a-4b08-a3fa-d5241afa9fd1")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -205,8 +189,8 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/unidasm.c",
-	MAME_DIR .. "src/emu/emucore.c",
+	MAME_DIR .. "src/tools/unidasm.cpp",
+	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 
@@ -218,10 +202,6 @@ project("ldresample")
 uuid ("3401561a-4407-4e13-9c6d-c0801330f7cc")
 kind "ConsoleApp"	
 
-options {
-	"ForceCPP",
-}
-
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
 }
@@ -264,7 +244,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/ldresample.c",
+	MAME_DIR .. "src/tools/ldresample.cpp",
 }
 
 --------------------------------------------------
@@ -275,10 +255,6 @@ project("ldverify")
 uuid ("3e66560d-b928-4227-928b-eadd0a10f00a")
 kind "ConsoleApp"	
 
-options {
-	"ForceCPP",
-}
-
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
 }
@@ -321,7 +297,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/ldverify.c",
+	MAME_DIR .. "src/tools/ldverify.cpp",
 }
 
 --------------------------------------------------
@@ -332,10 +308,6 @@ project("regrep")
 uuid ("7f6de580-d800-4e8d-bed6-9fc86829584d")
 kind "ConsoleApp"	
 
-options {
-	"ForceCPP",
-}
-
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
 }
@@ -366,7 +338,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/regrep.c",
+	MAME_DIR .. "src/tools/regrep.cpp",
 }
 
 --------------------------------------------------
@@ -377,10 +349,6 @@ project("srcclean")
 uuid ("4dd58139-313a-42c5-965d-f378bdeed220")
 kind "ConsoleApp"	
 
-options {
-	"ForceCPP",
-}
-
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
 }
@@ -411,7 +379,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/srcclean.c",
+	MAME_DIR .. "src/tools/srcclean.cpp",
 }
 
 --------------------------------------------------
@@ -422,10 +390,6 @@ project("src2html")
 uuid ("b31e963a-09ef-4696-acbd-e663e35ce6f7")
 kind "ConsoleApp"	
 
-options {
-	"ForceCPP",
-}
-
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
 }
@@ -456,7 +420,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/src2html.c",
+	MAME_DIR .. "src/tools/src2html.cpp",
 }
 
 --------------------------------------------------
@@ -466,10 +430,6 @@ files {
 project("split")
 uuid ("8ef6ff18-3199-4cc2-afd0-d64033070faa")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -512,7 +472,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/split.c",
+	MAME_DIR .. "src/tools/split.cpp",
 }
 
 --------------------------------------------------
@@ -522,10 +482,6 @@ files {
 project("pngcmp")
 uuid ("61f647d9-b129-409b-9c62-8acf98ed39be")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -557,7 +513,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/pngcmp.c",
+	MAME_DIR .. "src/tools/pngcmp.cpp",
 }
 
 --------------------------------------------------
@@ -567,10 +523,6 @@ files {
 project("nltool")
 uuid ("853a03b7-fa37-41a8-8250-0dc23dd935d6")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -615,7 +567,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/lib/netlist/prg/nltool.c",
+	MAME_DIR .. "src/lib/netlist/prg/nltool.cpp",
 }
 
 --------------------------------------------------
@@ -625,10 +577,6 @@ files {
 project("nlwav")
 uuid ("7c5396d1-2a1a-4c93-bed6-6b8fa182054a")
 kind "ConsoleApp" 
-
-options {
-  "ForceCPP",
-}
 
 flags {
   "Symbols", -- always include minimum symbols for executables  
@@ -651,7 +599,7 @@ includedirs {
 }
 
 files {
-  MAME_DIR .. "src/lib/netlist/prg/nlwav.c",
+  MAME_DIR .. "src/lib/netlist/prg/nlwav.cpp",
 }
 
 --------------------------------------------------
@@ -661,10 +609,6 @@ files {
 project("castool")
 uuid ("7d9ed428-e2ba-4448-832d-d882a64d5c22")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -709,7 +653,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/castool.c",
+	MAME_DIR .. "src/tools/castool.cpp",
 }
 
 --------------------------------------------------
@@ -719,10 +663,6 @@ files {
 project("floptool")
 uuid ("85d8e3a6-1661-4ac9-8c21-281d20cbaf5b")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -768,7 +708,7 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/floptool.c",
+	MAME_DIR .. "src/tools/floptool.cpp",
 }
 
 --------------------------------------------------
@@ -778,10 +718,6 @@ files {
 project("imgtool")
 uuid ("f3707807-e587-4297-a5d8-bc98f3d0b1ca")
 kind "ConsoleApp"	
-
-options {
-	"ForceCPP",
-}
 
 flags {
 	"Symbols", -- always include minimum symbols for executables 	
@@ -829,40 +765,40 @@ includedirs {
 }
 
 files {
-	MAME_DIR .. "src/tools/imgtool/main.c",
-	MAME_DIR .. "src/tools/imgtool/stream.c",
-	MAME_DIR .. "src/tools/imgtool/library.c",
-	MAME_DIR .. "src/tools/imgtool/modules.c",
-	MAME_DIR .. "src/tools/imgtool/iflopimg.c",
-	MAME_DIR .. "src/tools/imgtool/filter.c",
-	MAME_DIR .. "src/tools/imgtool/filteoln.c",
-	MAME_DIR .. "src/tools/imgtool/filtbas.c",
-	MAME_DIR .. "src/tools/imgtool/imgtool.c",
-	MAME_DIR .. "src/tools/imgtool/imgterrs.c",
-	MAME_DIR .. "src/tools/imgtool/imghd.c", 
-	MAME_DIR .. "src/tools/imgtool/charconv.c",
-	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk.c",
+	MAME_DIR .. "src/tools/imgtool/main.cpp",
+	MAME_DIR .. "src/tools/imgtool/stream.cpp",
+	MAME_DIR .. "src/tools/imgtool/library.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules.cpp",
+	MAME_DIR .. "src/tools/imgtool/iflopimg.cpp",
+	MAME_DIR .. "src/tools/imgtool/filter.cpp",
+	MAME_DIR .. "src/tools/imgtool/filteoln.cpp",
+	MAME_DIR .. "src/tools/imgtool/filtbas.cpp",
+	MAME_DIR .. "src/tools/imgtool/imgtool.cpp",
+	MAME_DIR .. "src/tools/imgtool/imgterrs.cpp",
+	MAME_DIR .. "src/tools/imgtool/imghd.cpp", 
+	MAME_DIR .. "src/tools/imgtool/charconv.cpp",
+	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk.cpp",
 	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk.h",
-	MAME_DIR .. "src/tools/imgtool/formats/coco_dsk.c",
+	MAME_DIR .. "src/tools/imgtool/formats/coco_dsk.cpp",
 	MAME_DIR .. "src/tools/imgtool/formats/coco_dsk.h",	
-	MAME_DIR .. "src/tools/imgtool/modules/amiga.c",
-	MAME_DIR .. "src/tools/imgtool/modules/macbin.c",
-	MAME_DIR .. "src/tools/imgtool/modules/rsdos.c",
-	MAME_DIR .. "src/tools/imgtool/modules/os9.c",
-	MAME_DIR .. "src/tools/imgtool/modules/mac.c",
-	MAME_DIR .. "src/tools/imgtool/modules/ti99.c", 
-	MAME_DIR .. "src/tools/imgtool/modules/ti990hd.c",
-	MAME_DIR .. "src/tools/imgtool/modules/concept.c",
-	MAME_DIR .. "src/tools/imgtool/modules/fat.c",
-	MAME_DIR .. "src/tools/imgtool/modules/pc_flop.c",
-	MAME_DIR .. "src/tools/imgtool/modules/pc_hard.c",
-	MAME_DIR .. "src/tools/imgtool/modules/prodos.c",
-	MAME_DIR .. "src/tools/imgtool/modules/vzdos.c",
-	MAME_DIR .. "src/tools/imgtool/modules/thomson.c",
-	MAME_DIR .. "src/tools/imgtool/modules/macutil.c",
-	MAME_DIR .. "src/tools/imgtool/modules/cybiko.c",
-	MAME_DIR .. "src/tools/imgtool/modules/cybikoxt.c",
-	MAME_DIR .. "src/tools/imgtool/modules/psion.c",
-	MAME_DIR .. "src/tools/imgtool/modules/bml3.c",
-	MAME_DIR .. "src/tools/imgtool/modules/hp48.c",
+	MAME_DIR .. "src/tools/imgtool/modules/amiga.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/macbin.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/rsdos.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/os9.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/mac.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/ti99.cpp", 
+	MAME_DIR .. "src/tools/imgtool/modules/ti990hd.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/concept.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/fat.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/pc_flop.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/pc_hard.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/prodos.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/vzdos.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/thomson.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/macutil.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/cybiko.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/cybikoxt.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/psion.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/bml3.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/hp48.cpp",
 }

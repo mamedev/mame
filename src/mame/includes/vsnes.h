@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
-#include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
 class vsnes_state : public driver_device
@@ -10,8 +9,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_nesapu1(*this, "nesapu1"),
-		m_nesapu2(*this, "nesapu2"),
 		m_ppu1(*this, "ppu1"),
 		m_ppu2(*this, "ppu2"),
 		m_work_ram(*this, "work_ram"),
@@ -20,8 +17,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
-	required_device<nesapu_device> m_nesapu1;
-	optional_device<nesapu_device> m_nesapu2;
 	required_device<ppu2c0x_device> m_ppu1;
 	optional_device<ppu2c0x_device> m_ppu2;
 
@@ -91,12 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_main);
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_sub);
 	void v_set_mirroring(int ppu, int mirroring);
-	DECLARE_READ8_MEMBER(psg1_4015_r);
-	DECLARE_WRITE8_MEMBER(psg1_4015_w);
-	DECLARE_WRITE8_MEMBER(psg1_4017_w);
-	DECLARE_READ8_MEMBER(psg2_4015_r);
-	DECLARE_WRITE8_MEMBER(psg2_4015_w);
-	DECLARE_WRITE8_MEMBER(psg2_4017_w);
+
 	DECLARE_DRIVER_INIT(vskonami);
 	DECLARE_DRIVER_INIT(vsvram);
 	DECLARE_DRIVER_INIT(bnglngby);
@@ -129,4 +119,10 @@ public:
 	void ppu_irq_2(int *ppu_regs);
 
 	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
+	DECLARE_WRITE8_MEMBER(bootleg_sound_write);
+	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_data_r);
+	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_address_r);
+	UINT8 m_bootleg_sound_offset;
+	UINT8 m_bootleg_sound_data;
+
 };

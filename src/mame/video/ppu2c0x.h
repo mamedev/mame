@@ -116,6 +116,8 @@ enum
 #define MCFG_PPU2C0X_SET_NMI(_class, _method) \
 	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 
+#define MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT \
+	ppu2c0x_device::use_sprite_write_limitation_disable(*device);
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -221,6 +223,14 @@ public:
 	emu_timer                   *m_nmi_timer;           /* NMI timer */
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
 
+	// some bootleg / clone hardware appears to ignore this
+	static void use_sprite_write_limitation_disable(device_t &device)
+	{
+		ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
+		dev.m_use_sprite_write_limitation = false;
+	}
+
+	bool m_use_sprite_write_limitation;
 private:
 	static const device_timer_id TIMER_HBLANK = 0;
 	static const device_timer_id TIMER_NMI = 1;

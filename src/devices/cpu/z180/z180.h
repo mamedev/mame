@@ -120,13 +120,6 @@ enum
 	Z180_TABLE_ex    /* cycles counts for taken jr/jp/call and interrupt latency (rst opcodes) */
 };
 
-enum
-{
-	CPUINFO_PTR_Z180_CYCLE_TABLE = CPUINFO_PTR_CPU_SPECIFIC,
-	CPUINFO_PTR_Z180_CYCLE_TABLE_LAST = CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex
-};
-
-
 #define Z180_IRQ0       0           /* Execute IRQ1 */
 #define Z180_IRQ1       1           /* Execute IRQ1 */
 #define Z180_IRQ2       2           /* Execute IRQ2 */

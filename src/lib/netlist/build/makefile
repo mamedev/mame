@@ -146,15 +146,15 @@ maketree: $(sort $(OBJDIRS))
 # generic rules
 #-------------------------------------------------
 
-$(OBJ)/%.o: $(SRC)/%.c 
+$(OBJ)/%.o: $(SRC)/%.cpp
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
-$(OBJ)/%.pp: $(SRC)/%.c | $(OSPREBUILD)
+$(OBJ)/%.pp: $(SRC)/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 
-$(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
+$(OBJ)/%.s: $(SRC)/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 

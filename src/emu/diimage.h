@@ -98,6 +98,7 @@ class device_image_interface;
 struct feature_list;
 class software_part;
 class software_info;
+class ui_menu;
 
 // device image interface function types
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;

@@ -21,7 +21,8 @@
 | implementations of C, `flag', `uint8', and `int8' should all be `typedef'ed
 | to the same as `int'.
 *----------------------------------------------------------------------------*/
-#include "emu.h"
+#include "assert.h"
+#include "osdcomm.h"
 
 typedef INT8 flag;
 typedef UINT8 uint8;

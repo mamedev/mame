@@ -321,51 +321,51 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
-			MAME_DIR .. "src/osd/sdl/main.c",
+			MAME_DIR .. "src/osd/sdl/main.cpp",
 		}
 	end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "src/osd/modules/debugger/debugosx.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/breakpointsview.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/consoleview.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/debugcommandhistory.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/debugconsole.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/debugview.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/debugwindowhandler.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/deviceinfoviewer.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/devicesviewer.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyview.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyviewer.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/memoryview.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.m",
-			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.m",
+			MAME_DIR .. "src/osd/modules/debugger/debugosx.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/breakpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/consoleview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugcommandhistory.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugconsole.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugwindowhandler.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/deviceinfoviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/devicesviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/memoryview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.mm",
 		}
 		if _OPTIONS["SDL_LIBVER"]=="sdl" then
 			-- SDLMain_tmpl isn't necessary for SDL2
 			files {
-				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.m",
+				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.mm",
 			}
 		end
 	end
 
 	files {
-		MAME_DIR .. "src/osd/sdl/sdlmain.c",
-		MAME_DIR .. "src/osd/sdl/input.c",
-		MAME_DIR .. "src/osd/sdl/video.c",
-		MAME_DIR .. "src/osd/sdl/window.c",
-		MAME_DIR .. "src/osd/sdl/output.c",
-		MAME_DIR .. "src/osd/sdl/watchdog.c",
-		MAME_DIR .. "src/osd/modules/render/drawsdl.c",
+		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
+		MAME_DIR .. "src/osd/sdl/input.cpp",
+		MAME_DIR .. "src/osd/sdl/video.cpp",
+		MAME_DIR .. "src/osd/sdl/window.cpp",
+		MAME_DIR .. "src/osd/sdl/output.cpp",
+		MAME_DIR .. "src/osd/sdl/watchdog.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawsdl.cpp",
 	}
 	if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 		files {
-			MAME_DIR .. "src/osd/modules/render/draw13.c",
+			MAME_DIR .. "src/osd/modules/render/draw13.cpp",
 		}
 	end
 
@@ -374,10 +374,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
-
-	options {
-		"ForceCPP",
-	}
 
 	removeflags {
 		"SingleOutputDir",
@@ -394,31 +390,31 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	files {
-		MAME_DIR .. "src/osd/osdcore.c",
-		MAME_DIR .. "src/osd/strconv.c",
-		MAME_DIR .. "src/osd/sdl/sdldir.c",
-		MAME_DIR .. "src/osd/sdl/sdlfile.c",
-		MAME_DIR .. "src/osd/sdl/sdlptty_" .. BASE_TARGETOS ..".c",
-		MAME_DIR .. "src/osd/sdl/sdlsocket.c",
-		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".c",
-		MAME_DIR .. "src/osd/modules/osdmodule.c",
-		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".c",
-		MAME_DIR .. "src/osd/modules/sync/sync_" .. SYNC_IMPLEMENTATION .. ".c",
+		MAME_DIR .. "src/osd/osdcore.cpp",
+		MAME_DIR .. "src/osd/strconv.cpp",
+		MAME_DIR .. "src/osd/sdl/sdldir.cpp",
+		MAME_DIR .. "src/osd/sdl/sdlfile.cpp",
+		MAME_DIR .. "src/osd/sdl/sdlptty_" .. BASE_TARGETOS ..".cpp",
+		MAME_DIR .. "src/osd/sdl/sdlsocket.cpp",
+		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".cpp",
+		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
+		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".cpp",
+		MAME_DIR .. "src/osd/modules/sync/sync_" .. SYNC_IMPLEMENTATION .. ".cpp",
 	}
 
 	if _OPTIONS["NOASM"]=="1" then
 		files {
-			MAME_DIR .. "src/osd/modules/sync/work_mini.c",
+			MAME_DIR .. "src/osd/modules/sync/work_mini.cpp",
 		}
 	else
 		files {
-			MAME_DIR .. "src/osd/modules/sync/work_osd.c",
+			MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
 		}
 	end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "src/osd/sdl/osxutils.m",
+			MAME_DIR .. "src/osd/sdl/osxutils.mm",
 		}
 	end
 
@@ -431,10 +427,6 @@ if _OPTIONS["with-tools"] then
 	project("testkeys")
 		uuid ("744cec21-c3b6-4d69-93cb-6811fed0ffe3")
 		kind "ConsoleApp"
-
-		options {
-			"ForceCPP",
-		}
 
 		flags {
 			"Symbols", -- always include minimum symbols for executables 	
@@ -457,7 +449,7 @@ if _OPTIONS["with-tools"] then
 		}
 
 		files {
-			MAME_DIR .. "src/osd/sdl/testkeys.c",
+			MAME_DIR .. "src/osd/sdl/testkeys.cpp",
 		}
 
 		if _OPTIONS["targetos"] == "windows" then
@@ -477,12 +469,12 @@ if _OPTIONS["with-tools"] then
 				"-municode",
 			}
 			files {
-				MAME_DIR .. "src/osd/sdl/main.c",
+				MAME_DIR .. "src/osd/sdl/main.cpp",
 			}
 		elseif _OPTIONS["targetos"] == "macosx" and _OPTIONS["SDL_LIBVER"] == "sdl" then
 			-- SDLMain_tmpl isn't necessary for SDL2
 			files {
-				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.m",
+				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.mm",
 			}
 		end
 end
@@ -496,10 +488,6 @@ if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
 	project("aueffectutil")
 		uuid ("3db8316d-fad7-4f5b-b46a-99373c91550e")
 		kind "ConsoleApp"
-
-		options {
-			"ForceCPP",
-		}
 
 		flags {
 			"Symbols", -- always include minimum symbols for executables 	
@@ -528,6 +516,6 @@ if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
 		}
 
 		files {
-			MAME_DIR .. "src/osd/sdl/aueffectutil.m",
+			MAME_DIR .. "src/osd/sdl/aueffectutil.mm",
 		}
 end

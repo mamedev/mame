@@ -525,7 +525,7 @@ macpb145  // 1992 Apple Macintosh PowerBook 145
 macpb160    // 1992 Apple Macintosh PowerBook 160
 macpb180    // 1992 Apple Macintosh PowerBook 180
 macpb180c // 1992 Apple Macintosh PowerBook 180c
-//macpd210  // 1992 Apple Macintosh PowerBook Duo 210
+macpd210  // 1992 Apple Macintosh PowerBook Duo 210
 maccclas // 1993 Apple Macintosh Color Classic
 macpb145b  // 1993 Apple Macintosh PowerBook 145B
 maclc3  // 1993 Apple Macintosh LC III
