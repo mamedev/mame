@@ -53,75 +53,73 @@ lev 3 : 0x6c : 0000 10a4 -
 lev 4 : 0x70 : 0000 10d0 - comm. with main68k, triggered when main writes cmd @ $403ffe
 
 ***********************************************************************************************
- PCB info
-***********************************************************************************************
-
 
 Jackie Chan Kung Fu Master
 Jackie Chan Fist Of Fire
 Kaneko, 1995
 
-Both games run on the same PCB, only the EPROMs are swapped.
+Both games run on the same PCB, only the EPROMs, maskROMs and EEPROM data are changed.
 
 PCB Layout
 ----------
 
 JC-BOARD
+JC01X00047
 |--------------------------------------------------------------------|
-|  VOL  J2M1X1.U56   JC-300-00.U84                     JC-106-00.U171|
-|         YMZ280B    JC-301-00.U85  6264                             |
-|     CA741           J2P1X5.U86    6264               JC-107-00.U172|
-|        62256        J2P1X6.U87          CG24143                    |
-|        62256                                         42S4260       |
-|        68000        PLSI2032            6264                       |
-|                     28.6364MHz    6116  CG24173      42S4260       |
-|                                   6116                             |
-|                     BABY004             VIEW2-CHIP   JC-200-00.U177|
-|J                                   6264                            |
-|A     62256                         6264              JC-100-00.U179|
-|M     62256                               J2G1X1.U164               |
-|M                                                     JC-101-00.U180|
-|A                                         J2G1X2.U165               |
-|     62256  J2P1X1.U67             6264               JC-102-00.U181|
-|     62256  J2P1X2.U68             6264       42S4260               |
-|62256       J2P1X3.U69  16MHz    33.3333MHz           JC-103-00.U182|
-|62256       J2P1X4.U70  PLSI2032    6116                            |
-|                                    6116   CG24173    JC-104-00.U183|
+|TA8210 J2M1X1.U56   JC-300-00.U84  LC3564 LC3564      JC-106-00.U171|
+|  VOL    YMZ280B    JC-301-00.U85  LC3564 LC3564                    |
+|     C4741           J2P1X5.U86                       JC-107-00.U172|
+|        58257        J2P1X6.U87          CG24143                    |
+|        58257                                         42S4260       |
+|        68000        PLSI2032            LH5497                     |
+|                     28.6364MHz   42101  CG24173      42S4260       |
+|   2003                           42101                             |
+|                     BABY004              |-----|     JC-200-00.U177|
+|J MC-1091                         LC3564  |VIEW2|                   |
+|A     58257                       LC3564  |-CHIP|     JC-100-00.U179|
+|M     58257                               |-----|                   |
+|M                            LC3564       J2G1X1.U164 JC-101-00.U180|
+|A                            LC3564       J2G1X2.U165               |
+|     58257  J2P1X1.U67       42101                    JC-102-00.U181|
+|SW1  58257  J2P1X2.U68       42101            42S4260               |
+|58257       J2P1X3.U69  16MHz    33.3333MHz           JC-103-00.U182|
+|58257       J2P1X4.U70  PLSI2032                                    |
+|                                           CG24173    JC-104-00.U183|
 |  J2D1X1.U13  68000                           42S4240               |
 |        93C46                                         JC-105-00.U184|
-|   TBS0P01                   6264  6264          6264               |
-| DSW1                        6264  6264    CG24143    JC-108-00.U185|
+|   TBS0P01                  LC3564 LC3564     LH5497                |
+| SW2                        LC3564 LC3564  CG24143    JC-108-00.U185|
 |--------------------------------------------------------------------|
-
 Notes:
-    68000 clock - 16.0MHz (both)
-  YMZ280B clock - 16.0MHz
-  TBS0P01 clock - 16.0MHz (NEC uPD78324 with 32K internal ROM & 1024 byte RAM)
-          62256 - 32k x8 SRAM
-           6264 - 8k x8 SRAM
-           6116 - 2k x8 SRAM
-        42S4260 - 256k x16 DRAM
+          68000 - Clock 16.0MHz (both)
+        YMZ280B - Clock 16.0MHz
+        TBS0P01 - Clock 16.0MHz (NEC uPD78324 with 32k internal ROM & 1k RAM)
+         LC3564 - Sanyo LC3564SM-85 8k x8 SRAM
+        42S4260 - NEC 42S4260-70 256k x16 DRAM
+          42101 - NEC D42101C-3 910-word x8-bit Line Buffer for Flicker-Free NTSC picture
+         LH5497 - SHARP LH5497D-20 CMOS 1kx9 FIFO
+          58257 - SONY CXK58257ASP-10L 8kx8 SRAM
+            SW1 - Test or reset switch, not populated
+            SW2 - 8-position DIP Switch
+          C4741 - NEC uPC4741 High Performance Quad Operational Amplifier
+          93C46 - AMTEL AT93C46 EEPROM
+       PLSI2032 - LATTICE pLSI 2032-80LJ (x2, PLCC44, labeled JCOP099 & JCOP100)
+     VIEW2-CHIP - KANEKO VIEW2-CHIP 1633F1208
+        BABY004 - KANEKO BABY004 9511EX009 VT-171
 CG24143/CG24173 - Fujitsu custom graphics generators
-       pLSI2032 - Lattice CPLD
-          CA741 - Intersil High Gain Operational Amplifier
-          VSync - 60Hz
-          HSync - 15.56kHz
+        MC-1091 - Custom I/O ceramic module
+         TA8210 - Toshiba TA8210AF 20W BTL 2 Channel Audio Power Amplifier
+           2003 - NEC uPA2003 Darlington Transistor Array
+          VSync - 59.6010Hz
+          HSync - 15.55610kHz
 
-Kung Fu Master - Jackie Chan (C) Kaneko 1995
-
-KANEKO PCB NUMBER: JC01X00047
-
-CPU: TMP68HC000N-16 x 2
-SND: YAMAHA YMZ280B
-OSC: 16.0000MHZ, 33.3333MHZ, 28.6364MHZ
-DIPS:1 DIP LABELLED SW2, 8 POSITION
-     Location for SW1 on PCB, but empty.
-
-Eproms
-
+Eproms:
 Location    Rom Type    PCB Label
+---------------------------------
 U164        27C2001     SPA-7A
 U165        27C2001     SPA-7B
+not populated (U158)    SPB-4A
+not populated (U159)    SPB-4B
 U13         27C1001     27C1001A
 U56         27C2001     23C8001E
 U67         27C040      27C4001
@@ -131,9 +129,9 @@ U70         27C040      27C4001
 U86         27C040      27C4001
 U87         27C040      27C4001
 
-There are 12 mask roms (42 pin) labelled....
-
-Rom Label           Label on PCB        Location
+Mask ROMs:
+Rom Label                   Label on PCB    Location
+----------------------------------------------------
 JC-100-00  9511 D           SPA-0           U179
 JC-101-00  9511 D           SPA-1           U180
 JC-102-00  9511 D           SPA-2           U181
@@ -141,31 +139,17 @@ JC-103-00  9511 D           SPA-3           U182
 JC-104-00  T39 9510K7092    SPA-4           U183
 JC-105-00  T40 9510K7094    SPA-5           U184
 JC-108-00  T65 9517K7012    SPA-6           U185
+not populated               SPA-7           U186
 JC-106-00  T41 9510K7091    SPB-0           U171
 JC-107-00  T42 9510K7096    SPB-1           U172
+not populated               SPB-2           U173
+not populated               SPB-3           U174
 JC-200-00  W10 9510K7055    BG-0            U177
+not populated               BG-1            U178
 JC-300-00  T43 9510K7098    23C16000        U84
 JC-301-00  W11 9510K7059    23C16000        U85
 
-SPB-2, SPB-3 and SPA-7 are labeled but unused on this PCB.
-
-Other chips:
-  AMTEL AT93C46 (EEPROM)
-  LATTICE pLSI 2032-80LJ (x 2, square, socketed labeled JCOP099 & JCOP100)
-  FUJITSU CG24143 4181 9449 Z01 (x 2, square SMD)
-  FUJITSU CG24173 6186 9447 Z01 (x 2, square SMD)
-  KANEKO VIEW2-CHIP 1633F1208 (square, SMD)
-  KANEKO BABY004 9511EX009 VT-171 (square, SMD)
-  KANEKO TBS0P01 452 9430HK001 (square, SMD NEC uPD78324 aka "TOYBOX")
-
-Ram I can see...
-SONY CXK58257ASP-10L (x 8)
-NEC D42101C-3 (x 4)
-SHARP LH5497D-20 (x 2)
-SANYO LC3564SM-85 (x 12, SMD)
-NEC 42S4260-70 (x 4, SMD)
-
-there are 9 PALS on the pcb (not dumped)
+***********************************************************************************************
 
 */
 
