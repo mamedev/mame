@@ -674,8 +674,8 @@ INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_slave_vblank)
 INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
 {
 	/* only used by namcos21 */
-	int scanline = get_posirq_scanline();
-	scanline = 0x50+0x89; /* HACK for Winning Run */
+	//int scanline = get_posirq_scanline();
+	INT32 scanline = 0x50+0x89; /* HACK for Winning Run */
 
 	//printf( "namcos2_68k_gpu_vblank(%d)\n",m_68k_gpu_C148[NAMCOS2_C148_POSIRQ] );
 	adjust_posirq_timer(scanline);

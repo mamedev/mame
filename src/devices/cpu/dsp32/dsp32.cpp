@@ -344,14 +344,14 @@ void dsp32c_device::state_export(const device_state_entry &entry)
 	{
 		case STATE_GENFLAGS:
 			// no actual flags register, so just make something up
-			m_iotemp =  ((zFLAG != 0) << 0) |
-						((nFLAG != 0) << 1) |
-						((cFLAG != 0) << 2) |
-						((vFLAG != 0) << 3) |
-						((ZFLAG != 0) << 4) |
-						((NFLAG != 0) << 5) |
-						((UFLAG != 0) << 6) |
-						((VFLAG != 0) << 7);
+			m_iotemp =  (zFLAG ? 0x01 : 0) |
+						(nFLAG ? 0x02 : 0) |
+						(cFLAG ? 0x04 : 0) |
+						(vFLAG ? 0x08 : 0) |
+						(ZFLAG ? 0x10 : 0) |
+						(NFLAG ? 0x20 : 0) |
+						(UFLAG ? 0x40 : 0) |
+						(VFLAG ? 0x80 : 0);
 			break;
 
 		case DSP32_PCR:

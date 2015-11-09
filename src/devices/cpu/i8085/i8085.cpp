@@ -916,7 +916,7 @@ void i8085a_cpu_device::device_start()
 	m_trap_pending = 0;
 	m_trap_im_copy = 0;
 	m_sod_state = 0;
-	m_ietemp = 0;
+	m_ietemp = false;
 
 	init_tables();
 
@@ -1005,16 +1005,24 @@ void i8085a_cpu_device::state_import(const device_state_entry &entry)
 	{
 		case I8085_SID:
 			if (m_ietemp)
-				m_IM |= IM_SID;
+            {
+                m_IM |= IM_SID;
+            }
 			else
+            {
 				m_IM &= ~IM_SID;
+            }
 			break;
 
 		case I8085_INTE:
 			if (m_ietemp)
+            {
 				m_IM |= IM_IE;
+            }
 			else
+            {
 				m_IM &= ~IM_IE;
+            }
 			break;
 
 		default:
@@ -1028,12 +1036,7 @@ void i8085a_cpu_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case I8085_SID:
-			{
-			int sid = m_in_sid_func();
-
-			m_ietemp = ((m_IM & IM_SID) != 0);
-			m_ietemp = (sid != 0);
-			}
+			m_ietemp = ((m_IM & IM_SID) != 0) && m_in_sid_func() != 0;
 			break;
 
 		case I8085_INTE:

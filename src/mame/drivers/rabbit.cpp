@@ -314,8 +314,6 @@ void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 		xflip = (source[0]&0x00008000)>>15;
 		yflip = (source[0]&0x00004000)>>14;
-		colr = (source[1]&0x0ff00000)>>15;
-
 
 		tileno = (source[1]&0x0001ffff);
 		colr =   (source[1]&0x0ff00000)>>20;
