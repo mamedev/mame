@@ -282,7 +282,7 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 	*/
 
 	m_beeper->set_frequency(BIT(data, 0) ? 2400 : 1200);
-	m_beeper->set_state(BIT(data, 6) & m_cb2);
+	m_beeper->set_state(BIT(data, 6) & (m_cb2 ? 1 : 0));
 
 	m_portb = data & 0x7f;
 }

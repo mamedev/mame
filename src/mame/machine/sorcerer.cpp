@@ -188,10 +188,10 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 		bool sound = BIT(m_iop_config->read(), 3);
 
 		m_cassette1->change_state(
-			(BIT(data,4) & sound) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			(BIT(data,4) && sound) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
 		m_cassette2->change_state(
-			(BIT(data,5) & sound) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			(BIT(data,5) && sound) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
 		/* cassette 1 motor */
 		m_cassette1->change_state(

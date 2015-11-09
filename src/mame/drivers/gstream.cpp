@@ -346,8 +346,8 @@ WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
 
 */
 
-	m_oki_bank_1 = ((BIT(data, 6) & !BIT(data, 7)) << 1) | (BIT(data, 2) & BIT(data, 3));
-	m_oki_bank_2 = ((BIT(data, 4) & !BIT(data, 5)) << 1) | (BIT(data, 0) & BIT(data, 1));
+	m_oki_bank_1 = ((BIT(data, 6) & ~BIT(data, 7)) << 1) | (BIT(data, 2) & BIT(data, 3));
+	m_oki_bank_2 = ((BIT(data, 4) & ~BIT(data, 5)) << 1) | (BIT(data, 0) & BIT(data, 1));
 
 	//popmessage("oki bank = %X\noki_1 = %X\noki_2 = %X\n",data, m_oki_bank_1, m_oki_bank_2);
 

@@ -134,7 +134,7 @@ void i8279_device::device_reset()
 	for (i = 0; i < 8; i++) m_s_ram[i] = 0;
 	for (i = 0; i < 16; i++) m_d_ram[i] = 0;
 	m_status = 0;
-	m_autoinc = 1;
+	m_autoinc = true;
 	m_d_ram_ptr = 0;
 	m_s_ram_ptr = 0;
 	m_read_flag = 0;
@@ -374,7 +374,9 @@ READ8_MEMBER( i8279_device::data_r )
 	// read the display ram
 		data = m_d_ram[m_d_ram_ptr];
 		if (m_autoinc)
+        {
 			m_d_ram_ptr++;
+        }
 	}
 	else
 	if (sensor_mode)
@@ -383,9 +385,13 @@ READ8_MEMBER( i8279_device::data_r )
 		assert(m_s_ram_ptr < ARRAY_LENGTH(m_s_ram));
 		data = m_s_ram[m_s_ram_ptr];
 		if (m_autoinc)
+        {
 			m_s_ram_ptr++;
+        }
 		else
+        {
 			set_irq(0);
+        }
 	}
 	else
 	{
@@ -471,7 +477,7 @@ WRITE8_MEMBER( i8279_device::cmd_w )
 
 WRITE8_MEMBER( i8279_device::data_w )
 {//printf("Data: %X ",data);
-	if (BIT(m_cmd[0], 4) & m_autoinc)
+	if (BIT(m_cmd[0], 4) && m_autoinc)
 	{
 	// right-entry autoincrement not implemented yet
 	}

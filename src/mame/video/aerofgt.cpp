@@ -463,9 +463,9 @@ void aerofgt_state::aerfboo2_draw_sprites( screen_device &screen, bitmap_ind16 &
 
 		pri = m_spriteram3[attr_start + 2] & 0x0010;
 
-		if ( chip_disabled_pri & !pri)
+		if ( chip_disabled_pri && !pri)
 			continue;
-		if ((!chip_disabled_pri) & (pri >> 4))
+		if ((!chip_disabled_pri) && (pri >> 4))
 			continue;
 		ox = m_spriteram3[attr_start + 1] & 0x01ff;
 		xsize = (m_spriteram3[attr_start + 2] & 0x0700) >> 8;

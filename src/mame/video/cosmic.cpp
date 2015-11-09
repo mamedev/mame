@@ -469,7 +469,7 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 			if (((!vb_) & vc_ & (!vd_)) ^ (vb_ & (!vc_) & vd_))
 			{
 				/* tree */
-				if ((!hd_) & hc_ & (!hb_))
+				if (!hd_ && hc_ && !hb_)
 				{
 					offs_t offs = ((x >> 3) & 0x03) | ((y & 0x1f) << 2) |
 									(flip_screen() ? 0x80 : 0);
@@ -482,13 +482,13 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 
 					color = (plane1 & plane2)       |   // R
 							(plane2         )  << 1 |   // G
-							(plane1 & !plane2) << 2;    // B
+							(plane1 & ~plane2) << 2;    // B
 				}
 			}
 			else
 			{
 				/* water */
-				if (hd_ & !hc_ & hb_ & !ha_)
+				if (hd_ && !hc_ && hb_ && !ha_)
 				{
 					offs_t offs = hd | (water << 1) | 0x0200;
 

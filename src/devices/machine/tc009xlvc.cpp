@@ -264,11 +264,11 @@ void tc0091lvc_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	memset(m_palette_ram, 0, sizeof(m_palette_ram));
-	memset(m_vregs, 0, sizeof(UINT8) * 0x100);
-	memset(m_bitmap_ram, 0, sizeof(UINT8) * 0x20000);
-	memset(m_pcg_ram, 0, sizeof(UINT8) * 0x10000);
-	memset(m_sprram_buffer, 0, sizeof(UINT8) * 0x400);
+	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
+	memset(m_vregs, 0, ARRAY_LENGTH(m_vregs));
+	memset(m_bitmap_ram, 0, ARRAY_LENGTH(m_bitmap_ram));
+	memset(m_pcg_ram, 0, ARRAY_LENGTH(m_pcg_ram));
+	memset(m_sprram_buffer, 0, ARRAY_LENGTH(m_sprram_buffer));
 
 	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
 	//       but we don't map it anywhere, so the first tiles are always blank at the moment.

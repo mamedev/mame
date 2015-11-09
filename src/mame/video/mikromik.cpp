@@ -36,8 +36,8 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 			// Step 3: Fill in missing 2 pixels in the screen bitmap by repeating last column of the char bitmap
 			// (works better with MikroMikko 1 font than duplicating the first and the last column)
 			qh = d7 & d6; // extend pixels on the right side only if there were two adjacent ones before shifting out the MSB
-			video_in = ((((d7 & llen) | !vsp) & !gpa0) & qh) | lten;
-			color = (hlt_in ? 1 : 2)*(video_in ^ compl_in);
+			video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
+			color = (hlt_in ? 1 : 2) * (video_in ^ compl_in);
 			bitmap.pix32(y, x + 8) = m_palette->pen(color);
 			bitmap.pix32(y, x + 9) = m_palette->pen(color);
 		}
@@ -45,7 +45,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 		for (i = 0; i < 8; ++i) // ...and now the actual character bitmap bits for this scanline
 		{
 			qh = BIT(data, i);
-			video_in = ((((d7 & llen) | !vsp) & !gpa0) & qh) | lten;
+			video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
 			color = (hlt_in ? 1 : 2)*(video_in ^ compl_in);
 			bitmap.pix32(y, x + i) = m_palette->pen(color);
 		}

@@ -178,8 +178,8 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, UINT32 chcr, 
 		}
 		break;
 	}
-	*sar    = (*sar & !AM) | src;
-	*dar    = (*dar & !AM) | dst;
+	*sar    = (*sar & ~AM) | src;
+	*dar    = (*dar & ~AM) | dst;
 	*dmatcr = count;
 	return 1;
 }

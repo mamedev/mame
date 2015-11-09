@@ -76,13 +76,13 @@ void ttl74181_device::update()
 	int mp = !m_m;
 
 	// intermediate calculations
-	int ap0 = !(a0 | (b0 & s0) | (s1 & !b0));
+	int ap0 = !(a0 | (b0 & s0) | (s1 & ~b0));
 	int bp0 = !(((!b0) & s2 & a0) | (a0 & b0 & s3));
-	int ap1 = !(a1 | (b1 & s0) | (s1 & !b1));
+	int ap1 = !(a1 | (b1 & s0) | (s1 & ~b1));
 	int bp1 = !(((!b1) & s2 & a1) | (a1 & b1 & s3));
-	int ap2 = !(a2 | (b2 & s0) | (s1 & !b2));
+	int ap2 = !(a2 | (b2 & s0) | (s1 & ~b2));
 	int bp2 = !(((!b2) & s2 & a2) | (a2 & b2 & s3));
-	int ap3 = !(a3 | (b3 & s0) | (s1 & !b3));
+	int ap3 = !(a3 | (b3 & s0) | (s1 & ~b3));
 	int bp3 = !(((!b3) & s2 & a3) | (a3 & b3 & s3));
 
 	int fp0 = !(m_c & mp) ^ ((!ap0) & bp0);

@@ -224,5 +224,5 @@ int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba
 
 int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | m_jp1->read()));
+	return (BIT(m_mode, 0) || !(BIT(m_mode, 2) || m_jp1->read())) ? 0 : 1;
 }

@@ -1044,7 +1044,7 @@ void cquestrot_cpu_device::execute_run()
 		dsrclatch =
 				(~(0x10 << dsrc) & 0xf0)
 				| (rsrc ? 0x04 : 0x02)
-				| !(spf == SPF_SWRT);
+				| (spf == SPF_SWRT ? 0 : 1);
 
 		/* R-latch is written on rising edge of dsrclatch bit 2 */
 		if (!_BIT(m_dsrclatch, 2) && _BIT(dsrclatch, 2))
@@ -1492,12 +1492,12 @@ void cquestlin_cpu_device::execute_run()
 			}
 
 			m_fglatch =
-					(!(latch == LLATCH_FADLATCH) << 5)
+					(latch == LLATCH_FADLATCH ? 0 : (1 << 5))
 					| (dowrt << 4)
 					| (start_stop << 3)
 					| (_pbcs << 2)
-					| (!(spf == LSPF_BRES) << 1)
-					| !(m_gt0reg && (spf == LSPF_BRES));
+					| (spf == LSPF_BRES ? 0 : (1 << 1))
+					| (m_gt0reg && (spf == LSPF_BRES) ? 0 : 1);
 		}
 		else
 		{

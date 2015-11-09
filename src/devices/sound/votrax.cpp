@@ -520,7 +520,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 	if (LOG_TIMING)
 		osd_printf_debug("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X ", m_master_clock, m_counter_34, m_latch_70, m_latch_72, m_beta1, m_p1, m_p2, m_phi1, m_phi2, m_phi1_20, m_phi2_20, m_subphoneme_count, m_clock_88, m_counter_84, m_latch_92, m_internal_request);
 	if (LOG_LOWPARAM)
-		osd_printf_debug("%4X %4X %4X %4X %4X ", m_srff_132, m_srff_114, m_srff_112, m_srff_142, m_latch_80);
+		osd_printf_debug("%d %d %d %d %d ", m_srff_132, m_srff_114, m_srff_112, m_srff_142, m_latch_80);
 	if (LOG_GLOTTAL)
 		osd_printf_debug("%4X %4X %4X %4X %4X %4X %4X ", m_counter_220, m_counter_222, m_counter_224, m_counter_234, m_counter_236, m_fgate, m_glottal_sync);
 	if (LOG_TRANSITION)
@@ -651,7 +651,9 @@ osd_printf_debug("counter=%d\n", m_counter_84);
 			{
 				// if the request line was previously low, reset the VD/CLD flip-flops
 				if (m_internal_request == CLEAR_LINE)
-					m_srff_112 = m_srff_114 = 0;
+                {
+					m_srff_112 = m_srff_114 = false;
+                }
 				m_internal_request = ASSERT_LINE;
 			}
 
@@ -684,21 +686,25 @@ osd_printf_debug("counter=%d\n", m_counter_84);
 				{
 					// update CL
 					case 3:
-						m_srff_132 = m_srff_114 & BIT(~romdata, 3);
+						m_srff_132 = m_srff_114 && BIT(~romdata, 3);
 						break;
 
 					// update CLD
 					case 4:
 						romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
 						if (m_counter_84 != 0 && romdata_swapped == (m_counter_84 ^ 0xf))
-							m_srff_114 = 1;
+                        {
+							m_srff_114 = true;
+                        }
 						break;
 
 					// update VD
 					case 5:
 						romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
 						if (m_counter_84 != 0 && romdata_swapped == (m_counter_84 ^ 0xf))
-							m_srff_112 = 1;
+                        {
+							m_srff_112 = true;
+                        }
 						break;
 
 					// update FF == PAC & (VA | FA)
@@ -840,18 +846,22 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 				// write if not FF and low 2 bits of latch
 				// FF is the S/R flip-flop at 142 ANDed with !(/FA & /VA)
 				case 0: case 1: case 2: case 3: case 4:
-					if (!(m_srff_142 & !((m_fa == 0) & (m_va == 0))) && (m_latch_46 & 0x3) == 0x3)
+					if ((m_srff_142 && !((m_fa == 0) && (m_va == 0))) == 0 && (m_latch_46 & 0x3) == 0x3)
 						ram_write = 1;
 					break;
 
 				case 5:
 					if ((m_latch_46 & 0xc) == 0xc && m_srff_112)
+                    {
 						ram_write = 1;
+                    }
 					break;
 
 				case 6:
 					if ((m_latch_46 & 0xc) == 0xc && m_srff_114)
+                    {
 						ram_write = 1;
+                    }
 					break;
 			}
 
@@ -1244,10 +1254,10 @@ void votrax_sc01_device::device_reset()
 	m_latch_92 = 0;
 
 	// reset low parameter clocking
-	m_srff_132 = 0;
-	m_srff_114 = 0;
-	m_srff_112 = 0;
-	m_srff_142 = 0;
+	m_srff_132 = false;
+	m_srff_114 = false;
+	m_srff_112 = false;
+	m_srff_142 = false;
 	m_latch_80 = 50;
 	update_subphoneme_clock_period();
 

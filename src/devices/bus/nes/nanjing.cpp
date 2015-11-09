@@ -124,8 +124,10 @@ WRITE8_MEMBER(nes_nanjing_device::write_l)
 		UINT8 temp = m_count;
 		m_count = data;
 
-		if (temp & !data)
-			m_latch2 ^= 0xff;
+		if ((temp & ~data) & 1)
+        {
+            m_latch2 ^= 0xff;
+        }
 	}
 
 	switch (offset & 0x300)
