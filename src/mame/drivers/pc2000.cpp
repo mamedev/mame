@@ -220,8 +220,8 @@ SED1520_UPDATE_CB(gl3000s_screen_update_right)
 
 SED1520_UPDATE_CB(gl3000s_screen_update_left)
 {
-	UINT8 sec[3];
-	UINT8 points[2][3];
+	UINT8 sec[5];
+	UINT8 points[2][5];
 	memset(sec, 0, sizeof(sec));
 	memset(points, 0, sizeof(points));
 
@@ -229,7 +229,11 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 		for (int x=59; x<85; x++)
 		{
 			UINT8 data = vram[(y*0x50 + x) % 0x140];
-			int dpos = (x - 74) / 2;
+			INT32 dpos = (x - 74) / 2;
+            if (dpos < 0)
+            {
+                dpos = 0;
+            }
 
 			for (int yi=0; yi<8; yi++)
 			{
@@ -264,7 +268,7 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 			}
 		}
 
-	for(int i=0; i<3; i++)
+	for(int i=0; i < 3; i++)
 	{
 		output_set_indexed_value("TIME", i, sec[i]);
 		output_set_indexed_value("P1", i, points[1][i]);

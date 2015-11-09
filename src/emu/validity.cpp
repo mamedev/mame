@@ -287,12 +287,12 @@ void validity_checker::validate_one(const game_driver &driver)
 		validate_roms();
 		validate_inputs();
 		validate_devices();
+	    m_current_config = NULL;
 	}
 	catch (emu_fatalerror &err)
 	{
 		osd_printf_error("Fatal error %s", err.string());
 	}
-	m_current_config = NULL;
 
 	// if we had warnings or errors, output
 	if (m_errors > start_errors || m_warnings > start_warnings)
