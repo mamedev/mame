@@ -1437,22 +1437,21 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 {
 	if (firststop && list == NULL)
 	{
-		DView *dv;
-		render_target *target;
-
-		target = &device.machine().render().ui_target();
+		render_target *target = &device.machine().render().ui_target();
 
 		//set_view_by_name(target, "Debug");
 
-		dv = dview_alloc(target, device.machine(), DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
-		dv->editor.active = TRUE;
-		dv->editor.container = &device.machine().render().ui_container();
-		dv = dview_alloc(target, device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
-		dv = dview_alloc(target, device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
-		dview_set_title(dv, "Console");
-		dv->editor.active = TRUE;
-		dv->editor.container = &device.machine().render().ui_container();
-		set_focus_view(dv);
+		DView *disassembly = dview_alloc(target, device.machine(), DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
+		disassembly->editor.active = TRUE;
+		disassembly->editor.container = &device.machine().render().ui_container();
+		
+        dview_alloc(target, device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
+		
+        DView *console = dview_alloc(target, device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
+		dview_set_title(console, "Console");
+		console->editor.active = TRUE;
+		console->editor.container = &device.machine().render().ui_container();
+		set_focus_view(console);
 	}
 
 	followers_set_cpu(&device);

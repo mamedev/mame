@@ -316,8 +316,6 @@ NETLIB_START(function)
 			rc.m_cmd = MULT;
 		else if (cmd == "/")
 			rc.m_cmd = DIV;
-		else if (cmd == "/")
-			rc.m_cmd = DIV;
 		else if (cmd.startsWith("A"))
 		{
 			rc.m_cmd = PUSH_INPUT;

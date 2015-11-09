@@ -1449,8 +1449,6 @@ void deco_146_base_device::device_reset()
 
 	m_current_rambank = 0;
 
-	m_nand = 0x0000;
-	m_xor = 0x0000;
 	m_soundlatch = 0x0000;
 
 	m_latchaddr = 0xffff;
@@ -1460,9 +1458,6 @@ void deco_146_base_device::device_reset()
 	m_xor=0;
 //  m_nand=0xffff;
 	m_nand=0x0; // wizard fire doesn't initialize it, but accesses addresses rohga needs the mask applied on
-
-
-
 }
 
 

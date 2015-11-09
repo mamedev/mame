@@ -860,7 +860,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 			set_busy_flag(3.5);
 			switch(cmd&7)
 			{
-				case 0:     m_registers[1] = m_charset->u8(indexrom(7) & 0x1fff);
+				case 0:     m_registers[1] = m_charset->u8(indexrom(7) & 0x1fff); break;
 				case 1:     m_registers[1] = m_tgs; break;
 				case 2:     m_registers[1] = m_mat; break;
 				case 3:     m_registers[1] = m_pat; break;

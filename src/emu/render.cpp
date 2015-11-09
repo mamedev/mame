@@ -935,7 +935,6 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
 	// determine the base orientation based on options
-	m_orientation = ROT0;
 	if (!manager.machine().options().rotate())
 		m_base_orientation = orientation_reverse(manager.machine().system().flags & ORIENTATION_MASK);
 
@@ -1353,7 +1352,7 @@ render_primitive_list &render_target::get_primitives()
 		ui_xform.yoffs = 0;
 		ui_xform.xscale = (float)m_width;
 		ui_xform.yscale = (float)m_height;
-		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = ui_xform.color.a = 1.0f;
+		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = 1.0f;
 		ui_xform.color.a = 0.9f;
 		ui_xform.orientation = m_orientation;
 		ui_xform.no_center = true;

@@ -1047,7 +1047,6 @@ void mc6845_device::device_start()
 	m_vert_sync_pos = 1;
 	m_de = 0;
 	m_sync_width = 1;
-	m_vert_disp = 0;
 	m_horiz_pix_total = m_vert_pix_total = 0;
 	m_max_visible_x = m_max_visible_y = 0;
 	m_hsync_on_pos = m_vsync_on_pos = 0;

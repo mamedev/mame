@@ -2016,7 +2016,6 @@ void h63484_device::device_reset()
 	m_hc = m_hds = m_hdw = m_hws = m_hww = 0;
 	m_vc = m_vws = m_vww = m_vds = m_vsw = 0;
 	m_sp[0] = m_sp[1] = m_sp[2] = 0;
-	m_ppx = m_ppy = 0;
 	m_cl0 = m_cl1 = 0;
 	m_xmin = m_ymin = m_xmax = m_ymax = 0;
 	m_ppx = m_pzcx = m_psx = m_pzx = m_pex = 0;
