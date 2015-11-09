@@ -22,7 +22,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos112" supported="no">
 		<description>2 PanOS System v1.1</description>
 		<year>1985</year>
@@ -35,7 +35,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos113" supported="no">
 		<description>3 FORTRAN 77 (PanOS) v1.1</description>
 		<year>1985</year>
@@ -48,7 +48,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos114" supported="no">
 		<description>4 ISO PASCAL (PanOS) v1.1</description>
 		<year>1985</year>
@@ -61,7 +61,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos115" supported="no">
 		<description>5 C (PanOS) v1.1</description>
 		<year>1985</year>
@@ -74,7 +74,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos116" supported="no">
 		<description>6 Cambridge LISP (PanOS) v1.1</description>
 		<year>1985</year>
@@ -87,7 +87,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos117" supported="no">
 		<description>7 Welcome Programs v1.1</description>
 		<year>1985</year>
@@ -100,7 +100,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos141" supported="no">
 		<description>1 PanOS Startup and Utilities v1.4</description>
 		<year>1985</year>
@@ -113,7 +113,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos142" supported="no">
 		<description>2 PanOS System v1.4</description>
 		<year>1985</year>
@@ -126,7 +126,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos143" supported="no">
 		<description>3 FORTRAN 77 (PanOS) v1.4</description>
 		<year>1985</year>
@@ -139,7 +139,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos144" supported="no">
 		<description>4 ISO PASCAL (PanOS) v1.4</description>
 		<year>1985</year>
@@ -152,7 +152,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos145" supported="no">
 		<description>5 C (PanOS) v1.4</description>
 		<year>1985</year>
@@ -165,7 +165,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos146" supported="no">
 		<description>6 Cambridge LISP (PanOS) v1.4</description>
 		<year>1985</year>
@@ -178,7 +178,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="panos147" supported="no">
 		<description>7 Welcome Programs v1.4</description>
 		<year>1985</year>

@@ -1,5 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Tatsuyuki Satoh
+/*
+
+Notice: please do not modify this file, except in case of compile- or critical emulation error
+A more accurate implementation is in mame/alpha8201.*
+
+cpu/alph8201/ will be removed soon
+
+
+
+
+*/
+
 	/**************************************************************************\
 	*                      Alpha8201 Emulator                                  *
 	*                                                                          *
@@ -401,8 +413,8 @@ public:
 };
 
 
-extern const device_type ALPHA8201;
-extern const device_type ALPHA8301;
+extern const device_type ALPHA8201L;
+extern const device_type ALPHA8301L;
 
 
 #endif  /* __ALPH8201_H__ */

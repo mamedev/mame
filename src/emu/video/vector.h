@@ -16,7 +16,7 @@
 /* The vertices are buffered here */
 struct point
 {
-		point():
+	point() :
 		x(0),
 		y(0),
 		col(0),
@@ -32,8 +32,7 @@ struct point
 	int status;         /* for dirty and clipping handling */
 };
 
-class vector_device :  public device_t,
-							public device_video_interface
+class vector_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
@@ -46,21 +45,30 @@ public:
 	void add_point(int x, int y, rgb_t color, int intensity);
 	void add_clip(int minx, int miny, int maxx, int maxy);
 
-	void set_flicker(float m_flicker_correction);
+	void set_flicker(float newval);
 	float get_flicker();
 
-	void set_beam(float _beam);
-	float get_beam();
+	void set_beam_width_min(float newval);
+	float get_beam_width_min();
+
+	void set_beam_width_max(float newval);
+	float get_beam_width_max();
+
+	void set_beam_intensity_weight(float newval);
+	float get_beam_intensity_weight();
 
 	// device-level overrides
 	virtual void device_start();
 
 private:
-	static int m_flicker;                              /* beam flicker value     */
-	static float m_flicker_correction;
-	static float m_beam_width;
+	static float m_flicker;
+	static float m_beam_width_min;
+	static float m_beam_width_max;
+	static float m_beam_intensity_weight;
 	point *m_vector_list;
 	static int m_vector_index;
+
+	float normalized_sigmoid(float n, float k);
 };
 
 

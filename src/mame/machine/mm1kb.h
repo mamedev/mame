@@ -87,8 +87,8 @@ private:
 	int m_drive;
 	UINT8 m_data;
 
-	static bool first_time;					// for power switch sound
-	emu_timer *m_scan_timer;				// scan timer
+	static bool first_time;                 // for power switch sound
+	emu_timer *m_scan_timer;                // scan timer
 };
 
 

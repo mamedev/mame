@@ -71,13 +71,14 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 
 	UINT8   reg[16];        /* adpcm registers      */
 	UINT8   emulation_mode; /* which chip we're emulating */
+	device_t *device;
 };
 
 /*void YM_DELTAT_BRDY_callback(YM_DELTAT *DELTAT);*/
 
 UINT8 YM_DELTAT_ADPCM_Read(YM_DELTAT *DELTAT);
 void YM_DELTAT_ADPCM_Write(YM_DELTAT *DELTAT,int r,int v);
-void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode);
+void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode, device_t *device);
 void YM_DELTAT_ADPCM_CALC(YM_DELTAT *DELTAT);
 
 void YM_DELTAT_postload(YM_DELTAT *DELTAT,UINT8 *regs);

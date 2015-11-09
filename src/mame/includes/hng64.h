@@ -111,15 +111,15 @@ class hng64_state;
 class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>
 {
 public:
-    hng64_poly_renderer(hng64_state& state);
-    
-    void drawShaded(polygon *p);
-    void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	hng64_poly_renderer(hng64_state& state);
 
-    hng64_state& state() { return m_state; }
-    bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
-    float* depthBuffer3d() { return m_depthBuffer3d; }
-    
+	void drawShaded(polygon *p);
+	void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+
+	hng64_state& state() { return m_state; }
+	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
+	float* depthBuffer3d() { return m_depthBuffer3d; }
+
 private:
 	hng64_state& m_state;
 
@@ -318,14 +318,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
 	void do_dma(address_space &space);
 
-    void hng64_mark_all_tiles_dirty(int tilemap);
+	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
-    void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
+	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
 
-    void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-        UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
+	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
 
-    void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat);
 
@@ -333,23 +333,23 @@ public:
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat);
 
-    
+
 
 	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 
-    hng64_poly_renderer* m_poly_renderer;
-    
-    TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
+	hng64_poly_renderer* m_poly_renderer;
 
-    UINT8 *m_texturerom;
+	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
+
+	UINT8 *m_texturerom;
 	UINT16* m_vertsrom;
 	int m_vertsrom_size;
-    std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
-    
-    void clear3d();
+	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
+
+	void clear3d();
 	void hng64_command3d(const UINT16* packet);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -359,13 +359,13 @@ public:
 	void setCameraProjectionMatrix(const UINT16* packet);
 	void recoverPolygonBlock(const UINT16* packet, int& numPolys);
 	void printPacket(const UINT16* packet, int hex);
-    float uToF(UINT16 input);
+	float uToF(UINT16 input);
 	void matmul4(float *product, const float *a, const float *b);
 	void vecmatmul4(float *product, const float *a, const float *b);
 	float vecDotProduct(const float *a, const float *b);
 	void setIdentity(float *matrix);
 	void normalize(float* x);
-    
+
 	void reset_sound();
 	void reset_net();
 
@@ -399,5 +399,5 @@ public:
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	UINT16 main_latch[2];
-    UINT16 sound_latch[2];
+	UINT16 sound_latch[2];
 };

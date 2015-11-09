@@ -57,8 +57,6 @@ public:
 	void romident(const char *filename);
 	void getsoftlist(const char *gamename = "*");
 	void verifysoftlist(const char *gamename = "*");
-	void listmididevices(const char *gamename = "*");
-	void listnetworkadapters(const char *gamename = "*");
 
 private:
 	// internal helpers

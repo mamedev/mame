@@ -48370,7 +48370,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="microms2" supported="no">
-		<description>Micro Musician II </description>
+		<description>Micro Musician II</description>
 		<year>19??</year>
 		<publisher>Music Network</publisher>
 		<part name="flop1" interface="floppy_5_25">

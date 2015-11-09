@@ -152,7 +152,6 @@ try:
     from itertools import imap
 except ImportError:
     imap = map
-from itertools import starmap
 import math
 # http://www.python.org/doc/2.4.4/lib/module-operator.html
 import operator
@@ -2779,4 +2778,5 @@ if __name__ == '__main__':
     try:
         _main(sys.argv)
     except Error:
-        print (sys.exc_info()[1], file=e)
+        e = sys.exc_info()[1]
+        print(e, file=sys.stderr)

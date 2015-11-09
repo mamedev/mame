@@ -123,7 +123,7 @@
 	</software>
 
 	<software name="actcpm">
-		<description>60K CP/M vers 2.20 for Osborne </description>
+		<description>60K CP/M vers 2.20 for Osborne</description>
 		<year>19??</year>
 		<publisher>Australian Computer &amp; Telecommunications</publisher>
 		<part name="flop1" interface="floppy_5_25">

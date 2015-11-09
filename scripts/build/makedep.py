@@ -45,7 +45,7 @@ def add_c_if_exists(root, fullname):
 def add_rest_if_exists(root, srcfile,folder):
     t = srcfile.rsplit('/', 2)
     if t[1]=='includes':
-        t[2] = t[2].replace('.h','.c')
+        t[2] = t[2].replace('.h','.cpp')
         t[1] = 'drivers'     
         add_c_if_exists(root,"/".join(t))
         parse_file_for_deps(root, "/".join(t), folder)
@@ -102,7 +102,7 @@ def parse_file_for_deps(root, srcfile, folder):
                    continue
                if fullname!='':
                    deps_files_included.append(fullname)
-                   add_c_if_exists(root, fullname.replace('.h','.c'))
+                   add_c_if_exists(root, fullname.replace('.h','.cpp'))
                    add_rest_if_exists(root, fullname,folder)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file_for_deps(root, fullname, newfolder)
@@ -161,7 +161,7 @@ def parse_file(root, srcfile, folder):
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file(root, fullname, newfolder)
                    if (fullname.endswith('.h')):
-                       parse_file(root, fullname.replace('.h','.c'), newfolder)
+                       parse_file(root, fullname.replace('.h','.cpp'), newfolder)
                continue
     fp.close()
     return 0
@@ -279,10 +279,6 @@ if sys.argv[3]=='target':
     sys.stdout.write('    targetsubdir(_target .."_" .. _subtarget)\n')
     sys.stdout.write('    kind (LIBTYPE)\n')
     sys.stdout.write('    uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4])
-    sys.stdout.write('    \n')
-    sys.stdout.write('    options {\n')
-    sys.stdout.write('        "ForceCPP",\n')
-    sys.stdout.write('    }\n')
     sys.stdout.write('    \n')
     sys.stdout.write('    includedirs {\n')
     sys.stdout.write('        MAME_DIR .. "src/osd",\n')

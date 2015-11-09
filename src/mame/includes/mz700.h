@@ -16,53 +16,26 @@
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
+#include "machine/bankdev.h"
 #include "machine/ram.h"
 
 class mz_state : public driver_device
 {
 public:
 	mz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_pit(*this, "pit8253"),
-		m_ppi(*this, "ppi8255"),
-		m_cassette(*this, "cassette"),
-		m_centronics(*this, "centronics"),
-		m_ram(*this, RAM_TAG),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_pit(*this, "pit8253")
+		, m_ppi(*this, "ppi8255")
+		, m_cassette(*this, "cassette")
+		, m_centronics(*this, "centronics")
+		, m_ram(*this, RAM_TAG)
+		, m_palette(*this, "palette")
+		, m_banke(*this, "banke")
+		, m_bankf(*this, "bankf")
+		{ }
 
-	int m_mz700;                /* 1 if running on an mz700 */
-
-	int m_cursor_timer;
-	int m_other_timer;
-
-	int m_intmsk;   /* PPI8255 pin PC2 */
-
-	int m_mz700_ram_lock;       /* 1 if ram lock is active */
-	int m_mz700_ram_vram;       /* 1 if vram is banked in */
-
-	/* mz800 specific */
-	UINT8 *m_cgram;
-
-	int m_mz700_mode;           /* 1 if in mz700 mode */
-	int m_mz800_ram_lock;       /* 1 if lock is active */
-	int m_mz800_ram_monitor;    /* 1 if monitor rom banked in */
-
-	int m_hires_mode;           /* 1 if in 640x200 mode */
-	int m_screennum;           /* screen designation */
-
-	int m_centronics_busy;
-	int m_centronics_perror;
-
-	UINT8 *m_colorram;
-	UINT8 *m_videoram;
-	UINT8 m_speaker_level;
-	UINT8 m_prev_state;
-	UINT16 m_mz800_ramaddr;
-	UINT8 m_mz800_palette[4];
-	UINT8 m_mz800_palette_bank;
 	DECLARE_READ8_MEMBER(mz700_e008_r);
 	DECLARE_WRITE8_MEMBER(mz700_e008_w);
 	DECLARE_READ8_MEMBER(mz800_bank_0_r);
@@ -87,9 +60,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
 	DECLARE_DRIVER_INIT(mz800);
 	DECLARE_DRIVER_INIT(mz700);
+	DECLARE_MACHINE_RESET(mz700);
+	DECLARE_MACHINE_RESET(mz800);
 	virtual void machine_start();
-	DECLARE_PALETTE_INIT(mz);
-	DECLARE_VIDEO_START(mz800);
 	UINT32 screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
@@ -105,6 +78,40 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+
+private:
+	int m_mz700;                /* 1 if running on an mz700 */
+
+	int m_cursor_timer;
+	int m_other_timer;
+
+	int m_intmsk;   /* PPI8255 pin PC2 */
+
+	int m_mz700_ram_lock;       /* 1 if ram lock is active */
+	int m_mz700_ram_vram;       /* 1 if vram is banked in */
+
+	/* mz800 specific */
+	UINT8 *m_cgram;
+	UINT8 *m_p_chargen;
+
+	int m_mz700_mode;           /* 1 if in mz700 mode */
+	int m_mz800_ram_lock;       /* 1 if lock is active */
+	int m_mz800_ram_monitor;    /* 1 if monitor rom banked in */
+
+	int m_hires_mode;           /* 1 if in 640x200 mode */
+	int m_screennum;           /* screen designation */
+
+	int m_centronics_busy;
+	int m_centronics_perror;
+
+	UINT8 *m_colorram;
+	UINT8 *m_videoram;
+	UINT8 m_speaker_level;
+	UINT8 m_prev_state;
+	UINT16 m_mz800_ramaddr;
+	UINT8 m_mz800_palette[4];
+	UINT8 m_mz800_palette_bank;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pit8253_device> m_pit;
@@ -112,8 +119,9 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<address_map_bank_device> m_banke;
+	optional_device<address_map_bank_device> m_bankf;
 };
 
 #endif /* MZ700_H_ */

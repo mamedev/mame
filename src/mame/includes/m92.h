@@ -37,7 +37,7 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
-			m_upd71059c(*this, "upd71059c") 
+			m_upd71059c(*this, "upd71059c")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;

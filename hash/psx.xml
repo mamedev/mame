@@ -9241,7 +9241,7 @@ A few comments on these:
 		-->
 		<description>Keiba Eito '98 Haru Natsu (Jpn)</description>
 		<year>1998</year>
-		<publisher> Shangri-La</publisher>
+		<publisher>Shangri-La</publisher>
 		<info name="alt_title" value="競馬エイト '98春"/>
 		<info name="serial" value="SLPS-01372" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -11593,7 +11593,7 @@ A few comments on these:
 		<rom name="Mini-Yonku Hakusou Kyoudai - Rettsu &amp; Go!! - WGP Hyper Heat (Japan) [SLPS-01078].bin" size="460620384" crc="cbf98acb" />
 		<rom name="Mini-Yonku Hakusou Kyoudai - Rettsu &amp; Go!! - WGP Hyper Heat (Japan) [SLPS-01078].cue" size="144" crc="0da04544" />
 		-->
-		<description> Mini-Yonku Bakusou Kyoudai Let's &amp; Go!! - WGP Hyper Heat (Jpn)</description>
+		<description>Mini-Yonku Bakusou Kyoudai Let's &amp; Go!! - WGP Hyper Heat (Jpn)</description>
 		<year>1997</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ミニ四駆爆走兄弟レッツ＆ゴー&#33;&#33;WGPハイパーヒート"/>
@@ -13015,7 +13015,7 @@ A few comments on these:
 		<rom name="Pachi-Slot Teiou 6 (Japan) [SLPS-02657].bin" size="38307024" crc="a0db9eb5" />
 		<rom name="Pachi-Slot Teiou 6 (Japan) [SLPS-02657].cue" size="105" crc="bb8946eb" />
 		-->
-		<description> Pachi-Slot Teiou 6 - Kung Fu Lady - BangBang - Prelude 2 (Jpn)</description>
+		<description>Pachi-Slot Teiou 6 - Kung Fu Lady - BangBang - Prelude 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Media</publisher>
 		<info name="alt_title" value="パチスロ帝王6"/>
@@ -13051,7 +13051,7 @@ A few comments on these:
 		<rom name="Pachi-Slot Teiou Maker Suishou Manual 3 - I'm Angel - White 2 &amp; Blue 2 (Japan) [SLPS-03130].bin" size="74965296" crc="e480a0e4" />
 		<rom name="Pachi-Slot Teiou Maker Suishou Manual 3 - I'm Angel - White 2 &amp; Blue 2 (Japan) [SLPS-03130].cue" size="157" crc="bb5b72a8" />
 		-->
-		<description> Pachi-Slot Teiou - Maker Suishou Manual 3 - I'm Angel White 2 &amp; Blue 2 (Jpn)</description>
+		<description>Pachi-Slot Teiou - Maker Suishou Manual 3 - I'm Angel White 2 &amp; Blue 2 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Media</publisher>
 		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル3 アイムエンジェル〜ホワイト2&amp;ブルー2〜"/>
@@ -15890,7 +15890,7 @@ A few comments on these:
 		<rom name="Simple 1500 Series Hello Kitty Vol.03 - Hello Kitty Block Kuzushi (Japan) [SLPM-86911].bin" size="290589600" crc="6e2afc57" />
 		<rom name="Simple 1500 Series Hello Kitty Vol.03 - Hello Kitty Block Kuzushi (Japan) [SLPM-86911].cue" size="728" crc="ad0cb3dc" />
 		-->
-		<description> Simple 1500 Series Hello Kitty vol.03 - Hello Kitty Block Kuzushi (Jpn)</description>
+		<description>Simple 1500 Series Hello Kitty vol.03 - Hello Kitty Block Kuzushi (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="SIMPLE1500シリーズ ハローキティ Vol.03 Hello Kitty ブロックくずし"/>

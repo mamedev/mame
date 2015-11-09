@@ -18,8 +18,6 @@
 
 #include <time.h>
 
-#include "webengine.h"
-
 class osd_interface;
 
 //**************************************************************************
@@ -73,6 +71,7 @@ public:
 	static void printf_usage(const char *par1, const char *par2);
 };
 
+class lua_engine;
 
 // ======================> machine_manager
 
@@ -89,8 +88,7 @@ public:
 
 	osd_interface &osd() const;
 	emu_options &options() const { return m_options; }
-	web_engine *web() { return &m_web; }
-	lua_engine *lua() { return &m_lua; }
+	lua_engine *lua() { return m_lua; }
 
 	running_machine *machine() { return m_machine; }
 
@@ -105,8 +103,7 @@ private:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
 
-	web_engine              m_web;
-	lua_engine              m_lua;
+	lua_engine *            m_lua;
 
 	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
 
@@ -120,20 +117,5 @@ private:
 
 extern const char build_version[];
 extern const char bare_build_version[];
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* ----- miscellaneous bits & pieces ----- */
-
-// pop-up a user visible message
-void CLIB_DECL popmessage(const char *format, ...) ATTR_PRINTF(1,2);
-
-// log to the standard error.log file
-void CLIB_DECL logerror(const char *format, ...) ATTR_PRINTF(1,2);
-void CLIB_DECL vlogerror(const char *format, va_list arg);
-
 
 #endif  /* __MAME_H__ */

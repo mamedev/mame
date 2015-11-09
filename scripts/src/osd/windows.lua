@@ -128,31 +128,31 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
-		MAME_DIR .. "src/osd/modules/render/drawd3d.c",
-		MAME_DIR .. "src/osd/modules/render/d3d/d3d9intf.c",
-		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.c",
-		MAME_DIR .. "src/osd/modules/render/drawdd.c",
-		MAME_DIR .. "src/osd/modules/render/drawgdi.c",
-		MAME_DIR .. "src/osd/modules/render/drawnone.c",
-		MAME_DIR .. "src/osd/windows/input.c",
-		MAME_DIR .. "src/osd/windows/output.c",
-		MAME_DIR .. "src/osd/windows/video.c",
-		MAME_DIR .. "src/osd/windows/window.c",
-		MAME_DIR .. "src/osd/windows/winmenu.c",
-		MAME_DIR .. "src/osd/windows/winmain.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/debugbaseinfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/debugviewinfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/debugwininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/disasmbasewininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/disasmviewinfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/disasmwininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/editwininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/logwininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/memoryviewinfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/memorywininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/pointswininfo.c",
-		MAME_DIR .. "src/osd/modules/debugger/win/uimetrics.c",
+		MAME_DIR .. "src/osd/modules/render/drawd3d.cpp",
+		MAME_DIR .. "src/osd/modules/render/d3d/d3d9intf.cpp",
+		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawdd.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawgdi.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
+		MAME_DIR .. "src/osd/windows/input.cpp",
+		MAME_DIR .. "src/osd/windows/output.cpp",
+		MAME_DIR .. "src/osd/windows/video.cpp",
+		MAME_DIR .. "src/osd/windows/window.cpp",
+		MAME_DIR .. "src/osd/windows/winmenu.cpp",
+		MAME_DIR .. "src/osd/windows/winmain.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/debugbaseinfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/debugviewinfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/debugwininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/disasmbasewininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/disasmviewinfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/disasmwininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/editwininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/logwininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/memoryviewinfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/memorywininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/pointswininfo.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/uimetrics.cpp",
 	}
 
 
@@ -160,9 +160,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
-	options {
-		"ForceCPP",
-	}
 	removeflags {
 		"SingleOutputDir",
 	}
@@ -186,28 +183,28 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	files {
-		MAME_DIR .. "src/osd/osdcore.c",
-		MAME_DIR .. "src/osd/strconv.c",
-		MAME_DIR .. "src/osd/windows/main.c",
-		MAME_DIR .. "src/osd/windows/windir.c",
-		MAME_DIR .. "src/osd/windows/winfile.c",
-		MAME_DIR .. "src/osd/modules/sync/sync_windows.c",
-		MAME_DIR .. "src/osd/windows/winutf8.c",
-		MAME_DIR .. "src/osd/windows/winutil.c",
-		MAME_DIR .. "src/osd/windows/winclip.c",
-		MAME_DIR .. "src/osd/windows/winsocket.c",
-		MAME_DIR .. "src/osd/windows/winptty.c",
-		MAME_DIR .. "src/osd/modules/osdmodule.c",
-		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.c",
+		MAME_DIR .. "src/osd/osdcore.cpp",
+		MAME_DIR .. "src/osd/strconv.cpp",
+		MAME_DIR .. "src/osd/windows/main.cpp",
+		MAME_DIR .. "src/osd/windows/windir.cpp",
+		MAME_DIR .. "src/osd/windows/winfile.cpp",
+		MAME_DIR .. "src/osd/modules/sync/sync_windows.cpp",
+		MAME_DIR .. "src/osd/windows/winutf8.cpp",
+		MAME_DIR .. "src/osd/windows/winutil.cpp",
+		MAME_DIR .. "src/osd/windows/winclip.cpp",
+		MAME_DIR .. "src/osd/windows/winsocket.cpp",
+		MAME_DIR .. "src/osd/windows/winptty.cpp",
+		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
+		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.cpp",
 	}
 
 	if _OPTIONS["NOASM"] == "1" then
 		files {
-			MAME_DIR .. "src/osd/modules/sync/work_mini.c",
+			MAME_DIR .. "src/osd/modules/sync/work_mini.cpp",
 		}
 	else
 		files {
-			MAME_DIR .. "src/osd/modules/sync/work_osd.c",
+			MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
 		}
 	end
 
@@ -220,10 +217,6 @@ if _OPTIONS["with-tools"] then
 	project("ledutil")
 		uuid ("061293ca-7290-44ac-b2b5-5913ae8dc9c0")
 		kind "ConsoleApp"
-
-		options {
-			"ForceCPP",
-		}
 
 		flags {
 			"Symbols", -- always include minimum symbols for executables 	
@@ -242,6 +235,6 @@ if _OPTIONS["with-tools"] then
 		}
 		
 		files {
-			MAME_DIR .. "src/osd/windows/ledutil.c",
+			MAME_DIR .. "src/osd/windows/ledutil.cpp",
 		}
 end

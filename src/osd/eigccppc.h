@@ -307,9 +307,9 @@ _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 		"1: lwarx  %[result], 0, %[ptr]   \n"
 		"   cmpw   %[compare], %[result]  \n"
 		"   bne    2f                     \n"
-		"   sync                          \n"
 		"   stwcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
+		"   lwsync                        \n"
 		"2:                                 "
 		: [dummy]    "+m"  (*ptr)   /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
 		, [result]   "=&r" (result)
@@ -343,6 +343,7 @@ _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 		"   bne    2f                     \n"
 		"   stdcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
+		"   lwsync                        \n"
 		"2:                                 "
 		: [dummy]    "+m"  (*ptr)   /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
 		, [result]   "=&r" (result)
@@ -371,9 +372,9 @@ _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 
 	__asm__ __volatile__ (
 		"1: lwarx  %[result], 0, %[ptr]   \n"
-		"   sync                          \n"
 		"   stwcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
+		"   lwsync                        \n"
 		: [dummy]    "+m"  (*ptr)   /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
 		, [result]   "=&r" (result)
 		: [ptr]      "r"   (ptr)
@@ -400,9 +401,9 @@ _atomic_add32(INT32 volatile *ptr, INT32 delta)
 	__asm__ __volatile__ (
 		"1: lwarx  %[result], 0, %[ptr]           \n"
 		"   add    %[result], %[result], %[delta] \n"
-		"   sync                                  \n"
 		"   stwcx. %[result], 0, %[ptr]           \n"
 		"   bne-   1b                             \n"
+		"   lwsync                                \n"
 		: [dummy]  "+m"  (*ptr) /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
 		, [result] "=&b" (result)
 		: [ptr]    "r"   (ptr)
@@ -429,9 +430,9 @@ _atomic_increment32(INT32 volatile *ptr)
 	__asm__ __volatile__ (
 		"1: lwarx   %[result], 0, %[ptr]    \n"
 		"   addi    %[result], %[result], 1 \n"
-		"   sync                            \n"
 		"   stwcx.  %[result], 0, %[ptr]    \n"
 		"   bne-    1b                      \n"
+		"   lwsync                          \n"
 		: [dummy]  "+m"  (*ptr) /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
 		, [result] "=&b" (result)
 		: [ptr]    "r"   (ptr)
@@ -457,9 +458,9 @@ _atomic_decrement32(INT32 volatile *ptr)
 	__asm__ __volatile__ (
 		"1: lwarx   %[result], 0, %[ptr]     \n"
 		"   addi    %[result], %[result], -1 \n"
-		"   sync                             \n"
 		"   stwcx.  %[result], 0, %[ptr]     \n"
 		"   bne-    1b                       \n"
+		"   lwsync                           \n"
 		: [dummy]  "+m"  (*ptr) /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
 		, [result] "=&b" (result)
 		: [ptr]    "r"   (ptr)

@@ -2691,7 +2691,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="avm" supported="no">
-		<description>Animal / Vegetable / Mineral (UK) </description>
+		<description>Animal / Vegetable / Mineral (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -4759,7 +4759,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="billykidlg" cloneof="billykid" supported="no">
-		<description>Billy The Kid (UK, LightGun) </description>
+		<description>Billy The Kid (UK, LightGun)</description>
 		<year>1989</year>
 		<publisher>Mastertronic</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -4795,7 +4795,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="bionicc" supported="no">
-		<description>Bionic Commando (UK, Colour Screen) </description>
+		<description>Bionic Commando (UK, Colour Screen)</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -4807,7 +4807,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="bioniccgs" cloneof="bionicc" supported="no">
-		<description>Bionic Commando (UK, Green Screen) </description>
+		<description>Bionic Commando (UK, Green Screen)</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -6219,7 +6219,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="caldrmag" supported="no">
 		<description>El Caldero Magico (Spa)</description>
 		<year>1986</year>
-		<publisher>Humanes </publisher>
+		<publisher>Humanes</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="24785">
@@ -6713,7 +6713,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="catastrp" supported="no">
-		<description>Catastrophes - Ile Infernale (UK) </description>
+		<description>Catastrophes - Ile Infernale (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -7171,7 +7171,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="cheatmd2" supported="no">
-		<description>Cheat Mode II The Revenge! (UK) </description>
+		<description>Cheat Mode II The Revenge! (UK)</description>
 		<year>1990</year>
 		<publisher>Amstrad Action</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -8739,7 +8739,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="copout" supported="no">
-		<description>Cop-Out (UK) </description>
+		<description>Cop-Out (UK)</description>
 		<year>1986</year>
 		<publisher>Mikrogen</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -9743,7 +9743,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="dandares" cloneof="dandare" supported="no">
-		<description>Dan Dare - Pilot of the Future (UK)</description>
+		<description>Dan Dare - Pilot of the Future [Discovery Informatic] (UK)</description>
 		<year>1986</year>
 		<publisher>Discovery Informatic</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -9755,7 +9755,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="dandare" supported="no">
-		<description>Dan Dare - Pilot of the Future (UK) </description>
+		<description>Dan Dare - Pilot of the Future [Virgin Games] (UK)</description>
 		<year>1986</year>
 		<publisher>Virgin Games</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -10440,7 +10440,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="defordie" supported="no">
-		<description>Defend or Die (UK) </description>
+		<description>Defend or Die (UK)</description>
 		<year>1985</year>
 		<publisher>Alligata Software</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -11393,7 +11393,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="ddragon" supported="no">
 		<description>Double Dragon (UK)</description>
 		<year>1988</year>
-		<publisher> Animagic </publisher>
+		<publisher>Animagic</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="151797">
@@ -11405,7 +11405,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="ddragons" cloneof="ddragon" supported="no">
 		<description>Double Dragon (Spa)</description>
 		<year>1988</year>
-		<publisher> Animagic </publisher>
+		<publisher>Animagic</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="145958">
@@ -20672,7 +20672,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="knightlr" supported="no">
 		<description>Knight Lore (UK, Ricochet)</description>
 		<year>1984</year>
-		<publisher> Ricochet </publisher>
+		<publisher>Ricochet</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42795">
@@ -37630,7 +37630,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="totrecal" supported="no">
-		<description>Total Recall (UK) </description>
+		<description>Total Recall (UK)</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />

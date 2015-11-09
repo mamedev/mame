@@ -128,7 +128,7 @@ enum {
 	extern int m_log_types;
 	extern int m_log_level;
 	extern bool m_log_newline;
-	void logprintf(int type, int level, const char* format, ...);
+	void logprintf(device_t *device, int type, int level, const char* format, ...);
 #   define  LOG(x) logprintf x
 #else
 #   define  LOG(x)

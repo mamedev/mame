@@ -33,31 +33,27 @@ function osdmodulesbuild()
 		"SingleOutputDir",
 	}
 
-	options {
-		"ForceCPP",
-	}
-
 	files {
-		MAME_DIR .. "src/osd/osdnet.c",
-		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
-		MAME_DIR .. "src/osd/modules/debugger/none.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugint.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugwin.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugqt.c",
-		MAME_DIR .. "src/osd/modules/font/font_sdl.c",
-		MAME_DIR .. "src/osd/modules/font/font_windows.c",
-		MAME_DIR .. "src/osd/modules/font/font_osx.c",
-		MAME_DIR .. "src/osd/modules/font/font_none.c",
-		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
-		MAME_DIR .. "src/osd/modules/netdev/pcap.c",
-		MAME_DIR .. "src/osd/modules/netdev/none.c",
-		MAME_DIR .. "src/osd/modules/midi/portmidi.c",
-		MAME_DIR .. "src/osd/modules/midi/none.c",
-		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/none.c",
+		MAME_DIR .. "src/osd/osdnet.cpp",
+		MAME_DIR .. "src/osd/modules/lib/osdobj_common.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/none.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/debugint.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/debugqt.cpp",
+		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
+		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
+		MAME_DIR .. "src/osd/modules/font/font_osx.cpp",
+		MAME_DIR .. "src/osd/modules/font/font_none.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/taptun.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/pcap.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/none.cpp",
+		MAME_DIR .. "src/osd/modules/midi/portmidi.cpp",
+		MAME_DIR .. "src/osd/modules/midi/none.cpp",
+		MAME_DIR .. "src/osd/modules/sound/js_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/direct_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/none.cpp",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -72,9 +68,9 @@ function osdmodulesbuild()
 		}
 	else
 		files {
-			MAME_DIR .. "src/osd/modules/render/drawogl.c",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.c",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.c",
+			MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.cpp",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.cpp",
 		}
 		defines {
 			"USE_OPENGL=1",
@@ -88,7 +84,7 @@ function osdmodulesbuild()
 
 	if USE_BGFX == 1 then
 		files {
-			MAME_DIR .. "src/osd/modules/render/drawbgfx.c",
+			MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
 		}
 		defines {
 			"USE_BGFX"
@@ -107,24 +103,24 @@ function osdmodulesbuild()
 
 	if _OPTIONS["USE_QTDEBUG"]=="1" then
 		files {
-			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.c",
-			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.c",
-			GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.c",
+			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp",
+			GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.cpp",
 		}
 		defines {
 			"USE_QTDEBUG=1",
@@ -156,15 +152,15 @@ function osdmodulesbuild()
 		
 		
 		custombuildtask {
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h", 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.c", { },			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h", 				GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.c", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.c", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",				GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",		GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.c", { }, 		{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h", 			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.c", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h", 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp", { },			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h", 				GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.cpp", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",				GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",		GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp", { }, 		{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h", 			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.cpp", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			
 		}
 		

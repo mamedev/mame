@@ -53,6 +53,29 @@ public:
 			m_txrdy(0)
 	{ }
 
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( cmd_w );
+	DECLARE_READ8_MEMBER( ieee488_r );
+	DECLARE_READ8_MEMBER( port3_r );
+	DECLARE_READ8_MEMBER( i8155_pa_r );
+	DECLARE_WRITE8_MEMBER( i8155_pb_w );
+	DECLARE_WRITE8_MEMBER( i8155_pc_w );
+	DECLARE_WRITE8_MEMBER( io_i8155_pb_w );
+	DECLARE_WRITE8_MEMBER( io_i8155_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( io_i8155_to_w );
+	DECLARE_WRITE_LINE_MEMBER( srq_w );
+	DECLARE_WRITE_LINE_MEMBER( atn_w );
+	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_DRIVER_INIT(vixen);
+	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
+	IRQ_CALLBACK_MEMBER(vixen_int_ack);
+	DECLARE_READ8_MEMBER(opram_r);
+	DECLARE_READ8_MEMBER(oprom_r);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1797_t> m_fdc;
 	required_device<i8155_device> m_io_i8155;
@@ -70,34 +93,14 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	required_ioport_array<8> m_key;
 
+	address_space *m_program;
+
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_interrupt();
-
-	DECLARE_WRITE8_MEMBER( ctl_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_READ8_MEMBER( ieee488_r );
-	DECLARE_READ8_MEMBER( port3_r );
-	DECLARE_READ8_MEMBER( i8155_pa_r );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_WRITE8_MEMBER( i8155_pc_w );
-	DECLARE_WRITE8_MEMBER( io_i8155_pb_w );
-	DECLARE_WRITE8_MEMBER( io_i8155_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( io_i8155_to_w );
-	DECLARE_WRITE_LINE_MEMBER( srq_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DIRECT_UPDATE_MEMBER(vixen_direct_update_handler);
-
-	// memory state
-	int m_reset;
 
 	// keyboard state
 	UINT8 m_col;
@@ -122,12 +125,8 @@ public:
 	int m_enb_ring_int;
 
 	// video state
-	int m_alt;
-	int m_256;
-
-	DECLARE_DRIVER_INIT(vixen);
-	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
-	IRQ_CALLBACK_MEMBER(vixen_int_ack);
+	bool m_alt;
+	bool m_256;
 };
 
 #endif

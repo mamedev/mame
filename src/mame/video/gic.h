@@ -6,7 +6,7 @@
 
    GI AY-3-8800-1 (Datasheet exists as AY-3-8500-1 Graphics Interface Chip)
    For the GIMINI "Challenger" programmable game system.
-   
+
    Really only ever used in the Unisonic Champion 2711
 
 ***************************************************************************/
@@ -25,7 +25,7 @@
 
 #define MCFG_GIC_ADD(_tag, _clock, _screen_tag) \
 	MCFG_DEVICE_ADD(_tag, GIC, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) 
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -49,8 +49,8 @@
 #define GIC_RIGHT_W 13
 
 class gic_device :  public device_t
-				  , public device_sound_interface
-				  , public device_video_interface
+					, public device_sound_interface
+					, public device_video_interface
 {
 public:
 	// construction/destruction
@@ -68,7 +68,7 @@ public:
 
 	//plgDavid please change this to a MESS friendly handshake
 	void set_shared_memory(const UINT8*m){ m_ram = m;};
-	
+
 	// Global constants (non mesured figures)
 	static const int START_ACTIVE_SCAN = 10;
 	static const int BORDER_SIZE       = GIC_CHAR_W*3;
@@ -86,7 +86,7 @@ protected:
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	
+
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
@@ -95,16 +95,16 @@ protected:
 
 	void draw_char_left (int x, int y, UINT8 code, bitmap_ind16 &bitmap);
 	void draw_char_right(int x, int y, UINT8 code, bitmap_ind16 &bitmap,int bg_col);
-	
+
 	bitmap_ind16 m_bitmap;
 	UINT8 *      m_cgrom;          // internal chargen ROM
-	
+
 	emu_timer    *m_vblank_timer;
 	sound_stream *m_stream;
-	
+
 	int m_audiocnt;
-	int m_audioval;	
-	int m_audioreset;	
+	int m_audioval;
+	int m_audioreset;
 	const UINT8* m_ram;
 };
 

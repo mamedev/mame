@@ -252,7 +252,7 @@ int tms7000_device::op_mpy(UINT8 param1, UINT8 param2)
 {
 	m_icount -= 39;
 	UINT16 t = param1 * param2;
-	SET_CNZ(t >> 8 & 0xff);
+	SET_CNZ(t >> 8);
 	write_mem16(0, t); // always writes result to regs A-B
 	return WB_NO;
 }
@@ -502,7 +502,7 @@ void tms7000_device::movd_dir()
 	m_icount -= 15;
 	UINT16 t = imm16();
 	write_r16(imm8(), t);
-	SET_CNZ(t >> 8 & 0xff);
+	SET_CNZ(t >> 8);
 }
 
 void tms7000_device::movd_inx()
@@ -510,7 +510,7 @@ void tms7000_device::movd_inx()
 	m_icount -= 17;
 	UINT16 t = imm16() + read_r8(1);
 	write_r16(imm8(), t);
-	SET_CNZ(t >> 8 & 0xff);
+	SET_CNZ(t >> 8);
 }
 
 void tms7000_device::movd_ind()
@@ -518,7 +518,7 @@ void tms7000_device::movd_ind()
 	m_icount -= 14;
 	UINT16 t = read_r16(imm8());
 	write_r16(imm8(), t);
-	SET_CNZ(t >> 8 & 0xff);
+	SET_CNZ(t >> 8);
 }
 
 // long branch

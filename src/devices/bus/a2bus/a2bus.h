@@ -149,12 +149,12 @@ public:
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a2bus_card_interface();
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) { logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) { logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) { m_device.logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) { m_device.logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
 	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) { return 0; }       // CnXX - /IOSEL
-	virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data) { logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
+	virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data) { m_device.logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
 	virtual UINT8 read_c800(address_space &space, UINT16 offset) { return 0; }      // C800 - /IOSTB
-	virtual void write_c800(address_space &space, UINT16 offset, UINT8 data) { logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
+	virtual void write_c800(address_space &space, UINT16 offset, UINT8 data) {m_device.logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
 	virtual bool take_c800() { return true; }   // override and return false if your card doesn't take over the c800 space
 	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset) { return 0; }
 	virtual void write_inh_rom(address_space &space, UINT16 offset, UINT8 data) { }

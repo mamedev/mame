@@ -42,7 +42,7 @@ private:
 
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_connector;
-	
+
 	bool m_rom_active;
 	bool m_romen;
 };

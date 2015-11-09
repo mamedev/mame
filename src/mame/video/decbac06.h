@@ -30,7 +30,7 @@ public:
 	int    m_tile_region_16;
 
 	// some bootlegs (eg midresb / midresbj) don't appear to actually support the alt modes, they set them and end up with broken gfx on later levels.
-	bool	m_supports_8x8;
+	bool    m_supports_8x8;
 	bool    m_supports_16x16;
 	bool    m_supports_rc_scroll;
 

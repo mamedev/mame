@@ -2299,7 +2299,7 @@ public:
 		{
 			if (m_t)
 			{
-				logerror("DSP561xx|Movec_4: This sure seems like it can't happen.");
+				osd_printf_error("DSP561xx|Movec_4: This sure seems like it can't happen.");
 			}
 			else
 			{

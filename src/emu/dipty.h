@@ -20,26 +20,26 @@
 class device_pty_interface : public device_interface
 {
 public:
-        // construction/destruction
-        device_pty_interface(const machine_config &mconfig, device_t &device);
-        virtual ~device_pty_interface();
+		// construction/destruction
+		device_pty_interface(const machine_config &mconfig, device_t &device);
+		virtual ~device_pty_interface();
 
-        bool open(void);
-        void close(void);
+		bool open(void);
+		void close(void);
 
-        bool is_open(void) const;
+		bool is_open(void) const;
 
-        ssize_t read(UINT8 *rx_chars , size_t count);
-        void write(UINT8 tx_char);
+		ssize_t read(UINT8 *rx_chars , size_t count);
+		void write(UINT8 tx_char);
 
-        bool is_slave_connected(void) const;
+		bool is_slave_connected(void) const;
 
-        const char *slave_name(void) const;
+		const char *slave_name(void) const;
 
 protected:
-        osd_file *m_pty_master;
-        std::string m_slave_name;
-        bool m_opened;
+		osd_file *m_pty_master;
+		std::string m_slave_name;
+		bool m_opened;
 };
 
 // iterator

@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi,Brad Oliver
 #include "machine/rp5h01.h"
-#include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
 struct chr_bank
@@ -16,7 +15,6 @@ public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nesapu(*this, "nesapu"),
 		m_ppu(*this, "ppu"),
 		m_rp5h01(*this, "rp5h01"),
 		m_ram_8w(*this, "ram_8w"),
@@ -27,7 +25,6 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<nesapu_device> m_nesapu;
 	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 
@@ -107,9 +104,6 @@ public:
 	void pc10_set_mirroring(int mirroring);
 	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
-	DECLARE_READ8_MEMBER(psg_4015_r);
-	DECLARE_WRITE8_MEMBER(psg_4015_w);
-	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	DECLARE_DRIVER_INIT(playch10);
 	DECLARE_DRIVER_INIT(pc_gun);
 	DECLARE_DRIVER_INIT(pcaboard);

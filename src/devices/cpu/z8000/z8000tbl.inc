@@ -561,7 +561,7 @@ void z8000_init_tables(void)
 		for (i = init->beg; i <= init->end; i += init->step)
 		{
 			if (z8000_exec[i].opcode != &z8002_device::zinvalid)
-				logerror("Z8000 opcode %04x clash '%s'\n", i, z8000_exec[i].dasm);
+				osd_printf_error("Z8000 opcode %04x clash '%s'\n", i, z8000_exec[i].dasm);
 
 			z8000_exec[i].opcode = init->opcode;
 			z8000_exec[i].cycles = init->cycles;

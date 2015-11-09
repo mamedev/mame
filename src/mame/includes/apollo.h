@@ -37,16 +37,16 @@
 #define LOG(x)  { logerror x; logerror ("\n"); apollo_check_log(); }
 #define LOG1(x) { if (VERBOSE > 0) LOG(x) }
 #define LOG2(x) { if (VERBOSE > 1) LOG(x) }
-#define CLOG(x) { logerror ("%s - %s: ", apollo_cpu_context(machine().device(MAINCPU)), tag()); LOG(x) }
+#define CLOG(x) { machine().logerror ("%s - %s: ", apollo_cpu_context(machine().device(MAINCPU)), tag()); machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
 #define CLOG1(x) { if (VERBOSE > 0) CLOG(x) }
 #define CLOG2(x) { if (VERBOSE > 1) CLOG(x) }
-#define DLOG(x) { logerror ("%s - %s: ", apollo_cpu_context(device->machine().device(MAINCPU)), device->tag()); LOG(x) }
+#define DLOG(x) { device->logerror ("%s - %s: ", apollo_cpu_context(device->machine().device(MAINCPU)), device->tag()); device->logerror x; device->logerror ("\n"); apollo_check_log(); }
 #define DLOG1(x) { if (VERBOSE > 0) DLOG(x) }
 #define DLOG2(x) { if (VERBOSE > 1) DLOG(x) }
-#define MLOG(x)  { logerror ("%s: ", apollo_cpu_context(machine().device(MAINCPU))); LOG(x) }
+#define MLOG(x)  { machine().logerror ("%s: ", apollo_cpu_context(machine().device(MAINCPU))); machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
 #define MLOG1(x) { if (VERBOSE > 0) MLOG(x) }
 #define MLOG2(x) { if (VERBOSE > 1) MLOG(x) }
-#define SLOG(x)  { logerror ("%s: ", apollo_cpu_context(m_maincpu)); LOG(x) }
+#define SLOG(x)  { machine().logerror ("%s: ", apollo_cpu_context(m_maincpu));machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
 #define SLOG1(x) { if (VERBOSE > 0) SLOG(x) }
 #define SLOG2(x) { if (VERBOSE > 1) SLOG(x) }
 
@@ -89,7 +89,7 @@ UINT32 apollo_get_node_id(void);
 	// should be called by the CPU core before executing each instruction
 int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
 
-void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
+void apollo_set_cache_status_register(device_t *device,UINT8 mask, UINT8 data);
 
 /*----------- machine/apollo.c -----------*/
 

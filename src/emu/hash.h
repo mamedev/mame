@@ -66,7 +66,7 @@ public:
 	bool operator!=(const hash_collection &rhs) const { return !(*this == rhs); }
 
 	// getters
-	bool flag(char flag) const { return (m_flags.find_first_of(flag) != -1); }
+	bool flag(char flag) const { return (m_flags.find_first_of(flag) != std::string::npos); }
 	const char *hash_types(std::string &buffer) const;
 
 	// hash manipulators

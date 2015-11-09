@@ -144,7 +144,7 @@ class running_machine
 	friend void debugger_init(running_machine &machine);
 	friend class sound_manager;
 
-	typedef void (*logerror_callback)(running_machine &machine, const char *string);
+	typedef void (*logerror_callback)(const running_machine &machine, const char *string);
 
 	// must be at top of member variables
 	resource_pool           m_respool;              // pool of resources for this machine
@@ -215,7 +215,6 @@ public:
 	void schedule_exit();
 	void schedule_hard_reset();
 	void schedule_soft_reset();
-	void schedule_new_driver(const game_driver &driver);
 	void schedule_save(const char *filename);
 	void schedule_load(const char *filename);
 
@@ -229,7 +228,9 @@ public:
 	INT32 get_vblank_watchdog_counter() { return m_watchdog_counter; }
 
 	// misc
-	void CLIB_DECL vlogerror(const char *format, va_list args);
+	void popmessage(const char *format, ...) const;
+	void logerror(const char *format, ...) const;
+	void vlogerror(const char *format, va_list args) const;
 	UINT32 rand();
 	const char *describe_context();
 
@@ -255,7 +256,6 @@ private:
 	void start();
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt);
-	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
 	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
@@ -266,7 +266,7 @@ private:
 	void nvram_save();
 
 	// internal callbacks
-	static void logfile_callback(running_machine &machine, const char *buffer);
+	static void logfile_callback(const running_machine &machine, const char *buffer);
 
 	// internal device helpers
 	void start_all_devices();

@@ -116,10 +116,10 @@ for i in range(0, state):
 	print("\tcase %d:	goto %s;" % (i, states_to_dispatch.get(i, "state_%d" % i)))
 
 # Output a default case
-print "\tdefault:"
-print "\t\tfatalerror(\"Unexpected state\");"
-print "\t\tbreak;"
-print
+print("\tdefault:")
+print("\t\tfatalerror(\"Unexpected state\");")
+print("\t\tbreak;")
+print("")
 
 # Finally output the text
-print text
+print(text)
