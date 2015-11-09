@@ -53,7 +53,7 @@ Notes:
         0 OPEN 2,4,31 : INPUT #2, A$ : CLOSE #2
         1 PRINT A$
 
-    http://mikenaberezny.com/hardware/projects/interpod-ieee-488-interface/
+    http://mikenaberezny.com/hardware/c64-128/interpod-ieee-488-interface/
 
 */
 
