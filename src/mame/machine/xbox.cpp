@@ -16,13 +16,6 @@
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
 #define LOG_PCI
 //#define LOG_OHCI
 //#define USB_ENABLED
@@ -1536,7 +1529,3 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	MCFG_SCREEN_UPDATE_DRIVER(xbox_base_state, screen_update_callback)
 	MCFG_SCREEN_VBLANK_DRIVER(xbox_base_state, vblank_callback)
 MACHINE_CONFIG_END
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif
