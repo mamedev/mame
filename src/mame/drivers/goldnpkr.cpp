@@ -1053,6 +1053,8 @@
   - Added partial decryption to the ICP1 daughterboard games.
      (currently only pokerduc set). Since it's just partial,
      commented out the code for now....
+  - Added port impulse to the Golden Poker's second coin slot.
+     This is needed for both royale sets.
   - Some fixes and clean-ups.
 
 
@@ -1782,7 +1784,7 @@ static INPUT_PORTS_START( goldnpkr )
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("D-31") PORT_CODE(KEYCODE_E) /* O.A.R? (D-31 in schematics) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Coupon (Note In)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Weight (Coupon In)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
