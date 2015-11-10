@@ -4537,36 +4537,6 @@ ROM_START( goodluck )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
-/****************************************************
-
-  Super Double (Karateco)
-
-  French text with some intentional typos to fit size.
-  Uses both 0x2000..0x3fff and 0x7000..0x7fff ROM range.
-
-  This is either the game advertised as "The Double",
-  or a successor thereof.
-
-*****************************************************/
-
-ROM_START( superdbl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sd6",  0x7000, 0x1000, CRC(3cf1ccb8) SHA1(c589ddf2e97abb9d95375d0964fd0aa6f7e2e468) )
-	ROM_LOAD( "sd7",  0x2000, 0x1000, CRC(f5136f82) SHA1(f086cd5495097ede037ea6cae584e95bfcd7b239) )
-	ROM_LOAD( "8",    0x3000, 0x1000, CRC(157332c2) SHA1(3c66200c49641b9d876c5fa134dd2f0e80136beb) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(                 0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4",    0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* text layer */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "1",    0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "2",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "3",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24sa10n.7d",      0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
 
 /************************************************************
 
@@ -4635,338 +4605,7 @@ ROM_START( ngoldb )
 ROM_END
 
 
-/******************************* WITCH CARD SETS *******************************/
-
-/*  Witch Card (Video Klein)
-    Video Klein original with epoxy block module
-*/
-	ROM_START( witchcrd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epoxy_27128.bin",    0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )  /* epoxy block program ROM */
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "wc4.7a", 0x2000, 0x0800, CRC(6a392b10) SHA1(9f36ae2e5a9a8741c6687e9c875d7b45999d9d6d) )    /* text layer */
-	ROM_LOAD( "wc4.7a", 0x2800, 0x0800, CRC(6a392b10) SHA1(9f36ae2e5a9a8741c6687e9c875d7b45999d9d6d) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "wc1.2a", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "wc2.4a", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "wc3.5a", 0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s129.7d",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
-	ROM_LOAD( "epoxy_82s129.bin",   0x0100, 0x0100, CRC(f0c012b1) SHA1(5502977404172e8c5b9fbf305581a406668ad1d9) ) /* original epoxy block PROM */
-ROM_END
-
-/*  Witch Card (Spanish, set 1)
-    Unknown argentine manufacturer.
-*/
-ROM_START( witchcda )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "w_card.256", 0x0000, 0x8000, CRC(63a471f8) SHA1(96a2140e2da0050e7865a6662f707cf024130832) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "bs_4_wcspa.032", 0x2000, 0x1000, CRC(4e520c7a) SHA1(1de3ac4a150160c15f453b0d3f9d3cd3178bfedd) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-/*  Witch Card (Spanish, set 2)
-    Unknown argentine manufacturer.
-*/
-ROM_START( witchcdb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "w_card.128", 0x4000, 0x4000, CRC(11ecac96) SHA1(717709b31f3dfa09be321c14fbf0e95d492ad2f2) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "bs_4_wcspa.032", 0x2000, 0x1000, CRC(4e520c7a) SHA1(1de3ac4a150160c15f453b0d3f9d3cd3178bfedd) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-/*  Witch Card (English, no witch game)
-    Hack?
-*/
-ROM_START( witchcdc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wc_sbruj.256",   0x0000, 0x8000, CRC(5689ae41) SHA1(c7a624ec881204137489b147ce66cc9a9900650a) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "bs_4_wc.032",    0x2000, 0x1000, CRC(41924d13) SHA1(8ab69b6efdc20858960fa5df669470ba90b5f8d7) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-/***************************************
-
-  Witch Card (German, WC3050, set 1 )
-
-  TV GAME ELEKTRONIK 1994
-         PROMA
-   CASINOVERSION WC3050
-
-***************************************/
-
-	ROM_START( witchcdd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "12a.bin",    0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
-
-	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "ce-3-tvg.bin",   0x4000, 0x2000, CRC(54b51497) SHA1(8c3a74377fde8c7c5a6b277a9c1e717e6bdd98f8) )    /* text layer */
-
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "ce-1-tvg.bin",   0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "ce-2-tvg.bin",   0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
-	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24s10n.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
-/*  Witch Card (Video Klein)
-    Video Klein original with epoxy block module.
-    Alt set....
-*/
-	ROM_START( witchcde )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "27128_epoxy.bin",    0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )  /* epoxy block program ROM */
-
-	ROM_REGION( 0x4000, "temp", 0 )
-	ROM_LOAD( "wc1.a2", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )
-	ROM_LOAD( "wc2.a4", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )
-	ROM_LOAD( "wc3.a5", 0x2000, 0x1000, CRC(a03f2d68) SHA1(6d81b1e92f40f7150498b65941d5a9ab64a89790) )
-	ROM_LOAD( "wc4.a7", 0x3000, 0x1000, CRC(d3694522) SHA1(0f66ff2dd5c7ac9bf91fa9f48eb9f356572e814c) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_COPY( "temp",   0x3800, 0x1000, 0x0800 )    /* 0800-0fff of wc4.a7 - charset */
-
-	ROM_REGION( 0x1800, "gfx2", 0 ) /* 2nd half of each ROM */
-	ROM_COPY( "temp",   0x0800, 0x0000, 0x0800 )    /* 0800-0fff of wc1.a2 - regular cards gfx, bitplane 1 */
-	ROM_COPY( "temp",   0x1800, 0x0800, 0x0800 )    /* 0800-0fff of wc2.a4 - regular cards gfx, bitplane 2 */
-	ROM_COPY( "temp",   0x2800, 0x1000, 0x0800 )    /* 0800-0fff of wc3.a5 - regular cards gfx, bitplane 3 */
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "24s10.bin",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
-	ROM_LOAD( "24s10_epoxy.bin",    0x0100, 0x0100, CRC(ddfd7034) SHA1(78dee69ab4ba759485ee7f00446c2d86f08cc50f) ) /* original epoxy block PROM */
-ROM_END
-
-/*  Witch Card (English, witch game, lights)
-    PCB by PM. Hybrid hardware.
-
-    Copyright 1983/84/85
-    W.BECK ELEKTRONIK
-*/
-ROM_START( witchcdf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "$25.bin",    0x5000, 0x1000, CRC(afd6cb4a) SHA1(4c769e1c724bada5875e028781086c32967953a1) )
-	ROM_LOAD( "$26.bin",    0x6000, 0x1000, CRC(ad11960c) SHA1(2b562cfe9401e21c9dcd90307165e2c2d1acfc5b) )
-	ROM_LOAD( "$27.bin",    0x7000, 0x1000, CRC(e6f9c973) SHA1(f209d13d1565160bc2c05c6c4fce73d14a9a56ab) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "$14.bin",    0x2000, 0x1000, CRC(19b68bec) SHA1(b8ef17ba5545e2f104cd2783e5f1c97c400fcbbc) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "11.bin", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "12.bin", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "13.bin", 0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wc_bprom.bin",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
-/*******************************************
-
-  Witch Card (Falcon)
-  Original Falcon PCB marked
-  "831 1.1 MADE IN JAPAN"
-
-  Same board as Falcons Wild, but without
-  extra RAM / ROM / encrypted 2nd CPU.
-
-  AY8910 is present.
-
-*******************************************/
-
-ROM_START( witchcdg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "6.b9",   0x5000, 0x1000, CRC(70462a63) SHA1(9dfa18bf7d4e0803f2a68e64661ece392a7983cc) )
-	ROM_LOAD( "7.b11",  0x6000, 0x1000, CRC(227b3801) SHA1(aebabce01b1abdb42b3e49c38f4fe429e65c1a88) )
-	ROM_LOAD( "8.b13",  0x7000, 0x1000, CRC(6bb0059e) SHA1(c5f515b692c3353323aff77f087bf0a92a8d99cf) )
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "3.b5",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
-	ROM_FILL(           0x0800, 0x0800, 0 ) /* filling the bitplane */
-	ROM_LOAD( "2.b3",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_FILL(           0x1800, 0x0800, 0 ) /* filling the bitplane */
-	ROM_LOAD( "1.b1",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    /* srctag, srcoffs, offset, length */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-//  ROM_LOAD( "82s129.7d",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
-	ROM_LOAD( "tbp24s10n.d2",   0x0000, 0x0100, BAD_DUMP CRC(3db3b9e0) SHA1(c956493d5d754665d214b416e6a473d73c22716c) )
-ROM_END
-
-/***************************************
-
-  Witch Card (German, WC3050, set 2 )
-
-  TV GAME ELEKTRONIK 1994
-         PROMA
-   CASINOVERSION WC3050
-
-***************************************/
-
-ROM_START( witchcdh )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "prog3000.a12",   0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
-
-	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "wc3050.a5",  0x4000, 0x2000, CRC(6f35b9c4) SHA1(df86687164f18f2bfe71e73cccd28fe4117e748c) )    /* text layer, alt gfx */
-
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "wc1.a2", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */ // sldh
-	ROM_LOAD( "wc1.a4", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */ // sldh
-	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24s10n.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
-/***************************************
-
-  Witch Card (German, WC3050, 27-4-94)
-
-  TV GAME ELEKTRONIK 1994
-         PROMA
-   CASINOVERSION WC3050
-
-****************************************
-
-01.a2                                           BADADDR           --xxxxxxxxxx
-02.a4                                           BADADDR           --xxxxxxxxxx
-03.a5                                           1ST AND 2ND HALF IDENTICAL
-27s21.d7                                        FIXED BITS (0000xxxx)
-                        tbp24s10n.7d            FIXED BITS (0000xxxx)
-                        ce-2-tvg.bin            BADADDR           --xxxxxxxxxx
-                        ce-1-tvg.bin            BADADDR           --xxxxxxxxxx
-01.a2                   ce-1-tvg.bin            IDENTICAL
-02.a4                   ce-2-tvg.bin            IDENTICAL
-27s21.d7                tbp24s10n.7d            IDENTICAL
-03.a5        [2/4]      ce-3-tvg.bin [2/4]      IDENTICAL
-04.a12       [2/4]      12a.bin      [2/4]      IDENTICAL
-03.a5        [2/4]      ce-3-tvg.bin [4/4]      IDENTICAL
-03.a5        [4/4]      ce-3-tvg.bin [2/4]      IDENTICAL
-03.a5        [4/4]      ce-3-tvg.bin [4/4]      IDENTICAL
-04.a12       [1/4]      12a.bin      [1/4]      99.609375%
-04.a12       [3/4]      12a.bin      [3/4]      99.414063%
-04.a12       [4/4]      12a.bin      [4/4]      96.020508%
-03.a5        [1/4]      ce-3-tvg.bin [1/4]      88.378906%
-03.a5        [3/4]      ce-3-tvg.bin [1/4]      88.378906%
-
-***************************************/
-
-	ROM_START( witchcdi )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "04.a12", 0x0000, 0x8000, CRC(0f662e02) SHA1(71d7344f63c11082beb4fb4eeb20b04780a9b14c) )
-
-	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "03.a5",  0x4000, 0x2000, CRC(f181e5aa) SHA1(44a7696bd223effbc7542142a0c3c623c628071d) )    /* text layer */
-
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "01.a2",  0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "02.a4",  0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
-	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "27s21.d7",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
-/******************************************
-
-  Witch Game (Video Klein)
-
-  Another evil hardware from Video Klein
-  with CPU box. Marked "12T1"
-
-******************************************/
-
-ROM_START( witchgme )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Video Klein */
-	ROM_LOAD( "hn58c256p.box12t1",  0x0000, 0x8000, CRC(26c334cb) SHA1(d8368835c88668f09560f6096148a6e528806f65) )
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  /* cards deck gfx, bitplane1 */
-	ROM_FILL(           0x0800, 0x0800, 0 ) /* filling the bitplane */
-	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  /* cards deck gfx, bitplane2 */
-	ROM_FILL(           0x1800, 0x0800, 0 ) /* filling the bitplane */
-	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  /* text layer */
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    /* srctag, srcoffs, offset, length */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-
-	ROM_REGION( 0x0100, "proms2", 0 )
-	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
-ROM_END
-
-/*  Witch Game (Video Klein)
-    Video Klein original with epoxy block module.
-    Alt set....
-*/
-	ROM_START( witchcdk )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wc_epoxy.bin",   0x0000, 0x8000, CRC(33f1acd9) SHA1(2facb3d807b5b2a2978e567d0c1106c0a027621a) )  /* epoxy block program ROM */
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(            0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "wc4.7a",  0x2000, 0x1000, BAD_DUMP CRC(3bf07c44) SHA1(f6e859b142b7d4585b89ca609d8bc85c84fe2b09) )    /* text chars, corrupt */ // sldh
-	ROM_COPY( "gfx1",    0x2800, 0x2000, 0x0800 )   /* srctag, srcoffs, offset, length */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "wc1.2a", 0x0000, 0x1000, CRC(f59c6fd2) SHA1(bea4b6043728311ca9fff36e2d7e24254af5b97a) )    /* cards deck gfx, bitplane1 */ // sldh
-	ROM_LOAD( "wc2.4a", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "wc3.5a", 0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "24s10.bin",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
-	ROM_LOAD( "82s137_epoxy.bin",   0x0100, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) ) /* original epoxy block PROM */
-ROM_END
-
-
-/******************************* BUENA SUERTE SETS *******************************/
+/**************************************** BUENA SUERTE SETS ****************************************/
 
 /*
     checksum routine at $5827
@@ -5349,583 +4988,332 @@ ROM_START( bsuerteu )
 ROM_END
 
 
-/******************************* FALCONS WILD SETS *******************************/
-
-/*********************************************
-
-    Falcons Wild - Wild Card 1991.
-    1992-1992 TVG D-6310 GRUENBERG.
-    (bootleg in real Bonanza hardware).
-
-  dm74s287n.7d     FIXED BITS (0000xxxx)
-  fw1.2a           BADADDR     x-xxxxxxxxxxx
-  fw2.4a           BADADDR     x-xxxxxxxxxxx
-  fw3.5a           1ST AND 2ND HALF IDENTICAL
-  nosticker.12a    x0xxxxxxxxxxxxxx = 0x00
-
-  fw3.5a is bitrotten.
-
-**********************************************/
-
-ROM_START( falcnwld )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Falcons Wild */
-	ROM_LOAD( "nosticker.12a",  0x0000, 0x10000, CRC(54ae4a8a) SHA1(0507098b53d807059b78ec098203d095d19028f8) )
-
-	ROM_REGION( 0x6000, "temp", 0 )
-	ROM_LOAD( "fw1.2a", 0x0000, 0x2000, CRC(d5a58098) SHA1(9c8860949b0adcd20222e9b3e3e8e7e864e8f39f) )  /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "fw2.4a", 0x2000, 0x2000, CRC(b28b7759) SHA1(513229cee451f59f824b7a64932679f91fbb324d) )  /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "fw3.5a", 0x4000, 0x2000, BAD_DUMP CRC(98edfc82) SHA1(e3dd597245b55c3bc6ea86acf80ee024ca28f564) )  /* text layer + cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x4000, 0x1000, 0x0800 )    /* first quarter of fw3.5a */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x0000, 0x0000, 0x0800 )    /* first quarter of fw1.2a */
-	ROM_COPY( "temp",   0x2000, 0x0800, 0x0800 )    /* first quarter of fw2.4a */
-	ROM_COPY( "temp",   0x4800, 0x1000, 0x0800 )    /* second quarter of fw3.5a */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "dm74s287n.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
-/************************************
-
-  Falcon's Wild - World Wide Poker.
-  1991, Video Klein
-
-  CPU BOX
-
-************************************/
-
-ROM_START( falcnwlda )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Falcons Wild, Video Klein */
-	ROM_LOAD( "nmc27c256.box",  0x0000, 0x8000, CRC(a0072c55) SHA1(27b84a896ff06a423450d8f0851f42f3e8ec5466) )
-	ROM_RELOAD(                 0x8000, 0x8000 )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling bitplanes */
-	ROM_LOAD( "fw4.7a", 0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* chars gfx */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "fw1.2a", 0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */ // sldh
-	ROM_IGNORE(                 0x0800)
-	ROM_LOAD( "fw2.4a", 0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */ // sldh
-	ROM_LOAD( "fw3.5a", 0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */ // sldh
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
-ROM_START( falcnwldb )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* World Wide Poker / 1992-11-04 */
-	ROM_LOAD( "fw12t1_19921104.bin",    0x0000, 0x8000, CRC(8b4f8cac) SHA1(e3bcbadaa157db48a41369a3fcdba536f8ca679e) )
-	ROM_RELOAD(                         0x8000, 0x8000 )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling bitplanes */
-	ROM_LOAD( "fw4.7a", 0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* chars gfx */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "fw1.2a", 0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */ // sldh
-	ROM_IGNORE(                 0x0800)
-	ROM_LOAD( "fw2.4a", 0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */ // sldh
-	ROM_LOAD( "fw3.5a", 0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */ // sldh
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
-/***********************************************
-
-  Falcon's Wild - World Wide Poker
-  1983, Falcon.
-
-  Original Falcon PCB marked
-  "831 1.1 MADE IN JAPAN"
-
-  Same board as Witch Card (Falcon), but with
-  extra RAM + ROM + encrypted 2nd CPU + AY8910.
-
-  The encrypted 40-pin CPU is scratched,
-  and seems based on a Z80.
-
-***********************************************/
-
-ROM_START( falcnwldc )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Falcons Wild, Falcon original */
-//  ROM_LOAD( "nosticker.12a",  0x0000, 0x10000, CRC(54ae4a8a) SHA1(0507098b53d807059b78ec098203d095d19028f8) )
-	ROM_LOAD( "4.b6",           0x3000, 0x1000, CRC(88684a8f) SHA1(5ffa0808b502e93ddcb8f13929008aec2836a773) )
-	ROM_LOAD( "5.b8",           0x4000, 0x1000, CRC(aa5de05c) SHA1(98559b35c7c31a41b1818a6e60ec82f43a5d1b4a) )
-	ROM_LOAD( "6-syncmod.b9",   0x5000, 0x1000, CRC(21cfa807) SHA1(ff908a5a43b3736494127539d6485648d8be1a9a) )  // ok
-	ROM_LOAD( "7.b11",          0x6000, 0x1000, CRC(d63bba8e) SHA1(09902574985a945117ec22d738c94fee72e673af) )
-	ROM_LOAD( "8.b13",          0x7000, 0x1000, CRC(251d6abf) SHA1(2384ae674bfbe96c19a3b66c7efa1e5e8b444f48) )  // ok
-
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "9.f10",  0x0000, 0x1000, CRC(22f1c52a) SHA1(6429a802e92f6b77446550a303567798a231f6d7) )  // MCU prg
-
-	ROM_REGION( 0x6000, "temp", 0 )
-	ROM_LOAD( "1.b1",   0x0000, 0x1000, CRC(fd95955d) SHA1(e5c029bc5683d06c2e5250c1271613232a058fcd) )
-	ROM_LOAD( "2.b3",   0x1000, 0x0800, CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )
-	ROM_LOAD( "3.b4",   0x1800, 0x0800, CRC(d9246780) SHA1(4ceb24131ec6208b742ba80373201aa53c50732d) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0800, 0x1000, 0x0800 )    /* second half of 1.b1 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x1800, 0x0000, 0x0800 )    /* first half of 3.b4 */
-	ROM_COPY( "temp",   0x1000, 0x0800, 0x0800 )    /* whole 2.b3 */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* first half of 1.b1 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "falcon_1.bin",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
+/**************************************** VIDEO KLEIN SETS ****************************************/
 
 
-/******************************* OTHER SETS *******************************/
+/*********** WITCH CARD SETS *************/
 
-ROM_START( pmpoker )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2-5.bin",    0x5000, 0x1000, CRC(3446a643) SHA1(e67854e3322e238c17fed4e05282922028b5b5ea) )
-	ROM_LOAD( "2-6.bin",    0x6000, 0x1000, CRC(50d2d026) SHA1(7f58ab176de0f0f7666d87271af69a845faec090) )
-	ROM_LOAD( "2-7.bin",    0x7000, 0x1000, CRC(a9ab972e) SHA1(477441b7ff3acae3a5d5a3e4c2a428e0b3121534) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "1-4.bin",    0x1000, 0x0800, CRC(62b9f90d) SHA1(39c61a01225027572fdb75543bb6a78ed74bb2fb) )    /* text layer */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "1-1.bin",    0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "1-2.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "1-3.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24sa10n.7d",      0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( royale )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "royalex.bin",    0x4000, 0x4000, CRC(ef370617) SHA1(0fc5679e9787aeea3bc592b36efcaa20e859f912) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "royalechr.bin",  0x2000, 0x1000, CRC(b1f2cbb8) SHA1(8f4930038f2e21ca90b213c35b45ed14d8fad6fb) )    /* text layer */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "royale3.bin",    0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "royale2.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "royale1.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( royalea )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "royal.256",  0x0000, 0x8000, CRC(9d7fdb79) SHA1(05cae00bca0f6ae696c69f531cb0fa2104ff696a) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "royalechr.bin",  0x2000, 0x1000, CRC(b1f2cbb8) SHA1(8f4930038f2e21ca90b213c35b45ed14d8fad6fb) )    /* text layer */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "royale3.bin",    0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "royale2.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "royale1.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( sloco93 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "locoloco.128",   0x4000, 0x4000, CRC(f626a770) SHA1(afbd33b3f65b8a781c716a3d6e5447aa817d856c) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "confloco.032",   0x2000, 0x1000, CRC(b86f219c) SHA1(3f655a96bcf597a271a4eaaa0acbf8dd70fcdae9) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( sloco93a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "locoloco.256",   0x0000, 0x8000, CRC(ab037b0b) SHA1(16f811daaed5bf7b72549db85755c5274dfee310) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "confloco.032",   0x2000, 0x1000, CRC(b86f219c) SHA1(3f655a96bcf597a271a4eaaa0acbf8dd70fcdae9) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-/*
-    checksum routine at $5f3e
-    protect $4000+ & $7ff9.
-    (see cmp at $5f6b)
-    balanced at $7ff8.
+/*  Witch Card (Video Klein)
+    Video Klein original with epoxy block module
 */
-ROM_START( maverik )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* maverik: Maverik (ind arg, fixed, changed logo) */
-	ROM_LOAD( "maverik.bin",    0x0000, 0x8000, CRC(65a986e9) SHA1(2e825d3fb2346036357af0e12d3a75b5ef6cfd0d) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-/*****************************
-
-  Brasil XX sets...
-
- ****************************/
-ROM_START( brasil86 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil86.128: Brasil 86, BS clone. */
-	ROM_LOAD( "brasil86.128",   0x4000, 0x4000, CRC(0e88b434) SHA1(80f921c277f4253c29ee80e9cfb046ade1f66300) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( brasil87 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil87.128: Brasil 87, BS clone. */
-	ROM_LOAD( "brasil87.128",   0x4000, 0x4000, CRC(6cfdaea9) SHA1(0704e61c1c573e99e130c22787b529ac5544c631) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( brasil89 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil89.128: Brasil 89, BS clone. */
-	ROM_LOAD( "brasil89.128",   0x4000, 0x4000, CRC(9030e0db) SHA1(d073ed0ddd3e5df6a3387e10e05ca34bc491eb35) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( brasil89a )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil89a.128: Brasil 89a, BS clone. */
-	ROM_LOAD( "brasil89a.128",  0x4000, 0x4000, CRC(41a93a99) SHA1(70eeaddbdd9d3a587d1330b81d21d881ab0a8c91) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( brasil93 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil93.128: Brasil 93, BS clone. No lights */
-	ROM_LOAD( "brasil93.128",   0x4000, 0x4000, CRC(cc25909f) SHA1(635184022bcb8936c396cb9fcfa6367fcae906fb) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( poker91 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* bs_pok91.bin: Poker 91. Based on witchcrd */
-	ROM_LOAD( "bs_pok91.bin",   0x0000, 0x8000, CRC(90c88b45) SHA1(9b5842075ece5f96a6869d7a8c874dee2b2abde2) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-/****************************************************
-
-  Genie (Video Fun Games Ltd.)
-  Skill game. Only for amusement.
-
-  PCB is a heavily modified Golden Poker hardware.
-  Silkscreened "ICP-1".
-
-  CPU:   1x SY6502.
-  Video: 1x HD6845P CRTC.
-  I/O:   2x HD6821P PIAs.
-
-  Sound: Discrete.
-
-  RAMs:  2x M5L5101LP-1.
-
-  ROMs:  2x 2732 for program. (2m.16a, 3m.17a)
-         1x 2716 for char gen. (4.8a)
-         3x 2716 for gfx bitplanes. (1.4a, 2.6a, 3.7a)
-
-  1x Reset switch. (R.SW)
-  1x 8 DIP switches bank.
-  1x 2x10 Edge connector. (GM1)
-  1x 2x22 Edge connector. (GM2)
-
-
-*****************************************************/
-
-ROM_START( genie )
+	ROM_START( witchcrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2m.16a", 0x2000, 0x1000, CRC(30df75f5) SHA1(0696fb3db0b9927e6366db7316d605914ff8d464) )
-	ROM_LOAD( "3m.17a", 0x3000, 0x1000, CRC(9d67f5c9) SHA1(d3bc13ce07a7b1713544756d7723dd0bcd59cd1a) )
+	ROM_LOAD( "epoxy_27128.bin",    0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )  /* epoxy block program ROM */
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "wc4.7a", 0x2000, 0x0800, CRC(6a392b10) SHA1(9f36ae2e5a9a8741c6687e9c875d7b45999d9d6d) )    /* text layer */
+	ROM_LOAD( "wc4.7a", 0x2800, 0x0800, CRC(6a392b10) SHA1(9f36ae2e5a9a8741c6687e9c875d7b45999d9d6d) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "wc1.2a", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "wc2.4a", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "wc3.5a", 0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s129.7d",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
+	ROM_LOAD( "epoxy_82s129.bin",   0x0100, 0x0100, CRC(f0c012b1) SHA1(5502977404172e8c5b9fbf305581a406668ad1d9) ) /* original epoxy block PROM */
+ROM_END
+
+/*  Witch Card (Spanish, set 1)
+    Unknown argentine manufacturer.
+*/
+ROM_START( witchcda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w_card.256", 0x0000, 0x8000, CRC(63a471f8) SHA1(96a2140e2da0050e7865a6662f707cf024130832) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "bs_4_wcspa.032", 0x2000, 0x1000, CRC(4e520c7a) SHA1(1de3ac4a150160c15f453b0d3f9d3cd3178bfedd) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/*  Witch Card (Spanish, set 2)
+    Unknown argentine manufacturer.
+*/
+ROM_START( witchcdb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w_card.128", 0x4000, 0x4000, CRC(11ecac96) SHA1(717709b31f3dfa09be321c14fbf0e95d492ad2f2) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "bs_4_wcspa.032", 0x2000, 0x1000, CRC(4e520c7a) SHA1(1de3ac4a150160c15f453b0d3f9d3cd3178bfedd) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/*  Witch Card (English, no witch game)
+    Hack?
+*/
+ROM_START( witchcdc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wc_sbruj.256",   0x0000, 0x8000, CRC(5689ae41) SHA1(c7a624ec881204137489b147ce66cc9a9900650a) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "bs_4_wc.032",    0x2000, 0x1000, CRC(41924d13) SHA1(8ab69b6efdc20858960fa5df669470ba90b5f8d7) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/***************************************
+
+  Witch Card (German, WC3050, set 1 )
+
+  TV GAME ELEKTRONIK 1994
+         PROMA
+   CASINOVERSION WC3050
+
+***************************************/
+ROM_START( witchcdd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "12a.bin",    0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "ce-3-tvg.bin",   0x4000, 0x2000, CRC(54b51497) SHA1(8c3a74377fde8c7c5a6b277a9c1e717e6bdd98f8) )    /* text layer */
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "ce-1-tvg.bin",   0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "ce-2-tvg.bin",   0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*  Witch Card (Video Klein)
+    Video Klein original with epoxy block module.
+    Alt set....
+*/
+	ROM_START( witchcde )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27128_epoxy.bin",    0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )  /* epoxy block program ROM */
+
+	ROM_REGION( 0x4000, "temp", 0 )
+	ROM_LOAD( "wc1.a2", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )
+	ROM_LOAD( "wc2.a4", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )
+	ROM_LOAD( "wc3.a5", 0x2000, 0x1000, CRC(a03f2d68) SHA1(6d81b1e92f40f7150498b65941d5a9ab64a89790) )
+	ROM_LOAD( "wc4.a7", 0x3000, 0x1000, CRC(d3694522) SHA1(0f66ff2dd5c7ac9bf91fa9f48eb9f356572e814c) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4.8a",   0x1000, 0x0800, CRC(1cdd1db9) SHA1(1940c6654b4a892abc3e4557666d341f407ac54f) )  /* chars gfx */
+	ROM_FILL(                   0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_COPY( "temp",   0x3800, 0x1000, 0x0800 )    /* 0800-0fff of wc4.a7 - charset */
 
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(40c52b9d) SHA1(64145bd2aa19b584fa56022303dc595320952c24) )  /* tiles, bitplane1 */
-	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(b0b61ffa) SHA1(d0a01027bd6acd7c72eb5bbdb37d6dd97df8aced) )  /* tiles, bitplane2 */
-	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(151e4af7) SHA1(a44feaa69a00a6db31c018267b8b67a248e7c66e) )  /* tiles, bitplane3 */
+	ROM_REGION( 0x1800, "gfx2", 0 ) /* 2nd half of each ROM */
+	ROM_COPY( "temp",   0x0800, 0x0000, 0x0800 )    /* 0800-0fff of wc1.a2 - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",   0x1800, 0x0800, 0x0800 )    /* 0800-0fff of wc2.a4 - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",   0x2800, 0x1000, 0x0800 )    /* 0800-0fff of wc3.a5 - regular cards gfx, bitplane 3 */
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise the game isn't stable */
-	ROM_LOAD( "genie_nvram.bin", 0x0000, 0x0800, CRC(1b062ae7) SHA1(9d01635f3968d4b91b4a5d9fadfaf6edd0dea7ba) )
-
-	ROM_REGION( 0x0100, "proms", 0 )    /* using original golden poker color prom */
-	ROM_LOAD( "n82s129.9c", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "24s10.bin",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
+	ROM_LOAD( "24s10_epoxy.bin",    0x0100, 0x0100, CRC(ddfd7034) SHA1(78dee69ab4ba759485ee7f00446c2d86f08cc50f) ) /* original epoxy block PROM */
 ROM_END
 
-// Unknown on Blue PCB ICP-1
-// Attract works, but hang when coin.
-// Need to improve the memory map...
-// checking the connected CPU addressing lines.
-// and guess how map the ROM 15a (vectors + a few routines)
-ROM_START( geniea )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2732.16a", 0x2000, 0x1000, CRC(c96ef87b) SHA1(a67f290d13fbe33dc7c29271be6f5ef0ec13e927) )
-	ROM_LOAD( "2732.17a", 0x3000, 0x1000, CRC(dcbfc29b) SHA1(a512b4bd4ab682810d8c432cca03f4320df9928b) )
-	ROM_LOAD( "2732.15a", 0x7000, 0x1000, CRC(7137aa06) SHA1(1a2af7dfe41e54fc9c3b4e641319d1a504e84a18) )
+/*  Witch Card (English, witch game, lights)
+    PCB by PM. Hybrid hardware.
 
-//	ROM_REGION( 0x1000, "temp", 0 ) // Only has vectors and a couple of routines. Just till know how to map it...
-//	ROM_LOAD( "2732.15a", 0x7000, 0x1000, CRC(7137aa06) SHA1(1a2af7dfe41e54fc9c3b4e641319d1a504e84a18) )
+    Copyright 1983/84/85
+    W.BECK ELEKTRONIK
+*/
+ROM_START( witchcdf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "$25.bin",    0x5000, 0x1000, CRC(afd6cb4a) SHA1(4c769e1c724bada5875e028781086c32967953a1) )
+	ROM_LOAD( "$26.bin",    0x6000, 0x1000, CRC(ad11960c) SHA1(2b562cfe9401e21c9dcd90307165e2c2d1acfc5b) )
+	ROM_LOAD( "$27.bin",    0x7000, 0x1000, CRC(e6f9c973) SHA1(f209d13d1565160bc2c05c6c4fce73d14a9a56ab) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "2732.9a",    0x2000, 0x1000, BAD_DUMP CRC(ffb7bca3) SHA1(b58175c0342f963cb42a04195e296db952e071b6) )    /* chars + bitplane3 */
+	ROM_LOAD( "$14.bin",    0x2000, 0x1000, CRC(19b68bec) SHA1(b8ef17ba5545e2f104cd2783e5f1c97c400fcbbc) )    /* text layer */
 
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "2716.4a",   0x0000, 0x0800, CRC(40c52b9d) SHA1(64145bd2aa19b584fa56022303dc595320952c24) )  /* tiles, bitplane1 */
-	ROM_LOAD( "2716.6a",   0x0800, 0x0800, CRC(b0b61ffa) SHA1(d0a01027bd6acd7c72eb5bbdb37d6dd97df8aced) )  /* tiles, bitplane2 */
-	ROM_COPY( "gfx1",      0x2800, 0x1000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "11.bin", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "12.bin", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "13.bin", 0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
 
-	ROM_REGION( 0x0100, "proms", 0 )    /* using original golden poker color prom */
-	ROM_LOAD( "n82s129.9c", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wc_bprom.bin",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/*******************************************
 
-/****************************************************
+  Witch Card (Falcon)
+  Original Falcon PCB marked
+  "831 1.1 MADE IN JAPAN"
 
-  Silver Game.
-  1983.
+  Same board as Falcons Wild, but without
+  extra RAM / ROM / encrypted 2nd CPU.
 
-  6502 CPU
-  2*6821 ios
-  mc6845 video chip
-  10mhz (?) xtal
+  AY8910 is present.
 
-  There are French strings related to the game, so maybe is
-  a leftover, or maybe there is a unknown way to switch the
-  language.
-
-
-*****************************************************/
-
-ROM_START( silverga )
+*******************************************/
+ROM_START( witchcdg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "14", 0x5000, 0x1000, CRC(e4691878) SHA1(376c3910030f27517d798aac759553d5634b8ffc) )
-	ROM_LOAD( "55", 0x6000, 0x2000, CRC(aad57b3c) SHA1(9508026c1a7b227a70d89ad2f7245e75a615b932) )
+	ROM_LOAD( "6.b9",   0x5000, 0x1000, CRC(70462a63) SHA1(9dfa18bf7d4e0803f2a68e64661ece392a7983cc) )
+	ROM_LOAD( "7.b11",  0x6000, 0x1000, CRC(227b3801) SHA1(aebabce01b1abdb42b3e49c38f4fe429e65c1a88) )
+	ROM_LOAD( "8.b13",  0x7000, 0x1000, CRC(6bb0059e) SHA1(c5f515b692c3353323aff77f087bf0a92a8d99cf) )
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "3.b5",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_FILL(           0x0800, 0x0800, 0 ) /* filling the bitplane */
+	ROM_LOAD( "2.b3",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_FILL(           0x1800, 0x0800, 0 ) /* filling the bitplane */
+	ROM_LOAD( "1.b1",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )    /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "13",     0x2000, 0x1000, CRC(98b8cb4f) SHA1(420ea544a41e24478a8eb1c7076f4569607d0379) )    /* text layer */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "11",     0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "12",     0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_COPY( "gfx1",   0x2800, 0x1000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd half of the char rom */
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    /* srctag, srcoffs, offset, length */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "s287",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+//  ROM_LOAD( "82s129.7d",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
+	ROM_LOAD( "tbp24s10n.d2",   0x0000, 0x0100, BAD_DUMP CRC(3db3b9e0) SHA1(c956493d5d754665d214b416e6a473d73c22716c) )
 ROM_END
 
-/***************************************************************
+/***************************************
 
-  Casino Poker
-  1987, PM / Beck Elektronik
+  Witch Card (German, WC3050, set 2 )
 
-  1x Xtal 10.000 MHz.
-  1x UM6502A
-  2x UM6521A
-  1x UM6845
+  TV GAME ELEKTRONIK 1994
+         PROMA
+   CASINOVERSION WC3050
 
-  GFX ROMS 051, 052, 053 and 054 have duplicated halves.
-
-  Bipolar PROM 24sa10 is filled with 0x09, so has at least
-  fixed bits 0 and 3 along the whole data. Needs a redump
-  using a supported EEPROM programmer.
-
-  Discrete sound circuitry was traced, being identical to the Golden Poker one.
-  Only difference is the PC617 replaced by one PC817.
-
-  The sound is ugly and seems that was programmed that way.
-
-***************************************************************/
-
-ROM_START( caspoker )
+***************************************/
+ROM_START( witchcdh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "234.bin",    0x4000, 0x1000, CRC(174bc526) SHA1(faef01484f0e0ea769d7bd2c5ad03369a6fdf037) )
-	ROM_LOAD( "235.bin",    0x5000, 0x1000, CRC(2e43552f) SHA1(5fbe0e62dec960850ef5f937254858fcd4da9e64) )
-	ROM_LOAD( "236.bin",    0x6000, 0x1000, CRC(3f4cfa39) SHA1(e2750a9c5d12c668e599181ee3972c5d78bd0006) )
-	ROM_LOAD( "237.bin",    0x7000, 0x1000, CRC(b411d0c4) SHA1(0617cd312026da78a171fc23f4788393d70371cf) )
+	ROM_LOAD( "prog3000.a12",   0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "054.bin",    0x1000, 0x0800, CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )    /* text chars */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "wc3050.a5",  0x4000, 0x2000, CRC(6f35b9c4) SHA1(df86687164f18f2bfe71e73cccd28fe4117e748c) )    /* text layer, alt gfx */
 
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "051.bin",    0x0000, 0x0800, CRC(82d823e5) SHA1(75bdf427a6204ef87444be0d8b06a07c5a2fc38f) )    /* cards deck gfx, bitplane1 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-	ROM_LOAD( "052.bin",    0x0800, 0x0800, CRC(eda12738) SHA1(ec7806c2bf1a238f489459c3c3653f43febaa464) )    /* cards deck gfx, bitplane2 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-	ROM_LOAD( "053.bin",    0x1000, 0x0800, CRC(d147ae0a) SHA1(dfdf0a42eb0a6f2afc9f301b0cf01411085247bd) )    /* cards deck gfx, bitplane3 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise settings parameters are incorrect */
-	ROM_LOAD( "caspoker_nvram.bin", 0x0000, 0x0800, CRC(be6e2671) SHA1(aef1b09d09e07eb39480a7901ed8535f74e461fa) )
-
-	ROM_REGION( 0x0100, "proms", 0 )    /* from other games */
-	ROM_LOAD( "24sa10.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-/****************************************************
-
-  Unknown poker game, set 1.
-  198?.
-
-  There are French strings related to the game into
-  the program ROM.
-
-  The dump lacks of 1 program ROM located at 17a.
-  (empty socket in the PCB picture)
-
-*****************************************************/
-
-ROM_START( pokerdub )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "15a_f_83.15a",   0x2000, 0x1000, CRC(06571884) SHA1(6823f5d4a2fc5adf51f1588273f808a2a25a15bc) )
-	ROM_LOAD( "unknown.17a",    0x3000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4.8a",   0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* char ROM (cracked title) */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "wc1.a2", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */ // sldh
+	ROM_LOAD( "wc1.a4", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */ // sldh
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "s287.8c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_LOAD( "tbp24s10n.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-/****************************************************
+/***************************************
 
-  Unknown poker game, set 2.
-  198?.
+  Witch Card (German, WC3050, 27-4-94)
 
-  This one is totally encrypted.
-  The PCB has a daughterboard coated with some plastic
-  or epoxy resin.
+  TV GAME ELEKTRONIK 1994
+         PROMA
+   CASINOVERSION WC3050
 
-  Char ROM is identical to the Witch Card one.
+****************************************
 
-*****************************************************/
+01.a2                                           BADADDR           --xxxxxxxxxx
+02.a4                                           BADADDR           --xxxxxxxxxx
+03.a5                                           1ST AND 2ND HALF IDENTICAL
+27s21.d7                                        FIXED BITS (0000xxxx)
+                        tbp24s10n.7d            FIXED BITS (0000xxxx)
+                        ce-2-tvg.bin            BADADDR           --xxxxxxxxxx
+                        ce-1-tvg.bin            BADADDR           --xxxxxxxxxx
+01.a2                   ce-1-tvg.bin            IDENTICAL
+02.a4                   ce-2-tvg.bin            IDENTICAL
+27s21.d7                tbp24s10n.7d            IDENTICAL
+03.a5        [2/4]      ce-3-tvg.bin [2/4]      IDENTICAL
+04.a12       [2/4]      12a.bin      [2/4]      IDENTICAL
+03.a5        [2/4]      ce-3-tvg.bin [4/4]      IDENTICAL
+03.a5        [4/4]      ce-3-tvg.bin [2/4]      IDENTICAL
+03.a5        [4/4]      ce-3-tvg.bin [4/4]      IDENTICAL
+04.a12       [1/4]      12a.bin      [1/4]      99.609375%
+04.a12       [3/4]      12a.bin      [3/4]      99.414063%
+04.a12       [4/4]      12a.bin      [4/4]      96.020508%
+03.a5        [1/4]      ce-3-tvg.bin [1/4]      88.378906%
+03.a5        [3/4]      ce-3-tvg.bin [1/4]      88.378906%
 
-ROM_START( pokerduc )
+***************************************/
+ROM_START( witchcdi )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b",  0x5000, 0x1000, CRC(8627fba5) SHA1(b94665f0bf425ff71f78c1258f910323c2a948f0) )
-	ROM_LOAD( "c",  0x6000, 0x1000, CRC(b35b4108) SHA1(6504ba55511637334c65e88ee5c60b1503b854b3) )
-	ROM_LOAD( "d",  0x7000, 0x1000, CRC(c48096ed) SHA1(279ba433369c7dc9cd902a19200e889eea45d115) )
+	ROM_LOAD( "04.a12", 0x0000, 0x8000, CRC(0f662e02) SHA1(71d7344f63c11082beb4fb4eeb20b04780a9b14c) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "a.8a",   0x1000, 0x0800, CRC(c70a3e49) SHA1(eb2f15b344f4dec5f05701415848c854bb27aaa3) )    /* char ROM (cracked title) */
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "03.a5",  0x4000, 0x2000, CRC(f181e5aa) SHA1(44a7696bd223effbc7542142a0c3c623c628071d) )    /* text layer */
 
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
-	ROM_IGNORE(                 0x0800) /* identical halves */
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "01.a2",  0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "02.a4",  0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24s10.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_LOAD( "27s21.d7",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/******************************************
+
+  Witch Game (Video Klein)
+
+  Another evil hardware from Video Klein
+  with CPU box. Marked "12T1"
+
+******************************************/
+ROM_START( witchgme )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Video Klein */
+	ROM_LOAD( "hn58c256p.box12t1",  0x0000, 0x8000, CRC(26c334cb) SHA1(d8368835c88668f09560f6096148a6e528806f65) )
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  /* cards deck gfx, bitplane1 */
+	ROM_FILL(           0x0800, 0x0800, 0 ) /* filling the bitplane */
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  /* cards deck gfx, bitplane2 */
+	ROM_FILL(           0x1800, 0x0800, 0 ) /* filling the bitplane */
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  /* text layer */
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    /* srctag, srcoffs, offset, length */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*  Witch Game (Video Klein)
+    Video Klein original with epoxy block module.
+    Alt set....
+*/
+	ROM_START( witchcdk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wc_epoxy.bin",   0x0000, 0x8000, CRC(33f1acd9) SHA1(2facb3d807b5b2a2978e567d0c1106c0a027621a) )  /* epoxy block program ROM */
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "wc4.7a",  0x2000, 0x1000, BAD_DUMP CRC(3bf07c44) SHA1(f6e859b142b7d4585b89ca609d8bc85c84fe2b09) )    /* text chars, corrupt */ // sldh
+	ROM_COPY( "gfx1",    0x2800, 0x2000, 0x0800 )   /* srctag, srcoffs, offset, length */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "wc1.2a", 0x0000, 0x1000, CRC(f59c6fd2) SHA1(bea4b6043728311ca9fff36e2d7e24254af5b97a) )    /* cards deck gfx, bitplane1 */ // sldh
+	ROM_LOAD( "wc2.4a", 0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "wc3.5a", 0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "24s10.bin",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
+	ROM_LOAD( "82s137_epoxy.bin",   0x0100, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) ) /* original epoxy block PROM */
 ROM_END
 
 
@@ -6032,7 +5420,7 @@ ROM_END
 
 /****************************************************
 
-  Wild Witch (Video Klein)
+  Wild Witch sets...
 
   Another evil hardware from Video Klein
   with CPU box.
@@ -8253,7 +7641,7 @@ ROM_END
 
 /************************************************
 
-  Witch Up & Down
+  Witch Up & Down sets...
   (1988, Video Klein)
 
   16 gfx banks!!!.
@@ -8923,7 +8311,7 @@ ROM_END
 
 /*********************************************
 
-   Witch Jack
+   Witch Jack sets...
    1992-1996 Video Klein
 
 *********************************************/
@@ -9021,844 +8409,7 @@ ROM_START( wtchjack )   /* Witch Jack 0.87-89 / 1996-10-08, GFX OK */
 ROM_END
 
 
-ROM_START( wtchjacka )  /* Witch Jackpot 0.25 / 1994-11-24 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x5015.bin",   0x8000, 0x8000, CRC(bc0e6b78) SHA1(29482035f6122385447009abd695ed52fc669158) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjackb )  /* Witch Jack 0.40 / 1995-02-27 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x5040.bin",   0x8000, 0x8000, CRC(2f0f1d7a) SHA1(048d0641a4e03a77f4964898ad2c224cb487aa36) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjackc )  /* Witch Jack 0.40T / 1995-02-27, Not Working */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x5t40.bin",   0x8000, 0x8000, CRC(a3a4f1d3) SHA1(16dcaf880134f10152703cb3ca81dfcbe48bff8b) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjackd )  /* Witch Jack 0.62 / 1995-08-02 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x563.bin",    0x8000, 0x8000, CRC(55e74382) SHA1(af0a890c55db36e8a2f847ea103858cc7b7115be) )  //
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjacke )  /* Witch Jack 0.64 / 1995-09-13 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x564p.bin",   0x8000, 0x8000, CRC(7ee61b69) SHA1(313b750a7949f4d08cdf79c068d01ed91fc66dce) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjackf )  /* Witch Jack 0.65 / 1995-10-19 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x565p.bin",   0x8000, 0x8000, CRC(20c23876) SHA1(ca2309766a68ba280d71b3b62e00d38d70b8536a) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjackg )  /* Witch Jack 0.70S / 1996-03-26 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x570s.bin",   0x8000, 0x8000, CRC(294e3ac6) SHA1(e58c38ae341dcb48572f8852ec858ef8433c6f95) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjackh )  /* Witch Jack 0.70P / 1996-03-26 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x570p.bin",   0x8000, 0x8000, CRC(d77d8119) SHA1(c8999e3c55257750f27f1683f5b416e8e4e4297d) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjacki )  /* Witch Jack 0.87 / 1996-07-16, GFX OK */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x5087.bin",   0x8000, 0x8000, CRC(b027d8a5) SHA1(f06b92cc7aacadca1b8c98bda19efa670596891c) )
-
-	ROM_REGION( 0x18000, "temp", 0 )
-	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
-	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
-	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
-
-	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
-	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx4", 0 )
-	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx5", 0 )
-	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx6", 0 )
-	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx7", 0 )
-	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx8", 0 )
-	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx9", 0 )
-	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx10", 0 )
-	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx11", 0 )
-	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx12", 0 )
-	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx13", 0 )
-	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx14", 0 )
-	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
-	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
-	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
-
-	ROM_REGION( 0x1800, "gfx15", 0 )
-	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
-	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
-	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
-ROM_END
-
-
-ROM_START( wtchjackj )  /* Witch Jack 0.87-88 / 1996-10-02, GFX OK */
+ROM_START( wtchjacka )  /* Witch Jack 0.87-88 / 1996-10-02, GFX OK */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wj5x5088.bin",   0x8000, 0x8000, CRC(08143537) SHA1(ef16531bcf955daded1be406dd3f61f37070298c) )
 
@@ -9951,6 +8502,1440 @@ ROM_START( wtchjackj )  /* Witch Jack 0.87-88 / 1996-10-02, GFX OK */
 ROM_END
 
 
+ROM_START( wtchjackb )  /* Witch Jack 0.87 / 1996-07-16, GFX OK */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x5087.bin",   0x8000, 0x8000, CRC(b027d8a5) SHA1(f06b92cc7aacadca1b8c98bda19efa670596891c) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjackc )  /* Witch Jack 0.70S / 1996-03-26 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x570s.bin",   0x8000, 0x8000, CRC(294e3ac6) SHA1(e58c38ae341dcb48572f8852ec858ef8433c6f95) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjackd )  /* Witch Jack 0.70P / 1996-03-26 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x570p.bin",   0x8000, 0x8000, CRC(d77d8119) SHA1(c8999e3c55257750f27f1683f5b416e8e4e4297d) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjacke )  /* Witch Jack 0.65 / 1995-10-19 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x565p.bin",   0x8000, 0x8000, CRC(20c23876) SHA1(ca2309766a68ba280d71b3b62e00d38d70b8536a) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjackf )  /* Witch Jack 0.64 / 1995-09-13 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x564p.bin",   0x8000, 0x8000, CRC(7ee61b69) SHA1(313b750a7949f4d08cdf79c068d01ed91fc66dce) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjackg )  /* Witch Jack 0.62 / 1995-08-02 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x563.bin",    0x8000, 0x8000, CRC(55e74382) SHA1(af0a890c55db36e8a2f847ea103858cc7b7115be) )  //
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjackh )  /* Witch Jack 0.40T / 1995-02-27, Not Working */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x5t40.bin",   0x8000, 0x8000, CRC(a3a4f1d3) SHA1(16dcaf880134f10152703cb3ca81dfcbe48bff8b) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjacki )  /* Witch Jack 0.40 / 1995-02-27 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x5040.bin",   0x8000, 0x8000, CRC(2f0f1d7a) SHA1(048d0641a4e03a77f4964898ad2c224cb487aa36) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wtchjackj )  /* Witch Jackpot 0.25 / 1994-11-24 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x5015.bin",   0x8000, 0x8000, CRC(bc0e6b78) SHA1(29482035f6122385447009abd695ed52fc669158) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "wj5x5_1zs.bin",  0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
+	ROM_LOAD( "wj5x5_2zs.bin",  0x08000, 0x8000, BAD_DUMP CRC(0f4e9f82) SHA1(a22bbbf0130dd6ece61189ce81a3376213617509) )
+	ROM_LOAD( "wj5x5_3zs.bin",  0x10000, 0x8000, BAD_DUMP CRC(708e1d7f) SHA1(518312fd0bc24d7895eae0cfa9dbad99e1adf67c) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* 0000-07ff of rom1.bin - char rom (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   /* 0800-0fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   /* 0800-0fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   /* 1000-17ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   /* 0000-07ff of rom2.bin - regular pin gfx (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   /* 0000-07ff of rom3.bin - regular pin gfx (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   /* 0800-0fff of rom1.bin - regular pin gfx (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   /* 4000-47ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   /* 4000-47ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   /* 4800-4fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   /* 1800-1fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   /* 1800-1fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   /* 2800-2fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   /* 2800-2fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   /* 3000-37ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   /* 2000-27ff of rom2.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   /* 2000-27ff of rom3.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   /* 2800-2fff of rom1.bin - 'Video Klein' logo lower tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   /* 6800-6fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   /* 6800-6fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   /* 7000-77ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   /* 3800-3fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   /* 3800-3fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   /* 4800-4fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   /* 4800-4fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   /* 4000-47ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   /* 1000-17ff of rom2.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   /* 1000-17ff of rom3.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   /* 1800-1fff of rom1.bin - extended pin gfx and logo upper tiles (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   /* 5000-57ff of rom2.bin - empty (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   /* 5000-57ff of rom3.bin - empty (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   /* 5800-5fff of rom1.bin - empty (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   /* 5800-5fff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   /* 5800-5fff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   /* 6000-67ff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   /* 6000-67ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   /* 6000-67ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   /* 6800-6fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   /* 3000-37ff of rom2.bin - garbage (placed ok), bitplane 1 */
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   /* 3000-37ff of rom3.bin - garbage (placed ok), bitplane 2 */
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   /* 3800-3fff of rom1.bin - garbage (placed ok), bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   /* 7000-77ff of rom2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   /* 7000-77ff of rom3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   /* 7800-7fff of rom1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wjack_tbp.bin",  0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+/******************************* FALCONS WILD SETS *******************************/
+
+
+/*********************************************
+
+    Falcons Wild - Wild Card 1991.
+    1992-1992 TVG D-6310 GRUENBERG.
+    (bootleg in real Bonanza hardware).
+
+  dm74s287n.7d     FIXED BITS (0000xxxx)
+  fw1.2a           BADADDR     x-xxxxxxxxxxx
+  fw2.4a           BADADDR     x-xxxxxxxxxxx
+  fw3.5a           1ST AND 2ND HALF IDENTICAL
+  nosticker.12a    x0xxxxxxxxxxxxxx = 0x00
+
+  fw3.5a is bitrotten.
+
+**********************************************/
+ROM_START( falcnwld )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Falcons Wild */
+	ROM_LOAD( "nosticker.12a",  0x0000, 0x10000, CRC(54ae4a8a) SHA1(0507098b53d807059b78ec098203d095d19028f8) )
+
+	ROM_REGION( 0x6000, "temp", 0 )
+	ROM_LOAD( "fw1.2a", 0x0000, 0x2000, CRC(d5a58098) SHA1(9c8860949b0adcd20222e9b3e3e8e7e864e8f39f) )  /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "fw2.4a", 0x2000, 0x2000, CRC(b28b7759) SHA1(513229cee451f59f824b7a64932679f91fbb324d) )  /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "fw3.5a", 0x4000, 0x2000, BAD_DUMP CRC(98edfc82) SHA1(e3dd597245b55c3bc6ea86acf80ee024ca28f564) )  /* text layer + cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x4000, 0x1000, 0x0800 )    /* first quarter of fw3.5a */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x0000, 0x0000, 0x0800 )    /* first quarter of fw1.2a */
+	ROM_COPY( "temp",   0x2000, 0x0800, 0x0800 )    /* first quarter of fw2.4a */
+	ROM_COPY( "temp",   0x4800, 0x1000, 0x0800 )    /* second quarter of fw3.5a */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dm74s287n.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/************************************
+
+  Falcon's Wild - World Wide Poker.
+  1991, Video Klein
+
+  CPU BOX
+
+************************************/
+ROM_START( falcnwlda )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Falcons Wild, Video Klein */
+	ROM_LOAD( "nmc27c256.box",  0x0000, 0x8000, CRC(a0072c55) SHA1(27b84a896ff06a423450d8f0851f42f3e8ec5466) )
+	ROM_RELOAD(                 0x8000, 0x8000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling bitplanes */
+	ROM_LOAD( "fw4.7a", 0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* chars gfx */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "fw1.2a", 0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */ // sldh
+	ROM_IGNORE(                 0x0800)
+	ROM_LOAD( "fw2.4a", 0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */ // sldh
+	ROM_LOAD( "fw3.5a", 0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */ // sldh
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+ROM_START( falcnwldb )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* World Wide Poker / 1992-11-04 */
+	ROM_LOAD( "fw12t1_19921104.bin",    0x0000, 0x8000, CRC(8b4f8cac) SHA1(e3bcbadaa157db48a41369a3fcdba536f8ca679e) )
+	ROM_RELOAD(                         0x8000, 0x8000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling bitplanes */
+	ROM_LOAD( "fw4.7a", 0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* chars gfx */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "fw1.2a", 0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */ // sldh
+	ROM_IGNORE(                 0x0800)
+	ROM_LOAD( "fw2.4a", 0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */ // sldh
+	ROM_LOAD( "fw3.5a", 0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */ // sldh
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/***********************************************
+
+  Falcon's Wild - World Wide Poker
+  1983, Falcon.
+
+  Original Falcon PCB marked
+  "831 1.1 MADE IN JAPAN"
+
+  Same board as Witch Card (Falcon), but with
+  extra RAM + ROM + encrypted 2nd CPU + AY8910.
+
+  The encrypted 40-pin CPU is scratched,
+  and seems based on a Z80.
+
+***********************************************/
+ROM_START( falcnwldc )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Falcons Wild, Falcon original */
+//  ROM_LOAD( "nosticker.12a",  0x0000, 0x10000, CRC(54ae4a8a) SHA1(0507098b53d807059b78ec098203d095d19028f8) )
+	ROM_LOAD( "4.b6",           0x3000, 0x1000, CRC(88684a8f) SHA1(5ffa0808b502e93ddcb8f13929008aec2836a773) )
+	ROM_LOAD( "5.b8",           0x4000, 0x1000, CRC(aa5de05c) SHA1(98559b35c7c31a41b1818a6e60ec82f43a5d1b4a) )
+	ROM_LOAD( "6-syncmod.b9",   0x5000, 0x1000, CRC(21cfa807) SHA1(ff908a5a43b3736494127539d6485648d8be1a9a) )  // ok
+	ROM_LOAD( "7.b11",          0x6000, 0x1000, CRC(d63bba8e) SHA1(09902574985a945117ec22d738c94fee72e673af) )
+	ROM_LOAD( "8.b13",          0x7000, 0x1000, CRC(251d6abf) SHA1(2384ae674bfbe96c19a3b66c7efa1e5e8b444f48) )  // ok
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "9.f10",  0x0000, 0x1000, CRC(22f1c52a) SHA1(6429a802e92f6b77446550a303567798a231f6d7) )  // MCU prg
+
+	ROM_REGION( 0x6000, "temp", 0 )
+	ROM_LOAD( "1.b1",   0x0000, 0x1000, CRC(fd95955d) SHA1(e5c029bc5683d06c2e5250c1271613232a058fcd) )
+	ROM_LOAD( "2.b3",   0x1000, 0x0800, CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )
+	ROM_LOAD( "3.b4",   0x1800, 0x0800, CRC(d9246780) SHA1(4ceb24131ec6208b742ba80373201aa53c50732d) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 )         /* filling bitplanes */
+	ROM_COPY( "temp",   0x0800, 0x1000, 0x0800 )    /* second half of 1.b1 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x1800, 0x0000, 0x0800 )    /* first half of 3.b4 */
+	ROM_COPY( "temp",   0x1000, 0x0800, 0x0800 )    /* whole 2.b3 */
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    /* first half of 1.b1 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "falcon_1.bin",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
+/**************************************** OTHER SETS ****************************************/
+
+
+ROM_START( pmpoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2-5.bin",    0x5000, 0x1000, CRC(3446a643) SHA1(e67854e3322e238c17fed4e05282922028b5b5ea) )
+	ROM_LOAD( "2-6.bin",    0x6000, 0x1000, CRC(50d2d026) SHA1(7f58ab176de0f0f7666d87271af69a845faec090) )
+	ROM_LOAD( "2-7.bin",    0x7000, 0x1000, CRC(a9ab972e) SHA1(477441b7ff3acae3a5d5a3e4c2a428e0b3121534) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "1-4.bin",    0x1000, 0x0800, CRC(62b9f90d) SHA1(39c61a01225027572fdb75543bb6a78ed74bb2fb) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1-1.bin",    0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1-2.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "1-3.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10n.7d",      0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( royale )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "royalex.bin",    0x4000, 0x4000, CRC(ef370617) SHA1(0fc5679e9787aeea3bc592b36efcaa20e859f912) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "royalechr.bin",  0x2000, 0x1000, CRC(b1f2cbb8) SHA1(8f4930038f2e21ca90b213c35b45ed14d8fad6fb) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "royale3.bin",    0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "royale2.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "royale1.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( royalea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "royal.256",  0x0000, 0x8000, CRC(9d7fdb79) SHA1(05cae00bca0f6ae696c69f531cb0fa2104ff696a) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "royalechr.bin",  0x2000, 0x1000, CRC(b1f2cbb8) SHA1(8f4930038f2e21ca90b213c35b45ed14d8fad6fb) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "royale3.bin",    0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "royale2.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "royale1.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( sloco93 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "locoloco.128",   0x4000, 0x4000, CRC(f626a770) SHA1(afbd33b3f65b8a781c716a3d6e5447aa817d856c) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "confloco.032",   0x2000, 0x1000, CRC(b86f219c) SHA1(3f655a96bcf597a271a4eaaa0acbf8dd70fcdae9) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( sloco93a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "locoloco.256",   0x0000, 0x8000, CRC(ab037b0b) SHA1(16f811daaed5bf7b72549db85755c5274dfee310) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "confloco.032",   0x2000, 0x1000, CRC(b86f219c) SHA1(3f655a96bcf597a271a4eaaa0acbf8dd70fcdae9) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/*
+    checksum routine at $5f3e
+    protect $4000+ & $7ff9.
+    (see cmp at $5f6b)
+    balanced at $7ff8.
+*/
+ROM_START( maverik )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* maverik: Maverik (ind arg, fixed, changed logo) */
+	ROM_LOAD( "maverik.bin",    0x0000, 0x8000, CRC(65a986e9) SHA1(2e825d3fb2346036357af0e12d3a75b5ef6cfd0d) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/*****************************
+
+  Brasil XX sets...
+
+ ****************************/
+ROM_START( brasil86 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil86.128: Brasil 86, BS clone. */
+	ROM_LOAD( "brasil86.128",   0x4000, 0x4000, CRC(0e88b434) SHA1(80f921c277f4253c29ee80e9cfb046ade1f66300) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( brasil87 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil87.128: Brasil 87, BS clone. */
+	ROM_LOAD( "brasil87.128",   0x4000, 0x4000, CRC(6cfdaea9) SHA1(0704e61c1c573e99e130c22787b529ac5544c631) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( brasil89 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil89.128: Brasil 89, BS clone. */
+	ROM_LOAD( "brasil89.128",   0x4000, 0x4000, CRC(9030e0db) SHA1(d073ed0ddd3e5df6a3387e10e05ca34bc491eb35) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( brasil89a )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil89a.128: Brasil 89a, BS clone. */
+	ROM_LOAD( "brasil89a.128",  0x4000, 0x4000, CRC(41a93a99) SHA1(70eeaddbdd9d3a587d1330b81d21d881ab0a8c91) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( brasil93 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* brasil93.128: Brasil 93, BS clone. No lights */
+	ROM_LOAD( "brasil93.128",   0x4000, 0x4000, CRC(cc25909f) SHA1(635184022bcb8936c396cb9fcfa6367fcae906fb) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( poker91 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* bs_pok91.bin: Poker 91. Based on witchcrd */
+	ROM_LOAD( "bs_pok91.bin",   0x0000, 0x8000, CRC(90c88b45) SHA1(9b5842075ece5f96a6869d7a8c874dee2b2abde2) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin", 0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/****************************************************
+
+  Genie (Video Fun Games Ltd.)
+  Skill game. Only for amusement.
+
+  PCB is a heavily modified Golden Poker hardware.
+  Silkscreened "ICP-1".
+
+  CPU:   1x SY6502.
+  Video: 1x HD6845P CRTC.
+  I/O:   2x HD6821P PIAs.
+
+  Sound: Discrete.
+
+  RAMs:  2x M5L5101LP-1.
+
+  ROMs:  2x 2732 for program. (2m.16a, 3m.17a)
+         1x 2716 for char gen. (4.8a)
+         3x 2716 for gfx bitplanes. (1.4a, 2.6a, 3.7a)
+
+  1x Reset switch. (R.SW)
+  1x 8 DIP switches bank.
+  1x 2x10 Edge connector. (GM1)
+  1x 2x22 Edge connector. (GM2)
+
+
+*****************************************************/
+ROM_START( genie )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2m.16a", 0x2000, 0x1000, CRC(30df75f5) SHA1(0696fb3db0b9927e6366db7316d605914ff8d464) )
+	ROM_LOAD( "3m.17a", 0x3000, 0x1000, CRC(9d67f5c9) SHA1(d3bc13ce07a7b1713544756d7723dd0bcd59cd1a) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",   0x1000, 0x0800, CRC(1cdd1db9) SHA1(1940c6654b4a892abc3e4557666d341f407ac54f) )  /* chars gfx */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(40c52b9d) SHA1(64145bd2aa19b584fa56022303dc595320952c24) )  /* tiles, bitplane1 */
+	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(b0b61ffa) SHA1(d0a01027bd6acd7c72eb5bbdb37d6dd97df8aced) )  /* tiles, bitplane2 */
+	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(151e4af7) SHA1(a44feaa69a00a6db31c018267b8b67a248e7c66e) )  /* tiles, bitplane3 */
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise the game isn't stable */
+	ROM_LOAD( "genie_nvram.bin", 0x0000, 0x0800, CRC(1b062ae7) SHA1(9d01635f3968d4b91b4a5d9fadfaf6edd0dea7ba) )
+
+	ROM_REGION( 0x0100, "proms", 0 )    /* using original golden poker color prom */
+	ROM_LOAD( "n82s129.9c", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+// Unknown on Blue PCB ICP-1
+// In fact alt set of Genie...
+ROM_START( geniea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732.16a", 0x2000, 0x1000, CRC(c96ef87b) SHA1(a67f290d13fbe33dc7c29271be6f5ef0ec13e927) )
+	ROM_LOAD( "2732.17a", 0x3000, 0x1000, CRC(dcbfc29b) SHA1(a512b4bd4ab682810d8c432cca03f4320df9928b) )
+	ROM_LOAD( "2732.15a", 0x7000, 0x1000, CRC(7137aa06) SHA1(1a2af7dfe41e54fc9c3b4e641319d1a504e84a18) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "2732.9a",    0x2000, 0x1000, BAD_DUMP CRC(ffb7bca3) SHA1(b58175c0342f963cb42a04195e296db952e071b6) )    /* chars + bitplane3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "2716.4a",   0x0000, 0x0800, CRC(40c52b9d) SHA1(64145bd2aa19b584fa56022303dc595320952c24) )  /* tiles, bitplane1 */
+	ROM_LOAD( "2716.6a",   0x0800, 0x0800, CRC(b0b61ffa) SHA1(d0a01027bd6acd7c72eb5bbdb37d6dd97df8aced) )  /* tiles, bitplane2 */
+	ROM_COPY( "gfx1",      0x2800, 0x1000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )    /* using original golden poker color prom */
+	ROM_LOAD( "n82s129.9c", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
+/****************************************************
+
+  Silver Game.
+  1983.
+
+  6502 CPU
+  2*6821 ios
+  mc6845 video chip
+  10mhz (?) xtal
+
+  There are French strings related to the game, so maybe is
+  a leftover, or maybe there is a unknown way to switch the
+  language.
+
+
+*****************************************************/
+ROM_START( silverga )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "14", 0x5000, 0x1000, CRC(e4691878) SHA1(376c3910030f27517d798aac759553d5634b8ffc) )
+	ROM_LOAD( "55", 0x6000, 0x2000, CRC(aad57b3c) SHA1(9508026c1a7b227a70d89ad2f7245e75a615b932) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "13",     0x2000, 0x1000, CRC(98b8cb4f) SHA1(420ea544a41e24478a8eb1c7076f4569607d0379) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "11",     0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "12",     0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",   0x2800, 0x1000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd half of the char rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "s287",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/***************************************************************
+
+  Casino Poker
+  1987, PM / Beck Elektronik
+
+  1x Xtal 10.000 MHz.
+  1x UM6502A
+  2x UM6521A
+  1x UM6845
+
+  GFX ROMS 051, 052, 053 and 054 have duplicated halves.
+
+  Bipolar PROM 24sa10 is filled with 0x09, so has at least
+  fixed bits 0 and 3 along the whole data. Needs a redump
+  using a supported EEPROM programmer.
+
+  Discrete sound circuitry was traced, being identical to the Golden Poker one.
+  Only difference is the PC617 replaced by one PC817.
+
+  The sound is ugly and seems that was programmed that way.
+
+***************************************************************/
+ROM_START( caspoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "234.bin",    0x4000, 0x1000, CRC(174bc526) SHA1(faef01484f0e0ea769d7bd2c5ad03369a6fdf037) )
+	ROM_LOAD( "235.bin",    0x5000, 0x1000, CRC(2e43552f) SHA1(5fbe0e62dec960850ef5f937254858fcd4da9e64) )
+	ROM_LOAD( "236.bin",    0x6000, 0x1000, CRC(3f4cfa39) SHA1(e2750a9c5d12c668e599181ee3972c5d78bd0006) )
+	ROM_LOAD( "237.bin",    0x7000, 0x1000, CRC(b411d0c4) SHA1(0617cd312026da78a171fc23f4788393d70371cf) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "054.bin",    0x1000, 0x0800, CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )    /* text chars */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "051.bin",    0x0000, 0x0800, CRC(82d823e5) SHA1(75bdf427a6204ef87444be0d8b06a07c5a2fc38f) )    /* cards deck gfx, bitplane1 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+	ROM_LOAD( "052.bin",    0x0800, 0x0800, CRC(eda12738) SHA1(ec7806c2bf1a238f489459c3c3653f43febaa464) )    /* cards deck gfx, bitplane2 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+	ROM_LOAD( "053.bin",    0x1000, 0x0800, CRC(d147ae0a) SHA1(dfdf0a42eb0a6f2afc9f301b0cf01411085247bd) )    /* cards deck gfx, bitplane3 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise settings parameters are incorrect */
+	ROM_LOAD( "caspoker_nvram.bin", 0x0000, 0x0800, CRC(be6e2671) SHA1(aef1b09d09e07eb39480a7901ed8535f74e461fa) )
+
+	ROM_REGION( 0x0100, "proms", 0 )    /* from other games */
+	ROM_LOAD( "24sa10.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/****************************************************
+
+  Super Double (Karateco)
+
+  French text with some intentional typos to fit size.
+  Uses both 0x2000..0x3fff and 0x7000..0x7fff ROM range.
+
+  This is either the game advertised as "The Double",
+  or a successor thereof.
+
+*****************************************************/
+ROM_START( superdbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sd6",  0x7000, 0x1000, CRC(3cf1ccb8) SHA1(c589ddf2e97abb9d95375d0964fd0aa6f7e2e468) )
+	ROM_LOAD( "sd7",  0x2000, 0x1000, CRC(f5136f82) SHA1(f086cd5495097ede037ea6cae584e95bfcd7b239) )
+	ROM_LOAD( "8",    0x3000, 0x1000, CRC(157332c2) SHA1(3c66200c49641b9d876c5fa134dd2f0e80136beb) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                 0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4",    0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1",    0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10n.7d",      0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/****************************************************
+
+  Unknown poker game, set 1.
+  198?.
+
+  There are French strings related to the game into
+  the program ROM.
+
+  The dump lacks of 1 program ROM located at 17a.
+  (empty socket in the PCB picture)
+
+*****************************************************/
+ROM_START( pokerdub )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15a_f_83.15a",   0x2000, 0x1000, CRC(06571884) SHA1(6823f5d4a2fc5adf51f1588273f808a2a25a15bc) )
+	ROM_LOAD( "unknown.17a",    0x3000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",   0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* char ROM (cracked title) */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "s287.8c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/****************************************************
+
+  Unknown poker game, set 2.
+  198?.
+
+  This one is totally encrypted.
+  The PCB has a daughterboard coated with some plastic
+  or epoxy resin.
+
+  Char ROM is identical to the Witch Card one.
+
+*****************************************************/
+ROM_START( pokerduc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b",  0x5000, 0x1000, CRC(8627fba5) SHA1(b94665f0bf425ff71f78c1258f910323c2a948f0) )
+	ROM_LOAD( "c",  0x6000, 0x1000, CRC(b35b4108) SHA1(6504ba55511637334c65e88ee5c60b1503b854b3) )
+	ROM_LOAD( "d",  0x7000, 0x1000, CRC(c48096ed) SHA1(279ba433369c7dc9cd902a19200e889eea45d115) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "a.8a",   0x1000, 0x0800, CRC(c70a3e49) SHA1(eb2f15b344f4dec5f05701415848c854bb27aaa3) )    /* char ROM (cracked title) */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
+	ROM_IGNORE(                 0x0800) /* identical halves */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 /*
 
   Bonne Chance!
@@ -9966,7 +9951,6 @@ ROM_END
             5f63
 
 */
-
 ROM_START( bchancep )   /* Bonne Chance! with PIAs 6821 */
 	ROM_REGION( 0x3000, "gfx", 0 )
 	ROM_LOAD( "84.bin",  0x0000, 0x1000, CRC(31f8104e) SHA1(b99f79019517ca90c48e9f303f41256d68faea91) )     /* cards deck gfx bitplane 3, identical halves */
@@ -10023,7 +10007,6 @@ ROM_END
   in banks of 0x4000 each.
 
 */
-
 ROM_START( pokermon )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 2 programs, selectable via DIP switch */
 	ROM_LOAD( "mbv_bi.bin",      0x0000, 0x8000, CRC(da00e08a) SHA1(98e52915178e29ab3ae674e6b895da14626d3dd8) )
@@ -10068,7 +10051,6 @@ ROM_START( pokersis )
 	ROM_LOAD( "n82s129n.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-
 /*
   Super 98',
   running in the ICP-1 boardset.
@@ -10076,7 +10058,6 @@ ROM_END
   Please read the 'Games Notes' section
   for game and debug notes / issues...
 */
-
 ROM_START( super98 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c256.17a",   0x0000, 0x8000, CRC(dfa319c5) SHA1(e1b2ef40350ee1f40272604cbe33b245210de003) )
@@ -10534,10 +10515,38 @@ GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, driver_device,  0,        
 GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrf,  pottnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 7, Royale GFX)", 0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrg,  pottnpkr, pottnpkr, potnpkra, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 8, Australian)", 0,                layout_goldnpkr )
-GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      0,                layout_goldnpkr )
+
+GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteb,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertec,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerted,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertee,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertef,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",           0,                layout_goldnpkr )
+GAME(  1991, bsuerteg,  bsuerte,  witchcrd, bsuertew, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",           0 )
+GAME(  1991, bsuerteh,  bsuerte,  witchcrd, bsuertew, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",           0 )
+GAMEL( 1991, bsuertei,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
+GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, driver_device,  0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
+
+GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, driver_device,  0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
+GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, driver_device,  0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,   layout_goldnpkr )
+GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, driver_device,  0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,   layout_goldnpkr )
+GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING )
 
 GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)", 0,                layout_goldnpkr )
 GAME(  1991, witchcda,  witchcrd, witchcrd, witchcda, driver_device,  0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)", 0 )
@@ -10588,46 +10597,17 @@ GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, driver_device,  0,        
 GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  goldnpkr_state, wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
 GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  goldnpkr_state, wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
 
-GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                       layout_goldnpkr )    /* Ver 0.87-89 / 1996-10-08 GFX OK */
-GAMEL( 1994, wtchjacka, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.25 / 1994-11-24 */
-GAMEL( 1995, wtchjackb, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.40 / 1995-02-27 */
-GAMEL( 1995, wtchjackc, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   MACHINE_NOT_WORKING,        layout_goldnpkr )    /* Ver 0.40T / 1995-02-27 */
-GAMEL( 1995, wtchjackd, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.62 / 1995-08-02 */
-GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.64 / 1995-09-13 */
-GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.65 / 1995-10-19 */
-GAMEL( 1996, wtchjackg, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70S / 1996-03-26 */
-GAMEL( 1996, wtchjackh, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70P / 1996-03-26 */
-GAMEL( 1996, wtchjacki, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                       layout_goldnpkr )    /* Ver 0.87 / 1996-07-16, GFX OK */
-GAMEL( 1996, wtchjackj, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                       layout_goldnpkr )    /* Ver 0.87-88 / 1996-10-02, GFX OK */
-
-GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteb,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertec,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerted,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertee,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertef,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",           0,                layout_goldnpkr )
-GAME(  1991, bsuerteg,  bsuerte,  witchcrd, bsuertew, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",           0 )
-GAME(  1991, bsuerteh,  bsuerte,  witchcrd, bsuertew, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",           0 )
-GAMEL( 1991, bsuertei,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
-GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, driver_device,  0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
-
-GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, driver_device,  0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
-GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, driver_device,  0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,   layout_goldnpkr )
-GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, driver_device,  0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,   layout_goldnpkr )
-GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING )
+GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                          layout_goldnpkr )    /* Ver 0.87-89 / 1996-10-08 GFX OK */
+GAMEL( 1996, wtchjacka, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                          layout_goldnpkr )    /* Ver 0.87-88 / 1996-10-02, GFX OK */
+GAMEL( 1996, wtchjackb, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                          layout_goldnpkr )    /* Ver 0.87 / 1996-07-16, GFX OK */
+GAMEL( 1996, wtchjackc, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70S / 1996-03-26 */
+GAMEL( 1996, wtchjackd, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70P / 1996-03-26 */
+GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.65 / 1995-10-19 */
+GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.64 / 1995-09-13 */
+GAMEL( 1995, wtchjackg, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.62 / 1995-08-02 */
+GAMEL( 1995, wtchjackh, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   MACHINE_NOT_WORKING,        layout_goldnpkr )    /* Ver 0.40T / 1995-02-27 */
+GAMEL( 1995, wtchjacki, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.40 / 1995-02-27 */
+GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.25 / 1994-11-24 */
 
 /*************************************** OTHER SETS ***************************************/
 
@@ -10649,6 +10629,7 @@ GAME(  198?, geniea,    genie,    geniea,   geniea,   driver_device,  0,        
 GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
 GAME(  1987, caspoker,  0,        goldnpkr, caspoker, driver_device,  0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  MACHINE_IMPERFECT_COLORS )
 
+GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
 GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            MACHINE_NOT_WORKING )   // encrypted.
 

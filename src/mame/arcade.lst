@@ -11231,11 +11231,36 @@ potnpkrd        // Bootleg
 potnpkre        // Bootleg
 potnpkrf        // Bootleg
 potnpkrg        // Bootleg
-goodluck        // Unknown
-superdbl        // 198? Karateco
 ngold           // 198? Unknown
 ngolda          // 198? Unknown
 ngoldb          // 198? Unknown
+goodluck        // Unknown
+bsuerte         // 1990, Unknown
+bsuertea        // 1991, Unknown
+bsuerteb        // 1991, Unknown
+bsuertec        // 1991, Unknown
+bsuerted        // 1991, Unknown
+bsuertee        // 1991, Unknown
+bsuertef        // 1991, Unknown
+bsuerteg        // 1991, Unknown
+bsuerteh        // 1991, Unknown
+bsuertei        // 1991, Unknown
+bsuertej        // 1991, Unknown
+bsuertek        // 1991, Unknown
+bsuertel        // 1991, Unknown
+bsuertem        // 1991, Unknown
+bsuerten        // 1991, Unknown
+bsuerteo        // 1991, Unknown
+bsuertep        // 1991, Unknown
+bsuerteq        // 1991, Unknown
+bsuerter        // 1991, Unknown
+bsuertes        // 1991, Unknown
+bsuertet        // 1991, Unknown
+bsuerteu        // 1991, Unknown
+falcnwld        // 1991, TVG
+falcnwlda       // (c) 1990, Video Klein
+falcnwldb       // (c) 1990, Video Klein
+falcnwldc       // (c) 1983, Falcon
 witchcrd        // (c) 1991, Video Klein
 witchcda        // 1991, Unknown
 witchcdb        // 1991, Unknown
@@ -11279,43 +11304,17 @@ wupndownc       // (c) 1998, Video Klein
 wupndownd       // (c) 1998, Video Klein
 wstrike         // (c) 1992, Video Klein
 wstrikea        // (c) 1992, Video Klein
-wtchjack        // (c) 1992-1996, Video Klein
-wtchjacka       // (c) 1992-1996, Video Klein
-wtchjackb       // (c) 1992-1996, Video Klein
-wtchjackc       // (c) 1992-1996, Video Klein
-wtchjackd       // (c) 1992-1996, Video Klein
-wtchjacke       // (c) 1992-1996, Video Klein
-wtchjackf       // (c) 1992-1996, Video Klein
-wtchjackg       // (c) 1992-1996, Video Klein
-wtchjackh       // (c) 1992-1996, Video Klein
-wtchjacki       // (c) 1992-1996, Video Klein
-wtchjackj       // (c) 1992-1996, Video Klein
-falcnwld        // 1991, TVG
-falcnwlda       // (c) 1990, Video Klein
-falcnwldb       // (c) 1990, Video Klein
-falcnwldc       // (c) 1983, Falcon
-bsuerte         // 1990, Unknown
-bsuertea        // 1991, Unknown
-bsuerteb        // 1991, Unknown
-bsuertec        // 1991, Unknown
-bsuerted        // 1991, Unknown
-bsuertee        // 1991, Unknown
-bsuertef        // 1991, Unknown
-bsuerteg        // 1991, Unknown
-bsuerteh        // 1991, Unknown
-bsuertei        // 1991, Unknown
-bsuertej        // 1991, Unknown
-bsuertek        // 1991, Unknown
-bsuertel        // 1991, Unknown
-bsuertem        // 1991, Unknown
-bsuerten        // 1991, Unknown
-bsuerteo        // 1991, Unknown
-bsuertep        // 1991, Unknown
-bsuerteq        // 1991, Unknown
-bsuerter        // 1991, Unknown
-bsuertes        // 1991, Unknown
-bsuertet        // 1991, Unknown
-bsuerteu        // 1991, Unknown
+wtchjack        // (c) 1996, Video Klein
+wtchjacka       // (c) 1996, Video Klein
+wtchjackb       // (c) 1996, Video Klein
+wtchjackc       // (c) 1996, Video Klein
+wtchjackd       // (c) 1996, Video Klein
+wtchjacke       // (c) 1995, Video Klein
+wtchjackf       // (c) 1995, Video Klein
+wtchjackg       // (c) 1995, Video Klein
+wtchjackh       // (c) 1995, Video Klein
+wtchjacki       // (c) 1995, Video Klein
+wtchjackj       // (c) 1994, Video Klein
 pmpoker         // (c) 1981 PlayMan
 royale          // Unknown
 royalea         // Unknown
@@ -11331,6 +11330,7 @@ poker91         // 1991, Unknown
 genie           // (c) 198? Video Fun Games Ltd.
 geniea          // 198?, Unknown
 silverga        // 1983, Unknown
+superdbl        // 198? Karateco
 pokerdub        // 198?, Unknown
 pokerduc        // 198?, Unknown
 bchancep        // 198?, Unknown
