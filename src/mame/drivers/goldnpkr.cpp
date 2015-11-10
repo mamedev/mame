@@ -24,10 +24,35 @@
   * Jack Potten's Poker (set 7, Royale GFX),          198?, Bootleg.
   * Jack Potten's Poker (set 8, Australian),          198?, Bootleg.
   * Good Luck,                                        198?, Unknown.
-  * Super Double (French),                            198?, Karateco.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
+  * Buena Suerte (Spanish, set 1),                    1990, Unknown.
+  * Buena Suerte (Spanish, set 2),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 3),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 4),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 5),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 6),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 7),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 8),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 9),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 10),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 11),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 12),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 13),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 14),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 15),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 16),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 17),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 18),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 19),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 20),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 21),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 22),                   1991, Unknown.
+  * Falcons Wild - World Wide Poker,                  1983, Falcon.
+  * Falcons Wild - World Wide Poker (VK set 1),       1990, Video Klein.
+  * Falcons Wild - World Wide Poker (VK set 2),       1990, Video Klein.
+  * Falcons Wild - Wild Card 1991,                    1991, TVG.
   * Witch Card (Video Klein CPU box, set 1),          1991, Video Klein.
   * Witch Card (Video Klein CPU box, set 2),          1991, Video Klein.
   * Witch Card (Spanish, witch game, set 1),          1991, Unknown.
@@ -82,32 +107,6 @@
   * Witch Jack (Export, 6T/12T ver 0.87),             1992-1996, Video Klein.
   * Witch Jack (Export, 6T/12T ver 0.87-88),          1992-1996, Video Klein.
   * Witch Jack (Export, 6T/12T ver 0.87-89),          1992-1996, Video Klein.
-  * Buena Suerte (Spanish, set 1),                    1990, Unknown.
-  * Buena Suerte (Spanish, set 2),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 3),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 4),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 5),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 6),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 7),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 8),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 9),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 10),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 11),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 12),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 13),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 14),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 15),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 16),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 17),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 18),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 19),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 20),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 21),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 22),                   1991, Unknown.
-  * Falcons Wild - World Wide Poker,                  1983, Falcon.
-  * Falcons Wild - World Wide Poker (VK set 1),       1990, Video Klein.
-  * Falcons Wild - World Wide Poker (VK set 2),       1990, Video Klein.
-  * Falcons Wild - Wild Card 1991,                    1991, TVG.
   * PlayMan Poker (German),                           1981, PM / Beck Elektronik.
   * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
   * Super Loco 93 (Spanish, set 2),                   1993, Unknown.
@@ -124,6 +123,7 @@
   * Genie (ICP-1, set 2),                             198?, Unknown.
   * Silver Game,                                      1983, Unknown.
   * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
+  * Super Double (French),                            198?, Karateco.
   * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
   * "Unknown Sisteme France Poker",                   198?, Sisteme France.
@@ -1044,6 +1044,16 @@
   - Derived a new machine with improved memory map for this new Genie set.
   - Minor fixes and clean-ups.
   - Added games & technical notes.
+
+
+  [2015-11-09]
+
+  - Renamed and rearranged the parent/clone relationship
+     of Witch Jack sets.
+  - Added partial decryption to the ICP1 daughterboard games.
+     (currently only pokerduc set). Since it's just partial,
+     commented out the code for now....
+  - Some fixes and clean-ups.
 
 
   TODO:
@@ -10377,53 +10387,42 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
 
   And repeat for every 0x100 segments...
 
-  So...
-
-  0000-0007 ok.
-  0008-000f XOR 0x04
-  0010-0017 XOR 0x02
-  0018-001f XOR 0x06
-
-  0020-0027 ok.
-  0028-002f XOR 0x04
-  0030-0037 XOR 0x02
-  0038-003f XOR 0x06
-
-  0040-0047 XOR 0x01
-  0048-004f XOR 0x05
-  0050-0057 XOR 0x03
-  0058-005f XOR 0x07
-
-  0060-0067 XOR 0x01
-  0068-006f XOR 0x05
-  0070-0077 XOR 0x03
-  0078-007f XOR 0x07
-
-  0080-0087 XOR 0x40
-  0088-008f XOR 0x44
-  0090-0097 XOR 0x42
-  0098-009f XOR 0x46
-
-  00a0-00a7 XOR 0x40
-  00a8-00af XOR 0x44
-  00b0-00b7 XOR 0x42
-  00b8-00bf XOR 0x46
-
-  00c0-00c7 XOR 0x41
-  00c8-00cf XOR 0x45
-  00d0-00d7 XOR 0x43
-  00d8-00df XOR 0x47
-
-  00e0-00e7 XOR 0x41
-  00e8-00ef XOR 0x45
-  00f0-00f7 XOR 0x43
-  00f8-00ff XOR 0x47
-
+  If you apply these XOR's to get 00's, the code has no sense,
+  so something is missing. For now will comment out the partial
+  decryption code...
+  
 ***********************************************/
 
 DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
 {
-	/* nothing yet... */
+/*
+	int i;
+	UINT8 *ROM = memregion("maincpu")->base();
+
+	unsigned char rawData[256] = {
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB,
+		0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB,
+		0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9,
+		0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA,
+		0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8,
+		0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA,
+		0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8,
+		0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB,
+		0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9,
+		0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB,
+		0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9,
+		0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA,
+		0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8,
+		0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA,
+		0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8,
+	};
+
+	for (i = 0; i < 0x10000; i++)
+	{
+		ROM[i] = ROM[i] ^ rawData[i & 0xff];
+	}
+*/
 }
 
 /**********************************************
