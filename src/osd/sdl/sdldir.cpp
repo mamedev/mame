@@ -9,7 +9,7 @@
 //============================================================
 
 #ifdef SDLMAME_WIN32
-#include "../windows/windir.c"
+#include "../windows/windir.cpp"
 #else
 
 #ifndef _LARGEFILE64_SOURCE

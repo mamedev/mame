@@ -9,8 +9,8 @@
 //============================================================
 
 #ifdef SDLMAME_WIN32
-#include "../windows/winfile.c"
-#include "../windows/winutil.c"
+#include "../windows/winfile.cpp"
+#include "../windows/winutil.cpp"
 #else
 
 #ifndef _LARGEFILE64_SOURCE
