@@ -96,10 +96,15 @@ const double votrax_sc01_device::s_glottal_wave[16] =
 
 votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VOTRAX_SC01, "Votrax SC-01", tag, owner, clock, "votrax", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
-		m_phoneme_timer(NULL),
-		m_request_cb(*this)
+	  device_sound_interface(mconfig, *this),
+	  m_stream(NULL),
+	  m_phoneme_timer(NULL), m_rom(NULL), m_inflection(0), m_phoneme(0),
+	  m_request_cb(*this), m_request_state(0), m_internal_request(0), m_master_clock_freq(0), m_master_clock(0), m_counter_34(0),
+	  m_latch_70(0), m_latch_72(0), m_beta1(0), m_p2(0), m_p1(0), m_phi2(0), m_phi1(0), m_phi2_20(0), m_phi1_20(0), m_subphoneme_period(0),
+	  m_subphoneme_count(0), m_clock_88(0), m_latch_42(0), m_counter_84(0), m_latch_92(0), m_srff_132(false), m_srff_114(false), m_srff_112(false),
+	  m_srff_142(false), m_latch_80(0), m_counter_220(0), m_counter_222(0), m_counter_224(0), m_counter_234(0), m_counter_236(0), m_fgate(0),
+	  m_glottal_sync(0), m_0625_clock(0), m_counter_46(0), m_latch_46(0), m_latch_168(0), m_latch_170(0), m_f1(0), m_f2(0), m_fc(0), m_f3(0),
+	  m_f2q(0), m_va(0), m_fa(0), m_noise_clock(0), m_shift_252(0), m_counter_250(0)
 {
 }
 

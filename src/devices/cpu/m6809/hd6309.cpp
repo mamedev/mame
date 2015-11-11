@@ -127,8 +127,10 @@ const device_type HD6309 = &device_creator<hd6309_device>;
 //  hd6309_device - constructor
 //-------------------------------------------------
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: m6809_base_device(mconfig, "HD6309", tag, owner, clock, HD6309, 4, "hd6309", __FILE__)
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	m6809_base_device(mconfig, "HD6309", tag, owner, clock, HD6309, 4, "hd6309", __FILE__), 
+	m_md(0), 
+	m_temp_im(0)
 {
 }
 
@@ -450,7 +452,7 @@ inline void hd6309_device::bittest_set(bool result)
 
 inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(UINT8 reg)
 {
-	UINT16 value = 0;
+	UINT16 value;
 
 	switch(reg & 0x0F)
 	{

@@ -493,7 +493,8 @@ INLINE void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, con
 INLINE void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, INT32 *tab, int zero_is_off)
 {
 	int j;
-	double rt, rw = 0;
+	double rt;
+	double rw;
 	double temp[32], min=10.0, max=0.0;
 
 	for (j=0; j < par->res_count; j++)

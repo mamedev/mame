@@ -238,7 +238,7 @@ READ8_MEMBER( riot6532_device::read )
 
 UINT8 riot6532_device::reg_r(UINT8 offset, bool debugger_access)
 {
-	UINT8 val = 0;
+	UINT8 val;
 
 	/* if A2 == 1 and A0 == 1, we are reading interrupt flags */
 	if ((offset & 0x05) == 0x05)
@@ -392,10 +392,15 @@ riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag,
 		m_out_pa_cb(*this),
 		m_in_pb_cb(*this),
 		m_out_pb_cb(*this),
-		m_irq_cb(*this),
+		m_irq_cb(*this), 
+		m_irqstate(0), 
+		m_irqenable(0),
 		m_irq(CLEAR_LINE),
 		m_pa7dir(0),
-		m_pa7prev(0)
+		m_pa7prev(0), 
+		m_timershift(0), 
+		m_timerstate(0), 
+		m_timer(NULL)
 {
 	memset(m_port, 0x00, sizeof(m_port));
 }

@@ -88,7 +88,6 @@ protected:
 private:
 	// internal helpers
 	void interrupt_check();
-	void timercallback(int chanindex);
 
 	// a single channel within the CTC
 	class ctc_channel

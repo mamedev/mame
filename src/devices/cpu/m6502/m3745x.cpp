@@ -55,7 +55,13 @@ m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, co
 	read_ad_4(*this),
 	read_ad_5(*this),
 	read_ad_6(*this),
-	read_ad_7(*this)
+	read_ad_7(*this), 
+	m_intreq1(0), 
+	m_intreq2(0), 
+	m_intctrl1(0), 
+	m_intctrl2(0), 
+	m_adctrl(0), 
+	m_last_all_ints(0)
 {
 }
 
@@ -195,7 +201,7 @@ void m3745x_device::execute_set_input(int inputnum, int state)
 
 void m3745x_device::recalc_irqs()
 {
-	UINT16 all_ints = 0;
+	UINT16 all_ints;
 	int static const irq_lines[16] =
 	{
 		-1, -1, -1, M740_INT11_LINE, M740_INT12_LINE, M740_INT13_LINE, -1, -1,

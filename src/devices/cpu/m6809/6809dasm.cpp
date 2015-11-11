@@ -372,7 +372,7 @@ CPU_DISASSEMBLE( m6809 )
 	const UINT8 *operandarray;
 	unsigned int ea, flags;
 	int numoperands, offset, indirect;
-	int i, p = 0, page = 0, opcode_found = FALSE;
+	int i, p = 0, page = 0, opcode_found;
 
 	do
 	{
