@@ -301,7 +301,7 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	float xratio = xscale / yscale;
 	float yratio = yscale / xscale;
 	xratio = (xratio < 1.0f) ? xratio : 1.0f;
-	xratio = (yratio < 1.0f) ? yratio : 1.0f;
+	yratio = (yratio < 1.0f) ? yratio : 1.0f;
 
 	point *curpoint;
 	render_bounds clip;
