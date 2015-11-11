@@ -510,7 +510,7 @@ bool render_font::load_bdf()
 				else if (strncmp(ptr, "BITMAP", 6) == 0)
 				{
 					// stash the raw pointer and scan for the end of the character
-					for (rawdata = ptr = next_line(ptr); ptr != NULL && strncmp(ptr, "ENDCHAR", 7) != 0; ptr = next_line(ptr)) ;
+					for (rawdata = ptr = next_line(ptr); ptr != NULL && strncmp(ptr, "ENDCHAR", 7) != 0; ptr = next_line(ptr)) { }
 					break;
 				}
 			}

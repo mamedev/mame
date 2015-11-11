@@ -853,7 +853,7 @@ device_interface::device_interface(device_t &device, const char *type)
 		m_type(type)
 {
 	device_interface **tailptr;
-	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;
+	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) { }
 	*tailptr = this;
 }
 

@@ -685,7 +685,7 @@ int floppy_image_device::find_index(UINT32 position, const std::vector<UINT32> &
 {
 	int spos = (buf.size() >> 1)-1;
 	int step;
-	for(step=1; step<buf.size()+1; step<<=1);
+	for(step=1; step<buf.size()+1; step<<=1) { }
 	step >>= 1;
 
 	for(;;) {

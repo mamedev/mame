@@ -290,7 +290,7 @@ void emu_options::update_slot_options()
 			}
 		}
 	}
-	while (add_slot_options(false));
+	while (add_slot_options(false)) { }
 	add_device_options(false);
 }
 
@@ -359,13 +359,15 @@ void emu_options::remove_device_options()
 bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value)
 {
 	// an initial parse to capture the initial set of values
-	bool result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	bool result;
+	
+	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// keep adding slot options until we stop seeing new stuff
 	bool isfirstpass = true;
 	while (add_slot_options(isfirstpass))
 	{
-		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+		core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 		isfirstpass = false;
 	}
 
@@ -373,9 +375,9 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 	add_device_options(true);
 	if (name != NULL && exists(name))
 		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
-	result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
-	int num = 0;
+	int num;
 	do {
 		num = options_count();
 		update_slot_options();
@@ -528,7 +530,7 @@ void emu_options::set_system_name(const char *name)
 
 		// then add the options
 		add_device_options(true);
-		int num = 0;
+		int num;
 		do {
 			num = options_count();
 			update_slot_options();

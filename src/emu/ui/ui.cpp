@@ -369,7 +369,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 
 		// clear the input memory
 		machine().input().reset_polling();
-		while (machine().input().poll_switches() != INPUT_CODE_INVALID) ;
+		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
 		while (m_handler_callback != handler_ingame && !machine().scheduled_event_pending() && !ui_menu::stack_has_special_main_menu())
