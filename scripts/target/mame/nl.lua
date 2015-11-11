@@ -97,18 +97,20 @@ function createProjects_mame_nl(_target, _subtarget)
 		GEN_DIR  .. "mame/layout",
 	}
 
-	files{
-		MAME_DIR .. "src/mame/drivers/pong.cpp",
-		MAME_DIR .. "src/mame/drivers/nl_pong.cpp",
-		MAME_DIR .. "src/mame/drivers/nl_pongd.cpp",
-		MAME_DIR .. "src/mame/drivers/nl_breakout.cpp",
+files{
+	MAME_DIR .. "src/mame/drivers/pong.cpp",
+	MAME_DIR .. "src/mame/drivers/nl_pong.cpp",
+	MAME_DIR .. "src/mame/drivers/nl_pongd.cpp",
+	MAME_DIR .. "src/mame/drivers/nl_breakout.cpp",
 
-		MAME_DIR .. "src/mame/drivers/1942.cpp",
-		MAME_DIR .. "src/mame/video/1942.cpp",
-		MAME_DIR .. "src/mame/drivers/popeye.cpp",
-		MAME_DIR .. "src/mame/video/popeye.cpp",
+	MAME_DIR .. "src/mame/drivers/1942.cpp",
+	MAME_DIR .. "src/mame/includes/1942.h",
+	MAME_DIR .. "src/mame/video/1942.cpp",
+	MAME_DIR .. "src/mame/drivers/popeye.cpp",
+	MAME_DIR .. "src/mame/includes/popeye.h",
+	MAME_DIR .. "src/mame/video/popeye.cpp",
 
-	}
+}
 end
 
 function linkProjects_mame_nl(_target, _subtarget)

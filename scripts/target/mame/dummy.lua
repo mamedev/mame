@@ -29,10 +29,12 @@ function createProjects_mame_dummy(_target, _subtarget)
 		GEN_DIR  .. "mess/layout",
 	}
 
-	files{
-		MAME_DIR .. "src/mame/drivers/coleco.cpp",
-		MAME_DIR .. "src/mame/machine/coleco.cpp",
-	}
+files{
+	MAME_DIR .. "src/mame/drivers/coleco.cpp",
+	MAME_DIR .. "src/mame/includes/coleco.h",
+	MAME_DIR .. "src/mame/machine/coleco.cpp",
+	MAME_DIR .. "src/mame/machine/coleco.h",
+}
 end
 
 function linkProjects_mame_dummy(_target, _subtarget)
