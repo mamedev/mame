@@ -8,7 +8,9 @@
 *  All detailed RE work done by Kevin 'kevtris' Horton
 *
 *  TODO:
-*  * Figure out why it says the first speech line twice; it shouldn't. (It sometimes does this on the sensory chess challenger real hardware)
+*  * Figure out why it says the first speech line twice; it shouldn't?
+*    It sometimes does this on Voice Sensory Chess Challenger real hardware.
+*    It can also be heard on Advanced Talking Chess Challenger real hardware, cold boot.
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
 *  * correctly hook up 7002/VBRC and 7014/bridgec3 speech so that the z80 is halted while words are being spoken
 *
