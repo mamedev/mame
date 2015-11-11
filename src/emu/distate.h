@@ -195,7 +195,7 @@ typedef device_interface_iterator<device_state_interface> state_interface_iterat
 //  or 0 if no state object exists
 //-------------------------------------------------
 
-inline offs_t device_t::safe_pc()
+inline offs_t device_t::safe_pc() const
 {
 	return (m_state != NULL) ? m_state->pc() : 0;
 }
@@ -206,7 +206,7 @@ inline offs_t device_t::safe_pc()
 //  base or 0 if no state object exists
 //-------------------------------------------------
 
-inline offs_t device_t::safe_pcbase()
+inline offs_t device_t::safe_pcbase() const
 {
 	return (m_state != NULL) ? m_state->pcbase() : 0;
 }

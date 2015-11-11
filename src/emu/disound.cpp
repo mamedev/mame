@@ -194,8 +194,8 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 	{
 		for (sound_stream *stream = m_device.machine().sound().first_stream(); stream != NULL; stream = stream->next())
 			if (&stream->device() == &device())
-				for (int outputnum = 0; outputnum < stream->output_count(); outputnum++)
-					stream->set_output_gain(outputnum, gain);
+				for (int num = 0; num < stream->output_count(); num++)
+					stream->set_output_gain(num, gain);
 	}
 
 	// look up the stream and stream output index

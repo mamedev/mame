@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "rendfont.h"
-#include "rendutil.h"
 #include "emuopts.h"
 #include "coreutil.h"
 

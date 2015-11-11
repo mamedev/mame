@@ -270,7 +270,6 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "formats/imageutl.h"
 #include "harddisk.h"
 #include "mfmhd.h"
 
@@ -310,7 +309,25 @@ std::string mfm_harddisk_device::tts(const attotime &t)
 
 mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: harddisk_image_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_card_interface(mconfig, *this)
+		device_slot_card_interface(mconfig, *this), 
+		m_index_timer(NULL),
+		m_spinup_timer(NULL),
+		m_seek_timer(NULL),
+		m_cache_timer(NULL),
+		m_precomp_cyl(0), 
+		m_redwc_cyl(0), 
+		m_encoding(), 
+		m_ready(false), 
+		m_current_cylinder(0), 
+		m_current_head(0), 
+		m_track_delta(0), 
+		m_step_phase(0), 
+		m_seek_complete(false), 
+		m_seek_inward(false), 
+		m_autotruncation(false), 
+		m_recalibrated(false), 
+		m_step_line(), 
+		m_format(NULL)
 {
 	m_spinupms = 10000;
 	m_cachelines = 5;
@@ -952,7 +969,8 @@ const device_type MFMHD_ST251 = &device_creator<mfm_hd_st251_device>;
 //   This is a write-back LRU cache.
 // ===========================================================
 
-mfmhd_trackimage_cache::mfmhd_trackimage_cache(running_machine &machine):
+mfmhd_trackimage_cache::mfmhd_trackimage_cache(running_machine &machine): 
+	m_mfmhd(NULL),
 	m_tracks(NULL),
 	m_machine(machine)
 {
@@ -1026,9 +1044,9 @@ void mfmhd_trackimage_cache::init(mfm_harddisk_device* mfmhd, int tracksize, int
 {
 	if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache init; cache size is %d tracks\n", mfmhd->tag(), trackslots);
 
-	chd_error state = CHDERR_NONE;
+	chd_error state;
 
-	mfmhd_trackimage* previous = NULL;
+	mfmhd_trackimage* previous;
 	mfmhd_trackimage* current = NULL;
 
 	m_mfmhd = mfmhd;
@@ -1141,7 +1159,11 @@ UINT16* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 
 mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
 	device_t(mconfig, MFM_HD_CONNECTOR, "MFM hard disk connector", tag, owner, clock, "mfm_hd_connector", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this), 
+	m_encoding(), 
+	m_spinupms(0), 
+	m_cachesize(0),
+	m_format(NULL)
 {
 }
 

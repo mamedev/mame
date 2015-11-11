@@ -13,7 +13,6 @@
 #include "debug/debugcpu.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
-#include "debug/express.h"
 #include "debug/debugvw.h"
 #include <ctype.h>
 

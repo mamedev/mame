@@ -161,7 +161,6 @@ private:
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
 	void floppy_drive_init();
 	void floppy_drive_index_func();
-	TIMER_CALLBACK(floppy_drive_index_callback);
 	int internal_floppy_device_load(int create_format, option_resolution *create_args);
 	TIMER_CALLBACK_MEMBER( set_wpt );
 

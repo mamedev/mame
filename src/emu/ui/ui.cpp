@@ -18,9 +18,7 @@
 #include "uiinput.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
-#include "ui/cheatopt.h"
 #include "ui/mainmenu.h"
-#include "ui/miscmenu.h"
 #include "ui/filemngr.h"
 #include "ui/sliders.h"
 #include "ui/viewgfx.h"
@@ -1688,7 +1686,6 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 UINT32 ui_manager::handler_load_save(running_machine &machine, render_container *container, UINT32 state)
 {
 	char filename[20];
-	input_code code;
 	char file = 0;
 
 	// if we're not in the middle of anything, skip

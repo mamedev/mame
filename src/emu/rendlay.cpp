@@ -53,8 +53,6 @@
 #include "rendlay.h"
 #include "rendutil.h"
 #include "xmlfile.h"
-#include "png.h"
-#include "ui/ui.h"
 
 
 
@@ -632,7 +630,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		std::string symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
-		int location = -1;
+		int location;
 		m_numstops = 0;
 		location=symbollist.find(",");
 		while (location!=-1)

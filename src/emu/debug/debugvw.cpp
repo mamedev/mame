@@ -17,9 +17,7 @@
 #include "dvmemory.h"
 #include "dvbpoints.h"
 #include "dvwpoints.h"
-#include "debugcmd.h"
 #include "debugcpu.h"
-#include "debugcon.h"
 #include <ctype.h>
 
 

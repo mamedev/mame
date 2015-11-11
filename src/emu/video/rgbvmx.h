@@ -28,11 +28,11 @@ protected:
 	typedef __vector unsigned int   VECU32;
 
 public:
-	inline rgbaint_t() { }
+	inline rgbaint_t(): VECS8(0), VECU8(0), VECS16(0), VECU16(0), VECS32(0), VECU32(0) { }
 	inline rgbaint_t(UINT32 rgba) { set(rgba); }
 	inline rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
 	inline rgbaint_t(rgb_t& rgb) { set(rgb); }
-	inline rgbaint_t(VECS32 rgba) { m_value = rgba; }
+	inline rgbaint_t(VECS32 rgba): VECS8(0), VECU8(0), VECS16(0), VECU16(0), VECS32(0), VECU32(0) { m_value = rgba; }
 
 	inline void set(rgbaint_t& other) { m_value = other.m_value; }
 

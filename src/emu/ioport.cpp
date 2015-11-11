@@ -97,7 +97,6 @@
 #include "profiler.h"
 #include "ui/ui.h"
 #include "uiinput.h"
-#include "debug/debugcon.h"
 
 #include "osdepend.h"
 
@@ -727,7 +726,8 @@ void input_type_entry::restore_default_seq()
 //-------------------------------------------------
 
 digital_joystick::digital_joystick(int player, int number)
-	: m_player(player),
+	:   m_next(NULL), 
+		m_player(player),
 		m_number(number),
 		m_current(0),
 		m_current4way(0),
@@ -2454,7 +2454,11 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
 		m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ),
 		m_playback_accumulated_speed(0),
-		m_playback_accumulated_frames(0)
+		m_playback_accumulated_frames(0), 
+		m_has_configs(false), 
+		m_has_analog(false), 
+		m_has_dips(false), 
+		m_has_bioses(false)
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -3233,9 +3237,9 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 					xml_set_attribute(portnode, "type", input_type_to_token(tempstr, entry->type(), entry->player()));
 
 					// add only the sequences that have changed from the defaults
-					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-						if (entry->seq(seqtype) != entry->defseq(seqtype))
-							save_sequence(portnode, seqtype, entry->type(), entry->seq(seqtype));
+					for (input_seq_type type = SEQ_TYPE_STANDARD; type < SEQ_TYPE_TOTAL; type++)
+						if (entry->seq(type) != entry->defseq(type))
+							save_sequence(portnode, type, entry->type(), entry->seq(type));
 				}
 			}
 		}

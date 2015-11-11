@@ -270,8 +270,8 @@ media_auditor::summary media_auditor::audit_samples()
 	int found = 0;
 
 	// iterate over sample entries
-	samples_device_iterator iter(m_enumerator.config().root_device());
-	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
+	samples_device_iterator iterator(m_enumerator.config().root_device());
+	for (samples_device *device = iterator.first(); device != NULL; device = iterator.next())
 	{
 		// by default we just search using the driver name
 		std::string searchpath(m_enumerator.driver().name);

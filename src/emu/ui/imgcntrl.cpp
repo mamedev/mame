@@ -28,7 +28,10 @@
 //-------------------------------------------------
 
 ui_menu_control_device_image::ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *_image)
-	: ui_menu(machine, container)
+	: ui_menu(machine, container), 
+	  submenu_result(0), 
+	  create_ok(false), 
+	  create_confirmed(false)
 {
 	image = _image;
 

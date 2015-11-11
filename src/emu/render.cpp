@@ -2500,8 +2500,8 @@ render_target *render_manager::target_by_index(int index) const
 
 float render_manager::ui_aspect(render_container *rc)
 {
-	int orient = 0;
-	float aspect = 1.0f;
+	int orient;
+	float aspect;
 
 	if (rc == m_ui_container || rc == NULL) {
 		// ui container, aggregated multi-screen target

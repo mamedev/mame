@@ -78,8 +78,8 @@ void ram_device::device_validity_check(validity_checker &valid) const
 {
 	const char *ramsize_string = NULL;
 	int is_valid = FALSE;
-	UINT32 specified_ram = 0;
-	const char *gamename_option = NULL;
+	UINT32 specified_ram;
+	const char *gamename_option;
 
 	/* verify default ram value */
 	if (default_size() == 0)
@@ -183,7 +183,7 @@ UINT32 ram_device::parse_string(const char *s)
 	UINT32 ram;
 	char suffix = '\0';
 
-	s += sscanf(s, "%u%c", &ram, &suffix);
+	sscanf(s, "%u%c", &ram, &suffix);
 
 	switch(tolower(suffix))
 	{

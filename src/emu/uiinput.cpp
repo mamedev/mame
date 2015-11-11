@@ -249,7 +249,7 @@ bool ui_input_pressed(running_machine &machine, int code)
 bool ui_input_pressed_repeat(running_machine &machine, int code, int speed)
 {
 	ui_input_private *uidata = machine.ui_input_data;
-	int pressed = FALSE;
+	int pressed;
 
 g_profiler.start(PROFILER_INPUT);
 

@@ -9,18 +9,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "osdnet.h"
 #include "emuopts.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
-#include "rendutil.h"
-#include "cheat.h"
 #include "uiinput.h"
 #include "ui/selgame.h"
 #include "ui/inputmap.h"
 #include "ui/miscmenu.h"
 #include "audit.h"
-#include "crsshair.h"
 #include <ctype.h>
 
 
@@ -409,7 +405,6 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	x1 += UI_BOX_LR_BORDER;
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
 
 	// draw all lines
 	for (line = 0; line < 4; line++)

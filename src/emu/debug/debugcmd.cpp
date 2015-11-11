@@ -1353,7 +1353,7 @@ static void execute_wpset(running_machine &machine, int ref, int params, const c
 	address_space *space;
 	const char *action = NULL;
 	UINT64 address, length;
-	int type = 0;
+	int type;
 	int wpnum;
 
 	/* CPU is implicit */
@@ -1830,7 +1830,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 {
 	UINT64 offset, endoffset, length, width = 0, ascii = 1;
 	address_space *space;
-	FILE *f = NULL;
+	FILE *f;
 	UINT64 i, j;
 
 	/* validate parameters */
@@ -1984,8 +1984,6 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	/* initialize entire memory by default */
 	if (params <= 1)
 	{
-		offset = 0;
-		length = space->bytemask() + 1;
 		for (entry = space->map()->m_entrylist.first(); entry != NULL; entry = entry->next())
 		{
 			cheat_region[region_count].offset = space->address_to_byte(entry->m_addrstart) & space->bytemask();
@@ -2456,7 +2454,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 	UINT64 offset, length, bytes = 1;
 	int minbytes, maxbytes, byteswidth;
 	address_space *space, *decrypted_space;
-	FILE *f = NULL;
+	FILE *f;
 	int j;
 
 	/* validate parameters */

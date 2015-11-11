@@ -1394,7 +1394,6 @@ public:
 	int count_players() const;
 	bool crosshair_position(int player, float &x, float &y);
 	bool has_keyboard() const;
-	void setup_natural_keyboard(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	const char *input_type_to_token(std::string &str, ioport_type type, int player);

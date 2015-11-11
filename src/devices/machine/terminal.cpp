@@ -143,16 +143,22 @@ static const UINT8 terminal_font[256*16] =
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_palette(*this, "palette"),
-		m_io_term_conf(*this, "TERM_CONF"),
+		m_io_term_conf(*this, "TERM_CONF"), 
+		m_x_pos(0), 
+		m_framecnt(0), 
+		m_y_pos(0),
 		m_keyboard_cb(*this)
 {
 }
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock, "generic_terminal", __FILE__),
-		m_palette(*this, "palette"),
-		m_io_term_conf(*this, "TERM_CONF"),
-		m_keyboard_cb(*this)
+	  m_palette(*this, "palette"),
+	  m_io_term_conf(*this, "TERM_CONF"),
+	  m_x_pos(0),
+	  m_framecnt(0),
+	  m_y_pos(0),
+	  m_keyboard_cb(*this)
 {
 }
 

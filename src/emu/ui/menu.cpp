@@ -9,14 +9,12 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/mainmenu.h"
-#include "ui/cheatopt.h"
 
 
 
@@ -411,7 +409,7 @@ void ui_menu::draw(bool customonly)
 
 	float effective_width, effective_left;
 	float visible_width, visible_main_menu_height;
-	float visible_extra_menu_height = 0;
+	float visible_extra_menu_height;
 	float visible_top, visible_left;
 	int selected_subitem_too_big = FALSE;
 	int visible_lines;
@@ -812,8 +810,8 @@ void ui_menu::handle_events()
 void ui_menu::handle_keys(UINT32 flags)
 {
 	int ignorepause = ui_menu::stack_has_special_main_menu();
-	int ignoreright = FALSE;
-	int ignoreleft = FALSE;
+	int ignoreright;
+	int ignoreleft;
 	int code;
 
 	// bail if no items

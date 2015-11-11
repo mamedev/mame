@@ -117,7 +117,7 @@ public:
 
 private:
 	// internal helpers
-	void release_current();
+	void release_current() const;
 
 	// entry in the config cache
 	struct config_entry

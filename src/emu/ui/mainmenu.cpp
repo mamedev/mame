@@ -9,17 +9,12 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "audit.h"
 #include "crsshair.h"
-#include "osdnet.h"
 #include "emuopts.h"
 #include "rendutil.h"
 #include "cheat.h"
-#include "uiinput.h"
-#include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/filemngr.h"
-#include "ui/filesel.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
 #include "ui/info.h"
@@ -33,7 +28,6 @@
 #include "ui/tapectrl.h"
 #include "ui/videoopt.h"
 #include "imagedev/cassette.h"
-#include "imagedev/bitbngr.h"
 #include "machine/bcreader.h"
 
 

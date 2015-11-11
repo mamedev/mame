@@ -32,7 +32,8 @@ public:
 	testcpu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_cpu(*this, "maincpu"),
-			m_ram(*this, "ram")
+			m_ram(*this, "ram"), 
+			m_space(NULL)
 	{
 	}
 

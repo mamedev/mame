@@ -13,8 +13,6 @@
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
-#include "emuopts.h"
-#include "osdepend.h"
 #include "drivenum.h"
 #include "ui/ui.h"
 #include "luaengine.h"
@@ -838,7 +836,7 @@ void lua_engine::serve_lua()
 		osd_lock_release(lock);
 
 		// Wait for response
-		int done = 0;
+		int done;
 		do {
 			osd_sleep(osd_ticks_per_second() / 1000);
 			osd_lock_acquire(lock);

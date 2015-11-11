@@ -12,7 +12,6 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "debugcpu.h"
-#include "debugcmd.h"
 #include "debugcon.h"
 #include "express.h"
 #include "debugvw.h"

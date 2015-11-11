@@ -30,8 +30,15 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 
 cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
-	device_image_interface(mconfig, *this),
-	m_state(CASSETTE_STOPPED),
+	device_image_interface(mconfig, *this), 
+	m_cassette(NULL),
+	m_state(CASSETTE_STOPPED), 
+	m_position(0), 
+	m_position_time(0), 
+	m_value(0), 
+	m_channel(0), 
+	m_speed(0), 
+	m_direction(0),
 	m_formats(cassette_default_formats),
 	m_create_opts(NULL),
 	m_default_state(CASSETTE_PLAY),
@@ -423,7 +430,6 @@ void cassette_image_device::call_display()
 			if (position > length)
 			{
 				m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
-				position = length;
 			}
 		}
 	}

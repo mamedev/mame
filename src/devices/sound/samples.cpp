@@ -363,7 +363,6 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 							chan.source_num = -1;
 							if (samples > 0)
 								memset(buffer, 0, samples * sizeof(*buffer));
-							samples = 0;
 							break;
 						}
 					}

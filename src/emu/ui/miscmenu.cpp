@@ -15,7 +15,6 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/miscmenu.h"
-#include "ui/filemngr.h"
 
 
 /***************************************************************************

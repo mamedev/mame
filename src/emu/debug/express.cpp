@@ -1105,7 +1105,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 		throw expression_error(expression_error::INVALID_TOKEN, token.offset());
 
 	// convert the space to flags
-	expression_space memspace = EXPSPACE_INVALID;
+	expression_space memspace;
 	switch (space)
 	{
 		case 'p':   memspace = physical ? EXPSPACE_PROGRAM_PHYSICAL : EXPSPACE_PROGRAM_LOGICAL; break;
@@ -1219,7 +1219,7 @@ void parsed_expression::infix_to_postfix()
 
 	// loop over all the original tokens
 	parse_token *prev = NULL;
-	parse_token *next = NULL;
+	parse_token *next;
 	for (parse_token *token = m_tokenlist.detach_all(); token != NULL; prev = token, token = next)
 	{
 		// pre-determine our next token

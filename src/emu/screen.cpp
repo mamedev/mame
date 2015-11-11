@@ -58,7 +58,8 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_container(NULL),
 		m_width(100),
 		m_height(100),
-		m_visarea(0, 99, 0, 99),
+		m_visarea(0, 99, 0, 99), 
+	    m_texformat(),
 		m_curbitmap(0),
 		m_curtexture(0),
 		m_changed(true),
@@ -634,7 +635,7 @@ bool screen_device::update_partial(int scanline)
 	LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 	g_profiler.start(PROFILER_VIDEO);
 
-	UINT32 flags = UPDATE_HAS_NOT_CHANGED;
+	UINT32 flags;
 	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 	switch (curbitmap.format())
 	{
@@ -751,7 +752,7 @@ void screen_device::update_now()
 
 		LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.max_y, clip.min_x, clip.max_x));
 
-		UINT32 flags = UPDATE_HAS_NOT_CHANGED;
+		UINT32 flags;
 		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 		switch (curbitmap.format())
 		{

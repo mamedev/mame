@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
-#include "ui/swlist.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/miscmenu.h"
@@ -29,7 +28,7 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_container *container, const char *warnings) : ui_menu(machine, container)
+ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_container *container, const char *warnings) : ui_menu(machine, container), selected_device(NULL)
 {
 	// This warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
@@ -127,8 +126,8 @@ void ui_menu_file_manager::populate()
 		if (subiter.count() > 0)
 		{
 			// if so, cycle through all its image interfaces
-			image_interface_iterator subiter(*dev);
-			for (device_image_interface *scan = subiter.first(); scan != NULL; scan = subiter.next())
+			image_interface_iterator subiterator(*dev);
+			for (device_image_interface *scan = subiterator.first(); scan != NULL; scan = subiterator.next())
 			{
 				// if it is a children device, and not something further down the device tree, we want it in the menu!
 				if (strcmp(scan->device().owner()->tag(), dev->tag()) == 0)
