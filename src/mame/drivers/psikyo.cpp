@@ -1242,7 +1242,6 @@ ROM_START( samuraia )
 ROM_END
 
 ROM_START( sngkace )
-
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u127.bin", 0x000000, 0x040000, CRC(6c45b2f8) SHA1(08473297e174f3a6d67043f3b16f4e6b9c68b826) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u126.bin", 0x000002, 0x040000, CRC(845a6760) SHA1(3b8fed294e28d9d8ef5cb5ec88b9ade396146a48) ) // 3&2
@@ -1262,7 +1261,29 @@ ROM_START( sngkace )
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
+ROM_END
 
+
+ROM_START( sngkacea ) // the roms have a very visible "." symbol after the number, it might indicate a newer revision.
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD32_WORD_SWAP( "1.-u127.bin", 0x000000, 0x040000, CRC(3a43708d) SHA1(f38d22304f8957c6d81c8946a8a03676965d4dd4) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "2.-u126.bin", 0x000002, 0x040000, CRC(7aa50c46) SHA1(bad250f64c6d796a61be5e2eb71e2f5774f4278e) ) // 3&2
+
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(00a546cb) SHA1(30a8679b49928d5fcbe58b5eecc2ebd08173adf8) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
+	ROM_LOAD( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
+	ROM_LOAD( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
+	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 
@@ -1992,8 +2013,9 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
 
 ***************************************************************************/
 
-GAME( 1993, samuraia, 0,        sngkace,  samuraia, psikyo_state, sngkace,  ROT270, "Psikyo", "Samurai Aces (World)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
-GAME( 1993, sngkace,  samuraia, sngkace,  sngkace, psikyo_state,  sngkace,  ROT270, "Psikyo", "Sengoku Ace (Japan)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
+GAME( 1993, samuraia,  0,        sngkace,  samuraia, psikyo_state, sngkace,  ROT270, "Psikyo", "Samurai Aces (World)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
+GAME( 1993, sngkace,   samuraia, sngkace,  sngkace, psikyo_state,  sngkace,  ROT270, "Psikyo", "Sengoku Ace (Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
+GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace, psikyo_state,  sngkace,  ROT270, "Psikyo", "Sengoku Ace (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
 
 GAME( 1994, gunbird,  0,        gunbird,  gunbird, psikyo_state,  gunbird,  ROT270, "Psikyo", "Gunbird (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunbirdk, gunbird,  gunbird,  gunbirdj, psikyo_state, gunbird,  ROT270, "Psikyo", "Gunbird (Korea)", MACHINE_SUPPORTS_SAVE )
