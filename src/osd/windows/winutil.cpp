@@ -12,7 +12,6 @@
 
 // MAMEOS headers
 #include "winutil.h"
-#include "strconv.h"
 
 //============================================================
 //  win_error_to_file_error

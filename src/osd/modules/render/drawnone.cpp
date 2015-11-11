@@ -32,8 +32,6 @@ public:
 	virtual void record() { };
 	virtual void toggle_fsfx() { };
 	virtual void destroy();
-
-private:
 };
 
 //============================================================

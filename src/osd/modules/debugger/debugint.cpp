@@ -17,7 +17,6 @@
 #include "debug/debugvw.h"
 #include "debug/dvdisasm.h"
 #include "debug/dvmemory.h"
-#include "debug/dvstate.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
@@ -151,10 +150,8 @@ class DView_edit
 	DISABLE_COPYING(DView_edit);
 
 public:
-	DView_edit()
-	{ }
-	~DView_edit()
-	{ }
+	DView_edit(): active(0), container(NULL) { }
+	~DView_edit() { }
 	int                 active;
 	render_container *  container;
 	std::string         str;
@@ -1131,7 +1128,6 @@ static void render_editor(DView_edit *editor)
 	x1 += UI_BOX_LR_BORDER;
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
 	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,

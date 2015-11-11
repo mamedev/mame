@@ -859,6 +859,7 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 			break;
 
 		default:
+			item = NULL;
 			assert(false);
 	}
 

@@ -29,11 +29,6 @@
 #include "winmain.h"
 #include "window.h"
 #include "video.h"
-#include "input.h"
-#include "output.h"
-#include "config.h"
-#include "osdepend.h"
-#include "strconv.h"
 #include "winutf8.h"
 #include "winutil.h"
 #include "debugger.h"
@@ -417,7 +412,7 @@ int main(int argc, char *argv[])
 
 
 	// parse config and cmdline options
-	DWORD result = 0;
+	DWORD result;
 	{
 		windows_options options;
 		windows_osd_interface osd(options);
@@ -1354,7 +1349,8 @@ FPTR symbol_manager::get_text_section_base()
 //-------------------------------------------------
 
 sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
-	: m_thread(NULL),
+	:   m_target_thread(NULL), 
+		m_thread(NULL),
 		m_thread_id(0),
 		m_thread_exit(false),
 		m_stack_depth(stack_depth),

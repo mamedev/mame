@@ -12,7 +12,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 #include "winmain.h"
 // MAMEOS headers
 #include "output.h"

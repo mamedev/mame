@@ -9,7 +9,6 @@
 #include "consolewininfo.h"
 
 #include "debugviewinfo.h"
-#include "disasmviewinfo.h"
 #include "uimetrics.h"
 
 #include "debug/debugcon.h"
@@ -84,7 +83,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	set_cpu(*debug_cpu_get_visible_cpu(machine()));
 
 	// mark the edit box as the default focus and set it
-	set_default_focus();
+	editwin_info::set_default_focus();
 	return;
 
 cleanup:

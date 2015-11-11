@@ -444,12 +444,12 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		osd_work_item *item;
 
 		// first allocate a new work item; try the free list first
-		INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
+		INT32 myslot = osd_scalable_lock_acquire(queue->lock);
 		do
 		{
 			item = (osd_work_item *)queue->free;
 		} while (item != NULL && compare_exchange_ptr((PVOID volatile *)&queue->free, item, item->next) != item);
-		osd_scalable_lock_release(queue->lock, lockslot);
+		osd_scalable_lock_release(queue->lock, myslot);
 
 		// if nothing, allocate something new
 		if (item == NULL)

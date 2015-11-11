@@ -29,7 +29,6 @@
 #include "render.h"
 #include "ui/ui.h"
 #include "rendutil.h"
-#include "options.h"
 #include "emuopts.h"
 #include "aviio.h"
 #include "png.h"
@@ -39,7 +38,6 @@
 #include "d3dintf.h"
 #include "winmain.h"
 #include "window.h"
-#include "config.h"
 #include "d3dcomm.h"
 #include "modules/render/drawd3d.h"
 #include "strconv.h"
@@ -178,7 +176,14 @@ static direct3dx9_loadeffect_ptr g_load_effect = NULL;
 //  shader manager constructor
 //============================================================
 
-shaders::shaders()
+shaders::shaders(): 
+	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), write_ini(false), read_ini(false), hlsl_prescale_x(0), hlsl_prescale_y(0), bloom_count(0), 
+	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(NULL), avi_frame(0), avi_copy_surface(NULL), avi_copy_texture(NULL), avi_final_target(NULL), avi_final_texture(NULL),
+	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL), 
+	snap_width(0), snap_height(0), lines_pending(false), backbuffer(NULL), curr_effect(NULL), default_effect(NULL), prescale_effect(NULL), post_effect(NULL), distortion_effect(NULL),
+	focus_effect(NULL), phosphor_effect(NULL), deconverge_effect(NULL), color_effect(NULL), yiq_encode_effect(NULL), yiq_decode_effect(NULL), bloom_effect(NULL), 
+	downsample_effect(NULL), vector_effect(NULL), fsfx_vertices(NULL), curr_texture(NULL), curr_render_target(NULL), curr_poly(NULL)
+
 {
 	master_enable = false;
 	vector_enable = true;
@@ -3435,7 +3440,7 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 			// find length of the device name
 			int end1 = snapstr.find("/", pos + 3);
 			int end2 = snapstr.find("%", pos + 3);
-			int end = -1;
+			int end;
 
 			if ((end1 != -1) && (end2 != -1))
 			{

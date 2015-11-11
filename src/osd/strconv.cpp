@@ -13,7 +13,6 @@
 
 // MAMEOS headers
 #include "strconv.h"
-#include "unicode.h"
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 //============================================================

@@ -122,7 +122,7 @@ class device_info
 {
 public:
 	device_info(running_machine &machine)
-		: m_machine(machine) { }
+		: head(NULL), next(NULL), name(NULL), poll(NULL), device(NULL), m_machine(machine) { }
 
 	running_machine &machine() const { return m_machine; }
 

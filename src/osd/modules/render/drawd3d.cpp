@@ -27,19 +27,15 @@
 // MAME headers
 #include "emu.h"
 #include "render.h"
-#include "ui/ui.h"
+
 #include "rendutil.h"
-#include "options.h"
 #include "emuopts.h"
 #include "aviio.h"
-#include "png.h"
 
 // MAMEOS headers
 #include "modules/render/d3d/d3dintf.h"
 #include "winmain.h"
 #include "window.h"
-#include "config.h"
-#include "strconv.h"
 #include "modules/render/d3d/d3dcomm.h"
 #include "drawd3d.h"
 
@@ -616,19 +612,11 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 }
 
 renderer::renderer(osd_window *window)
-	: osd_renderer(window, FLAG_NONE)
+	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(NULL), m_gamma_supported(0), m_pixformat(), 
+	m_vertexbuf(NULL), m_lockedbuf(NULL), m_numverts(0), m_vectorbatch(NULL), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0), 
+	m_screen_format(), m_last_texture(NULL), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
+	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(NULL), m_shaders(NULL), m_texture_manager(NULL), m_line_count(0)
 {
-	m_device = NULL;
-	m_restarting = false;
-	m_shaders = NULL;
-	m_numverts = 0;
-	m_numpolys = 0;
-	m_vertexbuf = NULL;
-	m_lockedbuf = NULL;
-	m_vectorbatch = NULL;
-	m_last_texture = NULL;
-	m_hlsl_buf = NULL;
-	m_texture_manager = NULL;
 }
 
 int renderer::initialize()

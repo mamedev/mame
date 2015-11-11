@@ -16,11 +16,6 @@
 // MAME headers
 #include "osdcore.h"
 
-// MAMEOS headers
-#include "strconv.h"
-#include "winutil.h"
-#include "winutf8.h"
-
 #include "winfile.h"
 
 const char *winfile_socket_identifier  = "socket.";

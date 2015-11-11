@@ -31,7 +31,6 @@ ui_metrics::ui_metrics(osd_options const &options) :
 		m_debug_font = CreateFont(-MulDiv((size <= 0) ? 9 : size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
 					ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, t_face);
 		osd_free(t_face);
-		t_face = NULL;
 
 		if (m_debug_font == NULL)
 			fatalerror("Unable to create debugger font\n");

@@ -41,9 +41,6 @@ public:
 	virtual bool poll();
 	virtual int read(UINT8 *pOut);
 	virtual void write(UINT8 data);
-
-private:
-	//int dummy;
 };
 
 osd_midi_device *none_module::create_midi_device()

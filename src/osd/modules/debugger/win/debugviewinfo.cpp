@@ -315,7 +315,7 @@ void debugview_info::draw_contents(HDC windc)
 		// loop twice; once to fill the background and once to draw the text
 		for (int iter = 0; iter < 2; iter++)
 		{
-			COLORREF fgcolor = RGB(0x00,0x00,0x00);
+			COLORREF fgcolor;
 			COLORREF bgcolor = RGB(0xff,0xff,0xff);
 			HBRUSH bgbrush = NULL;
 			int last_attrib = -1;
