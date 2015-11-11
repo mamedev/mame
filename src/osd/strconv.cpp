@@ -119,7 +119,7 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 }
 
 #else
-
+#include "unicode.h"
 //============================================================
 //  osd_uchar_from_osdchar
 //============================================================

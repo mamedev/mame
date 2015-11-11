@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
 	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("zpmirror") // mirror of 0x2040-0x20ff, for zero page
 	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("spmirror") // mirror of 0x2140-0x21ff, for stack page
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x60) AM_DEVICE("riot", mos6532_t, io_map)
+	AM_RANGE(0x0280, 0x02ff) AM_DEVICE("riot", mos6532_t, io_map)
 	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_DEVICE("riot", mos6532_t, ram_map)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("6116_1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("6116_2")
