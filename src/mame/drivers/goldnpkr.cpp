@@ -4499,16 +4499,16 @@ ROM_START( potnpkrf )
 	ROM_LOAD( "prg.bin",    0x4000, 0x4000, CRC(d7a932a2) SHA1(c940ea90378a631c217a09c4a9e73c382acaa48d) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_FILL(           0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
 	ROM_LOAD( "3.bin",  0x2000, 0x0800, CRC(23e83e89) SHA1(0c6352d46e3dfe176b0e970dd163e2bc01246890) )    /* text layer */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "0.bin",    0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "1.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "2.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+	ROM_LOAD( "0.bin",  0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1.bin",  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "2.bin",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_LOAD( "82s129.9c",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
 /* Unknown australian hard to dump set
@@ -4532,6 +4532,31 @@ ROM_START( potnpkrg )
 	ROM_LOAD( "bprom.bin",    0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
+/* Unknown australian set
+   String "just 4 fun" replaces the "insert coins" one.
+*/
+ROM_START( potnpkrh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "unk_2732.15a", 0x2000, 0x1000, CRC(441ad1b2) SHA1(248b8e03723989c7766b50858c9a5d0abbb5e055) )
+	ROM_LOAD( "unk_2732.17a", 0x3000, 0x1000, CRC(9d72e145) SHA1(526d88c70e03bcff18072436ca3d498a0bb39913) )
+
+	/* Backcard logo is different, showing 'FR'. The rest matches the common char gfx */
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                  0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "unk_2716.8a",   0x1000, 0x0800, CRC(a138afa6) SHA1(80c6d11086f78e36dfc01c15b23e70667fcf17fc) )    /* char ROM */
+
+	/* Backplane at 5a has two bits different against the common cards gfx
+       Offsets 0x380 and 0x400, bit0 is set to 0 */
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "unk_2716.4a",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "unk_2716.5a",  0x0800, 0x0800, CRC(daf38d03) SHA1(6b518494688756ad7b753fdec46b6392c4a9ebbe) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "unk_2716.7a",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "bprom.bin",    0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+
 ROM_START( goodluck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "goodluck_glh6b.bin", 0x0000, 0x8000, CRC(2cfa4a2c) SHA1(720e2900f3a0ef2632aa201a63b5eba0570e6aa3) )
@@ -4546,7 +4571,7 @@ ROM_START( goodluck )
 	ROM_LOAD( "5.bin",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_LOAD( "82s129.9c",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
 
@@ -10516,6 +10541,7 @@ GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, driver_device,  0,        
 GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrf,  pottnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 7, Royale GFX)", 0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrg,  pottnpkr, pottnpkr, potnpkra, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 8, Australian)", 0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrh,  pottnpkr, pottnpkr, goldnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 9, 'just 4 fun')", 0,              layout_goldnpkr )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      0,                layout_goldnpkr )
@@ -10565,29 +10591,29 @@ GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, driver_device,  0,        
 
 GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",  0,                layout_goldnpkr )
 
-GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                layout_goldnpkr )  /* Ver 184A, 2001-09-12 */
-GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                layout_goldnpkr )  /* Ver 157-SP, 1992-12-25 */
-GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, driver_device,  0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     MACHINE_NOT_WORKING, layout_goldnpkr )   /* Ver 157-TE, 1992-12-25 */
-GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                layout_goldnpkr )  /* Ver 162A, 1994-04-26 */
-GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                layout_goldnpkr )  /* Ver 162B, 1994-04-26 */
-GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, driver_device,  0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     MACHINE_NOT_WORKING, layout_goldnpkr )   /* Ver 162A-F, 1994-04-26 */
-GAMEL( 1994, wldwitchf, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A alt)",   0,                layout_goldnpkr )  /* Ver 162A alt, 1994-11-03 */
-GAMEL( 1994, wldwitchg, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B alt)",   0,                layout_goldnpkr )  /* Ver 162B alt, 1994-11-03 */
-GAMEL( 1995, wldwitchh, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A)",       0,                layout_goldnpkr )  /* Ver 165A, 1995-11-16 */
-GAMEL( 1996, wldwitchi, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S)",     0,                layout_goldnpkr )  /* Ver 165A-S (Fast Deal), 1996-03-26 */
-GAMEL( 1996, wldwitchj, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S alt)", 0,                layout_goldnpkr )  /* Ver 165A-S alt (Fast Deal), 1996-05-26 */
-GAMEL( 1996, wldwitchk, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-N)",     0,                layout_goldnpkr )  /* Ver 165A-N, 1996-05-29 */
-GAMEL( 1996, wldwitchl, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A beta)",  0,                layout_goldnpkr )  /* Ver 170A-beta, 1996-06-25 */
-GAMEL( 1996, wldwitchm, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A)",       0,                layout_goldnpkr )  /* Ver 170A, 1996-09-30 */
-GAMEL( 1997, wldwitchn, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A alt)",   0,                layout_goldnpkr )  /* Ver 170A alt, 1997-06-11 */
-GAMEL( 1998, wldwitcho, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwo, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG)", 0,              layout_goldnpkr )  /* Ver 174A-SP-BELG (no D-UP, no payout), 1998-05-11 */
-GAMEL( 1998, wldwitchp, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwp, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",       0,                layout_goldnpkr )  /* Ver 174A (no D-UP, no payout), 1998-09-20 */
-GAMEL( 1998, wldwitchq, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A alt)",   0,                layout_goldnpkr )  /* Ver 174A alt, box, 1998-09-25 */
-GAMEL( 1999, wldwitchr, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwr, ROT0,   "Video Klein",              "Wild Witch (Export, 6B/12B ver 1.75A-E English)", 0,            layout_goldnpkr )  /* Ver 175A-E (English), 1999-01-11 */
-GAMEL( 1999, wldwitchs, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswws, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.76A)",       0,                layout_goldnpkr )  /* Ver 176A, 1999-??-?? */
-GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwt, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.77A)",       0,                layout_goldnpkr )  /* Ver 177A, 1999-??-?? */
-GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                layout_goldnpkr )  /* Ver 179A, 2000-05-10 */
-GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                layout_goldnpkr )  /* Ver 183A, 2001-06-13 */
+GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                   layout_goldnpkr )  /* Ver 184A, 2001-09-12 */
+GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                   layout_goldnpkr )  /* Ver 157-SP, 1992-12-25 */
+GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, driver_device,  0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     MACHINE_NOT_WORKING, layout_goldnpkr )  /* Ver 157-TE, 1992-12-25 */
+GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                   layout_goldnpkr )  /* Ver 162A, 1994-04-26 */
+GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                   layout_goldnpkr )  /* Ver 162B, 1994-04-26 */
+GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, driver_device,  0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     MACHINE_NOT_WORKING, layout_goldnpkr )  /* Ver 162A-F, 1994-04-26 */
+GAMEL( 1994, wldwitchf, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A alt)",   0,                   layout_goldnpkr )  /* Ver 162A alt, 1994-11-03 */
+GAMEL( 1994, wldwitchg, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B alt)",   0,                   layout_goldnpkr )  /* Ver 162B alt, 1994-11-03 */
+GAMEL( 1995, wldwitchh, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A)",       0,                   layout_goldnpkr )  /* Ver 165A, 1995-11-16 */
+GAMEL( 1996, wldwitchi, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S)",     0,                   layout_goldnpkr )  /* Ver 165A-S (Fast Deal), 1996-03-26 */
+GAMEL( 1996, wldwitchj, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S alt)", 0,                   layout_goldnpkr )  /* Ver 165A-S alt (Fast Deal), 1996-05-26 */
+GAMEL( 1996, wldwitchk, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-N)",     0,                   layout_goldnpkr )  /* Ver 165A-N, 1996-05-29 */
+GAMEL( 1996, wldwitchl, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A beta)",  0,                   layout_goldnpkr )  /* Ver 170A-beta, 1996-06-25 */
+GAMEL( 1996, wldwitchm, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A)",       0,                   layout_goldnpkr )  /* Ver 170A, 1996-09-30 */
+GAMEL( 1997, wldwitchn, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A alt)",   0,                   layout_goldnpkr )  /* Ver 170A alt, 1997-06-11 */
+GAMEL( 1998, wldwitcho, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwo, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG)", 0,                 layout_goldnpkr )  /* Ver 174A-SP-BELG (no D-UP, no payout), 1998-05-11 */
+GAMEL( 1998, wldwitchp, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwp, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",       0,                   layout_goldnpkr )  /* Ver 174A (no D-UP, no payout), 1998-09-20 */
+GAMEL( 1998, wldwitchq, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A alt)",   0,                   layout_goldnpkr )  /* Ver 174A alt, box, 1998-09-25 */
+GAMEL( 1999, wldwitchr, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwr, ROT0,   "Video Klein",              "Wild Witch (Export, 6B/12B ver 1.75A-E English)", 0,               layout_goldnpkr )  /* Ver 175A-E (English), 1999-01-11 */
+GAMEL( 1999, wldwitchs, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswws, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.76A)",       0,                   layout_goldnpkr )  /* Ver 176A, 1999-??-?? */
+GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwt, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.77A)",       0,                   layout_goldnpkr )  /* Ver 177A, 1999-??-?? */
+GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                   layout_goldnpkr )  /* Ver 179A, 2000-05-10 */
+GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                   layout_goldnpkr )  /* Ver 183A, 2001-06-13 */
 
 GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, driver_device,  0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )    /* Ver 1.02, 1998-10-26 */
 GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, driver_device,  0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )    /* Ver 0.99, 1998-04-09 */
