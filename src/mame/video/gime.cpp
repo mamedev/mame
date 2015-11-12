@@ -1297,8 +1297,18 @@ inline UINT16 gime_base_device::get_lines_per_row(void)
 			case MODE_GM2|MODE_GM0:
 			case MODE_GM2|MODE_GM1:
 			case MODE_GM2|MODE_GM1|MODE_GM0:
-				lines_per_row = 12;
+			{
+				// http://cocogamedev.mxf.yuku.com/topic/4299238#.VyC6ozArI-U
+				static int ff9c_lines_per_row[16] =
+				{
+					11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 4, 3, 2, 1, 12
+				};
+
+				int i = m_gime_registers[0x0C] & 0x0F;
+				//lines_per_row = 12;
+				lines_per_row = ff9c_lines_per_row[i];
 				break;
+			}
 
 			case MODE_AG:
 			case MODE_AG|MODE_GM0:
@@ -1540,7 +1550,7 @@ void gime_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 log
 			}
 		}
 
-		/* is the GIME hoizontal virtual screen enabled? */
+		/* is the GIME horizontal virtual screen enabled? */
 		if (m_gime_registers[0x0F] & 0x80)
 		{
 			pitch = 256;
@@ -1580,7 +1590,7 @@ void gime_base_device::update_geometry(void)
 {
 	UINT16 top_border_scanlines, body_scanlines;
 
-	switch(m_legacy_video ? 0x00 : (m_gime_registers[9] & 0x60))
+	switch(m_gime_registers[9] & 0x60) // GIME affects scanlines change even in legacy modes
 	{
 		case 0x00:
 			// 192 lines (and legacy video)
