@@ -674,6 +674,11 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
 
+ifeq ($(SUBTARGET),mame)
+SCRIPTS += scripts/target/$(TARGET)/arcade.lua
+SCRIPTS += scripts/target/$(TARGET)/mess.lua
+endif
+
 ifndef SOURCES
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET).lua
 endif
