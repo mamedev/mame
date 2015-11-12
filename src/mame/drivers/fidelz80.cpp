@@ -10,7 +10,8 @@
 *  TODO:
 *  * Figure out why it says the first speech line twice; it shouldn't?
 *    It sometimes does this on Voice Sensory Chess Challenger real hardware.
-*    It can also be heard on Advanced Talking Chess Challenger real hardware, cold boot.
+*    It can also be heard on Advanced Talking Chess Challenger real hardware, but not the whole line:
+*    "I I am Fidelity's chess challenger", instead.
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
 *  * correctly hook up 7002/VBRC and 7014/bridgec3 speech so that the z80 is halted while words are being spoken
 *
@@ -51,7 +52,7 @@ Memory map (UVC):
 
 I/O map:
 --------
-00-FF: 8255 port chip [LN edit: 00-03, mirrored over the 00-FF range; program accesses F4-F7]
+00-03: 8255 port chip, mirrored over the 00-FF range; program accesses F4-F7
 
 
 8255 connections:
@@ -607,19 +608,19 @@ expect that the software reads these once on startup only.
 void fidelz80_state::update_display()
 {
 	// data for the 4x 7seg leds, bits are 0bxABCDEFG
-	UINT8 out_digit = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
+	UINT8 out_digit = BITSWAP8(m_digit_data,7,0,1,2,3,4,5,6) & 0x7f;
 
 	if (m_led_selected&0x04)
 	{
 		output_set_digit_value(0, out_digit);
 
-		output_set_led_value(1, m_led_data & 0x01);
+		output_set_led_value(1, m_led_data);
 	}
 	if (m_led_selected&0x08)
 	{
 		output_set_digit_value(1, out_digit);
 
-		output_set_led_value(0, m_led_data & 0x01);
+		output_set_led_value(0, m_led_data);
 	}
 	if (m_led_selected&0x10)
 	{
@@ -631,7 +632,7 @@ void fidelz80_state::update_display()
 	}
 }
 
-READ8_MEMBER( fidelz80_state::fidelz80_portc_r )
+READ8_MEMBER(fidelz80_state::fidelz80_portc_r)
 {
 	UINT8 data = 0xff;
 
@@ -655,11 +656,11 @@ READ8_MEMBER( fidelz80_state::fidelz80_portc_r )
 	return data;
 }
 
-WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
+WRITE8_MEMBER(fidelz80_state::fidelz80_portb_w)
 {
 	if (!(data & 0x80))
 	{
-		m_led_data = (data&0x01);   // common for two leds
+		m_led_data = data & 1; // common for two leds
 
 		m_led_selected = data;
 
@@ -669,12 +670,12 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
 	// ignoring the language switch enable for now, is bit 0x40
 }
 
-WRITE8_MEMBER( fidelz80_state::fidelz80_portc_w )
+WRITE8_MEMBER(fidelz80_state::fidelz80_portc_w)
 {
 	m_kp_matrix = data;
 }
 
-WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
+WRITE8_MEMBER(fidelz80_state::cc10_porta_w)
 {
 	m_beep->set_state((data & 0x80) ? 0 : 1);
 
@@ -683,12 +684,12 @@ WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 	update_display();
 }
 
-READ8_MEMBER( fidelz80_state::vcc_portb_r )
+READ8_MEMBER(fidelz80_state::vcc_portb_r)
 {
 	return (m_speech->bsy_r() != 0) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
+WRITE8_MEMBER(fidelz80_state::vcc_porta_w)
 {
 	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
 	m_speech->reg_w(data & 0x3f);
@@ -703,9 +704,9 @@ WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
     I8255 Device, for VSC
 ******************************************************************************/
 
-WRITE8_MEMBER( fidelz80_state::vsc_porta_w )
+WRITE8_MEMBER(fidelz80_state::vsc_porta_w)
 {
-	UINT8 out_digit = BITSWAP8( data,7,6,2,1,0,5,4,3 );
+	UINT8 out_digit = BITSWAP8(data,7,6,2,1,0,5,4,3);
 
 	if (m_kp_matrix & 0x01)
 	{
@@ -730,9 +731,9 @@ WRITE8_MEMBER( fidelz80_state::vsc_porta_w )
 	m_speech->reg_w(data & 0x3f);
 }
 
-WRITE8_MEMBER( fidelz80_state::vsc_portb_w )
+WRITE8_MEMBER(fidelz80_state::vsc_portb_w)
 {
-	for (int row=1; row<=8; row++)
+	for (int row = 1; row <= 8; row++)
 	{
 		if (m_kp_matrix & 0x01)
 			output_set_indexed_value("led_a", row, BIT(data, 8-row));
@@ -753,7 +754,7 @@ WRITE8_MEMBER( fidelz80_state::vsc_portb_w )
 	}
 }
 
-WRITE8_MEMBER( fidelz80_state::vsc_portc_w )
+WRITE8_MEMBER(fidelz80_state::vsc_portc_w)
 {
 	m_kp_matrix = (m_kp_matrix & 0x300) | data;
 }
@@ -762,7 +763,7 @@ WRITE8_MEMBER( fidelz80_state::vsc_portc_w )
     PIO Device, for VSC
 ******************************************************************************/
 
-READ8_MEMBER( fidelz80_state::vsc_pio_porta_r )
+READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 {
 	UINT8 data = 0;
 
@@ -790,7 +791,7 @@ READ8_MEMBER( fidelz80_state::vsc_pio_porta_r )
 	return data & 0xff;
 }
 
-READ8_MEMBER( fidelz80_state::vsc_pio_portb_r )
+READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 {
 	UINT8 data = 0x00;
 
@@ -800,7 +801,7 @@ READ8_MEMBER( fidelz80_state::vsc_pio_portb_r )
 	return data;
 }
 
-WRITE8_MEMBER( fidelz80_state::vsc_pio_portb_w )
+WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 {
 	m_kp_matrix = (m_kp_matrix & 0xff) | ((data & 0x03)<<8);
 
@@ -957,7 +958,7 @@ READ8_MEMBER(fidelz80_state::mcu_status_r)
 	return m_i8041->upi41_master_r(space, 1);
 }
 
-WRITE8_MEMBER( fidelz80_state::bridgec_speech_w )
+WRITE8_MEMBER(fidelz80_state::bridgec_speech_w)
 {
 	// todo: HALT THE z80 here, and set up a callback to poll the s14001a DONE line to resume z80
 	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
@@ -965,13 +966,21 @@ WRITE8_MEMBER( fidelz80_state::bridgec_speech_w )
 	m_speech->rst_w(BIT(data, 7));
 }
 
-void fidelz80_state::machine_reset()
+void fidelz80_state::machine_start()
 {
+	// zerofill
 	m_led_selected = 0;
 	m_kp_matrix = 0;
 	m_digit_data = 0;
 	m_led_data = 0;
 	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
+	
+	// register for savestates
+	save_item(NAME(m_led_selected));
+	save_item(NAME(m_kp_matrix));
+	save_item(NAME(m_digit_data));
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_digit_line_status));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::nmi_timer)
@@ -1011,7 +1020,7 @@ static ADDRESS_MAP_START(bridgec_z80_mem, AS_PROGRAM, 8, fidelz80_state)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 8k rom
 	AM_RANGE(0x4000, 0x5fff) AM_ROM // 8k rom
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
-	AM_RANGE(0xE000, 0xE000) AM_WRITE(bridgec_speech_w) AM_MIRROR(0x1FFF) // write to speech chip, halts cpu
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(bridgec_speech_w) AM_MIRROR(0x1fff) // write to speech chip, halts cpu
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(fidel_z80_io, AS_IO, 8, fidelz80_state)
@@ -1061,7 +1070,7 @@ INPUT_CHANGED_MEMBER(fidelz80_state::bridgec_trigger_reset)
 }
 
 static INPUT_PORTS_START( fidelz80 )
-	PORT_START("LEVEL")     // cc10 only
+	PORT_START("LEVEL") // cc10 only
 		PORT_CONFNAME( 0x80, 0x00, "Number of levels" )
 		PORT_CONFSETTING( 0x00, "10" )
 		PORT_CONFSETTING( 0x80, "3" )
@@ -1250,6 +1259,7 @@ INPUT_PORTS_END
 ******************************************************************************/
 
 static MACHINE_CONFIG_START( cc10, fidelz80_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(cc10_z80_mem)
@@ -1268,12 +1278,13 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, fidelz80_portc_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vcc, fidelz80_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(vcc_z80_mem)
@@ -1299,6 +1310,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vsc, fidelz80_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(vsc_mem)
@@ -1327,6 +1339,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bridgec, fidelz80_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2) // 2.5MHz
 	MCFG_CPU_PROGRAM_MAP(bridgec_z80_mem)
@@ -1343,9 +1356,9 @@ static MACHINE_CONFIG_START( bridgec, fidelz80_state )
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state,digit_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // around 25khz
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1419,10 +1432,10 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, driver_device, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", MACHINE_NOT_WORKING )
-COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", MACHINE_NOT_WORKING )
-COMP( 1979, vbrc,       0,          0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBRC/7002)",  MACHINE_NOT_WORKING )
-COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", MACHINE_NOT_WORKING )
-COMP( 1980, bridgec3,   vbrc,       0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger 3 (model 7014)", MACHINE_NOT_WORKING )
-COMP( 1980, vsc,        0,          0,      vsc,   vsc, driver_device,      0,      "Fidelity Electronics",   "Voice Sensory Chess Challenger (model VSC)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (Model CC10/BCC)", MACHINE_NOT_WORKING )
+COMP( 1979, vcc,      0,      0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Talking Chess Challenger (model VCC)", MACHINE_NOT_WORKING )
+COMP( 1979, vbrc,     0,      0,      bridgec, bridgec,  driver_device, 0, "Fidelity Electronics", "Bridge Challenger (model VBRC/7002)",  MACHINE_NOT_WORKING )
+COMP( 1980, uvc,      vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Advanced Talking Chess Challenger (model UVC)", MACHINE_NOT_WORKING )
+COMP( 1980, bridgec3, vbrc,   0,      bridgec, bridgec,  driver_device, 0, "Fidelity Electronics", "Bridge Challenger 3 (model 7014)", MACHINE_NOT_WORKING )
+COMP( 1980, vsc,      0,      0,      vsc,     vsc,      driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (model VSC)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
