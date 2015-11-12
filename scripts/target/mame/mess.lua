@@ -1333,7 +1333,6 @@ files {
 createMESSProjects(_target, _subtarget, "camputers")
 files {
 	MAME_DIR .. "src/mame/drivers/camplynx.cpp",
-	MAME_DIR .. "src/lib/formats/camplynx_dsk.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "canon")
