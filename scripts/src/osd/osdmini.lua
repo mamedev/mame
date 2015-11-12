@@ -30,8 +30,12 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	files {
 		MAME_DIR .. "src/osd/osdnet.cpp",
+		MAME_DIR .. "src/osd/osdnet.h",
 		MAME_DIR .. "src/osd/osdmini/minimain.cpp",
+		MAME_DIR .. "src/osd/osdmini/osdmini.h",
+		MAME_DIR .. "src/osd/osdepend.h",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.cpp",
+		MAME_DIR .. "src/osd/modules/lib/osdobj_common.h",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_osx.cpp",
@@ -85,7 +89,9 @@ project ("ocore_" .. _OPTIONS["osd"])
 
 	files {
 		MAME_DIR .. "src/osd/osdcore.cpp",
+		MAME_DIR .. "src/osd/osdcore.h",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
+		MAME_DIR .. "src/osd/modules/osdmodule.h",		
 		MAME_DIR .. "src/osd/osdmini/minidir.cpp",
 		MAME_DIR .. "src/osd/osdmini/minifile.cpp",
 		MAME_DIR .. "src/osd/osdmini/minimisc.cpp",

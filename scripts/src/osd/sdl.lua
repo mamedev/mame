@@ -329,43 +329,72 @@ project ("osd_" .. _OPTIONS["osd"])
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/debugosx.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/breakpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/breakpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/consoleview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/consoleview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/debugcommandhistory.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugcommandhistory.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/debugconsole.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugconsole.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/debugview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/debugwindowhandler.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugwindowhandler.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/deviceinfoviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/deviceinfoviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/devicesviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/devicesviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyview.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.h",
+			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/memoryview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/memoryview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.h",		
+			MAME_DIR .. "src/osd/modules/debugger/osx/debugosx.h",
 		}
 		if _OPTIONS["SDL_LIBVER"]=="sdl" then
 			-- SDLMain_tmpl isn't necessary for SDL2
 			files {
 				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.mm",
+				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.h",
 			}
 		end
 	end
 
 	files {
+		MAME_DIR .. "src/osd/sdl/osdsdl.h",
+		MAME_DIR .. "src/osd/sdl/sdlinc.h",
+		MAME_DIR .. "src/osd/sdl/sdlprefix.h",
 		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
+		MAME_DIR .. "src/osd/osdepend.h",
 		MAME_DIR .. "src/osd/sdl/input.cpp",
+		MAME_DIR .. "src/osd/sdl/input.h",
 		MAME_DIR .. "src/osd/sdl/video.cpp",
+		MAME_DIR .. "src/osd/sdl/video.h",
 		MAME_DIR .. "src/osd/sdl/window.cpp",
+		MAME_DIR .. "src/osd/sdl/window.h",
+		MAME_DIR .. "src/osd/modules/osdwindow.h",
 		MAME_DIR .. "src/osd/sdl/output.cpp",
 		MAME_DIR .. "src/osd/sdl/watchdog.cpp",
+		MAME_DIR .. "src/osd/sdl/watchdog.h",
 		MAME_DIR .. "src/osd/modules/render/drawsdl.cpp",
 	}
 	if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 		files {
 			MAME_DIR .. "src/osd/modules/render/draw13.cpp",
+			MAME_DIR .. "src/osd/modules/render/blit13.h",
 		}
 	end
 
@@ -391,15 +420,21 @@ project ("ocore_" .. _OPTIONS["osd"])
 
 	files {
 		MAME_DIR .. "src/osd/osdcore.cpp",
+		MAME_DIR .. "src/osd/osdcore.h",
 		MAME_DIR .. "src/osd/strconv.cpp",
+		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/sdl/sdldir.cpp",
 		MAME_DIR .. "src/osd/sdl/sdlfile.cpp",
+		MAME_DIR .. "src/osd/sdl/sdlfile.h",
 		MAME_DIR .. "src/osd/sdl/sdlptty_" .. BASE_TARGETOS ..".cpp",
 		MAME_DIR .. "src/osd/sdl/sdlsocket.cpp",
 		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
+		MAME_DIR .. "src/osd/modules/osdmodule.h",		
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".cpp",
+		MAME_DIR .. "src/osd/modules/lib/osdlib.h",
 		MAME_DIR .. "src/osd/modules/sync/sync_" .. SYNC_IMPLEMENTATION .. ".cpp",
+		MAME_DIR .. "src/osd/modules/sync/osdsync.h",
 	}
 
 	if _OPTIONS["NOASM"]=="1" then
@@ -414,6 +449,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
+			MAME_DIR .. "src/osd/sdl/osxutils.h",
 			MAME_DIR .. "src/osd/sdl/osxutils.mm",
 		}
 	end
