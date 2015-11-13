@@ -195,33 +195,6 @@ ROM_START( gunman )
 	ROM_LOAD( "gn01.b9",     0x0000, 0x0800, CRC(69474a3a) SHA1(7396f1be991a0e6207eaa79e0206a5286a8d615d) )
 ROM_END
 
-
-ROM_START( bazooka )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x0840, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "bd2.k1",      0x0000, 0x0200, CRC(c9e9ed15) SHA1(624bbc10942a386040aef161b96d64021a842c9f) ) // 6341-1 - gfx: tank, truck, jeep motorcycle
-	ROM_LOAD( "bd2.k4",      0x0200, 0x0200, CRC(c5a74df9) SHA1(2846a039e9bf372f3aa0b88ed89f9029eb7f797c) ) // 6341-1 - gfx: ambulance, stretcher, explosion
-	ROM_LOAD( "bd1.d2",      0x0400, 0x0200, CRC(4fc10886) SHA1(b1c6f890994ba2182a4e7fc17582d6797dbd6ce9) ) // 6341-1 or 82s115
-	ROM_LOAD( "bd1.e2",      0x0600, 0x0200, CRC(00179936) SHA1(e5417b8d3814dafe1278179b307a1b563a378cbe) ) // 6341-1 or 82s115
-	ROM_LOAD( "bd2.e6",      0x0800, 0x0020, CRC(14b84564) SHA1(69cdd14e23094678c4b280f60cec963609181b00) ) // 82123
-	ROM_LOAD( "bd2.e7",      0x0820, 0x0020, CRC(1bfb073f) SHA1(f6b26dcece71b2cf2ed4a537434edbe31cb10399) ) // 82123
-ROM_END
-
-
-ROM_START( bazookabr )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x0840, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "1",           0x0000, 0x0200, CRC(edc34cb0) SHA1(f76a81833b015784e55b33189e9058cd24922f9b) )
-	ROM_LOAD( "2",           0x0200, 0x0200, CRC(3e78e4c2) SHA1(814509eb773bfa87f1df933214f079e7dd2a8fa2) )
-	ROM_LOAD( "3",           0x0400, 0x0200, CRC(4fc10886) SHA1(b1c6f890994ba2182a4e7fc17582d6797dbd6ce9) )
-	ROM_LOAD( "4",           0x0600, 0x0200, CRC(00179936) SHA1(e5417b8d3814dafe1278179b307a1b563a378cbe) )
-	ROM_LOAD( "bd2.e6",      0x0800, 0x0020, BAD_DUMP CRC(14b84564) SHA1(69cdd14e23094678c4b280f60cec963609181b00) ) // not dumped, taken from PSE set
-	ROM_LOAD( "bd2.e7",      0x0820, 0x0020, BAD_DUMP CRC(1bfb073f) SHA1(f6b26dcece71b2cf2ed4a537434edbe31cb10399) ) // not dumped, taken from PSE set
-ROM_END
-
-
 /*
 
  Missile-X
@@ -279,8 +252,6 @@ ROM_END
 
 
 GAME( 1977, gunman,    0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Gunman [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, bazooka,   0,       taitottl, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON ) // clone of Taito Cross Fire - or is Cross Fire a clone of PSE Bazooka?
-GAME( 1977, bazookabr, bazooka, taitottl, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1977, missilex,  0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Missile-X [TTL]", MACHINE_IS_SKELETON )
 GAME( 1977, ttblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "T.T. Block [TTL]", MACHINE_IS_SKELETON )
 GAME( 1979, zzblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Zun Zun Block [TTL]", MACHINE_IS_SKELETON )

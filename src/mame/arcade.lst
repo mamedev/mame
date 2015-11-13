@@ -11232,6 +11232,7 @@ potnpkrd        // Bootleg
 potnpkre        // Bootleg
 potnpkrf        // Bootleg
 potnpkrg        // Bootleg
+potnpkrh        // Bootleg
 ngold           // 198? Unknown
 ngolda          // 198? Unknown
 ngoldb          // 198? Unknown
@@ -13313,8 +13314,10 @@ attckexd2     // (c) 1977 Exidy
 deathrac      // (c) 1976 Exidy
 biplane4      // (c) 1976 Fun Games
 take5         // (c) 1975 Fun Games
-dpatrol       // (c) 1977 PSE
 //knightar    // (c) 1976 PSE
+bazooka       // (c) 1976 PSE
+bazookabr     // (c) 1977 Taito do Brasil
+dpatrol       // (c) 1977 PSE
 //gametree    // (c) 1978 PSE
 vollyrmt      // (c) 1973 Ramtek
 hockyrmt      // (c) 1973 Ramtek
@@ -13326,8 +13329,6 @@ trivia        // (c) 1976 Ramtek
 monacogp      // (c) 1980 Sega
 monacogpa     // (c) 1980 Sega
 gunman        // (c) 1977 Taito
-bazooka       // (c) 1977 PSE
-bazookabr     // (c) 1977 Taito do Brasil
 missilex      // (c) 1977 Taito
 ttblock       // (c) 1977 Taito
 zzblock       // (c) 1979 Taito

@@ -930,6 +930,7 @@ files {
 	MAME_DIR .. "src/mame/video/tia.h",
 	MAME_DIR .. "src/mame/machine/atari.cpp",
 	MAME_DIR .. "src/mame/video/atari.cpp",
+	MAME_DIR .. "src/mame/includes/atari.h",
 	MAME_DIR .. "src/mame/video/antic.cpp",
 	MAME_DIR .. "src/mame/video/antic.h",
 	MAME_DIR .. "src/mame/video/gtia.cpp",
@@ -938,6 +939,9 @@ files {
 	MAME_DIR .. "src/mame/includes/jaguar.h",
 	MAME_DIR .. "src/mame/audio/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jaguar.cpp",
+	MAME_DIR .. "src/mame/video/jagblit.h",
+	MAME_DIR .. "src/mame/video/jagblit.inc",
+	MAME_DIR .. "src/mame/video/jagobj.inc",	
 	MAME_DIR .. "src/mame/audio/gorf.cpp",
 	MAME_DIR .. "src/mame/audio/wow.cpp",
 	MAME_DIR .. "src/mame/drivers/astrocde.cpp",
@@ -953,6 +957,8 @@ files {
 	MAME_DIR .. "src/mame/audio/snes_snd.h",
 	MAME_DIR .. "src/mame/machine/n64.cpp",
 	MAME_DIR .. "src/mame/video/n64.cpp",
+	MAME_DIR .. "src/mame/video/n64types.h",
+	MAME_DIR .. "src/mame/video/rdpfiltr.inc",	
 	MAME_DIR .. "src/mame/video/n64.h",
 	MAME_DIR .. "src/mame/video/rdpblend.cpp",
 	MAME_DIR .. "src/mame/video/rdpblend.h",
@@ -961,6 +967,7 @@ files {
 	MAME_DIR .. "src/mame/machine/megadriv.cpp",
 	MAME_DIR .. "src/mame/drivers/naomi.cpp",
 	MAME_DIR .. "src/mame/includes/naomi.h",
+	MAME_DIR .. "src/mame/includes/dc.h",
 	MAME_DIR .. "src/mame/machine/awboard.cpp",
 	MAME_DIR .. "src/mame/machine/awboard.h",
 	MAME_DIR .. "src/mame/machine/dc.cpp",
@@ -1333,7 +1340,6 @@ files {
 createMESSProjects(_target, _subtarget, "camputers")
 files {
 	MAME_DIR .. "src/mame/drivers/camplynx.cpp",
-	MAME_DIR .. "src/lib/formats/camplynx_dsk.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "canon")
@@ -1756,6 +1762,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mmodular.cpp",
 	MAME_DIR .. "src/mame/drivers/stratos.cpp",
 	MAME_DIR .. "src/mame/machine/mboard.cpp",
+	MAME_DIR .. "src/mame/includes/mboard.h",
 }
 
 createMESSProjects(_target, _subtarget, "hitachi")
@@ -2119,6 +2126,10 @@ files {
 	MAME_DIR .. "src/mame/includes/snes.h",
 	MAME_DIR .. "src/mame/machine/snescx4.cpp",
 	MAME_DIR .. "src/mame/machine/snescx4.h",
+	MAME_DIR .. "src/mame/machine/cx4data.inc",
+	MAME_DIR .. "src/mame/machine/cx4fn.inc",
+	MAME_DIR .. "src/mame/machine/cx4oam.inc",
+	MAME_DIR .. "src/mame/machine/cx4ops.inc",
 	MAME_DIR .. "src/mame/drivers/vboy.cpp",
 	MAME_DIR .. "src/mame/audio/vboy.cpp",
 	MAME_DIR .. "src/mame/audio/vboy.h",
@@ -2158,7 +2169,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/m24.cpp",
 	MAME_DIR .. "src/mame/machine/m24_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/m24_kbd.h",
-	MAME_DIR .. "src/mame/machine/m24_z8000.cpp"
+	MAME_DIR .. "src/mame/machine/m24_z8000.cpp",
+	MAME_DIR .. "src/mame/machine/m24_z8000.h",
 }
 
 createMESSProjects(_target, _subtarget, "olympia")
@@ -2207,6 +2219,7 @@ files {
 createMESSProjects(_target, _subtarget, "palm")
 files {
 	MAME_DIR .. "src/mame/drivers/palm.cpp",
+	MAME_DIR .. "src/mame/drivers/palm_dbg.inc",
 	MAME_DIR .. "src/mame/drivers/palmz22.cpp",
 }
 
@@ -2387,6 +2400,7 @@ files {
 	MAME_DIR .. "src/mame/machine/dccons.cpp",
 	MAME_DIR .. "src/mame/drivers/megadriv.cpp",
 	MAME_DIR .. "src/mame/includes/megadriv.h",
+	MAME_DIR .. "src/mame/includes/md_cons.h",
 	MAME_DIR .. "src/mame/drivers/saturn.cpp",
 	MAME_DIR .. "src/mame/drivers/segapico.cpp",
 	MAME_DIR .. "src/mame/drivers/sega_sawatte.cpp",
@@ -2428,12 +2442,16 @@ files {
 	MAME_DIR .. "src/mame/includes/pocketc.h",
 	MAME_DIR .. "src/mame/video/pc1401.cpp",
 	MAME_DIR .. "src/mame/machine/pc1401.cpp",
+	MAME_DIR .. "src/mame/includes/pc1401.h",
 	MAME_DIR .. "src/mame/video/pc1403.cpp",
 	MAME_DIR .. "src/mame/machine/pc1403.cpp",
+	MAME_DIR .. "src/mame/includes/pc1403.h",
 	MAME_DIR .. "src/mame/video/pc1350.cpp",
 	MAME_DIR .. "src/mame/machine/pc1350.cpp",
+	MAME_DIR .. "src/mame/includes/pc1350.h",
 	MAME_DIR .. "src/mame/video/pc1251.cpp",
 	MAME_DIR .. "src/mame/machine/pc1251.cpp",
+	MAME_DIR .. "src/mame/includes/pc1251.h",
 	MAME_DIR .. "src/mame/video/pocketc.cpp",
 	MAME_DIR .. "src/mame/machine/mz700.cpp",
 	MAME_DIR .. "src/mame/drivers/x68k.cpp",
@@ -2459,6 +2477,7 @@ files {
 	MAME_DIR .. "src/mame/machine/pce220_ser.h",
 	MAME_DIR .. "src/mame/drivers/mz6500.cpp",
 	MAME_DIR .. "src/mame/drivers/zaurus.cpp",
+	MAME_DIR .. "src/mame/machine/pxa255.h",
 }
 
 createMESSProjects(_target, _subtarget, "sinclair")
@@ -2706,6 +2725,8 @@ files {
 	MAME_DIR .. "src/mame/video/733_asr.h",
 	MAME_DIR .. "src/mame/video/911_vdt.cpp",
 	MAME_DIR .. "src/mame/video/911_vdt.h",
+	MAME_DIR .. "src/mame/video/911_chr.h",
+	MAME_DIR .. "src/mame/video/911_key.h",
 	MAME_DIR .. "src/mame/drivers/hh_tms1k.cpp",
 	MAME_DIR .. "src/mame/includes/hh_tms1k.h",
 }
@@ -2772,12 +2793,14 @@ files {
 	MAME_DIR .. "src/mame/machine/6883sam.cpp",
 	MAME_DIR .. "src/mame/machine/6883sam.h",
 	MAME_DIR .. "src/mame/machine/coco.cpp",
+	MAME_DIR .. "src/mame/includes/coco.h",
 	MAME_DIR .. "src/mame/machine/coco12.cpp",
 	MAME_DIR .. "src/mame/machine/coco3.cpp",
 	MAME_DIR .. "src/mame/machine/coco_vhd.cpp",
 	MAME_DIR .. "src/mame/machine/coco_vhd.h",
 	MAME_DIR .. "src/mame/machine/dragon.cpp",
 	MAME_DIR .. "src/mame/machine/dgnalpha.cpp",
+	MAME_DIR .. "src/mame/includes/dgnalpha.h",
 	MAME_DIR .. "src/mame/video/gime.cpp",
 	MAME_DIR .. "src/mame/video/gime.h",
 	MAME_DIR .. "src/mame/drivers/trs80.cpp",
@@ -2925,8 +2948,10 @@ files {
 	MAME_DIR .. "src/mame/includes/ec184x.h",
 	MAME_DIR .. "src/mame/drivers/iskr103x.cpp",
 	MAME_DIR .. "src/mame/drivers/mc1502.cpp",
+	MAME_DIR .. "src/mame/machine/kb_7007_3.h",
 	MAME_DIR .. "src/mame/includes/mc1502.h",
 	MAME_DIR .. "src/mame/drivers/poisk1.cpp",
+	MAME_DIR .. "src/mame/machine/kb_poisk1.h",
 	MAME_DIR .. "src/mame/includes/poisk1.h",
 	MAME_DIR .. "src/mame/video/poisk1.cpp",
 	MAME_DIR .. "src/mame/video/poisk1.h",

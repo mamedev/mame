@@ -4,18 +4,18 @@
 
 Exidy discrete hardware games
 
- Alley Rally (1975) (AR-1A)
- Attack (1977)
- Death Race (1976)
- Destruction Derby (1975)
- Hockey / Tennis (Thumper Bumper?) (1974)
- Score (1977)
+ Alley Rally (1976/10) (AR-1A)
+ Attack (1977/02)
+ Death Race (1976/04)
+ Destruction Derby (1976/01)
+ Hockey / Tennis (Thumper Bumper?) (1974/03)
+ Score (1977/07)
  Spiders From Space (1976)
- Sting (1974)
- Super Death Chase (1977)
- Table Foosballer / Table Football (1975)
- Table Pinball (1974)
- TV Pinball (1974) (PB-4)
+ Sting (1974/03)
+ Super Death Chase (1977/10)
+ Table Foosballer / Table Football (1975/11)
+ Table Pinball (1974/11)
+ TV Pinball (1974/11) (PB-4)
 
 ***************************************************************************/
 
@@ -210,8 +210,6 @@ ROM_START( deathrac )
 	ROM_LOAD( "6331-36.r7",     0x0000, 0x0020, CRC(1358c8d5) SHA1(2fa1041f30f3a6775393714a65c416738b06b330) )
 	ROM_LOAD( "6331-36.t7",     0x0000, 0x0020, CRC(15e00a2a) SHA1(cd43d227a34e5444ed9d8a4acf5497df9c789c73) )
 ROM_END
-
-
 
 GAME( 1977, attckexd,  0,        attack,   0, driver_device,  0, ROT0, "Exidy", "Attack (Set 1) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1977, attckexd2, attckexd, attack,   0, driver_device,  0, ROT0, "Exidy", "Attack (Set 2) [TTL]", MACHINE_IS_SKELETON )
