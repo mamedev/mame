@@ -172,11 +172,12 @@
 		</part>
 	</software>
 
+<!--This demonstration CD was released packed with some copies of Tobal No.1-->
 <!-- size="93662349" crc="59bd7278" -->
 	<software name="intcdff7">
 		<description>Final Fantasy VII Interactive Sampler CD</description>
 		<year>1996</year>
-		<publisher>SCEA</publisher>
+		<publisher>Squaresoft</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="Final Fantasy VII Interactive Sampler CD" sha1="0a88439b32be5172e79847f79ae33b6ba22b1de6"/>
