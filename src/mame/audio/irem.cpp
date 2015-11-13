@@ -409,7 +409,7 @@ ADDRESS_MAP_END
 #define USE_FRONTIERS 1
 #define USE_FIXED_STV 1
 
-#include "nl_kidniki.cpp"
+#include "nl_kidniki.inc"
 
 NETLIST_START(kidniki_interface)
 
