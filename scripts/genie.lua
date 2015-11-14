@@ -1254,9 +1254,9 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd1478", 			-- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
 			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
 			"/Qwd3291", 			-- warning #3291: invalid narrowing conversion from "double" to "int"
-			"/Qwd1195",
-			"/Qwd1786",
-			"/Qwd592", -- For lua, false positive?
+			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
+			"/Qwd47",				-- error #47: incompatible redefinition of macro "xxx"
+			"/Qwd265",				-- error #265: floating-point operation result is out of range
 		}
 end
 

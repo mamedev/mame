@@ -3055,7 +3055,7 @@ READ16_MEMBER(namcos23_state::mcu_pb_r)
 
 WRITE16_MEMBER(namcos23_state::mcu_pb_w)
 {
-	m_sub_portb = (m_sub_portb & 0x80) | (data & 0x7f);
+	m_sub_portb = (m_sub_portb & 0xc0) | (data & 0x3f);
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
 	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }

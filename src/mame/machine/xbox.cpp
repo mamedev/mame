@@ -1190,7 +1190,7 @@ static UINT32 hubintiasbridg_pci_r(device_t *busdevice, device_t *device, int fu
 static void hubintiasbridg_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	if (reg >= 16) device->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+	if (reg >= 16) busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
 
@@ -1209,7 +1209,7 @@ static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, i
 static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	if (reg >= 16) device->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+	if (reg >= 16) busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
 
