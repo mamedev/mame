@@ -76,10 +76,10 @@ unsigned int bbc_state::calculate_video_address(int ma,int ra)
 	if (BIT(ma,13))
 	{
 		// IC 10 and IC 11
-		m = ((ma&0x3ff) | 0x3c00) | ((s&0x8)<<11);
+		m = ((ma & 0x3ff) | 0x3c00) | ((s & 0x8)<<11);
 	} else {
 		// IC 8 and IC 9
-		m = ((ma&0xff)<<3) | (s<<11) | (ra&0x7);
+		m = ((ma & 0xff)<<3) | (s<<11) | (ra & 0x7);
 	}
 	if (m_memorySize == 16)
 		return  m & 0x3fff;
@@ -144,12 +144,12 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 	// Set the control register in the Video ULA
 	case 0:
 		m_videoULA_Reg = data;
-		m_videoULA_master_cursor_size     = (m_videoULA_Reg>>7)&0x01;
+		m_videoULA_master_cursor_size     = BIT(m_videoULA_Reg,7);
 		m_videoULA_width_of_cursor        = (m_videoULA_Reg>>5)&0x03;
-		m_videoULA_6845_clock_rate        = (m_videoULA_Reg>>4)&0x01;
+		m_videoULA_6845_clock_rate        = BIT(m_videoULA_Reg,4);
 		m_videoULA_characters_per_line    = (m_videoULA_Reg>>2)&0x03;
-		m_videoULA_teletext_normal_select = (m_videoULA_Reg>>1)&0x01;
-		m_videoULA_flash_colour_select    =  m_videoULA_Reg    &0x01;
+		m_videoULA_teletext_normal_select = BIT(m_videoULA_Reg,1);
+		m_videoULA_flash_colour_select    = BIT(m_videoULA_Reg,0);
 
 		m_videoULA_palette_lookup = m_videoULA_flash_colour_select ? m_videoULA_palette0 : m_videoULA_palette1;
 
@@ -161,16 +161,16 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 		else
 			m_pixels_per_byte = pixels_per_byte_set[m_videoULA_characters_per_line | (m_videoULA_6845_clock_rate<<2)];
 
-		m_mc6845->set_hpixels_per_column(m_pixels_per_byte);
+		m_hd6845->set_hpixels_per_column(m_pixels_per_byte);
 		if (m_videoULA_6845_clock_rate)
-			m_mc6845->set_clock(XTAL_16MHz/8);
+			m_hd6845->set_clock(XTAL_16MHz/8);
 		else
-			m_mc6845->set_clock(XTAL_16MHz/16);
+			m_hd6845->set_clock(XTAL_16MHz/16);
 		break;
 	// Set a palette register in the Video ULA
 	case 1:
-		int tpal = (data >> 4)&0x0f;
-		int tcol = data&0x0f;
+		int tpal = (data >> 4) & 0x0f;
+		int tcol = data & 0x0f;
 		m_videoULA_palette0[tpal] = tcol;
 		m_videoULA_palette1[tpal] = tcol<8 ? tcol : tcol^7;
 		break;
@@ -225,12 +225,6 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 
 				bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = rgb;
 			}
-		}
-
-		if (ra == 18)
-		{
-			m_trom->lose_w(1);
-			m_trom->lose_w(0);
 		}
 	}
 	else
