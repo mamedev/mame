@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   modules.lua
+--
+--   Rules for the building of modules
+--
+---------------------------------------------------------------------------
+
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end

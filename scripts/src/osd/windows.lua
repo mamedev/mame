@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   windows.lua
+--
+--   Rules for the building for Windows
+--
+---------------------------------------------------------------------------
+
 dofile("modules.lua")
 
 

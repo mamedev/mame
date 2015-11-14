@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   sdl.lua
+--
+--   Rules for the building with SDL
+--
+---------------------------------------------------------------------------
+
 dofile("modules.lua")
 
 

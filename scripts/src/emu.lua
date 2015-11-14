@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   emu.lua
+--
+--   Rules for building emu cores
+--
+---------------------------------------------------------------------------
+
 project ("emu")
 targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 uuid ("e6fa15e4-a354-4526-acef-13c8e80fcacf")

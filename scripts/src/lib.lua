@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   lib.lua
+--
+--   Rules for building lib cores
+--
+---------------------------------------------------------------------------
+
 project "utils"
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
 	kind (LIBTYPE)

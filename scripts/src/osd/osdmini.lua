@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   osdmini.lua
+--
+--   Rules for the building of osdmini
+--
+---------------------------------------------------------------------------
+
 function maintargetosdoptions(_target,_subtarget)
 end
 
