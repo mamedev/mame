@@ -155,7 +155,7 @@ wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_hgdc0(*this, UPD7720_0_TAG),
 	m_hgdc1(*this, UPD7720_1_TAG),
-	m_option(0),
+	m_option(0), m_underline(0),
 	m_palette(*this, "palette")
 {
 }

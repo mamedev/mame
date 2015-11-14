@@ -158,7 +158,7 @@ kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_halt_cb(*this)
+		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot_tag(nullptr), m_next_slot(nullptr)
 {
 }
 
@@ -167,7 +167,7 @@ kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type 
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_halt_cb(*this)
+		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot_tag(nullptr), m_next_slot(nullptr)
 {
 }
 

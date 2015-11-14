@@ -41,14 +41,14 @@ const device_type COCO_PAK = &device_creator<coco_pak_device>;
 //-------------------------------------------------
 coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cococart_interface( mconfig, *this )
+		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr)
 {
 }
 
 coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
-		device_cococart_interface( mconfig, *this )
-{
+		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr)
+	{
 }
 
 //-------------------------------------------------

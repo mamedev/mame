@@ -57,8 +57,8 @@ dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag,
 		m_ppi(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
 		m_cent_data_in(*this, "cent_data_in"),
-		m_cent_data_out(*this, "cent_data_out")
-{
+		m_cent_data_out(*this, "cent_data_out"), m_bus(nullptr), m_clk1_timer(nullptr), m_portb(0), m_portc(0)
+	{
 }
 
 //-------------------------------------------------

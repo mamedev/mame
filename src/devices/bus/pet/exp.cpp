@@ -36,7 +36,7 @@ const device_type PET_EXPANSION_SLOT = &device_creator<pet_expansion_slot_device
 
 pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_EXPANSION_SLOT, "PET memory expansion port", tag, owner, clock, "pet_expansion_slot", __FILE__),
-	device_slot_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this), m_card(nullptr),
 	m_read_dma(*this),
 	m_write_dma(*this)
 {

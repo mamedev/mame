@@ -113,7 +113,7 @@ bml3bus_mp1802_device::bml3bus_mp1802_device(const machine_config &mconfig, cons
 	m_floppy0(*this, "fdc:0"),
 	m_floppy1(*this, "fdc:1"),
 	m_floppy2(*this, "fdc:2"),
-	m_floppy3(*this, "fdc:3")
+	m_floppy3(*this, "fdc:3"), m_rom(nullptr)
 {
 }
 

@@ -37,7 +37,7 @@ machine_config_constructor cpc_pds_device::device_mconfig_additions() const
 
 cpc_pds_device::cpc_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_PDS, "Programmers Development System (CPC Target)", tag, owner, clock, "cpc_pds", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this),
+	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_pio(*this,"pio")
 {
 }

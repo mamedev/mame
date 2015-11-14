@@ -303,7 +303,7 @@ xtide_device::xtide_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, ISA8_XTIDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_xtide", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),
-	m_eeprom(*this, "eeprom")
+	m_eeprom(*this, "eeprom"), m_irq_number(0), m_d8_d15_latch(0)
 {
 }
 

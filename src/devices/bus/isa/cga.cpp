@@ -301,9 +301,9 @@ const rom_entry *isa8_cga_device::device_rom_region() const
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1),
-		m_vram_size( 0x4000 ),
+		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
+		m_update_row_type(-1), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+		m_vram_size( 0x4000 ), m_plantronics(0),
 		m_palette(*this, "palette")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
@@ -316,9 +316,9 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1),
-		m_vram_size( 0x4000 ),
+		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
+		m_update_row_type(-1), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+		m_vram_size( 0x4000 ), m_plantronics(0),
 		m_palette(*this, "palette")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
@@ -1523,7 +1523,7 @@ const UINT8 isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
 //-------------------------------------------------
 
 isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", tag, owner, clock, "cga_pc1512", __FILE__)
+		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", tag, owner, clock, "cga_pc1512", __FILE__), m_write(0), m_read(0), m_mc6845_address(0)
 {
 	m_vram_size = 0x10000;
 	m_chr_gen_offset[0] = 0x0000;
@@ -1652,7 +1652,7 @@ const device_type ISA8_WYSE700 = &device_creator<isa8_wyse700_device>;
 //-------------------------------------------------
 
 isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_WYSE700, "Wyse 700", tag, owner, clock, "wyse700", __FILE__)
+		isa8_cga_device( mconfig, ISA8_WYSE700, "Wyse 700", tag, owner, clock, "wyse700", __FILE__), m_bank_offset(0), m_bank_base(0), m_control(0)
 {
 	m_vram_size = 0x20000;
 	m_start_offset = 0x18000;
@@ -1740,7 +1740,7 @@ const device_type ISA8_EC1841_0002 = &device_creator<isa8_ec1841_0002_device>;
 //-------------------------------------------------
 
 isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_EC1841_0002, "EC 1841.0002 (CGA)", tag, owner, clock, "ec1841_0002", __FILE__)
+		isa8_cga_device( mconfig, ISA8_EC1841_0002, "EC 1841.0002 (CGA)", tag, owner, clock, "ec1841_0002", __FILE__), m_p3df(0)
 {
 }
 
@@ -1894,7 +1894,7 @@ const rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 const device_type ISA8_CGA_M24 = &device_creator<isa8_cga_m24_device>;
 
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_M24, "Olivetti M24 CGA", tag, owner, clock, "cga_m24", __FILE__)
+		isa8_cga_device( mconfig, ISA8_CGA_M24, "Olivetti M24 CGA", tag, owner, clock, "cga_m24", __FILE__), m_mode2(0), m_index(0)
 {
 	m_vram_size = 0x8000;
 }

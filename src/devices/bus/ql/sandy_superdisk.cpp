@@ -120,7 +120,7 @@ sandy_super_disk_t::sandy_super_disk_t(const machine_config &mconfig, const char
 	m_centronics(*this, CENTRONICS_TAG),
 	m_latch(*this, TTL74273_TAG),
 	m_rom(*this, "rom"),
-	m_busy(1)
+	m_busy(1), m_fd6(0)
 {
 }
 

@@ -690,7 +690,7 @@ c2040_t::c2040_t(const machine_config &mconfig, device_type type, const char *na
 	m_address(*this, "ADDRESS"),
 	m_rfdo(1),
 	m_daco(1),
-	m_atna(1)
+	m_atna(1), m_ifc(0)
 {
 }
 
@@ -710,7 +710,7 @@ c2040_t::c2040_t(const machine_config &mconfig, const char *tag, device_t *owner
 	m_address(*this, "ADDRESS"),
 	m_rfdo(1),
 	m_daco(1),
-	m_atna(1)
+	m_atna(1), m_ifc(0)
 {
 }
 

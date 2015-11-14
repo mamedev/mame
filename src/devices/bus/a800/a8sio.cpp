@@ -50,13 +50,13 @@ const device_type A8SIO_SLOT = &device_creator<a8sio_slot_device>;
 //-------------------------------------------------
 a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, A8SIO_SLOT, "Atari 8 bit SIO Slot", tag, owner, clock, "a8sio_slot", __FILE__)
-	, device_slot_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this), m_a8sio_tag(nullptr), m_a8sio_slottag(nullptr)
 {
 }
 
 a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_a8sio_tag(nullptr), m_a8sio_slottag(nullptr)
 {
 }
 
@@ -102,7 +102,7 @@ a8sio_device::a8sio_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, A8SIO, "Atari 8 biot SIO", tag, owner, clock, "a8sio", __FILE__)
 	, m_out_clock_in_cb(*this)
 	, m_out_data_in_cb(*this)
-	, m_out_audio_in_cb(*this)
+	, m_out_audio_in_cb(*this), m_device(nullptr)
 {
 }
 
@@ -110,7 +110,7 @@ a8sio_device::a8sio_device(const machine_config &mconfig, device_type type, cons
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_out_clock_in_cb(*this)
 	, m_out_data_in_cb(*this)
-	, m_out_audio_in_cb(*this)
+	, m_out_audio_in_cb(*this), m_device(nullptr)
 {
 }
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER( a8sio_device::audio_in_w )
 device_a8sio_card_interface::device_a8sio_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 	, m_a8sio(NULL)
-	, m_a8sio_tag(NULL)
+	, m_a8sio_tag(NULL), m_a8sio_slottag(nullptr)
 {
 }
 

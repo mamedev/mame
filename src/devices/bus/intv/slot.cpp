@@ -148,7 +148,7 @@ intv_cart_slot_device::intv_cart_slot_device(const machine_config &mconfig, cons
 						device_t(mconfig, INTV_CART_SLOT, "Intellivision Cartridge Slot", tag, owner, clock, "intv_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(INTV_STD)
+						m_type(INTV_STD), m_cart(nullptr)
 {
 }
 

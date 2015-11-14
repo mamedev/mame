@@ -192,7 +192,7 @@ stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *ta
 	m_dacl(*this, "dacl"),
 	m_dacr(*this, "dacr"),
 	m_joy(*this, "pc_joy"),
-	m_cpu(*this, "stereo_fx_cpu")
+	m_cpu(*this, "stereo_fx_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_port20(0), m_port00(0), m_timer(nullptr), m_t0(0)
 {
 	m_t1 = 0;
 }

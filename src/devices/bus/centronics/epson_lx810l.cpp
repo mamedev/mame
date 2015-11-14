@@ -302,7 +302,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	m_cr_pos_abs(1),
 	m_real_cr_pos(1),
 	m_real_cr_steps(0),
-	m_real_cr_dir(0)
+	m_real_cr_dir(0), m_fakemem(0)
 {
 }
 
@@ -323,7 +323,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	m_cr_pos_abs(1),
 	m_real_cr_pos(1),
 	m_real_cr_steps(0),
-	m_real_cr_dir(0)
+	m_real_cr_dir(0), m_fakemem(0)
 {
 }
 

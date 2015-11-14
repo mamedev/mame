@@ -38,7 +38,7 @@ const device_type C64_SUPER_EXPLODE = &device_creator<c64_super_explode_cartridg
 
 c64_super_explode_cartridge_device::c64_super_explode_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_SUPER_EXPLODE, "C64 Super Explode! cartridge", tag, owner, clock, "c64_super_explode", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this), m_bank(0), m_exrom_timer(nullptr)
 {
 }
 

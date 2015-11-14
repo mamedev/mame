@@ -33,7 +33,7 @@
 /****************************************************************************/
 
 ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_SPEECH, "TI-99 Speech synthesizer (on adapter card)", tag, owner, clock, "ti99_speech", __FILE__)
+: ti_expansion_card_device(mconfig, TI99_SPEECH, "TI-99 Speech synthesizer (on adapter card)", tag, owner, clock, "ti99_speech", __FILE__), m_vsp(nullptr), m_read_mode(false)
 {
 }
 

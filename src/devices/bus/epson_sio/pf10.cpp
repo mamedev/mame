@@ -96,10 +96,10 @@ epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_fdc(*this, "upd765a"),
-	m_sio_output(*this, "sio"),
+	m_sio_output(*this, "sio"), m_floppy(nullptr), m_timer(nullptr),
 	m_port1(0xff),
 	m_port2(0xff),
-	m_rxc(1)
+	m_rxc(1), m_hd6303_tx(0), m_pinc(0)
 {
 	m_sio_input = dynamic_cast<epson_sio_device *>(owner);
 }

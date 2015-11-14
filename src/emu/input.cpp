@@ -834,7 +834,7 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 	// if we have a generic ID, pick a new internal one
 	input_item_id originalid = itemid;
 	if (itemid >= ITEM_ID_OTHER_SWITCH && itemid <= ITEM_ID_OTHER_AXIS_RELATIVE)
-		for (itemid = (input_item_id)(ITEM_ID_MAXIMUM + 1); itemid <= ITEM_ID_ABSOLUTE_MAXIMUM; itemid++)
+		for (itemid = (input_item_id)(ITEM_ID_MAXIMUM + 1); itemid <= ITEM_ID_ABSOLUTE_MAXIMUM; ++itemid)
 			if (m_item[itemid] == NULL)
 				break;
 	assert(itemid <= ITEM_ID_ABSOLUTE_MAXIMUM);
@@ -920,7 +920,7 @@ void input_device::apply_steadykey() const
 
 	// update the state of all the keys and see if any changed state
 	bool anything_changed = false;
-	for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= m_maxitem; itemid++)
+	for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= m_maxitem; ++itemid)
 	{
 		input_device_item *item = m_item[itemid];
 		if (item != NULL && item->itemclass() == ITEM_CLASS_SWITCH)
@@ -930,7 +930,7 @@ void input_device::apply_steadykey() const
 
 	// if the keyboard state is stable, flush the current state
 	if (!anything_changed)
-		for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= m_maxitem; itemid++)
+		for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= m_maxitem; ++itemid)
 		{
 			input_device_item *item = m_item[itemid];
 			if (item != NULL && item->itemclass() == ITEM_CLASS_SWITCH)
@@ -1183,7 +1183,7 @@ void input_manager::reset_polling()
 	reset_memory();
 
 	// iterate over device classes and devices
-	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; devclass++)
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
 			// fetch the device; ignore if NULL
@@ -1192,7 +1192,7 @@ void input_manager::reset_polling()
 				continue;
 
 			// iterate over items within each device
-			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); itemid++)
+			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
 			{
 				// for any non-switch items, set memory equal to the current value
 				input_device_item *item = device->item(itemid);
@@ -1210,7 +1210,7 @@ void input_manager::reset_polling()
 input_code input_manager::poll_switches()
 {
 	// iterate over device classes and devices
-	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; devclass++)
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
 			// fetch the device; ignore if NULL
@@ -1219,7 +1219,7 @@ input_code input_manager::poll_switches()
 				continue;
 
 			// iterate over items within each device
-			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); itemid++)
+			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
 			{
 				input_device_item *item = device->item(itemid);
 				if (item != NULL)
@@ -1299,7 +1299,7 @@ input_code input_manager::poll_keyboard_switches()
 			continue;
 
 		// iterate over items within each device
-		for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); itemid++)
+		for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
 		{
 			input_device_item *item = device->item(itemid);
 			if (item != NULL && item->itemclass() == ITEM_CLASS_SWITCH)
@@ -1364,7 +1364,7 @@ bool input_manager::code_check_axis(input_device_item &item, input_code code)
 input_code input_manager::poll_axes()
 {
 	// iterate over device classes and devices
-	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; devclass++)
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
 			// fetch the device; ignore if NULL
@@ -1373,7 +1373,7 @@ input_code input_manager::poll_axes()
 				continue;
 
 			// iterate over items within each device
-			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); itemid++)
+			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
 			{
 				input_device_item *item = device->item(itemid);
 				if (item != NULL && item->itemclass() != ITEM_CLASS_SWITCH)
@@ -1445,7 +1445,7 @@ void input_manager::reset_memory()
 input_code input_manager::code_from_itemid(input_item_id itemid) const
 {
 	// iterate over device classes and devices
-	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; devclass++)
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
 			input_device *device = m_class[devclass]->device(devnum);
@@ -1613,7 +1613,7 @@ input_code input_manager::code_from_token(const char *_token)
 			return INPUT_CODE_INVALID;
 
 		// if not a standard code, look it up in the device specific codes
-		for (itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); itemid++)
+		for (itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
 		{
 			input_device_item *item = device->item(itemid);
 			if (item != NULL && token[curtok].compare(item->token()) == 0)

@@ -220,7 +220,7 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 : bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__),
 	m_console_inta(*this),
 	m_console_intb(*this),
-	m_datamux_ready(*this)
+	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
 	// The address prefix is actually created by the "Flex cable interface"
@@ -235,7 +235,7 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 : bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_console_inta(*this),
 	m_console_intb(*this),
-	m_datamux_ready(*this)
+	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0), m_address_prefix(0)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
 }
@@ -614,7 +614,7 @@ int peribox_slot_device::get_index_from_tagname()
 }
 
 peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, PERIBOX_SLOT, "TI P-Box slot", tag, owner, clock, "peribox_slot", __FILE__), device_slot_interface(mconfig, *this)
+: bus8z_device(mconfig, PERIBOX_SLOT, "TI P-Box slot", tag, owner, clock, "peribox_slot", __FILE__), device_slot_interface(mconfig, *this), m_card(nullptr), m_slotnumber(0)
 {
 }
 

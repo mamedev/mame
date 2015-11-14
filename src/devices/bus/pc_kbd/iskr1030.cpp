@@ -286,7 +286,7 @@ iskr_1030_keyboard_device::iskr_1030_keyboard_device(const machine_config &mconf
 		m_md20(*this, "MD20"),
 		m_md21(*this, "MD21"),
 		m_md22(*this, "MD22"),
-		m_md23(*this, "MD23"),
+		m_md23(*this, "MD23"), m_bus(0),
 		m_p1(0),
 		m_p2(0),
 		m_q(0)

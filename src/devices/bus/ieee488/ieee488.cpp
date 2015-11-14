@@ -40,7 +40,7 @@ const device_type IEEE488_SLOT = &device_creator<ieee488_slot_device>;
 //-------------------------------------------------
 
 device_ieee488_interface::device_ieee488_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
 {
 }
 
@@ -65,7 +65,7 @@ device_ieee488_interface::~device_ieee488_interface()
 
 ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock, "ieee488_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_address(0)
 {
 }
 

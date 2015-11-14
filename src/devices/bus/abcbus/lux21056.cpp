@@ -352,7 +352,7 @@ luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, cons
 		m_sasi_io(0),
 		m_sasi_cd(0),
 		m_sasi_msg(0),
-		m_sasi_bsy(0),
+		m_sasi_bsy(0), m_inp(0), m_out(0),
 		m_stat(0),
 		m_sasi_data(0)
 {

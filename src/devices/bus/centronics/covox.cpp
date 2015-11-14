@@ -92,8 +92,8 @@ centronics_covox_stereo_device::centronics_covox_stereo_device(const machine_con
 	: device_t(mconfig, CENTRONICS_COVOX_STEREO, "Covox (Stereo-in-1)", tag, owner, clock, "covox_stereo", __FILE__),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_dac_left(*this, "dac_left"),
-	m_dac_right(*this, "dac_right"),
-	m_data(0)
+	m_dac_right(*this, "dac_right"), m_strobe(0),
+	m_data(0), m_autofd(0)
 {
 }
 

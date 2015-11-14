@@ -104,8 +104,8 @@ a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *ta
 		m_dsw1(*this, "DSW1"),
 		m_ctx(*this, PIC_CENTRONICS_TAG),
 		m_ctx_data_in(*this, "ctx_data_in"),
-		m_ctx_data_out(*this, "ctx_data_out"),
-		m_started(false)
+		m_ctx_data_out(*this, "ctx_data_out"), m_rom(nullptr),
+		m_started(false), m_ack(0), m_irqenable(false), m_autostrobe(false), m_timer(nullptr)
 {
 }
 
@@ -115,8 +115,8 @@ a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type ty
 		m_dsw1(*this, "DSW1"),
 		m_ctx(*this, PIC_CENTRONICS_TAG),
 		m_ctx_data_in(*this, "ctx_data_in"),
-		m_ctx_data_out(*this, "ctx_data_out"),
-		m_started(false)
+		m_ctx_data_out(*this, "ctx_data_out"), m_rom(nullptr),
+		m_started(false), m_ack(0), m_irqenable(false), m_autostrobe(false), m_timer(nullptr)
 {
 }
 

@@ -67,7 +67,7 @@ c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_c
 	m_eprom4(*this, "rom4"),
 	m_eprom5(*this, "rom5"),
 	m_eprom6(*this, "rom6"),
-	m_eprom7(*this, "rom7")
+	m_eprom7(*this, "rom7"), m_bank(0)
 {
 }
 

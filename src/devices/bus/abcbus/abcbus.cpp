@@ -49,8 +49,8 @@ abcbus_slot_t::abcbus_slot_t(const machine_config &mconfig, const char *tag, dev
 	m_write_xint2(*this),
 	m_write_xint3(*this),
 	m_write_xint4(*this),
-	m_write_xint5(*this),
-	m_trrq(0)
+	m_write_xint5(*this), m_card(nullptr), m_irq(0), m_nmi(0), m_pren(0),
+	m_trrq(0), m_xint2(0), m_xint3(0), m_xint4(0), m_xint5(0)
 {
 }
 

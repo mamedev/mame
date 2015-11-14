@@ -176,14 +176,14 @@ machine_config_constructor nes_arcstick_device::device_mconfig_additions() const
 nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 					device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_nes_control_port_interface(mconfig, *this),
-					m_joypad(*this, "JOYPAD")
+					m_joypad(*this, "JOYPAD"), m_latch(0)
 {
 }
 
 nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_JOYPAD, "Nintendo NES / FC Control Pad", tag, owner, clock, "nes_joypad", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
-					m_joypad(*this, "JOYPAD")
+					m_joypad(*this, "JOYPAD"), m_latch(0)
 {
 }
 

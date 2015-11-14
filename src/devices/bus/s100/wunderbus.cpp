@@ -245,7 +245,7 @@ s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, cons
 	m_ace3(*this, INS8250_3_TAG),
 	m_rtc(*this, UPD1990C_TAG),
 	m_7c(*this, "7C"),
-	m_10a(*this, "10A")
+	m_10a(*this, "10A"), m_group(0), m_rtc_tp(0)
 {
 }
 

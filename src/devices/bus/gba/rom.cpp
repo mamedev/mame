@@ -57,13 +57,13 @@ gba_rom_eeprom64_device::gba_rom_eeprom64_device(const machine_config &mconfig, 
 }
 
 gba_rom_flash_device::gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gba_rom_device(mconfig, GBA_ROM_FLASH, "GBA Carts + Panasonic Flash", tag, owner, clock, "gba_flash", __FILE__),
+					: gba_rom_device(mconfig, GBA_ROM_FLASH, "GBA Carts + Panasonic Flash", tag, owner, clock, "gba_flash", __FILE__), m_flash_mask(0),
 						m_flash(*this, "flash")
 {
 }
 
 gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gba_rom_device(mconfig, GBA_ROM_FLASH1M, "GBA Carts + Sanyo Flash", tag, owner, clock, "gba_flash1m", __FILE__),
+					: gba_rom_device(mconfig, GBA_ROM_FLASH1M, "GBA Carts + Sanyo Flash", tag, owner, clock, "gba_flash1m", __FILE__), m_flash_mask(0),
 						m_flash(*this, "flash")
 {
 }

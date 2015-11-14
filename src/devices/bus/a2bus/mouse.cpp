@@ -179,7 +179,8 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_typ
 	m_mcu(*this, MOUSE_MCU_TAG),
 	m_mouseb(*this, MOUSE_BUTTON_TAG),
 	m_mousex(*this, MOUSE_XAXIS_TAG),
-	m_mousey(*this, MOUSE_YAXIS_TAG)
+	m_mousey(*this, MOUSE_YAXIS_TAG), m_rom(nullptr), m_ddr_a(0), m_ddr_b(0), m_ddr_c(0), m_port_a_out(0), m_port_b_out(0), m_port_c_out(0), m_port_a_in(0), m_port_b_in(0), 
+	m_port_c_in(0), m_timer_cnt(0), m_timer_ctl(0), m_mask_option(0), last_mx(0), last_my(0), count_x(0), count_y(0), m_timer(nullptr), m_read_timer(nullptr)
 {
 	m_started = false;
 	m_rom_bank = 0;
@@ -192,7 +193,7 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char
 	m_mcu(*this, MOUSE_MCU_TAG),
 	m_mouseb(*this, MOUSE_BUTTON_TAG),
 	m_mousex(*this, MOUSE_XAXIS_TAG),
-	m_mousey(*this, MOUSE_YAXIS_TAG)
+	m_mousey(*this, MOUSE_YAXIS_TAG), m_rom(nullptr), m_ddr_a(0), m_ddr_b(0), m_ddr_c(0), m_port_a_out(0), m_port_b_out(0), m_port_c_out(0), m_port_a_in(0), m_port_b_in(0), m_port_c_in(0), m_timer_cnt(0), m_timer_ctl(0), m_mask_option(0), last_mx(0), last_my(0), count_x(0), count_y(0), m_timer(nullptr), m_read_timer(nullptr)
 {
 	m_started = false;
 	m_rom_bank = 0;

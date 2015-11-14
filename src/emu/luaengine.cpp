@@ -428,7 +428,7 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef sp_table = luabridge::LuaRef::newTable(L);
 
-	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; sp++) {
+	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp) {
 		if (dev->memory().has_space(sp)) {
 			sp_table[dev->memory().space(sp).name()] = &(dev->memory().space(sp));
 		}

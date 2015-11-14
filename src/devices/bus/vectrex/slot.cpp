@@ -67,7 +67,7 @@ vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_type(VECTREX_STD),
-						m_vec3d(VEC3D_NONE)
+						m_vec3d(VEC3D_NONE), m_cart(nullptr)
 {
 }
 

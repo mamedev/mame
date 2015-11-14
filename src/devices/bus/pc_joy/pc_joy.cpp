@@ -15,7 +15,8 @@ const device_type PC_JOY = &device_creator<pc_joy_device>;
 
 pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PC_JOY, "PC joystick port", tag, owner, clock, "pc_joy", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this), 
+	m_dev(nullptr)
 {
 }
 

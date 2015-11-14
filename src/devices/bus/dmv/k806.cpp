@@ -82,8 +82,8 @@ dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag,
 		m_jumpers(*this, "JUMPERS"),
 		m_mouse_buttons(*this, "MOUSE"),
 		m_mouse_x(*this, "MOUSEX"),
-		m_mouse_y(*this, "MOUSEY")
-{
+		m_mouse_y(*this, "MOUSEY"), m_bus(nullptr)
+	{
 }
 
 //-------------------------------------------------

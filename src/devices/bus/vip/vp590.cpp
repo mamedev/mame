@@ -142,7 +142,7 @@ vp590_device::vp590_device(const machine_config &mconfig, const char *tag, devic
 	m_cgc(*this, CDP1862_TAG),
 	m_color_ram(*this, "color_ram"),
 	m_j1(*this, "J1"),
-	m_j2(*this, "J2")
+	m_j2(*this, "J2"), m_a12(0), m_color(0), m_keylatch(0)
 {
 }
 

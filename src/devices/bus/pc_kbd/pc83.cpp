@@ -275,7 +275,7 @@ ibm_pc_83_keyboard_device::ibm_pc_83_keyboard_device(const machine_config &mconf
 		m_dr20(*this, "DR20"),
 		m_dr21(*this, "DR21"),
 		m_dr22(*this, "DR22"),
-		m_dr23(*this, "DR23")
+		m_dr23(*this, "DR23"), m_cnt(0)
 {
 }
 

@@ -90,7 +90,7 @@ videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine
 	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock, "videobrain_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
-	m_write_extres(*this)
+	m_write_extres(*this), m_cart(nullptr)
 {
 }
 

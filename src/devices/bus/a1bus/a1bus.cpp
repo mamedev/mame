@@ -26,13 +26,15 @@ const device_type A1BUS_SLOT = &device_creator<a1bus_slot_device>;
 //-------------------------------------------------
 a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A1BUS_SLOT, "Apple I Slot", tag, owner, clock, "a1bus_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), 
+	m_a1bus_tag(nullptr), 
+	m_a1bus_slottag(nullptr)
 {
 }
 
 a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_a1bus_tag(nullptr), m_a1bus_slottag(nullptr)
 {
 }
 
@@ -75,16 +77,16 @@ void a1bus_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A1BUS, "Apple I Bus", tag, owner, clock, "a1bus", __FILE__),
+		device_t(mconfig, A1BUS, "Apple I Bus", tag, owner, clock, "a1bus", __FILE__), m_maincpu(nullptr),
 		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this)
+		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)
 {
 }
 
 a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this)
+		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)
 {
 }
 //-------------------------------------------------
@@ -166,8 +168,8 @@ WRITE_LINE_MEMBER( a1bus_device::nmi_w ) { m_out_nmi_cb(state); }
 
 device_a1bus_card_interface::device_a1bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_a1bus(NULL),
-		m_a1bus_tag(NULL)
+		m_a1bus(nullptr),
+		m_a1bus_tag(nullptr), m_a1bus_slottag(nullptr), m_next(nullptr)
 {
 }
 

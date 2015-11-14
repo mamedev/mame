@@ -26,7 +26,8 @@ const device_type CPC_EXPANSION_SLOT = &device_creator<cpc_expansion_slot_device
 
 
 device_cpc_expansion_card_interface::device_cpc_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_slot_card_interface(mconfig,device), 
+	m_rom_sel(0)
 {
 }
 
@@ -48,7 +49,7 @@ cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconf
 		m_out_nmi_cb(*this),
 		m_out_reset_cb(*this),
 		m_out_romdis_cb(*this),
-		m_out_rom_select(*this)
+		m_out_rom_select(*this), m_card(nullptr)
 {
 }
 

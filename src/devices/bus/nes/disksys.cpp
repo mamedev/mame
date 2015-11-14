@@ -104,11 +104,11 @@ const device_type NES_DISKSYS = &device_creator<nes_disksys_device>;
 
 
 nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_DISKSYS, "FC RAM Expansion + Disk System PCB", tag, owner, clock, "fc_disksys", __FILE__),
+					: nes_nrom_device(mconfig, NES_DISKSYS, "FC RAM Expansion + Disk System PCB", tag, owner, clock, "fc_disksys", __FILE__), m_2c33_rom(nullptr),
 						m_fds_data(NULL),
-						m_disk(*this, FLOPPY_0),
-						m_fds_sides(0)
-{
+						m_disk(*this, FLOPPY_0), irq_timer(nullptr), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_transfer(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0),
+						m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)
+				{
 }
 
 

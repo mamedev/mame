@@ -67,8 +67,8 @@ nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, d
 }
 
 nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_3DBLOCK, "NES Cart RCM 3D Block PCB", tag, owner, clock, "nes_3dblock", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_3DBLOCK, "NES Cart RCM 3D Block PCB", tag, owner, clock, "nes_3dblock", __FILE__), m_irq_count(0)
+				{
 }
 
 

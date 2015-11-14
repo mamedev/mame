@@ -22,26 +22,27 @@ const device_type A800_ROM_OSS91 = &device_creator<a800_rom_oss91_device>;
 
 
 a800_rom_oss8k_device::a800_rom_oss8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_OSS8K, "Atari 800 ROM Carts OSS 8K", tag, owner, clock, "a800_oss8k", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_OSS8K, "Atari 800 ROM Carts OSS 8K", tag, owner, clock, "a800_oss8k", __FILE__),
+	m_bank(0)
+				{
 }
 
 
 a800_rom_oss34_device::a800_rom_oss34_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_OSS34, "Atari 800 ROM Carts OSS-034M", tag, owner, clock, "a800_034m", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_OSS34, "Atari 800 ROM Carts OSS-034M", tag, owner, clock, "a800_034m", __FILE__), m_bank(0)
+				{
 }
 
 
 a800_rom_oss43_device::a800_rom_oss43_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_OSS43, "Atari 800 ROM Carts OSS-043M", tag, owner, clock, "a800_043m", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_OSS43, "Atari 800 ROM Carts OSS-043M", tag, owner, clock, "a800_043m", __FILE__), m_bank(0)
+				{
 }
 
 
 a800_rom_oss91_device::a800_rom_oss91_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_OSS91, "Atari 800 ROM Carts OSS-M091", tag, owner, clock, "a800_m091", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_OSS91, "Atari 800 ROM Carts OSS-M091", tag, owner, clock, "a800_m091", __FILE__), m_bank(0)
+				{
 }
 
 

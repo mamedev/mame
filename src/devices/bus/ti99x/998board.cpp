@@ -205,7 +205,7 @@
 
 mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: bus8z_device(mconfig, MAINBOARD8, "TI-99/8 Main board", tag, owner, clock, "ti998_mainboard", __FILE__),
-	m_ready(*this),
+	m_ready(*this), m_dsr_selected(false), m_hexbus_selected(false), m_CRUS(false), m_PTGE(false), m_waitcount(0), m_sram(nullptr), m_dram(nullptr), m_rom0(nullptr), m_rom1(nullptr), m_pcode(nullptr),
 	m_oso(*this, OSO_TAG)
 	{ }
 
@@ -859,7 +859,7 @@ enum
 };
 
 ti998_oso_device::ti998_oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, OSO, "OSO Hexbus interface", tag, owner, clock, "ti998_oso", __FILE__)
+: device_t(mconfig, OSO, "OSO Hexbus interface", tag, owner, clock, "ti998_oso", __FILE__), m_data(0), m_status(0), m_control(0), m_xmit(0)
 {
 }
 
@@ -948,7 +948,7 @@ const device_type OSO = &device_creator<ti998_oso_device>;
 #define REAL_TIMING 0
 
 ti998_spsyn_device::ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, SPEECH8, "TI-99/8 Onboard Speech synthesizer", tag, owner, clock, "ti998_speech", __FILE__),
+: bus8z_device(mconfig, SPEECH8, "TI-99/8 Onboard Speech synthesizer", tag, owner, clock, "ti998_speech", __FILE__), m_vsp(nullptr),
 	m_ready(*this)
 {
 }

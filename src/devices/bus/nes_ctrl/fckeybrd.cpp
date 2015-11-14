@@ -148,7 +148,7 @@ nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const ch
 					device_t(mconfig, NES_FCKEYBOARD, "Nintendo Family Computer Keyboard Component", tag, owner, clock, "nes_fckeybrd", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_cassette(*this, "tape"),
-					m_kbd(*this, "FCKEY")
+					m_kbd(*this, "FCKEY"), m_fck_scan(0), m_fck_mode(0)
 {
 }
 

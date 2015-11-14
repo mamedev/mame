@@ -41,7 +41,9 @@
 aladdin_cart_interface::aladdin_cart_interface(const machine_config &mconfig, device_t &device)
 						: device_slot_card_interface(mconfig, device),
 							m_rom(NULL),
-							m_rom_size(0),
+							m_rom_size(0), 
+	m_lobank(0), 
+	m_hibank(0),
 							m_rom_mask(0xff)
 {
 }
@@ -67,7 +69,7 @@ const device_type NES_ALADDIN_SLOT = &device_creator<nes_aladdin_slot_device>;
 nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, NES_ALADDIN_SLOT, "NES Aladdin Deck Enhancer Cartridge Slot", tag, owner, clock, "nes_ade_slot", __FILE__),
 						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this)
+						device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }
 
@@ -194,8 +196,8 @@ nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, const ch
 }
 
 nes_algq_rom_device::nes_algq_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-						: nes_algn_rom_device(mconfig, NES_ALGQ_ROM, "NES Aladdin Deck Enhancer ALGQ ROM", tag, owner, clock, "nes_algq_rom", __FILE__)
-{
+						: nes_algn_rom_device(mconfig, NES_ALGQ_ROM, "NES Aladdin Deck Enhancer ALGQ ROM", tag, owner, clock, "nes_algq_rom", __FILE__), m_bank_base(0)
+					{
 }
 
 void nes_algn_rom_device::device_start()

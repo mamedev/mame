@@ -496,8 +496,8 @@ d9060_base_t::d9060_base_t(const machine_config &mconfig, device_type type, cons
 		m_address(*this, "ADDRESS"),
 		m_rfdo(1),
 		m_daco(1),
-		m_atna(1),
-		m_enable(0),
+		m_atna(1), m_ifc(0),
+		m_enable(0), m_data(0),
 		m_variant(variant)
 {
 }

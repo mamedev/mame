@@ -10,7 +10,10 @@
 class SDD1_IM //Input Manager
 {
 public:
-	SDD1_IM() {}
+	SDD1_IM(): 
+		m_byte_ptr(0), 
+		m_bit_count(0)
+	{ }
 
 	UINT32 m_byte_ptr;
 	UINT8 m_bit_count;
@@ -34,8 +37,12 @@ class SDD1_BG // Bits Generator
 {
 public:
 	SDD1_BG(SDD1_GCD* associatedGCD, UINT8 code)
-	: m_code_num(code),
-	m_GCD(associatedGCD) { }
+		: m_code_num(code),
+		  m_MPScount(0),
+		  m_LPSind(0),
+		  m_GCD(associatedGCD)
+	{
+	}
 
 	UINT8 m_code_num;
 	UINT8 m_MPScount;
@@ -83,7 +90,7 @@ class SDD1_CM
 {
 public:
 	SDD1_CM(SDD1_PEM* associatedPEM)
-	: m_PEM(associatedPEM) { }
+	: m_bitplanesInfo(0), m_contextBitsInfo(0), m_bit_number(0), m_currBitplane(0), m_PEM(associatedPEM) { }
 
 	UINT8 m_bitplanesInfo;
 	UINT8 m_contextBitsInfo;
@@ -101,7 +108,7 @@ class SDD1_OL
 {
 public:
 	SDD1_OL(SDD1_CM* associatedCM)
-	: m_CM(associatedCM) { }
+	: m_bitplanesInfo(0), m_length(0), m_buffer(nullptr), m_CM(associatedCM) { }
 
 	UINT8 m_bitplanesInfo;
 	UINT16 m_length;

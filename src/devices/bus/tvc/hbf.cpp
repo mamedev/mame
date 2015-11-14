@@ -61,8 +61,8 @@ const device_type TVC_HBF = &device_creator<tvc_hbf_device>;
 tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, TVC_HBF, "HBF floppy interface", tag, owner, clock, "tvc_hbf", __FILE__),
 		device_tvcexp_interface( mconfig, *this ),
-		m_fdc(*this, "fdc")
-{
+		m_fdc(*this, "fdc"), m_rom(nullptr), m_ram(nullptr), m_rom_bank(0)
+	{
 }
 
 

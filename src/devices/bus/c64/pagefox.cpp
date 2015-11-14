@@ -51,7 +51,7 @@ const device_type C64_PAGEFOX = &device_creator<c64_pagefox_cartridge_device>;
 c64_pagefox_cartridge_device::c64_pagefox_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_PAGEFOX, "C64 Pagefox cartridge", tag, owner, clock, "c64_pagefox", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram"), m_bank(0)
 {
 }
 

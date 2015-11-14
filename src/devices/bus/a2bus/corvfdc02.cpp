@@ -87,7 +87,7 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, de
 	m_con1(*this, FDC02_FDC_TAG":0"),
 	m_con2(*this, FDC02_FDC_TAG":1"),
 	m_con3(*this, FDC02_FDC_TAG":2"),
-	m_con4(*this, FDC02_FDC_TAG":3")
+	m_con4(*this, FDC02_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_bufptr(0), m_curfloppy(nullptr), m_in_drq(false), m_timer(nullptr)
 {
 }
 
@@ -98,7 +98,7 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, co
 	m_con1(*this, FDC02_FDC_TAG":0"),
 	m_con2(*this, FDC02_FDC_TAG":1"),
 	m_con3(*this, FDC02_FDC_TAG":2"),
-	m_con4(*this, FDC02_FDC_TAG":3")
+	m_con4(*this, FDC02_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_bufptr(0), m_curfloppy(nullptr), m_in_drq(false), m_timer(nullptr)
 {
 }
 
@@ -125,7 +125,7 @@ void a2bus_corvfdc02_device::device_reset()
 {
 	m_fdc_local_status = 2;
 	m_fdc_local_command = 0;
-	m_curfloppy = NULL;
+	m_curfloppy = nullptr;
 	m_in_drq = false;
 	m_timer->adjust(attotime::never);
 }

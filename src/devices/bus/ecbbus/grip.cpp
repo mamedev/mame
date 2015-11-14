@@ -625,7 +625,7 @@ grip_device::grip_device(const machine_config &mconfig, const char *tag, device_
 	m_video_ram(*this, "video_ram"),
 	m_j3a(*this, "J3A"),
 	m_j3b(*this, "J3B"),
-	m_j7(*this, "J7")
+	m_j7(*this, "J7"), m_centronics_busy(0), m_centronics_fault(0), m_vol0(0), m_vol1(0), m_ia(0), m_ib(0), m_keydata(0), m_kbf(0), m_lps(0), m_page(0), m_flash(0), m_base(0), m_ppi_pa(0), m_ppi_pc(0), m_kb_timer(nullptr)
 {
 }
 

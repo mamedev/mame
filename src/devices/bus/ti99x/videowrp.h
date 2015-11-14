@@ -85,7 +85,7 @@ class ti_sound_system_device : public bus8z_device
 {
 public:
 	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source), m_sound_chip(nullptr),
 		m_console_ready(*this) { };
 
 	// Cannot read from sound; just ignore silently

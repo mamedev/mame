@@ -1355,7 +1355,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 					// advance in X
 					cx += incxx;
 					x++;
-					dest++;
+					++dest;
 					pri++;
 				}
 			}
@@ -1395,7 +1395,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				cx += incxx;
 				cy += incxy;
 				x++;
-				dest++;
+				++dest;
 				pri++;
 			}
 
@@ -1436,7 +1436,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				cx += incxx;
 				cy += incxy;
 				x++;
-				dest++;
+				++dest;
 				pri++;
 			}
 

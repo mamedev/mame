@@ -104,14 +104,14 @@ void device_a800_cart_interface::nvram_alloc(UINT32 size)
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this)
+						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
 {
 }
 
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, A800_CART_SLOT, "Atari 8bit Cartridge Slot", tag, owner, clock, "a800_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this)
+						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
 {
 }
 

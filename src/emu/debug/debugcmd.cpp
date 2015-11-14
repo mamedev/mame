@@ -1484,7 +1484,7 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 	/* loop over all CPUs */
 	device_iterator iter(machine.root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
+		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 			if (device->debug()->watchpoint_first(spacenum) != NULL)
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };

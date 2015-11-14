@@ -27,7 +27,9 @@ const device_type S100_SLOT = &device_creator<s100_slot_t>;
 //-------------------------------------------------
 
 device_s100_card_interface::device_s100_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device), 
+	m_bus(nullptr), 
+	m_next(nullptr)
 {
 }
 
@@ -37,7 +39,7 @@ device_s100_card_interface::device_s100_card_interface(const machine_config &mco
 //-------------------------------------------------
 s100_slot_t::s100_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, S100_SLOT, "S100 slot", tag, owner, clock, "s100_slot", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this), m_bus(nullptr)
 {
 }
 

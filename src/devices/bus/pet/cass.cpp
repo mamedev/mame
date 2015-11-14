@@ -54,7 +54,7 @@ device_pet_datassette_port_interface::~device_pet_datassette_port_interface()
 pet_datassette_port_device::pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_DATASSETTE_PORT, "Datassette Port", tag, owner, clock, "pet_datassette_port", __FILE__),
 	device_slot_interface(mconfig, *this),
-	m_read_handler(*this)
+	m_read_handler(*this), m_cart(nullptr)
 {
 }
 

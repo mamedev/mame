@@ -145,7 +145,7 @@ wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_WDC, "Wang PC-PM001", tag, owner, clock, "wangpc_wdc", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
-	m_ctc(*this, MK3882_TAG)
+	m_ctc(*this, MK3882_TAG), m_status(0), m_option(0), m_irq(0)
 {
 }
 

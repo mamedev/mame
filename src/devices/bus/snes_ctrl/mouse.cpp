@@ -63,7 +63,8 @@ snes_mouse_device::snes_mouse_device(const machine_config &mconfig, const char *
 					device_snes_control_port_interface(mconfig, *this),
 					m_buttons(*this, "BUTTONS"),
 					m_xaxis(*this, "MOUSE_X"),
-					m_yaxis(*this, "MOUSE_Y")
+					m_yaxis(*this, "MOUSE_Y"), m_strobe(0), m_idx(0), m_latch(0), m_x(0), m_y(0), m_oldx(0), m_oldy(0), m_deltax(0),
+	m_deltay(0), m_speed(0), m_dirx(0), m_diry(0)
 {
 }
 

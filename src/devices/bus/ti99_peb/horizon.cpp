@@ -67,7 +67,7 @@
 
 horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_HORIZON, "Horizon 4000 Ramdisk", tag, owner, clock,"ti99_horizon",__FILE__),
-	device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this), m_ram(nullptr), m_nvram(nullptr), m_ros(nullptr), m_select6_value(0), m_select_all(0), m_page(0), m_cru_horizon(0), m_cru_phoenix(0), m_timode(false), m_32k_installed(false), m_split_mode(false), m_rambo_mode(false), m_killswitch(false), m_use_rambo(false)
 {
 }
 

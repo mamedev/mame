@@ -109,7 +109,7 @@ void ui_menu_input_general::populate()
 
 			/* loop over all sequence types */
 			sortorder++;
-			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
 				/* build an entry for the standard sequence */
 				input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));
@@ -187,7 +187,7 @@ void ui_menu_input_specific::populate()
 					sortorder = field->type() | 0xf000;
 
 				/* loop over all sequence types */
-				for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+				for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				{
 					/* build an entry for the standard sequence */
 					input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));

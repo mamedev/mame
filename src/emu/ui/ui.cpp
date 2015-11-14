@@ -1713,15 +1713,15 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	}
 
 	// check for A-Z or 0-9
-	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; id++)
+	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; ++id)
 		if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 			file = id - ITEM_ID_A + 'a';
 	if (file == 0)
-		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; id++)
+		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; ++id)
 			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0 + '0';
 	if (file == 0)
-		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; id++)
+		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; ++id)
 			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0_PAD + '0';
 	if (file == 0)

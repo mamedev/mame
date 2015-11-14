@@ -23,15 +23,17 @@ const device_type O2_ROM_16K = &device_creator<o2_rom16_device>;
 
 
 o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_o2_cart_interface( mconfig, *this )
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	  device_o2_cart_interface(mconfig, *this),
+	  m_bank_base(0)
 {
 }
 
 o2_rom_device::o2_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, O2_ROM_STD, "Odyssey 2 Standard Carts", tag, owner, clock, "o2_rom", __FILE__),
-						device_o2_cart_interface( mconfig, *this )
-{
+						device_o2_cart_interface( mconfig, *this ), 
+	m_bank_base(0)
+				{
 }
 
 o2_rom12_device::o2_rom12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -58,18 +58,18 @@ nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, const 
 }
 
 nes_tc0190fmc_pal16r4_device::nes_tc0190fmc_pal16r4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_tc0190fmc_device(mconfig, NES_TC0190FMC_PAL16R4, "NES Cart Taito TC0190FMC + PAL16R4 PCB", tag, owner, clock, "nes_tc0190pal", __FILE__)
-{
+					: nes_tc0190fmc_device(mconfig, NES_TC0190FMC_PAL16R4, "NES Cart Taito TC0190FMC + PAL16R4 PCB", tag, owner, clock, "nes_tc0190pal", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
+				{
 }
 
 nes_x1_005_device::nes_x1_005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_X1_005, "NES Cart Taito X1-005 PCB", tag, owner, clock, "nes_x1_005", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_X1_005, "NES Cart Taito X1-005 PCB", tag, owner, clock, "nes_x1_005", __FILE__), m_latch(0)
+				{
 }
 
 nes_x1_017_device::nes_x1_017_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_X1_017, "NES Cart Taito X1-017 PCB", tag, owner, clock, "nes_x1_017", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_X1_017, "NES Cart Taito X1-017 PCB", tag, owner, clock, "nes_x1_017", __FILE__), m_latch(0)
+				{
 }
 
 

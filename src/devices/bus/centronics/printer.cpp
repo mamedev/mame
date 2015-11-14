@@ -27,7 +27,9 @@ MACHINE_CONFIG_END
 centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CENTRONICS_PRINTER, "Centronics Printer", tag, owner, clock, "centronics_printer", __FILE__),
 	device_centronics_peripheral_interface( mconfig, *this ),
-	m_strobe(0),
+	m_strobe(0), 
+	m_data(0), 
+	m_busy(0),
 	m_printer(*this, "printer")
 {
 }

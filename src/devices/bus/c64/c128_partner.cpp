@@ -80,7 +80,7 @@ partner128_t::partner128_t(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, C128_PARTNER, "PARTNER 128", tag, owner, clock, "c128_partner", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	//device_vcs_control_port_interface(mconfig, *this),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram"), t_joyb2(nullptr),
 	m_ram_a12_a7(0),
 	m_ls74_cd(0),
 	m_ls74_q1(0),
