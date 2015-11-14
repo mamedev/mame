@@ -97,6 +97,8 @@ shaders::shaders()
 
 shaders::~shaders()
 {
+	options = NULL;
+
 	cache_target *currcache = cachehead;
 	while(cachehead != NULL)
 	{
@@ -412,24 +414,32 @@ void shaders::toggle()
 	{
 		if (initialized)
 		{
+			// free shader resources before renderer resources
 			delete_resources(false);
 		}
+
 		master_enable = !master_enable;
+
+		// free shader resources and re-create
+		d3d->device_delete_resources();
+		d3d->device_create_resources();
 	}
 	else
 	{
+		master_enable = !master_enable;
+
+		// free shader resources and re-create
+		d3d->device_delete_resources();
+		d3d->device_create_resources();
+
 		if (!initialized)
 		{
-			master_enable = !master_enable;
+			// re-create shader resources after renderer resources
 			bool failed = create_resources(false);
 			if (failed)
 			{
 				master_enable = false;
 			}
-		}
-		else
-		{
-			master_enable = !master_enable;
 		}
 	}
 }
@@ -867,7 +877,7 @@ int shaders::create_resources(bool reset)
 		texture.palette = NULL;
 		texture.seqid = 0;
 
-		// now create it (no prescale, but wrap)
+		// now create it (no prescale, but wrap)		
 		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_TEXWRAP_MASK);
 	}
 
@@ -1987,8 +1997,6 @@ void shaders::delete_resources(bool reset)
 
 	initialized = false;
 
-	options = NULL;
-
 	cache_target *currcache = cachehead;
 	while(cachehead != NULL)
 	{
@@ -2145,11 +2153,11 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 }
 
 
-/*-------------------------------------------------
-    slider_alloc - allocate a new slider entry
-    currently duplicated from ui.c, this could
-    be done in a more ideal way.
--------------------------------------------------*/
+//============================================================
+//  slider_alloc - allocate a new slider entry
+//  currently duplicated from ui.c, this could
+//  be done in a more ideal way.
+//============================================================
 
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
 {

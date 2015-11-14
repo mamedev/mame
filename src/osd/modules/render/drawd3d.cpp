@@ -621,6 +621,7 @@ renderer::renderer(osd_window *window)
 	m_device = NULL;
 	m_restarting = false;
 	m_shaders = NULL;
+	m_shaders_options = NULL;
 	m_numverts = 0;
 	m_numpolys = 0;
 	m_vertexbuf = NULL;
@@ -654,10 +655,6 @@ int renderer::pre_window_draw_check()
 	if (m_restarting)
 	{
 		m_shaders->toggle();
-
-		// free all existing resources and re-create
-		device_delete_resources();
-		device_create_resources();
 
 		m_restarting = false;
 	}
