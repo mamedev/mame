@@ -1260,6 +1260,9 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
 			"/Qwd47",				-- error #47: incompatible redefinition of macro "xxx"
 			"/Qwd265",				-- error #265: floating-point operation result is out of range
+			-- these occur on a release build, while we can increase the size limits instead some of the files do require extreme amounts
+			"/Qwd11074",			-- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
+			"/Qwd11075",			-- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
 		}
 end
 
