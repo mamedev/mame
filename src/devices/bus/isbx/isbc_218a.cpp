@@ -83,7 +83,7 @@ isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *ta
 	device_t(mconfig, ISBC_218A, "ISBX 218a for ISBC", tag, owner, clock, "isbc_218a", __FILE__),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
-	m_floppy0(*this, I8272_TAG":0")
+	m_floppy0(*this, I8272_TAG":0"), m_reset(false), m_motor(false)
 {
 }
 

@@ -331,7 +331,7 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_dbrg(*this, COM8116_TAG),
-		m_hdc(*this, CORVUS_HDC_TAG)
+		m_hdc(*this, CORVUS_HDC_TAG), m_ifc(0)
 {
 }
 

@@ -49,7 +49,7 @@ ql_expansion_slot_t::ql_expansion_slot_t(const machine_config &mconfig, const ch
 	m_write_ipl0l(*this),
 	m_write_ipl1l(*this),
 	m_write_berrl(*this),
-	m_write_extintl(*this)
+	m_write_extintl(*this), m_card(nullptr)
 {
 }
 

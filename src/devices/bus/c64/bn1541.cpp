@@ -37,7 +37,7 @@ const device_type C64_BN1541 = &device_creator<c64_bn1541_device>;
 //-------------------------------------------------
 
 device_c64_floppy_parallel_interface::device_c64_floppy_parallel_interface(const machine_config &mconfig, device_t &device) :
-	m_other(NULL)
+	m_other(nullptr), m_parallel_data(0)
 {
 }
 
@@ -63,7 +63,7 @@ device_c64_floppy_parallel_interface::~device_c64_floppy_parallel_interface()
 c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_BN1541, "C64 Burst Nibbler 1541/1571 Parallel Cable", tag, owner, clock, "c64_bn1541", __FILE__),
 	device_pet_user_port_interface(mconfig, *this),
-	device_c64_floppy_parallel_interface(mconfig, *this)
+	device_c64_floppy_parallel_interface(mconfig, *this), m_parallel_output(0)
 {
 }
 

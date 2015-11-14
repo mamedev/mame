@@ -247,7 +247,7 @@ pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_c
 	, m_p1_4(*this, "P1.4")
 	, m_p1_5(*this, "P1.5")
 	, m_p1_6(*this, "P1.6")
-	, m_p1_7(*this, "P1.7")
+	, m_p1_7(*this, "P1.7"), m_p0(0), m_p1(0), m_p2(0), m_p3(0)
 {
 }
 

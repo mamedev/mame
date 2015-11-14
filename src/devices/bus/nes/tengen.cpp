@@ -49,12 +49,12 @@ nes_tengen008_device::nes_tengen008_device(const machine_config &mconfig, const 
 }
 
 nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
+				{
 }
 
 nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_TENGEN_800032, "NES Cart Tengen 800032 PCB", tag, owner, clock, "nes_tengen032", __FILE__)
+					: nes_nrom_device(mconfig, NES_TENGEN_800032, "NES Cart Tengen 800032 PCB", tag, owner, clock, "nes_tengen032", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
 {
 }
 

@@ -10,7 +10,9 @@ const device_type PSX_CONTROLLER_PORT = &device_creator<psx_controller_port_devi
 
 psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PSX_CONTROLLER_PORT, "Playstation Controller Port", tag, owner, clock, "psx_controller_port", __FILE__),
-		device_slot_interface(mconfig, *this),
+		device_slot_interface(mconfig, *this), 
+		m_tx(false), 
+		m_dev(nullptr),
 		m_card(*this, "card")
 {
 }
@@ -40,7 +42,7 @@ void psx_controller_port_device::disable_card(bool state)
 const device_type PSXCONTROLLERPORTS = &device_creator<psxcontrollerports_device>;
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock, "psxcontrollerports", __FILE__),
+	: device_t(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock, "psxcontrollerports", __FILE__), m_port0(nullptr), m_port1(nullptr),
 	m_dsr_handler(*this),
 	m_rxd_handler(*this)
 {
@@ -97,8 +99,8 @@ void psxcontrollerports_device::ack()
 }
 
 device_psx_controller_interface::device_psx_controller_interface(const machine_config &mconfig, device_t &device) :
-		device_slot_card_interface(mconfig, device),
-		m_ack(true)
+		device_slot_card_interface(mconfig, device), m_odata(0), m_idata(0), m_bit(0), m_count(0), m_memcard(false), m_clock(false), m_sel(false),
+		m_ack(true), m_rx(false), m_ack_timer(nullptr), m_owner(nullptr)
 {
 }
 

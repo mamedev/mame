@@ -69,7 +69,7 @@ apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config 
 	m_ext1_handler(*this),
 	m_ext2_handler(*this),
 	m_int2_handler(*this),
-	m_int3_handler(*this)
+	m_int3_handler(*this), m_cpu_tag(nullptr), m_iop_tag(nullptr)
 {
 }
 

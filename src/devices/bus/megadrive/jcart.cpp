@@ -59,14 +59,14 @@ md_jcart_device::md_jcart_device(const machine_config &mconfig, const char *tag,
 // Micro Machines 2, Micro Machines Military
 md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: md_jcart_device(mconfig, type, name, tag, owner, clock, shortname, source),
-					m_i2cmem(*this, "i2cmem")
-{
+					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
+				{
 }
 
 md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_jcart_device(mconfig, MD_SEPROM_CODEMAST, "MD J-Cart games + SEPROM", tag, owner, clock, "md_seprom_codemast", __FILE__),
-					m_i2cmem(*this, "i2cmem")
-{
+					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
+				{
 }
 
 // Micro Machines 96

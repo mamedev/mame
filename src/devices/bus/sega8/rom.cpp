@@ -45,14 +45,14 @@ const device_type SEGA8_ROM_KOREAN_NB = &device_creator<sega8_korean_nb_device>;
 
 sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_sega8_cart_interface( mconfig, *this )
-{
+						device_sega8_cart_interface( mconfig, *this ), m_ram_base(0), m_ram_enabled(0)
+				{
 }
 
 sega8_rom_device::sega8_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SEGA8_ROM_STD, "Mark III, SMS & GG Carts", tag, owner, clock, "sega8_rom", __FILE__),
-						device_sega8_cart_interface( mconfig, *this )
-{
+						device_sega8_cart_interface( mconfig, *this ), m_ram_base(0), m_ram_enabled(0)
+				{
 }
 
 
@@ -86,8 +86,8 @@ sega8_terebi_device::sega8_terebi_device(const machine_config &mconfig, const ch
 					: sega8_rom_device(mconfig, SEGA8_ROM_TEREBI, "SG-1000 Terebi Oekaki Cart", tag, owner, clock, "sega8_terebi", __FILE__),
 						m_tvdraw_x(*this, "TVDRAW_X"),
 						m_tvdraw_y(*this, "TVDRAW_Y"),
-						m_tvdraw_pen(*this, "TVDRAW_PEN")
-{
+						m_tvdraw_pen(*this, "TVDRAW_PEN"), m_tvdraw_data(0)
+				{
 }
 
 
@@ -108,15 +108,15 @@ sega8_dahjee_typeb_device::sega8_dahjee_typeb_device(const machine_config &mconf
 sega8_eeprom_device::sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SEGA8_ROM_EEPROM, "GG Carts + EEPROM", tag, owner, clock, "sega8_eeprom", __FILE__),
 						device_sega8_cart_interface( mconfig, *this ),
-						m_eeprom(*this, "eeprom")
-{
+						m_eeprom(*this, "eeprom"), m_93c46_enabled(0), m_93c46_lines(0)
+				{
 }
 
 
 sega8_codemasters_device::sega8_codemasters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SEGA8_ROM_CODEMASTERS, "Mark III, SMS & GG Codemasters Carts", tag, owner, clock, "sega8_codemasters", __FILE__),
-						device_sega8_cart_interface( mconfig, *this )
-{
+						device_sega8_cart_interface( mconfig, *this ), m_ram_base(0), m_ram_enabled(0)
+				{
 }
 
 
@@ -128,14 +128,14 @@ sega8_4pak_device::sega8_4pak_device(const machine_config &mconfig, const char *
 
 sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_sega8_cart_interface( mconfig, *this )
-{
+						device_sega8_cart_interface( mconfig, *this ), m_ram_base(0), m_ram_enabled(0)
+				{
 }
 
 sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SEGA8_ROM_ZEMINA, "SMS Zemina Carts", tag, owner, clock, "sega8_zemina", __FILE__),
-						device_sega8_cart_interface( mconfig, *this )
-{
+						device_sega8_cart_interface( mconfig, *this ), m_ram_base(0), m_ram_enabled(0)
+				{
 }
 
 
@@ -153,8 +153,8 @@ sega8_janggun_device::sega8_janggun_device(const machine_config &mconfig, const 
 
 
 sega8_hicom_device::sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sega8_rom_device(mconfig, SEGA8_ROM_HICOM, "SMS Hi-Com Carts", tag, owner, clock, "sega8_hicom", __FILE__)
-{
+					: sega8_rom_device(mconfig, SEGA8_ROM_HICOM, "SMS Hi-Com Carts", tag, owner, clock, "sega8_hicom", __FILE__), m_rom_bank_base(0)
+				{
 }
 
 

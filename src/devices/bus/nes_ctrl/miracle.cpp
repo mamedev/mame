@@ -63,7 +63,8 @@ nes_miracle_device::nes_miracle_device(const machine_config &mconfig, const char
 					device_serial_interface(mconfig, *this),
 					device_nes_control_port_interface(mconfig, *this),
 					m_midiin(*this, "mdin"),
-					m_midiout(*this, "mdout")
+					m_midiout(*this, "mdout"), strobe_timer(nullptr), m_strobe_on(0), m_midi_mode(0), m_sent_bits(0), m_strobe_clock(0),
+					m_data_sent(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_read_status(false), m_status_bit(false)
 {
 }
 

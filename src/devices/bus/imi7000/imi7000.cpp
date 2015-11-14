@@ -36,7 +36,7 @@ const device_type IMI7000_SLOT = &device_creator<imi7000_slot_device>;
 //-------------------------------------------------
 
 device_imi7000_interface::device_imi7000_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device), m_slot(nullptr)
 {
 }
 
@@ -52,7 +52,7 @@ device_imi7000_interface::device_imi7000_interface(const machine_config &mconfig
 
 imi7000_slot_device::imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, IMI7000_SLOT, "IMI 7000 slot", tag, owner, clock, "imi7000_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_card(nullptr)
 {
 }
 

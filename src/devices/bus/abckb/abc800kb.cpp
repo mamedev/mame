@@ -352,7 +352,7 @@ abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, co
 		m_txd(1),
 		m_clk(0),
 		m_stb(1),
-		m_keydown(1)
+		m_keydown(1), m_serial_timer(nullptr)
 {
 }
 

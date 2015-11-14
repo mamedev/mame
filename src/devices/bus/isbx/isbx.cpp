@@ -43,7 +43,7 @@ isbx_slot_device::isbx_slot_device(const machine_config &mconfig, const char *ta
 	m_write_mintr0(*this),
 	m_write_mintr1(*this),
 	m_write_mdrqt(*this),
-	m_write_mwait(*this)
+	m_write_mwait(*this), m_card(nullptr)
 {
 }
 

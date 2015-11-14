@@ -56,7 +56,7 @@ tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char
 		device_t(mconfig, TVCEXP_SLOT, "TVC64 Expansion Slot", tag, owner, clock, "tvcexp_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this)
+		m_out_nmi_cb(*this), m_cart(nullptr)
 {
 }
 

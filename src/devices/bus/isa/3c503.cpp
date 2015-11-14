@@ -18,10 +18,12 @@ machine_config_constructor el2_3c503_device::device_mconfig_additions() const {
 	return MACHINE_CONFIG_NAME(el2_3c503_config);
 }
 
-el2_3c503_device::el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, EL2_3C503, "3C503 Network Adapter", tag, owner, clock, "el2_3c503", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_dp8390(*this, "dp8390d") {
+el2_3c503_device::el2_3c503_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+	: device_t(mconfig, EL2_3C503, "3C503 Network Adapter", tag, owner, clock, "el2_3c503", __FILE__),
+	  device_isa8_card_interface(mconfig, *this),
+	  m_dp8390(*this, "dp8390d"),
+	  m_irq_state(0)
+{
 }
 
 void el2_3c503_device::device_start() {

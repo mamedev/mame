@@ -23,12 +23,16 @@ const device_type ATIMACH64_8514A = &device_creator<mach64_8514a_device>;
 
 // 8514/A device
 mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mach8_device(mconfig, ATIMACH32_8514A, "ATi mach32 (2D acceleration module)", tag, owner, clock, "mach32_8514a", __FILE__)
+	: mach8_device(mconfig, ATIMACH32_8514A, "ATi mach32 (2D acceleration module)", tag, owner, clock, "mach32_8514a", __FILE__), 
+	m_chip_ID(0), 
+	m_membounds(0)
 {
 }
 
 mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: mach8_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	: mach8_device(mconfig, type, name, tag, owner, clock, shortname, source), 
+	m_chip_ID(0), 
+	m_membounds(0)
 {
 }
 

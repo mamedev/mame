@@ -89,7 +89,7 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_ds1(0),
 	m_drv_sel(0),
 	m_mode_sel(0),
-	m_rw_sel(1)
+	m_rw_sel(1), m_odd_hd(0), m_pi(0), t_gen(nullptr)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;

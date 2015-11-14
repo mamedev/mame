@@ -413,7 +413,7 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 		m_floppy1(*this, MB8876_TAG":1"),
 		m_sw1(*this, "SW1"),
 		m_s1(*this, "S1"),
-		m_cs(false),
+		m_cs(false), m_status(0), m_data(0),
 		m_fdc_irq(0),
 		m_fdc_drq(0),
 		m_wait_enable(0),

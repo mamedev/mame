@@ -55,7 +55,7 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COLECOVISION_CARTRIDGE_SLOT, "ColecoVision cartridge port", tag, owner, clock, "coleco_cartridge_port", __FILE__),
 	device_slot_interface(mconfig, *this),
-	device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this), m_card(nullptr)
 {
 }
 

@@ -53,7 +53,7 @@ device_bw2_expansion_slot_interface::~device_bw2_expansion_slot_interface()
 
 bw2_expansion_slot_device::bw2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, BW2_EXPANSION_SLOT, "Bondwell 2 expansion port", tag, owner, clock, "bw2_expansion_slot", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }
 

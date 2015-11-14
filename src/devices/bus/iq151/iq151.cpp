@@ -62,7 +62,7 @@ iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, cons
 		m_out_irq2_cb(*this),
 		m_out_irq3_cb(*this),
 		m_out_irq4_cb(*this),
-		m_out_drq_cb(*this)
+		m_out_drq_cb(*this), m_cart(nullptr)
 {
 }
 

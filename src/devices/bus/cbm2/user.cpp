@@ -48,7 +48,7 @@ cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, cons
 	m_write_irq(*this),
 	m_write_sp(*this),
 	m_write_cnt(*this),
-	m_write_flag(*this)
+	m_write_flag(*this), m_card(nullptr)
 {
 }
 

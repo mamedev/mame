@@ -40,16 +40,16 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type 
 							: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 							device_md_cart_interface( mconfig, *this ),
 							m_svp(*this, "svp"),
-							m_test_ipt(*this, "MEMORY_TEST")
-{
+							m_test_ipt(*this, "MEMORY_TEST"), m_emu_status(0), m_xst(0), m_xst2(0)
+						{
 }
 
 md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 							: device_t(mconfig, MD_ROM_SVP, "MD Virtua Racing", tag, owner, clock, "md_rom_svp", __FILE__),
 							device_md_cart_interface( mconfig, *this ),
 							m_svp(*this, "svp"),
-							m_test_ipt(*this, "MEMORY_TEST")
-{
+							m_test_ipt(*this, "MEMORY_TEST"), m_emu_status(0), m_xst(0), m_xst2(0)
+						{
 }
 
 

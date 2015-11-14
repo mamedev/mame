@@ -44,13 +44,13 @@ const device_type KC_M036 = &device_creator<kc_m036_device>;
 
 kc_m011_device::kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, KC_M011, "M011 64KB RAM", tag, owner, clock, "kc_m011", __FILE__),
-		device_kcexp_interface( mconfig, *this )
-{
+		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_ram(nullptr), m_enabled(0), m_write_enabled(0), m_base(0), m_segment(0)
+	{
 }
 
 kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_kcexp_interface( mconfig, *this )
+		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_ram(nullptr), m_enabled(0), m_write_enabled(0), m_base(0), m_segment(0)
 {
 }
 

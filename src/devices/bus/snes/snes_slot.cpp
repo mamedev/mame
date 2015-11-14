@@ -177,7 +177,7 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_addon(ADDON_NONE),
-						m_type(SNES_MODE20)
+						m_type(SNES_MODE20), m_cart(nullptr)
 {
 }
 

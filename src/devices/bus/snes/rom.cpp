@@ -42,21 +42,21 @@ sns_rom_device::sns_rom_device(const machine_config &mconfig, const char *tag, d
 }
 
 sns_rom_obc1_device::sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_OBC1, "SNES Cart (LoROM) + OBC-1", tag, owner, clock, "sns_rom_obc1", __FILE__)
-{
+					: sns_rom_device(mconfig, SNS_LOROM_OBC1, "SNES Cart (LoROM) + OBC-1", tag, owner, clock, "sns_rom_obc1", __FILE__), m_address(0), m_offset(0), m_shift(0)
+				{
 }
 
 
 
 // Pirate LoROM 'mappers'
 sns_rom_pokemon_device::sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_POKEMON, "SNES Pirate Carts with Protection", tag, owner, clock, "sns_rom_pokemon", __FILE__)
-{
+					: sns_rom_device(mconfig, SNS_LOROM_POKEMON, "SNES Pirate Carts with Protection", tag, owner, clock, "sns_rom_pokemon", __FILE__), m_latch(0)
+				{
 }
 
 sns_rom_tekken2_device::sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_TEKKEN2, "SNES Tekken 2", tag, owner, clock, "sns_rom_tekken2", __FILE__)
-{
+					: sns_rom_device(mconfig, SNS_LOROM_TEKKEN2, "SNES Tekken 2", tag, owner, clock, "sns_rom_tekken2", __FILE__), m_prot(0)
+				{
 }
 
 sns_rom_soulblad_device::sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -76,18 +76,18 @@ sns_rom_bugs_device::sns_rom_bugs_device(const machine_config &mconfig, const ch
 
 // Multigame LoROM 'mappers'
 sns_rom_mcpirate1_device::sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_MCPIR1, "SNES Pirate Multigame Carts Type 1", tag, owner, clock, "sns_rom_mcpirate1", __FILE__)
-{
+					: sns_rom_device(mconfig, SNS_LOROM_MCPIR1, "SNES Pirate Multigame Carts Type 1", tag, owner, clock, "sns_rom_mcpirate1", __FILE__), m_base_bank(0)
+				{
 }
 
 sns_rom_mcpirate2_device::sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_MCPIR2, "SNES Pirate Multigame Carts Type 2", tag, owner, clock, "sns_rom_mcpirate2", __FILE__)
-{
+					: sns_rom_device(mconfig, SNS_LOROM_MCPIR2, "SNES Pirate Multigame Carts Type 2", tag, owner, clock, "sns_rom_mcpirate2", __FILE__), m_base_bank(0)
+				{
 }
 
 sns_rom_20col_device::sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_20COL, "SNES Super 20 Collection", tag, owner, clock, "sns_rom_20col", __FILE__)
-{
+					: sns_rom_device(mconfig, SNS_LOROM_20COL, "SNES Super 20 Collection", tag, owner, clock, "sns_rom_20col", __FILE__), m_base_bank(0)
+				{
 }
 
 

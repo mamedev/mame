@@ -114,7 +114,7 @@ vic20_final_expansion_3_t::vic20_final_expansion_3_t(const machine_config &mconf
 	device_t(mconfig, VIC20_FE3, "Final Expansion v3", tag, owner, clock, "vic20_fe3", __FILE__),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AM29F040_TAG),
-	m_ram(*this, "sram")
+	m_ram(*this, "sram"), m_reg1(0), m_reg2(0), m_lockbit(0)
 {
 }
 

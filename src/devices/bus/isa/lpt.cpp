@@ -14,7 +14,8 @@ const device_type ISA8_LPT = &device_creator<isa8_lpt_device>;
 
 isa8_lpt_device::isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA8_LPT, "Printer Adapter", tag, owner, clock, "isa_lpt", __FILE__),
-	device_isa8_card_interface(mconfig, *this)
+	device_isa8_card_interface(mconfig, *this), 
+	m_is_primary(false)
 {
 }
 

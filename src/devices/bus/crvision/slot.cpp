@@ -66,7 +66,7 @@ crvision_cart_slot_device::crvision_cart_slot_device(const machine_config &mconf
 						device_t(mconfig, CRVISION_CART_SLOT, "CreatiVision Cartridge Slot", tag, owner, clock, "crvision_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(CRV_4K)
+						m_type(CRV_4K), m_cart(nullptr)
 {
 }
 

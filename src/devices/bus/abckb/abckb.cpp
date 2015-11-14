@@ -47,7 +47,7 @@ abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig
 	device_slot_interface(mconfig, *this),
 	m_out_rx_handler(*this),
 	m_out_trxc_handler(*this),
-	m_out_keydown_handler(*this)
+	m_out_keydown_handler(*this), m_card(nullptr)
 {
 }
 

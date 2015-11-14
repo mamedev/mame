@@ -49,8 +49,8 @@ nes_nina006_device::nes_nina006_device(const machine_config &mconfig, const char
 }
 
 nes_maxi15_device::nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_MAXI15, "NES Cart AVE Maxi 15 PCB", tag, owner, clock, "nes_maxi15", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_MAXI15, "NES Cart AVE Maxi 15 PCB", tag, owner, clock, "nes_maxi15", __FILE__), m_reg(0), m_bank(0)
+				{
 }
 
 

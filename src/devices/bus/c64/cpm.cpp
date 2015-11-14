@@ -134,7 +134,7 @@ c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config &mconfig
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_enabled(0),
-	m_ba(1)
+	m_ba(1), m_reset(0)
 {
 }
 

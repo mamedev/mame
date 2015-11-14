@@ -73,7 +73,7 @@ a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, cons
 	device_a2bus_card_interface(mconfig, *this),
 	m_wozfdc(*this, WOZFDC_TAG),
 	floppy0(*this, "0"),
-	floppy1(*this, "1")
+	floppy1(*this, "1"), m_rom(nullptr)
 {
 }
 

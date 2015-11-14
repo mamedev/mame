@@ -123,7 +123,7 @@ adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_confi
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_ddp0(*this, "cassette"),
-		m_ddp1(*this, "cassette2")
+		m_ddp1(*this, "cassette2"), m_wr0(0), m_wr1(0), m_track(0)
 {
 }
 

@@ -72,11 +72,11 @@ machine_config_constructor al_magicsound_device::device_mconfig_additions() cons
 
 al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, AL_MAGICSOUND, "Magic Sound Board", tag, owner, clock, "al_magicsound", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this),
+	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_dac1(*this,"dac1"),
 	m_dmac(*this,"dmac"),
 	m_timer1(*this,"timer1"),
-	m_timer2(*this,"timer2")
+	m_timer2(*this,"timer2"), m_current_channel(0), m_ramptr(nullptr), m_current_output(0)
 {
 }
 

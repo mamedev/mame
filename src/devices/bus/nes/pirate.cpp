@@ -64,13 +64,13 @@ nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const 
 }
 
 nes_fukutake_device::nes_fukutake_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_FUKUTAKE, "NES Cart Fukutake Study Box PCB", tag, owner, clock, "nes_fukutake", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_FUKUTAKE, "NES Cart Fukutake Study Box PCB", tag, owner, clock, "nes_fukutake", __FILE__), m_latch(0)
+				{
 }
 
 nes_futuremedia_device::nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_FUTUREMEDIA, "NES Cart FutureMedia PCB", tag, owner, clock, "nes_futuremedia", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_FUTUREMEDIA, "NES Cart FutureMedia PCB", tag, owner, clock, "nes_futuremedia", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+				{
 }
 
 nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -104,38 +104,38 @@ nes_xiaozy_device::nes_xiaozy_device(const machine_config &mconfig, const char *
 }
 
 nes_edu2k_device::nes_edu2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_EDU2K, "NES Cart Educational Computer 2000 PCB", tag, owner, clock, "nes_edu2k", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_EDU2K, "NES Cart Educational Computer 2000 PCB", tag, owner, clock, "nes_edu2k", __FILE__), m_latch(0)
+				{
 }
 
 nes_t230_device::nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_T230, "NES Cart T-230 PCB", tag, owner, clock, "nes_t230", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_T230, "NES Cart T-230 PCB", tag, owner, clock, "nes_t230", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), m_irq_enable_latch(0)
+				{
 }
 
 nes_mk2_device::nes_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_MK2, "NES Cart Mortal Kombat 2 PCB", tag, owner, clock, "nes_mk2", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_MK2, "NES Cart Mortal Kombat 2 PCB", tag, owner, clock, "nes_mk2", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+				{
 }
 
 nes_whero_device::nes_whero_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_WHERO, "NES Cart World Heroes PCB", tag, owner, clock, "nes_whero", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_WHERO, "NES Cart World Heroes PCB", tag, owner, clock, "nes_whero", __FILE__), m_reg(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
+				{
 }
 
 nes_43272_device::nes_43272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_43272, "NES Cart UNL-43272 PCB", tag, owner, clock, "nes_43272", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_43272, "NES Cart UNL-43272 PCB", tag, owner, clock, "nes_43272", __FILE__), m_latch(0)
+				{
 }
 
 nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_TF1201, "NES Cart UNL-TF1201 PCB", tag, owner, clock, "nes_tf1201", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_TF1201, "NES Cart UNL-TF1201 PCB", tag, owner, clock, "nes_tf1201", __FILE__), m_prg(0), m_swap(0), m_irq_count(0), m_irq_enable(0), m_irq_enable_latch(0)
+				{
 }
 
 nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_TF1201, "NES Cart City Fighter PCB", tag, owner, clock, "nes_cityfight", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_TF1201, "NES Cart City Fighter PCB", tag, owner, clock, "nes_cityfight", __FILE__), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+				{
 }
 
 

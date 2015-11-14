@@ -73,13 +73,13 @@ ioport_constructor cpc_symbiface2_device::device_input_ports() const
 
 cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_SYMBIFACE2, "SYMBiFACE II", tag, owner, clock, "cpc_symf2", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this),
+	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_ide(*this,"ide"),
 	m_rtc(*this,"rtc"),
 	m_nvram(*this,"nvram"),
 	m_mouse_x(*this,"sf2_mouse_x"),
 	m_mouse_y(*this,"sf2_mouse_y"),
-	m_mouse_buttons(*this,"sf2_mouse_buttons")
+	m_mouse_buttons(*this,"sf2_mouse_buttons"), m_iohigh(false), m_ide_data(0), m_mouse_state(0), m_input_x(0), m_input_y(0), m_4xxx_ptr_r(nullptr), m_4xxx_ptr_w(nullptr), m_6xxx_ptr_r(nullptr), m_6xxx_ptr_w(nullptr)
 {
 }
 

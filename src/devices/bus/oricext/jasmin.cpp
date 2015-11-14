@@ -44,7 +44,7 @@ ADDRESS_MAP_END
 
 jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	oricext_device(mconfig, JASMIN, "Jasmin floppy drive interface", tag, owner, clock, "jasmin", __FILE__),
-	fdc(*this, "fdc")
+	fdc(*this, "fdc"), side_sel(false), fdc_reset(false), ram_access(false), rom_access(false), jasmin_rom(nullptr), cur_floppy(nullptr)
 {
 }
 

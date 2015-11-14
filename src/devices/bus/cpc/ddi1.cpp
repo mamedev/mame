@@ -63,9 +63,9 @@ machine_config_constructor cpc_ddi1_device::device_mconfig_additions() const
 
 cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_DDI1, "DDI-1", tag, owner, clock, "cpc_ddi1", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this),
+	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_fdc(*this,"upd765"),
-	m_connector(*this,"upd765:0")
+	m_connector(*this,"upd765:0"), m_rom_active(false), m_romen(false)
 {
 }
 

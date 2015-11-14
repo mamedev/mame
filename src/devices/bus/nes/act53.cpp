@@ -33,8 +33,9 @@ const device_type NES_ACTION53 = &device_creator<nes_action53_device>;
 
 
 nes_action53_device::nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_ACTION53, "NES Cart Action 53 PCB", tag, owner, clock, "nes_action53", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_ACTION53, "NES Cart Action 53 PCB", tag, owner, clock, "nes_action53", __FILE__), 
+	m_sel(0)
+				{
 }
 
 

@@ -55,7 +55,7 @@ adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mco
 	device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock, "adam_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
-	m_write_irq(*this)
+	m_write_irq(*this), m_card(nullptr)
 {
 }
 

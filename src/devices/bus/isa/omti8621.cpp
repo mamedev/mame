@@ -376,7 +376,8 @@ omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag,
 	device_isa16_card_interface(mconfig, *this),
 	m_fdc(*this, OMTI_FDC_TAG),
 	m_iobase(*this, "IO_BASE"),
-	m_biosopts(*this, "BIOS_OPTS")
+	m_biosopts(*this, "BIOS_OPTS"), jumper(0), omti_state(0), status_port(0), config_port(0), mask_port(0), command_length(0), command_index(0), command_status(0), data_buffer(nullptr), 
+	data_length(0), data_index(0), diskaddr_ecc_error(0), diskaddr_format_bad_track(0), m_timer(nullptr), m_installed(false)
 {
 }
 
@@ -1287,7 +1288,7 @@ const device_type OMTI_DISK = &device_creator<omti_disk_image_device>;
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OMTI_DISK, "OMTI8621 ESDI disk", tag, owner, clock, "omti_disk_image", __FILE__),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this), m_type(0), m_cylinders(0), m_heads(0), m_sectors(0), m_sectorbytes(0), m_sector_count(0), m_image(nullptr)
 {
 }
 

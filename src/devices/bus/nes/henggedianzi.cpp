@@ -54,8 +54,8 @@ nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, cons
 }
 
 nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_HENGG_SHJY3, "NES Cart Henggedianzi Shen Hua Jian Yun III PCB", tag, owner, clock, "nes_hengg_shjy3", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_HENGG_SHJY3, "NES Cart Henggedianzi Shen Hua Jian Yun III PCB", tag, owner, clock, "nes_hengg_shjy3", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_chr_mode(0)
+				{
 }
 
 

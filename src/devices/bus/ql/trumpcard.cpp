@@ -119,7 +119,7 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, const char *tag,
 	m_floppy1(*this, WD1772_TAG":1"),
 	m_rom(*this, "rom"),
 	m_ram(*this, "ram"),
-	m_ram_size(0)
+	m_ram_size(0), m_rom_en(false)
 {
 }
 
@@ -131,7 +131,7 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type
 	m_floppy1(*this, WD1772_TAG":1"),
 	m_rom(*this, "rom"),
 	m_ram(*this, "ram"),
-	m_ram_size(ram_size)
+	m_ram_size(ram_size), m_rom_en(false)
 {
 }
 

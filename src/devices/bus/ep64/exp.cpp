@@ -48,7 +48,7 @@ ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_con
 	m_write_irq(*this),
 	m_write_nmi(*this),
 	m_write_wait(*this),
-	m_dave(*this)
+	m_dave(*this), m_card(nullptr)
 {
 }
 

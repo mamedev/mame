@@ -139,7 +139,7 @@ vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, d
 		device_vic20_expansion_card_interface(mconfig, *this),
 		m_via0(*this, M6522_0_TAG),
 		m_via1(*this, M6522_1_TAG),
-		m_bus(*this, IEEE488_TAG)
+		m_bus(*this, IEEE488_TAG), m_via0_irq(0), m_via1_irq(0)
 {
 }
 

@@ -65,7 +65,7 @@ c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconf
 		m_write_irq(*this),
 		m_write_nmi(*this),
 		m_write_dma(*this),
-		m_write_reset(*this)
+		m_write_reset(*this), m_card(nullptr), m_hiram(0)
 {
 }
 

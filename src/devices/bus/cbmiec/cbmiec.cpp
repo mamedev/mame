@@ -222,7 +222,7 @@ const device_type CBM_IEC_SLOT = &device_creator<cbm_iec_slot_device>;
 //-------------------------------------------------
 
 device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
 {
 }
 
@@ -247,7 +247,7 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 
 cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, CBM_IEC_SLOT, "CBM IEC slot", tag, owner, clock, "cbm_iec_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_address(0)
 {
 }
 

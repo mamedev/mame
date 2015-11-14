@@ -55,7 +55,7 @@ vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconf
 	device_slot_interface(mconfig, *this),
 	m_write_int(*this),
 	m_write_dma_out(*this),
-	m_write_dma_in(*this)
+	m_write_dma_in(*this), m_card(nullptr)
 {
 }
 
