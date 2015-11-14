@@ -484,13 +484,13 @@ public:
 
 	// forward delegate callbacks configuration
 	template<typename _delegate> void set_delegate(_delegate delegate) const {
-		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
+		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); ++i)
 			(*i)->set_delegate(delegate, mask);
 	}
 
 	// forward I/O port access configuration
 	void set_ioport(ioport_port &ioport) const {
-		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
+		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); ++i)
 			(*i)->set_ioport(ioport);
 	}
 
@@ -661,7 +661,7 @@ public:
 		std::list<UINT32> entries;
 		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_read *> handlers;
-		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
+		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_read(*i));
 		return handler_entry_proxy<handler_entry_read>(handlers, mask);
 	}
@@ -734,7 +734,7 @@ public:
 		std::list<UINT32> entries;
 		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_write *> handlers;
-		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
+		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_write(*i));
 		return handler_entry_proxy<handler_entry_write>(handlers, mask);
 	}
@@ -812,7 +812,7 @@ public:
 		std::list<UINT32> entries;
 		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_setoffset *> handlers;
-		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
+		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_setoffset(*i));
 		return handler_entry_proxy<handler_entry_setoffset>(handlers, mask);
 	}
@@ -1524,7 +1524,7 @@ void memory_manager::initialize()
 	// loop over devices and spaces within each device
 	memory_interface_iterator iter(machine().root_device());
 	for (device_memory_interface *memory = iter.first(); memory != NULL; memory = iter.next())
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
+		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 		{
 			// if there is a configuration for this space, we need an address space
 			const address_space_config *spaceconfig = memory->space_config(spacenum);
@@ -1911,7 +1911,7 @@ void address_space::populate_from_map(address_map *map)
 	{
 		// find the entry before the last one we processed
 		const address_map_entry *entry;
-		for (entry = map->m_entrylist.first(); entry->next() != last_entry; entry = entry->next()) ;
+		for (entry = map->m_entrylist.first(); entry->next() != last_entry; entry = entry->next()) { };
 		last_entry = entry;
 
 		// map both read and write halves
@@ -2869,7 +2869,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 		curentry.configure(bytestart, byteend, bytemask);
 
 		// Populate it wherever needed
-		for (std::list<subrange>::const_iterator i = range_override.begin(); i != range_override.end(); i++)
+		for (std::list<subrange>::const_iterator i = range_override.begin(); i != range_override.end(); ++i)
 			populate_range(i->start, i->end, entry);
 
 		// Add it in the "to be setup" list
@@ -2882,7 +2882,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 	// Ranges in range_partial must duplicated then partially changed
 	if (!range_partial.empty())
 	{
-		for (std::map<UINT16, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); i++)
+		for (std::map<UINT16, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); ++i)
 		{
 			// Theorically, if the handler to change matches the
 			// characteristics of ours, we can directly change it.  In
@@ -2912,7 +2912,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 			curentry.configure(bytestart, byteend, bytemask);
 
 			// Populate it wherever needed
-			for (std::list<subrange>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+			for (std::list<subrange>::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
 				populate_range(j->start, j->end, entry);
 
 			// Add it in the "to be setup" list

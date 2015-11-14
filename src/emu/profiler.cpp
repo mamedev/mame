@@ -175,12 +175,12 @@ void real_profiler_state::update_text(running_machine &machine)
 	// compute the total time for all bits, not including profiler or idle
 	UINT64 computed = 0;
 	profile_type curtype;
-	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_PROFILER; curtype++)
+	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_PROFILER; ++curtype)
 		computed += m_data[curtype];
 
 	// save that result in normalize, and continue adding the rest
 	UINT64 normalize = computed;
-	for ( ; curtype < PROFILER_TOTAL; curtype++)
+	for ( ; curtype < PROFILER_TOTAL; ++curtype)
 		computed += m_data[curtype];
 
 	// this becomes the total; if we end up with 0 for anything, we were just started, so return empty
@@ -193,7 +193,7 @@ void real_profiler_state::update_text(running_machine &machine)
 
 	// loop over all types and generate the string
 	device_iterator iter(machine.root_device());
-	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_TOTAL; curtype++)
+	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_TOTAL; ++curtype)
 	{
 		// determine the accumulated time for this type
 		computed = m_data[curtype];

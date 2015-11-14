@@ -1002,7 +1002,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
-		edgeptr++;
+		++edgeptr;
 	}
 
 	// walk backward to build up the backward edge list
@@ -1023,7 +1023,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
-		edgeptr++;
+		++edgeptr;
 	}
 
 	// determine which list is left/right:
@@ -1068,9 +1068,9 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 			// compute the ending X based on which part of the triangle we're in
 			_BaseType fully = _BaseType(curscan + extnum) + _BaseType(0.5);
 			while (fully > ledge->v2->y && fully < v[maxv].y)
-				ledge++;
+				++ledge;
 			while (fully > redge->v2->y && fully < v[maxv].y)
-				redge++;
+				++redge;
 			_BaseType startx = ledge->v1->x + (fully - ledge->v1->y) * ledge->dxdy;
 			_BaseType stopx = redge->v1->x + (fully - redge->v1->y) * redge->dxdy;
 
@@ -1159,7 +1159,7 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 			nextout->y = v1.y + frac * (v2.y - v1.y);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 				nextout->p[paramnum] = v1.p[paramnum] + frac * (v2.p[paramnum] - v1.p[paramnum]);
-			nextout++;
+			++nextout;
 		}
 
 		// if this vertex is not clipped, copy it in

@@ -2216,7 +2216,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 	// loop over all layers
 	bool first = true;
 	bool scrfirst = true;
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 	{
 		// determine if this layer should be visible
 		switch (layer)
@@ -2291,7 +2291,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 	float yscale = (target_bounds.y1 - target_bounds.y0) / (m_bounds.y1 - m_bounds.y0);
 
 	// normalize all the item bounds
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 		for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
 		{
 			curitem->m_bounds.x0 = target_bounds.x0 + (curitem->m_rawbounds.x0 - xoffs) * xscale;
@@ -2308,7 +2308,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 void layout_view::resolve_tags()
 {
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 	{
 		for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
 		{
