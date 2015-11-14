@@ -846,6 +846,18 @@ vs2013_winrt: generate
 vs2015: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2015
 
+vs2015_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2015
+
+vs2015_xp: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-xp vs2015
+
+vs2015_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-clang vs2015
+
+vs2015_winrt: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=winstore81 vs2015
+
 android-arm: generate
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
