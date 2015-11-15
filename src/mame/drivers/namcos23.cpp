@@ -3377,7 +3377,53 @@ static INPUT_PORTS_START( timecrs2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( downhill )
+	PORT_START("P1")
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("P2")
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN01")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)		// brake left
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)		// start
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE	// test switch
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)		// select up
+	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)	// select down
+	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON1)	// enter
+	PORT_BIT(0xf00c, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN23")
+	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON4)		// brake right
+	PORT_BIT(0xfbff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service coin
+
+	PORT_START("DSW")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze?" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 
 /***************************************************************************
@@ -5081,7 +5127,7 @@ GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, s23, 
 GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
 GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
 GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, s23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
-GAME( 1997, downhill,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
+GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, s23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
 GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
 GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",   GAME_FLAGS )
 GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG1 Ver. A, set 1)", GAME_FLAGS )
