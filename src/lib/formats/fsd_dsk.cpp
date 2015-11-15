@@ -103,7 +103,7 @@ bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	UINT64 pos;
 	std::string title;
-	for(pos=8; pos < size && img[pos] != NULL; pos++)
+	for(pos=8; pos < size && img[pos] != '\0'; pos++)
 		title += char(img[pos]);
 	pos++;
 
