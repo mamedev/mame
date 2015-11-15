@@ -416,6 +416,8 @@ void shaders::toggle()
 		{
 			// free shader resources before renderer resources
 			delete_resources(false);
+
+			g_slider_list = NULL;
 		}
 
 		master_enable = !master_enable;
@@ -439,6 +441,10 @@ void shaders::toggle()
 			if (failed)
 			{
 				master_enable = false;
+			}
+			else
+			{
+				g_slider_list = init_slider_list();
 			}
 		}
 	}
