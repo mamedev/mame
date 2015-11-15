@@ -551,8 +551,8 @@ READ8_MEMBER(bbc_state::bbcm_r)
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
 		myo = offset-0x200;
-		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) return m_mc6845->status_r(space, myo-0x00);                     /* Video controller */
-		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      return m_mc6845->register_r(space, myo-0x01);
+		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) return m_hd6845->status_r(space, myo-0x00);                     /* Video controller */
+		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      return m_hd6845->register_r(space, myo-0x01);
 		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) return m_acia ? m_acia->status_r(space, myo-0x08) : 0xfe;       /* Serial controller */
 		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      return m_acia ? m_acia->data_r(space, myo-0x09) : 0xfe;
 		if ((myo>=0x10) && (myo<=0x17))                   return 0xfe;                                                    /* Serial System Chip */
@@ -569,8 +569,8 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(space, myo-0x60) : 0xfe;
 		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
-		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xfe;
-		if ((myo>=0xe0) && (myo<=0xff))                   return 0xfe;
+		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
+		if ((myo>=0xe0) && (myo<=0xff))                   return 0xff;
 	}
 	return 0xfe;
 }
@@ -582,8 +582,8 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) m_mc6845->address_w(space, myo-0x00, data);                     /* Video Controller */
-		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      m_mc6845->register_w(space, myo-0x01, data);
+		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) m_hd6845->address_w(space, myo-0x00, data);                     /* Video Controller */
+		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      m_hd6845->register_w(space, myo-0x01, data);
 		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) if (m_acia) m_acia->control_w(space, myo-0x08, data);           /* Serial controller */
 		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      if (m_acia) m_acia->data_w(space, myo-0x09, data);
 		if ((myo>=0x10) && (myo<=0x17))                   bbc_SerialULA_w(space, myo-0x10, data);                         /* Serial System Chip */
@@ -893,7 +893,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			}
 			break;
 		case 1:
-			if (m_rtc && m_MC146818_WR == 0)
+			if (m_machinetype == MASTER && m_MC146818_WR == 0)
 			{
 				/* BBC Master has NVRAM Here */
 				m_MC146818_WR = 1;
@@ -911,7 +911,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			}
 			break;
 		case 2:
-			if (m_rtc && m_MC146818_DS == 0)
+			if (m_machinetype == MASTER && m_MC146818_DS == 0)
 			{
 				/* BBC Master has NVRAM Here */
 				m_MC146818_DS = 1;
@@ -976,7 +976,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			}
 			break;
 		case 1:
-			if (m_rtc && m_MC146818_WR == 1)
+			if (m_machinetype == MASTER && m_MC146818_WR == 1)
 			{
 				/* BBC Master has NVRAM Here */
 				m_MC146818_WR = 0;
@@ -994,7 +994,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			}
 			break;
 		case 2:
-			if (m_rtc && m_MC146818_DS == 1)
+			if (m_machinetype == MASTER && m_MC146818_DS == 1)
 			{
 				/* BBC Master has NVRAM Here */
 				m_MC146818_DS = 0;
@@ -1051,7 +1051,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 	}
 
 
-	if (m_rtc)
+	if (m_machinetype == MASTER)
 	{
 		//set the Address Select
 		if (m_MC146818_AS != BIT(data,7))
@@ -1720,6 +1720,7 @@ void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, 
 
 MACHINE_START_MEMBER(bbc_state, bbca)
 {
+	m_machinetype = MODELA;
 	bbc_setup_banks(m_bank4, 4, 0, 0x4000);
 }
 
@@ -1749,6 +1750,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbca)
 
 MACHINE_START_MEMBER(bbc_state, bbcb)
 {
+	m_machinetype = MODELB;
 	m_mc6850_clock = 0;
 	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
 }
@@ -1771,6 +1773,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 
 MACHINE_START_MEMBER(bbc_state, bbcbp)
 {
+	m_machinetype = BPLUS;
 	m_mc6850_clock = 0;
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
@@ -1795,6 +1798,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 
 MACHINE_START_MEMBER(bbc_state, bbcm)
 {
+	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
@@ -1817,4 +1821,17 @@ MACHINE_RESET_MEMBER(bbc_state, bbcm)
 	m_bank7->set_base(m_region_os->base());                /* bank 6 OS rom of RAM         from c000 to dfff */
 
 	bbcb_IC32_initialise(this);
+}
+
+
+MACHINE_START_MEMBER(bbc_state, bbcmc)
+{
+	MACHINE_START_CALL_MEMBER(bbcm);
+
+	m_machinetype = COMPACT;
+}
+
+MACHINE_RESET_MEMBER(bbc_state, bbcmc)
+{
+	MACHINE_RESET_CALL_MEMBER(bbcm);
 }

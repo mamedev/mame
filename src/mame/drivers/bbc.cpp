@@ -30,6 +30,12 @@
     ARM1  - ARM Evaluation System
     ADB20 - Master Compact
 
+    Acorn Business Computer
+
+    ABC110        - 64K, 10MB HDD, Z80, CP/M 2.2
+    ABC210/ACW443 - 4096K, 20MB HDD, 32016, PanOS
+    ABC310        - 1024K, 10MB HDD, 80286, DOS 3.1/GEM
+
 ******************************************************************************/
 
 /* Core includes */
@@ -49,7 +55,7 @@
 /* Devices */
 #include "imagedev/flopdrv.h"
 #include "formats/bbc_dsk.h"
-//#include "formats/fsd_dsk.h"
+#include "formats/fsd_dsk.h"
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
@@ -136,17 +142,17 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                                              /*    c000-fbff                 OS ROM                          */
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP                                                                             /*    fc00-fdff                 FRED & JIM Pages                */
-																												/*    fe00-feff                 SHEILA Address Page             */
-	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
+																																																							/*    fe00-feff                 SHEILA Address Page             */
+	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, register_r, register_w)
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)  /*    fe08-fe0F  6850 ACIA      Serial controller               */
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP                                                                             /*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
-	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                                           /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
-																												/* W: fe20-fe2f  Video ULA      Video system chip               */
+	AM_RANGE(0xfe20, 0xfe2f) AM_READWRITE(bbc_fe_r, bbc_videoULA_w)                                             /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
+																																																							/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selecta_w)                                         /* R: fe30-fe3f  NC             Not Connected                   */
-																												/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																																																							/* W: fe30-fe3f  74LS161        Paged ROM selector              */
 	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
 	AM_RANGE(0xfe60, 0xfe7f) AM_NOP                                                                             /*    fe60-fe7f  6522 VIA       # USER VIA                      */
 	AM_RANGE(0xfe80, 0xfe9f) AM_NOP                                                                             /*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
@@ -162,18 +168,18 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                                              /*    c000-fbff                 OS ROM                          */
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP                                                                             /*    fc00-fdff                 FRED & JIM Pages                */
-																												/*    fe00-feff                 SHEILA Address Page             */
-	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
+																																																							/*    fe00-feff                 SHEILA Address Page             */
+	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, register_r, register_w)
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)  /*    fe08-fe0F  6850 ACIA      Serial controller               */
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_READ_PORT("STATID")                                                             /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
-	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                                           /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
-																												/* W: fe20-fe2f  Video ULA      Video system chip               */
+	AM_RANGE(0xfe20, 0xfe2f) AM_READWRITE(bbc_fe_r, bbc_videoULA_w)                                             /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
+																																																							/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)                          /*    fe60-fe7f  6522 VIA       USER VIA                        */
-																												/*    fe80-fe9f  FDC            Floppy disc controller          */
+																																																							/*    fe80-fe9f  FDC            Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)                            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
@@ -186,7 +192,7 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
-																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_DEVICE("i8271", i8271_device, map)                              /*    fe80-fe83  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, data_r, data_w)             /*    fe84-fe9f  8271 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -198,7 +204,7 @@ static ADDRESS_MAP_START(bbcb1770_mem, AS_PROGRAM, 8, bbc_state)
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
-																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -211,7 +217,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6")                                              /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
-																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -224,7 +230,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_128_w)                /*    8000-afff                 Paged ROM or 12K of SWRAM       */
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(bbc_memorybp6_128_w)                /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
-																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -237,7 +243,7 @@ static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6")                                              /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
-																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_NOP                                                             /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_NOP                                                             /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
@@ -677,16 +683,16 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_BBC_DFS_FORMAT,
-	FLOPPY_BBC_CPM_FORMAT
-	//FLOPPY_FSD_FORMAT
+	FLOPPY_BBC_CPM_FORMAT,
+	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
 	FLOPPY_BBC_DFS_FORMAT,
 	FLOPPY_BBC_ADFS_FORMAT,
 	FLOPPY_BBC_CPM_FORMAT,
-	FLOPPY_BBC_DOS_FORMAT
-	//FLOPPY_FSD_FORMAT
+	FLOPPY_BBC_DOS_FORMAT,
+	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcmc )
@@ -758,11 +764,12 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	//MCFG_SCREEN_RAW_PARAMS( XTAL_17_73447MHz / 4, 1024, 80, 80 + 640 + 48, 625, 12, 12 + 256 + 13 )
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("hd6845", hd6845_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
@@ -771,7 +778,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
+	MCFG_MC6845_ADD("hd6845", HD6845, "screen", 2000000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
@@ -875,6 +882,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b", "bbcb_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b", "bbcb_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_orig_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
 MACHINE_CONFIG_END
@@ -970,6 +978,7 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 MACHINE_CONFIG_END
 
@@ -990,6 +999,7 @@ static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 MACHINE_CONFIG_END
 
@@ -1041,6 +1051,7 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 MACHINE_CONFIG_END
@@ -1077,7 +1088,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("hd6845", hd6845_device, screen_update)
+
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
 
@@ -1085,7 +1097,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
+	MCFG_MC6845_ADD("hd6845", HD6845, "screen", 2000000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
@@ -1128,6 +1140,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a", "bbca_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b", "bbcb_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b", "bbcb_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_orig_flop")
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
@@ -1217,6 +1230,7 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 
@@ -1278,12 +1292,16 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	/* eeprom pcd8572 */
 	//MCFG_DEVICE_REMOVE("rtc")
 
+	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcmc)
+	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("cart_ls_m")

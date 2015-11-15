@@ -261,6 +261,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/fmsx_cas.h",
 		MAME_DIR .. "src/lib/formats/fmtowns_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/fmtowns_dsk.h",
+		MAME_DIR .. "src/lib/formats/fsd_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/fsd_dsk.h",
 		MAME_DIR .. "src/lib/formats/g64_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/g64_dsk.h",
 		MAME_DIR .. "src/lib/formats/gtp_cas.cpp",

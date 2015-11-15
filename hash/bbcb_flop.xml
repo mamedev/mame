@@ -15,13 +15,28 @@
 
 <softwarelist name="bbcb_flop" description="BBC Micro Model B disks">
 
+	<!-- Games -->
+
 	<software name="3dbombal">
 		<description>3D Bomb Alley</description>
 		<year>1983</year>
 		<publisher>Software Invasion</publisher>
+		<info name="notes" value="Original" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="3dbomballey.ssd" size="102400" crc="5a8deaff" sha1="d0f4716a376e4407492b4db7f87597bc07d7651f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arsoccer">
+		<description>Arcade Soccer</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92928">
+				<rom name="arcade soccer.ssd" size="92928" crc="c0ff80d4" sha1="7c522c65ea565b1eba20ea2200fa80b2cc06c2db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +51,7 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="elite">
 		<description>Elite</description>
 		<year>1984</year>
@@ -59,6 +74,18 @@
 		</part>
 	</software>
 
+	<software name="etype">
+		<description>E-Type</description>
+		<year>1990</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="72704">
+				<rom name="e-type.ssd" size="72704" crc="cd685f63" sha1="9d64109db22299adbae8da053eb9d2e68a1cb08c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="eyes">
 		<description>Eyes</description>
 		<year>1984</year>
@@ -81,13 +108,97 @@
 		</part>
 	</software>
 
+	<software name="gkiller">
+		<description>Giant Killer</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="giant killer.ssd" size="102400" crc="082df282" sha1="dfd5e3f33cd850246cce1a7f8de977ee21fa0385" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedout">
+		<description>Holed Out</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89856">
+				<rom name="holed out.ssd" size="89856" crc="4f767fc8" sha1="496f5f20d093651d056528fbee4bcfbc2e9a6c37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedoc1">
+		<description>Holed Out Extra Courses Vol.1</description>
+		<year>1990</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="99584">
+				<rom name="holed out extra courses vol1.ssd" size="99584" crc="186a21e9" sha1="b4475e56fae9786c4b964e43b0b1a14dec9e8368" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedoc2">
+		<description>Holed Out Extra Courses Vol.2</description>
+		<year>1990</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="99584">
+				<rom name="holed out extra courses vol2.ssd" size="99584" crc="78324f99" sha1="eab859a632e8251aa7c3ece6aae4b7d759ec5b99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huntshau">
+		<description>The Hunt: Search for Shauna</description>
+		<year>1987</year>
+		<publisher>Robico</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="the hunt search for shauna.ssd" size="102400" crc="9967e594" sha1="fc9512ecefc422ae6b2152aa308284b500072bd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inertia">
+		<description>Inertia</description>
+		<year>1990</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="56064">
+				<rom name="inertia.ssd" size="56064" crc="e7a50f85" sha1="ce2fa997a2e47abbae819a19b64858db816690d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="mapocaly">
-		<description>Mega Apocalypse</description>
+		<description>Mega-Apocalypse</description>
 		<year>1988</year>
-		<publisher>Martech (Unreleased)</publisher>
+		<publisher>Martech</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="40192">
 				<rom name="megaapocalypse.ssd" size="40192" crc="4a6e1489" sha1="399e09d9782d7f0068a9acd9113595657dbb4673" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nevryon">
+		<description>Nevryon</description>
+		<year>1991</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101632">
+				<rom name="nevryon.ssd" size="101632" crc="a6c83ad4" sha1="e5f8336ffd3b27be04d70974a45d3972b796afdc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -107,9 +218,60 @@
 		<description>Welcome and Disc Utils</description>
 		<year>1982</year>
 		<publisher>Acorn</publisher>
+		<info name="notes" value="Original" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="78336">
 				<rom name="welcome.ssd" size="78336" crc="03728f14" sha1="d212aa33a14b30dc2ff64920f834fe8c4e6715cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uim">
+		<description>U.I.M.</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="124928">
+				<rom name="uim.ssd" size="124928" crc="08871fd4" sha1="c08e86fde0c8faa154eca45fab70c915d9b9c526" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whimagic">
+		<description>White Magic</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88832">
+				<rom name="white magic.ssd" size="88832" crc="81988eaf" sha1="04aed4908320aa5befb11aa9d8d707bcdc493b79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whimagi2">
+		<description>White Magic 2</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="white magic 2.ssd" size="102400" crc="8d3ed4da" sha1="fe11e69648bae6e1c6fdfc54cdde91b816ca7e85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="wrldword">
+		<description>World Without Words</description>
+		<year>198?</year>
+		<publisher>4mation</publisher>
+		<info name="notes" value="Deprotected" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="world without words.ssd" size="102400" crc="576db44b" sha1="c2cb171af63296eb00bdb56a3b47ed0073ddc764" offset="0" />
 			</dataarea>
 		</part>
 	</software>
