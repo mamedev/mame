@@ -262,13 +262,13 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="G37" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Program" offset="0" />
+			<feature name="part_id" value="Program"/>
 			<dataarea name="flop" size="102461">
 				<rom name="033 acheton program.fsd" size="102461" crc="0c6c46ca" sha1="6322945135310ea8ae1dbf2f1aced77f21688008" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data" offset="0" />
+			<feature name="part_id" value="Data"/>
 			<dataarea name="flop" size="105079">
 				<rom name="033 acheton data.fsd" size="105079" crc="86fdca91" sha1="57f448a17868f0bdbbc6a415464220da0c418f72" offset="0" />
 			</dataarea>
@@ -760,13 +760,13 @@
 		<year>1990</year>
 		<publisher>Audiogenic</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side [A]" offset="0" />
+			<feature name="part_id" value="Side [A]"/>
 			<dataarea name="flop" size="104944">
 				<rom name="151 fab four vol 1 [a].fsd" size="104944" crc="f683f7ac" sha1="a8a43297779e2da6e80055fcc2ce80424ad86558" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side [B]" offset="0" />
+			<feature name="part_id" value="Side [B]"/>
 			<dataarea name="flop" size="104944">
 				<rom name="151 fab four vol 1 [b].fsd" size="104944" crc="88473bf5" sha1="23a31ca311f2ad7c32bf18199cae8fb1fc3e6ca9" offset="0" />
 			</dataarea>
@@ -778,13 +778,13 @@
 		<year>1987</year>
 		<publisher>Audiogenic</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side [A]" offset="0" />
+			<feature name="part_id" value="Side [A]"/>
 			<dataarea name="flop" size="105078">
 				<rom name="152 bbc bonanza [a].fsd" size="105078" crc="2b10b64f" sha1="2731e2e301bbb9e8ceb8e7cadd0b37b05daa83ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side [B]" offset="0" />
+			<feature name="part_id" value="Side [B]"/>
 			<dataarea name="flop" size="105078">
 				<rom name="152 bbc bonanza [b].fsd" size="105078" crc="c12d9858" sha1="5f1061b8abd05b603e3892d82846593dea07b092" offset="0" />
 			</dataarea>
@@ -829,13 +829,13 @@
 		<year>1988</year>
 		<publisher>CDS</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="104953">
 				<rom name="000 colossus chess 4 side 1.fsd" size="104953" crc="c759e652" sha1="04a92c17cfec2827b4c6e85e4a271831346c9d00" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="104953">
 				<rom name="000 colossus chess 4 side 2.fsd" size="104953" crc="2eda7e43" sha1="2b25c2d66c2d9ab40a90710ea931e01471b7a5d6" offset="0" />
 			</dataarea>
@@ -1518,13 +1518,13 @@
 		<year>1985</year>
 		<publisher>Glentop Publishers</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Startup" offset="0" />
+			<feature name="part_id" value="Startup"/>
 			<dataarea name="flop" size="97078">
 				<rom name="173 3d graphics development system.fsd" size="97078" crc="407466ba" sha1="304eaf043119e382888771d1afbcf29f8d02038f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Database" offset="0" />
+			<feature name="part_id" value="Database"/>
 			<dataarea name="flop" size="105073">
 				<rom name="173 3d graphics development system database.fsd" size="105073" crc="b6b986fe" sha1="b425ea1f925032293509423ebe0296db42a356bf" offset="0" />
 			</dataarea>
@@ -1613,13 +1613,13 @@
 		<year>1988</year>
 		<publisher>The Times</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="209879">
 				<rom name="203 the times crosswords volume 1 side 1.fsd" size="209879" crc="c24e1d46" sha1="43e6a446f763ecebac75fd83e2ee315cf4b7dadc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="209879">
 				<rom name="203 the times crosswords volume 1 side 2.fsd" size="209879" crc="341f1170" sha1="59bf18805722ef0e6b3672d35f9ac7192936f3b3" offset="0" />
 			</dataarea>
@@ -1686,19 +1686,19 @@
 		<year>1984</year>
 		<publisher>Island Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="1a" offset="0" />
+			<feature name="part_id" value="1a"/>
 			<dataarea name="flop" size="104741">
 				<rom name="244 the music system 1a.fsd" size="104741" crc="5c2bcbbc" sha1="832dca99880d53b258f68c1f66ef0ce365c02b97" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="1b" offset="0" />
+			<feature name="part_id" value="1b"/>
 			<dataarea name="flop" size="104741">
 				<rom name="244 the music system 1b.fsd" size="104741" crc="705e8c30" sha1="e7f0f1f379213c995e403fd2b15445dfc75eb7f5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="1c" offset="0" />
+			<feature name="part_id" value="1c"/>
 			<dataarea name="flop" size="104741">
 				<rom name="244 the music system 1c.fsd" size="104741" crc="c45ef959" sha1="655e0815acb01a9c9f474c58d6ebb9753aae9d56" offset="0" />
 			</dataarea>
@@ -1710,13 +1710,13 @@
 		<year>198?</year>
 		<publisher>Alternative</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="99705">
 				<rom name="211 sport spectacular side 1.fsd" size="99705" crc="12330a00" sha1="ed2368cde11a6cf26115e2dae85b4ce5ee5f3032" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="99706">
 				<rom name="211 sport spectacular side 2.fsd" size="99706" crc="e68f751d" sha1="0325f070f4263480d4ac5bf3d3d3f14282effccf" offset="0" />
 			</dataarea>
@@ -1739,13 +1739,13 @@
 		<year>1987</year>
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="104964">
 				<rom name="215 napmnapl side 1.fsd" size="104964" crc="8e59911a" sha1="91e5f2aaeee1eb7adb2ee8d898e8b46b53125c48" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="104964">
 				<rom name="215 napmnapl side 2.fsd" size="104964" crc="ad51aaac" sha1="ef0e5a6daddaac0de147d28b4a7399baf7f3eb1c" offset="0" />
 			</dataarea>
@@ -1779,13 +1779,13 @@
 		<year>1987</year>
 		<publisher>Bug Byte</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" offset="0" />
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="104937">
 				<rom name="226 dunjunz side a.fsd" size="104937" crc="25fc923b" sha1="9d05d9f79b506129347eeaf28711409058d029c9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" offset="0" />
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="104937">
 				<rom name="226 dunjunz side b.fsd" size="104937" crc="3f717792" sha1="915acda5b0522d96dabad0e3e0cfb0d1b260cae4" offset="0" />
 			</dataarea>
@@ -1951,13 +1951,13 @@
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="105091">
 				<rom name="300 lord of the rings side 1.fsd" size="105091" crc="922d9f1b" sha1="cc684e196b8d87c5ebb2791e163855242bfabf19" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="105091">
 				<rom name="300 lord of the rings side 2.fsd" size="105091" crc="b986982f" sha1="11ae12b8d274ac76b351b9e7b4e8cd192ad1b51d" offset="0" />
 			</dataarea>
@@ -1991,31 +1991,31 @@
 		<year>1983</year>
 		<publisher>Melbourne House</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="105084">
 				<rom name="304 the hobbit side 1.fsd" size="105084" crc="291aea5c" sha1="28b78d006b36dc3d4338729d6d92cb0454f9f285" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="105084">
 				<rom name="304 the hobbit side 2.fsd" size="105084" crc="2629eaff" sha1="ab033a5c6d74d7c86b0e4d03be4a2fd76814cfe2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Picture Disk 1" offset="0" />
+			<feature name="part_id" value="Picture Disk 1"/>
 			<dataarea name="flop" size="104955">
 				<rom name="304 the hobbit picture disk 1.fsd" size="104955" crc="c6b638f4" sha1="a0e0683312eaa726b1bfec3e859a7c87bcaff175" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Picture Disk 2" offset="0" />
+			<feature name="part_id" value="Picture Disk 2"/>
 			<dataarea name="flop" size="104955">
 				<rom name="304 the hobbit picture disk 2.fsd" size="104955" crc="b7a26a82" sha1="f8bc3078627fca6bf6760c86f1078686d8388061" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Save Game Disk" offset="0" />
+			<feature name="part_id" value="Save Game Disk"/>
 			<dataarea name="flop" size="104955">
 				<rom name="304 the hobbit save game disk.fsd" size="104955" crc="1f5b81aa" sha1="11f80d16b0d20258138791cd2a3649c4424f92c4" offset="0" />
 			</dataarea>
@@ -2049,13 +2049,13 @@
 		<year>1985</year>
 		<publisher>Robico</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Program Disc" offset="0" />
+			<feature name="part_id" value="Program Disc"/>
 			<dataarea name="flop" size="105092">
 				<rom name="335 enthar seven program disc.fsd" size="105092" crc="d5312823" sha1="2c87de7cd8d5a47bc892b544f1486a9b60003cc9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Database Disc" offset="0" />
+			<feature name="part_id" value="Database Disc"/>
 			<dataarea name="flop" size="105093">
 				<rom name="335 enthar seven database disc.fsd" size="105093" crc="e49c3c99" sha1="82ec0bd187eb38bb96940173740b8f35a20d98f5" offset="0" />
 			</dataarea>
@@ -2100,13 +2100,13 @@
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 0" offset="0" />
+			<feature name="part_id" value="Side 0"/>
 			<dataarea name="flop" size="105086">
 				<rom name="351 the gold collection side 0.fsd" size="105086" crc="394f6d76" sha1="462bb55bcf122f9d5d998eacf3f927c7d64bd802" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="105086">
 				<rom name="351 the gold collection side 1.fsd" size="105086" crc="aebd2b3d" sha1="77b604df862fd7ed18480ab09bb73f63f81adead" offset="0" />
 			</dataarea>
@@ -2558,13 +2558,13 @@
 		<year>1988</year>
 		<publisher>Mandarin</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game" offset="0" />
+			<feature name="part_id" value="Game"/>
 			<dataarea name="flop" size="209864">
 				<rom name="345 time and magik game side.fsd" size="209864" crc="03dd16fe" sha1="09c2bbaaf1a98292093933c139e3946b41faeddb" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Pictures" offset="0" />
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Pictures"/>
 			<dataarea name="flop" size="209849">
 				<rom name="345 time and magik pictures side.fsd" size="209849" crc="c8f7b4d5" sha1="4662ba6a2dd6445b293465165630bdfce6d9b4c1" offset="0" />
 			</dataarea>
@@ -2576,13 +2576,13 @@
 		<year>1988</year>
 		<publisher>Mandarin</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game" offset="0" />
+			<feature name="part_id" value="Game"/>
 			<dataarea name="flop" size="209868">
 				<rom name="350 lancelot game side.fsd" size="209868" crc="c4189869" sha1="5d65d025aded494d6030cf281d2bffe31049739d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Pictures" offset="0" />
+			<feature name="part_id" value="Pictures"/>
 			<dataarea name="flop" size="209872">
 				<rom name="350 lancelot pictures side.fsd" size="209872" crc="1a29bbe1" sha1="fb60bc459afc8b66b84a40a409076adad3b0b4f3" offset="0" />
 			</dataarea>
@@ -2797,13 +2797,13 @@
 		<year>1986</year>
 		<publisher>Micro Power</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side One" offset="0" />
+			<feature name="part_id" value="Side One"/>
 			<dataarea name="flop" size="86602">
 				<rom name="305 micro power magic i side one.fsd" size="86602" crc="5808f35e" sha1="8d290c1179560e0cca601fff17ea876050706158" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side Two" offset="0" />
+			<feature name="part_id" value="Side Two"/>
 			<dataarea name="flop" size="86602">
 				<rom name="305 micro power magic i side two.fsd" size="86602" crc="59188f60" sha1="faf9b366e650c808b3438bcc2e1c77a11ac1d529" offset="0" />
 			</dataarea>
@@ -2815,13 +2815,13 @@
 		<year>1986</year>
 		<publisher>Micro Power</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side One" offset="0" />
+			<feature name="part_id" value="Side One"/>
 			<dataarea name="flop" size="94466">
 				<rom name="306 micro power magic ii side one.fsd" size="94466" crc="02bfc44e" sha1="d323933d217c4b206f2cf7eefbd57b3b046b54bf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side Two" offset="0" />
+			<feature name="part_id" value="Side Two"/>
 			<dataarea name="flop" size="70877">
 				<rom name="306 micro power magic ii side two.fsd" size="70877" crc="2638f310" sha1="d9af8ba63ca03ff74f8fa3b2ab75b34fdc774b9d" offset="0" />
 			</dataarea>
@@ -2833,13 +2833,13 @@
 		<year>1986</year>
 		<publisher>Micro Power</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side One" offset="0" />
+			<feature name="part_id" value="Side One"/>
 			<dataarea name="flop" size="104951">
 				<rom name="307 micro power magic iii side one.fsd" size="104951" crc="b50c606d" sha1="fd5995c4bdbea382563eaa4216e14494d4d781b9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side Two" offset="0" />
+			<feature name="part_id" value="Side Two"/>
 			<dataarea name="flop" size="104951">
 				<rom name="307 micro power magic iii side two.fsd" size="104951" crc="b7404184" sha1="db1afd4c596654de069ad0e568a6a7d9f846c123" offset="0" />
 			</dataarea>
@@ -3050,13 +3050,13 @@
 		<year>1988</year>
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game" offset="0" />
+			<feature name="part_id" value="Game"/>
 			<dataarea name="flop" size="35495">
 				<rom name="057 return to doom.fsd" size="35495" crc="3e5c81b5" sha1="4e580a652a0df941fd2d434dfd507cff886a6280" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Database" offset="0" />
+			<feature name="part_id" value="Database"/>
 			<dataarea name="flop" size="104953">
 				<rom name="057 return to doom database.fsd" size="104953" crc="51b8a45c" sha1="bf910c6d9c027a48d23d4c638c06104724bcb340" offset="0" />
 			</dataarea>
@@ -3255,25 +3255,25 @@
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 00" offset="0" />
+			<feature name="part_id" value="Side 00"/>
 			<dataarea name="flop" size="104947">
 				<rom name="156 beverly hills  cop (side 00).fsd" size="104947" crc="11ecb37b" sha1="85cef485bd4936ac62fe350fcc3242bd62119f51" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 01" offset="0" />
+			<feature name="part_id" value="Side 01"/>
 			<dataarea name="flop" size="104948">
 				<rom name="156 beverly hills  cop (side 01).fsd" size="104948" crc="4ce85ea9" sha1="1e2951fb058fe10c212a5b59842733ba3dc09504" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side 02" offset="0" />
+			<feature name="part_id" value="Side 02"/>
 			<dataarea name="flop" size="104947">
 				<rom name="156 beverly hills  cop (side 02).fsd" size="104947" crc="05d06984" sha1="308cf3ff46e6b88478ab471bd412fc2d86d53e75" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side 03" offset="0" />
+			<feature name="part_id" value="Side 03"/>
 			<dataarea name="flop" size="104947">
 				<rom name="156 beverly hills  cop (side 03).fsd" size="104947" crc="bc1da561" sha1="8ac0badcea6caaedfe7a1404c4670928c8631fd7" offset="0" />
 			</dataarea>
@@ -3296,13 +3296,13 @@
 		<year>1986</year>
 		<publisher>Tynesoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="80 track" offset="0" />
+			<feature name="part_id" value="80 track"/>
 			<dataarea name="flop" size="209868">
 				<rom name="160 commonwealth games.fsd" size="209868" crc="7303c63a" sha1="377a42858481e6e5f2494058b70977f4a52ce4a3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="40 track" offset="0" />
+			<feature name="part_id" value="40 track"/>
 			<dataarea name="flop" size="104948">
 				<rom name="160 commonwealth games (40 track).fsd" size="104948" crc="12792e7e" sha1="d3a676358eaae38ca9b0d31d6bc4cf0687098575" offset="0" />
 			</dataarea>
@@ -3325,13 +3325,13 @@
 		<year>1989</year>
 		<publisher>Tynesoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 00" offset="0" />
+			<feature name="part_id" value="Side 00"/>
 			<dataarea name="flop" size="201995">
 				<rom name="162 superman (side 00).fsd" size="201995" crc="08577c45" sha1="7ea9dedb20495773418a47ae09ca88714a6d95c2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 01" offset="0" />
+			<feature name="part_id" value="Side 01"/>
 			<dataarea name="flop" size="201995">
 				<rom name="162 superman (side 01).fsd" size="201995" crc="de9ef62e" sha1="f74cc1cb34fcabf44b40489a2c00573f89c47add" offset="0" />
 			</dataarea>
@@ -3584,7 +3584,7 @@
 		</part>
 	</software>
 	
-	<software name="childspac">
+	<software name="childspc">
 		<description>Children from Space</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
@@ -3831,13 +3831,13 @@
 		<year>1989</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="104960">
 				<rom name="186 the teddy bears' picnic side 1.fsd" size="104960" crc="83657179" sha1="1d12b5579fca525558115fd3338ecf41d1c38ec8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="104960">
 				<rom name="186 the teddy bears' picnic side 2.fsd" size="104960" crc="139afdc0" sha1="6ffbb34bd86c2117fde0d559ba1b1a2e9ad9bba5" offset="0" />
 			</dataarea>
@@ -3882,13 +3882,13 @@
 		<year>1985</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="40 track" offset="0" />
+			<feature name="part_id" value="40 track"/>
 			<dataarea name="flop" size="104940">
 				<rom name="267 the circus.fsd" size="104940" crc="3aabf560" sha1="caca0c3362ffd5fe2d3c164a36c9177690be9236" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="80 track" offset="0" />
+			<feature name="part_id" value="80 track"/>
 			<dataarea name="flop" size="105020">
 				<rom name="267 the circus (80 track).fsd" size="105020" crc="bbf1118d" sha1="1eb0e41786ad7e43443b2a22f79e9d4a700460e6" offset="0" />
 			</dataarea>
@@ -3977,13 +3977,13 @@
 		<year>1989</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disc 1" offset="0" />
+			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="107134">
 				<rom name="275 the wizard's return disc 1.fsd" size="107134" crc="1702b5d1" sha1="c5e7a19a7a2b1968f2d145dda2c0485a486c33fa" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disc 2" offset="0" />
+			<feature name="part_id" value="Disc 2"/>
 			<dataarea name="flop" size="107134">
 				<rom name="275 the wizard's return disc 2.fsd" size="107134" crc="934a51ba" sha1="fa954c26816ab5f1f1c91aa75f7cfbf909d7764b" offset="0" />
 			</dataarea>
@@ -3995,13 +3995,13 @@
 		<year>1985</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Part 1" offset="0" />
+			<feature name="part_id" value="Part 1"/>
 			<dataarea name="flop" size="104949">
 				<rom name="313 the wizards return part 1.fsd" size="104949" crc="1d850a68" sha1="3c0df079d109623487b29357523597a7e5269855" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Part 2" offset="0" />
+			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="104949">
 				<rom name="313 the wizards return part 2.fsd" size="104949" crc="f3b0af75" sha1="f32b5340455d8bac2b2bb6f5f617b759314f310c" offset="0" />
 			</dataarea>
@@ -4035,13 +4035,13 @@
 		<year>1989</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="The Lost Box" offset="0" />
+			<feature name="part_id" value="The Lost Box"/>
 			<dataarea name="flop" size="104952">
 				<rom name="277 dreamtime the lost box.fsd" size="104952" crc="d5f3161f" sha1="a3cf6ef2c84ee90ea1abc99768f9df11bdb36b31" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="The Lost Toy" offset="0" />
+			<feature name="part_id" value="The Lost Toy"/>
 			<dataarea name="flop" size="104952">
 				<rom name="277 dreamtime the lost toy.fsd" size="104952" crc="bce9d536" sha1="d63b17b405b622e61e0454af9e2f3cc504056f1c" offset="0" />
 			</dataarea>
@@ -4053,13 +4053,13 @@
 		<year>198?</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="The Apple" offset="0" />
+			<feature name="part_id" value="The Apple"/>
 			<dataarea name="flop" size="104961">
 				<rom name="278 the teachers cupboard the apple.fsd" size="104961" crc="c2210968" sha1="9bcf2de3eb9928fba90da41e876c22218fe7f9cc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="The Crown" offset="0" />
+			<feature name="part_id" value="The Crown"/>
 			<dataarea name="flop" size="104961">
 				<rom name="278 the teachers cupboard the crown.fsd" size="104961" crc="92f645c6" sha1="dbd30585b46d08c9f830319a0d43d8b76a55c49e" offset="0" />
 			</dataarea>
@@ -4093,25 +4093,25 @@
 		<year>198?</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="1 The House on the Hill" offset="0" />
+			<feature name="part_id" value="1 The House on the Hill"/>
 			<dataarea name="flop" size="107151">
 				<rom name="282 story starts 1 the house on the hill.fsd" size="107151" crc="cdb59931" sha1="1650a33d33fd9b5a278e2eb1b25c374c7449cb45" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="2 Escape from the Castle of Evil" offset="0" />
+			<feature name="part_id" value="2 Escape from the Castle of Evil"/>
 			<dataarea name="flop" size="107160">
 				<rom name="282 story starts 2 escape from the castle of evil.fsd" size="107160" crc="bc37093c" sha1="6b5af817f84e9f7d01d490d20cb44baca0748732" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="3 The Box" offset="0" />
+			<feature name="part_id" value="3 The Box"/>
 			<dataarea name="flop" size="107137">
 				<rom name="282 story starts 3 the box.fsd" size="107137" crc="b97f2204" sha1="32d798223831e5df66ab0c327a7d94d5d2a97854" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="4 The Junk Shop" offset="0" />
+			<feature name="part_id" value="4 The Junk Shop"/>
 			<dataarea name="flop" size="107143">
 				<rom name="282 story starts 4 the junk shop.fsd" size="107143" crc="901c4d1a" sha1="4da1e8d3af012e48da2e174a4e56a80cdfe64350" offset="0" />
 			</dataarea>
@@ -4123,13 +4123,13 @@
 		<year>1989</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="40 track" offset="0" />
+			<feature name="part_id" value="40 track"/>
 			<dataarea name="flop" size="104950">
 				<rom name="283 the wizards revenge.fsd" size="104950" crc="a6595fae" sha1="9c0b74e7ec586eab95532bb1c8274fb3cedf14c1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="80 track" offset="0" />
+			<feature name="part_id" value="80 track"/>
 			<dataarea name="flop" size="105165">
 				<rom name="283 the wizard's revenge (80 track).fsd" size="105165" crc="189b2b12" sha1="7a16e39562c6634ea24a965c88aecb3c18f3d4a5" offset="0" />
 			</dataarea>
@@ -4141,19 +4141,19 @@
 		<year>1990</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Startup" offset="0" />
+			<feature name="part_id" value="Startup"/>
 			<dataarea name="flop" size="104945">
 				<rom name="287 zillion startup.fsd" size="104945" crc="5f418e9e" sha1="24c89246b9f4b25577b61fe03b9ca90704af0da9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Planet" offset="0" />
+			<feature name="part_id" value="Planet"/>
 			<dataarea name="flop" size="104944">
 				<rom name="287 zillion planet.fsd" size="104944" crc="5730fb6b" sha1="0b1f058cbc31c68e4d7ee18292635185b6160187" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Solar" offset="0" />
+			<feature name="part_id" value="Solar"/>
 			<dataarea name="flop" size="104943">
 				<rom name="287 zillion solar.fsd" size="104943" crc="31e6903e" sha1="3b2aa66e6c060b73654b99d1bd50e3c1b4312772" offset="0" />
 			</dataarea>
@@ -4165,25 +4165,25 @@
 		<year>1986</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Part 1" offset="0" />
+			<feature name="part_id" value="Part 1"/>
 			<dataarea name="flop" size="105162">
 				<rom name="288 animal rescue part 1 (80 track).fsd" size="105162" crc="bd4297a5" sha1="72d9de024711aef34bd6485bf1f0e874b9722e42" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Part 2" offset="0" />
+			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="105165">
 				<rom name="288 animal rescue part 2 (80 track).fsd" size="105165" crc="c22c14a8" sha1="7fdbf88045b672d64d63ade918a6af5402651907" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Part 3" offset="0" />
+			<feature name="part_id" value="Part 3"/>
 			<dataarea name="flop" size="105165">
 				<rom name="288 animal rescue part 3 (80 track).fsd" size="105165" crc="e2777096" sha1="f8309a72370535af6569890a4941daf6ca48d19c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Problems Disk" offset="0" />
+			<feature name="part_id" value="Problems Disk"/>
 			<dataarea name="flop" size="105172">
 				<rom name="288 animal rescue problems disk (80 track).fsd" size="105172" crc="3ebdc332" sha1="ff15becac2e10ef9d64c0dcda3a1dc4a7e0a1dd2" offset="0" />
 			</dataarea>
@@ -4195,25 +4195,25 @@
 		<year>1987</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Part 1" offset="0" />
+			<feature name="part_id" value="Part 1"/>
 			<dataarea name="flop" size="105095">
 				<rom name="289 nature park adventure part 1.fsd" size="105095" crc="a5d883c0" sha1="d9ac74f9432ef948d55f87c4b00c3dd416c94c7f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Part 2" offset="0" />
+			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="105095">
 				<rom name="289 nature park adventure part 2.fsd" size="105095" crc="94f2b938" sha1="e5b49a1ec877cc5bee5bdbab8527656d8b70d172" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Part 3" offset="0" />
+			<feature name="part_id" value="Part 3"/>
 			<dataarea name="flop" size="105095">
 				<rom name="289 nature park adventure part 3.fsd" size="105095" crc="23e7b649" sha1="5b243c89097cec8b5c47a57fbbd6faf8cd5c0561" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Problems Disk" offset="0" />
+			<feature name="part_id" value="Problems Disk"/>
 			<dataarea name="flop" size="105102">
 				<rom name="289 nature park adventure problems disk.fsd" size="105102" crc="255f2e11" sha1="3cd50cf3e4424e4e4b7355687497aca38a2160a2" offset="0" />
 			</dataarea>
@@ -4225,25 +4225,25 @@
 		<year>1987</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Part 1" offset="0" />
+			<feature name="part_id" value="Part 1"/>
 			<dataarea name="flop" size="104958">
 				<rom name="289b nature park adventure part 1.fsd" size="104958" crc="a61197f5" sha1="4468498ea1e4f9a31895b9fa074ae7ff0e65bb9b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Part 2" offset="0" />
+			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="104958">
 				<rom name="289b nature park adventure part 2.fsd" size="104958" crc="c306712d" sha1="bffcda49cd64ae843412f7cff4004d84e37215ee" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Part 3" offset="0" />
+			<feature name="part_id" value="Part 3"/>
 			<dataarea name="flop" size="104959">
 				<rom name="289b nature park adventure part 3.fsd" size="104959" crc="8460904d" sha1="53dfcbd310aa7934c400e54703cf0f29624e252d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Problems Disk" offset="0" />
+			<feature name="part_id" value="Problems Disk"/>
 			<dataarea name="flop" size="104965">
 				<rom name="289b nature park adventure problems disk.fsd" size="104965" crc="50569566" sha1="59c8e26e2582204637c7dbf2e7b020efe31902e6" offset="0" />
 			</dataarea>
@@ -4255,25 +4255,25 @@
 		<year>1990</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Fun and Games" offset="0" />
+			<feature name="part_id" value="Fun and Games"/>
 			<dataarea name="flop" size="105041">
 				<rom name="290 toby at the beach fun and games (80 track).fsd" size="105041" crc="651d558a" sha1="41159a812f10991ed1da2543439854f369f300b8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Judy's Shop" offset="0" />
+			<feature name="part_id" value="Judy's Shop"/>
 			<dataarea name="flop" size="105039">
 				<rom name="290 toby at the beach judy's shop (80 track).fsd" size="105039" crc="a786702b" sha1="3e8ae35f26714ff35a7f66c8d71db3ad3ac3705c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Punch + Judy-Rockpools" offset="0" />
+			<feature name="part_id" value="Punch + Judy-Rockpools"/>
 			<dataarea name="flop" size="105052">
 				<rom name="290 toby at the beach punch + judy-rockpools (80 track).fsd" size="105052" crc="1becee05" sha1="9e6459a380a56bff5e682f40c82ca3019c43d721" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Ship Ahoy" offset="0" />
+			<feature name="part_id" value="Ship Ahoy"/>
 			<dataarea name="flop" size="105037">
 				<rom name="290 toby at the beach ship ahoy (80 track).fsd" size="105037" crc="2080c6f9" sha1="dbbf24699a02dcca0acfb65bf9186971140a76ac" offset="0" />
 			</dataarea>
@@ -4285,31 +4285,31 @@
 		<year>198?</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 0" offset="0" />
+			<feature name="part_id" value="Side 0"/>
 			<dataarea name="flop" size="104955">
 				<rom name="292 the animated alphabet side 0.fsd" size="104955" crc="9ed822f1" sha1="9df716119c502dd1236c6339be4bacb824e3de1b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="104955">
 				<rom name="292 the animated alphabet side 1.fsd" size="104955" crc="2604da04" sha1="57f0f1942e3846be99a0443ce18f952067a45d24" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 		
-	<software name="selladore">
+	<software name="sellador">
 		<description>Selladore Tales</description>
 		<year>1991</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Startup Disk" offset="0" />
+			<feature name="part_id" value="Startup Disk"/>
 			<dataarea name="flop" size="104945">
 				<rom name="308 selladore tales startup disk.fsd" size="104945" crc="ae135f24" sha1="7fcad53681521abe225cd33b47ca9bb1885cd25e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="User Disk" offset="0" />
+			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="104945">
 				<rom name="308 selladore tales user disk.fsd" size="104945" crc="170e5791" sha1="210cae555661d056bb2ef016fd33486ea53c3b9b" offset="0" />
 			</dataarea>
@@ -4321,13 +4321,13 @@
 		<year>1987</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side 1" offset="0" />
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="104938">
 				<rom name="309 the farm side 1.fsd" size="104938" crc="39c245da" sha1="fcf750803e8bdd7ac50e2f40f1205096f9b85dc7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2" offset="0" />
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="104938">
 				<rom name="309 the farm side 2.fsd" size="104938" crc="ba7dbe11" sha1="269aeef0129233bd8e6f315f3c6e56ecccdb1319" offset="0" />
 			</dataarea>
@@ -4350,13 +4350,13 @@
 		<year>1988</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Part 1" offset="0" />
+			<feature name="part_id" value="Part 1"/>
 			<dataarea name="flop" size="106732">
 				<rom name="311 mapventure part 1.fsd" size="106732" crc="a13ffb19" sha1="0d537c94c54c2ba9fb626f3ef81a58635f5c6b22" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Part 2" offset="0" />
+			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="104940">
 				<rom name="311 mapventure part 2.fsd" size="104940" crc="aa5e5609" sha1="30659104edf7ed2257b743765d9deaed7e13dea7" offset="0" />
 			</dataarea>
@@ -4379,25 +4379,25 @@
 		<year>198?</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Startup Disk" offset="0" />
+			<feature name="part_id" value="Startup Disk"/>
 			<dataarea name="flop" size="104948">
 				<rom name="314 typesetter startup disc.fsd" size="104948" crc="2489ed9c" sha1="864a14ee1d3d8d3cbc1ba2269849b085dccb7105" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="User Disk" offset="0" />
+			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="104945">
 				<rom name="314 typesetter user disc.fsd" size="104945" crc="ac538429" sha1="c14cf40cd64c65bc5d96aca3c7c4641f2f16cc50" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Font Disk" offset="0" />
+			<feature name="part_id" value="Font Disk"/>
 			<dataarea name="flop" size="104945">
 				<rom name="314 typesetter font disc.fsd" size="104945" crc="8de73319" sha1="5d3dda7bd8495ec9f12c164103764e6ff2f4b975" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Font Disk II" offset="0" />
+			<feature name="part_id" value="Font Disk II"/>
 			<dataarea name="flop" size="104948">
 				<rom name="314 typesetter font disc ii.fsd" size="104948" crc="9233d18a" sha1="f76720b5d42d5c9b973150367c3f24f58398a66d" offset="0" />
 			</dataarea>
