@@ -22,6 +22,30 @@ project ("example-common")
 		path.join(BGFX_DIR, "examples/common/**.h"),
 	}
 
+	if _OPTIONS["with-scintilla"] then
+		defines {
+			"SCI_NAMESPACE",
+			"SCI_LEXER",
+		}
+
+		buildoptions {
+--			"-Wno-missing-field-initializers",
+		}
+
+		includedirs {
+			path.join(BGFX_DIR, "3rdparty/scintilla/include"),
+			path.join(BGFX_DIR, "3rdparty/scintilla/lexlib"),
+		}
+
+		files {
+			path.join(BGFX_DIR, "3rdparty/scintilla/src/**.cxx"),
+			path.join(BGFX_DIR, "3rdparty/scintilla/src/**.h"),
+			path.join(BGFX_DIR, "3rdparty/scintilla/lexlib/**.cxx"),
+			path.join(BGFX_DIR, "3rdparty/scintilla/lexlib/**.h"),
+			path.join(BGFX_DIR, "3rdparty/scintilla/lexers/**.cxx"),
+		}
+	end
+
 	if _OPTIONS["with-sdl"] then
 		defines {
 			"ENTRY_CONFIG_USE_SDL=1",
@@ -37,16 +61,10 @@ project ("example-common")
 		}
 	end
 
-	configuration { "vs2008" }
-		includedirs {
-			"$(DXSDK_DIR)/include",
+	configuration { "osx or ios*" }
+		files {
+			path.join(BGFX_DIR, "examples/common/**.mm"),
 		}
-	if (_OPTIONS["vs"] == "vs2012-xp") or (_OPTIONS["vs"] == "vs2013-xp") then
-	configuration { "vs201*" }
-		includedirs {
-			"$(DXSDK_DIR)/include",
-		}
-	end
 
 	configuration { "winphone8* or winstore8*"}
 		linkoptions {

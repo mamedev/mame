@@ -20,7 +20,8 @@ const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TECMO_SPRITE, "Tecmo Chained Sprites", tag, owner, clock, "tecmo_spr", __FILE__),
 m_gfxregion(0),
-m_bootleg(0)
+m_bootleg(0),
+m_yoffset(0)
 {
 }
 
@@ -44,6 +45,12 @@ void tecmo_spr_device::set_bootleg(device_t &device, int bootleg)
 {
 	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
 	dev.m_bootleg = bootleg;
+}
+
+void tecmo_spr_device::set_yoffset(device_t &device, int yoffset)
+{
+	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
+	dev.m_yoffset = yoffset;
 }
 
 
@@ -323,7 +330,9 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 				code = ( spriteram[offs+2] ) + ( spriteram[offs+3] << 8 );
 
 				int xpos = spriteram[offs + 8] + ( (spriteram[offs + 9] & 3 ) << 8 );
-				int ypos = spriteram[offs + 6] + ( (spriteram[offs + 7] & 1 ) << 8 );
+				int ypos = spriteram[offs + 6] + m_yoffset;
+				ypos &= 0xff; // sprite wrap right on edge (top @ ROT0) of pac90
+				ypos = ypos - ((spriteram[offs + 7] & 1) << 8); // sprite wrap on top of wc90
 
 				if (xpos >= 0x0300) xpos -= 0x0400;
 

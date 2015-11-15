@@ -104,23 +104,19 @@ struct UniformType
 {
 	enum Enum
 	{
-		Uniform1i,
-		Uniform1f,
+		Int1,
 		End,
 
-		Uniform1iv,
-		Uniform1fv,
-		Uniform2fv,
-		Uniform3fv,
-		Uniform4fv,
-		Uniform3x3fv,
-		Uniform4x4fv,
+		Vec4,
+		Mat3,
+		Mat4,
 
 		Count
 	};
 };
 
 #define BGFX_UNIFORM_FRAGMENTBIT UINT8_C(0x10)
+#define BGFX_UNIFORM_SAMPLERBIT  UINT8_C(0x20)
 
 const char* getUniformTypeName(UniformType::Enum _enum);
 UniformType::Enum nameToUniformTypeEnum(const char* _name);

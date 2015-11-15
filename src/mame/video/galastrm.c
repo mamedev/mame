@@ -15,11 +15,10 @@ struct polyVert
 
 
 galastrm_renderer::galastrm_renderer(galastrm_state& state)
-    : poly_manager<float, gs_poly_data, 2, 10000>(state.machine())
-    , m_state(state)
-    , m_screenbits(state.m_screen->width(), state.m_screen->height())
+	: poly_manager<float, gs_poly_data, 2, 10000>(state.machine())
+	, m_state(state)
+	, m_screenbits(state.m_screen->width(), state.m_screen->height())
 {
-    
 }
 
 
@@ -29,10 +28,10 @@ void galastrm_state::video_start()
 {
 	m_spritelist = auto_alloc_array(machine(), struct gs_tempsprite, 0x4000);
 
-    m_poly = auto_alloc(machine(), galastrm_renderer(*this));
+	m_poly = auto_alloc(machine(), galastrm_renderer(*this));
 
-    m_screen->register_screen_bitmap(m_tmpbitmaps);
-    m_screen->register_screen_bitmap(m_poly->screenbits());
+	m_screen->register_screen_bitmap(m_tmpbitmaps);
+	m_screen->register_screen_bitmap(m_poly->screenbits());
 }
 
 
@@ -184,7 +183,7 @@ void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 			m_sprite_ptr_pre++;
 		}
 		if (bad_chunks)
-            logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+			logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 }
 
@@ -216,11 +215,11 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void galastrm_renderer::tc0610_draw_scanline(INT32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid)
 {
-    UINT16 *framebuffer = &m_screenbits.pix16(scanline);
+	UINT16 *framebuffer = &m_screenbits.pix16(scanline);
 	const INT32 dudx = extent.param[0].dpdx;
 	const INT32 dvdx = extent.param[1].dpdx;
 
-    INT32 u = extent.param[0].start;
+	INT32 u = extent.param[0].start;
 	INT32 v = extent.param[1].start;
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -406,11 +405,11 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	vert[3].p[0] = (float)(lx - 1) * 65536.0f;
 	vert[3].p[1] = 0.0;
 
-    gs_poly_data& extra = object_data_alloc();
-    extra.texbase = &srcbitmap;
-    
-    render_polygon<4>(clip, render_delegate(FUNC(galastrm_renderer::tc0610_draw_scanline), this), 2, vert);
-    wait();
+	gs_poly_data& extra = object_data_alloc();
+	extra.texbase = &srcbitmap;
+
+	render_polygon<4>(clip, render_delegate(FUNC(galastrm_renderer::tc0610_draw_scanline), this), 2, vert);
+	wait();
 }
 
 /**************************************************************
@@ -530,10 +529,10 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	draw_sprites_pre(42-X_OFFSET, -571+Y_OFFSET);
 	draw_sprites(screen,m_tmpbitmaps,clip,primasks,1);
 
-    copybitmap_trans(bitmap, m_poly->screenbits(), 0,0, 0,0, cliprect, 0);
+	copybitmap_trans(bitmap, m_poly->screenbits(), 0,0, 0,0, cliprect, 0);
 	m_poly->screenbits().fill(0, clip);
-    m_poly->tc0610_rotate_draw(m_tmpbitmaps, cliprect);
-    
+	m_poly->tc0610_rotate_draw(m_tmpbitmaps, cliprect);
+
 	priority_bitmap.fill(0, cliprect);
 	draw_sprites(screen,bitmap,cliprect,primasks,0);
 

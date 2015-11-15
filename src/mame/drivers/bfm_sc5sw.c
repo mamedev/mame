@@ -14119,8 +14119,8 @@ GAME( 200?, sc5cblas    ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, 
 GAME( 200?, sc5cblasa   ,sc5cblas,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Cash Blast (Bellfruit) (Scorpion 5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
 // PR2338 XTRAVAGANZA         XTRV SOUNDS         XTRAVAGANZA
-GAME( 200?, sc5casxt    ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "Mazooma","Casino Xtravaganza  (Mazooma) (Scorpion 5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5casxta   ,sc5casxt,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "Mazooma","Casino Xtravaganza  (Mazooma) (Scorpion 5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5casxt    ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "Mazooma","Casino Xtravaganza (Mazooma) (Scorpion 5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5casxta   ,sc5casxt,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "Mazooma","Casino Xtravaganza (Mazooma) (Scorpion 5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
 // PR1711 AWP CHAV IT SCORP5         PR1711 CHAV IT SOUNDS11         CHAV IT S.SITE
 GAME( 200?, sc5chavi    ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )

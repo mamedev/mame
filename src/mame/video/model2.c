@@ -780,13 +780,13 @@ static void model2_3d_process_triangle( raster_state *raster, UINT32 attr )
 }
 
 /***********************************************************************************************/
-    
+
 /***********************************************************************************************/
 
 void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 {
 	model2_renderer *poly = m_state.m_poly;
-    m2_poly_extra_data& extra = poly->object_data_alloc();
+	m2_poly_extra_data& extra = poly->object_data_alloc();
 	UINT8 renderer;
 
 	/* select renderer based on attributes (bit15 = checker, bit14 = textured, bit13 = transparent */
@@ -821,35 +821,35 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * (1.0f / 8.0f);
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
 
-        // Note : The class model2_renderer has an array of function pointers in it named m_renderfuncs, in theory this simply
-        //        needs to be passed into the render_triangle function as such model2_renderer::m_renderfuncs[renderer], but
-        //        I was unable to make it work when converting to the new polygon rasterizer interface.
-        switch (renderer)
-        {
-        case 0: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_0), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 1: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_1), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 2: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_2), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 3: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_3), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 4: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_4), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 5: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_5), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 6: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_6), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 7: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_7), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-        }
+		// Note : The class model2_renderer has an array of function pointers in it named m_renderfuncs, in theory this simply
+		//        needs to be passed into the render_triangle function as such model2_renderer::m_renderfuncs[renderer], but
+		//        I was unable to make it work when converting to the new polygon rasterizer interface.
+		switch (renderer)
+		{
+		case 0: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_0), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 1: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_1), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 2: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_2), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 3: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_3), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 4: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_4), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 5: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_5), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 6: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_6), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 7: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_7), this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		}
 	}
 	else
-    {
-        switch (renderer)
-        {
-        case 0: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_0), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 1: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_1), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 2: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_2), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 3: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_3), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 4: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_4), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 5: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_5), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 6: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_6), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        case 7: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_7), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-        }
-    }
+	{
+		switch (renderer)
+		{
+		case 0: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_0), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 1: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_1), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 2: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_2), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 3: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_3), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 4: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_4), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 5: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_5), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 6: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_6), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 7: render_triangle(vp, render_delegate(FUNC(model2_renderer::model2_3d_render_7), this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		}
+	}
 }
 
 /*
@@ -947,8 +947,8 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 	}
 #endif
 
-    m_poly->destmap().fill(0x00000000, cliprect);
-    
+	m_poly->destmap().fill(0x00000000, cliprect);
+
 	/* go through the Z levels, and render each bucket */
 	for( z = raster->max_z; z >= raster->min_z; z-- )
 	{
@@ -970,8 +970,8 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 		}
 	}
 	m_poly->wait("End of frame");
-    
-    copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
+
+	copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
 }
 
 /* 3D Rasterizer main data input port */
@@ -2590,7 +2590,7 @@ VIDEO_START_MEMBER(model2_state,model2)
 
 	m_sys24_bitmap.allocate(width, height+4);
 
-    m_poly = auto_alloc(machine(), model2_renderer(*this));
+	m_poly = auto_alloc(machine(), model2_renderer(*this));
 
 	/* initialize the hardware rasterizer */
 	model2_3d_init( machine(), (UINT16*)memregion("user3")->base() );

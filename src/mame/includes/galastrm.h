@@ -19,14 +19,14 @@ class galastrm_renderer : public poly_manager<float, gs_poly_data, 2, 10000>
 public:
 	galastrm_renderer(galastrm_state &state);
 
-    void tc0610_draw_scanline(INT32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
-    void tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip);
-    
-    bitmap_ind16 &screenbits() { return m_screenbits; }
-    
+	void tc0610_draw_scanline(INT32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
+	void tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip);
+
+	bitmap_ind16 &screenbits() { return m_screenbits; }
+
 private:
 	galastrm_state& m_state;
-    bitmap_ind16 m_screenbits;
+	bitmap_ind16 m_screenbits;
 };
 
 
@@ -81,8 +81,8 @@ public:
 	struct gs_tempsprite *m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
-    galastrm_renderer *m_poly;
-    
+	galastrm_renderer *m_poly;
+
 	int m_rsxb;
 	int m_rsyb;
 	int m_rsxoffs;

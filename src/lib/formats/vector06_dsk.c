@@ -38,6 +38,10 @@ const vector06_format::format vector06_format::formats[] =
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
 		2000, 5, 82, 2, 1024, {}, 1, {}, 80, 22, 24
 	},
+	{
+		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
+		2000, 5, 80, 2, 1024, {}, 1, {}, 80, 22, 24
+	},
 	{}
 };
 

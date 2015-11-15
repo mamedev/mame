@@ -1240,42 +1240,99 @@ UINT32 nv2a_renderer::texture_get_texel(int number, int x, int y)
 	}
 }
 
+inline UINT8 *nv2a_renderer::read_pixel(int x, int y, UINT32 c[4])
+{
+	UINT32 offset;
+	UINT32 color;
+	UINT32 *addr;
+	UINT16 *addr16;
+	UINT8 *addr8;
+
+	if (type_rendertarget == SWIZZLED)
+		offset = (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]) * bytespixel_rendertarget;
+	else // type_rendertarget == LINEAR*/
+		offset = pitch_rendertarget * y + x * bytespixel_rendertarget;
+	switch (colorformat_rendertarget) {
+	case NV2A_COLOR_FORMAT_R5G6B5:
+		addr16 = (UINT16 *)((UINT8 *)rendertarget + offset);
+		color = *addr16;
+		c[3] = 0xff;
+		c[2] = pal5bit((color & 0xf800) >> 11);
+		c[1] = pal6bit((color & 0x07e0) >> 5);
+		c[0] = pal5bit(color & 0x1f);
+		return (UINT8 *)addr16;
+	case NV2A_COLOR_FORMAT_X8R8G8B8:
+		addr = (UINT32 *)((UINT8 *)rendertarget + offset);
+		color = *addr;
+
+		c[3] = 0xff;
+		c[2] = (color >> 16) & 255;
+		c[1] = (color >> 8) & 255;
+		c[0] = color & 255;
+		return (UINT8 *)addr;
+	case NV2A_COLOR_FORMAT_A8R8G8B8:
+		addr = (UINT32 *)((UINT8 *)rendertarget + offset);
+		color = *addr;
+		c[3] = color >> 24;
+		c[2] = (color >> 16) & 255;
+		c[1] = (color >> 8) & 255;
+		c[0] = color & 255;
+		return (UINT8 *)addr;
+	case NV2A_COLOR_FORMAT_B8:
+		addr8 = (UINT8 *)rendertarget + offset;
+		c[0] = *addr8;
+		c[1] = c[2] = 0;
+		c[3] = 0xff;
+		return addr8;
+	}
+	return NULL;
+}
+
 void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 {
-	UINT32 *addr, *daddr;
-	UINT32 fbcolor, deptsten;
+	UINT8 *addr;
+	UINT32 *daddr32;
+	UINT16 *daddr16;
+	UINT32 deptsten;
 	UINT32 c[4], fb[4], s[4], d[4], cc[4];
 	UINT32 dep, sten, stenc, stenv;
 	bool stencil_passed;
 	bool depth_passed;
 
-	if (type_rendertarget == SWIZZLED)
-		addr = rendertarget + (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]);
-	else // type_rendertarget == LINEAR*/
-		addr = rendertarget + (pitch_rendertarget / 4)*y + x;
-	fbcolor = 0;
+	fb[3] = fb[2] = fb[1] = fb[0] = 0;
+	addr = NULL;
 	if (color_mask != 0)
-		fbcolor = *addr;
-	daddr=depthbuffer + (pitch_depthbuffer / 4)*y + x;
-	deptsten = *daddr;
+		addr = read_pixel(x, y, fb);
+	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+		daddr32 = depthbuffer + (pitch_depthbuffer / 4) * y + x;
+		deptsten = *daddr32;
+		dep = deptsten >> 8;
+		sten = deptsten & 255;
+		daddr16 = NULL;
+	}
+	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+		daddr16 = (UINT16 *)depthbuffer + (pitch_depthbuffer / 2) * y + x;
+		deptsten = *daddr16;
+		dep = (deptsten << 8) | 0xff;
+		sten = 0;
+		daddr32 = NULL;
+	}
+	else {
+		daddr32 = NULL;
+		daddr16 = NULL;
+		dep = 0xffffff;
+		sten = 0;
+	}
+	if (depth > 0xffffff)
+		depth = 0xffffff;
 	c[3] = color >> 24;
 	c[2] = (color >> 16) & 255;
 	c[1] = (color >> 8) & 255;
 	c[0] = color & 255;
-	fb[3] = fbcolor >> 24;
-	fb[2] = (fbcolor >> 16) & 255;
-	fb[1] = (fbcolor >> 8) & 255;
-	fb[0] = fbcolor & 255;
 	cc[3] = blend_color >> 24;
 	cc[2] = (blend_color >> 16) & 255;
 	cc[1] = (blend_color >> 8) & 255;
 	cc[0] = blend_color & 255;
-	dep = deptsten >> 8;
-	sten = deptsten & 255;
-	if (depth > 0xffffff)
-		depth = 0xffffff;
-	if (depth & 0x80000000)
-		depth = 0;
 	// ownership test and scissor test not done
 	// alpha test
 	if (alpha_test_enabled) {
@@ -1383,8 +1440,14 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 					sten = 255;
 				break;
 			}
-			deptsten = (dep << 8) | sten;
-			*daddr = deptsten;
+			if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+				deptsten = (dep << 8) | sten;
+				*daddr32 = deptsten;
+			}
+			else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+				deptsten = dep >> 8;
+				*daddr16 = (UINT16)deptsten;
+			}
 			return;
 		}
 	}
@@ -1458,8 +1521,14 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 					sten = 255;
 				break;
 			}
-			deptsten = (dep << 8) | sten;
-			*daddr = deptsten;
+			if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+				deptsten = (dep << 8) | sten;
+				*daddr32 = deptsten;
+			}
+			else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+				deptsten = dep >> 8;
+				*daddr16 = (UINT16)deptsten;
+			}
 			return;
 		}
 		switch (stencil_op_zpass) {
@@ -1782,15 +1851,37 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 		}
 	}
 	if (color_mask != 0) {
-		UINT32 fbcolor_tmp;
+		UINT32 ct,ft,w;
 
-		fbcolor_tmp = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
-		*addr = (fbcolor & ~color_mask) | (fbcolor_tmp & color_mask);
+		ct = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
+		ft = (fb[3] << 24) | (fb[2] << 16) | (fb[1] << 8) | fb[0];
+		w = (ft & ~color_mask) | (ct & color_mask);
+		switch (colorformat_rendertarget) {
+		case NV2A_COLOR_FORMAT_R5G6B5:
+			w = ((w >> 8) & 0xf800) + ((w >> 5) & 0x7e0) + ((w >> 3) & 0x1f);
+			*((UINT16 *)addr) = (UINT16)w;
+			break;
+		case NV2A_COLOR_FORMAT_X8R8G8B8:
+			*((UINT32 *)addr) = w;
+			break;
+		case NV2A_COLOR_FORMAT_A8R8G8B8:
+			*((UINT32 *)addr) = w;
+			break;
+		case NV2A_COLOR_FORMAT_B8:
+			*addr = (UINT8)w;
+			break;
+		}
 	}
 	if (depth_write_enabled)
 		dep = depth;
-	deptsten = (dep << 8) | sten;
-	*daddr = deptsten;
+	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+		deptsten = (dep << 8) | sten;
+		*daddr32 = deptsten;
+	}
+	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+		deptsten = dep >> 8;
+		*daddr16 = (UINT16)deptsten;
+	}
 }
 
 void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
@@ -2238,6 +2329,83 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 	}
 }
 
+void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
+{
+	int m;
+
+	m = antialias_control;
+	if (antialiasing_rendertarget != 0)
+		m = 2;
+	else
+		m = 1;
+	if (what == 3) {
+		if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+			UINT32 *p, *pl;
+			int x, y;
+
+			pl = (UINT32 *)depthbuffer;
+			for (y = (limits_rendertarget.bottom() + 1) * m; y != 0; y--) {
+				p = pl;
+				for (x = (limits_rendertarget.right() + 1) * m; x != 0; x--) {
+					*p = value;
+					p++;
+				}
+				pl = pl + pitch_rendertarget / 4;
+			}
+		}
+		else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+			UINT16 *p, *pl;
+			int x, y;
+
+			pl = (UINT16 *)depthbuffer;
+			for (y = (limits_rendertarget.bottom() + 1) * m; y != 0; y--) {
+				p = pl;
+				for (x = (limits_rendertarget.right() + 1) * m; x != 0; x--) {
+					*p = (UINT16)value;
+					p++;
+				}
+				pl = pl + pitch_rendertarget / 2;
+			}
+		}
+	}
+	else {
+		if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+			UINT32 mask;
+			UINT32 *p, *pl;
+			int x, y;
+
+			if ((what & 0x03) == 2)
+				mask = 0x000000ff;
+			else
+				mask = 0xffffff00;
+			value = value & mask;
+			pl = depthbuffer;
+			for (y = (limits_rendertarget.bottom() + 1) * m; y != 0; y--) {
+				p = pl;
+				for (x = (limits_rendertarget.right() + 1) * m; x != 0; x--) {
+					*p = (*p & ~mask) | value;
+					p++;
+				}
+				pl = pl + pitch_rendertarget / 4;
+			}
+		}
+		else if ((depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) && (what == 1)) {
+			UINT16 *p, *pl;
+			int x, y;
+
+			pl = (UINT16 *)depthbuffer;
+			for (y = (limits_rendertarget.bottom() + 1) * m; y != 0; y--) {
+				p = pl;
+				for (x = (limits_rendertarget.right() + 1) * m; x != 0; x--) {
+					*p = (UINT16)value;
+					p++;
+				}
+				pl = pl + pitch_rendertarget / 2;
+			}
+		}
+	}
+}
+
 int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen)
 {
 	UINT32 maddress;
@@ -2359,6 +2527,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				convert_vertices_poly(vert, xy, 4);
 				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
 			}
+			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_FAN) {
 			if ((countlen * mult + indexesleft_count) >= 3) {
@@ -2405,6 +2574,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				convert_vertices_poly(vert, xy, 3);
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
 			}
+			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
 			if ((countlen * mult + indexesleft_count) >= 3) {
@@ -2432,6 +2602,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 						xy[(n + 2) & 3].y = xy[(n + 2) & 3].y + 1.0f;
 					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
 				}
+				wait();
 			}
 		}
 		else {
@@ -2519,6 +2690,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				address = address + c * 3;
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
 			}
+			wait();
 		}
 		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
 			vertex_nv vert[4];
@@ -2666,6 +2838,10 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		space.write_dword(base + offset, data);
 		countlen--;
 	}
+	if (maddress == 0x1d7c) {
+		antialias_control = data;
+		countlen--;
+	}
 	if (maddress == 0x1d98) {
 		countlen--;
 	}
@@ -2675,7 +2851,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	if (maddress == 0x1d94) {
 		int m;
 
-		m = channel[chanel][subchannel].object.method[0x1d7c / 4];
+		m = antialias_control;
 		if (antialiasing_rendertarget != 0)
 			m = 2;
 		else
@@ -2683,22 +2859,29 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		// possible buffers: color, depth, stencil
 		// clear framebuffer
 		if (data & 0xf0) {
-			bitmap_rgb32 bm(rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4); // why *2 ?
-			// clear colors
-			UINT32 color = channel[chanel][subchannel].object.method[0x1d90 / 4];
-			bm.fill(color);
+			if (bytespixel_rendertarget == 4) {
+				bitmap_rgb32 bm(rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4);
+
+				UINT32 color = channel[chanel][subchannel].object.method[0x1d90 / 4];
+				bm.fill(color);
+			}
+			else if (bytespixel_rendertarget == 2) {
+				bitmap_ind16 bm((UINT16 *)rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 2);
+
+				UINT16 color = channel[chanel][subchannel].object.method[0x1d90 / 4] & 0xffff;
+
+				bm.fill(color);
+			}
+			else if (bytespixel_rendertarget == 1) {
+				UINT8 color = channel[chanel][subchannel].object.method[0x1d90 / 4] & 0xff;
+
+				memset(rendertarget, color, pitch_rendertarget*(limits_rendertarget.bottom() + 1) * m);
+			}
 #ifdef LOG_NV2A
 			printf("clearscreen\n\r");
 #endif
 		}
-		if ((data & 0x03) == 3) {
-			bitmap_rgb32 bm(depthbuffer, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4); // why *2 ?
-			// clear zbuffer and stencil
-			UINT32 depth_stencil = channel[chanel][subchannel].object.method[0x1d8c / 4];
-			bm.fill(depth_stencil);
-		}
-		else if (((data & 0x03) == 1) || ((data & 0x03) == 2))
-			logerror("Unsupported clear method parameter %d\n\r", data & 0x03);
+		clear_depth_buffer(data & 3, channel[chanel][subchannel].object.method[0x1d8c / 4]);
 		countlen--;
 	}
 	if (maddress == 0x0200) {
@@ -2720,8 +2903,26 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		log2width_rendertarget = (data >> 16) & 255;
 		antialiasing_rendertarget = (data >> 12) & 15;
 		type_rendertarget = (data >> 8) & 15;
-		depth_rendertarget = (data >> 4) & 15;
-		color_rendertarget = (data >> 0) & 15;;
+		depthformat_rendertarget = (data >> 4) & 15;
+		colorformat_rendertarget = (data >> 0) & 15;
+		switch (colorformat_rendertarget) {
+		case NV2A_COLOR_FORMAT_R5G6B5:
+			bytespixel_rendertarget = 2;
+			break;
+		case NV2A_COLOR_FORMAT_X8R8G8B8:
+		case NV2A_COLOR_FORMAT_A8R8G8B8:
+			bytespixel_rendertarget = 4;
+			break;
+		case NV2A_COLOR_FORMAT_B8:
+			bytespixel_rendertarget = 1;
+			break;
+		default:
+#ifdef LOG_NV2A
+			printf("Unknown render target color format %d\n\r", colorformat_rendertarget);
+#endif
+			bytespixel_rendertarget = 4;
+			break;
+		}
 		dilate_rendertarget = dilatechose[(log2width_rendertarget << 4) + log2height_rendertarget];
 	}
 	if (maddress == 0x020c) {

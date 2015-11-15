@@ -9,6 +9,8 @@
 ***************************************************************************/
 
 #include "coreutil.h"
+#include <assert.h>
+#include <zlib.h>
 
 
 /***************************************************************************
@@ -81,12 +83,11 @@ int gregorian_is_leap_year(int year)
 
 int gregorian_days_in_month(int month, int year)
 {
-	if (month == 2)
-		return gregorian_is_leap_year(year) ? 29 : 28;
-	else if (month == 4 || month == 6 || month == 9 || month == 11)
-		return 30;
-	else
-		return 31;
+	assert(month >= 1 && month <= 12);
+
+	int days[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+	days[1] += gregorian_is_leap_year(year) ? 1 : 0;
+	return days[month-1];
 }
 
 
@@ -114,4 +115,10 @@ void rand_memory(void *memory, size_t length)
 		seed = seed * 214013 + 2531011;
 		bytes[i] = (UINT8) (seed >> 16);
 	}
+}
+
+
+UINT32 core_crc32(UINT32 crc, const UINT8 *buf, UINT32 len)
+{
+	return crc32(crc, buf, len);
 }

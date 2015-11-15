@@ -28,6 +28,17 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, disk_present(false)
 	, cart_present(false)
 {
+	for (INT32 i = 0; i < 256; i++)
+	{
+		m_gamma_table[i] = sqrt((float)(i << 6));
+		m_gamma_table[i] <<= 1;
+	}
+
+	for (INT32 i = 0; i < 0x4000; i++)
+	{
+		m_gamma_dither_table[i] = sqrt((float)i);
+		m_gamma_dither_table[i] <<= 1;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(n64_periphs::reset_timer_callback)
@@ -109,6 +120,7 @@ void n64_periphs::device_start()
 {
 	ai_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::ai_timer_callback),this));
 	pi_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::pi_dma_callback),this));
+	si_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::si_dma_callback),this));
 	vi_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::vi_scanline_callback),this));
 	reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::reset_timer_callback),this));
 }
@@ -202,8 +214,9 @@ void n64_periphs::device_reset()
 	si_dram_addr = 0;
 	si_pif_addr = 0;
 	si_status = 0;
+	si_dma_timer->adjust(attotime::never);
 
-	memset(m_save_data.eeprom, 0, 2048);
+	//memset(m_save_data.eeprom, 0, 2048);
 
 	dp_clock = 0;
 
@@ -225,7 +238,7 @@ void n64_periphs::device_reset()
 	pif_ram[0x26] = 0x3f;
 	pif_ram[0x27] = 0x3f;
 	cic_type=2;
-	mem_map->write_dword(0x00000318, 0x800000);
+	mem_map->write_dword(0x00000318, 0x800000); /* RDRAM Size */
 
 	if (boot_checksum == U64(0x00000000001ff230))
 	{
@@ -905,6 +918,7 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 {
 	n64_state *state = space.machine().driver_data<n64_state>();
 	UINT32 ret = 0;
+
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
@@ -944,20 +958,39 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 WRITE32_MEMBER( n64_periphs::dp_reg_w )
 {
 	n64_state *state = space.machine().driver_data<n64_state>();
+	UINT32 status = state->m_rdp->get_status();
 
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			state->m_rdp->set_start(data);
-			state->m_rdp->set_current(state->m_rdp->get_start());
+			if(status & DP_STATUS_START_VALID)
+				break;
+			else
+			{
+				state->m_rdp->set_status(status | DP_STATUS_START_VALID);
+				state->m_rdp->set_start(data & ~7);
+			}
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			state->m_rdp->set_end(data);
-			g_profiler.start(PROFILER_USER1);
-			state->m_rdp->process_command_list();
-			g_profiler.stop();
-			break;
+			if(status & DP_STATUS_START_VALID)
+			{
+				state->m_rdp->set_status(status & ~DP_STATUS_START_VALID);
+				state->m_rdp->set_current(state->m_rdp->get_start());
+				state->m_rdp->set_end(data & ~ 7);
+				g_profiler.start(PROFILER_USER1);
+				state->m_rdp->process_command_list();
+				g_profiler.stop();
+				break;
+			}
+			else
+			{
+				state->m_rdp->set_end(data & ~ 7);
+				g_profiler.start(PROFILER_USER1);
+				state->m_rdp->process_command_list();
+				g_profiler.stop();
+				break;
+			}
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
@@ -993,17 +1026,16 @@ void n64_periphs::vi_scanline_tick()
 // Video Interface
 void n64_periphs::vi_recalculate_resolution()
 {
-	n64_state *state = machine().driver_data<n64_state>();
-
 	int x_start = (vi_hstart & 0x03ff0000) >> 16;
 	int x_end = vi_hstart & 0x000003ff;
-	int y_start = ((vi_vstart & 0x03ff0000) >> 16) / 2;
-	int y_end = (vi_vstart & 0x000003ff) / 2;
+	int y_start = ((vi_vstart & 0x03ff0000) >> 16) >> 1;
+	int y_end = (vi_vstart & 0x000003ff) >> 1;
 	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
 
 	rectangle visarea = m_screen->visible_area();
-	attoseconds_t period = m_screen->frame_period().attoseconds();
+	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
+	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
 
 	if (width == 0 || height == 0)
 	{
@@ -1025,11 +1057,13 @@ void n64_periphs::vi_recalculate_resolution()
 	if (height > 480)
 		height = 480;
 
-	state->m_rdp->m_misc_state.m_fb_height = height;
+	if(vi_control & 0x40) /* Interlace */
+	{
+	}
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
-	m_screen->configure(width, 525, visarea, period);
+	m_screen->configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
 }
 
 READ32_MEMBER( n64_periphs::vi_reg_r )
@@ -1054,7 +1088,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = m_screen->vpos() << 1;
+			ret = (m_screen->vpos() & 0x3FE); // << 1);
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1103,7 +1137,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 
 WRITE32_MEMBER( n64_periphs::vi_reg_w )
 {
-	n64_state *state = machine().driver_data<n64_state>();
+	//n64_state *state = machine().driver_data<n64_state>();
 
 	switch (offset)
 	{
@@ -1122,12 +1156,12 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 				vi_recalculate_resolution();
 			}
 			vi_width = data;
-			state->m_rdp->m_misc_state.m_fb_width = data;
+			//state->m_rdp->m_misc_state.m_fb_width = data;
 			break;
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
+			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr)); // >> 1));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
@@ -1140,10 +1174,12 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x18/4:        // VI_V_SYNC_REG
 			vi_vsync = data;
+			vi_recalculate_resolution();
 			break;
 
 		case 0x1c/4:        // VI_H_SYNC_REG
 			vi_hsync = data;
+			vi_recalculate_resolution();
 			break;
 
 		case 0x20/4:        // VI_LEAP_REG
@@ -1214,7 +1250,7 @@ void n64_periphs::ai_fifo_push(UINT32 address, UINT32 length)
 
 	if (! (ai_status & 0x40000000))
 	{
-		signal_rcp_interrupt(AI_INTERRUPT);
+		//signal_rcp_interrupt(AI_INTERRUPT);
 		ai_dma();
 	}
 }
@@ -1237,7 +1273,7 @@ void n64_periphs::ai_fifo_pop()
 	if (ai_fifo_num < AUDIO_DMA_DEPTH)
 	{
 		ai_status &= ~0x80000001;   // FIFO not full
-		signal_rcp_interrupt(AI_INTERRUPT);
+		//signal_rcp_interrupt(AI_INTERRUPT);
 	}
 }
 
@@ -1277,7 +1313,7 @@ void n64_periphs::ai_dma()
 	ai_status |= 0x40000000;
 
 	// adjust the timer
-	period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 4));
+	period = attotime::from_hz(DACRATE_NTSC) * (ai_dacrate + 1) * (current->length / 4);
 	ai_timer->adjust(period);
 }
 
@@ -1289,12 +1325,12 @@ TIMER_CALLBACK_MEMBER(n64_periphs::ai_timer_callback)
 void n64_periphs::ai_timer_tick()
 {
 	ai_fifo_pop();
+	signal_rcp_interrupt(AI_INTERRUPT);
 
 	// keep playing if there's another DMA queued
 	if (ai_fifo_get_top() != NULL)
 	{
 		ai_dma();
-		signal_rcp_interrupt(AI_INTERRUPT);
 	}
 	else
 	{
@@ -1325,7 +1361,9 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 			}
 			break;
 		}
-
+		case 0x08/4:
+			ret = ai_control;
+			break;
 		case 0x0c/4:        // AI_STATUS_REG
 			ret = ai_status;
 			break;
@@ -1425,10 +1463,6 @@ void n64_periphs::pi_dma_tick()
 	{
 		UINT32 dma_length = pi_wr_len + 1;
 		//logerror("PI Write, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_wr_len);
-		if (dma_length & 7)
-		{
-			dma_length = (dma_length + 7) & ~7;
-		}
 
 		if (pi_dram_addr != 0xffffffff)
 		{
@@ -1445,10 +1479,6 @@ void n64_periphs::pi_dma_tick()
 	{
 		UINT32 dma_length = pi_rd_len + 1;
 		//logerror("PI Read, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_rd_len);
-		if (dma_length & 7)
-		{
-			dma_length = (dma_length + 7) & ~7;
-		}
 
 		if (pi_dram_addr != 0xffffffff)
 		{
@@ -2076,6 +2106,19 @@ void n64_periphs::handle_pif()
 	}*/
 }
 
+TIMER_CALLBACK_MEMBER(n64_periphs::si_dma_callback)
+{
+	machine().device<n64_periphs>("rcp")->si_dma_tick();
+}
+
+void n64_periphs::si_dma_tick()
+{
+	si_dma_timer->adjust(attotime::never);
+	si_status = 0;
+	si_status |= 0x1000;
+	signal_rcp_interrupt(SI_INTERRUPT);
+}
+
 void n64_periphs::pif_dma(int direction)
 {
 	if (si_dram_addr & 0x3)
@@ -2115,9 +2158,10 @@ void n64_periphs::pif_dma(int direction)
 			*dst++ = d;
 		}
 	}
-
-	si_status |= 0x1000;
-	signal_rcp_interrupt(SI_INTERRUPT);
+	si_status |= 1;
+	si_dma_timer->adjust(attotime::from_hz(1000));
+	//si_status |= 0x1000;
+	//signal_rcp_interrupt(SI_INTERRUPT);
 }
 
 READ32_MEMBER( n64_periphs::si_reg_r )
@@ -2158,7 +2202,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 			break;
 
 		case 0x18/4:        // SI_STATUS_REG
-			si_status &= ~0x1000;
+			si_status = 0;
 			clear_rcp_interrupt(SI_INTERRUPT);
 			break;
 
@@ -2266,9 +2310,11 @@ void n64_periphs::dd_update_bm()
 	}
 	else // dd read, BM Mode 1
 	{
-		if(((dd_track_reg & 0xFFF) == 6) && (dd_start_block == 0))
+		if(((dd_track_reg & 0xFFF) == 6) && (dd_start_block == 0) && ((machine().root_device().ioport("input")->read() & 0x0100) == 0x0000))
 		{
+			//only fail read LBA 12 if retail disk drive
 			dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
+			dd_buf_status_reg |= DD_BMST_MICRO_STATUS;
 		}
 		else if(dd_current_reg < SECTORS_PER_BLOCK)
 		{
@@ -2336,11 +2382,11 @@ void n64_periphs::dd_read_sector()
 	sector = (UINT8*)machine().root_device().memregion("disk")->base();
 	sector += dd_track_offset;
 	sector += dd_start_block * SECTORS_PER_BLOCK * ddZoneSecSize[dd_zone];
-	sector += (dd_current_reg) * ddZoneSecSize[dd_zone];
+	sector += (dd_current_reg) * (dd_sector_size + 1);
 
 	//logerror("Read Block %d, Sector %d\n", dd_start_block, dd_current_reg);
 
-	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
+	for(int i = 0; i < (dd_sector_size + 1)/4; i++)
 	{
 		dd_sector_data[i] = sector[(i*4 + 0)] << 24 | sector[(i*4 + 1)] << 16 |
 							sector[(i*4 + 2)] << 8  | sector[(i*4 + 3)];
@@ -2421,7 +2467,10 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 			ret = dd_seq_ctrl_reg;
 			break;
 		case 0x40/4: // ASIC ID
-			ret = 0x00030000; // Japan Retail Drive
+			if ((machine().root_device().ioport("input")->read() & 0x0100) == 0x0000)
+				ret = 0x00030000; // Japan Retail Drive
+			else
+				ret = 0x00040000; // Development Drive
 			break;
 	}
 

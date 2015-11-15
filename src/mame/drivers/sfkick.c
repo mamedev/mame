@@ -65,9 +65,27 @@ class sfkick_state : public driver_device
 public:
 	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_v9938(*this, "v9938"),
+		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_region_bios(*this, "bios"),
+		m_region_extrom(*this, "extrom"),
+		m_region_banked(*this, "banked"),
+		m_region_cartridge(*this, "cartridge"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_bank5(*this, "bank5"),
+		m_bank6(*this, "bank6"),
+		m_bank7(*this, "bank7"),
+		m_bank8(*this, "bank8"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_dial(*this, "DIAL"),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2(*this, "DSW2")
+	{ }
 
 	UINT8 *m_main_mem;
 	int m_bank_cfg;
@@ -83,22 +101,32 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 	DECLARE_DRIVER_INIT(sfkick);
 	virtual void machine_reset();
-	TIMER_DEVICE_CALLBACK_MEMBER(sfkick_interrupt);
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sfkick_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_memory_region m_region_bios;
+	required_memory_region m_region_extrom;
+	required_memory_region m_region_banked;
+	required_memory_region m_region_cartridge;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_memory_bank m_bank5;
+	required_memory_bank m_bank6;
+	required_memory_bank m_bank7;
+	required_memory_bank m_bank8;
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_dial;
+	required_ioport m_dsw1;
+	required_ioport m_dsw2;
 };
 
 
-#define MSX2_XBORDER_PIXELS 16
-#define MSX2_YBORDER_PIXELS 28
-#define MSX2_TOTAL_XRES_PIXELS 256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS 212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 #define MASTER_CLOCK    XTAL_21_4772MHz
 
 
@@ -106,11 +134,11 @@ READ8_MEMBER(sfkick_state::ppi_port_b_r)
 {
 	switch(m_input_mux&0x0f)
 	{
-		case 0: return ioport("IN0")->read();
-		case 1: return ioport("IN1")->read();
-		case 2: return BITSWAP8(ioport("DIAL")->read(),4,5,6,7,3,2,1,0);
-		case 3: return ioport("DSW2")->read();
-		case 4: return ioport("DSW1")->read();
+		case 0: return m_in0->read();
+		case 1: return m_in1->read();
+		case 2: return BITSWAP8(m_dial->read(),4,5,6,7,3,2,1,0);
+		case 3: return m_dsw2->read();
+		case 4: return m_dsw1->read();
 	}
 	return 0xff;
 }
@@ -122,33 +150,33 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* bios */
 		{
-			UINT8 *mem = memregion("bios")->base();
-			membank("bank1")->set_base(mem);
-			membank("bank2")->set_base(mem+0x2000);
+			UINT8 *mem = m_region_bios->base();
+			m_bank1->set_base(mem);
+			m_bank2->set_base(mem+0x2000);
 		}
 		break;
 
 		case 1: /* ext rom */
 		{
-			UINT8 *mem = memregion("extrom")->base();
-			membank("bank1")->set_base(mem+0x4000);
-			membank("bank2")->set_base(mem+0x6000);
+			UINT8 *mem = m_region_extrom->base();
+			m_bank1->set_base(mem+0x4000);
+			m_bank2->set_base(mem+0x6000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank1")->set_base(mem+0x2000*m_bank[0]);
-			membank("bank2")->set_base(mem+0x2000*m_bank[1]);
+			UINT8 *mem = m_region_banked->base();
+			m_bank1->set_base(mem+0x2000*m_bank[0]);
+			m_bank2->set_base(mem+0x2000*m_bank[1]);
 		}
 		break;
 
 		case 3: /* unknown */
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank1")->set_base(mem+0x18000);
-			membank("bank2")->set_base(mem+0x18000);
+			UINT8 *mem = m_region_banked->base();
+			m_bank1->set_base(mem+0x18000);
+			m_bank2->set_base(mem+0x18000);
 		}
 		break;
 	}
@@ -158,26 +186,26 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* bios - upper part */
 		{
-			UINT8 *mem = memregion("bios")->base();
-			membank("bank3")->set_base(mem+0x4000);
-			membank("bank4")->set_base(mem+0x6000);
+			UINT8 *mem = m_region_bios->base();
+			m_bank3->set_base(mem+0x4000);
+			m_bank4->set_base(mem+0x6000);
 		}
 		break;
 
 		case 1:  /* unknown */
 		case 3:
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank3")->set_base(mem+0x18000);
-			membank("bank4")->set_base(mem+0x18000);
+			UINT8 *mem = m_region_banked->base();
+			m_bank3->set_base(mem+0x18000);
+			m_bank4->set_base(mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank3")->set_base(mem+0x2000*m_bank[2]);
-			membank("bank4")->set_base(mem+0x2000*m_bank[3]);
+			UINT8 *mem = m_region_banked->base();
+			m_bank3->set_base(mem+0x2000*m_bank[2]);
+			m_bank4->set_base(mem+0x2000*m_bank[3]);
 		}
 		break;
 	}
@@ -187,26 +215,26 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* cartridge */
 		{
-			UINT8 *mem = memregion("cartridge")->base();
-			membank("bank5")->set_base(mem+0x4000);
-			membank("bank6")->set_base(mem+0x6000);
+			UINT8 *mem = m_region_cartridge->base();
+			m_bank5->set_base(mem+0x4000);
+			m_bank6->set_base(mem+0x6000);
 		}
 		break;
 
 		case 1: /* unknown */
 		case 3:
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank5")->set_base(mem+0x18000);
-			membank("bank6")->set_base(mem+0x18000);
+			UINT8 *mem = m_region_banked->base();
+			m_bank5->set_base(mem+0x18000);
+			m_bank6->set_base(mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank5")->set_base(mem+0x2000*m_bank[4]);
-			membank("bank6")->set_base(mem+0x2000*m_bank[5]);
+			UINT8 *mem = m_region_banked->base();
+			m_bank5->set_base(mem+0x2000*m_bank[4]);
+			m_bank6->set_base(mem+0x2000*m_bank[5]);
 		}
 		break;
 	}
@@ -217,24 +245,24 @@ void sfkick_state::sfkick_remap_banks()
 		case 0: /* unknown */
 		case 1:
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank7")->set_base(mem+0x18000);
-			membank("bank8")->set_base(mem+0x18000);
+			UINT8 *mem = m_region_banked->base();
+			m_bank7->set_base(mem+0x18000);
+			m_bank8->set_base(mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memregion("banked")->base();
-			membank("bank7")->set_base(mem+0x2000*m_bank[6]);
-			membank("bank8")->set_base(mem+0x2000*m_bank[7]);
+			UINT8 *mem = m_region_banked->base();
+			m_bank7->set_base(mem+0x2000*m_bank[6]);
+			m_bank8->set_base(mem+0x2000*m_bank[7]);
 		}
 		break;
 
 		case 3: /* RAM */
 		{
-			membank("bank7")->set_base(m_main_mem);
-			membank("bank8")->set_base(m_main_mem+0x2000);
+			m_bank7->set_base(m_main_mem);
+			m_bank8->set_base(m_main_mem+0x2000);
 		}
 		break;
 	}
@@ -447,11 +475,6 @@ void sfkick_state::machine_reset()
 	sfkick_remap_banks();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sfkick_state::sfkick_interrupt)
-{
-	m_v9938->interrupt();
-}
-
 WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 {
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
@@ -462,7 +485,6 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_map)
 	MCFG_CPU_IO_MAP(sfkick_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sfkick_state, sfkick_interrupt, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
@@ -472,14 +494,7 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 
 	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sfkick_state,sfkick_vdp_interrupt))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
-	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
-	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_PALETTE("v9938:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(sfkick_state, ppi_port_a_w))

@@ -7,29 +7,29 @@
 
  Game Name(s)                                                      Part #'s       Data      PROM/ROM Chip Numbers
  ----------------------------------------------------------------+--------------+---------+---------------------------------------
- Astro Race (11/1973) (clone of Atari's Space Race)                               UNKNOWN
  Anti-Aircraft (1975) (clone of Atari's Anti-Aircraft)                            YES
+ Astro Race (11/1973) (clone of Atari's Space Race)                               UNKNOWN
  Attack (09/1976)                                                                 UNKNOWN
  Attack UFO (08/1974)                                                             UNKNOWN
  Avenger (??/1976) (clone of Electra's Avenger)                                   YES
- Ball Park/TT Ball Park (??/1974)  (clone of Midway's Ball Park)                  YES
- Basketball (04/1974) (clone of Midway's TV Basketball)                           YES
- Bombs Away (??/1977)  (clone of Meadows' Bombs Away)                             YES
+ Ball Park/TT Ball Park (??/1974) (clone of Midway's Ball Park)                   YES
+ Basketball (04/1974) (clone of Midway's TV Basketball)                           NO
+ Bombs Away (??/1977) (clone of Meadows' Bombs Away)                              YES
  Cisco/Fisco 400 (04/1977)                                                        UNKNOWN
  Clean Sweep (??/1976) (clone of Ramtek's Clean Sweep)                            YES
  Clean Sweep II (??/1976) (clone of Ramtek's Clean Sweep)                         YES
  Crashing Race (06/1976) (clone of Atari's Crash'n Score?)                        UNKNOWN
  Cross Fire (08/1977) (clone of PSE's Bazooka)                                    YES
- Davis Cup (12/1973) (clone of Atari's Coupe Davis / Pong Doubles?)               UNKNOWN
+ Davis Cup (12/1973) (clone of Atari's Coupe Davis / Pong Doubles?)               NO
  Dead Heat (??/1975)                                                              UNKNOWN
  Elepong (07/1973)                                                                UNKNOWN
- Flying Fortress (??/1977) (clone of Electra's Flying Fortress?)                  UNKNOWN
+ Flying Fortress (??/1977) (clone of Electra's Flying Fortress?)                  YES
  Flying Fortress II (06/1977)                                                     UNKNOWN
  Gunman (10/1977)                                                                 YES        8 x 32bytes (or 11? )
  Interceptor (03/1976)                                                            UNKNOWN
  Missile-X (??/1977)                                                              YES        10 - (5 x 512bytes, 5x32bytes)
  Pro Hockey (11/1973)                                                             UNKNOWN
- Road Champion (04/1977) (clone of Williams' Road Champion?)                      UNKNOWN
+ Road Champion (04/1977) (clone of Williams' Road Champion?)                      YES
  Road Champion S (06/1977)                                                        UNKNOWN
  Soccer (11/1973)                                                                 UNKNOWN
  Soccer DX (??/1977)                                                              UNKNOWN

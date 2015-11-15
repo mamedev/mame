@@ -343,7 +343,7 @@ int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rect
 //          UINT16 pix3 = vram16[fbaddr3 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 
 			d[i] = 0;
-							
+
 			if (pix2 & 0x8000)
 			{
 				d[i] = pix2 & 0x7fff;

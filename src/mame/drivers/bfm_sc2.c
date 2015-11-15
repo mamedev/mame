@@ -8386,19 +8386,19 @@ GAME( 1996, sc2cpep     , sc2cpe    ,  scorpion2_dm01   , cpeno1    , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER 6012  COPS & ROBBERS #3/#6 - 29-DEC-1992 21:26:28
-GAME( 199?, sc2cops5    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1)  (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-044
+GAME( 199?, sc2cops5    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-044
 // PROJECT NUMBER 6012  COPS AND ROBBERS S+P 10P - 7-JUL-1993 10:17:18
 GAME( 199?, sc2cops2    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-110
 // PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (SINGLE SITE 5P/10P/20P) - 4-DEC-1995 10:52:08
-GAME( 199?, sc2cops3    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3)  (Scorpion 2/3)", GAME_FLAGS)            // GAME No 95-750-577
-GAME( 199?, sc2cops3p   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3, Protocol)  (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-577
+GAME( 199?, sc2cops3    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)            // GAME No 95-750-577
+GAME( 199?, sc2cops3p   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3, Protocol) (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-577
 // PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (ARCADE 5P/10P/20P) - 4-DEC-1995 10:53:58
-GAME( 199?, sc2copsp    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4, Protocol)  (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-578
+GAME( 199?, sc2copsp    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-578
 // PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (IRISH ALL CASH 5P/10P/20P) - 7-MAR-1996 15:07:40
 GAME( 199?, sc2cops4    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-645
 // PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (#10 ALL CASH 20P/25P) - 15-MAR-1996 11:52:02
 GAME( 199?, sc2cops     , 0         ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6) (Scorpion 2/3)", GAME_FLAGS)             // GAME No 95-750-652
-GAME( 199?, sc2cops1p   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6, Protocol)  (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-652
+GAME( 199?, sc2cops1p   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6, Protocol) (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-652
 
 
 /********************************************************************************************************************************************************************************************************************
@@ -8409,7 +8409,7 @@ GAME( 199?, sc2cops1p   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_st
 
 // PROJECT NUMBER 6622  BINGO COPS N ROBBERS #8/#10 ALL CASH - 9-JUL-1996 17:08:15
 GAME( 199?, sc2copsc    , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)            // GAME No 95-750-814
-GAME( 199?, sc2copscp   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-814
+GAME( 199?, sc2copscp   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-814
 // PROJECT NUMBER 6622  BINGO COPS N ROBBERS SWITCHABLE BINGO/ARCADE - 9-JUL-1996 17:12:33
 GAME( 199?, sc2copsc1   , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)                            // GAME No 95-750-816
 GAME( 199?, sc2copsc1p  , sc2cops   ,  scorpion2_dm01   , drwho     , bfm_sc2_state, ofah       , 0,         "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)                  // GAME No 95-751-816

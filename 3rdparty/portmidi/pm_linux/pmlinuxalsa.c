@@ -15,9 +15,16 @@
 #include "string.h"
 #include "porttime.h"
 #include "pmlinux.h"
-#include "osdcomm.h"
-
 #include <alsa/asoundlib.h>
+
+typedef unsigned int                        UINT32;
+__extension__ typedef unsigned long long    UINT64;
+
+#ifdef PTR64
+typedef UINT64                              FPTR;
+#else
+typedef UINT32                              FPTR;
+#endif
 
 /* I used many print statements to debug this code. I left them in the
  * source, and you can turn them on by changing false to true below:

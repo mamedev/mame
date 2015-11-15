@@ -25,6 +25,7 @@
     1990  Thunder Force AC           Sega / Technosoft 317-0172         C2
     1990  Borench                    Sega              317-0173         C2
     1991  Twin Squash                Sega              317-0193         C2
+    1991  Waku Waku Sonic Patrol Car Sega              317-0140         C2
     1992  Ribbit!                    Sega              317-0178         C2
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2     171-5992A
     1992  Tant-R (Japan)             Sega              317-0211         C2
@@ -883,6 +884,53 @@ static INPUT_PORTS_START( twinsqua )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( soniccar )
+	PORT_INCLUDE( systemc_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // siren
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // jump
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // turbo
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) // 'winker' (a left/right joystick)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) // steering (it's a wheel on the control panel, but just seems to send left/right signals)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // accel
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Demo Sound Interval" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "Every 4 Minutes" )
+	PORT_DIPSETTING(    0x02, "Every 2 Minutes" )
+	PORT_DIPSETTING(    0x03, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Lighting Time" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "Advertise & Playtime" )
+	PORT_DIPSETTING(    0x00, "Playtime Only" )
+	PORT_DIPNAME( 0x08, 0x08, "Light" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Screen Display" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "Insert 100-400 Yen" )
+	PORT_DIPSETTING(    0x00, "Insert Money" )
+	//"SW2:6" unused
+	//"SW2:7" unused
+	//"SW2:7" unused
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( ribbit )
 	PORT_INCLUDE( systemc_generic )
 
@@ -1575,6 +1623,16 @@ ROM_START( twinsqua ) /* Twin Squash  (c)1991 Sega */
 
 	ROM_REGION( 0x020000, "upd", 0 )
 	ROM_LOAD( "epr-14588.ic4", 0x000000, 0x020000, CRC(5a9b6881) SHA1(d86ec7f569fae5a1ce93a1cf40998cbb13726e0c) )
+ROM_END
+
+
+ROM_START( soniccar ) /* Waku Waku Sonic Patrol Car  (c)1991 Sega - 834-8401 SONIC PATCAR (EMP5032 labeled 317-0140) */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-14369.ic32", 0x000000, 0x040000, CRC(2ea4c9a3) SHA1(92ee27c93bd1cbb99c88af39f5f227a8cadfb13c) )
+	ROM_LOAD16_BYTE( "epr-14395.ic31", 0x000001, 0x040000, CRC(39622e18) SHA1(b7093c6d86e429e9721a0e1fd781231dc4342b31) )
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "epr-14394.ic4", 0x000000, 0x040000, CRC(476e30dd) SHA1(c9d381160c58b05763ea286a53c7ca6de074fda2) )
 ROM_END
 
 
@@ -2278,9 +2336,11 @@ GAME( 1990, tfrceacb,  tfrceac,  segac2, tfrceac, segac2_state,  tfrceacb, ROT0,
 GAME( 1990, borench,   0,        segac2, borench, segac2_state,  borench,  ROT0,   "Sega", "Borench (set 1)", 0 )
 GAME( 1990, borencha,  borench,  segac2, borench, segac2_state,  borench,  ROT0,   "Sega", "Borench (set 2)", 0 )
 
+GAME( 1991, ribbit,    0,        segac2, ribbit,   segac2_state, ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
+
 GAME( 1991, twinsqua,  0,        segac2, twinsqua, segac2_state, twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 
-GAME( 1991, ribbit,    0,        segac2, ribbit, segac2_state,   ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
+GAME( 1991, soniccar,   0,       segac2, soniccar, segac2_state, bloxeedc, ROT0,   "Sega", "Waku Waku Sonic Patrol Car", 0 )
 
 GAME( 1992, puyo,      0,        segac2, puyo, segac2_state,     puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
 GAME( 1992, puyobl,    puyo,     segac2, puyo, segac2_state,     puyo,     ROT0,   "bootleg", "Puyo Puyo (World, bootleg)", 0 )

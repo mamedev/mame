@@ -50,7 +50,7 @@ debugview_info::debugview_info(debugger_windows_interface &debugger, debugwin_in
 
 	// create the child view
 	m_wnd = CreateWindowEx(DEBUG_VIEW_STYLE_EX, TEXT("MAMEDebugView"), NULL, DEBUG_VIEW_STYLE,
-		    0, 0, 100, 100, parent, NULL, GetModuleHandleUni(), this);
+			0, 0, 100, 100, parent, NULL, GetModuleHandleUni(), this);
 	if (m_wnd == NULL)
 		goto cleanup;
 
@@ -800,7 +800,7 @@ void debugview_info::register_window_class()
 		wc.style            = 0;
 		wc.cbClsExtra       = 0;
 		wc.cbWndExtra       = 0;
-		
+
 		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't

@@ -772,19 +772,14 @@ function createMAMEProjects(_target, _subtarget, _name)
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices",
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "src/emu/netlist",
+		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
 	}
-
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-end
 end
 
 function createProjects_mame_arcade(_target, _subtarget)
@@ -851,7 +846,7 @@ files {
 	MAME_DIR .. "src/mame/machine/amiga.c",
 	MAME_DIR .. "src/mame/video/amiga.c",
 	MAME_DIR .. "src/mame/video/amigaaga.c",
-	MAME_DIR .. "src/mame/drivers/arcadia.c",
+	MAME_DIR .. "src/mame/drivers/arsystems.c",
 	MAME_DIR .. "src/mame/drivers/cubo.c",
 	MAME_DIR .. "src/mame/drivers/mquake.c",
 	MAME_DIR .. "src/mame/drivers/upscope.c",
@@ -1559,6 +1554,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/igs009.c",
 	MAME_DIR .. "src/mame/drivers/igs011.c",
 	MAME_DIR .. "src/mame/drivers/igs017.c",
+	MAME_DIR .. "src/mame/video/igs017_igs031.c",
+	MAME_DIR .. "src/mame/drivers/igs_fear.c",
 	MAME_DIR .. "src/mame/drivers/igs_m027.c",
 	MAME_DIR .. "src/mame/drivers/igs_m036.c",
 	MAME_DIR .. "src/mame/drivers/iqblock.c",
@@ -2817,9 +2814,9 @@ files {
 	MAME_DIR .. "src/mame/machine/qix.c",
 	MAME_DIR .. "src/mame/audio/qix.c",
 	MAME_DIR .. "src/mame/video/qix.c",
-	MAME_DIR .. "src/mame/drivers/rainbow.c",
-	MAME_DIR .. "src/mame/machine/rainbow.c",
-	MAME_DIR .. "src/mame/video/rainbow.c",
+	MAME_DIR .. "src/mame/drivers/rbisland.c",
+	MAME_DIR .. "src/mame/machine/rbisland.c",
+	MAME_DIR .. "src/mame/video/rbisland.c",
 	MAME_DIR .. "src/mame/drivers/rastan.c",
 	MAME_DIR .. "src/mame/video/rastan.c",
 	MAME_DIR .. "src/mame/drivers/retofinv.c",
@@ -3215,7 +3212,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/kissproto.c",
 	MAME_DIR .. "src/mame/drivers/ltd.c",
 	MAME_DIR .. "src/mame/drivers/micropin.c",
-	MAME_DIR .. "src/mame/drivers/mephisto.c",
+	MAME_DIR .. "src/mame/drivers/mephistp.c",
 	MAME_DIR .. "src/mame/drivers/mrgame.c",
 	MAME_DIR .. "src/mame/drivers/nsm.c",
 	MAME_DIR .. "src/mame/drivers/peyper.c",
@@ -3499,6 +3496,7 @@ files {
 	MAME_DIR .. "src/mame/video/pass.c",
 	MAME_DIR .. "src/mame/drivers/peplus.c",
 	MAME_DIR .. "src/mame/drivers/photon.c",
+	MAME_DIR .. "src/mame/drivers/piggypas.c",
 	MAME_DIR .. "src/mame/video/pk8000.c",
 	MAME_DIR .. "src/mame/drivers/photon2.c",
 	MAME_DIR .. "src/mame/drivers/photoply.c",
@@ -3537,6 +3535,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/slotcarn.c",
 	MAME_DIR .. "src/mame/drivers/smsmcorp.c",
 	MAME_DIR .. "src/mame/drivers/sothello.c",
+	MAME_DIR .. "src/mame/drivers/spcwarp.c",
 	MAME_DIR .. "src/mame/drivers/splus.c",
 	MAME_DIR .. "src/mame/drivers/spool99.c",
 	MAME_DIR .. "src/mame/drivers/sprcros2.c",
@@ -3592,6 +3591,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vroulet.c",
 	MAME_DIR .. "src/mame/drivers/wildpkr.c",
 	MAME_DIR .. "src/mame/drivers/wms.c",
+	MAME_DIR .. "src/mame/drivers/wacky_gator.c",
 	MAME_DIR .. "src/mame/drivers/xtom3d.c",
 	MAME_DIR .. "src/mame/drivers/xyonix.c",
 	MAME_DIR .. "src/mame/video/xyonix.c",

@@ -24,21 +24,21 @@ Sega MODEL2 COMMUNICATION BOARD 837-10537
 | |-------------------|    |-------------------|    |-------------------|     |
 |-----------------------------------------------------------------------------|
 
-	Setup:
-		Z80        Zilog Z0840008PSC Z80 CPU (DIP40)
-		LH5268A    SHARP LH5268AD-10LL 8k x8 SRAM (DIP28)
-		uPD72103   NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
-		16726.7    M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-16726')
-		315-5751   Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5752   Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5753A  AMI 18CV8PC-15 PAL (DIP20)
-		315-5547   AMI 18CV8PC-25 PAL (DIP20)
+    Setup:
+        Z80        Zilog Z0840008PSC Z80 CPU (DIP40)
+        LH5268A    SHARP LH5268AD-10LL 8k x8 SRAM (DIP28)
+        uPD72103   NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
+        16726.7    M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-16726')
+        315-5751   Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5752   Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5753A  AMI 18CV8PC-15 PAL (DIP20)
+        315-5547   AMI 18CV8PC-25 PAL (DIP20)
 
-	Board:
-		837-10537  Daytona USA
+    Board:
+        837-10537  Daytona USA
 
-	EEPROM:
-		16726.7    Daytona USA
+    EEPROM:
+        16726.7    Daytona USA
 
 
 Sega PC BD MODEL2 A-CRX COMMUNICATION 837-11525
@@ -63,23 +63,23 @@ Sega PC BD MODEL2 A-CRX COMMUNICATION 837-11525
 | |-------------------|    |-------------------|    |-------------------|                   |
 |-------------------------------------------------------------------------------------------|
 
-	Setup:
-		Z80        Zilog Z0840008PSC Z80 CPU (DIP40)
-		LH5268A    SHARP LH5268AD-10LL 8k x8 SRAM (DIP28)
-		uPD72103   NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
-		16726.7    M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-16726')
-		315-5751   Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5752   Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5753A  AMI 18CV8PC-15 PAL (DIP20)
-		315-5547   AMI 18CV8PC-25 PAL (DIP20)
+    Setup:
+        Z80        Zilog Z0840008PSC Z80 CPU (DIP40)
+        LH5268A    SHARP LH5268AD-10LL 8k x8 SRAM (DIP28)
+        uPD72103   NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
+        16726.7    M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-16726')
+        315-5751   Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5752   Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5753A  AMI 18CV8PC-15 PAL (DIP20)
+        315-5547   AMI 18CV8PC-25 PAL (DIP20)
 
-	Board:
-		837-11525
-		837-11572  Sega Rally Championship
+    Board:
+        837-11525
+        837-11572  Sega Rally Championship
 
-	EEPROM:
-		16726.7    Sega Rally Championship
-		18643A.7   ManxTT
+    EEPROM:
+        16726.7    Sega Rally Championship
+        18643A.7   ManxTT
 
 
 Sega PC BD MODEL2 B-CRX COMMUNICATION 837-11615
@@ -104,23 +104,23 @@ Sega PC BD MODEL2 B-CRX COMMUNICATION 837-11615
 |                                                  CN3               |-------------------|  |
 |-------------------------------------------------------------------------------------------|
 
-	Setup:
-		Z80          Zilog Z0840008PSC Z80 CPU (DIP40)
-		MB84256A     Fujitsu MB84256A-70LL 32k x8 SRAM (SDIP28)
-		uPD72103A    NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
-		18643A.7     M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-18643A')
-		315-5751     Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5752     Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5753A    ICT PEEL18CV8P-15 PAL (DIP20)
-		315-5547A    AMI 18CV8PC-25 PAL (DIP20)
+    Setup:
+        Z80          Zilog Z0840008PSC Z80 CPU (DIP40)
+        MB84256A     Fujitsu MB84256A-70LL 32k x8 SRAM (SDIP28)
+        uPD72103A    NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
+        18643A.7     M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-18643A')
+        315-5751     Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5752     Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5753A    ICT PEEL18CV8P-15 PAL (DIP20)
+        315-5547A    AMI 18CV8PC-25 PAL (DIP20)
 
-	Board:
-		837-11615    Virtua On
-		837-11615-02 Virtua On
+    Board:
+        837-11615    Virtua On
+        837-11615-02 Virtua On
 
-	EEPROM:
-		18643.7      Virtua On
-		18643A.7     Virtua On
+    EEPROM:
+        18643.7      Virtua On
+        18643A.7     Virtua On
 
 
 
@@ -146,21 +146,21 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 |                                                  CN3               |-------------------|  |
 |-------------------------------------------------------------------------------------------|
 
-	Setup:
-		Z80        Zilog Z0840008PSC Z80 CPU (DIP40)
-		MB84256A   Fujitsu MB84256A-70LL 32k x8 SRAM (SDIP28)
-		uPD72103A  NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
-		18643A.7   M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-18643A')
-		315-5751   Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5752   Lattice GAL16V8B-25LP PAL (DIP20)
-		315-5753A  ICT PEEL18CV8P-15 PAL (DIP20)
-		315-5547A  AMI 18CV8PC-25 PAL (DIP20)
+    Setup:
+        Z80        Zilog Z0840008PSC Z80 CPU (DIP40)
+        MB84256A   Fujitsu MB84256A-70LL 32k x8 SRAM (SDIP28)
+        uPD72103A  NEC uPD72103 HDLC/Frame Relay Controller (QFP80)
+        18643A.7   M27C1001 128k x8 EPROM (DIP32, labelled 'EPR-18643A')
+        315-5751   Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5752   Lattice GAL16V8B-25LP PAL (DIP20)
+        315-5753A  ICT PEEL18CV8P-15 PAL (DIP20)
+        315-5547A  AMI 18CV8PC-25 PAL (DIP20)
 
-	Board:
-		837-12839  Sega Touring Car Championship
+    Board:
+        837-12839  Sega Touring Car Championship
 
-	EEPROM:
-		18643A.7   Sega Touring Car Championship
+    EEPROM:
+        18643A.7   Sega Touring Car Championship
 */
 
 #include "machine/m2comm.h"
@@ -296,7 +296,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
 		m_linktimer = 0x04; //0x00E8; // 58 fps * 4s
-		
+
 		comm_tick();
 	}
 #endif
@@ -324,7 +324,7 @@ void m2comm_device::check_vint_irq()
 void m2comm_device::set_linktype(UINT16 linktype)
 {
 	m_linktype = linktype;
-	
+
 	switch (m_linktype)
 	{
 		case 16726:
@@ -347,7 +347,7 @@ void m2comm_device::comm_tick()
 
 void m2comm_device::comm_tick_16726()
 {
-	if (m_linkenable == 0x01)	
+	if (m_linkenable == 0x01)
 	{
 		m_zfg ^= 1;
 
@@ -369,21 +369,21 @@ void m2comm_device::comm_tick_16726()
 			m_shared[0] = 0x00;
 			m_shared[2] = 0xff;
 			m_shared[3] = 0xff;
-			
+
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
 				printf("M2COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
-			
+
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
 				printf("M2COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
-			
+
 			// if both sockets are there check ring
 			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
 			{
@@ -416,7 +416,7 @@ void m2comm_device::comm_tick_16726()
 								m_line_tx.write(m_buffer, dataSize);
 							}
 						}
-						
+
 						// 0xFE - link size
 						else if (idx == 0xfe)
 						{
@@ -427,11 +427,11 @@ void m2comm_device::comm_tick_16726()
 								// forward message
 								m_line_tx.write(m_buffer, dataSize);
 							}
-							
+
 							// consider it done
 							printf("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
-							
+
 							// write to shared mem
 							m_shared[0] = 0x01;
 							m_shared[2] = m_linkid;
@@ -449,13 +449,13 @@ void m2comm_device::comm_tick_16726()
 						}
 						printf("M2COMM: droped a message...\n");
 					}
-					
+
 					if (m_linkalive == 0x00)
 						recv = m_line_rx.read(m_buffer, dataSize);
 					else
 						recv = 0;
 				}
-				
+
 				// if we are master and link is not yet established
 				if (isMaster && (m_linkalive == 0x00))
 				{
@@ -493,7 +493,7 @@ void m2comm_device::comm_tick_16726()
 					}
 				}
 			}
-		}	
+		}
 
 		// update "ring buffer" if link established
 		if (m_linkalive == 0x01)
@@ -522,7 +522,7 @@ void m2comm_device::comm_tick_16726()
 								for (int j = 0x00 ; j < frameSize ; j++)
 								{
 									m_shared[frameOffset2 + j] = m_shared[frameOffset1 + j];
-								}								
+								}
 							}
 							slotDest -= m_linkcount;
 						}
@@ -574,7 +574,7 @@ void m2comm_device::comm_tick_16726()
 			}
 			m_line_tx.write(m_buffer, dataSize);
 
-			// master sends some additional status bytes 
+			// master sends some additional status bytes
 			if (isMaster){
 				m_buffer[0] = 0xF0;
 				for (int j = 0x00 ; j < frameSize ; j++)
@@ -589,9 +589,9 @@ void m2comm_device::comm_tick_16726()
 				m_line_tx.write(m_buffer, dataSize);
 			}
 		}
-		
+
 		// clear 03
 		//TODO:m_shared[3] = 0x00;
-	}	
+	}
 }
 #endif

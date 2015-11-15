@@ -90,6 +90,7 @@ P0-122A  (SZR-001)      95 Zombie Raid                          American Sammy
 Notes:
 - The NEC D4701 used by Caliber 50 is a mouse interface IC (uPD4701c).
   Of course it's used to control the spinner. DownTown probably has it as well.
+- jjsquawk is modified from jjsquawko so nuts don't fall from the trees shaken by white animal.
 
 DIP Locations verified from manuals for:
 - Zing Zing Zip
@@ -127,8 +128,7 @@ TODO:
   the current area is right for it)
 - crazyfgt: emulate protection & tickets, fix graphics glitches, find correct clocks,
   level 2 interrupt should probably be triggered by the 3812 but sound tends to die that way.
-- jjsquawk: Nuts don't fall from the trees shaken by white animal.
-  Player's shot sound is missing (not requested to X1-010?).
+- jjsquawk: Player's shot sound is missing (not requested to X1-010?).
   Many sounds are wrong since MAME 0.62.
   i.e.
   all scene: when you beat enemies or yellow walking eggs
@@ -10623,6 +10623,34 @@ ROM_START( jjsquawk ) /* PCB stickered  J.J. SQUAWKERS 9401- 1022 */
 	ROM_LOAD( "fe2001006.u70", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
 ROM_END
 
+ROM_START( jjsquawko ) /* Official 93111A PCB missing version sticker */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "fe2001001.u3", 0x000000, 0x040000, CRC(921c9762) SHA1(bbc1fb95256f7eb2aa7ad23f38dbcdf502e7da8d) )
+	ROM_CONTINUE   (                 0x100000, 0x040000  )
+	ROM_LOAD16_BYTE( "fe2001002.u4", 0x000001, 0x040000, CRC(0227a2be) SHA1(8ee0c39f84110865778564f803b4db11bfdfbad7) )
+	ROM_CONTINUE   (                 0x100001, 0x040000  )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "fe2001009", 0x000000, 0x080000, CRC(27441cd3) SHA1(5867fc30c158e07f2d36ecab97b1d304383e6f35) ) /* These roms located on a plug-in PCB */
+	ROM_LOAD( "fe2001010", 0x080000, 0x080000, CRC(ca2b42c4) SHA1(9b99b6618fe44a6c29a255e89dab72a0a56214df) )
+	ROM_LOAD( "fe2001007", 0x100000, 0x080000, CRC(62c45658) SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) )
+	ROM_LOAD( "fe2001008", 0x180000, 0x080000, CRC(2690c57b) SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD       ( "fe2001011", 0x000000, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD       ( "fe2001012", 0x080000, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD16_BYTE( "fe2001003", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD       ( "fe2001014", 0x000000, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD       ( "fe2001013", 0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD16_BYTE( "fe2001004", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "fe2001005.u69", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
+	ROM_LOAD( "fe2001006.u70", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
+ROM_END
+
 ROM_START( jjsquawkb )
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "3", 0x000000, 0x080000, CRC(afd5bd07) SHA1(eee231f596ce5cb9bbf41c7c9e18c11a399d7dfd) )
@@ -10649,7 +10677,7 @@ ROM_START( jjsquawkb )
 	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* fe2001005.u69 + fe2001006.u70 from jjsquawk */
 ROM_END
 
-ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted to JJ Squawkers. No labels on any of the ROMs */
+ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted to JJ Squawkers. No labels on any of the ROMs.  Apparently based on jjsquawko set. */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "u3.3a", 0x000000, 0x040000, CRC(f94c913b) SHA1(de6e422c514c787897f8f41d7cd98acb0135c763) ) // 99.999619%
 	ROM_CONTINUE   (                0x100000, 0x040000  )
@@ -11647,6 +11675,7 @@ GAME( 1993, daiohp,   daioh,    daiohp,   daiohp,   driver_device, 0,        ROT
 GAME( 1993, daiohc,   daioh,    wrofaero, daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, jjsquawko,jjsquawk, jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
 

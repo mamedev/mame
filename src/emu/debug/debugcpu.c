@@ -19,8 +19,8 @@
 #include "debugger.h"
 #include "uiinput.h"
 #include "xmlfile.h"
+#include "coreutil.h"
 #include <ctype.h>
-#include <zlib.h>
 
 
 /***************************************************************************
@@ -2746,7 +2746,7 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 	UINT32 numbytes = disassemble(diasmbuf, pc, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 
 	// return a CRC of the exact count of opcode bytes
-	return crc32(0, opbuf, numbytes);
+	return core_crc32(0, opbuf, numbytes);
 }
 
 

@@ -1463,10 +1463,10 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, NEOGEO_YM2610_CLOCK)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.28)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.28)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.98)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.98)
 	MCFG_NEOGEO_BANKED_CART_ADD("banked_cart")
 
 MACHINE_CONFIG_END

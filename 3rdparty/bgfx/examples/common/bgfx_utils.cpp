@@ -21,12 +21,12 @@ namespace stl = tinystl;
 
 #include "bgfx_utils.h"
 
-void* load(bx::FileReaderI* _reader, const char* _filePath, uint32_t* _size)
+void* load(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
 	if (0 == bx::open(_reader, _filePath) )
 	{
 		uint32_t size = (uint32_t)bx::getSize(_reader);
-		void* data = malloc(size);
+		void* data = BX_ALLOC(_allocator, size);
 		bx::read(_reader, data, size);
 		bx::close(_reader);
 		if (NULL != _size)
@@ -45,7 +45,12 @@ void* load(bx::FileReaderI* _reader, const char* _filePath, uint32_t* _size)
 
 void* load(const char* _filePath, uint32_t* _size)
 {
-	return load(entry::getFileReader(), _filePath, _size);
+	return load(entry::getFileReader(), entry::getAllocator(), _filePath, _size);
+}
+
+void unload(void* _ptr)
+{
+	BX_FREE(entry::getAllocator(), _ptr);
 }
 
 static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePath)
@@ -99,6 +104,10 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
 		shaderPath = "shaders/glsl/";
 		break;
 
+	case bgfx::RendererType::Metal:
+		shaderPath = "shaders/metal/";
+		break;
+
 	case bgfx::RendererType::OpenGLES:
 		shaderPath = "shaders/gles/";
 		break;
@@ -122,7 +131,11 @@ bgfx::ShaderHandle loadShader(const char* _name)
 bgfx::ProgramHandle loadProgram(bx::FileReaderI* _reader, const char* _vsName, const char* _fsName)
 {
 	bgfx::ShaderHandle vsh = loadShader(_reader, _vsName);
-	bgfx::ShaderHandle fsh = loadShader(_reader, _fsName);
+	bgfx::ShaderHandle fsh = BGFX_INVALID_HANDLE;
+	if (NULL != _fsName)
+	{
+		fsh = loadShader(_reader, _fsName);
+	}
 
 	return bgfx::createProgram(vsh, fsh, true /* destroy shaders when program is destroyed */);
 }
@@ -176,24 +189,27 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _name, uin
 
 		BX_FREE(allocator, data);
 
-		handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), 1
-										, bgfx::TextureFormat::RGBA8
-										, _flags
-										, bgfx::copy(img, width*height*4)
-										);
-
-		free(img);
-
-		if (NULL != _info)
+		if (NULL != img)
 		{
-			bgfx::calcTextureSize(*_info
-				, uint16_t(width)
-				, uint16_t(height)
-				, 0
-				, false
-				, 1
-				, bgfx::TextureFormat::RGBA8
-				);
+			handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), 1
+											, bgfx::TextureFormat::RGBA8
+											, _flags
+											, bgfx::copy(img, width*height*4)
+											);
+
+			free(img);
+
+			if (NULL != _info)
+			{
+				bgfx::calcTextureSize(*_info
+					, uint16_t(width)
+					, uint16_t(height)
+					, 0
+					, false
+					, 1
+					, bgfx::TextureFormat::RGBA8
+					);
+			}
 		}
 	}
 	else
@@ -521,11 +537,10 @@ struct Mesh
 			const Group& group = *it;
 
 			bgfx::setTransform(cached);
-			bgfx::setProgram(_program);
 			bgfx::setIndexBuffer(group.m_ibh);
 			bgfx::setVertexBuffer(group.m_vbh);
 			bgfx::setState(_state);
-			bgfx::submit(_id);
+			bgfx::submit(_id, _program);
 		}
 	}
 
@@ -551,11 +566,10 @@ struct Mesh
 							, texture.m_flags
 							);
 				}
-				bgfx::setProgram(state.m_program);
 				bgfx::setIndexBuffer(group.m_ibh);
 				bgfx::setVertexBuffer(group.m_vbh);
 				bgfx::setState(state.m_state);
-				bgfx::submit(state.m_viewId);
+				bgfx::submit(state.m_viewId, state.m_program);
 			}
 		}
 	}

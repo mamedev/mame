@@ -19,7 +19,24 @@
 #include "pmwinmm.h"
 #include <string.h>
 #include "porttime.h"
-#include "osdcomm.h"
+
+#ifndef _WINDOWS_H
+typedef unsigned int                        UINT32;
+#endif
+
+#ifndef _WINDOWS_H
+#ifdef _MSC_VER
+typedef unsigned __int64                    UINT64;
+#else
+__extension__ typedef unsigned long long    UINT64;
+#endif
+#endif
+
+#ifdef PTR64
+typedef UINT64                              FPTR;
+#else
+typedef UINT32                              FPTR;
+#endif
 
 /* asserts used to verify portMidi code logic is sound; later may want
     something more graceful */

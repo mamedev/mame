@@ -205,14 +205,19 @@ INPUT_PORTS_START( orlegendt )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( orld105k )
+
+INPUT_PORTS_START( orlegendk )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")
-	PORT_DIPNAME( 0x0003, 0x0002, DEF_STR( Unused ) )   // region switch
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )      // if enabled, game gives
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )       // "incorrect version" error
+	PORT_DIPNAME( 0x0007, 0x0002, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, "Invalid 00?" )
+	PORT_CONFSETTING(      0x0001, "Invalid 01?" )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0003, "Invalid 03?" )
+	PORT_CONFSETTING(      0x0004, "Invalid 04?" )
 INPUT_PORTS_END
+
 
 MACHINE_CONFIG_START( pgm_asic3, pgm_asic3_state )
 	MCFG_FRAGMENT_ADD(pgmbase)

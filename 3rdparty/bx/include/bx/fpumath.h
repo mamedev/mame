@@ -31,7 +31,7 @@ namespace bx
 
 	inline float fround(float _f)
 	{
-		return float(int(_f) );
+		return floorf(_f + 0.5f);
 	}
 
 	inline float fmin(float _a, float _b)
@@ -119,6 +119,25 @@ namespace bx
 		const float mod    = fmodf(_a, _wrap);
 		const float result = mod < 0.0f ? _wrap + mod : mod;
 		return result;
+	}
+
+	// References:
+	//  - Bias And Gain Are Your Friend
+	//    http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
+	//  - http://demofox.org/biasgain.html
+	inline float fbias(float _time, float _bias)
+	{
+		return _time / ( ( (1.0f/_bias - 2.0f)*(1.0f - _time) ) + 1.0f);
+	}
+
+	inline float fgain(float _time, float _gain)
+	{
+		if (_time < 0.5f)
+		{
+			return fbias(_time * 2.0f, _gain) * 0.5f;
+		}
+
+		return fbias(_time * 2.0f - 1.0f, 1.0f - _gain) * 0.5f + 0.5f;
 	}
 
 	inline void vec3Move(float* __restrict _result, const float* __restrict _a)
@@ -831,6 +850,82 @@ namespace bx
 		_result[1] = normal[1];
 		_result[2] = normal[2];
 		_result[3] = -vec3Dot(normal, _va);
+	}
+
+	inline void calcLinearFit2D(float _result[2], const void* _points, uint32_t _stride, uint32_t _numPoints)
+	{
+		float sumX  = 0.0f;
+		float sumY  = 0.0f;
+		float sumXX = 0.0f;
+		float sumXY = 0.0f;
+
+		const uint8_t* ptr = (const uint8_t*)_points;
+		for (uint32_t ii = 0; ii < _numPoints; ++ii, ptr += _stride)
+		{
+			const float* point = (const float*)ptr;
+			float xx = point[0];
+			float yy = point[1];
+			sumX  += xx;
+			sumY  += yy;
+			sumXX += xx*xx;
+			sumXY += xx*yy;
+		}
+
+		// [ sum(x^2) sum(x)    ] [ A ] = [ sum(x*y) ]
+		// [ sum(x)   numPoints ] [ B ]   [ sum(y)   ]
+
+		float det = (sumXX*_numPoints - sumX*sumX);
+		float invDet = 1.0f/det;
+
+		_result[0] = (-sumX * sumY + _numPoints * sumXY) * invDet;
+		_result[1] = (sumXX * sumY - sumX       * sumXY) * invDet;
+	}
+
+	inline void calcLinearFit3D(float _result[3], const void* _points, uint32_t _stride, uint32_t _numPoints)
+	{
+		float sumX  = 0.0f;
+		float sumY  = 0.0f;
+		float sumZ  = 0.0f;
+		float sumXX = 0.0f;
+		float sumXY = 0.0f;
+		float sumXZ = 0.0f;
+		float sumYY = 0.0f;
+		float sumYZ = 0.0f;
+
+		const uint8_t* ptr = (const uint8_t*)_points;
+		for (uint32_t ii = 0; ii < _numPoints; ++ii, ptr += _stride)
+		{
+			const float* point = (const float*)ptr;
+			float xx = point[0];
+			float yy = point[1];
+			float zz = point[2];
+
+			sumX  += xx;
+			sumY  += yy;
+			sumZ  += zz;
+			sumXX += xx*xx;
+			sumXY += xx*yy;
+			sumXZ += xx*zz;
+			sumYY += yy*yy;
+			sumYZ += yy*zz;
+		}
+
+		// [ sum(x^2) sum(x*y) sum(x)    ] [ A ]   [ sum(x*z) ]
+		// [ sum(x*y) sum(y^2) sum(y)    ] [ B ] = [ sum(y*z) ]
+		// [ sum(x)   sum(y)   numPoints ] [ C ]   [ sum(z)   ]
+
+		float mtx[9] =
+		{
+			sumXX, sumXY, sumX,
+			sumXY, sumYY, sumY,
+			sumX,  sumY,  float(_numPoints),
+		};
+		float invMtx[9];
+		mtx3Inverse(invMtx, mtx);
+
+		_result[0] = invMtx[0]*sumXZ + invMtx[1]*sumYZ + invMtx[2]*sumZ;
+		_result[1] = invMtx[3]*sumXZ + invMtx[4]*sumYZ + invMtx[5]*sumZ;
+		_result[2] = invMtx[6]*sumXZ + invMtx[7]*sumYZ + invMtx[8]*sumZ;
 	}
 
 	inline void rgbToHsv(float _hsv[3], const float _rgb[3])

@@ -2380,10 +2380,10 @@ almost nothing like the prototype.
 		<info name="programmer" value="TEP392" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-		<feature name="slot" value="a78_sg9" />
-		<dataarea name="rom" size="147456">
-			<rom name="dkxm_demo_v12_pal.bin" size="147456" crc="9f6c0600" sha1="18409eace880dda3646792f9ec050a87a3b1b382" offset="0" />
-		</dataarea>
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_demo_v12_pal.bin" size="147456" crc="9f6c0600" sha1="18409eace880dda3646792f9ec050a87a3b1b382" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -2394,10 +2394,10 @@ almost nothing like the prototype.
 		<info name="programmer" value="TEP392" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-		<feature name="slot" value="a78_sg9" />
-		<dataarea name="rom" size="147456">
-			<rom name="dkxm_demo_v12_ntsc.bin" size="147456" crc="8b06bb4b" sha1="3129cbc91dc8f223f00db5c3273a4a330320be99" offset="0" />
-		</dataarea>
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_demo_v12_ntsc.bin" size="147456" crc="8b06bb4b" sha1="3129cbc91dc8f223f00db5c3273a4a330320be99" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -2411,10 +2411,10 @@ almost nothing like the prototype.
 		<info name="programmer" value="TEP392" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-		<feature name="slot" value="a78_sg9" />
-		<dataarea name="rom" size="147456">
-			<rom name="dkxm_final_demo_pal_hsc.bin" size="147456" crc="6510b674" sha1="65b723b470d287af51e9888813149c43fb11ac26" offset="0" />
-		</dataarea>
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_pal_hsc.bin" size="147456" crc="6510b674" sha1="65b723b470d287af51e9888813149c43fb11ac26" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -2425,10 +2425,10 @@ almost nothing like the prototype.
 		<info name="programmer" value="TEP392" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-		<feature name="slot" value="a78_sg9" />
-		<dataarea name="rom" size="147456">
-			<rom name="dkxm_final_demo_ntsc_hsc.bin" size="147456" crc="2c67fea7" sha1="7825c1946e3c7492fa9bbfae33029cd68c0d1135" offset="0" />
-		</dataarea>
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_ntsc_hsc.bin" size="147456" crc="2c67fea7" sha1="7825c1946e3c7492fa9bbfae33029cd68c0d1135" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -2470,11 +2470,11 @@ almost nothing like the prototype.
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
 		<part name="cart" interface="a7800_cart">
-		<feature name="slot" value="a78_sg9" />
-		<dataarea name="rom" size="147456">
-			<rom name="dkxm_final_demo.bin" size="0x20000" crc="fd503bd4" sha1="454d754a0c4603323e476d9418f343a6a1a0d017" offset="0x4000" />
-			<rom size="0x4000" offset="0x0000" loadflag="continue" />
-		</dataarea>
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo.bin" size="0x20000" crc="fd503bd4" sha1="454d754a0c4603323e476d9418f343a6a1a0d017" offset="0x4000" />
+				<rom size="0x4000" offset="0x0000" loadflag="continue" />
+			</dataarea>
 		</part>
 	</software>
 

@@ -41,8 +41,11 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 private:
-	int m_offset;
-	int m_data;
+	int m_old_ctrl;
+	int m_state;
+	int m_in_offset;
+	int m_in_data;
+	int m_out_data;
 	char m_rom[EAROM_SIZE];
 };
 

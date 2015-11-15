@@ -1,10 +1,22 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
-/* Hyper NeoGeo 64 - 3D bits */
-
-// todo, use poly.c
 
 #include "includes/hng64.h"
+
+/////////////////////////////////
+/// Hyper NeoGeo 64 - 3D bits ///
+/////////////////////////////////
+
+
+// Polygon rasterizer interface
+hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
+	: poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>(state.machine())
+	, m_state(state)
+	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
+{
+	const INT32 bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
+	m_depthBuffer3d = auto_alloc_array(state.machine(), float, bufferSize);
+}
 
 
 
@@ -54,14 +66,14 @@ g_profiler.start(PROFILER_USER1);
 	for(int packetStart=0;packetStart<0x200;packetStart+=32)
 	{
 		// Send it off to the 3d subsystem.
-		hng64_command3d( &m_dl[packetStart/2] );
+		hng64_command3d(&m_dl[packetStart/2]);
 	}
 
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
 g_profiler.stop();
 }
 
-TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
+TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 {
 // ...
 	m_set_irq(0x0008);
@@ -584,8 +596,8 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
 
 					polys[*numPolys].vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
-					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)] );
-					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)] );
+					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
+					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
 				}
 
@@ -900,7 +912,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && m_mcu_type == SHOOT_MCU)
 			break;
 
-		recoverPolygonBlock( packet, &numPolys);
+		recoverPolygonBlock(packet, &numPolys);
 		break;
 
 	case 0x0102:    // Geometry with only translation
@@ -920,7 +932,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock( miniPacket, &numPolys);
+		recoverPolygonBlock(miniPacket, &numPolys);
 
 		memset(miniPacket, 0, sizeof(UINT16)*16);
 		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
@@ -928,7 +940,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock( miniPacket, &numPolys);
+		recoverPolygonBlock(miniPacket, &numPolys);
 		break;
 
 	case 0x1000:    // Unknown: Some sort of global flags?
@@ -949,9 +961,10 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 	{
 		if (polys[i].visible)
 		{
-			drawShaded( &polys[i]);
+			m_poly_renderer->drawShaded(&polys[i]);
 		}
 	}
+	m_poly_renderer->wait();
 }
 
 void hng64_state::clear3d()
@@ -963,9 +976,11 @@ void hng64_state::clear3d()
 	// Reset the buffers...
 	for (i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
-		m_depthBuffer3d[i] = 100.0f;
-		m_colorBuffer3d[i] = rgb_t(0, 0, 0, 0);
+		m_poly_renderer->depthBuffer3d()[i] = 100.0f;
 	}
+
+	// Clear the 3d rasterizer buffer
+	m_poly_renderer->colorBuffer3d().fill(0x00000000, m_screen->visible_area());
 
 	// Set some matrices to the identity...
 	setIdentity(m_projectionMatrix);
@@ -994,7 +1009,7 @@ void hng64_state::clear3d()
 /////////////////////
 
 /* 4x4 matrix multiplication */
-void hng64_state::matmul4(float *product, const float *a, const float *b )
+void hng64_state::matmul4(float *product, const float *a, const float *b)
 {
 	int i;
 	for (i = 0; i < 4; i++)
@@ -1014,10 +1029,10 @@ void hng64_state::matmul4(float *product, const float *a, const float *b )
 /* vector by 4x4 matrix multiply */
 void hng64_state::vecmatmul4(float *product, const float *a, const float *b)
 {
-	const float bi0 = b[0];
-	const float bi1 = b[1];
-	const float bi2 = b[2];
-	const float bi3 = b[3];
+	const float& bi0 = b[0];
+	const float& bi1 = b[1];
+	const float& bi2 = b[2];
+	const float& bi3 = b[3];
 
 	product[0] = bi0 * a[0] + bi1 * a[4] + bi2 * a[8 ] + bi3 * a[12];
 	product[1] = bi0 * a[1] + bi1 * a[5] + bi2 * a[9 ] + bi3 * a[13];
@@ -1071,16 +1086,6 @@ void hng64_state::normalize(float* x)
 ///////////////////////////
 // POLYGON CLIPPING CODE //
 ///////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////
-// The remainder of the code in this file is heavily                             //
-//   influenced by, and sometimes copied verbatim from Andrew Zaferakis' SoftGL  //
-//   rasterizing system.                                                         //
-//                                                                               //
-//   Andrew granted permission for its use in MAME in October of 2004.           //
-///////////////////////////////////////////////////////////////////////////////////
-
-
 
 int hng64_state::Inside(struct polyVert *v, int plane)
 {
@@ -1158,27 +1163,25 @@ void hng64_state::Intersect(struct polyVert *input0, struct polyVert *input1, st
 	Ol[2] = Il0[2] + (Il1[2] - Il0[2]) * t;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Clip against the volumes defined by the homogeneous clip coordinates //
+//////////////////////////////////////////////////////////////////////////
+
 void hng64_state::performFrustumClip(struct polygon *p)
 {
-	int i, j, k;
-	//////////////////////////////////////////////////////////////////////////
-	// Clip against the volumes defined by the homogeneous clip coordinates //
-	//////////////////////////////////////////////////////////////////////////
+	polyVert *v0;
+	polyVert *v1;
+	polyVert *tv;
 
-	struct polygon temp;
-
-	struct polyVert *v0;
-	struct polyVert *v1;
-	struct polyVert *tv;
-
+	polygon temp;
 	temp.n = 0;
 
 	// Skip near and far clipping planes ?
-	for (j = 0; j <= HNG64_BOTTOM; j++)
+	for (int j = 0; j <= HNG64_BOTTOM; j++)
 	{
-		for (i = 0; i < p->n; i++)
+		for (int i = 0; i < p->n; i++)
 		{
-			k = (i+1) % p->n; // Index of next vertex
+			int k = (i+1) % p->n; // Index of next vertex
 
 			v0 = &p->vert[i];
 			v1 = &p->vert[k];
@@ -1190,13 +1193,11 @@ void hng64_state::performFrustumClip(struct polygon *p)
 				memcpy(tv, v1, sizeof(struct polyVert));
 				temp.n++;
 			}
-
 			else if (Inside(v0, j) && !Inside(v1, j))                   // Edge goes from in to out...
 			{
 				Intersect(v0, v1, tv, j);
 				temp.n++;
 			}
-
 			else if (!Inside(v0, j) && Inside(v1, j))                   // Edge goes from out to in...
 			{
 				Intersect(v0, v1, tv, j);
@@ -1207,7 +1208,7 @@ void hng64_state::performFrustumClip(struct polygon *p)
 
 		p->n = temp.n;
 
-		for (i = 0; i < temp.n; i++)
+		for (int i = 0; i < temp.n; i++)
 		{
 			memcpy(&p->vert[i], &temp.vert[i], sizeof(struct polyVert));
 		}
@@ -1216,57 +1217,57 @@ void hng64_state::performFrustumClip(struct polygon *p)
 	}
 }
 
-
-
-/*********************************************************************/
-/**   FillSmoothTexPCHorizontalLine                                 **/
-/**     Input: Color Buffer (framebuffer), depth buffer, width and  **/
-/**            height of framebuffer, starting, and ending values   **/
-/**            for x and y, constant y.  Fills horizontally with    **/
-/**            z,r,g,b interpolation.                               **/
-/**                                                                 **/
-/**     Output: none                                                **/
-/*********************************************************************/
-inline void hng64_state::FillSmoothTexPCHorizontalLine(
-											const polygonRasterOptions& prOptions,
-											int x_start, int x_end, int y, float z_start, float z_delta,
-											float w_start, float w_delta, float r_start, float r_delta,
-											float g_start, float g_delta, float b_start, float b_delta,
-											float s_start, float s_delta, float t_start, float t_delta)
+void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
-	float*  db = &(m_depthBuffer3d[(y * m_screen->visible_area().max_x) + x_start]);
-	UINT32* cb = &(m_colorBuffer3d[(y * m_screen->visible_area().max_x) + x_start]);
+	// Pull the parameters out of the extent structure
+	float z = extent.param[0].start;
+	float w = extent.param[1].start;
+	float lightR = extent.param[2].start;
+	float lightG = extent.param[3].start;
+	float lightB = extent.param[4].start;
+	float s = extent.param[5].start;
+	float t = extent.param[6].start;
 
-	UINT8 paletteEntry = 0;
-	float t_coord, s_coord;
-	const UINT8 *gfx = m_texturerom;
-	const UINT8 *textureOffset = &gfx[prOptions.texIndex * 1024 * 1024];
+	const float dz = extent.param[0].dpdx;
+	const float dw = extent.param[1].dpdx;
+	const float dlightR = extent.param[2].dpdx;
+	const float dlightG = extent.param[3].dpdx;
+	const float dlightB = extent.param[4].dpdx;
+	const float ds = extent.param[5].dpdx;
+	const float dt = extent.param[6].dpdx;
 
-	for (; x_start <= x_end; x_start++)
+	// Pointers to the pixel buffers
+	UINT32* colorBuffer = &m_colorBuffer3d.pix32(scanline, extent.startx);
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+
+	const UINT8 *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
+
+	// Step over each pixel in the horizontal span
+	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z_start < (*db))
+		if (z < *depthBuffer)
 		{
-			// MULTIPLY BACK THROUGH BY W
-			t_coord = t_start / w_start;
-			s_coord = s_start / w_start;
+			// Multiply back through by w for everything that was interpolated perspective-correctly
+			const float sCorrect = s / w;
+			const float tCorrect = t / w;
+			const float rCorrect = lightR / w;
+			const float gCorrect = lightG / w;
+			const float bCorrect = lightB / w;
 
-			if ((prOptions.debugColor & 0xff000000) == 0x01000000)
+			if ((renderData.debugColor & 0xff000000) == 0x01000000)
 			{
-				// UV COLOR MODE
-				*cb = rgb_t(255, (UINT8)(s_coord*255.0f), (UINT8)(t_coord*255.0f), (UINT8)(0));
-				*db = z_start;
+				// ST color mode
+				*colorBuffer = rgb_t(255, (UINT8)(sCorrect*255.0f), (UINT8)(tCorrect*255.0f), (UINT8)(0));
 			}
-			else if ((prOptions.debugColor & 0xff000000) == 0x02000000)
+			else if ((renderData.debugColor & 0xff000000) == 0x02000000)
 			{
-				// Lit
-				*cb = rgb_t(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
-				*db = z_start;
+				// Lighting only
+				*colorBuffer = rgb_t(255, (UINT8)rCorrect, (UINT8)gCorrect, (UINT8)bCorrect);
 			}
-			else if ((prOptions.debugColor & 0xff000000) == 0xff000000)
+			else if ((renderData.debugColor & 0xff000000) == 0xff000000)
 			{
-				// DEBUG COLOR MODE
-				*cb = prOptions.debugColor;
-				*db = z_start;
+				// Debug color mode
+				*colorBuffer = renderData.debugColor;
 			}
 			else
 			{
@@ -1274,52 +1275,51 @@ inline void hng64_state::FillSmoothTexPCHorizontalLine(
 				float textureT = 0.0f;
 
 				// Standard & Half-Res textures
-				if (prOptions.texType == 0x0)
+				if (renderData.texType == 0x0)
 				{
-					textureS = s_coord * 1024.0f;
-					textureT = t_coord * 1024.0f;
+					textureS = sCorrect * 1024.0f;
+					textureT = tCorrect * 1024.0f;
 				}
-				else if (prOptions.texType == 0x1)
+				else if (renderData.texType == 0x1)
 				{
-					textureS = s_coord * 512.0f;
-					textureT = t_coord * 512.0f;
+					textureS = sCorrect * 512.0f;
+					textureT = tCorrect * 512.0f;
 				}
 
-				// stuff in mode 1 here already looks good?
 				// Small-Page textures
-				if (prOptions.texPageSmall == 2)
+				if (renderData.texPageSmall == 2)
 				{
 					textureT = fmod(textureT, 256.0f);
 					textureS = fmod(textureS, 256.0f);
 
-					textureT += (256.0f * (prOptions.texPageHorizOffset>>1));
-					textureS += (256.0f * (prOptions.texPageVertOffset>>1));
+					textureT += (256.0f * (renderData.texPageHorizOffset>>1));
+					textureS += (256.0f * (renderData.texPageVertOffset>>1));
 				}
-				else if (prOptions.texPageSmall == 3)
+				else if (renderData.texPageSmall == 3)
 				{
 					textureT = fmod(textureT, 128.0f);
 					textureS = fmod(textureS, 128.0f);
 
-					textureT += (128.0f * (prOptions.texPageHorizOffset>>0));
-					textureS += (128.0f * (prOptions.texPageVertOffset>>0));
+					textureT += (128.0f * (renderData.texPageHorizOffset>>0));
+					textureS += (128.0f * (renderData.texPageVertOffset>>0));
 				}
 
-				paletteEntry = textureOffset[((int)textureS)*1024 + (int)textureT];
+				UINT8 paletteEntry = textureOffset[((int)textureS)*1024 + (int)textureT];
 
-				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
+				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
 					// The color out of the texture
-					paletteEntry %= prOptions.palPageSize;
-					rgb_t color = m_palette->pen(prOptions.palOffset + paletteEntry);
+					paletteEntry %= renderData.palPageSize;
+					rgb_t color = m_state.m_palette->pen(renderData.palOffset + paletteEntry);
 
 					// Apply the lighting
-					float rIntensity = (r_start/w_start) / 255.0f;
-					float gIntensity = (g_start/w_start) / 255.0f;
-					float bIntensity = (b_start/w_start) / 255.0f;
-					float red   = color.r()   * rIntensity;
+					float rIntensity = rCorrect / 255.0f;
+					float gIntensity = gCorrect / 255.0f;
+					float bIntensity = bCorrect / 255.0f;
+					float red   = color.r() * rIntensity;
 					float green = color.g() * gIntensity;
-					float blue  = color.b()  * bIntensity;
+					float blue  = color.b() * bIntensity;
 
 					// Clamp and finalize
 					red = color.r() + red;
@@ -1332,347 +1332,41 @@ inline void hng64_state::FillSmoothTexPCHorizontalLine(
 
 					color = rgb_t(255, (UINT8)red, (UINT8)green, (UINT8)blue);
 
-					*cb = color;
-					*db = z_start;
+					*colorBuffer = color;
+					*depthBuffer = z;
 				}
 			}
 		}
-		db++;
-		cb++;
-		z_start += z_delta;
-		w_start += w_delta;
-		r_start += r_delta;
-		g_start += g_delta;
-		b_start += b_delta;
-		s_start += s_delta;
-		t_start += t_delta;
+
+		z += dz;
+		w += dw;
+		lightR += dlightR;
+		lightG += dlightG;
+		lightB += dlightB;
+		s += ds;
+		t += dt;
+
+		colorBuffer++;
+		depthBuffer++;
 	}
 }
 
-//----------------------------------------------------------------------------
-// Given 3D triangle ABC in screen space with clipped coordinates within the following
-// bounds: x in [0,W], y in [0,H], z in [0,1]. The origin for (x,y) is in the bottom
-// left corner of the pixel grid. z=0 is the near plane and z=1 is the far plane,
-// so lesser values are closer. The coordinates of the pixels are evenly spaced
-// in x and y 1 units apart starting at the bottom-left pixel with coords
-// (0.5,0.5). In other words, the pixel sample point is in the center of the
-// rectangular grid cell containing the pixel sample. The framebuffer has
-// dimensions width x height (WxH). The Color buffer is a 1D array (row-major
-// order) with 3 unsigned chars per pixel (24-bit color). The Depth buffer is
-// a 1D array (also row-major order) with a float value per pixel
-// For a pixel location (x,y) we can obtain
-// the Color and Depth array locations as: Color[(((int)y)*W+((int)x))*3]
-// (for the red value, green is offset +1, and blue is offset +2 and
-// Depth[((int)y)*W+((int)x)]. Fills the pixels contained in the triangle
-// with the global current color and the properly linearly interpolated depth
-// value (performs Z-buffer depth test before writing new pixel).
-// Pixel samples that lie inside the triangle edges are filled with
-// a bias towards the minimum values (samples that lie exactly on a triangle
-// edge are filled only for minimum x values along a horizontal span and for
-// minimum y values, samples lying on max values are not filled).
-// Per-vertex colors are RGB floating point triplets in [0.0,255.0]. The vertices
-// include their w-components for use in linearly interpolating perspectively
-// correct color (RGB) and texture-coords (st) across the face of the triangle.
-// A texture image of RGB floating point triplets of size TWxWH is also given.
-// Texture colors are normalized RGB values in [0,1].
-//   clamp and repeat wrapping modes : Wrapping={0,1}
-//   nearest and bilinear filtering: Filtering={0,1}
-//   replace and modulate application modes: Function={0,1}
-//---------------------------------------------------------------------------
-void hng64_state::RasterizeTriangle_SMOOTH_TEX_PC(
-											float A[4], float B[4], float C[4],
-											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
-											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-											const polygonRasterOptions& prOptions)
+void hng64_poly_renderer::drawShaded(struct polygon *p)
 {
-	// Get our order of points by increasing y-coord
-	float *p_min = ((A[1] <= B[1]) && (A[1] <= C[1])) ? A : ((B[1] <= A[1]) && (B[1] <= C[1])) ? B : C;
-	float *p_max = ((A[1] >= B[1]) && (A[1] >= C[1])) ? A : ((B[1] >= A[1]) && (B[1] >= C[1])) ? B : C;
-	float *p_mid = ((A != p_min) && (A != p_max)) ? A : ((B != p_min) && (B != p_max)) ? B : C;
+	// Polygon information for the rasterizer
+	hng64_poly_data rOptions;
+	rOptions.texType = p->texType;
+	rOptions.texIndex = p->texIndex;
+	rOptions.palOffset = p->palOffset;
+	rOptions.palPageSize = p->palPageSize;
+	rOptions.debugColor = p->debugColor;
+	rOptions.texPageSmall = p->texPageSmall;
+	rOptions.texPageHorizOffset = p->texPageHorizOffset;
+	rOptions.texPageVertOffset = p->texPageVertOffset;
 
-	// Perspectively correct color interpolation, interpolate r/w, g/w, b/w, then divide by 1/w at each pixel (A[3] = 1/w)
-	float ca[3], cb[3], cc[3];
-	float ta[2], tb[2], tc[2];
-
-	float *c_min;
-	float *c_mid;
-	float *c_max;
-
-	// We must keep the tex coords straight with the point ordering
-	float *t_min;
-	float *t_mid;
-	float *t_max;
-
-	// Find out control points for y, this divides the triangle into upper and lower
-	int   y_min;
-	int   y_max;
-	int   y_mid;
-
-	// Compute the slopes of each line, and color this is used to determine the interpolation
-	float x1_slope;
-	float x2_slope;
-	float z1_slope;
-	float z2_slope;
-	float w1_slope;
-	float w2_slope;
-	float r1_slope;
-	float r2_slope;
-	float g1_slope;
-	float g2_slope;
-	float b1_slope;
-	float b2_slope;
-	float s1_slope;
-	float s2_slope;
-	float t1_slope;
-	float t2_slope;
-
-	// Compute the t values used in the equation Ax = Ax + (Bx - Ax)*t
-	// We only need one t, because it is only used to compute the start.
-	// Create storage for the interpolated x and z values for both lines
-	// also for the RGB interpolation
-	float t;
-	float x1_interp;
-	float z1_interp;
-	float w1_interp;
-	float r1_interp;
-	float g1_interp;
-	float b1_interp;
-	float s1_interp;
-	float t1_interp;
-
-	float x2_interp;
-	float z2_interp;
-	float w2_interp;
-	float r2_interp;
-	float g2_interp;
-	float b2_interp;
-	float s2_interp;
-	float t2_interp;
-
-	// Create storage for the horizontal interpolation of z and RGB color and its starting points
-	// This is used to fill the triangle horizontally
-	int   x_start,     x_end;
-	float z_interp_x,  z_delta_x;
-	float w_interp_x,  w_delta_x;
-	float r_interp_x,  r_delta_x;
-	float g_interp_x,  g_delta_x;
-	float b_interp_x,  b_delta_x;
-	float s_interp_x,  s_delta_x;
-	float t_interp_x,  t_delta_x;
-
-	ca[0] = Ca[0]; ca[1] = Ca[1]; ca[2] = Ca[2];
-	cb[0] = Cb[0]; cb[1] = Cb[1]; cb[2] = Cb[2];
-	cc[0] = Cc[0]; cc[1] = Cc[1]; cc[2] = Cc[2];
-
-	// Perspectively correct tex interpolation, interpolate s/w, t/w, then divide by 1/w at each pixel (A[3] = 1/w)
-	ta[0] = Ta[0]; ta[1] = Ta[1];
-	tb[0] = Tb[0]; tb[1] = Tb[1];
-	tc[0] = Tc[0]; tc[1] = Tc[1];
-
-	// We must keep the colors straight with the point ordering
-	c_min = (p_min == A) ? ca : (p_min == B) ? cb : cc;
-	c_mid = (p_mid == A) ? ca : (p_mid == B) ? cb : cc;
-	c_max = (p_max == A) ? ca : (p_max == B) ? cb : cc;
-
-	// We must keep the tex coords straight with the point ordering
-	t_min = (p_min == A) ? ta : (p_min == B) ? tb : tc;
-	t_mid = (p_mid == A) ? ta : (p_mid == B) ? tb : tc;
-	t_max = (p_max == A) ? ta : (p_max == B) ? tb : tc;
-
-	// Find out control points for y, this divides the triangle into upper and lower
-	y_min  = (((int)p_min[1]) + 0.5 >= p_min[1]) ? (int)p_min[1] : ((int)p_min[1]) + 1;
-	y_max  = (((int)p_max[1]) + 0.5 <  p_max[1]) ? (int)p_max[1] : ((int)p_max[1]) - 1;
-	y_mid  = (((int)p_mid[1]) + 0.5 >= p_mid[1]) ? (int)p_mid[1] : ((int)p_mid[1]) + 1;
-
-	// Compute the slopes of each line, and color this is used to determine the interpolation
-	x1_slope = (p_max[0] - p_min[0]) / (p_max[1] - p_min[1]);
-	x2_slope = (p_mid[0] - p_min[0]) / (p_mid[1] - p_min[1]);
-	z1_slope = (p_max[2] - p_min[2]) / (p_max[1] - p_min[1]);
-	z2_slope = (p_mid[2] - p_min[2]) / (p_mid[1] - p_min[1]);
-	w1_slope = (p_max[3] - p_min[3]) / (p_max[1] - p_min[1]);
-	w2_slope = (p_mid[3] - p_min[3]) / (p_mid[1] - p_min[1]);
-	r1_slope = (c_max[0] - c_min[0]) / (p_max[1] - p_min[1]);
-	r2_slope = (c_mid[0] - c_min[0]) / (p_mid[1] - p_min[1]);
-	g1_slope = (c_max[1] - c_min[1]) / (p_max[1] - p_min[1]);
-	g2_slope = (c_mid[1] - c_min[1]) / (p_mid[1] - p_min[1]);
-	b1_slope = (c_max[2] - c_min[2]) / (p_max[1] - p_min[1]);
-	b2_slope = (c_mid[2] - c_min[2]) / (p_mid[1] - p_min[1]);
-	s1_slope = (t_max[0] - t_min[0]) / (p_max[1] - p_min[1]);
-	s2_slope = (t_mid[0] - t_min[0]) / (p_mid[1] - p_min[1]);
-	t1_slope = (t_max[1] - t_min[1]) / (p_max[1] - p_min[1]);
-	t2_slope = (t_mid[1] - t_min[1]) / (p_mid[1] - p_min[1]);
-
-	// Compute the t values used in the equation Ax = Ax + (Bx - Ax)*t
-	// We only need one t, because it is only used to compute the start.
-	// Create storage for the interpolated x and z values for both lines
-	// also for the RGB interpolation
-	t = (((float)y_min) + 0.5 - p_min[1]) / (p_max[1] - p_min[1]);
-	x1_interp = p_min[0] + (p_max[0] - p_min[0]) * t;
-	z1_interp = p_min[2] + (p_max[2] - p_min[2]) * t;
-	w1_interp = p_min[3] + (p_max[3] - p_min[3]) * t;
-	r1_interp = c_min[0] + (c_max[0] - c_min[0]) * t;
-	g1_interp = c_min[1] + (c_max[1] - c_min[1]) * t;
-	b1_interp = c_min[2] + (c_max[2] - c_min[2]) * t;
-	s1_interp = t_min[0] + (t_max[0] - t_min[0]) * t;
-	t1_interp = t_min[1] + (t_max[1] - t_min[1]) * t;
-
-	t = (((float)y_min) + 0.5 - p_min[1]) / (p_mid[1] - p_min[1]);
-	x2_interp = p_min[0] + (p_mid[0] - p_min[0]) * t;
-	z2_interp = p_min[2] + (p_mid[2] - p_min[2]) * t;
-	w2_interp = p_min[3] + (p_mid[3] - p_min[3]) * t;
-	r2_interp = c_min[0] + (c_mid[0] - c_min[0]) * t;
-	g2_interp = c_min[1] + (c_mid[1] - c_min[1]) * t;
-	b2_interp = c_min[2] + (c_mid[2] - c_min[2]) * t;
-	s2_interp = t_min[0] + (t_mid[0] - t_min[0]) * t;
-	t2_interp = t_min[1] + (t_mid[1] - t_min[1]) * t;
-
-	// First work on the bottom half of the triangle
-	// I'm using y_min as the incrementer because it saves space and we don't need it anymore
-	for (; y_min < y_mid; y_min++) {
-		// We always want to fill left to right, so we have 2 main cases
-		// Compute the integer starting and ending points and the appropriate z by
-		// interpolating.  Remember the pixels are in the middle of the grid, i.e. (0.5,0.5,0.5)
-		if (x1_interp < x2_interp) {
-			x_start    = ((((int)x1_interp) + 0.5) >= x1_interp) ? (int)x1_interp : ((int)x1_interp) + 1;
-			x_end      = ((((int)x2_interp) + 0.5) <  x2_interp) ? (int)x2_interp : ((int)x2_interp) - 1;
-			z_delta_x  = (z2_interp - z1_interp) / (x2_interp - x1_interp);
-			w_delta_x  = (w2_interp - w1_interp) / (x2_interp - x1_interp);
-			r_delta_x  = (r2_interp - r1_interp) / (x2_interp - x1_interp);
-			g_delta_x  = (g2_interp - g1_interp) / (x2_interp - x1_interp);
-			b_delta_x  = (b2_interp - b1_interp) / (x2_interp - x1_interp);
-			s_delta_x  = (s2_interp - s1_interp) / (x2_interp - x1_interp);
-			t_delta_x  = (t2_interp - t1_interp) / (x2_interp - x1_interp);
-			t          = (x_start + 0.5 - x1_interp) / (x2_interp - x1_interp);
-			z_interp_x = z1_interp + (z2_interp - z1_interp) * t;
-			w_interp_x = w1_interp + (w2_interp - w1_interp) * t;
-			r_interp_x = r1_interp + (r2_interp - r1_interp) * t;
-			g_interp_x = g1_interp + (g2_interp - g1_interp) * t;
-			b_interp_x = b1_interp + (b2_interp - b1_interp) * t;
-			s_interp_x = s1_interp + (s2_interp - s1_interp) * t;
-			t_interp_x = t1_interp + (t2_interp - t1_interp) * t;
-
-		} else {
-			x_start    = ((((int)x2_interp) + 0.5) >= x2_interp) ? (int)x2_interp : ((int)x2_interp) + 1;
-			x_end      = ((((int)x1_interp) + 0.5) <  x1_interp) ? (int)x1_interp : ((int)x1_interp) - 1;
-			z_delta_x  = (z1_interp - z2_interp) / (x1_interp - x2_interp);
-			w_delta_x  = (w1_interp - w2_interp) / (x1_interp - x2_interp);
-			r_delta_x  = (r1_interp - r2_interp) / (x1_interp - x2_interp);
-			g_delta_x  = (g1_interp - g2_interp) / (x1_interp - x2_interp);
-			b_delta_x  = (b1_interp - b2_interp) / (x1_interp - x2_interp);
-			s_delta_x  = (s1_interp - s2_interp) / (x1_interp - x2_interp);
-			t_delta_x  = (t1_interp - t2_interp) / (x1_interp - x2_interp);
-			t          = (x_start + 0.5 - x2_interp) / (x1_interp - x2_interp);
-			z_interp_x = z2_interp + (z1_interp - z2_interp) * t;
-			w_interp_x = w2_interp + (w1_interp - w2_interp) * t;
-			r_interp_x = r2_interp + (r1_interp - r2_interp) * t;
-			g_interp_x = g2_interp + (g1_interp - g2_interp) * t;
-			b_interp_x = b2_interp + (b1_interp - b2_interp) * t;
-			s_interp_x = s2_interp + (s1_interp - s2_interp) * t;
-			t_interp_x = t2_interp + (t1_interp - t2_interp) * t;
-		}
-
-		// Pass the horizontal line to the filler, this could be put in the routine
-		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine( prOptions,
-			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
-			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
-			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
-		x1_interp += x1_slope;   z1_interp += z1_slope;
-		x2_interp += x2_slope;   z2_interp += z2_slope;
-		r1_interp += r1_slope;   r2_interp += r2_slope;
-		g1_interp += g1_slope;   g2_interp += g2_slope;
-		b1_interp += b1_slope;   b2_interp += b2_slope;
-		w1_interp += w1_slope;   w2_interp += w2_slope;
-		s1_interp += s1_slope;   s2_interp += s2_slope;
-		t1_interp += t1_slope;   t2_interp += t2_slope;
-	}
-
-	// Now do the same thing for the top half of the triangle.
-	// We only need to recompute the x2 line because it changes at the midpoint
-	x2_slope = (p_max[0] - p_mid[0]) / (p_max[1] - p_mid[1]);
-	z2_slope = (p_max[2] - p_mid[2]) / (p_max[1] - p_mid[1]);
-	w2_slope = (p_max[3] - p_mid[3]) / (p_max[1] - p_mid[1]);
-	r2_slope = (c_max[0] - c_mid[0]) / (p_max[1] - p_mid[1]);
-	g2_slope = (c_max[1] - c_mid[1]) / (p_max[1] - p_mid[1]);
-	b2_slope = (c_max[2] - c_mid[2]) / (p_max[1] - p_mid[1]);
-	s2_slope = (t_max[0] - t_mid[0]) / (p_max[1] - p_mid[1]);
-	t2_slope = (t_max[1] - t_mid[1]) / (p_max[1] - p_mid[1]);
-
-	t = (((float)y_mid) + 0.5 - p_mid[1]) / (p_max[1] - p_mid[1]);
-	x2_interp = p_mid[0] + (p_max[0] - p_mid[0]) * t;
-	z2_interp = p_mid[2] + (p_max[2] - p_mid[2]) * t;
-	w2_interp = p_mid[3] + (p_max[3] - p_mid[3]) * t;
-	r2_interp = c_mid[0] + (c_max[0] - c_mid[0]) * t;
-	g2_interp = c_mid[1] + (c_max[1] - c_mid[1]) * t;
-	b2_interp = c_mid[2] + (c_max[2] - c_mid[2]) * t;
-	s2_interp = t_mid[0] + (t_max[0] - t_mid[0]) * t;
-	t2_interp = t_mid[1] + (t_max[1] - t_mid[1]) * t;
-
-	// We've seen this loop before haven't we?
-	// I'm using y_mid as the incrementer because it saves space and we don't need it anymore
-	for (; y_mid <= y_max; y_mid++) {
-		if (x1_interp < x2_interp) {
-			x_start    = ((((int)x1_interp) + 0.5) >= x1_interp) ? (int)x1_interp : ((int)x1_interp) + 1;
-			x_end      = ((((int)x2_interp) + 0.5) <  x2_interp) ? (int)x2_interp : ((int)x2_interp) - 1;
-			z_delta_x  = (z2_interp - z1_interp) / (x2_interp - x1_interp);
-			w_delta_x  = (w2_interp - w1_interp) / (x2_interp - x1_interp);
-			r_delta_x  = (r2_interp - r1_interp) / (x2_interp - x1_interp);
-			g_delta_x  = (g2_interp - g1_interp) / (x2_interp - x1_interp);
-			b_delta_x  = (b2_interp - b1_interp) / (x2_interp - x1_interp);
-			s_delta_x  = (s2_interp - s1_interp) / (x2_interp - x1_interp);
-			t_delta_x  = (t2_interp - t1_interp) / (x2_interp - x1_interp);
-			t          = (x_start + 0.5 - x1_interp) / (x2_interp - x1_interp);
-			z_interp_x = z1_interp + (z2_interp - z1_interp) * t;
-			w_interp_x = w1_interp + (w2_interp - w1_interp) * t;
-			r_interp_x = r1_interp + (r2_interp - r1_interp) * t;
-			g_interp_x = g1_interp + (g2_interp - g1_interp) * t;
-			b_interp_x = b1_interp + (b2_interp - b1_interp) * t;
-			s_interp_x = s1_interp + (s2_interp - s1_interp) * t;
-			t_interp_x = t1_interp + (t2_interp - t1_interp) * t;
-
-		} else {
-			x_start    = ((((int)x2_interp) + 0.5) >= x2_interp) ? (int)x2_interp : ((int)x2_interp) + 1;
-			x_end      = ((((int)x1_interp) + 0.5) <  x1_interp) ? (int)x1_interp : ((int)x1_interp) - 1;
-			z_delta_x  = (z1_interp - z2_interp) / (x1_interp - x2_interp);
-			w_delta_x  = (w1_interp - w2_interp) / (x1_interp - x2_interp);
-			r_delta_x  = (r1_interp - r2_interp) / (x1_interp - x2_interp);
-			g_delta_x  = (g1_interp - g2_interp) / (x1_interp - x2_interp);
-			b_delta_x  = (b1_interp - b2_interp) / (x1_interp - x2_interp);
-			s_delta_x  = (s1_interp - s2_interp) / (x1_interp - x2_interp);
-			t_delta_x  = (t1_interp - t2_interp) / (x1_interp - x2_interp);
-			t          = (x_start + 0.5 - x2_interp) / (x1_interp - x2_interp);
-			z_interp_x = z2_interp + (z1_interp - z2_interp) * t;
-			w_interp_x = w2_interp + (w1_interp - w2_interp) * t;
-			r_interp_x = r2_interp + (r1_interp - r2_interp) * t;
-			g_interp_x = g2_interp + (g1_interp - g2_interp) * t;
-			b_interp_x = b2_interp + (b1_interp - b2_interp) * t;
-			s_interp_x = s2_interp + (s1_interp - s2_interp) * t;
-			t_interp_x = t2_interp + (t1_interp - t2_interp) * t;
-		}
-
-		// Pass the horizontal line to the filler, this could be put in the routine
-		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine( prOptions,
-			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
-			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
-			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
-		x1_interp += x1_slope;   z1_interp += z1_slope;
-		x2_interp += x2_slope;   z2_interp += z2_slope;
-		r1_interp += r1_slope;   r2_interp += r2_slope;
-		g1_interp += g1_slope;   g2_interp += g2_slope;
-		b1_interp += b1_slope;   b2_interp += b2_slope;
-		w1_interp += w1_slope;   w2_interp += w2_slope;
-		s1_interp += s1_slope;   s2_interp += s2_slope;
-		t1_interp += t1_slope;   t2_interp += t2_slope;
-	}
-}
-
-void hng64_state::drawShaded( struct polygon *p)
-{
 	// The perspective-correct texture divide...
-	// !!! There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping !!!
-	int j;
-	for (j = 0; j < p->n; j++)
+	// NOTE: There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping - explore
+	for (int j = 0; j < p->n; j++)
 	{
 		p->vert[j].clipCoords[3] = 1.0f / p->vert[j].clipCoords[3];
 		p->vert[j].light[0]      = p->vert[j].light[0]     * p->vert[j].clipCoords[3];
@@ -1682,23 +1376,50 @@ void hng64_state::drawShaded( struct polygon *p)
 		p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
 	}
 
-	// Set up the struct that will pass the polygon's options around.
-	polygonRasterOptions prOptions;
-	prOptions.texType = p->texType;
-	prOptions.texIndex = p->texIndex;
-	prOptions.palOffset = p->palOffset;
-	prOptions.palPageSize = p->palPageSize;
-	prOptions.debugColor = p->debugColor;
-	prOptions.texPageSmall = p->texPageSmall;
-	prOptions.texPageHorizOffset = p->texPageHorizOffset;
-	prOptions.texPageVertOffset = p->texPageVertOffset;
-
-	for (j = 1; j < p->n-1; j++)
+	// Rasterize the triangles
+	for (int j = 1; j < p->n-1; j++)
 	{
-		RasterizeTriangle_SMOOTH_TEX_PC(
-										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
-										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
-										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
-										prOptions);
+		// Build some MAME rasterizer vertices from the hng64 vertices
+		vertex_t pVert[3];
+
+		const polyVert& pv0 = p->vert[0];
+		pVert[0].x = pv0.clipCoords[0];
+		pVert[0].y = pv0.clipCoords[1];
+		pVert[0].p[0] = pv0.clipCoords[2];
+		pVert[0].p[1] = pv0.clipCoords[3];
+		pVert[0].p[2] = pv0.light[0];
+		pVert[0].p[3] = pv0.light[1];
+		pVert[0].p[4] = pv0.light[2];
+		pVert[0].p[5] = pv0.texCoords[0];
+		pVert[0].p[6] = pv0.texCoords[1];
+
+		const polyVert& pvj = p->vert[j];
+		pVert[1].x = pvj.clipCoords[0];
+		pVert[1].y = pvj.clipCoords[1];
+		pVert[1].p[0] = pvj.clipCoords[2];
+		pVert[1].p[1] = pvj.clipCoords[3];
+		pVert[1].p[2] = pvj.light[0];
+		pVert[1].p[3] = pvj.light[1];
+		pVert[1].p[4] = pvj.light[2];
+		pVert[1].p[5] = pvj.texCoords[0];
+		pVert[1].p[6] = pvj.texCoords[1];
+
+		const polyVert& pvjp1 = p->vert[j+1];
+		pVert[2].x = pvjp1.clipCoords[0];
+		pVert[2].y = pvjp1.clipCoords[1];
+		pVert[2].p[0] = pvjp1.clipCoords[2];
+		pVert[2].p[1] = pvjp1.clipCoords[3];
+		pVert[2].p[2] = pvjp1.light[0];
+		pVert[2].p[3] = pvjp1.light[1];
+		pVert[2].p[4] = pvjp1.light[2];
+		pVert[2].p[5] = pvjp1.texCoords[0];
+		pVert[2].p[6] = pvjp1.texCoords[1];
+
+		// Pass the render data into the rasterizer
+		hng64_poly_data& renderData = object_data_alloc();
+		renderData = rOptions;
+
+		const rectangle& visibleArea = m_state.m_screen->visible_area();
+		render_triangle(visibleArea, render_delegate(FUNC(hng64_poly_renderer::render_scanline), this), 7, pVert[0], pVert[1], pVert[2]);
 	}
 }

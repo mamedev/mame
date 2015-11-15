@@ -207,8 +207,17 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_v9938(*this, "v9938")
-		{ }
+		m_v9938(*this, "v9938"),
+		m_pl1(*this, "PL1"),
+		m_pl2(*this, "PL2"),
+		m_pl3(*this, "PL3"),
+		m_pl4(*this, "PL4"),
+		m_pl5(*this, "PL5"),
+		m_pl6(*this, "PL6"),
+		m_svc(*this, "SVC"),
+		m_dsw(*this, "DSW"),
+		m_unk(*this, "UNK")
+	{ }
 
 	UINT8 m_mux_data;
 	UINT8 m_main_nmi_enable;
@@ -219,8 +228,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-
 	required_device<v9938_device> m_v9938;
+	required_ioport m_pl1;
+	required_ioport m_pl2;
+	required_ioport m_pl3;
+	required_ioport m_pl4;
+	required_ioport m_pl5;
+	required_ioport m_pl6;
+	required_ioport m_svc;
+	required_ioport m_dsw;
+	required_ioport m_unk;
+
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -231,7 +249,6 @@ public:
 	DECLARE_DRIVER_INIT(kas89);
 	virtual void machine_start();
 	virtual void machine_reset();
-	TIMER_DEVICE_CALLBACK_MEMBER(kas89_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
 	DECLARE_WRITE_LINE_MEMBER(kas89_vdp_interrupt);
@@ -245,14 +262,6 @@ public:
 WRITE_LINE_MEMBER(kas89_state::kas89_vdp_interrupt)
 {
 	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_interrupt)
-{
-	int scanline = param;
-
-	if((scanline % 2) == 0)
-		m_v9938->interrupt();
 }
 
 
@@ -291,19 +300,19 @@ READ8_MEMBER(kas89_state::mux_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return ioport("PL1")->read();
-		case 0x02: return ioport("PL2")->read();
-		case 0x04: return ioport("PL3")->read();
-		case 0x08: return ioport("PL4")->read();
-		case 0x10: return ioport("PL5")->read();
-		case 0x20: return ioport("PL6")->read();
+		case 0x01: return m_pl1->read();
+		case 0x02: return m_pl2->read();
+		case 0x04: return m_pl3->read();
+		case 0x08: return m_pl4->read();
+		case 0x10: return m_pl5->read();
+		case 0x20: return m_pl6->read();
 		case 0x40:
 		{
-			output_set_lamp_value(37, 1 - ((ioport("SVC")->read() >> 5) & 1));  /* Operator Key LAMP */
-			return ioport("SVC")->read();
+			output_set_lamp_value(37, 1 - ((m_svc->read() >> 5) & 1));  /* Operator Key LAMP */
+			return m_svc->read();
 		}
-		case 0x80: return ioport("DSW")->read();    /* Polled at $162a through NMI routine */
-		case 0x3f: return ioport("UNK")->read();
+		case 0x80: return m_dsw->read();    /* Polled at $162a through NMI routine */
+		case 0x3f: return m_unk->read();
 	}
 
 	logerror("Mux_data %02X\n", m_mux_data);
@@ -754,7 +763,6 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(kas89_map)
 	MCFG_CPU_IO_MAP(kas89_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kas89_state, kas89_interrupt, "screen", 0, 1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_nmi", kas89_state, kas89_nmi_cb, attotime::from_hz(138))
 
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/6)   /* Confirmed */
@@ -767,14 +775,7 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kas89_state,kas89_vdp_interrupt))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
-	MCFG_SCREEN_SIZE(544, 524)
-	MCFG_SCREEN_VISIBLE_AREA(0, 544 - 1, 0, 480 - 1)
-	MCFG_SCREEN_PALETTE("v9938:palette")
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

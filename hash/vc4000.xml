@@ -447,8 +447,8 @@
 		</part>
 	</software>
 
-	<!-- Cassette 34 (unreleased) -->
-	<!-- Cassette 35 (unreleased) -->
+	<!-- Cassette 34 - Space Laser (unreleased) -->
+	<!-- Cassette 35 - Rodeo (unreleased) -->
 
 	<software name="backgamm">
 		<description>Backgammon / Jacquet</description>
@@ -491,7 +491,7 @@
 		</part>
 	</software>
 
-	<!-- Cassette 39 (unreleased) -->
+	<!-- Cassette 39 - Basketball (unreleased) -->
 
 	<software name="suprspac">
 		<description>Super-Space</description>
@@ -504,6 +504,20 @@
 				<rom name="suprspac.bin" size="4096" crc="306e37bb" sha1="b11e9fed7700d5192b05dfabeca7b23feca64540" offset="0" />
 			</dataarea>
 			<dataarea name="ram" size="1024">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Unknown number - cart label shows "CASSETTE PARA SISTEMA DE VIDEO H-21" -->
+	<software name="comefrut" supported="no">
+		<description>Come Frutas</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<info name="serial" value="??"/>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="rom4k" />
+			<dataarea name="rom" size="4096">
+				<rom name="comefrutas.bin" size="4096" crc="f66c8e3a" sha1="c695bd36b572dff2c8f6c49edfcfda6dda3675c1" offset="0" />
 			</dataarea>
 		</part>
 	</software>

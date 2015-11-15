@@ -61,7 +61,12 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_f3_ram(*this,"f3_ram"),
-		m_paletteram32(*this, "paletteram") { }
+		m_paletteram32(*this, "paletteram"),
+		m_input(*this, "IN"),
+		m_dial(*this, "DIAL"),
+		m_eepromin(*this, "EEPROMIN")
+
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -72,6 +77,10 @@ public:
 
 	optional_shared_ptr<UINT32> m_f3_ram;
 	optional_shared_ptr<UINT32> m_paletteram32;
+	optional_ioport_array<6> m_input;
+	optional_ioport_array<2> m_dial;
+	optional_ioport m_eepromin;
+
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
@@ -245,6 +254,7 @@ public:
 	DECLARE_WRITE32_MEMBER(f3_palette_24bit_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 	DECLARE_DRIVER_INIT(commandw);
 	DECLARE_DRIVER_INIT(pbobble2);
 	DECLARE_DRIVER_INIT(puchicar);

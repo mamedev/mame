@@ -86,6 +86,7 @@ public:
 	TIMER_CALLBACK_MEMBER(vi_scanline_callback);
 	TIMER_CALLBACK_MEMBER(ai_timer_callback);
 	TIMER_CALLBACK_MEMBER(pi_dma_callback);
+	TIMER_CALLBACK_MEMBER(si_dma_callback);
 	DECLARE_READ32_MEMBER( dp_reg_r );
 	DECLARE_WRITE32_MEMBER( dp_reg_w );
 	DECLARE_READ32_MEMBER( sp_reg_r );
@@ -96,8 +97,10 @@ public:
 
 	void ai_timer_tick();
 	void pi_dma_tick();
+	void si_dma_tick();
 	void vi_scanline_tick();
 	void reset_tick();
+	void video_update(bitmap_rgb32 &bitmap);
 
 	// Video Interface (VI) registers
 	UINT32 vi_width;
@@ -242,6 +245,7 @@ private:
 	UINT32 pi_dma_dir;
 
 	// Serial Interface (SI) registers and functions
+	emu_timer *si_dma_timer;
 	void pif_dma(int direction);
 	void handle_pif();
 	int pif_channel_handle_command(int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata);
@@ -260,6 +264,14 @@ private:
 
 	// Video Interface (VI) functions
 	void vi_recalculate_resolution();
+	void video_update16(bitmap_rgb32 &bitmap);
+	void video_update32(bitmap_rgb32 &bitmap);
+	UINT8 random_seed;        // %HACK%, adds 19 each time it's read and is more or less random
+	UINT8 get_random() { return random_seed += 0x13; }
+
+	INT32 m_gamma_table[256];
+	INT32 m_gamma_dither_table[0x4000];
+
 };
 
 // device type definition
@@ -299,6 +311,7 @@ extern const device_type N64PERIPH;
 #define DP_STATUS_XBUS_DMA      0x01
 #define DP_STATUS_FREEZE        0x02
 #define DP_STATUS_FLUSH         0x04
+#define DP_STATUS_START_VALID   0x400
 
 #define DD_ASIC_STATUS_DISK_CHANGE   0x00010000
 #define DD_ASIC_STATUS_MECHA_ERR     0x00020000

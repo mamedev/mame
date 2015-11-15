@@ -52433,24 +52433,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<!--software name="bookyman">
-	    <description>Booky Man (Spa)</description>
-	    <year>1992</year>
-	    <publisher>Gluk Video</publisher>
-	    <info name="serial" value="CN-08"/>
-	    <info name="release" value="19920101"/>
-	    <part name="cart" interface="nes_cart">
-	        <feature name="pcb" value="NTDEC-N715062" />
-	        <feature name="mirroring" value="vertical" />
-	        <dataarea name="prg" size="32768">
-	            <rom name="0.prg" size="16384" crc="0d7ea169" sha1="f78f6589e4b209cc0e5a61c7dea45f73fdcadc5e" offset="00000" />
-	            <rom size="16384" offset="0x4000" loadflag="reload" />
-	        </dataarea>
-	        <dataarea name="chr" size="8192">
-	            <rom name="0.chr" size="8192" crc="e838b839" sha1="09e2bc2fa043675d5300a065fbc0e29d321a6ba3" offset="00000" />
-	        </dataarea>
-	    </part>
-	</software-->
+	<software name="bookyman">
+		<description>Booky Man (Spa)</description>
+		<year>1991</year>
+		<publisher>Gluk Video</publisher>
+		<info name="serial" value="CN-08"/>
+		<info name="release" value="19920101"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NTDEC-N715062" />
+			<feature name="mirroring" value="vertical" />
+			<!-- dumped as booky man.bin with .nes header - manually split matched hashes previously known. -->
+			<!-- <rom name="booky man.bin" size="40976" crc="dc5e106c" sha1="7777da877f2704101e73c0075c4a2a914b8430e3" offset="00000" /-->
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="16384" crc="0d7ea169" sha1="f78f6589e4b209cc0e5a61c7dea45f73fdcadc5e" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="0.chr" size="8192" crc="e838b839" sha1="09e2bc2fa043675d5300a065fbc0e29d321a6ba3" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--software name="cosmocops" cloneof="cosmocop">
 	    <description>Cosmos Cop (Spa)</description>
@@ -79881,34 +79883,48 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_cb280" supported="no">
-	<description>Coolboy RS-18 (280-in-1)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="cart" interface="nes_cart">
-		<!--<feature name="slot" value="coolboy" />
-		<feature name="pcb" value="UNL-COOLBOY" /> -->
-		<dataarea name="prg" size="4194304">
-		<rom name="w25q32.u5" size="4194304" crc="c9541bdf" sha1="f0ce46f18658ca5dbed881e5a80460e59820bbd0" offset="00000" />
-		</dataarea>
+		<description>Coolboy RS-18 (280-in-1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+		<!--<feature name="slot" value="coolboy" /> <feature name="pcb" value="UNL-COOLBOY" /> -->
+			<dataarea name="prg" size="4194304">
+				<rom name="w25q32.u5" size="4194304" crc="c9541bdf" sha1="f0ce46f18658ca5dbed881e5a80460e59820bbd0" offset="00000" />
+			</dataarea>
 		<!-- ?? -->
-		<dataarea name="vram" size="131072">
-		</dataarea>
-	</part>
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_cb203" supported="no">
+		<description>Coolboy RS-17 (203-in-1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+		<!--<feature name="slot" value="coolboy" /> <feature name="pcb" value="UNL-COOLBOY" /> -->
+			<dataarea name="prg" size="4194304">
+				<rom name="s25fl032.bin" size="4194304" crc="33c4e67b" sha1="5787db4c8ce4c2569a5f9e9054cbb1944c1b3092" offset="00000" />
+			</dataarea>
+		<!-- ?? -->
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="mc_samur" supported="no">
 	<!-- a VT03 OneBus based system -->
-	<description>Samurai (60-in-1)</description>
-	<year>2006</year>
-	<publisher>Team Hummer</publisher>
-	<part name="cart" interface="nes_cart">
-		<dataarea name="prg" size="2097152">
-		<rom name="29lv160b.bin" size="2097152" crc="7dac8efe" sha1="ffb27ebb4299d5b9a4b976c418fcc7695200060c" offset="00000" />
-		</dataarea>
+		<description>Samurai (60-in-1)</description>
+		<year>2006</year>
+		<publisher>Team Hummer</publisher>
+		<part name="cart" interface="nes_cart">
+			<dataarea name="prg" size="2097152">
+				<rom name="29lv160b.bin" size="2097152" crc="7dac8efe" sha1="ffb27ebb4299d5b9a4b976c418fcc7695200060c" offset="00000" />
+			</dataarea>
 		<!-- ?? -->
-		<dataarea name="vram" size="131072">
-		</dataarea>
-	</part>
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="mc_sg360" supported="no">

@@ -341,7 +341,7 @@ int running_machine::run(bool firstrun)
 		m_current_phase = MACHINE_PHASE_INIT;
 
 		// if we have a logfile, set up the callback
-		if (options().log())
+		if (options().log() && &system() != &GAME_NAME(___empty))
 		{
 			m_logfile.reset(global_alloc(emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)));
 			file_error filerr = m_logfile->open("error.log");
@@ -1351,10 +1351,11 @@ void system_time::full_time::set(struct tm &t)
 
 static running_machine * jsmess_machine;
 
-void js_main_loop() {
+void js_main_loop()
+{
 	device_scheduler * scheduler;
 	scheduler = &(jsmess_machine->scheduler());
-	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
+	attotime stoptime(scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60)));
 	while (scheduler->time() < stoptime) {
 		scheduler->timeslice();
 	}

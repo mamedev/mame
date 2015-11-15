@@ -23,8 +23,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-
-#include <zlib.h>
+#include "coreutil.h"
 
 
 //**************************************************************************
@@ -333,13 +332,13 @@ UINT32 save_manager::signature() const
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		// add the entry name to the CRC
-		crc = crc32(crc, (UINT8 *)entry->m_name.c_str(), entry->m_name.length());
+		crc = core_crc32(crc, (UINT8 *)entry->m_name.c_str(), entry->m_name.length());
 
 		// add the type and size to the CRC
 		UINT32 temp[2];
 		temp[0] = LITTLE_ENDIANIZE_INT32(entry->m_typecount);
 		temp[1] = LITTLE_ENDIANIZE_INT32(entry->m_typesize);
-		crc = crc32(crc, (UINT8 *)&temp[0], sizeof(temp));
+		crc = core_crc32(crc, (UINT8 *)&temp[0], sizeof(temp));
 	}
 	return crc;
 }

@@ -2,20 +2,36 @@ language: cpp
 compiler:
   - gcc
   - clang
+os:
+  - linux
+  - osx
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
 env:
   - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
   - SUBTARGET=mess   MAME=mess64
 script:
-  - if [ $CC == 'clang' ];
-    then make -j2 linux_x64_clang && ./$MAME -validate;
+  - if [ $TRAVIS_OS_NAME == 'linux' ]; then
+    if [ $CC == 'clang' ]; then
+    make -j2 linux_x64_clang && ./$MAME -validate;
     else make -j2 OPTIMIZE=0      && ./$MAME -validate;
+    fi
+    elif [ $TRAVIS_OS_NAME == 'osx' ]; then
+    unset LDOPTS && make -j2 OPTIMIZE=0 MACOSX_USE_LIBSDL=1 && ./$MAME -validate;
     fi
 sudo: required
 before_install:
-  - sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y
-  - sudo add-apt-repository ppa:shahar-evron/qt-backports -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -y --force-yes libsdl2-dev libsdl2-ttf-dev libasound2-dev libqt4-dev libqt4-dev-bin
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y; fi"
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo add-apt-repository ppa:shahar-evron/qt-backports -y; fi"
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo apt-get update -qq; fi"
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo apt-get install -y --force-yes libsdl2-dev libsdl2-ttf-dev libasound2-dev libqt4-dev libqt4-dev-bin; fi"
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'osx' ]; then brew update; fi"
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'osx' ]; then brew install sdl2 sdl2_ttf; fi"
+branches:
+  only:
+    - master
 notifications:
   email:
     - secure: "sK8JJcn1A0yLnbDJ/7vmJgESuXmP6D4QlvQvsYLp1xAx5eTVSJ5Z+GSXLBJ9CnoeJ5AlPVPX4rXdRV93UyxYlTh1O97x8VZZQtYBNPRjk/VCflsOOg7C+jcJKX/knMu/QG2MVEDE5G2b8mHSAgWljG/7Z2N0rYZlWppwklYafOkyW4uE0E7PU5XpmKim4ra6Y1eDSbap+XJiDwgUm9moDZrgAv7eom9NIWGNMRIozSRyR2IkYimlWE92FOy5PzLJtFGK02iumbYN+39mTux59v/h/m6HD6cD7Wf10Lco9+Fnmi9Bs+VvIReJIP9pDABRvJ3MkUV4I9BjUT9xk48lzxqjGtdfUwOMDOTABd4Pb/5cmNtyNUQIosy5oiplR6USBnqD7/gmJw+mfn3A+jdQHGne+akypwzUjSM6XrezjTiZLlDDG+QpA0kwAnxSXw8H2SpVyynMSn4nu0iZmOiOZMtFY0jKlt/W7OFC5wTuJFrky+bBGlVIv3KGOTJNJNgasXV4u0NXOjHyeBFpFYCIf0FZLfYyf7ITu94JxUzXGcVi5D0lBwvKY9HfJ4yJxciyfH6V7yU1+o23E/Meqe/tjt6dTW8DM5xIokrnusfzE5b0zw5GFyg54nbpazXpcPnrMdxhp+t2C7xKrxcZXhBECRYegj+Z86D9BJP/yum1YrQ="

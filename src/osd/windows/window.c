@@ -891,7 +891,7 @@ static void create_window_class(void)
 		wc.lpfnWndProc      = winwindow_video_window_proc_ui;
 		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
 		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
-		
+
 		UnregisterClass(wc.lpszClassName, wc.hInstance);
 
 		// register the class; fail if we can't

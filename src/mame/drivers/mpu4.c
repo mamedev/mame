@@ -2557,7 +2557,7 @@ GAME(199?, m4vivalvd,m4vivalv   ,mod4oki    ,mpu4               , mpu4_state,m4d
 
 GAME(199?, m4toprn  ,0          ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Top Run (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // unique behavior  (START UP IN countdown)
 
-GAME(199?, m4magtbo ,0          ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Magic Turbo  (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4magtbo ,0          ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Magic Turbo (Barcrest) (MPU4)",GAME_FLAGS )
 
 // bwb/nova?
 GAME(199?, m4ordmnd ,0          ,mod4oki    ,mpu4               , mpu4_state,m4default_big  ,ROT0,   "Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4)",GAME_FLAGS )

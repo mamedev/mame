@@ -835,7 +835,7 @@ sound_manager::sound_manager(running_machine &machine)
 #endif
 
 	// open the output WAV file if specified
-	if (wavfile[0] != 0)
+	if (wavfile[0] != 0 && &machine.system() != &GAME_NAME(___empty))
 		m_wavfile = wav_open(wavfile, machine.sample_rate(), 2);
 
 	// register callbacks

@@ -439,6 +439,44 @@ ROM_START( toratora )
 	ROM_LOAD( "tora.u11", 0xf800, 0x0800, CRC(55135d6f) SHA1(c48f180a9d6e894aafe87b2daf74e9a082f4600e) )
 ROM_END
 
+/* Tora Tora? Game Plan?
+Etched in copper on top of board        20-00047C
+                        20-10051A
+
+Etched in copper on back of daughter board  20-00048C
+                        20-10052A
+
+ROM text showed     TORA TOR*       * was A with bit 7 set
+            1980 GAME PLAN,INC
+
+and  war stuff (PLANE, BOMB, SQUAD, etc)
+
+.u2 2716    handwritten sticker U-2
+.u9 2716    handwritten sticker U-9
+.u10    2716    handwritten sticker U-10
+.u11    2716    handwritten sticker U-11
+
+open 24 pin socket @ U1 and U3
+open 40 pin socket @ U42
+
+Main board
+crystal with 5 185 on the top
+5280    x8
+socketed    ds8833  x2
+socketed    ds8t28  x2
+
+Daughter board
+open 40 pin socket @ U3 @ U2
+76477   X2 */
+
+ROM_START( toratorab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1027.u1",  0x1000, 0x0800, BAD_DUMP CRC(413c743a) SHA1(a887dfaaee557327a1699bb424488b934dab8612) ) /* rom u1 is missing in this set, using the toratora one */
+	ROM_LOAD( "1027.u10", 0x1800, 0x0800, CRC(6a906292) SHA1(4ceff91b7dcd398e57cd19a91d2199c09cb37c39) )
+	ROM_LOAD( "1027.u2",  0x2000, 0x0800, CRC(c1331648) SHA1(379101c6c1b8dab3e043ece01579cc96f6bb18a9) )
+	ROM_LOAD( "1027.u9",  0x2800, 0x0800, CRC(59b021b5) SHA1(ea5a0c1f58c0e08231969ad161b79af6e1ae4431) )
+	ROM_LOAD( "1027.u11", 0xf800, 0x0800, CRC(336f6659) SHA1(ea1151db54b68316908874da6983d6de5c94c29e) )
+ROM_END
 
 
 /*************************************
@@ -447,4 +485,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0,        toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratorab,toratora, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
