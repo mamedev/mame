@@ -114,7 +114,7 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, de
 						m_type(SEGA8_BASE_ROM),
 						m_must_be_loaded(FALSE),
 						m_interface("sms_cart"),
-						m_extensions("bin")
+						m_extensions("bin"), m_cart(nullptr)
 {
 	m_is_card = is_card;
 }
@@ -127,7 +127,7 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, co
 						m_must_be_loaded(FALSE),
 						m_is_card(FALSE),
 						m_interface("sms_cart"),
-						m_extensions("bin")
+						m_extensions("bin"), m_cart(nullptr)
 {
 }
 

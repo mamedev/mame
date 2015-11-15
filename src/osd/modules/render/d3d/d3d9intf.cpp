@@ -18,7 +18,6 @@
 
 // MAMEOS headers
 #include "d3dintf.h"
-#include "winmain.h"
 
 
 
@@ -83,7 +82,6 @@ base *drawd3d9_init(void)
 	{
 		osd_printf_verbose("Direct3D: Unable to find Direct3DCreate9\n");
 		FreeLibrary(dllhandle);
-		dllhandle = NULL;
 		return NULL;
 	}
 
@@ -93,7 +91,6 @@ base *drawd3d9_init(void)
 	{
 		osd_printf_verbose("Direct3D: Error attempting to initialize Direct3D9\n");
 		FreeLibrary(dllhandle);
-		dllhandle = NULL;
 		return NULL;
 	}
 

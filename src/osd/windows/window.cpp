@@ -23,7 +23,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "emuopts.h"
 #include "uiinput.h"
 
 // MAMEOS headers
@@ -31,8 +30,6 @@
 #include "window.h"
 #include "video.h"
 #include "input.h"
-#include "strconv.h"
-#include "config.h"
 #include "winutf8.h"
 
 #include "winutil.h"
@@ -617,7 +614,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 		RECT bounds;
 
 		// hide cursor
-		while (ShowCursor(FALSE) >= -1) ;
+		while (ShowCursor(FALSE) >= -1) { };
 		ShowCursor(TRUE);
 
 		// store the cursor position
@@ -632,7 +629,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	else
 	{
 		// show cursor
-		while (ShowCursor(TRUE) < 1) ;
+		while (ShowCursor(TRUE) < 1) { };
 		ShowCursor(FALSE);
 
 		// allow cursor to move freely

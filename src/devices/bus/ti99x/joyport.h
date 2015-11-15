@@ -33,7 +33,8 @@ class joyport_attached_device : public device_t
 {
 public:
 	joyport_attached_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_joyport(nullptr)
+{ }
 
 	virtual UINT8 read_dev() =0;
 	virtual void write_dev(UINT8 data) =0;

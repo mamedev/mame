@@ -11,7 +11,9 @@ serial_terminal_device::serial_terminal_device(const machine_config &mconfig, co
 	m_rs232_startbits(*this, "RS232_STARTBITS"),
 	m_rs232_databits(*this, "RS232_DATABITS"),
 	m_rs232_parity(*this, "RS232_PARITY"),
-	m_rs232_stopbits(*this, "RS232_STOPBITS")
+	m_rs232_stopbits(*this, "RS232_STOPBITS"), 
+	m_curr_key(0), 
+	m_key_valid(false)
 {
 }
 

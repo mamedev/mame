@@ -33,14 +33,14 @@ const device_type CHANF_ROM_MULTI_FINAL = &device_creator<chanf_multi_final_devi
 
 chanf_rom_device::chanf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_channelf_cart_interface( mconfig, *this )
-{
+						device_channelf_cart_interface( mconfig, *this ), m_addr_latch(0), m_addr(0), m_read_write(0), m_data0(0)
+				{
 }
 
 chanf_rom_device::chanf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, CHANF_ROM_STD, "Channel F Standard Carts", tag, owner, clock, "chanf_rom", __FILE__),
-						device_channelf_cart_interface( mconfig, *this )
-{
+						device_channelf_cart_interface( mconfig, *this ), m_addr_latch(0), m_addr(0), m_read_write(0), m_data0(0)
+				{
 }
 
 chanf_maze_device::chanf_maze_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -59,13 +59,13 @@ chanf_chess_device::chanf_chess_device(const machine_config &mconfig, const char
 }
 
 chanf_multi_old_device::chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: chanf_rom_device(mconfig, CHANF_ROM_MULTI_OLD, "Channel F Multigame (Earlier Version) Cart", tag, owner, clock, "chanf_multi_old", __FILE__)
-{
+					: chanf_rom_device(mconfig, CHANF_ROM_MULTI_OLD, "Channel F Multigame (Earlier Version) Cart", tag, owner, clock, "chanf_multi_old", __FILE__), m_base_bank(0)
+				{
 }
 
 chanf_multi_final_device::chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: chanf_rom_device(mconfig, CHANF_ROM_MULTI_FINAL, "Channel F Multigame (Final Version) Cart", tag, owner, clock, "chanf_multi_fin", __FILE__)
-{
+					: chanf_rom_device(mconfig, CHANF_ROM_MULTI_FINAL, "Channel F Multigame (Final Version) Cart", tag, owner, clock, "chanf_multi_fin", __FILE__), m_base_bank(0), m_half_bank(0)
+				{
 }
 
 

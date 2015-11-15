@@ -110,8 +110,8 @@ const device_type KC_D002 = &device_creator<kc_d002_device>;
 
 kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock, "kc_d002", __FILE__),
-		device_kcexp_interface( mconfig, *this )
-{
+		device_kcexp_interface( mconfig, *this ), m_slot(nullptr)
+	{
 }
 
 //-------------------------------------------------

@@ -45,13 +45,13 @@ nes_ffe3_device::nes_ffe3_device(const machine_config &mconfig, const char *tag,
 }
 
 nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_exram_enabled(0), m_exram_bank(0)
+				{
 }
 
 nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_FFE4, "NES Cart FFE-4 PCB", tag, owner, clock, "nes_ff4", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_FFE4, "NES Cart FFE-4 PCB", tag, owner, clock, "nes_ff4", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_exram_enabled(0), m_exram_bank(0)
+				{
 }
 
 nes_ffe8_device::nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -76,7 +76,7 @@ apf_cart_slot_device::apf_cart_slot_device(const machine_config &mconfig, const 
 						device_t(mconfig, APF_CART_SLOT, "APF Cartridge Slot", tag, owner, clock, "apf_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(APF_STD)
+						m_type(APF_STD), m_cart(nullptr)
 {
 }
 

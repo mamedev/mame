@@ -90,13 +90,13 @@ const device_type A2BUS_SLOT = &device_creator<a2bus_slot_device>;
 //-------------------------------------------------
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock, "a2bus_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
 {
 }
 
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
 {
 }
 
@@ -139,18 +139,18 @@ void a2bus_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__),
+		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__), m_maincpu(nullptr), m_maincpu_space(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_inh_cb(*this)
+		m_out_inh_cb(*this), m_cputag(nullptr), m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
 
 a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr), m_maincpu_space(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_inh_cb(*this)
+		m_out_inh_cb(*this), m_cputag(nullptr), m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
 //-------------------------------------------------
@@ -296,8 +296,8 @@ WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_cb(state); }
 
 device_a2bus_card_interface::device_a2bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_a2bus(NULL),
-		m_a2bus_tag(NULL)
+		m_a2bus(nullptr),
+		m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr), m_slot(0), m_next(nullptr)
 {
 }
 

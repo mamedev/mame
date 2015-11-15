@@ -18,9 +18,7 @@
 #include "uiinput.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
-#include "ui/cheatopt.h"
 #include "ui/mainmenu.h"
-#include "ui/miscmenu.h"
 #include "ui/filemngr.h"
 #include "ui/sliders.h"
 #include "ui/viewgfx.h"
@@ -371,7 +369,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 
 		// clear the input memory
 		machine().input().reset_polling();
-		while (machine().input().poll_switches() != INPUT_CODE_INVALID) ;
+		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
 		while (m_handler_callback != handler_ingame && !machine().scheduled_event_pending() && !ui_menu::stack_has_special_main_menu())
@@ -1688,7 +1686,6 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 UINT32 ui_manager::handler_load_save(running_machine &machine, render_container *container, UINT32 state)
 {
 	char filename[20];
-	input_code code;
 	char file = 0;
 
 	// if we're not in the middle of anything, skip
@@ -1716,15 +1713,15 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	}
 
 	// check for A-Z or 0-9
-	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; id++)
+	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; ++id)
 		if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 			file = id - ITEM_ID_A + 'a';
 	if (file == 0)
-		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; id++)
+		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; ++id)
 			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0 + '0';
 	if (file == 0)
-		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; id++)
+		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; ++id)
 			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0_PAD + '0';
 	if (file == 0)

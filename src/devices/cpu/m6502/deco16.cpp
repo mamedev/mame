@@ -16,7 +16,8 @@
 const device_type DECO16 = &device_creator<deco16_device>;
 
 deco16_device::deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6502_device(mconfig, DECO16, "DECO16", tag, owner, clock, "deco16", __FILE__),
+	m6502_device(mconfig, DECO16, "DECO16", tag, owner, clock, "deco16", __FILE__), 
+	io(NULL),
 	io_config("io", ENDIANNESS_LITTLE, 8, 16)
 {
 }

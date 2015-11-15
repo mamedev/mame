@@ -137,10 +137,11 @@
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   bus8z_device(mconfig, GROMPORT, "Cartridge port", tag, owner, clock, "gromport", __FILE__),
 		device_slot_interface(mconfig, *this),
-		m_connector(NULL),
+		m_connector(nullptr),
 		m_reset_on_insert(true),
 		m_console_ready(*this),
-		m_console_reset(*this) { }
+		m_console_reset(*this), m_grombase(0), m_grommask(0)
+{ }
 
 /* Only called for addresses 6000-7fff and GROM addresses (see datamux config) */
 READ8Z_MEMBER(gromport_device::readz)
@@ -1452,7 +1453,7 @@ const device_type TI99CART = &device_creator<ti99_cartridge_device>;
     Unlike in the previous implementation we do not model it as a full device.
 ***************************************************************************/
 
-ti99_cartridge_pcb::ti99_cartridge_pcb()
+ti99_cartridge_pcb::ti99_cartridge_pcb(): m_cart(nullptr), m_grom_size(0), m_rom_size(0), m_ram_size(0), m_rom_ptr(nullptr), m_ram_ptr(nullptr), m_rom_page(0), m_grom_ptr(nullptr), m_grom_address(0), m_ram_page(0), m_tag(nullptr)
 {
 }
 
@@ -2124,8 +2125,8 @@ DTD:
     Constructor.
 */
 rpk::rpk(emu_options& options, const char* sysname)
-	:m_options(options)
-	//,m_system_name(sysname)
+	:m_options(options), m_type(0)
+//,m_system_name(sysname)
 {
 	m_sockets.reset();
 }
@@ -2461,8 +2462,8 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 			if (strcmp(socket_node->name, "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
 			id = xml_get_attribute_string(socket_node, "id", NULL);
 			if (id == NULL) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have an 'id' attribute");
-			uses_name = xml_get_attribute_string(socket_node, "uses", NULL);
-			if (uses_name == NULL) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have a 'uses' attribute");
+			uses_name = xml_get_attribute_string(socket_node, "uses", nullptr);
+			if (uses_name == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have a 'uses' attribute");
 
 			bool found = false;
 			// Locate the resource node

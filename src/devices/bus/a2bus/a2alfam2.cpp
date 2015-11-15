@@ -88,7 +88,7 @@ a2bus_sn76489_device::a2bus_sn76489_device(const machine_config &mconfig, device
 	m_sn1(*this, SN1_TAG),
 	m_sn2(*this, SN2_TAG),
 	m_sn3(*this, SN3_TAG),
-	m_sn4(*this, SN4_TAG)
+	m_sn4(*this, SN4_TAG), m_latch0(0), m_latch1(0), m_latch2(0), m_latch3(0), m_has4thsn(false)
 {
 }
 

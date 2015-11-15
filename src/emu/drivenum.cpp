@@ -395,7 +395,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 //  we're done with it
 //-------------------------------------------------
 
-void driver_enumerator::release_current()
+void driver_enumerator::release_current() const
 {
 	// skip if no current entry
 	if (m_current < 0 || m_current >= s_driver_count)

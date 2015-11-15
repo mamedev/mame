@@ -1355,7 +1355,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 					// advance in X
 					cx += incxx;
 					x++;
-					dest++;
+					++dest;
 					pri++;
 				}
 			}
@@ -1395,7 +1395,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				cx += incxx;
 				cy += incxy;
 				x++;
-				dest++;
+				++dest;
 				pri++;
 			}
 
@@ -1436,7 +1436,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				cx += incxx;
 				cy += incxy;
 				x++;
-				dest++;
+				++dest;
 				pri++;
 			}
 
@@ -1589,7 +1589,8 @@ const device_type TILEMAP = &device_creator<tilemap_device>;
 tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
 		m_gfxdecode(*this),
-		m_standard_mapper(TILEMAP_STANDARD_COUNT),
+		m_standard_mapper(TILEMAP_STANDARD_COUNT), 
+	    m_bytes_per_entry(0),
 		m_tile_width(8),
 		m_tile_height(8),
 		m_num_columns(64),

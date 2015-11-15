@@ -92,7 +92,7 @@ powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const 
 	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock, "adam_ide", __FILE__),
 		device_adam_expansion_slot_card_interface(mconfig, *this),
 		m_ata(*this, ATA_TAG),
-		m_cent_data_out(*this, "cent_data_out")
+		m_cent_data_out(*this, "cent_data_out"), m_ata_data(0)
 {
 }
 

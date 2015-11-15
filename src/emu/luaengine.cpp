@@ -13,8 +13,6 @@
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
-#include "emuopts.h"
-#include "osdepend.h"
 #include "drivenum.h"
 #include "ui/ui.h"
 #include "luaengine.h"
@@ -430,7 +428,7 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef sp_table = luabridge::LuaRef::newTable(L);
 
-	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; sp++) {
+	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp) {
 		if (dev->memory().has_space(sp)) {
 			sp_table[dev->memory().space(sp).name()] = &(dev->memory().space(sp));
 		}
@@ -838,7 +836,7 @@ void lua_engine::serve_lua()
 		osd_lock_release(lock);
 
 		// Wait for response
-		int done = 0;
+		int done;
 		do {
 			osd_sleep(osd_ticks_per_second() / 1000);
 			osd_lock_acquire(lock);

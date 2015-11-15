@@ -232,11 +232,10 @@ public:
 		depthbuffer = NULL;
 		displayedtarget = NULL;
 		puller_channel = 0;
-		puller_subchannel = 0;
 		puller_waiting = 0;
 		debug_grab_texttype = -1;
 		debug_grab_textfile = NULL;
-		waitvblank_used = 0;
+		waitvblank_used = 1;
 		memset(vertex_attribute_words, 0, sizeof(vertex_attribute_words));
 		memset(vertex_attribute_offset, 0, sizeof(vertex_attribute_offset));
 	}
@@ -254,9 +253,10 @@ public:
 	int geforce_commandkind(UINT32 word);
 	UINT32 geforce_object_offset(UINT32 handle);
 	void geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT32 &size);
+	void geforce_assign_object(address_space &space, UINT32 chanel, UINT32 subchannel, UINT32 address);
 	int geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
 	UINT32 texture_get_texel(int number, int x, int y);
-	UINT8 *read_pixel(int x, int y, UINT32 c[4]);
+	UINT8 *read_pixel(int x, int y, INT32 c[4]);
 	void write_pixel(int x, int y, UINT32 color, UINT32 depth);
 	void combiner_initialize_registers(UINT32 argb8[6]);
 	void combiner_initialize_stage(int stage_number);
@@ -496,7 +496,6 @@ public:
 	int vertex_attribute_offset[16];
 	emu_timer *puller_timer;
 	int puller_channel;
-	int puller_subchannel;
 	int puller_waiting;
 	address_space *puller_space;
 	UINT32 dilated0[16][2048];
@@ -660,15 +659,16 @@ public:
 		NV2A_RT_DEPTH_FORMAT_Z16 = 0x0001,
 		NV2A_RT_DEPTH_FORMAT_Z24S8 = 0x0002
 	};
-
 	enum NV2A_COLOR_FORMAT {
-		NV2A_COLOR_FORMAT_X1R5G6B5 = 0x0002,
-		NV2A_COLOR_FORMAT_R5G6B5 = 0x0003,
-		NV2A_COLOR_FORMAT_UNKNOWN4 = 0x0004,
-		NV2A_COLOR_FORMAT_X8R8G8B8 = 0x0005,
-		NV2A_COLOR_FORMAT_X1A7R8G8B8 = 0x0007,
-		NV2A_COLOR_FORMAT_A8R8G8B8 = 0x0008,
-		NV2A_COLOR_FORMAT_B8 = 0x0009,
-		NV2A_COLOR_FORMAT_G8B8 = 0x000a
+		NV2A_COLOR_FORMAT_X1R5G5B5_Z1R5G5B5 = 1,
+		NV2A_COLOR_FORMAT_X1R5G5B5_X1R5G5B5 = 2,
+		NV2A_COLOR_FORMAT_R5G6B5 = 3,
+		NV2A_COLOR_FORMAT_X8R8G8B8_Z8R8G8B8 = 4,
+		NV2A_COLOR_FORMAT_X8R8G8B8_X8R8G8B8 = 5,
+		NV2A_COLOR_FORMAT_X1A7R8G8B8_Z1A7R8G8B8 = 6,
+		NV2A_COLOR_FORMAT_X1A7R8G8B8_X1A7R8G8B8 = 7,
+		NV2A_COLOR_FORMAT_A8R8G8B8 = 8,
+		NV2A_COLOR_FORMAT_B8 = 9,
+		NV2A_COLOR_FORMAT_G8B8 = 10
 	};
 };

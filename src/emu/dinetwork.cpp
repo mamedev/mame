@@ -16,7 +16,7 @@ device_network_interface::~device_network_interface()
 {
 }
 
-int device_network_interface::send(UINT8 *buf, int len)
+int device_network_interface::send(UINT8 *buf, int len) const
 {
 	if(!m_dev) return 0;
 	return m_dev->send(buf, len);

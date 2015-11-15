@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   3rdparty.lua
+--
+--   Library objects for all 3rdparty sources
+--
+---------------------------------------------------------------------------
+
 --------------------------------------------------
 -- expat library objects
 --------------------------------------------------
@@ -16,6 +24,14 @@ project "expat"
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd111",  			-- remark #111: statement is unreachable
+			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
+			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+		}
+end
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -48,7 +64,12 @@ project "zlib"
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
-
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd111",  			-- remark #111: statement is unreachable
+			"/Qwd280",  			-- remark #280: selector expression is constant
+		}
+end
 	configuration "Debug"
 		defines {
 			"verbose=-1",
@@ -98,7 +119,11 @@ project "softfloat"
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
-	
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+		}
+end	
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
@@ -120,6 +145,11 @@ project "jpeg"
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+		}
+end	
 
 	configuration { }
 
@@ -193,6 +223,15 @@ project "flac"
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter	
 			"/wd4702", -- warning C4702: unreachable code
 		}
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd111",  			-- remark #111: statement is unreachable
+			"/Qwd177",  			-- remark #177: function "xxx" was declared but never referenced
+			"/Qwd181",  			-- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
+			"/Qwd188",  			-- error #188: enumerated type mixed with another type
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+		}
+end	
 
 	configuration { "vs2015" }
 		buildoptions {
@@ -261,6 +300,11 @@ project "7z"
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 		}
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+		}
+end
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -318,7 +362,11 @@ project "lua"
 			"/wd4702", -- warning C4702: unreachable code
 			"/wd4310", -- warning C4310: cast truncates constant value
 		}
-
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd592", -- error #592: variable "xxx" is used before its value is set
+		}
+end
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -459,6 +507,12 @@ project "sqllite3"
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4706", -- warning C4706: assignment within conditional expression
 		}
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+		}
+end
 
 	configuration { "vs2015" }
 		buildoptions {
@@ -513,6 +567,14 @@ project "portmidi"
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4706", -- warning C4706: assignment within conditional expression
 		}
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd188",  			-- error #188: enumerated type mixed with another type
+			"/Qwd344",  			-- remark #344: typedef name has already been declared (with same type)
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+		}
+end
 
 	configuration { "vs2015" }
 		buildoptions {
@@ -587,7 +649,13 @@ project "bgfx"
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4310", -- warning C4310: cast truncates constant value			
 		}
-
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd906",  			-- message #906: effect of this "#pragma pack" directive is local to function "xxx"
+			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
+			"/Qwd82",   			-- remark #82: storage class is not first
+		}
+end
 	configuration { }
 
 	includedirs {		
@@ -706,7 +774,14 @@ project "portaudio"
 			"/wd4189", -- warning C4189: 'xxx' : local variable is initialized but not referenced
 			"/wd4127", -- warning C4127: conditional expression is constant
 		}
-
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd1478", 			-- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
+			"/Qwd2544", 			-- message #2544: empty dependent statement in if-statement
+			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
+		}
+end
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -847,6 +922,13 @@ project "gtest"
 			"-Wno-undef",
 			"-Wno-unused-variable",
 		}
+
+	configuration { "vs*" }
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
+		}
+end
 
 	configuration { }
 

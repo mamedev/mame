@@ -48,8 +48,8 @@ iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const ch
 		: device_t(mconfig, IQ151_STAPER, "IQ151 STAPER", tag, owner, clock, "iq151_staper", __FILE__),
 		device_iq151cart_interface( mconfig, *this ),
 		m_ppi(*this, "ppi8255"),
-		m_printer(*this, "printer")
-{
+		m_printer(*this, "printer"), m_printer_timer(nullptr), m_ppi_portc(0)
+	{
 }
 
 //-------------------------------------------------

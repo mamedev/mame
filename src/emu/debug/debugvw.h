@@ -162,7 +162,6 @@ public:
 	const simple_list<debug_view_source> &source_list() const { return m_source_list; }
 
 	// setters
-	void set_size(int width, int height);
 	void set_visible_size(debug_view_xy size);
 	void set_visible_position(debug_view_xy pos);
 	void set_cursor_position(debug_view_xy pos);

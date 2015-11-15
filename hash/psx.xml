@@ -2,7 +2,187 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
-	<!-- todo, reconvert original dumps using current CHDMAN version - Feb 2014 -->
+<!-- Interactive CD Sampler Discs-->
+
+<!-- size="364872255" crc="536126e5" -->	
+	<software name="intcdv1m">
+		<description>Interactive CD Sampler Disc - Volume 01 (M Rated)</description>
+		<year>1995</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 1 (m rated)" sha1="4bc8e61f799ecd19c1b8207943eaab8359d34858"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="428110417" crc="48bd3d35" -->
+	<software name="intcdv2">
+		<description>Interactive CD Sampler Disc - Volume 02</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 2" sha1="5801f9972e483b9e2a7f316796b57b74d8baa5e7"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="476195663" crc="fb8d356b" -->
+	<software name="intcdv30">
+		<description>Interactive CD Sampler Disc - Volume 03 (1.0)</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 3 (1.0)" sha1="f82e72d70b10badb35a91a09950d0d89db50855c"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="487436207" crc="336304eb" -->
+	<software name="intcdv31">
+		<description>Interactive CD Sampler Disc - Volume 03 (1.1)</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 3 (1.1)" sha1="5f6fa89b8c9b31b3dabdc7ac06806bc721d2aa16"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="487436203" crc="d96b31d2" -->
+	<software name="intcdv32">
+		<description>Interactive CD Sampler Disc - Volume 03 (1.2)</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 3 (1.2)" sha1="20f261877d3f63bd9215ca791800417ff7287e46"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="354903558" crc="67ca3059" -->
+	<software name="intcdv4">
+		<description>Interactive CD Sampler Disc - Volume 04</description>
+		<year>1997</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 4" sha1="c353a52e8b7831f11d3ce8ea771e865e9ba3431a"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="291855185" crc="8119ed78" -->
+	<software name="intcdv5">
+		<description>Interactive CD Sampler Disc - Volume 05</description>
+		<year>1997</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 5" sha1="9aef2ff7583b61d24302a35831a25ed5549610e1"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="427620748" crc="917b5f35" -->
+	<software name="intcdv6">
+		<description>Interactive CD Sampler Disc - Volume 06</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 6" sha1="c35833fdd8a46016b3ccafa9ae08f68c10309737"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="397092409" crc="17f17815" -->
+	<software name="intcdv7">
+		<description>Interactive CD Sampler Disc - Volume 07</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 7" sha1="81db574e4599e022cfac938516cff29bb09d1388"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="420000809" crc="91d8b335" -->
+	<software name="intcdv8">
+		<description>Interactive CD Sampler Disc - Volume 08</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 8" sha1="7f23e2d284a104e6914d34527960567111914264"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="389598196" crc="993e0ab1" -->
+	<software name="intcdv9">
+		<description>Interactive CD Sampler Disc - Volume 09</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 9" sha1="286559ce34f06a7f2eb2b441e9188da0e158d107"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="365007076" crc="5f5fd01f" -->
+	<software name="intcdv10">
+		<description>Interactive CD Sampler Disc - Volume 10</description>
+		<year>1999</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 10" sha1="8c414a1e26ac98d07f774cc8b16eb2fa8da0ca61"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="272935197" crc="82e6fdf0" -->
+	<software name="intcdv11">
+		<description>Interactive CD Sampler Disc - Volume 11</description>
+		<year>1999</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 11" sha1="3029004840d98c2789d2a0d93bdd762b3c56df0f"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="149681460" crc="99551669" -->
+	<software name="intcdtru">
+		<description>Toys R Us - Interactive CD Sampler Disc</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Toys R Us - Interactive CD Sampler Disc" sha1="4abae391a7ad1e38c2ee7cbd7401caebcf091df3"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- size="93662349" crc="59bd7278" -->
+	<software name="intcdff7">
+		<description>Final Fantasy VII Interactive Sampler CD</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Final Fantasy VII Interactive Sampler CD" sha1="0a88439b32be5172e79847f79ae33b6ba22b1de6"/>
+			</diskarea>
+		</part>
+	</software>
 
 <!--
 ***********************
@@ -27,7 +207,7 @@ A few comments on these:
    that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should
    be verified with the original media, and are marked as bad dumps.
 -->
-
+	<!-- todo, reconvert original dumps using current CHDMAN version - Feb 2014 -->
 
 <!-- Pirate disks -->
 

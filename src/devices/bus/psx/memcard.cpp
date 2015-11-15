@@ -43,7 +43,24 @@ enum transfer_states
 
 psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PSXCARD, "Sony PSX Memory Card", tag, owner, clock, "psxcard", __FILE__),
-	device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this), 
+	pkt_ptr(0), 
+	pkt_sz(0), 
+	cmd(0), 
+	addr(0), 
+	state(0),
+	m_disabled(false), 
+	m_odata(0), 
+	m_idata(0), 
+	m_bit(0), 
+	m_count(0), 
+	m_pad(false), 
+	m_clock(false), 
+	m_sel(false), 
+	m_ack(false), 
+	m_rx(false), 
+	m_ack_timer(nullptr),
+	m_owner(nullptr)
 {
 }
 

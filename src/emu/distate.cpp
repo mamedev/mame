@@ -146,7 +146,7 @@ void device_state_entry::format_from_mask()
 UINT64 device_state_entry::value() const
 {
 	// pick up the value
-	UINT64 result = ~(UINT64)0;
+	UINT64 result;
 	switch (m_datasize)
 	{
 		default:
@@ -172,7 +172,7 @@ std::string &device_state_entry::format(std::string &dest, const char *string, b
 	bool leadzero = false;
 	bool percent = false;
 	bool explicitsign = false;
-	bool hitnonzero = false;
+	bool hitnonzero;
 	bool reset = true;
 	int width = 0;
 	for (const char *fptr = m_format.c_str(); *fptr != 0; fptr++)

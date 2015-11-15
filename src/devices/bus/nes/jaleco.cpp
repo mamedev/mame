@@ -68,13 +68,13 @@ nes_jf16_device::nes_jf16_device(const machine_config &mconfig, const char *tag,
 }
 
 nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0)
+				{
 }
 
 nes_jf17_device::nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_JF17, "NES Cart Jaleco JF-17 PCB", tag, owner, clock, "nes_jf17", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_JF17, "NES Cart Jaleco JF-17 PCB", tag, owner, clock, "nes_jf17", __FILE__), m_latch(0)
+				{
 }
 
 nes_jf17_adpcm_device::nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -100,13 +100,13 @@ nes_jf19_adpcm_device::nes_jf19_adpcm_device(const machine_config &mconfig, cons
 }
 
 nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0)
+				{
 }
 
 nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_SS88006, "NES Cart Jaleco SS88006 PCB", tag, owner, clock, "nes_ss88006", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_SS88006, "NES Cart Jaleco SS88006 PCB", tag, owner, clock, "nes_ss88006", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0)
+				{
 }
 
 nes_ss88006_adpcm_device::nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)

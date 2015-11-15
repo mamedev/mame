@@ -28,13 +28,15 @@ const device_type MACPDS_SLOT = &device_creator<macpds_slot_device>;
 //-------------------------------------------------
 macpds_slot_device::macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, MACPDS_SLOT, "Mac 68000 Processor-Direct Slot", tag, owner, clock, "macpds_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), 
+	m_macpds_tag(nullptr), 
+	m_macpds_slottag(nullptr)
 {
 }
 
 macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_macpds_tag(nullptr), m_macpds_slottag(nullptr)
 {
 }
 
@@ -77,12 +79,12 @@ void macpds_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 macpds_device::macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, MACPDS, "MACPDS", tag, owner, clock, "macpds", __FILE__)
+		device_t(mconfig, MACPDS, "MACPDS", tag, owner, clock, "macpds", __FILE__), m_maincpu(nullptr), m_cputag(nullptr)
 {
 }
 
 macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr), m_cputag(nullptr)
 {
 }
 //-------------------------------------------------
@@ -148,8 +150,8 @@ void macpds_device::set_irq_line(int line, int state)
 
 device_macpds_card_interface::device_macpds_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_macpds(NULL),
-		m_macpds_tag(NULL)
+		m_macpds(nullptr),
+		m_macpds_tag(nullptr), m_macpds_slottag(nullptr), m_next(nullptr)
 {
 }
 

@@ -85,7 +85,7 @@ const rom_entry *nubus_specpdq_device::device_rom_region() const
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock, "nb_spdq", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this),
+		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr), m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
 		m_palette(*this, "palette")
 {
 	m_assembled_tag = std::string(tag).append(":").append(SPECPDQ_SCREEN_NAME);
@@ -95,7 +95,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this),
+		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr), m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
 		m_palette(*this, "palette")
 {
 	m_assembled_tag = std::string(tag).append(":").append(SPECPDQ_SCREEN_NAME);

@@ -40,7 +40,7 @@ x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mco
 		m_out_irq2_cb(*this),
 		m_out_irq4_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_reset_cb(*this)
+		m_out_reset_cb(*this), m_card(nullptr)
 {
 }
 

@@ -378,13 +378,6 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
 #define LOG_PCI
 //#define LOG_BASEBOARD
 
@@ -1283,7 +1276,3 @@ ROM_END
 // 0023
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (Rev A) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif

@@ -82,7 +82,7 @@ vp550_device::vp550_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, VP550, "VP550", tag, owner, clock, "vp550", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_pfg_a(*this, CDP1863_A_TAG),
-	m_pfg_b(*this, CDP1863_B_TAG)
+	m_pfg_b(*this, CDP1863_B_TAG), m_sync_timer(nullptr)
 {
 }
 

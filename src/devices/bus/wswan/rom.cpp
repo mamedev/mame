@@ -26,27 +26,53 @@ const device_type WS_ROM_SRAM = &device_creator<ws_rom_sram_device>;
 const device_type WS_ROM_EEPROM = &device_creator<ws_rom_eeprom_device>;
 
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_ws_cart_interface( mconfig, *this )
+ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	device_ws_cart_interface(mconfig, *this),
+	m_base20(0),
+	m_base30(0),
+	m_base40(0),
+	m_rtc_setting(0),
+	m_rtc_year(0),
+	m_rtc_month(0),
+	m_rtc_day(0),
+	m_rtc_day_of_week(0),
+	m_rtc_hour(0),
+	m_rtc_minute(0),
+	m_rtc_second(0),
+	m_rtc_index(0),
+	rtc_timer(nullptr)
 {
 }
 
 ws_rom_device::ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, WS_ROM_STD, "Wonderswan Standard Carts", tag, owner, clock, "ws_rom", __FILE__),
-						device_ws_cart_interface( mconfig, *this )
-{
+						device_ws_cart_interface( mconfig, *this ), m_base20(0),
+	m_base30(0),
+	m_base40(0),
+	m_rtc_setting(0),
+	m_rtc_year(0),
+	m_rtc_month(0),
+	m_rtc_day(0),
+	m_rtc_day_of_week(0),
+	m_rtc_hour(0),
+	m_rtc_minute(0),
+	m_rtc_second(0),
+	m_rtc_index(0),
+	rtc_timer(nullptr)
+				{
 }
 
 ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: ws_rom_device(mconfig, WS_ROM_SRAM, "Wonderswan Carts w/SRAM", tag, owner, clock, "ws_sram", __FILE__)
-{
+					: ws_rom_device(mconfig, WS_ROM_SRAM, "Wonderswan Carts w/SRAM", tag, owner, clock, "ws_sram", __FILE__), m_nvram_base(0)
+				{
 }
 
 
 ws_rom_eeprom_device::ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: ws_rom_device(mconfig, WS_ROM_EEPROM, "Wonderswan Carts w/EEPROM", tag, owner, clock, "ws_eeprom", __FILE__)
-{
+					: ws_rom_device(mconfig, WS_ROM_EEPROM, "Wonderswan Carts w/EEPROM", tag, owner, clock, "ws_eeprom", __FILE__), m_eeprom_mode(0),
+	m_eeprom_address(0), m_eeprom_command(0), m_eeprom_start(0), m_eeprom_write_enabled(0)
+				{
 }
 
 

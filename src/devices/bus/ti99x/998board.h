@@ -90,7 +90,7 @@ class logically_addressed_device
 
 public:
 	logically_addressed_device(mapper8_device_kind kind, device_t *busdevice, const mapper8_list_entry &entry)
-	:   m_kind(kind), m_device(busdevice), m_config(&entry) { };
+	: m_next(nullptr), m_kind(kind), m_device(busdevice), m_config(&entry) { };
 
 private:
 	logically_addressed_device     *m_next;        // needed for simple_list
@@ -109,7 +109,7 @@ class physically_addressed_device
 
 public:
 	physically_addressed_device(mapper8_device_kind kind, device_t *busdevice, const mapper8_list_entry &entry)
-	:   m_kind(kind), m_device(busdevice), m_config(&entry) { };
+	: m_next(nullptr), m_kind(kind), m_device(busdevice), m_config(&entry) { };
 
 private:
 	physically_addressed_device       *m_next;        // needed for simple_list

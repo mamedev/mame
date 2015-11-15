@@ -75,8 +75,9 @@
     Constructor
 */
 ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__),
-	m_ready(*this) { }
+: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__), m_spacep(nullptr),
+	m_ready(*this), m_muxready(), m_sysready(), m_addr_buf(0), m_read_mode(false), m_latch(0), m_waitcount(0), m_ram16b(nullptr), m_use32k(false), m_base32k(0), m_cpu(nullptr)
+{ }
 
 #define TRACE_READY 0
 #define TRACE_ACCESS 0

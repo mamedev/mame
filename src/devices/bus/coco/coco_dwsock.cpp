@@ -66,8 +66,8 @@ INPUT_CHANGED_MEMBER(beckerport_device::drivewire_port_changed)
 //-------------------------------------------------
 
 beckerport_device::beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, COCO_DWSOCK, "Virtual Becker Port", tag, owner, clock, "coco_dwsock", __FILE__),
-	m_dwconfigport(*this, DRIVEWIRE_PORT_TAG)
+	: device_t(mconfig, COCO_DWSOCK, "Virtual Becker Port", tag, owner, clock, "coco_dwsock", __FILE__), m_hostname(nullptr),
+	m_dwconfigport(*this, DRIVEWIRE_PORT_TAG), m_dwtcpport(0)
 {
 	m_pSocket = NULL;
 	m_head = 0;

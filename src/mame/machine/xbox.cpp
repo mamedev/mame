@@ -16,13 +16,6 @@
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
 #define LOG_PCI
 //#define LOG_OHCI
 //#define USB_ENABLED
@@ -1197,7 +1190,7 @@ static UINT32 hubintiasbridg_pci_r(device_t *busdevice, device_t *device, int fu
 static void hubintiasbridg_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	if (reg >= 16) device->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+	if (reg >= 16) busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
 
@@ -1216,7 +1209,7 @@ static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, i
 static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	if (reg >= 16) device->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+	if (reg >= 16) busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
 
@@ -1536,7 +1529,3 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	MCFG_SCREEN_UPDATE_DRIVER(xbox_base_state, screen_update_callback)
 	MCFG_SCREEN_VBLANK_DRIVER(xbox_base_state, vblank_callback)
 MACHINE_CONFIG_END
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif

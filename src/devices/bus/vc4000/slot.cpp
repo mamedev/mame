@@ -76,7 +76,7 @@ vc4000_cart_slot_device::vc4000_cart_slot_device(const machine_config &mconfig, 
 						device_t(mconfig, VC4000_CART_SLOT, "Interton VC 4000 Cartridge Slot", tag, owner, clock, "vc4000_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(VC4000_STD)
+						m_type(VC4000_STD), m_cart(nullptr)
 {
 }
 

@@ -54,18 +54,20 @@ const device_type NES_ZZ_PCB = &device_creator<nes_zz_device>;
 
 
 nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0),
+	m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+				{
 }
 
 nes_txrom_device::nes_txrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_TXROM, "NES Cart TxROM (MMC-3) PCB", tag, owner, clock, "nes_txrom", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_TXROM, "NES Cart TxROM (MMC-3) PCB", tag, owner, clock, "nes_txrom", __FILE__), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0),
+	m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+				{
 }
 
 nes_hkrom_device::nes_hkrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_txrom_device(mconfig, NES_HKROM, "NES Cart HKROM (MMC-6) PCB", tag, owner, clock, "nes_hkrom", __FILE__)
-{
+					: nes_txrom_device(mconfig, NES_HKROM, "NES Cart HKROM (MMC-6) PCB", tag, owner, clock, "nes_hkrom", __FILE__), m_wram_enable(0), m_mmc6_reg(0)
+				{
 }
 
 nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

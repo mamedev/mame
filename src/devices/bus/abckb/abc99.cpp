@@ -487,7 +487,7 @@ inline void abc99_device::scan_mouse()
 
 abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock, "abc99", __FILE__),
-	abc_keyboard_interface(mconfig, *this),
+	abc_keyboard_interface(mconfig, *this), m_serial_timer(nullptr), m_mouse_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
 	m_mousecpu(*this, I8035_Z5_TAG),
 	m_speaker(*this, "speaker"),

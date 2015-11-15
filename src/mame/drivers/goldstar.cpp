@@ -6236,32 +6236,32 @@ static INPUT_PORTS_START( cmpacman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> PB0 */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:!1")  /* OK */
+	PORT_DIPNAME( 0x01, 0x01, "Unknown" )                   PORT_DIPLOCATION("DSW1:!1")     /* not checked */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:!2")  /* OK */
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:!2")     /* not checked */
 	PORT_DIPSETTING(    0x02, "Active Low" )
 	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:!3")  /* OK */
+	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )               PORT_DIPLOCATION("DSW1:!3")     /* not checked */
 	PORT_DIPSETTING(    0x04, "Payout Switch" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:!4")  /* not checked */
-	PORT_DIPSETTING(    0x08, "Loss" )
-	PORT_DIPSETTING(    0x00, "Even" )
-	PORT_DIPNAME( 0x10, 0x00, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:!5")  /* OK */
+	PORT_DIPNAME( 0x08, 0x00, "'7' In Double Up Game" )     PORT_DIPLOCATION("DSW1:!4")     /* OK */
+	PORT_DIPSETTING(    0x00, "Lose" )
+	PORT_DIPSETTING(    0x08, "Even" )
+	PORT_DIPNAME( 0x10, 0x00, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:!5")     /* OK */
 	PORT_DIPSETTING(    0x00, "80%" )
 	PORT_DIPSETTING(    0x10, "90%" )
-	PORT_DIPNAME( 0x20, 0x00, "W-UP Game" )         PORT_DIPLOCATION("DSW1:!6")  /* OK */
+	PORT_DIPNAME( 0x20, 0x00, "Double Up Game" )            PORT_DIPLOCATION("DSW1:!6")     /* OK */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )           PORT_DIPLOCATION("DSW1:!7,!8")    /* OK */
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )                   PORT_DIPLOCATION("DSW1:!7,!8")  /* OK */
 	PORT_DIPSETTING(    0x00, "16" )
 	PORT_DIPSETTING(    0x40, "32" )
 	PORT_DIPSETTING(    0x80, "64" )
 	PORT_DIPSETTING(    0xc0, "96" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:!1,!2,!3")  /* OK */
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:!1,!2,!3")   /* OK */
 	PORT_DIPSETTING(    0x07, "55%" )
 	PORT_DIPSETTING(    0x06, "60%" )
 	PORT_DIPSETTING(    0x05, "65%" )
@@ -6270,18 +6270,18 @@ static INPUT_PORTS_START( cmpacman )
 	PORT_DIPSETTING(    0x02, "80%" )
 	PORT_DIPSETTING(    0x01, "85%" )
 	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:!4,!5")    /* OK */
+	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:!4,!5")      /* not checked */
 	PORT_DIPSETTING(    0x18, "300" )
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x20, 0x00, "100 Odds Sound" )        PORT_DIPLOCATION("DSW2:!6")  /* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "100 Odds Sound" )        PORT_DIPLOCATION("DSW2:!6")         /* not checked */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Key-In Type" )           PORT_DIPLOCATION("DSW2:!7")  /* OK */
+	PORT_DIPNAME( 0x40, 0x40, "Key-In Type" )           PORT_DIPLOCATION("DSW2:!7")         /* OK */
 	PORT_DIPSETTING(    0x40, "A-Type" )
 	PORT_DIPSETTING(    0x00, "B-Type" )
-	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:!8")  /* related with DSW 4-6 */
+	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:!8")     /* related with DSW 4-6 */
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
@@ -6318,11 +6318,14 @@ static INPUT_PORTS_START( cmpacman )
 	PORT_INCLUDE( cmv4_dsw4 )   /* Display Of Payout Limit not working; all others OK */
 
 	PORT_INCLUDE( cmv4_dsw5 )
+	PORT_MODIFY("DSW5")
 	/* Display of Doll On Demo only affects payout table screen */
 	/* Coin In Limit OK */
-	/* Condition For 3 Kind Of Bonus not checked */
+	/* Condition For 3 Kind Of Bonus OK */
 	/* Display Of Doll At All Fr. Bonus not checked */
-	/* DSW5-7 listed as unused */
+	PORT_DIPNAME( 0x40, 0x40, "Card Shuffle Animation" )    PORT_DIPLOCATION("DSW5:7")  /* OK */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Test Mode For Disp. Of Doll not working */
 INPUT_PORTS_END
 

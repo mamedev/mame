@@ -7,7 +7,13 @@ const device_type PSX_DUALSHOCK = &device_creator<psx_dualshock_device>;
 
 psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_psx_controller_interface(mconfig, *this),
+		device_psx_controller_interface(mconfig, *this), 
+		m_type(), 
+		m_confmode(false), 
+		m_analogmode(false), 
+		m_analoglock(false), 
+		m_temp(0), 
+		m_cmd(0),
 		m_pad0(*this, "PSXPAD0"),
 		m_pad1(*this, "PSXPAD1"),
 		m_rstickx(*this, "PSXRSTICKX"),

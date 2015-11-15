@@ -78,7 +78,7 @@ gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, const 
 						device_t(mconfig, GBA_CART_SLOT, "Game Boy Advance Cartridge Slot", tag, owner, clock, "gba_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(GBA_STD)
+						m_type(GBA_STD), m_cart(nullptr)
 {
 }
 

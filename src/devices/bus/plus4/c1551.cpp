@@ -428,7 +428,7 @@ c1551_t::c1551_t(const machine_config &mconfig, const char *tag, device_t *owner
 		m_status(1),
 		m_dav(1),
 		m_ack(1),
-		m_dev(0)
+		m_dev(0), m_irq_timer(nullptr)
 {
 }
 

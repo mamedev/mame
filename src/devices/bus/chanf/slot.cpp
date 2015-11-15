@@ -76,7 +76,7 @@ channelf_cart_slot_device::channelf_cart_slot_device(const machine_config &mconf
 						device_t(mconfig, CHANF_CART_SLOT, "Fairchild Channel F Cartridge Slot", tag, owner, clock, "cf_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(CF_CHESS)
+						m_type(CF_CHESS), m_cart(nullptr)
 {
 }
 

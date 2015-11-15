@@ -41,13 +41,13 @@ const device_type A78_ROM_P450_VB = &device_creator<a78_rom_p450_vb_device>;
 
 
 a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source), m_ram_bank(0)
+				{
 }
 
 a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_sg_device(mconfig, A78_ROM_VERSABOARD, "Atari 7800 VersaBoard Cart", tag, owner, clock, "a78_versaboard", __FILE__)
-{
+					: a78_rom_sg_device(mconfig, A78_ROM_VERSABOARD, "Atari 7800 VersaBoard Cart", tag, owner, clock, "a78_versaboard", __FILE__), m_ram_bank(0)
+				{
 }
 
 

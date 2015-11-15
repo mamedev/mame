@@ -208,7 +208,7 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag,
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_screen(*this, PGC_SCREEN_NAME),
-	m_palette(*this, "palette")
+	m_palette(*this, "palette"), m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr), m_bitmap(nullptr)
 {
 }
 
@@ -217,7 +217,7 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_screen(*this, PGC_SCREEN_NAME),
-	m_palette(*this, "palette")
+	m_palette(*this, "palette"), m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr), m_bitmap(nullptr)
 {
 }
 

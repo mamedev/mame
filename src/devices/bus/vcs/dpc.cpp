@@ -17,9 +17,15 @@
 const device_type ATARI_DPC = &device_creator<dpc_device>;
 
 
-dpc_device::dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: device_t(mconfig, ATARI_DPC, "Atari DCP", tag, owner, clock, "atari_dcp", __FILE__),
-				m_displaydata(NULL)
+dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+	device_t(mconfig, ATARI_DPC, "Atari DCP", tag, owner, clock, "atari_dcp", __FILE__),
+	m_movamt(0),
+	m_latch_62(0),
+	m_latch_64(0),
+	m_dlc(0),
+	m_shift_reg(0),
+	m_displaydata(nullptr),
+	m_oscillator(nullptr)
 {
 }
 

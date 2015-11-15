@@ -139,8 +139,8 @@ spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, co
 		device_spc1000_card_interface(mconfig, *this),
 		m_cpu(*this, "fdccpu"),
 		m_fdc(*this, "upd765"),
-		m_pio(*this, "d8255_master")
-{
+		m_pio(*this, "d8255_master"), m_fd0(nullptr), m_fd1(nullptr), m_timer_tc(nullptr), m_i8255_0_pc(0), m_i8255_1_pc(0), m_i8255_portb(0)
+	{
 }
 
 

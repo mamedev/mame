@@ -22,12 +22,24 @@
 const device_type SNS_LOROM_SUPERGB = &device_creator<sns_rom_sgb_device>;
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__),
-					m_gb_cpu(*this, "sgb_cpu"),
-					m_gb_snd(*this, "sgb_snd"),
-					m_gb_lcd(*this, "sgb_lcd"),
-					m_cartslot(*this, "gb_slot")
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+	sns_rom_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__),
+	m_gb_cpu(*this, "sgb_cpu"),
+	m_gb_snd(*this, "sgb_snd"),
+	m_gb_lcd(*this, "sgb_lcd"),
+	m_cartslot(*this, "gb_slot"),
+	m_sgb_ly(0),
+	m_sgb_row(0),
+	m_vram(0),
+	m_port(0),
+	m_joy1(0),
+	m_joy2(0),
+	m_joy3(0),
+	m_joy4(0),
+	m_vram_offs(0),
+	m_mlt_req(0),
+	m_lcd_row(0),
+	m_packetsize(0)
 {
 }
 

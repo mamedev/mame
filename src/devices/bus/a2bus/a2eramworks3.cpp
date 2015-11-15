@@ -30,13 +30,14 @@ const device_type A2EAUX_RAMWORKS3 = &device_creator<a2eaux_ramworks3_device>;
 
 a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2EAUX_RAMWORKS3, "Applied Engineering RamWorks III", tag, owner, clock, "a2erwks3", __FILE__),
-		device_a2eauxslot_card_interface(mconfig, *this)
+		device_a2eauxslot_card_interface(mconfig, *this),
+	m_bank(0)
 {
 }
 
 a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_a2eauxslot_card_interface(mconfig, *this)
+		device_a2eauxslot_card_interface(mconfig, *this), m_bank(0)
 {
 }
 

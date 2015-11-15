@@ -117,7 +117,7 @@ a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_t
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
-	m_scsibus(*this, SCSI_BUS_TAG)
+	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_816block(false), m_c0ne(0), m_c0nf(0)
 {
 }
 
@@ -125,7 +125,7 @@ a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, const ch
 	device_t(mconfig, A2BUS_HSSCSI, "Apple II High-Speed SCSI Card", tag, owner, clock, "a2hsscsi", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
-	m_scsibus(*this, SCSI_BUS_TAG)
+	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_816block(false), m_c0ne(0), m_c0nf(0)
 {
 }
 

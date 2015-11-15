@@ -38,7 +38,7 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	SetWindowPos(window(), HWND_TOP, 100, 100, bounds.right - bounds.left, bounds.bottom - bounds.top, SWP_SHOWWINDOW);
 
 	// recompute the children
-	recompute_children();
+	debugwin_info::recompute_children();
 }
 
 

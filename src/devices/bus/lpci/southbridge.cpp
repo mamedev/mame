@@ -141,7 +141,7 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc"),
 	m_ide(*this, "ide"),
-	m_ide2(*this, "ide2")
+	m_ide2(*this, "ide2"), m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }
 /**********************************************************

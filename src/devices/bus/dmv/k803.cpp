@@ -53,8 +53,8 @@ dmv_k803_device::dmv_k803_device(const machine_config &mconfig, const char *tag,
 		: device_t(mconfig, DMV_K803, "K803 RTC", tag, owner, clock, "dmv_k803", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_rtc(*this, "rtc"),
-		m_dsw(*this, "DSW")
-{
+		m_dsw(*this, "DSW"), m_bus(nullptr), m_latch(0), m_rtc_int(0)
+	{
 }
 
 //-------------------------------------------------

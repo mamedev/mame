@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "debugcon.h"
 #include "debugcpu.h"
-#include "debughlp.h"
 #include "debugvw.h"
 #include "textbuf.h"
 #include "debugger.h"
@@ -270,7 +269,7 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
 	char *params[MAX_COMMAND_PARAMS] = { 0 };
-	CMDERR result = CMDERR_NONE;
+	CMDERR result;
 	char *command_start;
 	char *p, c = 0;
 

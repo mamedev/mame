@@ -19,7 +19,6 @@
 *
 ******************************************************************************/
 #include "3526intf.h"
-#include "fm.h"
 #include "fmopl.h"
 
 
@@ -157,7 +156,9 @@ const device_type YM3526 = &device_creator<ym3526_device>;
 
 ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock, "ym3526", __FILE__),
-		device_sound_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this), 
+		m_stream(NULL), 
+		m_chip(NULL),
 		m_irq_handler(*this)
 {
 }

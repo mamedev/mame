@@ -83,7 +83,7 @@ vp585_device::vp585_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, VP585, "VP585", tag, owner, clock, "vp585", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_j1(*this, "J1"),
-	m_j2(*this, "J2")
+	m_j2(*this, "J2"), m_keylatch(0)
 {
 }
 

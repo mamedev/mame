@@ -126,7 +126,7 @@ a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconf
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, TIMEMASTER_PIA_TAG),
 	m_msm5832(*this, TIMEMASTER_M5832_TAG),
-	m_dsw1(*this, "DSW1")
+	m_dsw1(*this, "DSW1"), m_rom(nullptr), m_irqa(false), m_irqb(false)
 {
 	m_started = false;
 }
@@ -136,7 +136,7 @@ a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconf
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, TIMEMASTER_PIA_TAG),
 	m_msm5832(*this, TIMEMASTER_M5832_TAG),
-	m_dsw1(*this, "DSW1")
+	m_dsw1(*this, "DSW1"), m_rom(nullptr), m_irqa(false), m_irqb(false)
 {
 	m_started = false;
 }

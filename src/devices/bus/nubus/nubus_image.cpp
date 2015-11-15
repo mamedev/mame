@@ -70,7 +70,7 @@ const device_type MESSIMG_DISK = &device_creator<messimg_disk_image_device>;
 
 messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock, "messimg_disk_image", __FILE__),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this), m_size(0), m_data(nullptr), m_ejected(false)
 {
 }
 
@@ -175,13 +175,13 @@ const rom_entry *nubus_image_device::device_rom_region() const
 
 nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_IMAGE, "Disk Image Pseudo-Card", tag, owner, clock, "nb_image", __FILE__),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this), m_image(nullptr)
 {
 }
 
 nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this), m_image(nullptr)
 {
 }
 

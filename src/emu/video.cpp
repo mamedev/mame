@@ -1142,7 +1142,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 			// find length of the device name
 			int end1 = snapstr.find("/", pos + 3);
 			int end2 = snapstr.find("%", pos + 3);
-			int end = -1;
+			int end;
 
 			if ((end1 != -1) && (end2 != -1))
 				end = MIN(end1, end2);

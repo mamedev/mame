@@ -420,7 +420,7 @@ CPU_DISASSEMBLE( z80 )
 	char *dst;
 	INT8 offset = 0;
 	UINT8 op, op1 = 0;
-	UINT16 ea = 0;
+	UINT16 ea;
 	int pos = 0;
 
 	ixy = "oops!!";

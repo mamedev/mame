@@ -15,14 +15,6 @@
 #include "sound/samples.h"
 #include "softlist.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
-
 //**************************************************************************
 //  CORE FUNCTIONS
 //**************************************************************************
@@ -278,8 +270,8 @@ media_auditor::summary media_auditor::audit_samples()
 	int found = 0;
 
 	// iterate over sample entries
-	samples_device_iterator iter(m_enumerator.config().root_device());
-	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
+	samples_device_iterator iterator(m_enumerator.config().root_device());
+	for (samples_device *device = iterator.first(); device != NULL; device = iterator.next())
 	{
 		// by default we just search using the driver name
 		std::string searchpath(m_enumerator.driver().name);
@@ -615,7 +607,3 @@ audit_record::audit_record(const char *name, media_type type)
 		m_shared_device(NULL)
 {
 }
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif

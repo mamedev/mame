@@ -74,7 +74,7 @@ sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, 
 	device_sms_control_port_interface(mconfig, *this),
 	m_lphaser_pins(*this, "CTRL_PORT"),
 	m_lphaser_x(*this, "LPHASER_X"),
-	m_lphaser_y(*this, "LPHASER_Y")
+	m_lphaser_y(*this, "LPHASER_Y"), m_sensor_last_state(0), m_lphaser_timer(nullptr)
 {
 	// Workaround for failed validation that occurs when running on a driver
 	// with Sega Scope emulation, which adds 2 screens (left/right lenses).

@@ -20,7 +20,6 @@
 // MAMEOS headers
 #include "strconv.h"
 #include "winutil.h"
-#include "winutf8.h"
 
 #include "winfile.h"
 
@@ -187,10 +186,8 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, 
 			break;
 		case WINFILE_SOCKET:
 			return win_read_socket(file, buffer, offset, length, actual);
-			break;
 		case WINFILE_PTTY:
 			return win_read_ptty(file, buffer, offset, length, actual);
-			break;
 
 	}
 	return FILERR_NONE;
@@ -226,10 +223,8 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 			break;
 		case WINFILE_SOCKET:
 			return win_write_socket(file, buffer, offset, length, actual);
-			break;
 		case WINFILE_PTTY:
 			return win_write_ptty(file, buffer, offset, length, actual);
-			break;
 
 	}
 	return FILERR_NONE;
@@ -274,10 +269,8 @@ file_error osd_truncate(osd_file *file, UINT64 offset)
 			break;
 		case WINFILE_SOCKET:
 			return FILERR_FAILURE;
-			break;
 		case WINFILE_PTTY:
 			return FILERR_FAILURE;
-			break;
 
 	}
 	return FILERR_NONE;

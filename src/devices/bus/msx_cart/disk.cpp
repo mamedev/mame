@@ -140,8 +140,8 @@ msx_cart_disk_wd::msx_cart_disk_wd(const machine_config &mconfig, device_type ty
 
 
 msx_cart_disk_type1::msx_cart_disk_type1(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
-	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname)
-	, m_control(0)
+	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname), m_side_control(0)
+	  , m_control(0)
 {
 }
 

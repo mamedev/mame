@@ -101,7 +101,7 @@ c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mco
 	m_rtc(*this, DS1302_TAG),
 	m_ata(*this, ATA_TAG),
 	m_jp1(*this, "JP1"),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram"), m_bank(0), m_ata_data(0), m_wp(0), m_enable(0)
 {
 }
 

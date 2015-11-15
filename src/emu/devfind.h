@@ -53,7 +53,7 @@ public:
 
 protected:
 	// helpers
-	void *find_memregion(UINT8 width, size_t &length, bool required);
+	void *find_memregion(UINT8 width, size_t &length, bool required) const;
 	void *find_memshare(UINT8 width, size_t &bytes, bool required);
 	bool report_missing(bool found, const char *objname, bool required);
 
@@ -80,7 +80,8 @@ public:
 
 	// operators to make use transparent
 	operator _ObjectClass *() const { return m_target; }
-	_ObjectClass *operator->() const { assert(m_target != NULL); return m_target; }
+
+	virtual _ObjectClass *operator->() const { assert(m_target != NULL); return m_target; }
 
 	// getter for explicit fetching
 	_ObjectClass *target() const { return m_target; }

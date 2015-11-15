@@ -1107,7 +1107,7 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 	m_dacl(*this, "sbdacl"),
 	m_dacr(*this, "sbdacr"),
 	m_joy(*this, "pc_joy"),
-	m_mdout(*this, "mdout")
+	m_mdout(*this, "mdout"), m_dack_out(0), m_onebyte_midi(false), m_uart_midi(false), m_uart_irq(false), m_mpu_midi(false), m_rx_waiting(0), m_tx_waiting(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_timer(nullptr)
 {
 }
 

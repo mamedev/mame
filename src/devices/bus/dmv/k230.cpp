@@ -110,16 +110,16 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag,
 		: device_t(mconfig, DMV_K230, "K230 8088 without interrupt controller", tag, owner, clock, "dmv_k230", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "rom")
-{
+		m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
+	{
 }
 
 dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_dmvslot_interface( mconfig, *this ),
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "rom")
-{
+		m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
+	{
 }
 
 //-------------------------------------------------
@@ -136,8 +136,8 @@ dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: dmv_k230_device(mconfig, DMV_K234, "K234 68008", tag, owner, clock, "dmv_k234", __FILE__)
-{
+		: dmv_k230_device(mconfig, DMV_K234, "K234 68008", tag, owner, clock, "dmv_k234", __FILE__), m_snr(0)
+	{
 }
 
 //-------------------------------------------------
@@ -220,7 +220,7 @@ const rom_entry *dmv_k231_device::device_rom_region() const
 
 const rom_entry *dmv_k234_device::device_rom_region() const
 {
-	return NULL;
+	return nullptr;
 }
 
 const rom_entry *dmv_k235_device::device_rom_region() const

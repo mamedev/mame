@@ -17,9 +17,7 @@
 #include "dvmemory.h"
 #include "dvbpoints.h"
 #include "dvwpoints.h"
-#include "debugcmd.h"
 #include "debugcpu.h"
-#include "debugcon.h"
 #include <ctype.h>
 
 
@@ -443,7 +441,7 @@ void debug_view_manager::flush_osd_updates()
 debug_view *debug_view_manager::append(debug_view *view)
 {
 	debug_view **viewptr;
-	for (viewptr = &m_viewlist; *viewptr != NULL; viewptr = &(*viewptr)->m_next) ;
+	for (viewptr = &m_viewlist; *viewptr != NULL; viewptr = &(*viewptr)->m_next) { }
 	*viewptr = view;
 	return view;
 }

@@ -132,7 +132,7 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *ta
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),
-		m_acia(*this, SSC_ACIA_TAG),
+		m_acia(*this, SSC_ACIA_TAG), m_rom(nullptr),
 		m_started(false)
 {
 }
@@ -142,7 +142,7 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),
-		m_acia(*this, SSC_ACIA_TAG),
+		m_acia(*this, SSC_ACIA_TAG), m_rom(nullptr),
 		m_started(false)
 {
 }

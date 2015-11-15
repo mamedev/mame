@@ -7,18 +7,18 @@
  Game Name                       DATA
  -------------------------------------
  1-2-4 Cocktail Table (197?)     UNKNOWN
- Bazooka (1977)                  YES
- Desert Patrol (1977)            YES
- Espana (cabinet) (197?)         NO
- Frenzy (1975)                   UNKNOWN
- Game Tree (1978)                YES
- Hodge Podge (197?)              UNKNOWN
- Knights in Armor (1976)         YES
- Maneater (1975)                 YES
+ Bazooka (1976/11)               YES
+ Desert Patrol (1977/11)         YES
+ Espana (cabinet) (1975/10)      NO
+ Frenzy (1975/08)                UNKNOWN
+ Game Tree (1978/02)             YES
+ Hodge Podge (1975?)             NO
+ Knights in Armor (1976/06)      YES
+ Maneater (1975/11)              YES
  Play Five (1975?)               UNKNOWN
- Scandia (cabinet) (1975)        NO
+ Scandia (cabinet) (1975/08)     NO
  Two Game (1974)                 UNKNOWN
- U.N. Command (1977)             UNKNOWN
+ U.N. Command (1977)             YES?
 
  ***************************************************************************/
 
@@ -79,8 +79,8 @@ static NETLIST_START(pse)
 	// schematics
 	//...
 
-//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, psettl_state, sound_cb, "")
-//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+        //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, psettl_state, sound_cb, "")
+        //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -120,6 +120,29 @@ MACHINE_CONFIG_END
 
  ***************************************************************************/
 
+ROM_START( bazooka )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0840, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "bd2.k1",      0x0000, 0x0200, CRC(c9e9ed15) SHA1(624bbc10942a386040aef161b96d64021a842c9f) ) // 6341-1 - gfx: tank, truck, jeep motorcycle
+	ROM_LOAD( "bd2.k4",      0x0200, 0x0200, CRC(c5a74df9) SHA1(2846a039e9bf372f3aa0b88ed89f9029eb7f797c) ) // 6341-1 - gfx: ambulance, stretcher, explosion
+	ROM_LOAD( "bd1.d2",      0x0400, 0x0200, CRC(4fc10886) SHA1(b1c6f890994ba2182a4e7fc17582d6797dbd6ce9) ) // 6341-1 or 82s115
+	ROM_LOAD( "bd1.e2",      0x0600, 0x0200, CRC(00179936) SHA1(e5417b8d3814dafe1278179b307a1b563a378cbe) ) // 6341-1 or 82s115
+	ROM_LOAD( "bd2.e6",      0x0800, 0x0020, CRC(14b84564) SHA1(69cdd14e23094678c4b280f60cec963609181b00) ) // 82123
+	ROM_LOAD( "bd2.e7",      0x0820, 0x0020, CRC(1bfb073f) SHA1(f6b26dcece71b2cf2ed4a537434edbe31cb10399) ) // 82123
+ROM_END
+
+ROM_START( bazookabr )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0840, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "1",           0x0000, 0x0200, CRC(edc34cb0) SHA1(f76a81833b015784e55b33189e9058cd24922f9b) )
+	ROM_LOAD( "2",           0x0200, 0x0200, CRC(3e78e4c2) SHA1(814509eb773bfa87f1df933214f079e7dd2a8fa2) )
+	ROM_LOAD( "3",           0x0400, 0x0200, CRC(4fc10886) SHA1(b1c6f890994ba2182a4e7fc17582d6797dbd6ce9) )
+	ROM_LOAD( "4",           0x0600, 0x0200, CRC(00179936) SHA1(e5417b8d3814dafe1278179b307a1b563a378cbe) )
+	ROM_LOAD( "bd2.e6",      0x0800, 0x0020, BAD_DUMP CRC(14b84564) SHA1(69cdd14e23094678c4b280f60cec963609181b00) ) // not dumped, taken from PSE set
+	ROM_LOAD( "bd2.e7",      0x0820, 0x0020, BAD_DUMP CRC(1bfb073f) SHA1(f6b26dcece71b2cf2ed4a537434edbe31cb10399) ) // not dumped, taken from PSE set
+ROM_END
 
 ROM_START( dpatrol )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
@@ -168,7 +191,8 @@ ROM_START( gametree )
 ROM_END
 */
 
-
-GAME( 1977, dpatrol, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1976, knightar, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1978, gametree, 0, pse, 0, driver_device, 0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, bazooka,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, bazookabr,  bazooka, pse, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrol,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
+//GAME( 1976, knightar, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )
+//GAME( 1978, gametree, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )

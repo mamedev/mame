@@ -133,7 +133,7 @@ void debug_view_memory::enumerate_sources()
 	memory_interface_iterator iter(machine().root_device());
 	for (device_memory_interface *memintf = iter.first(); memintf != NULL; memintf = iter.next())
 		if (&memintf->device() != &machine().root_device())
-			for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
+			for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 				if (memintf->has_space(spacenum))
 				{
 					address_space &space = memintf->space(spacenum);

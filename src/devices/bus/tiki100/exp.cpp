@@ -29,7 +29,9 @@ const device_type TIKI100_BUS_SLOT = &device_creator<tiki100_bus_slot_t>;
 tiki100_bus_slot_t::tiki100_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TIKI100_BUS_SLOT, "TIKI-100 expansion bus slot", tag, owner, clock, "tiki100bus_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
-	device_z80daisy_interface(mconfig, *this)
+	device_z80daisy_interface(mconfig, *this), 
+	m_bus(nullptr), 
+	m_card(nullptr)
 {
 }
 
@@ -186,8 +188,8 @@ WRITE_LINE_MEMBER( tiki100_bus_t::busak_w )
 //-------------------------------------------------
 
 device_tiki100bus_card_interface::device_tiki100bus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
-	m_busak(CLEAR_LINE)
+	device_slot_card_interface(mconfig, device), m_bus(nullptr),
+	m_busak(CLEAR_LINE), m_next(nullptr)
 {
 	m_slot = dynamic_cast<tiki100_bus_slot_t *>(device.owner());
 }

@@ -270,7 +270,7 @@ UINT8 i8085a_cpu_device::get_rim_value()
 	if (m_irq_state[I8085_RST55_LINE]) result |= IM_I55;
 
 	/* fetch the SID bit if we have a callback */
-	result = (result & 0x7f) | (sid ? 0x80 : 0);
+	result = (result & ~IM_SID) | (sid ? IM_SID : 0);
 
 	return result;
 }

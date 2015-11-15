@@ -62,7 +62,7 @@ vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &m
 		device_image_interface(mconfig, *this),
 		m_write_irq(*this),
 		m_write_nmi(*this),
-		m_write_res(*this)
+		m_write_res(*this), m_card(nullptr)
 {
 }
 

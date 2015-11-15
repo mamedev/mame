@@ -78,7 +78,7 @@ vboy_cart_slot_device::vboy_cart_slot_device(const machine_config &mconfig, cons
 						device_t(mconfig, VBOY_CART_SLOT, "Nintendo Virtual Boy Cartridge Slot", tag, owner, clock, "vboy_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(VBOY_STD)
+						m_type(VBOY_STD), m_cart(nullptr)
 {
 }
 

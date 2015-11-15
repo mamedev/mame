@@ -285,7 +285,7 @@ abc_fd2_t::abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *o
 	m_floppy0(*this, FD1771_TAG ":0"),
 	m_floppy1(*this, FD1771_TAG ":1"),
 	m_dos_rom(*this, "dos"),
-	m_cs(false)
+	m_cs(false), m_status(0), m_data(0)
 {
 }
 

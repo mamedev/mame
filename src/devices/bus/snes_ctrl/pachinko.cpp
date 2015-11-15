@@ -48,7 +48,7 @@ snes_pachinko_device::snes_pachinko_device(const machine_config &mconfig, const 
 					device_t(mconfig, SNES_PACHINKO, "Sunsoft Pachinko Controller", tag, owner, clock, "snes_pachinko", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_dial(*this, "DIAL"),
-					m_button(*this, "BUTTON")
+					m_button(*this, "BUTTON"), m_strobe(0), m_latch(0)
 {
 }
 

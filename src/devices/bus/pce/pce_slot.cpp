@@ -140,7 +140,7 @@ pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const 
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_interface("pce_cart"),
-						m_type(PCE_STD)
+						m_type(PCE_STD), m_cart(nullptr)
 {
 }
 

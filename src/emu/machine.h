@@ -73,7 +73,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 #define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
 #define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
 
-#define auto_bitmap_alloc(m, w, h, f)   auto_alloc(m, bitmap_t(w, h, f))
 #define auto_bitmap_ind8_alloc(m, w, h) auto_alloc(m, bitmap_ind8(w, h))
 #define auto_bitmap_ind16_alloc(m, w, h)    auto_alloc(m, bitmap_ind16(w, h))
 #define auto_bitmap_ind32_alloc(m, w, h)    auto_alloc(m, bitmap_ind32(w, h))
@@ -191,7 +190,7 @@ public:
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 
 	// fetch items by name
-	inline device_t *device(const char *tag) { return root_device().subdevice(tag); }
+	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 
 	// configuration helpers

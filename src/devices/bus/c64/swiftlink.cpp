@@ -104,7 +104,7 @@ c64_swiftlink_cartridge_device::c64_swiftlink_cartridge_device(const machine_con
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MOS6551_TAG),
 	m_io_cs(*this, "CS"),
-	m_io_irq(*this, "IRQ")
+	m_io_irq(*this, "IRQ"), m_cs(0), m_irq(0)
 {
 }
 

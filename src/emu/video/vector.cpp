@@ -130,13 +130,15 @@ const device_type VECTOR = &device_creator<vector_device>;
 
 vector_device::vector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this), 
+		m_vector_list(NULL)
 {
 }
 
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector_device", __FILE__),
-		device_video_interface(mconfig, *this)
+	  device_video_interface(mconfig, *this),
+	  m_vector_list(NULL)
 {
 }
 
@@ -299,7 +301,7 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	float xratio = xscale / yscale;
 	float yratio = yscale / xscale;
 	xratio = (xratio < 1.0f) ? xratio : 1.0f;
-	xratio = (yratio < 1.0f) ? yratio : 1.0f;
+	yratio = (yratio < 1.0f) ? yratio : 1.0f;
 
 	point *curpoint;
 	render_bounds clip;

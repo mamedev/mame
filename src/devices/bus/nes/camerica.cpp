@@ -52,13 +52,13 @@ nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, const char *
 }
 
 nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_BF9096, "NES Cart Camerica BF9096 PCB", tag, owner, clock, "nes_bf9096", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_BF9096, "NES Cart Camerica BF9096 PCB", tag, owner, clock, "nes_bf9096", __FILE__), m_bank_base(0), m_latch(0)
+				{
 }
 
 nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_GOLDEN5, "NES Cart Camerica Golden 5 PCB", tag, owner, clock, "nes_golden5", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_GOLDEN5, "NES Cart Camerica Golden 5 PCB", tag, owner, clock, "nes_golden5", __FILE__), m_bank_base(0), m_latch(0)
+				{
 }
 
 

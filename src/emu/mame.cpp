@@ -73,15 +73,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
-#include "config.h"
-#include "debugger.h"
-#include "render.h"
-#include "cheat.h"
-#include "ui/ui.h"
-#include "uiinput.h"
-#include "crsshair.h"
 #include "validity.h"
-#include "debug/debugcon.h"
 #include "luaengine.h"
 #include <time.h>
 

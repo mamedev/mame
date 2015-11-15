@@ -20,6 +20,8 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+struct slider_state;
+
 namespace d3d
 {
 class effect;

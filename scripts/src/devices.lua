@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   devices.lua
+--
+--   Rules for building device cores
+--
+---------------------------------------------------------------------------
+
 function devicesProject(_target, _subtarget)
 
 	disasm_files = { }

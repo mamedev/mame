@@ -206,8 +206,8 @@
 #define TRACE_PFM 0
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__),
-	m_ready(*this)
+: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false), m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false), m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false), m_debug_no_ws(false), m_geneve_mode(false), m_direct_mode(false), m_cartridge_size(0), m_cartridge_secondpage(false), m_cartridge6_writable(false), m_cartridge7_writable(false), m_turbo(false), m_genmod(false), m_timode(false), m_pfm_mode(0), m_pfm_bank(0), m_pfm_output_enable(false), m_sram_mask(0), m_sram_val(0),
+	m_ready(*this), m_waitcount(0), m_ext_waitcount(0), m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr), m_pfm512a(nullptr), m_keyboard(nullptr), m_video(nullptr), m_peribox(nullptr), m_sound(nullptr), m_sram(nullptr), m_dram(nullptr)
 {
 	m_eprom = NULL;
 }
@@ -1468,7 +1468,9 @@ static const UINT8 MF1_CODE[0xe] =
 
 geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock, "geneve_keyboard", __FILE__),
-	m_interrupt(*this)
+	m_interrupt(*this), m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0), 
+	m_key_real_shift_state(0), m_key_fake_shift_state(false), m_key_fake_unshift_state(false), m_key_autorepeat_key(0), m_key_autorepeat_timer(0), m_keep_keybuf(false), 
+	m_keyboard_clock(false), m_timer(nullptr)
 {
 }
 
@@ -1918,7 +1920,7 @@ const device_type GENEVE_KEYBOARD = &device_creator<geneve_keyboard_device>;
 ****************************************************************************/
 
 geneve_mouse_device::geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_MOUSE, "Geneve mouse", tag, owner, clock, "geneve_mouse", __FILE__)
+: device_t(mconfig, GENEVE_MOUSE, "Geneve mouse", tag, owner, clock, "geneve_mouse", __FILE__), m_v9938(nullptr), m_last_mx(0), m_last_my(0)
 {
 }
 

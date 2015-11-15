@@ -241,7 +241,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 	bool detected_overlap = DETECT_OVERLAPPING_MEMORY ? false : true;
 
 	// loop over all address spaces
-	for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
+	for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 	{
 		const address_space_config *spaceconfig = space_config(spacenum);
 		if (spaceconfig != NULL)

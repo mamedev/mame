@@ -74,7 +74,7 @@ snes_multitap_device::snes_multitap_device(const machine_config &mconfig, const 
 	m_port2(*this, "port2"),
 	m_port3(*this, "port3"),
 	m_port4(*this, "port4"),
-	m_cfg(*this, "CONFIG")
+	m_cfg(*this, "CONFIG"), m_select(0)
 {
 }
 

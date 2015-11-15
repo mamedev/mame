@@ -64,7 +64,7 @@ const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
 //-------------------------------------------------
 
 device_md_cart_interface::device_md_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+	: device_slot_card_interface(mconfig, device), m_nvram_start(0), m_nvram_end(0), m_nvram_active(0), m_nvram_readonly(0), m_nvram_handlers_installed(0),
 		m_rom(NULL),
 		m_rom_size(0)
 {
@@ -164,7 +164,7 @@ base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(SEGA_STD),
+						m_type(SEGA_STD), m_cart(nullptr),
 						m_must_be_loaded(1)
 {
 }

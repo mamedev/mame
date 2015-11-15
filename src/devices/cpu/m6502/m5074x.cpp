@@ -49,7 +49,18 @@ m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, co
 	write_p0(*this),
 	write_p1(*this),
 	write_p2(*this),
-	write_p3(*this)
+	write_p3(*this), 
+	m_intctrl(0), 
+	m_tmrctrl(0), 
+	m_tmr12pre(0), 
+	m_tmr1(0), 
+	m_tmr2(0), 
+	m_tmrxpre(0), 
+	m_tmrx(0), 
+	m_tmr1latch(0), 
+	m_tmr2latch(0), 
+	m_tmrxlatch(0), 
+	m_last_all_ints(0)
 {
 }
 

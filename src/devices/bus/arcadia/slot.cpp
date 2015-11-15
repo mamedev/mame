@@ -66,7 +66,7 @@ arcadia_cart_slot_device::arcadia_cart_slot_device(const machine_config &mconfig
 						device_t(mconfig, EA2001_CART_SLOT, "Emerson Arcadia Cartridge Slot", tag, owner, clock, "arcadia_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(ARCADIA_STD)
+						m_type(ARCADIA_STD), m_cart(nullptr)
 {
 }
 

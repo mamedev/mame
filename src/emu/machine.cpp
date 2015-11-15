@@ -75,12 +75,9 @@
 #include "debugger.h"
 #include "render.h"
 #include "cheat.h"
-#include "ui/selgame.h"
 #include "uiinput.h"
 #include "crsshair.h"
-#include "validity.h"
 #include "unzip.h"
-#include "debug/debugcon.h"
 #include "debug/debugvw.h"
 #include "image.h"
 #include "luaengine.h"
@@ -322,9 +319,9 @@ device_t &running_machine::add_dynamic_device(device_t &owner, device_type type,
 
 	// notify this device and all its subdevices that they are now configured
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		if (!device->configured())
-			device->config_complete();
+	for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
+		if (!dev->configured())
+			dev->config_complete();
 	return *device;
 }
 
@@ -578,7 +575,7 @@ std::string running_machine::get_statename(const char *option)
 			// find length of the device name
 			int end1 = statename_str.find("/", pos + 3);
 			int end2 = statename_str.find("%", pos + 3);
-			int end = -1;
+			int end;
 
 			if ((end1 != -1) && (end2 != -1))
 				end = MIN(end1, end2);

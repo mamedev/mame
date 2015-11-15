@@ -76,7 +76,7 @@ static char *convert_ansi(LPCVOID data)
 
 char *osd_get_clipboard_text(void)
 {
-	char *result = NULL;
+	char *result;
 
 	// try to access unicode text
 	result = get_clipboard_text_by_format(CF_UNICODETEXT, convert_wide);

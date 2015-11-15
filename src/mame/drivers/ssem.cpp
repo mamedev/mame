@@ -11,13 +11,6 @@
 #include "cpu/ssem/ssem.h"
 #include "imagedev/snapquik.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
 class ssem_state : public driver_device
 {
 public:
@@ -649,7 +642,3 @@ ROM_END
 
 /*   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  INIT        COMPANY                       FULLNAME */
 COMP(1948, ssem,    0,        0,       ssem,    ssem, driver_device,  0,   "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif

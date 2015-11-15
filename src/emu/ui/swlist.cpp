@@ -270,8 +270,8 @@ void ui_menu_software_list::handle()
 		// handle selections
 		else if (event->iptkey == IPT_UI_SELECT)
 		{
-			entry_info *entry = (entry_info *) event->itemref;
-			m_result = entry->short_name;
+			entry_info *info = (entry_info *) event->itemref;
+			m_result = info->short_name;
 			ui_menu::stack_pop(machine());
 		}
 		else if (event->iptkey == IPT_SPECIAL)

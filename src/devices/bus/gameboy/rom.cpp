@@ -42,8 +42,8 @@ gb_rom_device::gb_rom_device(const machine_config &mconfig, const char *tag, dev
 }
 
 gb_rom_tama5_device::gb_rom_tama5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_device(mconfig, GB_ROM_TAMA5, "GB Tamagotchi", tag, owner, clock, "gb_rom_tama5", __FILE__)
-{
+					: gb_rom_device(mconfig, GB_ROM_TAMA5, "GB Tamagotchi", tag, owner, clock, "gb_rom_tama5", __FILE__), m_tama5_data(0), m_tama5_addr(0), m_tama5_cmd(0), m_rtc_reg(0)
+				{
 }
 
 gb_rom_wisdom_device::gb_rom_wisdom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

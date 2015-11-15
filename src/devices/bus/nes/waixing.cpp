@@ -132,18 +132,18 @@ nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, co
 }
 
 nes_waixing_sec_device::nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_txrom_device(mconfig, NES_WAIXING_SEC, "NES Cart Waixing Security Chip PCB", tag, owner, clock, "nes_waixing_sec", __FILE__)
-{
+					: nes_txrom_device(mconfig, NES_WAIXING_SEC, "NES Cart Waixing Security Chip PCB", tag, owner, clock, "nes_waixing_sec", __FILE__), m_reg(0)
+				{
 }
 
 nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_SGZ, "NES Cart Waixing San Guo Zhi PCB", tag, owner, clock, "nes_waixing_sgz", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_WAIXING_SGZ, "NES Cart Waixing San Guo Zhi PCB", tag, owner, clock, "nes_waixing_sgz", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
+				{
 }
 
 nes_waixing_sgzlz_device::nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_SGZLZ, "NES Cart Waixing San Guo Zhong Lie Zhuan PCB", tag, owner, clock, "nes_waixing_sgzlz", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_WAIXING_SGZLZ, "NES Cart Waixing San Guo Zhong Lie Zhuan PCB", tag, owner, clock, "nes_waixing_sgzlz", __FILE__), m_latch(0)
+				{
 }
 
 nes_waixing_ffv_device::nes_waixing_ffv_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

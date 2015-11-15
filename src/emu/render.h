@@ -304,6 +304,14 @@ class render_primitive
 	friend class simple_list<render_primitive>;
 
 public:
+	render_primitive(): 
+		type(), 
+		flags(0), 
+		width(0), 
+		container(NULL), 
+		m_next(NULL)
+	{}
+
 	// render primitive types
 	enum primitive_type
 	{
@@ -522,6 +530,8 @@ private:
 		friend class simple_list<item>;
 
 	public:
+		item() : m_next(NULL), m_type(0), m_flags(0), m_internal(0), m_width(0), m_texture(NULL) { }
+
 		// getters
 		item *next() const { return m_next; }
 		UINT8 type() const { return m_type; }

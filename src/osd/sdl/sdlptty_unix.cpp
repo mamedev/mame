@@ -19,6 +19,7 @@
 # include <termios.h>
 # include <libutil.h>
 #elif defined(SDLMAME_NETBSD) || defined(SDLMAME_MACOSX)
+# include <termios.h>
 # include <util.h>
 #elif defined(SDLMAME_OPENBSD)
 # include <termios.h>

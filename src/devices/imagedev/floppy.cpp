@@ -7,7 +7,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "ui/menu.h"
 #include "ui/filesel.h"
 #include "zippath.h"
@@ -127,7 +126,8 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock, "floppy_connector", __FILE__),
-	device_slot_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this), 
+	formats(NULL),
 	m_enable_sound(false)
 {
 }
@@ -167,10 +167,27 @@ floppy_image_device *floppy_connector::get_device()
 floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this),
+		device_slot_card_interface(mconfig, *this), 
+		input_format(NULL), 
+		output_format(NULL),
 		image(NULL),
-		fif_list(NULL),
-		m_make_sound(false)
+		fif_list(NULL), 
+		index_timer(NULL), 
+		tracks(0), 
+		sides(0), 
+		form_factor(0), 
+		motor_always_on(false), 
+		dir(0), stp(0), wtg(0), mon(0), ss(0), idx(0), wpt(0), rdy(0), dskchg(0), 
+		ready(false), 
+		rpm(0), 
+		floppy_ratio_1(0), 
+		revolution_count(0), 
+		cyl(0), 
+		subcyl(0), 
+		image_dirty(false), 
+		ready_counter(0),
+		m_make_sound(false), 
+		m_sound_out(NULL)
 {
 	extension_list[0] = '\0';
 	m_err = IMAGE_ERROR_INVALIDIMAGE;
@@ -668,7 +685,7 @@ int floppy_image_device::find_index(UINT32 position, const std::vector<UINT32> &
 {
 	int spos = (buf.size() >> 1)-1;
 	int step;
-	for(step=1; step<buf.size()+1; step<<=1);
+	for(step=1; step<buf.size()+1; step<<=1) { }
 	step >>= 1;
 
 	for(;;) {
@@ -983,7 +1000,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 
 	bool can_in_place = input_format->supports_save();
 	if(can_in_place) {
-		file_error filerr = FILERR_NOT_FOUND;
+		file_error filerr;
 		std::string tmp_path;
 		core_file *tmp_file;
 		/* attempt to open the file for writing but *without* create */
@@ -1004,8 +1021,9 @@ void ui_menu_control_floppy_image::handle()
 	switch (state) {
 	case DO_CREATE: {
 		floppy_image_format_t *fif_list = fd->get_formats();
-		int ext_match = 0, total_usable = 0;
-		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
+			int ext_match;
+			int total_usable = 0;
+			for(floppy_image_format_t *i = fif_list; i; i = i->next) {
 			if(!i->supports_save())
 				continue;
 			if (i->extension_matches(current_file.c_str()))
@@ -1085,7 +1103,22 @@ void ui_menu_control_floppy_image::handle()
 //===================================================================
 
 floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__)
+	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__), 
+	  m_sound(NULL), 
+	  m_is525(false), 
+	  m_sampleindex_motor_start(0), 
+	  m_sampleindex_motor_loop(0), 
+	  m_sampleindex_motor_end(0), 
+	  m_samplesize_motor_start(0), 
+	  m_samplesize_motor_loop(0), 
+	  m_samplesize_motor_end(0), 
+	  m_samplepos_motor(0), 
+	  m_motor_playback_state(0), 
+	  m_motor_on(false), 
+	  m_step_samples(0), 
+	  m_sampleindex_step1(0), 
+	  m_samplepos_step(0), 
+	  m_step_playback_state(0)
 {
 	m_loaded = false;
 }
@@ -1193,7 +1226,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// Also, there is no need for interpolation, as we only expect
 	// one sample rate of 44100 for all samples
 
-	INT16 out = 0;
+	INT16 out;
 	stream_sample_t *samplebuffer = outputs[0];
 
 	while (samples-- > 0)

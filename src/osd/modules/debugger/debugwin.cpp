@@ -22,11 +22,9 @@
 #include "win/uimetrics.h"
 
 #include "emu.h"
-#include "uiinput.h"
 #include "debugger.h"
 
 #include "window.h"
-#include "winmain.h"
 #include "../../windows/input.h"
 
 

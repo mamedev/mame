@@ -152,16 +152,16 @@ const rom_entry *isa8_mda_device::device_rom_region() const
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_MDA, "IBM Monochrome Display and Printer Adapter", tag, owner, clock, "isa_ibm_mda", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_update_row_type(-1),
+		device_isa8_card_interface(mconfig, *this), m_framecnt(0), m_mode_control(0),
+		m_update_row_type(-1), m_chr_gen(nullptr), m_vsync(0), m_hsync(0), m_pixel(0),
 		m_palette(*this, "palette")
 {
 }
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this),
-		m_update_row_type(-1),
+		device_isa8_card_interface(mconfig, *this), m_framecnt(0), m_mode_control(0),
+		m_update_row_type(-1), m_chr_gen(nullptr), m_vsync(0), m_hsync(0), m_pixel(0),
 		m_palette(*this, "palette")
 {
 }
@@ -581,7 +581,7 @@ const rom_entry *isa8_hercules_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_mda_device(mconfig, ISA8_HERCULES, "Hercules Graphics Card", tag, owner, clock, "isa_hercules", __FILE__)
+		isa8_mda_device(mconfig, ISA8_HERCULES, "Hercules Graphics Card", tag, owner, clock, "isa_hercules", __FILE__), m_configuration_switch(0)
 {
 }
 
@@ -787,7 +787,7 @@ machine_config_constructor isa8_ec1840_0002_device::device_mconfig_additions() c
 //-------------------------------------------------
 
 isa8_ec1840_0002_device::isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_mda_device( mconfig, ISA8_EC1840_0002, "EC 1840.0002 (MDA)", tag, owner, clock, "ec1840_0002", __FILE__)
+		isa8_mda_device( mconfig, ISA8_EC1840_0002, "EC 1840.0002 (MDA)", tag, owner, clock, "ec1840_0002", __FILE__), m_soft_chr_gen(nullptr)
 {
 }
 

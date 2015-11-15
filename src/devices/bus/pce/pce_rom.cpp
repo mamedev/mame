@@ -46,8 +46,8 @@ pce_populous_device::pce_populous_device(const machine_config &mconfig, const ch
 }
 
 pce_sf2_device::pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: pce_rom_device(mconfig, PCE_ROM_SF2, "PCE Street Fighters 2 Cart", tag, owner, clock, "pce_sf2", __FILE__)
-{
+					: pce_rom_device(mconfig, PCE_ROM_SF2, "PCE Street Fighters 2 Cart", tag, owner, clock, "pce_sf2", __FILE__), m_bank_base(0)
+				{
 }
 
 

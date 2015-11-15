@@ -28,7 +28,8 @@ const device_type C64_MAGIC_DESK = &device_creator<c64_magic_desk_cartridge_devi
 
 c64_magic_desk_cartridge_device::c64_magic_desk_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_MAGIC_DESK, "C64 Magic Desk cartridge", tag, owner, clock, "c64_magic_desk", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_bank(0)
 {
 }
 

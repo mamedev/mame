@@ -19,7 +19,6 @@
 *
 ******************************************************************************/
 #include "8950intf.h"
-#include "fm.h"
 #include "fmopl.h"
 
 
@@ -206,7 +205,9 @@ const device_type Y8950 = &device_creator<y8950_device>;
 
 y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Y8950, "Y8950", tag, owner, clock, "y8950", __FILE__),
-		device_sound_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this), 
+		m_stream(NULL), 
+		m_chip(NULL),
 		m_irq_handler(*this),
 		m_keyboard_read_handler(*this),
 		m_keyboard_write_handler(*this),

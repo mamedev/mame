@@ -81,7 +81,7 @@ const device_type ROMSLOT = &device_creator<rom_image_device>;
 
 rom_image_device::rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ROMSLOT, "ROM image", tag, owner, clock, "rom_image", __FILE__),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this), m_base(nullptr)
 {
 }
 

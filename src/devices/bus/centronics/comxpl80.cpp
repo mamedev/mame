@@ -163,7 +163,7 @@ comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *ta
 		device_centronics_peripheral_interface(mconfig, *this),
 		m_plotter(*this, "PLOTTER"),
 		m_font(*this, "FONT"),
-		m_sw(*this, "SW")
+		m_sw(*this, "SW"), m_font_addr(0), m_x_motor_phase(0), m_y_motor_phase(0), m_z_motor_phase(0), m_plotter_data(0), m_plotter_ack(0), m_plotter_online(0), m_data(0)
 {
 }
 

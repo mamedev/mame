@@ -19,7 +19,7 @@ public:
 	bool get_promisc() { return m_promisc; }
 	int get_interface() { return m_intf; }
 
-	int send(UINT8 *buf, int len);
+	int send(UINT8 *buf, int len) const;
 	virtual void recv_cb(UINT8 *buf, int len);
 
 protected:

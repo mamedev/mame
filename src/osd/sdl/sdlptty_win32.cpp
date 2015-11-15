@@ -9,4 +9,4 @@
 //
 //============================================================
 
-#include "../windows/winptty.c"
+#include "../windows/winptty.cpp"

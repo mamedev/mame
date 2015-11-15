@@ -109,7 +109,7 @@ void ui_menu_input_general::populate()
 
 			/* loop over all sequence types */
 			sortorder++;
-			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
 				/* build an entry for the standard sequence */
 				input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));
@@ -187,7 +187,7 @@ void ui_menu_input_specific::populate()
 					sortorder = field->type() | 0xf000;
 
 				/* loop over all sequence types */
-				for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+				for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				{
 					/* build an entry for the standard sequence */
 					input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));
@@ -224,7 +224,7 @@ ui_menu_input_specific::~ui_menu_input_specific()
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
-ui_menu_input::ui_menu_input(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_input::ui_menu_input(running_machine &machine, render_container *container) : ui_menu(machine, container), last_sortorder(0), record_next(false)
 {
 	pollingitem = 0;
 	pollingref = 0;
@@ -264,7 +264,6 @@ void ui_menu_input::handle()
 	if (pollingitem != NULL)
 	{
 		input_item_data *item = pollingitem;
-		input_seq newseq;
 
 		/* if UI_CANCEL is pressed, abort */
 		if (ui_input_pressed(machine(), IPT_UI_CANCEL))
@@ -533,7 +532,7 @@ void ui_menu_settings::handle()
     switches menus
 -------------------------------------------------*/
 
-ui_menu_settings::ui_menu_settings(running_machine &machine, render_container *container, UINT32 _type) : ui_menu(machine, container)
+ui_menu_settings::ui_menu_settings(running_machine &machine, render_container *container, UINT32 _type) : ui_menu(machine, container), diplist(NULL), dipcount(0)
 {
 	type = _type;
 }
