@@ -1895,7 +1895,6 @@ if (CPUS["TMS9900"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tms9900/tms9995.h",
 		MAME_DIR .. "src/devices/cpu/tms9900/ti990_10.cpp",
 		MAME_DIR .. "src/devices/cpu/tms9900/ti990_10.h",
-		MAME_DIR .. "src/devices/cpu/tms9900/99xxcore.h",
 		MAME_DIR .. "src/devices/cpu/tms9900/tms99com.h",
 	}
 end
