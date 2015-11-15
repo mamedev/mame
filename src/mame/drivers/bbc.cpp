@@ -55,7 +55,7 @@
 /* Devices */
 #include "imagedev/flopdrv.h"
 #include "formats/bbc_dsk.h"
-//#include "formats/fsd_dsk.h"
+#include "formats/fsd_dsk.h"
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
@@ -683,16 +683,16 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_BBC_DFS_FORMAT,
-	FLOPPY_BBC_CPM_FORMAT
-	//FLOPPY_FSD_FORMAT
+	FLOPPY_BBC_CPM_FORMAT,
+	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
 	FLOPPY_BBC_DFS_FORMAT,
 	FLOPPY_BBC_ADFS_FORMAT,
 	FLOPPY_BBC_CPM_FORMAT,
-	FLOPPY_BBC_DOS_FORMAT
-	//FLOPPY_FSD_FORMAT
+	FLOPPY_BBC_DOS_FORMAT,
+	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcmc )
@@ -882,7 +882,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b", "bbcb_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b", "bbcb_flop")
-	//MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_orig_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_orig_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
 MACHINE_CONFIG_END
@@ -978,7 +978,7 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	//MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 MACHINE_CONFIG_END
 
@@ -999,7 +999,7 @@ static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	//MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 MACHINE_CONFIG_END
 
@@ -1051,7 +1051,7 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	//MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 MACHINE_CONFIG_END
@@ -1140,7 +1140,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a", "bbca_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b", "bbcb_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b", "bbcb_flop")
-	//MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_orig_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_orig_flop")
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
@@ -1230,7 +1230,7 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	//MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 
@@ -1301,7 +1301,7 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	//MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("cart_ls_m")
