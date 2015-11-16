@@ -20,10 +20,10 @@
 *				programming, and emulation
 * * Felipe Sanches (FSanches) - for help with MESS and emulation
 * * Michael Zapf (mizapf)     - for building the HDC9234/HDC9224
-				driver that makes this driver possible
+*				driver that makes this driver possible
 *
 * Memory map:
-* * 0x00000000 - 0x00ffffff : RAM? 16MB, up to 128MB?
+* * 0x00000000 - 0x00ffffff : RAM 12MB to 16MB known, up to 128MB?
 * * 0x08000000 - 0x0800ffff : PROM Region
 *
 ******************************************************************************/
@@ -84,30 +84,10 @@ private:
 
 	// functions
 	UINT32 swap_uint32( UINT32 val );
-	bool fd_read(int LBA, unsigned char* buffer, int bufferLength);
 
 	virtual void machine_reset();
 };
 
-bool r9751_state::fd_read(int LBA, unsigned char* buffer, int bufferLength)
-{
-	if (bufferLength < 512)
-		return false;
-//	std::vector<UINT32> *ptr_fdd_vector = &m_floppy->get_buffer();
-//	std::vector<UINT32> *ptr_vector = &m_floppy->image->get_buffer(0,0);
-	//UINT32 f_start = 0x09000000;
-	UINT8 *f_hack = memregion("floppy_hack")->base();
-	memcpy(buffer,f_hack+(LBA*512),bufferLength);
-
-//	for(int i=0;i<bufferLength/4; i++)
-//	{
-//		buffer[i*4] = (*ptr_vector)[i] & 255;
-//		buffer[i*4+1] = ((*ptr_vector)[i]>>8)&255;
-//		buffer[i*4+2] = ((*ptr_vector)[i]>>16)&255;
-//		buffer[i*4+3] = ((*ptr_vector)[i]>>24)&255;
-//	}
-	return true;
-}
 
 UINT32 r9751_state::swap_uint32( UINT32 val )
 {
@@ -139,226 +119,213 @@ void r9751_state::machine_reset()
 	m_pdc->reset();
 }
 
+/******************************************************************************
+ External board communication registers [0x5FF00000 - 0x5FFFFFFF]
+******************************************************************************/
 READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 {
 	UINT32 data;
 	UINT32 address = offset * 4 + 0x5FF00000;
-        if(address == 0x5FF00824)
-                data = 0x10; // FDD Command result code
-	else if(address == 0x5FF00898) // Serial status or DMA status
-		data = 0x40;
-        else if(address == 0x5FF008B0)
-                data = 0x10; // HDD Command result code
-	else if(address == 0x5FF03024) // HDD Command status
-	{
-		data = 0x1; // HDD SCSI command completed successfully
-		logerror("SCSI HDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-		return data;
-	}
-	else if(address == 0x5FF030B0) // FDD Command status
-	{
-		//data = 0x1; // FDD SCSI command completed successfully
-		logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", fdd_cmd_complete, space.machine().firstcpu->pc(), address);
-		data = fdd_cmd_complete;
-		fdd_cmd_complete = 0;
 
-		return data;
+	switch(address)
+	{
+		/* PDC HDD region (0x24, device 9 */
+		case 0x5FF00824: /* HDD Command result code */
+			return 0x10;
+			break;
+		case 0x5FF03024: /* HDD SCSI command completed successfully */
+			data = 0x1;
+			logerror("SCSI HDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			return data;
+			break;
+		/* SMIOC region (0x98, device 26) */
+		case 0x5FF00898: /* Serial status or DMA status */
+			return 0x40;
+			break;
+		/* PDC FDD region (0xB0, device 44 */
+		case 0x5FF008B0: /* FDD Command result code */
+			return 0x10;
+			break;
+		case 0x5FF030B0: /* FDD command completion status */
+			logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", fdd_cmd_complete, space.machine().firstcpu->pc(), address);
+			data = fdd_cmd_complete;
+			fdd_cmd_complete = 0;
+			return data;
+			break;
+		default:
+			logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, 0, mem_mask);
+			return 0;
 	}
-	else
-		data = 0x00000000;
-	logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
-	return data;
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 {
 	UINT32 address = offset * 4 + 0x5FF00000;
-	if(address == 0x5FF00224) // HDD SCSI read command
-		logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-	else if(address == 0x5FF04098) // Serial DMA Command
-	{
-		if(data == 0x4100) // Send byte to serial
-		{
-			logerror("Serial byte: %02X\n", m_mem->read_dword(smioc_out_addr));
-			m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr));
-		}
-	}
-	else if(address == 0x5FF041B0) // Unknown - Probably old style commands
-	{
-		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-		//if(data == 0x7000 || data == 0x6800) // Unknown
-		//	fdd_cmd_complete = 1;
-		UINT8 data_b0;
-		UINT8 data_b1;
-		data_b0 = data & 0xFF;
-		data_b1 = (data & 0xFF00) >> 8;
-		logerror("Test: %02X and %02X\n", data_b0, data_b1);
-	}
-	else if(address == 0x5FF08024) // HDD SCSI read command
-		logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-	else if(address == 0x5FF0C024) // HDD SCSI read command
-		logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 
-	else if(address == 0x5FF001B0) // FDD SCSI read command
+	switch(address)
 	{
-		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-		//fdd_cmd_complete = 1;
-	}
-	else if(address == 0x5FF002B0) // FDD SCSI read command
-	{
-		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-		//fdd_cmd_complete = 1;
-	}
-	else if(address == 0x5FF008B0) // FDD SCSI read command
-	{
-		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-		//fdd_cmd_complete = 1;
-	}
-	else if(address == 0x5FF080B0) // fdd_dest_address register
-	{
-		fdd_dest_address = data << 1;
-		logerror("FDD destination address: %08X\n", fdd_dest_address);
-		//fdd_cmd_complete = 1;
-	}
-        else if(address == 0x5FF0C098) // Serial DMA output address
-                smioc_out_addr = data * 2;
-	else if((address == 0x5FF0C0B0) || (address == 0x5FF0C1B0)) // FDD Command address written to this memory location
-	{
-		UINT32 fdd_scsi_command;
-		UINT32 fdd_scsi_command2;
-		//UINT8 pdc_p38;
-
-		unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
-		//unsigned char fdd_buffer[512];
-		int scsi_lba; // FDD LBA location here, extracted from command
-		
-	//	fdd_scsi_command = swap_uint32(m_mem->read_dword(fdd_dest_address));
-	//	fdd_scsi_command2 = swap_uint32(m_mem->read_dword(fdd_dest_address+4));
-                fdd_scsi_command = swap_uint32(m_mem->read_dword(data << 1));
-                fdd_scsi_command2 = swap_uint32(m_mem->read_dword((data << 1)+4));
-		
-		memcpy(c_fdd_scsi_command,&fdd_scsi_command,4);
-		memcpy(c_fdd_scsi_command+4,&fdd_scsi_command2,4);
-
-		logerror("FDD SCSI Command: ");
-		for(int i = 0; i < 8; i++)
-			logerror("%02X ", c_fdd_scsi_command[i]);
-		logerror("\n");
-		
-		scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
-		logerror("FDD SCSI LBA: %i\n", scsi_lba);
-
-		//pdc_p38 = m_pdc->p38_r(space,0);
-		m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
-		//pdc_p38 = m_pdc->reg_p38;
-		logerror("pdc_p38: %X\n",m_pdc->reg_p38);
-		//m_pdc->p38_w(space,0,0x2); // Set bit 1 on port 38 register.  PDC polls register at this location looking for command
-/*
-		switch(c_fdd_scsi_command[0])
-		{
-			case 8:
+		/* PDC HDD region (0x24, device 9 */
+		case 0x5FF00224: /* HDD SCSI read command */
+			logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			break;
+		case 0x5FF08024: /* HDD SCSI read command */
+			logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			break;
+		case 0x5FF0C024: /* HDD SCSI read command */
+			logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			break;
+		/* SMIOC region (0x98, device 26) */
+		case 0x5FF04098: /* Serial DMA Command */
+			switch(data)
 			{
-				scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
-				unsigned char fdd_buffer[c_fdd_scsi_command[4]*512];
-				logerror("FDD: SCSI READ LBA: %i\n", scsi_lba);
-				fd_read(scsi_lba,fdd_buffer,sizeof(fdd_buffer));
-				logerror("Bytes: \n");
-				for (int i = 0; i < sizeof(fdd_buffer); i++)
-				{
-					logerror(" %02X",fdd_buffer[i]);
-					if (i % 16 == 15)
-						logerror("\n");
-				}
-			
-				for (int i = 0; i < sizeof(fdd_buffer); i++)
-				{
-					m_mem->write_byte(fdd_dest_address+i, fdd_buffer[i]);
-				}
-				break;
+				case 0x4100: /* Send byte to serial */
+					logerror("Serial byte: %02X\n", m_mem->read_dword(smioc_out_addr));
+					m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr));
+					break;
+				default:
+					logerror("Uknown serial DMA command: %X\n", data);
 			}
-			default:
-				logerror("FDD: Unknown SCSI command\n");
-				break;
-		}
-*/
-	}	
-	else
-		logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
-	return;
+			break;
+		case 0x5FF0C098: /* Serial DMA output address */
+			smioc_out_addr = data * 2;
+			break;
+		/* PDC FDD region (0xB0, device 44 */
+		case 0x5FF001B0: /* FDD SCSI read command */
+			logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			break;
+		case 0x5FF002B0: /* FDD SCSI read command */
+			logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			break;
+		case 0x5FF008B0: /* FDD SCSI read command */
+			logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			break;
+		case 0x5FF041B0: /* Unknown - Probably old style commands */
+			logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			UINT8 data_b0;
+			UINT8 data_b1;
+			data_b0 = data & 0xFF;
+			data_b1 = (data & 0xFF00) >> 8;
+			logerror("Test: %02X and %02X\n", data_b0, data_b1);
+			break;
+		case 0x5FF080B0: /* fdd_dest_address register */
+			fdd_dest_address = data << 1;
+			logerror("FDD destination address: %08X\n", fdd_dest_address);
+			break;
+		case 0x5FF0C0B0:
+		case 0x5FF0C1B0:
+			UINT32 fdd_scsi_command;
+			UINT32 fdd_scsi_command2;
+			unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
+			int scsi_lba; // FDD LBA location here, extracted from command
+
+			fdd_scsi_command = swap_uint32(m_mem->read_dword(data << 1));
+			fdd_scsi_command2 = swap_uint32(m_mem->read_dword((data << 1)+4));
+
+			memcpy(c_fdd_scsi_command,&fdd_scsi_command,4);
+			memcpy(c_fdd_scsi_command+4,&fdd_scsi_command2,4);
+
+			logerror("FDD SCSI Command: ");
+			for(int i = 0; i < 8; i++)
+				logerror("%02X ", c_fdd_scsi_command[i]);
+			logerror("\n");
+
+			scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
+			logerror("FDD SCSI LBA: %i\n", scsi_lba);
+
+			m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
+			logerror("pdc_p38: %X\n",m_pdc->reg_p38);
+			break;
+
+		default:
+			logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+	}
 }
 
-READ32_MEMBER( r9751_state::r9751_mmio_ff05_r ) //0xFF050000 - 0xFF06FFFF
+/******************************************************************************
+ CPU board registers [0xFF050000 - 0xFF06FFFF]
+******************************************************************************/
+READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 {
 	UINT32 data;
         UINT32 address = offset * 4 + 0xFF050000;
-	if(address == 0xFF050610)
-		data = 0xabacabac;
-	else if(address == 0xFF050004)
-		data = reg_ff050004;
-	else if(address == 0xFF050300)
-		data = 0x1B | (1<<0x14);
-	else if(address == 0xFF050320) // Some type of counter
-	{	
-		//data = 0x1;
-		reg_ff050320++;
-		data = reg_ff050320;
+
+	switch(address)
+	{
+		case 0xFF050004:
+			return reg_ff050004;
+			break;
+		case 0xFF050300:
+			return 0x1B | (1<<0x14);
+			break;
+		case 0xFF050320: /* Some type of counter */
+			reg_ff050320++;
+			return reg_ff050320;
+			break;
+		case 0xFF050584:
+			return 0;
+			break;
+		case 0xFF050610:
+			return 0xabacabac;
+			break;
+		case 0xFF060014:
+			return 0x80;
+			break;
+		default:
+			data = 0;
+			logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+			return data;
 	}
-	else if(address == 0xFF050584)
-		return 0x0;
-	else if(address == 0xFF060014)
-		data = 0x80;
-	else
-		data = 0x00000000;
-        logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
-        return data;
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 {
 	UINT32 address = offset * 4 + 0xFF050000;
-	if(address == 0xFF050004)
-		reg_ff050004 = data;
-	else if(address == 0xFF05000C) // LED hex display indicator
+
+	switch(address)
 	{
-		logerror("\n*** LED: %02x, Instruction: %08x ***\n\n", data, space.machine().firstcpu->pc());
-/*		char buf[10];
-		char *buf2;
-		sprintf(buf,"%02X",data);
-		buf2 = buf;
-		while(*buf2)
-		{
-			m_terminal->write(space,0,*buf2);
-			buf2++;
-		}
-		m_terminal->write(space,0,0x0a);
-*/
-		return;
+		case 0xFF050004:
+			reg_ff050004 = data;
+			return;
+			break;
+		case 0xFF05000C: /* CPU LED hex display indicator */
+			logerror("\n*** LED: %02x, Instruction: %08x ***\n\n", data, space.machine().firstcpu->pc());
+			return;
+			break;
+		default:
+			logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
 	}
-	logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
-        return;
 }
 
 READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 {
         UINT32 data;
         UINT32 address = offset * 4 + 0xFFF80000;
-	if(address == 0xFFF80040)
-		data = reg_fff80040;
-	else
-		data = 0x00000000;
 
-        logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
-        return data;
+	switch(address)
+	{
+		case 0xFFF80040:
+			return reg_fff80040;
+			break;
+		default:
+			data = 0;
+			logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+			return data;
+	}
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
 {
         UINT32 address = offset * 4 + 0xFFF80000;
-	if(address == 0xFFF80040)
-		reg_fff80040 = data;
 
-        logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
-        return;
+	switch(address)
+	{
+		case 0xFFF80040:
+			reg_fff80040 = data;
+			return;
+			break;
+		default:
+			logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+	}
 }
 
 /******************************************************************************
@@ -370,7 +337,6 @@ static ADDRESS_MAP_START(r9751_mem, AS_PROGRAM, 32, r9751_state)
 	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
 	//AM_RANGE(0x01000000,0x07ffffff) AM_NOP
 	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)
-	AM_RANGE(0x09000000,0x09167fff) AM_ROM AM_REGION("floppy_hack",0)
         AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
         AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
 	AM_RANGE(0xFFF80000,0xFFF8FFFF) AM_READWRITE(r9751_mmio_fff8_r, r9751_mmio_fff8_w)
@@ -415,9 +381,6 @@ ROM_START(r9751)
 	ROM_REGION32_BE(0x00010000, "prom", 0)
 	ROM_SYSTEM_BIOS(0, "prom34",  "PROM Version 3.4")
 	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__(49fe7a)__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27128 @Unknown
-	
-	ROM_REGION(0x00168000, "floppy_hack",0)
-	ROMX_LOAD( "floppy1.img", 0x0000, 0x00168000, CRC(b5d349b5) SHA1(9e7e4f13723f54eed7bcbabd6c4fe5670ee1aa96), ROM_GROUPWORD)
 ROM_END
 
 
@@ -427,4 +390,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,      "ROLM Systems, Inc.",   "ROLM 9751 Release 9005", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,      "ROLM Systems, Inc.",   "ROLM 9751 Release 9005 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
