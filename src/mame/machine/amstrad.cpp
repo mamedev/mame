@@ -709,7 +709,7 @@ void amstrad_state::amstrad_plus_gate_array_get_video_data()
 	{
 		ma += m_asic.horiz_disp;
 	}
-	m_gate_array.address = ( ( ma & 0x3000 ) << 2 ) | ( ( m_gate_array.ra & 0x07 ) << 11 ) | ( ( ma & 0x3ff ) << 1 );
+	m_gate_array.address = ( ( ma & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ma & 0x3ff ) << 1 );
 	m_gate_array.data = m_ram->pointer()[ m_gate_array.address ];
 	caddr = 0x2400 + m_gate_array.mode_lookup[m_gate_array.data] * 2;
 	m_gate_array.colour = m_asic.ram[caddr] + ( m_asic.ram[caddr+1] << 8 );
