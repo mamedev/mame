@@ -1190,7 +1190,7 @@ endif
 
 doxygen:
 	@echo Generate Doxygen documentation
-	doxygen mame.doxygen
+	doxygen doxygen/doxygen.config
 
 #-------------------------------------------------
 # CppCheck analysis
