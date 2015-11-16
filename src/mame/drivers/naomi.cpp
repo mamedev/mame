@@ -2881,54 +2881,76 @@ Region byte encoding is as follows:
 Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for the region byte.
   NOTE: this doesn't work for the HOTD2 or multi screen boot roms
 
+
+Naomi Dev BIOS v1.10:
+NAOMI DEVELOP  1999 01/10  1.10
+
+to boot into BIOS menu DIPSW 1-4 must be ON
+with other values various tests will be run instead
+with DIPSW 1 3 OFF, 2 4 ON  MultiBoard hardware tests will be run (not present in menu)
+
+Warning !!!
+"SECURITY TEST" and "FLASH TEST" will test "M2-type" 171-7885A ROM boards Flash-ROMs, erasing its contents.
+"FLASH COPY" : 2x 171-7885A ROM boards must be connected and configured as Bank 0 and 1, contents of one will be flashed to another.
+"NEW FLASH TEST" and "NEW SECURITY TEST" - tests for "M1-type" 171-7930B ROM boards (Actel-based), flash roms contents will be erased.
+
+Security tests uses hard coded encrypted/decrypted data, so all development ROM boards must be have same hardcoded security keys.
+no valid 315-5881 key can be found using current decryption routine.
+M1-type security key is ff9d4d3c
+
+other points of interest:
+000ADFB8 - 000AF7CB - HTML with Japanese SDK/Kit change log, used in M1 security test as plaintext data.
+
 */
 // game specific bios roms quite clearly don't belong in here.
 // Japan bios is default, because most games require it.
 #define NAOMI_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21576h (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576h.ic27", 0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21576g (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.ic27", 0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576e.ic27", 0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
-	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21576d (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.ic27", 0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
-	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21576c (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576c.ic27", 0x000000, 0x200000, CRC(4599ad13) SHA1(7e730e9452a792d76f210c33a955d385538682c7) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576b (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576b.ic27", 0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
-	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21576a (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576a.ic27", 0x000000, 0x200000, CRC(cedfe439) SHA1(f27798bf3d890863ef0c1d9dcb4e7782249dca27) ) \
-	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21576 (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21576.ic27",  0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
-	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21578h (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21578h.ic27", 0x000000, 0x200000, CRC(7b452946) SHA1(8e9f153bbada24b37066dc45b64a7bf0d4f26a9b) ) \
-	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21578g (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21578g.ic27", 0x000000, 0x200000, CRC(55413214) SHA1(bd2748365a9fc1821c9369aa7155d7c41c4df43e) ) \
+	ROM_SYSTEM_BIOS( 0, "bios0",   "epr-21576h (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-21576h.ic27", 0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1",   "epr-21576g (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21576g.ic27", 0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2",   "epr-21576e (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2,  "epr-21576e.ic27", 0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3",   "epr-21576d (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3,  "epr-21576d.ic27", 0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4",   "epr-21576c (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "epr-21576c.ic27", 0x000000, 0x200000, CRC(4599ad13) SHA1(7e730e9452a792d76f210c33a955d385538682c7) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5",   "epr-21576b (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5,  "epr-21576b.ic27", 0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6",   "epr-21576a (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6,  "epr-21576a.ic27", 0x000000, 0x200000, CRC(cedfe439) SHA1(f27798bf3d890863ef0c1d9dcb4e7782249dca27) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7",   "epr-21576 (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7,  "epr-21576.ic27",  0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
+	ROM_SYSTEM_BIOS( 8, "bios8",   "epr-21578h (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8,  "epr-21578h.ic27", 0x000000, 0x200000, CRC(7b452946) SHA1(8e9f153bbada24b37066dc45b64a7bf0d4f26a9b) ) \
+	ROM_SYSTEM_BIOS( 9, "bios9",   "epr-21578g (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9,  "epr-21578g.ic27", 0x000000, 0x200000, CRC(55413214) SHA1(bd2748365a9fc1821c9369aa7155d7c41c4df43e) ) \
 	ROM_SYSTEM_BIOS( 10, "bios10", "epr-21578e (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-21578e.ic27",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-21578e.ic27", 0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
 	ROM_SYSTEM_BIOS( 11, "bios11", "epr-21578d (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-21578d.ic27",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-21578d.ic27", 0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
 	ROM_SYSTEM_BIOS( 12, "bios12", "epr-21578a (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-21578a.ic27",  0x000000, 0x200000, CRC(6c9aad83) SHA1(555918de76d8dbee2a97d8a95297ef694b3e803f) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-21578a.ic27", 0x000000, 0x200000, CRC(6c9aad83) SHA1(555918de76d8dbee2a97d8a95297ef694b3e803f) ) \
 	ROM_SYSTEM_BIOS( 13, "bios13", "epr-21577h (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13, "epr-21577h.ic27",  0x000000, 0x200000, CRC(fdf17452) SHA1(5f3e4b677f0046ce690a4f096b0481e5dd8bb6e6) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "epr-21577h.ic27", 0x000000, 0x200000, CRC(fdf17452) SHA1(5f3e4b677f0046ce690a4f096b0481e5dd8bb6e6) ) \
 	ROM_SYSTEM_BIOS( 14, "bios14", "epr-21577g (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 14, "epr-21577g.ic27",  0x000000, 0x200000, CRC(25f64af7) SHA1(99f9e6cc0642319bd2da492611220540add573e8) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14, "epr-21577g.ic27", 0x000000, 0x200000, CRC(25f64af7) SHA1(99f9e6cc0642319bd2da492611220540add573e8) ) \
 	ROM_SYSTEM_BIOS( 15, "bios15", "epr-21577e (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 15, "epr-21577e.ic27",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 15, "epr-21577e.ic27", 0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
 	ROM_SYSTEM_BIOS( 16, "bios16", "epr-21577d (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 16, "epr-21577d.ic27",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 16, "epr-21577d.ic27", 0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
 	ROM_SYSTEM_BIOS( 17, "bios17", "epr-21577a (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 17, "epr-21577a.ic27",  0x000000, 0x200000, CRC(969dc491) SHA1(581d1eae328b87b67508a7586ffc60cee256f70f) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 17, "epr-21577a.ic27", 0x000000, 0x200000, CRC(969dc491) SHA1(581d1eae328b87b67508a7586ffc60cee256f70f) ) \
 	ROM_SYSTEM_BIOS( 18, "bios18", "epr-21579d (Korea)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 18, "epr-21579d.ic27",  0x000000, 0x200000, CRC(33513691) SHA1(b1d8c7c516e1471a788fcf7a02a794ad2f05aeeb) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 18, "epr-21579d.ic27", 0x000000, 0x200000, CRC(33513691) SHA1(b1d8c7c516e1471a788fcf7a02a794ad2f05aeeb) ) \
 	ROM_SYSTEM_BIOS( 19, "bios19", "epr-21579 (Korea)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 19, "epr-21579.ic27",  0x000000, 0x200000, CRC(71f9c918) SHA1(d15af8b947f41eea7c203b565cd403e3f37a2017) ) \
 	ROM_SYSTEM_BIOS( 20, "bios20", "Naomi Dev BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 20,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
-
+	ROM_LOAD16_WORD_SWAP_BIOS( 20, "dcnaodev.bios",   0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) \
+	ROM_SYSTEM_BIOS( 21, "bios21", "Naomi Dev BIOS v1.10" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) )
+/* dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096 */
 
 // bios for House of the Dead 2
 #define HOTD2_BIOS \
