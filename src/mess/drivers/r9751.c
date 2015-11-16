@@ -122,7 +122,7 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	reg_fff80040 = 0;
 	fdd_dest_address = 0;
 //	fdd_scsi_command = 0;
-	fdd_cmd_complete = 1;
+	fdd_cmd_complete = 0;
 	smioc_out_addr = 0;
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
@@ -152,13 +152,13 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 	else if(address == 0x5FF03024) // HDD Command status
 	{
 		data = 0x1; // HDD SCSI command completed successfully
-		logerror("SCSI HDD command completed - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		logerror("SCSI HDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 		return data;
 	}
 	else if(address == 0x5FF030B0) // FDD Command status
 	{
 		//data = 0x1; // FDD SCSI command completed successfully
-		logerror("--- SCSI FDD command completed - Read: %08X, From: %08X, Register: %08X\n", fdd_cmd_complete, space.machine().firstcpu->pc(), address);
+		logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", fdd_cmd_complete, space.machine().firstcpu->pc(), address);
 		data = fdd_cmd_complete;
 		fdd_cmd_complete = 0;
 
@@ -183,6 +183,17 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr));
 		}
 	}
+	else if(address == 0x5FF041B0) // Unknown - Probably old style commands
+	{
+		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		//if(data == 0x7000 || data == 0x6800) // Unknown
+		//	fdd_cmd_complete = 1;
+		UINT8 data_b0;
+		UINT8 data_b1;
+		data_b0 = data & 0xFF;
+		data_b1 = (data & 0xFF00) >> 8;
+		logerror("Test: %02X and %02X\n", data_b0, data_b1);
+	}
 	else if(address == 0x5FF08024) // HDD SCSI read command
 		logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 	else if(address == 0x5FF0C024) // HDD SCSI read command
@@ -196,18 +207,18 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 	else if(address == 0x5FF002B0) // FDD SCSI read command
 	{
 		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-		fdd_cmd_complete = 1;
+		//fdd_cmd_complete = 1;
 	}
 	else if(address == 0x5FF008B0) // FDD SCSI read command
 	{
 		logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-		fdd_cmd_complete = 1;
+		//fdd_cmd_complete = 1;
 	}
 	else if(address == 0x5FF080B0) // fdd_dest_address register
 	{
 		fdd_dest_address = data << 1;
 		logerror("FDD destination address: %08X\n", fdd_dest_address);
-		fdd_cmd_complete = 1;
+		//fdd_cmd_complete = 1;
 	}
         else if(address == 0x5FF0C098) // Serial DMA output address
                 smioc_out_addr = data * 2;
@@ -215,6 +226,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 	{
 		UINT32 fdd_scsi_command;
 		UINT32 fdd_scsi_command2;
+		//UINT8 pdc_p38;
+
 		unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
 		//unsigned char fdd_buffer[512];
 		int scsi_lba; // FDD LBA location here, extracted from command
@@ -235,7 +248,11 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
 		logerror("FDD SCSI LBA: %i\n", scsi_lba);
 
-		m_pdc->p38_w(space,0,0x2); // Set bit 1 on port 38 register.  PDC polls register at this location looking for command
+		//pdc_p38 = m_pdc->p38_r(space,0);
+		m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
+		//pdc_p38 = m_pdc->reg_p38;
+		logerror("pdc_p38: %X\n",m_pdc->reg_p38);
+		//m_pdc->p38_w(space,0,0x2); // Set bit 1 on port 38 register.  PDC polls register at this location looking for command
 /*
 		switch(c_fdd_scsi_command[0])
 		{

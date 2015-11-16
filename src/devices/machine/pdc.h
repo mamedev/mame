@@ -67,9 +67,11 @@ public:
 
 	DECLARE_WRITE8_MEMBER(p38_w);
 	DECLARE_READ8_MEMBER(p38_r);
+	DECLARE_READ8_MEMBER(p39_r);
 
         DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	UINT8 reg_p38;
 protected:
         // device-level overrides
         virtual void device_start();
@@ -109,7 +111,7 @@ protected:
         // interrupts
 //        int m_via0_irq;                         // VIA #0 interrupt request
 //        int m_via1_irq;                         // VIA #1 interrupt request
-	UINT8 reg_p38;
+//	UINT8 reg_p38;
 };
 
 

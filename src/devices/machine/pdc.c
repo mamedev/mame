@@ -67,6 +67,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
 	AM_RANGE(0x38, 0x38) AM_READ(p38_r) // Possibly UPD765 interrupt
+	AM_RANGE(0x39, 0x39) AM_READ(p39_r) AM_MIRROR(0xFF00) // HDD related
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE(HDC_TAG, hdc9224_device,read,write) AM_MIRROR(0xFF00)
 	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
 	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE(FDCDMA_TAG,am9517a_device,read,write) AM_MIRROR(0xFF00)
@@ -300,14 +301,21 @@ WRITE_LINE_MEMBER(pdc_device::hdd_irq)
 WRITE8_MEMBER(pdc_device::p38_w)
 {
 	logerror("PDC: Port 0x38 set bit: %i\n", data);
-	reg_p38 |= data;
+	//reg_p38 |= data;
+	reg_p38 = data;
 }
+
 READ8_MEMBER(pdc_device::p38_r)
 {
-	UINT8 retn;
+	//UINT8 retn;
 	logerror("PDC: Port 0x38 READ: %02X\n", reg_p38);
-	retn = reg_p38;
-	reg_p38 &= ~2; // Clear bit 1
+	//retn = reg_p38;
+	//reg_p38 &= ~2; // Clear bit 1
+	//return retn;
+	return reg_p38;
+}
 
-	return retn;
+READ8_MEMBER(pdc_device::p39_r)
+{
+	return 1;
 }
