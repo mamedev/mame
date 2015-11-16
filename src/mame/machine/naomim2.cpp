@@ -183,7 +183,7 @@ void naomi_m2_board::board_write(offs_t offset, UINT16 data)
 		case 0x1fffc: m_cryptdevice->set_subkey(data); return;
 		}
 	}
-	throw emu_fatalerror("NAOMIM2: unhandled board write %08x, %04x\n", offset, data);
+	logerror("NAOMIM2: unhandled board write %08x, %04x\n", offset, data);
 }
 
 UINT16 naomi_m2_board::read_callback(UINT32 addr)
