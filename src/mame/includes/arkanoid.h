@@ -20,8 +20,8 @@ public:
 		m_videoram(*this,"videoram"),
 		m_spriteram(*this,"spriteram"),
 		m_protram(*this,"protram"),
-		m_mcu(*this, "mcu"),
 		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -52,11 +52,15 @@ public:
 	UINT8    m_bootleg_cmd;
 
 	/* hexaa */
-	UINT8 hexaa_from_main;
-	UINT8 hexaa_from_sub;
+	UINT8 m_hexaa_from_main;
+	UINT8 m_hexaa_from_sub;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	DECLARE_READ8_MEMBER(arkanoid_Z80_mcu_r);
 	DECLARE_WRITE8_MEMBER(arkanoid_Z80_mcu_w);
 	DECLARE_READ8_MEMBER(arkanoid_68705_port_a_r);
@@ -84,6 +88,7 @@ public:
 	DECLARE_DRIVER_INIT(block2);
 	DECLARE_DRIVER_INIT(arkblock);
 	DECLARE_DRIVER_INIT(hexa);
+	DECLARE_DRIVER_INIT(hexaa);
 	DECLARE_DRIVER_INIT(paddle2);
 	DECLARE_DRIVER_INIT(tetrsark);
 	DECLARE_DRIVER_INIT(arkgcbl);
@@ -92,15 +97,12 @@ public:
 	DECLARE_DRIVER_INIT(arkangc);
 	DECLARE_DRIVER_INIT(brixian);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(arkanoid);
-	DECLARE_MACHINE_RESET(arkanoid);
-	DECLARE_VIDEO_START(arkanoid);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 	UINT32 screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(test);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
