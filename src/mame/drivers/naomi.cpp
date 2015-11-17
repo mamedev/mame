@@ -2882,7 +2882,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
   NOTE: this doesn't work for the HOTD2 or multi screen boot roms
 
 
-Naomi Dev BIOS v1.10:
+Naomi Dev BIOS v1.10:   (some sources call it "NAOMI Test BIOS ROM")
 NAOMI DEVELOP  1999 01/10  1.10
 
 to boot into BIOS menu DIPSW 1-4 must be ON
@@ -2900,6 +2900,15 @@ M1-type security key is ff9d4d3c
 
 other points of interest:
 000ADFB8 - 000AF7CB - HTML with Japanese SDK/Kit change log, used in M1 security test as plaintext data.
+
+"INPUT TEST" : tests inputs connected to MIE GPIO ports (active low):
+0 - Player 1 input
+1 - Player 2 input
+2 - Coins 1/2, Test, Service, Start 1/2
+4 - Port E
+6 - Port G
+F - 8x analogue inputs
+Probably at some stage of development NAOMI was planned as non-JVS system as well, and inputs must be wired to CN19-21, unpopulated on retail hardware.
 
 */
 // game specific bios roms quite clearly don't belong in here.
