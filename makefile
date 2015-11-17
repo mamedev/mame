@@ -91,7 +91,7 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
-# SOURCES = src/mame/drivers/asteroid.c,src/mame/audio/llander.c
+# SOURCES = src/mame/drivers/asteroid.cpp,src/mame/audio/llander.cpp
 
 # FORCE_VERSION_COMPILE = 1
 
