@@ -1376,16 +1376,22 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 				: (d3d->window().target()->orientation() & ROT270) == ROT270
 					? 3
 					: 0;
-
-	render_container &screen_container = machine->first_screen()->container();
+	
+	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device *screen = screen_iterator.first();
+	for (int i = 0; i < curr_screen; i++)
+	{
+		screen = screen_iterator.next();
+	}
+	render_container &screen_container = screen->container();
 
 	float xscale = screen_container.xscale();
 	float yscale = screen_container.yscale();
 	float xoffset = -screen_container.xoffset();
-	float yoffset = -screen_container.yoffset();		
+	float yoffset = -screen_container.yoffset();
 
 	float screen_scale[2] = { xscale, yscale };
-	float screen_offset[2] = { xoffset, yoffset };	
+	float screen_offset[2] = { xoffset, yoffset };
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
@@ -1671,6 +1677,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
 	{
+		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+
 		curr_render_target = find_render_target(curr_texture);
 
 		render_target *rt = curr_render_target;
@@ -1712,6 +1720,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_texture->mask_frame_count(options->yiq_phase_count);
 
 		options->params_dirty = false;
+
+		curr_screen++;
 	}
 	else if (PRIMFLAG_GET_VECTOR(poly->get_flags()) && vector_enable)
 	{
