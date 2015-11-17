@@ -434,6 +434,7 @@ private:
 	cache_target *          cachehead;
 
 	static slider_desc      s_sliders[];
+	static hlsl_options     last_options;               // last used options
 };
 
 }

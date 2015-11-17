@@ -102,6 +102,8 @@ shaders::shaders():
 
 shaders::~shaders()
 {
+	last_options = *options;
+
 	options = NULL;
 
 	cache_target *currcache = cachehead;
@@ -676,6 +678,11 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	hlsl_prescale_y = winoptions.d3d_hlsl_prescale_y();
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
+
+	if (last_options.params_init)
+	{
+		options = &last_options;
+	}
 
 	if (!options->params_init)
 	{
@@ -2679,10 +2686,7 @@ static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->bloom_level10_weight), 0.01f, "%1.2f", str, newval);
 }
 
-
-//============================================================
-//  init_slider_list
-//============================================================
+hlsl_options shaders::last_options;
 
 shaders::slider_desc shaders::s_sliders[] =
 {
@@ -2762,6 +2766,11 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Bloom Level 10 Scale",                0,     9,   100, 1, 7, slider_bloom_lvl10_scale },
 	{ NULL, 0, 0, 0, 0, 0, NULL },
 };
+
+
+//============================================================
+//  init_slider_list
+//============================================================
 
 slider_state *shaders::init_slider_list()
 {
