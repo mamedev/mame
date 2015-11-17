@@ -161,33 +161,66 @@ TODO:
 
 -------------------------------------------------------------------
 
+Top Roller
+Jaleco 1983
 
- Top Roller
- Jaleco
+PCB Layout
+----------
 
- Hardware : Original Jaleco board no 8307-B/8307-A(redump)
+8307-A
+JALECO MADE IN JAPAN
+|------------------------------------------------|
+|       2114  ENCR_Z80                           |
+|DSW(8) 2114  6116                              |-|
+|                                               | |
+|          7.3D   1.5D                          | |
+|2         8.3F   2.5F                          | |
+|2         9.3H   3.5H                2114      |-|
+|W         10.3K  4.5K                2114       |
+|A         11.3L  5.5L                2114       |
+|Y                6.5M                2114      |-|
+|          12.3P                         7603.9N| |
+|                                        7603.9P| |
+|    DSW(4)                                     | |
+|     LM3900                                    |-|
+|HA1388 VOL    AY-3-8910                 7611.9S |
+|------------------------------------------------|
+Notes:
+ ENCR_Z80 - Encrypted Z80 CPU. Clock 3.00MHz [12/4]. No markings on 
+            the chip but likely made by Sega (possibly 315-5018)
+ AY3-8910 - Clock 1.50MHz [12/8]
+     7603 - Harris M3-7603 32 bytes x8-bit (256 bits) bipolar PROM
+     7611 - Harris M3-7611 256 bytes x4-bit (1k) bipolar PROM
+     6116 - 2kx8 SRAM
+     2114 - 1kx4 SRAM
+   LM3900 - Texas Instruments LM3900 Quad Operational Amplifier
+   HA1388 - Hitachi HA1388 18W BTL Audio Power Amplifier
+    HSync - 15.13976kHz
+    VSync - 59.15182Hz
 
- Main CPU : Encrypted Z80 (probably 315-5018)
- Sound : AY-3-8910
 
- ROMS CRC32 + positions :
-
- [9894374d]  d5
- [ef789f00]  f5
- [d45494ba]  h5
- [1cb48ea0]  k5
- [84139f46]  l5
- [e30c1dd8]  m5
- [904fffb6]  d3
- [94371cfb]  f3
- [8a8032a7]  h3
- [1e8914a6]  k3
- [b20a9fa2]  l3
- [7f989dc9]  p3
- [89327329]  a4 bottom board 89327329
- [7a945733]  c4 bottom board
- [5f2c2a78]  h4 bottom board  bad dump / [1d9e3325] (8307-A)
- [ce3afe26]  j4 bottom board
+8307-B
+JALECO MADE IN JAPAN
+|------------------------------------------------|
+|7603.1A       13.4A  2114                       |
+|              14.4C  2114                      |-|
+|                           2114                | |
+|         2114              2114                | |
+|         2114 15.4H                            | |
+|              16.4J                            |-|
+| D2125 D2125                                    |
+| D2125 D2125                                    |
+| D2125 D2125                                   |-|
+|                                               | |
+|                                               | |
+|                                               | |
+|     7603.2P                                   |-|
+|     7603.2R                             12MHz  |
+|------------------------------------------------|
+Notes:
+      2114 - 1kx4 SRAM
+     D2125 - 1kx1 SRAM
+      7603 - Harris M3-7603 32 bytes x8-bit bipolar PROM
 
 ----
 
