@@ -245,6 +245,11 @@ render_primitive_list *d3d::renderer::get_primitives()
 		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
 		window().target()->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
 	}
+	if (m_shaders != NULL)
+	{
+		window().target()->set_scale_primitives(!m_shaders->enabled());
+		window().target()->set_offset_primitives(!m_shaders->enabled());
+	}
 	return &window().target()->get_primitives();
 }
 

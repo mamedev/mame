@@ -964,8 +964,7 @@ int shaders::create_resources(bool reset)
 	color_effect->add_uniform("Saturation", uniform::UT_FLOAT, uniform::CU_COLOR_SATURATION);
 
 	prescale_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	prescale_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-
+	
 	deconverge_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	deconverge_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 	deconverge_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
@@ -988,7 +987,7 @@ int shaders::create_resources(bool reset)
 	bloom_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 
 	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT); // backward compatibility
+	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
 	post_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	post_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 	post_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS); // backward compatibility
@@ -1371,10 +1370,22 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 					? 3
 					: 0;
 
+	render_container &screen_container = machine->first_screen()->container();
+
+	float xscale = screen_container.xscale();
+	float yscale = screen_container.yscale();
+	float xoffset = -screen_container.xoffset();
+	float yoffset = -screen_container.yoffset();		
+
+	float screen_scale[2] = { xscale, yscale };
+	float screen_offset[2] = { xoffset, yoffset };	
+
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
+	curr_effect->set_vector("ScreenScale", 2, screen_scale);
+	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
 	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
 	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
