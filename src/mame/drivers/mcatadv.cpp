@@ -477,6 +477,15 @@ static MACHINE_CONFIG_DERIVED( nost, mcatadv )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(nost_sound_map)
 	MCFG_CPU_IO_MAP(nost_sound_io_map)
+
+	MCFG_DEVICE_REMOVE("lspeaker")
+	MCFG_DEVICE_REMOVE("rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
+        MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
+        MCFG_SOUND_ROUTE(0, "mono", 0.2)
+        MCFG_SOUND_ROUTE(1, "mono", 0.5)
+        MCFG_SOUND_ROUTE(2, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
