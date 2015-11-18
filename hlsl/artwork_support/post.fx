@@ -235,7 +235,7 @@ float GetSpotAddend(float2 coord, float amount)
 					: float2(-0.25f, 0.25f)
 		: OrientationSwapXY
 			? float2(0.25f, 0.25f)
-			: float2(-0.25f, 0.25f);		
+			: float2(-0.25f, 0.25f);
 
 	float2 SpotCoord = coord;
 	SpotCoord += spotOffset * RatioCorrection;

@@ -360,7 +360,7 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 {
 	// an initial parse to capture the initial set of values
 	bool result;
-	
+
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// keep adding slot options until we stop seeing new stuff

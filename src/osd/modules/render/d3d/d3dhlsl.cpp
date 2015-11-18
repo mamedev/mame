@@ -901,7 +901,7 @@ int shaders::create_resources(bool reset)
 		texture.palette = NULL;
 		texture.seqid = 0;
 
-		// now create it (no prescale, but wrap)		
+		// now create it (no prescale, but wrap)
 		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_TEXWRAP_MASK);
 	}
 
@@ -977,7 +977,7 @@ int shaders::create_resources(bool reset)
 	color_effect->add_uniform("Saturation", uniform::UT_FLOAT, uniform::CU_COLOR_SATURATION);
 
 	prescale_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	
+
 	deconverge_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	deconverge_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 	deconverge_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
@@ -1382,7 +1382,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 				: (d3d->window().target()->orientation() & ROT270) == ROT270
 					? 3
 					: 0;
-	
+
 	screen_device_iterator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.first();
 	for (int i = 0; i < curr_screen; i++)
