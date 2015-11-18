@@ -193,9 +193,6 @@ public:
 	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 
-	// configuration helpers
-	device_t &add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock);
-
 	// immediate operations
 	int run(bool firstrun);
 	void pause();

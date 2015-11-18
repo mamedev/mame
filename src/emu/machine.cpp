@@ -309,24 +309,6 @@ void running_machine::start()
 
 
 //-------------------------------------------------
-//  add_dynamic_device - dynamically add a device
-//-------------------------------------------------
-
-device_t &running_machine::add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock)
-{
-	// add the device in a standard manner
-	device_t *device = const_cast<machine_config &>(m_config).device_add(&owner, tag, type, clock);
-
-	// notify this device and all its subdevices that they are now configured
-	device_iterator iter(root_device());
-	for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
-		if (!dev->configured())
-			dev->config_complete();
-	return *device;
-}
-
-
-//-------------------------------------------------
 //  run - execute the machine
 //-------------------------------------------------
 
