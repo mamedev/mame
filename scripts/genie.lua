@@ -621,6 +621,7 @@ if _OPTIONS["BIGENDIAN"]=="1" then
 		}
 		buildoptions {
 			"-Wno-unused-label",
+			"-flax-vector-conversions",
 		}
 		if _OPTIONS["SYMBOLS"] then
 			buildoptions {
