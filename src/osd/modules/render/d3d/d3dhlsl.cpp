@@ -72,14 +72,13 @@ static direct3dx9_loadeffect_ptr g_load_effect = NULL;
 //  shader manager constructor
 //============================================================
 
-shaders::shaders(): 
+shaders::shaders() : 
 	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), write_ini(false), read_ini(false), hlsl_prescale_x(0), hlsl_prescale_y(0), bloom_count(0), 
 	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(NULL), avi_frame(0), avi_copy_surface(NULL), avi_copy_texture(NULL), avi_final_target(NULL), avi_final_texture(NULL),
 	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL), 
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(NULL), curr_effect(NULL), default_effect(NULL), prescale_effect(NULL), post_effect(NULL), distortion_effect(NULL),
 	focus_effect(NULL), phosphor_effect(NULL), deconverge_effect(NULL), color_effect(NULL), yiq_encode_effect(NULL), yiq_decode_effect(NULL), bloom_effect(NULL), 
 	downsample_effect(NULL), vector_effect(NULL), fsfx_vertices(NULL), curr_texture(NULL), curr_render_target(NULL), curr_poly(NULL)
-
 {
 	master_enable = false;
 	vector_enable = true;
@@ -102,8 +101,10 @@ shaders::shaders():
 
 shaders::~shaders()
 {
-	last_options = *options;
-
+	if (options != NULL)
+	{
+		last_options = *options;
+	}
 	options = NULL;
 
 	cache_target *currcache = cachehead;
@@ -653,6 +654,11 @@ void shaders::set_texture(texture_info *texture)
 
 void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *renderer)
 {
+	if (&machine->system() == &GAME_NAME(___empty))
+	{
+		return;
+	}
+
 	if (!d3dintf->post_fx_available)
 	{
 		return;
@@ -2696,17 +2702,17 @@ static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->bloom_level10_weight), 0.01f, "%1.2f", str, newval);
 }
 
-hlsl_options shaders::last_options;
+hlsl_options shaders::last_options = { false };
 
 shaders::slider_desc shaders::s_sliders[] =
 {
-	{ "Vector Length Attenuation",           0,    80,   100, 1, 2, slider_vector_attenuation },
+	{ "Vector Length Attenuation",           0,    50,   100, 1, 2, slider_vector_attenuation },
 	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, 2, slider_vector_length_max },
 	{ "Shadow Mask Darkness",                0,     0,   100, 1, 7, slider_shadow_mask_alpha },
-	{ "Shadow Mask X Count",                 1,     6,  1024, 1, 7, slider_shadow_mask_x_count },
-	{ "Shadow Mask Y Count",                 1,     6,  1024, 1, 7, slider_shadow_mask_y_count },
-	{ "Shadow Mask Pixel Count X",           1,     6,    64, 1, 7, slider_shadow_mask_usize },
-	{ "Shadow Mask Pixel Count Y",           1,     6,    64, 1, 7, slider_shadow_mask_vsize },
+	{ "Shadow Mask X Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_x_count },
+	{ "Shadow Mask Y Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_y_count },
+	{ "Shadow Mask Pixel Count X",           1,     1,    64, 1, 7, slider_shadow_mask_usize },
+	{ "Shadow Mask Pixel Count Y",           1,     1,    64, 1, 7, slider_shadow_mask_vsize },
 	{ "Shadow Mask Offset X",             -100,     0,   100, 1, 7, slider_shadow_mask_uoffset },
 	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, 7, slider_shadow_mask_voffset },
 	{ "Screen Curvature",                    0,     0,   100, 1, 7, slider_curvature },
@@ -2714,7 +2720,7 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Screen Smooth Border",                0,     0,   100, 1, 7, slider_smooth_border },
 	{ "Screen Reflection",                   0,     0,   100, 1, 7, slider_reflection },
 	{ "Image Vignetting",                    0,     0,   100, 1, 7, slider_vignetting },
-	{ "Scanline Darkness",                   0,   100,   100, 1, 1, slider_scanline_alpha },
+	{ "Scanline Darkness",                   0,     0,   100, 1, 1, slider_scanline_alpha },
 	{ "Scanline Screen Height",              1,    20,    80, 1, 1, slider_scanline_scale },
 	{ "Scanline Indiv. Height",              1,    20,    80, 1, 1, slider_scanline_height },
 	{ "Scanline Brightness",                 0,    20,    40, 1, 1, slider_scanline_bright_scale },
@@ -2722,12 +2728,12 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Scanline Jitter",                     0,     0,    40, 1, 1, slider_scanline_offset },
 	{ "Defocus X",                           0,     0,    64, 1, 3, slider_defocus_x },
 	{ "Defocus Y",                           0,     0,    64, 1, 3, slider_defocus_y },
-	{ "Red Position Offset X",           -1500,     3,  1500, 1, 3, slider_red_converge_x },
+	{ "Red Position Offset X",           -1500,     0,  1500, 1, 3, slider_red_converge_x },
 	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 3, slider_red_converge_y },
 	{ "Green Position Offset X",         -1500,     0,  1500, 1, 3, slider_green_converge_x },
-	{ "Green Position Offset Y",         -1500,     3,  1500, 1, 3, slider_green_converge_y },
-	{ "Blue Position Offset X",          -1500,     3,  1500, 1, 3, slider_blue_converge_x },
-	{ "Blue Position Offset Y",          -1500,     3,  1500, 1, 3, slider_blue_converge_y },
+	{ "Green Position Offset Y",         -1500,     0,  1500, 1, 3, slider_green_converge_y },
+	{ "Blue Position Offset X",          -1500,     0,  1500, 1, 3, slider_blue_converge_x },
+	{ "Blue Position Offset Y",          -1500,     0,  1500, 1, 3, slider_blue_converge_y },
 	{ "Red Convergence X",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_x },
 	{ "Red Convergence Y",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_y },
 	{ "Green Convergence X",             -1500,     0,  1500, 1, 3, slider_green_radial_converge_x },
@@ -2743,37 +2749,37 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Blue Output from Red Input",       -400,     0,   400, 5, 7, slider_blue_from_r },
 	{ "Blue Output from Green Input",     -400,     0,   400, 5, 7, slider_blue_from_g },
 	{ "Blue Output from Blue Input",      -400,     0,   400, 5, 7, slider_blue_from_b },
-	{ "Saturation",                          0,   140,   400, 1, 7, slider_saturation },
+	{ "Saturation",                          0,   100,   400, 1, 7, slider_saturation },
 	{ "Red DC Offset",                    -100,     0,   100, 1, 7, slider_red_offset },
 	{ "Green DC Offset",                  -100,     0,   100, 1, 7, slider_green_offset },
 	{ "Blue DC Offset",                   -100,     0,   100, 1, 7, slider_blue_offset },
-	{ "Red Scale",                        -200,    95,   200, 1, 7, slider_red_scale },
-	{ "Green Scale",                      -200,    95,   200, 1, 7, slider_green_scale },
-	{ "Blue Scale",                       -200,    95,   200, 1, 7, slider_blue_scale },
-	{ "Red Gamma",                         -80,    16,    80, 1, 7, slider_red_power },
-	{ "Green Gamma",                       -80,    16,    80, 1, 7, slider_green_power },
-	{ "Blue Gamma",                        -80,    16,    80, 1, 7, slider_blue_power },
-	{ "Red Floor",                           0,     5,   100, 1, 7, slider_red_floor },
-	{ "Green Floor",                         0,     5,   100, 1, 7, slider_green_floor },
-	{ "Blue Floor",                          0,     5,   100, 1, 7, slider_blue_floor },
-	{ "Red Phosphor Life",                   0,    40,   100, 1, 7, slider_red_phosphor_life },
-	{ "Green Phosphor Life",                 0,    40,   100, 1, 7, slider_green_phosphor_life },
-	{ "Blue Phosphor Life",                  0,    40,   100, 1, 7, slider_blue_phosphor_life },
-	{ "Bloom Scale",                         0,   250,  2000, 5, 7, slider_bloom_scale },
-	{ "Bloom Red Overdrive",                 0,   250,  2000, 5, 7, slider_bloom_red_overdrive },
-	{ "Bloom Green Overdrive",               0,   250,  2000, 5, 7, slider_bloom_green_overdrive },
-	{ "Bloom Blue Overdrive",                0,   250,  2000, 5, 7, slider_bloom_blue_overdrive },
+	{ "Red Scale",                        -200,   100,   200, 1, 7, slider_red_scale },
+	{ "Green Scale",                      -200,   100,   200, 1, 7, slider_green_scale },
+	{ "Blue Scale",                       -200,   100,   200, 1, 7, slider_blue_scale },
+	{ "Red Gamma",                         -80,     0,    80, 1, 7, slider_red_power },
+	{ "Green Gamma",                       -80,     0,    80, 1, 7, slider_green_power },
+	{ "Blue Gamma",                        -80,     0,    80, 1, 7, slider_blue_power },
+	{ "Red Floor",                           0,     0,   100, 1, 7, slider_red_floor },
+	{ "Green Floor",                         0,     0,   100, 1, 7, slider_green_floor },
+	{ "Blue Floor",                          0,     0,   100, 1, 7, slider_blue_floor },
+	{ "Red Phosphor Life",                   0,     0,   100, 1, 7, slider_red_phosphor_life },
+	{ "Green Phosphor Life",                 0,     0,   100, 1, 7, slider_green_phosphor_life },
+	{ "Blue Phosphor Life",                  0,     0,   100, 1, 7, slider_blue_phosphor_life },
+	{ "Bloom Scale",                         0,     0,  2000, 5, 7, slider_bloom_scale },
+	{ "Bloom Red Overdrive",                 0,     0,  2000, 5, 7, slider_bloom_red_overdrive },
+	{ "Bloom Green Overdrive",               0,     0,  2000, 5, 7, slider_bloom_green_overdrive },
+	{ "Bloom Blue Overdrive",                0,     0,  2000, 5, 7, slider_bloom_blue_overdrive },
 	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, 7, slider_bloom_lvl0_scale },
-	{ "Bloom Level 1 Scale",                 0,    21,   100, 1, 7, slider_bloom_lvl1_scale },
-	{ "Bloom Level 2 Scale",                 0,    19,   100, 1, 7, slider_bloom_lvl2_scale },
-	{ "Bloom Level 3 Scale",                 0,    17,   100, 1, 7, slider_bloom_lvl3_scale },
-	{ "Bloom Level 4 Scale",                 0,    15,   100, 1, 7, slider_bloom_lvl4_scale },
-	{ "Bloom Level 5 Scale",                 0,    14,   100, 1, 7, slider_bloom_lvl5_scale },
-	{ "Bloom Level 6 Scale",                 0,    13,   100, 1, 7, slider_bloom_lvl6_scale },
-	{ "Bloom Level 7 Scale",                 0,    12,   100, 1, 7, slider_bloom_lvl7_scale },
-	{ "Bloom Level 8 Scale",                 0,    11,   100, 1, 7, slider_bloom_lvl8_scale },
-	{ "Bloom Level 9 Scale",                 0,    10,   100, 1, 7, slider_bloom_lvl9_scale },
-	{ "Bloom Level 10 Scale",                0,     9,   100, 1, 7, slider_bloom_lvl10_scale },
+	{ "Bloom Level 1 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl1_scale },
+	{ "Bloom Level 2 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl2_scale },
+	{ "Bloom Level 3 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl3_scale },
+	{ "Bloom Level 4 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl4_scale },
+	{ "Bloom Level 5 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl5_scale },
+	{ "Bloom Level 6 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl6_scale },
+	{ "Bloom Level 7 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl7_scale },
+	{ "Bloom Level 8 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl8_scale },
+	{ "Bloom Level 9 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl9_scale },
+	{ "Bloom Level 10 Scale",                0,     0,   100, 1, 7, slider_bloom_lvl10_scale },
 	{ NULL, 0, 0, 0, 0, 0, NULL },
 };
 

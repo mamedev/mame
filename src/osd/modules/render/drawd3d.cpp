@@ -804,6 +804,7 @@ int renderer::device_create(HWND device_hwnd)
 	if (m_shaders_options == NULL)
 	{
 		m_shaders_options = (hlsl_options*)global_alloc_clear(hlsl_options);
+		m_shaders_options->params_init = false;
 	}
 
 	// verify the caps

@@ -347,7 +347,7 @@ float2 GetAdjustedCoords(float2 coord, float2 centerOffset, float distortionAmou
 	// apply ratio difference between screen and quad
 	coord /= RatioCorrection;
 
-	// applay screen scale
+	// apply screen scale
 	coord /= ScreenScale;
 
 	// distort coordinates
