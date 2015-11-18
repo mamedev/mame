@@ -21,8 +21,8 @@
 
 To Do:
 
-- Remove ROM patches from smoto, stisub and tesorone, emulate the protection instead.
-- Hopper emulation currently hooked up in stisub, tesorone and smoto. Add to others.
+- Remove ROM patches from smoto, stbsub and tesorone, emulate the protection instead.
+- Hopper emulation currently hooked up in stbsub, tesorone and smoto. Add to others.
 
 ****************************************************************************
 
@@ -247,7 +247,7 @@ public:
 		m_reel1_ram(*this, "reel1_ram"),
 		m_reel2_ram(*this, "reel2_ram"),
 		m_reel3_ram(*this, "reel3_ram"),
-		m_stisub_out_c(*this, "stisub_out_c"),
+		m_stbsub_out_c(*this, "stbsub_out_c"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") {
@@ -261,7 +261,7 @@ public:
 	optional_shared_ptr<UINT8> m_reel1_ram;
 	optional_shared_ptr<UINT8> m_reel2_ram;
 	optional_shared_ptr<UINT8> m_reel3_ram;
-	optional_shared_ptr<UINT8> m_stisub_out_c;
+	optional_shared_ptr<UINT8> m_stbsub_out_c;
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_reel1_tilemap;
@@ -276,7 +276,7 @@ public:
 	UINT8 m_flash_packet;
 	UINT8 m_flash_packet_start;
 	int m_colordac_offs;
-	UINT8 *m_stisub_colorram;
+	UINT8 *m_stbsub_colorram;
 
 	ticket_dispenser_device *m_hopper;
 
@@ -295,6 +295,7 @@ public:
 	DECLARE_WRITE8_MEMBER(colordac_w);
 	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
 	DECLARE_READ8_MEMBER(reel_scrollattr_r);
+	DECLARE_DRIVER_INIT(stbsub);
 	DECLARE_DRIVER_INIT(stisub);
 	DECLARE_DRIVER_INIT(tesorone);
 	DECLARE_DRIVER_INIT(tesorone230);
@@ -309,21 +310,21 @@ public:
 	DECLARE_DRIVER_INIT(tisub);
 	DECLARE_DRIVER_INIT(mtrainnv);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_stisub_tile_info);
+	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);
 	TILE_GET_INFO_MEMBER(get_subsino_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_stisub_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_stbsub_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_subsino_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_stisub_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_stbsub_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_subsino_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_stisub_reel3_tile_info);
+	TILE_GET_INFO_MEMBER(get_stbsub_reel3_tile_info);
 	DECLARE_VIDEO_START(subsino);
 	DECLARE_PALETTE_INIT(subsino_2proms);
 	DECLARE_PALETTE_INIT(subsino_3proms);
 	DECLARE_VIDEO_START(subsino_reels);
-	DECLARE_VIDEO_START(stisub);
+	DECLARE_VIDEO_START(stbsub);
 	UINT32 screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_stisub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -368,7 +369,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stisub_tile_info)
+TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
 {
 	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	code&= 0x3fff;
@@ -402,7 +403,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel1_tile_info)
+TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attr[tile_index];
@@ -431,7 +432,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel2_tile_info)
+TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attr[tile_index];
@@ -459,7 +460,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel3_tile_info)
+TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attr[tile_index];
@@ -485,14 +486,14 @@ VIDEO_START_MEMBER(subsino_state,subsino_reels)
 
 }
 
-VIDEO_START_MEMBER(subsino_state,stisub)
+VIDEO_START_MEMBER(subsino_state,stbsub)
 {
-	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
+	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	m_tmap->set_transparent_pen(0 );
 
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
@@ -538,7 +539,7 @@ UINT32 subsino_state::screen_update_subsino_reels(screen_device &screen, bitmap_
 }
 
 
-UINT32 subsino_state::screen_update_stisub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	bitmap.fill(0, cliprect);
@@ -1081,11 +1082,11 @@ WRITE8_MEMBER(subsino_state::colordac_w)
 			break;
 
 		case 1:
-			m_stisub_colorram[m_colordac_offs] = data;
+			m_stbsub_colorram[m_colordac_offs] = data;
 			m_palette->set_pen_color(m_colordac_offs/3,
-				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+0]),
-				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+1]),
-				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+2])
+				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+0]),
+				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+1]),
+				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+2])
 			);
 			m_colordac_offs = (m_colordac_offs+1) % (256*3);
 			break;
@@ -1104,7 +1105,7 @@ WRITE8_MEMBER(subsino_state::colordac_w)
 // not 100% sure on the bank bits.. other bits are also set
 WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 {
-	if (*m_stisub_out_c & 0x20)
+	if (*m_stbsub_out_c & 0x20)
 	{
 		if (offset<0x200)
 		{
@@ -1151,7 +1152,7 @@ READ8_MEMBER(subsino_state::reel_scrollattr_r)
 	return m_reel1_attr[offset];
 }
 
-static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8, subsino_state )
+static ADDRESS_MAP_START( stbsub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
@@ -1164,7 +1165,7 @@ static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
 
-	AM_RANGE( 0x0d008, 0x0d008 ) AM_RAM AM_SHARE("stisub_out_c")
+	AM_RANGE( 0x0d008, 0x0d008 ) AM_RAM AM_SHARE("stbsub_out_c")
 
 	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE(subsino_out_b_w )
 	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE(subsino_out_a_w )
@@ -1204,7 +1205,7 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
-	AM_RANGE( 0x0d008, 0x0d008 ) AM_RAM AM_SHARE("stisub_out_c")
+	AM_RANGE( 0x0d008, 0x0d008 ) AM_RAM AM_SHARE("stbsub_out_c")
 //  AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE
 //  AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE
 //  AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
@@ -1592,7 +1593,7 @@ static INPUT_PORTS_START( tisub )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( stisub )
+static INPUT_PORTS_START( stbsub )
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
@@ -2786,7 +2787,7 @@ static GFXDECODE_START( subsino_depth4_reels )
 	GFXDECODE_ENTRY( "reels", 0, layout_8x32x4, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( subsino_stisub )
+static GFXDECODE_START( subsino_stbsub )
 	GFXDECODE_ENTRY( "tilemap", 0, layout_8x8x8, 0, 1 )
 	GFXDECODE_ENTRY( "reels", 0, layout_8x32x8, 0, 1 )
 GFXDECODE_END
@@ -2943,10 +2944,10 @@ static MACHINE_CONFIG_START( tisub, subsino_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( stisub, subsino_state )
+static MACHINE_CONFIG_START( stbsub, subsino_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
-	MCFG_CPU_PROGRAM_MAP(stisub_map)
+	MCFG_CPU_PROGRAM_MAP(stbsub_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2957,15 +2958,15 @@ static MACHINE_CONFIG_START( stisub, subsino_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stisub_reels)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stbsub_reels)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_stisub)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_stbsub)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	//MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
 
-	MCFG_VIDEO_START_OVERRIDE(subsino_state,stisub)
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2974,7 +2975,7 @@ static MACHINE_CONFIG_START( stisub, subsino_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mtrainnv, stisub )
+static MACHINE_CONFIG_DERIVED( mtrainnv, stbsub )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3613,7 +3614,7 @@ ROM_END
 
 ***************************************************************************/
 
-ROM_START( stisub )
+ROM_START( stbsub )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trbon-rlu16.u12", 0x00000, 0x10000, CRC(07771290) SHA1(c485943045396d8580271504a1fec7c88579f4a2) )
 
@@ -3629,6 +3630,27 @@ ROM_START( stisub )
 	ROM_LOAD( "sti-alpha_8-ver1.1.u23", 0x40000, 0x20000, CRC(d3c11545) SHA1(0383358d223c9bfe67c3b5de7a9cc3e43a9769b2) )
 	ROM_LOAD( "sti-alpha_9-ver1.1.u22", 0x60000, 0x20000, CRC(9710a223) SHA1(76ef6bd77ae33d91a9b6a9a615d07caee3356dfb) )
 ROM_END
+
+
+
+ROM_START( stisub )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b1", 0x00000, 0x10000, CRC(3f7adf66) SHA1(6ff37d070c7866133853c7cb3e2fbcb5610d87e8) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "-2.u30",  0x00000, 0x40000, CRC(c7435727) SHA1(115f41fe8da7be1e3928c1539e901b4b54132616) )
+	ROM_LOAD( "b-3.u29", 0x40000, 0x40000, CRC(eb0968d3) SHA1(5313150725d9b7019ddaddc0b1cdb92330ab0b49) )
+	ROM_LOAD( "b-4.u28", 0x80000, 0x40000, CRC(ee5024ba) SHA1(cf65bbee12f6aaf8bb22c2a03e7b360fa58f3b80) )
+	ROM_LOAD( "a-5.u27", 0xc0000, 0x40000, CRC(6748c76d) SHA1(1013f5924c584df4bd6a1a3dbd0fff96c1313ed3) )
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "a-6.u25", 0x00000, 0x20000, CRC(69a19c43) SHA1(d90a59bfee500ea9b1a21f60bc2fd7c3ddadb6a6) )
+	ROM_LOAD( "b-7.u24", 0x20000, 0x20000, CRC(09173bec) SHA1(c9bf491a9d4009d1debf7a19657129a209f02768) )
+	ROM_LOAD( "b-8.u23", 0x40000, 0x20000, CRC(10ff8fdf) SHA1(1f07ce5517c816852e5b739e3170d104c080ea18) )
+	ROM_LOAD( "a-9.u22", 0x60000, 0x20000, CRC(ce1e9a3d) SHA1(263e396058e74ae55834dc028b477eb21ceab9b9) )
+ROM_END
+
+
 
 /***************************************************************************
 
@@ -3810,7 +3832,7 @@ DRIVER_INIT_MEMBER(subsino_state,tisuba)
 	rom[0x6498] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(subsino_state,stisub)
+DRIVER_INIT_MEMBER(subsino_state,stbsub)
 {
 #if 1
 	UINT8 *rom = memregion( "maincpu" )->base();
@@ -3819,7 +3841,7 @@ DRIVER_INIT_MEMBER(subsino_state,stisub)
 	rom[0x957] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stisub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
@@ -3829,6 +3851,24 @@ DRIVER_INIT_MEMBER(subsino_state,stisub)
 	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
 	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
 }
+
+DRIVER_INIT_MEMBER(subsino_state, stisub)
+{
+	UINT8 *rom = memregion( "maincpu" )->base();
+	rom[0x0FA0] = 0x28;
+	rom[0x0FA1] = 0x1d; //patch protection check
+
+	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+
+	m_reel1_scroll.allocate(0x40);
+	m_reel2_scroll.allocate(0x40);
+	m_reel3_scroll.allocate(0x40);
+
+	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+}
+
 DRIVER_INIT_MEMBER(subsino_state,tesorone)
 {
 #if 1
@@ -3839,7 +3879,7 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 	rom[0xa84] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stisub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
@@ -3860,7 +3900,7 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 	rom[0xa88] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stisub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
@@ -3874,7 +3914,7 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 
 DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	m_stisub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
@@ -3899,10 +3939,11 @@ GAMEL( 1992, tisuba,      tisub,    tisub,    tisub,    subsino_state, tisuba,  
 
 GAMEL( 1991, crsbingo,    0,        crsbingo, crsbingo, subsino_state, crsbingo, ROT0, "Subsino",         "Poker Carnival",                       0,               layout_crsbingo )
 
-GAMEL( 1995, stisub,      0,        stisub,   stisub,   subsino_state, stisub,   ROT0, "American Alpha",  "Treasure Bonus (Subsino, v1.6)",       0,               layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
-GAMEL( 1995, tesorone,    stisub,   stisub,   tesorone, subsino_state, tesorone, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",   0,               layout_stisub   )
-GAMEL( 1995, tesorone240, stisub,   stisub,   tesorone, subsino_state, tesorone, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",   0,               layout_stisub   )
-GAMEL( 1995, tesorone230, stisub,   stisub,   tesorone, subsino_state, tesorone230,ROT0,"Subsino",        "Tesorone Dell'Isola (Italy, v2.30)",   0,               layout_stisub   )
+GAMEL( 1995, stbsub,      0,        stbsub,   stbsub,   subsino_state, stbsub,   ROT0, "American Alpha",  "Treasure Bonus (Subsino, v1.6)",       0,               layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
+GAMEL( 1995, stisub,      stbsub,   stbsub,   stbsub,   subsino_state, stisub,   ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",  MACHINE_NOT_WORKING, layout_stisub   ) // need proper patches
+GAMEL( 1995, tesorone,    stbsub,   stbsub,   tesorone, subsino_state, tesorone, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",   0,               layout_stisub   )
+GAMEL( 1995, tesorone240, stbsub,   stbsub,   tesorone, subsino_state, tesorone, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",   0,               layout_stisub   )
+GAMEL( 1995, tesorone230, stbsub,   stbsub,   tesorone, subsino_state, tesorone230,ROT0,"Subsino",        "Tesorone Dell'Isola (Italy, v2.30)",   0,               layout_stisub   )
 
 GAMEL( 1996, sharkpy,     0,        sharkpy,  sharkpy,  subsino_state, sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,               layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy,  sharkpy,  sharkpy,  subsino_state, sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,               layout_sharkpy  ) // missing POST messages?
@@ -3915,4 +3956,4 @@ GAMEL( 1995, victor6b,    victor6,  sharkpy,  victor6b, subsino_state, sharkpye,
 GAMEL( 1996, smoto20,     0,        srider,   smoto20,  subsino_state, smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,               layout_smoto    )
 GAMEL( 1996, smoto16,     smoto20,  srider,   smoto16,  subsino_state, smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,               layout_smoto    )
 
-GAME ( 1996, mtrainnv,    mtrain,   mtrainnv, stisub,   subsino_state, mtrainnv, ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",       MACHINE_NOT_WORKING )
+GAME ( 1996, mtrainnv,    mtrain,   mtrainnv, stbsub,   subsino_state, mtrainnv, ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",       MACHINE_NOT_WORKING )
