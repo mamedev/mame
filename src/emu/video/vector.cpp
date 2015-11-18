@@ -131,14 +131,18 @@ const device_type VECTOR = &device_creator<vector_device>;
 vector_device::vector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this), 
-		m_vector_list(NULL)
+		m_vector_list(NULL),
+		m_min_intensity(255),
+		m_max_intensity(0)
 {
 }
 
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector_device", __FILE__),
-	  device_video_interface(mconfig, *this),
-	  m_vector_list(NULL)
+		device_video_interface(mconfig, *this),
+		m_vector_list(NULL),
+		m_min_intensity(255),
+		m_max_intensity(0)
 {
 }
 
@@ -221,24 +225,18 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
-	if (intensity > 255)
-	{
-		intensity = 255;
-	}
+	intensity = MAX(0, MIN(255, intensity));
+
+	m_min_intensity = intensity > 0 ? MIN(m_min_intensity, intensity) : m_min_intensity;
+	m_max_intensity = intensity > 0 ? MAX(m_max_intensity, intensity) : m_max_intensity;
 
 	if (m_flicker && (intensity > 0))
 	{
 		float random = (float)(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
 
 		intensity -= (int)(intensity * random * m_flicker);
-		if (intensity < 0)
-		{
-			intensity = 0;
-		}
-		if (intensity > 255)
-		{
-			intensity = 255;
-		}
+
+		intensity = MAX(0, MIN(255, intensity));
 	}
 
 	newpoint = &m_vector_list[m_vector_index];
@@ -334,10 +332,17 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else
 		{
-			float intensity = (float)curpoint->intensity / 255.0f;
-			float intensity_weight = normalized_sigmoid(intensity, m_beam_intensity_weight);
+			float beam_intensity_width = m_beam_width_min;
 
-			float beam_intensity_width = (m_beam_width_max - m_beam_width_min) * intensity_weight + m_beam_width_min;
+			float intensity = (float)curpoint->intensity / 255.0f;
+
+			// check for dynamic intensity
+			if (m_min_intensity != m_max_intensity)
+			{
+				float intensity_weight = normalized_sigmoid(intensity, m_beam_intensity_weight);
+				beam_intensity_width = (m_beam_width_max - m_beam_width_min) * intensity_weight + m_beam_width_min;
+			}
+
 			float beam_width = beam_intensity_width * (1.0f / (float)VECTOR_WIDTH_DENOM);
 
 			coords.x0 = ((float)lastx - xoffs) * xscale;

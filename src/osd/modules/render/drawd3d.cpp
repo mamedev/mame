@@ -247,8 +247,7 @@ render_primitive_list *d3d::renderer::get_primitives()
 	}
 	if (m_shaders != NULL)
 	{
-		window().target()->set_scale_primitives(!m_shaders->enabled());
-		window().target()->set_offset_primitives(!m_shaders->enabled());
+		window().target()->set_transform_primitives(!m_shaders->enabled());
 	}
 	return &window().target()->get_primitives();
 }
