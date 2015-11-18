@@ -792,7 +792,7 @@ private:
 	digital_joystick *          m_next;                                         // next joystick in the list
 	int                         m_player;                                       // player number represented
 	int                         m_number;                                       // joystick number represented
-	simple_list<ioport_field> m_field[JOYDIR_COUNT];  // potential input fields for each direction
+	simple_list<simple_list_wrapper<ioport_field> > m_field[JOYDIR_COUNT];  // potential input fields for each direction
 	UINT8                       m_current;                                      // current value
 	UINT8                       m_current4way;                                  // current 4-way value
 	UINT8                       m_previous;                                     // previous value

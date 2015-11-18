@@ -277,6 +277,40 @@ private:
 	int             m_count;        // number of objects in the list
 };
 
+
+// ======================> simple_list_wrapper
+
+// a simple_list_wrapper wraps an existing object with a next pointer so it
+// can live in a simple_list without requiring the object to have a next
+// pointer
+template<class _ObjectType>
+class simple_list_wrapper
+{
+public:
+	template<class U> friend class simple_list;
+
+	// construction/destruction
+	simple_list_wrapper(_ObjectType *object)
+		: m_next(NULL),
+			m_object(object) { }
+
+	// operators
+	operator _ObjectType *() { return m_object; }
+	operator _ObjectType *() const { return m_object; }
+	_ObjectType *operator *() { return m_object; }
+	_ObjectType *operator *() const { return m_object; }
+
+	// getters
+	simple_list_wrapper *next() const { return m_next; }
+	_ObjectType *object() const { return m_object; }
+
+private:
+	// internal state
+	simple_list_wrapper *   m_next;
+	_ObjectType *           m_object;
+};
+
+
 // ======================> fixed_allocator
 
 // a fixed_allocator is a simple class that maintains a free pool of objects

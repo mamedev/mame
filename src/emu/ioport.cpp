@@ -744,7 +744,7 @@ digital_joystick::digital_joystick(int player, int number)
 digital_joystick::direction_t digital_joystick::add_axis(ioport_field &field)
 {
 	direction_t direction = direction_t((field.type() - (IPT_DIGITAL_JOYSTICK_FIRST + 1)) % 4);
-	m_field[direction].append(field);
+	m_field[direction].append(*global_alloc(simple_list_wrapper<ioport_field>(&field)));
 	return direction;
 }
 
@@ -764,10 +764,10 @@ void digital_joystick::frame_update()
 	// read all the associated ports
 	running_machine *machine = NULL;
 	for (direction_t direction = JOYDIR_UP; direction < JOYDIR_COUNT; ++direction)
-		for (const ioport_field *i = m_field[direction].first(); i != NULL; i = i->next())
+		for (const simple_list_wrapper<ioport_field> *i = m_field[direction].first(); i != NULL; i = i->next())
 		{
-			machine = &i->machine();
-			if (machine->input().seq_pressed(i->seq(SEQ_TYPE_STANDARD)))
+			machine = &i->object()->machine();
+			if (machine->input().seq_pressed(i->object()->seq(SEQ_TYPE_STANDARD)))
 				m_current |= 1 << direction;
 		}
 
