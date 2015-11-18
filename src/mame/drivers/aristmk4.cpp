@@ -336,6 +336,7 @@
 #include "wildone.lh"  // Video poker
 #include "gunnrose.lh" // Video poker
 #include "gldnpkr.lh"  // Video poker
+#include "fvrpitch.lh"  // 5 line without gamble
 
 UINT8 crtc_cursor_index = 0;
 UINT8 crtc_reg = 0;
@@ -1576,6 +1577,20 @@ static INPUT_PORTS_START(gldnpkr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(fvrpitch)
+	PORT_INCLUDE(arcwins)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Reserve") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_W)
+INPUT_PORTS_END
+
+
 static const gfx_layout layout8x8x6 =
 {
 	8,8,
@@ -2469,4 +2484,4 @@ GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4_state, aristmk4, R
 GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, layout_topgear ) // possibly 20c, 1 coin = 1 credit
 GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, layout_topgear ) // 20c, 1 coin = 1 credit
 GAMEL( 1986, cgold,    0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, layout_topgear ) // 25c, 1 coin = 1 credit
-GAMEL( 1986, fvrpitch, 0,        aristmk4, cgold2,   aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch? (2VXEC534, NSW, 90.36%)", 0, layout_cgold2  ) // 5c, $1 = 20 credits
+GAMEL( 1986, fvrpitch, 0,        aristmk4, fvrpitch, aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch? (2VXEC534, NSW, 90.36%)", 0, layout_fvrpitch  ) // 5c, $1 = 20 credits
