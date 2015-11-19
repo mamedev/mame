@@ -178,6 +178,7 @@ public:
 	texture_info *          get_vector_texture() { return m_texture_manager->get_vector_texture(); }
 
 	shaders *               get_shaders() { return m_shaders; }
+	hlsl_options *          get_shaders_options() { return m_shaders_options; }
 
 private:
 	int                     m_adapter;                  // ordinal adapter number
@@ -220,6 +221,7 @@ private:
 
 	void *                  m_hlsl_buf;                 // HLSL vertex data
 	shaders *               m_shaders;                  // HLSL interface
+	hlsl_options *          m_shaders_options;          // HLSL options
 
 	texture_manager *       m_texture_manager;          // texture manager
 

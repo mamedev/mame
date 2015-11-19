@@ -245,6 +245,10 @@ render_primitive_list *d3d::renderer::get_primitives()
 		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
 		window().target()->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
 	}
+	if (m_shaders != NULL)
+	{
+		window().target()->set_transform_primitives(!m_shaders->enabled());
+	}
 	return &window().target()->get_primitives();
 }
 
@@ -615,7 +619,7 @@ renderer::renderer(osd_window *window)
 	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(NULL), m_gamma_supported(0), m_pixformat(), 
 	m_vertexbuf(NULL), m_lockedbuf(NULL), m_numverts(0), m_vectorbatch(NULL), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0), 
 	m_screen_format(), m_last_texture(NULL), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
-	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(NULL), m_shaders(NULL), m_texture_manager(NULL), m_line_count(0)
+	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(NULL), m_shaders(NULL), m_shaders_options(NULL), m_texture_manager(NULL), m_line_count(0)
 {
 }
 
@@ -642,10 +646,6 @@ int renderer::pre_window_draw_check()
 	if (m_restarting)
 	{
 		m_shaders->toggle();
-
-		// free all existing resources and re-create
-		device_delete_resources();
-		device_create_resources();
 
 		m_restarting = false;
 	}
@@ -796,7 +796,16 @@ int renderer::device_create(HWND device_hwnd)
 {
 	// if a device exists, free it
 	if (m_device != NULL)
+	{
 		device_delete();
+	}
+
+	// create shader options only once
+	if (m_shaders_options == NULL)
+	{
+		m_shaders_options = (hlsl_options*)global_alloc_clear(hlsl_options);
+		m_shaders_options->params_init = false;
+	}
 
 	// verify the caps
 	int verify = device_verify_caps();
@@ -806,7 +815,9 @@ int renderer::device_create(HWND device_hwnd)
 		return 1;
 	}
 	if (verify == 1)
+	{
 		osd_printf_warning("Warning: Device may not perform well for Direct3D rendering\n");
+	}
 
 	// verify texture formats
 	HRESULT result = (*d3dintf->d3d.check_device_format)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, 0, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8);
@@ -987,6 +998,12 @@ int renderer::device_create_resources()
 
 renderer::~renderer()
 {
+	if (m_shaders_options != NULL)
+	{
+		global_free(m_shaders_options);
+	}
+	m_shaders_options = NULL;
+
 	device_delete();
 }
 
@@ -1043,8 +1060,7 @@ int renderer::device_verify_caps()
 {
 	int retval = 0;
 
-	m_shaders = global_alloc_clear(shaders);
-	// FIXME: Dynamic cast
+	m_shaders = (shaders*)global_alloc_clear(shaders);
 	m_shaders->init(d3dintf, &window().machine(), this);
 
 	DWORD tempcaps;

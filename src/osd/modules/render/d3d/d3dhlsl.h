@@ -186,6 +186,7 @@ class renderer;
 /* in the future this will be moved into an OSD/emu shared buffer */
 struct hlsl_options
 {
+	bool                    params_init;
 	bool                    params_dirty;
 	float                   shadow_mask_alpha;
 	char                    shadow_mask_texture[1024];
@@ -309,6 +310,14 @@ public:
 	// slider-related functions
 	slider_state *init_slider_list();
 
+	enum slider_screen_type
+	{
+		SLIDER_SCREEN_TYPE_NONE = 0,
+		SLIDER_SCREEN_TYPE_RASTER = 1,
+		SLIDER_SCREEN_TYPE_VECTOR = 2,
+		SLIDER_SCREEN_TYPE_LCD = 4
+	};
+
 	struct slider_desc
 	{
 		const char *        name;
@@ -316,6 +325,7 @@ public:
 		int                 defval;
 		int                 maxval;
 		int                 step;
+		int                 screen_type;              
 		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
 	};
 
@@ -362,10 +372,6 @@ private:
 	int                     lastidx;                    // index of the last-encountered target
 	bool                    write_ini;                  // enable external ini saving
 	bool                    read_ini;                   // enable external ini loading
-	int                     prescale_force_x;           // prescale force x
-	int                     prescale_force_y;           // prescale force y
-	int                     prescale_size_x;            // prescale size x
-	int                     prescale_size_y;            // prescale size y
 	int                     hlsl_prescale_x;            // hlsl prescale x
 	int                     hlsl_prescale_y;            // hlsl prescale y
 	float                   bloom_dims[11][2];          // bloom texture dimensions
@@ -373,7 +379,7 @@ private:
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
-	hlsl_options *          options;                    // current uniform state
+	hlsl_options *          options;                    // current options
 	D3DPRIMITIVETYPE        vecbuf_type;
 	UINT32                  vecbuf_index;
 	UINT32                  vecbuf_count;
@@ -424,13 +430,11 @@ private:
 	texture_info *          curr_texture;
 	render_target *         curr_render_target;
 	poly_info *             curr_poly;
-
-public:
 	render_target *         targethead;
 	cache_target *          cachehead;
 
 	static slider_desc      s_sliders[];
-	static hlsl_options     s_hlsl_presets[4];
+	static hlsl_options     last_options;               // last used options
 };
 
 }

@@ -77,6 +77,7 @@ bool xor(bool a, bool b)
 
 uniform float2 ScreenDims; // size of the window or fullscreen
 uniform float2 SourceDims; // size of the texture in power-of-two size
+uniform float2 SourceRect; // size of the uv rectangle
 uniform float2 TargetDims; // size of the target surface
 
 uniform float2 ShadowDims = float2(32.0f, 32.0f); // size of the shadow texture (extended to power-of-two size)
@@ -87,6 +88,7 @@ uniform bool RotationSwapXY = false; // swapped default screen orientation due t
 
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures
 uniform bool PrepareVector = false;
+uniform bool PrepareRaster = false;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -123,6 +125,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Post-Processing Pixel Shader
 //-----------------------------------------------------------------------------
 
+uniform float2 ScreenScale = float2(1.0f, 1.0f);
+uniform float2 ScreenOffset = float2(0.0f, 0.0f);
+
 uniform float ScanlineAlpha = 1.0f;
 uniform float ScanlineScale = 1.0f;
 uniform float ScanlineBrightScale = 1.0f;
@@ -137,16 +142,42 @@ uniform float2 ShadowUV = float2(0.25f, 0.25f);
 uniform float3 Power = float3(1.0f, 1.0f, 1.0f);
 uniform float3 Floor = float3(0.0f, 0.0f, 0.0f);
 
+float2 GetAdjustedCoords(float2 coord, float2 centerOffset)
+{
+	// center coordinates
+	coord -= centerOffset;
+
+	// apply screen scale
+	coord /= ScreenScale;
+
+	// un-center coordinates
+	coord += centerOffset;
+
+	// apply screen offset
+	coord += (centerOffset * 2.0) * ScreenOffset;
+
+	return coord;
+}
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 
+	float2 HalfSourceRect = PrepareVector
+		? float2(0.5f, 0.5f)
+		: SourceRect * 0.5f;
+
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
-	float2 BaseCoord = Input.TexCoord;
+	float2 BaseCoord = GetAdjustedCoords(Input.TexCoord, HalfSourceRect);
 
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
+
+	if (BaseCoord.x < 0.0f || BaseCoord.y < 0.0f)
+	{
+		BaseColor.rgb = 0.0f;
+	}
 
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom)
@@ -204,8 +235,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Scanline Simulation (may not affect bloom)
 	if (!PrepareBloom)
 	{
-		// Scanline Simulation (disabled for vector)
-		if (!PrepareVector)
+		// Scanline Simulation (only for raster screen)
+		if (PrepareRaster)
 		{
 			float InnerSine = BaseCoord.y * ScanlineScale * SourceDims.y;
 			float ScanJitter = ScanlineOffset * SourceDims.y;

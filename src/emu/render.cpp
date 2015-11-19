@@ -924,7 +924,8 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 		m_base_view(NULL),
 		m_base_orientation(ROT0),
 		m_maxtexwidth(65536),
-		m_maxtexheight(65536)
+		m_maxtexheight(65536),
+		m_transform_primitives(true)
 {
 	// determine the base layer configuration based on options
 	m_base_layerconfig.set_backdrops_enabled(manager.machine().options().use_backdrops());
@@ -1659,6 +1660,13 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 		float yoffs = (container_xform.orientation & ORIENTATION_SWAP_XY) ? container.xoffset() : container.yoffset();
 		if (container_xform.orientation & ORIENTATION_FLIP_X) xoffs = -xoffs;
 		if (container_xform.orientation & ORIENTATION_FLIP_Y) yoffs = -yoffs;
+		if (!m_transform_primitives)
+		{
+			xscale = 1.0f;
+			yscale = 1.0f;
+			xoffs = 0.0f;
+			yoffs = 0.0f;
+		}
 		container_xform.xscale = xform.xscale * xscale;
 		container_xform.yscale = xform.yscale * yscale;
 		if (xform.no_center)

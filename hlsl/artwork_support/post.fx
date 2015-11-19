@@ -152,6 +152,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Post-Processing Pixel Shader
 //-----------------------------------------------------------------------------
 
+uniform float2 ScreenScale = float2(1.0f, 1.0f);
+uniform float2 ScreenOffset = float2(0.0f, 0.0f);
+
 uniform float ScanlineAlpha = 1.0f;
 uniform float ScanlineScale = 1.0f;
 uniform float ScanlineBrightScale = 1.0f;
@@ -232,7 +235,7 @@ float GetSpotAddend(float2 coord, float amount)
 					: float2(-0.25f, 0.25f)
 		: OrientationSwapXY
 			? float2(0.25f, 0.25f)
-			: float2(-0.25f, 0.25f);		
+			: float2(-0.25f, 0.25f);
 
 	float2 SpotCoord = coord;
 	SpotCoord += spotOffset * RatioCorrection;
@@ -334,6 +337,34 @@ float2 GetCoords(float2 coord, float2 centerOffset, float distortionAmount)
 	return coord;
 }
 
+float2 GetAdjustedCoords(float2 coord, float2 centerOffset, float distortionAmount)
+{
+	float2 RatioCorrection = GetRatioCorrection();
+
+	// center coordinates
+	coord -= centerOffset;
+
+	// apply ratio difference between screen and quad
+	coord /= RatioCorrection;
+
+	// apply screen scale
+	coord /= ScreenScale;
+
+	// distort coordinates
+	coord = GetDistortedCoords(coord, distortionAmount);
+
+	// revert ratio difference between screen and quad
+	coord *= RatioCorrection;
+
+	// un-center coordinates
+	coord += centerOffset;
+
+	// apply screen offset
+	coord += (centerOffset * 2.0) * ScreenOffset;
+
+	return coord;
+}
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
@@ -345,14 +376,25 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
 	ScreenCoord = GetCoords(ScreenCoord, float2(0.5f, 0.5f), CurvatureAmount);
 
+	float2 DistortionCoord = Input.TexCoord;
+	DistortionCoord = GetCoords(DistortionCoord, HalfSourceRect, CurvatureAmount);
+
 	float2 BaseCoord = Input.TexCoord;
-	BaseCoord = GetCoords(BaseCoord, HalfSourceRect, CurvatureAmount);
+	BaseCoord = GetAdjustedCoords(BaseCoord, HalfSourceRect, CurvatureAmount);
+
+	float2 DistortionCoordCentered = DistortionCoord;
+	DistortionCoordCentered -= HalfSourceRect;
 
 	float2 BaseCoordCentered = BaseCoord;
 	BaseCoordCentered -= HalfSourceRect;
 
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
+
+	if (BaseCoord.x < 0.0f || BaseCoord.y < 0.0f)
+	{
+		BaseColor.rgb = 0.0f;
+	}
 
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom)
@@ -431,7 +473,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Vignetting Simulation (may not affect bloom)
 	if (!PrepareBloom)
 	{
-		float2 VignetteCoord = BaseCoordCentered;
+		float2 VignetteCoord = DistortionCoordCentered;
 
 		float VignetteFactor = GetVignetteFactor(VignetteCoord, VignettingAmount);
 		Output.rgb *= VignetteFactor;
@@ -442,8 +484,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	{
 		float3 LightColor = float3(1.0f, 0.90f, 0.80f);
 
-		float2 SpotCoord = BaseCoordCentered;
-		float2 NoiseCoord = BaseCoordCentered;
+		float2 SpotCoord = DistortionCoordCentered;
+		float2 NoiseCoord = DistortionCoordCentered;
 
 		float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount);
 		float NoiseFactor = GetNoiseFactor(SpotAddend, random(NoiseCoord));
@@ -451,7 +493,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 
 	// Round Corners Simulation (may affect bloom)
-	float2 RoundCornerCoord = BaseCoordCentered;
+	float2 RoundCornerCoord = DistortionCoordCentered;
 
 	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, SmoothBorderAmount);
 	Output.rgb *= roundCornerFactor;

@@ -898,6 +898,7 @@ public:
 	void set_orientation(int orientation) { m_orientation = orientation; }
 	void set_view(int viewindex);
 	void set_max_texture_size(int maxwidth, int maxheight);
+	void set_transform_primitives(bool transform_primitives) { m_transform_primitives = transform_primitives; }
 
 	// layer config getters
 	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }
@@ -996,6 +997,8 @@ private:
 	simple_list<render_container> m_debug_containers;   // list of debug containers
 	INT32                   m_clear_extent_count;       // number of clear extents
 	INT32                   m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
+	bool                    m_transform_primitives;     // determines if the primitives shall be scaled/offset by screen settings,
+	                                                    // otherwise the respective render API will handle it (default is true)
 
 	static render_screen_list s_empty_screen_list;
 };
