@@ -2454,15 +2454,18 @@ MACHINE_CONFIG_END
 */
 void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 {
-	UINT8 *RAM  =   memregion(region)->base();
-	int size            =   memregion(region)->bytes();
-	int i;
-
-	if (RAM == nullptr)    return;
-
-	for (i = 0; i < size; i ++)
+	memory_region *tile_region = memregion(region);
+	if (tile_region == NULL)
 	{
-		RAM[i] = ((RAM[i] & 0xF0)>>4) + ((RAM[i] & 0x0F)<<4);
+		return;
+	}
+
+	UINT8 *ram = tile_region->base();
+	int size = tile_region->bytes();
+
+	for (int i = 0; i < size; i ++)
+	{
+		ram[i] = ((ram[i] & 0xF0) >> 4) + ((ram[i] & 0x0F) << 4);
 	}
 }
 

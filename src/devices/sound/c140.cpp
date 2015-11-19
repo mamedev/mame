@@ -88,14 +88,15 @@ static inline int limit(INT32 in)
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C140, "C140", tag, owner, clock, "c140", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_sample_rate(0),
-		m_stream(nullptr),
-		m_banking_type(0),
-		m_mixer_buffer_left(nullptr),
-		m_mixer_buffer_right(nullptr),
-		m_baserate(0),
-		m_pRom(nullptr)
+	, device_sound_interface(mconfig, *this),
+	, m_sample_rate(0),
+	, m_stream(nullptr),
+	, m_banking_type(0),
+	, m_mixer_buffer_left(nullptr),
+	, m_mixer_buffer_right(nullptr),
+	, m_baserate(0),
+	, m_rom_region(*this, tag)
+	, m_pRom(nullptr)
 {
 	memset(m_REG, 0, sizeof(UINT8)*0x200);
 	memset(m_pcmtbl, 0, sizeof(INT16)*8);
@@ -112,7 +113,10 @@ void c140_device::device_start()
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 
-	m_pRom = (INT8 *)region()->base();
+	if (m_rom_region)
+	{
+		m_pRom = (INT8 *)m_rom_region->base();
+	}
 
 	/* make decompress pcm table */     //2000.06.26 CAB
 	{

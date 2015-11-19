@@ -151,13 +151,16 @@ private:
 	UINT32 m_mem_size;
 	UINT32 m_clock;
 
-	emu_timer *m_timA, *m_timB;
+	emu_timer *m_timA;
+	emu_timer *m_timB;
 	sound_stream *m_stream;
 	std::unique_ptr<INT32[]> m_mix_buffer;
 
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_ext_read_handler;
 	devcb_write8 m_ext_write_handler;
+
+	optional_memory_region m_mem_region;
 };
 
 extern const device_type YMF271;
