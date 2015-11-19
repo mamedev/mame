@@ -127,7 +127,8 @@
   * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
   * "Unknown Sisteme France Poker",                   198?, Sisteme France.
-  * Bonne Chance! (Golden Poker prequel hardware),    198?, Unknown.
+  * Bonne Chance! (Golden Poker prequel HW, set 1),   198?, Unknown.
+  * Bonne Chance! (Golden Poker prequel HW, set 2),   198?, Unknown.
   * Mundial/Mondial (Italian/French),                 1987, Unknown.
   * Super 98 (3-hands, ICP-1),                        199?, Unknown.
 
