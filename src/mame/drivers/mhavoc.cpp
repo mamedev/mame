@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_MHAVOC, 0)
+	MCFG_DEVICE_ADD("avg", AVG_MHAVOC, XTAL_12_096MHz)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
@@ -763,9 +763,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc, driver_device,   0,        ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc, driver_device,   0,        ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, mhavocrv, ROT0, "Atari / JMA",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp, driver_device,  0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaone, mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   driver_device, 0,        ROT0, "Atari",       "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   driver_device, 0,        ROT0, "Atari",       "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state,  mhavocrv, ROT0, "Atari / JMA", "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  driver_device, 0,        ROT0, "Atari",       "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaone, mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",       "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",       "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )

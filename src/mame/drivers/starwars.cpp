@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 250, 0, 280)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_STARWARS, 0)
+	MCFG_DEVICE_ADD("avg", AVG_STARWARS, MASTER_CLOCK)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */

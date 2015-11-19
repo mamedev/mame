@@ -4,14 +4,13 @@
 
   machine.c
 
-  Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
-  I/O ports)
+  Functions to emulate general aspects of the machine 
+  (RAM, ROM, interrupts, I/O ports)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/atari_vg.h"
-#include "video/avgdvg.h"
 #include "includes/asteroid.h"
 
 
