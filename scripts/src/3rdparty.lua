@@ -674,9 +674,11 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
+if _OPTIONS["CPP11"]~="1" then		
 		defines {
 			"nullptr=NULL" -- not used but needed for C++11 code
 		}
+end
 
 	configuration { "osx*" }
 		includedirs {

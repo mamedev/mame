@@ -532,9 +532,11 @@ else
 	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
 end
 configuration { "gmake" }
+if _OPTIONS["CPP11"]~="1" then
 	defines {
 		"nullptr=NULL" -- getting ready for C++11
 	}
+end
 	flags {
 		"SingleOutputDir",
 	}
