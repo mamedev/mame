@@ -30,7 +30,7 @@ h83048_device::h83048_device(const machine_config &mconfig, device_type type, co
 	timer16_3(*this, "timer16:3"),
 	timer16_4(*this, "timer16:4"),
 	sci0(*this, "sci0"),
-	sci1(*this, "sci1")
+	sci1(*this, "sci1"), ram_start(0), syscr(0)
 {
 }
 

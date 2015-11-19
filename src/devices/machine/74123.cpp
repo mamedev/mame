@@ -29,7 +29,7 @@ const device_type TTL74123 = &device_creator<ttl74123_device>;
 //-------------------------------------------------
 
 ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TTL74123, "74123 TTL", tag, owner, clock, "ttl74123", __FILE__),
+	: device_t(mconfig, TTL74123, "74123 TTL", tag, owner, clock, "ttl74123", __FILE__), m_timer(nullptr),
 		m_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE),
 		m_res(1.0),
 		m_cap(1.0),

@@ -48,7 +48,7 @@ ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, d
 	m_out_a_cb(*this),
 	m_in_b_cb(*this),
 	m_out_b_cb(*this),
-	m_out_irq_cb(*this)
+	m_out_irq_cb(*this), m_in_a(0), m_in_b(0), m_out_a(0), m_out_b(0), m_mdr(0), m_odra(0), m_odrb(0)
 {
 }
 

@@ -46,10 +46,11 @@ const device_type TX0_64KW = &device_creator<tx0_64kw_device>;
 
 tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_bits, int address_mask, int ir_mask)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 32, addr_bits , -2)
-	, m_address_mask(address_mask)
-	, m_ir_mask(ir_mask)
-	, m_cpy_handler(*this)
+	, m_program_config("program", ENDIANNESS_BIG, 32, addr_bits , -2), m_mbr(0), m_ac(0), m_mar(0), m_pc(0), m_ir(0), m_lr(0), m_xr(0), m_pf(0), m_tbr(0), m_tac(0), m_cm_sel(0), 
+	m_lr_sel(0), m_gbl_cm_sel(0), m_stop_cyc0(0), m_stop_cyc1(0), m_run(0), m_rim(0), m_cycle(0), m_ioh(0), m_ios(0), m_rim_step(0)
+	  , m_address_mask(address_mask)
+	, m_ir_mask(ir_mask), m_icount(0), m_program(nullptr)
+	  , m_cpy_handler(*this)
 	, m_r1l_handler(*this)
 	, m_dis_handler(*this)
 	, m_r3l_handler(*this)

@@ -29,9 +29,9 @@ adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, d
 		m_address(0),
 		m_start(0),
 		m_eoc(0),
-		m_next_eoc(0),
+		m_next_eoc(0), m_sar(0),
 		m_cycle(0),
-		m_bit(0)
+		m_bit(0), m_cycle_timer(nullptr)
 {
 }
 

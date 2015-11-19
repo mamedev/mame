@@ -25,8 +25,8 @@ static const UINT8 bgr2rgb[8] =
 
 ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EF9340_1, "EF9340+EF9341", tag, owner, clock, "ef9340_1", __FILE__)
-	, device_video_interface(mconfig, *this)
-	//, m_start_vpos(START_Y)
+	, device_video_interface(mconfig, *this), m_line_timer(nullptr)
+//, m_start_vpos(START_Y)
 	//, m_start_vblank(START_Y + SCREEN_HEIGHT)
 	//, m_screen_lines(LINES)
 {

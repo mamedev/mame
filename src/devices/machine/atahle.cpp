@@ -66,7 +66,7 @@ ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, 
 	m_pdiagin(0),
 	m_pdiagout(0),
 	m_single_device(0),
-	m_resetting(0)
+	m_resetting(0), m_busy_timer(nullptr), m_buffer_empty_timer(nullptr)
 {
 }
 

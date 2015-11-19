@@ -14,12 +14,12 @@
 const device_type M740 = &device_creator<m740_device>;
 
 m740_device::m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6502_device(mconfig, M740, "M740", tag, owner, clock, "m740", __FILE__)
+	m6502_device(mconfig, M740, "M740", tag, owner, clock, "m740", __FILE__), m_irq_multiplex(0), m_irq_vector(0)
 {
 }
 
 m740_device::m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	m6502_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	m6502_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_multiplex(0), m_irq_vector(0)
 {
 }
 

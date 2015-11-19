@@ -26,9 +26,9 @@ ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, 
 	m_can_identify_device(0),
 	m_num_cylinders(0),
 	m_num_sectors(0),
-	m_num_heads(0),
-	m_master_password(NULL),
-	m_user_password(NULL)
+	m_num_heads(0), m_cur_lba(0), m_block_count(0), m_sectors_until_int(0), m_master_password_enable(0), m_user_password_enable(0),
+	m_master_password(nullptr),
+	m_user_password(nullptr)
 {
 }
 

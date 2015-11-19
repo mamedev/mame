@@ -37,8 +37,8 @@ ADDRESS_MAP_END
 upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7752, "uPD7752", tag, owner, clock, "upd7752", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7752_ram))
+		device_memory_interface(mconfig, *this), m_stream(nullptr),
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(upd7752_ram)), m_status(0), m_ram_addr(0), m_mode(0)
 {
 }
 

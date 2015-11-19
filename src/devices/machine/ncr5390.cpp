@@ -22,7 +22,8 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 ADDRESS_MAP_END
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock, "ncr5390", __FILE__),
+		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock, "ncr5390", __FILE__), tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0), 
+	select_timeout(0), seq(0), tcount(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false),
 	m_irq_handler(*this),
 	m_drq_handler(*this)
 {

@@ -32,9 +32,9 @@ const device_type WAVE = &device_creator<wave_device>;
 
 wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wave", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this), m_cass(nullptr)
 {
-	m_cassette_tag = 0;
+	m_cassette_tag = nullptr;
 }
 
 //-------------------------------------------------

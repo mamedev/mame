@@ -31,7 +31,7 @@ const device_type VRC6 = &device_creator<vrc6snd_device>;
 
 vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VRC6, "VRC6 sound", tag, owner, clock, "vrc6snd", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this), m_freqctrl(0), m_sawrate(0), m_sawfrql(0), m_sawfrqh(0), m_sawclock(0), m_sawaccum(0), m_stream(nullptr)
 {
 }
 

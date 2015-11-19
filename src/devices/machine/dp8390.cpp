@@ -21,12 +21,12 @@ rtl8019a_device::rtl8019a_device(const machine_config &mconfig, const char *tag,
 
 dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_network_interface(mconfig, *this, bandwidth),
+		device_network_interface(mconfig, *this, bandwidth), m_type(0),
 		m_irq_cb(*this),
 		m_breq_cb(*this),
 		m_mem_read_cb(*this),
-		m_mem_write_cb(*this)
-		{
+		m_mem_write_cb(*this), m_reset(0), m_cs(false), m_rdma_active(0)
+{
 }
 
 void dp8390_device::device_start() {

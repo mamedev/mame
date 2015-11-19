@@ -35,7 +35,7 @@ const device_type FIXFREQ = &device_creator<fixedfreq_device>;
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this, false),
+		device_video_interface(mconfig, *this, false), m_htotal(0), m_vtotal(0), m_vid(0), m_last_x(0), m_last_y(0), m_cur_bm(0),
 		// default to NTSC "704x480@30i"
 		m_monitor_clock(13500000),
 		m_hvisible(704),
@@ -48,7 +48,7 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 		m_vbackporch(525),
 		m_fieldcount(2),
 		m_sync_threshold(0.3),
-		m_gain(1.0 / 3.7)
+		m_gain(1.0 / 3.7), m_vint(0), m_int_trig(0), m_mult(0), m_sig_vsync(0), m_sig_composite(0), m_sig_field(0)
 {
 }
 

@@ -24,7 +24,8 @@ const device_type SERFLASH = &device_creator<serflash_device>;
 serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SERFLASH, "Serial Flash", tag, owner, clock, "serflash", __FILE__),
 		device_nvram_interface(mconfig, *this),
-		m_length(0)
+		m_length(0), m_region(nullptr), m_flash_state(), m_flash_enab(0), m_flash_cmd_seq(0), m_flash_cmd_prev(0), m_flash_addr_seq(0), m_flash_read_seq(0), m_flash_row(0), 
+	m_flash_col(0), m_flash_page_addr(0), m_flash_page_index(0), m_last_flash_cmd(0), m_flash_addr(0)
 {
 }
 

@@ -39,8 +39,8 @@ psxsio1_device::psxsio1_device(const machine_config &mconfig, const char *tag, d
 
 psxsio_device::psxsio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_status(SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY),
-	m_rxd(1),
+	m_status(SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY), m_mode(0), m_control(0), m_baud(0),
+	m_rxd(1), m_tx_data(0), m_rx_data(0), m_tx_shift(0), m_rx_shift(0), m_tx_bits(0), m_rx_bits(0), m_timer(nullptr),
 	m_irq_handler(*this),
 	m_sck_handler(*this),
 	m_txd_handler(*this),

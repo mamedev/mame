@@ -43,7 +43,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_org_dn(0),
 	m_org_dpd(0),
 	m_cl0(0),
-	m_cl1(0),
+	m_cl1(0), m_ccmp(0), m_mask(0), m_cpx(0),
 	m_dcr(0),
 	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1, NULL, *ADDRESS_MAP_NAME(h63484_vram))
 {

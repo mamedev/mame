@@ -40,7 +40,7 @@ const device_type E0516 = &device_creator<e0516_device>;
 
 e0516_device::e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, E0516, "E05-16", tag, owner, clock, "e0516", __FILE__),
-		device_rtc_interface(mconfig, *this)
+		device_rtc_interface(mconfig, *this), m_cs(0), m_clk(0), m_data_latch(0), m_reg_latch(0), m_read_write(0), m_state(0), m_bits(0), m_dio(0), m_timer(nullptr)
 {
 }
 

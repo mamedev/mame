@@ -27,7 +27,7 @@ const device_type HUC6261 = &device_creator<huc6261_device>;
 
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this), m_huc6270_a_tag(nullptr), m_huc6270_b_tag(nullptr), m_huc6270_a(nullptr), m_huc6270_b(nullptr), m_last_h(0), m_last_v(0), m_height(0), m_address(0), m_palette_latch(0), m_register(0), m_control(0), m_pixels_per_clock(0), m_pixel_data(0), m_pixel_clock(0), m_timer(nullptr), m_bmp(nullptr)
 {
 	// Set up UV lookup table
 	for ( int ur = 0; ur < 256; ur++ )

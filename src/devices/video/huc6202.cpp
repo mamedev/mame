@@ -27,7 +27,7 @@ huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, d
 		m_vsync_changed_1_cb(*this),
 		m_hsync_changed_1_cb(*this),
 		m_read_1_cb(*this),
-		m_write_1_cb(*this)
+		m_write_1_cb(*this), m_window1(0), m_window2(0), m_io_device(0), m_map_index(0), m_map_dirty(0)
 {
 }
 

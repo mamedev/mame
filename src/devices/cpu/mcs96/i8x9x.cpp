@@ -13,7 +13,8 @@
 
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	mcs96_device(mconfig, type, name, tag, owner, clock, 8, "i8x9x", __FILE__),
-	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
+	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1), io(nullptr), base_timer2(0), ad_done(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0), 
+	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
 {
 }
 

@@ -34,7 +34,7 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	timer16_5(*this, "timer16:5"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	sci2(*this, "sci2")
+	sci2(*this, "sci2"), syscr(0)
 {
 	has_trace = true;
 }

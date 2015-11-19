@@ -308,7 +308,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
-		m_update_row_type(-1), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+		m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
 		m_vram_size( 0x4000 ), m_plantronics(0),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")
@@ -324,7 +324,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
-		m_update_row_type(-1), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+		m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
 		m_vram_size( 0x4000 ), m_plantronics(0),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")

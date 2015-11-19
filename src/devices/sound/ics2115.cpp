@@ -19,9 +19,9 @@ const device_type ICS2115 = &device_creator<ics2115_device>;
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),
-		device_sound_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_rom(*this, DEVICE_SELF),
-		m_irq_cb(*this)
+		m_irq_cb(*this), m_active_osc(0), m_osc_select(0), m_reg_select(0), m_irq_enabled(0), m_irq_pending(0), m_irq_on(false), m_vmode(0)
 {
 }
 

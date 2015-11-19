@@ -6,7 +6,7 @@ const device_type NSCSI_BUS = &device_creator<nscsi_bus_device>;
 const device_type NSCSI_CONNECTOR = &device_creator<nscsi_connector>;
 
 nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__)
+	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__), data(0), ctrl(0)
 {
 	devcnt = 0;
 	memset(dev, 0, sizeof(dev));

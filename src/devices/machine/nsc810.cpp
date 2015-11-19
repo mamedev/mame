@@ -23,7 +23,9 @@
 const device_type NSC810 = &device_creator<nsc810_device>;
 
 nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, NSC810, "National Semiconductor NSC810", tag, owner, clock, "nsc810", __FILE__),
+	device_t(mconfig, NSC810, "National Semiconductor NSC810", tag, owner, clock, "nsc810", __FILE__), m_portA_latch(0), m_portB_latch(0), m_portC_latch(0), 
+	m_ddrA(0), m_ddrB(0), m_ddrC(0), m_mode(0), m_timer0(nullptr), m_timer1(nullptr), m_timer0_mode(0), m_timer1_mode(0), m_timer0_counter(0), m_timer1_counter(0), 
+	m_timer0_base(0), m_timer1_base(0), m_timer0_running(false), m_timer1_running(false), m_timer0_clock(0), m_timer1_clock(0), m_ramselect(false),
 	m_portA_r(*this),
 	m_portB_r(*this),
 	m_portC_r(*this),

@@ -6,12 +6,12 @@
 const device_type NSCSI_HARDDISK = &device_creator<nscsi_harddisk_device>;
 
 nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	nscsi_full_device(mconfig, NSCSI_HARDDISK, "SCSI HARDDISK", tag, owner, clock, "scsi_harddisk", __FILE__)
+	nscsi_full_device(mconfig, NSCSI_HARDDISK, "SCSI HARDDISK", tag, owner, clock, "scsi_harddisk", __FILE__), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
 
 nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	nscsi_full_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	nscsi_full_device(mconfig, type, name, tag, owner, clock, shortname, source), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
 

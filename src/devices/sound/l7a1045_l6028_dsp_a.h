@@ -6,9 +6,9 @@
 
 struct l7a1045_voice
 {
-	l7a1045_voice() :
-		pos(0),
-		frac(0)
+	l7a1045_voice() : end(0), mode(false),
+	                  pos(0),
+		frac(0), l_volume(0), r_volume(0)
 	{
 		//memset(regs, 0, sizeof(UINT32)*8);
 		start = 0;

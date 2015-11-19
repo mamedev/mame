@@ -32,7 +32,7 @@ ttl74181_device::ttl74181_device(const machine_config &mconfig, const char *tag,
 	m_b(0),
 	m_s(0),
 	m_m(0),
-	m_c(0)
+	m_c(0), m_f(0), m_cn(0), m_g(0), m_p(0), m_equals(0)
 {
 }
 

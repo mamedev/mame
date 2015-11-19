@@ -16,7 +16,8 @@
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
-	io_config("io", ENDIANNESS_BIG, 16, 16, -1)
+	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0), 
+	TMP1(0), TMP2(0), TMPR(0), inst_state(0), inst_substate(0), icount(0), bcount(0), irq_vector(0), taken_irq_vector(0), irq_level(0), taken_irq_level(0), irq_required(false), irq_nmi(false)
 {
 	supports_advanced = false;
 	mode_advanced = false;

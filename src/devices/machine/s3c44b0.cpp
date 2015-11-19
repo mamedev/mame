@@ -33,7 +33,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const ch
 const device_type S3C44B0 = &device_creator<s3c44b0_device>;
 
 s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock, "s3c44b0", __FILE__),
+				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock, "s3c44b0", __FILE__), m_cpu(nullptr),
 					m_port_r_cb(*this),
 					m_port_w_cb(*this),
 					m_scl_w_cb(*this),
