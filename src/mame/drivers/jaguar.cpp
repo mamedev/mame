@@ -427,9 +427,10 @@ void jaguar_state::machine_reset()
 	}
 
 	/* configure banks for gfx/sound ROMs */
-	UINT8 *romboard = memregion("romboard")->base();
-	if (romboard != nullptr)
+	if (m_romboard_region != nullptr)
 	{
+		UINT8 *romboard = m_romboard_region->base();
+
 		/* graphics banks */
 		if (m_is_r3000)
 		{
@@ -617,7 +618,7 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 	}
 
 	/* adjust banking */
-	if (memregion("romboard")->base())
+	if (m_romboard_region != NULL)
 	{
 		membank("mainsndbank")->set_entry((data >> 1) & 7);
 		membank("dspsndbank")->set_entry((data >> 1) & 7);
@@ -776,10 +777,12 @@ WRITE32_MEMBER(jaguar_state::latch_w)
 	logerror("%08X:latch_w(%X)\n", space.device().safe_pcbase(), data);
 
 	/* adjust banking */
-	if (memregion("romboard")->base())
+	if (m_romboard_region != NULL)
 	{
 		if (m_is_r3000)
+		{
 			membank("maingfxbank")->set_entry(data & 1);
+		}
 		membank("gpugfxbank")->set_entry(data & 1);
 	}
 }
@@ -1915,7 +1918,8 @@ MACHINE_CONFIG_END
 
 void jaguar_state::fix_endian( UINT32 addr, UINT32 size )
 {
-	UINT8 j[4], *ram = memregion("maincpu")->base();
+	UINT8 j[4];
+	UINT8 *ram = memregion("maincpu")->base();
 	UINT32 i;
 	size += addr;
 	logerror("File Loaded to address range %X to %X\n",addr,size-1);

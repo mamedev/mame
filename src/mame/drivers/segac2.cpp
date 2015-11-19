@@ -98,11 +98,14 @@ class segac2_state : public md_base_state
 {
 public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag),
-	m_paletteram(*this, "paletteram"),
-	m_upd7759(*this, "upd"),
-	m_screen(*this, "screen"),
-	m_palette(*this, "palette") { }
+		: md_base_state(mconfig, type, tag)
+		, m_paletteram(*this, "paletteram")
+		, m_upd_region(*this, "upd")
+		, m_upd7759(*this, "upd")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{
+	}
 
 	// for Print Club only
 	int m_cam_data;
@@ -110,6 +113,7 @@ public:
 	int m_segac2_enable_display;
 
 	required_shared_ptr<UINT16> m_paletteram;
+	optional_memory_region m_upd_region;
 
 	/* protection-related tracking */
 	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
@@ -244,8 +248,10 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 
 	/* determine how many sound banks */
 	m_sound_banks = 0;
-	if (memregion("upd")->base())
-		m_sound_banks = memregion("upd")->bytes() / 0x20000;
+	if (m_upd_region != NULL)
+	{
+		m_sound_banks = m_upd_region->bytes() / 0x20000;
+	}
 
 	/* reset the protection */
 	m_prot_write_buf = 0;
@@ -934,7 +940,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( wwmarine )
 	PORT_INCLUDE( systemc_generic )
-	
+
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Button 1
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Button 2

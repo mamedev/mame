@@ -1049,7 +1049,11 @@ static const unsigned int example_word_TEN[619]={
 
 void tms5110_device::device_start()
 {
-	m_table = region()->base();
+	m_table = NULL;
+	if (m_table_region != NULL)
+	{
+		m_table = m_table_region->base();
+	}
 
 	set_variant(TMS5110_IS_TMS5110A);
 
@@ -1532,23 +1536,25 @@ const device_type TMS5110 = &device_creator<tms5110_device>;
 
 tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_m0_cb(*this),
-		m_m1_cb(*this),
-		m_addr_cb(*this),
-		m_data_cb(*this),
-		m_romclk_cb(*this)
+	, device_sound_interface(mconfig, *this)
+	, m_table_region(*this, tag)
+	, m_m0_cb(*this)
+	, m_m1_cb(*this)
+	, m_addr_cb(*this)
+	, m_data_cb(*this)
+	, m_romclk_cb(*this)
 {
 }
 
 tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_m0_cb(*this),
-		m_m1_cb(*this),
-		m_addr_cb(*this),
-		m_data_cb(*this),
-		m_romclk_cb(*this)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_sound_interface(mconfig, *this)
+	, m_table_region(*this, tag)
+	, m_m0_cb(*this)
+	, m_m1_cb(*this)
+	, m_addr_cb(*this)
+	, m_data_cb(*this)
+	, m_romclk_cb(*this)
 {
 }
 

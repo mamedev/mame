@@ -97,6 +97,9 @@ private:
 	void parse_frame();
 
 	// internal state
+	/* table region */
+	optional_memory_region m_table_region;
+
 	/* coefficient tables */
 	int m_variant;                /* Variant of the 5110 - see tms5110.h */
 
