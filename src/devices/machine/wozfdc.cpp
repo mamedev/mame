@@ -76,22 +76,12 @@ void wozfdc_device::device_start()
 	save_item(NAME(active));
 	save_item(NAME(phases));
 	save_item(NAME(external_io_select));
-	save_item(NAME(cur_lss.tm));
-	save_item(NAME(cur_lss.cycles));
-	save_item(NAME(cur_lss.data_reg));
-	save_item(NAME(cur_lss.address));
-	save_item(NAME(cur_lss.write_start_time));
-//  save_item(NAME(cur_lss.write_buffer));
-	save_item(NAME(cur_lss.write_position));
-	save_item(NAME(cur_lss.write_line_active));
-	save_item(NAME(predicted_lss.tm));
-	save_item(NAME(predicted_lss.cycles));
-	save_item(NAME(predicted_lss.data_reg));
-	save_item(NAME(predicted_lss.address));
-	save_item(NAME(predicted_lss.write_start_time));
-//  save_item(NAME(predicted_lss.write_buffer));
-	save_item(NAME(predicted_lss.write_position));
-	save_item(NAME(predicted_lss.write_line_active));
+	save_item(NAME(cycles));
+	save_item(NAME(data_reg));
+	save_item(NAME(address));
+	save_item(NAME(write_start_time));
+	save_item(NAME(write_position));
+	save_item(NAME(write_line_active));
 	save_item(NAME(drvsel));
 	save_item(NAME(enable1));
 }
@@ -104,15 +94,17 @@ void wozfdc_device::device_reset()
 	mode_write = false;
 	mode_load = false;
 	last_6502_write = 0x00;
-	cur_lss.tm = machine().time();
-	cur_lss.cycles = time_to_cycles(cur_lss.tm);
-	cur_lss.data_reg = 0x00;
-	cur_lss.address = 0x00;
-	cur_lss.write_start_time = attotime::never;
-	cur_lss.write_position = 0;
-	cur_lss.write_line_active = false;
-	predicted_lss.tm = attotime::never;
+	cycles = time_to_cycles(machine().time());
+	data_reg = 0x00;
+	address = 0x00;
+	write_start_time = attotime::never;
+	write_position = 0;
+	write_line_active = false;
 	external_io_select = false;
+
+	// Just a timer to be sure that the lss is updated from time to
+	// time, so that there's no hiccup when it's talked to again.
+	timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
 void wozfdc_device::a3_update_drive_sel()
@@ -152,10 +144,8 @@ void wozfdc_device::a3_update_drive_sel()
 			floppy->mon_w(true);
 		}
 		floppy = newflop;
-		if(active) {
+		if(active)
 			floppy->mon_w(false);
-			lss_predict();
-		}
 	}
 }
 
@@ -188,9 +178,6 @@ void wozfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			floppy->mon_w(true);
 		active = MODE_IDLE;
 	}
-
-	if(active)
-		lss_predict();
 }
 
 /*-------------------------------------------------
@@ -201,8 +188,10 @@ READ8_MEMBER(wozfdc_device::read)
 {
 	control(offset);
 
-	if(!(offset & 1))
-		return cur_lss.data_reg;
+	if(!(offset & 1)) {
+		lss_sync();
+		return data_reg;
+	}
 	return 0xff;
 }
 
@@ -214,8 +203,8 @@ READ8_MEMBER(wozfdc_device::read)
 WRITE8_MEMBER(wozfdc_device::write)
 {
 	control(offset);
+	lss_sync();
 	last_6502_write = data;
-	lss_predict();
 }
 
 void wozfdc_device::phase(int ph, bool on)
@@ -235,8 +224,6 @@ void wozfdc_device::control(int offset)
 		if(active)
 			lss_sync();
 		phase(offset >> 1, offset & 1);
-		if(active)
-			lss_predict();
 
 	} else
 		switch(offset) {
@@ -262,7 +249,7 @@ void wozfdc_device::control(int offset)
 				break;
 			}
 			break;
-			case 0xa:
+		case 0xa:
 				external_io_select = false;
 				if(floppy != floppy0->get_device()) {
 					if(active) {
@@ -270,10 +257,8 @@ void wozfdc_device::control(int offset)
 						floppy->mon_w(true);
 					}
 				floppy = floppy0->get_device();
-				if(active) {
+				if(active)
 					floppy->mon_w(false);
-					lss_predict();
-				}
 			}
 			break;
 		case 0xb:
@@ -287,10 +272,8 @@ void wozfdc_device::control(int offset)
 						floppy->mon_w(true);
 					}
 					floppy = floppy1->get_device();
-					if(active) {
+					if(active)
 						floppy->mon_w(false);
-						lss_predict();
-					}
 				}
 			}
 			else
@@ -302,47 +285,39 @@ void wozfdc_device::control(int offset)
 			if(mode_load) {
 				if(active) {
 					lss_sync();
-					cur_lss.address &= ~0x04;
+					address &= ~0x04;
 				}
 				mode_load = false;
-				if(active)
-					lss_predict();
 			}
 			break;
 		case 0xd:
 			if(!mode_load) {
 				if(active) {
 					lss_sync();
-					cur_lss.address |= 0x04;
+					address |= 0x04;
 				}
 				mode_load = true;
-				if(active)
-					lss_predict();
 			}
 			break;
 		case 0xe:
 			if(mode_write) {
 				if(active) {
 					lss_sync();
-					cur_lss.address &= ~0x08;
+					address &= ~0x08;
 				}
 				mode_write = false;
-				if(active)
-					lss_predict();
 			}
 			break;
 		case 0xf:
 			if(!mode_write) {
 				if(active) {
 					lss_sync();
-					cur_lss.address |= 0x08;
-					cur_lss.write_start_time = machine().time();
+					address |= 0x08;
+					write_start_time = machine().time();
 					if(floppy)
-						floppy->set_write_splice(cur_lss.write_start_time);
+						floppy->set_write_splice(write_start_time);
 				}
 				mode_write = true;
-				if(active)
-					lss_predict();
 			}
 			break;
 		}
@@ -365,84 +340,26 @@ attotime wozfdc_device::cycles_to_time(UINT64 cycles)
 
 void wozfdc_device::lss_start()
 {
-	cur_lss.tm = machine().time();
-	cur_lss.cycles = time_to_cycles(cur_lss.tm);
-	cur_lss.data_reg = 0x00;
-	cur_lss.address &= ~0x0e;
-	cur_lss.write_position = 0;
-	cur_lss.write_start_time = mode_write ? machine().time() : attotime::never;
-	cur_lss.write_line_active = false;
+	cycles = time_to_cycles(machine().time());
+	data_reg = 0x00;
+	address &= ~0x0e;
+	write_position = 0;
+	write_start_time = mode_write ? machine().time() : attotime::never;
+	write_line_active = false;
 	if(mode_write && floppy)
-		floppy->set_write_splice(cur_lss.write_start_time);
-	lss_predict();
-}
-
-void wozfdc_device::lss_delay(UINT64 cycles, const attotime &tm, UINT8 data_reg, UINT8 address, bool write_line_active)
-{
-	if(data_reg & 0x80)
-		address |= 0x02;
-	else
-		address &= ~0x02;
-	predicted_lss.cycles = cycles;
-	predicted_lss.tm = tm;
-	predicted_lss.data_reg = data_reg;
-	predicted_lss.address = address;
-	predicted_lss.write_line_active = write_line_active;
-	attotime mtm = machine().time();
-	if(predicted_lss.tm > mtm)
-		timer->adjust(predicted_lss.tm - mtm);
-}
-
-void wozfdc_device::lss_delay(UINT64 cycles, UINT8 data_reg, UINT8 address, bool write_line_active)
-{
-	lss_delay(cycles, cycles_to_time(cycles), data_reg, address, write_line_active);
-}
-
-void wozfdc_device::commit_predicted()
-{
-	cur_lss = predicted_lss;
-	assert(!mode_write || (cur_lss.write_line_active && (cur_lss.address & 0x80)) || ((!cur_lss.write_line_active) && !(cur_lss.address & 0x80)));
-	if(mode_write) {
-		if(floppy)
-			floppy->write_flux(cur_lss.write_start_time, cur_lss.tm, cur_lss.write_position, cur_lss.write_buffer);
-		cur_lss.write_start_time = cur_lss.tm;
-		cur_lss.write_position = 0;
-	}
-
-	predicted_lss.tm = attotime::never;
+		floppy->set_write_splice(write_start_time);
 }
 
 void wozfdc_device::lss_sync()
 {
-	attotime tm = machine().time();
-	if(!predicted_lss.tm.is_never() && predicted_lss.tm <= tm)
-		commit_predicted();
+	if(!active)
+		return;
 
-	while(cur_lss.tm < tm) {
-		lss_predict(tm);
-		commit_predicted();
-	}
-}
+	attotime next_flux = floppy ? floppy->get_next_transition(cycles_to_time(cycles) - attotime::from_usec(1)) : attotime::never;
 
-void wozfdc_device::lss_predict(attotime limit)
-{
-	predicted_lss.write_start_time = cur_lss.write_start_time;
-	predicted_lss.write_position = cur_lss.write_position;
-	memcpy(predicted_lss.write_buffer, cur_lss.write_buffer, cur_lss.write_position * sizeof(attotime));
-	bool write_line_active = cur_lss.write_line_active;
-
-	attotime next_flux = floppy ? floppy->get_next_transition(cur_lss.tm - attotime::from_usec(1)) : attotime::never;
-
-	if(limit == attotime::never)
-		limit = machine().time() + attotime::from_usec(50);
-
-	UINT64 cycles = cur_lss.cycles;
-	UINT64 cycles_limit = time_to_cycles(limit);
+	UINT64 cycles_limit = time_to_cycles(machine().time());
 	UINT64 cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : UINT64(-1);
 	UINT64 cycles_next_flux_down = cycles_next_flux != UINT64(-1) ? cycles_next_flux+1 : UINT64(-1);
-
-	UINT8 address = cur_lss.address;
-	UINT8 data_reg = cur_lss.data_reg;
 
 	if(cycles >= cycles_next_flux && cycles < cycles_next_flux_down)
 		address &= ~0x10;
@@ -463,34 +380,35 @@ void wozfdc_device::lss_predict(attotime limit)
 				if((write_line_active && !(address & 0x80)) ||
 					(!write_line_active && (address & 0x80))) {
 					write_line_active = !write_line_active;
-					assert(predicted_lss.write_position != 32);
-					predicted_lss.write_buffer[predicted_lss.write_position++] = cycles_to_time(cycles);
+					assert(write_position != 32);
+					write_buffer[write_position++] = cycles_to_time(cycles);
 				}
 			}
 
 			address = (address & 0x1e) | (opcode & 0xc0) | ((opcode & 0x20) >> 5) | ((opcode & 0x10) << 1);
 			switch(opcode & 0x0f) {
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-				if(data_reg) {
-					lss_delay(cycles+1, 0x00, address, write_line_active);
-					return;
-				}
+				data_reg = 0x00;
 				break;
 			case 0x8: case 0xc:
 				break;
 			case 0x9:
-				lss_delay(cycles+1, data_reg << 1, address, write_line_active);
-				return;
+				data_reg <<= 1;
+				break;
 			case 0xa: case 0xe:
-				lss_delay(cycles+1, (data_reg >> 1) | (floppy && floppy->wpt_r() ? 0x80 : 0x00), address, write_line_active);
-				return;
+				data_reg = (data_reg >> 1) | (floppy && floppy->wpt_r() ? 0x80 : 0x00);
+				break;
 			case 0xb: case 0xf:
-				lss_delay(cycles+1, last_6502_write, address, write_line_active);
-				return;
+				data_reg = last_6502_write;
+				break;
 			case 0xd:
-				lss_delay(cycles+1, (data_reg << 1) | 0x01, address, write_line_active);
-				return;
+				data_reg = (data_reg << 1) | 0x01;
+				break;
 			}
+			if(data_reg & 0x80)
+				address |= 0x02;
+			else
+				address &= ~0x02;
 			cycles++;
 		}
 
@@ -503,8 +421,6 @@ void wozfdc_device::lss_predict(attotime limit)
 			cycles_next_flux_down = cycles_next_flux != UINT64(-1) ? cycles_next_flux+1 : UINT64(-1);
 		}
 	}
-
-	lss_delay(cycles, limit, data_reg, address, write_line_active);
 }
 
 // set the two images for the Disk II
