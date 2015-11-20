@@ -931,7 +931,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 			// CPC+/GX4000 Programmable Raster Interrupt (disabled if &6800 in ASIC RAM is 0)
 			if ( m_asic.pri != 0 )
 			{
-				if ( m_asic.pri == m_asic.vpos - 1 )
+				if ( m_asic.pri == m_asic.vpos )
 				{
 					logerror("PRI: triggered, scanline %d\n",m_asic.pri);
 					m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -1030,13 +1030,20 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 		/* DE became active, store the starting MA and RA signals */
 		m_gate_array.ma = m_crtc->get_ma();
 		m_gate_array.ra = m_crtc->get_ra();
+
 		m_asic.h_start = m_gate_array.line_ticks;
 		if(m_asic.de_start == 0)
-			m_asic.vpos = 1;
+			m_asic.vpos = 0;
 		m_asic.de_start = 1;
+		m_gate_array.colour = m_asic.ram[0x2420] + ( m_asic.ram[0x2421] << 8 );
+		m_asic.hscroll = m_asic.ram[0x2804] & 0x0f;
+		if ( m_asic.hscroll == 0 )
+			amstrad_plus_gate_array_get_video_data();
+//		if( m_asic.ram[0x2804] & 0x80 )  // draw border for first character if set (hides graphic mess when using softscroll)
+//			*m_gate_array.draw_p = m_asic.ram[0x2420] + ( m_asic.ram[0x2421] << 8 );
 
 		/* Start of screen */
-		if ( m_asic.vpos == 1 )
+		if ( m_asic.vpos == 0 )
 		{
 			m_asic.split_ma_base = 0x0000;
 			m_asic.split_ma_started = 0x0000;
@@ -1047,12 +1054,6 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 			m_asic.split_ma_started = m_gate_array.ma;
 			m_asic.split_ma_base = ( m_asic.ram[0x2802] << 8 ) | m_asic.ram[0x2803];
 		}
-
-		m_gate_array.colour = m_asic.ram[0x2420] + ( m_asic.ram[0x2421] << 8 );
-		m_asic.hscroll = m_asic.ram[0x2804] & 0x0f;
-
-		if ( m_asic.hscroll == 0 )
-			amstrad_plus_gate_array_get_video_data();
 	}
 
 	if ( m_gate_array.de && ! state )
