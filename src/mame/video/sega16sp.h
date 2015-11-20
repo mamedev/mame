@@ -201,6 +201,9 @@ public:
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	optional_memory_region		m_sprite_region;
 };
 
 

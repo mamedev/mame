@@ -62,7 +62,10 @@ class arcadia_amiga_state : public amiga_state
 {
 public:
 	arcadia_amiga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag) { }
+		: amiga_state(mconfig, type, tag)
+		, m_bios_region(*this, "user2")
+	{
+	}
 
 	UINT8 m_coin_counter[2];
 
@@ -91,6 +94,10 @@ public:
 
 protected:
 	virtual void machine_reset() override;
+
+	optional_memory_region m_bios_region;
+
+	UINT8 m_coin_counter[2];
 };
 
 
@@ -922,12 +929,16 @@ DRIVER_INIT_MEMBER( arcadia_amiga_state, arcadia )
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
 
-	/* OnePlay bios is encrypted, TenPlay is not */
-	UINT16 *biosrom = (UINT16 *)memregion("user2")->base();
+	if (m_bios_region != NULL)
+	{
+		/* OnePlay bios is encrypted, TenPlay is not */
+		UINT16 *rom = (UINT16 *)m_bios_region->base();
 
-	if (biosrom)
-		if (biosrom[0] != 0x4afc)
+		if (rom[0] != 0x4afc)
+		{
 			generic_decode("user2", 6, 1, 0, 2, 3, 4, 5, 7);
+		}
+	}
 }
 
 

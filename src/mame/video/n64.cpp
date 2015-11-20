@@ -91,7 +91,7 @@ INT32 n64_rdp::get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp
 
 void n64_state::video_start()
 {
-	m_rdp = auto_alloc(machine(), n64_rdp(*this));
+	m_rdp = auto_alloc(machine(), n64_rdp(*this, m_rdram, m_rsp_dmem));
 
 	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
@@ -203,7 +203,7 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 	//INT32 dither_filter = (n64->vi_control >> 16) & 1;
 	//INT32 vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
-	UINT16* frame_buffer = (UINT16*)&rdram[(vi_origin & 0xffffff) >> 2];
+	UINT16* frame_buffer = (UINT16*)&m_rdram[(vi_origin & 0xffffff) >> 2];
 	//UINT32 hb = ((n64->vi_origin & 0xffffff) >> 2) >> 1;
 	//UINT8* hidden_buffer = &m_hidden_bits[hb];
 
@@ -261,7 +261,7 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 	INT32 gamma_dither = (vi_control >> 2) & 1;
 	//INT32 vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
-	UINT32* frame_buffer32 = (UINT32*)&rdram[(vi_origin & 0xffffff) >> 2];
+	UINT32* frame_buffer32 = (UINT32*)&m_rdram[(vi_origin & 0xffffff) >> 2];
 
 	const INT32 hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
 	const float hcoeff = ((float)(vi_xscale & 0xfff) / (1 << 10));
@@ -843,7 +843,7 @@ void n64_rdp::z_store(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzc
 	UINT16 zval = m_z_com_table[z & 0x3ffff]|(enc >> 2);
 	if(zcurpixel <= MEM16_LIMIT)
 	{
-		((UINT16*)rdram)[zcurpixel ^ WORD_ADDR_XOR] = zval;
+		((UINT16*)m_rdram)[zcurpixel ^ WORD_ADDR_XOR] = zval;
 	}
 	if(dzcurpixel <= MEM8_LIMIT)
 	{
@@ -1099,11 +1099,11 @@ UINT32 n64_rdp::read_data(UINT32 address)
 {
 	if (m_status & 0x1)     // XBUS_DMEM_DMA enabled
 	{
-		return rsp_dmem[(address & 0xfff) / 4];
+		return m_dmem[(address & 0xfff) / 4];
 	}
 	else
 	{
-		return rdram[((address & 0xffffff) / 4)];
+		return m_rdram[((address & 0xffffff) / 4)];
 	}
 }
 
@@ -3124,10 +3124,14 @@ void n64_rdp::process_command_list()
 
 /*****************************************************************************/
 
-n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 32000>(state.machine())
+n64_rdp::n64_rdp(n64_state &state, UINT32* rdram, UINT32* dmem) : poly_manager<UINT32, rdp_poly_state, 8, 32000>(state.machine())
 {
 	ignore = false;
 	dolog = false;
+
+	m_rdram = rdram;
+	m_dmem = dmem;
+
 	m_aux_buf_ptr = 0;
 	m_aux_buf = nullptr;
 	m_pipe_clean = true;

@@ -197,14 +197,23 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 
 	ppu1_space.install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
 
-	m_vrom[0] = memregion("gfx1")->base();
-	m_vrom_size[0] = memregion("gfx1")->bytes();
-	m_vrom_banks = m_vrom_size[0] / 0x400;
+	if (m_gfx1_rom != NULL)
+	{
+		m_vrom[0] = memregion("gfx1")->base();
+		m_vrom_size[0] = memregion("gfx1")->bytes();
+		m_vrom_banks = m_vrom_size[0] / 0x400;
+	}
+	else
+	{
+		m_vrom[0] = NULL;
+		m_vrom_size[0] = 0;
+		m_vrom_banks = 0;
+	}
 
 	/* establish chr banks */
 	/* bank 1 is used already! */
 	/* DRIVER_INIT is called first - means we can handle this different for VRAM games! */
-	if (nullptr != m_vrom[0])
+	if (m_vrom[0] != nullptr)
 	{
 		for (i = 0; i < 8; i++)
 		{
