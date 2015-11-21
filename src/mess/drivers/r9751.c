@@ -129,7 +129,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 
 	switch(address)
 	{
-		/* PDC HDD region (0x24, device 9 */
+		/* PDC HDD region (0x24, device 9) */
 		case 0x5FF00824: /* HDD Command result code */
 			return 0x10;
 			break;
@@ -146,11 +146,17 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 		case 0x5FF008B0: /* FDD Command result code */
 			return 0x10;
 			break;
+		case 0x5FF010B0: /* Clear 5FF030B0 ?? */
+			//m_pdc->reg_p4 = 0;
+			//m_pdc->reg_p5 = 0;
+			//logerror("--- FDD 0x5FF010B0 READ (0) - CLEARING 0x5FF30B0 (PDC 0x4, 0x5)\n");
+			logerror("--- FDD 0x5FF010B0 READ (0)\n");
+			return 0;
 		case 0x5FF030B0: /* FDD command completion status */
-			logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", fdd_cmd_complete, space.machine().firstcpu->pc(), address);
-			data = fdd_cmd_complete;
-			fdd_cmd_complete = 0;
+			data = (m_pdc->reg_p5 << 8) + m_pdc->reg_p4;
+			logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 			return data;
+			//return m_pdc->reg_p21;
 			break;
 		default:
 			logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, 0, mem_mask);
@@ -160,6 +166,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 {
+	UINT8 data_b0, data_b1;
 	UINT32 address = offset * 4 + 0x5FF00000;
 
 	switch(address)
@@ -201,22 +208,43 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			break;
 		case 0x5FF041B0: /* Unknown - Probably old style commands */
 			logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
-			UINT8 data_b0;
-			UINT8 data_b1;
+			//UINT8 data_b0;
+			//UINT8 data_b1;
+
+			/* Clear FDD Command completion status 0x5FF030B0 (PDC 0x4, 0x5)*/
+			m_pdc->reg_p4 = 0;
+			m_pdc->reg_p5 = 0;
+
 			data_b0 = data & 0xFF;
 			data_b1 = (data & 0xFF00) >> 8;
-			logerror("Test: %02X and %02X\n", data_b0, data_b1);
+			m_pdc->reg_p0 = data_b0;
+			m_pdc->reg_p1 = data_b1;
+			m_pdc->reg_p38 |= 0x2; /* Set bit 1 on port 38 register, PDC polls this port looking for a command */
+			logerror("--- FDD Old Command: %02X and %02X\n", data_b0, data_b1);
 			break;
 		case 0x5FF080B0: /* fdd_dest_address register */
 			fdd_dest_address = data << 1;
-			logerror("FDD destination address: %08X\n", fdd_dest_address);
+			logerror("--- FDD destination address: %08X\n", fdd_dest_address);
 			break;
 		case 0x5FF0C0B0:
-		case 0x5FF0C1B0:
+		case 0x5FF0C1B0: /* FDD command address register */
 			UINT32 fdd_scsi_command;
 			UINT32 fdd_scsi_command2;
+			//UINT8 data_b0;
+			//UINT8 data_b1;
 			unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
 			int scsi_lba; // FDD LBA location here, extracted from command
+
+			/* Clear FDD Command completion status 0x5FF030B0 (PDC 0x4, 0x5)*/
+			m_pdc->reg_p4 = 0;
+			m_pdc->reg_p5 = 0;
+
+			/* Send FDD SCSI command location address to PDC 0x2, 0x3 */
+			logerror("--- FDD command address: %08X\n", data);
+			data_b0 = data & 0xFF;
+			data_b1 = (data & 0xFF00) >> 8;
+			m_pdc->reg_p2 = data_b0;
+			m_pdc->reg_p3 = data_b1;
 
 			fdd_scsi_command = swap_uint32(m_mem->read_dword(data << 1));
 			fdd_scsi_command2 = swap_uint32(m_mem->read_dword((data << 1)+4));
@@ -224,16 +252,16 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			memcpy(c_fdd_scsi_command,&fdd_scsi_command,4);
 			memcpy(c_fdd_scsi_command+4,&fdd_scsi_command2,4);
 
-			logerror("FDD SCSI Command: ");
+			logerror("--- FDD SCSI Command: ");
 			for(int i = 0; i < 8; i++)
 				logerror("%02X ", c_fdd_scsi_command[i]);
 			logerror("\n");
 
 			scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
-			logerror("FDD SCSI LBA: %i\n", scsi_lba);
+			logerror("--- FDD SCSI LBA: %i\n", scsi_lba);
 
 			m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
-			logerror("pdc_p38: %X\n",m_pdc->reg_p38);
+			logerror("--- FDD SET PDC Port 38: %X\n",m_pdc->reg_p38);
 			break;
 
 		default:

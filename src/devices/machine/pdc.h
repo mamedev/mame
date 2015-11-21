@@ -65,12 +65,23 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
 
+	DECLARE_READ8_MEMBER(p0_5_r);
+	DECLARE_WRITE8_MEMBER(p0_5_w);
+	DECLARE_WRITE8_MEMBER(p21_w);
 	DECLARE_WRITE8_MEMBER(p38_w);
 	DECLARE_READ8_MEMBER(p38_r);
 	DECLARE_READ8_MEMBER(p39_r);
 
         DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	/* Main CPU accessible registers */
+	UINT8 reg_p0;
+	UINT8 reg_p1;
+	UINT8 reg_p2;
+	UINT8 reg_p3;
+	UINT8 reg_p4;
+	UINT8 reg_p5;
+	UINT8 reg_p21;
 	UINT8 reg_p38;
 protected:
         // device-level overrides

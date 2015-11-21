@@ -66,7 +66,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
-	AM_RANGE(0x38, 0x38) AM_READ(p38_r) // Possibly UPD765 interrupt
+	AM_RANGE(0x00, 0x05) AM_READWRITE(p0_5_r,p0_5_w) AM_MIRROR(0xFF00)
+	AM_RANGE(0x21, 0x21) AM_WRITE(p21_w) AM_MIRROR(0xFF00)
+	AM_RANGE(0x38, 0x38) AM_READ(p38_r) AM_MIRROR(0xFF00) // Possibly UPD765 interrupt
 	AM_RANGE(0x39, 0x39) AM_READ(p39_r) AM_MIRROR(0xFF00) // HDD related
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE(HDC_TAG, hdc9224_device,read,write) AM_MIRROR(0xFF00)
 	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
@@ -296,6 +298,54 @@ WRITE8_MEMBER(pdc_device::i8237_fdc_dma_w)
 WRITE_LINE_MEMBER(pdc_device::hdd_irq)
 {
 	m_pdccpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+}
+
+READ8_MEMBER(pdc_device::p0_5_r)
+{
+	switch(offset)
+	{
+		case 0: /* Port 0 */
+			logerror("PDC: Port 0x00 READ: %02X\n", reg_p0);
+			return reg_p0;
+		case 1: /* Port 1 */
+			logerror("PDC: Port 0x01 READ: %02X\n", reg_p1);
+			return reg_p1;
+		case 2:
+			logerror("PDC: Port 0x02 READ: %02X\n", reg_p2);
+			return reg_p2;
+		case 3:
+			logerror("PDC: Port 0x03 READ: %02X\n", reg_p3);
+			return reg_p3;
+		default:
+			logerror("(!)PDC: Port %02X READ: \n", offset);
+			return 0;
+	}
+}
+
+WRITE8_MEMBER(pdc_device::p0_5_w)
+{
+	switch(offset)
+	{
+		case 4:
+			logerror("PDC: Port 0x04 WRITE: %02X\n", data);
+			reg_p4 = data;
+			break;
+		case 5:
+			logerror("PDC: Port 0x05 WRITE: %02X\n", data);
+			reg_p5 = data;
+			break;
+		default:
+			logerror("(!)PDC: Port %02X WRITE: %02X\n", offset, data);
+			break;
+	}
+}
+
+WRITE8_MEMBER(pdc_device::p21_w)
+{
+	logerror("PDC: Port 0x21 WRITE: %02X\n", data);
+	logerror("PDC: Resetting 0x38 bit 1\n");
+	reg_p38 &= ~2; // Clear bit 1
+	reg_p21 = data;
 }
 
 WRITE8_MEMBER(pdc_device::p38_w)
