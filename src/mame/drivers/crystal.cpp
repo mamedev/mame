@@ -703,8 +703,8 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
 	srcline = (UINT16 *) Visible;
-	for (y = 0; y < 240; y++)
-		memcpy(&bitmap.pix16(y), &srcline[y * 512], width * 2);
+	for (y = 0; y < screen.height(); y++)
+		memcpy(&bitmap.pix16(y), &srcline[y * 1024], width * 2);
 
 	return 0;
 }
