@@ -662,7 +662,9 @@ READ16_MEMBER(model1_state::io_r)
 WRITE16_MEMBER(model1_state::io_w)
 {
 	if(offset == 0x0f){
-		// tested in vr, vf, swa, wingwar
+		// lamp and coinmeters
+		// 0x01 = COIN METER 1
+		// 0x02 = COIN METER 2
 		set_led_status(machine(), 0, data & 0x4);   // START (1)
 		set_led_status(machine(), 1, data & 0x8);   // VIEW1 (START2 - VF)
 		set_led_status(machine(), 2, data & 0x10);  // VIEW2 (VIEW - SWA)
@@ -670,6 +672,11 @@ WRITE16_MEMBER(model1_state::io_w)
 		set_led_status(machine(), 4, data & 0x40);  // VIEW4
 		set_led_status(machine(), 5, data & 0x80);  // RACE LEADER
 		m_lamp_state = data;
+		output_set_digit_value(1, data);
+		return;
+	} else if (offset == 0x11) {
+		// drive board commands
+		output_set_digit_value(0, data);
 		return;
 	}
 	logerror("IOW: %02x %02x\n", offset, data);
