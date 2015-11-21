@@ -21,6 +21,15 @@ const char *const genpin_sample_names[] =
 	"knocker",
 	"sling",
 	"coinin",
+	"outhole",
+	"kickback",
+	"drop_target_reset",
+	"coil_coinlockout_engage",
+	"coil_coinlockout_release",
+	"relay_engage",
+	"relay_release",
+	"solenoid_engage",
+	"solenoid_release",
 	0   /* end of array */
 };
 

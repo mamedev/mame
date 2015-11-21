@@ -62,14 +62,16 @@
 
 	<software name="welcome">
 		<description>Welcome</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>BBC Soft</publisher>
 		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="28803">
 				<rom name="welcome-bbcmaster-side1_bm.uef" size="28803" crc="29076f21" sha1="d56ddebc09166687e89fd1210d87a98ddaf37272" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="38565">
 				<rom name="welcome-bbcmaster-side2_bm.uef" size="38565" crc="ac51d83c" sha1="c6cfd8ddbff42f983fbf0aa341cd49844025995b" offset="0" />
 			</dataarea>

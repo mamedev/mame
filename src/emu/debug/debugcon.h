@@ -89,7 +89,7 @@ void CLIB_DECL      debug_console_printf_wrap(running_machine &machine, int wrap
 text_buffer *       debug_console_get_textbuf(void);
 
 /* errorlog management */
-void                debug_errorlog_write_line(running_machine &machine, const char *line);
+void                debug_errorlog_write_line(const running_machine &machine, const char *line);
 text_buffer *       debug_errorlog_get_textbuf(void);
 
 #endif

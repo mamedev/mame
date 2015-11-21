@@ -12,16 +12,24 @@
 #define __N2A03_H__
 
 #include "m6502.h"
+#include "sound/nes_apu.h"
 
 class n2a03_device : public m6502_device {
 public:
 	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	required_device<nesapu_device> m_apu;
 
 	static const disasm_entry disasm_entries[0x100];
 
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
+
+	READ8_MEMBER(psg1_4014_r);
+	READ8_MEMBER(psg1_4015_r);
+	WRITE8_MEMBER(psg1_4015_w);
+	WRITE8_MEMBER(psg1_4017_w);
 
 protected:
 	class mi_2a03_normal : public memory_interface {
@@ -54,6 +62,13 @@ protected:
 	O(sbc_nd_aba); O(sbc_nd_abx); O(sbc_nd_aby); O(sbc_nd_idx); O(sbc_nd_idy); O(sbc_nd_imm); O(sbc_nd_zpg); O(sbc_nd_zpx);
 
 #undef O
+
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+private:
+	address_space_config m_program_config;
+
 };
 
 #define N2A03_DEFAULTCLOCK (21477272.724 / 12)

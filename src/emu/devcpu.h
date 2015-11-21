@@ -17,43 +17,6 @@
 #ifndef __DEVCPU_H__
 #define __DEVCPU_H__
 
-#include "emuopts.h"
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// CPU information constants
-const int MAX_REGS = 256;
-enum
-{
-	// --- the following bits of info are returned as 64-bit signed integers ---
-	CPUINFO_INT_FIRST = 0x00000,
-
-	CPUINFO_INT_CPU_SPECIFIC = 0x08000,                     // R/W: CPU-specific values start here
-
-	// --- the following bits of info are returned as pointers to data or functions ---
-	CPUINFO_PTR_FIRST = 0x10000,
-
-		// CPU-specific additions
-		CPUINFO_PTR_INSTRUCTION_COUNTER = 0x14000,
-															// R/O: int *icount
-
-	CPUINFO_PTR_CPU_SPECIFIC = 0x18000, // R/W: CPU-specific values start here
-
-	// --- the following bits of info are returned as pointers to functions ---
-	CPUINFO_FCT_FIRST = 0x20000,
-
-	CPUINFO_FCT_CPU_SPECIFIC = 0x28000, // R/W: CPU-specific values start here
-
-	// --- the following bits of info are returned as NULL-terminated strings ---
-	CPUINFO_STR_FIRST = 0x30000,
-
-	CPUINFO_STR_CPU_SPECIFIC = 0x38000  // R/W: CPU-specific values start here
-};
-
-
-
 //**************************************************************************
 //  CPU DEVICE CONFIGURATION MACROS
 //**************************************************************************

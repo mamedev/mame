@@ -107,7 +107,7 @@ namespace bgfx { namespace d3d12
 		void destroy();
 
 		uint16_t alloc(ID3D12Resource* _ptr, const D3D12_SHADER_RESOURCE_VIEW_DESC* _desc);
-		uint16_t alloc(const uint32_t* _flags, uint32_t _num = BGFX_CONFIG_MAX_TEXTURE_SAMPLERS);
+		uint16_t alloc(const uint32_t* _flags, uint32_t _num, const float _palette[][4]);
 		void free(uint16_t _handle);
 		void reset();
 
@@ -179,7 +179,7 @@ namespace bgfx { namespace d3d12
 		{
 			if (NULL != m_constantBuffer)
 			{
-				ConstantBuffer::destroy(m_constantBuffer);
+				UniformBuffer::destroy(m_constantBuffer);
 				m_constantBuffer = NULL;
 			}
 
@@ -194,7 +194,7 @@ namespace bgfx { namespace d3d12
 		}
 
 		const Memory* m_code;
-		ConstantBuffer* m_constantBuffer;
+		UniformBuffer* m_constantBuffer;
 
 		PredefinedUniform m_predefined[PredefinedUniform::Count];
 		uint16_t m_attrMask[Attrib::Count];
@@ -272,6 +272,9 @@ namespace bgfx { namespace d3d12
 		ID3D12Resource* m_ptr;
 		D3D12_RESOURCE_STATES m_state;
 		uint32_t m_flags;
+		uint32_t m_width;
+		uint32_t m_height;
+		uint32_t m_depth;
 		uint16_t m_samplerIdx;
 		uint8_t m_type;
 		uint8_t m_requestedFormat;
@@ -341,9 +344,9 @@ namespace bgfx { namespace d3d12
 		uint64_t m_currentFence;
 		uint64_t m_completedFence;
 		ID3D12Fence* m_fence;
-		CommandList m_commandList[32];
+		CommandList m_commandList[256];
 		typedef stl::vector<ID3D12Resource*> ResourceArray;
-		ResourceArray m_release[32];
+		ResourceArray m_release[256];
 		bx::RingBufferControl m_control;
 	};
 

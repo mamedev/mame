@@ -2,6 +2,15 @@
 // copyright-holders:Bryan McPhail, David Haywood
 /* BAC06 */
 
+#define MCFG_BAC06_BOOTLEG_DISABLE_8x8 \
+	deco_bac06_device::disable_8x8(*device);
+
+#define MCFG_BAC06_BOOTLEG_DISABLE_16x16 \
+	deco_bac06_device::disable_16x16(*device);
+
+#define MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL \
+	deco_bac06_device::disable_rc_scroll(*device);
+
 
 class deco_bac06_device : public device_t
 {
@@ -17,7 +26,32 @@ public:
 
 	tilemap_t* m_pf8x8_tilemap[3];
 	tilemap_t* m_pf16x16_tilemap[3];
-	int    m_tile_region;
+	int    m_tile_region_8;
+	int    m_tile_region_16;
+
+	// some bootlegs (eg midresb / midresbj) don't appear to actually support the alt modes, they set them and end up with broken gfx on later levels.
+	bool    m_supports_8x8;
+	bool    m_supports_16x16;
+	bool    m_supports_rc_scroll;
+
+	static void disable_8x8(device_t &device)
+	{
+		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
+		dev.m_supports_8x8 = false;
+	}
+
+	static void disable_16x16(device_t &device)
+	{
+		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
+		dev.m_supports_16x16 = false;
+	}
+
+	static void disable_rc_scroll(device_t &device)
+	{
+		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
+		dev.m_supports_rc_scroll = false;
+	}
+
 	void create_tilemaps(int region8x8,int region16x16);
 	UINT16 m_pf_control_0[8];
 	UINT16 m_pf_control_1[8];

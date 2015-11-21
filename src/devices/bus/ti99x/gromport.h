@@ -404,7 +404,8 @@ public:
 class ti99_gromemu_cartridge : public ti99_cartridge_pcb
 {
 public:
-	ti99_gromemu_cartridge() {  m_grom_address = 0; }
+	ti99_gromemu_cartridge(): m_waddr_LSB(false)
+	{  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);

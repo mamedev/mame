@@ -58,6 +58,8 @@ protected:
 	UINT32 m_num_subblocks;
 	UINT32 m_cur_subblock;
 	int m_audio_sense;
+	
+	device_t *m_device;
 };
 
 #endif

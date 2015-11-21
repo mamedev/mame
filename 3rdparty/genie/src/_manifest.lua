@@ -45,6 +45,11 @@
 		"actions/codelite/codelite_workspace.lua",
 		"actions/codelite/codelite_project.lua",
 
+		-- CodeLite action
+		"actions/cmake/_cmake.lua",
+		"actions/cmake/cmake_workspace.lua",
+		"actions/cmake/cmake_project.lua",
+
 		-- GNU make action
 		"actions/make/_make.lua",
 		"actions/make/make_solution.lua",

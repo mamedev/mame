@@ -31,6 +31,16 @@ enum screen_type_enum
 	SCREEN_TYPE_LCD
 };
 
+// texture formats
+enum texture_format
+{
+	TEXFORMAT_UNDEFINED = 0,                            // require a format to be specified
+	TEXFORMAT_PALETTE16,                                // 16bpp palettized, alpha ignored
+	TEXFORMAT_PALETTEA16,                               // 16bpp palettized, alpha respected
+	TEXFORMAT_RGB32,                                    // 32bpp 8-8-8 RGB
+	TEXFORMAT_ARGB32,                                   // 32bpp 8-8-8-8 ARGB
+	TEXFORMAT_YUY16                                     // 16bpp 8-8 Y/Cb, Y/Cr in sequence
+};
 
 // screen_update callback flags
 const UINT32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
@@ -218,8 +228,7 @@ public:
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	void register_screen_bitmap(bitmap_t &bitmap);
-	int vblank_port_read();
-
+	
 	// internal to the video system
 	bool update_quads();
 	void update_burnin();
@@ -285,6 +294,7 @@ private:
 	UINT8               m_curtexture;               // current texture index
 	bool                m_changed;                  // has this bitmap changed?
 	INT32               m_last_partial_scan;        // scanline of last partial update
+	INT32               m_partial_scan_hpos;        // horizontal pixel last rendered on this partial scanline
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
 	UINT32              m_unique_id;                // unique id for this screen_device
 	rgb_t               m_color;                    // render color

@@ -14,7 +14,7 @@
 #define __UI_SELGAME_H__
 
 #include "drivenum.h"
-
+#include "menu.h"
 
 class ui_menu_select_game : public ui_menu {
 public:

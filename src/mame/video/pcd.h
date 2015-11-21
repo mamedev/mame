@@ -27,6 +27,7 @@ protected:
 	required_device<scn2674_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<pic8259_device> m_pic2;
 };
 
 class pcd_video_device : public pcdx_video_device
@@ -35,23 +36,42 @@ public:
 	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_ADDRESS_MAP(map, 16);
-	DECLARE_ADDRESS_MAP(vram_map, 8);
-	DECLARE_READ8_MEMBER(mcu_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
 	DECLARE_WRITE8_MEMBER(vram_sw_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(t1_r);
+	DECLARE_READ8_MEMBER(p1_r);
+	DECLARE_WRITE8_MEMBER(p2_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
 
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 protected:
 	void device_start();
 	void device_reset();
 private:
+	required_ioport m_mouse_btn;
+	required_ioport m_mouse_x;
+	required_ioport m_mouse_y;
+
 	dynamic_buffer m_vram;
 	dynamic_buffer m_charram;
-	UINT8 m_vram_sw;
+	UINT8 m_vram_sw, m_t1, m_p2;
+
+	struct
+	{
+		int phase;
+		int x;
+		int y;
+		int prev_x;
+		int prev_y;
+		int xa;
+		int xb;
+		int ya;
+		int yb;
+	} m_mouse;
 };
 
 class pcx_video_device : public pcdx_video_device,
@@ -87,7 +107,6 @@ protected:
 private:
 	dynamic_buffer m_vram;
 	required_region_ptr<UINT8> m_charrom;
-	required_device<pic8259_device> m_pic2;
 	devcb_write_line m_txd_handler;
 	UINT8 m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2], m_p1;
 };

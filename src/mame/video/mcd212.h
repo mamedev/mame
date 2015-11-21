@@ -6,7 +6,7 @@
     CD-i MCD212 video emulation
     -------------------
 
-    MESS implementation by Harmony
+    written by Ryan Holtz
 
 
 *******************************************************************************

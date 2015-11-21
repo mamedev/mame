@@ -89,7 +89,7 @@
 	</software>
 
 	<software name="restaur" supported="no">
-		<description>Restaurant Guide </description>
+		<description>Restaurant Guide</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">

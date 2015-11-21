@@ -117,6 +117,7 @@ public:
 	UINT32 vi_leap;
 	UINT32 vi_intr;
 	UINT32 vi_vburst;
+	UINT8 field;
 
 	/* nvram-specific for MESS */
 	device_t *m_nvram_image;

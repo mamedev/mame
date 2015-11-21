@@ -1204,9 +1204,7 @@ public:
 
 	// read/write to the port
 	ioport_value read();
-	ioport_value read_safe(ioport_value defval) { return (this == NULL) ? defval : read(); }
 	void write(ioport_value value, ioport_value mask = ~0);
-	void write_safe(ioport_value value, ioport_value mask = ~0) { if (this != NULL) write(value, mask); }
 
 	// other operations
 	ioport_field *field(ioport_value mask);
@@ -1226,6 +1224,9 @@ private:
 	ioport_value                m_active;       // mask of active bits in the port
 	auto_pointer<ioport_port_live> m_live;      // live state of port (NULL if not live)
 };
+
+inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == NULL) ? defval : port->read(); }
+
 
 
 // ======================> analog_field
@@ -1393,7 +1394,6 @@ public:
 	int count_players() const;
 	bool crosshair_position(int player, float &x, float &y);
 	bool has_keyboard() const;
-	void setup_natural_keyboard(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	const char *input_type_to_token(std::string &str, ioport_type type, int player);

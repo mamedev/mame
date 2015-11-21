@@ -99,6 +99,8 @@
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
 		#define MEMBER_ABI __thiscall
 		#define HAS_DIFFERENT_ABI 1
+	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
+		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#elif defined(EMSCRIPTEN)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#elif defined(__arm__) || defined(__ARMEL__)

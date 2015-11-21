@@ -50,9 +50,6 @@
 #ifndef __DRAWGFXM_H__
 #define __DRAWGFXM_H__
 
-#include "profiler.h"
-
-
 /* special priority type meaning "none" */
 struct NO_PRIORITY { char dummy[3]; };
 

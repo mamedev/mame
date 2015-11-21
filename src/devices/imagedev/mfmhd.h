@@ -33,7 +33,7 @@ public:
 class mfmhd_trackimage_cache
 {
 public:
-	mfmhd_trackimage_cache();
+	mfmhd_trackimage_cache(running_machine &machine);
 	~mfmhd_trackimage_cache();
 	void        init(mfm_harddisk_device* mfmhd, int tracksize, int trackslots);
 	UINT16*     get_trackimage(int cylinder, int head);
@@ -44,6 +44,7 @@ public:
 private:
 	mfm_harddisk_device*        m_mfmhd;
 	mfmhd_trackimage*           m_tracks;
+	running_machine &			m_machine;
 };
 
 class mfm_harddisk_device : public harddisk_image_device,
@@ -153,7 +154,6 @@ private:
 	mfmhd_trackimage_cache* m_cache;
 	mfmhd_image_format_t*   m_format;
 
-	void        prepare_track(int cylinder, int head);
 	void        head_move();
 	void        recalibrate();
 

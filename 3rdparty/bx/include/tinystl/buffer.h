@@ -179,9 +179,11 @@ namespace tinystl {
 			Alloc::static_deallocate(b->first, sizeof(T)*capacity);
 			b->capacity = b->first;
 		} else if (b->capacity != b->last) {
+			const size_t capacity = (size_t)(b->capacity - b->first);
 			const size_t size = (size_t)(b->last - b->first);
 			T* newfirst = (T*)Alloc::static_allocate(sizeof(T) * size);
 			buffer_move_urange(newfirst, b->first, b->last);
+			Alloc::static_deallocate(b->first, sizeof(T) * capacity);
 			b->first = newfirst;
 			b->last = newfirst + size;
 			b->capacity = b->last;
@@ -223,6 +225,26 @@ namespace tinystl {
 		where = buffer_insert_common(b, where, count);
 		for (size_t i = 0; i < count; ++i)
 			new(placeholder(), where) T();
+	}
+
+	template<typename T, typename Alloc, typename Param>
+	static inline void buffer_append(buffer<T, Alloc>* b, const Param* param) {
+		if (b->capacity != b->last) {
+			new(placeholder(), b->last) T(*param);
+			++b->last;
+		} else {
+			buffer_insert(b, b->last, param, param + 1);
+		}
+	}
+
+	template<typename T, typename Alloc>
+	static inline void buffer_append(buffer<T, Alloc>* b) {
+		if (b->capacity != b->last) {
+			new(placeholder(), b->last) T();
+			++b->last;
+		} else {
+			buffer_insert(b, b->last, 1);
+		}
 	}
 
 	template<typename T, typename Alloc>

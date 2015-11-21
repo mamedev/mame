@@ -400,6 +400,10 @@ public:
 	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 
+	// is there a better way to access the memory map when not using AM_DEVICE?
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start();

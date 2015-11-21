@@ -67,6 +67,7 @@ public:
 	~render_target();
 
 	bool init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	int next_index(int index) { return ++index > 1 ? 0 : index; }
 
 	int target_width;
 	int target_height;
@@ -80,12 +81,10 @@ public:
 	int screen_index;
 	int page_index;
 
-	surface *prescaletarget;
-	texture *prescaletexture;
-	surface *smalltarget;
-	texture *smalltexture;
-	surface *target[5];
-	texture *render_texture[5];
+	surface *prescale_target[2];
+	texture *prescale_texture[2];
+	surface *native_target[2];
+	texture *native_texture[2];
 
 	render_target *next;
 	render_target *prev;
@@ -179,6 +178,7 @@ public:
 	texture_info *          get_vector_texture() { return m_texture_manager->get_vector_texture(); }
 
 	shaders *               get_shaders() { return m_shaders; }
+	hlsl_options *          get_shaders_options() { return m_shaders_options; }
 
 private:
 	int                     m_adapter;                  // ordinal adapter number
@@ -221,6 +221,7 @@ private:
 
 	void *                  m_hlsl_buf;                 // HLSL vertex data
 	shaders *               m_shaders;                  // HLSL interface
+	hlsl_options *          m_shaders_options;          // HLSL options
 
 	texture_manager *       m_texture_manager;          // texture manager
 

@@ -33,7 +33,6 @@
 #define WINOPTION_HLSLPATH                  "hlslpath"
 #define WINOPTION_HLSL_PRESCALE_X           "hlsl_prescale_x"
 #define WINOPTION_HLSL_PRESCALE_Y           "hlsl_prescale_y"
-#define WINOPTION_HLSL_PRESET               "hlsl_preset"
 #define WINOPTION_HLSL_WRITE                "hlsl_write"
 #define WINOPTION_HLSL_SNAP_WIDTH           "hlsl_snap_width"
 #define WINOPTION_HLSL_SNAP_HEIGHT          "hlsl_snap_height"
@@ -48,6 +47,7 @@
 #define WINOPTION_REFLECTION                "reflection"
 #define WINOPTION_CURVATURE                 "curvature"
 #define WINOPTION_ROUND_CORNER              "round_corner"
+#define WINOPTION_SMOOTH_BORDER             "smooth_border"
 #define WINOPTION_VIGNETTING                "vignetting"
 #define WINOPTION_SCANLINE_AMOUNT           "scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE            "scanline_size"
@@ -83,9 +83,9 @@
 #define WINOPTION_YIQ_PHASE_COUNT           "yiq_phase_count"
 #define WINOPTION_VECTOR_LENGTH_SCALE       "vector_length_scale"
 #define WINOPTION_VECTOR_LENGTH_RATIO       "vector_length_ratio"
-#define WINOPTION_VECTOR_BLOOM_SCALE        "vector_bloom_scale"
 #define WINOPTION_VECTOR_TIME_PERIOD        "vector_time_period"
-#define WINOPTION_RASTER_BLOOM_SCALE        "raster_bloom_scale"
+#define WINOPTION_BLOOM_SCALE               "bloom_scale"
+#define WINOPTION_BLOOM_OVERDRIVE           "bloom_overdrive"
 #define WINOPTION_BLOOM_LEVEL0_WEIGHT       "bloom_lvl0_weight"
 #define WINOPTION_BLOOM_LEVEL1_WEIGHT       "bloom_lvl1_weight"
 #define WINOPTION_BLOOM_LEVEL2_WEIGHT       "bloom_lvl2_weight"
@@ -136,7 +136,6 @@ public:
 	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
 	int d3d_hlsl_prescale_x() const { return int_value(WINOPTION_HLSL_PRESCALE_X); }
 	int d3d_hlsl_prescale_y() const { return int_value(WINOPTION_HLSL_PRESCALE_Y); }
-	int d3d_hlsl_preset() const { return int_value(WINOPTION_HLSL_PRESET); }
 	int d3d_snap_width() const { return int_value(WINOPTION_HLSL_SNAP_WIDTH); }
 	int d3d_snap_height() const { return int_value(WINOPTION_HLSL_SNAP_HEIGHT); }
 	float screen_shadow_mask_alpha() const { return float_value(WINOPTION_SHADOW_MASK_ALPHA); }
@@ -156,6 +155,7 @@ public:
 	float screen_reflection() const { return float_value(WINOPTION_REFLECTION); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
 	float screen_round_corner() const { return float_value(WINOPTION_ROUND_CORNER); }
+	float screen_smooth_border() const { return float_value(WINOPTION_SMOOTH_BORDER); }
 	float screen_vignetting() const { return float_value(WINOPTION_VIGNETTING); }
 	const char *screen_defocus() const { return value(WINOPTION_DEFOCUS); }
 	const char *screen_converge_x() const { return value(WINOPTION_CONVERGE_X); }
@@ -179,9 +179,9 @@ public:
 	int screen_yiq_phase_count() const { return int_value(WINOPTION_YIQ_PHASE_COUNT); }
 	float screen_vector_length_scale() const { return float_value(WINOPTION_VECTOR_LENGTH_SCALE); }
 	float screen_vector_length_ratio() const { return float_value(WINOPTION_VECTOR_LENGTH_RATIO); }
-	float screen_vector_bloom_scale() const { return float_value(WINOPTION_VECTOR_BLOOM_SCALE); }
 	float screen_vector_time_period() const { return float_value(WINOPTION_VECTOR_TIME_PERIOD); }
-	float screen_raster_bloom_scale() const { return float_value(WINOPTION_RASTER_BLOOM_SCALE); }
+	float screen_bloom_scale() const { return float_value(WINOPTION_BLOOM_SCALE); }
+	const char *screen_bloom_overdrive() const { return value(WINOPTION_BLOOM_OVERDRIVE); }
 	float screen_bloom_lvl0_weight() const { return float_value(WINOPTION_BLOOM_LEVEL0_WEIGHT); }
 	float screen_bloom_lvl1_weight() const { return float_value(WINOPTION_BLOOM_LEVEL1_WEIGHT); }
 	float screen_bloom_lvl2_weight() const { return float_value(WINOPTION_BLOOM_LEVEL2_WEIGHT); }

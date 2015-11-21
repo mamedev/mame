@@ -21791,6 +21791,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+
+	<software name="puttsqup" >
+		<description>Putty Squad (prototype)</description>
+		<year>1992</year>
+		<publisher>System 3 / Ocean</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="PS-md.BIN" size="0x100000" crc="2348da80" sha1="f529598f56c581854d2bde2ee960100273813539" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="putter">
 		<description>Putter Golf (Jpn, SegaNet)</description>
 		<year>1991</year>

@@ -4,7 +4,7 @@
  *
  * Intel PXA255 on-chip peripheral emulation
  *
- * Mostly-incomplete implementation by MooglyGuy
+ * Mostly-incomplete implementation by Ryan Holtz
  *
  **************************************************************************/
 

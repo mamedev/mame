@@ -315,8 +315,6 @@ public:
 	{
 		INT8 b;
 		reg_id SD;
-		std::string args;
-
 		b = (char)(word0 & 0x00ff);
 		decode_HHH_table(BITSn(word1,0x0e00), SD);
 		assemble_reg_from_W_table(BITSn(word1,0x0100), 'X', SD, b, m_source, m_destination);

@@ -34,7 +34,9 @@ enum
 	A26_4IN1,
 	A26_DPC,
 	A26_SS,
-	A26_CM
+	A26_CM,
+	A26_X07,
+	A26_HARMONY,
 };
 
 

@@ -466,7 +466,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 	{
 		time = get_profile_ticks() - time;
 		if (time > LOG_WAIT_THRESHOLD)
-			logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
+			machine().logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
 	}
 
 	// reset the state
@@ -656,9 +656,9 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 		v3 = tv;
 		if (v2->y < v1->y)
 		{
-			const vertex_t *tv = v1;
+			const vertex_t *tv2 = v1;
 			v1 = v2;
-			v2 = tv;
+			v2 = tv2;
 		}
 	}
 
@@ -1002,7 +1002,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
-		edgeptr++;
+		++edgeptr;
 	}
 
 	// walk backward to build up the backward edge list
@@ -1023,7 +1023,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
-		edgeptr++;
+		++edgeptr;
 	}
 
 	// determine which list is left/right:
@@ -1068,9 +1068,9 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 			// compute the ending X based on which part of the triangle we're in
 			_BaseType fully = _BaseType(curscan + extnum) + _BaseType(0.5);
 			while (fully > ledge->v2->y && fully < v[maxv].y)
-				ledge++;
+				++ledge;
 			while (fully > redge->v2->y && fully < v[maxv].y)
-				redge++;
+				++redge;
 			_BaseType startx = ledge->v1->x + (fully - ledge->v1->y) * ledge->dxdy;
 			_BaseType stopx = redge->v1->x + (fully - redge->v1->y) * redge->dxdy;
 
@@ -1159,7 +1159,7 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 			nextout->y = v1.y + frac * (v2.y - v1.y);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 				nextout->p[paramnum] = v1.p[paramnum] + frac * (v2.p[paramnum] - v1.p[paramnum]);
-			nextout++;
+			++nextout;
 		}
 
 		// if this vertex is not clipped, copy it in
@@ -1171,5 +1171,149 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 	}
 	return nextout - outv;
 }
+
+
+template<typename _BaseType, int _MaxParams>
+struct frustum_clip_vertex
+{
+	_BaseType x, y, z, w;       // A 3d coordinate already transformed by a projection matrix
+	_BaseType p[_MaxParams];    // Additional parameters to clip
+};
+
+
+template<typename _BaseType, int _MaxParams>
+int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
+{
+	if (num_vertices <= 0)
+		return 0;
+
+	const _BaseType W_PLANE = 0.000001f;
+
+	frustum_clip_vertex<_BaseType, _MaxParams> clipv[10];
+	int clip_verts = 0;
+
+	int previ = num_vertices - 1;
+
+	for (int i=0; i < num_vertices; i++)
+	{
+		int v1_side = (v[i].w < W_PLANE) ? -1 : 1;
+		int v2_side = (v[previ].w < W_PLANE) ? -1 : 1;
+
+		if ((v1_side * v2_side) < 0)        // edge goes through W plane
+		{
+			// insert vertex at intersection point
+			_BaseType wdiv = v[previ].w - v[i].w;
+			if (wdiv == 0.0f)       // 0 edge means degenerate polygon
+				return 0;
+
+			_BaseType t = fabs((W_PLANE - v[previ].w) / wdiv);
+
+			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
+			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
+			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
+			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
+
+			// Interpolate the rest of the parameters
+			for (int pi = 0; pi < _MaxParams; pi++)
+				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+
+			++clip_verts;
+		}
+		if (v1_side > 0)                // current point is inside
+		{
+			clipv[clip_verts] = v[i];
+			++clip_verts;
+		}
+
+		previ = i;
+	}
+
+	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
+	return clip_verts;
+}
+
+
+template<typename _BaseType, int _MaxParams>
+int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out, int axis, int sign)
+{
+	if (num_vertices <= 0)
+		return 0;
+
+	frustum_clip_vertex<_BaseType, _MaxParams> clipv[10];
+	int clip_verts = 0;
+
+	int previ = num_vertices - 1;
+
+	for (int i=0; i < num_vertices; i++)
+	{
+		int v1_side, v2_side;
+		_BaseType* v1a = (_BaseType*)&v[i];
+		_BaseType* v2a = (_BaseType*)&v[previ];
+
+		_BaseType v1_axis, v2_axis;
+
+		if (sign)       // +axis
+		{
+			v1_axis = v1a[axis];
+			v2_axis = v2a[axis];
+		}
+		else            // -axis
+		{
+			v1_axis = -v1a[axis];
+			v2_axis = -v2a[axis];
+		}
+
+		v1_side = (v1_axis <= v[i].w) ? 1 : -1;
+		v2_side = (v2_axis <= v[previ].w) ? 1 : -1;
+
+		if ((v1_side * v2_side) < 0)        // edge goes through W plane
+		{
+			// insert vertex at intersection point
+			_BaseType wdiv = ((v[previ].w - v2_axis) - (v[i].w - v1_axis));
+
+			if (wdiv == 0.0f)           // 0 edge means degenerate polygon
+				return 0;
+
+			_BaseType t = fabs((v[previ].w - v2_axis) / wdiv);
+
+			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
+			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
+			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
+			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
+
+			// Interpolate the rest of the parameters
+			for (int pi = 0; pi < _MaxParams; pi++)
+				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+
+			++clip_verts;
+		}
+		if (v1_side > 0)                // current point is inside
+		{
+			clipv[clip_verts] = v[i];
+			++clip_verts;
+		}
+
+		previ = i;
+	}
+
+	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
+	return clip_verts;
+}
+
+
+template<typename _BaseType, int _MaxParams>
+int frustum_clip_all(frustum_clip_vertex<_BaseType, _MaxParams>* clip_vert, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
+{
+	num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+	out = clip_vert;
+	return num_vertices;
+}
+
 
 #endif  // __POLY_H__

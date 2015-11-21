@@ -172,12 +172,32 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
+// Constants
+//-----------------------------------------------------------------------------
+
+static const float E = 2.7182817f;
+static const float Gelfond = 23.140692f; // e^pi (Gelfond constant)
+static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneider constant)
+
+//-----------------------------------------------------------------------------
+// Funcions
+//-----------------------------------------------------------------------------
+
+// www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
+float random(float2 seed)
+{
+	// irrationals for pseudo randomness
+	float2 i = float2(Gelfond, GelfondSchneider);
+
+	return frac(cos(dot(seed, i)) * 123456.0f);
+}
+
+//-----------------------------------------------------------------------------
 // Bloom Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-
-uniform float2 Prescale = float2(8.0f, 8.0f);
+uniform float2 TargetDims;
 
 uniform float4 Level01Size;
 uniform float4 Level23Size;
@@ -186,43 +206,28 @@ uniform float4 Level67Size;
 uniform float4 Level89Size;
 uniform float2 LevelASize;
 
-uniform bool PrepareVector = false;
-
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 ScreenDimsTexel = 1.0f / ScreenDims;
-
-	float2 HalfPrescale = Prescale * 0.5f;
-
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
 	Output.Color = Input.Color;
 
-	// Vector graphics is not prescaled it has the size of the screen
-	if (PrepareVector)
-	{
-		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level01Size;
-		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level23Size;
-		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level45Size;
-		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level67Size;
-		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level89Size;
-		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + 1.0f / LevelASize;
-	}
-	else
-	{
-		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level01Size;
-		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level23Size;
-		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level45Size;
-		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level67Size;
-		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level89Size;
-		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + HalfPrescale.xy   / LevelASize;
-	}
+	float2 TexCoord = Input.Position.xy / ScreenDims;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
+	Output.TexCoord01.xy = TexCoord.xy;
+	Output.TexCoord01.zw = TexCoord.xy + 0.5f / Level01Size.zw;
+	Output.TexCoord23 = TexCoord.xyxy + 0.5f / Level23Size;
+	Output.TexCoord45 = TexCoord.xyxy + 0.5f / Level45Size;
+	Output.TexCoord67 = TexCoord.xyxy + 0.5f / Level67Size;
+	Output.TexCoord89 = TexCoord.xyxy + 0.5f / Level89Size;
+	Output.TexCoordA = TexCoord.xy + 0.5f / LevelASize;
 
 	return Output;
 }
@@ -234,6 +239,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 uniform float4 Level0123Weight;
 uniform float4 Level4567Weight;
 uniform float3 Level89AWeight;
+
+uniform float3 OverdriveWeight;
+
+float3 GetNoiseFactor(float3 n, float random)
+{
+	// smaller n become more noisy
+	return 1.0f + random * max(0.0f, 0.25f * pow(E, -8 * n));
+}
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
@@ -261,23 +274,35 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	texel9 = texel9 * Level89AWeight.y;
 	texelA = texelA * Level89AWeight.z;
 
-	float4 sum = float4(
-		texel0 + 
-		texel1 + 
-		texel2 + 
-		texel3 + 
+	float3 bloom = float3(
+		texel1 +
+		texel2 +
+		texel3 +
 		texel4 +
-		texel5 + 
-		texel6 + 
-		texel7 + 
-		texel8 + 
-		texel9 + 
-		texelA, 1.0f);
-	return sum;
+		texel5 +
+		texel6 +
+		texel7 +
+		texel8 +
+		texel9 +
+		texelA);
+
+	float3 bloomOverdrive = max(0.0f, texel0 + bloom - 1.0f) * OverdriveWeight;
+
+	bloom.r += bloomOverdrive.g * 0.5f;
+	bloom.r += bloomOverdrive.b * 0.5f;
+	bloom.g += bloomOverdrive.r * 0.5f;
+	bloom.g += bloomOverdrive.b * 0.5f;
+	bloom.b += bloomOverdrive.r * 0.5f;
+	bloom.b += bloomOverdrive.g * 0.5f;
+
+	float2 NoiseCoord = Input.TexCoord01.xy;
+	float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
+	
+	return float4(texel0 + bloom * NoiseFactor, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
-// Downsample Effect
+// Bloom Effect
 //-----------------------------------------------------------------------------
 
 technique TestTechnique

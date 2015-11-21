@@ -17,6 +17,7 @@ class apollo_format : public upd765_format {
 public:
 	apollo_format();
 
+	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual const char *name() const;
 	virtual const char *description() const;
 	virtual const char *extensions() const;

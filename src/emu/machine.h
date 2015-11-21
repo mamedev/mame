@@ -73,7 +73,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 #define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
 #define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
 
-#define auto_bitmap_alloc(m, w, h, f)   auto_alloc(m, bitmap_t(w, h, f))
 #define auto_bitmap_ind8_alloc(m, w, h) auto_alloc(m, bitmap_ind8(w, h))
 #define auto_bitmap_ind16_alloc(m, w, h)    auto_alloc(m, bitmap_ind16(w, h))
 #define auto_bitmap_ind32_alloc(m, w, h)    auto_alloc(m, bitmap_ind32(w, h))
@@ -144,7 +143,7 @@ class running_machine
 	friend void debugger_init(running_machine &machine);
 	friend class sound_manager;
 
-	typedef void (*logerror_callback)(running_machine &machine, const char *string);
+	typedef void (*logerror_callback)(const running_machine &machine, const char *string);
 
 	// must be at top of member variables
 	resource_pool           m_respool;              // pool of resources for this machine
@@ -191,11 +190,8 @@ public:
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 
 	// fetch items by name
-	inline device_t *device(const char *tag) { return root_device().subdevice(tag); }
+	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
-
-	// configuration helpers
-	device_t &add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock);
 
 	// immediate operations
 	int run(bool firstrun);
@@ -215,7 +211,6 @@ public:
 	void schedule_exit();
 	void schedule_hard_reset();
 	void schedule_soft_reset();
-	void schedule_new_driver(const game_driver &driver);
 	void schedule_save(const char *filename);
 	void schedule_load(const char *filename);
 
@@ -226,9 +221,12 @@ public:
 	// watchdog control
 	void watchdog_reset();
 	void watchdog_enable(bool enable = true);
+	INT32 get_vblank_watchdog_counter() { return m_watchdog_counter; }
 
 	// misc
-	void CLIB_DECL vlogerror(const char *format, va_list args);
+	void popmessage(const char *format, ...) const;
+	void logerror(const char *format, ...) const;
+	void vlogerror(const char *format, va_list args) const;
 	UINT32 rand();
 	const char *describe_context();
 
@@ -254,7 +252,6 @@ private:
 	void start();
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt);
-	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
 	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
@@ -265,7 +262,7 @@ private:
 	void nvram_save();
 
 	// internal callbacks
-	static void logfile_callback(running_machine &machine, const char *buffer);
+	static void logfile_callback(const running_machine &machine, const char *buffer);
 
 	// internal device helpers
 	void start_all_devices();

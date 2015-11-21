@@ -98,6 +98,7 @@ class device_image_interface;
 struct feature_list;
 class software_part;
 class software_info;
+class ui_menu;
 
 // device image interface function types
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
@@ -252,7 +253,6 @@ protected:
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 
-	int read_hash_config(const char *sysname);
 	void run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *), hash_collection &hashes, const char *types);
 	void image_checkhash();
 	void update_names(const device_type device_type = NULL, const char *inst = NULL, const char *brief = NULL);

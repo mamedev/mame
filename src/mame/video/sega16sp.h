@@ -70,6 +70,22 @@ public:
 	// live configuration
 	void set_bank(int banknum, int offset) { m_bank[banknum] = offset; }
 	void set_flip(bool flip) { m_flip = flip; }
+	void set_local_origin(int x, int y)
+	{
+		m_xoffs_flipped = m_xoffs = x;
+		m_yoffs_flipped = m_yoffs = y;
+		set_origin(x, y);
+	}
+
+	void set_local_origin(int x, int y, int xf, int yf)
+	{
+		m_xoffs = x;
+		m_yoffs = y;
+		m_xoffs_flipped = xf;
+		m_yoffs_flipped = yf;
+		set_origin(x, y);
+	}
+
 
 	// write trigger memory handler
 	DECLARE_WRITE16_MEMBER( draw_write );
@@ -81,6 +97,9 @@ protected:
 	// internal state
 	bool                        m_flip;                 // screen flip?
 	UINT8                       m_bank[16];             // banking redirection
+	int m_xoffs, m_yoffs;
+	int m_xoffs_flipped, m_yoffs_flipped;
+
 };
 
 

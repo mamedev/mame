@@ -142,21 +142,21 @@ public:
 	virtual void rcv_callback();
 	virtual void rcv_complete();
 
-		// read register handlers
-		UINT8 do_sioreg_rr0();
-		UINT8 do_sioreg_rr1();
-		UINT8 do_sioreg_rr2();
+	// read register handlers
+	UINT8 do_sioreg_rr0();
+	UINT8 do_sioreg_rr1();
+	UINT8 do_sioreg_rr2();
 
-		// write register handlers
-		void do_sioreg_wr0(UINT8 data);
-		void do_sioreg_wr0_resets(UINT8 data);
-		void do_sioreg_wr1(UINT8 data);
-		void do_sioreg_wr2(UINT8 data);
-		void do_sioreg_wr3(UINT8 data);
-		void do_sioreg_wr4(UINT8 data);
-		void do_sioreg_wr5(UINT8 data);
-		void do_sioreg_wr6(UINT8 data);
-		void do_sioreg_wr7(UINT8 data);
+	// write register handlers
+	void do_sioreg_wr0(UINT8 data);
+	void do_sioreg_wr0_resets(UINT8 data);
+	void do_sioreg_wr1(UINT8 data);
+	void do_sioreg_wr2(UINT8 data);
+	void do_sioreg_wr3(UINT8 data);
+	void do_sioreg_wr4(UINT8 data);
+	void do_sioreg_wr5(UINT8 data);
+	void do_sioreg_wr6(UINT8 data);
+	void do_sioreg_wr7(UINT8 data);
 
 	UINT8 control_read();
 	void control_write(UINT8 data);
@@ -203,116 +203,116 @@ protected:
 		INT_SPECIAL
 	};
 
-		// Read registers
-		enum
-		{
-				REG_RR0_STATUS          = 0,
-				REG_RR1_SPEC_RCV_COND   = 1,
-				REG_RR2_INTERRUPT_VECT  = 2,
-		};
+	// Read registers
+	enum
+	{
+		REG_RR0_STATUS      = 0,
+		REG_RR1_SPEC_RCV_COND   = 1,
+		REG_RR2_INTERRUPT_VECT  = 2
+	};
 
-		// Write registers
-		enum
-		{
-				REG_WR0_COMMAND_REGPT   = 0,
-				REG_WR1_INT_DMA_ENABLE  = 1,
-				REG_WR2_INT_VECTOR      = 2,
-				REG_WR3_RX_CONTROL      = 3,
-				REG_WR4_RX_TX_MODES     = 4,
-				REG_WR5_TX_CONTROL      = 5,
-				REG_WR6_SYNC_OR_SDLC_A  = 6,
-				REG_WR7_SYNC_OR_SDLC_F  = 7,
-		};
+	// Write registers
+	enum
+	{
+		REG_WR0_COMMAND_REGPT   = 0,
+		REG_WR1_INT_DMA_ENABLE  = 1,
+		REG_WR2_INT_VECTOR  = 2,
+		REG_WR3_RX_CONTROL  = 3,
+		REG_WR4_RX_TX_MODES = 4,
+		REG_WR5_TX_CONTROL  = 5,
+		REG_WR6_SYNC_OR_SDLC_A  = 6,
+		REG_WR7_SYNC_OR_SDLC_F  = 7
+	};
 
 	enum
 	{
 		RR0_RX_CHAR_AVAILABLE     = 0x01,
 		RR0_INTERRUPT_PENDING     = 0x02,
-		RR0_TX_BUFFER_EMPTY       = 0x04,
-		RR0_DCD                   = 0x08,
-		RR0_SYNC_HUNT             = 0x10,
-		RR0_CTS                   = 0x20,
-		RR0_TX_UNDERRUN           = 0x40,
-		RR0_BREAK_ABORT           = 0x80
+		RR0_TX_BUFFER_EMPTY   = 0x04,
+		RR0_DCD           = 0x08,
+		RR0_SYNC_HUNT         = 0x10,
+		RR0_CTS           = 0x20,
+		RR0_TX_UNDERRUN       = 0x40,
+		RR0_BREAK_ABORT       = 0x80
 	};
 
 	enum
 	{
-		RR1_ALL_SENT              = 0x01,
+		RR1_ALL_SENT          = 0x01,
 		RR1_RESIDUE_CODE_MASK     = 0x0e,
-		RR1_PARITY_ERROR          = 0x10,
+		RR1_PARITY_ERROR      = 0x10,
 		RR1_RX_OVERRUN_ERROR      = 0x20,
 		RR1_CRC_FRAMING_ERROR     = 0x40,
-		RR1_END_OF_FRAME          = 0x80
+		RR1_END_OF_FRAME      = 0x80
 	};
 
-		enum
-		{                                         // TODO: overload SIO functionality
-				RR2_INT_VECTOR_MASK       = 0xff, // SCC channel A, SIO channel B (special case)
-				RR2_INT_VECTOR_V1         = 0x02, // SIO (special case) /SCC Channel B
-				RR2_INT_VECTOR_V2         = 0x04, // SIO (special case) /SCC Channel B
-				RR2_INT_VECTOR_V3         = 0x08  // SIO (special case) /SCC Channel B
-		};
+	enum
+	{                     // TODO: overload SIO functionality
+		RR2_INT_VECTOR_MASK   = 0xff, // SCC channel A, SIO channel B (special case)
+		RR2_INT_VECTOR_V1     = 0x02, // SIO (special case) /SCC Channel B
+		RR2_INT_VECTOR_V2     = 0x04, // SIO (special case) /SCC Channel B
+		RR2_INT_VECTOR_V3     = 0x08  // SIO (special case) /SCC Channel B
+	};
 
 	enum
 	{
-		WR0_REGISTER_MASK         = 0x07,
-		WR0_COMMAND_MASK          = 0x38,
-		WR0_NULL                  = 0x00,
-		WR0_SEND_ABORT            = 0x08, // not supported
+		WR0_REGISTER_MASK     = 0x07,
+		WR0_COMMAND_MASK      = 0x38,
+		WR0_NULL          = 0x00,
+		WR0_SEND_ABORT        = 0x08, // not supported
 		WR0_RESET_EXT_STATUS      = 0x10,
-		WR0_CHANNEL_RESET         = 0x18,
+		WR0_CHANNEL_RESET     = 0x18,
 		WR0_ENABLE_INT_NEXT_RX    = 0x20,
-		WR0_RESET_TX_INT          = 0x28, // not supported
-		WR0_ERROR_RESET           = 0x30,
-		WR0_RETURN_FROM_INT       = 0x38, // not supported
+		WR0_RESET_TX_INT      = 0x28, // not supported
+		WR0_ERROR_RESET       = 0x30,
+		WR0_RETURN_FROM_INT   = 0x38, // not supported
 		WR0_CRC_RESET_CODE_MASK   = 0xc0, // not supported
-		WR0_CRC_RESET_NULL        = 0x00, // not supported
-		WR0_CRC_RESET_RX          = 0x40, // not supported
-		WR0_CRC_RESET_TX          = 0x80, // not supported
+		WR0_CRC_RESET_NULL    = 0x00, // not supported
+		WR0_CRC_RESET_RX      = 0x40, // not supported
+		WR0_CRC_RESET_TX      = 0x80, // not supported
 		WR0_CRC_RESET_TX_UNDERRUN = 0xc0  // not supported
 	};
 
 	enum
 	{
-		WR1_EXT_INT_ENABLE        = 0x01,
-		WR1_TX_INT_ENABLE         = 0x02,
-		WR1_STATUS_VECTOR         = 0x04,
+		WR1_EXT_INT_ENABLE    = 0x01,
+		WR1_TX_INT_ENABLE     = 0x02,
+		WR1_STATUS_VECTOR     = 0x04,
 		WR1_RX_INT_MODE_MASK      = 0x18,
-		WR1_RX_INT_DISABLE        = 0x00,
-		WR1_RX_INT_FIRST          = 0x08,
+		WR1_RX_INT_DISABLE    = 0x00,
+		WR1_RX_INT_FIRST      = 0x08,
 		WR1_RX_INT_ALL_PARITY     = 0x10, // not supported
-		WR1_RX_INT_ALL            = 0x18,
-		WR1_WRDY_ON_RX_TX         = 0x20, // not supported
-		WR1_WRDY_FUNCTION         = 0x40, // not supported
-		WR1_WRDY_ENABLE           = 0x80  // not supported
+		WR1_RX_INT_ALL        = 0x18,
+		WR1_WRDY_ON_RX_TX     = 0x20, // not supported
+		WR1_WRDY_FUNCTION     = 0x40, // not supported
+		WR1_WRDY_ENABLE       = 0x80  // not supported
 	};
 
 	enum
 	{
-		WR2_DATA_XFER_INT         = 0x00, // not supported
+		WR2_DATA_XFER_INT     = 0x00, // not supported
 		WR2_DATA_XFER_DMA_INT     = 0x01, // not supported
-		WR2_DATA_XFER_DMA         = 0x02, // not supported
+		WR2_DATA_XFER_DMA     = 0x02, // not supported
 		WR2_DATA_XFER_ILLEGAL     = 0x03, // not supported
-		WR2_DATA_XFER_MASK        = 0x03, // not supported
-		WR2_PRIORITY              = 0x04, // not supported
-		WR2_MODE_8085_1           = 0x00, // not supported
-		WR2_MODE_8085_2           = 0x08, // not supported
-		WR2_MODE_8086_8088        = 0x10, // not supported
-		WR2_MODE_ILLEGAL          = 0x18, // not supported
-		WR2_MODE_MASK             = 0x18, // not supported
-		WR2_VECTORED_INT          = 0x20, // not supported
+		WR2_DATA_XFER_MASK    = 0x03, // not supported
+		WR2_PRIORITY          = 0x04, // not supported
+		WR2_MODE_8085_1       = 0x00, // not supported
+		WR2_MODE_8085_2       = 0x08, // not supported
+		WR2_MODE_8086_8088    = 0x10, // not supported
+		WR2_MODE_ILLEGAL      = 0x18, // not supported
+		WR2_MODE_MASK         = 0x18, // not supported
+		WR2_VECTORED_INT      = 0x20, // not supported
 		WR2_PIN10_SYNDETB_RTSB    = 0x80  // not supported
 	};
 
 	enum
 	{
-		WR3_RX_ENABLE             = 0x01,
+		WR3_RX_ENABLE         = 0x01,
 		WR3_SYNC_CHAR_LOAD_INHIBIT= 0x02, // not supported
 		WR3_ADDRESS_SEARCH_MODE   = 0x04, // not supported
-		WR3_RX_CRC_ENABLE         = 0x08, // not supported
+		WR3_RX_CRC_ENABLE     = 0x08, // not supported
 		WR3_ENTER_HUNT_PHASE      = 0x10, // not supported
-		WR3_AUTO_ENABLES          = 0x20,
+		WR3_AUTO_ENABLES      = 0x20,
 		WR3_RX_WORD_LENGTH_MASK   = 0xc0,
 		WR3_RX_WORD_LENGTH_5      = 0x00,
 		WR3_RX_WORD_LENGTH_7      = 0x40,
@@ -322,41 +322,41 @@ protected:
 
 	enum
 	{
-		WR4_PARITY_ENABLE         = 0x01,
-		WR4_PARITY_EVEN           = 0x02,
-		WR4_STOP_BITS_MASK        = 0x0c,
-		WR4_STOP_BITS_1           = 0x04,
-		WR4_STOP_BITS_1_5         = 0x08, // not supported
-		WR4_STOP_BITS_2           = 0x0c,
-		WR4_SYNC_MODE_MASK        = 0x30, // not supported
-		WR4_SYNC_MODE_8_BIT       = 0x00, // not supported
+		WR4_PARITY_ENABLE     = 0x01,
+		WR4_PARITY_EVEN       = 0x02,
+		WR4_STOP_BITS_MASK    = 0x0c,
+		WR4_STOP_BITS_1       = 0x04,
+		WR4_STOP_BITS_1_5     = 0x08, // not supported
+		WR4_STOP_BITS_2       = 0x0c,
+		WR4_SYNC_MODE_MASK    = 0x30, // not supported
+		WR4_SYNC_MODE_8_BIT   = 0x00, // not supported
 		WR4_SYNC_MODE_16_BIT      = 0x10, // not supported
-		WR4_SYNC_MODE_SDLC        = 0x20, // not supported
-		WR4_SYNC_MODE_EXT         = 0x30, // not supported
-		WR4_CLOCK_RATE_MASK       = 0xc0,
-		WR4_CLOCK_RATE_X1         = 0x00,
-		WR4_CLOCK_RATE_X16        = 0x40,
-		WR4_CLOCK_RATE_X32        = 0x80,
-		WR4_CLOCK_RATE_X64        = 0xc0
+		WR4_SYNC_MODE_SDLC    = 0x20, // not supported
+		WR4_SYNC_MODE_EXT     = 0x30, // not supported
+		WR4_CLOCK_RATE_MASK   = 0xc0,
+		WR4_CLOCK_RATE_X1     = 0x00,
+		WR4_CLOCK_RATE_X16    = 0x40,
+		WR4_CLOCK_RATE_X32    = 0x80,
+		WR4_CLOCK_RATE_X64    = 0xc0
 	};
 
 	enum
 	{
-		WR5_TX_CRC_ENABLE         = 0x01, // not supported
-		WR5_RTS                   = 0x02,
-		WR5_CRC16                 = 0x04, // not supported
-		WR5_TX_ENABLE             = 0x08,
-		WR5_SEND_BREAK            = 0x10,
+		WR5_TX_CRC_ENABLE     = 0x01, // not supported
+		WR5_RTS           = 0x02,
+		WR5_CRC16         = 0x04, // not supported
+		WR5_TX_ENABLE         = 0x08,
+		WR5_SEND_BREAK        = 0x10,
 		WR5_TX_WORD_LENGTH_MASK   = 0x60,
 		WR5_TX_WORD_LENGTH_5      = 0x00,
 		WR5_TX_WORD_LENGTH_6      = 0x40,
 		WR5_TX_WORD_LENGTH_7      = 0x20,
 		WR5_TX_WORD_LENGTH_8      = 0x60,
-		WR5_DTR                   = 0x80
+		WR5_DTR           = 0x80
 	};
 
 	void update_serial();
-		void update_rts();
+	void update_rts();
 	void set_dtr(int state);
 	void set_rts(int state);
 
@@ -368,28 +368,28 @@ protected:
 	// receiver state
 	UINT8 m_rx_data_fifo[3];    // receive data FIFO
 	UINT8 m_rx_error_fifo[3];   // receive error FIFO
-	UINT8 m_rx_error;           // current receive error
-	int m_rx_fifo;              // receive FIFO pointer
+	UINT8 m_rx_error;       // current receive error
+	int m_rx_fifo;      // receive FIFO pointer
 
-	int m_rx_clock;             // receive clock pulse count
-	int m_rx_first;             // first character received
-	int m_rx_break;             // receive break condition
-	UINT8 m_rx_rr0_latch;       // read register 0 latched
+	int m_rx_clock;     // receive clock pulse count
+	int m_rx_first;     // first character received
+	int m_rx_break;     // receive break condition
+	UINT8 m_rx_rr0_latch;   // read register 0 latched
 
 	int m_rxd;
-	int m_sh;                   // sync hunt
-	int m_cts;                  // clear to send latch
-	int m_dcd;                  // data carrier detect latch
+	int m_sh;           // sync hunt
+	int m_cts;          // clear to send latch
+	int m_dcd;          // data carrier detect latch
 
 	// transmitter state
-	UINT8 m_tx_data;            // transmit data register
-	int m_tx_clock;             // transmit clock pulse count
+	UINT8 m_tx_data;        // transmit data register
+	int m_tx_clock;     // transmit clock pulse count
 
-	int m_dtr;                  // data terminal ready
-	int m_rts;                  // request to send
+	int m_dtr;          // data terminal ready
+	int m_rts;          // request to send
 
 	// synchronous state
-	UINT16 m_sync;              // sync character
+	UINT16 m_sync;      // sync character
 
 	int m_index;
 	z80sio_device *m_uart;
@@ -403,7 +403,7 @@ class z80sio_device :  public device_t,
 {
 	friend class z80sio_channel;
 
-public:
+	public:
 	// construction/destruction
 	z80sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -486,7 +486,7 @@ protected:
 
 	enum
 	{
-		TYPE_Z80SIO,
+		TYPE_Z80SIO
 	};
 
 	enum
@@ -522,8 +522,7 @@ protected:
 	devcb_write_line    m_out_rxdrqb_cb;
 	devcb_write_line    m_out_txdrqb_cb;
 
-	int m_int_state[8];     // interrupt state
-
+	int m_int_state[8]; // interrupt state
 	int m_variant;
 };
 

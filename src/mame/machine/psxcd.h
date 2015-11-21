@@ -38,6 +38,7 @@ protected:
 	virtual void device_stop();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual const rom_entry *device_rom_region() const;
 
 private:
 	void write_command(UINT8 byte);

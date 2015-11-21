@@ -14,7 +14,6 @@
 		<description>Introductory and Utilities Disk</description>
 		<year>1983</year>
 		<publisher>Acorn</publisher>
-		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="introductory_utils(1983)(acorn).ssd" size="204800" crc="60612fc2" sha1="037f7c3499547d5ac5f88e812d7765ccaf27d6e1" offset="0" />

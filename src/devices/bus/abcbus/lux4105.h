@@ -78,9 +78,9 @@ private:
 	UINT8 m_dma;
 
 	int m_sasi_bsy;
-	int m_sasi_req;
-	int m_sasi_cd;
-	int m_sasi_io;
+	bool m_sasi_req;
+	bool m_sasi_cd;
+	bool m_sasi_io;
 };
 
 

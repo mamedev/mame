@@ -12,6 +12,7 @@
 !/scripts/
 !/src/
 !/tests/
+!/doxygen/
 !/web/
 !/.gitattributes
 !/.gitignore
@@ -19,6 +20,8 @@
 !/makefile
 !/mame.doxygen
 !/*.md
+/.idea
 src/regtests/chdman/temp
 src/regtests/jedutil/output
 *.pyc
+/CMakeLists.txt 

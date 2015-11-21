@@ -197,25 +197,6 @@ enum
 #define MIPS3_MAX_FASTRAM       3
 #define MIPS3_MAX_HOTSPOTS      16
 
-enum
-{
-	CPUINFO_INT_MIPS3_DRC_OPTIONS = CPUINFO_INT_CPU_SPECIFIC,
-
-	CPUINFO_INT_MIPS3_FASTRAM_SELECT,
-	CPUINFO_INT_MIPS3_FASTRAM_START,
-	CPUINFO_INT_MIPS3_FASTRAM_END,
-	CPUINFO_INT_MIPS3_FASTRAM_READONLY,
-
-	CPUINFO_INT_MIPS3_HOTSPOT_SELECT,
-	CPUINFO_INT_MIPS3_HOTSPOT_PC,
-	CPUINFO_INT_MIPS3_HOTSPOT_OPCODE,
-	CPUINFO_INT_MIPS3_HOTSPOT_CYCLES,
-
-	CPUINFO_PTR_MIPS3_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC
-};
-
-
-
 /***************************************************************************
     INTERRUPT CONSTANTS
 ***************************************************************************/
@@ -300,7 +281,8 @@ public:
 	void clear_fastram(UINT32 select_start);
 	void mips3drc_set_options(UINT32 options);
 	void mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles);
-
+	void burn_cycles(INT32 cycles);
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -313,6 +295,7 @@ protected:
 	virtual UINT32 execute_input_lines() const { return 6; }
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
+	virtual void execute_burn(INT32 cycles) { m_totalcycles += cycles; }
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
@@ -366,6 +349,7 @@ private:
 	UINT32      m_nextpc;
 	UINT32      m_pcbase;
 	UINT8       m_cf[4][8];
+	bool        m_delayslot;
 	int         m_op;
 	int         m_interrupt_cycles;
 	UINT32      m_ll_value;

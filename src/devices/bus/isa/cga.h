@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
+	MC6845_RECONFIGURE(reconfigure);
 public:
 	int     m_framecnt;
 
@@ -69,7 +69,7 @@ public:
 	UINT8   m_color_select;  /* wo 0x3d9 */
 	//UINT8   m_status;   //unused?     /* ro 0x3da */
 
-	int     m_update_row_type;
+	int     m_update_row_type, m_y;
 	UINT8   m_palette_lut_2bpp[4];
 	offs_t  m_chr_gen_offset[4];
 	UINT8   m_font_selection_mask;
@@ -83,6 +83,7 @@ public:
 	UINT8   m_plantronics; /* This should be moved into the appropriate subclass */
 	offs_t  m_start_offset;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 // device type definition
@@ -268,12 +269,14 @@ class isa8_cga_m24_device :
 public:
 	// construction/destruction
 	isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual machine_config_constructor device_mconfig_additions() const;
 	// optional information overrides
 	//virtual const rom_entry *device_rom_region() const;
 	virtual DECLARE_READ8_MEMBER( io_read );
 	virtual DECLARE_WRITE8_MEMBER( io_write );
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( m24_gfx_1bpp_m24_update_row );
+	MC6845_RECONFIGURE(reconfigure);
 protected:
 	virtual void device_reset();
 private:
