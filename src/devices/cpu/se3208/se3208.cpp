@@ -550,7 +550,7 @@ INST(LEATOSP)
 	else
 		Offset=SEX(4,Offset);
 
-	m_SP=Index+Offset;
+	m_SP=(Index+Offset) & (~3);
 
 	CLRFLAG(FLAG_E);
 }
@@ -581,7 +581,7 @@ INST(LEASPTOSP)
 	else
 		Offset=SEX(10,Offset);
 
-	m_SP=m_SP+Offset;
+	m_SP=(m_SP+Offset) & (~3);
 
 	CLRFLAG(FLAG_E);
 }
