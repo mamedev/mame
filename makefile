@@ -327,6 +327,10 @@ endif
 ifeq ($(TARGETOS),os2)
 OSD := sdl
 endif
+
+ifeq ($(TARGETOS),asmjs)
+OSD := sdl
+endif
 endif
 
 #-------------------------------------------------

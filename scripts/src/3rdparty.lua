@@ -371,7 +371,7 @@ end
 		defines {
 			"LUA_COMPAT_ALL",
 		}
-	if not (_OPTIONS["targetos"]=="windows") then
+	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
 		defines {
 			"LUA_USE_POSIX",
 		}
