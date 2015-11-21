@@ -913,11 +913,43 @@ ROM_END
 
 ROM_START( ripribit )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_LOAD16_BYTE( "ribbit_vc8_v3.5.vc8", 0x000000, 0x080000, CRC(8ce7f8f2) SHA1(b40b5127a0dc84a44e0283711cc526114e012c09) )
+	ROM_LOAD16_BYTE( "ribbit_vc9_v3.5.vc9", 0x000001, 0x080000, CRC(70be27c3) SHA1(61328e51d083b0ffde739711675d19cfe3253244) )
+
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_LOAD16_BYTE( "ribbit_gr1_rv2.81.gr1",   0x000000, 0x100000, CRC(e02c79b7) SHA1(75e352424c449cd5cba1057555928d7ee13ab113) )
+	ROM_LOAD16_BYTE( "ribbit_gr2_rv2.81.gr2",   0x000001, 0x100000, CRC(09f48db7) SHA1(d0156c6e3d05ff81540c0eeb66e9a5e7fc4d053c) )
+	ROM_LOAD16_BYTE( "ribbit_gr4_rv2.81.gr4",   0x200000, 0x100000, CRC(94d0db81) SHA1(aa46c2e5a627cf01c1d57002204ec3419f0d4503) )
+	ROM_LOAD16_BYTE( "ribbit_gr3_rv2.81.gr3",   0x200001, 0x100000, CRC(b65e1a36) SHA1(4feb7ea0bec509fa07d27c76e5a3904b8d1690c4) )
+	ROM_LOAD16_BYTE( "ribbit_gr6_rv2.81.gr6",   0x400000, 0x100000, CRC(c9ac211b) SHA1(75cbfa0f875da82d510d75ad28b9db0892b3da85) )
+	ROM_LOAD16_BYTE( "ribbit_gr5_rv2.81.gr5",   0x400001, 0x100000, CRC(84ae466a) SHA1(4e7b3dc27a46f735ff13a753806b3688f34a64fe) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )  /* sound data (music) */
+	ROM_LOAD( "ribbit_rr_u20.u20", 0x00000, 0x80000, CRC(c345b779) SHA1(418058bbda74727ec99ac375982c9cd2c8bc5c86) )
+
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )                /* sound data */
+	/* Not populated */
+
+	ROM_REGION( 0x80000, "oki3", 0 ) /* sound data (effects) */
+	ROM_LOAD( "ribbit_rr_u18.u18", 0x00000, 0x80000, CRC(badb9cb6) SHA1(716d65b5ff8d3f8ff25ae70426ce318af9a92b7e) )
+
+	ROM_REGION( 0x80000, "user2", 0 ) /* convert these */
+	ROM_LOAD( "vc-12.jed", 0x0000, 0x3f03, CRC(6947ea9e) SHA1(5a418cd04851841a49beeeea274c1441fefde173) )
+	ROM_LOAD( "vc-16.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )
+	ROM_LOAD( "vc-22.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )
+	ROM_LOAD( "vc-23.jed", 0x0000, 0x3efa, CRC(c054cb13) SHA1(1a45548747712112e2457bd933db5ced70dae72e) )
+	ROM_LOAD( "vc-24.jed", 0x0000, 0x3efa, CRC(c054cb13) SHA1(1a45548747712112e2457bd933db5ced70dae72e) )
+	/* 25 / 26 are secure? */
+ROM_END
+
+
+ROM_START( ripribita )
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "rr_v2-84-vc8.bin", 0x000000, 0x080000, CRC(5ecc432d) SHA1(073062528fbcf63be7e3c6695d60d048430f6e4b) )
 	ROM_LOAD16_BYTE( "rr_v2-84-vc9.bin", 0x000001, 0x080000, CRC(d9bae3f8) SHA1(fcf8099ebe170ad5778aaa533bcfd1e5ead46e6b) )
 
 	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
-	ROM_LOAD16_BYTE( "rr-gr1.bin",   0x000000, 0x100000, CRC(e02c79b7) SHA1(75e352424c449cd5cba1057555928d7ee13ab113) )
+	ROM_LOAD16_BYTE( "rr-gr1.bin",   0x000000, 0x100000, CRC(e02c79b7) SHA1(75e352424c449cd5cba1057555928d7ee13ab113) ) /* Same data, different labels */
 	ROM_LOAD16_BYTE( "rr-gr2.bin",   0x000001, 0x100000, CRC(09f48db7) SHA1(d0156c6e3d05ff81540c0eeb66e9a5e7fc4d053c) )
 	ROM_LOAD16_BYTE( "rr-gr4.bin",   0x200000, 0x100000, CRC(94d0db81) SHA1(aa46c2e5a627cf01c1d57002204ec3419f0d4503) )
 	ROM_LOAD16_BYTE( "rr-gr3.bin",   0x200001, 0x100000, CRC(b65e1a36) SHA1(4feb7ea0bec509fa07d27c76e5a3904b8d1690c4) )
@@ -925,13 +957,13 @@ ROM_START( ripribit )
 	ROM_LOAD16_BYTE( "rr-gr5.bin",   0x400001, 0x100000, CRC(84ae466a) SHA1(4e7b3dc27a46f735ff13a753806b3688f34a64fe) )
 
 	ROM_REGION( 0x80000, "oki1", 0 )  /* sound data (music) */
-	ROM_LOAD( "rr-s-u20.bin", 0x00000, 0x80000, CRC(c345b779) SHA1(418058bbda74727ec99ac375982c9cd2c8bc5c86) )
+	ROM_LOAD( "rr-s-u20.bin", 0x00000, 0x80000, CRC(c345b779) SHA1(418058bbda74727ec99ac375982c9cd2c8bc5c86) ) /* Same data, different label */
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )                /* sound data */
-//  ROM_LOAD( "rr-s-u21.bin", 0x00000, 0x80000 ) // not populated
+	/* Not populated */
 
 	ROM_REGION( 0x80000, "oki3", 0 ) /* sound data (effects) */
-	ROM_LOAD( "rr-s-u18.bin", 0x00000, 0x80000, CRC(badb9cb6) SHA1(716d65b5ff8d3f8ff25ae70426ce318af9a92b7e) )
+	ROM_LOAD( "rr-s-u18.bin", 0x00000, 0x80000, CRC(badb9cb6) SHA1(716d65b5ff8d3f8ff25ae70426ce318af9a92b7e) ) /* Same data, different label */
 
 	ROM_REGION( 0x80000, "user2", 0 ) /* convert these */
 	ROM_LOAD( "vc-12.jed", 0x0000, 0x3f03, CRC(6947ea9e) SHA1(5a418cd04851841a49beeeea274c1441fefde173) )
@@ -1015,6 +1047,7 @@ GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  driver_device, 0,        R
 GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
 GAME( 1997, eggventra, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
 GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
+GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
+GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
 GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
 GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )
