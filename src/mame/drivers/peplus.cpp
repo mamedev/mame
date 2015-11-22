@@ -2053,6 +2053,11 @@ ROM_END
 
 ROM_START( pepp0048 ) /* Normal board : Joker Poker (PP0048) */
 /*
+                                            w/J     w/oJ
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+   YD       1    1   2   3    5   7  15  50 100 200 400    940
+  % Range: 92.7-94.7%  Optimum: 96.7%  Hit Frequency: 44.1%
      Programs Available: PP0048
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2385,7 +2390,8 @@ ROM_START( pepp0064 ) /* Normal board : Joker Poker (PP0064) */
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
-  ????      1    1   2   3    4   5  20  40 100 200 500    ???
+  P17A      1    1   2   3    4   5  20  40 100 200 500    800
+  % Range: 91.5-92.5%  Optimum: 95.5%  Hit Frequency: 44.7%
      Programs Available: PP0064
 
 */
@@ -2751,7 +2757,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "cap953.u50", 0x0000, 0x0100, CRC(6ece50ad) SHA1(bc5761303b09625850ba50263607d11871ea3ed3) )
 ROM_END
 
-ROM_START( pepp0132 ) /* Normal board : Standard Draw Poker (PP0132) */
+ROM_START( pepp0132 ) /* Normal board : Standard Draw Poker (PP0132) - requires SET chip to set denomination */
 /*
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 ---------------------------------------------------------
@@ -3442,7 +3448,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0221a ) /* Normal board : Standard Draw Poker (PP0221) */
+ROM_START( pepp0221a ) /* Normal board : Standard Draw Poker (PP0221) - requires SET chip to set denomination */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -3998,7 +4004,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0420 ) /* Normal board : Standard Draw Poker (No Double-up) (PP0420) */
+ROM_START( pepp0420 ) /* Normal board : Standard Draw Poker (No Double-up) (PP0420) - requires SET chip to set denomination */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -4040,7 +4046,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0423a ) /* Normal board : Standard Draw Poker (No Double-up) (PP0423) */
+ROM_START( pepp0423a ) /* Normal board : Standard Draw Poker (No Double-up) (PP0423) - requires SET chip to set denomination */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -4108,7 +4114,7 @@ ROM_START( pepp0426 ) /* Normal board : Joker Poker (No Double-up) (PP0426) */
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
-   YD       1    1   1   3    5   7  15  50 100 200 400    940
+   YD       1    1   2   3    5   7  15  50 100 200 400    940
   % Range: 92.7-94.7%  Optimum: 96.7%  Hit Frequency: 44.1%
      Programs Available: PP0568, X000568P & PP0426 - Non Double-up Only
 */
@@ -5003,7 +5009,7 @@ ROM_START( pepp0568 ) /* Normal board : Joker Poker (PP0568) */
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
-   YD       1    1   1   3    5   7  15  50 100 200 400    940
+   YD       1    1   2   3    5   7  15  50 100 200 400    940
   % Range: 92.7-94.7%  Optimum: 96.7%  Hit Frequency: 44.1%
      Programs Available: PP0568, X000568P & PP0426 - Non Double-up Only
 */
@@ -8056,7 +8062,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
    ZA       1    1   2   3    5   7  20  50 100 200 400    800
   % Range: 99.2-98.2%  Optimum: 100.2%  Hit Frequency: 44.2%
-     Programs Available: PP0588, X000588
+     Programs Available: PP0588, X000588P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
