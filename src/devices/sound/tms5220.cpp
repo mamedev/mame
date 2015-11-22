@@ -377,6 +377,8 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_old_frame_energy_idx));
 	save_item(NAME(m_old_frame_pitch_idx));
 	save_item(NAME(m_old_frame_k_idx));
+	save_item(NAME(m_old_zpar));
+	save_item(NAME(m_old_uv_zpar));
 #endif
 	save_item(NAME(m_current_energy));
 	save_item(NAME(m_current_pitch));
