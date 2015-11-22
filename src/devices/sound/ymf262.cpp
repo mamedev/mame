@@ -343,7 +343,7 @@ static const UINT32 ksl_tab[8*16]=
 #undef DV
 
 /* 0 / 3.0 / 1.5 / 6.0 dB/OCT */
-static const UINT32 ksl_shift[4] = { 31, 2, 1, 0 };
+static const UINT32 ksl_shift[4] = { 31, 1, 2, 0 };
 
 
 /* sustain level table (3dB per step) */
