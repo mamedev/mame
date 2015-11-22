@@ -800,13 +800,6 @@ int renderer::device_create(HWND device_hwnd)
 		device_delete();
 	}
 
-	// create shader options only once
-	if (m_shaders_options == NULL)
-	{
-		m_shaders_options = (hlsl_options*)global_alloc_clear(hlsl_options);
-		m_shaders_options->params_init = false;
-	}
-
 	// verify the caps
 	int verify = device_verify_caps();
 	if (verify == 2)
@@ -919,9 +912,21 @@ try_again:
 		}
 	}
 
-	int ret = m_shaders->create_resources(false);
-	if (ret != 0)
-		return ret;
+	// create shader options only once
+	if (m_shaders_options == NULL)
+	{
+		m_shaders_options = (hlsl_options*)global_alloc_clear(hlsl_options);
+		m_shaders_options->params_init = false;
+	}
+
+	m_shaders = (shaders*)global_alloc_clear(shaders);
+	m_shaders->init(d3dintf, &window().machine(), this);
+
+	int failed = m_shaders->create_resources(false);
+	if (failed)
+	{
+		return failed;
+	}
 
 	return device_create_resources();
 }
@@ -998,13 +1003,13 @@ int renderer::device_create_resources()
 
 renderer::~renderer()
 {
+	device_delete();
+
 	if (m_shaders_options != NULL)
 	{
 		global_free(m_shaders_options);
+		m_shaders_options = NULL;
 	}
-	m_shaders_options = NULL;
-
-	device_delete();
 }
 
 void renderer::device_delete()
@@ -1024,16 +1029,16 @@ void renderer::device_delete()
 	if (m_texture_manager != NULL)
 	{
 		global_free(m_texture_manager);
+		m_texture_manager = NULL;
 	}
-	m_texture_manager = NULL;
 
 	// free the device itself
 	if (m_device != NULL)
 	{
 		(*d3dintf->device.reset)(m_device, &m_presentation);
 		(*d3dintf->device.release)(m_device);
+		m_device = NULL;
 	}
-	m_device = NULL;
 }
 
 
@@ -1044,11 +1049,16 @@ void renderer::device_delete()
 void renderer::device_delete_resources()
 {
 	if (m_texture_manager != NULL)
+	{
 		m_texture_manager->delete_resources();
+	}
+
 	// free the vertex buffer
 	if (m_vertexbuf != NULL)
+	{
 		(*d3dintf->vertexbuf.release)(m_vertexbuf);
-	m_vertexbuf = NULL;
+		m_vertexbuf = NULL;
+	}
 }
 
 
@@ -1059,9 +1069,6 @@ void renderer::device_delete_resources()
 int renderer::device_verify_caps()
 {
 	int retval = 0;
-
-	m_shaders = (shaders*)global_alloc_clear(shaders);
-	m_shaders->init(d3dintf, &window().machine(), this);
 
 	DWORD tempcaps;
 	HRESULT result = (*d3dintf->d3d.get_caps_dword)(d3dintf, m_adapter, D3DDEVTYPE_HAL, CAPS_MAX_PS30_INSN_SLOTS, &tempcaps);
@@ -1138,9 +1145,8 @@ int renderer::device_test_cooperative()
 		osd_printf_verbose("Direct3D: resetting device\n");
 
 		// free all existing resources and call reset on the device
-		//device_delete();
-		device_delete_resources();
 		m_shaders->delete_resources(true);
+		device_delete_resources();
 		result = (*d3dintf->device.reset)(m_device, &m_presentation);
 
 		// if it didn't work, punt to GDI

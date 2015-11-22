@@ -101,12 +101,6 @@ shaders::shaders() :
 
 shaders::~shaders()
 {
-	if (options != NULL)
-	{
-		last_options = *options;
-	}
-	options = NULL;
-
 	cache_target *currcache = cachehead;
 	while(cachehead != NULL)
 	{
@@ -654,11 +648,6 @@ void shaders::set_texture(texture_info *texture)
 
 void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *renderer)
 {
-	if (&machine->system() == &GAME_NAME(___empty))
-	{
-		return;
-	}
-
 	if (!d3dintf->post_fx_available)
 	{
 		return;
@@ -669,6 +658,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	{
 		printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
 		d3dintf->post_fx_available = false;
+
 		return;
 	}
 
@@ -676,6 +666,12 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	this->machine = machine;
 	this->d3d = renderer;
 	this->options = renderer->get_shaders_options();
+
+	// check if no driver loaded (not all settings might be loaded yet)
+	if (&machine->system() == &GAME_NAME(___empty))
+	{
+		return;
+	}
 
 	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
@@ -847,6 +843,11 @@ int shaders::create_resources(bool reset)
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
 		return 0;
+	}
+
+	if (last_options.params_init)
+	{
+		options = &last_options;
 	}
 
 	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
@@ -2038,6 +2039,12 @@ void shaders::delete_resources(bool reset)
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
 		return;
+	}
+
+	if (options != NULL)
+	{
+		last_options = *options;
+		options = NULL;
 	}
 
 	initialized = false;
