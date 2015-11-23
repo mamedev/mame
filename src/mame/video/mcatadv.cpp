@@ -216,7 +216,7 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 {
 	int i;
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(0x3f0, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	if (m_scroll1[2] != m_palette_bank1)
