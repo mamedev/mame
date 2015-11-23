@@ -61,7 +61,7 @@ UINT32 se3208_device::read_dword_unaligned(address_space &space, UINT32 address)
 	case 1:
 	case 2:
 	case 3:
-		printf("%08x: dword READ unaligned %d\n", m_PC, address);
+		printf("%08x: dword READ unaligned %08x\n", m_PC, address);
 #if ALLOW_UNALIGNED_DWORD_ACCESS
 		return space.read_byte(address) | space.read_byte(address + 1) << 8 | space.read_byte(address + 2) << 16 | space.read_byte(address + 3) << 24;
 #else
@@ -97,7 +97,7 @@ void se3208_device::write_dword_unaligned(address_space &space, UINT32 address, 
 		space.write_byte(address + 2, (data >> 16) & 0xff);
 		space.write_byte(address + 3, (data >> 24) & 0xff);
 #endif
-		printf("%08x: dword WRITE unaligned %d\n", m_PC, address);
+		printf("%08x: dword WRITE unaligned %08x\n", m_PC, address);
 
 		break;
 	}
