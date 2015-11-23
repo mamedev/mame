@@ -21,8 +21,7 @@ struct vgvector
 
 // ======================> avgdvg_device
 
-class avgdvg_device : public device_t,
-                      public device_execute_interface
+class avgdvg_device : public device_t
 {
 public:
 	// construction/destruction
@@ -41,6 +40,8 @@ public:
 	void set_flip_x(int flip);
 	void set_flip_y(int flip);
 
+	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
+	TIMER_CALLBACK_MEMBER(run_state_machine);
 protected:
 	void apply_flipping(int *x, int *y);
 	void vg_set_halt(int dummy);
@@ -51,20 +52,21 @@ protected:
 
 	void register_state();
 
-    virtual void execute_run();
-    int m_icount;
-    
 	UINT8 *avgdvg_vectorram;
 	size_t avgdvg_vectorram_size;
 
-    UINT8 *avgdvg_colorram;
+	UINT8 *avgdvg_colorram;
 
-	int m_xmin, m_xmax, m_ymin, m_ymax;
-	int m_xcenter, m_ycenter;
-	int m_flipx, m_flipy;
 
-	int m_nvect;
+	int xmin, xmax, ymin, ymax;
+	int xcenter, ycenter;
+	emu_timer *vg_run_timer, *vg_halt_timer;
+
+	int flip_x, flip_y;
+
+	int nvect;
 	vgvector vectbuf[MAXVECT];
+
 
 	UINT16 m_pc;
 	UINT8 m_sp;
