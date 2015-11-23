@@ -7,8 +7,6 @@ Notes:
 Tilemap drawing is a killer on the first level of Nost due to the whole tilemap being dirty every frame.
 Sprite drawing is quite fast (See USER1 in the profiler)
 
-Nost final boss, the priority of the arms is under the tilemaps, everything else is above. Should it be blended? i.e. Shadow.
-
 ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 */
 
