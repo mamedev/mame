@@ -38,6 +38,9 @@
 //Precompute the instruction decoding in a big table
 #define INST(a) void se3208_device::a(UINT16 Opcode)
 
+// officeye and donghaer perform unaligned DWORD accesses, allowing them to happen causes the games to malfunction.
+// are such accesses simply illegal, be handled in a different way, or simply not be happening in the first place?
+#define ALLOW_UNALIGNED_DWORD_ACCESS 0
 
 const device_type SE3208 = &device_creator<se3208_device>;
 
@@ -58,9 +61,12 @@ UINT32 se3208_device::read_dword_unaligned(address_space &space, UINT32 address)
 	case 1:
 	case 2:
 	case 3:
-//		printf("dword read unaligned %d\n", address & 3);
+		printf("%08x: dword READ unaligned %d\n", m_PC, address);
+#if ALLOW_UNALIGNED_DWORD_ACCESS
 		return space.read_byte(address) | space.read_byte(address + 1) << 8 | space.read_byte(address + 2) << 16 | space.read_byte(address + 3) << 24;
-
+#else
+		return 0;
+#endif
 	}
 
 	return 0;
@@ -85,11 +91,14 @@ void se3208_device::write_dword_unaligned(address_space &space, UINT32 address, 
 	case 1:
 	case 2:
 	case 3:
+#if ALLOW_UNALIGNED_DWORD_ACCESS
 		space.write_byte(address, data & 0xff);
 		space.write_byte(address + 1, (data >> 8) & 0xff);
 		space.write_byte(address + 2, (data >> 16) & 0xff);
 		space.write_byte(address + 3, (data >> 24) & 0xff);
-//		printf("dword write unaligned %d\n", address & 3);
+#endif
+		printf("%08x: dword WRITE unaligned %d\n", m_PC, address);
+
 		break;
 	}
 
